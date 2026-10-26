@@ -144,7 +144,9 @@ class _LabelledPairingGraph:
     def _graph(self):
         tables = self._pairing_tables()
         size = self._size()
-        graph = Graph(loops=True, multiedges=False)
+        # GenericGraph.__eq__ compares edge labels only for weighted graphs.
+        # The canonical forms must retain their actual colours and pairings.
+        graph = Graph(loops=True, multiedges=False, weighted=True)
         graph.add_vertices(range(size))
         for left in range(size):
             colour = self._colouring(self._position(left))
