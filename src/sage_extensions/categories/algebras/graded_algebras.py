@@ -289,6 +289,7 @@ class GradedAlgebraMor(CategoricalMor):
         )
 
     @object_level
+    @cached_method
     def identity(self):
         if self.domain() is not self.codomain():
             raise ValueError(
