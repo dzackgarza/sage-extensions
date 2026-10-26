@@ -8641,8 +8641,7 @@ class EvenTwoElementaryLattices(OwnedCategoryOverBaseRing):
         if _engine_ring(self.base_ring()) is not SageZZ:
             raise TypeError("2-elementary integral lattices require the integer coefficient ring")
         return [
-            Lattices(self.base_ring()).Even().Nondegenerate(),
-            Lattices(self.base_ring()).FinitelyGenerated(),
+            Lattices(self.base_ring()).Even().Nondegenerate().FinitelyGenerated(),
         ]
 
     class ParentMethods:
