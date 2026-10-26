@@ -3,7 +3,7 @@ r"""A represented category ``Cat`` of categories, functors, and natural transfor
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Any, overload
+from typing import TYPE_CHECKING, Any
 
 from sage.categories.category import Category
 from sage.categories.map import Map
@@ -18,23 +18,23 @@ from sage.structure.parent import Parent
 from sage_extensions.categories.abstract_categories.mor_categories import (
     CategoricalMor,
     CategoryPacketMethods,
-    FixedMorCategory,
     MorCategories,
     MorCategoryConstruction,
     _category_mor_parent,
     _declared_construction,
     _precomposable,
 )
+from sage_extensions.categories.abstract_categories.mor_foundation import (
+    CategoricalArrow,
+    object_level,
+)
 from sage_extensions.categories.abstract_categories.objects import Objects
 from sage_extensions.categories.functors.core import (
-    _CompositeFunctor,
     Functor,
     IdentityFunctor,
     NaturalTransformation,
 )
 from sage_extensions.lexicon.category_theory import ObjectOfCategory
-from sage_extensions.owned_category import _object_of
-from sage_extensions.categories.abstract_categories.mor_foundation import CategoricalArrow, object_level
 
 if TYPE_CHECKING:
     from sage_extensions.categories.sets.indexed_families import IndexedFamily
@@ -78,7 +78,11 @@ class FunctorMorCategoryConstruction(MorCategoryConstruction):
         # declares the construction's class for its arrow and sequence
         # diagrams as the nested ``ArrowDiagrams`` / ``SequenceDiagrams``
         # (subclasses of these realizations), through its class inheritance.
-        name = "ArrowDiagrams" if realization is _WalkingArrowFunctorCategory else "SequenceDiagrams"
+        name = (
+            "ArrowDiagrams"
+            if realization is _WalkingArrowFunctorCategory
+            else "SequenceDiagrams"
+        )
         construction = _declared_construction(codomain, name)
         return realization if construction is None else construction
 
@@ -93,7 +97,8 @@ class FunctorMorCategoryConstruction(MorCategoryConstruction):
         if cached is not None:
             return cached
         return self._remember_between(
-            source, target,
+            source,
+            target,
             typecall(
                 self.fixed_category_class_for(source, target),
                 category,
@@ -123,7 +128,9 @@ class Cat(CategoryPacketMethods, Category):
     def __init__(self) -> None:
         self._arrows = {}
         if Cat._construction_instance is not None:
-            raise RuntimeError("Cat construction is re-entrant before its owned Objects root is initialized")
+            raise RuntimeError(
+                "Cat construction is re-entrant before its owned Objects root is initialized"
+            )
         # Objects records Cat as its placement category. Publish this partially
         # initialized instance only across the superclass construction, so
         # Objects._init_cat_object can reuse it rather than recursively calling
@@ -163,12 +170,19 @@ class Cat(CategoryPacketMethods, Category):
     def object(self, category: Category) -> Category:
         r"""Admit the actual category as an object of ``Cat``."""
         if not isinstance(category, Category):
-            raise TypeError(f"an object of Cat is a category, but {category!r} is not a category")
+            raise TypeError(
+                f"an object of Cat is a category, but {category!r} is not a category"
+            )
         return category
 
     _mor_endpoint = object
 
-    @cached_method(key=lambda self, domain, codomain: (id(self.object(domain)), id(self.object(codomain))))
+    @cached_method(
+        key=lambda self, domain, codomain: (
+            id(self.object(domain)),
+            id(self.object(codomain)),
+        )
+    )
     def functor_mor(
         self,
         domain: Category,
@@ -217,11 +231,11 @@ class Cat(CategoryPacketMethods, Category):
         This is ``Functor.Fiber`` in Mathlib's
         ``CategoryTheory/FiberedCategory/Fiber.lean``.
         """
-        pass
 
-    def fiber_inclusion(self, functor: Functor, target_object: ObjectOfCategory) -> Functor:
+    def fiber_inclusion(
+        self, functor: Functor, target_object: ObjectOfCategory
+    ) -> Functor:
         r"""Include the strict fiber of ``functor`` in its domain category."""
-        pass
 
     class ParentMethods:
         r"""What a category can do, as an object of ``Cat``.
@@ -239,7 +253,9 @@ class Cat(CategoryPacketMethods, Category):
         """
 
         _mor_endpoint = CategoryPacketMethods._mor_endpoint
-        _mor_endpoints_in_supercategory = CategoryPacketMethods._mor_endpoints_in_supercategory
+        _mor_endpoints_in_supercategory = (
+            CategoryPacketMethods._mor_endpoints_in_supercategory
+        )
         ArrowCategory = CategoryPacketMethods.ArrowCategory
         Core = CategoryPacketMethods.Core
         category_packet = CategoryPacketMethods.category_packet
@@ -277,7 +293,9 @@ class Cat(CategoryPacketMethods, Category):
                 _CoproductCoconeCategory,
             )
 
-            return _CoproductCoconeCategory(self.coproduct_construction(cofactors).diagram())
+            return _CoproductCoconeCategory(
+                self.coproduct_construction(cofactors).diagram()
+            )
 
         def Biproduct(self, factors) -> Category:
             r"""Return the owned category of the selected biproduct object."""
@@ -324,7 +342,9 @@ class Cat(CategoryPacketMethods, Category):
             )
 
             if diagram.codomain() is not self:
-                raise ValueError(f"the diagram {diagram} does not take values in {self}")
+                raise ValueError(
+                    f"the diagram {diagram} does not take values in {self}"
+                )
             return _ConeCategory(diagram)
 
         def Cocone(self, diagram: Functor) -> Category:
@@ -334,7 +354,9 @@ class Cat(CategoryPacketMethods, Category):
             )
 
             if diagram.codomain() is not self:
-                raise ValueError(f"the diagram {diagram} does not take values in {self}")
+                raise ValueError(
+                    f"the diagram {diagram} does not take values in {self}"
+                )
             return _CoconeCategory(diagram)
 
         def Arrow(self) -> Category:
@@ -355,7 +377,9 @@ class Cat(CategoryPacketMethods, Category):
 
         def inclusion_into(self, supercategory: Category):
             r"""Return the canonical inclusion functor into a declared supercategory."""
-            from sage_extensions.categories.functors.core import _CategoryInclusionFunctor
+            from sage_extensions.categories.functors.core import (
+                _CategoryInclusionFunctor,
+            )
 
             return _CategoryInclusionFunctor(self, supercategory)
 
@@ -385,9 +409,15 @@ class Cat(CategoryPacketMethods, Category):
             a represented complete set of arrows, retaining the actual
             source/target maps and their universal quotient.
             """
-            from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+            from sage_extensions.categories.sets.finite_ordered_sets import (
+                finite_ordered_set,
+            )
             from sage_extensions.categories.sets.indexed_families import IndexedFamily
-            from sage_extensions.categories.sets.set_categories import EnumeratedSets, FiniteSets, Sets
+            from sage_extensions.categories.sets.set_categories import (
+                EnumeratedSets,
+                FiniteSets,
+                Sets,
+            )
 
             indices = self.object_set()
             if indices not in FiniteSets() or indices not in EnumeratedSets():
@@ -397,10 +427,13 @@ class Cat(CategoryPacketMethods, Category):
                 )
             objects = (
                 finite_ordered_set(tuple(self.objects()))
-                if hasattr(self, "objects") else indices
+                if hasattr(self, "objects")
+                else indices
             )
             if not all(obj in self for obj in objects):
-                raise TypeError(f"the selected object set of {self} is not admitted in that category")
+                raise TypeError(
+                    f"the selected object set of {self} is not admitted in that category"
+                )
             presented = self.arrows()
             arrows = (
                 finite_ordered_set(tuple(presented))
@@ -414,9 +447,7 @@ class Cat(CategoryPacketMethods, Category):
                     f"the category {self} needs a complete owned arrow set, "
                     f"but its arrow presentation is {arrows}"
                 )
-            source = Sets().Mor(arrows, objects)(
-                lambda arrow: objects(arrow.domain())
-            )
+            source = Sets().Mor(arrows, objects)(lambda arrow: objects(arrow.domain()))
             target = Sets().Mor(arrows, objects)(
                 lambda arrow: objects(arrow.codomain())
             )
@@ -495,11 +526,15 @@ class Cat(CategoryPacketMethods, Category):
         ElementType = CategoryPacketMethods.ElementType
 
         @abstract_method(optional=True)
-        def _categorical_tensor_product(self, left: Parent, right: Parent) -> ObjectOfCategory:
+        def _categorical_tensor_product(
+            self, left: Parent, right: Parent
+        ) -> ObjectOfCategory:
             r"""Return this category's represented tensor product of two objects."""
 
         @abstract_method(optional=True)
-        def _categorical_biproduct(self, left: Parent, right: Parent) -> ObjectOfCategory:
+        def _categorical_biproduct(
+            self, left: Parent, right: Parent
+        ) -> ObjectOfCategory:
             r"""Return this category's represented biproduct of two objects."""
 
         @abstract_method(optional=True)
@@ -511,7 +546,9 @@ class Cat(CategoryPacketMethods, Category):
             r"""Return the selected product with its discrete diagram and universal cone."""
 
         @abstract_method(optional=True)
-        def _categorical_coproduct(self, left: Parent, right: Parent) -> ObjectOfCategory:
+        def _categorical_coproduct(
+            self, left: Parent, right: Parent
+        ) -> ObjectOfCategory:
             r"""Return this category's represented coproduct of two objects."""
 
         @abstract_method(optional=True)
@@ -567,7 +604,9 @@ class Cat(CategoryPacketMethods, Category):
             r"""Return the selected coequalizer with its diagram, cocone and factorization."""
 
         @abstract_method(optional=True)
-        def _categorical_equalizer_family(self, morphisms: IndexedFamily) -> ObjectOfCategory:
+        def _categorical_equalizer_family(
+            self, morphisms: IndexedFamily
+        ) -> ObjectOfCategory:
             r"""Return this category's represented equalizer of an indexed arrow family."""
 
         @abstract_method(optional=True)
@@ -575,11 +614,15 @@ class Cat(CategoryPacketMethods, Category):
             r"""Return the selected wide equalizer with its diagram, cone and factorization."""
 
         @abstract_method(optional=True)
-        def _categorical_coequalizer_family(self, morphisms: IndexedFamily) -> ObjectOfCategory:
+        def _categorical_coequalizer_family(
+            self, morphisms: IndexedFamily
+        ) -> ObjectOfCategory:
             r"""Return this category's represented coequalizer of an indexed arrow family."""
 
         @abstract_method(optional=True)
-        def _categorical_coequalizer_family_construction(self, morphisms: IndexedFamily):
+        def _categorical_coequalizer_family_construction(
+            self, morphisms: IndexedFamily
+        ):
             r"""Return the selected wide coequalizer with its diagram, cocone and factorization."""
 
         def product_construction(self, factors):
@@ -819,7 +862,9 @@ class Cat(CategoryPacketMethods, Category):
         ) -> Morphism:
             r"""Return the induced morphism between represented binary coproducts."""
 
-        def fiber_product(self, left_leg: Morphism, right_leg: Morphism) -> ObjectOfCategory:
+        def fiber_product(
+            self, left_leg: Morphism, right_leg: Morphism
+        ) -> ObjectOfCategory:
             r"""Return the fiber product of the cospan these two legs form.
 
             \(A\times_C B\) is the equalizer of \(f p_A\) and \(g p_B\) on
@@ -864,9 +909,13 @@ class Cat(CategoryPacketMethods, Category):
                 (left_leg.codomain(), right_leg.codomain()),
                 target_category=self,
             )
-            return (diagram).Spans().cone(
-                left_leg.domain(),
-                lambda index: legs[int(index.value())],
+            return (
+                (diagram)
+                .Spans()
+                .cone(
+                    left_leg.domain(),
+                    lambda index: legs[int(index.value())],
+                )
             )
 
         def ProductCones(self, factors) -> Category:
@@ -952,6 +1001,7 @@ class Cat(CategoryPacketMethods, Category):
             )
 
             return _EndArrowCategory(self)
+
         def IsoArrowCategory(self) -> Category:
             r"""Return the full arrow subcategory on represented isomorphisms."""
             from sage_extensions.categories.abstract_categories.arrow_categories import (
@@ -959,6 +1009,7 @@ class Cat(CategoryPacketMethods, Category):
             )
 
             return _IsoArrowCategory(self)
+
         def AutomorphismArrowCategory(self) -> Category:
             r"""Return the full arrow subcategory on automorphisms."""
             from sage_extensions.categories.abstract_categories.arrow_categories import (
@@ -966,6 +1017,7 @@ class Cat(CategoryPacketMethods, Category):
             )
 
             return _AutomorphismArrowCategory(self)
+
         def MonomorphismArrowCategory(self) -> Category:
             r"""Return the full arrow subcategory on represented monomorphisms."""
             from sage_extensions.categories.abstract_categories.arrow_categories import (
@@ -973,6 +1025,7 @@ class Cat(CategoryPacketMethods, Category):
             )
 
             return _MonomorphismArrowCategory(self)
+
         def EpimorphismArrowCategory(self) -> Category:
             r"""Return the full arrow subcategory on represented epimorphisms."""
             from sage_extensions.categories.abstract_categories.arrow_categories import (
@@ -980,6 +1033,7 @@ class Cat(CategoryPacketMethods, Category):
             )
 
             return _EpimorphismArrowCategory(self)
+
         def WideSubcategory(self, arrow_category: Category) -> Category:
             r"""Return the wide subcategory with the selected arrow class."""
             from sage_extensions.categories.abstract_categories.arrow_categories import (
@@ -987,6 +1041,7 @@ class Cat(CategoryPacketMethods, Category):
             )
 
             return _WideSubcategory(self, arrow_category)
+
         def SliceOver(self, base_object: Parent) -> Category:
             r"""Return the slice \(C/X\)."""
             from sage_extensions.categories.abstract_categories.arrow_categories import (
@@ -994,6 +1049,7 @@ class Cat(CategoryPacketMethods, Category):
             )
 
             return SliceCategory(self, base_object)
+
         def CosliceUnder(self, base_object: Parent) -> Category:
             r"""Return the coslice \(X/C\)."""
             from sage_extensions.categories.abstract_categories.arrow_categories import (
@@ -1001,6 +1057,7 @@ class Cat(CategoryPacketMethods, Category):
             )
 
             return CosliceCategory(self, base_object)
+
         def SubobjectCategory(self, base_object: Parent) -> Category:
             r"""Return the category of subobjects of ``base_object`` here."""
             from sage_extensions.categories.abstract_categories.arrow_categories import (
@@ -1067,10 +1124,13 @@ class Cat(CategoryPacketMethods, Category):
 
         def Subobjects(self, base_object: Parent) -> Category:
             return self.SubobjectCategory(base_object)
+
         def Superobjects(self, base_object: Parent) -> Category:
             return self.SuperobjectCategory(base_object)
+
         def CoveringObjects(self, base_object: Parent) -> Category:
             return self.CoveringObjectCategory(base_object)
+
         def CoveredObjects(self, base_object: Parent) -> Category:
             return self.CoveredObjectCategory(base_object)
 
@@ -1095,7 +1155,9 @@ class Cat(CategoryPacketMethods, Category):
         are inverted.
         """
         members = tuple(categories)
-        assert members, "the meet of categories needs at least one category, but none was given"
+        assert members, (
+            "the meet of categories needs at least one category, but none was given"
+        )
 
         # ``Category.join`` builds one dynamic class from every supplied
         # branch.  A strict supercategory contributes no new mathematics to
@@ -1136,10 +1198,14 @@ class Cat(CategoryPacketMethods, Category):
         two names arrive inverted.
         """
         members = tuple(categories)
-        assert members, "the join of categories needs at least one category, but none was given"
+        assert members, (
+            "the join of categories needs at least one category, but none was given"
+        )
         return Category.meet(members)
 
-    def presheaves(self, category: Category, value_category: Category | None = None) -> Category:
+    def presheaves(
+        self, category: Category, value_category: Category | None = None
+    ) -> Category:
         r"""The presheaf bifunctor on objects: \((C, D) \mapsto [C^{op}, D]\).
 
         ``Cat`` is not an object of itself here, so the bifunctor
@@ -1148,7 +1214,9 @@ class Cat(CategoryPacketMethods, Category):
         """
         return category.presheaves(value_category)
 
-    def presheaf_transport(self, site_functor: Functor, value_functor: Functor) -> Functor:
+    def presheaf_transport(
+        self, site_functor: Functor, value_functor: Functor
+    ) -> Functor:
         r"""The presheaf bifunctor on arrows.
 
         For \(F: C' \to C\) and \(G: D \to D'\), the functor
@@ -1208,7 +1276,7 @@ class NaturalTransformationMorphism(CategoricalArrow, CategoricalMor.ElementMeth
         parent: NaturalTransformationMor,
         transformation: NaturalTransformation,
     ) -> None:
-        Morphism.__init__(self, parent)
+        CategoricalArrow.__init__(self, parent)
         if transformation.source() is not parent.source():
             raise ValueError(
                 f"a morphism {self.domain()} -> {self.codomain()} in the functor category needs a natural "
@@ -1236,7 +1304,7 @@ class NaturalTransformationMorphism(CategoricalArrow, CategoricalMor.ElementMeth
     def naturality_square(self, morphism: Map):
         return self.transformation().naturality_square(morphism)
 
-    def __eq__(self, other: Any) -> bool | Predicate:
+    def __eq__(self, other: object) -> bool | Predicate:
         r"""Compare every component when the domain is a represented finite chain.
 
         Equality of natural transformations is equality of their component
@@ -1249,15 +1317,19 @@ class NaturalTransformationMorphism(CategoricalArrow, CategoricalMor.ElementMeth
             return False
         if self.transformation() is other.transformation():
             return True
-        from sage_extensions.categories.abstract_categories.products import FiniteOrdinalCategory
+        from sage_extensions.categories.abstract_categories.products import (
+            FiniteOrdinalCategory,
+        )
         from sage_extensions.logic import AtomicProposition, conjunction
 
         shape = self.transformation().source().domain()
         if isinstance(shape, FiniteOrdinalCategory):
-            return conjunction(self.component(obj) == other.component(obj) for obj in shape.objects())
+            return conjunction(
+                self.component(obj) == other.component(obj) for obj in shape.objects()
+            )
         return AtomicProposition("equal", self, other)
 
-    def __ne__(self, other: Any) -> bool | Predicate:
+    def __ne__(self, other: object) -> bool | Predicate:
         from sage_extensions.logic import negation
 
         return negation(self == other)
@@ -1280,8 +1352,10 @@ class NaturalTransformationMorphism(CategoricalArrow, CategoricalMor.ElementMeth
             target,
             lambda obj: self.component(obj) * other.component(obj),
         )
-        return self.parent().functor_category().Mor(other.domain(), self.codomain())(
-            composite
+        return (
+            self.parent()
+            .functor_category()
+            .Mor(other.domain(), self.codomain())(composite)
         )
 
 
@@ -1294,9 +1368,7 @@ class NaturalTransformationMor(CategoricalMor):
         domain: Parent,
         codomain: Parent,
     ) -> None:
-        CategoricalMor.__init__(
-            self, family, domain, codomain
-        )
+        CategoricalMor.__init__(self, family, domain, codomain)
 
     def functor_category(self) -> _FunctorCategory:
         return self.base_category()
@@ -1311,11 +1383,17 @@ class NaturalTransformationMor(CategoricalMor):
         r"""A natural transformation between these two functors, given as one or by its components."""
         return self._transformation(transformation)
 
-    def _transformation(self, transformation, *, element_class=None, construction_data=None):
+    def _transformation(
+        self, transformation, *, element_class=None, construction_data=None
+    ):
         r"""Construct one transformation, optionally with a private realization."""
         match transformation:
             case NaturalTransformationMorphism():
-                if transformation.parent() is self and element_class is None and construction_data is None:
+                if (
+                    transformation.parent() is self
+                    and element_class is None
+                    and construction_data is None
+                ):
                     return transformation
                 transformation = transformation.transformation()
             case NaturalTransformation():
@@ -1400,8 +1478,12 @@ def _apex_isomorphism_in_subgroup(witness, subgroup, stabilizer_generators):
     )
     stabilizer = group.subgroup(stabilizer_generators)
     inclusion = stabilizer.inclusion()
-    action = FiniteGSets(stabilizer)(cosets, lambda element, point: cosets.act(inclusion(element), point))
-    transporter = action.transporter_witness(cosets.coset_of(~witness), cosets.base_point())
+    action = FiniteGSets(stabilizer)(
+        cosets, lambda element, point: cosets.act(inclusion(element), point)
+    )
+    transporter = action.transporter_witness(
+        cosets.coset_of(~witness), cosets.base_point()
+    )
     return None if transporter is None else witness * ~inclusion(transporter)
 
 
@@ -1453,7 +1535,9 @@ class _FunctorCategory(CategoricalMor):
     Element = Functor
 
     @staticmethod
-    def __classcall__(cls, category_of_categories: Cat, domain: Category, codomain: Category):
+    def __classcall__(
+        cls, category_of_categories: Cat, domain: Category, codomain: Category
+    ):
         r"""``[C, D]`` is built only by ``Cat``'s Mor family, which interns it.
 
         Naming a realization directly asks that family, so the walking-arrow
@@ -1571,7 +1655,9 @@ class _FunctorCategory(CategoricalMor):
 
     def _marking_shape(self):
         r"""``J = FiniteOrdinalCategory(n)`` and its apex ``n-1`` (protected contract above)."""
-        from sage_extensions.categories.abstract_categories.products import FiniteOrdinalCategory
+        from sage_extensions.categories.abstract_categories.products import (
+            FiniteOrdinalCategory,
+        )
 
         shape = self.domain_category()
         size = int(shape.object_set().cardinality())
@@ -1598,29 +1684,45 @@ class _FunctorCategory(CategoricalMor):
             )
             for obj in shape.objects()
         }
-        return NaturalTransformation(first, second, lambda obj: components[obj.position()])
+        return NaturalTransformation(
+            first, second, lambda obj: components[obj.position()]
+        )
 
     def _core_isomorphism_from_apex(self, core_mor, apex):
         r"""The isomorphism of ``core_mor`` whose apex component is ``apex`` (protected contract above)."""
         source, target = core_mor.domain(), core_mor.codomain()
-        forward = self.Mor(source, target)(self._natural_transformation_from_apex(source, target, apex))
-        inverse = self.Mor(target, source)(self._natural_transformation_from_apex(target, source, ~apex))
+        forward = self.Mor(source, target)(
+            self._natural_transformation_from_apex(source, target, apex)
+        )
+        inverse = self.Mor(target, source)(
+            self._natural_transformation_from_apex(target, source, ~apex)
+        )
         return core_mor(forward, inverse)
 
     def _core_isomorphism_witness(self, core_mor):
         r"""One isomorphism of ``core_mor``, or ``None`` when the codomain decides there is none."""
-        apex = self.codomain_category()._marked_isometry(self, core_mor.domain(), core_mor.codomain())
-        return None if apex is None else self._core_isomorphism_from_apex(core_mor, apex)
+        apex = self.codomain_category()._marked_isometry(
+            self, core_mor.domain(), core_mor.codomain()
+        )
+        return (
+            None if apex is None else self._core_isomorphism_from_apex(core_mor, apex)
+        )
 
     def _core_automorphism_generators(self, core_mor):
         r"""Automorphisms of the marked diagram generating its automorphism group."""
-        from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+        from sage_extensions.categories.sets.finite_ordered_sets import (
+            finite_ordered_set,
+        )
 
         assert core_mor.domain() is core_mor.codomain(), (
             f"group generators belong to Aut(X) = Iso(X, X), but {core_mor} has distinct endpoints"
         )
-        apexes = self.codomain_category()._marked_automorphism_generators(self, core_mor.domain())
-        return finite_ordered_set(tuple(self._core_isomorphism_from_apex(core_mor, apex) for apex in apexes))
+        apexes = self.codomain_category()._marked_automorphism_generators(
+            self, core_mor.domain()
+        )
+        return finite_ordered_set(
+            tuple(self._core_isomorphism_from_apex(core_mor, apex) for apex in apexes)
+        )
 
     def _core_isomorphism_in(self, core_mor, subgroup):
         r"""An isomorphism of ``core_mor`` whose apex component lies in ``subgroup``, or ``None``.
@@ -1642,9 +1744,13 @@ class _FunctorCategory(CategoricalMor):
         apex = _apex_isomorphism_in_subgroup(
             witness,
             subgroup,
-            self.codomain_category()._marked_automorphism_generators(self, core_mor.domain()),
+            self.codomain_category()._marked_automorphism_generators(
+                self, core_mor.domain()
+            ),
         )
-        return None if apex is None else self._core_isomorphism_from_apex(core_mor, apex)
+        return (
+            None if apex is None else self._core_isomorphism_from_apex(core_mor, apex)
+        )
 
     def __call__(self, functor: Functor):
         r"""Admit the actual functor with this Mor category's endpoints."""
@@ -1704,7 +1810,9 @@ class _FunctorCategory(CategoricalMor):
     @cached_method
     def identity(self):
         if self.domain_category() is not self.codomain_category():
-            raise ValueError(f"an identity functor needs the same domain and codomain, but got {self}")
+            raise ValueError(
+                f"an identity functor needs the same domain and codomain, but got {self}"
+            )
         return self(IdentityFunctor(self.domain_category()))
 
     def evaluation_functor(self, obj: Parent) -> _EvaluationFunctor:
@@ -1723,7 +1831,9 @@ class _FunctorCategory(CategoricalMor):
         return _EvaluationFunctor(self, obj)
 
     def _repr_(self) -> str:
-        return f"Functor category [{self.domain_category()}, {self.codomain_category()}]"
+        return (
+            f"Functor category [{self.domain_category()}, {self.codomain_category()}]"
+        )
 
 
 class _EvaluationFunctor(Functor):
