@@ -48,6 +48,18 @@ def test_reindexed_a2_simple_roots_have_an_integral_transporter():
     assert {witness(family(i)) for i in indices} == {reindexed(i) for i in indices}
 
 
+@pytest.mark.parametrize("multiple", [1, 2])
+def test_a2_bases_with_different_pairings_have_no_orthogonal_transporter(multiple):
+    r"""b(a,b)=-1 differs from b(a,m*a+b)=2m-1 for m=1,2."""
+    lattice = NamedLattices.A2
+    first, second = tuple(lattice.module_generators())
+    source = Sets().Mor(Sets.Δ[1], lattice)(lambda i: (first, second)[int(i)])
+    target = Sets().Mor(Sets.Δ[1], lattice)(
+        lambda i: (first, multiple * first + second)[int(i)]
+    )
+    assert lattice.O().transporter(source, target) is None
+
+
 def test_hyperbolic_plane_is_even_unimodular_and_two_elementary():
     lattice = NamedLattices.U
     assert lattice.is_even()
