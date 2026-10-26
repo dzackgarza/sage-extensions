@@ -819,6 +819,10 @@ class _AT21ToricADEPairEngine:
     def complementary_divisor(self):
         return self.base_pair().complementary_divisor()
 
+    def blue_divisor(self):
+        r"""The selected blue divisor of the retained ADE base pair."""
+        return self.base_pair().blue_divisor()
+
     def source_variant(self):
         return self._source_variant
 
