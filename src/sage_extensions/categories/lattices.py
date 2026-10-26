@@ -6168,22 +6168,27 @@ class Lattices(OwnedCategoryOverBaseRing):
             )
 
         @cached_method
+        def _discriminant_invariant_factors(self):
+            r"""Return the nontrivial invariant factors of ``A_L`` over ``ZZ``."""
+            if _engine_ring(self.base_ring()) is not SageZZ:
+                raise TypeError(
+                    f"cannot compute discriminant invariant factors of {self!r}: the lattice is over {self.base_ring()}, not ZZ"
+                )
+            ring = self.base_ring()
+            return tuple(
+                abs(invariant)
+                for invariant in self.correlation_morphism().cokernel().invariant_factors()
+                if abs(invariant) > ring.one()
+            )
+
+        @cached_method
         def discriminant_length(self):
             r"""Return the minimal number of generators of ``A_L`` over ``ZZ``."""
             if _engine_ring(self.base_ring()) is not SageZZ:
                 raise TypeError(
                     f"cannot compute the length of the discriminant group of {self!r}: it is implemented only for lattices over ZZ, and this lattice is over {self.base_ring()}"
                 )
-            ring = self.base_ring()
-            return ring(
-                len(
-                    tuple(
-                        invariant
-                        for invariant in self.correlation_morphism().cokernel().invariant_factors()
-                        if abs(invariant) > ring.one()
-                    )
-                )
-            )
+            return self.base_ring()(len(self._discriminant_invariant_factors()))
 
         @cached_method
         def is_p_elementary(self, prime) -> bool:
@@ -6203,11 +6208,7 @@ class Lattices(OwnedCategoryOverBaseRing):
                 # p-elementarity is immediate for every prime. Avoid building
                 # the correlation cokernel merely to enumerate no invariants.
                 return True
-            invariants = tuple(
-                abs(invariant)
-                for invariant in self.correlation_morphism().cokernel().invariant_factors()
-                if abs(invariant) > ring.one()
-            )
+            invariants = self._discriminant_invariant_factors()
             return all(invariant == prime for invariant in invariants)
 
         def is_coeven(self) -> bool:
