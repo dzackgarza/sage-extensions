@@ -208,6 +208,7 @@ def owned_parent_class(implementation: type, category: Category) -> type:
         )
         for name, value in overrides.items():
             setattr(new_class, name, value)
+        _abc_init(new_class)
         new_class._preamble_concrete = implementation.__dict__.get(
             "_preamble_concrete", inherited
         )
