@@ -6192,7 +6192,15 @@ class Lattices(OwnedCategoryOverBaseRing):
 
         @cached_method
         def is_p_elementary(self, prime) -> bool:
-            r"""Return whether ``A_L`` is an elementary abelian ``prime``-group."""
+            r"""Return whether ``A_L`` is an elementary abelian ``prime``-group.
+
+            For a finite-rank nondegenerate integral lattice with Gram matrix
+            ``G``, the exponent of ``coker(G)`` is the least positive integer
+            ``m`` for which ``m*G^(-1)`` is integral.  Thus ``A_L`` is
+            ``p``-elementary exactly when the common denominator of ``G^(-1)``
+            divides the prime ``p``.  This tests the exponent directly without
+            constructing Smith normal form of the cokernel.
+            """
             if _engine_ring(self.base_ring()) is not SageZZ:
                 raise TypeError(
                     f"cannot decide whether {self!r} is {prime}-elementary: it is implemented only for lattices over ZZ, and this lattice is over {self.base_ring()}"
@@ -6208,8 +6216,9 @@ class Lattices(OwnedCategoryOverBaseRing):
                 # p-elementarity is immediate for every prime. Avoid building
                 # the correlation cokernel merely to enumerate no invariants.
                 return True
-            invariants = self._discriminant_invariant_factors()
-            return all(invariant == prime for invariant in invariants)
+            gram = _engine_component_matrix(self.gram_tensor()).change_ring(SageZZ)
+            denominator = ring(gram.inverse().denominator())
+            return denominator == ring.one() or denominator == prime
 
         def is_coeven(self) -> bool:
             r"""Return whether the discriminant quadratic form is integer-valued.
