@@ -93,3 +93,29 @@ def test_power_series_retain_their_completion() -> None:
     assert series.completion_source() is rationals.polynomial_ring("s")
     s = series.formal_parameter("s")
     assert s.coefficient(1) == rationals(1)
+
+
+def test_matrix_and_laurent_ring_constructions() -> None:
+    rationals = _owned_rationals()
+    matrices = rationals.matrix_space(2)
+    assert matrices is rationals.matrix_space(2)
+    assert matrices.one() * matrices.one() == matrices.one()
+    laurent = rationals.laurent_polynomial_ring("z")
+    assert laurent is rationals.laurent_polynomial_ring("z")
+    z = laurent.algebra_generator("z")
+    assert z * z.inverse_of_unit() == laurent.one()
+
+
+def test_symmetric_algebra_of_integer_torsion_retains_polynomial_cover() -> None:
+    integers = _owned_integers()
+    polynomial = integers.polynomial_ring("u")
+    free = integers.free_module(polynomial.algebra_generating_set())
+    relation = free.module_category().Mor(free, free)(
+        {"u": 2 * free.module_generator("u")}
+    )
+    torsion = relation.cokernel()
+    symmetric = torsion.symmetric_algebra()
+    assert symmetric.presentation_ring() is polynomial
+    u = symmetric.algebra_generator("u")
+    assert 2 * u == symmetric.zero()
+    assert u != symmetric.zero()
