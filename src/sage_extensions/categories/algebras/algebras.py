@@ -4514,7 +4514,11 @@ class _OwnedAlgebraParent(_OwnedRingParent):
             self,
             engine,
             base=base,
-            category=Cat().meet(initial_placement),
+            # Select the full implementation type before Parent.__init__, but
+            # initialize it in the minimal category until the selected algebra
+            # resolution and native module datum have been installed.
+            category=Cat().meet(tuple(placement)),
+            initial_category=Cat().meet(initial_placement),
             constructing_category=(
                 associative if constructing_category is None else constructing_category
             ),
