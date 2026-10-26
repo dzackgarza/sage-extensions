@@ -6376,9 +6376,17 @@ class ProjectiveSpaces(OwnedCategoryOverBaseRing):
                 for numerator in range(dimension + 1)
                 if numerator != target_index
             }
+            # The overlap algebra is a localization, not a symmetric algebra:
+            # the map is an arrow of commutative R-algebras, fixed by the
+            # images of the free generators of the chart.
             into_target_chart = _scheme_mor_category(source_overlap, target_chart)(
-                target_chart.coordinate_algebra().Mor(
-                    source_overlap.coordinate_algebra()
+                Algebras(self.scheme_base_ring())
+                .Associative()
+                .Unital()
+                .Commutative()
+                .Mor(
+                    target_chart.coordinate_algebra(),
+                    source_overlap.coordinate_algebra(),
                 )(images)
             )
             return target_overlap.corestriction(into_target_chart)
