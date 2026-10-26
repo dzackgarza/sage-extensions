@@ -4671,11 +4671,11 @@ class _OwnedAlgebraParent(_OwnedRingParent):
 
 @cached_function(key=lambda engine, base_ring, labels=None, categories=(), construction_data=(), law_decisions=(), ring_placement=(): (
     base_ring,
-    labels,
-    tuple(categories),
-    tuple(construction_data),
-    tuple(law_decisions),
-    tuple(ring_placement),
+    None if labels is None else id(labels),
+    tuple(map(id, categories)),
+    tuple((name, id(value)) for name, value in construction_data),
+    tuple((name, id(value)) for name, value in law_decisions),
+    tuple(map(id, ring_placement)),
 ))
 def _owned_algebra_view(
     engine,

@@ -323,10 +323,10 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
         )
 
 @cached_function(key=lambda engine, generating_module, flavor, categories=(), construction_data=(): (
-    generating_module,
+    id(generating_module),
     flavor,
-    tuple(categories),
-    tuple(construction_data),
+    tuple(map(id, categories)),
+    tuple((name, id(value)) for name, value in construction_data),
 ))
 def _native_free_algebra(engine, generating_module, flavor, *, categories=(), construction_data=()):
     r"""The native realization of the free functor on this exact module.
