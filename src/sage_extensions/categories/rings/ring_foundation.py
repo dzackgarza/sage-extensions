@@ -2534,9 +2534,9 @@ def _install_local_ring_construction(ring, maximal_ideal, residue_field, residue
                 f"{existing.residue_field()}; it cannot also have maximal ideal {maximal_ideal} and residue field "
                 f"{residue_field}"
             )
-        return ring
-    ring._local_ring_construction = construction
-    return ring
+    else:
+        ring._local_ring_construction = construction
+    return refine(ring, OwnedRings().Commutative().Local())
 
 
 class OwnedRings(CategoryPacketMethods, OwnedCategory):
