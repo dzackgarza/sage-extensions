@@ -5421,7 +5421,6 @@ class _OwnedRingParent(Parent):
             if (
                 engine is not SageQQ
                 and engine in SageNumberFields()
-                and base is _own_ring(_engine_scalar_ring(engine))
                 and self._native_module_basis is None
             ):
                 from sage_extensions.categories.modules.native_modules import (
