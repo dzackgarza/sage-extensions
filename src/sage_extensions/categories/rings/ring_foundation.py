@@ -6670,17 +6670,9 @@ def _owned_integers() -> _OwnedRingParent:
 # caller that needs it names it here instead of adopting the engine.
 
 
-def _owned_rationals() -> Ring:
-    r"""The canonical rational field ``QQ = (ZZ - {0})^{-1} ZZ``.
-
-    There is one owned object for the rational field: the localization of the
-    canonical integer ring at its nonzero multiplicative submonoid. Sage's
-    fraction-field engine is selected privately by that localization
-    construction; it is not separately adopted as a second owned ring.
-    """
-    rationals = _owned_integers().fraction_field_localization()
-    _set_owned_ring_display(rationals, "Rational field QQ")
-    return rationals
+def _owned_rationals() -> _OwnedRingParent:
+    r"""The canonical owned rational numbers ``QQ``."""
+    return _OwnedRingParent(SageQQ, named_placement=_rational_placements)
 
 
 def _owned_real_algebraic_numbers() -> _OwnedRingParent:
