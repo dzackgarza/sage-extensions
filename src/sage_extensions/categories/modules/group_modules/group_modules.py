@@ -1799,6 +1799,29 @@ class BrauerCharacterRepresentations(FiniteFreeGroupRepresentations):
             from sage.combinat.free_module import CombinatorialFreeModule
 
             indices = tuple(range(int(coefficient_module.module_rank())))
+            characteristic = int(coefficient_ring.characteristic())
+            representatives = tuple(
+                representative
+                for representative in group.conjugacy_classes_representatives()
+                if int(representative.order()) % characteristic
+            )
+            from math import lcm
+
+            cyclotomic_order = lcm(
+                *(int(representative.order()) for representative in representatives)
+            )
+            if cyclotomic_order <= 2:
+                from sage_extensions.categories.rings.ring_foundation import (
+                    _owned_rationals,
+                )
+
+                value_ring = _owned_rationals()
+            else:
+                from sage_extensions.categories.rings.number_fields import (
+                    CyclotomicField,
+                )
+
+                value_ring = CyclotomicField(cyclotomic_order)
             computation_module = CombinatorialFreeModule(
                 _engine_ring(coefficient_ring),
                 indices,
@@ -1836,11 +1859,8 @@ class BrauerCharacterRepresentations(FiniteFreeGroupRepresentations):
                     f"the Brauer character of {self} came back with no values, but {group} has at least the "
                     f"identity as a p-regular class"
                 )
-            value_ring = _own_ring(backend_values[0].parent())
             engine_value_ring = _engine_ring(value_ring)
             values = tuple(_owned_engine_element(value_ring, engine_value_ring(value)) for value in backend_values)
-            characteristic = int(coefficient_ring.characteristic())
-            representatives = tuple(representative for representative in group.conjugacy_classes_representatives() if int(representative.order()) % characteristic)
             if len(representatives) != len(values):
                 raise ArithmeticError(
                     f"the Brauer character of {self} has {len(values)} values, but {group} has "
