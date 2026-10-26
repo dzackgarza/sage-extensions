@@ -6682,6 +6682,7 @@ def _owned_rationals() -> Ring:
     return rationals
 
 
+@cached_function
 def _owned_real_algebraic_numbers() -> _OwnedRingParent:
     r"""The canonical owned real algebraic numbers ``AA``."""
     return _OwnedRingParent(SageAA, named_placement=_real_algebraic_placements)
@@ -6699,6 +6700,7 @@ def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingPare
     )
 
 
+@cached_function
 def _owned_algebraic_numbers() -> _OwnedRingParent:
     r"""The canonical owned algebraic numbers ``QQbar``."""
     from sage.rings.qqbar import QQbar as SageQQbar
@@ -6706,6 +6708,7 @@ def _owned_algebraic_numbers() -> _OwnedRingParent:
     return _OwnedRingParent(SageQQbar, named_placement=_algebraic_number_placements)
 
 
+@cached_function
 def _owned_real_double_field() -> _OwnedRingParent:
     r"""The canonical owned double-precision real field ``RDF``."""
     from sage.rings.real_double import RDF as SageRDF
@@ -6717,6 +6720,7 @@ def _owned_real_double_field() -> _OwnedRingParent:
     )
 
 
+@cached_function
 def _owned_complex_double_field() -> _OwnedRingParent:
     r"""The canonical owned double-precision complex field ``CDF``."""
     from sage.rings.complex_double import CDF as SageCDF
