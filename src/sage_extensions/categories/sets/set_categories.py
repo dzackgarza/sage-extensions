@@ -8,9 +8,9 @@ from math import comb
 from operator import index as integer_index
 from typing import TYPE_CHECKING, Any, Self, SupportsIndex, TypeVar
 
-from sage.categories.map import Map
 from sage.categories.category import Category
 from sage.categories.category_with_axiom import all_axioms
+from sage.categories.map import Map
 from sage.categories.morphism import Morphism, SetMorphism
 from sage.categories.sets_cat import Sets as SageSets
 from sage.misc.abstract_method import abstract_method
@@ -36,14 +36,15 @@ from sage_extensions.categories.abstract_categories.mor_categories import (
     _category_accepts_morphism,
     _category_mor,
 )
-from sage_extensions.categories.abstract_categories.objects import (
-    Objects,
-    OwnedCategory,
-)
 from sage_extensions.categories.abstract_categories.mor_foundation import (
     CategoricalArrow,
     CategoryPacketMethods,
     _refuse_foreign_arrow,
+    object_level,
+)
+from sage_extensions.categories.abstract_categories.objects import (
+    Objects,
+    OwnedCategory,
 )
 from sage_extensions.categories.functors.core import Adjunction, Functor
 from sage_extensions.lexicon.category_theory import ObjectOfCategory
@@ -51,13 +52,11 @@ from sage_extensions.owned_category import OwnedParent, _object_of, owned_catego
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook
 from sage_extensions.validation import validator
-from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 
 if TYPE_CHECKING:
     from sage_extensions.categories.sets.cardinals import (
         Cardinalities,
         CardinalityMorphism,
-        Ordinal,
     )
     from sage_extensions.categories.sets.indexed_families import IndexedFamily
     from sage_extensions.logic import Predicate
@@ -306,7 +305,9 @@ def _integer_translation_relation_quotient(integers, displacements):
     # The underlying function of the ring quotient map, read by the
     # forgetful functor to sets, not admitted as a ring arrow (``CON-17``).
     ring_projection = quotient.quotient_map()
-    projection = Sets().Mor(integers, quotient)(lambda integer: ring_projection(integer))
+    projection = Sets().Mor(integers, quotient)(
+        lambda integer: ring_projection(integer)
+    )
     return quotient, projection, lambda cls: cls.lift()
 
 
@@ -344,7 +345,9 @@ class EnumeratedSets(OwnedCategory):
             counting_order = ranking.codomain()
             match counting_order in FiniteSets():
                 case True:
-                    positions = range(int(cardinal(counting_order.cardinality()).finite_value()))
+                    positions = range(
+                        int(cardinal(counting_order.cardinality()).finite_value())
+                    )
                 case False:
                     assert counting_order in CountablyInfiniteSets(), (
                         f"the ranking map of {self} has codomain {counting_order}, not a finite or countably infinite "
@@ -429,7 +432,9 @@ class AugmentedSimplexCategory(OwnedCategory):
     def super_categories(self):
         # [n] is a finite totally ordered set, enumerated by itself: it is the
         # base case of the enumeration datum.  The ordinal n is its order type.
-        from sage_extensions.categories.sets.finite_ordered_sets import FiniteOrderedSets
+        from sage_extensions.categories.sets.finite_ordered_sets import (
+            FiniteOrderedSets,
+        )
 
         return [FiniteOrderedSets()]
 
@@ -438,7 +443,9 @@ class AugmentedSimplexCategory(OwnedCategory):
         return _object_of(self, size=size)
 
     class ParentMethods:
-        _derived_construction_parameters = frozenset({"index_set", "element_at", "index_of"})
+        _derived_construction_parameters = frozenset(
+            {"index_set", "element_at", "index_of"}
+        )
 
         def __init__(self, size: int, **rest) -> None:
             self._size = int(size)
@@ -609,7 +616,9 @@ class OwnedSetMorphism:
         self._composition_factors = composite_factors
         if composite_factors is not None:
             left, right = composite_factors
-            function = lambda point, *args, **kwargs: left(right(point), *args, **kwargs)
+            function = lambda point, *args, **kwargs: left(
+                right(point), *args, **kwargs
+            )
         Morphism.__init__(self, parent)
         self._owned_function = function
 
@@ -669,14 +678,13 @@ class OwnedSetMorphism:
         ``n+d``, does not certify a translation law; their result is
         ``None`` rather than an inferred displacement.
         """
-        if (
-            self.domain() is self.codomain()
-            and isinstance(self._owned_function, _IntegerTranslationOnZZ)
+        if self.domain() is self.codomain() and isinstance(
+            self._owned_function, _IntegerTranslationOnZZ
         ):
             return self._owned_function.displacement()
         return None
 
-    def __eq__(self, other: Any) -> bool | Predicate:
+    def __eq__(self, other: object) -> bool | Predicate:
         r"""Compare two arrows of one Mor through ``_richcmp_``.
 
         Sage's ``SetMorphism`` compares the stored functions and never calls
@@ -688,7 +696,7 @@ class OwnedSetMorphism:
         """
         return self._compare_in_common_mor(other, op_EQ)
 
-    def __ne__(self, other: Any) -> bool | Predicate:
+    def __ne__(self, other: object) -> bool | Predicate:
         return self._compare_in_common_mor(other, op_NE)
 
     def _compare_in_common_mor(self, other: Any, op: int) -> bool | Predicate:
@@ -717,11 +725,10 @@ class OwnedSetMorphism:
             return op == op_EQ
         domain = self.domain()
         match domain:
-            case _ if (
-                Sets().is_provably_finite(domain)
-                and domain in EnumeratedSets()
-            ):
-                equal = conjunction(self(element) == other(element) for element in domain)
+            case _ if Sets().is_provably_finite(domain) and domain in EnumeratedSets():
+                equal = conjunction(
+                    self(element) == other(element) for element in domain
+                )
             case _:
                 equal = AtomicProposition("equal", self, other)
         return equal if op == op_EQ else negation(equal)
@@ -784,10 +791,7 @@ class OwnedSetMorphism:
             return function.is_injective()
         domain = self.domain()
         match domain:
-            case _ if (
-                Sets().is_provably_finite(domain)
-                and domain in EnumeratedSets()
-            ):
+            case _ if Sets().is_provably_finite(domain) and domain in EnumeratedSets():
                 # Finite domain enumeration does not decide equality of
                 # symbolic image values. Only an exact image-cardinality
                 # computation can certify injectivity or its failure.
@@ -810,7 +814,7 @@ class OwnedSetMorphism:
         proved noncontainment, or ``None`` when no such computation is selected.
         An undecided containment must retain its named computation frontier.
         """
-        return None
+        return
 
     def factor_through_or_none(self, target: SetInjection) -> OwnedSetMorphism | None:
         r"""The unique ``f`` with ``target * f == self``, or proved nonexistence.
@@ -843,14 +847,23 @@ class OwnedSetMorphism:
         image = self.image()
         target_image = target.image()
         if domain in FiniteSets() and domain in EnumeratedSets():
-            contained = conjunction(target_image.is_parent_of(self(point)) for point in domain)
+            contained = conjunction(
+                target_image.is_parent_of(self(point)) for point in domain
+            )
         else:
             assert base in FiniteSets() and base in EnumeratedSets(), (
                 f"cannot decide whether {image} is contained in {target_image}: no selected "
                 f"containment algorithm applies, and neither {domain} nor {base} is finite and enumerated"
             )
             contained = conjunction(
-                negation(conjunction((image.is_parent_of(point), negation(target_image.is_parent_of(point)))))
+                negation(
+                    conjunction(
+                        (
+                            image.is_parent_of(point),
+                            negation(target_image.is_parent_of(point)),
+                        )
+                    )
+                )
                 for point in base
             )
         if contained is False:
@@ -859,8 +872,10 @@ class OwnedSetMorphism:
             f"cannot factor {self} through {target}: image containment remains undecided"
         )
         if (
-            isinstance(self, SetInjection) and self._subset_premise
-            and isinstance(target, SetInjection) and target._subset_premise
+            isinstance(self, SetInjection)
+            and self._subset_premise
+            and isinstance(target, SetInjection)
+            and target._subset_premise
         ):
             return Sets().Mono(domain, target.domain())._from_subset_inclusion()
         assert isinstance(target, SetInjection), (
@@ -892,8 +907,7 @@ class OwnedSetMorphism:
         codomain = self.codomain()
         match domain, codomain:
             case _ if all(
-                Sets().is_provably_finite(end)
-                and end in EnumeratedSets()
+                Sets().is_provably_finite(end) and end in EnumeratedSets()
                 for end in (domain, codomain)
             ):
                 image = self.image()
@@ -947,7 +961,10 @@ class OwnedSetMorphism:
         composes: a composite of two group homomorphisms is a group
         homomorphism of the composite's endpoints.
         """
-        if not isinstance(other, (Morphism, CategoricalArrow)) or other.codomain() is not self.domain():
+        if (
+            not isinstance(other, (Morphism, CategoricalArrow))
+            or other.codomain() is not self.domain()
+        ):
             return NotImplemented
         if other.domain() is other.codomain() and other is other.parent().identity():
             return self
@@ -961,7 +978,11 @@ class OwnedSetMorphism:
         map with a set map is a set map.
         """
         mor = Sets().Mor(right.domain(), self.codomain())
-        if self.domain() is self.codomain() and self is self.parent().identity() and right.parent() is mor:
+        if (
+            self.domain() is self.codomain()
+            and self is self.parent().identity()
+            and right.parent() is mor
+        ):
             return right
         return mor.element_class(mor, None, composite_factors=(self, right))
 
@@ -980,14 +1001,15 @@ class SetMorCategory(CategoricalMor):
 
     def __iter__(self):
         r"""Enumerate functions between finite sets by their finite value tuples."""
-        assert Sets().is_provably_finite(self.domain()) and Sets().is_provably_finite(self.codomain()), (
-            f"enumerating every function in {self} requires finite endpoints"
-        )
+        assert Sets().is_provably_finite(self.domain()) and Sets().is_provably_finite(
+            self.codomain()
+        ), f"enumerating every function in {self} requires finite endpoints"
         source = tuple(self.domain())
         target = tuple(self.codomain())
         for values in product(target, repeat=len(source)):
             if self.domain() is self.codomain() and all(
-                (left == right) is True for left, right in zip(source, values, strict=True)
+                (left == right) is True
+                for left, right in zip(source, values, strict=True)
             ):
                 arrow = self.identity()
             else:
@@ -1013,9 +1035,12 @@ class SetMorCategory(CategoricalMor):
             if domain in FiniteSets()
             else FunctionSets()
         )
-        placement = owned_category_join((
-            placement, _cardinalities().set_power_category(codomain, domain),
-        ))
+        placement = owned_category_join(
+            (
+                placement,
+                _cardinalities().set_power_category(codomain, domain),
+            )
+        )
         CategoricalMor.__init__(
             self,
             mor_family,
@@ -1051,21 +1076,30 @@ class SetMorCategory(CategoricalMor):
         map of one argument, and is rejected naming its variables.
         """
         if isinstance(datum, (Map, CategoricalArrow)):
-            if datum.domain() is not self.domain() or datum.codomain() is not self.codomain():
+            if (
+                datum.domain() is not self.domain()
+                or datum.codomain() is not self.codomain()
+            ):
                 raise ValueError(
                     f"cannot view {datum} as a map {self.domain()} -> {self.codomain()}: it is a map "
                     f"{datum.domain()} -> {datum.codomain()}"
                 )
             arrows = datum.parent()
-            if arrows is self or (arrows in MorCategories() and self in arrows.super_categories()):
+            if arrows is self or (
+                arrows in MorCategories() and self in arrows.super_categories()
+            ):
                 return datum
             _refuse_foreign_arrow(
-                self, datum, "its underlying map is its image under the forgetful functor to sets, such as "
-                "Modules(R).underlying_set()"
+                self,
+                datum,
+                "its underlying map is its image under the forgetful functor to sets, such as "
+                "Modules(R).underlying_set()",
             )
         match datum:
             case Expression() if element_parent(datum) is SR:
-                datum = _formula_binding_its_variable(datum, self.domain(), self.codomain())
+                datum = _formula_binding_its_variable(
+                    datum, self.domain(), self.codomain()
+                )
             case _:
                 pass
         if not callable(datum):
@@ -1193,7 +1227,9 @@ class Sets(CategoryPacketMethods, OwnedCategory):
         )
 
         match universe:
-            case _ if Sets().is_provably_finite(universe) and universe in EnumeratedSets():
+            case _ if (
+                Sets().is_provably_finite(universe) and universe in EnumeratedSets()
+            ):
                 ordered_subset = _filtered_ordered_set(universe, predicate)
                 if ordered_subset is not None:
                     return ordered_subset
@@ -1343,16 +1379,24 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                     "the selected subcategory does not contain this product"
                 )
             diagram = _discrete_diagram(family, self)
-            universal_cone = (diagram).ProductCones().cone(
-                product,
-                lambda index: product.projection(index.value()),
+            universal_cone = (
+                (diagram)
+                .ProductCones()
+                .cone(
+                    product,
+                    lambda index: product.projection(index.value()),
+                )
             )
 
             def factorizer(cone):
-                finite = family.cardinality().is_finite() and family.index_set() in EnumeratedSets()
+                finite = (
+                    family.cardinality().is_finite()
+                    and family.index_set() in EnumeratedSets()
+                )
                 components = (
                     (lambda label: cone.structure_morphism(diagram.domain()(label)))
-                    if finite else cone.transformation()
+                    if finite
+                    else cone.transformation()
                 )
                 # This is a limit in Sets. Its apex need not carry the
                 # additive structure that the product's factors happen to
@@ -1360,7 +1404,8 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                 # from_maps is not the universal set-map constructor.
                 return CartesianProductsOfSets.ParentMethods.from_maps(
                     product,
-                    cone.apex(), components,
+                    cone.apex(),
+                    components,
                 )
 
             return SelectedLimitConstruction(diagram, universal_cone, factorizer)
@@ -1371,9 +1416,7 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                 left_morphism, right_morphism
             ).object()
 
-        def _categorical_equalizer_construction(
-            self, left_morphism, right_morphism
-        ):
+        def _categorical_equalizer_construction(self, left_morphism, right_morphism):
             r"""Return the selected equalizer cone for two parallel set maps."""
             from sage_extensions.categories.abstract_categories.products import (
                 SelectedLimitConstruction,
@@ -1413,9 +1456,7 @@ class Sets(CategoryPacketMethods, OwnedCategory):
             universal_cone = diagram.Cones().cone(
                 equalizer,
                 lambda index: (
-                    inclusion
-                    if index is shape.source()
-                    else left_morphism * inclusion
+                    inclusion if index is shape.source() else left_morphism * inclusion
                 ),
             )
 
@@ -1543,9 +1584,7 @@ class Sets(CategoryPacketMethods, OwnedCategory):
             universal_cone = diagram.Cones().cone(
                 equalizer,
                 lambda index: (
-                    inclusion
-                    if index is shape.source()
-                    else reference * inclusion
+                    inclusion if index is shape.source() else reference * inclusion
                 ),
             )
 
@@ -1625,17 +1664,25 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                     f"the disjoint union {coproduct} is not an object of {self}"
                 )
             diagram = _discrete_diagram(family, self)
-            universal_cocone = (diagram).CoproductCocones().cocone(
-                coproduct,
-                lambda index: coproduct.injection(index.value()),
+            universal_cocone = (
+                (diagram)
+                .CoproductCocones()
+                .cocone(
+                    coproduct,
+                    lambda index: coproduct.injection(index.value()),
+                )
             )
 
             def factorizer(cocone):
-                finite = family.cardinality().is_finite() and family.index_set() in EnumeratedSets()
+                finite = (
+                    family.cardinality().is_finite()
+                    and family.index_set() in EnumeratedSets()
+                )
                 return coproduct.from_maps(
                     cocone.apex(),
                     (lambda label: cocone.costructure_morphism(diagram.domain()(label)))
-                    if finite else cocone.transformation(),
+                    if finite
+                    else cocone.transformation(),
                 )
 
             return SelectedColimitConstruction(diagram, universal_cocone, factorizer)
@@ -1645,9 +1692,7 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                 left_morphism, right_morphism
             ).object()
 
-        def _categorical_coequalizer_construction(
-            self, left_morphism, right_morphism
-        ):
+        def _categorical_coequalizer_construction(self, left_morphism, right_morphism):
             from sage_extensions.categories.abstract_categories.products import (
                 SelectedColimitConstruction,
                 _parallel_pair_diagram,
@@ -1686,13 +1731,20 @@ class Sets(CategoryPacketMethods, OwnedCategory):
             translation_step = None
             if source is target and target is _own_ring(SageZZ):
                 identity = self.Mor(target, target).identity()
-                if left_morphism is identity and isinstance(right_morphism, OwnedSetMorphism):
-                    translation_step = right_morphism.selected_integer_translation_step()
-                elif right_morphism is identity and isinstance(left_morphism, OwnedSetMorphism):
+                if left_morphism is identity and isinstance(
+                    right_morphism, OwnedSetMorphism
+                ):
+                    translation_step = (
+                        right_morphism.selected_integer_translation_step()
+                    )
+                elif right_morphism is identity and isinstance(
+                    left_morphism, OwnedSetMorphism
+                ):
                     translation_step = left_morphism.selected_integer_translation_step()
 
             if left_morphism is right_morphism or (
-                Sets().is_provably_finite(source) and source.cardinality() == cardinal(0)
+                Sets().is_provably_finite(source)
+                and source.cardinality() == cardinal(0)
             ):
                 # An empty relation generates equality, even when the
                 # target is infinite and has no selected enumeration. The
@@ -1716,31 +1768,35 @@ class Sets(CategoryPacketMethods, OwnedCategory):
             elif enumerated_finite_relation:
                 # DisjointSet computes the closure over a selected finite
                 # enumeration; this is a computation of the same quotient.
-                quotient, projection, representative_point = _finite_set_quotient_by_generated_relation(
-                    target,
-                    (
-                        (left_morphism(point), right_morphism(point))
-                        for point in source
-                    ),
+                quotient, projection, representative_point = (
+                    _finite_set_quotient_by_generated_relation(
+                        target,
+                        (
+                            (left_morphism(point), right_morphism(point))
+                            for point in source
+                        ),
+                    )
                 )
             else:
                 # The arbitrary relation is still a represented quotient;
                 # no enumeration or equality decision is inferred from the
                 # cardinalities of either endpoint.
-                quotient, projection, representative_point = _represented_set_coequalizer(
-                    left_morphism, right_morphism
+                quotient, projection, representative_point = (
+                    _represented_set_coequalizer(left_morphism, right_morphism)
                 )
-            diagram = _parallel_pair_diagram(
-                left_morphism, right_morphism, self
-            )
+            diagram = _parallel_pair_diagram(left_morphism, right_morphism, self)
             shape = diagram.domain()
-            universal_cocone = (diagram).Cocones().cocone(
-                quotient,
-                lambda index: (
-                    projection * left_morphism
-                    if index is shape.source()
-                    else projection
-                ),
+            universal_cocone = (
+                (diagram)
+                .Cocones()
+                .cocone(
+                    quotient,
+                    lambda index: (
+                        projection * left_morphism
+                        if index is shape.source()
+                        else projection
+                    ),
+                )
             )
 
             def factorizer(cocone):
@@ -1749,9 +1805,7 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                     lambda label: target_map(representative_point(label))
                 )
 
-            return SelectedColimitConstruction(
-                diagram, universal_cocone, factorizer
-            )
+            return SelectedColimitConstruction(diagram, universal_cocone, factorizer)
 
         def _categorical_coequalizer_family(self, morphisms):
             return self._categorical_coequalizer_family_construction(morphisms).object()
@@ -1810,9 +1864,11 @@ class Sets(CategoryPacketMethods, OwnedCategory):
             if source is target and target is _own_ring(SageZZ):
                 identity = self.Mor(target, target).identity()
                 displacements = tuple(
-                    target.zero() if arrow is identity
+                    target.zero()
+                    if arrow is identity
                     else arrow.selected_integer_translation_step()
-                    if isinstance(arrow, OwnedSetMorphism) else None
+                    if isinstance(arrow, OwnedSetMorphism)
+                    else None
                     for arrow in (morphisms.value(label) for label in labels)
                 )
                 if all(displacement is not None for displacement in displacements):
@@ -1822,7 +1878,8 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                     )
 
             if all(morphisms.value(label) is reference for label in labels) or (
-                Sets().is_provably_finite(source) and source.cardinality() == cardinal(0)
+                Sets().is_provably_finite(source)
+                and source.cardinality() == cardinal(0)
             ):
                 quotient = target
                 projection = Sets().Mor(target, target).identity()
@@ -1838,13 +1895,15 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                 projection = Sets().Mor(target, target).identity()
                 representative_point = target
             elif enumerated_finite_relation:
-                quotient, projection, representative_point = _finite_set_quotient_by_generated_relation(
-                    target,
-                    (
-                        (reference(point), morphisms.value(label)(point))
-                        for point in source
-                        for label in labels
-                    ),
+                quotient, projection, representative_point = (
+                    _finite_set_quotient_by_generated_relation(
+                        target,
+                        (
+                            (reference(point), morphisms.value(label)(point))
+                            for point in source
+                            for label in labels
+                        ),
+                    )
                 )
             else:
                 # A finite family of relations with an infinite source is
@@ -1857,23 +1916,19 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                     name="Sources of the wide coequalizer relation",
                 )
                 relation_source = self.coproduct(sources)
-                left = relation_source.from_maps(
-                    target, lambda _index: reference
-                )
+                left = relation_source.from_maps(target, lambda _index: reference)
                 right = relation_source.from_maps(
                     target, lambda index: morphisms.value(index)
                 )
-                quotient, projection, representative_point = _represented_set_coequalizer(
-                    left, right
+                quotient, projection, representative_point = (
+                    _represented_set_coequalizer(left, right)
                 )
             diagram = _parallel_family_diagram(morphisms, self)
             shape = diagram.domain()
             universal_cocone = diagram.Cocones().cocone(
                 quotient,
                 lambda index: (
-                    projection * reference
-                    if index is shape.source()
-                    else projection
+                    projection * reference if index is shape.source() else projection
                 ),
             )
 
@@ -1883,18 +1938,20 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                     lambda label: target_map(representative_point(label))
                 )
 
-            return SelectedColimitConstruction(
-                diagram, universal_cocone, factorizer
-            )
+            return SelectedColimitConstruction(diagram, universal_cocone, factorizer)
 
-        def _categorical_product_morphism(self, left_morphism, right_morphism, source, target):
+        def _categorical_product_morphism(
+            self, left_morphism, right_morphism, source, target
+        ):
             return _cartesian_product_morphism(
                 source,
                 target,
                 lambda index: left_morphism if int(index) == 0 else right_morphism,
             )
 
-        def _categorical_coproduct_morphism(self, left_morphism, right_morphism, source, target):
+        def _categorical_coproduct_morphism(
+            self, left_morphism, right_morphism, source, target
+        ):
             return _coproduct_morphism(
                 source,
                 target,
@@ -2040,7 +2097,7 @@ class Sets(CategoryPacketMethods, OwnedCategory):
             normalization; this does not admit a fresh member or decide a
             predicate. Public set construction and membership are unchanged.
             """
-            return None
+            return
 
         def is_parent_of(self, element) -> bool | Predicate:
             r"""Whether the candidate belongs to this represented set.
@@ -2101,13 +2158,17 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                         result = indices._cardinality_decision()
                 case _ if self in PowerSets():
                     size = self.base_set()._cardinality_decision()
-                    if size is not None and cardinal(size).expression().is_normal_form():
+                    if (
+                        size is not None
+                        and cardinal(size).expression().is_normal_form()
+                    ):
                         result = cardinal(2) ** cardinal(size)
                 case _ if self in FunctionSets():
                     base_size = self.base()._cardinality_decision()
                     exponent_size = self.exponent()._cardinality_decision()
                     if (
-                        base_size is not None and exponent_size is not None
+                        base_size is not None
+                        and exponent_size is not None
                         and cardinal(base_size).expression().is_normal_form()
                         and cardinal(exponent_size).expression().is_normal_form()
                     ):
@@ -2118,40 +2179,61 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                         result = cardinal(1)
                     else:
                         source_size = self.source()._cardinality_decision()
-                        if source_size is not None and cardinal(source_size).expression().is_normal_form():
+                        if (
+                            source_size is not None
+                            and cardinal(source_size).expression().is_normal_form()
+                        ):
                             source_size = cardinal(source_size)
                             result = (
-                                cardinal(comb(source_size.finite_value(), selected_size))
+                                cardinal(
+                                    comb(source_size.finite_value(), selected_size)
+                                )
                                 if source_size.is_finite()
                                 else source_size
                             )
                 case _ if self in FinitePowerSets():
                     source_size = self.source()._cardinality_decision()
-                    if source_size is not None and cardinal(source_size).expression().is_normal_form():
+                    if (
+                        source_size is not None
+                        and cardinal(source_size).expression().is_normal_form()
+                    ):
                         source_size = cardinal(source_size)
                         result = (
                             cardinal(2) ** source_size
                             if source_size.is_finite()
                             else source_size
                         )
-                case _ if self in CartesianProductsOfSets() or self in CoproductsOfSets():
+                case _ if (
+                    self in CartesianProductsOfSets() or self in CoproductsOfSets()
+                ):
                     indices = self.index_set()
                     index_size = indices._cardinality_decision()
-                    if index_size is not None and cardinal(index_size).expression().is_normal_form():
+                    if (
+                        index_size is not None
+                        and cardinal(index_size).expression().is_normal_form()
+                    ):
                         product = self in CartesianProductsOfSets()
                         term = self.factor if product else self.cofactor
                         if cardinal(index_size).is_finite():
-                            if indices in EnumeratedSets() or isinstance(indices, _FiniteLiteralSet):
+                            if indices in EnumeratedSets() or isinstance(
+                                indices, _FiniteLiteralSet
+                            ):
                                 values = []
                                 for index in indices:
                                     value = term(index)._cardinality_decision()
-                                    if value is None or not cardinal(value).expression().is_normal_form():
+                                    if (
+                                        value is None
+                                        or not cardinal(value)
+                                        .expression()
+                                        .is_normal_form()
+                                    ):
                                         break
                                     values.append(cardinal(value))
                                 else:
                                     result = (
                                         _cardinalities().product(*values)
-                                        if product else _cardinalities().sum(*values)
+                                        if product
+                                        else _cardinalities().sum(*values)
                                     )
                         else:
                             # This existing cardinal constructor retains the
@@ -2160,10 +2242,13 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                             # factor cardinalities are exact-valued lazy data.
                             result = (
                                 _cardinalities().indexed_product(
-                                    indices, lambda index: term(index).cardinality(),
+                                    indices,
+                                    lambda index: term(index).cardinality(),
                                 )
-                                if product else _cardinalities().indexed_sum(
-                                    indices, lambda index: term(index).cardinality(),
+                                if product
+                                else _cardinalities().indexed_sum(
+                                    indices,
+                                    lambda index: term(index).cardinality(),
                                 )
                             )
                 case _:
@@ -2320,16 +2405,31 @@ class Sets(CategoryPacketMethods, OwnedCategory):
             sense when ``A`` and ``B`` share no ambient category.  A named
             ``category`` is the explicit request for the arrows of that
             category (``X.Mor(Y, category=Sets())`` forgets structure).
+
+            Owner ruling 2026-10-16 (``ARC-07``): ``A`` has a poset of ambient
+            categories, and ``A.Mor(B)`` is asked in the nearest one that
+            contains ``B``: ``Q[x].Mor(Q[x, 1/x])`` is a map of commutative
+            algebras, not of symmetric algebras.  The search ends before the
+            category of sets: a map of underlying sets is asked by naming
+            ``Sets()``.
             """
             if category is not None:
                 return _category_mor(category, self, codomain)
             ambient = self.ambient_category()
-            assert codomain in ambient, (
-                f"Mor({self}, {codomain}) is asked in the ambient category {ambient} of {self}, "
-                f"but {codomain} is not an object of it (it lies in {codomain.category()}); "
-                f"name the category whose arrows are meant"
+            nearest = next(
+                (
+                    _ambient_of(candidate)
+                    for candidate in ambient.all_super_categories()
+                    if not Sets().is_subcategory(candidate) and codomain in candidate
+                ),
+                None,
             )
-            return ambient.Mor(self, codomain)
+            assert nearest is not None, (
+                f"Mor({self}, {codomain}) has no ambient category: no category above the ambient "
+                f"category {ambient} of {self}, short of sets, contains {codomain} (it lies in "
+                f"{codomain.category()}); name the category whose arrows are meant"
+            )
+            return nearest.Mor(self, codomain)
 
         @object_level
         def End(self):
@@ -2371,7 +2471,9 @@ class Sets(CategoryPacketMethods, OwnedCategory):
                 f"the product {self} x Y needs Y a set, but {other} is not in the category of sets"
             )
             factors = (self, other)
-            return Sets().product(indexed_family(Sets.Δ[1], lambda index: factors[int(index)]))
+            return Sets().product(
+                indexed_family(Sets.Δ[1], lambda index: factors[int(index)])
+            )
 
         def coproduct_with(self, other: Parent) -> Sets().ObjectType:
             r"""Return $X \sqcup Y$, the coproduct asked of the objects."""
@@ -2537,13 +2639,15 @@ class _FiniteLiteralSet(Sets().ObjectType):
         """
         try:
             return point in self._points
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             from sage_extensions.logic import conjunction, negation
 
-            return negation(conjunction(
-                negation(True if point is member else point == member)
-                for member in self._points
-            ))
+            return negation(
+                conjunction(
+                    negation(True if point is member else point == member)
+                    for member in self._points
+                )
+            )
 
     is_parent_of = __contains__
 
@@ -2606,7 +2710,9 @@ class _FiniteLiteralSet(Sets().ObjectType):
             return _FiniteLiteralSet(self._points.difference(other._points))
         from sage_extensions.logic import negation
 
-        return Sets().condition_set(self, lambda member: negation(other.is_parent_of(member)))
+        return Sets().condition_set(
+            self, lambda member: negation(other.is_parent_of(member))
+        )
 
     def __or__(self, other):
         return self.union(other)
@@ -2646,12 +2752,13 @@ def Set[SourcePointT](source: Parent | Iterable[SourcePointT]) -> Sets().ObjectT
     """
     if isinstance(source, _FiniteLiteralSet):
         return source
-    if isinstance(source, Parent) and source in Sets() and (
-        not Sets().is_provably_finite(source) or source not in EnumeratedSets()
+    if (
+        isinstance(source, Parent)
+        and source in Sets()
+        and (not Sets().is_provably_finite(source) or source not in EnumeratedSets())
     ):
         return source
     return _FiniteLiteralSet(source)
-
 
 
 class SetInjection(OwnedSetMorphism):
@@ -2714,7 +2821,9 @@ class SetInjection(OwnedSetMorphism):
             case True:
                 pass
             case False:
-                raise ValueError(f"{self} is not injective as a map {self.domain()} -> {self.codomain()}")
+                raise ValueError(
+                    f"{self} is not injective as a map {self.domain()} -> {self.codomain()}"
+                )
             case _:
                 raise ValueError(
                     f"cannot decide whether {self} is injective as a map {self.domain()} -> {self.codomain()}"
@@ -2760,15 +2869,22 @@ class SetInjection(OwnedSetMorphism):
                 try:
                     lookup = dict(pairs)
                     if len(lookup) != len(pairs):
-                        raise ValueError("a set injection cannot identify distinct source points")
-                except (TypeError, ValueError):
+                        raise ValueError(
+                            "a set injection cannot identify distinct source points"
+                        )
+                except TypeError, ValueError:
                     for position, (key, _) in enumerate(pairs):
                         for previous, _ in pairs[:position]:
                             same = True if key is previous else key == previous
                             if same is True:
-                                raise ValueError("a set injection cannot identify distinct source points")
+                                raise ValueError(
+                                    "a set injection cannot identify distinct source points"
+                                )
                             if same is not False:
-                                raise ValueError("injectivity of the selected image values is undecided")
+                                raise ValueError(
+                                    "injectivity of the selected image values is undecided"
+                                )
+
                     # A finite unhashable image has no dictionary backend.
                     # Retain its represented pairs without assuming that
                     # undecidable point equality is Boolean.
@@ -2779,10 +2895,11 @@ class SetInjection(OwnedSetMorphism):
                                 return point
                         raise ValueError("image preimage is absent or undecided")
                 else:
+
                     def preimage(value):
                         try:
                             return lookup[value]
-                        except (TypeError, ValueError):
+                        except TypeError, ValueError:
                             # A query may have undecidable hash equality even
                             # when the image values established an injective
                             # hash table. A witnessed pair still has an
@@ -2791,6 +2908,7 @@ class SetInjection(OwnedSetMorphism):
                                 if key is value or (key == value) is True:
                                     return point
                             raise ValueError("image preimage is absent or undecided")
+
                 return Sets().Mor(image, domain)(preimage)
 
     @cached_method
@@ -2812,9 +2930,7 @@ class SetInjection(OwnedSetMorphism):
                 f"membership in the image {image} has not been established"
             )
 
-        return Sets().Mor(self.codomain(), truth_values)(
-            characteristic
-        )
+        return Sets().Mor(self.codomain(), truth_values)(characteristic)
 
     def __mul__(self, other):
         r"""Compose; a composite of monomorphisms is placed as a monomorphism."""
@@ -2822,7 +2938,9 @@ class SetInjection(OwnedSetMorphism):
         if composite is NotImplemented:
             return composite
         monomorphisms = Sets().Mono(other.domain(), self.codomain())
-        if self.is_injective() is True and Sets().Mono(other.domain(), other.codomain()).accepts(other):
+        if self.is_injective() is True and Sets().Mono(
+            other.domain(), other.codomain()
+        ).accepts(other):
             if (
                 self._subset_premise
                 and isinstance(other, SetInjection)
@@ -2865,7 +2983,9 @@ class SetSurjection(OwnedSetMorphism):
             case True:
                 pass
             case False:
-                raise ValueError(f"{self} is not surjective as a map {self.domain()} -> {self.codomain()}")
+                raise ValueError(
+                    f"{self} is not surjective as a map {self.domain()} -> {self.codomain()}"
+                )
             case _:
                 raise ValueError(
                     f"cannot decide whether {self} is surjective as a map {self.domain()} -> {self.codomain()}"
@@ -2877,7 +2997,9 @@ class SetSurjection(OwnedSetMorphism):
         if composite is NotImplemented:
             return composite
         epimorphisms = Sets().Epi(other.domain(), self.codomain())
-        if self.is_surjective() is True and Sets().Epi(other.domain(), other.codomain()).accepts(other):
+        if self.is_surjective() is True and Sets().Epi(
+            other.domain(), other.codomain()
+        ).accepts(other):
             return epimorphisms.element_class(
                 epimorphisms,
                 lambda element: self(other(element)),
@@ -2894,14 +3016,19 @@ class SetInjectionMor(SetMorCategory):
     def _element_constructor_(self, datum, *, check=False):
         r"""An injection given by a set map or a function on points; injectivity is its validator."""
         if isinstance(datum, (Map, CategoricalArrow)):
-            if datum.domain() is not self.domain() or datum.codomain() is not self.codomain():
+            if (
+                datum.domain() is not self.domain()
+                or datum.codomain() is not self.codomain()
+            ):
                 raise ValueError(
                     f"cannot view {datum} as an injection {self.domain()} -> {self.codomain()}: it is a map "
                     f"{datum.domain()} -> {datum.codomain()}"
                 )
             if self._already_parented_arrow(datum):
                 return datum
-            raise TypeError(f"{datum} is an arrow of another Mor; give a function on points")
+            raise TypeError(
+                f"{datum} is an arrow of another Mor; give a function on points"
+            )
         elif not callable(datum):
             raise TypeError(
                 f"an injection {self.domain()} -> {self.codomain()} needs a function on points, but "
@@ -2951,7 +3078,9 @@ class SetInjectionMor(SetMorCategory):
             raise ValueError(
                 f"the identity map exists only on Mor(X, X), but this is Mor({self.domain()}, {self.codomain()})"
             )
-        return self.element_class(self, lambda element: element, injectivity_decision=True)
+        return self.element_class(
+            self, lambda element: element, injectivity_decision=True
+        )
 
     def super_categories(self):
         r"""An injection ``X -> Y`` is a map ``X -> Y``: ``Mono_Set(X, Y)`` is a full subcategory of ``Mor_Set(X, Y)``.
@@ -2974,14 +3103,19 @@ class SetSurjectionMor(SetMorCategory):
     def _element_constructor_(self, datum, *, check=False):
         r"""A surjection given by a set map or a function on points; surjectivity is its validator."""
         if isinstance(datum, (Map, CategoricalArrow)):
-            if datum.domain() is not self.domain() or datum.codomain() is not self.codomain():
+            if (
+                datum.domain() is not self.domain()
+                or datum.codomain() is not self.codomain()
+            ):
                 raise ValueError(
                     f"cannot view {datum} as a surjection {self.domain()} -> {self.codomain()}: it is a map "
                     f"{datum.domain()} -> {datum.codomain()}"
                 )
             if self._already_parented_arrow(datum):
                 return datum
-            raise TypeError(f"{datum} is an arrow of another Mor; give a function on points")
+            raise TypeError(
+                f"{datum} is an arrow of another Mor; give a function on points"
+            )
         elif not callable(datum):
             raise TypeError(
                 f"a surjection {self.domain()} -> {self.codomain()} needs a function on points, but "
@@ -3011,7 +3145,9 @@ class SetSurjectionMor(SetMorCategory):
             raise ValueError(
                 f"the identity map exists only on Mor(X, X), but this is Mor({self.domain()}, {self.codomain()})"
             )
-        return self.element_class(self, lambda element: element, surjectivity_decision=True)
+        return self.element_class(
+            self, lambda element: element, surjectivity_decision=True
+        )
 
     def super_categories(self):
         r"""A surjection ``X -> Y`` is a map ``X -> Y``: ``Epi_Set(X, Y)`` is a full subcategory of ``Mor_Set(X, Y)``.
@@ -3133,7 +3269,10 @@ class PowerSets(OwnedCategory):
             if not (
                 isinstance(characteristic_morphism, (Morphism, CategoricalArrow))
                 and _category_accepts_morphism(
-                    Sets(), self.base_set(), self.truth_values(), characteristic_morphism
+                    Sets(),
+                    self.base_set(),
+                    self.truth_values(),
+                    characteristic_morphism,
                 )
             ):
                 raise ValueError(
@@ -3141,7 +3280,9 @@ class PowerSets(OwnedCategory):
                     f"{self.base_set()}"
                 )
             truth = self.truth_values()(1)
-            return self.from_predicate(lambda member: characteristic_morphism(member) == truth)
+            return self.from_predicate(
+                lambda member: characteristic_morphism(member) == truth
+            )
 
         def _from_finite_members(self, members):
             r"""The finite subset on the stated members, with its original inclusion.
@@ -3207,14 +3348,19 @@ class PowerSets(OwnedCategory):
             if candidate is self.base_set():
                 return self.top()
             if candidate in Sets():
-                assert Sets().is_provably_finite(candidate) and candidate in EnumeratedSets(), (
+                assert (
+                    Sets().is_provably_finite(candidate)
+                    and candidate in EnumeratedSets()
+                ), (
                     f"cannot read {candidate} as a subset of {self.base_set()}: a set is read as a subset here only "
                     "through its elements, which needs it finite and enumerated"
                 )
                 return self._from_finite_members(candidate)
             if isinstance(candidate, Iterable):
                 return self._from_finite_members(candidate)
-            raise TypeError(f"{candidate!r} does not present a subset of {self.base_set()}")
+            raise TypeError(
+                f"{candidate!r} does not present a subset of {self.base_set()}"
+            )
 
         def __contains__(self, candidate) -> bool | Predicate:
             r"""Whether ``candidate`` is a subset of \(X\): \(A\in P(X)\) exactly when \(A\subseteq X\).
@@ -3233,7 +3379,10 @@ class PowerSets(OwnedCategory):
                 case _ if candidate is base:
                     return True
                 case _ if candidate in Sets():
-                    if not Sets().is_provably_finite(candidate) or candidate not in EnumeratedSets():
+                    if (
+                        not Sets().is_provably_finite(candidate)
+                        or candidate not in EnumeratedSets()
+                    ):
                         from sage_extensions.logic import AtomicProposition
 
                         return AtomicProposition("is_subset", candidate, base)
@@ -3288,7 +3437,9 @@ class PowerSets(OwnedCategory):
                 )
             target = morphism.domain().power_set()
             return Sets().Mor(self, target)(
-                lambda subset: target.from_predicate(lambda member: subset.is_parent_of(morphism(member)))
+                lambda subset: target.from_predicate(
+                    lambda member: subset.is_parent_of(morphism(member))
+                )
             )
 
         def direct_image_morphism(self, morphism: SetMorphism) -> SetMorphism:
@@ -3325,7 +3476,9 @@ def _finite_subset_ranking_map(subset_set, source) -> CategoricalIsomorphism:
 
     def point_at(position):
         position = int(position)
-        bound = 1 << int(source_size.finite_value()) if source_size.is_finite() else None
+        bound = (
+            1 << int(source_size.finite_value()) if source_size.is_finite() else None
+        )
         if position < 0 or (bound is not None and position >= bound):
             raise IndexError(
                 f"position {position} is out of range for {subset_set}, which has cardinality {subset_set.cardinality()}"
@@ -3363,7 +3516,9 @@ def _finite_subset_ranking_map(subset_set, source) -> CategoricalIsomorphism:
             if decision is True:
                 position |= 1 << source_position
             elif decision is not False:
-                raise ValueError("subset ranking requires decided membership at each source point")
+                raise ValueError(
+                    "subset ranking requires decided membership at each source point"
+                )
         return position
 
     return subset_set._ranking_isomorphism(position_of, point_at)
@@ -3444,14 +3599,19 @@ class FixedCardinalitySubsetSets(OwnedCategory):
     def _call_(self, source, subset_cardinality):
         r"""Construct the set of subsets of ``source`` of the stated cardinality."""
         if source not in Sets():
-            raise ValueError(f"fixed-cardinality subsets require a set source, not {source!r}")
+            raise ValueError(
+                f"fixed-cardinality subsets require a set source, not {source!r}"
+            )
         selected_size = int(subset_cardinality)
         if selected_size < 0 or subset_cardinality != selected_size:
             raise ValueError(
                 f"the cardinality of a subset must be a nonnegative integer, not {subset_cardinality!r}"
             )
         subset_cardinality = selected_size
-        placements = [self, _cardinalities().set_subset_category(source, fixed_size=subset_cardinality)]
+        placements = [
+            self,
+            _cardinalities().set_subset_category(source, fixed_size=subset_cardinality),
+        ]
         engine = None
         if source in EnumeratedSets():
             placements.append(EnumeratedSets())
@@ -3500,12 +3660,16 @@ class FixedCardinalitySubsetSets(OwnedCategory):
                 from sage_extensions.logic import AtomicProposition
 
                 return AtomicProposition("is_member", candidate, self)
-            return ambient_power_set(candidate).domain().cardinality() == cardinal(self.subset_cardinality())
+            return ambient_power_set(candidate).domain().cardinality() == cardinal(
+                self.subset_cardinality()
+            )
 
         is_parent_of = __contains__
 
         def _repr_(self) -> str:
-            return f"Subsets of {self.source()} of cardinality {self.subset_cardinality()}"
+            return (
+                f"Subsets of {self.source()} of cardinality {self.subset_cardinality()}"
+            )
 
 
 class _EnumeratedFixedCardinalitySubsetSetEngine:
@@ -3523,13 +3687,17 @@ class _EnumeratedFixedCardinalitySubsetSetEngine:
                 # The unique zero-element subset has combinadic rank zero;
                 # neither the size of its ambient set nor an enumeration of
                 # the empty subset is needed to select this rank.
-                return selections.ranking_map()(selections.from_source_rank_positions(()))
+                return selections.ranking_map()(
+                    selections.from_source_rank_positions(())
+                )
             members = subset.domain()
             if members in EnumeratedSets() and Sets().is_provably_finite(members):
                 # The actual finite member enumeration determines the rank
                 # positions. Scanning the ambient enumeration does not
                 # terminate for sparse subsets of an infinite source.
-                positions = sorted(int(self.source().ranking_map()(member)) for member in members)
+                positions = sorted(
+                    int(self.source().ranking_map()(member)) for member in members
+                )
                 selection = selections.from_source_rank_positions(positions)
                 return selections.ranking_map()(selection)
             if self.source() in Sets().Infinite():
@@ -3541,15 +3709,23 @@ class _EnumeratedFixedCardinalitySubsetSetEngine:
 
             def source_positions():
                 found = 0
-                for source_position in range(int(cardinal(self.source().cardinality()).finite_value())):
-                    decision = subset.is_parent_of(point_at_source_rank(source_position))
+                for source_position in range(
+                    int(cardinal(self.source().cardinality()).finite_value())
+                ):
+                    decision = subset.is_parent_of(
+                        point_at_source_rank(source_position)
+                    )
                     if decision is True:
                         yield source_position
                         found += 1
                     elif decision is not False:
-                        raise ValueError("fixed-size subset ranking requires decided membership")
+                        raise ValueError(
+                            "fixed-size subset ranking requires decided membership"
+                        )
                 if found != needed:
-                    raise ValueError("the represented subset does not have its stated cardinality")
+                    raise ValueError(
+                        "the represented subset does not have its stated cardinality"
+                    )
 
             selection = selections.from_source_rank_positions(source_positions())
             return selections.ranking_map()(selection)
@@ -3607,7 +3783,9 @@ class FinitePowerSets(OwnedCategory):
             subset = self.source().power_set()(members)
             finite = subset.domain().is_finite()
             if finite is False:
-                raise ValueError(f"{subset.domain()} is not in {self}: it is not finite")
+                raise ValueError(
+                    f"{subset.domain()} is not in {self}: it is not finite"
+                )
             assert finite is True, (
                 f"cannot admit {subset.domain()} into {self}: its finiteness is undecided"
             )
@@ -3641,7 +3819,9 @@ def _finite_subsets(source: Parent) -> Sets().ObjectType:
     return FinitePowerSets()(source)
 
 
-def _condition_set(universe: Parent, predicate: Callable[[SourcePointT], bool | Predicate]) -> Sets().ObjectType:
+def _condition_set(
+    universe: Parent, predicate: Callable[[SourcePointT], bool | Predicate]
+) -> Sets().ObjectType:
     r"""The subset \(\{x\in X : P(x)\}\) of ``universe``, constructed by the set owner.
 
     A subset of a finite set is finite, which places it.
@@ -3675,14 +3855,21 @@ class _ConditionSetEngine:
     retains its predicate without a selected enumeration.
     """
 
-    def __init__(self, universe: Parent, predicate: Callable[[SourcePointT], bool | Predicate], **rest) -> None:
+    def __init__(
+        self,
+        universe: Parent,
+        predicate: Callable[[SourcePointT], bool | Predicate],
+        **rest,
+    ) -> None:
         self._universe = universe
         self._predicate = predicate
         self._admitted_members = {}
         self._selected_point_computation = None
         super().__init__(facade=True, **rest)
 
-    def _retain_point_computation(self, computation: Callable[[], SourcePointT]) -> None:
+    def _retain_point_computation(
+        self, computation: Callable[[], SourcePointT]
+    ) -> None:
         r"""Retain a private, possibly failing choice computation.
 
         Protected realization contract: a successful computation returns
@@ -3837,7 +4024,11 @@ class _ConditionSetEngine:
                 if id(point) in self._admitted_members:
                     return True
                 member = self.predicate()(point)
-                if member is not True and member is not False and not isinstance(member, Predicate):
+                if (
+                    member is not True
+                    and member is not False
+                    and not isinstance(member, Predicate)
+                ):
                     raise TypeError(
                         f"a subset predicate on {universe} must return True, False or a proposition, "
                         f"but returned {member!r} at {point!r}"
@@ -4016,7 +4207,7 @@ class _ImageSetEngine:
             return None
         try:
             return tuple(dict.fromkeys(values))
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             pass
         distinct = []
         for value in values:
@@ -4060,7 +4251,7 @@ class _ImageSetEngine:
             return None
         try:
             return frozenset(values)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             return None
 
     def __iter__(self):
@@ -4107,7 +4298,9 @@ class _ImageSetEngine:
                     # forward map would apply it outside its domain.
                     from sage_extensions.logic import AtomicProposition
 
-                    return conjunction((admitted, AtomicProposition("is_member", element, self)))
+                    return conjunction(
+                        (admitted, AtomicProposition("is_member", element, self))
+                    )
                 image_value = self.image_map()(source(preimage))
                 return True if image_value is element else image_value == element
             case _ if Sets().is_provably_finite(source) and (
@@ -4117,7 +4310,7 @@ class _ImageSetEngine:
                 if hashed is not None:
                     try:
                         return element in hashed
-                    except (TypeError, ValueError):
+                    except TypeError, ValueError:
                         pass
                 # Membership is the finite existential proposition
                 # exists a in A, f(a) = element. It does not require
@@ -4125,10 +4318,12 @@ class _ImageSetEngine:
                 # only to enumerate the image without repetitions.
                 from sage_extensions.logic import conjunction, negation
 
-                return negation(conjunction(
-                    negation(True if element is value else element == value)
-                    for value in self._finite_image_values()
-                ))
+                return negation(
+                    conjunction(
+                        negation(True if element is value else element == value)
+                        for value in self._finite_image_values()
+                    )
+                )
             case _:
                 # Without an inverse or a finite enumeration, existence of a
                 # preimage is still a well-defined proposition. The inability
@@ -4200,6 +4395,7 @@ def _cartesian_product_of(family: IndexedFamily) -> Sets().ObjectType:
         _cardinalities().set_indexed_category(family, operation="product"),
     ]
     from sage_extensions.categories.group.magmas import AdditiveGroups, AdditiveMonoids
+
     commutative_groups = AdditiveGroups().AdditiveCommutative()
     commutative_monoids = AdditiveMonoids().AdditiveCommutative()
 
@@ -4318,22 +4514,29 @@ class CartesianProductsOfSets(OwnedCategory):
                 if self._positional_components is not None:
                     resolved = self._positional_components[position]
                 else:
-                    resolved = self.parent().factor(normalized)(self._components(normalized))
+                    resolved = self.parent().factor(normalized)(
+                        self._components(normalized)
+                    )
                 self._resolved_component_positions[position] = resolved
                 return resolved
             cached = self._resolved_component_identity.get(id(normalized))
             if cached is not None and cached[0] is normalized:
                 return cached[1]
             try:
-                bucket = self._resolved_component_hash_buckets.setdefault(hash(normalized), [])
+                bucket = self._resolved_component_hash_buckets.setdefault(
+                    hash(normalized), []
+                )
                 candidates = (*bucket, *self._resolved_component_unhashable)
-            except (TypeError, ValueError):
+            except TypeError, ValueError:
                 bucket = self._resolved_component_unhashable
                 candidates = self._resolved_components
             for prior_index, resolved in candidates:
                 equal = True if normalized is prior_index else normalized == prior_index
                 if equal is True:
-                    self._resolved_component_identity[id(normalized)] = (normalized, resolved)
+                    self._resolved_component_identity[id(normalized)] = (
+                        normalized,
+                        resolved,
+                    )
                     return resolved
                 # An undecided comparison supplies neither an identification
                 # nor an inequality. Keep this presentation independent in
@@ -4342,7 +4545,9 @@ class CartesianProductsOfSets(OwnedCategory):
                 position = int(self.parent().index_set().ranking_map()(normalized))
                 resolved = self._positional_components[position]
             else:
-                resolved = self.parent().factor(normalized)(self._components(normalized))
+                resolved = self.parent().factor(normalized)(
+                    self._components(normalized)
+                )
             self._resolved_components.append((normalized, resolved))
             bucket.append((normalized, resolved))
             self._resolved_component_identity[id(normalized)] = (normalized, resolved)
@@ -4355,9 +4560,18 @@ class CartesianProductsOfSets(OwnedCategory):
             return (self.component(index) for index in self.parent().index_set())
 
         def _repr_(self) -> str:
-            if not self.parent().has_finite_index_set() or self.parent().index_set() not in EnumeratedSets():
+            if (
+                not self.parent().has_finite_index_set()
+                or self.parent().index_set() not in EnumeratedSets()
+            ):
                 return f"Section of {self.parent()}"
-            return "(" + ", ".join(repr(self.component(index)) for index in self.parent().index_set()) + ")"
+            return (
+                "("
+                + ", ".join(
+                    repr(self.component(index)) for index in self.parent().index_set()
+                )
+                + ")"
+            )
 
         def __eq__(self, other) -> bool | Predicate:
             from sage_extensions.logic import AtomicProposition, conjunction
@@ -4366,10 +4580,19 @@ class CartesianProductsOfSets(OwnedCategory):
                 return True
             if element_parent(other) is not self.parent():
                 return False
-            if not self.parent().has_finite_index_set() or self.parent().index_set() not in EnumeratedSets():
-                return True if self._components is other._components else AtomicProposition("equal", self, other)
+            if (
+                not self.parent().has_finite_index_set()
+                or self.parent().index_set() not in EnumeratedSets()
+            ):
+                return (
+                    True
+                    if self._components is other._components
+                    else AtomicProposition("equal", self, other)
+                )
             undecided = []
-            finite_enumerated = self.parent() in FiniteEnumeratedCartesianProductsOfSets()
+            finite_enumerated = (
+                self.parent() in FiniteEnumeratedCartesianProductsOfSets()
+            )
             for index in self.parent().index_set():
                 left = self.component(index)
                 right = other.component(index)
@@ -4426,7 +4649,9 @@ class CartesianProductsOfSets(OwnedCategory):
             indices = self.index_set()
             if not self.has_finite_index_set() or indices not in EnumeratedSets():
                 return None
-            decisions = tuple(self.factor(index)._emptiness_decision() for index in indices)
+            decisions = tuple(
+                self.factor(index)._emptiness_decision() for index in indices
+            )
             if any(decision is True for decision in decisions):
                 return True
             if all(decision is False for decision in decisions):
@@ -4463,7 +4688,10 @@ class CartesianProductsOfSets(OwnedCategory):
                 )
             if callable(components):
                 return self.element_class(self, components)
-            if not self.has_finite_index_set() or self.index_set() not in EnumeratedSets():
+            if (
+                not self.has_finite_index_set()
+                or self.index_set() not in EnumeratedSets()
+            ):
                 raise TypeError(
                     f"cannot read {components!r} as an element of {self} component by component: the index set "
                     f"{self.index_set()} is not finite and enumerated; give a function from indices to components"
@@ -4476,7 +4704,8 @@ class CartesianProductsOfSets(OwnedCategory):
                     f"{len(values)} were given"
                 )
             positional = tuple(
-                self.factor(index)(value) for index, value in zip(indices, values, strict=True)
+                self.factor(index)(value)
+                for index, value in zip(indices, values, strict=True)
             )
             ranking = self.index_set().ranking_map()
             return self.element_class(
@@ -4487,7 +4716,9 @@ class CartesianProductsOfSets(OwnedCategory):
 
         def projection(self, index: IndexT) -> SetMorphism:
             normalized = self.index_set()(index)
-            return Sets().Mor(self, self.factor(normalized))(lambda element: element.component(normalized))
+            return Sets().Mor(self, self.factor(normalized))(
+                lambda element: element.component(normalized)
+            )
 
         def from_maps(
             self,
@@ -4506,8 +4737,13 @@ class CartesianProductsOfSets(OwnedCategory):
                 raise TypeError(f"a set product map needs a set source, not {source}")
             index = self.index_set()
             if not Sets().is_provably_finite(index) or index not in EnumeratedSets():
-                from sage_extensions.categories.abstract_categories.functors import DiscreteCategory, _ConstantDiagram
-                from sage_extensions.categories.functors.core import NaturalTransformation
+                from sage_extensions.categories.abstract_categories.functors import (
+                    DiscreteCategory,
+                    _ConstantDiagram,
+                )
+                from sage_extensions.categories.functors.core import (
+                    NaturalTransformation,
+                )
 
                 if isinstance(maps, NaturalTransformation):
                     diagram = self.family().selected_diagram()
@@ -4515,17 +4751,42 @@ class CartesianProductsOfSets(OwnedCategory):
                     constant = self.family().constant_value()
                     if diagram is None and constant is not None:
                         target_diagram = maps.target()
-                        if not isinstance(target_diagram, _ConstantDiagram) or target_diagram.constant_value() is not constant:
-                            raise ValueError("the target diagram does not present the product's constant factor")
+                        if (
+                            not isinstance(target_diagram, _ConstantDiagram)
+                            or target_diagram.constant_value() is not constant
+                        ):
+                            raise ValueError(
+                                "the target diagram does not present the product's constant factor"
+                            )
                         diagram = target_diagram
-                    if diagram is None or maps.target() is not diagram or maps.source().domain() is not index_category:
-                        raise ValueError("the component transformation must target the product's exact indexed diagram")
-                    if not diagram.codomain().is_subcategory(Sets()) or maps.source().codomain() is not diagram.codomain():
-                        raise TypeError("the component transformation must have the product's set-valued codomain")
-                    if not isinstance(maps.source(), _ConstantDiagram) or maps.source().constant_value() is not source:
-                        raise ValueError("the component transformation must have the selected constant source")
+                    if (
+                        diagram is None
+                        or maps.target() is not diagram
+                        or maps.source().domain() is not index_category
+                    ):
+                        raise ValueError(
+                            "the component transformation must target the product's exact indexed diagram"
+                        )
+                    if (
+                        not diagram.codomain().is_subcategory(Sets())
+                        or maps.source().codomain() is not diagram.codomain()
+                    ):
+                        raise TypeError(
+                            "the component transformation must have the product's set-valued codomain"
+                        )
+                    if (
+                        not isinstance(maps.source(), _ConstantDiagram)
+                        or maps.source().constant_value() is not source
+                    ):
+                        raise ValueError(
+                            "the component transformation must have the selected constant source"
+                        )
                     return Sets().Mor(source, self)(
-                        lambda element: self(lambda label: maps.component(index_category.object(label))(element))
+                        lambda element: self(
+                            lambda label: maps.component(index_category.object(label))(
+                                element
+                            )
+                        )
                     )
                 raise TypeError(
                     "a set product without finite enumerated indices requires a selected "
@@ -4534,7 +4795,10 @@ class CartesianProductsOfSets(OwnedCategory):
             # The chosen enumeration is a bijection, so it supplies the
             # component selector without re-solving equality of index labels
             # on every evaluation (labels can themselves be unhashable).
-            from sage_extensions.categories.abstract_categories.functors import DiscreteCategory, _ConstantDiagram
+            from sage_extensions.categories.abstract_categories.functors import (
+                DiscreteCategory,
+                _ConstantDiagram,
+            )
             from sage_extensions.categories.functors.core import NaturalTransformation
 
             labels = tuple(index)
@@ -4543,30 +4807,65 @@ class CartesianProductsOfSets(OwnedCategory):
                 diagram = self.family().selected_diagram()
                 constant = self.family().constant_value()
                 if diagram is None and constant is not None:
-                    if isinstance(maps.target(), _ConstantDiagram) and maps.target().constant_value() is constant:
+                    if (
+                        isinstance(maps.target(), _ConstantDiagram)
+                        and maps.target().constant_value() is constant
+                    ):
                         diagram = maps.target()
-                if diagram is None and maps.target().domain() is index_category and maps.target().codomain().is_subcategory(Sets()):
+                if (
+                    diagram is None
+                    and maps.target().domain() is index_category
+                    and maps.target().codomain().is_subcategory(Sets())
+                ):
                     # Every factor can be inspected at finite enumerated
                     # indices; the diagram must agree at every actual object.
-                    if all(maps.target()(index_category.object(label)) is self.factor(label) for label in labels):
+                    if all(
+                        maps.target()(index_category.object(label))
+                        is self.factor(label)
+                        for label in labels
+                    ):
                         diagram = maps.target()
-                if diagram is None or maps.target() is not diagram or maps.source().domain() is not index_category:
-                    raise ValueError("the component transformation must target the product's exact indexed diagram")
-                if maps.source().codomain() is not diagram.codomain() or not diagram.codomain().is_subcategory(Sets()):
+                if (
+                    diagram is None
+                    or maps.target() is not diagram
+                    or maps.source().domain() is not index_category
+                ):
+                    raise ValueError(
+                        "the component transformation must target the product's exact indexed diagram"
+                    )
+                if (
+                    maps.source().codomain() is not diagram.codomain()
+                    or not diagram.codomain().is_subcategory(Sets())
+                ):
                     raise TypeError("the component transformation must be set-valued")
-                if not isinstance(maps.source(), _ConstantDiagram) or maps.source().constant_value() is not source:
-                    raise ValueError("the component transformation must have the selected constant source")
-                components = tuple(maps.component(index_category.object(label)) for label in labels)
+                if (
+                    not isinstance(maps.source(), _ConstantDiagram)
+                    or maps.source().constant_value() is not source
+                ):
+                    raise ValueError(
+                        "the component transformation must have the selected constant source"
+                    )
+                components = tuple(
+                    maps.component(index_category.object(label)) for label in labels
+                )
             else:
                 components = tuple(maps(label) for label in labels)
             for label, morphism in zip(labels, components, strict=True):
-                from sage_extensions.categories.abstract_categories.mor_categories import _category_accepts_morphism
+                from sage_extensions.categories.abstract_categories.mor_categories import (
+                    _category_accepts_morphism,
+                )
 
-                if not _category_accepts_morphism(Sets(), source, self.factor(label), morphism):
-                    raise TypeError(f"the component at {label} is not a set morphism into {self.factor(label)}")
+                if not _category_accepts_morphism(
+                    Sets(), source, self.factor(label), morphism
+                ):
+                    raise TypeError(
+                        f"the component at {label} is not a set morphism into {self.factor(label)}"
+                    )
             ranking = index.ranking_map()
             return Sets().Mor(source, self)(
-                lambda element: self(lambda label: components[int(ranking(label))](element))
+                lambda element: self(
+                    lambda label: components[int(ranking(label))](element)
+                )
             )
 
         def _repr_(self) -> str:
@@ -4691,11 +4990,18 @@ class CartesianProductsOfAdditiveMonoids(OwnedCategory):
             from sage_extensions.categories.group.magmas import AdditiveMonoids
 
             if source not in AdditiveMonoids():
-                raise TypeError(f"an additive product map needs an additive-monoid source, not {source}")
+                raise TypeError(
+                    f"an additive product map needs an additive-monoid source, not {source}"
+                )
             index = self.index_set()
             if not Sets().is_provably_finite(index) or index not in EnumeratedSets():
-                from sage_extensions.categories.abstract_categories.functors import DiscreteCategory, _ConstantDiagram
-                from sage_extensions.categories.functors.core import NaturalTransformation
+                from sage_extensions.categories.abstract_categories.functors import (
+                    DiscreteCategory,
+                    _ConstantDiagram,
+                )
+                from sage_extensions.categories.functors.core import (
+                    NaturalTransformation,
+                )
 
                 diagram = self.family().selected_diagram()
                 index_category = DiscreteCategory(index)
@@ -4711,21 +5017,49 @@ class CartesianProductsOfAdditiveMonoids(OwnedCategory):
                     # selected constant family even without a separately
                     # stored functor. A selected constant target diagram at
                     # that very A presents exactly its component endpoints.
-                    if not isinstance(target_diagram, _ConstantDiagram) or target_diagram.constant_value() is not constant_factor:
-                        raise ValueError("the target diagram does not present the product's constant factor")
+                    if (
+                        not isinstance(target_diagram, _ConstantDiagram)
+                        or target_diagram.constant_value() is not constant_factor
+                    ):
+                        raise ValueError(
+                            "the target diagram does not present the product's constant factor"
+                        )
                     diagram = target_diagram
-                if diagram is None or target_diagram is not diagram or maps.source().domain() is not index_category:
-                    raise ValueError("the component transformation must target the product's exact indexed diagram")
-                if maps.source().codomain() is not diagram.codomain() or not diagram.codomain().is_subcategory(AdditiveMonoids()):
-                    raise TypeError("the component transformation must be additive-monoid-valued")
-                if not isinstance(maps.source(), _ConstantDiagram) or maps.source().constant_value() is not source:
-                    raise ValueError("the component transformation must have the selected constant source")
+                if (
+                    diagram is None
+                    or target_diagram is not diagram
+                    or maps.source().domain() is not index_category
+                ):
+                    raise ValueError(
+                        "the component transformation must target the product's exact indexed diagram"
+                    )
+                if (
+                    maps.source().codomain() is not diagram.codomain()
+                    or not diagram.codomain().is_subcategory(AdditiveMonoids())
+                ):
+                    raise TypeError(
+                        "the component transformation must be additive-monoid-valued"
+                    )
+                if (
+                    not isinstance(maps.source(), _ConstantDiagram)
+                    or maps.source().constant_value() is not source
+                ):
+                    raise ValueError(
+                        "the component transformation must have the selected constant source"
+                    )
 
                 def induced(point):
-                    return self(lambda label: maps.component(index_category.object(label))(point))
+                    return self(
+                        lambda label: maps.component(index_category.object(label))(
+                            point
+                        )
+                    )
 
                 return AdditiveMonoids().Mor(source, self)(induced)
-            from sage_extensions.categories.abstract_categories.functors import DiscreteCategory, _ConstantDiagram
+            from sage_extensions.categories.abstract_categories.functors import (
+                DiscreteCategory,
+                _ConstantDiagram,
+            )
             from sage_extensions.categories.functors.core import NaturalTransformation
 
             labels = tuple(index)
@@ -4734,34 +5068,74 @@ class CartesianProductsOfAdditiveMonoids(OwnedCategory):
                 diagram = self.family().selected_diagram()
                 constant = self.family().constant_value()
                 if diagram is None and constant is not None:
-                    if isinstance(maps.target(), _ConstantDiagram) and maps.target().constant_value() is constant:
+                    if (
+                        isinstance(maps.target(), _ConstantDiagram)
+                        and maps.target().constant_value() is constant
+                    ):
                         diagram = maps.target()
-                if diagram is None and maps.target().domain() is shape and maps.target().codomain().is_subcategory(AdditiveMonoids()):
-                    if all(maps.target()(shape.object(label)) is self.factor(label) for label in labels):
+                if (
+                    diagram is None
+                    and maps.target().domain() is shape
+                    and maps.target().codomain().is_subcategory(AdditiveMonoids())
+                ):
+                    if all(
+                        maps.target()(shape.object(label)) is self.factor(label)
+                        for label in labels
+                    ):
                         diagram = maps.target()
-                if diagram is None or maps.target() is not diagram or maps.source().domain() is not shape:
-                    raise ValueError("the component transformation must target the additive product's exact diagram")
-                if maps.source().codomain() is not diagram.codomain() or not diagram.codomain().is_subcategory(AdditiveMonoids()):
-                    raise TypeError("the component transformation must be additive-monoid-valued")
-                if not isinstance(maps.source(), _ConstantDiagram) or maps.source().constant_value() is not source:
-                    raise ValueError("the component transformation must have the selected constant source")
-                components = tuple(maps.component(shape.object(label)) for label in labels)
+                if (
+                    diagram is None
+                    or maps.target() is not diagram
+                    or maps.source().domain() is not shape
+                ):
+                    raise ValueError(
+                        "the component transformation must target the additive product's exact diagram"
+                    )
+                if (
+                    maps.source().codomain() is not diagram.codomain()
+                    or not diagram.codomain().is_subcategory(AdditiveMonoids())
+                ):
+                    raise TypeError(
+                        "the component transformation must be additive-monoid-valued"
+                    )
+                if (
+                    not isinstance(maps.source(), _ConstantDiagram)
+                    or maps.source().constant_value() is not source
+                ):
+                    raise ValueError(
+                        "the component transformation must have the selected constant source"
+                    )
+                components = tuple(
+                    maps.component(shape.object(label)) for label in labels
+                )
             else:
                 components = tuple(maps(label) for label in labels)
-            from sage_extensions.categories.abstract_categories.mor_categories import _category_accepts_morphism
+            from sage_extensions.categories.abstract_categories.mor_categories import (
+                _category_accepts_morphism,
+            )
 
             for label, morphism in zip(labels, components, strict=True):
-                if not _category_accepts_morphism(AdditiveMonoids(), source, self.factor(label), morphism):
-                    raise TypeError(f"the component at {label} is not an additive morphism into {self.factor(label)}")
+                if not _category_accepts_morphism(
+                    AdditiveMonoids(), source, self.factor(label), morphism
+                ):
+                    raise TypeError(
+                        f"the component at {label} is not an additive morphism into {self.factor(label)}"
+                    )
             if index in EnumeratedSets():
                 ranking = index.ranking_map()
                 return AdditiveMonoids().Mor(source, self)(
-                    lambda point: self(lambda label: components[int(ranking(label))](point))
+                    lambda point: self(
+                        lambda label: components[int(ranking(label))](point)
+                    )
                 )
             return AdditiveMonoids().Mor(source, self)(
-                lambda point: self(lambda label: next(
-                    morphism(point) for key, morphism in zip(labels, components, strict=True) if key == label
-                ))
+                lambda point: self(
+                    lambda label: next(
+                        morphism(point)
+                        for key, morphism in zip(labels, components, strict=True)
+                        if key == label
+                    )
+                )
             )
 
 
@@ -4822,7 +5196,9 @@ def _cartesian_product_ranking_map(product) -> CategoricalIsomorphism:
 
     def point_at(position):
         position = int(position)
-        if position < 0 or (product_size.is_finite() and position >= int(product_size.finite_value())):
+        if position < 0 or (
+            product_size.is_finite() and position >= int(product_size.finite_value())
+        ):
             raise IndexError(
                 f"position {position} is out of range for {product}, which has cardinality {product_size}"
             )
@@ -4923,7 +5299,9 @@ class CoproductsOfSets(OwnedCategory):
                 ranking = indices.ranking_map()
                 same_index = ranking(left_index) == ranking(right_index)
             else:
-                same_index = True if left_index is right_index else left_index == right_index
+                same_index = (
+                    True if left_index is right_index else left_index == right_index
+                )
             if same_index is False:
                 return False
             if same_index is True:
@@ -4986,7 +5364,9 @@ class CoproductsOfSets(OwnedCategory):
                 cofactor = self.cofactor(index)
                 if cofactor.is_empty() is False:
                     return self(index, cofactor.an_element())
-            assert False, f"cannot choose a point of {self}: no summand is decided nonempty"
+            assert False, (
+                f"cannot choose a point of {self}: no summand is decided nonempty"
+            )
 
         def __call__(self, *args, **kwargs):
             r"""Construct through the owned set representation directly."""
@@ -5007,7 +5387,9 @@ class CoproductsOfSets(OwnedCategory):
 
         def injection(self, index: IndexT) -> SetMorphism:
             normalized = self.index_set()(index)
-            return Sets().Mor(self.cofactor(normalized), self)(lambda element: self(normalized, element))
+            return Sets().Mor(self.cofactor(normalized), self)(
+                lambda element: self(normalized, element)
+            )
 
         def from_maps(
             self,
@@ -5018,66 +5400,117 @@ class CoproductsOfSets(OwnedCategory):
             from sage_extensions.categories.functors.core import NaturalTransformation
 
             if target not in Sets():
-                raise TypeError(f"a set coproduct map requires a set target, not {target}")
+                raise TypeError(
+                    f"a set coproduct map requires a set target, not {target}"
+                )
             index_set = self.index_set()
-            if not Sets().is_provably_finite(index_set) or index_set not in EnumeratedSets():
+            if (
+                not Sets().is_provably_finite(index_set)
+                or index_set not in EnumeratedSets()
+            ):
                 if not isinstance(maps, NaturalTransformation):
                     raise TypeError(
                         "a map from a coproduct without finite enumerated indices needs a selected family of set morphisms, "
                         "not an unchecked component callback"
                     )
-                from sage_extensions.categories.abstract_categories.functors import DiscreteCategory, _ConstantDiagram
+                from sage_extensions.categories.abstract_categories.functors import (
+                    DiscreteCategory,
+                    _ConstantDiagram,
+                )
 
                 index_category = DiscreteCategory(index_set)
-                if maps.source().domain() is not index_category or maps.target().domain() is not index_category:
-                    raise ValueError("the component transformation must use the coproduct's exact discrete index category")
-                if not maps.source().codomain().is_subcategory(Sets()) or not maps.target().codomain().is_subcategory(Sets()):
+                if (
+                    maps.source().domain() is not index_category
+                    or maps.target().domain() is not index_category
+                ):
+                    raise ValueError(
+                        "the component transformation must use the coproduct's exact discrete index category"
+                    )
+                if not maps.source().codomain().is_subcategory(
+                    Sets()
+                ) or not maps.target().codomain().is_subcategory(Sets()):
                     raise TypeError("the component transformation must be set-valued")
                 selected = self.family().selected_diagram()
                 constant = self.family().constant_value()
                 if selected is None and constant is not None:
-                    if isinstance(maps.source(), _ConstantDiagram) and maps.source().constant_value() is constant:
+                    if (
+                        isinstance(maps.source(), _ConstantDiagram)
+                        and maps.source().constant_value() is constant
+                    ):
                         selected = maps.source()
                 if selected is None or maps.source() is not selected:
-                    raise ValueError("the component transformation must start at the coproduct's exact indexed diagram")
-                if not isinstance(maps.target(), _ConstantDiagram) or maps.target().constant_value() is not target:
-                    raise ValueError("the component transformation must target the selected constant target set")
+                    raise ValueError(
+                        "the component transformation must start at the coproduct's exact indexed diagram"
+                    )
+                if (
+                    not isinstance(maps.target(), _ConstantDiagram)
+                    or maps.target().constant_value() is not target
+                ):
+                    raise ValueError(
+                        "the component transformation must target the selected constant target set"
+                    )
 
                 def induced(element):
                     label = element.summand_index()
                     selected = index_category.object(label)
                     component = maps.component(selected)
                     if component.domain() is not self.cofactor(label):
-                        raise TypeError("the selected component has the wrong coproduct summand")
+                        raise TypeError(
+                            "the selected component has the wrong coproduct summand"
+                        )
                     return component(element.summand_element())
 
                 return Sets().Mor(self, target)(induced)
             if isinstance(maps, NaturalTransformation):
-                from sage_extensions.categories.abstract_categories.functors import DiscreteCategory, _ConstantDiagram
+                from sage_extensions.categories.abstract_categories.functors import (
+                    DiscreteCategory,
+                    _ConstantDiagram,
+                )
 
                 shape = DiscreteCategory(index_set)
                 selected = self.family().selected_diagram()
                 constant = self.family().constant_value()
                 if selected is None and constant is not None:
-                    if isinstance(maps.source(), _ConstantDiagram) and maps.source().constant_value() is constant:
+                    if (
+                        isinstance(maps.source(), _ConstantDiagram)
+                        and maps.source().constant_value() is constant
+                    ):
                         selected = maps.source()
-                if selected is None and maps.source().domain() is shape and maps.source().codomain().is_subcategory(Sets()):
+                if (
+                    selected is None
+                    and maps.source().domain() is shape
+                    and maps.source().codomain().is_subcategory(Sets())
+                ):
                     # At finite enumerated indices, validate the complete
                     # supplied diagram against the actual summand family.
-                    if all(maps.source()(shape.object(index)) is self.cofactor(index) for index in index_set):
+                    if all(
+                        maps.source()(shape.object(index)) is self.cofactor(index)
+                        for index in index_set
+                    ):
                         selected = maps.source()
-                if (selected is None or maps.source() is not selected
+                if (
+                    selected is None
+                    or maps.source() is not selected
                     or maps.source().domain() is not shape
                     or not isinstance(maps.target(), _ConstantDiagram)
-                    or maps.target().constant_value() is not target):
-                    raise ValueError("the finite coproduct cocone must use its actual summand diagram and constant target")
-                components = tuple((index, maps.component(shape.object(index))) for index in index_set)
+                    or maps.target().constant_value() is not target
+                ):
+                    raise ValueError(
+                        "the finite coproduct cocone must use its actual summand diagram and constant target"
+                    )
+                components = tuple(
+                    (index, maps.component(shape.object(index))) for index in index_set
+                )
             else:
                 components = tuple((index, maps(index)) for index in index_set)
             for index, morphism in components:
-                from sage_extensions.categories.abstract_categories.mor_categories import _category_accepts_morphism
+                from sage_extensions.categories.abstract_categories.mor_categories import (
+                    _category_accepts_morphism,
+                )
 
-                if not _category_accepts_morphism(Sets(), self.cofactor(index), target, morphism):
+                if not _category_accepts_morphism(
+                    Sets(), self.cofactor(index), target, morphism
+                ):
                     raise TypeError(
                         f"the component at {index} must lie in the exact Mor category "
                         f"from {self.cofactor(index)} to {target}"
@@ -5181,9 +5614,13 @@ class EnumeratedCoproductsOfSets(OwnedCategory):
             if count is None or self._known_finite_size() is None:
                 return None
             index_at = self.index_set().ranking_map().inverse()
-            sizes = tuple(cardinal(self.cofactor(index_at(j)).cardinality()) for j in range(count))
+            sizes = tuple(
+                cardinal(self.cofactor(index_at(j)).cardinality()) for j in range(count)
+            )
             if not all(size.is_finite() is True for size in sizes):
-                raise ValueError("finite coproduct ranking requires certified finite summand cardinalities")
+                raise ValueError(
+                    "finite coproduct ranking requires certified finite summand cardinalities"
+                )
             return tuple(int(size.finite_value()) for size in sizes)
 
         def _enumeration_pairs(self):
@@ -5206,13 +5643,20 @@ class EnumeratedCoproductsOfSets(OwnedCategory):
                     cardinal(self.cofactor(index_at(j)).cardinality())
                     for j in range(finite_index_count)
                 )
-                if not all(length.is_finite() is True or length.is_finite() is False for length in lengths):
-                    raise ValueError("coproduct rank-layer enumeration needs decided summand finiteness")
+                if not all(
+                    length.is_finite() is True or length.is_finite() is False
+                    for length in lengths
+                ):
+                    raise ValueError(
+                        "coproduct rank-layer enumeration needs decided summand finiteness"
+                    )
                 layer = 0
                 while True:
                     emitted = False
                     for index_position, length in enumerate(lengths):
-                        if length.is_finite() is False or layer < int(length.finite_value()):
+                        if length.is_finite() is False or layer < int(
+                            length.finite_value()
+                        ):
                             emitted = True
                             yield index_position, layer
                     if not emitted:
@@ -5256,11 +5700,13 @@ class EnumeratedCoproductsOfSets(OwnedCategory):
                 sizes = self._finite_summand_sizes()
                 if sizes is not None:
                     from bisect import bisect_right
+
                     # The cumulative number of points up to layer k is
                     # sum(min(k + 1, n_j)). Search those monotone cumulative
                     # counts without enumerating earlier coproduct elements.
                     layer = bisect_right(
-                        range(max(sizes, default=0)), position,
+                        range(max(sizes, default=0)),
+                        position,
                         key=lambda k: sum(min(k + 1, n) for n in sizes),
                     )
                     previous = sum(min(layer, n) for n in sizes)
@@ -5268,7 +5714,10 @@ class EnumeratedCoproductsOfSets(OwnedCategory):
                         if size > layer:
                             if previous == position:
                                 index = index_at(j)
-                                return self(index, self._factor_point_at(self.cofactor(index), layer))
+                                return self(
+                                    index,
+                                    self._factor_point_at(self.cofactor(index), layer),
+                                )
                             previous += 1
                     raise IndexError(f"position {position} is out of range for {self}")
                 finite_indices = self._finite_index_count()
@@ -5280,12 +5729,23 @@ class EnumeratedCoproductsOfSets(OwnedCategory):
                         for j in range(finite_indices)
                     )
                     if not any(length.is_finite() is False for length in lengths):
-                        raise ValueError("infinite coproduct ranking requires a certified infinite summand")
-                    if any(length.is_finite() is not False and length.is_finite() is not True for length in lengths):
-                        raise ValueError("coproduct inverse ranking needs decided finiteness of each summand")
+                        raise ValueError(
+                            "infinite coproduct ranking requires a certified infinite summand"
+                        )
+                    if any(
+                        length.is_finite() is not False
+                        and length.is_finite() is not True
+                        for length in lengths
+                    ):
+                        raise ValueError(
+                            "coproduct inverse ranking needs decided finiteness of each summand"
+                        )
+
                     def preceding(layer):
                         return sum(
-                            min(layer, int(length.finite_value())) if length.is_finite() else layer
+                            min(layer, int(length.finite_value()))
+                            if length.is_finite()
+                            else layer
                             for length in lengths
                         )
 
@@ -5301,10 +5761,15 @@ class EnumeratedCoproductsOfSets(OwnedCategory):
                         if not length.is_finite() or int(length.finite_value()) > layer:
                             if remaining == 0:
                                 index = index_at(j)
-                                return self(index, self._factor_point_at(self.cofactor(index), layer))
+                                return self(
+                                    index,
+                                    self._factor_point_at(self.cofactor(index), layer),
+                                )
                             remaining -= 1
                     raise IndexError(f"position {position} is out of range for {self}")
-                for reached, (index_position, factor_position) in enumerate(self._enumeration_pairs()):
+                for reached, (index_position, factor_position) in enumerate(
+                    self._enumeration_pairs()
+                ):
                     if reached != position:
                         continue
                     index = index_at(index_position)
@@ -5319,7 +5784,9 @@ class EnumeratedCoproductsOfSets(OwnedCategory):
                 summand = element.summand_index()
                 target = (
                     int(self.index_set().ranking_map()(summand)),
-                    self._factor_position_of(self.cofactor(summand), element.summand_element()),
+                    self._factor_position_of(
+                        self.cofactor(summand), element.summand_element()
+                    ),
                 )
                 sizes = self._finite_summand_sizes()
                 if sizes is not None:
@@ -5341,11 +5808,19 @@ class EnumeratedCoproductsOfSets(OwnedCategory):
                         cardinal(self.cofactor(index_at(j)).cardinality())
                         for j in range(finite_indices)
                     )
-                    if any(length.is_finite() is not False and length.is_finite() is not True for length in lengths):
-                        raise ValueError("coproduct ranking needs decided finiteness of each summand")
+                    if any(
+                        length.is_finite() is not False
+                        and length.is_finite() is not True
+                        for length in lengths
+                    ):
+                        raise ValueError(
+                            "coproduct ranking needs decided finiteness of each summand"
+                        )
                     summand_rank, layer = target
                     return sum(
-                        min(layer, int(length.finite_value())) if length.is_finite() else layer
+                        min(layer, int(length.finite_value()))
+                        if length.is_finite()
+                        else layer
                         for length in lengths
                     ) + sum(
                         not length.is_finite() or int(length.finite_value()) > layer
@@ -5357,6 +5832,7 @@ class EnumeratedCoproductsOfSets(OwnedCategory):
                 raise ValueError(f"{element!r} is not an element of {self}")
 
             return self._ranking_isomorphism(position_of, point_at)
+
 
 DisjointUnionsOfSets = CoproductsOfSets
 
@@ -5379,14 +5855,19 @@ class _FiniteWordSet:
             case True:
                 degree_set = alphabet.multisets_of_size
             case False:
+
                 def degree_set(degree):
                     positions = finite_ordinal_set(int(degree))
                     return Sets().product(indexed_family(positions, lambda _: alphabet))
+
         super().__init__(family=indexed_family(NN, degree_set), **rest)
 
     def _cardinality_decision(self):
         alphabet_size = self._alphabet._cardinality_decision()
-        if alphabet_size is None or not cardinal(alphabet_size).expression().is_normal_form():
+        if (
+            alphabet_size is None
+            or not cardinal(alphabet_size).expression().is_normal_form()
+        ):
             return None
         match cardinal(alphabet_size) == 0:
             case True:
@@ -5409,7 +5890,8 @@ def _finite_words(alphabet, *, commutative):
     return _object_of(
         owned_category_join((EnumeratedCoproductsOfSets(), size_category)),
         _engine=(CoproductsOfSets(), _FiniteWordSet, None),
-        alphabet=alphabet, commutative=commutative,
+        alphabet=alphabet,
+        commutative=commutative,
     )
 
 
@@ -5444,46 +5926,86 @@ def _cartesian_product_morphism[IndexT](
         )
     index_set = source.index_set()
     if not Sets().is_provably_finite(index_set) or index_set not in EnumeratedSets():
-        from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+        from sage_extensions.categories.abstract_categories.functors import (
+            DiscreteCategory,
+        )
         from sage_extensions.categories.functors.core import NaturalTransformation
 
         if not isinstance(component_morphisms, NaturalTransformation):
-            raise TypeError("componentwise product maps need a selected typed family without finite enumerated indices")
+            raise TypeError(
+                "componentwise product maps need a selected typed family without finite enumerated indices"
+            )
         transformation = component_morphisms
         shape = DiscreteCategory(index_set)
-        if transformation.source().domain() is not shape or transformation.target().domain() is not shape:
-            raise ValueError("the product component transformation must have the exact discrete index category")
-        if not transformation.source().codomain().is_subcategory(Sets()) or not transformation.target().codomain().is_subcategory(Sets()):
+        if (
+            transformation.source().domain() is not shape
+            or transformation.target().domain() is not shape
+        ):
+            raise ValueError(
+                "the product component transformation must have the exact discrete index category"
+            )
+        if not transformation.source().codomain().is_subcategory(
+            Sets()
+        ) or not transformation.target().codomain().is_subcategory(Sets()):
             raise TypeError("componentwise product transformations must be set-valued")
-        from sage_extensions.categories.abstract_categories.functors import _ConstantDiagram
+        from sage_extensions.categories.abstract_categories.functors import (
+            _ConstantDiagram,
+        )
 
-        for product, diagram in ((source, transformation.source()), (target, transformation.target())):
+        for product, diagram in (
+            (source, transformation.source()),
+            (target, transformation.target()),
+        ):
             selected = product.family().selected_diagram()
             constant = product.family().constant_value()
             if selected is not None:
                 if diagram is not selected:
-                    raise ValueError("the component transformation must use the product's selected factor diagram")
-            elif constant is None or not isinstance(diagram, _ConstantDiagram) or diagram.constant_value() is not constant:
-                raise ValueError("the component transformation must use the product's constant factor diagram")
+                    raise ValueError(
+                        "the component transformation must use the product's selected factor diagram"
+                    )
+            elif (
+                constant is None
+                or not isinstance(diagram, _ConstantDiagram)
+                or diagram.constant_value() is not constant
+            ):
+                raise ValueError(
+                    "the component transformation must use the product's constant factor diagram"
+                )
 
         def component(index):
             selected = shape.object(index)
-            if transformation.source()(selected) is not source.factor(index) or transformation.target()(selected) is not target.factor(index):
-                raise ValueError("the component transformation does not have the product's factor objects")
+            if transformation.source()(selected) is not source.factor(
+                index
+            ) or transformation.target()(selected) is not target.factor(index):
+                raise ValueError(
+                    "the component transformation does not have the product's factor objects"
+                )
             arrow = transformation.component(selected)
-            if not _category_accepts_morphism(Sets(), source.factor(index), target.factor(index), arrow):
-                raise TypeError(f"component at {index} is not a set morphism between its selected factors")
+            if not _category_accepts_morphism(
+                Sets(), source.factor(index), target.factor(index), arrow
+            ):
+                raise TypeError(
+                    f"component at {index} is not a set morphism between its selected factors"
+                )
             return arrow
 
         return Sets().Mor(source, target)(
-            lambda section: target(lambda index: component(index)(section.component(index)))
+            lambda section: target(
+                lambda index: component(index)(section.component(index))
+            )
         )
     components = tuple((index, component_morphisms(index)) for index in index_set)
-    from sage_extensions.categories.abstract_categories.mor_categories import _category_accepts_morphism
+    from sage_extensions.categories.abstract_categories.mor_categories import (
+        _category_accepts_morphism,
+    )
 
     for index, arrow in components:
-        if not _category_accepts_morphism(Sets(), source.factor(index), target.factor(index), arrow):
-            raise TypeError(f"component at {index} is not a set morphism between its selected factors")
+        if not _category_accepts_morphism(
+            Sets(), source.factor(index), target.factor(index), arrow
+        ):
+            raise TypeError(
+                f"component at {index} is not a set morphism between its selected factors"
+            )
     # The finite enumeration gives the unique coordinate of each label.
     # Do not search component labels with potentially symbolic equality.
     ranking = index_set.ranking_map()
@@ -5524,10 +6046,15 @@ def _coproduct_of_indexed_family(family: IndexedFamily) -> Sets().ObjectType:
         index_set in EnumeratedSets()
         and index_set in Sets().Infinite()
         and (
-            (family.constant_value() is not None and family.constant_value() in EnumeratedSets())
+            (
+                family.constant_value() is not None
+                and family.constant_value() in EnumeratedSets()
+            )
             or (
                 family.selected_diagram() is not None
-                and family.selected_diagram().codomain().is_subcategory(EnumeratedSets())
+                and family.selected_diagram()
+                .codomain()
+                .is_subcategory(EnumeratedSets())
             )
         )
     ):
@@ -5551,45 +6078,85 @@ def _coproduct_morphism[IndexT](
         )
     index_set = source.index_set()
     if not Sets().is_provably_finite(index_set) or index_set not in EnumeratedSets():
-        from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+        from sage_extensions.categories.abstract_categories.functors import (
+            DiscreteCategory,
+        )
         from sage_extensions.categories.functors.core import NaturalTransformation
 
         if not isinstance(component_morphisms, NaturalTransformation):
-            raise TypeError("componentwise coproduct maps need a selected typed family without finite enumerated indices")
+            raise TypeError(
+                "componentwise coproduct maps need a selected typed family without finite enumerated indices"
+            )
         transformation = component_morphisms
         shape = DiscreteCategory(index_set)
-        if transformation.source().domain() is not shape or transformation.target().domain() is not shape:
-            raise ValueError("the coproduct component transformation must have the exact discrete index category")
-        if not transformation.source().codomain().is_subcategory(Sets()) or not transformation.target().codomain().is_subcategory(Sets()):
-            raise TypeError("componentwise coproduct transformations must be set-valued")
-        from sage_extensions.categories.abstract_categories.functors import _ConstantDiagram
+        if (
+            transformation.source().domain() is not shape
+            or transformation.target().domain() is not shape
+        ):
+            raise ValueError(
+                "the coproduct component transformation must have the exact discrete index category"
+            )
+        if not transformation.source().codomain().is_subcategory(
+            Sets()
+        ) or not transformation.target().codomain().is_subcategory(Sets()):
+            raise TypeError(
+                "componentwise coproduct transformations must be set-valued"
+            )
+        from sage_extensions.categories.abstract_categories.functors import (
+            _ConstantDiagram,
+        )
 
-        for coproduct, diagram in ((source, transformation.source()), (target, transformation.target())):
+        for coproduct, diagram in (
+            (source, transformation.source()),
+            (target, transformation.target()),
+        ):
             selected = coproduct.family().selected_diagram()
             constant = coproduct.family().constant_value()
             if selected is not None:
                 if diagram is not selected:
-                    raise ValueError("the component transformation must use the coproduct's selected summand diagram")
-            elif constant is None or not isinstance(diagram, _ConstantDiagram) or diagram.constant_value() is not constant:
-                raise ValueError("the component transformation must use the coproduct's constant summand diagram")
+                    raise ValueError(
+                        "the component transformation must use the coproduct's selected summand diagram"
+                    )
+            elif (
+                constant is None
+                or not isinstance(diagram, _ConstantDiagram)
+                or diagram.constant_value() is not constant
+            ):
+                raise ValueError(
+                    "the component transformation must use the coproduct's constant summand diagram"
+                )
 
         def induced(element):
             index = element.summand_index()
             selected = shape.object(index)
-            if transformation.source()(selected) is not source.cofactor(index) or transformation.target()(selected) is not target.cofactor(index):
-                raise ValueError("the component transformation does not have the coproduct's summand objects")
+            if transformation.source()(selected) is not source.cofactor(
+                index
+            ) or transformation.target()(selected) is not target.cofactor(index):
+                raise ValueError(
+                    "the component transformation does not have the coproduct's summand objects"
+                )
             arrow = transformation.component(selected)
-            if not _category_accepts_morphism(Sets(), source.cofactor(index), target.cofactor(index), arrow):
-                raise TypeError(f"component at {index} is not a set morphism between its selected summands")
+            if not _category_accepts_morphism(
+                Sets(), source.cofactor(index), target.cofactor(index), arrow
+            ):
+                raise TypeError(
+                    f"component at {index} is not a set morphism between its selected summands"
+                )
             return target(index, arrow(element.summand_element()))
 
         return Sets().Mor(source, target)(induced)
     components = tuple((index, component_morphisms(index)) for index in index_set)
-    from sage_extensions.categories.abstract_categories.mor_categories import _category_accepts_morphism
+    from sage_extensions.categories.abstract_categories.mor_categories import (
+        _category_accepts_morphism,
+    )
 
     for index, arrow in components:
-        if not _category_accepts_morphism(Sets(), source.cofactor(index), target.cofactor(index), arrow):
-            raise TypeError(f"component at {index} is not a set morphism between its selected summands")
+        if not _category_accepts_morphism(
+            Sets(), source.cofactor(index), target.cofactor(index), arrow
+        ):
+            raise TypeError(
+                f"component at {index} is not a set morphism between its selected summands"
+            )
     ranking = index_set.ranking_map()
     arrows = tuple(arrow for _, arrow in components)
     return Sets().Mor(source, target)(
@@ -5643,7 +6210,7 @@ class NaturalNumberSets(OwnedCategory):
             # presented it, so the hash is the number's.
             return hash(self._value)
 
-        def __eq__(self, other: Any) -> bool:
+        def __eq__(self, other: object) -> bool:
             if other not in self.parent():
                 return False
             return int(self.parent()(other)) == self._value
@@ -5707,7 +6274,9 @@ class NaturalNumberSets(OwnedCategory):
             divisor = int(self.parent()(other))
             match divisor:
                 case 0:
-                    raise ZeroDivisionError(f"cannot compute {self} mod 0 in the natural numbers")
+                    raise ZeroDivisionError(
+                        f"cannot compute {self} mod 0 in the natural numbers"
+                    )
                 case _:
                     return self.parent()(self._value % divisor)
 
@@ -5747,7 +6316,11 @@ class NaturalNumberSets(OwnedCategory):
                     return True
                 case _ if isinstance(value, int):
                     return value >= 0
-                case _ if isinstance(value, Element) and element_parent(value) in Objects() and isinstance(value, SupportsIndex):
+                case _ if (
+                    isinstance(value, Element)
+                    and element_parent(value) in Objects()
+                    and isinstance(value, SupportsIndex)
+                ):
                     return integer_index(value) >= 0
                 case _:
                     return False
@@ -5827,7 +6400,9 @@ class _PosetOnOrderRelation:
         return point in self._underlying_set
 
     def _element_constructor_(self, point):
-        assert point in self._underlying_set, f"{point} is not a point of the poset {self}"
+        assert point in self._underlying_set, (
+            f"{point} is not a point of the poset {self}"
+        )
         return point
 
     def _cardinality_decision(self):
@@ -5906,7 +6481,9 @@ class PartiallyOrderedSets(OwnedCategory):
             )
             top = next((m for m in self if all(self.le(x, m) for x in self)), None)
             if top is None:
-                raise ValueError(f"{self} has no maximum: no point lies above every point")
+                raise ValueError(
+                    f"{self} has no maximum: no point lies above every point"
+                )
             return top
 
         def minimum(self):
@@ -5917,7 +6494,9 @@ class PartiallyOrderedSets(OwnedCategory):
             )
             bottom = next((m for m in self if all(self.le(m, x) for x in self)), None)
             if bottom is None:
-                raise ValueError(f"{self} has no minimum: no point lies below every point")
+                raise ValueError(
+                    f"{self} has no minimum: no point lies below every point"
+                )
             return bottom
 
     class ElementMethods:
@@ -6108,7 +6687,7 @@ NN = _object_of(NaturalNumberSets())
 
 def register_set_axioms() -> None:
     r"""Compatibility entry point: the live owned categories need no Sage-global mutation."""
-    return None
+    return
 
 
 class SetSubcategoryMethods:
@@ -6116,11 +6695,12 @@ class SetSubcategoryMethods:
 
 
 __all__ = [
+    "NN",
     "AugmentedSimplexCategory",
     "CartesianProductsOfSets",
+    "CoproductsOfSets",
     "CountableSets",
     "CountablyInfiniteSets",
-    "CoproductsOfSets",
     "DisjointUnionsOfSets",
     "EnumeratedSets",
     "FinitePowerSets",
@@ -6130,11 +6710,10 @@ __all__ = [
     "FunctionSets",
     "InfiniteSets",
     "NaturalNumberSets",
-    "NN",
     "ObjectSetsOfDiscreteCategories",
-    "PartiallyOrderedSets",
     "PartiallyOrderedSetMor",
     "PartiallyOrderedSetMorphism",
+    "PartiallyOrderedSets",
     "PowerSets",
     "Set",
     "SetInjection",

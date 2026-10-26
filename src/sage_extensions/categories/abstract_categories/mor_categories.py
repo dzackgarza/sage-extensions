@@ -27,7 +27,11 @@ reuses the arrow objects without inheriting all the squares between them.
 """
 
 from __future__ import annotations
-from sage_extensions.categories.abstract_categories.mor_foundation import CategoricalArrow, object_level
+
+from sage_extensions.categories.abstract_categories.mor_foundation import (
+    CategoricalArrow,
+    object_level,
+)
 
 
 def _compose_operation_preserving_mor(left, right, fallback):
@@ -41,16 +45,24 @@ def _compose_operation_preserving_mor(left, right, fallback):
         or not right.parent().mor_family().base_category().is_subcategory(category)
     ):
         return fallback(right)
-    return left.parent().mor_family().Of(right.domain(), left.codomain())(
-        lambda element: left(right(element))
+    return (
+        left.parent()
+        .mor_family()
+        .Of(right.domain(), left.codomain())(lambda element: left(right(element)))
     )
 
-from typing import TYPE_CHECKING, Any
-from types import NotImplementedType
 
-from sage.categories.category import Category, JoinCategory as SageJoinCategory
-from sage.categories.category_with_axiom import CategoryWithAxiom as SageCategoryWithAxiom
-from sage.categories.homset import Hom as SageHom, Homset as SageHomset
+from types import NotImplementedType
+from typing import TYPE_CHECKING, Any
+
+from sage.categories.category import Category
+from sage.categories.category import JoinCategory as SageJoinCategory
+from sage.categories.category_with_axiom import (
+    CategoryWithAxiom as SageCategoryWithAxiom,
+)
+from sage.categories.homset import Hom as SageHom
+from sage.categories.homset import Homset as SageHomset
+from sage.categories.map import Map
 from sage.categories.morphism import Morphism
 from sage.categories.objects import Objects as SageObjects
 from sage.categories.sets_cat import Sets as SageSets
@@ -70,12 +82,11 @@ from sage_extensions.categories.abstract_categories.mor_foundation import (
     _underlying_set_mor,
 )
 from sage_extensions.categories.abstract_categories.objects import Objects
-from sage_extensions.owned_category_bases import Category as OwnedCategoryBase
 from sage_extensions.owned_category import (
     OwnedCategoryMixin,
-    _object_of,
     owned_category_join,
 )
+from sage_extensions.owned_category_bases import Category as OwnedCategoryBase
 from sage_extensions.refine import (
     check_certifying_predicates,
     construction_scope,
@@ -89,9 +100,9 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from sage_extensions.categories.sets.indexed_families import IndexedFamily
-    from sage_extensions.logic import Predicate
     from sage_extensions.lexicon.category_theory import ObjectOfCategory
     from sage_extensions.lexicon.set_theory import SetObject
+    from sage_extensions.logic import Predicate
 
 
 def _category_mor(
@@ -272,7 +283,9 @@ def _precomposable(second: Morphism, first) -> bool:
     match first:
         case Morphism() | CategoricalArrow() if first.codomain() is second.domain():
             base = second.parent().base_category()
-            return _category_accepts_morphism(base, first.domain(), first.codomain(), first)
+            return _category_accepts_morphism(
+                base, first.domain(), first.codomain(), first
+            )
         case _:
             return False
 
@@ -283,12 +296,12 @@ class MorArrowIdentity(CategoricalArrow, Element):
     def _call_(self, value):
         return value
 
-    def __eq__(self, other: Any) -> bool | NotImplementedType:
+    def __eq__(self, other: object) -> bool | NotImplementedType:
         if parent(other) is self.parent():
             return True
         return NotImplemented
 
-    def __ne__(self, other: Any) -> bool | NotImplementedType:
+    def __ne__(self, other: object) -> bool | NotImplementedType:
         comparison = self.__eq__(other)
         return NotImplemented if comparison is NotImplemented else not comparison
 
@@ -474,40 +487,65 @@ def _init_mor_category_class(mor: CategoricalMor | FixedMorCategory) -> None:
     )
 
 
-
 def _attach_end_family(owner: CategoricalMor, family: _EndCategoryOf) -> None:
     if owner.domain_object() is not owner.codomain_object():
-        raise ValueError(f"only End(X) = Mor(X, X) can be the endomorphism category of X, but {owner} has distinct objects")
+        raise ValueError(
+            f"only End(X) = Mor(X, X) can be the endomorphism category of X, but {owner} has distinct objects"
+        )
     category_owner = _category_packet(owner.base_category()).Ends()
     if family is not category_owner:
-        represented = _category_packet(family.base_category()).Mors().Of(owner.domain_object(), owner.codomain_object())
+        represented = (
+            _category_packet(family.base_category())
+            .Mors()
+            .Of(owner.domain_object(), owner.codomain_object())
+        )
         if represented is not owner and represented.arrow_set() is not owner:
-            raise ValueError(f"{family} already has {represented} as End({owner.domain_object()})")
+            raise ValueError(
+                f"{family} already has {represented} as End({owner.domain_object()})"
+            )
     if owner._end_family is not None and owner._end_family is not category_owner:
         raise ValueError(f"{owner} is already attached to another End family")
     owner._end_family = category_owner
-    category_owner._remember_between(owner.domain_object(), owner.codomain_object(), owner)
+    category_owner._remember_between(
+        owner.domain_object(), owner.codomain_object(), owner
+    )
 
 
 def _attach_aut_family(owner: CategoricalMor, family: _AutCategoryOf) -> None:
     if owner.domain_object() is not owner.codomain_object():
-        raise ValueError(f"only Iso(X, X) can be the automorphism category Aut(X), but {owner} has distinct objects")
+        raise ValueError(
+            f"only Iso(X, X) can be the automorphism category Aut(X), but {owner} has distinct objects"
+        )
     category_owner = _category_packet(owner.base_category()).Auts()
     if family is not category_owner:
-        represented = _category_packet(family.base_category()).Isos().Of(owner.domain_object(), owner.codomain_object())
+        represented = (
+            _category_packet(family.base_category())
+            .Isos()
+            .Of(owner.domain_object(), owner.codomain_object())
+        )
         if represented is not owner and represented.arrow_set() is not owner:
-            raise ValueError(f"{family} already has {represented} as Aut({owner.domain_object()})")
+            raise ValueError(
+                f"{family} already has {represented} as Aut({owner.domain_object()})"
+            )
     if owner._aut_family is not None and owner._aut_family is not category_owner:
         raise ValueError(f"{owner} is already attached to another Aut family")
     owner._aut_family = category_owner
-    category_owner._remember_between(owner.domain_object(), owner.codomain_object(), owner)
+    category_owner._remember_between(
+        owner.domain_object(), owner.codomain_object(), owner
+    )
 
 
 class _DeferredMorElementClass:
     r"""Initialization marker which carries no eager element operations."""
 
 
-class CategoricalMor(_DiscreteTwoMorConstructions, OwnedCategoryMixin, CategoryPacketMethods, OwnedMor, Category):
+class CategoricalMor(
+    _DiscreteTwoMorConstructions,
+    OwnedCategoryMixin,
+    CategoryPacketMethods,
+    OwnedMor,
+    Category,
+):
     r"""A represented Mor object which is both a Sage Mor and a category.
 
     This mixed runtime parent deliberately retains Sage's raw ``Category`` base.
@@ -694,14 +732,10 @@ class CategoricalMor(_DiscreteTwoMorConstructions, OwnedCategoryMixin, CategoryP
             CategoricalMor.ElementMethods,
         ):
             if any(
-                candidate is known or issubclass(known, candidate)
-                for known in bases
+                candidate is known or issubclass(known, candidate) for known in bases
             ):
                 continue
-            bases = [
-                known for known in bases
-                if not issubclass(candidate, known)
-            ]
+            bases = [known for known in bases if not issubclass(candidate, known)]
             bases.append(candidate)
 
         result = dynamic_class(
@@ -909,7 +943,9 @@ class CategoricalMor(_DiscreteTwoMorConstructions, OwnedCategoryMixin, CategoryP
 
     def _already_parented_arrow(self, candidate: Morphism) -> bool:
         r"""Whether ``candidate`` is already represented by this Mor theory."""
-        return candidate.parent() is self or _arrow_is_inherited_from_subcategory(self, candidate)
+        return candidate.parent() is self or _arrow_is_inherited_from_subcategory(
+            self, candidate
+        )
 
     def __call__(self, *args, **kwargs):
         r"""Construct an arrow, preserving one already represented here.
@@ -996,7 +1032,10 @@ class CategoricalMor(_DiscreteTwoMorConstructions, OwnedCategoryMixin, CategoryP
         is a separate operation: constructor failure is not a membership
         decision, and successful conversion does not place the input here.
         """
-        if arrow.domain() is not self.domain_object() or arrow.codomain() is not self.codomain_object():
+        if (
+            arrow.domain() is not self.domain_object()
+            or arrow.codomain() is not self.codomain_object()
+        ):
             return False
         return self._already_parented_arrow(arrow)
 
@@ -1027,16 +1066,10 @@ class CategoricalMor(_DiscreteTwoMorConstructions, OwnedCategoryMixin, CategoryP
                 self.codomain_object(),
             )
             supers.append(
-                self.mor_family().family_over(supercategory).Of(
-                    domain, codomain
-                )
+                self.mor_family().family_over(supercategory).Of(domain, codomain)
             )
             if self.end_family() is not None:
-                supers.append(
-                    self.end_family().family_over(supercategory).Of(
-                        domain
-                    )
-                )
+                supers.append(self.end_family().family_over(supercategory).Of(domain))
         return _distinct_supercategories(supers) or [Objects()]
 
     def two_mor(
@@ -1101,7 +1134,9 @@ class MorArrowDiscreteMor(CategoricalMor):
         return self()
 
 
-class FixedMorCategory(_DiscreteTwoMorConstructions, CategoryPacketMethods, OwnedCategoryBase):
+class FixedMorCategory(
+    _DiscreteTwoMorConstructions, CategoryPacketMethods, OwnedCategoryBase
+):
     r"""The category ``Hom_C(A,B)`` of arrows with fixed endpoints.
 
     Its objects are the arrows ``A -> B`` themselves. Calling the category
@@ -1215,7 +1250,9 @@ class FixedMorCategory(_DiscreteTwoMorConstructions, CategoryPacketMethods, Owne
         """
         if _has_category_packet_surface(self.base_category()):
             return _underlying_set_mor(self.domain_object(), self.codomain_object())
-        return SageHom(self.domain_object(), self.codomain_object(), self.base_category())
+        return SageHom(
+            self.domain_object(), self.codomain_object(), self.base_category()
+        )
 
     underlying_mor = arrow_set
 
@@ -1227,16 +1264,27 @@ class FixedMorCategory(_DiscreteTwoMorConstructions, CategoryPacketMethods, Owne
         mathematical parent; the category graph supplies this inclusion,
         not an attempted conversion through a possibly undecidable constructor.
         """
-        if arrow.domain() is not self.domain_object() or arrow.codomain() is not self.codomain_object():
+        if (
+            arrow.domain() is not self.domain_object()
+            or arrow.codomain() is not self.codomain_object()
+        ):
             return False
         mor = self.arrow_set()
-        return arrow.parent() is mor or _arrow_is_inherited_from_subcategory(self, arrow)
+        return arrow.parent() is mor or _arrow_is_inherited_from_subcategory(
+            self, arrow
+        )
 
     def __call__(self, *data, **options):
-        if len(data) == 1 and not options and isinstance(data[0], (Morphism, CategoricalArrow)):
+        if (
+            len(data) == 1
+            and not options
+            and isinstance(data[0], (Morphism, CategoricalArrow))
+        ):
             if self.accepts(data[0]):
                 return data[0]
-            raise TypeError(f"{data[0]} is not an arrow of {self}; apply a functor between the categories")
+            raise TypeError(
+                f"{data[0]} is not an arrow of {self}; apply a functor between the categories"
+            )
         return self.arrow_set()(*data, **options)
 
     def _mor_endpoint(self, obj: Parent | Category | Morphism):
@@ -1284,17 +1332,15 @@ class FixedMorCategory(_DiscreteTwoMorConstructions, CategoryPacketMethods, Owne
                 self.codomain_object(),
             )
             supers.append(
-                self.mor_family().family_over(supercategory).Of(
+                self.mor_family()
+                .family_over(supercategory)
+                .Of(
                     domain,
                     codomain,
                 )
             )
             if self.end_family() is not None:
-                supers.append(
-                    self.end_family().family_over(supercategory).Of(
-                        domain
-                    )
-                )
+                supers.append(self.end_family().family_over(supercategory).Of(domain))
         return _distinct_supercategories(supers) or [Objects()]
 
     def _repr_(self) -> str:
@@ -1326,9 +1372,12 @@ class FixedRestrictedMorCategory(FixedMorCategory):
         category's already-existing Mor object.  It therefore reuses the
         endpoint Mor owned by the base category packet.
         """
-        return _category_packet(self.base_category()).Mors().Of(
-            self.domain_object(), self.codomain_object()
-        ).arrow_set()
+        return (
+            _category_packet(self.base_category())
+            .Mors()
+            .Of(self.domain_object(), self.codomain_object())
+            .arrow_set()
+        )
 
     underlying_mor = arrow_set
 
@@ -1336,16 +1385,22 @@ class FixedRestrictedMorCategory(FixedMorCategory):
         return super().accepts(arrow) and self.mor_family().accepts(arrow)
 
     def super_categories(self):
-        base = _category_packet(self.base_category()).Mors().Of(
-            self.domain_object(), self.codomain_object()
+        base = (
+            _category_packet(self.base_category())
+            .Mors()
+            .Of(self.domain_object(), self.codomain_object())
         )
         owner = self.base_category()
         inherited = [
-            self.mor_family().family_over(supercategory).Of(*owner._mor_endpoints_in_supercategory(
-                supercategory,
-                self.domain_object(),
-                self.codomain_object(),
-            ))
+            self.mor_family()
+            .family_over(supercategory)
+            .Of(
+                *owner._mor_endpoints_in_supercategory(
+                    supercategory,
+                    self.domain_object(),
+                    self.codomain_object(),
+                )
+            )
             for supercategory in _packet_supercategories(self.base_category())
         ]
         return _distinct_supercategories([base, *inherited])
@@ -1454,8 +1509,16 @@ class CategoricalIsomorphism(CategoricalArrow, CategoricalMor.ElementMethods):
         *,
         verify: bool = False,
     ) -> None:
-        Morphism.__init__(self, parent)
-        if forward.domain() is not self.domain() or forward.codomain() is not self.codomain():
+        # The isomorphism is an arrow of the base category too: its element
+        # class carries that category's arrow level after Sage's ``Map``.
+        # Initialize that level from the forward arrow, by the transport
+        # protocol every arrow owner supplies, so its data are established.
+        args, options = forward._transport_initialization_to_mor(parent)
+        super(Map, self).__init__(*args, **options)
+        if (
+            forward.domain() is not self.domain()
+            or forward.codomain() is not self.codomain()
+        ):
             raise ValueError(
                 f"an isomorphism {self.domain()} -> {self.codomain()} needs a forward map "
                 f"{self.domain()} -> {self.codomain()}, but {forward} is a map {forward.domain()} -> {forward.codomain()}"
@@ -1475,7 +1538,10 @@ class CategoricalIsomorphism(CategoricalArrow, CategoricalMor.ElementMethods):
         subclasses.  Any other caller asks ``inverse().forward()``.
         """
         inverse = self._inverse_computation()
-        if inverse.domain() is not self.codomain() or inverse.codomain() is not self.domain():
+        if (
+            inverse.domain() is not self.codomain()
+            or inverse.codomain() is not self.domain()
+        ):
             raise ValueError(
                 f"an isomorphism {self.domain()} -> {self.codomain()} needs an inverse map "
                 f"{self.codomain()} -> {self.domain()}, but {inverse} is a map {inverse.domain()} -> {inverse.codomain()}"
@@ -1493,7 +1559,9 @@ class CategoricalIsomorphism(CategoricalArrow, CategoricalMor.ElementMethods):
             _isomorphism_from_known_inverse_pair,
         )
 
-        return _isomorphism_from_known_inverse_pair(self._inverse_morphism(), self._forward)
+        return _isomorphism_from_known_inverse_pair(
+            self._inverse_morphism(), self._forward
+        )
 
     def __invert__(self) -> CategoricalIsomorphism:
         return self.inverse()
@@ -1509,7 +1577,9 @@ class CategoricalIsomorphism(CategoricalArrow, CategoricalMor.ElementMethods):
     def inverse_pair_decision(self):
         from sage_extensions.logic import conjunction
 
-        return conjunction((self.left_inverse_decision(), self.right_inverse_decision()))
+        return conjunction(
+            (self.left_inverse_decision(), self.right_inverse_decision())
+        )
 
     @validator
     def validate_inverse_pair(self):
@@ -1526,7 +1596,7 @@ class CategoricalIsomorphism(CategoricalArrow, CategoricalMor.ElementMethods):
     def _call_(self, element):
         return self.forward()(element)
 
-    def __eq__(self, other: Any) -> bool | Predicate:
+    def __eq__(self, other: object) -> bool | Predicate:
         r"""Compare through the retained forward arrows of the core inclusion.
 
         An inverse is unique when it exists, so the forward arrows decide;
@@ -1542,7 +1612,7 @@ class CategoricalIsomorphism(CategoricalArrow, CategoricalMor.ElementMethods):
             case _:
                 return False
 
-    def __ne__(self, other: Any) -> bool | Predicate:
+    def __ne__(self, other: object) -> bool | Predicate:
         from sage_extensions.logic import negation
 
         return negation(self == other)
@@ -1843,9 +1913,13 @@ def _ambient_of(category: Category) -> Category:
     match category:
         case SageJoinCategory():
             return owned_category_join(
-                tuple(_ambient_of(component) for component in category.super_categories())
+                tuple(
+                    _ambient_of(component) for component in category.super_categories()
+                )
             )
-        case SageCategoryWithAxiom() if _declared_construction(category, "_MorCategory") is None:
+        case SageCategoryWithAxiom() if (
+            _declared_construction(category, "_MorCategory") is None
+        ):
             return _ambient_of(category.base_category())
         case _:
             return category
@@ -1980,9 +2054,14 @@ class _MorCategoryOf(OwnedCategoryBase):
         cached = self._objects.get((id(domain), id(codomain)))
         if cached is None:
             return None
-        return cached if (
-            cached.domain_object() is domain and cached.codomain_object() is codomain
-        ) else None
+        return (
+            cached
+            if (
+                cached.domain_object() is domain
+                and cached.codomain_object() is codomain
+            )
+            else None
+        )
 
     def _remember_between(self, domain, codomain, value):
         r"""Record this family's constructed fixed Mor, including literal reuse.
@@ -2209,9 +2288,10 @@ class _MorCategoryOf(OwnedCategoryBase):
         """
         if candidate not in MorCategories():
             return False
-        return self._cached_between(
-            candidate.domain_object(), candidate.codomain_object()
-        ) is candidate
+        return (
+            self._cached_between(candidate.domain_object(), candidate.codomain_object())
+            is candidate
+        )
 
     def _repr_(self) -> str:
         return f"Mor-category packet of {self.base_category()}"
@@ -2289,10 +2369,9 @@ def _carves_the_same_mor(self, supercategory, domain, codomain) -> bool:
         # does not.  Do not replace that predicate by an ancestor's predicate
         # merely because both use FixedRestrictedMorCategory to represent it.
         return False
-    return (
-        _category_packet(self.base_category()).Mors().Of(domain, codomain)
-        is _category_packet(supercategory).Mors().Of(domain, codomain)
-    )
+    return _category_packet(self.base_category()).Mors().Of(
+        domain, codomain
+    ) is _category_packet(supercategory).Mors().Of(domain, codomain)
 
 
 class _EndCategoryOf(_MorCategoryOf):
@@ -2333,7 +2412,9 @@ class _EndCategoryOf(_MorCategoryOf):
         # Its defining category owns the role regardless of which inherited
         # family is queried first.
         if endomorphisms.end_family() is None:
-            endomorphisms.attach_end_family(_category_packet(endomorphisms.base_category()).Ends())
+            endomorphisms.attach_end_family(
+                _category_packet(endomorphisms.base_category()).Ends()
+            )
         return self._remember_between(obj, obj, endomorphisms)
 
     def Between(self, domain: Parent, codomain: Parent) -> FixedMorObject:
@@ -2409,7 +2490,9 @@ class _MonoCategoryOf(_RestrictedMorCategoryOf):
         return _category_packet(category).Monos()
 
     def accepts(self, arrow: Morphism) -> bool:
-        return _is_selected_identity_in(self.base_category(), arrow) or self._accepts_by_placement(arrow)
+        return _is_selected_identity_in(
+            self.base_category(), arrow
+        ) or self._accepts_by_placement(arrow)
 
 
 class _EpiCategoryOf(_RestrictedMorCategoryOf):
@@ -2426,7 +2509,9 @@ class _EpiCategoryOf(_RestrictedMorCategoryOf):
         return _category_packet(category).Epis()
 
     def accepts(self, arrow: Morphism) -> bool:
-        return _is_selected_identity_in(self.base_category(), arrow) or self._accepts_by_placement(arrow)
+        return _is_selected_identity_in(
+            self.base_category(), arrow
+        ) or self._accepts_by_placement(arrow)
 
 
 class _IsoCategoryOf(_MorCategoryOf):
@@ -2464,7 +2549,9 @@ class _AutCategoryOf(_IsoCategoryOf):
             if codomain is not None:
                 codomain = self.base_category()._mor_endpoint(codomain)
         if codomain is not None and codomain is not obj:
-            raise ValueError(f"Aut(X) needs equal endpoints, but got {obj} and {codomain}")
+            raise ValueError(
+                f"Aut(X) needs equal endpoints, but got {obj} and {codomain}"
+            )
         if obj not in self.base_category():
             raise TypeError(
                 f"Aut(X) in {self.base_category()} needs X an object of it, but {obj} is not one"
@@ -2473,7 +2560,9 @@ class _AutCategoryOf(_IsoCategoryOf):
         # As for End above: a shared Iso object has the same isomorphisms, so
         # the same automorphisms. Their defining category owns the role.
         if automorphisms.aut_family() is None:
-            automorphisms.attach_aut_family(_category_packet(automorphisms.base_category()).Auts())
+            automorphisms.attach_aut_family(
+                _category_packet(automorphisms.base_category()).Auts()
+            )
         return self._remember_between(obj, obj, automorphisms)
 
     def Between(self, domain: Parent, codomain: Parent) -> FixedMorObject:
@@ -2515,19 +2604,19 @@ def AutCategoryConstruction(base_category: Category) -> _AutCategoryOf:
 
 __all__ = [
     "AutCategoryConstruction",
-    "CategoryPacketMethods",
-    "CategoricalMor",
     "CategoricalIsomorphism",
+    "CategoricalMor",
+    "CategoryPacketMethods",
     "EndCategoryConstruction",
     "EpiCategoryConstruction",
     "FixedAutCategory",
     "FixedEndCategory",
-    "FixedMorCategory",
     "FixedIsoCategory",
+    "FixedMorCategory",
+    "IsoCategoryConstruction",
+    "MonoCategoryConstruction",
     "MorArrowIdentity",
     "MorCategories",
     "MorCategoryConstruction",
-    "IsoCategoryConstruction",
-    "MonoCategoryConstruction",
     "RestrictedMorCategoryParent",
 ]

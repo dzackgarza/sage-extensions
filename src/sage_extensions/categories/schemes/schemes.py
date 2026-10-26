@@ -1111,7 +1111,7 @@ class SchemeMorphismMethods:
     def _transport_initialization_to_mor(self, mor):
         r"""Retain this scheme-map representation while adding stronger arrow structure."""
         return (
-            (self._native_morphism,),
+            (mor, self._native_morphism),
             {
                 "mor": mor,
                 "pullback": self._coordinate_pullback,
@@ -2117,6 +2117,11 @@ class SchemeMorphismMethods:
         if self._is_the_identity():
             return True
         source = self.domain()
+        # An isomorphism is an open immersion onto the open subscheme Y.
+        if self in Schemes(source.scheme_base_ring()).Core().Mor(
+            source, self.codomain()
+        ):
+            return True
         if source in FiberProductSchemes(source.scheme_base_ring()):
             # Open immersions are stable under base change (Stacks, 01JY).
             left, right = source.fiber_product_cospan()
