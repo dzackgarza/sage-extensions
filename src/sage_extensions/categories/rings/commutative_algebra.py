@@ -52,6 +52,7 @@ from sage_extensions.categories.algebras.free_algebras import SymmetricAlgebras
 from sage_extensions.categories.functors.core import Functor
 from sage_extensions.categories.group.magmas import Monoids
 from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
+from sage_extensions.categories.rings.commutative_ideals import CommutativeIdeals
 from sage_extensions.categories.rings.ring_foundation import (
     LocalRingConstruction,
     LocalizationRings,
