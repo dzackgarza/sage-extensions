@@ -253,7 +253,14 @@ def _face_transition_morphism(face, source_cone, target_cone, base_ring):
             for position, generator in enumerate(target_cone.semigroup_generators())
         }
     )
-    return target_open.corestriction(source_open.Mor(target_chart)(extension))
+    # The extension is built from characters on the common face. Each target
+    # semigroup generator is sent to a source monomial times a power of the
+    # inverted source supporting character, so the target supporting character
+    # maps to a unit by this construction. Preserve that universal-property
+    # proof instead of asking generic unit membership to rediscover it through
+    # ideal saturation in the source localization.
+    induced = target_open.coordinate_algebra()._induced_morphism_from_unit_images(extension)
+    return _scheme_mor_category(source_open, target_open)(induced)
 
 
 def _face_transition(source_cone, target_cone, base_ring):
