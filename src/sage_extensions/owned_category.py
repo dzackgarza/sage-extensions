@@ -1496,51 +1496,33 @@ def _implementation_with_engine(implementation: type, owner: type, engine: type)
             + implementation.__bases__[anchor:]
         )
         reduction = (_implementation_with_engine, (implementation, owner, engine))
-    methods = dict(implementation.__dict__)
-    # Sage's AbstractMethod descriptor predates Python's
-    # ``__isabstractmethod__`` protocol, so recognize that concrete descriptor
-    # type as well as any modern abstract descriptor.
-    for name, value in tuple(methods.items()):
-        is_abstract = (
-            getattr(value, "__isabstractmethod__", False)
-            or (
-                type(value).__module__ == "sage.misc.abstract_method"
-                and type(value).__name__ == "AbstractMethod"
-            )
-        )
-        if not is_abstract:
-            continue
-        if any(
-            name in base.__dict__
-            and not (
-                getattr(base.__dict__[name], "__isabstractmethod__", False)
-                or (
-                    type(base.__dict__[name]).__module__ == "sage.misc.abstract_method"
-                    and type(base.__dict__[name]).__name__ == "AbstractMethod"
-                )
-            )
-            for base in bases
-        ):
-            methods.pop(name)
-    if not any(isinstance(base, ABCMeta) for base in bases):
-        template = type(
-            implementation.__name__,
-            (),
-            {
-                key: value
-                for key, value in methods.items()
-                if key not in ("__dict__", "__weakref__", "__slots__")
-            },
-        )
-        return dynamic_class(
-            f"{implementation.__name__}[{engine.__name__}]",
-            bases,
-            template,
+        if not any(isinstance(base, ABCMeta) for base in bases):
+            return dynamic_class(
+                f"{implementation.__name__}[{engine.__name__}]",
+                bases,
+                implementation,
                 reduction=reduction,
                 doccls=engine,
                 prepend_cls_bases=False,
                 cache=False,
             )
+        methods = dict(implementation.__dict__)
+        # Sage's dynamic parent-class builder can leave an abstract method in
+        # the implementation class dictionary even when the selected owned
+        # category contributes a concrete implementation later in the MRO.
+        # Copying that descriptor onto the engine-backed class would shadow
+        # the concrete category owner (for example Algebras.Unital.one).
+        # Preserve local abstract declarations only when no concrete provider
+        # exists among the selected bases.
+        for name, value in tuple(methods.items()):
+            if not getattr(value, "__isabstractmethod__", False):
+                continue
+            if any(
+                name in base.__dict__
+                and not getattr(base.__dict__[name], "__isabstractmethod__", False)
+                for base in bases
+            ):
+                methods.pop(name)
         for key in ("__dict__", "__weakref__", "__slots__"):
             methods.pop(key, None)
         methods.update(
