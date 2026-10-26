@@ -14,7 +14,6 @@ from sage.all import (
 )
 from sage.rings.finite_rings.finite_field_constructor import GF as _SageGF
 from sage.categories.fields import Fields as SageFields
-from sage.categories.ordered_fields import OrderedFields as SageOrderedFields
 from sage.categories.rings import Rings as SageRings
 from sage.misc.cachefunc import cached_function, cached_method
 from sage.rings.abc import Order as SageNumberFieldOrder
@@ -55,7 +54,6 @@ from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
     OwnedFields,
     OwnedIntegralDomains,
-    OwnedOrderedRings,
     OwnedOrders,
     OwnedPrincipalIdealDomains,
     OwnedRings,
@@ -4162,12 +4160,6 @@ def _fraction_field_localization(source, submonoid):
     ]
     if source in OwnedRings().Noetherian():
         placements.append(OwnedRings().Noetherian())
-    # An ordered integral domain has a unique order extension to its fraction
-    # field. Preserve the owned order only when the selected fraction-field
-    # engine itself realizes Sage's ordered-field contract; do not manufacture
-    # an order for an engine whose comparisons do not implement that extension.
-    if source in OwnedOrderedRings() and fraction_engine in SageOrderedFields():
-        placements.append(OwnedOrderedRings())
     base = source.base_ring()
     algebra_source = (
         source
