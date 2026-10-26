@@ -127,6 +127,26 @@ class FractionalIdeals(OwnedCategoryOverBaseRing):
                 self._module_generator_values[labels.ranking_map()(label)],
             )
 
+        def __eq__(self, other):
+            r"""Compare fractional ideals as coefficient-ring submodules, not presentations."""
+            if not isinstance(other, type(self)) and other not in FractionalIdeals(self.base_ring()):
+                return False
+            if self.base_ring() is not other.base_ring():
+                return False
+            if _engine_ring(self.base_ring()) is SageZZ:
+                return _zz_fractional_generator(self._module_generator_values) == (
+                    _zz_fractional_generator(other._module_generator_values)
+                )
+            return _integer_coordinate_submodule(self) == _integer_coordinate_submodule(other)
+
+        def __ne__(self, other):
+            return not self == other
+
+        def __hash__(self):
+            # Equality is extensional within one coefficient ring; that ring
+            # is the shared invariant required for equal fractional ideals.
+            return id(self.base_ring())
+
         def _selected_module_coefficients(self, element):
             r"""Coordinates in the spanning family, over the integers.
 
@@ -522,8 +542,17 @@ def _integer_coordinate_submodule_from_values(base_ring, module_generator_values
 def _order_integer_submodule_values(base_ring, integer_submodule):
     ring = _owned_ring(base_ring)
     field = _engine_ring(ring.fraction_field())
+    # Rows are coordinates in the power basis, not field elements. Calling
+    # ``field(row)`` asks Sage to coerce a vector into the number field and
+    # fails for nontrivial orders; reconstruct the represented element from
+    # its coordinates instead.
+    generator = field.gen() if field is not SageQQ else field.zero()
     return tuple(
-        field(row) for row in integer_submodule.basis_matrix().rows()
+        sum(
+            (field(coefficient) * generator**index for index, coefficient in enumerate(row)),
+            field.zero(),
+        )
+        for row in integer_submodule.basis_matrix().rows()
     )
 
 

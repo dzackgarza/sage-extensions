@@ -568,6 +568,40 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
                 return None
             if _realized_as_quotient(ring):
                 return self._binary_cover_ideal_result(other, "colon")
+            if ring in OwnedRings().Commutative().DedekindDomains():
+                match other.is_zero():
+                    case True:
+                        return ring.ideal(ring.one())
+                    case False:
+                        pass
+                    case _:
+                        return None
+                # Every nonzero ideal J of a Dedekind domain is invertible,
+                # and (I:J) = I J^{-1}.  Contract the resulting fractional
+                # ideal only after verifying its generators lie in R.
+                extension = CommutativeIdeals(ring).extension_to_fraction_field()
+                left = extension(self)
+                right = extension(other).inverse()
+                quotient = (left * right).intersection(
+                    ring.fractional_ideal(ring.one())
+                )
+                order_engine = _engine_ring(ring)
+                generators = tuple(
+                    _owned_engine_element(
+                        ring,
+                        order_engine(
+                            _engine_ring(quotient.fraction_field())(
+                                generator._inclusion_value()
+                            )
+                        ),
+                    )
+                    for generator in quotient.ideal_generators()
+                )
+                if not all(generator in ring for generator in generators):
+                    raise ArithmeticError(
+                        f"the Dedekind ideal quotient {self} : {other} was not integral: {quotient}"
+                    )
+                return ring.ideal(*(generators or (ring.zero(),)))
             if ring in OwnedRings().Commutative().NoZeroDivisors().PrincipalIdeals():
                 numerator, denominator = self._binary_pid_generators(other)
                 match denominator == ring.zero():
@@ -637,6 +671,25 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
                 return None
             if _realized_as_quotient(ring):
                 return self._binary_cover_ideal_result(other, "saturation")
+            if ring in OwnedRings().Commutative().DedekindDomains():
+                match other.is_zero():
+                    case True:
+                        return ring.ideal(ring.one())
+                    case False:
+                        pass
+                    case _:
+                        return None
+                # The chain I : J^n is ascending. A Dedekind domain is
+                # Noetherian, so iteration of the exact colon operation
+                # terminates at I : J^infinity without assuming J principal.
+                current = self
+                while True:
+                    following = current._colon_decision(other)
+                    if following is None:
+                        return None
+                    if following == current:
+                        return current
+                    current = following
             if ring in OwnedRings().Commutative().NoZeroDivisors().PrincipalIdeals():
                 numerator, denominator = self._binary_pid_generators(other)
                 match (numerator == ring.zero(), denominator == ring.zero()):
@@ -1724,7 +1777,15 @@ def _commutative_ideal(source, generators):
     return _placed_commutative_ideal(source, generators, placement)
 
 
-@cached_function
+@cached_function(
+    key=lambda source, generators, placement=None: (
+        id(source),
+        tuple(_engine_ring_value(source, generator) for generator in generators),
+        None
+        if placement is None
+        else (type(placement), tuple(sorted(placement.axioms()))),
+    )
+)
 def _placed_commutative_ideal(source, generators, placement=None):
     r"""Return the one ideal of ``R`` built from this generating family in ``placement``.
 
