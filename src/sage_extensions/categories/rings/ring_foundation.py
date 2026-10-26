@@ -5401,7 +5401,6 @@ class _OwnedRingParent(Parent):
         what lets the module level's construction step -- registering the
         scalar action -- run on this route with nothing left to guess.
         """
-        SageObject.__init__(self)
         canonical_native = base is None and category is None
         # The constructing category is defining construction data (OWN-15):
         # a level above names the category it builds in. Raw engine rings do
@@ -5561,7 +5560,10 @@ class _OwnedRingParent(Parent):
                 from sage_extensions.owned_category import owned_category_join
 
                 placement = owned_category_join((placement, category))
-            Parent.__init__(self, base=base, category=placement)
+            # This is the root of the owned ring construction chain. Let the
+            # host Parent initialize cooperatively here, exactly once; levels
+            # above this one reach it through super().__init__.
+            super().__init__(base=base, category=placement)
             realize_owned_category(self)
 
             # The primitive owned ring now exists as a Parent.  Cache every

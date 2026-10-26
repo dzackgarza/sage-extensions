@@ -3489,6 +3489,10 @@ class CommutativeAlgebraCoproducts(OwnedCategoryOverBaseRing):
         return [Algebras(self.base_ring()).Associative().Unital().Commutative()]
 
     class ParentMethods:
+        @staticmethod
+        def _initialize_construction_data(parent, factors):
+            parent._preamble_coproduct_factors = factors
+
         def coproduct_factors(self):
             r"""Return the family of factors, indexed by the product's own index set."""
 
@@ -4426,7 +4430,10 @@ class _OwnedAlgebraParent(_OwnedRingParent):
         # must still use this exact base rather than infer it from the engine.
         self._preamble_selected_algebra_base_ring = base
         for name, value in construction_data:
-            setattr(self, name, value)
+            if name == "_preamble_coproduct_factors":
+                CommutativeAlgebraCoproducts.ParentMethods._initialize_construction_data(self, value)
+            else:
+                raise TypeError(f"no category constructor declares adopted-algebra datum {name!r}")
         self._realized_scalar_structure = (
             lambda scalar: self._from_engine_element(
                 engine(_engine_element(base, scalar))
@@ -4514,8 +4521,7 @@ class _OwnedAlgebraParent(_OwnedRingParent):
         # was asked for (OWN-15).  A route that names none is an algebra of
         # ``Algebras(R).Associative().Unital()``; commutativity, read off the
         # engine above, is a full axiom and is not recorded (ARC-08).
-        _OwnedRingParent.__init__(
-            self,
+        super().__init__(
             engine,
             base=base,
             category=Cat().meet(initial_placement),

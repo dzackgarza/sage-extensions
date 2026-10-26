@@ -461,7 +461,6 @@ def _owned_laurent_polynomial_ring(base, labels, engine):
         base,
         labels,
         Algebras(base).Associative().Unital().Commutative(),
-        construction_data=(("kind", "laurent_polynomial"), ("variables", tuple(labels))),
     )
     _set_owned_ring_display(
         algebra,
