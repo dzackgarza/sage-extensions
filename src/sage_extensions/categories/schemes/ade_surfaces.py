@@ -862,6 +862,11 @@ class _AT21ToricADEPairEngine:
     def branch_line_bundle(self):
         return self._branch_line_bundle
 
+    @cached_method
+    def log_boundary_coefficient_ring(self):
+        r"""The owned characteristic-zero polynomial ring for AT21 boundary coefficients."""
+        return self.scheme().scheme_base_ring().polynomial_ring("epsilon")
+
     def branch_section_space(self):
         return self.scheme().divisor_section_space(self.branch_divisor_class())
 
