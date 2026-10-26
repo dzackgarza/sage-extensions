@@ -936,7 +936,11 @@ class ConvexPolytopes(OwnedParameterizedCategory):
                 if any((dual_label == label) is True for label in point_labels):
                     return dual_label
                 try:
-                    candidate = dual_label[0]
+                    # The character lattice is Hom(M, ZZ), whose matrix
+                    # generator labels are (row, column). Evaluation on M
+                    # uses the column label: the row is the basis label of
+                    # the rank-one codomain ZZ, not a coordinate of M.
+                    candidate = dual_label[1]
                 except (TypeError, IndexError, KeyError):
                     candidate = None
                 if any((candidate == label) is True for label in point_labels):
