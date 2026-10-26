@@ -172,8 +172,6 @@ def owned_parent_class(implementation: type, category: Category) -> type:
     the same class.
     """
     providers = _owned_mixins(category, "ParentMethods")
-    if not providers:
-        return implementation
     inherited = implementation.__dict__.get("_preamble_inherited", implementation)
     carried = frozenset(inherited.__mro__)
     mixins = tuple(provider for provider in providers if provider is not object and provider not in carried)
@@ -192,7 +190,10 @@ def owned_parent_class(implementation: type, category: Category) -> type:
         for name, value in implementation.__dict__.items():
             if not is_abstract(value):
                 continue
-            for provider in providers:
+            # The selected category's parent class already linearizes its
+            # providers. Read that order directly; the category object may not
+            # expose the providers through its own Python type MRO.
+            for provider in implementation.__mro__[1:]:
                 candidate = vars(provider).get(name)
                 if candidate is None or is_abstract(candidate):
                     continue
