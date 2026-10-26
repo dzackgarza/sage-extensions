@@ -3,8 +3,8 @@
 from itertools import combinations
 
 from sage.categories.category import Category
-from sage.categories.morphism import Morphism
 from sage.categories.category_with_axiom import all_axioms
+from sage.categories.morphism import Morphism
 from sage.misc.cachefunc import cached_function, cached_method
 from sage.misc.classcall_metaclass import typecall
 from sage.structure.dynamic_class import DynamicMetaclass
@@ -12,11 +12,12 @@ from sage.structure.richcmp import op_EQ, op_NE
 from sage.structure.sage_object import SageObject
 
 from sage_extensions.categories.abstract_categories.mor_categories import (
-    CategoryPacketMethods,
     CategoricalMor,
+    CategoryPacketMethods,
     FixedMorCategory,
     MorCategoryConstruction,
 )
+from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 from sage_extensions.categories.abstract_categories.objects import (
     Objects,
     OwnedCategory,
@@ -25,8 +26,8 @@ from sage_extensions.categories.abstract_categories.objects import (
 from sage_extensions.categories.abstract_categories.presheaves import (
     Coverage,
     CoveringFamilies,
-    CoveringFamilyMorCategoryConstruction,
     CoveringFamilyMor,
+    CoveringFamilyMorCategoryConstruction,
     CoveringFamilyMorphism,
     DescentData,
 )
@@ -38,8 +39,6 @@ from sage_extensions.logic import AtomicProposition, conjunction, negation
 from sage_extensions.owned_category import _object_of, owned_category_join
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.validation import validator
-from sage_extensions.categories.abstract_categories.mor_foundation import object_level
-
 
 if "Invertible" not in all_axioms:
     all_axioms.add("Invertible")
@@ -61,8 +60,10 @@ class _SchemeTopologyData(SageObject):
 
     def open_subsets(self, space):
         if space.has_selected_finite_affine_atlas():
-            return space.underlying_space().power_set().condition_set(
-                lambda subset: self.is_open_subset(space, subset)
+            return (
+                space.underlying_space()
+                .power_set()
+                .condition_set(lambda subset: self.is_open_subset(space, subset))
             )
         return space.power_set().condition_set(
             lambda subset: self.is_open_subset(space, subset)
@@ -70,7 +71,9 @@ class _SchemeTopologyData(SageObject):
 
     def is_open_subset(self, space, subset) -> bool:
         if space.has_selected_finite_affine_atlas():
-            from sage_extensions.categories.schemes.gluing import _AffineChartOpenSubobjects
+            from sage_extensions.categories.schemes.gluing import (
+                _AffineChartOpenSubobjects,
+            )
 
             if subset in _AffineChartOpenSubobjects(space):
                 return True
@@ -164,7 +167,9 @@ class PresheafObjects(OwnedParameterizedCategory):
 
     def morphism(self, source, target, value_functor: Functor, transformation):
         r"""``(G, alpha): (D, F) -> (D', F')`` for ``G: D -> D'`` and ``alpha: G F => F'``."""
-        assert False, "morphism (G, alpha) of presheaves on PresheafObjects: not implemented"
+        assert False, (
+            "morphism (G, alpha) of presheaves on PresheafObjects: not implemented"
+        )
 
     def presheaf_datum(self, presheaf: Functor):
         r"""The datum ``F: Open(X)^op -> D`` of an object ``(D, F)`` of this category."""
@@ -202,16 +207,22 @@ class _UnpresentedSectionsPresheaf(Functor):
         Functor.__init__(self, space.open_subsets_site().opposite(), value_category)
 
     def _apply_object(self, opposite_object):
-        assert False, f"sections of {self._sheaf_name} on {opposite_object}: not implemented"
+        assert False, (
+            f"sections of {self._sheaf_name} on {opposite_object}: not implemented"
+        )
 
     def _apply_morphism(self, opposite_arrow):
-        assert False, f"restriction of {self._sheaf_name} along {opposite_arrow}: not implemented"
+        assert False, (
+            f"restriction of {self._sheaf_name} along {opposite_arrow}: not implemented"
+        )
 
     def _repr_(self):
         return f"Sections presheaf of {self._sheaf_name}"
 
 
-def _unpresented_sections_presheaf(space, sheaf_name: str, value_category: Category | None = None):
+def _unpresented_sections_presheaf(
+    space, sheaf_name: str, value_category: Category | None = None
+):
     r"""``F: Open(X)^op -> D`` of a sheaf whose sections on the opens of ``space`` are not presented.
 
     ``D`` defaults to ``Ab = Modules(ZZ)``, an abelian group being a
@@ -226,7 +237,10 @@ def _unpresented_sections_presheaf(space, sheaf_name: str, value_category: Categ
 
 
 def _unpresented_sheaf_placement(
-    space, sheaf_name: str, mor_category: Category | None = None, value_category: Category | None = None
+    space,
+    sheaf_name: str,
+    mor_category: Category | None = None,
+    value_category: Category | None = None,
 ):
     r"""``Sh(Open(X), D)`` and its data for a sheaf whose sections on opens are not presented.
 
@@ -246,7 +260,10 @@ def _unpresented_sheaf_placement(
 def _is_empty_open(presheaf, opposite_object):
     r"""Recognize the canonical empty open of the presheaf's open site."""
     opens = presheaf.domain().base_category().object_set()
-    return opposite_object.underlying_object().value() is opens.inclusion().codomain().bottom()
+    return (
+        opposite_object.underlying_object().value()
+        is opens.inclusion().codomain().bottom()
+    )
 
 
 def _open_sheaf_placement(space, presheaf, mor_category=None):
@@ -330,8 +347,6 @@ class SheafedSpaces(OwnedCategory):
             return self
 
 
-
-
 class ModuleSheaves(OwnedParameterizedCategory):
     r"""Sheaves of ``O_X``-modules on one represented ringed space ``X``."""
 
@@ -398,17 +413,26 @@ class ModuleSheaves(OwnedParameterizedCategory):
             from sage_extensions.categories.schemes.geometric_cohomology import (
                 _projective_space_line_bundle_derived_global_sections,
             )
-            from sage_extensions.categories.schemes.schemes import ProjectiveSpaces, Schemes
+            from sage_extensions.categories.schemes.schemes import (
+                ProjectiveSpaces,
+                Schemes,
+            )
 
             space = self.scheme()
             base = space.scheme_base_ring()
             match space:
-                case _ if space in ProjectiveSpaces(base) and self in InvertibleSheavesWithChosenTrivialization(space):
+                case _ if space in ProjectiveSpaces(
+                    base
+                ) and self in InvertibleSheavesWithChosenTrivialization(space):
                     return _projective_space_line_bundle_derived_global_sections(self)
-                case _ if space in Schemes(base).Affine() and self in QuasiCoherentSheaves(space):
+                case _ if space in Schemes(
+                    base
+                ).Affine() and self in QuasiCoherentSheaves(space):
                     return self.geometric_cohomology_complex().derived_global_sections()
                 case _:
-                    assert False, "derived_global_sections on ModuleSheaves: not implemented"
+                    assert False, (
+                        "derived_global_sections on ModuleSheaves: not implemented"
+                    )
 
         def sheaf_cohomology(self, degree):
             r"""``H^degree(X, F) = H^degree(RΓ(X, F))``, an object of ``Modules(Γ(X, O_X))``."""
@@ -489,8 +513,10 @@ class AlgebraSheafMorphismMethods:
         return self._richcmp_(other, op_NE)
 
     def __mul__(self, other):
-        if other.codomain() is not self.domain() or other not in self.parent().mor_category().Mor(
-            other.domain(), self.domain()
+        if (
+            other.codomain() is not self.domain()
+            or other
+            not in self.parent().mor_category().Mor(other.domain(), self.domain())
         ):
             return NotImplemented
         mor = self.parent().mor_category().Mor(other.domain(), self.codomain())
@@ -508,7 +534,9 @@ class AlgebraSheafMor(CategoricalMor):
         if isinstance(underlying_morphism, AlgebraSheafMorphismMethods):
             if underlying_morphism.parent() is self:
                 return underlying_morphism
-            raise TypeError(f"{underlying_morphism} belongs to another Mor; apply the functor between the categories")
+            raise TypeError(
+                f"{underlying_morphism} belongs to another Mor; apply the functor between the categories"
+            )
         return self.element_class(self, underlying_morphism)
 
     def _from_known_algebra_map(self, underlying_morphism):
@@ -549,7 +577,7 @@ class AlgebraSheaves(OwnedParameterizedCategory):
     def object(self, presheaf, *, categories=(), construction_data=None, _engine):
         r"""Construct an algebra sheaf from its sections on the open site."""
         fibre, presheaf_data = _open_sheaf_placement(self.scheme(), presheaf, self)
-        return open_sections_presheaf._with_structure(
+        return presheaf._with_structure(
             (self, fibre, *tuple(categories)),
             {
                 **presheaf_data,
@@ -649,7 +677,11 @@ class _StructureSheafEngine:
 
         if target_open is ambient:
             if source_open is not ambient:
-                return remember(_localization_restriction_map(source_sections, self.global_sections()))
+                return remember(
+                    _localization_restriction_map(
+                        source_sections, self.global_sections()
+                    )
+                )
             return remember(source_sections.Mor(source_sections).identity())
         if not _is_distinguished_open_of(target_open, ambient):
             raise ValueError(
@@ -660,7 +692,10 @@ class _StructureSheafEngine:
 
         if source_open is ambient:
             restriction = target_open.inclusion().coordinate_algebra_morphism()
-            if restriction.domain() is not source_sections or restriction.codomain() is not target_sections:
+            if (
+                restriction.domain() is not source_sections
+                or restriction.codomain() is not target_sections
+            ):
                 raise ArithmeticError(
                     f"the inclusion of {target_open} into {ambient} pulls back functions along a map "
                     f"{restriction.domain()} -> {restriction.codomain()}, not "
@@ -668,8 +703,6 @@ class _StructureSheafEngine:
                 )
             return remember(restriction)
         if source_open is target_open:
-
-
             return remember(source_sections.Mor(source_sections).identity())
         return remember(_localization_restriction_map(source_sections, target_sections))
 
@@ -748,7 +781,9 @@ class _AffineStructurePresheaf(Functor):
         return algebra.regular_module().restrict_scalars(scalar_map)
 
     def _apply_morphism(self, opposite_arrow):
-        from sage_extensions.categories.modules.pure.modules import RestrictedScalarsModules
+        from sage_extensions.categories.modules.pure.modules import (
+            RestrictedScalarsModules,
+        )
 
         source = self(opposite_arrow.domain())
         target = self(opposite_arrow.codomain())
@@ -772,8 +807,10 @@ class _AffineStructurePresheaf(Functor):
 
         # Pullback along a morphism of algebras over the scalar ring is linear
         # over that ring, so the construction alone gives linearity.
-        return source.module_category().Mor(source, target)._from_constructed_element_map(
-            image
+        return (
+            source.module_category()
+            .Mor(source, target)
+            ._from_constructed_element_map(image)
         )
 
     def _repr_(self):
@@ -804,7 +841,9 @@ def _affine_de_rham_complex(scheme):
         presheaf,
         descent,
         categories=(SheafObjects(scheme),),
-        construction_data=PresheafObjects(scheme).presheaf_datum(_AffineOpenDeRhamPresheaf(scheme)),
+        construction_data=PresheafObjects(scheme).presheaf_datum(
+            _AffineOpenDeRhamPresheaf(scheme)
+        ),
     )
 
 
@@ -824,7 +863,11 @@ class _AffineOpenDeRhamPresheaf(Functor):
         self._scheme = scheme
         self._structure_presheaf = _AffineOpenStructurePresheaf(scheme)
         self._de_rham_functor = _de_rham_functor(scheme.scheme_base_ring())
-        Functor.__init__(self, scheme.open_subsets_site().opposite(), self._de_rham_functor.codomain())
+        Functor.__init__(
+            self,
+            scheme.open_subsets_site().opposite(),
+            self._de_rham_functor.codomain(),
+        )
 
     def scheme(self):
         return self._scheme
@@ -888,7 +931,9 @@ class _AffineOpenStructurePresheaf(Functor):
         from sage_extensions.categories.rings.ring_foundation import OwnedRings
 
         self._scheme = scheme
-        Functor.__init__(self, scheme.open_subsets_site().opposite(), OwnedRings().Commutative())
+        Functor.__init__(
+            self, scheme.open_subsets_site().opposite(), OwnedRings().Commutative()
+        )
 
     def scheme(self):
         return self._scheme
@@ -939,9 +984,9 @@ def _localization_restriction_map(source, target):
     r"""Return ``S^{-1}A -> T^{-1}A`` when the target inverts every element of ``S``."""
 
     from sage_extensions.categories.rings.ring_foundation import (
-    LocalizationRings,
-    OwnedRings,
-)
+        LocalizationRings,
+        OwnedRings,
+    )
 
     if source is target:
         return source.Mor(source).identity()
@@ -952,7 +997,10 @@ def _localization_restriction_map(source, target):
         )
     if target is source.localization_source():
         target_unit = target.Mor(target).identity()
-    elif target in LocalizationRings() and source.localization_source() is target.localization_source():
+    elif (
+        target in LocalizationRings()
+        and source.localization_source() is target.localization_source()
+    ):
         target_unit = target.localization_map()
     else:
         raise ValueError(
@@ -1099,13 +1147,9 @@ class ZariskiCoveringFamilies(OwnedParameterizedCategory):
                         f"a Zariski cover of {scheme} must be a family of maps into {scheme} over "
                         f"the identity of {scheme}, but its target is {target_arrow}"
                     )
-            embeddings = tuple(
-                self.member(index).left()
-                for index in self.index_set()
-            )
+            embeddings = tuple(self.member(index).left() for index in self.index_set())
             match all(
-                embedding.is_open_immersion() is True
-                for embedding in embeddings
+                embedding.is_open_immersion() is True for embedding in embeddings
             ):
                 case True:
                     pass
@@ -1214,7 +1258,6 @@ class DistinguishedAffineCovers(OwnedCategory):
             return "distinguished affine covers"
         return f"distinguished affine covering families of {scheme}"
 
-
     def _call_(self, elements):
         r"""Construct ``{D(f_i) -> X}`` through the covering-family entry."""
         scheme = self.scheme()
@@ -1233,34 +1276,44 @@ class DistinguishedAffineCovers(OwnedCategory):
         )
         labels = finite_ordered_set(range(len(values)))
         defining_elements = finite_indexed_family(
-            labels, lambda label: values[int(labels.ranking_map()(label))],
+            labels,
+            lambda label: values[int(labels.ranking_map()(label))],
             name="Defining elements of the distinguished opens",
         )
         site = self.site_category()
         target = self.slice_target()
         opens = finite_indexed_family(
-            labels, lambda label: scheme.distinguished_open(defining_elements[label]),
+            labels,
+            lambda label: scheme.distinguished_open(defining_elements[label]),
             name="Distinguished opens",
         )
         charts = finite_indexed_family(
-            labels, lambda label: site.object(opens[label].inclusion()),
+            labels,
+            lambda label: site.object(opens[label].inclusion()),
             name="Affine charts over the covered scheme",
         )
         members = finite_indexed_family(
-            labels, lambda label: site.Mor(charts[label], target)(opens[label].inclusion()),
+            labels,
+            lambda label: site.Mor(charts[label], target)(opens[label].inclusion()),
             name="Distinguished affine cover arrows",
         )
 
         def overlap_data(left, right):
-            overlap = scheme.distinguished_open(defining_elements[left] * defining_elements[right])
+            overlap = scheme.distinguished_open(
+                defining_elements[left] * defining_elements[right]
+            )
             apex = site.object(overlap.inclusion())
             return site.span(
                 site.Mor(apex, charts[left])(overlap.inclusion_into(opens[left])),
                 site.Mor(apex, charts[right])(overlap.inclusion_into(opens[right])),
             )
 
-        overlaps = {pair: overlap_data(*pair) for pair in combinations(tuple(labels), 2)}
-        return self.family(target, members, overlaps, defining_elements=defining_elements)
+        overlaps = {
+            pair: overlap_data(*pair) for pair in combinations(tuple(labels), 2)
+        }
+        return self.family(
+            target, members, overlaps, defining_elements=defining_elements
+        )
 
     class ParentMethods:
         r"""A cover whose defining elements refine its already constructed family.
@@ -1282,15 +1335,19 @@ class DistinguishedAffineCovers(OwnedCategory):
             r"""Return the retained decision that the selected family is ``{D(f_i) -> X}``."""
             scheme = self.ambient_scheme()
             algebra = scheme.coordinate_algebra()
-            return conjunction((
-                self.target().arrow() == scheme.categorical_identity_morphism(),
-                algebra.ideal(*self.defining_elements()).contains_ambient_element(algebra.one()),
-                conjunction(
-                    self.open(label)
-                    is scheme.distinguished_open(self.defining_element(label))
-                    for label in self.index_set()
-                ),
-            ))
+            return conjunction(
+                (
+                    self.target().arrow() == scheme.categorical_identity_morphism(),
+                    algebra.ideal(*self.defining_elements()).contains_ambient_element(
+                        algebra.one()
+                    ),
+                    conjunction(
+                        self.open(label)
+                        is scheme.distinguished_open(self.defining_element(label))
+                        for label in self.index_set()
+                    ),
+                )
+            )
 
         @validator
         def validate_defining_data(self):
@@ -1370,9 +1427,13 @@ class DistinguishedAffineCovers(OwnedCategory):
 
         def structure_sheaf_restriction(self, chart_index, other_index):
             r"""``O(U_i) -> O(U_i cap U_j)``."""
-            return self.ambient_scheme().structure_sheaf().restriction_map(
-                self.open(chart_index),
-                self.overlap(chart_index, other_index),
+            return (
+                self.ambient_scheme()
+                .structure_sheaf()
+                .restriction_map(
+                    self.open(chart_index),
+                    self.overlap(chart_index, other_index),
+                )
             )
 
         @cached_method
@@ -1396,9 +1457,15 @@ class DistinguishedAffineCovers(OwnedCategory):
                 case _ if target is chart:
                     return module
                 case _ if module in Algebras(chart_ring).Associative().Unital():
-                    return self.restrict_algebra(module, chart_index, *intersection_indices)
+                    return self.restrict_algebra(
+                        module, chart_index, *intersection_indices
+                    )
                 case _:
-                    ring_map = self.ambient_scheme().structure_sheaf().restriction_map(chart, target)
+                    ring_map = (
+                        self.ambient_scheme()
+                        .structure_sheaf()
+                        .restriction_map(chart, target)
+                    )
                     restricted = module.base_change(ring_map)
                     assert restricted.base_ring() is target.coordinate_algebra(), (
                         f"the restriction of {module} to {target} is a module over "
@@ -1420,9 +1487,19 @@ class DistinguishedAffineCovers(OwnedCategory):
             target = self.intersection(chart_index, *intersection_indices)
             if target is chart:
                 return algebra
-            ring_map = self.ambient_scheme().structure_sheaf().restriction_map(chart, target)
-            restricted = Algebras(chart_ring).Associative().Unital().scalar_extension(ring_map)(algebra)
-            assert restricted in Algebras(target.coordinate_algebra()).Associative().Unital(), (
+            ring_map = (
+                self.ambient_scheme().structure_sheaf().restriction_map(chart, target)
+            )
+            restricted = (
+                Algebras(chart_ring)
+                .Associative()
+                .Unital()
+                .scalar_extension(ring_map)(algebra)
+            )
+            assert (
+                restricted
+                in Algebras(target.coordinate_algebra()).Associative().Unital()
+            ), (
                 f"the restriction of {algebra} to {target} is not an algebra over "
                 f"{target.coordinate_algebra()}; it is in {restricted.category()}"
             )
@@ -1454,9 +1531,7 @@ class DistinguishedAffineCovers(OwnedCategory):
             )
             category = self.category()
             index_pairs = tuple(
-                (left, right)
-                for left in self.atlas()
-                for right in other.atlas()
+                (left, right) for left in self.atlas() for right in other.atlas()
             )
             fine = category(
                 tuple(
@@ -1567,10 +1642,15 @@ class _AffineModuleSheafEngine:
             )
         key = id(distinguished_open)
         selected = self._local_sections.get(key)
-        if selected is not None and selected.base_ring() is distinguished_open.coordinate_algebra():
+        if (
+            selected is not None
+            and selected.base_ring() is distinguished_open.coordinate_algebra()
+        ):
             return selected
-        section_ring = self.scheme().structure_sheaf().sections_on_distinguished_open(
-            distinguished_open
+        section_ring = (
+            self.scheme()
+            .structure_sheaf()
+            .sections_on_distinguished_open(distinguished_open)
         )
         selected = section_ring.localize_module(self.module())
         self._local_sections[key] = selected
@@ -1578,7 +1658,6 @@ class _AffineModuleSheafEngine:
 
     def restriction_map(self, source_open, target_open):
         r"""Return the module restriction, linear over the structure-sheaf restriction."""
-
 
         ambient = self.scheme()
         structure_restriction = ambient.structure_sheaf().restriction_map(
@@ -1591,7 +1670,11 @@ class _AffineModuleSheafEngine:
             else self.sections_on_distinguished_open(source_open)
         )
         if target_open is ambient and source_open is ambient:
-            return source_sections.module_category().Mor(source_sections, source_sections).identity()
+            return (
+                source_sections.module_category()
+                .Mor(source_sections, source_sections)
+                .identity()
+            )
         target_sections = (
             self.global_sections()
             if target_open is ambient
@@ -1608,7 +1691,11 @@ class _AffineModuleSheafEngine:
                 )
             return localization.unit(self.module(), localized=target_sections)
         if source_open is target_open:
-            return source_sections.module_category().Mor(source_sections, source_sections).identity()
+            return (
+                source_sections.module_category()
+                .Mor(source_sections, source_sections)
+                .identity()
+            )
 
         restricted_target = target_sections.restrict_scalars(structure_restriction)
         source_ring = source_sections.base_ring()
@@ -1630,9 +1717,11 @@ class _AffineModuleSheafEngine:
         # The restriction of a localized module along the localization of its
         # ring is linear over the source ring, so the construction alone gives
         # linearity.
-        return source_sections.module_category().Mor(
-            source_sections, restricted_target
-        )._from_constructed_element_map(restrict)
+        return (
+            source_sections.module_category()
+            .Mor(source_sections, restricted_target)
+            ._from_constructed_element_map(restrict)
+        )
 
     def sheaf_category(self):
         r"""``QCoh(X)``, the category this sheaf is an object of."""
@@ -1672,7 +1761,11 @@ class _ModuleOpenPresheaf(Functor):
     def _apply_object(self, opposite_object):
         if _is_empty_open(self, opposite_object):
             # A module sheaf has one empty-open section (Stacks, Tag 04B3).
-            return self._scheme.scheme_base_ring().free_module(0).underlying_additive_group()
+            return (
+                self._scheme.scheme_base_ring()
+                .free_module(0)
+                .underlying_additive_group()
+            )
         open_scheme = self._open_scheme(opposite_object)
         sheaf = self._sheaf()
         module = (
@@ -1683,20 +1776,30 @@ class _ModuleOpenPresheaf(Functor):
         return module.underlying_additive_group()
 
     def _apply_morphism(self, opposite_arrow):
-        if _is_empty_open(self, opposite_arrow.domain()) or _is_empty_open(self, opposite_arrow.codomain()):
-            return self.codomain().Mor(
-                self(opposite_arrow.domain()), self(opposite_arrow.codomain()),
-            ).zero()
+        if _is_empty_open(self, opposite_arrow.domain()) or _is_empty_open(
+            self, opposite_arrow.codomain()
+        ):
+            return (
+                self.codomain()
+                .Mor(
+                    self(opposite_arrow.domain()),
+                    self(opposite_arrow.codomain()),
+                )
+                .zero()
+            )
         source_open = self._open_scheme(opposite_arrow.domain())
         target_open = self._open_scheme(opposite_arrow.codomain())
         if source_open is target_open:
             sections = self(opposite_arrow.domain())
             return self.codomain().Mor(sections, sections).identity()
         restriction = self._sheaf().restriction_map(
-            source_open, target_open,
+            source_open,
+            target_open,
         )
-        return restriction.domain().module_category().underlying_additive_group_functor()(
-            restriction
+        return (
+            restriction.domain()
+            .module_category()
+            .underlying_additive_group_functor()(restriction)
         )
 
 
@@ -1781,7 +1884,10 @@ class AffineQuasiCoherentSheafMorphismMethods:
         r"""Compare through the affine equivalence without collapsing unknown equality."""
         if op not in (op_EQ, op_NE):
             return NotImplemented
-        if not isinstance(other, AffineQuasiCoherentSheafMorphismMethods) or other.parent() is not self.parent():
+        if (
+            not isinstance(other, AffineQuasiCoherentSheafMorphismMethods)
+            or other.parent() is not self.parent()
+        ):
             return op == op_NE
         equal = self.underlying_module_morphism() == other.underlying_module_morphism()
         return equal if op == op_EQ else negation(equal)
@@ -1797,12 +1903,13 @@ class AffineQuasiCoherentSheafMorphismMethods:
             return NotImplemented
         if other.codomain() is not self.domain():
             return NotImplemented
-        return self.parent().mor_category().Mor(
-            other.domain(),
-            self.codomain(),
-        )(
-            self.underlying_module_morphism()
-            * other.underlying_module_morphism()
+        return (
+            self.parent()
+            .mor_category()
+            .Mor(
+                other.domain(),
+                self.codomain(),
+            )(self.underlying_module_morphism() * other.underlying_module_morphism())
         )
 
 
@@ -1821,10 +1928,14 @@ class AffineQuasiCoherentSheafMor(QuasiCoherentSheafMor):
 
     def _element_constructor_(self, module_morphism):
         match module_morphism:
-            case AffineQuasiCoherentSheafMorphismMethods() if module_morphism.parent() is self:
+            case AffineQuasiCoherentSheafMorphismMethods() if (
+                module_morphism.parent() is self
+            ):
                 return module_morphism
             case AffineQuasiCoherentSheafMorphismMethods():
-                raise TypeError(f"{module_morphism} belongs to another Mor; apply the functor between the categories")
+                raise TypeError(
+                    f"{module_morphism} belongs to another Mor; apply the functor between the categories"
+                )
             case _:
                 pass
         return self.element_class(self, module_morphism)
@@ -1963,11 +2074,21 @@ class QuasiCoherentSheaves(CategoryPacketMethods, OwnedParameterizedCategory):
 
         def projectivization_base_change(self, ring_map):
             r"""Return the represented base-change comparison for ``P_quot(self)``."""
-            return self.projectivization().arrow().domain().projectivization_base_change(
-                ring_map
+            return (
+                self.projectivization()
+                .arrow()
+                .domain()
+                .projectivization_base_change(ring_map)
             )
 
-    def object(self, *, categories=(), construction_data=None, _engine, open_sections_presheaf=None):
+    def object(
+        self,
+        *,
+        categories=(),
+        construction_data=None,
+        _engine,
+        open_sections_presheaf=None,
+    ):
         r"""Construct one represented quasi-coherent sheaf through this owner.
 
         ``_engine`` is the private realization of the sheaf in the represented
@@ -2033,7 +2154,9 @@ class QuasiCoherentSheaves(CategoryPacketMethods, OwnedParameterizedCategory):
 
         def WithChosenTrivialization(self):
             r"""Return invertible sheaves carrying one selected trivializing cover."""
-            return InvertibleSheavesWithChosenTrivialization(self.base_category().scheme())
+            return InvertibleSheavesWithChosenTrivialization(
+                self.base_category().scheme()
+            )
 
     def module_category(self):
         r"""``Modules(A)``: the category this one is equivalent to, for affine ``X``."""
@@ -2188,12 +2311,11 @@ class RingedSpaces(CategoryPacketMethods, OwnedCategory):
 
     def an_object(self):
         r"""The affine ringed space ``Spec(ZZ)``."""
-        from sage.rings.integer_ring import ZZ as SageZZ
 
         from sage_extensions.categories.rings.ring_foundation import (
-            _own_ring,
             _owned_integers,
         )
+
         return (_owned_integers()).affine_spectrum()
 
     @classmethod
@@ -2343,7 +2465,6 @@ __all__ = [
     "AlgebraSheaves",
     "DistinguishedAffineCoverRefinement",
     "DistinguishedAffineCovers",
-    "distinguished_affine_coverage",
     "LocallyRingedSpaces",
     "ModuleSheaves",
     "QuasiCoherentSheaves",
@@ -2351,5 +2472,6 @@ __all__ = [
     "SheafObjects",
     "SheafedSpaces",
     "ZariskiCoveringFamilies",
+    "distinguished_affine_coverage",
     "zariski_coverage",
 ]
