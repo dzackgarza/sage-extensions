@@ -1931,7 +1931,12 @@ class Algebras(OwnedCategoryOverBaseRing):
 
             Commutativity is a property of the multiplication before it is a
             refinement; the ``Commutative`` axiom answers ``True`` by placement.
+            An algebra its constructor placed commutative (``Q[x]``) answers
+            here too: ``Modules(R)`` reads this hook to place its objects, and
+            no finite decision on infinitely many generators replaces it.
             """
+            if self in Magmas().Commutative():
+                return True
             multiplication = self.multiplication()
             return _decide_on_module_generators(
                 self.unformed_module(),

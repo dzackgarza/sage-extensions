@@ -6697,7 +6697,11 @@ class ProductSchemes(OwnedCategoryOverBaseRing):
                     pullback = (
                         source.structure_morphism().coordinate_algebra_morphism()
                         if product_algebra is base
-                        else product_algebra.Mor(source.coordinate_algebra())(images)
+                        else Algebras(base)
+                        .Associative()
+                        .Unital()
+                        .Commutative()
+                        .Mor(product_algebra, source.coordinate_algebra())(images)
                     )
                     cone = _affine_morphism_from_pullback(source, self, pullback)
                 case _ if self in ProductProjectiveSpaces(base):

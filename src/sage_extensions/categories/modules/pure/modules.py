@@ -21,18 +21,16 @@ from sage.structure.element import Element, ModuleElement
 from sage.structure.element import parent as element_parent
 from sage.structure.parent import Parent
 from sage.structure.richcmp import richcmp
-from sage.structure.sage_object import SageObject
 
 from sage_extensions.categories.abstract_categories.mor_categories import (
     EndCategoryConstruction,
-    MorCategoryConstruction,
     IsoCategoryConstruction,
     MonoCategoryConstruction,
+    MorCategoryConstruction,
     _category_accepts_morphism,
-    _category_mor_parent,
 )
+from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 from sage_extensions.categories.abstract_categories.objects import (
-    Objects,
     _fix_selected_resolution,
 )
 from sage_extensions.categories.abstract_categories.products import (
@@ -53,7 +51,10 @@ from sage_extensions.categories.modules.module_morphisms.module_morphisms import
     TensorProductModuleMor,
     _framing_morphism,
 )
-from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
+from sage_extensions.categories.modules.module_morphisms.morphism_matrices import (
+    _matrix_group,
+    _row_normal_form,
+)
 from sage_extensions.categories.rings.ring_foundation import (
     IntegralDomains,
     LocalizationRings,
@@ -63,21 +64,17 @@ from sage_extensions.categories.rings.ring_foundation import (
     OwnedOrders,
     OwnedRings,
     PrincipalIdealDomains,
-    _OwnedRingParent,
+    RingMor,
     _engine_element,
     _engine_ring,
-    _linear_algebra_ring,
     _linear_algebra_element,
-    _own_ring,
-    _owned_ring,
-    RingMor,
+    _linear_algebra_ring,
+    _owned_engine_element,
     _owned_integers,
+    _owned_ring,
+    _OwnedRingParent,
 )
 from sage_extensions.categories.sets.cardinals import cardinal
-from sage_extensions.categories.modules.module_morphisms.morphism_matrices import (
-    _matrix_group,
-    _row_normal_form,
-)
 from sage_extensions.categories.sets.finite_ordered_sets import (
     FiniteOrderedSets,
     finite_ordered_set,
@@ -88,16 +85,19 @@ from sage_extensions.categories.sets.indexed_families import (
     indexed_family,
 )
 from sage_extensions.categories.sets.set_categories import (
-    EnumeratedSets,
     NN,
+    EnumeratedSets,
     Sets,
 )
-
-
-from sage_extensions.logic import AtomicProposition, Predicate, Unknown, ask, conjunction
+from sage_extensions.logic import (
+    AtomicProposition,
+    Predicate,
+    Unknown,
+    ask,
+    conjunction,
+)
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook
-from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 
 if TYPE_CHECKING:
     from sage_extensions.lexicon.category_theory import ObjectOfCategory
@@ -204,6 +204,7 @@ class LinearEndCategoryConstruction(EndCategoryConstruction):
             )
         return endomorphisms
 
+
 class ModuleEndCategoryConstruction(LinearEndCategoryConstruction):
     r"""The ring-valued endomorphism family ``M |-> End_R(M)``."""
 
@@ -239,7 +240,10 @@ def _is_group_algebra(ring) -> bool:
         return False
     # Sage realizes each category instance in a dynamic subclass, so the
     # placement is recognized by its category class, not by identity.
-    return any(isinstance(placement, GroupAlgebras) for placement in ring.category().all_super_categories(proper=False))
+    return any(
+        isinstance(placement, GroupAlgebras)
+        for placement in ring.category().all_super_categories(proper=False)
+    )
 
 
 def _action_with_canonical_endomorphism_parent(base_ring, additive_group, action):
@@ -300,7 +304,9 @@ class Modules(OwnedCategoryOverBaseRing):
 
     def Core(self):
         r"""The core groupoid of modules; at ``(M, M)`` its Mor is ``Aut_R(M)`` (``_ModuleCore``)."""
-        from sage_extensions.categories.modules.module_morphisms.module_morphisms import _ModuleCore
+        from sage_extensions.categories.modules.module_morphisms.module_morphisms import (
+            _ModuleCore,
+        )
 
         return _ModuleCore(self)
 
@@ -348,12 +354,15 @@ class Modules(OwnedCategoryOverBaseRing):
         ``Modules(R)(X, rho)`` states those same endpoints explicitly.
         """
         from sage_extensions.categories.modules.general_modules import GeneralModules
+        from sage_extensions.categories.modules.native_modules import (
+            _RingModulePresentation,
+        )
         from sage_extensions.owned_category import _object_of
 
-        from sage_extensions.categories.modules.native_modules import _RingModulePresentation
-
         if isinstance(datum, _RingModulePresentation):
-            assert scalar_action is None, f"{datum} already determines its scalar action, so the separate scalar action {scalar_action} is not accepted"
+            assert scalar_action is None, (
+                f"{datum} already determines its scalar action, so the separate scalar action {scalar_action} is not accepted"
+            )
             return datum.construct(self)
         if scalar_action is None:
             scalar_action = datum
@@ -846,18 +855,28 @@ class Modules(OwnedCategoryOverBaseRing):
                 constant = family.constant_value()
                 if constant is not None:
                     from sage_extensions.categories.abstract_categories.cat import Cat
-                    from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+                    from sage_extensions.categories.abstract_categories.functors import (
+                        DiscreteCategory,
+                    )
 
-                    diagram = Cat().Mor(DiscreteCategory(family.index_set()), self).constant_functor(constant)
+                    diagram = (
+                        Cat()
+                        .Mor(DiscreteCategory(family.index_set()), self)
+                        .constant_functor(constant)
+                    )
                 else:
                     diagram = _discrete_diagram(family, self)
-            universal_cone = (diagram).ProductCones().cone(
-                product,
-                lambda index: _module_product_projection(
+            universal_cone = (
+                (diagram)
+                .ProductCones()
+                .cone(
                     product,
-                    family,
-                    index.value(),
-                ),
+                    lambda index: _module_product_projection(
+                        product,
+                        family,
+                        index.value(),
+                    ),
+                )
             )
 
             def factorizer(cone):
@@ -867,15 +886,23 @@ class Modules(OwnedCategoryOverBaseRing):
                     name="Product cone legs",
                 )
                 if family.cardinality() == cardinal(0):
-                    apex_map = cone.apex().module_category().Mor(cone.apex(), product).zero()
+                    apex_map = (
+                        cone.apex().module_category().Mor(cone.apex(), product).zero()
+                    )
                 else:
                     match product:
                         case _ if product in BiproductModules(self.base_ring()):
                             apex_map = product.from_product_cone(legs)
                         case _:
-                            apex_map = _module_product_factor(product, family, cone.apex(), legs)
-                return diagram.Cones().Mor(cone, universal_cone)._from_commuting_apex_map(
-                    apex_map,
+                            apex_map = _module_product_factor(
+                                product, family, cone.apex(), legs
+                            )
+                return (
+                    diagram.Cones()
+                    .Mor(cone, universal_cone)
+                    ._from_commuting_apex_map(
+                        apex_map,
+                    )
                 )
 
             return SelectedLimitConstruction(diagram, universal_cone, factorizer)
@@ -894,9 +921,13 @@ class Modules(OwnedCategoryOverBaseRing):
                     "its biproduct realization does not establish closure in this subcategory"
                 )
             diagram = _discrete_diagram(family, self)
-            universal_cocone = (diagram).CoproductCocones().cocone(
-                coproduct,
-                lambda index: coproduct.injection(index.value()),
+            universal_cocone = (
+                (diagram)
+                .CoproductCocones()
+                .cocone(
+                    coproduct,
+                    lambda index: coproduct.injection(index.value()),
+                )
             )
 
             def factorizer(cocone):
@@ -906,7 +937,9 @@ class Modules(OwnedCategoryOverBaseRing):
                     name="Coproduct cocone legs",
                 )
                 if family.cardinality() == cardinal(0):
-                    return coproduct.module_category().Mor(coproduct, cocone.apex()).zero()
+                    return (
+                        coproduct.module_category().Mor(coproduct, cocone.apex()).zero()
+                    )
                 return coproduct.from_coproduct_cocone(legs)
 
             return SelectedColimitConstruction(diagram, universal_cocone, factorizer)
@@ -933,9 +966,9 @@ class Modules(OwnedCategoryOverBaseRing):
                 or left_morphism.codomain() is not right_morphism.codomain()
             ):
                 raise ValueError(
-                f"the equalizer of {left_morphism} and {right_morphism} is not defined in {self}: "
-                f"the two maps must be parallel morphisms between objects of {self}"
-            )
+                    f"the equalizer of {left_morphism} and {right_morphism} is not defined in {self}: "
+                    f"the two maps must be parallel morphisms between objects of {self}"
+                )
             ambient_modules = Modules(left_morphism.domain().base_ring())
             ambient_mor = ambient_modules.Mor(
                 left_morphism.domain(),
@@ -950,10 +983,14 @@ class Modules(OwnedCategoryOverBaseRing):
                         f"both maps must be {left_morphism.domain().base_ring()}-linear maps in {ambient_mor}"
                     )
             if not all(
-                _category_accepts_morphism(self, left_morphism.domain(), left_morphism.codomain(), arrow)
+                _category_accepts_morphism(
+                    self, left_morphism.domain(), left_morphism.codomain(), arrow
+                )
                 for arrow in (left_morphism, right_morphism)
             ):
-                raise TypeError("the module equalizer requires arrows in the selected Mor category")
+                raise TypeError(
+                    "the module equalizer requires arrows in the selected Mor category"
+                )
             match (
                 _represented_finite_presentation(left_morphism.domain()),
                 _represented_finite_presentation(left_morphism.codomain()),
@@ -977,27 +1014,35 @@ class Modules(OwnedCategoryOverBaseRing):
                     f"is not an object of {self}; an ambient module kernel does not "
                     "establish closure in the selected subcategory"
                 )
-            diagram = _parallel_pair_diagram(
-                left_morphism, right_morphism, self
-            )
+            diagram = _parallel_pair_diagram(left_morphism, right_morphism, self)
             shape = diagram.domain()
-            universal_cone = (diagram).Cones().cone(
-                equalizer,
-                lambda index: (
-                    inclusion
-                    if index is shape.source()
-                    else left_morphism * inclusion
-                ),
+            universal_cone = (
+                (diagram)
+                .Cones()
+                .cone(
+                    equalizer,
+                    lambda index: (
+                        inclusion
+                        if index is shape.source()
+                        else left_morphism * inclusion
+                    ),
+                )
             )
 
             def factorizer(cone):
                 source_leg = cone.structure_morphism(shape.source())
                 source = cone.apex()
                 match equalizer:
-                    case _ if equalizer in ModuleSubobjects(left_morphism.domain().base_ring()):
-                        return source.module_category().Mor(source, equalizer)._equalizer_factor(
-                            source_leg,
-                            inclusion=inclusion,
+                    case _ if equalizer in ModuleSubobjects(
+                        left_morphism.domain().base_ring()
+                    ):
+                        return (
+                            source.module_category()
+                            .Mor(source, equalizer)
+                            ._equalizer_factor(
+                                source_leg,
+                                inclusion=inclusion,
+                            )
                         )
                     case _:
                         return _module_equalizer_factor(
@@ -1037,10 +1082,14 @@ class Modules(OwnedCategoryOverBaseRing):
                     f"two {self.base_ring()}-linear morphisms in {ambient_mor}"
                 )
             if not all(
-                _category_accepts_morphism(self, left_morphism.domain(), left_morphism.codomain(), arrow)
+                _category_accepts_morphism(
+                    self, left_morphism.domain(), left_morphism.codomain(), arrow
+                )
                 for arrow in (left_morphism, right_morphism)
             ):
-                raise TypeError("the module coequalizer requires arrows in the selected Mor category")
+                raise TypeError(
+                    "the module coequalizer requires arrows in the selected Mor category"
+                )
             difference = left_morphism - right_morphism
             raw_coequalizer = difference.cokernel()
             raw_projection = difference.cokernel_projection()
@@ -1081,26 +1130,28 @@ class Modules(OwnedCategoryOverBaseRing):
                     "quotient is not automatically a colimit in this subcategory"
                 )
 
-            diagram = _parallel_pair_diagram(
-                left_morphism, right_morphism, self
-            )
+            diagram = _parallel_pair_diagram(left_morphism, right_morphism, self)
             shape = diagram.domain()
-            universal_cocone = (diagram).Cocones().cocone(
-                coequalizer,
-                lambda index: (
-                    projection * left_morphism
-                    if index is shape.source()
-                    else projection
-                ),
+            universal_cocone = (
+                (diagram)
+                .Cocones()
+                .cocone(
+                    coequalizer,
+                    lambda index: (
+                        projection * left_morphism
+                        if index is shape.source()
+                        else projection
+                    ),
+                )
             )
 
             def factorizer(cocone):
                 target_leg = cocone.costructure_morphism(shape.target())
                 target = cocone.apex()
                 ambient = left_morphism.codomain()
-                raw_factor = raw_coequalizer.module_category().Mor(raw_coequalizer, target)(
-                    lambda label: target_leg(ambient.module_generator(label))
-                )
+                raw_factor = raw_coequalizer.module_category().Mor(
+                    raw_coequalizer, target
+                )(lambda label: target_leg(ambient.module_generator(label)))
                 if coequalizer_transport is None:
                     return raw_factor
                 return raw_factor * coequalizer_transport.inverse().forward()
@@ -1126,13 +1177,26 @@ class Modules(OwnedCategoryOverBaseRing):
             )
             labels = tuple(index_set)
             reference = morphisms.value(labels[0])
-            ambient_mor = Modules(self.base_ring()).Mor(reference.domain(), reference.codomain())
+            ambient_mor = Modules(self.base_ring()).Mor(
+                reference.domain(), reference.codomain()
+            )
             if reference.domain() not in self or reference.codomain() not in self:
-                raise ValueError(f"the wide equalizer of {morphisms} is not a diagram in {self}")
+                raise ValueError(
+                    f"the wide equalizer of {morphisms} is not a diagram in {self}"
+                )
             for label in labels:
                 arrow = morphisms.value(label)
-                if arrow.domain() is not reference.domain() or arrow.codomain() is not reference.codomain() or arrow not in ambient_mor or not _category_accepts_morphism(self, reference.domain(), reference.codomain(), arrow):
-                    raise ValueError(f"the wide equalizer needs parallel {self.base_ring()}-linear arrows, but got {arrow}")
+                if (
+                    arrow.domain() is not reference.domain()
+                    or arrow.codomain() is not reference.codomain()
+                    or arrow not in ambient_mor
+                    or not _category_accepts_morphism(
+                        self, reference.domain(), reference.codomain(), arrow
+                    )
+                ):
+                    raise ValueError(
+                        f"the wide equalizer needs parallel {self.base_ring()}-linear arrows, but got {arrow}"
+                    )
             if len(labels) == 1:
                 # A singleton parallel family imposes no equality relation.
                 # The limit is its literal source, not a newly computed
@@ -1140,14 +1204,20 @@ class Modules(OwnedCategoryOverBaseRing):
                 return reference.domain()
             equalizer = self._categorical_equalizer(reference, reference)
             for label in labels[1:]:
-                equalizer = equalizer.intersection(self._categorical_equalizer(morphisms.value(label), reference))
+                equalizer = equalizer.intersection(
+                    self._categorical_equalizer(morphisms.value(label), reference)
+                )
             if equalizer not in self:
-                raise TypeError(f"the wide equalizer {equalizer} is not an object of {self}")
+                raise TypeError(
+                    f"the wide equalizer {equalizer} is not an object of {self}"
+                )
             return equalizer
 
         def _categorical_equalizer_family_construction(self, morphisms):
             r"""Retain the selected wide equalizer's diagram and inclusion."""
-            from sage_extensions.categories.abstract_categories.products import _parallel_family_diagram
+            from sage_extensions.categories.abstract_categories.products import (
+                _parallel_family_diagram,
+            )
 
             equalizer = self._categorical_equalizer_family(morphisms)
             reference = morphisms.value(next(iter(morphisms.index_set())))
@@ -1160,7 +1230,9 @@ class Modules(OwnedCategoryOverBaseRing):
             shape = diagram.domain()
             universal_cone = diagram.Cones().cone(
                 equalizer,
-                lambda index: inclusion if index is shape.source() else reference * inclusion,
+                lambda index: (
+                    inclusion if index is shape.source() else reference * inclusion
+                ),
             )
 
             def factorizer(cone):
@@ -1168,8 +1240,10 @@ class Modules(OwnedCategoryOverBaseRing):
                 source_leg = cone.structure_morphism(shape.source())
                 if equalizer is reference.domain():
                     return source_leg
-                return source.module_category().Mor(source, equalizer)._equalizer_factor(
-                    source_leg, inclusion=inclusion
+                return (
+                    source.module_category()
+                    .Mor(source, equalizer)
+                    ._equalizer_factor(source_leg, inclusion=inclusion)
                 )
 
             return SelectedLimitConstruction(diagram, universal_cone, factorizer)
@@ -1193,13 +1267,26 @@ class Modules(OwnedCategoryOverBaseRing):
             )
             labels = tuple(index_set)
             reference = morphisms.value(labels[0])
-            ambient_mor = Modules(self.base_ring()).Mor(reference.domain(), reference.codomain())
+            ambient_mor = Modules(self.base_ring()).Mor(
+                reference.domain(), reference.codomain()
+            )
             if reference.domain() not in self or reference.codomain() not in self:
-                raise ValueError(f"the wide coequalizer of {morphisms} is not a diagram in {self}")
+                raise ValueError(
+                    f"the wide coequalizer of {morphisms} is not a diagram in {self}"
+                )
             for label in labels:
                 arrow = morphisms.value(label)
-                if arrow.domain() is not reference.domain() or arrow.codomain() is not reference.codomain() or arrow not in ambient_mor or not _category_accepts_morphism(self, reference.domain(), reference.codomain(), arrow):
-                    raise ValueError(f"the wide coequalizer needs parallel {self.base_ring()}-linear arrows, but got {arrow}")
+                if (
+                    arrow.domain() is not reference.domain()
+                    or arrow.codomain() is not reference.codomain()
+                    or arrow not in ambient_mor
+                    or not _category_accepts_morphism(
+                        self, reference.domain(), reference.codomain(), arrow
+                    )
+                ):
+                    raise ValueError(
+                        f"the wide coequalizer needs parallel {self.base_ring()}-linear arrows, but got {arrow}"
+                    )
             if len(labels) == 1:
                 return reference.codomain()
             relations = (reference - reference).image()
@@ -1207,12 +1294,16 @@ class Modules(OwnedCategoryOverBaseRing):
                 relations = relations.sum((morphisms.value(label) - reference).image())
             quotient = relations.inclusion().cokernel()
             if quotient not in self:
-                raise TypeError(f"the wide coequalizer {quotient} is not an object of {self}")
+                raise TypeError(
+                    f"the wide coequalizer {quotient} is not an object of {self}"
+                )
             return quotient
 
         def _categorical_coequalizer_family_construction(self, morphisms):
             r"""Retain the relation quotient and its universal wide cocone."""
-            from sage_extensions.categories.abstract_categories.products import _parallel_family_diagram
+            from sage_extensions.categories.abstract_categories.products import (
+                _parallel_family_diagram,
+            )
 
             quotient = self._categorical_coequalizer_family(morphisms)
             reference = morphisms.value(next(iter(morphisms.index_set())))
@@ -1226,13 +1317,20 @@ class Modules(OwnedCategoryOverBaseRing):
                 if quotient is target
                 else quotient.cokernel_projection()
             )
-            if projection.domain() is not target or projection.codomain() is not quotient:
-                raise ValueError("the wide module quotient's retained projection has incorrect endpoints")
+            if (
+                projection.domain() is not target
+                or projection.codomain() is not quotient
+            ):
+                raise ValueError(
+                    "the wide module quotient's retained projection has incorrect endpoints"
+                )
             diagram = _parallel_family_diagram(morphisms, self)
             shape = diagram.domain()
             universal_cocone = diagram.Cocones().cocone(
                 quotient,
-                lambda index: projection * reference if index is shape.source() else projection,
+                lambda index: (
+                    projection * reference if index is shape.source() else projection
+                ),
             )
 
             def factorizer(cocone):
@@ -1245,8 +1343,12 @@ class Modules(OwnedCategoryOverBaseRing):
 
             return SelectedColimitConstruction(diagram, universal_cocone, factorizer)
 
-        def _categorical_product_morphism(self, left_morphism, right_morphism, source, target):
-            return left_morphism.biproduct_map(right_morphism, source=source, target=target)
+        def _categorical_product_morphism(
+            self, left_morphism, right_morphism, source, target
+        ):
+            return left_morphism.biproduct_map(
+                right_morphism, source=source, target=target
+            )
 
         _categorical_coproduct_morphism = _categorical_product_morphism
 
@@ -1299,7 +1401,9 @@ class Modules(OwnedCategoryOverBaseRing):
         scalars = obj.base_ring()
         if scalars in GroupAlgebras(self.base_ring()):
             group_modules = Modules(scalars)
-            return group_modules.restriction_of_scalars(group_modules.coefficient_inclusion())(obj)
+            return group_modules.restriction_of_scalars(
+                group_modules.coefficient_inclusion()
+            )(obj)
         return obj
 
     def _mor_parent_placement(
@@ -1315,11 +1419,10 @@ class Modules(OwnedCategoryOverBaseRing):
         no full-Hom basis or presentation. This construction datum neither
         decides equality with the full Hom nor proves any arrow law.
         """
-        from sage_extensions.owned_category import owned_category_join
-
         from sage_extensions.categories.group.additive_mors import (
             AdditiveEndomorphismRings,
         )
+        from sage_extensions.owned_category import owned_category_join
 
         ring = self.base_ring()
         if not full_linear_mor:
@@ -1331,15 +1434,21 @@ class Modules(OwnedCategoryOverBaseRing):
         if ring not in OwnedRings().Commutative():
             center = ring.ring_center()
             placement = [LinearMorModules(center)]
-            if _coordinate_framed_free_module(domain, ring) and _coordinate_framed_free_module(codomain, ring):
+            if _coordinate_framed_free_module(
+                domain, ring
+            ) and _coordinate_framed_free_module(codomain, ring):
                 placement.append(MatrixSpaces(ring))
                 if domain is codomain:
                     placement.append(MatrixEndomorphismSpaces(ring))
             if domain is codomain:
                 placement.append(AdditiveEndomorphismRings(center))
             return owned_category_join(tuple(placement))
-        placement = [InternalMorModules(ring) if full_internal_mor else LinearMorModules(ring)]
-        matrix = _coordinate_framed_free_module(domain, ring) and _coordinate_framed_free_module(codomain, ring)
+        placement = [
+            InternalMorModules(ring) if full_internal_mor else LinearMorModules(ring)
+        ]
+        matrix = _coordinate_framed_free_module(
+            domain, ring
+        ) and _coordinate_framed_free_module(codomain, ring)
         if matrix:
             placement.append(MatrixSpaces(ring))
             if domain is codomain:
@@ -1361,11 +1470,17 @@ class Modules(OwnedCategoryOverBaseRing):
                 _SelectedFinitePresentationModules,
             )
 
-            if _represented_finite_presentation(domain) and _represented_finite_presentation(codomain):
+            if _represented_finite_presentation(
+                domain
+            ) and _represented_finite_presentation(codomain):
                 placement.append(_SelectedFinitePresentationModules(ring))
         if full_internal_mor and domain in TensorProductModules(ring):
             factors = domain.tensor_factors()
-            if factors.cardinality().is_finite() and int(factors.cardinality().finite_value()) == 2 and factors[0] is factors[1]:
+            if (
+                factors.cardinality().is_finite()
+                and int(factors.cardinality().finite_value()) == 2
+                and factors[0] is factors[1]
+            ):
                 from sage_extensions.categories.forms.forms import BilinearFormMors
 
                 placement.append(BilinearFormMors(ring))
@@ -1395,10 +1510,12 @@ class Modules(OwnedCategoryOverBaseRing):
             )
             image = evaluation.image()
             regular_label = regular.module_generating_set()[0]
-            return ring.ideal(*(
-                image.inclusion()(generator).to_vector()(regular_label)
-                for generator in image.module_generators()
-            ))
+            return ring.ideal(
+                *(
+                    image.inclusion()(generator).to_vector()(regular_label)
+                    for generator in image.module_generators()
+                )
+            )
 
         def __rmul__(self, scalar):
             r"""Return ring multiplication or the left module scalar action.
@@ -1411,7 +1528,10 @@ class Modules(OwnedCategoryOverBaseRing):
             commute; scalar multiplication need not be R-linear.
             """
             match scalar:
-                case _ if element_parent(scalar) is self.parent() and self.parent() in OwnedRings():
+                case _ if (
+                    element_parent(scalar) is self.parent()
+                    and self.parent() in OwnedRings()
+                ):
                     return scalar._mul_(self)
                 case _:
                     return self.parent().scalar_multiple(scalar, self)
@@ -1448,7 +1568,9 @@ class Modules(OwnedCategoryOverBaseRing):
             scalar ring. Consumers read the retained owned constructor datum
             through the owner query rather than opening this object's storage.
             """
-            assert getattr(self, "_preamble_native_module_presentation", None) is None, (
+            assert (
+                getattr(self, "_preamble_native_module_presentation", None) is None
+            ), (
                 f"the module structure of {self} over {self.base_ring()} is already defined and cannot be defined again"
             )
             assert self.base_ring() is presentation.base_ring(), (
@@ -1456,7 +1578,6 @@ class Modules(OwnedCategoryOverBaseRing):
                 f"{presentation.base_ring()}"
             )
             self._preamble_native_module_presentation = presentation
-
 
         def __init__(
             self,
@@ -1494,7 +1615,6 @@ class Modules(OwnedCategoryOverBaseRing):
             about its scalars afterwards.
             """
             _register_module_scalar_action(self)
-
 
         @object_level
         def Mono(self, codomain):
@@ -1574,7 +1694,9 @@ class Modules(OwnedCategoryOverBaseRing):
 
             def preimage_on_labels(element):
                 coordinates = codomain(element).to_vector()
-                coefficients = coordinates.parent()._selected_module_coefficients(coordinates)
+                coefficients = coordinates.parent()._selected_module_coefficients(
+                    coordinates
+                )
                 match conjunction(
                     coefficient == self.base_ring().zero()
                     for label, coefficient in coefficients.items()
@@ -1584,7 +1706,11 @@ class Modules(OwnedCategoryOverBaseRing):
                         return None
                     case True:
                         return self.linear_combination(
-                            {label: coefficient for label, coefficient in coefficients.items() if label in source_labels}
+                            {
+                                label: coefficient
+                                for label, coefficient in coefficients.items()
+                                if label in source_labels
+                            }
                         )
                     case _:
                         raise AssertionError(
@@ -1883,9 +2009,7 @@ class Modules(OwnedCategoryOverBaseRing):
                 _divided_power_product,
             )
 
-            return _divided_power_product(
-                self, left_degree, left, right_degree, right
-            )
+            return _divided_power_product(self, left_degree, left, right_degree, right)
 
         def exterior_power_product(self, left_degree, left, right_degree, right):
             r"""Multiply homogeneous exterior powers of ``self`` by the wedge product."""
@@ -2055,7 +2179,7 @@ class Modules(OwnedCategoryOverBaseRing):
             specific category supplies the answer as a cardinal; ``None``
             here means none is supplied.
             """
-            return None
+            return
 
         def module_rank(self):
             r"""Return ``rank_R(M)`` (Mathlib ``Module.rank``), a cardinal.
@@ -2070,8 +2194,16 @@ class Modules(OwnedCategoryOverBaseRing):
             """
             ring = self.base_ring()
             match self:
-                case _ if ring in OwnedFields() and ring.is_finite() is True and self.is_finite() is True:
-                    return cardinal(SageZZ(int(self.cardinality())).exact_log(int(ring.cardinality())))
+                case _ if (
+                    ring in OwnedFields()
+                    and ring.is_finite() is True
+                    and self.is_finite() is True
+                ):
+                    return cardinal(
+                        SageZZ(int(self.cardinality())).exact_log(
+                            int(ring.cardinality())
+                        )
+                    )
                 case _:
                     decided = self._rank_decision()
                     assert decided is not None, (
@@ -2116,7 +2248,9 @@ class Modules(OwnedCategoryOverBaseRing):
             restriction = Modules(scalars).restriction_of_scalars(ring_map)
             scalars_over_ring = restriction(regular)
             tensor = _tensor_quotient(
-                _finite_factor_family((scalars_over_ring, self), name="Scalar-extension factors")
+                _finite_factor_family(
+                    (scalars_over_ring, self), name="Scalar-extension factors"
+                )
             )
             classes = tensor.underlying_set()
             endomorphisms = regular.module_category().Mor(regular, regular)
@@ -2125,7 +2259,9 @@ class Modules(OwnedCategoryOverBaseRing):
                 multiplication = restriction(
                     endomorphisms(
                         {
-                            label: regular.scalar_multiple(scalar, regular.module_generator(label))
+                            label: regular.scalar_multiple(
+                                scalar, regular.module_generator(label)
+                            )
                             for label in regular.module_generating_set()
                         }
                     )
@@ -2239,7 +2375,9 @@ class Modules(OwnedCategoryOverBaseRing):
                         base_engine = _engine_ring(base)
                         selected = {
                             label: _owned_engine_element(base, base_engine(coefficient))
-                            for label, coefficient in zip(labels, coordinates, strict=True)
+                            for label, coefficient in zip(
+                                labels, coordinates, strict=True
+                            )
                             if coefficient != 0
                         }
                     case _:
@@ -2249,7 +2387,9 @@ class Modules(OwnedCategoryOverBaseRing):
                 case _ if element_parent(selected) is source:
                     return selected
                 case IndexedFamily():
-                    return source({label: selected[label] for label in selected.index_set()})
+                    return source(
+                        {label: selected[label] for label in selected.index_set()}
+                    )
                 case _:
                     return source(dict(selected))
 
@@ -2284,7 +2424,6 @@ class Modules(OwnedCategoryOverBaseRing):
             it never means that a proved infinite dimension may be discarded.
             """
             _ = ring_map
-            return None
 
         def _represented_vector_space_dimension(self):
             r"""An owned dimension, or ``NotImplemented`` when not represented.
@@ -2383,7 +2522,9 @@ class Modules(OwnedCategoryOverBaseRing):
                 "owner selects the realization of a module with added structure"
             )
             added_categories, added_data = self._added_structure(construction_data)
-            return self._module_with_structure((*added_categories, *categories), added_data)
+            return self._module_with_structure(
+                (*added_categories, *categories), added_data
+            )
 
         def _module_with_structure(self, categories, construction_data):
             r"""Construct further structure on this exact module's data.
@@ -2395,26 +2536,36 @@ class Modules(OwnedCategoryOverBaseRing):
             match self:
                 case _ if self in ModulesWithChosenFinitePresentation(self.base_ring()):
                     return self._same_presentation_module(
-                        self.module_generating_set(), _extra_categories=categories,
+                        self.module_generating_set(),
+                        _extra_categories=categories,
                         _extra_construction_data=construction_data,
                     )
                 case _ if _represented_framed_free(self):
-                    from sage_extensions.categories.modules.framed.framed_free_modules import _fresh_free_module_on
+                    from sage_extensions.categories.modules.framed.framed_free_modules import (
+                        _fresh_free_module_on,
+                    )
+
                     return _fresh_free_module_on(
                         self.base_ring(),
-                        self.module_generating_set(), _extra_categories=categories,
+                        self.module_generating_set(),
+                        _extra_categories=categories,
                         _extra_construction_data=construction_data,
                     )
                 case _:
-                    from sage_extensions.categories.modules.general_modules import GeneralModules
+                    from sage_extensions.categories.modules.general_modules import (
+                        GeneralModules,
+                    )
                     from sage_extensions.owned_category import (
                         _object_of,
                         owned_category_join,
                     )
 
                     return _object_of(
-                        owned_category_join((GeneralModules(self.base_ring()), *categories)),
-                        base_ring=self.base_ring(), rho=self.scalar_action(),
+                        owned_category_join(
+                            (GeneralModules(self.base_ring()), *categories)
+                        ),
+                        base_ring=self.base_ring(),
+                        rho=self.scalar_action(),
                         **construction_data,
                     )
 
@@ -2508,9 +2659,7 @@ class Modules(OwnedCategoryOverBaseRing):
                 if native is not None
                 else self.underlying_additive_group()
             )
-            endomorphisms = AdditiveGroups().AdditiveCommutative().End(
-                additive_group
-            )
+            endomorphisms = AdditiveGroups().AdditiveCommutative().End(additive_group)
             # Use the module owner's one construction for rho_M in both cases.
             # During native construction U(M) is already specified by the
             # retained module presentation, even if its category refinement has
@@ -2553,11 +2702,20 @@ class Modules(OwnedCategoryOverBaseRing):
             zero = ring._fresh_free_module_on(Sets.Δ[-1])
 
             def inclusion(source):
-                arrow = Modules(ring).Mor(source, self)._from_constructed_element_map(
-                    lambda element: self.zero()
+                arrow = (
+                    Modules(ring)
+                    .Mor(source, self)
+                    ._from_constructed_element_map(lambda element: self.zero())
                 )
-                return Modules(ring).Mono(source, self)._subobject_inclusion(
-                    arrow, lift=lambda value: source.zero() if value == self.zero() else None,
+                return (
+                    Modules(ring)
+                    .Mono(source, self)
+                    ._subobject_inclusion(
+                        arrow,
+                        lift=lambda value: (
+                            source.zero() if value == self.zero() else None
+                        ),
+                    )
                 )
 
             return zero._module_with_structure(
@@ -2609,7 +2767,12 @@ class Modules(OwnedCategoryOverBaseRing):
             )
             from sage_extensions.categories.schemes.schemes import Schemes
 
-            return Schemes(ring).base_scheme().associated_module_sheaf(self).projectivization()
+            return (
+                Schemes(ring)
+                .base_scheme()
+                .associated_module_sheaf(self)
+                .projectivization()
+            )
 
         @cached_method
         def restrict_scalars(self, ring_map):
@@ -2807,12 +2970,12 @@ class Modules(OwnedCategoryOverBaseRing):
         def extra_super_categories(self):
             r"""A finitely presented module is finitely generated over the same ring.
 
-                sage: C = Modules(ZZ)
-                sage: C.FinitelyPresented().extra_super_categories()[0] is C.FinitelyGenerated()
-                True
-                sage: X = ZZ.free_module(1)
-                sage: X in C.FinitelyPresented() and X in C.FinitelyGenerated()
-                True
+            sage: C = Modules(ZZ)
+            sage: C.FinitelyPresented().extra_super_categories()[0] is C.FinitelyGenerated()
+            True
+            sage: X = ZZ.free_module(1)
+            sage: X in C.FinitelyPresented() and X in C.FinitelyGenerated()
+            True
             """
             return [self.base_category().FinitelyGenerated()]
 
@@ -2957,7 +3120,9 @@ class Modules(OwnedCategoryOverBaseRing):
                 relations = free.module_category().Mor(free, free)(
                     {
                         label: free.scalar_multiple(order, free.module_generator(label))
-                        for label, order in zip(free.module_generating_set(), orders, strict=True)
+                        for label, order in zip(
+                            free.module_generating_set(), orders, strict=True
+                        )
                     }
                 )
                 return self(relations)
@@ -2988,7 +3153,9 @@ class Modules(OwnedCategoryOverBaseRing):
                     )
                 additive = group.category().is_subcategory(CommutativeAdditiveGroups())
                 if not additive:
-                    commutative = group.category().is_subcategory(SageGroups().Commutative())
+                    commutative = group.category().is_subcategory(
+                        SageGroups().Commutative()
+                    )
                     if not commutative and not bool(group.is_abelian()):
                         raise ValueError(
                             f"{group} is not a ZZ-module: the group is not abelian"
@@ -3013,7 +3180,12 @@ class Modules(OwnedCategoryOverBaseRing):
 
                     def combine(exponents):
                         return sum(
-                            (exponent * generator for exponent, generator in zip(exponents, generators, strict=True)),
+                            (
+                                exponent * generator
+                                for exponent, generator in zip(
+                                    exponents, generators, strict=True
+                                )
+                            ),
                             identity,
                         )
                 else:
@@ -3021,17 +3193,26 @@ class Modules(OwnedCategoryOverBaseRing):
 
                     def combine(exponents):
                         return prod(
-                            (generator**exponent for exponent, generator in zip(exponents, generators, strict=True)),
+                            (
+                                generator**exponent
+                                for exponent, generator in zip(
+                                    exponents, generators, strict=True
+                                )
+                            ),
                             identity,
                         )
 
                 relation_rows = [
                     exponents
-                    for exponents in itertools.product(*(range(order) for order in orders))
+                    for exponents in itertools.product(
+                        *(range(order) for order in orders)
+                    )
                     if combine(exponents) == identity
                 ]
                 relation_rows.extend(
-                    tuple(order if row == column else 0 for column in range(len(orders)))
+                    tuple(
+                        order if row == column else 0 for column in range(len(orders))
+                    )
                     for row, order in enumerate(orders)
                 )
                 relations = engine_matrix(SageZZ, relation_rows)
@@ -3043,7 +3224,9 @@ class Modules(OwnedCategoryOverBaseRing):
                     return target.linear_combination(
                         {
                             generator: ring(coefficient)
-                            for generator, coefficient in zip(generators, row, strict=True)
+                            for generator, coefficient in zip(
+                                generators, row, strict=True
+                            )
                             if coefficient
                         }
                     )
@@ -3053,7 +3236,9 @@ class Modules(OwnedCategoryOverBaseRing):
                         {
                             relation: relation_image(row)
                             for relation, row in zip(
-                                source.module_generating_set(), full_rank_rows.rows(), strict=True
+                                source.module_generating_set(),
+                                full_rank_rows.rows(),
+                                strict=True,
                             )
                         }
                     )
@@ -3089,7 +3274,9 @@ class Modules(OwnedCategoryOverBaseRing):
                     raise ValueError("the zero vector has no primitive part")
                 module = self.parent()
                 multiplication = Modules(module.base_ring()).Mor(module, module)(
-                    lambda label: module.scalar_multiple(content, module.module_generator(label))
+                    lambda label: module.scalar_multiple(
+                        content, module.module_generator(label)
+                    )
                 )
                 return multiplication.preimage(self)
 
@@ -3100,12 +3287,12 @@ class Modules(OwnedCategoryOverBaseRing):
         def extra_super_categories(self):
             r"""A free module is projective over the same scalar ring.
 
-                sage: C = Modules(ZZ)
-                sage: C.Free().extra_super_categories()[0] is C.Projective()
-                True
-                sage: X = ZZ.free_module(1)
-                sage: X in C.Free() and X in C.Projective()
-                True
+            sage: C = Modules(ZZ)
+            sage: C.Free().extra_super_categories()[0] is C.Projective()
+            True
+            sage: X = ZZ.free_module(1)
+            sage: X in C.Free() and X in C.Projective()
+            True
             """
             return [self.base_category().Projective()]
 
@@ -3140,7 +3327,6 @@ class Modules(OwnedCategoryOverBaseRing):
                 surjection because the ranks agree.
                 """
 
-
                 localized = self.localize_at_prime(point)
                 labels = localized.residue_module().basis_generator_labels()
                 free = localized.base_ring().free_module(labels)
@@ -3157,9 +3343,13 @@ class Modules(OwnedCategoryOverBaseRing):
                 of the localized module or claim a global basis.
                 """
                 if self not in Modules(self.base_ring()).FinitelyGenerated():
-                    raise TypeError(f"local determinant requires a finitely generated projective module: {self}")
+                    raise TypeError(
+                        f"local determinant requires a finitely generated projective module: {self}"
+                    )
                 trivialization = self.local_free_trivialization(point)
-                return trivialization.codomain().exterior_power(int(trivialization.domain().module_rank()))
+                return trivialization.codomain().exterior_power(
+                    int(trivialization.domain().module_rank())
+                )
 
     class Torsion(CategoryWithAxiom):
         r"""Modules whose generic fibre vanishes."""
@@ -3171,6 +3361,7 @@ class Modules(OwnedCategoryOverBaseRing):
             from sage_extensions.categories.lattices import Lattices
 
             return Lattices(self.base_ring())("U").discriminant_group()
+
 
 FinitelyGeneratedModules = Modules.FinitelyGenerated
 FinitelyPresentedModules = Modules.FinitelyPresented
@@ -3185,7 +3376,9 @@ class ModulesOverIntegralDomains(OwnedCategoryOverBaseRing):
 
     def super_categories(self):
         if self.base_ring() not in IntegralDomains():
-            raise TypeError("generic-fibre modules require an integral-domain coefficient ring")
+            raise TypeError(
+                "generic-fibre modules require an integral-domain coefficient ring"
+            )
         return [Modules(self.base_ring())]
 
     def an_object(self):
@@ -3195,7 +3388,9 @@ class ModulesOverIntegralDomains(OwnedCategoryOverBaseRing):
         from sage_extensions.refine import refine
 
         if module not in Modules(self.base_ring()):
-            raise TypeError("the supplied module does not have this integral-domain base")
+            raise TypeError(
+                "the supplied module does not have this integral-domain base"
+            )
         return refine(module, self)
 
     class ParentMethods:
@@ -3203,7 +3398,11 @@ class ModulesOverIntegralDomains(OwnedCategoryOverBaseRing):
         def generic_fibre_map(self):
             r"""The unit ``M -> Frac(R) tensor_R M`` of fraction-field extension."""
             ring = self.base_ring()
-            return Modules(ring).base_change_adjunction(ring.fraction_field_map()).unit(self)
+            return (
+                Modules(ring)
+                .base_change_adjunction(ring.fraction_field_map())
+                .unit(self)
+            )
 
         def torsion_submodule(self):
             r"""The kernel of ``M -> Frac(R) tensor_R M``."""
@@ -3263,14 +3462,18 @@ class LinearMorModules(OwnedCategoryOverBaseRing):
             split radical extension when N is the radical of M ⊕ N.
             """
             from sage_extensions.categories.group.groups import OwnedGroups
-            from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+            from sage_extensions.categories.sets.finite_ordered_sets import (
+                finite_ordered_set,
+            )
 
             source, target = self.domain(), self.codomain()
             assert source_action.codomain().domain() is source
             assert source_action.codomain().codomain() is source
             assert target_action.codomain().domain() is target
             assert target_action.codomain().codomain() is target
-            product = OwnedGroups().product_construction((source_action.domain(), target_action.domain()))
+            product = OwnedGroups().product_construction(
+                (source_action.domain(), target_action.domain())
+            )
             factors = product.object()
             shape = product.diagram().domain()
             source_projection = product.structure_morphism(shape(0))
@@ -3290,12 +3493,24 @@ class LinearMorModules(OwnedCategoryOverBaseRing):
                 inverse_action = a.internal_mor_map(
                     ~b, source_internal_mor=self, target_internal_mor=self
                 )
-                forward = normal.Mor(normal).elementwise(lambda element: exponential(forward_action(logarithm(element))))
-                inverse = normal.Mor(normal).elementwise(lambda element: exponential(inverse_action(logarithm(element))))
+                forward = normal.Mor(normal).elementwise(
+                    lambda element: exponential(forward_action(logarithm(element)))
+                )
+                inverse = normal.Mor(normal).elementwise(
+                    lambda element: exponential(inverse_action(logarithm(element)))
+                )
                 return automorphisms(forward, inverse)
 
-            if self.base_ring() is _owned_integers() and self.has_selected_module_resolution() and self.module_generating_set() in Sets().Finite():
-                normal.select_group_generators(lambda: finite_ordered_set(tuple(exponential(t) for t in self.module_generators())))
+            if (
+                self.base_ring() is _owned_integers()
+                and self.has_selected_module_resolution()
+                and self.module_generating_set() in Sets().Finite()
+            ):
+                normal.select_group_generators(
+                    lambda: finite_ordered_set(
+                        tuple(exponential(t) for t in self.module_generators())
+                    )
+                )
             return factors.Mor(automorphisms).elementwise(induced)
 
         def source_module(self):
@@ -3342,11 +3557,15 @@ class InternalMorModules(OwnedCategoryOverBaseRing):
 
         def _to_smith_engine_element(self, morphism):
             model = self._internal_mor_model()
-            return model._to_smith_engine_element(self._internal_model_from_morphism(morphism))
+            return model._to_smith_engine_element(
+                self._internal_model_from_morphism(morphism)
+            )
 
         def _from_smith_engine_element(self, element):
             model = self._internal_mor_model()
-            return self._morphism_from_internal_model(model._from_smith_engine_element(element))
+            return self._morphism_from_internal_model(
+                model._from_smith_engine_element(element)
+            )
 
         def _internal_mor_model(self):
             r"""The presented module ``ker(N^{gens(M)} -> N^{rels(M)})`` modelling ``Hom_R(M, N)``.
@@ -3405,11 +3624,21 @@ class InternalMorModules(OwnedCategoryOverBaseRing):
             power_labels = power.module_generating_set()
             coefficients = {}
             for source_label in self.domain().module_generating_set():
-                image = self.codomain().framing_morphism().lift(
-                    morphism(self.domain().module_generator(source_label))
+                image = (
+                    self.codomain()
+                    .framing_morphism()
+                    .lift(morphism(self.domain().module_generator(source_label)))
                 )
-                for target_label, coefficient in image.parent()._selected_module_coefficients(image).items():
-                    coefficients[power_labels(lambda index: source_label if int(index) == 0 else target_label)] = coefficient
+                for target_label, coefficient in (
+                    image.parent()._selected_module_coefficients(image).items()
+                ):
+                    coefficients[
+                        power_labels(
+                            lambda index: (
+                                source_label if int(index) == 0 else target_label
+                            )
+                        )
+                    ] = coefficient
             assignment = power.linear_combination(coefficients)
             inclusion = self.inclusion_into_generator_maps()
             if inclusion.has_selected_lift():
@@ -3506,11 +3735,15 @@ class ModuleSubobjects(OwnedCategoryOverBaseRing):
             of ``T``'s inclusion; equality is containment both ways.
             """
             if self.inclusion().codomain() is not other.inclusion().codomain():
-                raise ValueError(f"{self} and {other} are submodules of different modules")
+                raise ValueError(
+                    f"{self} and {other} are submodules of different modules"
+                )
             target = other.inclusion()
             inclusion = self.inclusion()
             for label in self.module_generating_set():
-                decision = ask(target.is_in_image(inclusion(self.module_generator(label))))
+                decision = ask(
+                    target.is_in_image(inclusion(self.module_generator(label)))
+                )
                 assert decision is True or decision is False, (
                     f"containment of {self} in {other} requires decided membership of its generators"
                 )
@@ -3579,7 +3812,7 @@ class ModuleSubobjects(OwnedCategoryOverBaseRing):
             are owned module subobjects; `None` means no such specialization
             was selected and the ordinary module construction is used.
             """
-            return None
+            return
 
         def sum(self, other):
             r"""Return the join of two subobjects of the same codomain."""
@@ -3590,7 +3823,11 @@ class ModuleSubobjects(OwnedCategoryOverBaseRing):
                 )
             specialized = self._subobject_binary_realization(other, "sum")
             if specialized is not None:
-                if specialized not in ModuleSubobjects(self.base_ring()) or specialized.inclusion().codomain() is not self.inclusion().codomain():
+                if (
+                    specialized not in ModuleSubobjects(self.base_ring())
+                    or specialized.inclusion().codomain()
+                    is not self.inclusion().codomain()
+                ):
                     raise TypeError(
                         f"the selected sum of {self} and {other} must remain a module "
                         f"subobject of {self.inclusion().codomain()}, but returned {specialized}"
@@ -3612,7 +3849,9 @@ class ModuleSubobjects(OwnedCategoryOverBaseRing):
                 lambda tagged: (
                     self.inclusion()(self.module_generator(tagged.summand_element()))
                     if int(tagged.summand_index()) == 0
-                    else other.inclusion()(other.module_generator(tagged.summand_element()))
+                    else other.inclusion()(
+                        other.module_generator(tagged.summand_element())
+                    )
                 ),
                 name="Subobject-sum generators",
             )
@@ -3627,7 +3866,11 @@ class ModuleSubobjects(OwnedCategoryOverBaseRing):
                 )
             specialized = self._subobject_binary_realization(other, "intersection")
             if specialized is not None:
-                if specialized not in ModuleSubobjects(self.base_ring()) or specialized.inclusion().codomain() is not self.inclusion().codomain():
+                if (
+                    specialized not in ModuleSubobjects(self.base_ring())
+                    or specialized.inclusion().codomain()
+                    is not self.inclusion().codomain()
+                ):
                     raise TypeError(
                         f"the selected intersection of {self} and {other} must remain a module "
                         f"subobject of {self.inclusion().codomain()}, but returned {specialized}"
@@ -3820,7 +4063,9 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
 
         def base_change(self, ring_map, *, _extra_construction_data=None):
             r"""Transport the selected finite presentation along ``R -> S``."""
-            from sage_extensions.categories.modules.base_change import _base_change_scalar
+            from sage_extensions.categories.modules.base_change import (
+                _base_change_scalar,
+            )
             from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
                 _presented_module_from_morphism,
             )
@@ -3839,7 +4084,9 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             )
 
             def changed_image(relation_label):
-                image = presentation(presentation.domain().module_generator(relation_label)).to_vector()
+                image = presentation(
+                    presentation.domain().module_generator(relation_label)
+                ).to_vector()
                 return target.linear_combination(
                     {
                         changed_label: _base_change_scalar(ring_map, image(label))
@@ -3945,7 +4192,9 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                     f"{self} cannot be base changed to {completion}: it is a completion of "
                     f"{completion.completion_source()}, not of the base ring {ring}"
                 )
-            adjunction = Modules(ring).base_change_adjunction(completion.completion_map())
+            adjunction = Modules(ring).base_change_adjunction(
+                completion.completion_map()
+            )
             return adjunction.left_adjoint()(self)
 
         # The completion M_hat is an ordinary scalar-extension image and holds
@@ -3960,7 +4209,11 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                     f"{self} cannot be base changed to {completion}: it is a completion of "
                     f"{completion.completion_source()}, not of the base ring {ring}"
                 )
-            return Modules(ring).base_change_adjunction(completion.completion_map()).unit(self)
+            return (
+                Modules(ring)
+                .base_change_adjunction(completion.completion_map())
+                .unit(self)
+            )
 
         @cached_method
         def adic_module_truncation(self, completion, exponent):
@@ -3994,7 +4247,9 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             )
 
         @cached_method
-        def adic_module_transition_map(self, completion, higher_exponent, lower_exponent):
+        def adic_module_transition_map(
+            self, completion, higher_exponent, lower_exponent
+        ):
             r"""Return ``M/I^higher M -> Res(M/I^lower M)`` for one selected completion."""
             higher_exponent = int(higher_exponent)
             lower_exponent = int(lower_exponent)
@@ -4146,7 +4401,9 @@ class FreeResolution:
         components = {}
         source_zero = self.term(0)
         target_augmentation = target_resolution.augmentation()
-        components[0] = source_zero.module_category().Mor(source_zero, target_resolution.term(0))(
+        components[0] = source_zero.module_category().Mor(
+            source_zero, target_resolution.term(0)
+        )(
             {
                 label: target_augmentation.preimage(
                     morphism(self.augmentation()(source_zero.module_generator(label)))
@@ -4160,10 +4417,14 @@ class FreeResolution:
             target_differential = target_resolution.differential(degree)
             previous = components[degree - 1]
             source_differential = self.differential(degree)
-            components[degree] = source_term.module_category().Mor(source_term, target_resolution.term(degree))(
+            components[degree] = source_term.module_category().Mor(
+                source_term, target_resolution.term(degree)
+            )(
                 {
                     label: target_differential.preimage(
-                        previous(source_differential(source_term.module_generator(label)))
+                        previous(
+                            source_differential(source_term.module_generator(label))
+                        )
                     )
                     for label in source_term.module_generating_set()
                 }
@@ -4185,9 +4446,9 @@ class FreeResolutionMorphism:
         source_zero = self.domain().term(0)
         for label in source_zero.module_generating_set():
             generator = source_zero.module_generator(label)
-            if self.codomain().augmentation()(degree_zero(generator)) != self.module_morphism()(
-                self.domain().augmentation()(generator)
-            ):
+            if self.codomain().augmentation()(
+                degree_zero(generator)
+            ) != self.module_morphism()(self.domain().augmentation()(generator)):
                 raise ValueError(
                     f"the degree-0 component of the lift of {self.module_morphism()} does not commute with "
                     f"the augmentations: the two paths differ on the generator {generator}"
@@ -4233,7 +4494,10 @@ class FreeResolutionMorphism:
         of the target resolution, exactly as :meth:`FreeResolution.lift_morphism`
         constructs a lift by projectivity of the free source terms.
         """
-        if other.domain() is not self.domain() or other.codomain() is not self.codomain():
+        if (
+            other.domain() is not self.domain()
+            or other.codomain() is not self.codomain()
+        ):
             raise ValueError(
                 f"a chain homotopy from {self} to {other} is not defined: they are chain maps "
                 f"{self.domain()} -> {self.codomain()} and {other.domain()} -> {other.codomain()}, "
@@ -4253,13 +4517,17 @@ class FreeResolutionMorphism:
             target_differential = target.differential(degree + 1)
 
             def residual(generator, degree=degree):
-                value = self.component(degree)(generator) - other.component(degree)(generator)
+                value = self.component(degree)(generator) - other.component(degree)(
+                    generator
+                )
                 if degree > 0:
                     previous_homotopy = components[degree - 1]
                     value -= previous_homotopy(source.differential(degree)(generator))
                 return value
 
-            components[degree] = source_term.module_category().Mor(source_term, target_next)(
+            components[degree] = source_term.module_category().Mor(
+                source_term, target_next
+            )(
                 {
                     label: target_differential.preimage(
                         residual(source_term.module_generator(label))
@@ -4292,7 +4560,9 @@ class FreeResolutionMorotopy:
                     right += self.component(degree - 1)(
                         source_resolution.differential(degree)(generator)
                     )
-                left = self._source.component(degree)(generator) - self._target.component(degree)(generator)
+                left = self._source.component(degree)(
+                    generator
+                ) - self._target.component(degree)(generator)
                 if left != right:
                     raise ValueError(
                         f"{self} is not a chain homotopy between {self.source()} and {self.target()}: "
@@ -4370,10 +4640,14 @@ def _fix_selected_module_resolution(
         augmentation = _framing_morphism(module, source, generator_morphism)
         match source is module, labels.cardinality().is_finite():
             case (True, True):
-                return ordinary_modules.FinitelyPresented().resolution_category().selected_constant(
-                    module,
-                    generating_set=labels,
-                    generator_morphism=generator_morphism,
+                return (
+                    ordinary_modules.FinitelyPresented()
+                    .resolution_category()
+                    .selected_constant(
+                        module,
+                        generating_set=labels,
+                        generator_morphism=generator_morphism,
+                    )
                 )
             case _:
                 pass
@@ -4507,7 +4781,7 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
             r"""Return the original ``S``-module before restriction of scalars."""
             return self._module_over_extension
 
-        def subobject_on(self, module_generators) -> "ModuleSubobjects.ParentMethods":
+        def subobject_on(self, module_generators) -> ModuleSubobjects.ParentMethods:
             r"""Return the finite span over the restricted base ring, with its inclusion.
 
             For restriction from the fraction field of a PID, Sage computes
@@ -4557,13 +4831,20 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
                 f"{self} is not restricted from the regular module of {scalars}, so it has no identification "
                 f"with {scalars}"
             )
-            assert scalars in Algebras(self.base_ring()) and self.ring_map() is scalars.algebra_structure_morphism(), (
+            assert (
+                scalars in Algebras(self.base_ring())
+                and self.ring_map() is scalars.algebra_structure_morphism()
+            ), (
                 f"{self} is restricted along {self.ring_map()}, which is not the structure morphism of {scalars} "
                 f"as a {self.base_ring()}-algebra"
             )
             to_scalars = scalars.regular_module_isomorphism()
-            return self.module_category().Mor(self, scalars)._from_constructed_element_map(
-                lambda element: to_scalars(self(element).underlying_element())
+            return (
+                self.module_category()
+                .Mor(self, scalars)
+                ._from_constructed_element_map(
+                    lambda element: to_scalars(self(element).underlying_element())
+                )
             )
 
         def underlying_additive_group(self):
@@ -4589,7 +4870,10 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
             element of a field for ``r != 0``, so ``r m = f(r) m`` vanishes
             only when ``m`` does.
             """
-            return self.extension_ring() in OwnedFields() and self.ring_map().is_injective() is True
+            return (
+                self.extension_ring() in OwnedFields()
+                and self.ring_map().is_injective() is True
+            )
 
         def _torsion_freeness_decision(self):
             r"""``Res_f(M)`` is torsion-free when ``S`` is a field and ``f`` is injective.
@@ -4635,9 +4919,14 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
                     and ring in OwnedRings().Commutative()
                     and extension_ring in OwnedRings().Commutative()
                     and extension_ring.one() != extension_ring.zero()
-                    and (extension_ring in OwnedFields() or module in Modules(extension_ring).Free())
+                    and (
+                        extension_ring in OwnedFields()
+                        or module in Modules(extension_ring).Free()
+                    )
                 ):
-                    return self._scalar_basis.source().module_rank() * module.module_rank()
+                    return (
+                        self._scalar_basis.source().module_rank() * module.module_rank()
+                    )
                 case _:
                     return Unknown
 
@@ -4671,8 +4960,10 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
             """
             ring = self.base_ring()
             extension_action = self.module_over_extension().scalar_action()
-            endomorphisms = AdditiveGroups().AdditiveCommutative().End(
-                self.underlying_additive_group()
+            endomorphisms = (
+                AdditiveGroups()
+                .AdditiveCommutative()
+                .End(self.underlying_additive_group())
             )
             ring_map = self.ring_map()
             return ring.Mor(endomorphisms, category=OwnedRings())(
@@ -4684,9 +4975,7 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
         def scalar_multiple(self, scalar, element):
             element = self(element)
             underlying = self._underlying_additive_element(element)
-            return self.wrap(
-                self.scalar_action()(self.base_ring()(scalar))(underlying)
-            )
+            return self.wrap(self.scalar_action()(self.base_ring()(scalar))(underlying))
 
         def _element_constructor_(self, value):
             if isinstance(value, self.element_class) and value.parent() is self:
@@ -4700,7 +4989,9 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
 
         def wrap(self, underlying_element):
             r"""Read an element of ``M`` as the same element of ``Res_f(M)``."""
-            return self.element_class(self, self.module_over_extension()(underlying_element))
+            return self.element_class(
+                self, self.module_over_extension()(underlying_element)
+            )
 
         def _coerce_map_from_(self, source):
             # Restriction of scalars is a change of structure, not a coercion of
@@ -4718,9 +5009,14 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
         def _restricted_scalar_generator(self, label):
             r"""Return the retained basis image, or ``s_i m_j`` in the scalar tower."""
             labels = self.module_generating_set()
-            assert label in labels, f"{label!r} does not index a generator of {self}; its generators are indexed by {labels}"
+            assert label in labels, (
+                f"{label!r} does not index a generator of {self}; its generators are indexed by {labels}"
+            )
             label = labels(label)
-            if self._restriction_data is not None and self._restriction_data[1] is not None:
+            if (
+                self._restriction_data is not None
+                and self._restriction_data[1] is not None
+            ):
                 return self.wrap(self._restriction_data[1].image(label))
             extension_module = self.module_over_extension()
             scalar = self._scalar_basis.image(label.component(0))
@@ -4733,17 +5029,30 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
         def _selected_module_coefficients(self, element):
             r"""``m = sum_j t_j m_j`` and ``t_j = sum_i c_ij s_i`` give ``m = sum_ij c_ij s_i m_j``."""
             element = self(element)
-            if self._restriction_data is not None and self._restriction_data[1] is not None:
-                return self._restriction_data[1].coordinates(element.underlying_element())
-            module_coordinates = self.module_over_extension().framing_morphism().lift(
-                element.underlying_element()
+            if (
+                self._restriction_data is not None
+                and self._restriction_data[1] is not None
+            ):
+                return self._restriction_data[1].coordinates(
+                    element.underlying_element()
+                )
+            module_coordinates = (
+                self.module_over_extension()
+                .framing_morphism()
+                .lift(element.underlying_element())
             )
             framing = self.module_generating_set()
             coefficients = {}
-            for module_label, coefficient in module_coordinates.parent()._selected_module_coefficients(module_coordinates).items():
+            for module_label, coefficient in (
+                module_coordinates.parent()
+                ._selected_module_coefficients(module_coordinates)
+                .items()
+            ):
                 scalar_coordinates = self._scalar_basis.coordinates(coefficient)
                 for scalar_label, value in scalar_coordinates.items():
-                    coefficients[framing((scalar_label, module_label))] = self.base_ring()(value)
+                    coefficients[framing((scalar_label, module_label))] = (
+                        self.base_ring()(value)
+                    )
             return coefficients
 
         def _represented_kernel_of_morphism(self, morphism):
@@ -4773,7 +5082,9 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
 
             if not _coordinate_framed_free_module(extension, fractions):
                 coordinates = extension.finite_free_trivialization().forward()
-                restricted = Modules(fractions).restriction_of_scalars(self.ring_map())(coordinates)
+                restricted = Modules(fractions).restriction_of_scalars(self.ring_map())(
+                    coordinates
+                )
                 return (restricted * morphism).kernel()
 
             framing = extension.framing_morphism()
@@ -4785,7 +5096,11 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
             }
             denominator = ring.one()
             for coordinates in image_coordinates.values():
-                for coefficient in coordinates.parent()._selected_module_coefficients(coordinates).values():
+                for coefficient in (
+                    coordinates.parent()
+                    ._selected_module_coefficients(coordinates)
+                    .values()
+                ):
                     denominator = denominator.lcm(coefficient.denominator())
             scale = self.ring_map()(denominator)
             cleared_module = ring._fresh_free_module_on(
@@ -4796,7 +5111,9 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
                 return cleared_module.linear_combination(
                     {
                         label: ring(scale * coefficient)
-                        for label, coefficient in coordinates.parent()._selected_module_coefficients(coordinates).items()
+                        for label, coefficient in coordinates.parent()
+                        ._selected_module_coefficients(coordinates)
+                        .items()
                     }
                 )
 
@@ -4856,12 +5173,20 @@ def _restricted_scalar_presentation(module, ring_map, labels, scalar_basis):
 
     def restricted_relation(relation_label, scalar_label):
         scalar_generator = scalar_basis.image(scalar_label)
-        relation = relations(relations.domain().module_generator(relation_label)).to_vector()
+        relation = relations(
+            relations.domain().module_generator(relation_label)
+        ).to_vector()
         coefficients = {}
-        for module_label, coefficient in relation.parent()._selected_module_coefficients(relation).items():
+        for module_label, coefficient in (
+            relation.parent()._selected_module_coefficients(relation).items()
+        ):
             product = extension_ring(scalar_generator * extension_ring(coefficient))
             for output_scalar_label, value in scalar_basis.coordinates(product).items():
-                label = labels(lambda index: output_scalar_label if int(index) == 0 else module_label)
+                label = labels(
+                    lambda index: (
+                        output_scalar_label if int(index) == 0 else module_label
+                    )
+                )
                 coefficients[label] = coefficients.get(label, ring.zero()) + ring(value)
         return generators.linear_combination(coefficients)
 
@@ -4872,13 +5197,21 @@ def _restricted_scalar_presentation(module, ring_map, labels, scalar_basis):
     )
     return _morphism_on_elements(
         generators,
-        tuple(relation for relation in restricted if (relation == generators.zero()) is not True),
+        tuple(
+            relation
+            for relation in restricted
+            if (relation == generators.zero()) is not True
+        ),
     )
 
 
-@cached_function(key=lambda module, ring_map, *data: (
-    id(module), id(ring_map), tuple(id(value) for value in data)
-))
+@cached_function(
+    key=lambda module, ring_map, *data: (
+        id(module),
+        id(ring_map),
+        tuple(id(value) for value in data),
+    )
+)
 def _restricted_scalars_view(
     module,
     ring_map,
@@ -4920,20 +5253,31 @@ def _restricted_scalars_view(
     # concrete parent, and the native scalar-action constructor checks this
     # prerequisite before retaining the module presentation.  Record it at
     # the shared restriction-of-scalars construction owner.
-    placement = [RestrictedScalarsModules(base_ring), AdditiveGroups().AdditiveCommutative()]
+    placement = [
+        RestrictedScalarsModules(base_ring),
+        AdditiveGroups().AdditiveCommutative(),
+    ]
     if base_ring in OwnedFields():
         placement.append(VectorSpaces(base_ring))
     data = {"module_over_extension": module, "ring_map": ring_map}
 
-    finitely_framed = module.has_selected_module_resolution() and module in Modules(extension_ring).FinitelyGenerated()
+    finitely_framed = (
+        module.has_selected_module_resolution()
+        and module in Modules(extension_ring).FinitelyGenerated()
+    )
     field_tower = (
         base_ring in OwnedFields()
         and extension_ring in OwnedFields()
         and ring_map.codomain() is extension_ring
     )
-    scalar_basis = extension_ring._module_basis_along(ring_map) if finitely_framed or field_tower else None
-    finite_scalar_basis = scalar_basis is not None and scalar_basis.source() in FinitelyGeneratedFreeModules(
-        base_ring
+    scalar_basis = (
+        extension_ring._module_basis_along(ring_map)
+        if finitely_framed or field_tower
+        else None
+    )
+    finite_scalar_basis = (
+        scalar_basis is not None
+        and scalar_basis.source() in FinitelyGeneratedFreeModules(base_ring)
     )
     framed_over_finite_free_scalars = finitely_framed and finite_scalar_basis
     restriction_data = None
@@ -4950,7 +5294,10 @@ def _restricted_scalars_view(
         if restriction_data is not None:
             data["restriction_data"] = restriction_data
     match module:
-        case _ if framed_over_finite_free_scalars and module in ModulesWithChosenFinitePresentation(extension_ring):
+        case _ if (
+            framed_over_finite_free_scalars
+            and module in ModulesWithChosenFinitePresentation(extension_ring)
+        ):
             presentation = _restricted_scalar_presentation(
                 module,
                 ring_map,
@@ -5058,7 +5405,9 @@ def BilinearMap(left, right, codomain, generator_images):
                     case True:
                         return assignment[key]
                     case False:
-                        raise ValueError(f"the bilinear map {left} x {right} -> {codomain} has no image for the pair of generators {key!r}")
+                        raise ValueError(
+                            f"the bilinear map {left} x {right} -> {codomain} has no image for the pair of generators {key!r}"
+                        )
 
             for pair in pair_labels:
                 raw_image(pair)
@@ -5081,13 +5430,24 @@ def BilinearMap(left, right, codomain, generator_images):
                 lambda pair: codomain(raw_image(pair)),
                 name="Bilinear generator images",
             )
-            return tensor_product.module_category().Mor(tensor_product, codomain)(images)
+            return tensor_product.module_category().Mor(tensor_product, codomain)(
+                images
+            )
         case False:
+
             def evaluation(left_element, right_element):
                 left_coordinates = left.framing_morphism().lift(left_element)
                 right_coordinates = right.framing_morphism().lift(right_element)
-                left_coefficients = left_coordinates.parent()._selected_module_coefficients(left_coordinates)
-                right_coefficients = right_coordinates.parent()._selected_module_coefficients(right_coordinates)
+                left_coefficients = (
+                    left_coordinates.parent()._selected_module_coefficients(
+                        left_coordinates
+                    )
+                )
+                right_coefficients = (
+                    right_coordinates.parent()._selected_module_coefficients(
+                        right_coordinates
+                    )
+                )
                 return sum(
                     (
                         left_coefficient
@@ -5108,7 +5468,6 @@ def BilinearMap(left, right, codomain, generator_images):
                 )
 
             return tensor_product.from_bilinear_map(codomain, evaluation)
-
 
 
 class TensorProductModules(OwnedCategoryOverBaseRing):
@@ -5138,7 +5497,9 @@ class TensorProductModules(OwnedCategoryOverBaseRing):
         def tensor_factors(self):
             r"""Return the family of factors, indexed by the product's own index set."""
 
-            return _finite_factor_family(self._preamble_tensor_factors, name="Tensor factors")
+            return _finite_factor_family(
+                self._preamble_tensor_factors, name="Tensor factors"
+            )
 
         def tensor_factor(self, index):
             return self.tensor_factors()[index]
@@ -5168,12 +5529,19 @@ class TensorProductModules(OwnedCategoryOverBaseRing):
 
             left_coordinates = left.framing_morphism().lift(left_element)
             right_coordinates = right.framing_morphism().lift(right_element)
-            left_coefficients = left_coordinates.parent()._selected_module_coefficients(left_coordinates)
-            right_coefficients = right_coordinates.parent()._selected_module_coefficients(right_coordinates)
+            left_coefficients = left_coordinates.parent()._selected_module_coefficients(
+                left_coordinates
+            )
+            right_coefficients = (
+                right_coordinates.parent()._selected_module_coefficients(
+                    right_coordinates
+                )
+            )
             labels = self.module_generating_set()
             return self.linear_combination(
                 {
-                    _tensor_pair(labels, left_label, right_label): left_coefficient * right_coefficient
+                    _tensor_pair(labels, left_label, right_label): left_coefficient
+                    * right_coefficient
                     for left_label, left_coefficient in left_coefficients.items()
                     for right_label, right_coefficient in right_coefficients.items()
                 }
@@ -5236,7 +5604,9 @@ def _finite_biproduct_realizes_product(factors) -> bool:
                     return True
                 case _:
                     values = tuple(factors)
-                    return all(_represented_framed_free(factor) for factor in values) or all(
+                    return all(
+                        _represented_framed_free(factor) for factor in values
+                    ) or all(
                         _represented_finite_presentation(factor) for factor in values
                     )
 
@@ -5328,7 +5698,8 @@ def _module_product_created_by_underlying_sets(base_ring, factors):
     else:
         underlying_values = lambda index: forgetful(factors.value(index))
     underlying_factors = indexed_family(
-        factors.index_set(), underlying_values,
+        factors.index_set(),
+        underlying_values,
         name="Underlying sets of module product factors",
     )
     underlying_product = Sets().product(underlying_factors)
@@ -5400,8 +5771,10 @@ def _module_product_projection(product, factors, index):
         case _:
             underlying_projection = product.underlying_set().projection(index)
             target = factors.value(index)
-            return product.module_category().Mor(product, target)._product_projection(
-                underlying_projection
+            return (
+                product.module_category()
+                .Mor(product, target)
+                ._product_projection(underlying_projection)
             )
 
 
@@ -5419,17 +5792,22 @@ def _module_product_factor(product, factors, source, legs):
         or underlying_family.constant_value() is not None
     ):
         from sage_extensions.categories.abstract_categories.cat import Cat
-        from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+        from sage_extensions.categories.abstract_categories.functors import (
+            DiscreteCategory,
+        )
         from sage_extensions.categories.functors.core import NaturalTransformation
 
         shape = DiscreteCategory(factors.index_set())
         functor_category = Cat().Mor(shape, Sets())
         target = underlying_family.selected_diagram()
         if target is None:
-            target = functor_category.constant_functor(underlying_family.constant_value())
+            target = functor_category.constant_functor(
+                underlying_family.constant_value()
+            )
         constant_source = functor_category.constant_functor(forgetful(source))
         components = NaturalTransformation(
-            constant_source, target,
+            constant_source,
+            target,
             lambda obj: forgetful(legs.value(obj.value())),
         )
         # The underlying set product also lies in the more specific
@@ -5438,7 +5816,9 @@ def _module_product_factor(product, factors, source, legs):
         # transformation. Here the actual transported cone is Set-valued;
         # invoke the inherited Set-product universal construction at its
         # declared owner rather than misclassifying its component arrows.
-        from sage_extensions.categories.sets.set_categories import CartesianProductsOfSets
+        from sage_extensions.categories.sets.set_categories import (
+            CartesianProductsOfSets,
+        )
 
         underlying_factor = CartesianProductsOfSets.ParentMethods.from_maps(
             underlying_product, forgetful(source), components
@@ -5451,9 +5831,13 @@ def _module_product_factor(product, factors, source, legs):
                 lambda index: forgetful(legs.value(index))(point)
             )
         )
-    return source.module_category().Mor(source, product)._product_factor(
-        underlying_factor,
-        legs,
+    return (
+        source.module_category()
+        .Mor(source, product)
+        ._product_factor(
+            underlying_factor,
+            legs,
+        )
     )
 
 
@@ -5480,18 +5864,26 @@ def _module_equalizer_created_by_underlying_sets(left_morphism, right_morphism):
     )
     shape = set_equalizer.diagram().domain()
     underlying_inclusion = set_equalizer.structure_morphism(shape.source())
-    inclusion = equalizer.module_category().Mor(equalizer, source)._equalizer_inclusion(
-        underlying_inclusion,
-        (left_morphism, right_morphism),
+    inclusion = (
+        equalizer.module_category()
+        .Mor(equalizer, source)
+        ._equalizer_inclusion(
+            underlying_inclusion,
+            (left_morphism, right_morphism),
+        )
     )
     return equalizer, inclusion
 
 
 def _module_equalizer_factor(equalizer, source, source_leg, inclusion):
     r"""Factor an equalizing module map through a set-created equalizer."""
-    return source.module_category().Mor(source, equalizer)._equalizer_factor(
-        source_leg,
-        inclusion=inclusion,
+    return (
+        source.module_category()
+        .Mor(source, equalizer)
+        ._equalizer_factor(
+            source_leg,
+            inclusion=inclusion,
+        )
     )
 
 
@@ -5509,7 +5901,9 @@ def _module_tensor_product_with_data(
 ):
     r"""Construct a represented tensor product with additional owned structure."""
     values = tuple(factors)
-    assert values, "the tensor product of an empty family of modules is not constructed here: give at least one factor"
+    assert values, (
+        "the tensor product of an empty family of modules is not constructed here: give at least one factor"
+    )
     ring = _owned_ring(values[0].base_ring())
     assert all(_owned_ring(factor.base_ring()) == ring for factor in values), (
         f"the tensor product of {values} is not defined: the factors must all be modules over {ring}, "
@@ -5524,7 +5918,8 @@ def _module_tensor_product_with_data(
         from sage_extensions.categories.modules.tensor_quotients import _tensor_quotient
 
         return _tensor_quotient(
-            factors, extra_categories=extra_categories,
+            factors,
+            extra_categories=extra_categories,
             extra_construction_data=extra_construction_data,
         )
 
@@ -5577,11 +5972,17 @@ def _module_tensor_product_with_data(
             f"the tensor product of {values} needs the relations of {factor}, but they are not known explicitly"
         )
         for relation_label in factor_relations.domain().module_generating_set():
-            relation = factor_relations(factor_relations.domain().module_generator(relation_label)).to_vector()
+            relation = factor_relations(
+                factor_relations.domain().module_generator(relation_label)
+            ).to_vector()
             for elsewhere in itertools.product(*elsewhere_sets):
                 coefficients = {}
-                for factor_label, coefficient in relation.parent()._selected_module_coefficients(relation).items():
-                    section = elsewhere[:position] + (factor_label,) + elsewhere[position:]
+                for factor_label, coefficient in (
+                    relation.parent()._selected_module_coefficients(relation).items()
+                ):
+                    section = (
+                        elsewhere[:position] + (factor_label,) + elsewhere[position:]
+                    )
                     label = tensor_labels(
                         lambda place, section=section: section[int(ranking(place))]
                     )
@@ -5679,7 +6080,9 @@ class BiproductModules(OwnedCategoryOverBaseRing):
             summand = self.biproduct_factor(index)
             labels = self.module_generating_set()
             return summand.module_category().Mor(summand, self)(
-                lambda label: self.module_generator(_biproduct_label(labels, index, label))
+                lambda label: self.module_generator(
+                    _biproduct_label(labels, index, label)
+                )
             )
 
         def projection(self, index):
@@ -5789,7 +6192,9 @@ class BiproductModules(OwnedCategoryOverBaseRing):
             assert all(
                 legs.value(index).codomain() is factors.value(index)
                 for index in factors.index_set()
-            ), f"a map into the direct sum {self} needs the map at index i to end at the i-th summand, "
+            ), (
+                f"a map into the direct sum {self} needs the map at index i to end at the i-th summand, "
+            )
             f"but the maps {legs} do not"
 
             labels = self.module_generating_set()
@@ -5798,9 +6203,19 @@ class BiproductModules(OwnedCategoryOverBaseRing):
                 generator = source.module_generator(source_label)
                 coefficients = {}
                 for index in factors.index_set():
-                    leg_image = factors.value(index).framing_morphism().lift(legs.value(index)(generator))
-                    for target_label, coefficient in leg_image.parent()._selected_module_coefficients(leg_image).items():
-                        coefficients[_biproduct_label(labels, index, target_label)] = coefficient
+                    leg_image = (
+                        factors.value(index)
+                        .framing_morphism()
+                        .lift(legs.value(index)(generator))
+                    )
+                    for target_label, coefficient in (
+                        leg_image.parent()
+                        ._selected_module_coefficients(leg_image)
+                        .items()
+                    ):
+                        coefficients[_biproduct_label(labels, index, target_label)] = (
+                            coefficient
+                        )
                 return self.linear_combination(coefficients)
 
             return source.module_category().Mor(source, self)(image)
@@ -5826,7 +6241,9 @@ class BiproductModules(OwnedCategoryOverBaseRing):
             return self.from_product_cone(legs)
 
 
-@cached_function(key=lambda factors, base_ring: (base_ring, factors.index_set(), tuple(factors)))
+@cached_function(
+    key=lambda factors, base_ring: (base_ring, factors.index_set(), tuple(factors))
+)
 def _module_biproduct(factors, base_ring):
     r"""Return $\bigoplus_{i \in I} M_i$ over the family's own index set."""
     return _module_biproduct_with_data(factors, base_ring=base_ring)
@@ -5894,12 +6311,18 @@ def _biproduct_morphism(left_morphism, right_morphism, source=None, target=None)
 
     source_left, source_right = source._binary_biproduct_labels()
     target_left, target_right = target._binary_biproduct_labels()
-    if source.biproduct_factor(source_left) is not left_morphism.domain() or source.biproduct_factor(source_right) is not right_morphism.domain():
+    if (
+        source.biproduct_factor(source_left) is not left_morphism.domain()
+        or source.biproduct_factor(source_right) is not right_morphism.domain()
+    ):
         raise ValueError(
             f"the direct sum of {left_morphism} and {right_morphism} cannot start at {source}: its summands "
             f"must be {left_morphism.domain()} and {right_morphism.domain()}"
         )
-    if target.biproduct_factor(target_left) is not left_morphism.codomain() or target.biproduct_factor(target_right) is not right_morphism.codomain():
+    if (
+        target.biproduct_factor(target_left) is not left_morphism.codomain()
+        or target.biproduct_factor(target_right) is not right_morphism.codomain()
+    ):
         raise ValueError(
             f"the direct sum of {left_morphism} and {right_morphism} cannot end at {target}: its summands "
             f"must be {left_morphism.codomain()} and {right_morphism.codomain()}"
@@ -5907,11 +6330,23 @@ def _biproduct_morphism(left_morphism, right_morphism, source=None, target=None)
 
     # f + g = i_L f p_L + i_R g p_R, read on the biproduct's own projections and
     # injections, so it does not depend on how the source labels its generators.
-    left_projection, right_projection = source.projection(source_left), source.projection(source_right)
-    left_injection, right_injection = target.injection(target_left), target.injection(target_right)
+    left_projection, right_projection = (
+        source.projection(source_left),
+        source.projection(source_right),
+    )
+    left_injection, right_injection = (
+        target.injection(target_left),
+        target.injection(target_right),
+    )
     return source.module_category().Mor(source, target)(
-        lambda label: left_injection(left_morphism(left_projection(source.module_generator(label))))
-        + right_injection(right_morphism(right_projection(source.module_generator(label))))
+        lambda label: (
+            left_injection(
+                left_morphism(left_projection(source.module_generator(label)))
+            )
+            + right_injection(
+                right_morphism(right_projection(source.module_generator(label)))
+            )
+        )
     )
 
 
@@ -5937,7 +6372,9 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
         modules = Modules(self.base_ring())
         match _is_group_algebra(self.base_ring()):
             case True:
-                modules = OwnedCategoryOverBaseRing.__classcall__(Modules, self.base_ring())
+                modules = OwnedCategoryOverBaseRing.__classcall__(
+                    Modules, self.base_ring()
+                )
                 free = self.base_ring().free_module(1)
             case False:
                 free = modules.an_object()
@@ -5950,6 +6387,7 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
         from sage_extensions.categories.modules.framed.framed_free_modules import (
             FramedFreeModules,
         )
+
         ring = self.base_ring()
         match ring in OwnedRings().Commutative():
             case True:
@@ -5973,7 +6411,9 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
             """
             ring = self.domain().base_ring()
             match ring.is_commutative():
-                case True if _coordinate_framed_free_module(self.domain(), ring) and _coordinate_framed_free_module(self.codomain(), ring):
+                case True if _coordinate_framed_free_module(
+                    self.domain(), ring
+                ) and _coordinate_framed_free_module(self.codomain(), ring):
                     return True
                 case _:
                     return AtomicProposition("is_projective", self)
@@ -6011,8 +6451,12 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
         def from_rows(self, rows):
             r"""Construct the matrix morphism with the stated row entries."""
             rows = tuple(tuple(row) for row in rows)
-            if len(rows) != self.nrows() or any(len(row) != self.ncols() for row in rows):
-                raise ValueError(f"the rows {rows} do not form a matrix in {self}: it has shape {self.matrix_shape()}")
+            if len(rows) != self.nrows() or any(
+                len(row) != self.ncols() for row in rows
+            ):
+                raise ValueError(
+                    f"the rows {rows} do not form a matrix in {self}: it has shape {self.matrix_shape()}"
+                )
             ring = self.base_ring()
             row_labels = tuple(self.row_index_set())
             column_labels = tuple(self.column_index_set())
@@ -6047,15 +6491,31 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
             # index the domain's rank.
             shape = coordinate_tensor.tensor_shape()
             if shape[0] != self.nrows() or shape[1] != self.ncols():
-                raise ValueError(f"{coordinate_tensor} cannot be read as a matrix in {self}: its shape {shape} is not {self.matrix_shape()}")
-            return self.from_rows(tuple(tuple(coordinate_tensor[row, column] for column in range(self.ncols())) for row in range(self.nrows())))
+                raise ValueError(
+                    f"{coordinate_tensor} cannot be read as a matrix in {self}: its shape {shape} is not {self.matrix_shape()}"
+                )
+            return self.from_rows(
+                tuple(
+                    tuple(
+                        coordinate_tensor[row, column] for column in range(self.ncols())
+                    )
+                    for row in range(self.nrows())
+                )
+            )
 
         def from_flat_entries(self, entries):
             entries = tuple(entries)
             expected = self.nrows() * self.ncols()
             if len(entries) != expected:
-                raise ValueError(f"a matrix in {self} of shape {self.matrix_shape()} has {expected} entries, but {len(entries)} were given")
-            return self.from_rows(tuple(entries[row * self.ncols() : (row + 1) * self.ncols()] for row in range(self.nrows())))
+                raise ValueError(
+                    f"a matrix in {self} of shape {self.matrix_shape()} has {expected} entries, but {len(entries)} were given"
+                )
+            return self.from_rows(
+                tuple(
+                    entries[row * self.ncols() : (row + 1) * self.ncols()]
+                    for row in range(self.nrows())
+                )
+            )
 
     class ElementMethods:
         def matrix(self):
@@ -6110,7 +6570,11 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
             r"""The coordinates of the image of the basis vector ``e_s``: the column ``s`` as a function of the rows."""
             column_label = _matrix_index(self.parent().column_index_set(), column_label)
             generator_image = self._generator_image
-            image = generator_image(column_label) if generator_image is not None else self(self.domain().module_generator(column_label))
+            image = (
+                generator_image(column_label)
+                if generator_image is not None
+                else self(self.domain().module_generator(column_label))
+            )
             return self.codomain()(image).to_vector()
 
         def matrix_entry(self, row_label, column_label):
@@ -6127,7 +6591,11 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
             row_label = _matrix_index(self.parent().row_index_set(), row_label)
             dual = self.domain().dual_module()
             return dual.linear_combination(
-                {column_label: self.matrix_entry(row_label, column_label) for column_label in self.parent().column_index_set() if self.matrix_entry(row_label, column_label)}
+                {
+                    column_label: self.matrix_entry(row_label, column_label)
+                    for column_label in self.parent().column_index_set()
+                    if self.matrix_entry(row_label, column_label)
+                }
             )
 
         def column(self, column_label):
@@ -6156,10 +6624,15 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
             from sage_extensions.rings.real import RR
 
             if self.parent().base_ring() is RR:
-                return RR._matrix_determinant(tuple(
-                    tuple(self.matrix_entry(row, column) for column in self.parent().column_index_set())
-                    for row in self.parent().row_index_set()
-                ))
+                return RR._matrix_determinant(
+                    tuple(
+                        tuple(
+                            self.matrix_entry(row, column)
+                            for column in self.parent().column_index_set()
+                        )
+                        for row in self.parent().row_index_set()
+                    )
+                )
             backend = _engine_matrix(self)
             return _owned_engine_element(self.parent().base_ring(), backend.det())
 
@@ -6196,16 +6669,26 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
             r"""Return ``x`` in the domain with ``self(x)=target``."""
             from sage.modules.free_module_element import vector as sage_vector
 
-            target = target if target.parent() is self.codomain() else self.codomain()(target)
+            target = (
+                target
+                if target.parent() is self.codomain()
+                else self.codomain()(target)
+            )
             ring = self.parent().base_ring()
             coordinates = target.to_vector()
             rhs = sage_vector(
                 _linear_algebra_ring(ring),
-                [_linear_algebra_element(ring, coordinates(label)) for label in self.parent().row_index_set()],
+                [
+                    _linear_algebra_element(ring, coordinates(label))
+                    for label in self.parent().row_index_set()
+                ],
             )
             solution = _engine_matrix(self).solve_right(rhs)
             return self.domain().linear_combination(
-                {label: _owned_engine_element(ring, solution[position]) for position, label in enumerate(self.parent().column_index_set())}
+                {
+                    label: _owned_engine_element(ring, solution[position])
+                    for position, label in enumerate(self.parent().column_index_set())
+                }
             )
 
         def _kernel_spanning_family(self):
@@ -6217,7 +6700,10 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                 row_labels = self.parent().row_index_set()
                 column_labels = self.parent().column_index_set()
                 entries = tuple(
-                    tuple(self.matrix_entry(row_label, column_label) for column_label in column_labels)
+                    tuple(
+                        self.matrix_entry(row_label, column_label)
+                        for column_label in column_labels
+                    )
                     for row_label in row_labels
                 )
                 fractions = tuple(
@@ -6225,9 +6711,7 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                     for row in entries
                 )
                 denominators = tuple(
-                    denominator
-                    for row in fractions
-                    for _numerator, denominator in row
+                    denominator for row in fractions for _numerator, denominator in row
                 )
 
                 cleared_rows = []
@@ -6246,8 +6730,10 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
 
                 source_domain = source_ring._fresh_free_module_on(column_labels)
                 source_codomain = source_ring._fresh_free_module_on(row_labels)
-                source_map = source_domain.module_category().Mor(source_domain, source_codomain).from_rows(
-                    tuple(cleared_rows)
+                source_map = (
+                    source_domain.module_category()
+                    .Mor(source_domain, source_codomain)
+                    .from_rows(tuple(cleared_rows))
                 )
                 source_kernel = source_map.kernel()
                 kernel_labels = source_kernel.module_generating_set()
@@ -6256,11 +6742,15 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                 localization_map = ring.localization_map()
 
                 def localized_kernel_element(label):
-                    coordinates = inclusion(source_kernel.module_generator(label)).to_vector()
+                    coordinates = inclusion(
+                        source_kernel.module_generator(label)
+                    ).to_vector()
                     return localized_domain.linear_combination(
                         {
                             column_label: localization_map(coefficient)
-                            for column_label, coefficient in coordinates.parent()._selected_module_coefficients(coordinates).items()
+                            for column_label, coefficient in coordinates.parent()
+                            ._selected_module_coefficients(coordinates)
+                            .items()
                         }
                     )
 
@@ -6279,7 +6769,9 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                     for row in self.parent().row_index_set()
                 )
                 reduced, pivots = _represented_real_rref(rows, len(labels), ring)
-                free = tuple(column for column in range(len(labels)) if column not in pivots)
+                free = tuple(
+                    column for column in range(len(labels)) if column not in pivots
+                )
                 positions = Sets.Δ[len(free) - 1]
 
                 def kernel_vector(position):
@@ -6298,15 +6790,21 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                     name=f"Kernel spanning family of {self}",
                 )
 
-            basis = _engine_matrix(self).change_ring(
-                _linear_algebra_ring(ring)
-            ).right_kernel().basis_matrix()
+            basis = (
+                _engine_matrix(self)
+                .change_ring(_linear_algebra_ring(ring))
+                .right_kernel()
+                .basis_matrix()
+            )
             labels = self.parent().column_index_set()
             positions = Sets.Δ[int(basis.nrows()) - 1]
             return finite_indexed_family(
                 positions,
                 lambda position: self.domain().linear_combination(
-                    {label: _owned_engine_element(ring, basis[int(position), column]) for column, label in enumerate(labels)}
+                    {
+                        label: _owned_engine_element(ring, basis[int(position), column])
+                        for column, label in enumerate(labels)
+                    }
                 ),
                 name=f"Kernel spanning family of {self}",
             )
@@ -6348,7 +6846,9 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
             """
             ring = self.parent().base_ring()
             if ring not in OwnedRings().Commutative():
-                raise ValueError("symmetrized multiplication requires a commutative base ring")
+                raise ValueError(
+                    "symmetrized multiplication requires a commutative base ring"
+                )
             modules = Modules(ring)
             parameters = modules.Mor(self.codomain(), self.domain())
             values = modules.Mor(self.domain(), self.domain())
@@ -6366,7 +6866,13 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
             target = source.module_category().Mor(source, codomain)
             _require_matrix_mor(target)
             return target.from_rows(
-                tuple(tuple(self.matrix_entry(row_label, column_label) for row_label in self.parent().row_index_set()) for column_label in self.parent().column_index_set())
+                tuple(
+                    tuple(
+                        self.matrix_entry(row_label, column_label)
+                        for row_label in self.parent().row_index_set()
+                    )
+                    for column_label in self.parent().column_index_set()
+                )
             )
 
         T = transpose
@@ -6395,13 +6901,19 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                 )
 
             ring = self.parent().base_ring()
-            backend = _engine_matrix(self).change_ring(
-                _linear_algebra_ring(ring)
-            ).inverse()
+            backend = (
+                _engine_matrix(self).change_ring(_linear_algebra_ring(ring)).inverse()
+            )
             source = self.codomain()
             codomain = self.domain()
             target = _require_matrix_mor(source.module_category().Mor(source, codomain))
-            return target.from_rows((_owned_engine_element(ring, backend[row, column]) for column in range(target.ncols())) for row in range(target.nrows()))
+            return target.from_rows(
+                (
+                    _owned_engine_element(ring, backend[row, column])
+                    for column in range(target.ncols())
+                )
+                for row in range(target.nrows())
+            )
 
         __invert__ = inverse
 
@@ -6439,11 +6951,13 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
             # Thus D = right * A * left^{-1} in matrix notation.
             left_change = normalization.forward().right()
             right_change = normalization.inverse().forward().left()
-            labels = finite_ordered_set((
-                "diagonal",
-                "left_change",
-                "right_change",
-            ))
+            labels = finite_ordered_set(
+                (
+                    "diagonal",
+                    "left_change",
+                    "right_change",
+                )
+            )
             factors = {
                 "diagonal": diagonal.parent(),
                 "left_change": left_change.parent(),
@@ -6502,7 +7016,9 @@ class MatrixEndomorphismSpaces(OwnedCategoryOverBaseRing):
         modules = Modules(self.base_ring())
         match _is_group_algebra(self.base_ring()):
             case True:
-                modules = OwnedCategoryOverBaseRing.__classcall__(Modules, self.base_ring())
+                modules = OwnedCategoryOverBaseRing.__classcall__(
+                    Modules, self.base_ring()
+                )
                 free = self.base_ring().free_module(1)
             case False:
                 free = modules.an_object()
@@ -6602,14 +7118,19 @@ class MatrixEndomorphismSpaces(OwnedCategoryOverBaseRing):
         def trace(self):
             ring = self.parent().base_ring()
             return sum(
-                (self.matrix_entry(label, label) for label in self.parent().row_index_set()),
+                (
+                    self.matrix_entry(label, label)
+                    for label in self.parent().row_index_set()
+                ),
                 ring.zero(),
             )
 
 
 def _matrix_index(index_set, key):
     r"""Read a row or column key as a label of ``index_set``; a position is read through ``index_set[i]`` by the caller."""
-    assert key in index_set, f"{key!r} is not a label of {index_set}: matrix entries are keyed by label"
+    assert key in index_set, (
+        f"{key!r} is not a label of {index_set}: matrix entries are keyed by label"
+    )
     return index_set(key)
 
 
@@ -6619,7 +7140,8 @@ def _represented_real_rref(coefficients, column_count, ring):
     pivots = []
     for column in range(column_count):
         candidates = tuple(
-            row for row in range(len(pivots), len(rows))
+            row
+            for row in range(len(pivots), len(rows))
             if (rows[row][column] == ring.zero()) is False
         )
         if not candidates:
@@ -6632,13 +7154,17 @@ def _represented_real_rref(coefficients, column_count, ring):
         selected = candidates[0]
         rows[pivot_row], rows[selected] = rows[selected], rows[pivot_row]
         pivot = rows[pivot_row][column]
-        rows[pivot_row] = [ring._divide_by_nonzero(value, pivot) for value in rows[pivot_row]]
+        rows[pivot_row] = [
+            ring._divide_by_nonzero(value, pivot) for value in rows[pivot_row]
+        ]
         for row in range(len(rows)):
             if row != pivot_row:
                 coefficient = rows[row][column]
                 rows[row] = [
                     entry - coefficient * pivot_entry
-                    for entry, pivot_entry in zip(rows[row], rows[pivot_row], strict=True)
+                    for entry, pivot_entry in zip(
+                        rows[row], rows[pivot_row], strict=True
+                    )
                 ]
         pivots.append(column)
         if len(pivots) == len(rows):
@@ -6671,7 +7197,11 @@ def _engine_matrix(morphism):
         _linear_algebra_ring(ring),
         parent.nrows(),
         parent.ncols(),
-        [_linear_algebra_element(ring, entry) for row in zip(*columns, strict=True) for entry in row],
+        [
+            _linear_algebra_element(ring, entry)
+            for row in zip(*columns, strict=True)
+            for entry in row
+        ],
     )
 
 
@@ -6694,7 +7224,14 @@ def _matrix_unit(mor, label):
     column_label = label[1]
     column_labels = mor.column_index_set()
     return mor(
-        {source_label: (mor.codomain().module_generator(row_label) if source_label == column_label else mor.codomain().zero()) for source_label in column_labels}
+        {
+            source_label: (
+                mor.codomain().module_generator(row_label)
+                if source_label == column_label
+                else mor.codomain().zero()
+            )
+            for source_label in column_labels
+        }
     )
 
 
@@ -6705,7 +7242,9 @@ def _matrix_coefficients(mor, morphism):
     coefficients = {}
     for column_label in mor.column_index_set():
         column = morphism._matrix_column_coordinates(column_label)
-        for row_label, coefficient in column.parent()._selected_module_coefficients(column).items():
+        for row_label, coefficient in (
+            column.parent()._selected_module_coefficients(column).items()
+        ):
             coefficients[labels((row_label, column_label))] = coefficient
     return coefficients
 
@@ -6715,7 +7254,10 @@ def _require_matrix_mor(mor):
     ring = mor.base_ring()
     domain = mor.domain()
     codomain = mor.codomain()
-    if not (_coordinate_framed_free_module(domain, ring) and _coordinate_framed_free_module(codomain, ring)):
+    if not (
+        _coordinate_framed_free_module(domain, ring)
+        and _coordinate_framed_free_module(codomain, ring)
+    ):
         return mor
     assert mor in MatrixSpaces(ring), (
         f"{mor} between the free modules {domain} and {codomain} with chosen bases is not a space "
@@ -6754,4 +7296,6 @@ def _coordinate_images(morphism):
         image = morphism(morphism.domain().module_generator(label)).to_vector()
         return tuple(image(codomain_label) for codomain_label in codomain_labels)
 
-    return tuple(coordinates(label) for label in morphism.domain().module_generating_set())
+    return tuple(
+        coordinates(label) for label in morphism.domain().module_generating_set()
+    )
