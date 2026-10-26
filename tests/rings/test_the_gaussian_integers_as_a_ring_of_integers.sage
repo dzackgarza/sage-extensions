@@ -21,8 +21,36 @@ def test_the_gaussian_integers_are_the_maximal_order_of_q_i() -> None:
     assert integers.fraction_field() is field
     assert integers.krull_dimension() == 1
     assert integers.base_ring() is ZZ
+    assert integers in OwnedRings().Commutative().DedekindDomains()
+    assert integers not in OwnedRings().Commutative().NoZeroDivisors().PrincipalIdeals()
+    assert "Order of rank 2" in repr(integers)
+    hash(integers)
     assert i.is_unit()
     assert not (integers.one() + i).is_unit()
+
+
+def test_a_nonmaximal_order_is_not_placed_in_dedekind_domains() -> None:
+    field = QuadraticField(-1)
+    nonmaximal = field.order_generated_by(2 * field.primitive_element())
+    assert not nonmaximal.is_maximal()
+    assert nonmaximal not in OwnedRings().Commutative().DedekindDomains()
+
+
+def test_order_identity_and_dedekind_placement_do_not_depend_on_constructor_order() -> None:
+    # First reach the maximal lattice through the generic order constructor.
+    field = QuadraticField(-2)
+    generic_order = field.order_generated_by(field.primitive_element())
+    maximal_order = field.ring_of_integers()
+    assert generic_order is maximal_order
+    assert generic_order in OwnedRings().Commutative().DedekindDomains()
+
+    # A distinct field exercises the reverse construction order.
+    other_field = QuadraticField(-7)
+    maximal_first = other_field.ring_of_integers()
+    integral_generator = (other_field.one() + other_field.primitive_element()) / other_field(2)
+    generic_after = other_field.order_generated_by(integral_generator)
+    assert maximal_first is generic_after
+    assert generic_after in OwnedRings().Commutative().DedekindDomains()
 
 
 def test_one_plus_i_becomes_a_unit_after_inverting_two() -> None:
@@ -45,8 +73,25 @@ def test_the_local_ring_at_one_plus_i() -> None:
     i = integers(field.primitive_element())
     local = integers.localize_at_prime(integers.ideal(integers.one() + i))
 
+    assert integers.spectrum()(integers.ideal(integers.one() + i)).height() == 1
+
     assert not local(integers.one() + i).is_unit()
     assert local(integers(3)).is_unit()
+
+
+def test_dedekind_ideal_colon_uses_fractional_ideal_inverses() -> None:
+    integers = QuadraticField(-1).ring_of_integers()
+    i = integers(QuadraticField(-1).primitive_element())
+    ramified = integers.ideal(integers.one() + i)
+    inert = integers.ideal(integers(3))
+    fractional = integers.fractional_ideal(integers.one() + i)
+
+    product = fractional * fractional.inverse()
+    assert product == integers.fractional_ideal(integers.one())
+    assert ramified.colon(ramified) == integers.ideal(integers.one())
+    assert inert.colon(ramified) == inert
+    assert inert.ideal_saturation(ramified) == inert
+    assert ramified.ideal_saturation(ramified) == integers.ideal(integers.one())
 
 
 def test_the_inert_prime_three_stays_a_nonunit_after_inverting_two() -> None:

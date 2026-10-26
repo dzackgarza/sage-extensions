@@ -29,6 +29,7 @@ from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.polynomial.polynomial_quotient_ring import PolynomialQuotientRing_generic
 from sage.rings.quotient_ring import QuotientRing_generic
 from sage.structure.element import CommutativeRingElement, Element, parent as element_parent
+from sage.structure.parent import Parent
 from sage.structure.richcmp import op_EQ, op_NE
 from sage.structure.sage_object import SageObject
 
@@ -356,6 +357,15 @@ class PrimeSpectra(OwnedCategory):
         @cached_method
         def height(self):
             r"""The intrinsic height ``ht(p) = dim(R_p)`` of a prime ideal."""
+            ring = self.parent().ring()
+            if ring in OwnedRings().Commutative().DedekindDomains():
+                match self.ideal().is_zero():
+                    case True:
+                        return _owned_integers().zero()
+                    case False:
+                        return _owned_integers().one()
+                    case _:
+                        pass
             return self.local_ring().krull_dimension()
 
         @cached_method
@@ -542,7 +552,8 @@ class PrimeSpectra(OwnedCategory):
             source = element_parent(ideal)
             ring = self.ring()
             if (
-                source in PrimeSpectra()
+                not isinstance(ideal, Parent)
+                and source in PrimeSpectra()
                 and ring in LocalizationRings()
                 and ring.localization_source() is source.ring()
             ):
@@ -2485,6 +2496,11 @@ class PrimeLocalizations(OwnedCategory):
                 if base is not None and source in Algebras(base).Associative().Unital()
                 else None
             )
+            # This constructor owns the decision from ``source``; the object
+            # factory may already have forwarded the same datum. Consume that
+            # copy rather than passing duplicate ``algebra_source`` keywords
+            # down to LocalizationRings.ParentMethods.
+            rest.pop("algebra_source", None)
             super().__init__(
                 source,
                 submonoid,
