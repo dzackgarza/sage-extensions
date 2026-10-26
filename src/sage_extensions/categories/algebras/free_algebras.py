@@ -271,7 +271,6 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
                 *algebra_placements,
                 *categories,
             ),
-            construction_data=construction_data,
             law_decisions=(("grading", True),),
             algebra_generating_family=algebra_generators,
             algebra_framing_source=self,
@@ -336,9 +335,28 @@ def _native_free_algebra(engine, generating_module, flavor, *, categories=(), co
     engine object supplied by a caller. Engine parents are realizations, not
     identities of the free algebra.
     """
-    return _NativeFreeAlgebraParent(
-        engine, generating_module, flavor,
-        categories=categories, construction_data=construction_data,
+    if not construction_data:
+        return _NativeFreeAlgebraParent(
+            engine, generating_module, flavor, categories=categories,
+        )
+    data = dict(construction_data)
+    if set(data) != {"_preamble_coproduct_factors"}:
+        raise TypeError(f"no category-level free-algebra constructor declares {tuple(data)}")
+    from sage.misc.classcall_metaclass import typecall
+    from sage_extensions.refine import _owned_dynamic_class
+
+    implementation = _owned_dynamic_class(
+        "NativeFreeAlgebraWithCoproductData",
+        (CommutativeAlgebraCoproducts.ParentMethods, _NativeFreeAlgebraParent),
+        _NativeFreeAlgebraParent,
+    )
+    return typecall(
+        implementation,
+        engine=engine,
+        generating_module=generating_module,
+        flavor=flavor,
+        categories=categories,
+        **data,
     )
 
 

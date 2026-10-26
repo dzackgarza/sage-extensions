@@ -3489,9 +3489,9 @@ class CommutativeAlgebraCoproducts(OwnedCategoryOverBaseRing):
         return [Algebras(self.base_ring()).Associative().Unital().Commutative()]
 
     class ParentMethods:
-        @staticmethod
-        def _initialize_construction_data(parent, factors):
-            parent._preamble_coproduct_factors = factors
+        def __init__(self, _preamble_coproduct_factors, **rest):
+            self._preamble_coproduct_factors = _preamble_coproduct_factors
+            super().__init__(**rest)
 
         def coproduct_factors(self):
             r"""Return the family of factors, indexed by the product's own index set."""
@@ -4405,7 +4405,6 @@ class _OwnedAlgebraParent(_OwnedRingParent):
         generator_values=None,
         *,
         categories=(),
-        construction_data=(),
         law_decisions=(),
         algebra_framing_source=None,
         algebra_generating_family=None,
@@ -4429,11 +4428,6 @@ class _OwnedAlgebraParent(_OwnedRingParent):
         # the algebra category, but the native regular-module construction
         # must still use this exact base rather than infer it from the engine.
         self._preamble_selected_algebra_base_ring = base
-        for name, value in construction_data:
-            if name == "_preamble_coproduct_factors":
-                CommutativeAlgebraCoproducts.ParentMethods._initialize_construction_data(self, value)
-            else:
-                raise TypeError(f"no category constructor declares adopted-algebra datum {name!r}")
         self._realized_scalar_structure = (
             lambda scalar: self._from_engine_element(
                 engine(_engine_element(base, scalar))
@@ -4700,12 +4694,35 @@ def _owned_algebra_view(
     # A structure view retains its source algebra as defining data. The base
     # and labels alone do not determine that algebra or its multiplication.
     base = _owned_ring(base_ring)
+    if construction_data:
+        data = dict(construction_data)
+        if set(data) != {"_preamble_coproduct_factors"}:
+            raise TypeError(
+                f"no category-level adopted-algebra constructor declares {tuple(data)}"
+            )
+        from sage.misc.classcall_metaclass import typecall
+        from sage_extensions.refine import _owned_dynamic_class
+
+        implementation = _owned_dynamic_class(
+            "OwnedAlgebraWithCoproductData",
+            (CommutativeAlgebraCoproducts.ParentMethods, _OwnedAlgebraParent),
+            _OwnedAlgebraParent,
+        )
+        return typecall(
+            implementation,
+            engine=_engine_ring(algebra),
+            base_ring=base,
+            labels=labels,
+            categories=tuple(categories),
+            law_decisions=tuple(law_decisions),
+            ring_placement=lambda: ring_placement,
+            **data,
+        )
     return _OwnedAlgebraParent(
         _engine_ring(algebra),
         base,
         labels,
         categories=tuple(categories),
-        construction_data=tuple(construction_data),
         law_decisions=tuple(law_decisions),
         ring_placement=lambda: ring_placement,
     )
