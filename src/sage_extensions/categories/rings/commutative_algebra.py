@@ -3595,10 +3595,17 @@ def _quotient_ring(source, defining_ideal):
         and Category.__contains__(CommutativeIdeals(source).Maximal(), defining_ideal)
     ):
         generators = tuple(defining_ideal.ideal_generators())
-        if len(generators) == 1:
+        if generators:
+            # In QQ[t], the gcd of the selected ideal generators is the
+            # principal generator of their ideal. A maximal ideal need not
+            # have a one-element selected generating family, so normalize the
+            # whole family before entering the canonical number-field owner.
+            generator = generators[0]
+            for other in generators[1:]:
+                generator = generator.gcd(other)
             from sage_extensions.categories.rings.number_fields import _number_field_of
 
-            return _number_field_of(generators[0].monic())
+            return _number_field_of(generator.monic())
 
     exact_source_quotient = (
         source in LocalizationRings() or _engine_ring(source) is source
