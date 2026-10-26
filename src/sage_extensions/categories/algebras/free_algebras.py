@@ -19,6 +19,7 @@ from sage.rings.polynomial.polynomial_quotient_ring import (
     PolynomialQuotientRing_generic,
 )
 from sage.rings.polynomial.polynomial_ring import PolynomialRing_generic
+from sage.structure.element import parent as element_parent
 from sage.structure.richcmp import op_EQ, op_NE
 
 from sage_extensions.categories.abstract_categories.mor_categories import (
