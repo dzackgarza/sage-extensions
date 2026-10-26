@@ -1162,13 +1162,15 @@ class SchemeMorphismMethods:
     def _projective_engine_morphism(self):
         ring = self.coefficient_map().codomain()
         base = self.coefficient_map().domain()
-        native_scalar = _engine_ring(ring).coerce_map_from(_engine_ring(base))
-        assert native_scalar is not None, (
-            f"Sage has no canonical coefficient map {base} -> {ring} for {self}"
-        )
-        natural = OwnedRings().Mor(base, ring)(native_scalar)
-        assert _ring_morphisms_equal(self.coefficient_map(), natural) is True, (
-            f"the selected coefficient map of {self} is not Sage's canonical map {base} -> {ring}"
+        # The engine realizes the coordinates over its own scalars, so the
+        # selected coefficient map must be the structure map R -> A of the
+        # coordinate algebra, the map the engine applies to scalars.
+        natural = ring.algebra_structure_morphism()
+        assert (
+            natural.domain() is base
+            and _ring_morphisms_equal(self.coefficient_map(), natural) is True
+        ), (
+            f"the selected coefficient map of {self} is not the structure map {base} -> {ring}"
         )
         return _native_scheme_mor(self.domain(), self.codomain())(
             [_engine_element(ring, value) for value in self.homogeneous_coordinates()],
