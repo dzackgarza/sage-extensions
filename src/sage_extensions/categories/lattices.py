@@ -5334,6 +5334,8 @@ class Lattices(OwnedCategoryOverBaseRing):
 
             fraction_field = ring.fraction_field()
             dual_gram = self.gram_tensor().change_ring(fraction_field).dual_pairing()
+            scalars = fraction_field.regular_module()
+            scalar_generator = next(iter(scalars.module_generators()))
             # The dual lattice has one value type in every case: the selected
             # restriction-of-scalars module Res_{R -> K}(K).  Even when every
             # inverse-Gram entry lies in R (notably for unimodular lattices),
@@ -5341,7 +5343,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             # interface and breaks generic descent through ``underlying_element``.
             value_module = Modules(fraction_field).restriction_of_scalars(
                 ring.fraction_field_map()
-            )(fraction_field)
+            )(scalars)
             dual_module = self.dual_module()
             # ``dual_gram`` is a tensor over Frac(R), on the fraction-field
             # extension of the dual basis. Transfer its coefficients through
@@ -5352,7 +5354,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             def rational_pairing(left, right):
                 left_coordinates = left.to_vector()
                 right_coordinates = right.to_vector()
-                return value_module(sum(
+                value = sum(
                     (
                         fraction_field(left_coordinates(left_label))
                         * dual_gram[row, column]
@@ -5361,7 +5363,8 @@ class Lattices(OwnedCategoryOverBaseRing):
                         for column, right_label in enumerate(labels)
                     ),
                     fraction_field.zero(),
-                ))
+                )
+                return value_module.wrap(scalars.scalar_multiple(value, scalar_generator))
 
             rational = dual_module.bilinear_hom_space(value_module)._from_bilinear_evaluation(
                 rational_pairing
