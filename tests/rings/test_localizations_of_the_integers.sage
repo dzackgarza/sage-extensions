@@ -93,3 +93,4 @@ def test_inverting_two_in_z_mod_six_leaves_z_mod_three() -> None:
 
     assert localized(ring(3)) == localized.zero()
     assert localized(ring(2)).is_unit()
+    assert localized.characteristic() == 3
