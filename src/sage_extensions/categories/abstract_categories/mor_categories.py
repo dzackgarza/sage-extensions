@@ -1539,12 +1539,10 @@ class CategoricalIsomorphism(CategoricalArrow, CategoricalMor.ElementMethods):
         *,
         verify: bool = False,
     ) -> None:
-        # The isomorphism is an arrow of the base category too: its element
-        # class carries that category's arrow level after Sage's ``Map``.
-        # Initialize that level from the forward arrow, by the transport
-        # protocol every arrow owner supplies, so its data are established.
-        args, options = forward._transport_initialization_to_mor(parent)
-        super(Map, self).__init__(*args, **options)
+        # The isomorphism is an arrow of the base category too.  Its selected
+        # Mor parent already fixes both endpoints; transport data for the
+        # forward arrow are not arguments to the post-Map Element initializer.
+        Morphism.__init__(self, parent)
         if (
             forward.domain() is not self.domain()
             or forward.codomain() is not self.codomain()
