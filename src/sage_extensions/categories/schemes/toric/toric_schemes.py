@@ -1150,12 +1150,13 @@ class ToricSchemes(OwnedCategoryOverBaseRing):
             point of ``P_D`` as a basis, so the lattice points of the divisor
             polytope are returned as elements of ``M``.
             """
-            characters = self.character_lattice()
-            return FiniteOrderedSets().from_indexed(
-                self.divisor_polytope(divisor).integral_points(),
-                lambda point: _owned_vector(characters, point),
-                name="Section characters",
-            )
+            # divisor_polytope is constructed in the selected character
+            # lattice, and its integral_points() already returns elements of
+            # that exact lattice.  Re-entering them through _owned_vector
+            # treats a lattice element as a coordinate tuple; for a character
+            # lattice represented as Hom(N, ZZ), iteration instead indexes the
+            # matrix-shaped morphism and is not coordinate extraction.
+            return self.divisor_polytope(divisor).integral_points()
 
         @cached_method
         def divisor_section_space(self, divisor):
