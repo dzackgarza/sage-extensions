@@ -1482,7 +1482,7 @@ def _implementation_with_engine(implementation: type, owner: type, engine: type)
         anchors = tuple(
             index
             for index, base in enumerate(implementation.__bases__)
-            if base in owner.__mro__
+            if base in owner.__mro__ or base in engine.__mro__
         )
         assert anchors, (
             f"cannot insert the computation class {engine.__name__} for objects of type "
