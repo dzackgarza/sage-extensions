@@ -5747,8 +5747,10 @@ class BiproductModules(OwnedCategoryOverBaseRing):
             assert all(
                 legs.value(index).domain() is factors.value(index)
                 for index in factors.index_set()
-            ), f"a map out of the direct sum {self} needs the map at index i to start at the i-th summand, "
-            f"but the maps {legs} do not"
+            ), (
+                f"a map out of the direct sum {self} needs the map at index i to start at the i-th summand, "
+                f"but the maps {legs} do not"
+            )
 
             return self.module_category().Mor(self, target)(
                 lambda label: legs.value(label.summand_index())(
