@@ -1988,6 +1988,14 @@ class Modules(OwnedCategoryOverBaseRing):
             whose data does not decide projectivity answers the proposition
             ``is_projective(M)``.
             """
+            presentation = Modules.ParentMethods._native_module_presentation(self)
+            if presentation is not None:
+                basis = presentation.module_basis()
+                if basis is not None and basis.is_basis():
+                    # A retained free basis is a construction witness for
+                    # projectivity, independently of whether the projective
+                    # category has already been added to this parent's class.
+                    return True
             return AtomicProposition("is_projective", self)
 
         def is_projective(self):
