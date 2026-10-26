@@ -247,13 +247,20 @@ class _LabelledPairingGraph:
 
     def isomorphism(self, other):
         r"""A colour- and pairing-preserving bijection of indices onto ``other``'s, or ``None``."""
-        equivalent, certificate = self._graph().is_isomorphic(
-            other._graph(), edge_labels=True, certificate=True
+        # Sage's is_isomorphic expands edge labels into a dense partition
+        # search. Bliss canonical labels retain an exact certificate using
+        # its sparse graph engine (GenericGraph.canonical_label).
+        source, source_certificate = self._graph().canonical_label(
+            algorithm="bliss", edge_labels=True, certificate=True
         )
-        if not equivalent:
+        target, target_certificate = other._graph().canonical_label(
+            algorithm="bliss", edge_labels=True, certificate=True
+        )
+        if source != target:
             return None
+        inverse_target = {image: vertex for vertex, image in target_certificate.items()}
         return Sets().Mor(self._positions, other._positions)(
-            lambda position: other._position(certificate[self._vertex(position)])
+            lambda position: other._position(inverse_target[source_certificate[self._vertex(position)]])
         )
 
 

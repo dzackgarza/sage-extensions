@@ -946,6 +946,15 @@ function definite_isometry(source_entries, target_entries)
     return is_isometric_with_isometry(source, target)
 end
 
+function finite_form_isometry_group(gram_entries, invariants, modulus, modulus_qf)
+    cover = integer_lattice(; gram=_qq_matrix(gram_entries))
+    relations = lattice(ambient_space(cover), diagonal_matrix(QQ, collect(invariants)))
+    form = torsion_quadratic_module(cover, relations;
+        snf=false, modulus=QQ(modulus), modulus_qf=QQ(modulus_qf))
+    group = orthogonal_group(form)
+    return order(group), [matrix(generator) for generator in gens(group)]
+end
+
 function square_shell(gram_entries, square)
     gram = _zz_matrix(gram_entries)
     lattice = integer_lattice(; gram=change_base_ring(QQ, gram))
@@ -1156,6 +1165,24 @@ class _OscarLatticeAdapter:
         if not isometric:
             return False
         return witness.change_ring(SageZZ).transpose()
+
+    def finite_form_isometry_group(self, gram, invariants, modulus, modulus_qf):
+        r"""Return the order and row-action generators of a presented finite form.
+
+        The quotient is ZZ^n / diag(invariants) ZZ^n, with both value
+        moduli retained. Hecke Torsion.jl:10-110 with snf=false preserves
+        this generator basis. Oscar 1.8.2 abelian_aut.jl:357-382 computes
+        generators through the normal form, including degenerate forms.
+        https://github.com/oscar-system/Oscar.jl/blob/v1.8.2/src/Groups/abelian_aut.jl
+        """
+        order, generators = self._bridge().call(
+            "DzackResearchOscarLatticeAdapter.finite_form_isometry_group",
+            gram.change_ring(SageQQ),
+            tuple(SageZZ(value) for value in invariants),
+            SageQQ(modulus),
+            SageQQ(modulus_qf),
+        )
+        return SageZZ(order), tuple(generator.change_ring(SageZZ) for generator in generators)
 
     def square_shell(self, gram, square):
         r"""Return one coordinate row per sign pair of nonzero square vectors."""

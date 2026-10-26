@@ -10,12 +10,6 @@ from sage.categories.map import Map
 from sage.categories.category import Category
 from sage.misc.cachefunc import cached_method
 from sage.misc.classcall_metaclass import typecall
-# Private engine adapter (OWN-06): Sage's ``sage.groups.fqf_orthogonal._isom_fqf(A)``
-# returns generator matrices of O(A) for a finite quadratic module A by
-# exhaustive extension of partial isometries; it is called here on one primary
-# part at a time (any p).  No public Sage routine supplies generators of the
-# orthogonal group of a primary part.
-from sage.groups.fqf_orthogonal import _isom_fqf as _engine_isom_fqf
 from sage.matrix.constructor import matrix as _engine_matrix
 from sage.rings.finite_rings.finite_field_constructor import GF as _engine_GF
 from sage.rings.integer_ring import ZZ as SageZZ
@@ -1703,14 +1697,17 @@ def _engine_orthogonal_group(T):
     ``p`` odd has ``q`` determined by ``b``, and ``O(T_p)`` is the orthogonal
     group of the Gram matrix of ``p b`` over ``GF(p)``: GAP's
     ``GO(epsilon, n, p)`` conjugated onto that matrix by an explicit isometry
-    of diagonalized forms.  The other primary parts use Sage's search
-    ``_isom_fqf`` on that part alone.  Sage's ``orthogonal_group()`` without
-    generators searches all of ``T`` (TRAPS.md).  The isometry of diagonalized
+    of diagonalized forms. The other primary parts use OSCAR's normal-form
+    orthogonal-group algorithm on the same presented quotient, retaining
+    both value moduli and the Smith generator basis. The isometry of diagonalized
     forms is computed here because GAP's ``forms`` package, which provides
     ``BaseChangeToCanonical``, is not installed in the engine (TRAPS.md).
     """
+    from sage_extensions.categories.lattice_engines import _oscar_lattices
+
     exponent = SageZZ(T.annihilator().gen())
     generators = []
+    order = SageZZ.one()
     for p in exponent.prime_divisors():
         part = T.primary_part(p)
         gens = part.smith_form_gens()
@@ -1718,13 +1715,22 @@ def _engine_orthogonal_group(T):
         if p != 2 and all(x == p for x in part.invariants()):
             field = _engine_GF(p)
             gram = _engine_matrix(field, n, n, [field(p * gens[i].b(gens[j]).lift()) for i in range(n) for j in range(n)])
-            matrices, _order = _engine_odd_orthogonal_generators(gram, p)
+            matrices, part_order = _engine_odd_orthogonal_generators(gram, p)
         else:
-            matrices = _engine_isom_fqf(part)
+            gram = _engine_matrix(SageQQ, n, n, [
+                gens[i].q().lift() if i == j else gens[i].b(gens[j]).lift()
+                for i in range(n) for j in range(n)
+            ])
+            part_order, matrices = _oscar_lattices.finite_form_isometry_group(
+                gram, part.invariants(), part._modulus, part._modulus_qf
+            )
+        order *= part_order
         for m in matrices:
             images = [sum((SageZZ(m[i, j]) * gens[j] for j in range(n)), part.zero()) for i in range(n)]
             generators.append(_extend(T, part, gens, p, exponent, images))
-    return T.orthogonal_group(gens=generators)
+    group = T.orthogonal_group(gens=generators)
+    group.gap().SetSize(order)
+    return group
 
 
 def _extend(T, part, gens, p, exponent, images):
