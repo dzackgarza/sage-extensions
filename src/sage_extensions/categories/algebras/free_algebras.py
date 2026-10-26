@@ -2650,7 +2650,7 @@ class FramedFreeAlgebraMorphism:
         # An R-algebra morphism sends a coefficient c of R to its image under
         # the codomain's structure map R -> B.
         codomain = self.codomain()
-        base = _own_ring(domain.base_ring())
+        base = _owned_ring(domain.base_ring())
 
         def coefficient_image(coefficient):
             # The selected polynomial backend can expose a native Sage scalar
