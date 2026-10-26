@@ -74,6 +74,7 @@ from sage_extensions.categories.rings.ring_foundation import (
     _ring_morphism_with_engine,
     _ring_morphisms_equal,
     _owned_integers,
+    _owned_rationals,
 )
 from sage_extensions.categories.sets.cardinals import aleph0, cardinal
 from sage_extensions.categories.sets.finite_ordered_sets import (
