@@ -3171,7 +3171,10 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                     maximal_ideal = construction.maximal_ideal()
                     if maximal_ideal not in CommutativeIdeals(self):
                         return super()._field_decision()
-                    return maximal_ideal.is_zero()
+                    # Fieldhood is decided by the ideal's generators. A
+                    # finite-module zero algorithm may itself require this
+                    # same field decision to choose its computation.
+                    return CommutativeIdeals.ParentMethods.is_zero(maximal_ideal)
 
             class Complete(CategoryWithAxiom):
                 r"""Complete local rings: complete and separated for the maximal-ideal topology."""
