@@ -1,8 +1,6 @@
-# Agent rules for the library
+# Agent rules
 
-These rules govern writing the mathematical library. They moved here from
-research's `AGENTS.md`, which keeps the research workflow: the evidence
-model, memory, the issue tree and milestones, review, TODO and docs.
+These rules govern writing the mathematical library.
 
 ## Preamble coding prerequisites
 

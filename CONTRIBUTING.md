@@ -1,9 +1,24 @@
-# Contribution policies for the library
+# Contribution policies
 
-These policies govern the mathematical library. They moved here from
-research's `CONTRIBUTING.md`, which keeps the delivery workflow, the
-development discipline (`DEV-*`), notebook style (`NB-*`) and writing
-conventions.
+These policies govern the mathematical library. Each policy has a unique
+identifier, grouped by family:
+
+| Family | Governs |
+| --- | --- |
+| `OWN-*` | [normative architecture](#preamble-architecture-specification): sanctioned construction paths, the recursive public boundary, encapsulation, and reuse |
+| `ARC-*` | architecture of the preamble's presentation of `lean-categories`' mathematics |
+| `API-*` | the public surface of preamble objects |
+| `CON-*` | constructors, witnesses, actions, and structural transport |
+| `CAT-*` | category placement, chosen data, and computational capability |
+| `DEF-*` | definitions, predicates, structural results, and special cases |
+| `LEX-*` | mathematical vocabulary and public type names |
+| `SET-*` | mathematical collections, underlying sets, and cardinality |
+| `ENG-*` | delegation of heavy computation to exact engines |
+| `BND-*` | private engine crossings and representation boundaries |
+| `BRG-*` | external-system interoperability and bridge transport |
+| `ENV-*` | repository execution and environment conventions |
+| `STY-*` | corrective implementation style and declarative Python patterns |
+| `FSA-*` | search of `lean-categories` and its libraries, absence claims, and the sourcing of a formalization request |
 
 ## Preamble design philosophy
 
@@ -431,7 +446,6 @@ This is a deliberate contrast with a GAP/Julia-style global operation catalogue.
 **The formalized placement determines API placement.**  An operation lives where `lean-categories` places it: on the mathematical object whose structure makes the operation meaningful.  Products of a category with products are constructed on that category.  Operations whose hypotheses are properties of a Hom live on that Homset.  Morphism-level constructions live on morphisms, parent-level constructions on parents, element-level operations on elements, functorial operations on functors.  The code implementing the operation belongs with that receiver or in its subtree.  Free-standing helpers may support notation internally, but they must not become a second public language.
 
 The same placement determines implementation dataflow.  Code wires a computation **where `lean-categories` places the operation**, and downstream behavior follows from the presented object/category graph.  If `C` has products, wire their construction on `C`; do not teach a global `Product(...)` dispatcher every category for which products happen to exist.  If equality of arrows is determined by structure of a Homset, teach that Homset; do not make a root equality helper enumerate concrete theories.  This is mathematical organization used as implementation compression: the general structure is stated once at its owner and inherited or delegated through the ordinary category machinery.
-
 
 **Mathematical domain and computational domain are different.** Method placement follows the first category/object/element on which `lean-categories` defines the notion, not the currently decidable or implemented cases. Every set has a cardinality, so `cardinality()` belongs to sets even though no CAS can compute the cardinality of an arbitrary represented set such as `X = {n in NN | n.is_twin_prime()}`. Every formed module has a well-defined degeneracy predicate, so `is_nondegenerate()` belongs with formed modules even when the current implementation only decides finite-rank represented forms. The implementation may therefore route across the cases currently understood and assert-gate the remainder with an informative statement of the missing computational hypothesis. This is not a stub: supported cases must actually compute. Over time the routing table grows so that the computational domain converges toward the mathematical domain.
 
@@ -3983,7 +3997,6 @@ mathematical consumer
 
 The latter makes every consumer finite-coordinate-aware and gives infinite generalization a repository-wide blast radius.
 
-
 #### `STY-104`: `morphism -> matrix -> nullspace -> rebuilt submodule` -> `morphism.kernel()`
 
 This is a canonical LLM over-lowering pattern.
@@ -4827,7 +4840,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 * * *
 
-
 ### 1. Presentation Architecture (`ARC-*`)
 
 #### `ARC-00`: The Preamble Is a Closed Universe Over Its Engines
@@ -4900,7 +4912,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: Owned `ZZ` has owned integer elements.  An owned free module has owned module elements whose coefficients lie in owned `ZZ`.  A private FGP adapter converts the owned ring, presentation matrix, and elements to Sage `ZZ`, a Sage free module, and Sage FGP elements, performs the computation, and converts the answer back to owned elements and morphisms before returning.
 
-
 #### `ARC-06`: Backend Adoption Creates a New Preamble Object; It Is Never Reclassification or a Facade
 
 - **Rule**: Importing or selecting a backend representation constructs or attaches private computational state for an independently owned object.
@@ -4913,7 +4924,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: A post-init hook that refines a Sage group in place; `Parent(..., facade=sage_free_module)` for an owned module; `OwnedRingView._element_constructor_` returning `SageZZ(value)`; rebuilding or preserving a Sage Cython element class as the element class of an owned group.
 
 - **Correct Example**: `own_group(G_backend)` returns an owned group with owned group elements and a private conversion between those elements and `G_backend` elements.  `own_free_module(F_backend)` returns an owned free module with owned coefficient-bearing elements and privately records `F_backend` only as an optional computation service.  Neither backend parent nor its elements are changed or exposed.
-
 
 #### `ARC-07`: A Morphism Is Asked of Its Endpoints
 
@@ -5051,7 +5061,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: State exactness as `im(d_1)=ker(epsilon)`, cohomology as `ker(d_n)/im(d_{n-1})`, subobject intersection as a pullback, and a divisor group as the free module on its prime-divisor set with finite-support elements.  The finite represented cases dispatch internally to matrix/Sage/Singular algorithms; future infinite cases supply different implementations of the same semantic methods.
 
-
 #### `ARC-17`: Repair the Semantic API Before Writing a Local Numerical Workaround
 
 - **Rule**: When a consumer needs a mathematical result canonically expressed through a presented semantic construction, the consumer calls that construction. It does not extract coordinates, matrices, rows, columns, basis vectors, engine objects, or finite presentations and reimplement the construction locally. If the required semantic method is missing, incomplete, or awkward to compose, improving that lower-level API is part of the implementation task. Do not preserve a local numerical workaround merely to keep the patch geographically small.
@@ -5065,7 +5074,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Extension Test**: After writing a consumer, mentally replace every finite-rank object by a plausible infinite analogue. If the consumer itself must change because it knows about matrix sizes, complete bases, exhaustive generator lists, or backend rows, the numerical boundary is probably too high. If only a low-level semantic method needs a new case, the architecture is correctly localized.
 
-
 #### `ARC-18`: The Interface Is Judged by the Invalid Mathematics It Permits
 
 - **Rule**: Design public constructors and methods adversarially against representation shortcuts.  A semantic API is insufficient if an equally public coordinate/vector/matrix path lets downstream code bypass the mathematical object and reimplement its theorems locally.  Close or privatize such hatches; force callers through parents, elements, Homs, structure morphisms, universal constructions, and preamble collections.
@@ -5075,7 +5083,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: A public lattice element constructor accepts arbitrary coordinate lists; an owned morphism exposes a convenient raw matrix accessor used by ordinary consumers; a group action constructor accepts raw matrices without first constructing `rho:G->Aut(M)`.
 
 - **Correct Example**: Elements are formed in their parent from named generators and finite-support mathematical data; matrix data may enter only at the narrow finite-framed Hom construction that returns a genuine morphism; all downstream operations stay on that morphism.  Assertions at likely misuse sites explain the mathematical ambiguity and name the correct construction.
-
 
 #### `ARC-19`: Present at the Generality `lean-categories` Formalizes
 
@@ -5089,8 +5096,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Sweep Question**: “If I drop one hypothesis from the current examples, does the formalized definition still apply?”  If yes, that hypothesis belongs to an implementation/subcategory, not the presentation.
 
-
-
 #### `ARC-20`: Structured Objects Include Their Witnessing Arrows
 
 - **Rule**: When the mathematical object is a subobject, quotient, image, re-presentation, or other structured occurrence of an underlying object, the witnessing morphism is part of the mathematical data and therefore part of identity/equality at that structured level.  Do not collapse the structured object to its underlying abstract object or to the image subset suggested by a coordinate realization.
@@ -5101,7 +5106,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: Subobject equality is equality in the subobject/slice construction and includes the inclusion; quotient equality includes the projection.  The underlying-object forgetful operation may return equal/isomorphic abstract objects without making the structured objects equal.
 
-
 #### `ARC-21`: Categories of Arrows, Homs, and Functors Are First-Class Objects of `Cat`
 
 - **Rule**: Present `Ar(C)`, `Fun(C,D)`, Hom categories, endomorphism/automorphism arrow categories, cores, slices, coslices, and analogous category constructions as actual objects of `Cat`, as `lean-categories` formalizes them, not as implementation namespaces around special Python classes.  Their objects/elements inherit ordinary categorical structure through the same graph as every other category.
@@ -5111,7 +5115,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: Treat morphisms as a third API species unrelated to Hom elements; attach special methods directly to a morphism wrapper because arrow categories are not represented; implement `Fun(C,D)` as a utility registry rather than a category.
 
 - **Correct Example**: `Ar(C)` and `Fun(C,D)` are preamble categories; `Hom_C(A,B)` is the appropriate preamble Hom/category object; `End`/`Aut` refinements and their elements inherit through the same categorical construction machinery.  Convenience aliases may expose familiar syntax without creating a second object model.
-
 
 #### `ARC-22`: Inherited Mathematics Propagates Through Named Functors and Composition
 
@@ -5133,7 +5136,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: Use one generic represented form/morphism object and one formed-module construction; refine it into symmetric/integral/nondegenerate/lattice/group-action categories as the construction places it.
 
-
 #### `ARC-24`: Structural Functors Are Outputs of Category Constructions, Not a Parallel Hand-Written Graph
 
 - **Rule**: A named category expression—root, classifier application, product/pullback, slice/coslice, core, or other construction—presenting a `lean-categories` category is the preamble's single source for its structural functors.  Canonical projection/forgetful/structural functors implied by that expression are derived from the construction and composed recursively.  Do not maintain a second manually authored “forgets-to” or preferred-path graph encoding the same relationships.
@@ -5143,7 +5145,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: Add `forgets_to = Modules(R)` beside a category whose defining expression already projects to modules; maintain BFS/preferred-functor tables for ancestor routes that the category expression canonically composes; hand-author every axiom projection.
 
 - **Correct Example**: classifier/category constructors create their primary structural maps; `project(C.A,K)` composes the primary projection with `project(C,K)`.  Explicit alternative functors remain first-class when they are genuinely different mathematics, rather than entries in a duplicate hierarchy table.
-
 
 #### `ARC-25`: Formed Mathematics Starts With the Arbitrary Form Actually Carried by the Object
 
@@ -5155,7 +5156,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: pairings/norms route through the object's form/correlation; radical and orthogonal complement are morphism/subobject constructions; positive-definite reduction/shortest-vector algorithms live behind the definite refinement while the general formed object remains valid for arbitrary forms.
 
-
 #### `ARC-26`: Category, Object, Runtime Representation, and Presentation Are Distinct Levels
 
 - **Rule**: Keep distinct the mathematical category, an object of that category, the runtime type representing such objects, the preamble/Sage category structure attached to that runtime type, chosen presentation data, and property-cut subcategories.  Equivalences or convenient representations do not collapse these levels into one noun or one identity relation.
@@ -5165,7 +5165,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: Call the Python class of bundled finite-set objects “the category of finite sets”; identify finite free modules with based modules because a basis exists by choice; treat `Cat.of(SomeType)` as the mathematical category rather than one representation of its objects.
 
 - **Correct Example**: explicitly name the `lean-categories` category and its morphisms, the objects it contains, the generated `ObjectType`/`ElementType` used at runtime, and any framing/enumeration/presentation as additional data/refinement.
-
 
 * * *
 
@@ -5184,7 +5183,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: Public `cover()`, `relation_submodule()`, `coordinate_vector()`, `optimized()`, or `engine()` methods returning Sage objects from an owned presented module; `module_generator(i)` returning a Sage vector; `group_generators()` returning GAP/Sage elements; returning `kernel.V()` or a Sage submodule from an owned Hom computation.
 
 - **Correct Example**: `presentation()` returns the preamble relation morphism, `presentation_matrix()` returns a tensor, `module_generator(i)` returns an element parented by the preamble module, `group_generators()` returns elements parented by the preamble group, `smith_form_module_generators()` returns preamble module elements in a preamble set, and `invariant_factor_form()` returns a preamble isomorphism.
-
 
 #### `API-05`: Public APIs Accept Preamble Data, Never Raw Backend Objects
 
@@ -5373,7 +5371,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: Use the existing functor-image construction (or another explicit chosen-image object) when a chosen preimage is required, and let the adjunction consume that selected presentation.  If the inverse transpose can be derived from the unit/counit without recovering a hidden source object, derive it directly instead.  For `Spec`, make the contravariant functor's action on an algebra morphism produce the scheme morphism whose pullback is intrinsic to that morphism, rather than attaching `_preamble_coordinate_algebra_morphism` afterward as a side channel.
 
-
 #### `CON-06`: Constructor Admission Is a Semantic Firewall
 
 - **Rule**: Judge a constructor by the invalid states and alternate object models its input form admits.  The canonical constructor consumes the defining mathematical datum in its declared input form.  It does not compute the laws the construction claims (`OWN-22`).  Do not broaden constructor inputs for convenience when doing so lets callers bypass that datum.
@@ -5398,7 +5395,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: Construct the lattice in the even-lattice category when evenness is the claim; `L.is_even()` returns a computed answer; `ZZ.ideal(5)` is placed maximal by its cited routing, and `ZZ.quotient(ZZ.ideal(5))` is that one field; `if I in Ideals(R).Maximal():` asks the proposition; pass an actual `rho:G->Aut(M)` for an action; call saturation on the subobject/inclusion that already carries its codomain.
 
-
 #### `CON-08`: A Mathematical Choice Is Represented by Its Selecting Datum
 
 - **Rule**: Whenever several mathematically valid objects/maps could satisfy a phrase such as “the extension”, “the lift”, “the normalization”, “the dual”, “the section”, or “the presentation”, either identify the canonical construction that removes the choice or represent the chosen datum explicitly.  Do not hide a choice in a boolean, mode string, import state, or undocumented constructor convention.
@@ -5408,7 +5404,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: `normalize=True` mutates/re-presents an object without returning the isomorphism; `map=True` changes a constructor's mathematical return object; `dual()` ambiguously chooses among module, metric, or Pontryagin duals; a chosen preimage is recovered from hidden provenance.
 
 - **Correct Example**: `invariant_factor_form()` returns the normalized framed module with its explicit isomorphism; different dual functors have distinct names; a selected section/lift/preimage is stored as a morphism or functor-image datum.
-
 
 #### `CON-09`: Universal Constructions Return Complete Mathematical Data
 
@@ -5420,7 +5415,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: `K = f.kernel()` is a subobject whose `inclusion()` has codomain `f.domain()`; `Q = f.cokernel()` carries `Q.projection(): f.codomain() -> Q`; a quotient element may provide a chosen `lift()` as representative selection, explicitly not as an inverse to the projection.
 
-
 #### `CON-10`: Do Not Parameterize a Notion Already Determined by Existing Mathematical Data
 
 - **Rule**: If the current object, morphism, base map, or category structure already determines the standard mathematical notion uniquely, derive it from that data.  Do not add a parameter, flag, policy object, or user-selected convention that silently redefines the notion.  Extra input is accepted only when the mathematics genuinely contains a choice, in which case `CON-08` requires the selecting datum itself.
@@ -5430,7 +5424,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: Add `integral_over=D` to redefine integrality of a ring-valued form when the structural map `R -> W` already determines integrality over `R`; pass `even=True` or `torsion=True`; make “the dual” selectable by a mode string instead of using distinct dual functors.
 
 - **Correct Example**: Compute integrality from the specified ring extension; derive evenness/torsion as properties; represent a genuinely chosen orientation, embedding, section, framing, or presentation by its actual mathematical datum.
-
 
 #### `CON-11`: A Chosen Generating Set Is a Selected Epimorphism `Free_R(S) -> M`
 
@@ -5442,8 +5435,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: retain `S`, `Free_R(S)`, and the selected epimorphism. The canonical rank-`n` free module is the specialization `S=[n]`; its categorical framing is the selected isomorphism `Free_R(S) -> M`. An ordering or indexing of that basis is separate additional structure when not already given by `S`.
 
-
-
 #### `CON-12`: Public Construction Enters Through the Category the Caller Names; Implementation Selection Is Private
 
 - **Rule**: A public constructor is the category, presenting a `lean-categories` category, applied to the defining datum the caller has.  The object is placed where that construction places it; placement in a stronger category comes from constructing there, including theorem-backed routing in the constructor (`CON-07`); a membership proposition asked later answers its caller and never places the object.  Do not require callers to choose a concrete implementation class; implementation selection is private.
@@ -5454,8 +5445,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: construction enters through `Lattices(R)`, `Modules(R)`, the appropriate Hom/category, or a canonical object constructor such as `Lattice(...)`; the constructor returns the preamble object in the category it was constructed in.  Private implementation selection occurs after mathematical construction/routing.
 
-
-
 #### `CON-13`: Supplied Generating Data Constructs the Generated Subobject/Subgroup, Never the Canonical Whole
 
 - **Rule**: Caller-supplied generators, relations, samples, or other finite data construct exactly the mathematical object generated by that data.  They do not stand in for a canonical ambient object/group whose completeness is a separate claim.  Canonical objects are presented where `lean-categories` places them even when enumeration/generator computation is unavailable.
@@ -5465,8 +5454,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: `L.O(generators=gens)` returns the canonical orthogonal group; `Aut(X, generators=...)` substitutes a finitely generated subgroup for the automorphism group; downstream invariants are labeled as canonical-group invariants.
 
 - **Correct Example**: `L.O()` is the canonical predicate-defined group object with membership/element operations available; `L.O().subgroup(gens)` is the supplied subgroup.  A specialized algorithm may later compute a generating family for `L.O()`, and its `group_generators()` method returns that computation's answer, untrusted like every answer and judged only by the `lean-cas-dsl` acceptance suite.
-
-
 
 #### `CON-14`: A Free Object Is Built on a Set; an Arity Is a Chosen Set
 
@@ -5534,7 +5521,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: Constructing `coker(f: M -> N)` for presented modules by calling `f.matrix()` and appending its rows to a presentation matrix, even though `M` or `N` is not free.
 
 - **Correct Example**: If `N` has selected presentation relations and `M` has a chosen generating morphism, present `coker(f)` by the existing relations of `N` together with the coefficient rows of `f(m_s)` in the chosen framing of `N`.  Only when both endpoints are framed free modules is that same data literally the matrix of `f`.
-
 
 #### `CAT-01`: Place the Method by Mathematical Domain; Route Algorithms by Computable Case
 
@@ -5852,7 +5838,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: the `ElementType` supplied by `Modules(R)` carries left scalar syntax through the object's scalar action; the matrix-Hom element type supplies entries/rows/columns; a concrete presented-module runtime element supplies only the representation primitive needed by those category methods.
 
-
 #### `DEF-01`: A Predicate's Body Is Its Definition, Not a Recognition Criterion
 
 - **Rule**: Implement a mathematical predicate from its `lean-categories` definition, expressed through the preamble objects and morphisms that occur in that definition.
@@ -5901,7 +5886,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: Normalize the presentation `R^n -> R^m -> coker(A)` to its invariant-factor presentation, retaining isomorphisms of the presenting free modules.  `A.smith_form()` is then the coordinate matrix of that normalized presentation together with the coordinate matrices of those basis changes.  If a backend canonicalizes a relation submodule before reduction, its basis change must be included in this presentation isomorphism; it may not be discarded.
 
-
 #### `DEF-05`: A Normal Form Is a New Object Together With an Isomorphism
 
 - **Rule**: When normalization, reduction, canonicalization, or re-presentation changes chosen framing/presentation data, the result is a new preamble object of the same mathematical category together with an explicit isomorphism from the original.  Do not mutate the source into its normal form and do not make the comparison morphism an optional flag.
@@ -5912,8 +5896,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: `M.invariant_factor_form()` returns an isomorphism `M -> M_normal`; the matrix normal form is the private/coordinate computation used to construct that arrow.  Normal forms of actual matrix objects may remain matrix operations, while normal forms of framed modules are object-plus-isomorphism constructions.
 
-
-
 #### `DEF-06`: Exact Mathematical Questions and Soft Knowledge Questions Have Different Codomains
 
 - **Rule**: Preserve the actual mathematical codomain of an exact operation or predicate.  Do not return `False`, `None`, or `Unknown` merely because the current implementation cannot decide/compute a represented case.  An exact operation uses the assertion-gated computational frontier of `CAT-01`.  An exact predicate returns a proposition: `True` or `False` where the question is computable or decidable and is decided, and otherwise the `Predicate` (`preamble/logic.py`) that states it, which `ask(P)` evaluates to `True`, `False` or `Unknown`.  Separately, an explicitly **soft knowledge/computability predicate** may be designed with a three-valued codomain `True | False | Unknown` when the proposition being returned is itself “what is currently known/computable/available.”
@@ -5923,7 +5905,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: `is_nondegenerate()` returns `False` when no algorithm handles an infinite callable form; `cardinality()` returns `Unknown`; `generators_are_computable()` returns `True` merely because the constructor accepted external input.
 
 - **Correct Example**: `is_nondegenerate()` computes known cases and returns the proposition on the rest; `G_QQ.is_abelian()` returns `False` from a finite quotient isomorphic to `S_3`; `Sets().Mor(QQ, QQ)(f).is_injective()` for an arbitrary function `f` returns the proposition, and `ask` of it is `Unknown`.  A distinct `generators_are_computable()` or `has_computed_group_generators()` may return Sage's `Unknown` when that explicitly three-valued knowledge question has not been decided.
-
 
 #### `DEF-07`: An Operation's Codomain Is `lean-categories`'; an Implementation Outside It Is a Finding
 
@@ -5983,7 +5964,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: `RealNumber` denotes an exact real in the repository's mathematical vocabulary where represented; `RealApproximation` or an explicitly precision-bearing operation denotes an MPFR approximation.
 
-
 #### `LEX-04`: Software Roles Are Not Mathematics
 
 - **Rule**: Interpret fields, accessors, aliases, wrappers, helper classes, registries, and implementation edges by the mathematics they denote, not by their software role.  Public mathematical nouns must be standard mathematical objects/data whenever such a referent exists.  Do not create an epistemic or administrative vocabulary (`knowledge`, `evidence`, `provider`, `manager`, `context`, `metadata`, `model`, `descriptor`, `record`, `info`, `result`, `factory`, `payload`, `adapter`, `backend`) to stand in for morphisms, functors, bases, sections, predicates, isomorphisms, or other standard data.
@@ -5993,8 +5973,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: `SubobjectEvidence` containing an inclusion; `GeneratorProvider` containing an indexed family; `NormalizationContext` containing an isomorphism; dismissing a local functor as a mere “realization edge” because it is stored in a helper field.
 
 - **Correct Example**: Name the inclusion morphism, indexed family, isomorphism, or functor directly.  An engineering cache/adapter may have engineering vocabulary privately, but the mathematical layer exposes the standard object it implements.
-
-
 
 #### `LEX-05`: Standard Mathematical Vocabulary Outranks Backend Vocabulary
 
@@ -6006,8 +5984,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: Use `invariant_factors`, standard signature terminology, standard dual/functor names, and ordinary categorical nouns.  Private adapters may call Sage's `.invariants()`, `.gens()`, or exact backend class names while converting the result back into preamble vocabulary.
 
-
-
 #### `LEX-06`: Processes and Named Examples Do Not Become Mathematical Kinds
 
 - **Rule**: A public type/category/constructor name must denote a reusable mathematical concept, not the process by which an ordinary object was generated or its role in a test/example.  Randomness, fixture/example status, “standard test object”, and similar modifiers generate/select data for existing constructors.  A named specimen may live in a catalogue without becoming a new category-level concept.
@@ -6017,8 +5993,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: `RandomLattices`, `RandomLatticeOfSignature`, `ExampleModule`, or a category API obligation for a local `rankTwo` example.
 
 - **Correct Example**: `random_gram(...)` produces legitimate construction data and the ordinary lattice constructor consumes it; named objects such as `E8` live as catalogue specimens constructed by the same public lattice language.
-
-
 
 #### `LEX-07`: Public Mathematical Names Never Encode the Current Algorithm or Computability Frontier
 
@@ -6040,8 +6014,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: the tensor product of morphisms has a Kronecker matrix in chosen bases; Smith normal form is the matrix computation producing an invariant-factor re-presentation; primitivity is the cokernel torsion-freeness predicate.
 
-
-
 #### `LEX-09`: Public Category Names Are Standard Names for Identities, Not Substitutes for Their Definitions
 
 - **Rule**: Use `lean-categories`' plural/category name, and retain the construction/classifier expression that presents its definition.  Project/Sage aliases are metadata on that one category, never extra categories whose existence must be reconciled later.
@@ -6051,7 +6023,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: expose only `Magmas.Associative.Unital.Inverse` when `Groups` is the established mathematical noun; or create `Groups` as a separate wrapper category around that classifier expression.
 
 - **Correct Example**: `Groups` is the standard public name of the one preamble category, presented by the classifier/category expression for `lean-categories`' definition; aliases and backend names resolve to that identity.
-
 
 #### `LEX-10`: Every Generator, Dual and Basis Names Its Structure -- and No Alias Omits It
 
@@ -6210,7 +6181,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: `FormalDivisorGroup(R,S)` is the free `R`-module on the set `S`; a divisor is a finite-support coefficient map on `S`.  Algorithms consume only that support unless their theorem genuinely requires a finite parent.
 
-
 #### `SET-05`: The Set API Is Closed Under Standard Set Constructions and Canonical Identifications
 
 - **Rule**: Every preamble object that is mathematically a set—ordinary sets, exponentials/function sets, Set-Homs, power sets, Cartesian products, coproducts, images, subobjects, and similar constructions—participates in the same preamble set API.  Canonically identical set constructions are represented by one parent/object, not parallel implementations reached through different notation.
@@ -6220,8 +6190,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: Maintain an independent power-set implementation beside exponentials; make Set-Homs a Homset object that does not receive ordinary set methods; compute function-set cardinality separately from Set-Hom cardinality.
 
 - **Correct Example**: Present the canonical identifications `Hom_Set(X,Y)=Y^X` and `P(X)=2^X` that `lean-categories` states; the one resulting parent has both Hom/exponential placements and inherits the complete set interface.  Cartesian products/coproducts likewise carry their standard projections/injections and cardinal arithmetic at the set-construction level.
-
-
 
 * * *
 
@@ -6290,8 +6258,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: prefer the dependency when it centralizes the generic problem and leaves the preamble only its presentation and adaptation.  Reject a dependency for semantic mismatch, maintenance/reliability, or inability to satisfy the preamble boundary—not merely because it exists.
 
-
-
 #### `ENG-06`: A New Nontrivial Mathematical Algorithm Requires a Demonstrated Backend Gap
 
 - **Rule**: Before the preamble implements a new nontrivial mathematical algorithm, search the repository's backend/capability references and the relevant mature open-source systems for the semantic operation.  If a suitable exact implementation exists, wire it behind the preamble method.  Bespoke implementation is justified only after the relevant alternatives have been checked and a real semantic/capability gap is established; if maintaining the algorithm materially expands the project's burden, it requires an explicit project/user decision rather than an agent convenience choice.  The algorithm is an untrusted computation; any correctness argument written for it is not evidence.  An algorithm that needs mathematics `lean-categories` does not formalize is not written: that mathematics is requested there first.
@@ -6332,8 +6298,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: `engine_capabilities.compute("lattice.isometry_witness", gram_1, gram_2)`; `if engine_capabilities.is_available(...): ... else: <another route>`; a table row `(capability, kernel, None, None)` for an operation the engine lacks.
 - **Correct Example**: inside the preamble method, `from sage_indefinite_port.indefinite.recursive import isometry` and `return isometry(L_1, L_2)`. While the port lacks `isometry`, every caller raises `ImportError` and the tests that reach it fail.
 
-
-
 * * *
 
 ### 9. Engine Crossing Boundaries (`BND-*`)
@@ -6354,7 +6318,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 
 - **Correct Example**: A private presented-module adapter owns one optional Smith engine and one documented conversion boundary used by the few algorithms that require the FGP implementation; ordinary consumers never receive its parent or elements.
 
-
 #### `BND-02`: Cross In, Compute, Cross Back
 
 - **Rule**: A backend crossing converts preamble inputs to the backend representation, performs the backend computation, and converts the result back before the boundary returns.
@@ -6367,7 +6330,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: Internal Hom computes an FGP kernel and returns that Sage FGP module or its elements for later consumers to inspect; a lattice invariant returns a Sage kernel basis and expects its caller to reconstruct the lattice; an owned group operation returns a GAP element because GAP performed the multiplication.
 
 - **Correct Example**: Cross a preamble module morphism and its coefficients into Sage's FGP representation to compute a kernel, then construct the preamble presented kernel, its elements, and its inclusion before returning.
-
 
 #### `BND-05`: Backend Conversion Is Private and Non-Exported
 
@@ -6440,7 +6402,6 @@ A construct that survives these questions is allowed.  The catalogue exists to m
 - **Violation Example**: Joining a Sage engine category into a preamble ring so `FreeModule(preamble_ring, n)` succeeds; skipping Cython element refinement because a reclassed permutation group loops in coercion; declaring Sage vectors to be the elements of a preamble free module; adding `_im_gens_` only because a Sage algebra constructor received a preamble module parent.
 
 - **Correct Example**: A private adapter converts preamble ring elements to Sage ring elements, builds a Sage free module or FGP workspace entirely on the backend side, computes there, and converts all outputs back.  A private group adapter may use a Sage/GAP group model, but public group parents and elements remain preamble objects.  No backend category join, facade parent, reclassification, or backend-element exception is required.
-
 
 #### `BRG-01`: Structured Engine Bridges Over Ad-Hoc Shelling
 
