@@ -9,7 +9,7 @@ from sage.categories.category import Category
 from sage.categories.map import Map
 from sage.categories.morphism import Morphism
 from sage.misc.abstract_method import abstract_method
-from sage.misc.cachefunc import cached_method
+from sage.misc.cachefunc import cached_function, cached_method
 from sage.misc.classcall_metaclass import typecall
 from sage.structure.dynamic_class import DynamicMetaclass
 from sage.structure.element import parent
@@ -21,6 +21,7 @@ from sage_extensions.categories.abstract_categories.mor_categories import (
     FixedMorCategory,
     MorCategories,
     MorCategoryConstruction,
+    _category_packet,
     _category_mor_parent,
     _declared_construction,
     _precomposable,
@@ -1294,6 +1295,8 @@ class NaturalTransformationMor(CategoricalMor):
         domain: Parent,
         codomain: Parent,
     ) -> None:
+        domain = _functor_object(domain)
+        codomain = _functor_object(codomain)
         CategoricalMor.__init__(
             self, family, domain, codomain
         )
@@ -1349,6 +1352,48 @@ class NaturalTransformationMor(CategoricalMor):
 
 class NaturalTransformationMorCategoryConstruction(MorCategoryConstruction):
     FixedCategoryClass = NaturalTransformationMor
+
+
+class _FunctorObject(Parent):
+    r"""Sage Parent endpoint for a functor used as a natural-transformation object.
+
+    Sage's ``Morphism`` requires Parent endpoints, while a functor is itself a
+    morphism and therefore is not a Parent. This identity-bearing endpoint
+    retains the literal functor and exposes the accessors used by the
+    functor-category Mor owner.
+    """
+
+    def __init__(self, functor: Functor) -> None:
+        self._functor = functor
+        from sage_extensions.categories.sets.set_categories import Sets
+
+        Parent.__init__(self, category=Sets())
+
+    def functor(self) -> Functor:
+        return self._functor
+
+    def arrow(self):
+        return self._functor.arrow()
+
+    def __hash__(self):
+        return id(self._functor)
+
+    def __eq__(self, other):
+        return isinstance(other, _FunctorObject) and self._functor is other._functor
+
+    def __ne__(self, other):
+        return not self == other
+
+    def _repr_(self):
+        return f"Functor object for {self._functor}"
+
+
+@cached_function(key=lambda functor: id(functor))
+def _functor_object(functor: Functor) -> _FunctorObject:
+    r"""The canonical Sage Parent endpoint representing this literal functor."""
+    if isinstance(functor, _FunctorObject):
+        return functor
+    return _FunctorObject(functor)
 
 
 class _EvaluationFunctor(Functor):
@@ -1679,6 +1724,8 @@ class _FunctorCategory(CategoricalMor):
 
     def __contains__(self, candidate: Any) -> bool:
         r"""A functor ``C -> D`` is itself an object of ``[C,D]``."""
+        if isinstance(candidate, _FunctorObject):
+            candidate = candidate.functor()
         return isinstance(candidate, Functor) and self._has_endpoints_of(candidate)
 
     def Mor(
@@ -1686,13 +1733,19 @@ class _FunctorCategory(CategoricalMor):
         domain: Parent | Functor,
         codomain: Parent | Functor,
     ) -> NaturalTransformationMor:
-        domain = self._mor_endpoint(domain)
-        codomain = self._mor_endpoint(codomain)
+        if isinstance(domain, _FunctorObject):
+            domain = domain.functor()
+        if isinstance(codomain, _FunctorObject):
+            codomain = codomain.functor()
+        domain = _FunctorCategory._mor_endpoint(self, domain)
+        codomain = _FunctorCategory._mor_endpoint(self, codomain)
         if domain not in self or codomain not in self:
             raise TypeError(
                 f"a morphism in the functor category {self} needs two functors in it, but got {domain} and {codomain}"
             )
-        return self.MorCategory().Of(domain, codomain)
+        return _category_packet(self).Mors().Of(
+            _functor_object(domain), _functor_object(codomain)
+        )
 
     two_mor = Mor
 

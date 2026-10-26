@@ -4787,7 +4787,17 @@ class _ScalarAlgebraEngine:
             return value
         if source in Modules(self.base_ring()) and self._built_on_the_same_data(source):
             return self._element_on_the_same_data(source, value)
-        if source is self.base_ring():
+        if source in SageRings():
+            try:
+                native_scalar = _engine_ring(self.base_ring())(value)
+            except (TypeError, ValueError):
+                pass
+            else:
+                value = _owned_engine_element(self.base_ring(), native_scalar)
+                source = self.base_ring()
+        if source is self.base_ring() or source is _engine_ring(self.base_ring()):
+            if source is _engine_ring(self.base_ring()):
+                value = _owned_engine_element(self.base_ring(), value)
             module = self.unformed_module()
             scalar_value = module.scalar_multiple(value, module(self._native_ring.one()))
             return self._element_from_unformed_module(scalar_value)

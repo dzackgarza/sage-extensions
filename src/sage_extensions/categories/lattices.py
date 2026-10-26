@@ -4441,8 +4441,31 @@ class Lattices(OwnedCategoryOverBaseRing):
 
             rank = int(self.module_rank())
             gram = self.gram_tensor()
+            value_module = self.value_module()
+            if hasattr(value_module, "module_over_extension"):
+                scalar_ring = value_module.extension_ring()
+                try:
+                    scalar_identification = value_module.regular_module_identification()
+                except (AssertionError, TypeError, ValueError) as error:
+                    raise TypeError(
+                        f"the determinant of {self} requires a selected rank-one scalar-value identification; "
+                        f"the value module {value_module} is not the restriction of the regular module of "
+                        f"its extension ring"
+                    ) from error
+                if getattr(gram, "base_ring", lambda: None)() is scalar_ring:
+                    scalar_entry = lambda row, column: gram[row, column]
+                else:
+                    scalar_entry = lambda row, column: scalar_identification(gram[row, column])
+                matrix = scalar_ring.matrix_space(rank).from_rows(
+                    (
+                        scalar_entry(row, column)
+                        for column in range(rank)
+                    )
+                    for row in range(rank)
+                )
+                return matrix.determinant()
             matrix = (
-                self.value_module()
+                value_module
                 .matrix_space(rank)
                 .from_rows(
                     (gram[row, column] for column in range(rank)) for row in range(rank)
@@ -5342,7 +5365,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             # returning an R-valued form here gives its norm a different
             # interface and breaks generic descent through ``underlying_element``.
             value_module = Modules(fraction_field).restriction_of_scalars(
-                ring.fraction_field_map()
+                fraction_field.algebra_structure_morphism()
             )(scalars)
             dual_module = self.dual_module()
             # ``dual_gram`` is a tensor over Frac(R), on the fraction-field
@@ -5367,7 +5390,8 @@ class Lattices(OwnedCategoryOverBaseRing):
                 return value_module.wrap(scalars.scalar_multiple(value, scalar_generator))
 
             rational = dual_module.bilinear_hom_space(value_module)._from_bilinear_evaluation(
-                rational_pairing
+                rational_pairing,
+                defining_tensor=dual_gram,
             )
             return FormModules(ring)(
                 rational,

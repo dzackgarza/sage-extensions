@@ -407,7 +407,7 @@ class _TwoElementaryTable(Mapping):
     r"""Lazy read-only form of the 75-row Nikulin table."""
 
     def __getitem__(self, key):
-        key = tuple(SageZZ(entry) for entry in key)
+        key = tuple(ZZ(entry) for entry in key)
         if key not in _TWO_ELEMENTARY_RECIPES:
             raise KeyError(key)
         return _two_elementary_lattice(key)
@@ -829,12 +829,12 @@ def _negative_block(name, twist=1):
     if name.startswith("N") and name[1:].isdigit():
         # ``rank_one_negative(d)`` in the archived catalogue means
         # ``<-2d>``, not ``<-d>``.
-        block = _C([[-2 * SageZZ(name[1:])]])
+        block = _C([[-2 * ZZ(name[1:])]])
     elif name in _NAMED_LATTICE_NAMES:
         block = _named_lattice_block(name)
     else:
         block = _C(name)
-    return block if twist == 1 else block.twist(SageZZ(twist))
+    return block if twist == 1 else block.twist(ZZ(twist))
 
 
 def _negative_sum(parts):
@@ -885,7 +885,7 @@ def _negative_two_elementary_row(key):
 
 class _NegativeDefTwoElementaryTable(Mapping):
     def __getitem__(self, key):
-        key = tuple(SageZZ(entry) for entry in key)
+        key = tuple(ZZ(entry) for entry in key)
         if key not in _NEGATIVE_TWO_ELEMENTARY_SPECS:
             raise KeyError(key)
         return _negative_two_elementary_row(key)

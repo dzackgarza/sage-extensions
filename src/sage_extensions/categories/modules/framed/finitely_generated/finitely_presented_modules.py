@@ -1359,7 +1359,26 @@ class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
             if already_invariant:
                 arrows = Modules(ring).ArrowCategory()
                 original_object = arrows(presentation)
-                identity = arrows.Mor(original_object, original_object).identity()
+                # The selected presentation already is in invariant-factor
+                # form. Construct its identity square from the endpoint
+                # identity maps through the declared square owner; calling
+                # `.identity()` here is routed by the dynamic category MRO to
+                # the arrow object rather than this Mor parent.
+                from sage_extensions.categories.abstract_categories.arrow_categories import ArrowMor
+                from sage_extensions.categories.abstract_categories.cat import _FunctorCategory
+                from sage_extensions.categories.abstract_categories.mor_categories import _category_mor_parent
+
+                arrow_mor = _FunctorCategory.Mor(arrows, original_object, original_object)
+                arrow = original_object.arrow()
+                edge_category = arrows.codomain_category()
+                left = _category_mor_parent(edge_category, arrow.domain(), arrow.domain()).identity()
+                right = _category_mor_parent(edge_category, arrow.codomain(), arrow.codomain()).identity()
+                identity = ArrowMor._square(
+                    arrow_mor,
+                    left,
+                    right,
+                    identity_data=(arrow, left, right),
+                )
                 return arrows.Core().Mor(original_object, original_object)(identity, identity)
 
             smith = self._selected_presentation_smith_backend()

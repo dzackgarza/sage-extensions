@@ -238,14 +238,17 @@ class CommutativeSquare(NaturalTransformationMorphism):
 class ArrowMor(NaturalTransformationMor):
     r"""The Mor of ``Ar(C)``, or of a subcategory of it, written by its two edges."""
 
-    Element = CommutativeSquare
+    ElementMethods = CommutativeSquare
 
     def arrow_category(self) -> Category:
         return self.base_category()
 
     def _edge_category(self) -> Category:
         r"""``C``, the category whose morphisms the edges are."""
-        return self.source().codomain()
+        arrows = self.arrow_category()
+        if isinstance(arrows, _SubcategoryOfArrows):
+            return arrows.base_category()
+        return arrows.codomain_category()
 
     def _domain_arrow(self) -> Morphism:
         r"""The arrow of ``C`` that the domain of this Mor is."""
@@ -327,8 +330,14 @@ class ArrowMor(NaturalTransformationMor):
             self.target(),
             lambda obj: edges[obj.position()],
         )
-        selected = self.element_class if element_class is None else element_class
-        square = selected(self, transformation, **dict(construction_data or {}))
+        parent = self if isinstance(self, SageHomset) else self.parent()
+        if not isinstance(parent, Parent):
+            raise TypeError(
+                f"square construction receiver {type(self).__name__} is_parent={isinstance(self, Parent)}; "
+                f"resolved parent {type(parent).__name__} is not a Sage Parent"
+            )
+        selected = parent.element_class if element_class is None else element_class
+        square = typecall(selected, parent, transformation, **dict(construction_data or {}))
         square._commutativity_premises = (
             None if commutativity_premises is None else tuple(commutativity_premises)
         )
@@ -344,7 +353,6 @@ class ArrowMor(NaturalTransformationMor):
             left, right, commutativity_premises=commutativity_premises
         )
 
-    @object_level
     @cached_method
     def identity(self) -> CommutativeSquare:
         if self.domain() is not self.codomain():
@@ -355,7 +363,8 @@ class ArrowMor(NaturalTransformationMor):
         category = self._edge_category()
         left = _category_mor_parent(category, arrow.domain(), arrow.domain()).identity()
         right = _category_mor_parent(category, arrow.codomain(), arrow.codomain()).identity()
-        return self._square(
+        square_parent = self.arrow_category().Mor(self.domain(), self.codomain())
+        return square_parent._square(
             left, right, identity_data=(arrow, left, right)
         )
 
@@ -2453,7 +2462,7 @@ class CoreMor(CategoricalMor):
         # OWN-22 forbids re-proving it at construction; callers that derive an
         # inverse use _from_known_inverse_pair, and explicit verification is a
         # separate call to validate_inverse_pair(check=True).
-        return self.element_class(self, forward, lambda: inverse, verify=False)
+        return self.ElementMethods(self, forward, lambda: inverse, verify=False)
 
     def _require_base_morphisms(self, forward: Morphism, inverse: Morphism) -> None:
         base = self.core_category().base_category()
@@ -2480,7 +2489,7 @@ class CoreMor(CategoricalMor):
         isomorphisms of this core (``CategoricalIsomorphism.__mul__``) is the
         first caller.  Nothing is checked or composed here (``OWN-22``).
         """
-        return self.element_class(self, forward, inverse_computation, verify=False)
+        return self.ElementMethods(self, forward, inverse_computation, verify=False)
 
     @object_level
     def identity(self) -> CategoricalIsomorphism:
@@ -2558,8 +2567,8 @@ def _represented_morphism_category(forward: Morphism, inverse: Morphism) -> Cate
     homs = (forward.parent(), inverse.parent())
     match homs:
         case (forward_mor, inverse_mor) if (
-            forward_mor in MorCategories()
-            and inverse_mor in MorCategories()
+            isinstance(forward_mor, CategoricalMor)
+            and isinstance(inverse_mor, CategoricalMor)
             and forward_mor.base_category() is inverse_mor.base_category()
         ):
             return forward_mor.base_category()

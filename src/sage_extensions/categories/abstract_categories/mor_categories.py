@@ -108,6 +108,16 @@ def _category_mor(
     parent alone is not admission to the selected category.
     """
     if _has_category_packet_surface(category):
+        # A dynamic functor category can inherit Sets.ParentMethods before
+        # `_FunctorCategory.Mor` in its realized MRO. In that case the public
+        # attribute incorrectly constructs an underlying-set map with functor
+        # endpoints, which are categorical arrows (Elements), not Sage
+        # Parents. The functor category's declared natural-transformation Mor
+        # family is the owner of these endpoints; select it directly.
+        from sage_extensions.categories.abstract_categories.cat import _FunctorCategory
+
+        if isinstance(category, _FunctorCategory):
+            return _FunctorCategory.Mor(category, domain, codomain)
         # Admission follows the category's public Mor selector.  Most owned
         # categories inherit the packet implementation, while constructions
         # such as G-objects and functor categories legitimately specialize
@@ -134,6 +144,16 @@ def _category_accepts_morphism(
     a trial object or drops a selected restriction by asking ``arrow_set``.
     """
     selected = _category_mor(category, domain, codomain)
+    if isinstance(selected, SageHomset):
+        if arrow in selected:
+            return True
+        parent = arrow.parent()
+        return (
+            isinstance(parent, SageHomset)
+            and parent.mor_family() is selected.mor_family()
+            and parent.domain() is selected.domain()
+            and parent.codomain() is selected.codomain()
+        )
     match selected:
         case Category():
             return selected.accepts(arrow)
@@ -835,6 +855,16 @@ class CategoricalMor(_DiscreteTwoMorConstructions, OwnedCategoryMixin, CategoryP
         *,
         category: Category | None = None,
     ) -> None:
+        if not isinstance(domain, Parent) or not isinstance(codomain, Parent):
+            from sage_extensions.categories.abstract_categories.cat import (
+                Functor,
+                _functor_object,
+            )
+
+            if isinstance(domain, Functor):
+                domain = _functor_object(domain)
+            if isinstance(codomain, Functor):
+                codomain = _functor_object(codomain)
         self._family = family
         self._end_family = None
         self._aut_family = None

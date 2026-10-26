@@ -1486,8 +1486,24 @@ class LocalizationRings(OwnedCategory):
             the selected multiplicative system.
             """
             source = self.localization_source()
-            numerator = source(numerator)
-            denominator = source.one() if denominator is None else source(denominator)
+            def source_element(value):
+                if hasattr(value, "underlying_element"):
+                    underlying = value.underlying_element()
+                    if hasattr(underlying, "to_vector"):
+                        value = underlying.to_vector()(0)
+                    else:
+                        value = underlying
+                value_parent = element_parent(value)
+                if value_parent in OwnedRings():
+                    return source(value)
+                try:
+                    native_value = _engine_ring(source)(value)
+                except (TypeError, ValueError):
+                    return source(value)
+                return _owned_engine_element(source, native_value)
+
+            numerator = source_element(numerator)
+            denominator = source.one() if denominator is None else source_element(denominator)
             match self._valid_denominator(denominator):
                 case True:
                     pass
@@ -3060,6 +3076,12 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                         if self in OwnedRings().Division().Commutative():
                             return OwnedRings().Mor(self, self).identity()
                         field = self.fraction_field()
+                        from sage_extensions.categories.algebras.algebras import Algebras
+
+                        if field in Algebras(self):
+                            structure = field.algebra_structure_morphism()
+                            if structure.domain() is self and structure.codomain() is field:
+                                return structure
                         localization = self.fraction_field_localization()
                         if field is localization:
                             return localization.localization_map()

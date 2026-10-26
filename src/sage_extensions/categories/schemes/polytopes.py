@@ -930,9 +930,26 @@ class ConvexPolytopes(OwnedParameterizedCategory):
             point_coordinates = point.to_vector()
             normal_coordinates = normal.to_vector()
             zero = rationals.zero()
+            point_labels = tuple(point.parent().module_generating_set().index_set())
+
+            def source_label(dual_label):
+                if any((dual_label == label) is True for label in point_labels):
+                    return dual_label
+                try:
+                    candidate = dual_label[0]
+                except (TypeError, IndexError, KeyError):
+                    candidate = None
+                if any((candidate == label) is True for label in point_labels):
+                    return candidate
+                raise ValueError(
+                    f"dual coordinate label {dual_label!r} does not identify a selected source basis "
+                    f"label of {point.parent()}; dual labels are {normal_coordinates.support().domain()}"
+                )
+
             return sum(
                 (
-                    rationals(normal_coordinates(label)) * rationals(point_coordinates(label))
+                    rationals(normal_coordinates(label))
+                    * rationals(point_coordinates(source_label(label)))
                     for label in normal_coordinates.support().domain()
                 ),
                 zero,
@@ -944,11 +961,12 @@ class ConvexPolytopes(OwnedParameterizedCategory):
             If ``normal`` is the primitive inner normal of a facet, this says
             exactly that ``point`` lies on that facet.
             """
-            value = self.normal_value(normal, point)
-            return value == min(
-                self.normal_value(normal, vertex)
+            value = SageQQ(_engine_element(_owned_rationals(), self.normal_value(normal, point)))
+            values = (
+                SageQQ(_engine_element(_owned_rationals(), self.normal_value(normal, vertex)))
                 for vertex in self.vertices()
             )
+            return value == min(values)
 
         def integral_points(self):
 

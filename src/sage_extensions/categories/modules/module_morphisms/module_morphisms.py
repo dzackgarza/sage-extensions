@@ -3349,16 +3349,26 @@ class TensorProductModuleMorphismMethods:
             from sage_extensions.categories.modules.pure.modules import RestrictedScalarsModules
 
             values = self.codomain()
-            if values in RestrictedScalarsModules(left.base_ring()):
-                scalar_ring = values.module_over_extension()
+            if (
+                values in RestrictedScalarsModules(left.base_ring())
+                or (
+                    hasattr(values, "module_over_extension")
+                    and values.base_ring() is left.base_ring()
+                )
+            ):
+                try:
+                    scalar_identification = values.regular_module_identification()
+                except AssertionError:
+                    # A restriction of S^n for n>1 remains genuinely
+                    # S^n-valued. Do not project it to one coordinate or
+                    # pretend it is a scalar tensor.
+                    return self.coordinate_values()
+                scalar_ring = scalar_identification.codomain()
                 if scalar_ring in OwnedRings():
-                    # Res_{R -> S}(S)-valued forms carry a selected scalar
-                    # extension. Numerical computations use the coefficients
-                    # in S, while the Hom itself remains R-linear into W.
                     return tensor(
                         scalar_ring, (), (n, m),
                         (
-                            self._gram_entry(left_labels[i], right_labels[j]).underlying_element()
+                            scalar_identification(self._gram_entry(left_labels[i], right_labels[j]))
                             for i in range(n)
                             for j in range(m)
                         ),
@@ -4095,7 +4105,7 @@ class TensorProductModuleMor(ModuleMor):
             morphism._defining_pairing_values = defining_values
         return morphism
 
-    def _from_bilinear_evaluation(self, evaluation, premises=None):
+    def _from_bilinear_evaluation(self, evaluation, premises=None, defining_tensor=None):
         r"""Classify a stated bilinear evaluation without proving it from a framing sample.
 
         The values on pairs of factor generators are the images of the
@@ -4120,9 +4130,29 @@ class TensorProductModuleMor(ModuleMor):
             )
             return value if element_parent(value) is codomain else codomain(value)
 
-        return self.element_class(
+        morphism = self.element_class(
             self,
             generator_image,
             linearity_premises=premises,
             bilinear_evaluation=evaluation,
         )
+        if defining_tensor is not None:
+            from sage_extensions.tensors.tensor import Tensor
+
+            if not isinstance(defining_tensor, Tensor):
+                raise TypeError(f"the selected defining tensor {defining_tensor!r} is not a Tensor")
+            if not hasattr(codomain, "regular_module_identification"):
+                raise TypeError(
+                    f"a scalar defining tensor cannot define a bilinear map into non-scalar module {codomain}"
+                )
+            scalar_identification = codomain.regular_module_identification()
+            expected_ranks = (int(left.module_rank()), int(right.module_rank()))
+            actual_ranks = tuple(int(rank) for rank in defining_tensor._index_ranks())
+            scalar_ring = codomain.extension_ring()
+            if defining_tensor.base_ring() is not scalar_ring or actual_ranks != expected_ranks:
+                raise ValueError(
+                    f"the defining tensor {defining_tensor} must have base ring {scalar_ring} "
+                    f"and index ranks {expected_ranks} for the selected bilinear map into {codomain}"
+                )
+            morphism._defining_pairing_tensor = defining_tensor
+        return morphism

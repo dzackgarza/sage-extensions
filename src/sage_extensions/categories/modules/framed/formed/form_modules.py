@@ -2091,9 +2091,17 @@ class FormModules(OwnedCategoryOverBaseRing):
 
         def signature_pair(self):
             r"""Return cardinal inertia of the selected norm in its chosen ordering."""
-            assert self.value_module() in OwnedRings(), (
-                f"the signature of {self} needs ordered scalar values, not {self.value_module()}"
-            )
+            value_module = self.value_module()
+            if value_module not in OwnedRings():
+                if not hasattr(value_module, "regular_module_identification"):
+                    raise TypeError(
+                        f"the signature of {self} needs ordered scalar values, not {value_module}"
+                    )
+                # This is not a coordinate projection: the selected value
+                # module must be literally the restriction of its extension
+                # ring's regular module along the selected algebra structure
+                # morphism. The identification supplies the exact scalar Gram.
+                value_module.regular_module_identification()
             from sage_extensions.categories._lattice import (
                 _signature_pair_of_gram,
             )
@@ -2265,7 +2273,10 @@ class FormModules(OwnedCategoryOverBaseRing):
         def gram_tensor(self):
             r"""Return the scalar Gram as its intrinsic type-``(0,2)`` tensor."""
             form = self.form()
-            return form._as_numerical_tensor() if _is_bilinear_form(form) else form.gram_tensor()
+            numerical_coordinates = getattr(form, "_as_numerical_tensor", None)
+            if numerical_coordinates is not None:
+                return numerical_coordinates()
+            return form.gram_tensor()
 
         def raise_index(self, tensor, slot=0):
             r"""Raise one lower tensor index using this formed module.

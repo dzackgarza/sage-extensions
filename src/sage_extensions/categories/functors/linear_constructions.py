@@ -48,7 +48,12 @@ class _DualizationFunctor(Functor):
         double_dual = self(opposite(dual))
         return module.module_category().Mor(module, double_dual)(
             {
-                label: double_dual.module_generator(label)
+                label: double_dual(
+                    {
+                        dual_label: dual.module_generator(dual_label)(module.module_generator(label))
+                        for dual_label in dual.module_generating_set()
+                    }
+                )
                 for label in module.module_generating_set()
             }
         )

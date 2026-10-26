@@ -67,6 +67,7 @@ from sage_extensions.categories.abstract_categories.mor_foundation import Catego
 from sage_extensions.categories.abstract_categories.mor_categories import (
     CategoricalMor,
     _MonoCategoryOf,
+    _category_packet,
 )
 from sage_extensions.categories.abstract_categories.objects import (
     OwnedCategory,
@@ -631,6 +632,7 @@ class SchemeMorphismMethods:
 
     def __init__(
         self,
+        parent,
         native_morphism,
         *,
         mor,
@@ -660,6 +662,9 @@ class SchemeMorphismMethods:
         toric_chart_pullbacks=None,
         affine_quotient_base_change_data=None,
     ) -> None:
+        assert parent is mor, (
+            "a scheme morphism's element parent and retained Mor must be the same literal object"
+        )
         self._native_morphism = native_morphism
         self._coordinate_pullback = pullback
         self._scalar_pullback = scalar_pullback
@@ -689,7 +694,13 @@ class SchemeMorphismMethods:
         self._toric_chart_targets = toric_chart_targets
         self._toric_chart_pullbacks = toric_chart_pullbacks
         self._affine_quotient_base_change_datum = affine_quotient_base_change_data
-        super().__init__(mor)
+        # This is the host-map initialization root for the owned morphism
+        # adapter.  A dynamic scheme-morphism MRO can place Sage's
+        # ContinuousMap between this mixin and Map; its initializer requires
+        # (domain, codomain, set_morphism), which is not the constructor data
+        # of this represented morphism.  Initialize the actual Map parent
+        # directly, as the other categorical morphism roots do.
+        Morphism.__init__(self, mor)
 
     def with_cone_construction(self, construction):
         r"""This morphism, retaining the universal cone it was induced by."""
@@ -951,16 +962,6 @@ class SchemeMorphismMethods:
         if self._closed_complement is None:
             raise AttributeError(f"{self} has no selected closed complement")
         return self._closed_complement
-
-    def is_open_immersion(self):
-        r"""Whether this arrow is the open inclusion of a selected closed complement."""
-        return (
-            self._closed_complement is not None
-            or self._standard_projective_chart_embedding
-            or self._multiprojective_chart_embedding
-            or self._gluing_role in ("open_inclusion", "chart_embedding")
-            or self._relative_projectivization_role == "surjectivity_open_inclusion"
-        )
 
     def _in_mor(self, mor):
         r"""Re-site this representation in a Mor with the same endpoints.
@@ -1503,6 +1504,58 @@ class SchemeMorphismMethods:
         affine composites compose their pullbacks and the remaining ones
         compose their realizations.
         """
+        # Keep construction-specific composition at this surviving method.
+        # The earlier duplicate __mul__ was shadowed by this definition, so
+        # glued chart arrows fell through to Sage's native-morphism adapter.
+        if self._relative_projectivization_role == "base_projection":
+            if other is self.comparison().changed_projectivization().arrow().domain().projectivization_projection():
+                return self.comparison().square_composite()
+            return self.underlying_projection() * other
+        if self._relative_projectivization_role == "base_change_base":
+            if (
+                other is self.comparison().changed_projectivization().arrow().domain().projectivization_projection()
+            ):
+                return self.comparison().square_composite()
+            return super().__mul__(other)
+        if self._gluing_role == "glued_domain":
+            if not isinstance(other, SchemeMorphismMethods) or other.codomain() is not self.domain():
+                return NotImplemented
+            if self._is_the_identity():
+                return other
+            if other._is_the_identity():
+                return self
+            return other._postcompose_with(self)
+        if self._gluing_role == "finite_atlas":
+            if not isinstance(other, SchemeMorphismMethods) or other.codomain() is not self.domain():
+                return NotImplemented
+            if self._is_the_identity():
+                return other
+            if other._is_the_identity():
+                return self
+            return other._postcompose_with(self)
+        if self._gluing_role == "open_inclusion":
+            datum = self.gluing_datum()
+            chart = datum.chart_isomorphism(self.chart_index())
+            return datum.chart_embedding(self.chart_index()) * (chart.inverse() * other)
+        if self._gluing_role == "chart_embedding":
+            if other.codomain() is not self.domain():
+                return NotImplemented
+            from sage_extensions.categories.schemes.gluing import _glued_scheme_chart_map
+            from sage_extensions.categories.schemes.gluing import _scheme_composition_mor as _gluing_scheme_composition_mor
+            return _glued_scheme_chart_map(_gluing_scheme_composition_mor(self, other), self, other)
+        if self._gluing_role == "chart_map":
+            composite = self.chart_map() * other
+            if composite is NotImplemented:
+                return NotImplemented
+            from sage_extensions.categories.schemes.gluing import _glued_scheme_chart_map
+            from sage_extensions.categories.schemes.gluing import _scheme_composition_mor as _gluing_scheme_composition_mor
+            return _glued_scheme_chart_map(
+                _gluing_scheme_composition_mor(self, other), self.chart_embedding(), composite,
+            )
+        if self._multiprojective_chart_embedding:
+            if other.codomain() is not self.domain():
+                return NotImplemented
+            return _projective_coordinate_morphism(self) * other
         assert other.codomain() is self.domain(), (
             f"{self} and {other} are not composable: the codomain of the second is not the domain of the first"
         )
@@ -1879,6 +1932,17 @@ class SchemeMorphismMethods:
         inclusion.  A representation whose arrows factor that way by their
         construction states it by overriding this method.
         """
+        # Selected construction data directly witness an open inclusion.  Keep
+        # them in this common predicate; a duplicate definition would shadow
+        # them and misclassify gluing chart embeddings.
+        if (
+            self._closed_complement is not None
+            or self._standard_projective_chart_embedding
+            or self._multiprojective_chart_embedding
+            or self._gluing_role in ("open_inclusion", "chart_embedding")
+            or self._relative_projectivization_role == "surjectivity_open_inclusion"
+        ):
+            return True
         if self._is_the_identity():
             return True
         source = self.domain()
@@ -2713,7 +2777,7 @@ class Schemes(OwnedCategoryOverBaseRing):
 
     def Mor(self, domain, codomain):
         r"""``Mor_{Sch/R}(X, Y)``, the single Mor selected by its category family."""
-        return self.MorCategory().Of(domain, codomain)
+        return _category_packet(self).Mors().Of(domain, codomain)
 
     _MonoCategory = None  # set below, once SchemeMonomorphisms is defined
 

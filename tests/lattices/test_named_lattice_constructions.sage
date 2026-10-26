@@ -55,16 +55,31 @@ def test_the_dolgachev_pinkham_dual_lattice_retains_its_metric_form() -> None:
     pairing takes values in the fraction field.
     """
     from sage.matrix.constructor import matrix
+    from sage.rings.rational_field import QQ as SageQQ
+
+    from sage_extensions.categories.modules.framed.formed.form_modules import FormModules
+    from sage_extensions.categories.modules.pure.modules import Modules
+    from sage_extensions.categories.rings.ring_foundation import _engine_element
 
     lattice = NamedLattices.TdP
     dual = lattice.dual_lattice()
     gram = matrix(
-        QQ,
-        [[QQ(lattice.gram_tensor()[i, j]) for j in range(20)] for i in range(20)],
+        SageQQ,
+        [
+            [SageQQ(_engine_element(ZZ, entry)) for entry in row]
+            for row in lattice.gram_tensor()._component_array()
+        ],
     )
+    labels = tuple(lattice.module_generating_set())
     dual_gram = matrix(
-        QQ,
-        [[QQ(dual.gram_tensor()[i, j]) for j in range(20)] for i in range(20)],
+        SageQQ,
+        [
+            [
+                SageQQ(_engine_element(QQ, dual.gram_tensor()[i, j]))
+                for j in range(20)
+            ]
+            for i in range(20)
+        ],
     )
 
     assert dual in FormModules(ZZ)
@@ -75,10 +90,31 @@ def test_the_dolgachev_pinkham_dual_lattice_retains_its_metric_form() -> None:
     assert dual.form().codomain() is dual.value_module()
     assert dual.value_module() is Modules(QQ).restriction_of_scalars(
         ZZ.fraction_field_map()
-    )(QQ)
+    )(QQ.regular_module())
     assert dual_gram == gram.inverse()
     assert dual.signature_pair() == lattice.signature_pair() == signature_pair(2, 18)
-    assert lattice.determinant() * dual.determinant() == 1
+    assert lattice.determinant() * dual.determinant() == QQ.one()
+
+
+def test_a_restricted_rank_two_value_module_is_not_scalarized_for_determinants() -> None:
+    from sage_extensions.categories.modules.framed.formed.form_modules import FormModules
+    from sage_extensions.categories.modules.pure.modules import Modules
+    from sage_extensions.tensors.tensor import Tensor
+
+    module = Modules(ZZ).free_module(1)
+    values = Modules(QQ).restriction_of_scalars(ZZ.fraction_field_map())(QQ**2)
+    form = module.bilinear_hom_space(values)._from_bilinear_evaluation(
+        lambda left, right: values.zero()
+    )
+    formed = FormModules(ZZ)(form)
+
+    try:
+        formed.determinant()
+    except AssertionError as error:
+        assert "needs numerical scalar data" in str(error)
+    else:
+        raise AssertionError("a QQ^2-valued form was incorrectly assigned a scalar determinant")
+    assert not isinstance(form._as_numerical_tensor(), Tensor)
 
 
 def test_the_k3_complement_of_a_degree_two_polarization() -> None:

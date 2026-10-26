@@ -2479,9 +2479,33 @@ class FramedFreeAlgebraMorphism:
         # An R-algebra morphism sends a coefficient c of R to its image under
         # the codomain's structure map R -> B.
         codomain = self.codomain()
+        base = _own_ring(domain.base_ring())
+
+        def coefficient_image(coefficient):
+            # The selected polynomial backend can expose a native Sage scalar
+            # even though the term adapter normally returns an owned scalar.
+            # Normalize that backend value at this coefficient boundary; do
+            # not let it leak into a localization/owned ring constructor.
+            coefficient_parent = element_parent(coefficient)
+            if coefficient_parent is base:
+                owned_coefficient = coefficient
+            elif coefficient_parent in SageRings():
+                owned_coefficient = _owned_engine_element(
+                    base,
+                    _engine_ring(base)(coefficient),
+                )
+            elif coefficient_parent in OwnedRings():
+                owned_coefficient = base(coefficient)
+            else:
+                raise TypeError(
+                    f"the polynomial coefficient {coefficient!r} has parent {coefficient_parent}, "
+                    f"not the selected coefficient ring {base} or its engine realization"
+                )
+            return codomain(owned_coefficient)
+
         return sum(
             (
-                codomain(coefficient)
+                coefficient_image(coefficient)
                 * prod(
                     (self._images[label] for label in factors),
                     start=self.codomain().one(),
