@@ -534,10 +534,7 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
 
         def dynkin_variant(self):
             r"""The decorations naming this member of its family."""
-            return finite_family(
-                self._dynkin_variant,
-                name="Dynkin variant",
-            )
+            return self._dynkin_variant
 
         def is_affine_type(self) -> bool:
             return self._is_affine_type
