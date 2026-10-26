@@ -1892,6 +1892,13 @@ class Algebras(OwnedCategoryOverBaseRing):
             return self.selected_algebra_resolution().level(0)
 
         def algebra_framing_morphism(self):
+            source = self.algebra_framing_source()
+            if source is self:
+                # A free algebra whose selected framing source is the same
+                # literal object has the identity augmentation.  Return that
+                # identity in the object's selected Mor, rather than the
+                # equivalent arrow retained by the broader resolution owner.
+                return self.Mor(self).identity()
             return self.selected_algebra_resolution().augmentation()
 
         def algebra_generating_set(self):
