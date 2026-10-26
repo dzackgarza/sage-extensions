@@ -9,7 +9,6 @@ from sage.misc.mrange import cantor_product as _engine_cantor_product
 from sage.misc.repr import repr_lincomb
 from sage.modules.free_module import FreeModule as _SageFreeModule
 from sage.rings.integer import Integer
-from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import ModuleElement, RingElement
 from sage.structure.element import parent as element_parent
 from sage.structure.parent import Parent
@@ -30,7 +29,6 @@ from sage_extensions.categories.modules.pure.modules import (
     _represented_real_rref,
     _require_matrix_mor,
 )
-from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
 from sage_extensions.categories.rings.ring_foundation import (
     IntegralDomains,
     OwnedCategoryOverBaseRing,
@@ -38,14 +36,13 @@ from sage_extensions.categories.rings.ring_foundation import (
     OwnedRings,
     PrincipalIdealDomains,
     _engine_element,
-    _engine_numeral,
     _engine_ring,
-    _linear_algebra_ring,
     _linear_algebra_element,
-    _own_ring,
-    _owned_ring,
+    _linear_algebra_ring,
+    _owned_engine_element,
     _owned_integers,
     _owned_rationals,
+    _owned_ring,
 )
 from sage_extensions.categories.sets.cardinals import (
     Cardinalities,
@@ -62,10 +59,11 @@ from sage_extensions.categories.sets.indexed_families import (
     indexed_family,
 )
 from sage_extensions.categories.sets.set_categories import EnumeratedSets, Sets
+from sage_extensions.logic import AtomicProposition, conjunction, negation
 from sage_extensions.owned_category import _object_of
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook
-from sage_extensions.logic import AtomicProposition, conjunction, negation
+
 
 def _finitely_generated_free_placement(ring, module_generating_set):
     r"""Return the owned categories of ``R^(S)``: finitely generated exactly when ``S`` is finite."""
@@ -82,7 +80,9 @@ def _finitely_generated_free_placement(ring, module_generating_set):
             categories.append(FramedFreeModules(ring).FinitelyGenerated())
         case False:
             pass
-    categories.append(Cardinalities().finite_support_power_category(ring, module_generating_set))
+    categories.append(
+        Cardinalities().finite_support_power_category(ring, module_generating_set)
+    )
     return categories
 
 
@@ -110,7 +110,9 @@ class _SparseFreeModuleElement(ModuleElement):
         coefficient of that basis element.
         """
         labels = self.parent().module_generating_set()
-        assert label in labels, f"{label!r} is not a basis label of {self.parent()}; the basis is indexed by {labels}"
+        assert label in labels, (
+            f"{label!r} is not a basis label of {self.parent()}; the basis is indexed by {labels}"
+        )
         return self._coefficients.get(labels(label), self.parent().base_ring().zero())
 
     @cached_method
@@ -125,10 +127,17 @@ class _SparseFreeModuleElement(ModuleElement):
         labels = self.parent().module_generating_set()
         possible = labels.finite_subsets()(tuple(self._coefficients))
         zero = self.parent().base_ring().zero()
-        if all((coefficient == zero) is False for coefficient in self._coefficients.values()):
+        if all(
+            (coefficient == zero) is False
+            for coefficient in self._coefficients.values()
+        ):
             return possible
-        actual = possible.domain().condition_set(lambda label: negation(self(label) == zero))
-        return Sets().Subobjects(labels).object(possible.inclusion() * actual.inclusion())
+        actual = possible.domain().condition_set(
+            lambda label: negation(self(label) == zero)
+        )
+        return (
+            Sets().Subobjects(labels).object(possible.inclusion() * actual.inclusion())
+        )
 
     def _coefficient_data(self):
         r"""Storage read for ``Modules._selected_module_coefficients``.
@@ -155,9 +164,16 @@ class _SparseFreeModuleElement(ModuleElement):
     def is_canonical_free_generator(self) -> bool:
         r"""Whether this is one of the chosen basis vectors, with coefficient one."""
         zero = self.parent().base_ring().zero()
-        if any((coefficient == zero) is not False for coefficient in self._coefficients.values()):
+        if any(
+            (coefficient == zero) is not False
+            for coefficient in self._coefficients.values()
+        ):
             return AtomicProposition("is_canonical_free_generator", self)
-        return len(self._coefficients) == 1 and next(iter(self._coefficients.values())) == self.parent().base_ring().one()
+        return (
+            len(self._coefficients) == 1
+            and next(iter(self._coefficients.values()))
+            == self.parent().base_ring().one()
+        )
 
     def underlying_set_element(self):
         r"""Recover ``s`` when this is the canonical free generator ``[s]``.
@@ -226,14 +242,28 @@ class _SparseFreeModuleElement(ModuleElement):
 
     def __hash__(self):
         zero = self.parent().base_ring().zero()
-        if any((coefficient == zero) is not False for coefficient in self._coefficients.values()):
-            raise TypeError("a sparse vector with undecided zero coefficients has no selected canonical hash")
+        if any(
+            (coefficient == zero) is not False
+            for coefficient in self._coefficients.values()
+        ):
+            raise TypeError(
+                "a sparse vector with undecided zero coefficients has no selected canonical hash"
+            )
         return hash((id(self.parent()), frozenset(self._coefficients.items())))
 
     def _repr_(self):
         zero = self.parent().base_ring().zero()
-        if any((coefficient == zero) is not False for coefficient in self._coefficients.values()):
-            return " + ".join(f"({coefficient})*[{label}]" for label, coefficient in self._coefficients.items()) or "0"
+        if any(
+            (coefficient == zero) is not False
+            for coefficient in self._coefficients.values()
+        ):
+            return (
+                " + ".join(
+                    f"({coefficient})*[{label}]"
+                    for label, coefficient in self._coefficients.items()
+                )
+                or "0"
+            )
         return repr_lincomb(
             self._coefficients.items(),
             repr_monomial=lambda label: f"[{label}]",
@@ -242,11 +272,17 @@ class _SparseFreeModuleElement(ModuleElement):
 
     def _latex_(self):
         zero = self.parent().base_ring().zero()
-        if any((coefficient == zero) is not False for coefficient in self._coefficients.values()):
-            return " + ".join(
-                rf"\left({latex(coefficient)}\right)\left[{latex(label)}\right]"
-                for label, coefficient in self._coefficients.items()
-            ) or "0"
+        if any(
+            (coefficient == zero) is not False
+            for coefficient in self._coefficients.values()
+        ):
+            return (
+                " + ".join(
+                    rf"\left({latex(coefficient)}\right)\left[{latex(label)}\right]"
+                    for label, coefficient in self._coefficients.items()
+                )
+                or "0"
+            )
         return repr_lincomb(
             self._coefficients.items(),
             repr_monomial=lambda label: rf"\left[{latex(label)}\right]",
@@ -279,7 +315,9 @@ class _SparseFreeModuleParent:
 
     def _basis_element(self, label):
         labels = self._module_generating_set
-        assert label in labels, f"{label!r} is not a basis label of {self}; the basis is indexed by {labels}"
+        assert label in labels, (
+            f"{label!r} is not a basis label of {self}; the basis is indexed by {labels}"
+        )
         return self.element_class(self, {labels(label): self.base_ring().one()})
 
     def _linear_combination_from_generator_coefficients(self, coefficients):
@@ -300,7 +338,9 @@ class _SparseFreeModuleParent:
         match value:
             case _ if source is self:
                 return value
-            case _ if isinstance(source, Parent) and self._built_on_the_same_data(source):
+            case _ if isinstance(source, Parent) and self._built_on_the_same_data(
+                source
+            ):
                 return self._element_on_the_same_data(source, value)
             case dict():
                 coefficients = {}
@@ -397,14 +437,16 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
     def super_categories(self):
         r"""The chosen free basis refines free modules over the same ring.
 
-            sage: from dzack_research.preamble.all import ZZ, Modules
-            sage: F = FramedFreeModules(ZZ).an_object()
-            sage: F in Modules(ZZ).Free() and F in FramedFreeModules(ZZ)
-            True
-            sage: F.module_rank() == 1 and F.framing_morphism().codomain() is F
-            True
+        sage: from dzack_research.preamble.all import ZZ, Modules
+        sage: F = FramedFreeModules(ZZ).an_object()
+        sage: F in Modules(ZZ).Free() and F in FramedFreeModules(ZZ)
+        True
+        sage: F.module_rank() == 1 and F.framing_morphism().codomain() is F
+        True
         """
-        from sage_extensions.categories.rings.ring_foundation import OwnedCategoryOverBaseRing
+        from sage_extensions.categories.rings.ring_foundation import (
+            OwnedCategoryOverBaseRing,
+        )
 
         # The Free axiom belongs to Modules; use that base rather than the
         # group-algebra specialization when constructing the axiom category.
@@ -413,6 +455,7 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
 
     class ElementMethods:
         if TYPE_CHECKING:
+
             def __call__(self, label) -> RingElement: ...
 
         def order_ideal(self):
@@ -435,11 +478,17 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
             """
             ring = self.parent().base_ring()
             if ring not in OwnedRings().Commutative():
-                raise TypeError("the module order ideal requires a commutative scalar ring")
+                raise TypeError(
+                    "the module order ideal requires a commutative scalar ring"
+                )
             coordinates = self.to_vector()
-            return ring.ideal(*coordinates.parent()._selected_module_coefficients(coordinates).values())
+            return ring.ideal(
+                *coordinates.parent()
+                ._selected_module_coefficients(coordinates)
+                .values()
+            )
 
-        def primitive_part(self) -> "FramedFreeModules.ElementMethods":
+        def primitive_part(self) -> FramedFreeModules.ElementMethods:
             r"""Return ``v/content(v)`` for a nonzero vector over ``ZZ``.
 
             EXAMPLES::
@@ -453,12 +502,14 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
             if not content:
                 raise ValueError("the zero vector has no primitive part")
             coordinates = self.to_vector()
-            return self.parent().linear_combination({
-                label: coordinates(label) // content
-                for label in coordinates.support().domain()
-            })
+            return self.parent().linear_combination(
+                {
+                    label: coordinates(label) // content
+                    for label in coordinates.support().domain()
+                }
+            )
 
-        def to_vector(self) -> "FramedFreeModules.ElementMethods":
+        def to_vector(self) -> FramedFreeModules.ElementMethods:
             r"""The coordinates of this element in the chosen basis ``I``.
 
             The finitely supported function \(a_v\colon I\to R\) with
@@ -483,7 +534,9 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
             # the ring's intrinsic order presentation when this module is the
             # order itself; ordinary free modules retain the basis display.
             if getattr(self, "_preamble_is_number_field_order", lambda: False)():
-                from sage_extensions.categories.rings.ring_foundation import _engine_ring
+                from sage_extensions.categories.rings.ring_foundation import (
+                    _engine_ring,
+                )
 
                 engine = _engine_ring(self)
                 names = tuple(self.variable_names())
@@ -493,7 +546,9 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
             size = cardinal(labels.cardinality())
             match (labels in EnumeratedSets(), size.is_finite()):
                 case (True, True) if int(size.finite_value()) <= 12:
-                    basis = ", ".join(repr(self.module_generator(label)) for label in labels)
+                    basis = ", ".join(
+                        repr(self.module_generator(label)) for label in labels
+                    )
                     return f"Free module on {{{basis}}} over {self.base_ring()}"
                 case _:
                     return f"Free module on {labels} over {self.base_ring()}"
@@ -511,7 +566,9 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
 
         def _Hom_(self, codomain, category=None):
 
-            if category is not None and not category.is_subcategory(Modules(self.base_ring())):
+            if category is not None and not category.is_subcategory(
+                Modules(self.base_ring())
+            ):
                 raise TypeError(
                     f"cannot form morphisms {self} -> {codomain} in {category}: "
                     f"it is not a subcategory of {Modules(self.base_ring())}"
@@ -622,15 +679,24 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 return super()._cardinality_decision()
             scalars = self.base_ring()._cardinality_decision()
             labels = self.module_generating_set()._cardinality_decision()
-            if labels is not None and (cardinal(labels) == Cardinalities().zero()) is True:
+            if (
+                labels is not None
+                and (cardinal(labels) == Cardinalities().zero()) is True
+            ):
                 return Cardinalities().one()
-            if scalars is not None and (cardinal(scalars) == Cardinalities().one()) is True:
+            if (
+                scalars is not None
+                and (cardinal(scalars) == Cardinalities().one()) is True
+            ):
                 return Cardinalities().one()
             if scalars is None or labels is None:
                 return None
             scalars = cardinal(scalars)
             labels = cardinal(labels)
-            if not scalars.expression().is_normal_form() or not labels.expression().is_normal_form():
+            if (
+                not scalars.expression().is_normal_form()
+                or not labels.expression().is_normal_form()
+            ):
                 return None
             if labels.is_finite():
                 return scalars**labels
@@ -643,7 +709,13 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 return AtomicProposition("is_finite", self)
             return cardinal(size).is_finite()
 
-        @cached_method
+        # Arrow equality is a proposition, so the cache is keyed by the given map.
+        @cached_method(
+            key=lambda self, ring_map, _extra_construction_data=None: (
+                id(ring_map),
+                id(_extra_construction_data),
+            )
+        )
         def base_change(self, ring_map, *, _extra_construction_data=None):
             r"""Return ``S tensor_R M`` along the specified ring map ``R -> S``."""
             return _framed_free_base_change(self, ring_map, _extra_construction_data)
@@ -723,7 +795,9 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 ring = self.base_ring()
                 scalars = tuple(ring(value) for value in coefficients)
                 return self.power_set()(
-                    self.linear_combination(dict(zip(basis_labels, coordinates, strict=True)))
+                    self.linear_combination(
+                        dict(zip(basis_labels, coordinates, strict=True))
+                    )
                     for coordinates in product(scalars, repeat=len(basis_labels))
                 )
 
@@ -755,7 +829,10 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                     yield self.zero()
                     return
                 ring = self.base_ring()
-                assert ring in (_owned_integers(), _owned_rationals()) or ring.is_finite() is True, (
+                assert (
+                    ring in (_owned_integers(), _owned_rationals())
+                    or ring.is_finite() is True
+                ), (
                     f"enumerating {self} by scalar coordinates requires ZZ, QQ or a finite ring, not {ring}"
                 )
                 assert labels in EnumeratedSets(), (
@@ -765,31 +842,42 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 for coordinates in _engine_cantor_product(
                     _engine_ring(ring), repeat=len(basis_labels)
                 ):
-                    yield self({
-                        label: _owned_engine_element(ring, coefficient)
-                        for label, coefficient in zip(basis_labels, coordinates)
-                    })
+                    yield self(
+                        {
+                            label: _owned_engine_element(ring, coefficient)
+                            for label, coefficient in zip(basis_labels, coordinates)
+                        }
+                    )
 
             def determinant_line(self):
                 r"""The top exterior power of this finite free module."""
                 from sage_extensions.categories.modules.hodge import _determinant_line
+
                 return _determinant_line(self)
 
             def exterior_forms(self, degree):
                 r"""Exterior forms in the selected finite free framing."""
                 from sage_extensions.categories.modules.hodge import _exterior_forms
+
                 return _exterior_forms(self, degree)
 
             def volume_trivialization(self, forward, inverse):
-                from sage_extensions.categories.modules.hodge import _volume_trivialization
+                from sage_extensions.categories.modules.hodge import (
+                    _volume_trivialization,
+                )
+
                 return _volume_trivialization(self, forward, inverse)
 
             def framing_volume_trivialization(self, unit=None):
-                from sage_extensions.categories.modules.hodge import _framing_volume_trivialization
+                from sage_extensions.categories.modules.hodge import (
+                    _framing_volume_trivialization,
+                )
+
                 return _framing_volume_trivialization(self, unit=unit)
 
             def poincare_duality(self, volume, degree):
                 from sage_extensions.categories.modules.hodge import _poincare_duality
+
                 return _poincare_duality(self, volume, degree)
 
             def _represented_vector_space_dimension(self):
@@ -805,13 +893,17 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 chosen basis is the additive identity; this also handles the zero
                 coefficient ring without replacing the basis by a rank heuristic.
                 """
-                return conjunction(generator == self.zero() for generator in self.module_generators())
+                return conjunction(
+                    generator == self.zero() for generator in self.module_generators()
+                )
 
             @cached_method
             def _selected_relation_morphism(self):
                 r"""Return the relation morphism ``0: F(∅) -> M``: a free module has no relations."""
                 relations = _fresh_free_module_on(self.base_ring(), Sets.Δ[-1])
-                return relations.module_category().Mor(relations, self)(lambda label: self.zero())
+                return relations.module_category().Mor(relations, self)(
+                    lambda label: self.zero()
+                )
 
             def presentation(self):
                 r"""Return the chosen presentation ``0: F_1 = R^(∅) -> F_0 = M`` of this framed free module.
@@ -832,7 +924,13 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                     case _:
                         return selected.differential(1)
 
-            @cached_method
+            # Arrow equality is a proposition, so the cache is keyed by the given map.
+            @cached_method(
+                key=lambda self, ring_map, _extra_construction_data=None: (
+                    id(ring_map),
+                    id(_extra_construction_data),
+                )
+            )
             def base_change(self, ring_map, *, _extra_construction_data=None):
                 r"""Return ``S tensor_R R^(S) = S^(S)`` on the same basis labels.
 
@@ -842,7 +940,9 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 ``ModulesWithChosenFinitePresentation``, whose ``F_0`` is this
                 module itself.
                 """
-                return _framed_free_base_change(self, ring_map, _extra_construction_data)
+                return _framed_free_base_change(
+                    self, ring_map, _extra_construction_data
+                )
 
             def presentation_projection(self):
                 r"""Return the presentation projection ``F_0 -> M``: the framing of ``M``."""
@@ -923,9 +1023,7 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                     # Retain its finite presentation and inclusion through
                     # the common presentation owner, not a PID span basis.
                     return _selected_presentation_kernel(morphism)
-                coordinate_mor = self.module_category().Mor(
-                    self, morphism.codomain()
-                )
+                coordinate_mor = self.module_category().Mor(self, morphism.codomain())
                 from sage_extensions.categories.modules.pure.modules import MatrixSpaces
 
                 if coordinate_mor not in MatrixSpaces(self.base_ring()):
@@ -967,7 +1065,8 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 _extra_categories=(),
                 _extra_construction_data=None,
             ):
-                return _fresh_free_module_on(self.base_ring(), 
+                return _fresh_free_module_on(
+                    self.base_ring(),
                     labels,
                     _extra_categories=tuple(_extra_categories),
                     _extra_construction_data=_extra_construction_data,
@@ -990,7 +1089,9 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 return FreeResolution(
                     self,
                     degrees,
-                    indexed_family(degrees, lambda degree: self, name="Free resolution terms"),
+                    indexed_family(
+                        degrees, lambda degree: self, name="Free resolution terms"
+                    ),
                     indexed_family(
                         Sets.Δ[-1],
                         lambda degree: None,
@@ -1017,7 +1118,9 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 labels = self.module_generating_set()
 
                 def coordinate_functional(label):
-                    return dual(lambda other: ring.one() if other == label else ring.zero())
+                    return dual(
+                        lambda other: ring.one() if other == label else ring.zero()
+                    )
 
                 return finite_indexed_family(
                     labels,
@@ -1081,10 +1184,13 @@ def _new_sparse_free_module(
     return _object_of(
         Cat().meet(tuple(categories)),
         _ambient=Cat().meet(tuple(module_categories)),
-        _engine=(FramedFreeModules(ring), _SparseFreeModuleParent, _SparseFreeModuleElement),
+        _engine=(
+            FramedFreeModules(ring),
+            _SparseFreeModuleParent,
+            _SparseFreeModuleElement,
+        ),
         **data,
     )
-
 
 
 def _element_from_row(module, row):
@@ -1116,7 +1222,9 @@ def _known_finite_generator_family(module_generating_set):
             assert (
                 module_generating_set in Sets()
                 and module_generating_set.cardinality().is_finite()
-            ), "subobject generators are a finite owned set or an explicit finite family"
+            ), (
+                "subobject generators are a finite owned set or an explicit finite family"
+            )
             return module_generating_set
 
 
@@ -1172,8 +1280,9 @@ def _span_basis_elements(module, module_generating_set):
     if ring is RR:
         rows = tuple(
             tuple(
-                (candidate if candidate.parent() is module else module(candidate))
-                .to_vector()(label)
+                (
+                    candidate if candidate.parent() is module else module(candidate)
+                ).to_vector()(label)
                 for label in support_points
             )
             for candidate in generators
@@ -1282,11 +1391,17 @@ def _restricted_fraction_field_subobject_on(module, module_generators):
 
     def embedded(label):
         coordinates = engine_span.basis()[int(label)]
-        return module(extension.linear_combination({
-            point: _owned_engine_element(fractions, coordinate)
-            for point, coordinate in zip(support_points, coordinates, strict=True)
-            if coordinate
-        }))
+        return module(
+            extension.linear_combination(
+                {
+                    point: _owned_engine_element(fractions, coordinate)
+                    for point, coordinate in zip(
+                        support_points, coordinates, strict=True
+                    )
+                    if coordinate
+                }
+            )
+        )
 
     def lift(source, element):
         underlying_element = module(element).underlying_element()
@@ -1297,11 +1412,13 @@ def _restricted_fraction_field_subobject_on(module, module_generators):
         if candidate not in engine_span:
             return None
         coefficients = engine_span.coordinate_vector(candidate)
-        return source.linear_combination({
-            label: _owned_engine_element(ring, _engine_ring(ring)(coefficient))
-            for label, coefficient in zip(labels, coefficients, strict=True)
-            if coefficient
-        })
+        return source.linear_combination(
+            {
+                label: _owned_engine_element(ring, _engine_ring(ring)(coefficient))
+                for label, coefficient in zip(labels, coefficients, strict=True)
+                if coefficient
+            }
+        )
 
     return _new_sparse_free_module(
         ring,
@@ -1399,14 +1516,19 @@ def _module_subobject_constructor_data(module, basis):
         retained = coordinates.parent()._selected_module_coefficients(coordinates)
         outside_zero = conjunction(
             coefficient == ring.zero()
-            for label, coefficient in retained.items() if label not in support_labels
+            for label, coefficient in retained.items()
+            if label not in support_labels
         )
         if outside_zero is False:
             return None
         if outside_zero is not True:
-            raise ValueError("cannot decide whether coordinates outside the finite span window vanish")
+            raise ValueError(
+                "cannot decide whether coordinates outside the finite span window vanish"
+            )
         if source_rank == 0:
-            zero = conjunction(coefficient == ring.zero() for coefficient in retained.values())
+            zero = conjunction(
+                coefficient == ring.zero() for coefficient in retained.values()
+            )
             if zero is True:
                 return source.zero()
             if zero is False:
@@ -1418,23 +1540,15 @@ def _module_subobject_constructor_data(module, basis):
                 ring,
             )
         solution = coordinate_solver(
-            (
-                coordinates(support_points[j])
-                for j in range(support_rank_count)
-            ),
+            (coordinates(support_points[j]) for j in range(support_rank_count)),
         )
         if solution is None:
             return None
         return source.linear_combination(
-            {
-                labels[i]: coefficient
-                for i, coefficient in enumerate(solution)
-            }
+            {labels[i]: coefficient for i, coefficient in enumerate(solution)}
         )
 
     return labels, embedded, lift_from_finite_support
-
-
 
 
 def _module_generating_set(labels):
@@ -1467,9 +1581,9 @@ def _module_generating_set(labels):
     return Sets.Δ[rank - 1]
 
 
-@cached_function(key=lambda ring, module_generating_set: (
-    id(ring), id(module_generating_set)
-))
+@cached_function(
+    key=lambda ring, module_generating_set: (id(ring), id(module_generating_set))
+)
 def _owned_free_module_on(ring, module_generating_set):
     r"""Return ``F_R(S)`` for this literal ring and selected label-set object.
 
@@ -1488,7 +1602,9 @@ def _matrix_space(base_ring, nrows, ncols=None):
 
     def dimension(value):
         result = int(integers(value))
-        assert result >= 0, f"cannot form matrices with {result} rows or columns: a dimension is nonnegative"
+        assert result >= 0, (
+            f"cannot form matrices with {result} rows or columns: a dimension is nonnegative"
+        )
         return result
 
     nrows = dimension(nrows)
@@ -1519,7 +1635,9 @@ def _fresh_free_module_on(
 
     ring = base_ring
     if ring not in OwnedRings():
-        raise TypeError(f"cannot form a free module over {ring!r}: it is not a ring of this session")
+        raise TypeError(
+            f"cannot form a free module over {ring!r}: it is not a ring of this session"
+        )
     labels = _module_generating_set(module_generating_set)
     return _new_sparse_free_module(
         ring,

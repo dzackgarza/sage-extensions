@@ -3,7 +3,6 @@ r"""Descent and gluing for represented schemes, modules, and algebras."""
 from collections.abc import Mapping
 from itertools import combinations, permutations
 
-from sage.categories.category import Category
 from sage.categories.morphism import Morphism
 from sage.misc.cachefunc import cached_method
 from sage.structure.element import parent as element_parent
@@ -18,17 +17,17 @@ from sage_extensions.categories.abstract_categories.mor_categories import (
     MorCategoryConstruction,
     _precomposable,
 )
+from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 from sage_extensions.categories.abstract_categories.objects import (
     OwnedCategory,
     OwnedParameterizedCategory,
 )
 from sage_extensions.categories.abstract_categories.presheaves import (
-    CoveringFamilyMorCategoryConstruction,
     CoveringFamilyMor,
+    CoveringFamilyMorCategoryConstruction,
     CoveringFamilyMorphism,
     DescentData,
     DescentDataOnCover,
-    OpenCoveringFamilies,
     Sheaves,
     _CechCoveringFamilies,
 )
@@ -40,15 +39,15 @@ from sage_extensions.categories.algebras.algebras import (
     Algebras,
     _algebra_structure_view,
 )
-from sage_extensions.categories.modules.pure.modules import (
-    Modules,
-)
+from sage_extensions.categories.functors.core import Functor
 from sage_extensions.categories.modules.base_change import _base_change_element
 from sage_extensions.categories.modules.fibered_modules import (
     ModulesOverCommutativeRings,
     SemilinearModuleMorphism,
 )
-from sage_extensions.categories.functors.core import Functor
+from sage_extensions.categories.modules.pure.modules import (
+    Modules,
+)
 from sage_extensions.categories.rings.ring_foundation import (
     LocalizationRings,
     OwnedRings,
@@ -61,45 +60,43 @@ from sage_extensions.categories.schemes.ringed_spaces import (
     QuasiCoherentSheaves,
     SheafObjects,
     ZariskiCoveringFamilies,
-    PresheafObjects,
-    zariski_coverage,
     _AffineModuleOpenPresheaf,
     _is_empty_open,
     _open_sheaf_placement,
+    zariski_coverage,
 )
 from sage_extensions.categories.schemes.schemes import (
     OpenImmersions,
     SchemeMorCategory,
-    SchemeMorphism,
     SchemeMorphismMethods,
     Schemes,
     _affine_scheme,
     _affine_structure_morphism_to_base,
-    _scheme_composition_mor,
 )
 from sage_extensions.categories.sets.finite_families import finite_family
 from sage_extensions.categories.sets.finite_ordered_sets import (
     finite_ordered_set,
 )
-from sage_extensions.categories.topological_spaces import TopologicalSpaces
 from sage_extensions.categories.sets.indexed_families import (
     IndexedFamily,
     finite_indexed_family,
     finite_indexed_family_from_values,
 )
 from sage_extensions.categories.sets.set_categories import Sets
+from sage_extensions.categories.topological_spaces import TopologicalSpaces
 from sage_extensions.logic import AtomicProposition, conjunction, negation
 from sage_extensions.owned_category import _object_of, owned_category_join
 from sage_extensions.validation import validator
-from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 
 
 def _ordered_transition_images(datum, transition_data, source_index, target_index):
     r"""Return the selected transition and inverse in the requested chart order."""
     pair = datum._ordered_pair(source_index, target_index)
     forward, backward = transition_data[pair]
-    if pair == (datum.normalize_chart_index(source_index),
-                datum.normalize_chart_index(target_index)):
+    if pair == (
+        datum.normalize_chart_index(source_index),
+        datum.normalize_chart_index(target_index),
+    ):
         return forward, backward
     return backward, forward
 
@@ -220,7 +217,10 @@ def _glued_scheme_chart_map(parent, chart_embedding, chart_map):
             f"{chart_map} must land in the chart {chart_embedding.domain()}, but it lands in "
             f"{chart_map.codomain()}"
         )
-    if chart_map.domain() is not parent.domain() or chart_embedding.codomain() is not parent.codomain():
+    if (
+        chart_map.domain() is not parent.domain()
+        or chart_embedding.codomain() is not parent.codomain()
+    ):
         raise ValueError(
             f"cannot make the composite of {chart_map} and {chart_embedding} a morphism "
             f"{parent.domain()} -> {parent.codomain()}: it is a morphism {chart_map.domain()} -> "
@@ -237,11 +237,14 @@ def _glued_scheme_chart_map(parent, chart_embedding, chart_map):
     )
 
 
-def _glued_scheme_morphism(parent, local_maps, *, verify_compatibility=True, cone_construction=None):
+def _glued_scheme_morphism(
+    parent, local_maps, *, verify_compatibility=True, cone_construction=None
+):
     r"""Construct a map out of a glued scheme as an element of its generated Mor."""
     datum = parent.domain().gluing_datum()
     raw = _family_on_finite_ordered_set(
-        datum.chart_index_set(), local_maps,
+        datum.chart_index_set(),
+        local_maps,
         name="Raw local maps of a glued-scheme morphism",
         noun="a glued-scheme morphism",
     )
@@ -264,7 +267,9 @@ def _glued_scheme_morphism(parent, local_maps, *, verify_compatibility=True, con
                     f"the overlap of charts {left_index} and {right_index} they disagree after the chart change"
                 )
     return parent.element_class(
-        parent, None, mor=parent,
+        parent,
+        None,
+        mor=parent,
         cone_construction=cone_construction,
         gluing_datum=datum,
         gluing_role="glued_domain",
@@ -288,7 +293,9 @@ def _finite_atlas_scheme_morphism(domain, codomain, atlas, local_maps):
     )
     local_maps = finite_indexed_family(
         atlas.chart_index_set(),
-        lambda index: parent.mor_category().Mor(atlas.chart(index), codomain)(raw[index]),
+        lambda index: parent.mor_category().Mor(atlas.chart(index), codomain)(
+            raw[index]
+        ),
         name="Local maps of a finite-atlas scheme morphism",
     )
     for left_index, right_index in atlas.transition_index_set():
@@ -303,7 +310,9 @@ def _finite_atlas_scheme_morphism(domain, codomain, atlas, local_maps):
                 f"the overlap of charts {left_index} and {right_index} they disagree after the chart change"
             )
     return parent.element_class(
-        parent, None, mor=parent,
+        parent,
+        None,
+        mor=parent,
         gluing_role="finite_atlas",
         finite_atlas=atlas,
         atlas_local_maps=local_maps,
@@ -326,15 +335,23 @@ class _GluedSchemeMorCategory(SchemeMorCategory):
         return self._gluing_datum
 
     def _element_constructor_(self, datum):
-        if isinstance(datum, SchemeMorphismMethods) and datum._gluing_role == "glued_domain":
-            if datum.domain() is not self.domain() or datum.codomain() is not self.codomain():
+        if (
+            isinstance(datum, SchemeMorphismMethods)
+            and datum._gluing_role == "glued_domain"
+        ):
+            if (
+                datum.domain() is not self.domain()
+                or datum.codomain() is not self.codomain()
+            ):
                 raise ValueError(
                     f"cannot make {datum} a morphism {self.domain()} -> {self.codomain()}: it is a morphism "
                     f"{datum.domain()} -> {datum.codomain()}"
                 )
             if datum.parent() is self:
                 return datum
-            raise TypeError(f"{datum} belongs to another Mor; apply the functor between the categories")
+            raise TypeError(
+                f"{datum} belongs to another Mor; apply the functor between the categories"
+            )
         if isinstance(datum, (tuple, list, IndexedFamily, Mapping)):
             return _glued_scheme_morphism(self, datum)
         return super()._element_constructor_(datum)
@@ -349,10 +366,7 @@ class _GluedSchemeMorCategory(SchemeMorCategory):
         datum = self.gluing_datum()
         return _glued_scheme_morphism(
             self,
-            tuple(
-                datum.chart_embedding(index)
-                for index in datum.chart_indices()
-            ),
+            tuple(datum.chart_embedding(index) for index in datum.chart_indices()),
             verify_compatibility=False,
         )
 
@@ -370,7 +384,9 @@ class _AffineChartOpenSubobjects(OwnedParameterizedCategory):
         return f"affine chart basis opens of {self.base()}"
 
     class ParentMethods:
-        def __init__(self, chart_gluing_datum, chart_index, chart_embedding, chart_open, **rest):
+        def __init__(
+            self, chart_gluing_datum, chart_index, chart_embedding, chart_open, **rest
+        ):
             self._chart_gluing_datum = chart_gluing_datum
             self._chart_index = chart_gluing_datum.normalize_chart_index(chart_index)
             self._chart_embedding = chart_embedding
@@ -396,7 +412,10 @@ class _AffineChartOpenSubobjects(OwnedParameterizedCategory):
                 and other.gluing_datum() is self.gluing_datum()
             ):
                 return scheme.selected_finite_affine_atlas().basis_open_inclusion(
-                    self.chart_index(), self.chart_open(), other.chart_index(), other.chart_open(),
+                    self.chart_index(),
+                    self.chart_open(),
+                    other.chart_index(),
+                    other.chart_open(),
                 )
             return super().is_contained_in(other)
 
@@ -405,14 +424,19 @@ def _affine_chart_image_subset(scheme, datum, index, point_map, embedding, chart
     space = scheme.underlying_space()
     image = point_map.underlying_set_morphism().image()
     domain = space.condition_set(image.is_parent_of)
-    return Sets().Subobjects(space).object(
-        domain.inclusion(),
-        categories=(_AffineChartOpenSubobjects(scheme),),
-        construction_data={
-            "chart_gluing_datum": datum, "chart_index": index,
-            "chart_embedding": embedding,
-            "chart_open": chart_open,
-        },
+    return (
+        Sets()
+        .Subobjects(space)
+        .object(
+            domain.inclusion(),
+            categories=(_AffineChartOpenSubobjects(scheme),),
+            construction_data={
+                "chart_gluing_datum": datum,
+                "chart_index": index,
+                "chart_embedding": embedding,
+                "chart_open": chart_open,
+            },
+        )
     )
 
 
@@ -446,8 +470,56 @@ def _glued_chart_embedding(datum, index):
     r"""``e_i : U_i -> X``, the chart isomorphism onto its open image followed by that image's inclusion."""
     chart = datum.chart(index)
     return _glued_scheme_chart_embedding(
-        Schemes(datum.base_ring()).Mor(chart, datum.scheme()), datum, index,
+        Schemes(datum.base_ring()).Mor(chart, datum.scheme()),
+        datum,
+        index,
     )
+
+
+def is_projective_line_gluing(datum) -> bool:
+    r"""Whether ``datum`` glues ``Spec R[s]`` and ``Spec R[t]`` along ``D(s) -> D(t)``, ``t |-> 1/s``.
+
+    That gluing is ``P^1_R`` (Hartshorne, *Algebraic Geometry*, Example
+    II.2.3.5; its charts are the standard opens ``D_+(T_i)`` of Stacks, Tag
+    01NG).  The test reads the chart algebras, the two overlaps and the
+    pullback of the transition; any other datum answers ``False``.
+    """
+    from sage_extensions.categories.algebras.free_algebras import SymmetricAlgebras
+    from sage_extensions.categories.modules.framed.framed_free_modules import (
+        FramedFreeModules,
+    )
+    from sage_extensions.categories.sets.cardinals import cardinal
+
+    base = datum.base_ring()
+    if (datum.number_of_charts() == 2) is not True:
+        return False
+    first, second = tuple(datum.chart_indices())
+    coordinates = []
+    for index in (first, second):
+        algebra = datum.chart(index).coordinate_algebra()
+        if algebra not in SymmetricAlgebras(base):
+            return False
+        if algebra.generating_module() not in FramedFreeModules(base):
+            return False
+        labels = algebra.algebra_generating_set()
+        if (labels.cardinality() == cardinal(1)) is not True:
+            return False
+        coordinates.append(algebra.algebra_generator(next(iter(labels))))
+    s, t = coordinates
+    source_overlap = datum.overlap(first, second)
+    target_overlap = datum.overlap(second, first)
+    if source_overlap is not datum.chart(first).distinguished_open(s):
+        return False
+    if target_overlap is not datum.chart(second).distinguished_open(t):
+        return False
+    pullback = (
+        datum.transition_between(first, second).forward().coordinate_algebra_morphism()
+    )
+    restrict_source = source_overlap.inclusion().coordinate_algebra_morphism()
+    restrict_target = target_overlap.inclusion().coordinate_algebra_morphism()
+    return (
+        pullback(restrict_target(t)) == restrict_source(s).inverse_of_unit()
+    ) is True
 
 
 def _glued_scheme(datum, placements, level_data):
@@ -459,6 +531,11 @@ def _glued_scheme(datum, placements, level_data):
     """
     base = datum.base_ring()
     category = Schemes(base)
+    if is_projective_line_gluing(datum):
+        # The glued scheme is P^1_R.  It is projective over R, hence proper
+        # (Stacks, Tag 01WC), and covered by two copies of A^1_R (Tag 01NG),
+        # each smooth over R, hence smooth.
+        placements = (*placements, Schemes(base).Proper(), Schemes(base).Smooth())
     if placements:
         category = owned_category_join((category, *placements))
     data = dict(level_data)
@@ -536,17 +613,23 @@ class _GluedScheme(SageObject):
         opposite = spectrum.domain()
 
         def spectrum_map(ring_map):
-            return spectrum.on_morphism(opposite.Mor(
-                opposite(ring_map.codomain()), opposite(ring_map.domain())
-            )(ring_map))
+            return spectrum.on_morphism(
+                opposite.Mor(
+                    opposite(ring_map.codomain()), opposite(ring_map.domain())
+                )(ring_map)
+            )
 
         def overlap_legs(pair):
             left, right = pair
             transition = datum.transition_between(left, right)
             left_overlap = datum.overlap(left, right)
             right_overlap = datum.overlap(right, left)
-            left_inclusion = spectrum_map(left_overlap.inclusion().coordinate_algebra_morphism())
-            right_inclusion = spectrum_map(right_overlap.inclusion().coordinate_algebra_morphism())
+            left_inclusion = spectrum_map(
+                left_overlap.inclusion().coordinate_algebra_morphism()
+            )
+            right_inclusion = spectrum_map(
+                right_overlap.inclusion().coordinate_algebra_morphism()
+            )
             # Contravariance sends the scheme inverse pair to its retained
             # coordinate-ring inverse pair, then back to a homeomorphism.
             ring_isomorphism = _isomorphism_from_known_inverse_pair(
@@ -557,10 +640,14 @@ class _GluedScheme(SageObject):
             chart_change = spectrum_map(ring_isomorphism).forward()
             return (
                 charts.costructure_morphism(chart_shape(left)) * left_inclusion,
-                charts.costructure_morphism(chart_shape(right)) * right_inclusion * chart_change,
+                charts.costructure_morphism(chart_shape(right))
+                * right_inclusion
+                * chart_change,
             )
 
-        legs = finite_indexed_family(pairs, overlap_legs, name="Gluing overlap point maps")
+        legs = finite_indexed_family(
+            pairs, overlap_legs, name="Gluing overlap point maps"
+        )
         overlap_diagram = overlaps.diagram()
         left_cocone = overlap_diagram.CoproductCocones().cocone(
             charts.object(), lambda index: legs[index.value()][0]
@@ -583,7 +670,9 @@ class _GluedScheme(SageObject):
         charts = self._chart_space_coproduct()
         quotient = self.topological_gluing_construction()
         projection = quotient.costructure_morphism(quotient.diagram().domain().target())
-        return projection * charts.costructure_morphism(charts.diagram().domain()(index))
+        return projection * charts.costructure_morphism(
+            charts.diagram().domain()(index)
+        )
 
     @cached_method
     def chart_image_subset(self, index):
@@ -596,7 +685,11 @@ class _GluedScheme(SageObject):
         datum = self.gluing_datum()
         index = datum.normalize_chart_index(index)
         return _affine_chart_image_subset(
-            datum.scheme(), datum, index, self.chart_point_map(index), datum.chart_embedding(index),
+            datum.scheme(),
+            datum,
+            index,
+            self.chart_point_map(index),
+            datum.chart_embedding(index),
             datum.chart(index),
         )
 
@@ -617,7 +710,9 @@ class _GluedScheme(SageObject):
         base = datum.base_ring()
         base_scheme = base.affine_spectrum(base_ring=base)
         return scheme.Mor(base_scheme)(
-            datum.charts().map(lambda chart: _affine_structure_morphism_to_base(chart, base))
+            datum.charts().map(
+                lambda chart: _affine_structure_morphism_to_base(chart, base)
+            )
         )
 
     def chartwise_closed_subscheme(
@@ -672,7 +767,10 @@ class _TwoChartSchemeGluingDatum(SageObject):
 
     def __init__(self, schemes, left_chart, right_chart, transition) -> None:
         base = schemes.base_ring()
-        if left_chart not in Schemes(base).Affine() or right_chart not in Schemes(base).Affine():
+        if (
+            left_chart not in Schemes(base).Affine()
+            or right_chart not in Schemes(base).Affine()
+        ):
             raise TypeError(
                 f"cannot glue {left_chart} and {right_chart}: gluing two charts is computed here only for "
                 f"affine charts over {base}, but they are objects of {left_chart.category()} and "
@@ -697,7 +795,10 @@ class _TwoChartSchemeGluingDatum(SageObject):
                 f"cannot glue {left_chart} and {right_chart}: the codomain {right_overlap} of the chart "
                 f"change must be an open subscheme of {right_chart}"
             )
-        if inverse.domain() is not right_overlap or inverse.codomain() is not left_overlap:
+        if (
+            inverse.domain() is not right_overlap
+            or inverse.codomain() is not left_overlap
+        ):
             raise ValueError(
                 f"cannot glue {left_chart} and {right_chart}: the inverse chart change must be "
                 f"{right_overlap} -> {left_overlap}, but it is {inverse.domain()} -> {inverse.codomain()}"
@@ -761,9 +862,13 @@ class _TwoChartSchemeGluingDatum(SageObject):
     def _reversed_transition(self):
         r"""``phi^{-1}``, the isomorphism from the right overlap to the left one."""
         transition = self.transition()
-        return Schemes(self.base_ring()).Core().Mor(transition.codomain(), transition.domain())(
-            transition.inverse().forward(),
-            transition.forward(),
+        return (
+            Schemes(self.base_ring())
+            .Core()
+            .Mor(transition.codomain(), transition.domain())(
+                transition.inverse().forward(),
+                transition.forward(),
+            )
         )
 
     def overlap(self, source_index, target_index):
@@ -800,10 +905,18 @@ class _TwoChartSchemeGluingDatum(SageObject):
         return _glued_chart_embedding(self, label)
 
     def chart_images(self):
-        return finite_indexed_family(self.chart_index_set(), self.chart_image, name="Open chart images in glued scheme")
+        return finite_indexed_family(
+            self.chart_index_set(),
+            self.chart_image,
+            name="Open chart images in glued scheme",
+        )
 
     def chart_isomorphisms(self):
-        return finite_indexed_family(self.chart_index_set(), self.chart_isomorphism, name="Chart-to-image isomorphisms")
+        return finite_indexed_family(
+            self.chart_index_set(),
+            self.chart_isomorphism,
+            name="Chart-to-image isomorphisms",
+        )
 
     def _repr_(self):
         return f"Two-chart scheme gluing datum for {self.chart(0)} and {self.chart(1)}"
@@ -812,7 +925,9 @@ class _TwoChartSchemeGluingDatum(SageObject):
 class _FiniteSchemeGluingDatum(SageObject):
     r"""Finite affine charts with distinguished pair overlaps and a cocycle."""
 
-    def __init__(self, schemes, charts, transitions, *, placements=(), level_data=None) -> None:
+    def __init__(
+        self, schemes, charts, transitions, *, placements=(), level_data=None
+    ) -> None:
         self._schemes = schemes
         self._charts = _finite_chart_family(charts)
         for chart in self.charts():
@@ -837,7 +952,9 @@ class _FiniteSchemeGluingDatum(SageObject):
 
         self._verify_pairwise_transitions()
         self.validate_transition_inverses(check=False)
-        self._scheme = _glued_scheme(self, placements, {} if level_data is None else level_data)
+        self._scheme = _glued_scheme(
+            self, placements, {} if level_data is None else level_data
+        )
 
     def base_ring(self):
         return self._schemes.base_ring()
@@ -891,12 +1008,16 @@ class _FiniteSchemeGluingDatum(SageObject):
         for cached_key, cached in self._reverse_transitions:
             if cached_key == key:
                 return cached
-        reversed_transition = transition.parent().core_category().Mor(
-            transition.codomain(),
-            transition.domain(),
-        )(
-            transition.inverse().forward(),
-            transition.forward(),
+        reversed_transition = (
+            transition.parent()
+            .core_category()
+            .Mor(
+                transition.codomain(),
+                transition.domain(),
+            )(
+                transition.inverse().forward(),
+                transition.forward(),
+            )
         )
         self._reverse_transitions.append((key, reversed_transition))
         return reversed_transition
@@ -928,13 +1049,19 @@ class _FiniteSchemeGluingDatum(SageObject):
                     f"cannot glue along the chart change from chart {source_index} to chart {target_index}: "
                     f"its codomain {target_overlap} must be an open subscheme of the chart {target_chart}"
                 )
-            if source_overlap.is_distinguished_open() is not True or target_overlap.is_distinguished_open() is not True:
+            if (
+                source_overlap.is_distinguished_open() is not True
+                or target_overlap.is_distinguished_open() is not True
+            ):
                 raise TypeError(
                     f"cannot glue along the chart change from chart {source_index} to chart {target_index}: "
                     "gluing is computed here only when both overlaps are distinguished open subschemes D(f) "
                     f"of their charts, and {source_overlap} or {target_overlap} is not known to be one"
                 )
-            if inverse.domain() is not target_overlap or inverse.codomain() is not source_overlap:
+            if (
+                inverse.domain() is not target_overlap
+                or inverse.codomain() is not source_overlap
+            ):
                 raise ValueError(
                     f"cannot glue along the chart change from chart {source_index} to chart {target_index}: "
                     f"the inverse chart change must be {target_overlap} -> {source_overlap}, but it is "
@@ -971,11 +1098,16 @@ class _FiniteSchemeGluingDatum(SageObject):
         middle_index = self.normalize_chart_index(middle_index)
         target_index = self.normalize_chart_index(target_index)
         chart_ranking = self.chart_index_set().ranking_map()
-        if len({
-            chart_ranking(source_index),
-            chart_ranking(middle_index),
-            chart_ranking(target_index),
-        }) != 3:
+        if (
+            len(
+                {
+                    chart_ranking(source_index),
+                    chart_ranking(middle_index),
+                    chart_ranking(target_index),
+                }
+            )
+            != 3
+        ):
             raise ValueError(
                 f"there is no triple overlap of the charts {source_index}, {middle_index} and "
                 f"{target_index} of {self}: a triple overlap needs three distinct charts"
@@ -1057,12 +1189,16 @@ class _FiniteSchemeGluingDatum(SageObject):
         """
         labels = tuple(self.chart_indices())
         mutually_inverse = all(
-            self.transition_on_triple(target, source, third) * self.transition_on_triple(source, target, third)
-            == self.triple_overlap(source, target, third).categorical_identity_morphism()
+            self.transition_on_triple(target, source, third)
+            * self.transition_on_triple(source, target, third)
+            == self.triple_overlap(
+                source, target, third
+            ).categorical_identity_morphism()
             for source, target, third in permutations(labels, 3)
         )
         return mutually_inverse and all(
-            self.transition_on_triple(middle, right, left) * self.transition_on_triple(left, middle, right)
+            self.transition_on_triple(middle, right, left)
+            * self.transition_on_triple(left, middle, right)
             == self.transition_on_triple(left, right, middle)
             for left, middle, right in permutations(labels, 3)
         )
@@ -1092,10 +1228,18 @@ class _FiniteSchemeGluingDatum(SageObject):
         return _glued_chart_embedding(self, label)
 
     def chart_images(self):
-        return finite_indexed_family(self.chart_index_set(), self.chart_image, name="Open chart images in glued scheme")
+        return finite_indexed_family(
+            self.chart_index_set(),
+            self.chart_image,
+            name="Open chart images in glued scheme",
+        )
 
     def chart_isomorphisms(self):
-        return finite_indexed_family(self.chart_index_set(), self.chart_isomorphism, name="Chart-to-image isomorphisms")
+        return finite_indexed_family(
+            self.chart_index_set(),
+            self.chart_isomorphism,
+            name="Chart-to-image isomorphisms",
+        )
 
     def _repr_(self):
         return f"Finite affine scheme gluing datum indexed by {self.chart_index_set()}"
@@ -1151,7 +1295,9 @@ class _FiniteAffineAtlasEngine:
         return self.presentation().overlap(source_index, target_index)
 
     def triple_overlap(self, source_index, middle_index, target_index):
-        return self.presentation().triple_overlap(source_index, middle_index, target_index)
+        return self.presentation().triple_overlap(
+            source_index, middle_index, target_index
+        )
 
     def transition_on_triple(self, source_index, target_index, third_index):
         return self.presentation().transition_on_triple(
@@ -1188,25 +1334,39 @@ class _FiniteAffineAtlasEngine:
             True
         """
         if morphism.codomain() is not self.scheme():
-            raise ValueError("atlas pullback requires a morphism into the atlas's scheme")
+            raise ValueError(
+                "atlas pullback requires a morphism into the atlas's scheme"
+            )
         affine = Schemes(self.base_ring()).Affine()
-        from sage_extensions.categories.schemes.schemes import ClosedSubschemes, ProjectiveSpaces, ProductProjectiveSpaces
+        from sage_extensions.categories.schemes.schemes import (
+            ClosedSubschemes,
+            ProductProjectiveSpaces,
+            ProjectiveSpaces,
+        )
 
         closed_projective = (
             morphism.domain() in ClosedSubschemes(self.base_ring())
             and (morphism == morphism.domain().inclusion()) is True
-            and (self.scheme() in ProjectiveSpaces(self.base_ring()) or self.scheme() in ProductProjectiveSpaces(self.base_ring()))
+            and (
+                self.scheme() in ProjectiveSpaces(self.base_ring())
+                or self.scheme() in ProductProjectiveSpaces(self.base_ring())
+            )
         )
-        assert (self.scheme() in affine and morphism.domain() in affine) or closed_projective, (
+        assert (
+            self.scheme() in affine and morphism.domain() in affine
+        ) or closed_projective, (
             "atlas pullback requires affine endpoints or a represented projective closed immersion"
         )
         chart_maps = finite_indexed_family(
-            self.chart_index_set(), self.chart_embedding,
+            self.chart_index_set(),
+            self.chart_embedding,
             name="Chart maps of the atlas to be pulled back",
         )
         charts, transitions = _affine_atlas_pullback_data(self, chart_maps, morphism)
         return FiniteAffineAtlases(morphism.domain())(
-            charts, transitions, charts.map(lambda chart: chart.right_projection()),
+            charts,
+            transitions,
+            charts.map(lambda chart: chart.right_projection()),
         )
 
     @cached_method
@@ -1214,7 +1374,9 @@ class _FiniteAffineAtlasEngine:
         r"""The image of a chart or distinguished open within that chart."""
         scheme = self.scheme()
         index = self.normalize_chart_index(index)
-        assert self.presentation() is scheme.selected_finite_affine_atlas().presentation(), (
+        assert (
+            self.presentation() is scheme.selected_finite_affine_atlas().presentation()
+        ), (
             "a chart of another atlas needs its point-space comparison with the selected atlas"
         )
         chart = self.chart(index)
@@ -1223,21 +1385,31 @@ class _FiniteAffineAtlasEngine:
         embedding = self.chart_embedding(index)
         if selected is not chart:
             assert (
-                selected in OpenImmersions(chart) and selected.is_distinguished_open() is True
+                selected in OpenImmersions(chart)
+                and selected.is_distinguished_open() is True
             ), "a chart basis open must be the chart or one of its distinguished opens"
             ring_map = selected.inclusion().coordinate_algebra_morphism()
             spectrum = OwnedRings().Commutative().prime_spectrum_functor()
             opposite = spectrum.domain()
-            local_map = spectrum.on_morphism(opposite.Mor(
-                opposite(ring_map.codomain()), opposite(ring_map.domain())
-            )(ring_map))
+            local_map = spectrum.on_morphism(
+                opposite.Mor(
+                    opposite(ring_map.codomain()), opposite(ring_map.domain())
+                )(ring_map)
+            )
             point_map = point_map * local_map
             embedding = embedding * selected.inclusion()
         return _affine_chart_image_subset(
-            scheme, self.presentation(), index, point_map, embedding, selected,
+            scheme,
+            self.presentation(),
+            index,
+            point_map,
+            embedding,
+            selected,
         )
 
-    def basis_coordinate_restriction(self, source_index, source_open, target_index, target_open):
+    def basis_coordinate_restriction(
+        self, source_index, source_open, target_index, target_open
+    ):
         r"""Restrict functions between contained affine chart basis opens.
 
         Across charts, use the overlap transition and the target chart's
@@ -1249,18 +1421,29 @@ class _FiniteAffineAtlasEngine:
         source_chart = self.chart(source_index)
         target_chart = self.chart(target_index)
         if source_index == target_index:
-            return source_chart.structure_sheaf().restriction_map(source_open, target_open)
+            return source_chart.structure_sheaf().restriction_map(
+                source_open, target_open
+            )
         source_overlap = self.overlap(source_index, target_index)
         target_overlap = self.overlap(target_index, source_index)
-        across = self.transition_between(source_index, target_index).inverse().forward().coordinate_algebra_morphism()
+        across = (
+            self.transition_between(source_index, target_index)
+            .inverse()
+            .forward()
+            .coordinate_algebra_morphism()
+        )
         localize = source_overlap.inclusion().coordinate_algebra_morphism()
-        target_restriction = target_chart.structure_sheaf().restriction_map(target_overlap, target_open)
+        target_restriction = target_chart.structure_sheaf().restriction_map(
+            target_overlap, target_open
+        )
         chart_map = target_restriction * across * localize
         if source_open is source_chart:
             return chart_map
         return source_open.coordinate_algebra().induced_morphism(chart_map)
 
-    def basis_open_inclusion(self, smaller_index, smaller_open, larger_index, larger_open):
+    def basis_open_inclusion(
+        self, smaller_index, smaller_open, larger_index, larger_open
+    ):
         r"""Decide containment from overlap membership and localization units."""
         smaller_index = self.normalize_chart_index(smaller_index)
         larger_index = self.normalize_chart_index(larger_index)
@@ -1270,22 +1453,37 @@ class _FiniteAffineAtlasEngine:
             spectrum = smaller_chart.underlying_space()
             smaller = (
                 spectrum.distinguished_open(smaller_chart.coordinate_algebra().one())
-                if smaller_open is smaller_chart else smaller_open.open_subset()
+                if smaller_open is smaller_chart
+                else smaller_open.open_subset()
             )
-            larger = spectrum.power_set().top() if larger_open is larger_chart else larger_open.open_subset()
+            larger = (
+                spectrum.power_set().top()
+                if larger_open is larger_chart
+                else larger_open.open_subset()
+            )
             return smaller.is_contained_in(larger)
         overlap = self.overlap(smaller_index, larger_index)
-        contained = self.basis_open_inclusion(smaller_index, smaller_open, smaller_index, overlap)
+        contained = self.basis_open_inclusion(
+            smaller_index, smaller_open, smaller_index, overlap
+        )
         if contained is False:
             return False
         if contained is not True:
             return AtomicProposition(
-                "basis_open_is_contained_in", self, smaller_index, smaller_open, larger_index, larger_open,
+                "basis_open_is_contained_in",
+                self,
+                smaller_index,
+                smaller_open,
+                larger_index,
+                larger_open,
             )
         if larger_open is larger_chart:
             return True
         restriction = self.basis_coordinate_restriction(
-            larger_index, larger_chart, smaller_index, smaller_open,
+            larger_index,
+            larger_chart,
+            smaller_index,
+            smaller_open,
         )
         return restriction(larger_open.distinguished_open_element()).is_unit()
 
@@ -1327,10 +1525,9 @@ class _FiniteAffineAtlasEngine:
                 label = next(iter(_finite_framing(local)))
                 left_component = datum.base_restricted_section_component(left, index)
                 right_component = datum.base_restricted_section_component(right, index)
-                coefficient = (
-                    self._rank_one_coefficient(local, left_component)
-                    * self._rank_one_coefficient(local, right_component)
-                )
+                coefficient = self._rank_one_coefficient(
+                    local, left_component
+                ) * self._rank_one_coefficient(local, right_component)
                 components[index] = local.scalar_multiple(
                     coefficient,
                     local.module_generator(label),
@@ -1346,10 +1543,15 @@ class _FiniteAffineAtlasEngine:
                 for index in self.chart_index_set()
             }
         )
-        return Algebras(base).Associative().Unital().Commutative()(
-            module,
-            multiplication,
-            unit,
+        return (
+            Algebras(base)
+            .Associative()
+            .Unital()
+            .Commutative()(
+                module,
+                multiplication,
+                unit,
+            )
         )
 
     @cached_method
@@ -1360,19 +1562,19 @@ class _FiniteAffineAtlasEngine:
         underlying = functions.unformed_module()
         datum = self.structure_module_datum()
         target = self.chart(index).coordinate_algebra()
-        base = self.scheme().scheme_base_ring()
 
         def image(section):
             component = datum.base_restricted_section_component(
                 underlying(section),
                 index,
             )
-            return target(self._rank_one_coefficient(datum.local_module(index), component))
+            return target(
+                self._rank_one_coefficient(datum.local_module(index), component)
+            )
 
         # Restriction of global functions to a chart is a morphism of
-        # algebras over the base, so the construction alone gives linearity.
-        linear = Modules(base).Mor(functions, target)._from_constructed_element_map(image)
-        return _algebra_mor(functions, target)(linear)
+        # algebras over the base: the construction alone gives its laws.
+        return _algebra_mor(functions, target)._from_constructed_element_map(image)
 
     @cached_method
     def global_function_overlap_restriction(self, source_index, target_index):
@@ -1384,13 +1586,11 @@ class _FiniteAffineAtlasEngine:
         chart_restriction = self.global_function_restriction(source_index)
         overlap_restriction = overlap.inclusion().coordinate_algebra_morphism()
         target = overlap.coordinate_algebra()
-        base = self.scheme().scheme_base_ring()
         # A composite of two restrictions of functions is a morphism of
-        # algebras over the base, so the construction alone gives linearity.
-        linear = Modules(base).Mor(functions, target)._from_constructed_element_map(
+        # algebras over the base: the construction alone gives its laws.
+        return _algebra_mor(functions, target)._from_constructed_element_map(
             lambda section: target(overlap_restriction(chart_restriction(section)))
         )
-        return _algebra_mor(functions, target)(linear)
 
     def _repr_(self):
         return f"Finite affine atlas of {self.scheme()} indexed by {self.chart_index_set()}"
@@ -1515,11 +1715,17 @@ class FiniteAtlasRefinementMethods:
         def image(function):
             components = {}
             for index in fine.chart_indices():
-                restriction = coarse.global_function_restriction(self.coarse_index(index))
-                scalar = self.chart_map(index).coordinate_algebra_morphism()(restriction(function))
+                restriction = coarse.global_function_restriction(
+                    self.coarse_index(index)
+                )
+                scalar = self.chart_map(index).coordinate_algebra_morphism()(
+                    restriction(function)
+                )
                 module = structure.local_module(index)
                 label = next(iter(module.module_generating_set()))
-                components[index] = module.scalar_multiple(scalar, module.module_generator(label))
+                components[index] = module.scalar_multiple(
+                    scalar, module.module_generator(label)
+                )
             return target(structure.base_restricted_section(components))
 
         return _algebra_mor(source, target)._from_constructed_element_map(image)
@@ -1533,11 +1739,15 @@ class FiniteAtlasRefinementMethods:
         pullback functor's target, rather than another equalizer realization.
         """
         if descent.gluing_datum() is not self.coarse_datum():
-            raise ValueError("global-section pullback requires descent on the coarse atlas")
+            raise ValueError(
+                "global-section pullback requires descent on the coarse atlas"
+            )
         pulled_sheaf = self.module_pullback_functor()(descent.sheaf())
         pulled = pulled_sheaf.gluing_datum()
         source = descent.compatible_sections()
-        target = pulled_sheaf.global_sections().restrict_scalars(self.global_function_map())
+        target = pulled_sheaf.global_sections().restrict_scalars(
+            self.global_function_map()
+        )
 
         def image(section):
             components = {
@@ -1545,13 +1755,19 @@ class FiniteAtlasRefinementMethods:
                     descent.local_module(self.coarse_index(index)),
                     pulled.local_module(index),
                     self.chart_map(index).coordinate_algebra_morphism(),
-                    descent.compatible_section_component(section, self.coarse_index(index)),
+                    descent.compatible_section_component(
+                        section, self.coarse_index(index)
+                    ),
                 )
                 for index in self.fine_datum().chart_indices()
             }
             return target.wrap(pulled.compatible_section(components))
 
-        return source.module_category().Mor(source, target)._from_constructed_element_map(image)
+        return (
+            source.module_category()
+            .Mor(source, target)
+            ._from_constructed_element_map(image)
+        )
 
     def _coarse_chart_open(self, fine_index, open_subscheme):
         fine = self.fine_datum()
@@ -1562,7 +1778,10 @@ class FiniteAtlasRefinementMethods:
         coarse_chart = coarse.chart(coarse_index)
         selected = fine_chart if open_subscheme is None else open_subscheme
         if selected is not fine_chart:
-            assert selected in OpenImmersions(fine_chart) and selected.is_distinguished_open() is True, (
+            assert (
+                selected in OpenImmersions(fine_chart)
+                and selected.is_distinguished_open() is True
+            ), (
                 "a refinement basis open must be the fine chart or one of its distinguished opens"
             )
         chart_map = self.chart_map(fine_index)
@@ -1575,7 +1794,10 @@ class FiniteAtlasRefinementMethods:
                 "a refinement chart image requires a represented localization tower"
             )
             comparison = middle.principal_localization_comparison(original)
-            canonical = comparison.inverse().forward() * comparison.codomain().localization_map()
+            canonical = (
+                comparison.inverse().forward()
+                * comparison.codomain().localization_map()
+            )
         assert (scalar_map == canonical) is True, (
             "a refinement chart image requires the canonical map of its localization tower"
         )
@@ -1584,8 +1806,16 @@ class FiniteAtlasRefinementMethods:
             identity = original.Mor(original).identity()
             return coarse_index, selected, coarse_chart, identity, identity
         comparison = selected_ring.principal_localization_comparison(original)
-        image = coarse_chart.distinguished_open(comparison.codomain().inverted_element())
-        return coarse_index, selected, image, comparison.inverse().forward(), comparison.forward()
+        image = coarse_chart.distinguished_open(
+            comparison.codomain().inverted_element()
+        )
+        return (
+            coarse_index,
+            selected,
+            image,
+            comparison.inverse().forward(),
+            comparison.forward(),
+        )
 
     @cached_method
     def chart_open_subset(self, fine_index, open_subscheme=None):
@@ -1654,7 +1884,9 @@ class FiniteAtlasRefinementMethods:
             sage: reverse(forward(denominator_inverse)) == denominator_inverse
             True
         """
-        coarse_index, _selected, image, _forward, _reverse = self._coarse_chart_open(fine_index, open_subscheme)
+        coarse_index, _selected, image, _forward, _reverse = self._coarse_chart_open(
+            fine_index, open_subscheme
+        )
         return self.coarse_datum().chart_open_subset(coarse_index, image)
 
     @cached_method
@@ -1664,10 +1896,13 @@ class FiniteAtlasRefinementMethods:
         Both coordinate maps are induced by localization. In particular,
         ``(A_f)_g`` and ``A_fa`` retain their actual inverse universal maps.
         """
-        _index, selected, image, forward, reverse = self._coarse_chart_open(fine_index, open_subscheme)
+        _index, selected, image, forward, reverse = self._coarse_chart_open(
+            fine_index, open_subscheme
+        )
         schemes = Schemes(selected.scheme_base_ring())
         return schemes.Core().Mor(selected, image)(
-            schemes.Mor(selected, image)(forward), schemes.Mor(image, selected)(reverse),
+            schemes.Mor(selected, image)(forward),
+            schemes.Mor(image, selected)(reverse),
         )
 
     def overlap_map(self, source_index, target_index):
@@ -1689,8 +1924,11 @@ class FiniteAtlasRefinementMethods:
     def overlap_compatibility_decision(self):
         fine = self.fine_datum()
         coarse = self.coarse_datum()
+
         def commutes(source_index, target_index):
-            fine_transition = fine.transition_between(source_index, target_index).forward()
+            fine_transition = fine.transition_between(
+                source_index, target_index
+            ).forward()
             source_overlap = fine.overlap(source_index, target_index)
             target_overlap = fine.overlap(target_index, source_index)
             coarse_source = self.coarse_index(source_index)
@@ -1703,10 +1941,9 @@ class FiniteAtlasRefinementMethods:
                     * fine_transition
                 )
             else:
-                left = (
-                    coarse.transition_between(coarse_source, coarse_target).forward()
-                    * self.overlap_map(source_index, target_index)
-                )
+                left = coarse.transition_between(
+                    coarse_source, coarse_target
+                ).forward() * self.overlap_map(source_index, target_index)
                 right = self.overlap_map(target_index, source_index) * fine_transition
             return left == right
 
@@ -1775,6 +2012,7 @@ class FiniteAtlasRefinementMethods:
             coarse_source = self.coarse_index(source_index)
             coarse_target = self.coarse_index(target_index)
             if coarse_source == coarse_target:
+
                 def forward_identity(label, _domain, codomain):
                     return codomain.module_generator(label)
 
@@ -1890,14 +2128,20 @@ class FiniteAtlasMor(CoveringFamilyMor):
 
     ElementMethods = FiniteAtlasRefinementMethods
 
-    def _element_constructor_(self, index_map, chart_maps=None, *, target_map=None, check=False):
+    def _element_constructor_(
+        self, index_map, chart_maps=None, *, target_map=None, check=False
+    ):
         match index_map:
-            case FiniteAtlasRefinementMethods() if chart_maps is None and target_map is None:
+            case FiniteAtlasRefinementMethods() if (
+                chart_maps is None and target_map is None
+            ):
                 if index_map.parent() is self:
                     if check:
                         index_map.validate_overlap_compatibility()
                     return index_map
-                raise TypeError(f"{index_map} belongs to another Mor; apply the functor between the categories")
+                raise TypeError(
+                    f"{index_map} belongs to another Mor; apply the functor between the categories"
+                )
         if chart_maps is None:
             raise TypeError(
                 f"cannot build a refinement {self.domain()} -> {self.codomain()} from {index_map}: a map "
@@ -2191,10 +2435,14 @@ class FiniteAtlasInvertibleSheafRefinement(SageObject):
                     )
                 }
             )
-            local_isomorphisms[fine_index] = pulled.module_category().Core().Mor(
-                pulled,
-                refined,
-            )(forward, inverse)
+            local_isomorphisms[fine_index] = (
+                pulled.module_category()
+                .Core()
+                .Mor(
+                    pulled,
+                    refined,
+                )(forward, inverse)
+            )
         self._local_isomorphisms = finite_indexed_family(
             fine.chart_index_set(),
             lambda index: local_isomorphisms[index],
@@ -2330,8 +2578,12 @@ class SemilinearAlgebraMorphism(SageObject):
                 f"{morphism.domain()}"
             )
         source_structure = self.source().algebra_structure_morphism()
-        scalar_restriction = self.source().base_ring().Mor(morphism.codomain())(
-            lambda scalar: morphism(source_structure(scalar)),
+        scalar_restriction = (
+            self.source()
+            .base_ring()
+            .Mor(morphism.codomain())(
+                lambda scalar: morphism(source_structure(scalar)),
+            )
         )
         target_scalars = self.target().base_ring()
         assert target_scalars in LocalizationRings(), (
@@ -2355,9 +2607,7 @@ class SemilinearAlgebraMorphism(SageObject):
         source_map = localization_source.Mor(localization_source).identity()
         for step in reversed(localization_steps):
             source_map = step * source_map
-        scalar_factor = target_scalars.induced_morphism(
-            scalar_restriction * source_map
-        )
+        scalar_factor = target_scalars.induced_morphism(scalar_restriction * source_map)
         target_view = _algebra_structure_view(morphism.codomain(), scalar_factor)
         source_labels = self.source().algebra_generating_set()
         target_labels = self.target().algebra_generating_set()
@@ -2442,7 +2692,14 @@ class SemilinearAlgebraMorphism(SageObject):
 class FiniteAtlasAlgebraTransition(SageObject):
     r"""One semilinear algebra-descent isomorphism across two affine overlaps."""
 
-    def __init__(self, scheme_transition, source_algebra, target_algebra, pullback, inverse_pullback) -> None:
+    def __init__(
+        self,
+        scheme_transition,
+        source_algebra,
+        target_algebra,
+        pullback,
+        inverse_pullback,
+    ) -> None:
         if scheme_transition not in _scheme_core_mor(scheme_transition):
             raise TypeError(
                 f"cannot build an algebra chart change over {scheme_transition}: it must be an isomorphism "
@@ -2454,7 +2711,9 @@ class FiniteAtlasAlgebraTransition(SageObject):
         self._pullback = pullback
         self._inverse_pullback = inverse_pullback
         forward_scalar = scheme_transition.forward().coordinate_algebra_morphism()
-        reverse_scalar = scheme_transition.inverse().forward().coordinate_algebra_morphism()
+        reverse_scalar = (
+            scheme_transition.inverse().forward().coordinate_algebra_morphism()
+        )
         if (
             pullback.source() is not target_algebra
             or pullback.target() is not source_algebra
@@ -2478,12 +2737,14 @@ class FiniteAtlasAlgebraTransition(SageObject):
             )
 
     def inverse_pair_decision(self):
-        return conjunction((
-            self.pullback() * self.inverse_pullback()
-            == SemilinearAlgebraMorphism.identity(self.source_algebra()),
-            self.inverse_pullback() * self.pullback()
-            == SemilinearAlgebraMorphism.identity(self.target_algebra()),
-        ))
+        return conjunction(
+            (
+                self.pullback() * self.inverse_pullback()
+                == SemilinearAlgebraMorphism.identity(self.source_algebra()),
+                self.inverse_pullback() * self.pullback()
+                == SemilinearAlgebraMorphism.identity(self.target_algebra()),
+            )
+        )
 
     @validator
     def validate_inverse_pair(self):
@@ -2539,7 +2800,9 @@ class FiniteAtlasModuleTransition(SageObject):
         self._pullback = pullback
         self._inverse_pullback = inverse_pullback
         forward_scalar = scheme_transition.forward().coordinate_algebra_morphism()
-        reverse_scalar = scheme_transition.inverse().forward().coordinate_algebra_morphism()
+        reverse_scalar = (
+            scheme_transition.inverse().forward().coordinate_algebra_morphism()
+        )
         if (
             pullback.source() is not target_module
             or pullback.target() is not source_module
@@ -2563,12 +2826,14 @@ class FiniteAtlasModuleTransition(SageObject):
             )
 
     def inverse_pair_decision(self):
-        return conjunction((
-            self.pullback() * self.inverse_pullback()
-            == SemilinearModuleMorphism.identity(self.source_module()),
-            self.inverse_pullback() * self.pullback()
-            == SemilinearModuleMorphism.identity(self.target_module()),
-        ))
+        return conjunction(
+            (
+                self.pullback() * self.inverse_pullback()
+                == SemilinearModuleMorphism.identity(self.source_module()),
+                self.inverse_pullback() * self.pullback()
+                == SemilinearModuleMorphism.identity(self.target_module()),
+            )
+        )
 
     @validator
     def validate_inverse_pair(self):
@@ -2726,7 +2991,8 @@ class _FiniteAtlasModuleGluingDatumEngine:
                     {
                         target_label: codomain.base_ring()(coefficient)
                         for target_label, coefficient in dict(value).items()
-                        if codomain.base_ring()(coefficient) != codomain.base_ring().zero()
+                        if codomain.base_ring()(coefficient)
+                        != codomain.base_ring().zero()
                     }
                 )
         return images
@@ -2818,13 +3084,18 @@ class _FiniteAtlasModuleGluingDatumEngine:
                     target_pair,
                     target_triple,
                     target_restriction,
-                    pair_transition.inverse_pullback()(source_pair.module_generator(label)),
+                    pair_transition.inverse_pullback()(
+                        source_pair.module_generator(label)
+                    ),
                 )
                 for label in source_pair.module_generating_set()
             },
         )
         transition = FiniteAtlasModuleTransition(
-            triple_scheme_transition.parent().base_category().Core().Mor(
+            triple_scheme_transition.parent()
+            .base_category()
+            .Core()
+            .Mor(
                 triple_scheme_transition.domain(),
                 triple_scheme_transition.codomain(),
             )(triple_scheme_transition, inverse_scheme_transition),
@@ -2864,10 +3135,9 @@ class _FiniteAtlasModuleGluingDatumEngine:
             )
         chart_index = self.gluing_datum().normalize_chart_index(chart_index)
         other_index = self.gluing_datum().normalize_chart_index(other_index)
-        if (
-            local_map.domain() is not self.local_module(chart_index)
-            or local_map.codomain() is not target_datum.local_module(chart_index)
-        ):
+        if local_map.domain() is not self.local_module(
+            chart_index
+        ) or local_map.codomain() is not target_datum.local_module(chart_index):
             raise ValueError(
                 f"cannot restrict {local_map} on chart {chart_index}: it must be a map "
                 f"{self.local_module(chart_index)} -> {target_datum.local_module(chart_index)}, but it is "
@@ -2897,6 +3167,7 @@ class _FiniteAtlasModuleGluingDatumEngine:
 
     def identity_morphism(self):
         r"""Return the identity morphism of this finite-atlas descent datum."""
+
         def identity_at(index):
             module = self.local_module(index)
             return module.module_category().Mor(module, module).identity()
@@ -3014,16 +3285,23 @@ class _FiniteAtlasModuleGluingDatumEngine:
             source_value = _base_change_element(
                 self.local_module(source_index),
                 self.pair_module(source_index, target_index),
-                atlas.overlap(source_index, target_index).inclusion().coordinate_algebra_morphism(),
+                atlas.overlap(source_index, target_index)
+                .inclusion()
+                .coordinate_algebra_morphism(),
                 components[source_index],
             )
             target_value = _base_change_element(
                 self.local_module(target_index),
                 self.pair_module(target_index, source_index),
-                atlas.overlap(target_index, source_index).inclusion().coordinate_algebra_morphism(),
+                atlas.overlap(target_index, source_index)
+                .inclusion()
+                .coordinate_algebra_morphism(),
                 components[target_index],
             )
-            if self.transition(source_index, target_index).pullback()(target_value) != source_value:
+            if (
+                self.transition(source_index, target_index).pullback()(target_value)
+                != source_value
+            ):
                 raise ValueError(
                     f"the local sections {sections} do not glue: on the overlap of charts {source_index} and "
                     f"{target_index} they disagree after the chart change"
@@ -3037,7 +3315,10 @@ class _FiniteAtlasModuleGluingDatumEngine:
         factors = finite_indexed_family(
             self.chart_index_set(),
             lambda index: self.local_module(index).restrict_scalars(
-                self.gluing_datum().chart(index).coordinate_algebra().algebra_structure_morphism()
+                self.gluing_datum()
+                .chart(index)
+                .coordinate_algebra()
+                .algebra_structure_morphism()
             ),
             name="Finite-atlas chart modules over the scheme base ring",
         )
@@ -3050,7 +3331,10 @@ class _FiniteAtlasModuleGluingDatumEngine:
         factors = finite_indexed_family(
             self.gluing_datum().transition_index_set(),
             lambda pair: self.pair_module(*pair).restrict_scalars(
-                self.gluing_datum().overlap(*pair).coordinate_algebra().algebra_structure_morphism()
+                self.gluing_datum()
+                .overlap(*pair)
+                .coordinate_algebra()
+                .algebra_structure_morphism()
             ),
             name="Finite-atlas overlap modules over the scheme base ring",
         )
@@ -3069,10 +3353,15 @@ class _FiniteAtlasModuleGluingDatumEngine:
                 chart_index = source_index
                 local_module = self.local_module(source_index)
                 pair_module = self.pair_module(source_index, target_index)
-                ring_map = self.gluing_datum().overlap(
-                    source_index,
-                    target_index,
-                ).inclusion().coordinate_algebra_morphism()
+                ring_map = (
+                    self.gluing_datum()
+                    .overlap(
+                        source_index,
+                        target_index,
+                    )
+                    .inclusion()
+                    .coordinate_algebra_morphism()
+                )
 
                 def image(element):
                     return matching_factor.wrap(
@@ -3088,10 +3377,15 @@ class _FiniteAtlasModuleGluingDatumEngine:
                 chart_index = target_index
                 local_module = self.local_module(target_index)
                 pair_module = self.pair_module(target_index, source_index)
-                ring_map = self.gluing_datum().overlap(
-                    target_index,
-                    source_index,
-                ).inclusion().coordinate_algebra_morphism()
+                ring_map = (
+                    self.gluing_datum()
+                    .overlap(
+                        target_index,
+                        source_index,
+                    )
+                    .inclusion()
+                    .coordinate_algebra_morphism()
+                )
                 transition = self.transition(source_index, target_index).pullback()
 
                 def image(element):
@@ -3113,9 +3407,11 @@ class _FiniteAtlasModuleGluingDatumEngine:
         # A leg of the Čech diagram restricts a chart module to an overlap
         # and changes coordinates there, both linear over the base, so the
         # construction alone gives linearity.
-        restriction = local_factor.module_category().Mor(
-            local_factor, matching_factor
-        )._from_constructed_element_map(image)
+        restriction = (
+            local_factor.module_category()
+            .Mor(local_factor, matching_factor)
+            ._from_constructed_element_map(image)
+        )
         projection = local_product.structure_morphism(
             local_product.diagram().domain()(chart_index)
         )
@@ -3133,7 +3429,9 @@ class _FiniteAtlasModuleGluingDatumEngine:
         def side_map(side):
             cone = matching_diagram.Cones().cone(
                 local_product.object(),
-                lambda index: self._base_restricted_matching_section_leg(index.value(), side),
+                lambda index: self._base_restricted_matching_section_leg(
+                    index.value(), side
+                ),
             )
             return matching_product.factor(cone).apex_map()
 
@@ -3219,10 +3517,15 @@ class _FiniteAtlasModuleGluingDatumEngine:
                 chart_index = source_index
                 local_module = self.local_module(source_index)
                 pair_module = self.pair_module(source_index, target_index)
-                ring_map = self.gluing_datum().overlap(
-                    source_index,
-                    target_index,
-                ).inclusion().coordinate_algebra_morphism()
+                ring_map = (
+                    self.gluing_datum()
+                    .overlap(
+                        source_index,
+                        target_index,
+                    )
+                    .inclusion()
+                    .coordinate_algebra_morphism()
+                )
 
                 def image(element):
                     return matching_factor.wrap(
@@ -3238,10 +3541,15 @@ class _FiniteAtlasModuleGluingDatumEngine:
                 chart_index = target_index
                 local_module = self.local_module(target_index)
                 pair_module = self.pair_module(target_index, source_index)
-                ring_map = self.gluing_datum().overlap(
-                    target_index,
-                    source_index,
-                ).inclusion().coordinate_algebra_morphism()
+                ring_map = (
+                    self.gluing_datum()
+                    .overlap(
+                        target_index,
+                        source_index,
+                    )
+                    .inclusion()
+                    .coordinate_algebra_morphism()
+                )
                 transition = self.transition(source_index, target_index).pullback()
 
                 def image(element):
@@ -3263,9 +3571,11 @@ class _FiniteAtlasModuleGluingDatumEngine:
         # A leg of the Čech diagram restricts a chart module to an overlap
         # and changes coordinates there, both linear over the base, so the
         # construction alone gives linearity.
-        restriction = local_factor.module_category().Mor(
-            local_factor, matching_factor
-        )._from_constructed_element_map(image)
+        restriction = (
+            local_factor.module_category()
+            .Mor(local_factor, matching_factor)
+            ._from_constructed_element_map(image)
+        )
         projection = local_product.structure_morphism(
             local_product.diagram().domain()(chart_index)
         )
@@ -3335,9 +3645,15 @@ class _FiniteAtlasModuleGluingDatumEngine:
         module = self.local_module(chart_index)
         if chart_open is chart:
             return module
-        return QuasiCoherentSheaves(chart).associated_sheaf(module).sections_on_distinguished_open(chart_open)
+        return (
+            QuasiCoherentSheaves(chart)
+            .associated_sheaf(module)
+            .sections_on_distinguished_open(chart_open)
+        )
 
-    def basis_restriction(self, source_index, source_open, target_index, target_open, section):
+    def basis_restriction(
+        self, source_index, source_open, target_index, target_open, section
+    ):
         r"""Restrict module sections between contained chart basis opens.
 
         The coordinate restriction determines scalar transport. Generator
@@ -3349,9 +3665,14 @@ class _FiniteAtlasModuleGluingDatumEngine:
         target_index = atlas.normalize_chart_index(target_index)
         source = self.basis_module(source_index, source_open)
         target = self.basis_module(target_index, target_open)
-        scalar_map = atlas.basis_coordinate_restriction(source_index, source_open, target_index, target_open)
+        scalar_map = atlas.basis_coordinate_restriction(
+            source_index, source_open, target_index, target_open
+        )
         if source_index == target_index:
-            images = {label: target.module_generator(label) for label in source.module_generating_set()}
+            images = {
+                label: target.module_generator(label)
+                for label in source.module_generating_set()
+            }
         else:
             original = self.local_module(source_index)
             overlap = atlas.overlap(source_index, target_index)
@@ -3359,18 +3680,31 @@ class _FiniteAtlasModuleGluingDatumEngine:
             target_overlap = atlas.overlap(target_index, source_index)
             target_pair = self.pair_module(target_index, source_index)
             target_restriction = ModulesOverCommutativeRings().Mor(target_pair, target)(
-                target_chart.structure_sheaf().restriction_map(target_overlap, target_open),
-                {label: target.module_generator(label) for label in target_pair.module_generating_set()},
+                target_chart.structure_sheaf().restriction_map(
+                    target_overlap, target_open
+                ),
+                {
+                    label: target.module_generator(label)
+                    for label in target_pair.module_generating_set()
+                },
             )
             transition = self.transition(source_index, target_index).inverse_pullback()
             images = {
-                label: target_restriction(transition(_base_change_element(
-                    original, self.pair_module(source_index, target_index),
-                    overlap.inclusion().coordinate_algebra_morphism(), original.module_generator(label),
-                )))
+                label: target_restriction(
+                    transition(
+                        _base_change_element(
+                            original,
+                            self.pair_module(source_index, target_index),
+                            overlap.inclusion().coordinate_algebra_morphism(),
+                            original.module_generator(label),
+                        )
+                    )
+                )
                 for label in source.module_generating_set()
             }
-        return ModulesOverCommutativeRings().Mor(source, target)(scalar_map, images)(section)
+        return ModulesOverCommutativeRings().Mor(source, target)(scalar_map, images)(
+            section
+        )
 
     def tensor_product(self, other):
         r"""Return the descent datum for the chartwise tensor product with ``other``."""
@@ -3388,8 +3722,12 @@ class _FiniteAtlasModuleGluingDatumEngine:
         }
 
         def tensor_transition(left_datum, right_datum, source_index, target_index):
-            left_transition = left_datum.transition(source_index, target_index).pullback()
-            right_transition = right_datum.transition(source_index, target_index).pullback()
+            left_transition = left_datum.transition(
+                source_index, target_index
+            ).pullback()
+            right_transition = right_datum.transition(
+                source_index, target_index
+            ).pullback()
             left_source = left_datum.pair_module(target_index, source_index)
             right_source = right_datum.pair_module(target_index, source_index)
             left_target = left_datum.pair_module(source_index, target_index)
@@ -3406,9 +3744,9 @@ class _FiniteAtlasModuleGluingDatumEngine:
                 )
                 coefficients = {}
                 for tensor_label in codomain.module_generating_set():
-                    coefficient = left_coordinates(tensor_label.component(0)) * right_coordinates(
-                        tensor_label.component(1)
-                    )
+                    coefficient = left_coordinates(
+                        tensor_label.component(0)
+                    ) * right_coordinates(tensor_label.component(1))
                     if coefficient:
                         coefficients[tensor_label] = coefficient
                 return codomain.linear_combination(coefficients)
@@ -3450,17 +3788,18 @@ class FiniteAtlasModuleGluingMorphismMethods:
         )
         for index in source.chart_indices():
             local_map = self._local_maps[index]
-            if (
-                local_map.domain() is not source.local_module(index)
-                or local_map.codomain() is not target.local_module(index)
-            ):
+            if local_map.domain() is not source.local_module(
+                index
+            ) or local_map.codomain() is not target.local_module(index):
                 raise ValueError(
                     f"cannot build a morphism of glued modules {source} -> {target}: the local map "
                     f"{local_map} on chart {index} must be {source.local_module(index)} -> "
                     f"{target.local_module(index)}, but it is {local_map.domain()} -> {local_map.codomain()}"
                 )
-            local_mor = source.local_module(index).module_category().Mor(
-                source.local_module(index), target.local_module(index)
+            local_mor = (
+                source.local_module(index)
+                .module_category()
+                .Mor(source.local_module(index), target.local_module(index))
             )
             if local_map not in local_mor:
                 raise TypeError(
@@ -3526,7 +3865,10 @@ class FiniteAtlasModuleGluingMorphismMethods:
     @staticmethod
     def _base_changed_map(local_map, ring_map, source, target):
         r"""Transport ``local_map`` to already selected scalar-extension parents."""
-        if source.base_ring() is not ring_map.codomain() or target.base_ring() is not ring_map.codomain():
+        if (
+            source.base_ring() is not ring_map.codomain()
+            or target.base_ring() is not ring_map.codomain()
+        ):
             raise ValueError(
                 f"cannot base change {local_map} along {ring_map}: {source} and {target} must be modules "
                 f"over {ring_map.codomain()}, but they are modules over {source.base_ring()} and "
@@ -3535,7 +3877,9 @@ class FiniteAtlasModuleGluingMorphismMethods:
         framing = local_map.codomain().framing_morphism()
         images = {}
         for label in local_map.domain().module_generating_set():
-            coordinates = framing.lift(local_map(local_map.domain().module_generator(label)))
+            coordinates = framing.lift(
+                local_map(local_map.domain().module_generator(label))
+            )
             images[label] = target.linear_combination(
                 {
                     target_label: ring_map(coordinates(target_label))
@@ -3556,8 +3900,7 @@ class FiniteAtlasModuleGluingMorphismMethods:
         """
         datum = self.source_datum().gluing_datum()
         local_kernels = {
-            index: self.local_map(index).kernel()
-            for index in datum.chart_indices()
+            index: self.local_map(index).kernel() for index in datum.chart_indices()
         }
         assert all(kernel.is_free() is True for kernel in local_kernels.values()), (
             f"cannot glue the kernel of {self}: the kernels of its local maps must be free modules, "
@@ -3571,9 +3914,19 @@ class FiniteAtlasModuleGluingMorphismMethods:
             target_kernel = local_kernels[target_index]
             source_pair = self.source_datum().pair_module(source_index, target_index)
             target_pair = self.source_datum().pair_module(target_index, source_index)
-            source_ring_map = datum.overlap(source_index, target_index).inclusion().coordinate_algebra_morphism()
-            target_ring_map = datum.overlap(target_index, source_index).inclusion().coordinate_algebra_morphism()
-            ambient_transition = self.source_datum().transition(source_index, target_index).pullback()
+            source_ring_map = (
+                datum.overlap(source_index, target_index)
+                .inclusion()
+                .coordinate_algebra_morphism()
+            )
+            target_ring_map = (
+                datum.overlap(target_index, source_index)
+                .inclusion()
+                .coordinate_algebra_morphism()
+            )
+            ambient_transition = (
+                self.source_datum().transition(source_index, target_index).pullback()
+            )
 
             def images(label, domain, codomain):
                 target_inclusion = self._base_changed_map(
@@ -3618,8 +3971,14 @@ class FiniteAtlasModuleGluingMorphismMethods:
         def cokernel_transition(source_index, target_index):
             source_pair = self.target_datum().pair_module(source_index, target_index)
             target_pair = self.target_datum().pair_module(target_index, source_index)
-            source_ring_map = datum.overlap(source_index, target_index).inclusion().coordinate_algebra_morphism()
-            ambient_transition = self.target_datum().transition(source_index, target_index).pullback()
+            source_ring_map = (
+                datum.overlap(source_index, target_index)
+                .inclusion()
+                .coordinate_algebra_morphism()
+            )
+            ambient_transition = (
+                self.target_datum().transition(source_index, target_index).pullback()
+            )
 
             def images(label, domain, codomain):
                 source_projection = self._base_changed_map(
@@ -3643,7 +4002,9 @@ class FiniteAtlasModuleGluingMorphismMethods:
 
     def stalk_map(self, chart_index, point):
         r"""Return the induced map on the stalk at ``point`` of one affine chart."""
-        chart_index = self.source_datum().gluing_datum().normalize_chart_index(chart_index)
+        chart_index = (
+            self.source_datum().gluing_datum().normalize_chart_index(chart_index)
+        )
         chart = self.source_datum().gluing_datum().chart(chart_index)
         spectrum = chart.underlying_space()
         if point.parent() is not spectrum:
@@ -3663,6 +4024,7 @@ class FiniteAtlasModuleGluingMorphismMethods:
     def overlap_compatibility_decision(self):
         source = self.source_datum()
         target = self.target_datum()
+
         def commutes(source_index, target_index):
             source_transition = source.transition(source_index, target_index)
             target_transition = target.transition(source_index, target_index)
@@ -3681,7 +4043,10 @@ class FiniteAtlasModuleGluingMorphismMethods:
             left = target_transition.pullback() * SemilinearModuleMorphism.from_linear(
                 target_side
             )
-            right = SemilinearModuleMorphism.from_linear(source_side) * source_transition.pullback()
+            right = (
+                SemilinearModuleMorphism.from_linear(source_side)
+                * source_transition.pullback()
+            )
             return left == right
 
         return conjunction(
@@ -3721,7 +4086,9 @@ class FiniteAtlasModuleSheafMorphismMethods:
         return self._local_maps
 
     def local_map(self, index):
-        return self.local_maps()[self.source_datum().gluing_datum().normalize_chart_index(index)]
+        return self.local_maps()[
+            self.source_datum().gluing_datum().normalize_chart_index(index)
+        ]
 
     def is_surjective(self) -> bool:
         r"""Surjectivity on the affine cover, hence on stalks (Hartshorne, II.5.5).
@@ -3755,8 +4122,12 @@ class FiniteAtlasModuleSheafMorphismMethods:
     def __mul__(self, other):
         r"""Compose sheaf arrows, with descent maps composing chartwise."""
         match other:
-            case FiniteAtlasModuleSheafMorphismMethods() if other.codomain() is self.domain():
-                return QuasiCoherentSheaves(self.domain().scheme()).Mor(other.domain(), self.codomain())(
+            case FiniteAtlasModuleSheafMorphismMethods() if (
+                other.codomain() is self.domain()
+            ):
+                return QuasiCoherentSheaves(self.domain().scheme()).Mor(
+                    other.domain(), self.codomain()
+                )(
                     {
                         index: self.local_map(index) * other.local_map(index)
                         for index in other.source_datum().chart_indices()
@@ -3766,7 +4137,10 @@ class FiniteAtlasModuleSheafMorphismMethods:
                 return NotImplemented
 
     def __eq__(self, other):
-        if not isinstance(other, FiniteAtlasModuleSheafMorphismMethods) or other.parent() is not self.parent():
+        if (
+            not isinstance(other, FiniteAtlasModuleSheafMorphismMethods)
+            or other.parent() is not self.parent()
+        ):
             return False
         return conjunction(
             self.local_map(index) == other.local_map(index)
@@ -3832,7 +4206,9 @@ class FiniteAtlasModuleSheafMor(QuasiCoherentSheafMor):
                     local_maps.validate_overlap_compatibility()
                 return local_maps
             case FiniteAtlasModuleSheafMorphismMethods():
-                raise TypeError(f"{local_maps} belongs to another Mor; apply the functor between the categories")
+                raise TypeError(
+                    f"{local_maps} belongs to another Mor; apply the functor between the categories"
+                )
             case _:
                 pass
         morphism = self.element_class(self, local_maps)
@@ -3850,7 +4226,8 @@ class FiniteAtlasModuleSheafMor(QuasiCoherentSheafMor):
         datum = self.domain().gluing_datum()
         return self(
             {
-                index: datum.local_module(index).module_category()
+                index: datum.local_module(index)
+                .module_category()
                 .Mor(datum.local_module(index), datum.local_module(index))
                 .identity()
                 for index in datum.chart_indices()
@@ -3874,12 +4251,16 @@ class FiniteAtlasModuleGluingMor(CategoricalMor):
 
     def _element_constructor_(self, local_maps, *, check=False):
         match local_maps:
-            case FiniteAtlasModuleGluingMorphismMethods() if local_maps.parent() is self:
+            case FiniteAtlasModuleGluingMorphismMethods() if (
+                local_maps.parent() is self
+            ):
                 if check:
                     local_maps.validate_overlap_compatibility()
                 return local_maps
             case FiniteAtlasModuleGluingMorphismMethods():
-                raise TypeError(f"{local_maps} belongs to another Mor; apply the functor between the categories")
+                raise TypeError(
+                    f"{local_maps} belongs to another Mor; apply the functor between the categories"
+                )
             case _:
                 pass
         morphism = self.element_class(self, local_maps)
@@ -3897,7 +4278,8 @@ class FiniteAtlasModuleGluingMor(CategoricalMor):
         datum = self.domain()
         return self(
             {
-                index: datum.local_module(index).module_category()
+                index: datum.local_module(index)
+                .module_category()
                 .Mor(datum.local_module(index), datum.local_module(index))
                 .identity()
                 for index in datum.chart_indices()
@@ -3934,9 +4316,13 @@ class FiniteAtlasModuleGluingData(CategoryPacketMethods, OwnedParameterizedCateg
             objects; the transition and cocycle data stay on this datum.
             """
             values = self.local_modules()
-            return Cat().Mor(
-                DiscreteCategory(values.index_set()), ModulesOverCommutativeRings()
-            ).discrete_diagram(values)
+            return (
+                Cat()
+                .Mor(
+                    DiscreteCategory(values.index_set()), ModulesOverCommutativeRings()
+                )
+                .discrete_diagram(values)
+            )
 
     @staticmethod
     def __classcall__(cls, atlas):
@@ -3996,7 +4382,8 @@ class _FiniteAtlasAlgebraGluingDatumEngine:
         self._gluing_datum = gluing_datum
         indices = gluing_datum.chart_index_set()
         self._local_algebras = _family_on_finite_ordered_set(
-            indices, local_algebras,
+            indices,
+            local_algebras,
             name="Local algebras of finite-atlas descent",
             noun="finite-atlas local algebra data",
         )
@@ -4011,7 +4398,8 @@ class _FiniteAtlasAlgebraGluingDatumEngine:
                 )
             _finite_algebra_framing(algebra)
         self._transition_data = _family_on_finite_ordered_set(
-            gluing_datum.transition_index_set(), transitions,
+            gluing_datum.transition_index_set(),
+            transitions,
             name="Semilinear algebra transition data of a finite atlas",
             noun="finite-atlas algebra transition data",
         )
@@ -4062,7 +4450,15 @@ class _FiniteAtlasAlgebraGluingDatumEngine:
         datum = self.gluing_datum()
         chart_index = datum.normalize_chart_index(chart_index)
         ranking = datum.chart_index_set().ranking_map()
-        others = tuple(sorted((datum.normalize_chart_index(first_other), datum.normalize_chart_index(second_other)), key=ranking))
+        others = tuple(
+            sorted(
+                (
+                    datum.normalize_chart_index(first_other),
+                    datum.normalize_chart_index(second_other),
+                ),
+                key=ranking,
+            )
+        )
         key = (chart_index, *others)
         for cached_key, cached in self._triple_algebras:
             if cached_key == key:
@@ -4107,16 +4503,24 @@ class _FiniteAtlasAlgebraGluingDatumEngine:
         scheme_transition = datum.transition_between(source_index, target_index)
         source = self.pair_algebra(source_index, target_index)
         target = self.pair_algebra(target_index, source_index)
-        pullback_images, inverse_images = self._transition_images(source_index, target_index)
+        pullback_images, inverse_images = self._transition_images(
+            source_index, target_index
+        )
         pullback = SemilinearAlgebraMorphism(
-            target, source, scheme_transition.forward().coordinate_algebra_morphism(),
+            target,
+            source,
+            scheme_transition.forward().coordinate_algebra_morphism(),
             self._images(target, source, pullback_images),
         )
         inverse_pullback = SemilinearAlgebraMorphism(
-            source, target, scheme_transition.inverse().forward().coordinate_algebra_morphism(),
+            source,
+            target,
+            scheme_transition.inverse().forward().coordinate_algebra_morphism(),
             self._images(source, target, inverse_images),
         )
-        transition = FiniteAtlasAlgebraTransition(scheme_transition, source, target, pullback, inverse_pullback)
+        transition = FiniteAtlasAlgebraTransition(
+            scheme_transition, source, target, pullback, inverse_pullback
+        )
         self._transitions.append((key, transition))
         return transition
 
@@ -4124,11 +4528,20 @@ class _FiniteAtlasAlgebraGluingDatumEngine:
         pair = self.pair_algebra(chart_index, first_other)
         triple = self.triple_algebra(chart_index, first_other, second_other)
         pair_open = self.gluing_datum().overlap(chart_index, first_other)
-        triple_open = self.gluing_datum().triple_overlap(chart_index, first_other, second_other)
-        ring_map = pair_open.corestriction(triple_open.inclusion()).coordinate_algebra_morphism()
+        triple_open = self.gluing_datum().triple_overlap(
+            chart_index, first_other, second_other
+        )
+        ring_map = pair_open.corestriction(
+            triple_open.inclusion()
+        ).coordinate_algebra_morphism()
         return SemilinearAlgebraMorphism(
-            pair, triple, ring_map,
-            {label: triple.algebra_generator(label) for label in pair.algebra_generating_set()},
+            pair,
+            triple,
+            ring_map,
+            {
+                label: triple.algebra_generator(label)
+                for label in pair.algebra_generating_set()
+            },
         )
 
     def transition_on_triple(self, source_index, target_index, third_index):
@@ -4147,28 +4560,48 @@ class _FiniteAtlasAlgebraGluingDatumEngine:
         target_triple = self.triple_algebra(target_index, source_index, third_index)
         source_restriction = self._restriction(source_index, target_index, third_index)
         target_restriction = self._restriction(target_index, source_index, third_index)
-        triple_scheme_transition = datum.transition_on_triple(source_index, target_index, third_index)
+        triple_scheme_transition = datum.transition_on_triple(
+            source_index, target_index, third_index
+        )
         pullback = SemilinearAlgebraMorphism(
-            target_triple, source_triple, triple_scheme_transition.coordinate_algebra_morphism(),
+            target_triple,
+            source_triple,
+            triple_scheme_transition.coordinate_algebra_morphism(),
             {
-                label: source_restriction(pair_transition.pullback()(target_pair.algebra_generator(label)))
+                label: source_restriction(
+                    pair_transition.pullback()(target_pair.algebra_generator(label))
+                )
                 for label in target_triple.algebra_generating_set()
             },
         )
-        inverse_scheme_transition = datum.transition_on_triple(target_index, source_index, third_index)
+        inverse_scheme_transition = datum.transition_on_triple(
+            target_index, source_index, third_index
+        )
         inverse_pullback = SemilinearAlgebraMorphism(
-            source_triple, target_triple, inverse_scheme_transition.coordinate_algebra_morphism(),
+            source_triple,
+            target_triple,
+            inverse_scheme_transition.coordinate_algebra_morphism(),
             {
-                label: target_restriction(pair_transition.inverse_pullback()(source_pair.algebra_generator(label)))
+                label: target_restriction(
+                    pair_transition.inverse_pullback()(
+                        source_pair.algebra_generator(label)
+                    )
+                )
                 for label in source_triple.algebra_generating_set()
             },
         )
         transition = FiniteAtlasAlgebraTransition(
-            triple_scheme_transition.parent().base_category().Core().Mor(
+            triple_scheme_transition.parent()
+            .base_category()
+            .Core()
+            .Mor(
                 triple_scheme_transition.domain(),
                 triple_scheme_transition.codomain(),
             )(triple_scheme_transition, inverse_scheme_transition),
-            source_triple, target_triple, pullback, inverse_pullback,
+            source_triple,
+            target_triple,
+            pullback,
+            inverse_pullback,
         )
         self._triple_transitions.append((key, transition))
         return transition
@@ -4201,10 +4634,9 @@ class _FiniteAtlasAlgebraGluingDatumEngine:
         datum = self.gluing_datum()
         chart_index = datum.normalize_chart_index(chart_index)
         other_index = datum.normalize_chart_index(other_index)
-        if (
-            local_map.domain() is not self.local_algebra(chart_index)
-            or local_map.codomain() is not target_datum.local_algebra(chart_index)
-        ):
+        if local_map.domain() is not self.local_algebra(
+            chart_index
+        ) or local_map.codomain() is not target_datum.local_algebra(chart_index):
             raise ValueError(
                 f"cannot restrict {local_map} on chart {chart_index}: it must be a map "
                 f"{self.local_algebra(chart_index)} -> {target_datum.local_algebra(chart_index)}, but it "
@@ -4266,16 +4698,17 @@ class FiniteAtlasAlgebraGluingMorphismMethods(CategoricalMor.ElementMethods):
         )
         for index in source.chart_indices():
             local_map = self._local_maps[index]
-            if (
-                local_map.domain() is not source.local_algebra(index)
-                or local_map.codomain() is not target.local_algebra(index)
-            ):
+            if local_map.domain() is not source.local_algebra(
+                index
+            ) or local_map.codomain() is not target.local_algebra(index):
                 raise ValueError(
                     f"cannot build a morphism of glued algebras {source} -> {target}: the local map "
                     f"{local_map} on chart {index} must be {source.local_algebra(index)} -> "
                     f"{target.local_algebra(index)}, but it is {local_map.domain()} -> {local_map.codomain()}"
                 )
-            local_mor = _algebra_mor(source.local_algebra(index), target.local_algebra(index))
+            local_mor = _algebra_mor(
+                source.local_algebra(index), target.local_algebra(index)
+            )
             if local_map not in local_mor:
                 raise TypeError(
                     f"the local map on chart {index} must be an arrow of {local_mor}, but it is {local_map}"
@@ -4292,7 +4725,9 @@ class FiniteAtlasAlgebraGluingMorphismMethods(CategoricalMor.ElementMethods):
         return self._local_maps
 
     def local_map(self, index):
-        return self.local_maps()[self.source().gluing_datum().normalize_chart_index(index)]
+        return self.local_maps()[
+            self.source().gluing_datum().normalize_chart_index(index)
+        ]
 
     @cached_method
     def local_transformation(self):
@@ -4350,12 +4785,17 @@ class FiniteAtlasAlgebraGluingMorphismMethods(CategoricalMor.ElementMethods):
             left = target_transition.pullback() * SemilinearAlgebraMorphism.from_linear(
                 target_side
             )
-            right = SemilinearAlgebraMorphism.from_linear(source_side) * source_transition.pullback()
+            right = (
+                SemilinearAlgebraMorphism.from_linear(source_side)
+                * source_transition.pullback()
+            )
             return left == right
 
         return conjunction(
             commutes(source_index, target_index)
-            for source_index, target_index in self.source().gluing_datum().transition_index_set()
+            for source_index, target_index in self.source()
+            .gluing_datum()
+            .transition_index_set()
         )
 
     @validator
@@ -4392,7 +4832,9 @@ class FiniteAtlasAlgebraGluingMor(CategoricalMor):
                 if check:
                     local_maps.validate_overlap_compatibility()
                 return local_maps
-            raise TypeError(f"{local_maps} belongs to another Mor; apply the functor between the categories")
+            raise TypeError(
+                f"{local_maps} belongs to another Mor; apply the functor between the categories"
+            )
         morphism = self.element_class(self, local_maps)
         if check:
             morphism.validate_overlap_compatibility()
@@ -4439,9 +4881,11 @@ class FiniteAtlasAlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCate
             as components, so composition retains their finer Mor parents.
             """
             values = self.local_algebras()
-            return Cat().Mor(
-                DiscreteCategory(values.index_set()), OwnedRings()
-            ).discrete_diagram(values)
+            return (
+                Cat()
+                .Mor(DiscreteCategory(values.index_set()), OwnedRings())
+                .discrete_diagram(values)
+            )
 
     @staticmethod
     def __classcall__(cls, atlas):
@@ -4568,9 +5012,7 @@ class _ModuleGluingSheafEngine:
     local_module = sections_on_chart
 
     def sections_on_intersection(self, chart_index, *intersection_indices):
-        return self.gluing_datum().restricted_module(
-            chart_index, *intersection_indices
-        )
+        return self.gluing_datum().restricted_module(chart_index, *intersection_indices)
 
     def transition(self, source_index, target_index):
         return self.gluing_datum().transition(source_index, target_index)
@@ -4622,8 +5064,12 @@ class ModuleGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
         def identity_transition(left, right):
             source = cover.restrict_module(local_modules[left], left, right)
             target = cover.restrict_module(local_modules[right], right, left)
-            forward = source.module_category().Mor(source, target)(target.module_generator)
-            inverse = target.module_category().Mor(target, source)(source.module_generator)
+            forward = source.module_category().Mor(source, target)(
+                target.module_generator
+            )
+            inverse = target.module_category().Mor(target, source)(
+                source.module_generator
+            )
             return source.module_category().Core().Mor(source, target)(forward, inverse)
 
         return self(
@@ -4660,7 +5106,10 @@ class ModuleGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
             self._transitions = transitions
             super().__init__(**rest)
             for label in self.chart_index_set():
-                if self.local_module(label).base_ring() is not self.cover().open(label).coordinate_algebra():
+                if (
+                    self.local_module(label).base_ring()
+                    is not self.cover().open(label).coordinate_algebra()
+                ):
                     raise ValueError(
                         f"cannot glue the local modules on {self.cover()}: the module {self.local_module(label)} "
                         f"on chart {label} must be a module over the coordinate algebra "
@@ -4699,7 +5148,10 @@ class ModuleGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
         def transition(self, source_index, target_index):
             r"""Return the represented overlap isomorphism from one chart to another."""
             pair = _chart_pair(self.cover(), source_index, target_index)
-            if pair == (self.cover().chart_label(source_index), self.cover().chart_label(target_index)):
+            if pair == (
+                self.cover().chart_label(source_index),
+                self.cover().chart_label(target_index),
+            ):
                 return self._transitions[pair]
             return self._reversed_transition(pair)
 
@@ -4709,9 +5161,13 @@ class ModuleGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
             original = self._transitions[pair]
             source = original.codomain()
             target = original.domain()
-            return source.module_category().Core().Mor(source, target)(
-                original.inverse().forward(),
-                original.forward(),
+            return (
+                source.module_category()
+                .Core()
+                .Mor(source, target)(
+                    original.inverse().forward(),
+                    original.forward(),
+                )
             )
 
         def _verify_pairwise_transitions(self) -> None:
@@ -4720,7 +5176,9 @@ class ModuleGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
                 transition = self._transitions[pair]
                 source = self.restricted_module(left, left, right)
                 target = self.restricted_module(right, left, right)
-                if transition not in source.module_category().Core().Mor(source, target):
+                if transition not in source.module_category().Core().Mor(
+                    source, target
+                ):
                     raise TypeError(
                         f"cannot glue along {transition} on the overlap of charts {left} and {right}: it must be "
                         f"an isomorphism of modules {source} -> {target} between the restrictions of the two "
@@ -4752,7 +5210,9 @@ class ModuleGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
                 self.cover().intersection_indices(chart, *intersection_indices),
             )
 
-        def restriction_between_intersections(self, chart_index, source_indices, target_indices):
+        def restriction_between_intersections(
+            self, chart_index, source_indices, target_indices
+        ):
             r"""Return ``M_i|U_I -> Res(M_i|U_J)`` for ``U_J subseteq U_I``."""
             cover = self.cover()
             chart = cover.chart_label(chart_index)
@@ -4776,7 +5236,11 @@ class ModuleGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
                 return source.module_category().Mor(source, source).identity()
             source_open = self.cover().intersection(*source_labels)
             target_open = self.cover().intersection(*target_labels)
-            ring_map = self.scheme().structure_sheaf().restriction_map(source_open, target_open)
+            ring_map = (
+                self.scheme()
+                .structure_sheaf()
+                .restriction_map(source_open, target_open)
+            )
             restricted_target = target.restrict_scalars(ring_map)
             return source.module_category().Mor(source, restricted_target)(
                 lambda label: restricted_target.wrap(target.module_generator(label))
@@ -4792,7 +5256,9 @@ class ModuleGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
                 self.cover().intersection_indices(chart, *intersection_indices),
             )
 
-        def restrict_section_between_intersections(self, chart_index, section, source_indices, target_indices):
+        def restrict_section_between_intersections(
+            self, chart_index, section, source_indices, target_indices
+        ):
             r"""Restrict a section living on one represented cover intersection to a smaller one.
 
             The restriction lands in the restriction of scalars of the smaller
@@ -4806,12 +5272,16 @@ class ModuleGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
             target_labels = cover.intersection_indices(chart, *tuple(target_indices))
             source = self.restricted_module(chart, *source_labels)
             target = self.restricted_module(chart, *target_labels)
-            image = self._restriction_between(chart, source_labels, target_labels)(source(section))
+            image = self._restriction_between(chart, source_labels, target_labels)(
+                source(section)
+            )
             if target is source:
                 return image
             return image.underlying_element()
 
-        def transition_on_intersection(self, source_index, target_index, *intersection_indices):
+        def transition_on_intersection(
+            self, source_index, target_index, *intersection_indices
+        ):
             r"""Restrict a pairwise transition to a finer represented intersection."""
             cover = self.cover()
             source = cover.chart_label(source_index)
@@ -4831,7 +5301,9 @@ class ModuleGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
                 return transition
             pair_open = cover.intersection(*pair)
             target_open = cover.intersection(*labels)
-            ring_map = self.scheme().structure_sheaf().restriction_map(pair_open, target_open)
+            ring_map = (
+                self.scheme().structure_sheaf().restriction_map(pair_open, target_open)
+            )
             pair_source = self.restricted_module(source_label, *pair)
             pair_target = self.restricted_module(target_label, *pair)
             source = self.restricted_module(source_label, *labels)
@@ -4848,8 +5320,12 @@ class ModuleGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
         def _verify_cocycles(self) -> None:
             for left, middle, right in combinations(tuple(self.chart_index_set()), 3):
                 labels = (left, middle, right)
-                composite = self.transition_on_intersection(middle, right, *labels) * self.transition_on_intersection(left, middle, *labels)
-                if not _maps_agree_on_framing(composite, self.transition_on_intersection(left, right, *labels)):
+                composite = self.transition_on_intersection(
+                    middle, right, *labels
+                ) * self.transition_on_intersection(left, middle, *labels)
+                if not _maps_agree_on_framing(
+                    composite, self.transition_on_intersection(left, right, *labels)
+                ):
                     raise ValueError(
                         f"the module chart changes of {self} fail the cocycle condition on the triple overlap of "
                         f"charts {left}, {middle} and {right}"
@@ -4872,9 +5348,16 @@ class ModuleGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
                 name="Compatible local sections",
             )
             for left, right in combinations(tuple(self.chart_index_set()), 2):
-                restricted_left = self.restrict_section(left, components[left], left, right)
-                restricted_right = self.restrict_section(right, components[right], left, right)
-                if self.transition(left, right).forward()(restricted_left) != restricted_right:
+                restricted_left = self.restrict_section(
+                    left, components[left], left, right
+                )
+                restricted_right = self.restrict_section(
+                    right, components[right], left, right
+                )
+                if (
+                    self.transition(left, right).forward()(restricted_left)
+                    != restricted_right
+                ):
                     raise ValueError(
                         f"the local sections {sections} do not glue: on the overlap of charts {left} and {right} "
                         "they disagree after the chart change"
@@ -4890,7 +5373,9 @@ class ModuleGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
                 lambda label: presheaf.value_on_label((label,)),
                 name="Čech chart modules over O(X)",
             )
-            return Modules(self.scheme().coordinate_algebra()).product_construction(values)
+            return Modules(self.scheme().coordinate_algebra()).product_construction(
+                values
+            )
 
         @cached_method
         def matching_section_product_construction(self):
@@ -4902,7 +5387,9 @@ class ModuleGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
                 lambda pair: presheaf.value_on_label(tuple(pair)),
                 name="Čech overlap modules over O(X)",
             )
-            return Modules(self.scheme().coordinate_algebra()).product_construction(values)
+            return Modules(self.scheme().coordinate_algebra()).product_construction(
+                values
+            )
 
         def _local_overlap_leg(self, pair, side):
             r"""One leg ``prod_i F(U_i) -> F(U_ij)`` of the Čech parallel pair."""
@@ -5170,9 +5657,13 @@ class _ModuleGluingCechPresheaf(Functor):
                     case (_chart,):
                         return target.wrap(local)
                     case _:
-                        return target.wrap(datum.restrict_section(owner, local, *target_label))
+                        return target.wrap(
+                            datum.restrict_section(owner, local, *target_label)
+                        )
             case (chart,):
-                restricted = datum.restrict_section(chart, element.underlying_element(), *target_label)
+                restricted = datum.restrict_section(
+                    chart, element.underlying_element(), *target_label
+                )
                 if chart != owner:
                     restricted = datum.transition(owner, chart).inverse()(restricted)
                 return target.wrap(restricted)
@@ -5322,7 +5813,11 @@ class _FiniteAtlasModuleCechPresheaf(_ModuleGluingCechPresheaf):
                         return target.wrap(local)
                     case (left, right):
                         pair = datum.pair_module(left, right)
-                        ring_map = atlas.overlap(left, right).inclusion().coordinate_algebra_morphism()
+                        ring_map = (
+                            atlas.overlap(left, right)
+                            .inclusion()
+                            .coordinate_algebra_morphism()
+                        )
                         return target.wrap(
                             _base_change_element(
                                 datum.local_module(left),
@@ -5343,7 +5838,11 @@ class _FiniteAtlasModuleCechPresheaf(_ModuleGluingCechPresheaf):
                     case False:
                         other = left
                 pair = datum.pair_module(chart, other)
-                ring_map = atlas.overlap(chart, other).inclusion().coordinate_algebra_morphism()
+                ring_map = (
+                    atlas.overlap(chart, other)
+                    .inclusion()
+                    .coordinate_algebra_morphism()
+                )
                 restricted = _base_change_element(
                     datum.local_module(chart),
                     pair,
@@ -5354,7 +5853,9 @@ class _FiniteAtlasModuleCechPresheaf(_ModuleGluingCechPresheaf):
                     case True:
                         return target.wrap(restricted)
                     case False:
-                        return target.wrap(datum.transition(owner, chart).pullback()(restricted))
+                        return target.wrap(
+                            datum.transition(owner, chart).pullback()(restricted)
+                        )
         raise ValueError(
             f"there is no restriction from {source_label} to {target_label} in the Čech site of "
             f"{self.cover()}: an overlap of two charts has no arrows out of it"
@@ -5411,9 +5912,14 @@ class ModuleGluingMorphismMethods(CategoricalMor.ElementMethods):
         target = self.codomain().restricted_module(chart, *labels)
         if source is self.domain().local_module(chart):
             return local_map
-        ring_map = self.domain().scheme().structure_sheaf().restriction_map(
-            self.cover().open(chart),
-            self.cover().intersection(*labels),
+        ring_map = (
+            self.domain()
+            .scheme()
+            .structure_sheaf()
+            .restriction_map(
+                self.cover().open(chart),
+                self.cover().intersection(*labels),
+            )
         )
         local_source = self.domain().local_module(chart)
         local_target = self.codomain().local_module(chart)
@@ -5431,7 +5937,9 @@ class ModuleGluingMorphismMethods(CategoricalMor.ElementMethods):
             source_transition = self.domain().transition(left, right).forward()
             target_transition = self.codomain().transition(left, right).forward()
             via_left = target_transition * self.restricted_local_map(left, left, right)
-            via_right = self.restricted_local_map(right, left, right) * source_transition
+            via_right = (
+                self.restricted_local_map(right, left, right) * source_transition
+            )
             if not _maps_agree_on_framing(via_left, via_right):
                 raise ValueError(
                     f"{self} does not glue: on the overlap of charts {left} and {right} its local maps do not "
@@ -5461,11 +5969,13 @@ class ModuleGluingMorphismMethods(CategoricalMor.ElementMethods):
 
         # A compatible section mapped chartwise is linear when every local
         # map is.
-        return source_sections.module_category().Mor(
-            source_sections, target_sections
-        )._from_constructed_element_map(
-            image,
-            premises=tuple(self.local_map(label) for label in atlas),
+        return (
+            source_sections.module_category()
+            .Mor(source_sections, target_sections)
+            ._from_constructed_element_map(
+                image,
+                premises=tuple(self.local_map(label) for label in atlas),
+            )
         )
 
     def then(self, other):
@@ -5511,14 +6021,19 @@ class ModuleGluingMor(CategoricalMor):
             isinstance(local_maps, CategoricalMor.ElementMethods)
             and local_maps.parent().base_category() is self.base_category()
         ):
-            if local_maps.domain() is not self.domain() or local_maps.codomain() is not self.codomain():
+            if (
+                local_maps.domain() is not self.domain()
+                or local_maps.codomain() is not self.codomain()
+            ):
                 raise ValueError(
                     f"cannot make {local_maps} a morphism {self.domain()} -> {self.codomain()}: it is a "
                     f"morphism {local_maps.domain()} -> {local_maps.codomain()}"
                 )
             if local_maps.parent() is self:
                 return local_maps
-            raise TypeError(f"{local_maps} belongs to another Mor; apply the functor between the categories")
+            raise TypeError(
+                f"{local_maps} belongs to another Mor; apply the functor between the categories"
+            )
         return self.element_class(self, local_maps)
 
     @object_level
@@ -5528,9 +6043,9 @@ class ModuleGluingMor(CategoricalMor):
                 f"{self} has no identity: its domain {self.domain()} is not its codomain {self.codomain()}"
             )
         return self(
-            self.domain().local_modules().map(
-                lambda module: module.module_category().Mor(module, module).identity()
-            )
+            self.domain()
+            .local_modules()
+            .map(lambda module: module.module_category().Mor(module, module).identity())
         )
 
 
@@ -5601,9 +6116,7 @@ class _AlgebraGluingSheafEngine:
         )
 
     def restriction_map(self, chart_index, *intersection_indices):
-        return self.gluing_datum().restriction_map(
-            chart_index, *intersection_indices
-        )
+        return self.gluing_datum().restriction_map(chart_index, *intersection_indices)
 
     def transition(self, source_index, target_index, *intersection_indices):
         match intersection_indices:
@@ -5657,7 +6170,12 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
         cover = self.cover()
         local_algebras = finite_indexed_family(
             cover.atlas(),
-            lambda label: cover.open(label).coordinate_algebra().free_module(("z",)).symmetric_algebra(),
+            lambda label: (
+                cover.open(label)
+                .coordinate_algebra()
+                .free_module(("z",))
+                .symmetric_algebra()
+            ),
             name="Polynomial chart algebras",
         )
 
@@ -5703,7 +6221,10 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
             self._transitions = transitions
             super().__init__(**rest)
             for label in self.chart_index_set():
-                if self.local_algebra(label).base_ring() is not self.cover().open(label).coordinate_algebra():
+                if (
+                    self.local_algebra(label).base_ring()
+                    is not self.cover().open(label).coordinate_algebra()
+                ):
                     raise ValueError(
                         f"cannot glue the local algebras on {self.cover()}: the algebra "
                         f"{self.local_algebra(label)} on chart {label} must be an algebra over the coordinate "
@@ -5738,7 +6259,11 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
                 chart_index,
                 *intersection_indices,
             )
-            target = self.cover().intersection(chart_index, *intersection_indices).coordinate_algebra()
+            target = (
+                self.cover()
+                .intersection(chart_index, *intersection_indices)
+                .coordinate_algebra()
+            )
             if restricted not in Algebras(target).Associative().Unital():
                 raise TypeError(
                     f"the base change {restricted} of the algebra {self.local_algebra(chart_index)} on chart "
@@ -5750,7 +6275,10 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
 
         def transition(self, source_index, target_index):
             pair = _chart_pair(self.cover(), source_index, target_index)
-            if pair == (self.cover().chart_label(source_index), self.cover().chart_label(target_index)):
+            if pair == (
+                self.cover().chart_label(source_index),
+                self.cover().chart_label(target_index),
+            ):
                 return self._transitions[pair]
             return self._reversed_transition(pair)
 
@@ -5760,9 +6288,15 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
             original = self._transitions[pair]
             source = original.codomain()
             target = original.domain()
-            return Algebras(source.algebra_base_ring()).Associative().Unital().Core().Mor(source, target)(
-                original.inverse().forward(),
-                original.forward(),
+            return (
+                Algebras(source.algebra_base_ring())
+                .Associative()
+                .Unital()
+                .Core()
+                .Mor(source, target)(
+                    original.inverse().forward(),
+                    original.forward(),
+                )
             )
 
         def _verify_pairwise_transitions(self) -> None:
@@ -5771,31 +6305,41 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
                 transition = self._transitions[pair]
                 source = self.restricted_algebra(left, left, right)
                 target = self.restricted_algebra(right, left, right)
-                core = Algebras(source.algebra_base_ring()).Associative().Unital().Core()
+                core = (
+                    Algebras(source.algebra_base_ring()).Associative().Unital().Core()
+                )
                 if transition not in core.Mor(source, target):
                     raise TypeError(
                         f"cannot glue along {transition} on the overlap of charts {left} and {right}: it must be "
                         f"an isomorphism of algebras {source} -> {target} between the restrictions of the two "
                         "local algebras to the overlap"
                     )
-                if _algebra_maps_agree_on_generators(
-                    transition.inverse() * transition.forward(),
-                    _algebra_mor(source, source).identity(),
-                ) is False:
+                if (
+                    _algebra_maps_agree_on_generators(
+                        transition.inverse() * transition.forward(),
+                        _algebra_mor(source, source).identity(),
+                    )
+                    is False
+                ):
                     raise ValueError(
                         f"cannot glue along {transition} on the overlap of charts {left} and {right}: it followed "
                         f"by its stated inverse is not the identity of {source}"
                     )
-                if _algebra_maps_agree_on_generators(
-                    transition.forward() * transition.inverse().forward(),
-                    _algebra_mor(target, target).identity(),
-                ) is False:
+                if (
+                    _algebra_maps_agree_on_generators(
+                        transition.forward() * transition.inverse().forward(),
+                        _algebra_mor(target, target).identity(),
+                    )
+                    is False
+                ):
                     raise ValueError(
                         f"cannot glue along {transition} on the overlap of charts {left} and {right}: its stated "
                         f"inverse followed by it is not the identity of {target}"
                     )
 
-        def restriction_between_intersections(self, chart_index, source_indices, target_indices):
+        def restriction_between_intersections(
+            self, chart_index, source_indices, target_indices
+        ):
             r"""Return the algebra restriction to a finer represented intersection."""
             cover = self.cover()
             chart = cover.chart_label(chart_index)
@@ -5819,7 +6363,11 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
                 return _algebra_mor(source, source).identity()
             source_open = self.cover().intersection(*source_labels)
             target_open = self.cover().intersection(*target_labels)
-            ring_map = self.scheme().structure_sheaf().restriction_map(source_open, target_open)
+            ring_map = (
+                self.scheme()
+                .structure_sheaf()
+                .restriction_map(source_open, target_open)
+            )
             restricted_target = target.restrict_scalars(ring_map)
             return _algebra_mor(source, restricted_target)(
                 lambda label: restricted_target(target.algebra_generator(label))
@@ -5833,7 +6381,9 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
                 self.cover().intersection_indices(chart, *intersection_indices),
             )
 
-        def restrict_section_between_intersections(self, chart_index, section, source_indices, target_indices):
+        def restrict_section_between_intersections(
+            self, chart_index, section, source_indices, target_indices
+        ):
             source = self.restricted_algebra(chart_index, *tuple(source_indices))
             target = self.restricted_algebra(chart_index, *tuple(target_indices))
             image = self.restriction_between_intersections(
@@ -5843,7 +6393,9 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
             )(source(section))
             return target(image)
 
-        def transition_on_intersection(self, source_index, target_index, *intersection_indices):
+        def transition_on_intersection(
+            self, source_index, target_index, *intersection_indices
+        ):
             r"""Restrict an algebra transition to a finer represented intersection."""
             cover = self.cover()
             source = cover.chart_label(source_index)
@@ -5863,12 +6415,18 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
             pair_source = self.restricted_algebra(source_label, *pair)
             source = self.restricted_algebra(source_label, *labels)
             target = self.restricted_algebra(target_label, *labels)
-            target_restriction = self.restriction_between_intersections(target_label, pair, labels)
+            target_restriction = self.restriction_between_intersections(
+                target_label, pair, labels
+            )
             return _algebra_mor(source, target)(
-                lambda label: target(target_restriction(transition(pair_source.algebra_generator(label))))
+                lambda label: target(
+                    target_restriction(transition(pair_source.algebra_generator(label)))
+                )
             )
 
-        def restricted_local_map(self, target_datum, chart_index, other_index, local_map):
+        def restricted_local_map(
+            self, target_datum, chart_index, other_index, local_map
+        ):
             r"""Base-change one local algebra map to a represented pair overlap."""
             if target_datum.cover() is not self.cover():
                 raise ValueError(
@@ -5878,10 +6436,9 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
                 )
             chart = self.cover().chart_label(chart_index)
             other = self.cover().chart_label(other_index)
-            if (
-                local_map.domain() is not self.local_algebra(chart)
-                or local_map.codomain() is not target_datum.local_algebra(chart)
-            ):
+            if local_map.domain() is not self.local_algebra(
+                chart
+            ) or local_map.codomain() is not target_datum.local_algebra(chart):
                 raise ValueError(
                     f"cannot restrict {local_map} on chart {chart}: it must be a map "
                     f"{self.local_algebra(chart)} -> {target_datum.local_algebra(chart)}, but it is "
@@ -5899,7 +6456,9 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
             extended_source = extended_map.domain()
             return _algebra_mor(source, target)(
                 {
-                    label: target(extended_map(extended_source.algebra_generator(label)))
+                    label: target(
+                        extended_map(extended_source.algebra_generator(label))
+                    )
                     for label in source.algebra_generating_set()
                 }
             )
@@ -5907,11 +6466,14 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
         def _verify_cocycles(self) -> None:
             for left, middle, right in combinations(tuple(self.chart_index_set()), 3):
                 labels = (left, middle, right)
-                if _algebra_maps_agree_on_generators(
-                    self.transition_on_intersection(middle, right, *labels)
-                    * self.transition_on_intersection(left, middle, *labels),
-                    self.transition_on_intersection(left, right, *labels),
-                ) is False:
+                if (
+                    _algebra_maps_agree_on_generators(
+                        self.transition_on_intersection(middle, right, *labels)
+                        * self.transition_on_intersection(left, middle, *labels),
+                        self.transition_on_intersection(left, right, *labels),
+                    )
+                    is False
+                ):
                     raise ValueError(
                         f"the algebra chart changes of {self} fail the cocycle condition on the triple overlap of "
                         f"charts {left}, {middle} and {right}"
@@ -5923,13 +6485,20 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
             transitions = {}
             for pair in self._transitions.index_set():
                 transition = self._transitions[pair]
-                forget = Algebras(self.cover().intersection(*pair).coordinate_algebra()).underlying_module()
+                forget = Algebras(
+                    self.cover().intersection(*pair).coordinate_algebra()
+                ).underlying_module()
                 forward = forget(transition.forward())
                 inverse = forget(transition.inverse().forward())
-                transitions[pair] = forward.domain().module_category().Core().Mor(
-                    forward.domain(),
-                    forward.codomain(),
-                )(forward, inverse)
+                transitions[pair] = (
+                    forward.domain()
+                    .module_category()
+                    .Core()
+                    .Mor(
+                        forward.domain(),
+                        forward.codomain(),
+                    )(forward, inverse)
+                )
             return ModuleGluingData(self.cover())(self.local_algebras(), transitions)
 
         @cached_method
@@ -5945,11 +6514,13 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
                 return module_datum.compatible_section(
                     finite_indexed_family(
                         self.chart_index_set(),
-                        lambda label: self.local_algebra(label)(
-                            module_datum.compatible_section_component(left, label)
-                        )
-                        * self.local_algebra(label)(
-                            module_datum.compatible_section_component(right, label)
+                        lambda label: (
+                            self.local_algebra(label)(
+                                module_datum.compatible_section_component(left, label)
+                            )
+                            * self.local_algebra(label)(
+                                module_datum.compatible_section_component(right, label)
+                            )
                         ),
                         name="Components of a product of compatible algebra sections",
                     )
@@ -5975,7 +6546,8 @@ class AlgebraGluingData(CategoryPacketMethods, OwnedParameterizedCategory):
             algebras = Algebras(ring).Associative().Unital()
             commutative = algebras.Commutative()
             match all(
-                algebra in Algebras(algebra.base_ring()).Associative().Unital().Commutative()
+                algebra
+                in Algebras(algebra.base_ring()).Associative().Unital().Commutative()
                 for algebra in self.local_algebras()
             ):
                 case True:
@@ -6139,11 +6711,17 @@ class _AffineAlgebraOpenPresheaf(Functor):
                 numerator = fraction.numerator()
                 denominator = fraction.denominator()
             if target_ring is self._ring:
-                return target(original.scalar_multiple(denominator.inverse_of_unit(), numerator))
-            fraction = extended_target.unformed_module().fraction(numerator, denominator)
+                return target(
+                    original.scalar_multiple(denominator.inverse_of_unit(), numerator)
+                )
+            fraction = extended_target.unformed_module().fraction(
+                numerator, denominator
+            )
             return target(extended_target(fraction))
 
-        return self.codomain().Mor(source, target)._from_constructed_element_map(restrict)
+        return (
+            self.codomain().Mor(source, target)._from_constructed_element_map(restrict)
+        )
 
 
 class _AlgebraGluingCechPresheaf(Functor):
@@ -6161,7 +6739,9 @@ class _AlgebraGluingCechPresheaf(Functor):
         cover = gluing_datum.cover()
         super().__init__(
             cover.cech_site().opposite(),
-            Algebras(cover.ambient_scheme().coordinate_algebra()).Associative().Unital(),
+            Algebras(cover.ambient_scheme().coordinate_algebra())
+            .Associative()
+            .Unital(),
         )
 
     def gluing_datum(self):
@@ -6207,7 +6787,9 @@ class _AlgebraGluingCechPresheaf(Functor):
                         return target(local)
                     case _:
                         return target(
-                            datum.restrict_section_between_intersections(owner, local, (owner,), target_label)
+                            datum.restrict_section_between_intersections(
+                                owner, local, (owner,), target_label
+                            )
                         )
             case (chart,):
                 restricted = datum.restrict_section_between_intersections(
@@ -6280,10 +6862,13 @@ class AlgebraGluingMorphism(CategoricalMor.ElementMethods):
             right_restriction = self.domain().restricted_local_map(
                 self.codomain(), right, left, self.local_map(right)
             )
-            if _algebra_maps_agree_on_generators(
-                target_transition * left_restriction,
-                right_restriction * source_transition,
-            ) is False:
+            if (
+                _algebra_maps_agree_on_generators(
+                    target_transition * left_restriction,
+                    right_restriction * source_transition,
+                )
+                is False
+            ):
                 raise ValueError(
                     f"{self} does not glue: on the overlap of charts {left} and {right} its local maps do not "
                     "commute with the chart changes"
@@ -6291,15 +6876,17 @@ class AlgebraGluingMorphism(CategoricalMor.ElementMethods):
 
     @cached_method
     def underlying_module_morphism(self):
-        return self.domain().underlying_module_datum().Mor(
-            self.codomain().underlying_module_datum()
-        )(
-            finite_indexed_family(
-                self.cover().atlas(),
-                lambda label: Algebras(self.cover().open(label).coordinate_algebra()).underlying_module()(
-                    self.local_map(label)
-                ),
-                name="Local module maps underlying an algebra descent morphism",
+        return (
+            self.domain()
+            .underlying_module_datum()
+            .Mor(self.codomain().underlying_module_datum())(
+                finite_indexed_family(
+                    self.cover().atlas(),
+                    lambda label: Algebras(
+                        self.cover().open(label).coordinate_algebra()
+                    ).underlying_module()(self.local_map(label)),
+                    name="Local module maps underlying an algebra descent morphism",
+                )
             )
         )
 
@@ -6360,14 +6947,19 @@ class AlgebraGluingMor(CategoricalMor):
 
     def _element_constructor_(self, local_maps):
         if isinstance(local_maps, AlgebraGluingMorphism):
-            if local_maps.domain() is not self.domain() or local_maps.codomain() is not self.codomain():
+            if (
+                local_maps.domain() is not self.domain()
+                or local_maps.codomain() is not self.codomain()
+            ):
                 raise ValueError(
                     f"cannot make {local_maps} a morphism {self.domain()} -> {self.codomain()}: it is a "
                     f"morphism {local_maps.domain()} -> {local_maps.codomain()}"
                 )
             if local_maps.parent() is self:
                 return local_maps
-            raise TypeError(f"{local_maps} belongs to another Mor; apply the functor between the categories")
+            raise TypeError(
+                f"{local_maps} belongs to another Mor; apply the functor between the categories"
+            )
         return self.element_class(self, local_maps)
 
     @object_level
@@ -6377,9 +6969,9 @@ class AlgebraGluingMor(CategoricalMor):
                 f"{self} has no identity: its domain {self.domain()} is not its codomain {self.codomain()}"
             )
         return self(
-            self.domain().local_algebras().map(
-                lambda algebra: _algebra_mor(algebra, algebra).identity()
-            )
+            self.domain()
+            .local_algebras()
+            .map(lambda algebra: _algebra_mor(algebra, algebra).identity())
         )
 
 
@@ -6453,47 +7045,75 @@ class _FiniteAtlasModuleOpenPresheaf(Functor):
         atlas = self._datum.gluing_datum()
         scalar_map = atlas.global_function_restriction(index)
         if chart_open is not atlas.chart(index):
-            scalar_map = chart_open.inclusion().coordinate_algebra_morphism() * scalar_map
+            scalar_map = (
+                chart_open.inclusion().coordinate_algebra_morphism() * scalar_map
+            )
         return self._datum.basis_module(index, chart_open).restrict_scalars(scalar_map)
 
     def _apply_morphism(self, opposite_arrow):
         source = self(opposite_arrow.domain())
         target = self(opposite_arrow.codomain())
-        if _is_empty_open(self, opposite_arrow.domain()) or _is_empty_open(self, opposite_arrow.codomain()):
+        if _is_empty_open(self, opposite_arrow.domain()) or _is_empty_open(
+            self, opposite_arrow.codomain()
+        ):
             return self.codomain().Mor(source, target).zero()
         if opposite_arrow.domain() is opposite_arrow.codomain() or (
-            self._is_whole(opposite_arrow.domain()) and self._is_whole(opposite_arrow.codomain())
+            self._is_whole(opposite_arrow.domain())
+            and self._is_whole(opposite_arrow.codomain())
         ):
             return self.codomain().Mor(source, target).identity()
 
         def restrict(section):
             if self._is_whole(opposite_arrow.domain()):
                 index = self._chart_index(opposite_arrow.codomain())
-                target_open = opposite_arrow.codomain().underlying_object().value().chart_open()
+                target_open = (
+                    opposite_arrow.codomain().underlying_object().value().chart_open()
+                )
                 chart = self._datum.gluing_datum().chart(index)
-                return target.wrap(self._datum.basis_restriction(
-                    index, chart, index, target_open,
-                    self._datum.compatible_section_component(section, index),
-                ))
+                return target.wrap(
+                    self._datum.basis_restriction(
+                        index,
+                        chart,
+                        index,
+                        target_open,
+                        self._datum.compatible_section_component(section, index),
+                    )
+                )
             source_index = self._chart_index(opposite_arrow.domain())
-            source_open = opposite_arrow.domain().underlying_object().value().chart_open()
+            source_open = (
+                opposite_arrow.domain().underlying_object().value().chart_open()
+            )
             local = source(section).underlying_element()
             if self._is_whole(opposite_arrow.codomain()):
                 components = finite_indexed_family(
                     self._datum.chart_index_set(),
                     lambda index: self._datum.basis_restriction(
-                        source_index, source_open, index, self._datum.gluing_datum().chart(index), local,
+                        source_index,
+                        source_open,
+                        index,
+                        self._datum.gluing_datum().chart(index),
+                        local,
                     ),
                     name="Chart sections restricted from a chart covering the whole space",
                 )
                 return self._datum.compatible_section(components)
             target_index = self._chart_index(opposite_arrow.codomain())
-            target_open = opposite_arrow.codomain().underlying_object().value().chart_open()
-            return target.wrap(self._datum.basis_restriction(
-                source_index, source_open, target_index, target_open, local,
-            ))
+            target_open = (
+                opposite_arrow.codomain().underlying_object().value().chart_open()
+            )
+            return target.wrap(
+                self._datum.basis_restriction(
+                    source_index,
+                    source_open,
+                    target_index,
+                    target_open,
+                    local,
+                )
+            )
 
-        return self.codomain().Mor(source, target)._from_constructed_element_map(restrict)
+        return (
+            self.codomain().Mor(source, target)._from_constructed_element_map(restrict)
+        )
 
 
 class _FiniteAtlasModuleSheafEngine:
@@ -6619,9 +7239,7 @@ class _FiniteAtlasInverseImageModuleSheafEngine:
         return self.source_sheaf().sections_on_chart(self.coarse_index(fine_index))
 
     def structural_ring_map(self, fine_index):
-        return self.refinement().chart_map(
-            fine_index
-        ).coordinate_algebra_morphism()
+        return self.refinement().chart_map(fine_index).coordinate_algebra_morphism()
 
     def sections_on_chart(self, fine_index):
         r"""Evaluate the inverse-image sheaf on a represented fine chart image."""
@@ -6669,8 +7287,12 @@ class _FiniteAtlasInverseImageModuleMor(CategoricalMor):
                 and other.parent().base_category() is self.parent().base_category()
                 and other.codomain() is self.domain()
             ):
-                return self.domain().category().Mor(other.domain(), self.codomain())(
-                    self.source_morphism() * other.source_morphism()
+                return (
+                    self.domain()
+                    .category()
+                    .Mor(other.domain(), self.codomain())(
+                        self.source_morphism() * other.source_morphism()
+                    )
                 )
             return NotImplemented
 
@@ -6681,10 +7303,16 @@ class _FiniteAtlasInverseImageModuleMor(CategoricalMor):
         ):
             if source_morphism.parent() is self:
                 return source_morphism
-            raise TypeError(f"{source_morphism} belongs to another Mor; apply the functor between the categories")
-        source_mor = self.base_category().source_category().Mor(
-            self.domain().source_sheaf(),
-            self.codomain().source_sheaf(),
+            raise TypeError(
+                f"{source_morphism} belongs to another Mor; apply the functor between the categories"
+            )
+        source_mor = (
+            self.base_category()
+            .source_category()
+            .Mor(
+                self.domain().source_sheaf(),
+                self.codomain().source_sheaf(),
+            )
         )
         if source_morphism not in source_mor:
             raise TypeError(
@@ -6702,7 +7330,9 @@ class _FiniteAtlasInverseImageModuleMor(CategoricalMor):
                 f"{self} has no identity: its domain {self.domain()} is not its codomain {self.codomain()}"
             )
         source = self.domain().source_sheaf()
-        return self(self.base_category().source_category().Mor(source, source).identity())
+        return self(
+            self.base_category().source_category().Mor(source, source).identity()
+        )
 
 
 class _FiniteAtlasInverseImageModuleMorCategoryConstruction(MorCategoryConstruction):
@@ -6728,9 +7358,7 @@ class _FiniteAtlasInverseImageModuleSheaves(OwnedCategory):
         return self._refinement
 
     def source_category(self):
-        return _finite_atlas_quasi_coherent_sheaves(
-            self.refinement().coarse_datum()
-        )
+        return _finite_atlas_quasi_coherent_sheaves(self.refinement().coarse_datum())
 
     def super_categories(self):
         return [SheafObjects(self.refinement().fine_scheme())]
@@ -6839,9 +7467,9 @@ class _FiniteAtlasInverseImageScalarExtensionFunctor(Functor):
         local_maps = {}
         for fine_index in self.refinement().fine_datum().chart_indices():
             coarse_index = self.refinement().coarse_index(fine_index)
-            ring_map = self.refinement().chart_map(
-                fine_index
-            ).coordinate_algebra_morphism()
+            ring_map = (
+                self.refinement().chart_map(fine_index).coordinate_algebra_morphism()
+            )
             local_maps[fine_index] = FiniteAtlasModuleGluingMorphism._base_changed_map(
                 source_morphism.local_map(coarse_index),
                 ring_map,
@@ -6851,13 +7479,19 @@ class _FiniteAtlasInverseImageScalarExtensionFunctor(Functor):
         return source.morphism_to(target, local_maps)
 
     def _repr_(self):
-        return f"Extension of inverse-image module scalars along {self.scheme_morphism()}"
+        return (
+            f"Extension of inverse-image module scalars along {self.scheme_morphism()}"
+        )
 
 
-class _FiniteAtlasLineBundleModuleGluingDatumEngine(_FiniteAtlasModuleGluingDatumEngine):
+class _FiniteAtlasLineBundleModuleGluingDatumEngine(
+    _FiniteAtlasModuleGluingDatumEngine
+):
     r"""Module descent whose defining source is one finite-atlas line bundle."""
 
-    def __init__(self, line_bundle, gluing_datum, local_modules, transitions, **rest) -> None:
+    def __init__(
+        self, line_bundle, gluing_datum, local_modules, transitions, **rest
+    ) -> None:
         if gluing_datum is not line_bundle.gluing_datum():
             raise ValueError(
                 f"cannot glue the module of the line bundle {line_bundle} over {gluing_datum}: it must be "
@@ -6889,17 +7523,12 @@ def _finite_atlas_line_bundle_module_datum(line_bundle):
     r"""Return the rank-one module descent datum of a finite-atlas line bundle."""
     datum = line_bundle.gluing_datum()
     local_modules = {
-        index: line_bundle.local_module(index)
-        for index in datum.chart_indices()
+        index: line_bundle.local_module(index) for index in datum.chart_indices()
     }
     transitions = {
         (source_index, target_index): (
-            _line_bundle_transition_images(
-                line_bundle, source_index, target_index
-            ),
-            _line_bundle_transition_images(
-                line_bundle, target_index, source_index
-            ),
+            _line_bundle_transition_images(line_bundle, source_index, target_index),
+            _line_bundle_transition_images(line_bundle, target_index, source_index),
         )
         for source_index, target_index in datum.transition_index_set()
     }
@@ -6922,12 +7551,8 @@ class FiniteAtlasLineBundlePullbackComparison(SageObject):
         self._line_bundle = line_bundle
         self._pullback_functor = refinement.module_pullback_functor()
         coarse_module_sheaf = line_bundle.module_sheaf()
-        self._generic_pullback = self._pullback_functor.on_object(
-            coarse_module_sheaf
-        )
-        self._line_bundle_refinement = refinement.pullback_invertible_sheaf(
-            line_bundle
-        )
+        self._generic_pullback = self._pullback_functor.on_object(coarse_module_sheaf)
+        self._line_bundle_refinement = refinement.pullback_invertible_sheaf(line_bundle)
         self._specialized_module_sheaf = (
             self._line_bundle_refinement.refined_bundle().module_sheaf()
         )
@@ -6947,7 +7572,9 @@ class FiniteAtlasLineBundlePullbackComparison(SageObject):
                     f"chart {index}: the generic pullback has {len(generic_labels)} module generators and the "
                     f"specialized pullback has {len(specialized_labels)}"
                 )
-            forward_maps[index] = generic_module.module_category().Mor(generic_module, specialized_module)(
+            forward_maps[index] = generic_module.module_category().Mor(
+                generic_module, specialized_module
+            )(
                 {
                     source_label: specialized_module.module_generator(target_label)
                     for source_label, target_label in zip(
@@ -6955,7 +7582,9 @@ class FiniteAtlasLineBundlePullbackComparison(SageObject):
                     )
                 }
             )
-            inverse_maps[index] = specialized_module.module_category().Mor(specialized_module, generic_module)(
+            inverse_maps[index] = specialized_module.module_category().Mor(
+                specialized_module, generic_module
+            )(
                 {
                     target_label: generic_module.module_generator(source_label)
                     for source_label, target_label in zip(
@@ -6998,7 +7627,6 @@ class FiniteAtlasLineBundlePullbackComparison(SageObject):
 
     def inverse(self):
         return self._inverse
-
 
 
 def _chartwise_closed_subscheme(
@@ -7064,19 +7692,26 @@ def _affine_atlas_pullback_data(datum, chart_maps, right_map):
 
     labels = datum.chart_index_set()
     charts = finite_indexed_family(
-        labels, lambda index: _scheme_fiber_product(chart_maps[index], right_map),
+        labels,
+        lambda index: _scheme_fiber_product(chart_maps[index], right_map),
         name="Base-changed affine charts",
     )
 
     def chart_overlap(source, target):
         chart = charts[source]
         base_overlap = datum.overlap(source, target)
-        element = datum.chart(source).coordinate_algebra()(base_overlap.distinguished_open_element())
-        return chart.distinguished_open(chart.left_projection().coordinate_algebra_morphism()(element))
+        element = datum.chart(source).coordinate_algebra()(
+            base_overlap.distinguished_open_element()
+        )
+        return chart.distinguished_open(
+            chart.left_projection().coordinate_algebra_morphism()(element)
+        )
 
     overlaps = {
         (source, target): chart_overlap(source, target)
-        for source in labels for target in labels if source != target
+        for source in labels
+        for target in labels
+        if source != target
     }
 
     def transition(source, target):
@@ -7092,7 +7727,9 @@ def _affine_atlas_pullback_data(datum, chart_maps, right_map):
         return overlaps[target, source].corestriction(into_target_chart)
 
     transitions = {
-        (source, target): _scheme_isomorphism(transition(source, target), transition(target, source))
+        (source, target): _scheme_isomorphism(
+            transition(source, target), transition(target, source)
+        )
         for source, target in combinations(tuple(labels), 2)
     }
     return charts, transitions
@@ -7120,7 +7757,8 @@ def _glued_fiber_product_over_affine_base(left_map, right_map):
     datum = left_map.domain().gluing_datum()
     labels = tuple(datum.chart_indices())
     chart_maps = finite_indexed_family(
-        datum.chart_index_set(), lambda index: left_map * datum.chart_embedding(index),
+        datum.chart_index_set(),
+        lambda index: left_map * datum.chart_embedding(index),
         name="Glued-scheme chart maps to the affine base",
     )
     charts, transitions = _affine_atlas_pullback_data(datum, chart_maps, right_map)
@@ -7128,7 +7766,12 @@ def _glued_fiber_product_over_affine_base(left_map, right_map):
 
     def factor(left_cone_map, right_cone_map):
         return _glued_fiber_product_factorization(
-            product, datum, labels, charts, left_cone_map, right_cone_map,
+            product,
+            datum,
+            labels,
+            charts,
+            left_cone_map,
+            right_cone_map,
         )
 
     product = Schemes(base).glue_affine_atlas(
@@ -7138,7 +7781,10 @@ def _glued_fiber_product_over_affine_base(left_map, right_map):
         fiber_product_construction=SchemeFiberProductConstruction(
             (left_map, right_map),
             (
-                tuple(datum.chart_embedding(label) * charts[label].left_projection() for label in labels),
+                tuple(
+                    datum.chart_embedding(label) * charts[label].left_projection()
+                    for label in labels
+                ),
                 tuple(charts[label].right_projection() for label in labels),
             ),
             scheme_factorization=factor,
@@ -7147,7 +7793,9 @@ def _glued_fiber_product_over_affine_base(left_map, right_map):
     return product
 
 
-def _glued_fiber_product_factorization(product, datum, labels, charts, left_cone_map, right_cone_map):
+def _glued_fiber_product_factorization(
+    product, datum, labels, charts, left_cone_map, right_cone_map
+):
     r"""The factorization ``T -> X x_Y Y'`` of a cone ``(a: T -> X, b: T -> Y')``.
 
     The fibre product is local on ``X`` and on ``T`` (Hartshorne II.3.3,
@@ -7274,14 +7922,20 @@ def _glued_chartwise_distinguished_open(
                 target_overlap = datum.overlap(target_coarse, source_coarse)
                 coarse_element = coarse_overlap.distinguished_open_element()
                 target_element = target_open.distinguished_open_element()
-                target_on_overlap = target_overlap.inclusion().coordinate_algebra_morphism()(
-                    target_element
+                target_on_overlap = (
+                    target_overlap.inclusion().coordinate_algebra_morphism()(
+                        target_element
+                    )
                 )
-                pulled_target = datum.transition_between(
-                    source_coarse, target_coarse
-                ).forward().coordinate_algebra_morphism()(target_on_overlap)
-                numerator, _denominator = coarse_overlap.coordinate_algebra().localization_fraction_data(
-                    pulled_target
+                pulled_target = (
+                    datum.transition_between(source_coarse, target_coarse)
+                    .forward()
+                    .coordinate_algebra_morphism()(target_on_overlap)
+                )
+                numerator, _denominator = (
+                    coarse_overlap.coordinate_algebra().localization_fraction_data(
+                        pulled_target
+                    )
                 )
                 return source_open.distinguished_open(
                     source_restriction(coarse_element * numerator)
@@ -7301,9 +7955,10 @@ def _glued_chartwise_distinguished_open(
             case False:
                 coarse_overlap = datum.overlap(source_coarse, target_coarse)
                 into_coarse_overlap = coarse_overlap.corestriction(into_source_chart)
-                across = datum.transition_between(
-                    source_coarse, target_coarse
-                ).forward() * into_coarse_overlap
+                across = (
+                    datum.transition_between(source_coarse, target_coarse).forward()
+                    * into_coarse_overlap
+                )
                 into_target_chart = (
                     datum.overlap(target_coarse, source_coarse).inclusion() * across
                 )
@@ -7327,8 +7982,10 @@ def _glued_chartwise_distinguished_open(
         inclusion_codomain=datum.scheme(),
         inclusion_datum=finite_indexed_family(
             fine_indices,
-            lambda index: datum.chart_embedding(normalized_coarse(index))
-            * opens[index].inclusion(),
+            lambda index: (
+                datum.chart_embedding(normalized_coarse(index))
+                * opens[index].inclusion()
+            ),
             name="Local inclusions of a glued chartwise open",
         ),
     )
@@ -7370,7 +8027,11 @@ def _chartwise_fixed_subscheme(datum, local_automorphisms):
         lambda index: automorphisms[index].fixed_subscheme(),
         name="Affine charts of the glued fixed subscheme",
     )
-    return _glued_chartwise_subscheme(datum, local_fixed, (ClosedEmbeddings(datum.scheme()), ClosedSubschemes(datum.base_ring())))
+    return _glued_chartwise_subscheme(
+        datum,
+        local_fixed,
+        (ClosedEmbeddings(datum.scheme()), ClosedSubschemes(datum.base_ring())),
+    )
 
 
 def _glued_chartwise_subscheme(
@@ -7394,15 +8055,24 @@ def _glued_chartwise_subscheme(
     def local_overlap(source_index, target_index):
         closed = local_closed[source_index]
         element = datum.overlap(source_index, target_index).distinguished_open_element()
-        return closed.distinguished_open(closed.inclusion().coordinate_algebra_morphism()(element))
+        return closed.distinguished_open(
+            closed.inclusion().coordinate_algebra_morphism()(element)
+        )
 
     def local_transition(source_index, target_index):
         source = local_overlap(source_index, target_index)
         target = local_overlap(target_index, source_index)
         into_source_chart = local_closed[source_index].inclusion() * source.inclusion()
-        into_source_overlap = datum.overlap(source_index, target_index).corestriction(into_source_chart)
-        across = datum.transition_between(source_index, target_index).forward() * into_source_overlap
-        into_target_chart = datum.overlap(target_index, source_index).inclusion() * across
+        into_source_overlap = datum.overlap(source_index, target_index).corestriction(
+            into_source_chart
+        )
+        across = (
+            datum.transition_between(source_index, target_index).forward()
+            * into_source_overlap
+        )
+        into_target_chart = (
+            datum.overlap(target_index, source_index).inclusion() * across
+        )
         into_target_closed = local_closed[target_index].corestriction(into_target_chart)
         return target.corestriction(into_target_closed)
 
@@ -7411,7 +8081,9 @@ def _glued_chartwise_subscheme(
     for left, right in datum.transition_index_set():
         forward = local_transition(left, right)
         inverse = local_transition(right, left)
-        transitions[left, right] = schemes.Core().Mor(forward.domain(), forward.codomain())(forward, inverse)
+        transitions[left, right] = schemes.Core().Mor(
+            forward.domain(), forward.codomain()
+        )(forward, inverse)
     return schemes.glue_affine_atlas(
         local_closed,
         transitions,
@@ -7419,7 +8091,9 @@ def _glued_chartwise_subscheme(
         inclusion_codomain=datum.scheme(),
         inclusion_datum=finite_indexed_family(
             datum.chart_index_set(),
-            lambda index: datum.chart_embedding(index) * local_closed[index].inclusion(),
+            lambda index: (
+                datum.chart_embedding(index) * local_closed[index].inclusion()
+            ),
             name="Local inclusions of a glued closed subscheme",
         ),
         _object_engine=_engine,
@@ -7476,7 +8150,8 @@ class _FiniteAtlasStructurePresheaf(Functor):
         self._scheme = atlas.scheme()
         self._global_section_ring = global_section_ring
         self._global_restrictions = _family_on_finite_ordered_set(
-            atlas.chart_index_set(), global_restrictions,
+            atlas.chart_index_set(),
+            global_restrictions,
             name="Restrictions of global functions to affine charts",
             noun="global-function restriction",
         )
@@ -7486,8 +8161,14 @@ class _FiniteAtlasStructurePresheaf(Functor):
                 restriction.domain() is not global_section_ring
                 or restriction.codomain() is not atlas.chart(index).coordinate_algebra()
             ):
-                raise ValueError("a global-function restriction must retain its global and chart ring endpoints")
-        Functor.__init__(self, self._scheme.open_subsets_site().opposite(), OwnedRings().Commutative())
+                raise ValueError(
+                    "a global-function restriction must retain its global and chart ring endpoints"
+                )
+        Functor.__init__(
+            self,
+            self._scheme.open_subsets_site().opposite(),
+            OwnedRings().Commutative(),
+        )
 
     def scheme(self):
         return self._scheme
@@ -7516,7 +8197,12 @@ class _FiniteAtlasStructurePresheaf(Functor):
         if self._is_whole(opposite_object):
             return self._global_section_ring
         self._chart_index(opposite_object)
-        return opposite_object.underlying_object().value().chart_open().coordinate_algebra()
+        return (
+            opposite_object.underlying_object()
+            .value()
+            .chart_open()
+            .coordinate_algebra()
+        )
 
     def _global_restriction(self, opposite_object):
         index = self._chart_index(opposite_object)
@@ -7529,10 +8215,17 @@ class _FiniteAtlasStructurePresheaf(Functor):
     def _apply_morphism(self, opposite_arrow):
         source = self(opposite_arrow.domain())
         target = self(opposite_arrow.codomain())
-        if _is_empty_open(self, opposite_arrow.domain()) or _is_empty_open(self, opposite_arrow.codomain()):
-            return self.codomain().Mor(source, target).elementwise(lambda _section: target.zero())
+        if _is_empty_open(self, opposite_arrow.domain()) or _is_empty_open(
+            self, opposite_arrow.codomain()
+        ):
+            return (
+                self.codomain()
+                .Mor(source, target)
+                .elementwise(lambda _section: target.zero())
+            )
         if opposite_arrow.domain() is opposite_arrow.codomain() or (
-            self._is_whole(opposite_arrow.domain()) and self._is_whole(opposite_arrow.codomain())
+            self._is_whole(opposite_arrow.domain())
+            and self._is_whole(opposite_arrow.codomain())
         ):
             return source.Mor(target).identity()
         if self._is_whole(opposite_arrow.domain()):
@@ -7543,8 +8236,10 @@ class _FiniteAtlasStructurePresheaf(Functor):
             return self._global_restriction(opposite_arrow.domain()).inverse()
         target_index = self._chart_index(opposite_arrow.codomain())
         return self._atlas.basis_coordinate_restriction(
-            source_index, opposite_arrow.domain().underlying_object().value().chart_open(),
-            target_index, opposite_arrow.codomain().underlying_object().value().chart_open(),
+            source_index,
+            opposite_arrow.domain().underlying_object().value().chart_open(),
+            target_index,
+            opposite_arrow.codomain().underlying_object().value().chart_open(),
         )
 
     def _repr_(self):
@@ -7588,10 +8283,15 @@ class _FiniteAtlasStructureSheafEngine:
 def _finite_atlas_structure_sheaf(atlas, global_section_ring, global_restrictions):
     r"""Construct ``O_X`` on ``Open(|X|)`` from the charts of ``atlas`` and ``Gamma(X, O_X)``."""
     scheme = atlas.scheme()
-    presheaf = _FiniteAtlasStructurePresheaf(atlas, global_section_ring, global_restrictions)
+    presheaf = _FiniteAtlasStructurePresheaf(
+        atlas, global_section_ring, global_restrictions
+    )
     return AlgebraSheaves(scheme).object(
         presheaf,
-        categories=(QuasiCoherentSheaves(scheme), QuasiCoherentSheaves(scheme).Invertible()),
+        categories=(
+            QuasiCoherentSheaves(scheme),
+            QuasiCoherentSheaves(scheme).Invertible(),
+        ),
         construction_data={
             "atlas": atlas,
             "global_section_ring": global_section_ring,
@@ -7604,15 +8304,15 @@ __all__ = [
     "AlgebraGluingData",
     "AlgebraGluingMor",
     "AlgebraGluingMorphism",
+    "FiniteAffineAtlases",
     "FiniteAtlasAlgebraGluingData",
     "FiniteAtlasAlgebraTransition",
-    "FiniteAffineAtlases",
     "FiniteAtlasInvertibleSheafRefinement",
     "FiniteAtlasLineBundlePullbackComparison",
-    "FiniteAtlasRefinement",
     "FiniteAtlasModuleGluingData",
     "FiniteAtlasModuleGluingMorphism",
     "FiniteAtlasModuleTransition",
+    "FiniteAtlasRefinement",
     "ModuleGluingData",
     "ModuleGluingMor",
     "SemilinearAlgebraMorphism",

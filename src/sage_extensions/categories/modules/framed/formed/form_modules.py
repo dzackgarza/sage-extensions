@@ -1,6 +1,7 @@
 r"""Modules equipped with exact bilinear or quadratic forms."""
 
 from collections.abc import Iterable
+from typing import TYPE_CHECKING
 
 from sage.categories.category_with_axiom import all_axioms
 from sage.categories.morphism import Morphism
@@ -8,41 +9,29 @@ from sage.misc.cachefunc import cached_function, cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.richcmp import op_EQ
 
-from sage_extensions.categories.abstract_categories.mor_foundation import CategoricalArrow
 from sage_extensions.categories.abstract_categories.mor_categories import (
     CategoricalMor,
+    MonoCategoryConstruction,
     MorCategories,
     MorCategoryConstruction,
-    MonoCategoryConstruction,
-    _category_mor_parent,
+)
+from sage_extensions.categories.abstract_categories.mor_foundation import (
+    CategoricalArrow,
+    object_level,
 )
 from sage_extensions.categories.abstract_categories.objects import (
     OwnedParameterizedCategory,
 )
 from sage_extensions.categories.forms.forms import (
     _is_bilinear_form as _form_is_bilinear,
+)
+from sage_extensions.categories.forms.forms import (
     _is_quadratic_form as _form_is_quadratic,
 )
 from sage_extensions.categories.modules.base_change import (
     _base_change_codomain,
     _base_change_element,
     _base_change_scalar,
-)
-from sage_extensions.categories.modules.framed.framed_free_modules import (
-    FramedFreeModules,
-    _module_subobject_spanning,
-    _span_basis_elements,
-)
-from sage_extensions.categories.modules.hodge import (
-    _algebraic_correlation_morphism,
-    _correlation_isomorphism,
-    _hodge_discriminant,
-    _hodge_star,
-    _hodge_star_over_fraction_field,
-    _multivector_hodge_star,
-)
-from sage_extensions.categories.modules.module_morphisms.module_morphisms import (
-    ModuleMorphismMethods,
 )
 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
     _relation_images,
@@ -78,6 +67,22 @@ from sage_extensions.categories.modules.framed.formed.torsion_form_modules impor
 from sage_extensions.categories.modules.framed.fraction_field_quotients import (
     FractionFieldQuotients,
 )
+from sage_extensions.categories.modules.framed.framed_free_modules import (
+    FramedFreeModules,
+    _module_subobject_spanning,
+    _span_basis_elements,
+)
+from sage_extensions.categories.modules.hodge import (
+    _algebraic_correlation_morphism,
+    _correlation_isomorphism,
+    _hodge_discriminant,
+    _hodge_star,
+    _hodge_star_over_fraction_field,
+    _multivector_hodge_star,
+)
+from sage_extensions.categories.modules.module_morphisms.module_morphisms import (
+    ModuleMorphismMethods,
+)
 from sage_extensions.categories.modules.pure.modules import (
     MatrixSpaces,
     Modules,
@@ -105,8 +110,6 @@ from sage_extensions.logic import AtomicProposition, Predicate, conjunction, neg
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.tensors.tensor import tensor
 from sage_extensions.validation import validator
-from typing import TYPE_CHECKING
-from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 
 if TYPE_CHECKING:
     from sage.categories.category import Category
@@ -153,7 +156,9 @@ def _relation_morphism(ring, relation_rows):
             relation: target.linear_combination(
                 {
                     label: ring(coefficient)
-                    for label, coefficient in zip(target.module_generating_set(), row, strict=True)
+                    for label, coefficient in zip(
+                        target.module_generating_set(), row, strict=True
+                    )
                     if coefficient
                 }
             )
@@ -197,7 +202,9 @@ def _represented_module(value, ring):
 
 
 def _value_as_module_element(formed_module, value):
-    return _as_module_element(formed_module.value_module(), formed_module.base_ring(), value)
+    return _as_module_element(
+        formed_module.value_module(), formed_module.base_ring(), value
+    )
 
 
 def _as_module_element(values, ring, value):
@@ -210,9 +217,7 @@ def _as_module_element(values, ring, value):
         return represented.linear_combination({unit_label: ring(value)})
     extension = represented.module_over_extension()
     unit_label = extension.module_generating_set()[0]
-    return represented.wrap(
-        extension.linear_combination({unit_label: values(value)})
-    )
+    return represented.wrap(extension.linear_combination({unit_label: values(value)}))
 
 
 def _value_from_module_element(formed_module, element):
@@ -228,7 +233,9 @@ def _value_from_module_element(formed_module, element):
 
     extension = represented.module_over_extension()
     restricted_element = represented(element)
-    coordinates = extension.framing_morphism().lift(restricted_element.underlying_element())
+    coordinates = extension.framing_morphism().lift(
+        restricted_element.underlying_element()
+    )
     unit_label = extension.module_generating_set()[0]
     return values(coordinates(unit_label))
 
@@ -240,7 +247,9 @@ def _mapped_value(domain, codomain, value_morphism, value):
     )
 
 
-def _form_square_commutes(domain, codomain, module_morphism, value_morphism) -> bool | Predicate:
+def _form_square_commutes(
+    domain, codomain, module_morphism, value_morphism
+) -> bool | Predicate:
     r"""Whether ``h(b_M(x, y)) = b_N(f(x), f(y))`` for the pair ``(f, h)`` from ``M`` to ``N``.
 
     When both forms are bilinear with values in the same R-algebra S,
@@ -283,7 +292,8 @@ def _form_square_commutes(domain, codomain, module_morphism, value_morphism) -> 
     module_mor = domain.module_category().Mor(domain, codomain)
     value_identity = (
         values.module_category().Mor(values, values).identity()
-        if value_morphism.codomain() is values else None
+        if value_morphism.codomain() is values
+        else None
     )
     if (
         domain is codomain
@@ -328,7 +338,8 @@ def _form_square_commutes(domain, codomain, module_morphism, value_morphism) -> 
             rows, columns = map(int, source_gram.tensor_shape())
             equations = conjunction(
                 pulled_back[row, column] == source_gram[row, column]
-                for row in range(rows) for column in range(columns)
+                for row in range(rows)
+                for column in range(columns)
             )
         case True, _:
             equations = conjunction(
@@ -355,10 +366,7 @@ def _form_square_commutes(domain, codomain, module_morphism, value_morphism) -> 
 
 def _formed_component_map(domain, codomain, module_morphism):
     r"""Realize an underlying-module component on its formed endpoints."""
-    if (
-        module_morphism.domain() is domain
-        and module_morphism.codomain() is codomain
-    ):
+    if module_morphism.domain() is domain and module_morphism.codomain() is codomain:
         return module_morphism
     source_module = domain.unformed_module()
     target_module = codomain.unformed_module()
@@ -371,11 +379,15 @@ def _formed_component_map(domain, codomain, module_morphism):
             f"{source_module} -> {target_module}, but {module_morphism} is "
             f"{module_morphism.domain()} -> {module_morphism.codomain()}"
         )
-    return domain.module_category().Mor(domain, codomain)._from_constructed_element_map(
-        lambda element: codomain._element_from_unformed_module(
-            module_morphism(domain._element_of_unformed_module(element))
-        ),
-        premises=(module_morphism,),
+    return (
+        domain.module_category()
+        .Mor(domain, codomain)
+        ._from_constructed_element_map(
+            lambda element: codomain._element_from_unformed_module(
+                module_morphism(domain._element_of_unformed_module(element))
+            ),
+            premises=(module_morphism,),
+        )
     )
 
 
@@ -449,9 +461,13 @@ class FormedModuleMorphism:
         return value_morphism == identity
 
     def map_value(self, value):
-        return _mapped_value(self.domain(), self.codomain(), self.value_morphism(), value)
+        return _mapped_value(
+            self.domain(), self.codomain(), self.value_morphism(), value
+        )
 
-    def base_change(self, ring_map: Morphism | CategoricalArrow) -> "FormedModuleMorphism":
+    def base_change(
+        self, ring_map: Morphism | CategoricalArrow
+    ) -> FormedModuleMorphism:
         r"""Extend both the module map and the value map along ``R -> S``.
 
         A formed morphism is a pair ``(f,h)`` satisfying the form square.
@@ -503,12 +519,12 @@ class FormedModuleMorphism:
         extension = Modules(ring).scalar_extension(ring_map)
         changed_source, changed_target = extension(source), extension(target)
         module_map = extension(self.module_morphism())
-        multiplier = _base_change_scalar(
-            ring_map, self.map_value(ring.one())
-        )
+        multiplier = _base_change_scalar(ring_map, self.map_value(ring.one()))
         values = _represented_value_module(changed_source)
         value_map = values.module_category().Mor(values, values)(
-            lambda label: values.scalar_multiple(multiplier, values.module_generator(label))
+            lambda label: values.scalar_multiple(
+                multiplier, values.module_generator(label)
+            )
         )
         return FormModules(ring_map.codomain()).Mor(changed_source, changed_target)(
             (module_map, value_map)
@@ -552,7 +568,9 @@ class FormedModuleMorphism:
         if self.parent() is not other.parent():
             return False
         module_equal = ModuleMorphismMethods._richcmp_(self, other, op_EQ)
-        return conjunction((module_equal, self.value_morphism() == other.value_morphism()))
+        return conjunction(
+            (module_equal, self.value_morphism() == other.value_morphism())
+        )
 
     def __ne__(self, other) -> bool | Predicate:
         return negation(self == other)
@@ -562,9 +580,9 @@ class FormedModuleMorphism:
     def __mul__(self, other):
         if not isinstance(other, FormedModuleMorphism):
             modules = Modules(self.domain().base_ring())
-            ordinary = modules.Mor(self.domain(), self.codomain())._from_constructed_element_map(
-                self, premises=(self,)
-            )
+            ordinary = modules.Mor(
+                self.domain(), self.codomain()
+            )._from_constructed_element_map(self, premises=(self,))
             return ordinary * other
         if other.codomain() is not self.domain():
             raise ValueError(
@@ -584,8 +602,10 @@ class FormedModuleMorphism:
             if factor.domain() is factor.codomain():
                 values = _represented_value_module(factor.domain())
                 if (
-                    factor._form_module_morphism is modules.Mor(factor.domain(), factor.domain()).identity()
-                    and factor.value_morphism() is values.module_category().Mor(values, values).identity()
+                    factor._form_module_morphism
+                    is modules.Mor(factor.domain(), factor.domain()).identity()
+                    and factor.value_morphism()
+                    is values.module_category().Mor(values, values).identity()
                 ):
                     return remainder
         module_composite = modules.Mor(source, target)._from_constructed_element_map(
@@ -638,8 +658,13 @@ class FormEmbedding:
     def multiplier(self):
         r"""The scalar multiplying the form, distinct from a denominator factor."""
         ring = self.domain().base_ring()
-        if self.domain().value_module() is not ring or self.codomain().value_module() is not ring:
-            raise TypeError("a scalar multiplier requires forms valued in their common scalar ring")
+        if (
+            self.domain().value_module() is not ring
+            or self.codomain().value_module() is not ring
+        ):
+            raise TypeError(
+                "a scalar multiplier requires forms valued in their common scalar ring"
+            )
         return self.map_value(ring.one())
 
     @validator
@@ -651,17 +676,31 @@ class FormEmbedding:
         source, target = self.domain(), self.codomain()
         ring = source.base_ring()
         if scale <= ring.zero() or ideal != rational.denominator_ideal(source, target):
-            raise ValueError("the retained ideal must be the denominator ideal of the rational map")
+            raise ValueError(
+                "the retained ideal must be the denominator ideal of the rational map"
+            )
         if ring.ideal(scale) != ideal or self.multiplier() != scale * scale:
-            raise ValueError("the clearing factor must generate the denominator ideal and square to the multiplier")
+            raise ValueError(
+                "the clearing factor must generate the denominator ideal and square to the multiplier"
+            )
         fraction_map = ring.fraction_field_map()
         restrict = Modules(fraction_map.codomain()).restriction_of_scalars(fraction_map)
-        from sage_extensions.categories.modules.pure.modules import ModulesOverIntegralDomains
-        extended = restrict(rational) * ModulesOverIntegralDomains(ring)(source).generic_fibre_map()
+        from sage_extensions.categories.modules.pure.modules import (
+            ModulesOverIntegralDomains,
+        )
+
+        extended = (
+            restrict(rational)
+            * ModulesOverIntegralDomains(ring)(source).generic_fibre_map()
+        )
         integral = ModulesOverIntegralDomains(ring)(target).generic_fibre_map()
         for vector in source.module_generators():
-            if integral(self(vector)) != extended.codomain().scalar_multiple(scale, extended(vector)):
-                raise ValueError("the embedding must equal the clearing factor times its retained rational map")
+            if integral(self(vector)) != extended.codomain().scalar_multiple(
+                scale, extended(vector)
+            ):
+                raise ValueError(
+                    "the embedding must equal the clearing factor times its retained rational map"
+                )
 
     def is_quadratic(self) -> bool:
         return self._quadratic
@@ -740,7 +779,9 @@ class FormEmbedding:
         kernel = pairing.kernel()
         kernel_inclusion = kernel.inclusion()
         return target.subobject_on(
-            tuple(kernel_inclusion(generator) for generator in kernel.module_generators())
+            tuple(
+                kernel_inclusion(generator) for generator in kernel.module_generators()
+            )
         )
 
 
@@ -752,7 +793,11 @@ class FormEmbeddingMor(CategoricalMor):
     def __init__(self, mor_family, domain, codomain) -> None:
         ring = domain.base_ring()
         formed = FormModules(ring)
-        if codomain.base_ring() is not ring or domain not in formed or codomain not in formed:
+        if (
+            codomain.base_ring() is not ring
+            or domain not in formed
+            or codomain not in formed
+        ):
             raise TypeError(
                 f"form-preserving embeddings {domain} -> {codomain} need two modules with forms over one "
                 f"base ring {ring}, but they lie in {domain.category()} and {codomain.category()}"
@@ -760,14 +805,29 @@ class FormEmbeddingMor(CategoricalMor):
         CategoricalMor.__init__(self, mor_family, domain, codomain)
 
     def __call__(self, images, *, value_morphism=None, **kwargs):
-        if isinstance(images, (Morphism, CategoricalArrow)) and value_morphism is not None:
+        if (
+            isinstance(images, (Morphism, CategoricalArrow))
+            and value_morphism is not None
+        ):
             return super().__call__((images, value_morphism), **kwargs)
         return super().__call__(images, value_morphism=value_morphism, **kwargs)
 
-    def _element_constructor_(self, images, *, quadratic: bool | None = None, value_morphism=None, denominator_clearing=None, check=False):
+    def _element_constructor_(
+        self,
+        images,
+        *,
+        quadratic: bool | None = None,
+        value_morphism=None,
+        denominator_clearing=None,
+        check=False,
+    ):
         domain = self.domain()
         codomain = self.codomain()
-        if isinstance(images, tuple) and len(images) == 2 and all(isinstance(part, (Morphism, CategoricalArrow)) for part in images):
+        if (
+            isinstance(images, tuple)
+            and len(images) == 2
+            and all(isinstance(part, (Morphism, CategoricalArrow)) for part in images)
+        ):
             images, value_morphism = images
         elif isinstance(images, (Morphism, CategoricalArrow)):
             if self._already_parented_arrow(images):
@@ -775,7 +835,9 @@ class FormEmbeddingMor(CategoricalMor):
                 images.validate_injectivity(check=check)
                 images.validate_denominator_clearing(check=check)
                 return images
-            raise TypeError(f"{images} is not an arrow of {self}; give the module and value maps as defining data")
+            raise TypeError(
+                f"{images} is not an arrow of {self}; give the module and value maps as defining data"
+            )
 
         if quadratic is None:
             ring = domain.base_ring()
@@ -850,14 +912,23 @@ class FormedModuleMor(CategoricalMor):
             source_values = _represented_value_module(domain)
             target_values = _represented_value_module(codomain)
             if source_values is not target_values:
-                raise TypeError(f"{self} requires an explicit value map between {source_values} and {target_values}")
-            datum = (module_morphism, source_values.module_category().Mor(source_values, target_values).identity())
+                raise TypeError(
+                    f"{self} requires an explicit value map between {source_values} and {target_values}"
+                )
+            datum = (
+                module_morphism,
+                source_values.module_category()
+                .Mor(source_values, target_values)
+                .identity(),
+            )
 
         if isinstance(datum, (Morphism, CategoricalArrow)):
             if self._already_parented_arrow(datum):
                 datum.validate_form_preservation(check=check)
                 return datum
-            raise TypeError(f"{datum} is not an arrow of {self}; give the module and value maps as defining data")
+            raise TypeError(
+                f"{datum} is not an arrow of {self}; give the module and value maps as defining data"
+            )
         module_morphism, value_morphism = datum
         morphism = self.element_class(self, module_morphism, value_morphism)
         morphism.validate_form_preservation(check=check)
@@ -872,7 +943,10 @@ class FormedModuleMor(CategoricalMor):
         """
         domain = self.domain()
         codomain = self.codomain()
-        assert module_morphism.domain() is domain and module_morphism.codomain() is codomain, (
+        assert (
+            module_morphism.domain() is domain
+            and module_morphism.codomain() is codomain
+        ), (
             f"{self} preserves forms along module maps {domain} -> {codomain}, but {module_morphism} is "
             f"{module_morphism.domain()} -> {module_morphism.codomain()}"
         )
@@ -900,6 +974,7 @@ class FormedModuleMor(CategoricalMor):
                 values.module_category().Mor(values, values).identity(),
             )
         )
+
 
 class FormedModuleMorCategoryConstruction(MorCategoryConstruction):
     def fixed_category_class(self):
@@ -1013,7 +1088,9 @@ class FiberedFormedModuleMorphism:
         )
 
         module_equal = SemilinearModuleMorphism._richcmp_(self, other, op_EQ)
-        return conjunction((module_equal, self.value_morphism() == other.value_morphism()))
+        return conjunction(
+            (module_equal, self.value_morphism() == other.value_morphism())
+        )
 
     def __ne__(self, other) -> bool | Predicate:
         return negation(self == other)
@@ -1065,9 +1142,7 @@ class FiberedFormedModuleMorphism:
         if getattr(other, "_preamble_fibered_formed_identity", False):
             return self
         composite_ring_map = self.ring_map() * other.ring_map()
-        mor = other.domain().fibered_formed_mor(
-            self.codomain(), composite_ring_map
-        )
+        mor = other.domain().fibered_formed_mor(self.codomain(), composite_ring_map)
 
         direct_changed = mor.base_changed_domain()
         middle_changed = self.base_changed_domain()
@@ -1102,7 +1177,9 @@ class FiberedFormedModuleMorphism:
                 middle_value,
             )
             value_images[label] = self.value_morphism()(lifted_value)
-        value_map = direct_values.module_category().Mor(direct_values, target_values)(value_images)
+        value_map = direct_values.module_category().Mor(direct_values, target_values)(
+            value_images
+        )
         return mor((module_map, value_map))
 
 
@@ -1217,10 +1294,6 @@ class PairingObjects(OwnedCategoryOverBaseRing):
     def _repr_object_names(self):
         return f"pairing-bearing module objects over {self.base_ring()}"
 
-    def super_categories(self):
-        r"""Paired modules are slice objects and formed modules are modules; both are sets."""
-        return [OwnedSets()]
-
     def an_object(self):
         return PairedModules(self.base_ring()).an_object()
 
@@ -1252,7 +1325,9 @@ class PairingObjects(OwnedCategoryOverBaseRing):
             covariant tensor: testing its entries must not evaluate the
             classifying Hom on all pairs of generators a second time.
             """
-            match self.left_module() is self.right_module() and self.left_module() is self:
+            match (
+                self.left_module() is self.right_module() and self.left_module() is self
+            ):
                 case True:
                     pass
                 case False:
@@ -1275,9 +1350,7 @@ class PairingObjects(OwnedCategoryOverBaseRing):
                             )
                         size = int(self.module_rank())
                         return all(
-                            gram[i, j] in ring
-                            for i in range(size)
-                            for j in range(size)
+                            gram[i, j] in ring for i in range(size) for j in range(size)
                         )
                     generators = tuple(self.module_generators())
                     return all(
@@ -1299,14 +1372,16 @@ class PairingObjects(OwnedCategoryOverBaseRing):
             ring = self.base_ring()
             values = _represented_module(pairing_values, ring)
             internal_mor = right.module_category().Mor(right, values)
-            return left.module_category().Mor(
-                left, internal_mor
-            )._from_constructed_element_map(
-                lambda left_element: internal_mor._from_constructed_element_map(
-                    lambda right_element: _as_module_element(
-                        pairing_values,
-                        ring,
-                        self.pairing(left_element, right_element),
+            return (
+                left.module_category()
+                .Mor(left, internal_mor)
+                ._from_constructed_element_map(
+                    lambda left_element: internal_mor._from_constructed_element_map(
+                        lambda right_element: _as_module_element(
+                            pairing_values,
+                            ring,
+                            self.pairing(left_element, right_element),
+                        )
                     )
                 )
             )
@@ -1320,14 +1395,16 @@ class PairingObjects(OwnedCategoryOverBaseRing):
             ring = self.base_ring()
             values = _represented_module(pairing_values, ring)
             internal_mor = left.module_category().Mor(left, values)
-            return right.module_category().Mor(
-                right, internal_mor
-            )._from_constructed_element_map(
-                lambda right_element: internal_mor._from_constructed_element_map(
-                    lambda left_element: _as_module_element(
-                        pairing_values,
-                        ring,
-                        self.pairing(left_element, right_element),
+            return (
+                right.module_category()
+                .Mor(right, internal_mor)
+                ._from_constructed_element_map(
+                    lambda right_element: internal_mor._from_constructed_element_map(
+                        lambda left_element: _as_module_element(
+                            pairing_values,
+                            ring,
+                            self.pairing(left_element, right_element),
+                        )
                     )
                 )
             )
@@ -1354,7 +1431,9 @@ class PairedModules(OwnedParameterizedCategory):
 
     @staticmethod
     def __classcall__(cls, value_module):
-        return OwnedParameterizedCategory.__classcall__(cls, _value_module_of(value_module))
+        return OwnedParameterizedCategory.__classcall__(
+            cls, _value_module_of(value_module)
+        )
 
     @classmethod
     def _repr_object_names(cls):
@@ -1397,11 +1476,18 @@ class PairedModules(OwnedParameterizedCategory):
             f"a pairing in {self} takes values in {value}, not {pairing.codomain()}"
         )
         if pairing.codomain() is not value:
-            square = Modules(ring).tensor_product((pairing.left_module(), pairing.right_module()))
+            square = Modules(ring).tensor_product(
+                (pairing.left_module(), pairing.right_module())
+            )
             left, right = square.tensor_factor(0), square.tensor_factor(1)
             pairing = square.module_category().Mor(square, value)(
                 lambda pair: value(
-                    (pairing(left.module_generator(pair.component(0)), right.module_generator(pair.component(1))),)
+                    (
+                        pairing(
+                            left.module_generator(pair.component(0)),
+                            right.module_generator(pair.component(1)),
+                        ),
+                    )
                 )
             )
         assert pairing.parent().mor_category().is_subcategory(Modules(ring)), (
@@ -1441,10 +1527,13 @@ def _base_changed_scalar_gram(source, ring_map):
     rank = int(source.module_rank())
     gram = source.gram_tensor()
     return tensor(
-        ring_map.codomain(), (), (rank, rank),
+        ring_map.codomain(),
+        (),
+        (rank, rank),
         (
             _base_change_scalar(ring_map, gram[i, j])
-            for i in range(rank) for j in range(rank)
+            for i in range(rank)
+            for j in range(rank)
         ),
     )
 
@@ -1473,10 +1562,12 @@ def _formed_module_base_change(self, ring_map):
                 # In a finite basis the determinant is a unit, and its
                 # image under every unital ring map remains a unit.
                 categories.append(FormModules(target_ring).Unimodular())
-            elif (source in FormModules(source.base_ring()).Nondegenerate()
-                    and target_ring in OwnedIntegralDomains()
-                    and _base_change_scalar(ring_map, source.determinant())
-                    != target_ring.zero()):
+            elif (
+                source in FormModules(source.base_ring()).Nondegenerate()
+                and target_ring in OwnedIntegralDomains()
+                and _base_change_scalar(ring_map, source.determinant())
+                != target_ring.zero()
+            ):
                 # Over a domain, the nonzero image of this finite Gram
                 # determinant is the exact target nondegeneracy witness.
                 categories.append(FormModules(target_ring).Nondegenerate())
@@ -1487,23 +1578,28 @@ def _formed_module_base_change(self, ring_map):
             data["gram_tensor"] = (
                 _base_changed_scalar_gram(source, ring_map)
                 if source.module_rank().is_finite()
-                else _BaseChangedGram(changed, source.gram_tensor(), ring_map, changed_form)
+                else _BaseChangedGram(
+                    changed, source.gram_tensor(), ring_map, changed_form
+                )
             )
-        return _form_module(changed_form, _extra_categories=categories, _extra_construction_data=data)
+        return _form_module(
+            changed_form, _extra_categories=categories, _extra_construction_data=data
+        )
 
     if _is_bilinear_form(form):
         target_values = _represented_module(target_ring, target_ring)
         if _has_finite_framing(form.module()):
             changed_values = form.coordinate_values().map(
                 lambda value: _as_module_element(
-                    target_ring, target_ring,
-                    _base_change_scalar(ring_map, _value_from_module_element(source, value)),
+                    target_ring,
+                    target_ring,
+                    _base_change_scalar(
+                        ring_map, _value_from_module_element(source, value)
+                    ),
                 ),
                 name="Base-changed bilinear coordinate values",
             )
-            return equip(
-                changed.bilinear_forms(target_values)(changed_values)
-            )
+            return equip(changed.bilinear_forms(target_values)(changed_values))
 
         def changed_bilinear_value(left, right):
             left_coordinates = changed(left).to_vector()
@@ -1525,9 +1621,7 @@ def _formed_module_base_change(self, ring_map):
                     )
             return _as_module_element(target_ring, target_ring, result)
 
-        return equip(
-            changed.bilinear_forms(target_values)(changed_bilinear_value)
-        )
+        return equip(changed.bilinear_forms(target_values)(changed_bilinear_value))
 
     if not _is_quadratic_form(form):
         raise TypeError(
@@ -1540,25 +1634,23 @@ def _formed_module_base_change(self, ring_map):
     if source_form.has_selected_bilinear_lift():
         changed_lift_values = source_form.lift_coordinate_values().map(
             lambda value: _as_module_element(
-                target_ring, target_ring,
-                _base_change_scalar(ring_map, _value_from_module_element(source, value)),
+                target_ring,
+                target_ring,
+                _base_change_scalar(
+                    ring_map, _value_from_module_element(source, value)
+                ),
             ),
             name="Base-changed quadratic-lift coordinate values",
         )
-        return equip(
-            changed.quadratic_forms(target_values)(changed_lift_values)
-        )
+        return equip(changed.quadratic_forms(target_values)(changed_lift_values))
 
     def changed_quadratic_value(element):
         coordinates = changed(element).to_vector()
         result = target_ring.zero()
         for left_label in coordinates.support().domain():
             source_left = form.module().module_generator(left_label)
-            result += (
-                coordinates(left_label)**2
-                * _base_change_scalar(
-                    ring_map, _value_from_module_element(source, form(source_left))
-                )
+            result += coordinates(left_label) ** 2 * _base_change_scalar(
+                ring_map, _value_from_module_element(source, form(source_left))
             )
             left_rank = source_labels.ranking_map()(left_label)
             for right_label in coordinates.support().domain():
@@ -1577,9 +1669,7 @@ def _formed_module_base_change(self, ring_map):
                 )
         return _as_module_element(target_ring, target_ring, result)
 
-    return equip(
-        changed.quadratic_map(target_values, changed_quadratic_value)
-    )
+    return equip(changed.quadratic_map(target_values, changed_quadratic_value))
 
 
 class FormModules(OwnedCategoryOverBaseRing):
@@ -1636,7 +1726,9 @@ class FormModules(OwnedCategoryOverBaseRing):
         if _is_bilinear_form(form):
             module = form.module()
             if form.parent() is not module.bilinear_hom_space(form.codomain()):
-                raise TypeError(f"{form} is not an element of the chosen bilinear Hom of {module}")
+                raise TypeError(
+                    f"{form} is not an element of the chosen bilinear Hom of {module}"
+                )
         elif _is_quadratic_form(form):
             module = form.module()
         else:
@@ -1674,11 +1766,15 @@ class FormModules(OwnedCategoryOverBaseRing):
             )
             self._preamble_form = source_form
             self._preamble_form_computation = source_form_computation
-            self._preamble_radical_quotient_cokernel_projection = radical_quotient_cokernel_projection
+            self._preamble_radical_quotient_cokernel_projection = (
+                radical_quotient_cokernel_projection
+            )
             self._preamble_radical_quotient_basis_map = radical_quotient_basis_map
             super().__init__(**rest)
 
-        def _added_structure(self, construction_data: "dict[str, ConstructionData]") -> "tuple[tuple[Category, ...], dict[str, ConstructionData]]":
+        def _added_structure(
+            self, construction_data: dict[str, ConstructionData]
+        ) -> tuple[tuple[Category, ...], dict[str, ConstructionData]]:
             r"""The form this level adds, kept when the module is constructed again (``OWN-05``; see ``Objects``)."""
             categories, data = super()._added_structure(construction_data)
             return categories, {"source_form": self.form(), **data}
@@ -1823,14 +1919,19 @@ class FormModules(OwnedCategoryOverBaseRing):
             if ring in OwnedIntegralDomains() and values is ring.fraction_field():
                 return ring.fractional_ideal(*value_generators)
             represented_values = _represented_module(values, ring)
-            return represented_values.subobject_on(tuple(
-                _as_module_element(values, ring, value) for value in value_generators
-            ))
+            return represented_values.subobject_on(
+                tuple(
+                    _as_module_element(values, ring, value)
+                    for value in value_generators
+                )
+            )
 
         def pullback_form(self, morphism):
             r"""Pull back this formed module's form along a map into this module."""
             if morphism.codomain() is not self:
-                raise ValueError("the form pullback requires a map into this formed module")
+                raise ValueError(
+                    "the form pullback requires a map into this formed module"
+                )
             return self._formed_form().pullback(morphism)
 
         @cached_method
@@ -1909,12 +2010,16 @@ class FormModules(OwnedCategoryOverBaseRing):
         def _nondegeneracy_decision(self):
             r"""Decide vanishing of both radicals from the pairing itself."""
             ring = self.base_ring()
-            if (self.value_module() is ring and ring in OwnedIntegralDomains()
-                    and self in FramedFreeModules(ring)
-                    and self.module_generating_set().is_finite() is True):
+            if (
+                self.value_module() is ring
+                and ring in OwnedIntegralDomains()
+                and self in FramedFreeModules(ring)
+                and self.module_generating_set().is_finite() is True
+            ):
                 return self.determinant() != ring.zero()
-            return conjunction((self.left_curry().is_injective(), self.right_curry().is_injective()))
-
+            return conjunction(
+                (self.left_curry().is_injective(), self.right_curry().is_injective())
+            )
 
         @object_level
         def Mono(self, codomain):
@@ -1950,7 +2055,9 @@ class FormModules(OwnedCategoryOverBaseRing):
         def _Hom_(self, codomain, category=None):
             ring = self.base_ring()
             formed = FormModules(ring)
-            if codomain in formed and (category is None or category.is_subcategory(formed)):
+            if codomain in formed and (
+                category is None or category.is_subcategory(formed)
+            ):
                 return FormModules(ring).Mor(self, codomain)
 
             return self.module_category().Mor(self, codomain)
@@ -1968,7 +2075,9 @@ class FormModules(OwnedCategoryOverBaseRing):
                 )
             form = self.form()
             match _is_quadratic_form(form):
-                case False if form.codomain() in OwnedRings() and _has_finite_framing(self):
+                case False if form.codomain() in OwnedRings() and _has_finite_framing(
+                    self
+                ):
                     # This module is constructed on the framing of the form's
                     # module, so its coordinates are the Gram tensor's indices.
                     framing = self.framing_morphism()
@@ -2137,9 +2246,13 @@ class FormModules(OwnedCategoryOverBaseRing):
             if positive == 0 and negative == 0:
                 return "zero"
             if negative == 0:
-                return "positive_definite" if positive == rank else "positive_semidefinite"
+                return (
+                    "positive_definite" if positive == rank else "positive_semidefinite"
+                )
             if positive == 0:
-                return "negative_definite" if negative == rank else "negative_semidefinite"
+                return (
+                    "negative_definite" if negative == rank else "negative_semidefinite"
+                )
             return "indefinite"
 
         @cached_method
@@ -2154,7 +2267,7 @@ class FormModules(OwnedCategoryOverBaseRing):
                 f"Isometries of {self}",
             )
 
-        O = orthogonal_group  # noqa: E741 - standard notation O(M,q)
+        O = orthogonal_group
 
         @cached_method
         def square_fibre(self, square):
@@ -2175,17 +2288,28 @@ class FormModules(OwnedCategoryOverBaseRing):
             else:
                 from sage_extensions.categories.lattices import Lattices
                 from sage_extensions.categories.rings.ring_foundation import (
-                    _owned_rationals, _owned_real_algebraic_numbers,
+                    _owned_rationals,
+                    _owned_real_algebraic_numbers,
                 )
                 from sage_extensions.rings.real import RR
 
                 ring = self.base_ring()
-                if (self in Lattices(ring) and values is ring
-                        and ring in (_owned_integers(), _owned_rationals(), _owned_real_algebraic_numbers(), RR)
-                        and self.module_rank().is_finite()
-                        and int(self.module_rank()) > 0
-                        and self in FormModules(ring).Nondegenerate()):
+                if (
+                    self in Lattices(ring)
+                    and values is ring
+                    and ring
+                    in (
+                        _owned_integers(),
+                        _owned_rationals(),
+                        _owned_real_algebraic_numbers(),
+                        RR,
+                    )
+                    and self.module_rank().is_finite()
+                    and int(self.module_rank()) > 0
+                    and self in FormModules(ring).Nondegenerate()
+                ):
                     locus = fibre.object()
+
                     def point():
                         # The solver supplies a solution of this exact
                         # equation; admission retains that actual point
@@ -2298,6 +2422,7 @@ class FormModules(OwnedCategoryOverBaseRing):
         def base_change(self, ring_map):
             r"""Extend the form through its source-retaining scalar-change construction."""
             return FormBaseChanges(ring_map.codomain())(self, ring_map)
+
     class ElementMethods:
         @cached_method
         def b(self, other):
@@ -2458,14 +2583,25 @@ class FormModules(OwnedCategoryOverBaseRing):
                         quadratic=self._torsion_form_is_quadratic(),
                     )
                     rows, columns = map(int, representative.tensor_shape())
-                    return representative.base_ring().matrix_space(rows, columns).from_rows(
-                        tuple(
-                            tuple(representative[row, column] for column in range(columns))
-                            for row in range(rows)
+                    return (
+                        representative.base_ring()
+                        .matrix_space(rows, columns)
+                        .from_rows(
+                            tuple(
+                                tuple(
+                                    representative[row, column]
+                                    for column in range(columns)
+                                )
+                                for row in range(rows)
+                            )
                         )
                     )
 
-                @cached_method(key=lambda self, generators: tuple(id(generator) for generator in generators))
+                @cached_method(
+                    key=lambda self, generators: tuple(
+                        id(generator) for generator in generators
+                    )
+                )
                 def reframing_isometry(self, generators):
                     return _regenerate_form_on_generators(
                         self,
@@ -2501,7 +2637,9 @@ class FormModules(OwnedCategoryOverBaseRing):
                     return _finite_form_subobject_orbits(self, group=group)
 
                 def orbits_on_isotropic_subobjects(self, group=None):
-                    return _finite_form_subobject_orbits(self, isotropic=True, group=group)
+                    return _finite_form_subobject_orbits(
+                        self, isotropic=True, group=group
+                    )
 
                 def is_anisotropic(self) -> bool:
                     zero = self.zero()
@@ -2628,7 +2766,7 @@ class FormModules(OwnedCategoryOverBaseRing):
                 def orthogonal_group(self):
                     return self.automorphism_group()
 
-                def O(self):  # noqa: E743 - standard notation O(A, form)
+                def O(self):
                     return self.automorphism_group()
 
 
@@ -2645,10 +2783,12 @@ class NondegenerateGenericFibreFormModules(OwnedCategoryOverBaseRing):
 
     def an_object(self):
         from sage_extensions.categories.lattices import Lattices
+
         return self(Lattices(self.base_ring())("U"))
 
     def _call_(self, formed):
         from sage_extensions.refine import refine
+
         if formed not in FormModules(self.base_ring()) or not formed.is_nondegenerate():
             raise ValueError("generic-fibre index raising needs a nondegenerate form")
         if formed not in Modules(self.base_ring()).FinitelyGenerated():
@@ -2666,13 +2806,20 @@ class NondegenerateGenericFibreFormModules(OwnedCategoryOverBaseRing):
 
 def _primary_form_component_family(form):
     r"""The primary decomposition indexed by primes of the finite form."""
-    primes = finite_ordered_set(tuple(sorted({
-        prime
-        for invariant in form.invariant_factors()
-        for prime in abs(invariant).prime_divisors()
-    })))
+    primes = finite_ordered_set(
+        tuple(
+            sorted(
+                {
+                    prime
+                    for invariant in form.invariant_factors()
+                    for prime in abs(invariant).prime_divisors()
+                }
+            )
+        )
+    )
     return indexed_family(
-        primes, lambda prime: form.primary_part(prime),
+        primes,
+        lambda prime: form.primary_part(prime),
         name=f"Primary components of {form}",
     )
 
@@ -2768,10 +2915,16 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
 
             generators = tuple(self.module_generators())
             two = ring(2)
-            doubling = values.module_category().Mor(values, values)._from_constructed_element_map(
-                lambda element: values.scalar_multiple(two, element)
+            doubling = (
+                values.module_category()
+                .Mor(values, values)
+                ._from_constructed_element_map(
+                    lambda element: values.scalar_multiple(two, element)
+                )
             )
-            probes = tuple(self.b(generator, generator) for generator in generators) + tuple(
+            probes = tuple(
+                self.b(generator, generator) for generator in generators
+            ) + tuple(
                 self.b(left + right, left + right)
                 for left_position, left in enumerate(generators)
                 for right in generators[left_position + 1 :]
@@ -2835,7 +2988,8 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
 
                 points = self.square_fibre(square).object()
                 return GObjects(self.Aut(), OwnedSets()).on_set(
-                    points, lambda isometry, vector: isometry(vector),
+                    points,
+                    lambda isometry, vector: isometry(vector),
                     orbit_relation=orbit_relation,
                 )
 
@@ -2930,8 +3084,7 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
                 )
                 from sage_extensions.rings.real import RR
 
-                if (self.base_ring() is RR
-                        and self in FormModules(RR).Nondegenerate()):
+                if self.base_ring() is RR and self in FormModules(RR).Nondegenerate():
                     return _nonsingular_real_signature(numerical)
                 return _signature_pair_of_gram(numerical)
 
@@ -2986,10 +3139,12 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
                 represented = _represented_value_module(self)
                 two = ring(2)
                 inverse = two.inverse_of_unit() if two.is_unit() is True else None
-                doubling = represented.module_category().Mor(
-                    represented, represented
-                )._from_constructed_element_map(
-                    lambda element: represented.scalar_multiple(two, element)
+                doubling = (
+                    represented.module_category()
+                    .Mor(represented, represented)
+                    ._from_constructed_element_map(
+                        lambda element: represented.scalar_multiple(two, element)
+                    )
                 )
                 if inverse is None:
                     assert (
@@ -3083,7 +3238,10 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
                 The value object is explicit.  Descent to the quotient is the
                 validator ``validate_descent`` (``OWN-22``).
                 """
-                if module not in Modules(self.base_ring()).FinitelyPresented().Torsion():
+                if (
+                    module
+                    not in Modules(self.base_ring()).FinitelyPresented().Torsion()
+                ):
                     raise ValueError(
                         f"a torsion bilinear form in {self} is defined on a finitely presented torsion "
                         f"{self.base_ring()}-module, but {module} is in {module.category()}"
@@ -3111,7 +3269,9 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
                 """
 
                 relations = _relation_morphism(self.base_ring(), relation_rows)
-                module = Modules(self.base_ring()).FinitelyPresented().Torsion()(relations)
+                module = (
+                    Modules(self.base_ring()).FinitelyPresented().Torsion()(relations)
+                )
                 return self.from_module(module, gram, value_module)
 
             def cokernel(self, morphism):
@@ -3157,7 +3317,9 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
                         _representative_gram(self, quadratic=False),
                         int(module.module_generating_set().cardinality()),
                     )
-                    if not _bilinear_descends(_relation_images(module), values, value_module):
+                    if not _bilinear_descends(
+                        _relation_images(module), values, value_module
+                    ):
                         raise ValueError(
                             f"the Gram matrix {values} does not define a bilinear form on {module}: some "
                             f"relation of {module} does not pair to zero in {value_module} with every generator"
@@ -3169,7 +3331,10 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
                     generators = tuple(self.module_generators())
                     if any(
                         element != zero
-                        and all(self.b(element, generator) == self.value_module().zero() for generator in generators)
+                        and all(
+                            self.b(element, generator) == self.value_module().zero()
+                            for generator in generators
+                        )
                         for element in self.elements()
                     ):
                         raise ValueError(
@@ -3188,6 +3353,7 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
                         )
 
                     return OwnedSets().Mor(self, characters)(character)
+
 
 class QuadraticFormModules(OwnedCategoryOverBaseRing):
     def an_object(self):
@@ -3270,7 +3436,10 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                 descent to the quotient is the validator ``validate_descent``
                 (``OWN-22``).
                 """
-                if module not in Modules(self.base_ring()).FinitelyPresented().Torsion():
+                if (
+                    module
+                    not in Modules(self.base_ring()).FinitelyPresented().Torsion()
+                ):
                     raise ValueError(
                         f"a torsion quadratic form in {self} is defined on a finitely presented torsion "
                         f"{self.base_ring()}-module, but {module} is in {module.category()}"
@@ -3299,7 +3468,9 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                 """
 
                 relations = _relation_morphism(self.base_ring(), relation_rows)
-                module = Modules(self.base_ring()).FinitelyPresented().Torsion()(relations)
+                module = (
+                    Modules(self.base_ring()).FinitelyPresented().Torsion()(relations)
+                )
                 return self.from_module(module, gram, value_module)
 
             def cokernel(self, morphism):
@@ -3346,7 +3517,9 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                         _representative_gram(self, quadratic=True),
                         int(module.module_generating_set().cardinality()),
                     )
-                    if not _quadratic_descends(_relation_images(module), values, value_module):
+                    if not _quadratic_descends(
+                        _relation_images(module), values, value_module
+                    ):
                         raise ValueError(
                             f"the Gram matrix {values} does not define a quadratic form on {module}: for "
                             f"some relation r, q(r) or the polar value of r with a generator is nonzero in "
@@ -3375,24 +3548,39 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                 @cached_method
                 def maximal_isotropic_subobjects(self):
                     r"""Return the quadratic-isotropic subobjects maximal by inclusion."""
-                    return _torsion_form_maximal_isotropic_subobjects(self, quadratic=True)
+                    return _torsion_form_maximal_isotropic_subobjects(
+                        self, quadratic=True
+                    )
 
                 def form_vanishes_on(self, elements) -> bool:
-                    return all(self.q(element) == self.value_module().zero() for element in elements)
-
+                    return all(
+                        self.q(element) == self.value_module().zero()
+                        for element in elements
+                    )
 
                 def gram_matrix(self):
                     r"""Return canonical rational representatives of the finite-form Gram values."""
                     representative = _representative_gram(self, quadratic=True)
                     rows, columns = map(int, representative.tensor_shape())
-                    return representative.base_ring().matrix_space(rows, columns).from_rows(
-                        tuple(
-                            tuple(representative[row, column] for column in range(columns))
-                            for row in range(rows)
+                    return (
+                        representative.base_ring()
+                        .matrix_space(rows, columns)
+                        .from_rows(
+                            tuple(
+                                tuple(
+                                    representative[row, column]
+                                    for column in range(columns)
+                                )
+                                for row in range(rows)
+                            )
                         )
                     )
 
-                @cached_method(key=lambda self, generators: tuple(id(generator) for generator in generators))
+                @cached_method(
+                    key=lambda self, generators: tuple(
+                        id(generator) for generator in generators
+                    )
+                )
                 def reframing_isometry(self, generators):
                     r"""Return the explicit isometry to this form on the selected generating family."""
                     return _regenerate_form_on_generators(
@@ -3410,7 +3598,6 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
 
                 def primary_decomposition(self, *args, **kwargs):
                     return self.primary_components(*args, **kwargs)
-
 
                 @cached_method
                 def subobjects(self):
@@ -3432,7 +3619,9 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
 
                 def orbits_on_isotropic_subobjects(self, group=None):
                     r"""Return the orthogonal-group orbits on isotropic subobjects."""
-                    return _finite_form_subobject_orbits(self, isotropic=True, group=group)
+                    return _finite_form_subobject_orbits(
+                        self, isotropic=True, group=group
+                    )
 
                 @cached_method
                 def isotropic_elements(self):
@@ -3503,7 +3692,9 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
 
                 def twist(self, scalar):
                     r"""Return the same finite module equipped with ``scalar*q``."""
-                    return TorsionQuadraticFormModules(self.base_ring()).twist_functor(scalar)(self)
+                    return TorsionQuadraticFormModules(self.base_ring()).twist_functor(
+                        scalar
+                    )(self)
 
                 def is_isomorphic(self, other) -> bool:
                     r"""Decide isometry of represented finite quadratic forms."""
@@ -3542,7 +3733,7 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                 def orthogonal_group(self):
                     return self.automorphism_group()
 
-                def O(self):  # noqa: E743 - standard mathematical notation O(A,q)
+                def O(self):
                     return self.automorphism_group()
 
                 @cached_method
@@ -3571,12 +3762,16 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                     for element in self.elements():
                         lifted = values.lift(self.q(element))
                         value = _engine_element(lifted.parent(), lifted)
-                        total += QQbar.zeta(2 * value.denominator()) ** value.numerator()
+                        total += (
+                            QQbar.zeta(2 * value.denominator()) ** value.numerator()
+                        )
                     phase = total / QQbar(int(self.cardinality())).sqrt()
                     zeta8 = QQbar.zeta(8)
                     integers = _owned_integers()
                     residues = integers.quotient_ring(integers.ideal(integers(8)))
-                    return residues(next(residue for residue in range(8) if phase == zeta8**residue))
+                    return residues(
+                        next(residue for residue in range(8) if phase == zeta8**residue)
+                    )
 
                 def b(self, left, right):
                     r"""The bilinear form ``b: A x A -> K/R`` of ``q: A -> K/2R``.
@@ -3587,13 +3782,18 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                     its half by ``R``.
                     """
                     values = self.value_module()
-                    assert values in FractionFieldQuotients(self.base_ring()) and values.modulus() == 2, (
+                    assert (
+                        values in FractionFieldQuotients(self.base_ring())
+                        and values.modulus() == 2
+                    ), (
                         f"the bilinear form of {self} is the half of its polar value, which is defined here "
                         f"for q valued in K/2R, but q takes values in {values}"
                     )
                     polar = self.q(left + right) - self.q(left) - self.q(right)
                     bilinear_values = FractionFieldQuotients(self.base_ring())(1)
-                    return bilinear_values(values.lift(polar) / values.fraction_field()(2))
+                    return bilinear_values(
+                        values.lift(polar) / values.fraction_field()(2)
+                    )
 
                 def value_module(self):
                     r"""Return ``K/2R``, the codomain of ``q``."""
@@ -3622,7 +3822,9 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                                 self._element_from_unformed_module(right),
                             )
                         ),
-                        _extra_categories=(TorsionBilinearFormModules(self.base_ring()),),
+                        _extra_categories=(
+                            TorsionBilinearFormModules(self.base_ring()),
+                        ),
                     )
 
 
@@ -3677,7 +3879,9 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                 sage: L = Lattices(RR).Unimodular()([[x]])
                 sage: assert L.is_unimodular() is True
             """
-            if self.category().is_subcategory(FormModules(self.base_ring()).Unimodular()):
+            if self.category().is_subcategory(
+                FormModules(self.base_ring()).Unimodular()
+            ):
                 return True
             return self._unimodularity_decision()
 
@@ -3690,10 +3894,10 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                 and ring in OwnedRings().Commutative()
             ):
                 return self.determinant().is_unit()
-            correlation = _algebraic_correlation_morphism(
-                self, injective=False
+            correlation = _algebraic_correlation_morphism(self, injective=False)
+            return conjunction(
+                (correlation.is_injective(), correlation.is_surjective())
             )
-            return conjunction((correlation.is_injective(), correlation.is_surjective()))
 
         def subobject_on(self, module_generating_set):
             r"""Return the span equipped with the pulled-back form."""
@@ -3716,22 +3920,39 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
 
             def gram_matrix(self, basis=None):
                 r"""Return the coordinate matrix of the selected finite free form."""
-                if basis is None and _is_bilinear_form(self.form()) and self.value_module() in OwnedRings():
+                if (
+                    basis is None
+                    and _is_bilinear_form(self.form())
+                    and self.value_module() in OwnedRings()
+                ):
                     size = int(self.module_rank())
                     gram = self.gram_tensor()
-                    return self.value_module().matrix_space(size, size).from_rows(
-                        (gram[row, column] for column in range(size))
-                        for row in range(size)
+                    return (
+                        self.value_module()
+                        .matrix_space(size, size)
+                        .from_rows(
+                            (gram[row, column] for column in range(size))
+                            for row in range(size)
+                        )
                     )
-                selected = tuple(self.module_generators()) if basis is None else tuple(basis)
+                selected = (
+                    tuple(self.module_generators()) if basis is None else tuple(basis)
+                )
                 if any(vector.parent() is not self for vector in selected):
                     raise ValueError(
                         f"a Gram matrix of {self} is taken on elements of {self}, but {basis} contains "
                         "an element of another module"
                     )
                 size = len(selected)
-                return self.value_module().matrix_space(size, size).from_rows(
-                    tuple(tuple(self.b(left, right) for right in selected) for left in selected)
+                return (
+                    self.value_module()
+                    .matrix_space(size, size)
+                    .from_rows(
+                        tuple(
+                            tuple(self.b(left, right) for right in selected)
+                            for left in selected
+                        )
+                    )
                 )
 
             @cached_method
@@ -3758,7 +3979,11 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                 radical = self.left_radical().intersection(self.right_radical())
                 inclusion = radical.inclusion()
                 value_module = self.value_module()
-                value_identity = value_module.module_category().Mor(value_module, value_module).identity()
+                value_identity = (
+                    value_module.module_category()
+                    .Mor(value_module, value_module)
+                    .identity()
+                )
                 descended = self._formed_form().descend_along(inclusion, value_identity)
                 quotient = descended.module()
                 ring = quotient.base_ring()
@@ -3769,7 +3994,10 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                 # vector-space dimension.  Re-present the quotient on an
                 # actual basis before returning the formed module, so its
                 # underlying module and Gram tensor have the same rank.
-                if ring in OwnedFields() and quotient.module_generating_set().cardinality().is_finite():
+                if (
+                    ring in OwnedFields()
+                    and quotient.module_generating_set().cardinality().is_finite()
+                ):
                     basis_labels = quotient.basis_generator_labels()
                     free = ring.free_module(basis_labels)
                     basis_map = free.module_category().Mor(free, quotient)(
@@ -3845,10 +4073,15 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                     f"but it takes values in {self.value_module()}"
                 )
                 rank = int(self.module_rank())
-                return numerical.base_ring().matrix_space(rank).from_rows(
-                    (numerical[i, j] for j in range(rank))
-                    for i in range(rank)
-                ).determinant()
+                return (
+                    numerical.base_ring()
+                    .matrix_space(rank)
+                    .from_rows(
+                        (numerical[i, j] for j in range(rank)) for i in range(rank)
+                    )
+                    .determinant()
+                )
+
 
 class FormBaseChanges(OwnedCategoryOverBaseRing):
     r"""Formed scalar extensions retaining their source and scalar map."""
@@ -3858,7 +4091,9 @@ class FormBaseChanges(OwnedCategoryOverBaseRing):
 
     def _call_(self, source, ring_map):
         if ring_map.codomain() is not self.base_ring():
-            raise ValueError("the scalar extension must end at this category's base ring")
+            raise ValueError(
+                "the scalar extension must end at this category's base ring"
+            )
         return _formed_module_base_change(source, ring_map)
 
     class ParentMethods:
@@ -3891,7 +4126,11 @@ class FormBaseChanges(OwnedCategoryOverBaseRing):
         def base_change_unit(self):
             r"""The source-to-restriction map of this scalar-extension construction."""
             source = self.base_change_source()
-            return Modules(source.base_ring()).base_change_adjunction(self.base_change_ring_map()).unit(source)
+            return (
+                Modules(source.base_ring())
+                .base_change_adjunction(self.base_change_ring_map())
+                .unit(source)
+            )
 
 
 class FormValueScalings(OwnedCategoryOverBaseRing):
@@ -3954,7 +4193,7 @@ def _scaled_form_module(source, scalar):
     Thus the unit action returns the original object, including a double
     sign twist. No cancellation by a nonunit is used.
     """
-    from sage_extensions.categories.lattices import OrthogonalSumLattices, Lattices
+    from sage_extensions.categories.lattices import Lattices, OrthogonalSumLattices
 
     # Scaling changes the selected form on its original module, not the
     # form re-expressed on the already-formed parent.  The latter constructs
@@ -3994,7 +4233,8 @@ def _scaled_form_module(source, scalar):
         # the correlation of sb is the correlation of b composed with it.
         categories.append(FormModules(ring).Unimodular())
     if source in FormModules(ring).Nondegenerate() and (
-        known_unit or (ring in OwnedIntegralDomains() and (scalar != ring.zero()) is True)
+        known_unit
+        or (ring in OwnedIntegralDomains() and (scalar != ring.zero()) is True)
     ):
         # Multiplication by a unit is injective on every value module;
         # on an integral domain it is injective on this R-valued form.
@@ -4010,7 +4250,9 @@ def _scaled_form_module(source, scalar):
         # selected Gram directly; pairing-rule tensors retain that rule.
         data["gram_tensor"] = (
             scaled_gram
-            if _is_bilinear_form(form) and form.codomain() in OwnedRings() and _has_finite_framing(module)
+            if _is_bilinear_form(form)
+            and form.codomain() in OwnedRings()
+            and _has_finite_framing(module)
             else source.gram_tensor() * scalar
         )
         if source in Lattices(ring).FinitelyGenerated():
@@ -4025,14 +4267,18 @@ def _scaled_form_module(source, scalar):
         # The zero free module has an isomorphism 0 -> Hom(0,R) for every
         # scalar, including zero and nonunits.
         if source.module_rank().is_finite() and int(source.module_rank()) == 0:
-            categories.extend((Lattices(ring).Nondegenerate(), Lattices(ring).Unimodular()))
+            categories.extend(
+                (Lattices(ring).Nondegenerate(), Lattices(ring).Unimodular())
+            )
         if source in OrthogonalSumLattices(ring):
             categories.append(OrthogonalSumLattices(ring))
             data["biproduct_factors"] = source.biproduct_factors().map(
                 lambda factor: FormValueScalings(ring)(factor, scalar),
                 name=f"Orthogonal summands scaled by {scalar}",
             )
-    return _form_module(scaled, _extra_categories=categories, _extra_construction_data=data)
+    return _form_module(
+        scaled, _extra_categories=categories, _extra_construction_data=data
+    )
 
 
 def _form_module_categories(module, *, bilinear, extra_categories):
@@ -4217,9 +4463,8 @@ def _bilinear_form(module, form):
 def _quadratic_form(module, value_module, datum):
     r"""Return ``module`` equipped with the stated quadratic form."""
 
-    coordinate_datum = (
-        isinstance(datum, IndexedFamily)
-        or (isinstance(datum, Iterable) and not isinstance(datum, (str, bytes)))
+    coordinate_datum = isinstance(datum, IndexedFamily) or (
+        isinstance(datum, Iterable) and not isinstance(datum, (str, bytes))
     )
     form = (
         module.quadratic_forms(value_module)(datum)
