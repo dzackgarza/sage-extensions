@@ -3746,7 +3746,7 @@ def _quotient_ring(source, defining_ideal):
     # locality criterion is Stacks Project, Lemma 10.18.3 (Tag 00E9),
     # https://stacks.math.columbia.edu/tag/00E9: all elements outside this
     # maximal ideal are units, by Bezout applied to their lift and p^k.
-    # integer generator is the construction datum; use its exact prime-power
+    # The integer generator is the construction datum; use its exact prime-power
     # factorization rather than testing any property of the quotient or its
     # engine realization.
     if source is _owned_integers() and not exact_source_quotient:
