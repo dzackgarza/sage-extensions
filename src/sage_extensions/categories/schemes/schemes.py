@@ -43,6 +43,7 @@ from sage.rings.integer import Integer as SageInteger
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.polynomial.multi_polynomial_ring_base import MPolynomialRing_base
 from sage.rings.polynomial.polynomial_ring import PolynomialRing_generic
+from sage.rings.rational_field import QQ as SageQQ
 from sage.schemes.affine.affine_space import AffineSpace as _SageAffineSpace
 from sage.schemes.generic.algebraic_scheme import (
     AlgebraicScheme_quasi as _SageAlgebraicSchemeQuasi,
@@ -8421,6 +8422,70 @@ class EffectiveCartierDivisors(_SchemeSubobjectsOf):
 
         def is_effective_cartier_divisor(self) -> bool:
             return True
+
+        def _smooth_plane_curve_degree(self):
+            r"""The degree ``d`` of a smooth curve ``V_+(f) ⊂ P^2_k`` over a field, ``d = deg f``."""
+            ambient = self.inclusion().codomain()
+            base = self.scheme_base_ring()
+            assert (
+                base in OwnedFields()
+                and ambient in ProjectiveSpaces(base)
+                and int(ambient.relative_dimension()) == 2
+                and self.is_smooth()
+            ), (
+                f"the genus of {self} is computed here for a smooth curve in P^2 over a field, "
+                f"but it is a divisor on {ambient} over {base}"
+            )
+            (equation,) = tuple(self.defining_equations())
+            return int(
+                ambient.homogeneous_coordinate_ring().homogeneous_degree(equation)
+            )
+
+        def genus(self):
+            r"""The genus ``g = (d - 1)(d - 2)/2`` of a smooth plane curve of degree ``d``.
+
+            A smooth curve of degree ``d`` in ``P^2_k`` has arithmetic genus
+            ``(d - 1)(d - 2)/2`` (Hartshorne, *Algebraic Geometry*, Exercise
+            I.7.2(b)), and a smooth projective curve has equal arithmetic and
+            geometric genus.
+            """
+            d = self._smooth_plane_curve_degree()
+            return _owned_integers()((d - 1) * (d - 2) // 2)
+
+        def _zeta_function(self):
+            r"""``Z(C, T) = P(T) / ((1 - T)(1 - qT))`` for a smooth plane curve over ``F_q``.
+
+            For a smooth projective curve of genus ``g`` over ``F_q``,
+            ``P(T) = prod (1 - alpha_i T)`` has degree ``2g`` and
+            ``#C(F_{q^n}) = q^n + 1 - sum alpha_i^n``; the functional equation
+            gives ``a_{2g-k} = q^(g-k) a_k``, so ``P`` is determined by
+            ``#C(F_{q^n})`` for ``n <= g`` (Hartshorne, *Algebraic Geometry*,
+            Appendix C, Theorem 1.2 and Exercise C.5.7).  The power sums
+            ``s_n = q^n + 1 - #C(F_{q^n})`` give ``a_1, ..., a_g`` by
+            Newton's identities ``k a_k = -sum_{i=1}^k s_i a_{k-i}``.
+            """
+            g = int(self.genus())
+            q = int(self.scheme_base_ring().cardinality().finite_value())
+            counts = [int(c) for c in self.point_counts(g)] if g else []
+            power_sums = [q ** (n + 1) + 1 - counts[n] for n in range(g)]
+            coefficients = [SageQQ(1)]
+            for k in range(1, g + 1):
+                coefficients.append(
+                    -sum(
+                        power_sums[i - 1] * coefficients[k - i] for i in range(1, k + 1)
+                    )
+                    / k
+                )
+            coefficients += [
+                SageQQ(q) ** (g - k) * coefficients[k] for k in range(g - 1, -1, -1)
+            ]
+            rational_functions, T = _rational_functions_in_T()
+            one = rational_functions.one()
+            numerator = sum(
+                (rational_functions(int(c)) * T**k for k, c in enumerate(coefficients)),
+                rational_functions.zero(),
+            )
+            return numerator / ((one - T) * (one - q * T))
 
         def picard_class(self):
             r"""Return the represented class ``[O_X(D)] = [I_D^vee]`` in ``Pic(X)``."""

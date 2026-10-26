@@ -5111,11 +5111,18 @@ def _algebra_with_structure(
     native algebra constructor, without assuming a monomial basis.
     """
     base = _owned_ring(base_ring)
-    specialized = algebra._specialized_algebra_with_structure(
-        base,
-        labels,
-        tuple(categories),
-        tuple(construction_data),
+    # An optional abstract method that a parent does not implement is the
+    # value NotImplemented, not a callable (sage.misc.abstract_method).
+    specialize = algebra._specialized_algebra_with_structure
+    specialized = (
+        NotImplemented
+        if specialize is NotImplemented
+        else specialize(
+            base,
+            labels,
+            tuple(categories),
+            tuple(construction_data),
+        )
     )
     if specialized is not NotImplemented and specialized is not None:
         return specialized
