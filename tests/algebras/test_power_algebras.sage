@@ -1,0 +1,102 @@
+r"""Exterior and divided power algebras of free and torsion abelian groups."""
+
+from sage_extensions.all import *  # noqa: F401,F403
+
+
+def _torsion_square(n):
+    r"""``(ZZ/n)^2`` as the cokernel of multiplication by ``n`` on ``ZZ^2``."""
+    free = Modules(ZZ).free_module(2)
+    return (n * free.Mor(free).identity()).cokernel()
+
+
+def test_exterior_square_of_z4_squared_is_z4() -> None:
+    r"""For ``M = (ZZ/4)^2``: ``4x = 0``, ``x ∧ x = 0``, ``x ∧ y = -y ∧ x``, and
+    ``Λ^2 M = ZZ/4 ⊗ ZZ/4 = ZZ/4`` (``Λ^2`` of a sum of two cyclics is their
+    tensor product)."""
+    algebra = _torsion_square(4).exterior_algebra()
+    x = algebra.degree_one_generator(0)
+    y = algebra.degree_one_generator(1)
+
+    assert 4 * x == algebra.zero()
+    assert x * x == algebra.zero()
+    assert x * y == -(y * x)
+    assert 2 * (x * y) != algebra.zero()
+    factors = algebra.graded_piece(2).invariant_factors()
+    assert factors.cardinality() == 1
+    assert factors[0] == 4
+
+
+def test_integral_divided_power_laws_on_two_generators() -> None:
+    r"""In ``Γ_ZZ(x, y)``: ``x^2 = 2 γ_2(x)``, ``γ_2(x) x = 3 γ_3(x)``,
+    ``γ_2(x + y) = γ_2(x) + xy + γ_2(y)``, and the augmentation kills positive degrees."""
+    divided = Modules(ZZ).free_module(("x", "y")).divided_power_algebra()
+    x = divided.degree_one_generator("x")
+    y = divided.degree_one_generator("y")
+    gamma2x, gamma2y = divided.divided_power(x, 2), divided.divided_power(y, 2)
+
+    assert x * x == 2 * gamma2x
+    assert gamma2x * x == 3 * divided.divided_power(x, 3)
+    assert divided.divided_power(x + y, 2) == gamma2x + x * y + gamma2y
+    assert divided.augmentation(divided.one() + x + gamma2y) == 1
+
+
+def test_exterior_and_divided_power_algebras_preserve_composition_on_torsion_modules() -> None:
+    r"""``Λ`` and ``Γ`` are functors: along ``(ZZ/8)^2 -> (ZZ/4)^2 -> (ZZ/2)^2``,
+    ``e0 ↦ f0 + f1``, ``e1 ↦ 2 f1``, then reduction, ``F(g f) = F(g) F(f)``.
+    On ``Λ^2``, ``e0 e1 ↦ 2 f0 f1 ↦ 2 g0 g1 = 0``."""
+    source, middle, target = _torsion_square(8), _torsion_square(4), _torsion_square(2)
+    f0, f1 = middle.module_generator(0), middle.module_generator(1)
+    first = source.Mor(middle)({source.module_generator(0): f0 + f1, source.module_generator(1): 2 * f1})
+    second = middle.Mor(target)({f0: target.module_generator(0), f1: target.module_generator(1)})
+
+    for functor in (Modules(ZZ).exterior_algebra(), Modules(ZZ).divided_power_algebra()):
+        algebra = functor(source)
+        e0, e1 = algebra.degree_one_generator(0), algebra.degree_one_generator(1)
+        composite = functor(second * first)
+        stepwise = functor(second) * functor(first)
+        for probe in (algebra.one(), e0, e1, e0 * e1):
+            assert composite(probe) == stepwise(probe)
+        assert functor(first)(e0 * e1) == 2 * functor(middle).degree_one_generator(0) * functor(middle).degree_one_generator(1)
+
+    divided = Modules(ZZ).divided_power_algebra()
+    gamma_3 = divided(source).divided_power(divided(source).degree_one_generator(0), 3)
+    assert divided(second * first)(gamma_3) == (divided(second) * divided(first))(gamma_3)
+
+    exterior = Modules(ZZ).exterior_algebra()
+    top = exterior(source).degree_one_generator(0) * exterior(source).degree_one_generator(1)
+    assert exterior(second * first)(top) == exterior(target).zero()
+
+
+def test_canonical_comparison_maps_between_the_four_free_constructions() -> None:
+    r"""For ``M = ZZ^2``: ``T -> Sym`` kills ``xy - yx``; ``T -> Λ`` kills ``x ⊗ x``
+    and ``xy + yx``; ``Sym -> Γ`` sends ``x^3`` to ``6 γ_3(x)``; over ``QQ`` the
+    maps ``Sym -> Γ`` and ``Γ -> Sym`` are inverse."""
+    module = Modules(ZZ).free_module(("x", "y"))
+    tensor, symmetric = module.tensor_algebra(), module.symmetric_algebra()
+    exterior, divided = module.exterior_algebra(), module.divided_power_algebra()
+    x_t, y_t = tensor.algebra_generator("x"), tensor.algebra_generator("y")
+
+    assert module.tensor_to_symmetric()(x_t * y_t - y_t * x_t) == symmetric.zero()
+    assert module.tensor_to_alternating()(x_t * x_t) == exterior.zero()
+    assert module.tensor_to_alternating()(x_t * y_t + y_t * x_t) == exterior.zero()
+    assert module.symmetric_to_divided()(symmetric.algebra_generator("x") ** 3) == 6 * divided.divided_power(divided.degree_one_generator("x"), 3)
+
+    rational = Modules(QQ).free_module(("x", "y"))
+    forward, backward = rational.symmetric_to_divided(), rational.divided_to_symmetric()
+    symmetric_q, divided_q = rational.symmetric_algebra(), rational.divided_power_algebra()
+    x_q, y_q = symmetric_q.algebra_generator("x"), symmetric_q.algebra_generator("y")
+    probe = divided_q.divided_power(divided_q.degree_one_generator("x"), 2) * divided_q.degree_one_generator("y")
+    assert backward(forward(x_q**2 * y_q + 3 * y_q)) == x_q**2 * y_q + 3 * y_q
+    assert forward(backward(probe)) == probe
+
+
+def test_gamma_2_of_x_is_not_in_the_subalgebra_generated_by_x_over_the_integers() -> None:
+    r"""In ``Γ_ZZ(x)`` the subalgebra generated by ``x`` meets degree 2 in
+    ``ZZ x^2 = 2 ZZ γ_2(x)``, so ``γ_2(x)`` is a further algebra generator."""
+    divided = Modules(ZZ).free_module(("x",)).divided_power_algebra()
+    x = divided.degree_one_generator("x")
+    gamma_2 = divided.divided_power(x, 2)
+
+    assert x * x == 2 * gamma_2
+    assert 2 * gamma_2 in divided.subalgebra([x])
+    assert gamma_2 not in divided.subalgebra([x])

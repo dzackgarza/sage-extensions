@@ -3743,7 +3743,10 @@ def _quotient_ring(source, defining_ideal):
     # For p prime and k > 1, an integer class modulo p^k is a unit exactly
     # when it is not divisible by p.  Thus all nonunits lie in (p), making
     # (p) the unique maximal ideal; the quotient by it is Z/p.  The selected
-    # integer generator is the construction datum; use its exact prime-power
+    # locality criterion is Stacks Project, Lemma 10.18.3 (Tag 00E9),
+    # https://stacks.math.columbia.edu/tag/00E9: all elements outside this
+    # maximal ideal are units, by Bezout applied to their lift and p^k.
+    # The integer generator is the construction datum; use its exact prime-power
     # factorization rather than testing any property of the quotient or its
     # engine realization.
     if source is _owned_integers() and not exact_source_quotient:
@@ -3754,11 +3757,12 @@ def _quotient_ring(source, defining_ideal):
                 prime_power = SageZZ(modulus).is_prime_power(get_data=True)
                 if prime_power and int(prime_power[1]) > 1:
                     prime, _exponent = prime_power
+                    owned_prime = _owned_engine_element(_owned_integers(), prime)
                     maximal_ideal = CommutativeIdeals(quotient).Maximal()(
-                        quotient(_owned_integers()(prime))
+                        quotient(owned_prime)
                     )
                     residue_field = _owned_integers().quotient_ring(
-                        _owned_integers().ideal(_owned_integers()(prime))
+                        _owned_integers().ideal(owned_prime)
                     )
                     residue_map = quotient.Mor(residue_field)(
                         lambda element: residue_field(element.lift())

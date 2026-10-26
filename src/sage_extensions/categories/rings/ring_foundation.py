@@ -2534,9 +2534,9 @@ def _install_local_ring_construction(ring, maximal_ideal, residue_field, residue
                 f"{existing.residue_field()}; it cannot also have maximal ideal {maximal_ideal} and residue field "
                 f"{residue_field}"
             )
-        return ring
-    ring._local_ring_construction = construction
-    return ring
+    else:
+        ring._local_ring_construction = construction
+    return refine(ring, OwnedRings().Commutative().Local())
 
 
 class OwnedRings(CategoryPacketMethods, OwnedCategory):
@@ -3171,7 +3171,10 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                     maximal_ideal = construction.maximal_ideal()
                     if maximal_ideal not in CommutativeIdeals(self):
                         return super()._field_decision()
-                    return maximal_ideal.is_zero()
+                    # Fieldhood is decided by the ideal's generators. A
+                    # finite-module zero algorithm may itself require this
+                    # same field decision to choose its computation.
+                    return CommutativeIdeals.ParentMethods.is_zero(maximal_ideal)
 
             class Complete(CategoryWithAxiom):
                 r"""Complete local rings: complete and separated for the maximal-ideal topology."""
@@ -3802,7 +3805,7 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
             Native/completed parents retain installed values, while a prime
             localization supplies its actual source-quotient construction.
             """
-            return None
+            return vars(self).get("_local_ring_construction")
 
         def _selected_engine_ring(self):
             r"""Return the private computation parent selected for this ring.

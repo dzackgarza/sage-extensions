@@ -4,6 +4,7 @@ version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
     "networkx",
+    "tree-sitter-sage @ git+https://github.com/dzackgarza/tree-sitter-sage",
     "sage-categories @ git+https://github.com/dzackgarza/sage-categories",
     "sage-julia-bridge @ git+https://github.com/dzackgarza/sage-julia-bridge",
     "vinal @ git+https://github.com/dzackgarza/vinal",
@@ -19,3 +20,50 @@ where = ["src"]
 [tool.setuptools.package-data]
 sage_extensions = ["py.typed", "categories/*.gp"]
 
+# The category packages sage-mypy-category-plugin projects for the Sage QC
+# tier's mypy run: these categories, built through Sage's runtime.
+[tool.sage-mypy-category-plugin]
+packages = ["sage_extensions"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Every run says where its wall time went and leaves a machine-readable record.
+#
+# The selection-invariant time gates measure preamble import, collection, and
+# each test's call phase against recorded baselines
+# (sage_extensions.testing.suite_budget). --no-time-gates retains reporting
+# while lifting those performance ceilings for one-off measurement runs.
+#
+# The test lint (sage_extensions.testing.test_lint) ends the run red when a
+# collected test breaks the session standard; --no-test-lint lifts it for a
+# one-off triage run.
+#
+# --timeout bounds one test: a test that blocks -- on a subprocess, a lock, a
+# network call -- burns wall clock at low CPU and reports nothing at all when
+# it is killed.  On timeout pytest-timeout dumps the stack of every thread,
+# which names the blocking call instead of leaving it to bisection.
+# --durations ranks test phases, pytest-durations aggregates them by file, and
+# the report log plus JUnit xml make runs comparable to each other.
+addopts = """
+  -p sage_extensions.testing.suite_budget
+  -p sage_extensions.testing.test_lint
+  --timeout=60 --timeout-method=signal
+  --durations=0 --durations-min=0
+  --junit-xml=tests/.report/junit.xml
+  --report-log=tests/.report/run.jsonl
+"""
+log_cli = false
+log_file = "tests/.report/pytest.log"
+log_file_level = "DEBUG"
+
+[dependency-groups]
+dev = [
+    "coverage>=7.10",
+    "hypothesis>=6.167.1",
+    "ipython>=9.16.1",
+    "pytest-cov>=7.0",
+    "pytest-reportlog>=1.0.0",
+    "pytest-timeout>=2.4.0",
+    "pytest-xdist>=3.8",
+    "sage-stubs @ git+https://github.com/dzackgarza/sage-stubs.git",
+]

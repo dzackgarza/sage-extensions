@@ -268,6 +268,17 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
             )
             return generators
 
+        def is_zero(self):
+            r"""The generated ideal is zero exactly when all its generators are zero.
+
+            Every generator belongs to the ideal, and every ideal element is
+            a linear combination of these generators. This criterion needs
+            no field hypothesis on the coefficient ring and retains any
+            undecided equality as a proposition.
+            """
+            zero = self.ring().zero()
+            return conjunction(generator == zero for generator in self.ideal_generators())
+
         def is_contained_in(self, other):
             r"""Whether this ideal is contained in another ideal of the same ring.
 
