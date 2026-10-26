@@ -4951,8 +4951,11 @@ def _owned_ring_element_text(element) -> str:
     if isinstance(engine, QuotientRing_generic) and isinstance(
         engine.cover_ring(), (PolynomialRing_generic, MPolynomialRing_base)
     ):
-        cover = parent.quotient_source()
-        return f"[{_owned_polynomial_text(cover, value.lift())}]"
+        from sage_extensions.categories.rings.commutative_algebra import QuotientRings
+
+        if parent in QuotientRings():
+            cover = parent.quotient_source()
+            return f"[{_owned_polynomial_text(cover, value.lift())}]"
     return f"element of {parent}"
 
 
