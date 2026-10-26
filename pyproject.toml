@@ -27,9 +27,6 @@ packages = ["sage_extensions"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# The specification helpers beside tests/constructions are imported from
-# other test directories as well.
-pythonpath = ["tests/constructions"]
 # Every run says where its wall time went and leaves a machine-readable record.
 #
 # The selection-invariant time gates measure preamble import, collection, and

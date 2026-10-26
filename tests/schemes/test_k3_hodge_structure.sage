@@ -15,7 +15,7 @@ def _fermat_quartic():
 
 def test_fermat_quartic_has_hodge_numbers_one_twenty_one() -> None:
     r"""`h^{2,0} = h^{0,2} = 1`, `h^{1,1} = 20`, and they sum to `b_2 = 22`."""
-    hodge = SmoothQuarticK3CompleteIntersections(QQ)(_fermat_quartic()).hodge_structure()
+    hodge = ProjectiveCompleteIntersections(QQ).Smooth().K3()(_fermat_quartic()).hodge_structure()
 
     assert hodge.hodge_number(2, 0) == 1
     assert hodge.hodge_number(0, 2) == 1
@@ -27,7 +27,7 @@ def test_fermat_quartic_has_hodge_numbers_one_twenty_one() -> None:
 def test_fermat_quartic_polarization_is_the_hyperplane_class_of_square_four() -> None:
     r"""The polarization is `c_1(\mathcal{O}(1))`, with `h^2 = \deg X = 4`."""
     quartic = _fermat_quartic()
-    polarization = SmoothQuarticK3CompleteIntersections(QQ)(quartic).hodge_structure().polarization_class()
+    polarization = ProjectiveCompleteIntersections(QQ).Smooth().K3()(quartic).hodge_structure().polarization_class()
 
     assert polarization == quartic.first_chern_class(quartic.O(1))
     assert polarization.b(polarization) == 4

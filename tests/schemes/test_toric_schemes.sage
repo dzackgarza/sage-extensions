@@ -67,8 +67,8 @@ def test_the_chart_of_a_smooth_cone_is_the_affine_plane() -> None:
     chart = variety.affine_chart(cone)
 
     assert variety in Surfaces(QQ)
-    assert variety not in ProperSurfaces(QQ)
-    assert variety not in ProjectiveSurfaces(QQ)
+    assert variety not in Surfaces(QQ).Proper()
+    assert variety not in Surfaces(QQ).Projective()
     assert chart in AffineSchemes(QQ)
     assert chart.coordinate_algebra().algebra_generating_set().cardinality() == 2
 

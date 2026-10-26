@@ -4,7 +4,7 @@ A test is an end-to-end mathematical workflow typed into a session: every
 name comes from ``from sage_extensions.all import *``, objects are
 built through the top-level category of their kind applied to their data, and
 the assertions are mathematical facts (``TODO.md``,
-``test-suite-mathematical-assertions``; ``tests/constructions/CONTRIBUTING.md``).
+``test-suite-mathematical-assertions``; research's ``tests/constructions/CONTRIBUTING.md``).
 Guidelines are ignored or misread; this bounces the observable violations.
 
 The checks read each file's syntax tree, and resolve the names it uses against
@@ -38,8 +38,7 @@ text. Rules, each with a code:
 Run ``python -m sage_extensions.testing.test_lint [paths]``, or ``just
 test-lint``. As a pytest plugin (loaded from ``pyproject.toml``) it lints the
 collected files once collection is final and ends the run red on any finding;
-``--no-test-lint`` lifts it for a one-off triage run. The protected
-specification subtrees are the owner's and are linted only when named.
+``--no-test-lint`` lifts it for a one-off triage run.
 """
 
 from __future__ import annotations
@@ -56,12 +55,6 @@ import pytest
 
 SESSION_MODULE = "sage_extensions.all"
 ALLOWED_IMPORTS = frozenset({SESSION_MODULE, "pytest", "__future__"})
-PROTECTED = ("tests/constructions/", "tests/user_simulations/", "tests/conftest.py")
-EXPLICIT_SESSION_IMPORT_EXCEPTIONS = frozenset({
-    "tests/constructions/test_direct_sum_objects_archive.sage",
-    "tests/constructions/test_slice_coslice_archive.sage",
-    "tests/constructions/test_products_archive_reconciliation.sage",
-})
 
 INTROSPECTION_CALLS = frozenset({
     "getattr", "hasattr", "setattr", "delattr", "isinstance", "issubclass", "type",
@@ -261,7 +254,6 @@ def lint_file(path: Path, session_names: frozenset[str], axioms: frozenset[str])
                 if (
                     module == SESSION_MODULE
                     and not (len(names) == 1 and names[0].name == "*")
-                    and shown not in EXPLICIT_SESSION_IMPORT_EXCEPTIONS
                 ):
                     flag(node, "TL01", "import the complete session with from sage_extensions.all import *")
                 elif module not in ALLOWED_IMPORTS:
@@ -357,10 +349,6 @@ def _python_source(path: Path) -> str:
     return preparse.preparse_file(source)
 
 
-def _unprotected(path: Path) -> bool:
-    shown = path.as_posix()
-    return not any(marker in shown for marker in PROTECTED)
-
 
 def lint(paths: list[Path]) -> list[Finding]:
     session_names = _session_names()
@@ -391,7 +379,7 @@ def main(arguments: list[str]) -> int:
     if named:
         files = [file for path in named for file in (sorted([*path.rglob("test_*.py"), *path.rglob("test_*.sage")]) if path.is_dir() else [path])]
     else:
-        files = [file for file in sorted([*Path("tests").rglob("test_*.py"), *Path("tests").rglob("test_*.sage")]) if _unprotected(file)]
+        files = [file for file in sorted([*Path("tests").rglob("test_*.py"), *Path("tests").rglob("test_*.sage")])]
     _run_conftests(files)
     findings = lint(files)
     for finding in findings:
@@ -418,7 +406,7 @@ def pytest_collection_finish(session: pytest.Session) -> None:
         for item in session.items
         if Path(item.path).suffix in {".py", ".sage"}
     })
-    findings = lint([file for file in files if _unprotected(file)])
+    findings = lint([file for file in files])
     if findings:
         shown = "\n".join(str(finding) for finding in findings[:50])
         more = f"\n... and {len(findings) - 50} more" if len(findings) > 50 else ""

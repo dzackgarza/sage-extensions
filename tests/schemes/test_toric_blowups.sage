@@ -87,5 +87,5 @@ def test_first_projective_plane_blowup_has_del_pezzo_degree_eight() -> None:
     first = plane.toric_fixed_point_blowup(plane.fan().maximal_cones()[0])
 
     assert first.is_del_pezzo()
-    assert DelPezzoSurfaces(first.scheme_base_ring())(first).del_pezzo_degree() == 8
+    assert Surfaces(first.scheme_base_ring()).DelPezzo()(first).del_pezzo_degree() == 8
     assert int(first.picard_group().module_rank()) == 2

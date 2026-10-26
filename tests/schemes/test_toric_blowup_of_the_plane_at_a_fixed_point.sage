@@ -52,4 +52,4 @@ def test_the_blowup_is_a_del_pezzo_surface_of_degree_eight() -> None:
     r"""``K_{F_1}^2 = K_{P^2}^2 - 1 = 8``."""
     plane, cone, blowup = _blowup()
 
-    assert DelPezzoSurfaces(blowup.scheme_base_ring())(blowup).del_pezzo_degree() == 8
+    assert Surfaces(blowup.scheme_base_ring()).DelPezzo()(blowup).del_pezzo_degree() == 8

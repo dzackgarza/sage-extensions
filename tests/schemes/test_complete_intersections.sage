@@ -72,8 +72,8 @@ def test_the_fermat_cubic_surface_is_a_del_pezzo_surface_of_degree_three() -> No
     assert anticanonical.degree() == 1
     assert anticanonical.is_ample()
     assert cubic.is_del_pezzo()
-    assert DelPezzoSurfaces(cubic.scheme_base_ring())(cubic).del_pezzo_degree() == 3
-    assert DelPezzoSurfaces(cubic.scheme_base_ring())(cubic).del_pezzo_degree().parent() is ZZ
+    assert Surfaces(cubic.scheme_base_ring()).DelPezzo()(cubic).del_pezzo_degree() == 3
+    assert Surfaces(cubic.scheme_base_ring()).DelPezzo()(cubic).del_pezzo_degree().parent() is ZZ
 
 
 def test_the_fermat_quartic_surface_has_trivial_canonical_class_and_is_not_del_pezzo() -> None:
@@ -135,8 +135,8 @@ def test_two_quadrics_in_p4_meet_in_a_gorenstein_del_pezzo_surface_of_degree_fou
 
     assert tuple(surface.defining_degrees()) == (2, 2)
     assert surface.dimension() == 2
-    assert surface in ProperSurfaces(QQ)
-    assert surface in ProjectiveSurfaces(QQ)
+    assert surface in Surfaces(QQ).Proper()
+    assert surface in Surfaces(QQ).Projective()
     assert surface.projective_degree() == 4
     assert surface.is_gorenstein()
     assert not surface.is_smooth()

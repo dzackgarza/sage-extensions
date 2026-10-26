@@ -130,7 +130,7 @@ def test_base_change_of_a_cubic_surface_retains_its_projective_surface_owner() -
     changed = cubic.base_change(ring_map)
 
     assert changed in ProjectiveCompleteIntersections(field)
-    assert changed in ProperSurfaces(field)
-    assert changed in ProjectiveSurfaces(field)
+    assert changed in Surfaces(field).Proper()
+    assert changed in Surfaces(field).Projective()
     assert changed.is_del_pezzo()
-    assert DelPezzoSurfaces(changed.scheme_base_ring())(changed).del_pezzo_degree() == 3
+    assert Surfaces(changed.scheme_base_ring()).DelPezzo()(changed).del_pezzo_degree() == 3

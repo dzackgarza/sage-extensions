@@ -1,5 +1,46 @@
+# sage-extensions — the mathematical library behind the research session.
+#
+# QC delegates to ~/ai-review-ci/justfiles/sage.just. Project-specific recipes
+# below are non-QC entry points or narrow repo orchestration.
+
+# ai-review-ci contract variables consumed by doctor and workflow installers.
+ai_review_ci_schema_version := "1"
+ai_review_ci_profile := "sage"
+ai_review_ci_ref := "main"
+ai_review_ci_release_channel := "main"
+ai_review_ci_workflow_template_version := "1"
+ai_review_ci_local_delegation := "global-justfile"
+ai_review_ci_default_branch := "main"
+
+# List available recipes
 default:
     @just --list
+
+# Development commits inspect staged source syntax only. The repository-owned
+# coordinate-ownership scan is retained as an independent CI diagnostic.
+test-commit:
+    @just -f ~/ai-review-ci/justfiles/sage.just -d . test-commit
+
+# No full-tree scan on the publication path.
+test-push:
+    @just -f ~/ai-review-ci/justfiles/sage.just -d . test-push
+
+# Run CI suites and the repository-owned tensor-ownership detector independently,
+# retaining both in one nonblocking findings/burndown report.
+test-ci:
+    @python3 ~/ai-review-ci/scripts/ci-triage.py sage --caller-check sage-extensions-tensor-boundary tensor-boundary
+
+# The scheduled whole-tree audit includes the tensor-ownership detector.
+ambient:
+    @python3 ~/ai-review-ci/scripts/ci-triage.py sage --tier ambient --caller-check sage-extensions-tensor-boundary tensor-boundary
+
+# CI-only provision for the repository-specific scanner, not a local hook.
+_ci-tensor-tools:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    prefix="$RUNNER_TEMP/sage-extensions-tensor-tools"
+    npm install --prefix "$prefix" --no-audit --no-fund @ast-grep/cli@0.41.0
+    printf '%s\n' "$prefix/node_modules/.bin" >> "$GITHUB_PATH"
 
 # Detect coordinate conventions written outside the tensor package (OWN-24).
 # AST provenance, not identical source-line text, exempts the typed Mor
@@ -167,7 +208,7 @@ coverage-update:
     mapfile -t tests < <(flock "$out/.lock" "$sage_python" -m sage_extensions.testing.coverage_gaps --select-affected)
     # A purged file whose lines only the import runs is remeasured by collection alone.
     if [ "${#tests[@]}" -eq 0 ]; then
-        just coverage-add --collect-only tests/conftest.py > /dev/null
+        just coverage-add --collect-only "$(git ls-files 'tests/**/test_*.sage' | head -n 1)" > /dev/null
         just coverage-report
         exit 0
     fi
@@ -245,7 +286,7 @@ test-universe:
     echo "The proof surface stays inside the universe."
 
 # Lint the test tree against the session standard (sage_extensions.testing.test_lint).
-# With no paths it lints every test outside the protected specification subtrees.
+# With no paths it lints every test.
 test-lint *paths:
     "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" \
         -m sage_extensions.testing.test_lint {{paths}}
