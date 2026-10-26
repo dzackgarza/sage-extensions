@@ -964,13 +964,13 @@ def _fix_selected_algebra_presentation(
                     return relations.value(tagged[1])
 
         degree_one_generating_set = degree_one.algebra_generating_set()
-        first_face = degree_one.Mor(presentation_ring)(
+        first_face = presentation_owner.Mor(degree_one, presentation_ring)(
             Sets().Mor(degree_one_generating_set, presentation_ring)(first_face_value)
         )
-        second_face = degree_one.Mor(presentation_ring)(
+        second_face = presentation_owner.Mor(degree_one, presentation_ring)(
             Sets().Mor(degree_one_generating_set, presentation_ring)(second_face_value)
         )
-        degeneracy = presentation_ring.Mor(degree_one)(
+        degeneracy = presentation_owner.Mor(presentation_ring, degree_one)(
             Sets().Mor(
                 labels,
                 degree_one,

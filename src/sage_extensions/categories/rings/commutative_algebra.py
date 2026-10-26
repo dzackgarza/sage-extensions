@@ -5186,6 +5186,10 @@ class _DualNumbersAlgebraParent(_OwnedAlgebraParent):
             enter through this selected element class. The public lift
             operation remains at QuotientRings.ElementMethods.
             """
+            if element_parent(backend_value) is parent._quotient_source:
+                backend_value = parent._engine(
+                    _engine_element(parent._quotient_source, backend_value)
+                )
             super().__init__(parent, backend_value)
             self._representative = _owned_engine_element(
                 parent._quotient_source, backend_value.lift()
@@ -5231,6 +5235,7 @@ class _DualNumbersAlgebraParent(_OwnedAlgebraParent):
         self._quotient_source = polynomial
         self._quotient_defining_ideal = defining_ideal
         self._quotient_map_factory = quotient_map
+        self._preamble_engine_ring = engine
         placements = [QuotientRings()]
         ring_placements = []
         if base in OwnedRings().Commutative():
