@@ -2520,7 +2520,8 @@ class Modules(OwnedCategoryOverBaseRing):
             # can silently replace a selected coefficient embedding. The
             # endpoint and ring-morphism construction remain common to both
             # native and generic modules.
-            return self._ring_morphism_defining_module_action(
+            return Modules.ParentMethods._ring_morphism_defining_module_action(
+                self,
                 endomorphisms,
                 additive_group,
                 None if native is None else native.scalar_multiple,
