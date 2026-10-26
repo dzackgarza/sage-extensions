@@ -6217,7 +6217,7 @@ class Lattices(OwnedCategoryOverBaseRing):
                 # the correlation cokernel merely to enumerate no invariants.
                 return True
             gram = _engine_component_matrix(self.gram_tensor()).change_ring(SageZZ)
-            denominator = ring(gram.inverse().denominator())
+            denominator = _owned_engine_element(ring, gram.inverse().denominator())
             return denominator == ring.one() or denominator == prime
 
         def is_coeven(self) -> bool:
