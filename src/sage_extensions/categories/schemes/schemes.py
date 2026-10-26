@@ -2897,6 +2897,49 @@ def _normal_placement(base_ring) -> bool:
     return base_ring in OwnedPrincipalIdealDomains()
 
 
+def _is_segre_image(product, closed) -> bool:
+    r"""Whether ``closed`` is the image of the Segre embedding of ``product = P^n x P^m``.
+
+    The Segre embedding ``P^n x P^m -> P^N``, ``N = (n+1)(m+1) - 1``, is a
+    closed immersion (Stacks, Tag 01WD), hence an isomorphism onto its image.
+    It sends ``Z_{i+(n+1)j}`` to ``X_i Y_j``, and its image is cut out by the
+    ``2 x 2`` minors ``Z_{ij} Z_{kl} - Z_{il} Z_{kj}`` of that matrix
+    (Harris, *Algebraic Geometry*, Example 2.11).  This answers ``True``
+    exactly when ``closed`` is a closed subscheme of ``P^N`` whose equations
+    generate that ideal in the standard coordinates.
+    """
+    base = product.scheme_base_ring()
+    if product not in ProductProjectiveSpaces(base) or closed not in ClosedSubschemes(
+        base
+    ):
+        return False
+    if (product.number_of_factors() == 2) is not True:
+        return False
+    ambient = closed.inclusion().codomain()
+    if ambient not in ProjectiveSpaces(base):
+        return False
+    first, second = product.factors()[0], product.factors()[1]
+    n = int(first.relative_dimension())
+    m = int(second.relative_dimension())
+    if int(ambient.relative_dimension()) != (n + 1) * (m + 1) - 1:
+        return False
+    ring = ambient.homogeneous_coordinate_ring()
+    Z = ambient.homogeneous_coordinate_generators()
+
+    def z(i, j):
+        return Z[i + (n + 1) * j]
+
+    minors = tuple(
+        z(i, j) * z(k, l) - z(i, l) * z(k, j)
+        for i in range(n + 1)
+        for k in range(i + 1, n + 1)
+        for j in range(m + 1)
+        for l in range(j + 1, m + 1)
+    )
+    equations = closed.homogeneous_defining_equations(ring)
+    return (ring.ideal(tuple(equations)) == ring.ideal(minors)) is True
+
+
 def _integral_placement(ring) -> bool:
     r"""Whether ``Spec`` of ``ring`` is integral: ``ring`` is placed as an integral domain.
 
@@ -3365,6 +3408,28 @@ class Schemes(OwnedCategoryOverBaseRing):
 
     class ParentMethods:
         _derived_construction_parameters = frozenset({"topology_data"})
+
+        def is_isomorphic(self, other):
+            r"""Whether there is an isomorphism of schemes ``X ≅ Y`` over the base ``R``.
+
+            Decided by a constructed isomorphism: the identity, and the
+            Segre embedding ``P^n x P^m -> P^((n+1)(m+1)-1)``, a closed
+            immersion (Stacks, Tag 01WD) onto ``V`` of the ``2 x 2`` minors of
+            ``(Z_{i+(n+1)j})``, ``Z_{i+(n+1)j} = X_i Y_j``. Any other pair
+            returns the proposition.
+            """
+            base = self.scheme_base_ring()
+            assert other in Schemes(base), (
+                f"{self} and {other} are compared as schemes over {base}, but {other} lies in "
+                f"{other.category()}"
+            )
+            match self, other:
+                case _ if other is self:
+                    return True
+                case _ if _is_segre_image(self, other) or _is_segre_image(other, self):
+                    return True
+                case _:
+                    return AtomicProposition("is_isomorphic", self, other)
 
         def __contains__(self, point) -> bool:
             if self.has_selected_finite_affine_atlas():
