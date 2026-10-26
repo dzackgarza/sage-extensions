@@ -84,21 +84,24 @@ class _LabelledPairingGraph:
     label-preserving ``Mor`` but no computed isomorphism or automorphism group
     (recorded in COMPLAINTS), so the bliss/nauty computations run here.
 
-    Data: an owned finite ordered set of indices, the owned Gram tensor on
-    the free module on those indices, and the owned colouring map of the
-    indices.  For a degenerate span the owned family morphism is also
-    retained, to record its linear relations.  The tensor is lowered once (``_engine_component_matrix``);
+    Data: an owned finite ordered set of indices, the lattice's Gram tensor,
+    the owned family morphism and the owned colouring map. The pairing
+    matrix is the exact pullback F^t G F inside this adapter; constructing
+    an intermediate owned tensor would allocate a scalar object per pair.
+    For a proper span the family also records its linear relations.
+    The lattice tensor is lowered once (``_engine_component_matrix``);
     the indices are lowered by their ``ranking_map``.  Leaving the adapter:
     an owned subgroup of the symmetric group on the indices, the induced
     permutations of the indices as set maps, and isomorphisms as set maps of
     indices.
     """
 
-    def __init__(self, positions, gram, colouring, family=None):
+    def __init__(self, positions, gram, colouring, family, *, preserve_relations):
         self._positions = positions
         self._gram = gram
         self._colouring = colouring
         self._family = family
+        self._preserve_relations = preserve_relations
 
     def _size(self):
         return int(self._positions.cardinality())
@@ -112,8 +115,10 @@ class _LabelledPairingGraph:
     @cached_method
     def _pairings(self):
         from sage_extensions.tensors.tensor import _engine_component_matrix
+        from sage_extensions.categories.modules.pure.modules import _engine_matrix
 
-        return _engine_component_matrix(self._gram)
+        family = _engine_matrix(self._family)
+        return family.transpose() * _engine_component_matrix(self._gram) * family
 
     def rank(self):
         r"""The rank of the family pairing matrix, used only inside this engine adapter."""
@@ -131,7 +136,7 @@ class _LabelledPairingGraph:
         ``PolytopeEquiStab.h``; it is independent of the selected columns.
         The original Gram matrix alone loses relations in a degenerate span.
         """
-        if self._family is None:
+        if not self._preserve_relations:
             return (self._pairings(),)
         from sage_extensions.categories.modules.pure.modules import _engine_matrix
 
@@ -369,8 +374,9 @@ class _ColouredFamilyRealization:
     @cached_method
     def pairing_graph(self):
         return _LabelledPairingGraph(
-            self._indices, self.pairing_tensor(), self.colouring(),
-            None if self.spans_rational_space() else self.family_morphism(),
+            self._indices, self._lattice.gram_tensor(), self.colouring(),
+            self.family_morphism(),
+            preserve_relations=not self.spans_rational_space(),
         )
 
     def rationalization(self):

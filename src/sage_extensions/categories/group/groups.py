@@ -461,6 +461,89 @@ def _engine_subgroup_admits(subgroup, element) -> bool:
     return subgroup.supergroup()._engine_subgroup_contains(element, _engine_group(subgroup))
 
 
+class _TransversalCoset(Element):
+    r"""A left coset represented by its position in a GAP transversal."""
+
+    def __init__(self, parent, position):
+        Element.__init__(self, parent)
+        self._position = position
+
+    def representative(self):
+        return self.parent().representative(self._position)
+
+    def __contains__(self, element):
+        return self.parent().position_of(element) == self._position
+
+    def __eq__(self, other):
+        return (isinstance(other, _TransversalCoset)
+                and other.parent() is self.parent()
+                and other._position == self._position)
+
+    def __hash__(self):
+        return hash((id(self.parent()), self._position))
+
+    def _repr_(self):
+        return f"{self.representative()} * {self.parent().subgroup}"
+
+
+class _TransversalCosets(Parent):
+    r"""Private exact left-coset arithmetic, with owned representatives.
+
+    GAP Reference Manual 39.7-4 and 39.8-1 identify gH with Hg^-1
+    and locate its representative by PositionCanonical on RightTransversal:
+    https://docs.gap-system.org/doc/ref/chap39_mj.html
+    When the owned group law reverses the engine law, gH instead maps
+    directly to H*engine(g). In either case left translation becomes right
+    multiplication in the transversal. No elements of H are enumerated.
+    """
+
+    def __init__(self, group, subgroup):
+        self.group = group
+        self.subgroup = subgroup
+        self._reversed = _law_reversed(group)
+        self._permutations = libgap.IsomorphismPermGroup(_gap_model(group))
+        self._transversal = libgap.RightTransversal(
+            self._permutations.Image(),
+            self._permutations.Image(_gap_model(subgroup)),
+        )
+        Parent.__init__(self, category=Sets())
+
+    @cached_method
+    def _multiplier(self, element):
+        encoded = self._permutations.Image(_element_to_engine(self.group, element))
+        return encoded if self._reversed else encoded.Inverse()
+
+    def position_of(self, element):
+        return int(libgap.PositionCanonical(self._transversal, self._multiplier(element))) - 1
+
+    @cached_method
+    def point(self, position):
+        return _TransversalCoset(self, position)
+
+    def representative(self, position):
+        encoded = self._permutations.PreImagesRepresentative(self._transversal[position])
+        return _element_from_engine(self.group, encoded if self._reversed else encoded.Inverse())
+
+    def act(self, element, point):
+        image = self._transversal[point._position] * self._multiplier(element)
+        return self.point(int(libgap.PositionCanonical(self._transversal, image)) - 1)
+
+
+def _engine_left_coset_g_set(group, subgroup):
+    r"""Realize G/H through GAP's transversal, retaining its Schreier word section."""
+    from sage_extensions.categories.group.g_sets import FiniteGSets
+    from sage_extensions.categories.group.predicate_subgroups import PredicateSubgroups
+
+    if subgroup.supergroup() is not group:
+        raise ValueError("a left-coset space needs a subgroup of its acting group")
+    if subgroup in PredicateSubgroups(group) and subgroup.has_finite_coset_space():
+        return subgroup.coset_space()
+    points = _TransversalCosets(group, subgroup)
+    return FiniteGSets(group).pointed_orbit(
+        subgroup, points.point(points.position_of(group.one())), points.act,
+    )
+
+
 def _engine_cosets(group, subgroup, side):
     r"""Return the cosets of ``subgroup`` on ``side``, each an ordered set of elements."""
     engine = _engine_group(group)
@@ -1255,6 +1338,14 @@ class _GroupEngine:
 
     def _engine_group(self):
         return self._engine
+
+    @cached_method
+    def _left_coset_construction(self, subgroup):
+        from sage_extensions.categories.group.g_sets import _left_coset_g_set
+
+        if self.is_finite() is True and _encodes_elements_in_gap(self._engine):
+            return _engine_left_coset_g_set(self, subgroup)
+        return _left_coset_g_set(self, subgroup)
 
     def _to_engine(self, element):
         supergroup = self.supergroup()
@@ -6076,8 +6167,15 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 return self._selected_data_registry()[LeftCosetGSets(subgroup)]
             return self._left_coset_construction(subgroup)
 
+        @RealizationHook
         @cached_method
         def _left_coset_construction(self, subgroup):
+            r"""Construct the pointed G/H action through the selected group realization.
+
+            Protected construction contract: left_cosets is the caller;
+            group realizations supply owned pointed actions with their
+            section. The general realization uses exact coset equality.
+            """
             from sage_extensions.categories.group.g_sets import _left_coset_g_set
             return _left_coset_g_set(self, subgroup)
 

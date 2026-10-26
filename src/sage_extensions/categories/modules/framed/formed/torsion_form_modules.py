@@ -1260,6 +1260,12 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
         r"""Return the private Sage orthogonal-group parent."""
         return _engine_orthogonal_group(self._engine_module())
 
+    @cached_method
+    def _left_coset_construction(self, subgroup):
+        from sage_extensions.categories.group.groups import _engine_left_coset_g_set
+
+        return _engine_left_coset_g_set(self, subgroup)
+
     def _to_engine(self, automorphism):
         r"""Lower a live automorphism under the owned-group engine contract.
 
