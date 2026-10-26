@@ -1479,6 +1479,8 @@ def _implementation_with_engine(implementation: type, owner: type, engine: type)
         # such base, preserving the same semantic precedence as the ordinary
         # subclass path below: stronger providers first, engine computation,
         # then the owner's defaults and the weaker structure underneath it.
+        # A retained computation class can already inherit these providers;
+        # it must precede each such ancestor as required by C3.
         anchors = tuple(
             index
             for index, base in enumerate(implementation.__bases__)

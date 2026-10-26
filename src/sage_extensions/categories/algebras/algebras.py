@@ -4427,7 +4427,11 @@ class _OwnedAlgebraParent(_OwnedRingParent):
         self._preamble_selected_algebra_base_ring = base
         for name, value in construction_data:
             setattr(self, name, value)
-        self._realized_scalar_structure = (lambda scalar: self(scalar)) if scalar_structure is None else scalar_structure
+        self._realized_scalar_structure = (
+            lambda scalar: self._from_engine_element(
+                engine(_engine_element(base, scalar))
+            )
+        ) if scalar_structure is None else scalar_structure
         if labels is None:
             selected_labels = None
         else:
