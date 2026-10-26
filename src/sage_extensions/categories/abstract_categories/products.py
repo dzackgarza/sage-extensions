@@ -109,8 +109,8 @@ class InverseSystem(_DiagramCategory):
 
 
 
-class PosetMorphism(Morphism):
-    r"""The unique arrow ``p -> q`` of a thin poset category when ``p <= q``."""
+class PosetMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for the generated unique arrow ``p -> q`` when ``p <= q``."""
 
     def __init__(self, parent) -> None:
         Morphism.__init__(self, parent)
@@ -131,7 +131,7 @@ class PosetMorphism(Morphism):
 
 
 class PosetMor(CategoricalMor):
-    Element = PosetMorphism
+    ElementMethods = PosetMorphism
 
     def poset_category(self):
         return self.base_category()
@@ -151,7 +151,7 @@ class PosetMor(CategoricalMor):
                 f"there is no arrow {self.domain()} -> {self.codomain()} in the poset: {self.domain()} is not "
                 f"<= {self.codomain()}"
             )
-        return PosetMorphism(self)
+        return self.element_class(self)
 
     def _element_constructor_(self, value=None):
         if value is not None and value is not self.unique():
@@ -309,8 +309,8 @@ class _TwoLegDiagram(Functor):
         raise ValueError("a two-leg diagram has exactly two nonidentity morphisms")
 
 
-class FiniteOrdinalMorphism(Morphism):
-    r"""The unique arrow ``i -> j`` in a finite ordinal category when ``i <= j``."""
+class FiniteOrdinalMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for the generated unique arrow ``i -> j`` when ``i <= j``."""
 
     def __init__(self, parent) -> None:
         Morphism.__init__(self, parent)
@@ -331,7 +331,7 @@ class FiniteOrdinalMorphism(Morphism):
 
 
 class FiniteOrdinalMor(CategoricalMor):
-    Element = FiniteOrdinalMorphism
+    ElementMethods = FiniteOrdinalMorphism
 
     def ordinal_category(self):
         return self.base_category()
@@ -346,7 +346,7 @@ class FiniteOrdinalMor(CategoricalMor):
                 f"there is no arrow {self.domain()} -> {self.codomain()} in a finite ordinal: arrows go only "
                 "from smaller to larger elements"
             )
-        return FiniteOrdinalMorphism(self)
+        return self.element_class(self)
 
     def _element_constructor_(self, value=None):
         if value is not None and value is not self.unique():
@@ -547,8 +547,8 @@ class _FiniteSequenceFunctorCategory(_FunctorCategory):
             )
 
 
-class ParallelPairMorphism(Morphism):
-    r"""One arrow of the walking parallel-pair category ``0 ⇉ 1``."""
+class ParallelPairMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for a generated arrow of the walking parallel-pair category ``0 ⇉ 1``."""
 
     def __init__(self, parent, name: str) -> None:
         Morphism.__init__(self, parent)
@@ -582,7 +582,7 @@ class ParallelPairMorphism(Morphism):
 
 
 class ParallelPairMor(CategoricalMor):
-    Element = ParallelPairMorphism
+    ElementMethods = ParallelPairMorphism
 
     def __init__(self, family, domain, codomain) -> None:
         CategoricalMor.__init__(self, family, domain, codomain)
@@ -606,13 +606,13 @@ class ParallelPairMor(CategoricalMor):
                     f"Mor({self.domain()}, {self.domain()}) in the walking parallel pair contains only the identity, "
                     f"but got {name!r}"
                 )
-            return ParallelPairMorphism(self, "identity")
+            return self.element_class(self, "identity")
         if self.domain() is category.source() and self.codomain() is category.target():
             if name not in ("left", "right"):
                 raise ValueError(
                     f"the two parallel arrows 0 -> 1 are named 'left' and 'right', but got {name!r}"
                 )
-            return ParallelPairMorphism(self, name)
+            return self.element_class(self, name)
         raise ValueError(
             f"the walking parallel pair has no arrow {self.domain()} -> {self.codomain()}"
         )
@@ -752,8 +752,8 @@ def _parallel_pair_diagram(left: Morphism, right: Morphism, target_category: Cat
 _MISSING_PARALLEL_FAMILY_LABEL = object()
 
 
-class ParallelFamilyMorphism(Morphism):
-    r"""One arrow of the walking category for an indexed parallel family."""
+class ParallelFamilyMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for a generated arrow of the indexed parallel-family category."""
 
     def __init__(self, parent, label=_MISSING_PARALLEL_FAMILY_LABEL) -> None:
         Morphism.__init__(self, parent)
@@ -798,7 +798,7 @@ class ParallelFamilyMorphism(Morphism):
 class ParallelFamilyMor(CategoricalMor):
     r"""A fixed Mor in the walking category for an indexed parallel family."""
 
-    Element = ParallelFamilyMorphism
+    ElementMethods = ParallelFamilyMorphism
 
     def parallel_family_category(self):
         return self.base_category()
@@ -819,14 +819,14 @@ class ParallelFamilyMor(CategoricalMor):
                     f"Mor({self.domain()}, {self.domain()}) in the walking parallel-family category contains "
                     f"only the identity, but got the label {label!r}"
                 )
-            return ParallelFamilyMorphism(self)
+            return self.element_class(self)
         if self.domain() is category.source() and self.codomain() is category.target():
             if label is _MISSING_PARALLEL_FAMILY_LABEL:
                 raise ValueError(
                     f"an arrow {self.domain()} -> {self.codomain()} in the walking parallel-family category "
                     "needs its family label"
                 )
-            return ParallelFamilyMorphism(self, category.index_set()(label))
+            return self.element_class(self, category.index_set()(label))
         raise ValueError(
             f"the walking parallel-family category has no arrow {self.domain()} -> {self.codomain()}"
         )
@@ -1195,8 +1195,8 @@ def _apex_morphism_equal(left, right):
     return left.apex_map() == right.apex_map()
 
 
-class ConeMorphism(Morphism):
-    r"""A morphism of cones, determined by its apex map."""
+class ConeMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for a generated morphism of cones, determined by its apex map."""
 
     def __init__(self, parent: ConeMor, apex_map: Morphism, *, verify: bool = False) -> None:
         Morphism.__init__(self, parent)
@@ -1262,8 +1262,8 @@ class ConeMorphism(Morphism):
         )
 
 
-class CoconeMorphism(Morphism):
-    r"""A morphism of cocones, determined by its apex map."""
+class CoconeMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for a generated morphism of cocones, determined by its apex map."""
 
     def __init__(self, parent: CoconeMor, apex_map: Morphism, *, verify: bool = False) -> None:
         Morphism.__init__(self, parent)
@@ -1330,7 +1330,7 @@ class CoconeMorphism(Morphism):
 
 
 class ConeMor(CategoricalMor):
-    Element = ConeMorphism
+    ElementMethods = ConeMorphism
 
     def __init__(
         self,
@@ -1372,7 +1372,7 @@ class ConeMor(CategoricalMor):
 
 
 class CoconeMor(CategoricalMor):
-    Element = CoconeMorphism
+    ElementMethods = CoconeMorphism
 
     def __init__(
         self,

@@ -841,6 +841,17 @@ class PolarizedEquivariantLattice(SageObject):
         return self.isometry().centralizer_group()
 
     @cached_method
+    def coinvariant_extension_subgroup(self):
+        r"""Return coinvariant isometries extending while fixing the polarization.
+
+        For full discriminant gluing, the permitted invariant discriminant
+        actions are the image of O(L^f, h), transported across the glue.
+        """
+        extension = self.primitive_extension()
+        stabilizer = extension.invariant.O().stabilizer(self.invariant_polarization())
+        return extension.coinvariant_extension_subgroup(stabilizer)
+
+    @cached_method
     def polarization_stabilizer(self):
         return self.lattice().O().stabilizer(self.polarization())
 
@@ -938,7 +949,7 @@ class IsometryPrimitiveExtension:
         return glue, invariant_form, coinvariant_form, glue_source, glue_target
 
     @cached_method
-    def coinvariant_extension_subgroup(self):
+    def coinvariant_extension_subgroup(self, invariant_subgroup=None):
         r"""Return the coinvariant restriction image in the full-glue involution case.
 
         Suppose ``f`` is an involution and the primitive extension glues the
@@ -948,6 +959,10 @@ class IsometryPrimitiveExtension:
         action belongs to
 
         ``gamma rho(O(L^f)) gamma^-1``.
+
+        When an invariant subgroup H is supplied, replace O(L^f) by H.
+        The gluing criterion then gives precisely the restrictions of
+        extensions whose invariant action lies in H.
 
         The returned group is therefore the actual finite-character preimage
         in ``O(L^-)``; it is not a separately represented copy of the ambient
@@ -962,7 +977,11 @@ class IsometryPrimitiveExtension:
             self._full_discriminant_glue_data()
         )
 
-        invariant_image = self.invariant.discriminant_image()
+        invariant_image = (
+            self.invariant.discriminant_image()
+            if invariant_subgroup is None
+            else invariant_subgroup.image_under(self.invariant.discriminant_representation())
+        )
         coinvariant_orthogonal_group = coinvariant_form.O()
 
         allowed_discriminant_image = coinvariant_orthogonal_group.subgroup_on(

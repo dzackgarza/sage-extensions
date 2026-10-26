@@ -25,8 +25,8 @@ from sage_extensions.owned_category import _object_of
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 
 
-class ClassifyingMorphism(Morphism):
-    r"""An arrow of ``BG``, named by its group element."""
+class ClassifyingMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for a generated arrow of ``BG``, named by its group element."""
 
     def __init__(self, parent, group_element) -> None:
         self._group_element = parent.mor_category().group()(group_element)
@@ -57,7 +57,7 @@ class ClassifyingMorphism(Morphism):
 class ClassifyingMor(CategoricalMor):
     r"""The single Mor object of ``BG``."""
 
-    Element = ClassifyingMorphism
+    ElementMethods = ClassifyingMorphism
 
     def _element_constructor_(self, datum):
         if isinstance(datum, ClassifyingMorphism):
@@ -124,9 +124,9 @@ class ClassifyingCategory(CategoryPacketMethods, OwnedParameterizedCategory):
             sage: B.Mor(B.object(), B.object()).identity().group_element() == B.group().one()
             True
         """
-        from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+        from sage_extensions.categories.sets.set_categories import Set
 
-        return finite_ordered_set((self.object(),))
+        return Set((self.object(),))
 
     def arrows(self):
         r"""The complete set of arrows of ``BG``, namely ``Mor_BG(*,*)``.

@@ -315,9 +315,6 @@ class DiscriminantBilinearModules(OwnedCategoryOverBaseRing):
             this map is the canonical Pontryagin-dual identification rather
             than merely a homomorphism into the character group.
             """
-            from sage.categories.morphism import SetMorphism
-
-
             characters = self.module_category().Mor(self, self.bilinear_value_module())
 
             def character(element):
@@ -329,7 +326,7 @@ class DiscriminantBilinearModules(OwnedCategoryOverBaseRing):
                     }
                 )
 
-            return SetMorphism(Sets().Mor(self, characters), character)
+            return Sets().Mor(self, characters)(character)
 
 
 class DiscriminantQuadraticModules(OwnedCategoryOverBaseRing):

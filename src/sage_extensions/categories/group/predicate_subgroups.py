@@ -425,6 +425,16 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             r"""The ambient identity, which lies in the declared subgroup."""
             return self.supergroup().one()
 
+        def stabilizer(self, target, action="setwise"):
+            r"""Restrict the ambient stabilizer to this subgroup.
+
+            For H <= G acting on a marking x, H_x = H intersect G_x.
+            The ambient operation owns the distinction between setwise and
+            pointwise stabilization; intersection retains the subgroup's
+            finite character and generating morphisms.
+            """
+            return self.intersection(self.supergroup().stabilizer(target, action=action))
+
         def intersection(self, other):
             if other.supergroup() is not self.supergroup():
                 raise ValueError(

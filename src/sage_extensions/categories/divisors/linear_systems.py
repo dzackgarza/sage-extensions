@@ -9,9 +9,6 @@ from sage.rings.integer_ring import ZZ as SageZZ
 from sage_extensions.categories.algebras.algebras import (
     AlgebrasWithChosenFinitePresentation,
 )
-from sage_extensions.categories.modules.module_morphisms.module_morphisms import (
-    ModuleMorphism,
-)
 from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
@@ -856,43 +853,6 @@ def _coordinate_hyperplane_section_restriction(projective_space, degree, coordin
     )
 
 
-class ProjectiveSectionRestrictionMap(ModuleMorphism):
-    r"""The exact image-valued restriction of a represented projective section space."""
-
-    def __init__(
-        self,
-        parent,
-        images,
-        *,
-        line_bundle,
-        closed_subscheme,
-        coordinate_quotient,
-        ambient_normal_form_space,
-        image_inclusion,
-    ) -> None:
-        self._line_bundle = line_bundle
-        self._closed_subscheme = closed_subscheme
-        self._coordinate_quotient = coordinate_quotient
-        self._ambient_normal_form_space = ambient_normal_form_space
-        self._image_inclusion = image_inclusion
-        ModuleMorphism.__init__(self, parent, images)
-
-    def line_bundle(self):
-        return self._line_bundle
-
-    def closed_subscheme(self):
-        return self._closed_subscheme
-
-    def coordinate_quotient(self):
-        return self._coordinate_quotient
-
-    def ambient_normal_form_space(self):
-        return self._ambient_normal_form_space
-
-    def restriction_image_inclusion(self):
-        return self._image_inclusion
-
-
 def _projective_section_restriction(
     line_bundle,
     closed_subscheme,
@@ -978,14 +938,15 @@ def _projective_section_restriction(
         )
         for label in source.module_generating_set()
     }
-    return ProjectiveSectionRestrictionMap(
-        source.module_category().Mor(source, image),
+    return source.module_category().Mor(source, image)(
         restriction_images,
-        line_bundle=line_bundle,
-        closed_subscheme=closed_subscheme,
-        coordinate_quotient=quotient,
-        ambient_normal_form_space=ambient,
-        image_inclusion=image.inclusion(),
+        projective_section_restriction_data={
+            "line_bundle": line_bundle,
+            "closed_subscheme": closed_subscheme,
+            "coordinate_quotient": quotient,
+            "ambient_normal_form_space": ambient,
+            "image_inclusion": image.inclusion(),
+        },
     )
 
 

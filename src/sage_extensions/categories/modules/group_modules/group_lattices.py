@@ -7,7 +7,6 @@ whenever ``S`` is a group algebra; the constructor is
 ``Lattices(R[G])(L, action)``.
 """
 
-from sage.categories.morphism import SetMorphism
 from sage.misc.cachefunc import cached_method
 
 from sage_extensions.categories.abstract_categories.mor_categories import (
@@ -18,7 +17,7 @@ from sage_extensions.categories.group.g_objects import GObjects
 from sage_extensions.categories.group.groups import OwnedGroups
 from sage_extensions.categories.lattice_morphisms import (
     LatticeMor,
-    LatticeMorphism,
+    LatticeMorphismMethods,
 )
 from sage_extensions.categories.lattices import (
     Lattices,
@@ -34,8 +33,8 @@ from sage_extensions.categories.rings.ring_foundation import (
 from sage_extensions.categories.sets.set_categories import Sets
 
 
-class GroupLatticeMorphism(LatticeMorphism):
-    r"""A form-preserving equivariant morphism of lattices with one group action."""
+class GroupLatticeMorphism(LatticeMorphismMethods):
+    r"""Methods for a generated form-preserving equivariant lattice morphism."""
 
     def __mul__(self, other):
         if not isinstance(other, GroupLatticeMorphism):
@@ -50,7 +49,7 @@ class GroupLatticeMorphism(LatticeMorphism):
 class GroupLatticeMor(LatticeMor):
     r"""Form-preserving maps commuting with one selected group action."""
 
-    Element = GroupLatticeMorphism
+    ElementMethods = GroupLatticeMorphism
 
     def __init__(self, mor_family, domain, codomain) -> None:
         if domain.group() != codomain.group():
@@ -239,11 +238,10 @@ class LatticesOverGroupAlgebra(OwnedCategoryOverBaseRing):
                 )
 
             orthogonal_group = self.Aut()
-            action = SetMorphism(
-                Sets().Mor(group, orthogonal_group),
+            action = Sets().Mor(group, orthogonal_group)(
                 lambda group_element: orthogonal_group(
                     lambda label: transported_image(group_element, label)
-                ),
+                )
             )
             assert group.has_selected_group_resolution()
             for group_generator in group.group_generators():

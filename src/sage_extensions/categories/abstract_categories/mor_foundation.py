@@ -68,7 +68,7 @@ class OwnedMor(SageHomset):
         return self.identity()
 
 
-class CategoricalArrow(Element):
+class CategoricalArrow:
     r"""An arrow with its actual categorical endpoints.
 
     Sage's ``Map`` stores endpoints as ``Parent`` instances. Objects of a
@@ -76,6 +76,9 @@ class CategoricalArrow(Element):
     Mor category. This realization stores only the Mor parent and reads its
     endpoints without replacing them by auxiliary objects.
     """
+
+    def __init__(self, parent: Parent) -> None:
+        Element.__init__(self, parent)
 
     def domain(self):
         return self.parent().domain()
@@ -146,14 +149,14 @@ class UnderlyingSetMor(OwnedMor):
             raise TypeError(
                 f"a map {self.domain()} -> {self.codomain()} needs a function on points, but {datum!r} is not callable"
             )
-        return SetMorphism(self, datum)
+        return self.element_class(self, datum)
 
     def identity(self) -> SetMorphism:
         if self.domain() is not self.codomain():
             raise ValueError(
                 f"the identity map exists only on Mor(X, X), but this is Mor({self.domain()}, {self.codomain()})"
             )
-        return SetMorphism(self, lambda element: element)
+        return self.element_class(self, lambda element: element)
 
 
 _underlying_set_mors = {}
@@ -449,4 +452,3 @@ class CategoryPacketMethods(_CategoryPacketOperations):
         from sage_extensions.categories.abstract_categories.cat import Cat
 
         return Cat().Aut(self)
-

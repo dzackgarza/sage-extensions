@@ -20,6 +20,7 @@ from sage.categories.map import Map
 from sage.categories.morphism import Morphism
 from sage.misc.abstract_method import abstract_method
 from sage.misc.cachefunc import cached_function, cached_method
+from sage.structure.element import Element
 from sage.structure.parent import Parent
 
 from sage_extensions.categories.abstract_categories.mor_foundation import CategoricalArrow
@@ -91,7 +92,7 @@ def _functor_factor_family(factors):
     )
 
 
-class Functor(CategoricalArrow):
+class Functor(CategoricalArrow, Element):
     r"""A functor with explicit object and arrow actions.
 
     The functor itself is an arrow of ``Cat`` and an object of ``[C,D]``.

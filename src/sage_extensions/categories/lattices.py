@@ -651,7 +651,9 @@ class _Genus(Sets().ObjectType):
 
         signature = self.signature_pair()
         positive, negative = signature.first(), signature.second()
-        if positive != 0 and negative != 0:
+        positive_is_zero = (positive == cardinal(0)) is True
+        negative_is_zero = (negative == cardinal(0)) is True
+        if not positive_is_zero and not negative_is_zero:
             raise ValueError(
                 f"the Smith--Minkowski--Siegel mass of {self!r} is not defined: the mass is a finite sum only for a definite genus, and this genus has signature ({positive}, {negative})"
             )
@@ -683,7 +685,9 @@ class _Genus(Sets().ObjectType):
         component of the theta series of every member.
         """
         signature = self.signature_pair()
-        assert signature.first() == 0 or signature.second() == 0, (
+        positive_is_zero = (signature.first() == cardinal(0)) is True
+        negative_is_zero = (signature.second() == cardinal(0)) is True
+        assert positive_is_zero or negative_is_zero, (
             f"the theta series of {self!r} is a power series only for a definite genus, and this genus has signature ({signature.first()}, {signature.second()})"
         )
         rationals = self._lattice.base_ring().fraction_field()
@@ -4708,8 +4712,10 @@ class Lattices(OwnedCategoryOverBaseRing):
                 raise ValueError(
                     f"{self!r} has no Nikulin invariant delta: delta is defined for an even 2-elementary lattice, and {self!r} is not both even and 2-elementary"
                 )
-            discriminant_form = self.discriminant_quadratic_form()
             ring = self.base_ring()
+            if self.is_unimodular() is True:
+                return ring.zero()
+            discriminant_form = self.discriminant_quadratic_form()
             if discriminant_form.is_zero():
                 return ring.zero()
             return ring(
@@ -5328,40 +5334,42 @@ class Lattices(OwnedCategoryOverBaseRing):
 
             fraction_field = ring.fraction_field()
             dual_gram = self.gram_tensor().change_ring(fraction_field).dual_pairing()
-            rank = int(self.module_rank())
-            match all(
-                dual_gram[row, column] in ring
-                for row in range(rank)
-                for column in range(rank)
-            ):
-                case True:
-                    integral_dual_form = tensor(
-                        ring,
-                        (),
-                        (rank, rank),
-                        [
-                            [ring(dual_gram[row, column]) for column in range(rank)]
-                            for row in range(rank)
-                        ],
-                    )
-                    return Lattices(ring)(
-                        integral_dual_form,
-                        module_generators=self.module_generating_set(),
-                    )
-                case False:
-                    # The metric dual is still an R-module.  Its values
-                    # lie in Res_{R -> K}(K), an R-module selected by the
-                    # fraction-field map, not in a second, untyped
-                    # callable-form space over the bare ring K.
-                    value_module = Modules(fraction_field).restriction_of_scalars(
-                        ring.fraction_field_map()
-                    )(fraction_field)
-                    dual_module = self.dual_module()
-                    rational = dual_module.bilinear_hom_space(value_module)(dual_gram)
-                    return FormModules(ring)(
-                        rational,
-                        _extra_categories=(FormModules(ring).Nondegenerate(), BilinearFormModules(ring).Symmetric()),
-                    )
+            # The dual lattice has one value type in every case: the selected
+            # restriction-of-scalars module Res_{R -> K}(K).  Even when every
+            # inverse-Gram entry lies in R (notably for unimodular lattices),
+            # returning an R-valued form here gives its norm a different
+            # interface and breaks generic descent through ``underlying_element``.
+            value_module = Modules(fraction_field).restriction_of_scalars(
+                ring.fraction_field_map()
+            )(fraction_field)
+            dual_module = self.dual_module()
+            # ``dual_gram`` is a tensor over Frac(R), on the fraction-field
+            # extension of the dual basis. Transfer its coefficients through
+            # the selected R-basis by stating the bilinear evaluation in the
+            # actual R-module Hom parent.
+            labels = tuple(self.module_generating_set())
+
+            def rational_pairing(left, right):
+                left_coordinates = left.to_vector()
+                right_coordinates = right.to_vector()
+                return value_module(sum(
+                    (
+                        fraction_field(left_coordinates(left_label))
+                        * dual_gram[row, column]
+                        * fraction_field(right_coordinates(right_label))
+                        for row, left_label in enumerate(labels)
+                        for column, right_label in enumerate(labels)
+                    ),
+                    fraction_field.zero(),
+                ))
+
+            rational = dual_module.bilinear_hom_space(value_module)._from_bilinear_evaluation(
+                rational_pairing
+            )
+            return FormModules(ring)(
+                rational,
+                _extra_categories=(FormModules(ring).Nondegenerate(), BilinearFormModules(ring).Symmetric()),
+            )
 
         @cached_method
         def dual_lattice_to_linear_dual(self):
@@ -6161,6 +6169,11 @@ class Lattices(OwnedCategoryOverBaseRing):
                 raise ValueError(
                     f"cannot decide whether {self!r} is p-elementary for p = {prime}: {prime} is not prime"
                 )
+            if self.is_unimodular() is True:
+                # A unimodular lattice has trivial discriminant group, so its
+                # p-elementarity is immediate for every prime. Avoid building
+                # the correlation cokernel merely to enumerate no invariants.
+                return True
             invariants = tuple(
                 abs(invariant)
                 for invariant in self.correlation_morphism().cokernel().invariant_factors()
@@ -6494,12 +6507,18 @@ class Lattices(OwnedCategoryOverBaseRing):
             )
 
         def is_positive_definite(self) -> bool:
-            rank = self.module_rank()
-            return self.signature_pair() == signature_pair(rank, 0)
+            signature = self.signature_pair()
+            return (
+                (signature.first() == self.module_rank()) is True
+                and (signature.second() == cardinal(0)) is True
+            )
 
         def is_negative_definite(self) -> bool:
-            rank = self.module_rank()
-            return self.signature_pair() == signature_pair(0, rank)
+            signature = self.signature_pair()
+            return (
+                (signature.first() == cardinal(0)) is True
+                and (signature.second() == self.module_rank()) is True
+            )
 
         def is_definite(self) -> bool:
             return self.is_positive_definite() or self.is_negative_definite()
@@ -6556,7 +6575,11 @@ class Lattices(OwnedCategoryOverBaseRing):
             finite_rank = int(rank.finite_value())
             if finite_rank < 2:
                 return False
-            return self.signature_pair() == signature_pair(0, finite_rank - 1)
+            signature = self.signature_pair()
+            return (
+                (signature.first() == cardinal(0)) is True
+                and (signature.second() == cardinal(finite_rank - 1)) is True
+            )
 
         def lll_reduction(self):
             return _lll_reduction(self)
@@ -8623,6 +8646,10 @@ class EvenTwoElementaryLattices(OwnedCategoryOverBaseRing):
         ]
 
     class ParentMethods:
+        def delta(self):
+            r"""Return Nikulin's invariant on the even 2-elementary lattice surface."""
+            return Lattices.ParentMethods.delta(self)
+
         def two_elementary_invariants(self):
             r"""Return Nikulin's \((r,a,\delta)\) for an even 2-elementary lattice.
 

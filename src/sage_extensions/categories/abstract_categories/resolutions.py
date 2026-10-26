@@ -82,8 +82,8 @@ def _component_function(components):
             )
 
 
-class ResolutionMorphism(Morphism):
-    r"""A map of chosen truncated resolutions."""
+class ResolutionMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for a generated map of chosen truncated resolutions."""
 
     def __init__(self, parent, components, *, target_morphism=None) -> None:
         Morphism.__init__(self, parent)
@@ -210,7 +210,7 @@ class ResolutionMorphism(Morphism):
 class ResolutionMor(CategoricalMor):
     r"""The Mor object between two chosen truncated resolutions."""
 
-    Element = ResolutionMorphism
+    ElementMethods = ResolutionMorphism
 
     def _element_constructor_(self, components, *, target_morphism=None):
         match components:

@@ -1455,9 +1455,17 @@ def _module_generating_set(labels):
     return Sets.Δ[rank - 1]
 
 
-@cached_function
+@cached_function(key=lambda ring, module_generating_set: (
+    id(ring), id(module_generating_set)
+))
 def _owned_free_module_on(ring, module_generating_set):
-    r"""Return the owned free module ``F_R(S)`` on the stated labels."""
+    r"""Return ``F_R(S)`` for this literal ring and selected label-set object.
+
+    Equality of sets does not identify a selected basis: a free module's
+    framing records the actual set object on which it was constructed.
+    Therefore cache by the identities of ``R`` and ``S``, not by their
+    extensional equality or hashes.
+    """
     return _new_sparse_free_module(ring, module_generating_set)
 
 

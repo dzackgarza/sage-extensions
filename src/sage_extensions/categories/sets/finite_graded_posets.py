@@ -23,8 +23,8 @@ from sage_extensions.owned_category import _object_of
 from sage_extensions.validation import validator
 
 
-class FiniteGradedPosetMorphism(Morphism):
-    r"""A monotone map preserving the selected integer grade."""
+class FiniteGradedPosetMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for a generated monotone map preserving the selected integer grade."""
 
     def __init__(self, parent, order_map):
         Morphism.__init__(self, parent)

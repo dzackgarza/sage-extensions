@@ -64,10 +64,8 @@ from sage_extensions.categories.rings.ring_foundation import (
     _owned_integers,
 )
 from sage_extensions.categories.schemes.schemes import (
-    SchemeMorphism,
     Schemes,
     _engine_scheme,
-    _engine_scheme_morphism,
     _scheme_mor_category,
 )
 from sage_extensions.categories.schemes.toric.fans import (
@@ -346,99 +344,6 @@ def _toric_chart_pullback(lattice_morphism, source_cone, target_cone, base_ring)
             for position, character in enumerate(target_generators)
         }
     )
-
-
-class ToricSchemeMorphism(SchemeMorphism):
-    r"""The toric morphism ``X_Sigma -> X_Sigma'`` of a fan-compatible lattice map.
-
-    An element of ``Mor_{Sch/k}(X_Sigma, X_Sigma')``, constructed by that Mor
-    from an arrow realization rule (:meth:`ToricSchemes.ParentMethods.toric_morphism`).
-    Its defining datum is the lattice map ``phi: N -> N'``; the chart targets
-    and chart pullbacks are the families, indexed by the maximal cones of
-    ``Sigma``, that ``phi`` determines (CLS Thm. 3.3.4), and the native
-    morphism is its realization between the private Sage toric varieties.
-    """
-
-    def __init__(
-        self,
-        mor,
-        native_morphism,
-        *,
-        lattice_morphism,
-        chart_targets,
-        chart_pullbacks,
-    ) -> None:
-        super().__init__(native_morphism, mor=mor)
-        self._lattice_morphism = lattice_morphism
-        self._chart_targets = chart_targets
-        self._chart_pullbacks = chart_pullbacks
-
-    def lattice_morphism(self):
-        return self._lattice_morphism
-
-    def chart_target(self, source_cone):
-        r"""The maximal cone of ``Sigma'`` whose chart receives the chart of ``source_cone``."""
-        return self._chart_targets.value(source_cone)
-
-    def chart_pullback(self, source_cone):
-        r"""Return the pullback on the affine chart indexed by ``source_cone``."""
-        return self._chart_pullbacks.value(source_cone)
-
-    def chart_morphism(self, source_cone):
-        r"""Return the represented affine map into the selected target chart."""
-        source_chart = self.domain().affine_chart(source_cone)
-        target_chart = self.codomain().affine_chart(self.chart_target(source_cone))
-        return source_chart.Mor(target_chart)(self.chart_pullback(source_cone))
-
-    def local_map(self, source_cone):
-        r"""The map on a source chart, followed by its target chart's open immersion."""
-        target_embedding = self.codomain().gluing_datum().chart_embedding(self.chart_target(source_cone))
-        return target_embedding * self.chart_morphism(source_cone)
-
-    def _postcompose_with(self, after):
-        r"""Compose on the affine charts, then use their common glued Mor."""
-        from sage_extensions.categories.schemes.schemes import _scheme_composition_mor
-
-        datum = self.domain().gluing_datum()
-        return _scheme_composition_mor(after, self)(
-            finite_indexed_family(datum.chart_index_set(), lambda index: after * self.local_map(index))
-        )
-
-    def pullback_divisor(self, divisor):
-        r"""Pull back one represented torus-invariant Cartier divisor."""
-        codomain = self.codomain()
-        target_group = codomain.weil_divisor_group()
-        divisor = target_group(divisor)
-        assert codomain.is_cartier(divisor), (
-            f"the pullback along {self} is defined for Cartier divisors, but {divisor} is not "
-            f"Cartier on {codomain}"
-        )
-        target_rays = codomain.fan().cones(1)
-        target_coordinates = divisor.to_vector()
-        engine_divisor = _engine_scheme(codomain).divisor(
-            [int(target_coordinates(ray)) for ray in target_rays]
-        )
-        pulled = _engine_scheme_morphism(self).pullback_divisor(engine_divisor)
-        source = self.domain()
-        source_group = source.weil_divisor_group()
-        source_rays = source.fan().cones(1)
-        return source_group.linear_combination(
-            {
-                ray: _integers()(pulled.coefficient(position))
-                for position, ray in enumerate(source_rays)
-                if pulled.coefficient(position)
-            }
-        )
-
-    def pullback_line_bundle(self, bundle):
-        r"""Return ``f^* O_Y(D) = O_X(f^*D)`` for a selected toric divisor bundle."""
-        assert bundle.scheme() is self.codomain(), (
-            f"cannot pull back {bundle} along {self}: it is a line bundle on {bundle.scheme()}, "
-            f"not on the codomain {self.codomain()}"
-        )
-        return self.domain().invertible_sheaf_of_divisor(
-            self.pullback_divisor(bundle.associated_divisor())
-        )
 
 
 def _owned_incidence_morphism(base, source, target, engine_matrix):
@@ -1950,12 +1855,13 @@ class ToricSchemes(OwnedCategoryOverBaseRing):
                     _engine_scheme(codomain),
                 )
             return _scheme_mor_category(self, codomain)(
-                lambda mor: ToricSchemeMorphism(
+                lambda mor: mor.element_class(
                     mor,
                     native,
-                    lattice_morphism=lattice_morphism,
-                    chart_targets=chart_targets,
-                    chart_pullbacks=chart_pullbacks,
+                    mor=mor,
+                    toric_lattice_morphism=lattice_morphism,
+                    toric_chart_targets=chart_targets,
+                    toric_chart_pullbacks=chart_pullbacks,
                 )
             )
 
@@ -2166,4 +2072,4 @@ class SmoothCompleteRationalToricSchemes(OwnedCategoryOverBaseRing):
             return _toric_fundamental_group(self, base_point_cone)
 
 
-__all__ = ["ToricSchemeMorphism", "ToricSchemes", "ToricProjectiveSpaces", "GorensteinToricSchemes", "SmoothCompleteRationalToricSchemes"]
+__all__ = ["ToricSchemes", "ToricProjectiveSpaces", "GorensteinToricSchemes", "SmoothCompleteRationalToricSchemes"]

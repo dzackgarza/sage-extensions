@@ -421,6 +421,41 @@ class _TwoElementaryTable(Mapping):
     def cardinality(self):
         return cardinal(len(self))
 
+    def validate(self):
+        r"""Validate each Nikulin row's signature and 2-elementary invariants."""
+        for triple in self:
+            lattice = self[triple]
+            rank, length, delta = triple
+            expected_signature = signature_pair(1, rank - 1)
+            actual_signature = lattice.signature_pair()
+            # Compare the owned cardinal components themselves. Equality of
+            # product points may remain a three-valued proposition even when
+            # each inertia index is decidable.
+            signature_matches = (
+                (actual_signature.first() == expected_signature.first()) is True
+                and (actual_signature.second() == expected_signature.second()) is True
+            )
+            if not signature_matches:
+                raise ValueError(
+                    f"TwoElementary[{triple}] has signature {actual_signature}, "
+                    f"expected {expected_signature}"
+                )
+            actual_invariants = EvenTwoElementaryLattices(ZZ)(lattice).two_elementary_invariants()
+            expected_invariants = nikulin_invariants(rank, length, delta)
+            # Nikulin's triple lives in the owned product NN^3. Decide each
+            # natural-number coordinate rather than asking product equality
+            # for a Boolean decision it need not provide.
+            invariants_match = all(
+                (actual_invariants.component(index) == expected_invariants.component(index)) is True
+                for index in actual_invariants.parent().index_set()
+            )
+            if not invariants_match:
+                raise ValueError(
+                    f"TwoElementary[{triple}] has invariants {actual_invariants}, "
+                    f"expected {expected_invariants}"
+                )
+        return True
+
 TwoElementary = _TwoElementaryTable()
 
 

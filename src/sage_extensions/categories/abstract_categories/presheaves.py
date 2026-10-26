@@ -388,8 +388,8 @@ class _CoverPresentationDiagram(Functor):
         )
 
 
-class CoveringFamilyMorphism(Morphism):
-    r"""A comparison of represented covering families.
+class CoveringFamilyMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for a generated comparison of represented covering families.
 
     For covers ``(U_i -> U)`` and ``(V_a -> V)`` in one category ``C``, a
     morphism from the latter to the former is a map ``V -> U``, a map
@@ -533,7 +533,7 @@ class CoveringFamilyMorphism(Morphism):
 class CoveringFamilyMor(CategoricalMor):
     r"""Comparisons between two represented covering families."""
 
-    Element = CoveringFamilyMorphism
+    ElementMethods = CoveringFamilyMorphism
 
     def _element_constructor_(self, index_map, member_maps=None, *, target_map=None, check=False):
         match index_map:

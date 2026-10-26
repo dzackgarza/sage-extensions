@@ -52,6 +52,7 @@ from sage_extensions.categories.schemes.schemes import (
     FiberProductSchemes,
     ProductProjectiveSpaces,
     ProjectiveSpaces,
+    SchemeMorphismMethods,
     SchemeFiberProductConstruction,
     Schemes,
     _affine_morphism_from_pullback,
@@ -267,11 +268,6 @@ class _SchemeBaseChangeFunctor(Functor):
 
     def _glued_factorization(self, changed, to_source, to_base):
         r"""Factor a represented cone through the scalar pullback of a glued scheme."""
-        from sage_extensions.categories.schemes.gluing import (
-            _GluedSchemeChartEmbedding,
-            _GluedSchemeChartMap,
-        )
-
         source = to_source.domain()
         source_datum = changed.fiber_product_cospan()[0].domain().gluing_datum()
         changed_datum = changed.gluing_datum()
@@ -294,10 +290,10 @@ class _SchemeBaseChangeFunctor(Functor):
                 pass
 
         match to_source:
-            case _GluedSchemeChartMap() if to_source.gluing_datum() is source_datum:
+            case SchemeMorphismMethods() if to_source._gluing_role == "chart_map" and to_source.gluing_datum() is source_datum:
                 chart_index = to_source.chart_index()
                 chart_map = to_source.chart_map()
-            case _GluedSchemeChartEmbedding() if to_source.gluing_datum() is source_datum:
+            case SchemeMorphismMethods() if to_source._gluing_role == "chart_embedding" and to_source.gluing_datum() is source_datum:
                 chart_index = to_source.chart_index()
                 chart_map = to_source.domain().categorical_identity_morphism()
             case _:

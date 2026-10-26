@@ -64,7 +64,14 @@ def RealApproximation(value):
     r"""Return the owned finite-precision real represented by ``value``."""
     backend = _create_real_approximation(value)
 
-    parent = _own_ring(backend.parent())
+    # The approximation constructor selects its MPFR precision. Preserve that
+    # defining datum through the owned field constructor rather than adopting
+    # the native RealField parent by engine class.
+    from sage_extensions.categories.rings.ring_foundation import (
+        _owned_real_field,
+    )
+
+    parent = _owned_real_field(int(backend.parent().precision()))
     return _owned_engine_element(parent, backend)
 
 

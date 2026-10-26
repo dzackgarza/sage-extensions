@@ -28,8 +28,8 @@ from sage_extensions.owned_category import _object_of
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 
 
-class FunctorImageMorphism(Morphism):
-    r"""A codomain arrow read between two chosen functor presentations."""
+class FunctorImageMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for a generated codomain arrow between chosen functor presentations."""
 
     def __init__(self, parent, underlying_arrow) -> None:
         Morphism.__init__(self, parent)
@@ -48,7 +48,7 @@ class FunctorImageMorphism(Morphism):
 
 
 class FunctorImageMor(CategoricalMor):
-    Element = FunctorImageMorphism
+    ElementMethods = FunctorImageMorphism
 
     def image_category(self):
         return self.base_category()
@@ -81,7 +81,7 @@ class FunctorImageMor(CategoricalMor):
                 f"{arrow} is not a morphism {self.domain().underlying_image()} -> "
                 f"{self.codomain().underlying_image()} in {self.image_category().functor().codomain()}"
             )
-        return FunctorImageMorphism(self, arrow)
+        return self.element_class(self, arrow)
 
     @object_level
     @cached_method

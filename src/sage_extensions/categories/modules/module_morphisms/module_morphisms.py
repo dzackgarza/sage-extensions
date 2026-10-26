@@ -309,6 +309,8 @@ class ModuleMorphismMethods:
     _scalar_extension_functor = None
     _lift_function = None
     _linearity_premises = None
+    _projective_section_restriction_data = None
+    _surjectivity_premise = None
 
     def _initialize_lower_arrow(self, parent) -> None:
         domain = parent.domain()
@@ -338,7 +340,59 @@ class ModuleMorphismMethods:
         source_morphism = self._source_module_morphism
         if source_morphism is not None:
             return source_morphism.linearity_decision()
+        derivation = getattr(self, "_originating_derivation", None)
+        if derivation is not None:
+            return derivation.linearity_decision()
+        witness = getattr(self, "_elementwise_linearity_witness", None)
+        if witness is not None:
+            return witness.linearity_decision() if hasattr(witness, "linearity_decision") else witness
         return None
+
+    def represented_module_morphism(self):
+        r"""Return this arrow as its represented module-morphism object."""
+        return self
+
+    def _projective_section_restriction_datum(self):
+        if self._projective_section_restriction_data is None:
+            raise AttributeError(f"{self} is not a projective-section restriction map")
+        return self._projective_section_restriction_data
+
+    def line_bundle(self):
+        return self._projective_section_restriction_datum()["line_bundle"]
+
+    def closed_subscheme(self):
+        return self._projective_section_restriction_datum()["closed_subscheme"]
+
+    def coordinate_quotient(self):
+        return self._projective_section_restriction_datum()["coordinate_quotient"]
+
+    def ambient_normal_form_space(self):
+        return self._projective_section_restriction_datum()["ambient_normal_form_space"]
+
+    def restriction_image_inclusion(self):
+        return self._projective_section_restriction_datum()["image_inclusion"]
+
+    def derivation(self):
+        r"""Return the derivation whose underlying linear arrow this is, when recorded."""
+        try:
+            return self._originating_derivation
+        except AttributeError:
+            raise AttributeError(f"{self} is not marked as the underlying arrow of a derivation") from None
+
+    def degree_shift(self):
+        r"""Return the recorded graded-derivation degree when this arrow has one."""
+        try:
+            return self._originating_derivation.degree_shift()
+        except AttributeError:
+            raise AttributeError(f"{self} has no originating graded derivation") from None
+
+    def _repr_(self):
+        derivation = getattr(self, "_originating_derivation", None)
+        if derivation is None:
+            return super()._repr_()
+        if hasattr(derivation, "degree_shift"):
+            return f"Degree {derivation.degree_shift()} graded derivation of {derivation.algebra()}"
+        return f"Derivation {derivation.domain()} -> {derivation.codomain()}"
 
     def _generator_image_linearity_derivation(self):
         r"""The linearity decision of a map given by images of a chosen generating set.
@@ -368,6 +422,8 @@ class ModuleMorphismMethods:
         scalar_extension_functor=None,
         lift=None,
         linearity_premises=None,
+        projective_section_restriction_data=None,
+        surjectivity_premise=None,
     ) -> None:
         self._initialize_lower_arrow(parent)
         assert (scalar_extension_of is None) == (scalar_extension_functor is None), (
@@ -378,6 +434,8 @@ class ModuleMorphismMethods:
         self._scalar_extension_functor = scalar_extension_functor
         self._lift_function = lift
         self._linearity_premises = linearity_premises
+        self._projective_section_restriction_data = projective_section_restriction_data
+        self._surjectivity_premise = surjectivity_premise
         self._source_module_morphism = None
         self._element_function = None
         domain = self.domain()
@@ -962,6 +1020,9 @@ class ModuleMorphismMethods:
         return hash(id(self.parent()))
 
     def __rmul__(self, actor):
+        derivation = getattr(self, "_originating_derivation", None)
+        if derivation is not None:
+            return derivation.parent().algebra_multiple(actor, self)
         # A specialized right operand such as a module embedding gets reflected
         # multiplication before Python tries the less-specialized left
         # ModuleMorphism.__mul__.  In that case the operation is composition,
@@ -983,6 +1044,12 @@ class ModuleMorphismMethods:
 
     def _acted_upon_(self, actor, self_on_left):
         r"""Use the canonical pointwise scalar action of the Mor module."""
+        derivation = getattr(self, "_originating_derivation", None)
+        if derivation is not None:
+            try:
+                return derivation.parent().algebra_multiple(actor, self)
+            except (TypeError, ValueError):
+                return None
         _ = self_on_left
         match actor:
             case _ if actor in self.parent().base_ring():
@@ -1548,6 +1615,8 @@ class ModuleMorphismMethods:
 
     def is_surjective(self) -> bool:
         r"""Return whether ``coker(self)=0`` when the cokernel is computable."""
+        if self._surjectivity_premise is not None:
+            return self._surjectivity_premise
         self._require_established_linearity("surjectivity")
         ring = self.domain().base_ring()
         if (
@@ -2388,41 +2457,21 @@ def _combined_linearity_decision(morphisms):
     return conjunction(morphism.linearity_decision() for morphism in morphisms)
 
 
-class ModuleMorphism(ModuleMorphismMethods, Morphism):
-    r"""Compatibility shell for private realizations not yet moved to generated Mor types."""
-
-    def _initialize_lower_arrow(self, parent) -> None:
-        Morphism.__init__(self, parent)
+ModuleMorphism = ModuleMorphismMethods
 
 
-class FramingMorphism(ModuleMorphism):
-    r"""A constructor-selected generating epimorphism from a free module."""
+def FramingMorphism(parent, generator_morphism):
+    r"""Construct a framing epimorphism as an element of its generated module Mor.
 
-    def __init__(self, parent, generator_morphism) -> None:
-        match generator_morphism.codomain() is parent.codomain():
-            case False:
-                raise ValueError(
-                    f"the generator map inducing {parent.domain()} -> {parent.codomain()} "
-                    f"must land in {parent.codomain()}, but it lands in "
-                    f"{generator_morphism.codomain()}"
-                )
-            case True:
-                pass
-        super().__init__(parent, generator_morphism)
-
-    def lift(self, element):
-        r"""The preimage of ``element`` in the free module that the codomain's construction chose.
-
-        On a basis it is the unique preimage, the coordinate vector.  The
-        construction that produced the codomain's elements chose it, so it is
-        not recombined and compared here.
-        """
-        codomain = self.codomain()
-        return codomain._framing_lift(codomain(element))
-
-    def is_surjective(self) -> bool:
-        r"""True: the codomain's framing coefficients supply a preimage in the selected free source."""
-        return True
+    This compatibility constructor retains the historical public entry point
+    without introducing a second arrow class beside ``parent.element_class``.
+    """
+    if generator_morphism.codomain() is not parent.codomain():
+        raise ValueError(
+            f"the generator map inducing {parent.domain()} -> {parent.codomain()} "
+            f"must land in {parent.codomain()}, but it lands in {generator_morphism.codomain()}"
+        )
+    return parent.element_class(parent, generator_morphism, surjectivity_premise=True)
 
 
 class ModuleEmbeddingMethods:
@@ -3128,7 +3177,7 @@ class ModuleMor(_ModuleMorCommonMethods, CategoricalMor):
         return f"Mor({self.domain()}, {self.codomain()})"
 
 
-def _framing_morphism(codomain, domain, generator_morphism) -> FramingMorphism:
+def _framing_morphism(codomain, domain, generator_morphism):
     from sage_extensions.categories.modules.pure.modules import Modules
     from sage_extensions.categories.rings.ring_foundation import OwnedCategoryOverBaseRing
 
@@ -3418,8 +3467,7 @@ class TensorProductModuleMorphismMethods:
         return self.parent().scalar_multiple(self.domain().base_ring()(2), self)
 
 
-class TensorProductModuleMorphism(TensorProductModuleMorphismMethods, ModuleMorphism):
-    r"""Compatibility shell for private tensor-product arrow realizations."""
+TensorProductModuleMorphism = TensorProductModuleMorphismMethods
 
 
 class ModuleAutomorphismMethods:
@@ -3488,8 +3536,7 @@ class ModuleAutomorphismMethods:
                 return self.forward() * other
 
 
-class ModuleAutomorphism(ModuleAutomorphismMethods, ModuleMorphism):
-    r"""Compatibility shell for private module-automorphism realizations."""
+ModuleAutomorphism = ModuleAutomorphismMethods
 
 
 def _flag_stabilizer_engine_data(automorphisms, terms):

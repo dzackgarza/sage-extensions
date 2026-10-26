@@ -62,8 +62,8 @@ class _CodomainFunctor(Functor):
 
 
 
-class DiscreteMorphism(Morphism):
-    r"""The unique identity arrow of a discrete-category object."""
+class DiscreteMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for the generated unique identity arrow of a discrete object."""
 
     def __init__(self, parent: DiscreteMor) -> None:
         Morphism.__init__(self, parent)
@@ -91,7 +91,7 @@ class DiscreteMorphism(Morphism):
 
 
 class DiscreteMor(CategoricalMor):
-    Element = DiscreteMorphism
+    ElementMethods = DiscreteMorphism
 
     def __init__(
         self,
@@ -123,7 +123,7 @@ class DiscreteMor(CategoricalMor):
                     f"but got {value}"
                 )
             return value
-        return DiscreteMorphism(self)
+        return self.element_class(self)
 
     @object_level
     @cached_method

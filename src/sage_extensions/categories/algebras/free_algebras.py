@@ -49,8 +49,11 @@ from sage_extensions.categories.modules.pure.modules import (
 )
 from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
 from sage_extensions.categories.rings.ring_foundation import (
+    _OwnedRingParent,
     _free_associative_algebra_placements,
+    _inherited_ring_placements,
     _polynomial_ring_placements,
+    _size_of_finitely_supported_families,
     LocalizationRings,
     OwnedCategoryOverBaseRing,
     OwnedRings,
@@ -62,16 +65,18 @@ from sage_extensions.categories.rings.ring_foundation import (
     _set_owned_ring_display,
 )
 from sage_extensions.categories.sets.cardinals import cardinal
-from sage_extensions.categories.sets.finite_ordered_sets import (
-    FiniteOrderedSets,
-    finite_ordered_set,
-)
+from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
 from sage_extensions.categories.sets.finite_families import finite_family
 from sage_extensions.categories.sets.indexed_families import (
     IndexedFamily,
     indexed_family,
 )
-from sage_extensions.categories.sets.set_categories import FiniteSets, NN, Sets
+from sage_extensions.categories.sets.set_categories import (
+    EnumeratedSets,
+    FiniteSets,
+    NN,
+    Sets,
+)
 from sage_extensions.logic import AtomicProposition, conjunction, negation
 from sage_extensions.refine import RealizationHook
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
@@ -252,7 +257,11 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
             associative_owner.Commutative() if flavor == "symmetric" else associative_owner
         )
         super().__init__(
-            engine, base, generating_module.module_generating_set(),
+            # The generator family above and the selected algebra framing
+            # must share the very same index-set object. Re-querying the
+            # module can return an equal but distinct set, forcing the common
+            # constructor to decide extensional equality unnecessarily.
+            engine, base, labels,
             categories=(
                 FreeAlgebras(base),
                 GradedFreeAlgebras(base),
@@ -288,10 +297,16 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
         selected_labels = (
             self.algebra_generating_set()
             if labels is None
-            else finite_ordered_set(labels)
+            else _finite_labels(labels)
         )
+        current_labels = self.algebra_generating_set()
+        # A specialization that supplies an equal-but-distinct enumerated set
+        # has selected a new framing. Extensional equality does not authorize
+        # retaining the old generating module, whose basis is indexed by the
+        # old set object.
+        same_labels = selected_labels is current_labels
         generating = self.generating_module()
-        if selected_labels == self.algebra_generating_set():
+        if same_labels:
             if (
                 not construction_data
                 and all(self in category for category in categories)
@@ -308,7 +323,11 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
         )
 
 @cached_function(key=lambda engine, generating_module, flavor, categories=(), construction_data=(): (
-    engine, id(generating_module), flavor, categories, construction_data,
+    id(engine),
+    id(generating_module),
+    flavor,
+    tuple(map(id, categories)),
+    tuple((name, id(value)) for name, value in construction_data),
 ))
 def _native_free_algebra(engine, generating_module, flavor, *, categories=(), construction_data=()):
     r"""The native realization of the free functor on this exact module."""
@@ -319,11 +338,22 @@ def _native_free_algebra(engine, generating_module, flavor, *, categories=(), co
 
 
 def _finite_labels(labels):
-    if labels in FiniteOrderedSets():
+    if labels in Sets():
+        # The free module and its algebra must share the exact selected
+        # generating set. An owned set is its own indexing datum, whether or
+        # not an enumeration has been selected. Rebuilding it as a finite
+        # ordered set changes that defining object before the algebra owner
+        # sees it.
         return labels
-    if isinstance(labels, int):
-        return finite_ordered_set(range(labels))
-    return finite_ordered_set(labels)
+    # Use the module owner's single normalization rule for ranks, finite
+    # cardinalities, and literal finite label families. In particular Sage's
+    # Integer is not a Python int, and must still denote the canonical ordinal
+    # basis rather than being sent to the explicit-label constructor.
+    from sage_extensions.categories.modules.framed.framed_free_modules import (
+        _module_generating_set,
+    )
+
+    return _module_generating_set(labels)
 
 
 def _variable_names(labels) -> tuple[str, ...]:
@@ -340,17 +370,29 @@ def _variable_names(labels) -> tuple[str, ...]:
     return tuple(names)
 
 
+@cached_function(key=lambda names: tuple(name.strip() for name in names))
+def _named_polynomial_variables(names):
+    """Intern a polynomial variable index set by its normalized ordered names."""
+    return finite_ordered_set(tuple(name.strip() for name in names))
+
+
 def _polynomial_variables(variables):
     r"""The set of variables a polynomial ring is constructed on.
 
     A string names its comma-separated variables, ``"x,y"``; a tuple or list
     names its entries in order; an owned set is its own set of variables.
+    Name-based inputs are interned by their ordered names, so separate
+    constructors of ``R[x_1, ..., x_n]`` retain the same literal selected
+    index set. Explicit owned sets retain their own identity.
     """
     match variables:
         case str():
-            return finite_ordered_set(tuple(name.strip() for name in variables.split(",")))
+            return _named_polynomial_variables(tuple(variables.split(",")))
         case tuple() | list():
-            return finite_ordered_set(tuple(variables))
+            assert all(isinstance(name, str) for name in variables), (
+                f"polynomial variable names must be strings, but got {variables!r}"
+            )
+            return _named_polynomial_variables(tuple(variables))
         case _:
             assert variables in Sets(), (
                 f"cannot form a polynomial ring in {variables!r}: give the variables as a string, "
@@ -383,13 +425,39 @@ def _polynomial_engine(engine_base, names):
     return _SagePolynomialRing(engine_base, names)
 
 
-def _laurent_polynomial_ring(base_ring, *args, **kwargs):
+def _laurent_polynomial_ring(base_ring, *args, _engine=None, **kwargs):
     base = _owned_ring(base_ring)
-    result = _own_ring(
+    engine = (
         _SageLaurentPolynomialRing(_engine_ring(base), *args, **kwargs)
+        if _engine is None
+        else _engine
     )
-    labels = tuple(_engine_ring(result).variable_names())
-    algebra = _algebra_with_structure(result, base, labels)
+    labels = tuple(engine.variable_names())
+    return _owned_laurent_polynomial_ring(base, labels, engine)
+
+
+@cached_function(key=lambda base, labels, engine: (id(base), tuple(labels)))
+def _owned_laurent_polynomial_ring(base, labels, engine):
+    r"""The Laurent polynomial algebra interned by its owned coefficient ring and variable labels."""
+    placements = (
+        *_inherited_ring_placements(
+            base, univariate_over_field_is_principal=len(labels) == 1
+        ),
+        _size_of_finitely_supported_families(base, len(labels)),
+    )
+    ring_parent = _OwnedRingParent(
+        engine,
+        base=base,
+        named_placement=lambda: placements,
+        constructing_category=Algebras(base).Associative().Unital().Commutative(),
+    )
+    algebra = _algebra_with_structure(
+        ring_parent,
+        base,
+        labels,
+        Algebras(base).Associative().Unital().Commutative(),
+        construction_data=(("kind", "laurent_polynomial"), ("variables", tuple(labels))),
+    )
     _set_owned_ring_display(
         algebra,
         f"{base}[{', '.join(labels)}^±1]",
@@ -401,14 +469,29 @@ def _laurent_polynomial_ring(base_ring, *args, **kwargs):
 
 def _symmetric_algebra_on(base_ring, algebra_generating_set, *, source_module=None):
     r"""``Sym_R(F_R(S))`` on the free module ``F_R(S)`` (or the given ``source_module`` on ``S``)."""
+    from sage_extensions.categories.modules.framed.framed_free_modules import (
+        FramedFreeModules,
+    )
+
     base = _owned_ring(base_ring)
     infinite = algebra_generating_set in Sets() and algebra_generating_set.is_finite() is not True
     labels = algebra_generating_set if infinite else _finite_labels(algebra_generating_set)
     generating = base.free_module(labels) if source_module is None else source_module
+    assert generating.base_ring() is base, (
+        f"the symmetric algebra on {labels} over {base} needs a generating module over that exact ring, "
+        f"but {generating} is over {generating.base_ring()}"
+    )
+    assert generating in FramedFreeModules(base), (
+        f"the symmetric algebra on {labels} needs a free generating module, but {generating} is not free over {base}"
+    )
+    assert generating.module_generating_set() is labels, (
+        f"the symmetric algebra's generating module {generating} must use the literal selected index set {labels}, "
+        f"not {generating.module_generating_set()}"
+    )
     return _symmetric_algebra_of_free_module(generating)
 
 
-@cached_function
+@cached_function(key=lambda generating: id(generating))
 def _symmetric_algebra_of_free_module(generating):
     r"""``Sym_R(F)`` for the free module ``F = F_R(S)``: one object per ``F``, which is the cache key.
 
@@ -422,7 +505,11 @@ def _symmetric_algebra_of_free_module(generating):
     base = generating.base_ring()
     labels = generating.module_generating_set()
     engine_base = _engine_ring(base)
-    if labels.is_finite() is not True or engine_base not in SageRings():
+    if (
+        labels.is_finite() is not True
+        or labels not in EnumeratedSets()
+        or engine_base not in SageRings()
+    ):
         from sage_extensions.categories.algebras.sparse_free_algebras import (
             _sparse_symmetric_algebra_of,
         )
@@ -437,23 +524,37 @@ def _symmetric_algebra_of_free_module(generating):
 
 
 def _tensor_algebra_on(base_ring, algebra_generating_set, *, source_module=None):
+    from sage_extensions.categories.modules.framed.framed_free_modules import (
+        FramedFreeModules,
+    )
+
     base = _owned_ring(base_ring)
     engine_base = _engine_ring(base)
-    if (
+    infinite = (
         algebra_generating_set in Sets()
         and algebra_generating_set.is_finite() is not True
-    ) or engine_base not in SageRings():
+    )
+    labels = algebra_generating_set if infinite else _finite_labels(algebra_generating_set)
+    generating = base.free_module(labels) if source_module is None else source_module
+    assert generating.base_ring() is base, (
+        f"the tensor algebra on {labels} over {base} needs a generating module over that exact ring, "
+        f"but {generating} is over {generating.base_ring()}"
+    )
+    assert generating in FramedFreeModules(base), (
+        f"the tensor algebra on {labels} needs a free generating module, but {generating} is not free over {base}"
+    )
+    assert generating.module_generating_set() is labels, (
+        f"the tensor algebra's generating module {generating} must use the literal selected index set {labels}, "
+        f"not {generating.module_generating_set()}"
+    )
+    if infinite or labels not in EnumeratedSets() or engine_base not in SageRings():
         from sage_extensions.categories.algebras.sparse_free_algebras import (
             _sparse_tensor_algebra_of,
         )
 
-        return _sparse_tensor_algebra_of(
-            base.free_module(algebra_generating_set) if source_module is None else source_module
-        )
-    labels = _finite_labels(algebra_generating_set)
+        return _sparse_tensor_algebra_of(generating)
     names = _variable_names(labels)
     algebra = _SageFreeAlgebra(engine_base, len(labels), names=names)
-    generating = base.free_module(labels) if source_module is None else source_module
     return _native_free_algebra(algebra, generating, "tensor")
 
 
@@ -665,10 +766,18 @@ class _PresentedAlgebraParent(_OwnedAlgebraParent):
             labels,
             generator_values=selected_generator_values,
             categories=tuple(placement),
-            law_decisions=law_decisions,
-            algebra_framing_source=presentation_ring,
-            constructing_category=constructing_category,
-        )
+        law_decisions=law_decisions,
+        algebra_framing_source=presentation_ring,
+        constructing_category=constructing_category,
+        ring_placement=lambda: tuple(
+            category
+            for category in (
+                *((OwnedRings().Commutative(),) if commutative_backend else ()),
+                *((OwnedRings().Noetherian(),) if base in OwnedRings().Noetherian() and (commutative_backend or finite_free_degree is not None) else ()),
+                *((OwnedRings().Artinian(),) if base in OwnedRings().Artinian() and finite_free_degree is not None else ()),
+            )
+        ),
+    )
         _fix_selected_algebra_presentation(
             self,
             presentation_ring,
@@ -2266,10 +2375,9 @@ class FramedFreeAlgebraMorphism:
         return self._images
 
     def algebra_generator_morphism(self):
-        return SetMorphism(
-            Sets().Mor(self.domain().algebra_generating_set(), self.codomain()),
-            self._images.value,
-        )
+        return Sets().Mor(
+            self.domain().algebra_generating_set(), self.codomain()
+        )(self._images.value)
 
     def _tensor_terms(self, element):
         domain = self.domain()

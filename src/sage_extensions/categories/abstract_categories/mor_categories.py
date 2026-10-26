@@ -60,7 +60,7 @@ from sage.misc.classcall_metaclass import typecall
 from sage.misc.lazy_attribute import lazy_attribute
 from sage.structure.category_object import CategoryObject as SageCategoryObject
 from sage.structure.dynamic_class import DynamicMetaclass, dynamic_class
-from sage.structure.element import parent
+from sage.structure.element import Element, parent
 from sage.structure.parent import Parent
 
 from sage_extensions.categories.abstract_categories.mor_foundation import (
@@ -277,7 +277,7 @@ def _precomposable(second: Morphism, first) -> bool:
             return False
 
 
-class MorArrowIdentity(CategoricalArrow):
+class MorArrowIdentity(CategoricalArrow, Element):
     r"""The identity 2-arrow on one arrow object."""
 
     def _call_(self, value):
@@ -1436,7 +1436,7 @@ class RestrictedMorCategoryParent(FixedRestrictedMorCategory):
                 return Category.__contains__(self, candidate)
 
 
-class CategoricalIsomorphism(CategoricalArrow):
+class CategoricalIsomorphism(CategoricalArrow, CategoricalMor.ElementMethods):
     r"""An isomorphism represented by mutually inverse arrows.
 
     The defining datum is the forward arrow ``f: X -> Y``; the inverse
@@ -1454,7 +1454,7 @@ class CategoricalIsomorphism(CategoricalArrow):
         *,
         verify: bool = False,
     ) -> None:
-        CategoricalArrow.__init__(self, parent)
+        Morphism.__init__(self, parent)
         if forward.domain() is not self.domain() or forward.codomain() is not self.codomain():
             raise ValueError(
                 f"an isomorphism {self.domain()} -> {self.codomain()} needs a forward map "
@@ -1658,6 +1658,21 @@ class MorCategories(OwnedCategoryBase):
         from sage_extensions.categories.abstract_categories.cat import Cat
 
         return [Cat()]
+
+    def Mor(self, domain: Category, codomain: Category) -> Category:
+        r"""Return the represented functor category between fixed-Mor categories.
+
+        ``MorCategories`` is a full subcategory of ``Cat`` on represented Mor
+        categories. Its arrows are therefore the actual functors and natural
+        transformations of ``Cat``; constructing them through a raw generic
+        Mor-family ingress records the unrepresented endpoints and breaks the
+        identity-sensitive admission lookup. Normalize both endpoints through
+        the owner before entering that canonical family.
+        """
+        from sage_extensions.categories.abstract_categories.cat import Cat
+
+        cat = Cat()
+        return cat.functor_mor(cat.object(domain), cat.object(codomain))
 
     def an_object(self) -> Category:
         r"""The Mor of the witness of the category of sets to itself."""

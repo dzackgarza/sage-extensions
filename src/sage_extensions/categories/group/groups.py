@@ -759,10 +759,11 @@ def _engine_element_action(group, backend_element, point):
         case SageGaloisGroup():
             from sage_extensions.categories.rings.number_fields import (
                 _engine_number_field_isomorphism,
+                _number_field_from_engine,
             )
 
             source = engine.number_field()
-            field = _own_ring(source)
+            field = _number_field_from_engine(source)
             assert point in field, f"{group} acts on the field {field} by automorphisms, but {point} is not an element of {field}"
             # The automorphism on the owned field's own realization: the
             # Galois group's engine field is carried there generator to
@@ -7733,10 +7734,10 @@ class Subgroups(OwnedParameterizedCategory):
             match self:
                 case _ if self in GeneratedSubgroups(self.supergroup()):
                     generators = self.selected_subgroup_generators()
-                case _ if self in OwnedFiniteGroups():
-                    generators = tuple(self)
                 case _ if self.has_selected_group_resolution():
                     generators = self.group_generators()
+                case _ if self in OwnedFiniteGroups():
+                    generators = tuple(self)
                 case _ if index_bound is not None and hasattr(self, "finite_index_schreier_generators"):
                     generators = self.finite_index_schreier_generators(index_bound=index_bound, generators=ambient_generators)
                 case _:

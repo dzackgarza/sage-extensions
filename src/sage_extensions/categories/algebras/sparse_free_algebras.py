@@ -4,7 +4,6 @@ from math import prod
 from typing import Any
 
 from sage.categories.map import Map
-from sage.categories.morphism import SetMorphism
 from sage.misc.cachefunc import cached_function, cached_method
 from sage.structure.element import parent as element_parent
 
@@ -297,10 +296,9 @@ class SparseFreeAlgebraMorphism:
         return self._generator_images
 
     def algebra_generator_morphism(self):
-        return SetMorphism(
-            OwnedSets().Mor(self.domain().algebra_generating_set(), self.codomain()),
-            self._generator_images.value,
-        )
+        return OwnedSets().Mor(
+            self.domain().algebra_generating_set(), self.codomain()
+        )(self._generator_images.value)
 
     def _component_map(self, key):
         cached = self._component_maps.get(key)

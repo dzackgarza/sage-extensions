@@ -2,7 +2,6 @@ r"""Invertible sheaves represented by rank-one affine module descent data."""
 
 from sage.misc.cachefunc import cached_function, cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
-from sage.categories.morphism import Morphism
 from sage.structure.richcmp import op_EQ, op_NE
 
 from sage_extensions.categories.abstract_categories.mor_categories import (
@@ -28,7 +27,6 @@ from sage_extensions.logic import conjunction, negation
 from sage_extensions.categories.schemes.ringed_spaces import (
     InvertibleSheavesWithChosenTrivialization,
     QuasiCoherentSheafMor,
-    QuasiCoherentSheafMorphismMethods,
     QuasiCoherentSheaves,
     _is_empty_open,
 )
@@ -1971,14 +1969,6 @@ class _ChosenTrivializationQuasiCoherentMorphismMethods:
         )
 
 
-class _ChosenTrivializationQuasiCoherentMorphism(
-    _ChosenTrivializationQuasiCoherentMorphismMethods,
-    QuasiCoherentSheafMorphismMethods,
-    Morphism,
-):
-    r"""Compatibility shell for private chosen-trivialization QCoh arrows."""
-
-
 class _ChosenTrivializationQuasiCoherentMor(QuasiCoherentSheafMor):
     r"""The QCoh Mor of line bundles carrying one represented trivializing cover."""
 
@@ -2129,14 +2119,6 @@ class _PullbackLineBundleQuasiCoherentMorphismMethods:
             other.domain(),
             self.codomain(),
         )(self.ambient_morphism() * other.ambient_morphism())
-
-
-class _PullbackLineBundleQuasiCoherentMorphism(
-    _PullbackLineBundleQuasiCoherentMorphismMethods,
-    QuasiCoherentSheafMorphismMethods,
-    Morphism,
-):
-    r"""Compatibility shell for private pulled-back line-bundle QCoh arrows."""
 
 
 class _PullbackLineBundleQuasiCoherentMor(QuasiCoherentSheafMor):

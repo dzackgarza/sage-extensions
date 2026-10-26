@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from itertools import combinations, permutations
 
 from sage.categories.category import Category
-from sage.categories.morphism import Morphism, SetMorphism
+from sage.categories.morphism import Morphism
 from sage.misc.cachefunc import cached_method
 from sage.structure.element import parent as element_parent
 from sage.structure.richcmp import op_EQ, op_NE
@@ -181,477 +181,132 @@ def _finite_chart_family(charts):
     return family
 
 
-class _GluedChartPointMorphism(SchemeMorphism):
-    r"""Point evaluation shared by a chart embedding and its open inclusion."""
-
-    def _call_(self, point):
-        from sage_extensions.categories.rings.commutative_algebra import PrimeSpectra
-
-        if element_parent(point) in PrimeSpectra():
-            if element_parent(point) is not self.domain().underlying_space():
-                raise ValueError(f"{point} is not a prime point of the chart {self.domain()}")
-            return self.codomain()._glued_chart_point_map(self.chart_index())(point)
-        return super()._call_(point)
-
-
-class _GluedSchemeOpenInclusion(_GluedChartPointMorphism):
-    r"""The chosen inclusion of one chart image into the glued scheme."""
-
-    def __init__(self, parent, gluing_datum, chart_index) -> None:
-        super().__init__(None, mor=parent)
-        self._gluing_datum = gluing_datum
-        self._chart_index = gluing_datum.normalize_chart_index(chart_index)
-
-    def gluing_datum(self):
-        return self._gluing_datum
-
-    def chart_index(self):
-        return self._chart_index
-
-    def _in_mor(self, mor):
-        return _GluedSchemeOpenInclusion(mor, self.gluing_datum(), self.chart_index())
-
-    def is_open_immersion(self) -> bool:
-        return True
-
-    def __mul__(self, other):
-        datum = self.gluing_datum()
-        chart = datum.chart_isomorphism(self.chart_index())
-        return datum.chart_embedding(self.chart_index()) * (chart.inverse() * other)
-
-    def _postcompose_with(self, after):
-        chart = self.gluing_datum().chart_isomorphism(self.chart_index())
-        return after.local_map(self.chart_index()) * chart.inverse().forward()
-
-    def __eq__(self, other) -> bool:
-        return (
-            isinstance(other, _GluedSchemeOpenInclusion)
-            and other.gluing_datum() is self.gluing_datum()
-            and other.chart_index() == self.chart_index()
-        )
-
-    def __ne__(self, other) -> bool:
-        return not self == other
-
-    def __hash__(self) -> int:
-        position = self.gluing_datum().chart_index_set().ranking_map()(self.chart_index())
-        return hash((id(self.gluing_datum()), int(position), "open-image"))
-
-    def _repr_(self):
-        return f"Open inclusion {self.domain()} -> {self.codomain()}"
-
-
-class _GluedSchemeChartEmbedding(_GluedChartPointMorphism):
-    r"""One canonical chart map into a represented two-chart glued scheme."""
-
-    def __init__(
-        self,
+def _glued_scheme_open_inclusion(parent, gluing_datum, chart_index):
+    r"""Construct the chart-image inclusion as an element of its generated scheme Mor."""
+    return parent.element_class(
         parent,
-        gluing_datum,
-        chart_index,
-        open_image,
-        chart_isomorphism,
-    ) -> None:
-        super().__init__(None, mor=parent)
-        self._gluing_datum = gluing_datum
-        self._chart_index = gluing_datum.normalize_chart_index(chart_index)
-        self._open_image = open_image
-        self._chart_isomorphism = chart_isomorphism
+        None,
+        mor=parent,
+        gluing_datum=gluing_datum,
+        gluing_chart_index=gluing_datum.normalize_chart_index(chart_index),
+        gluing_role="open_inclusion",
+    )
 
-    def gluing_datum(self):
-        return self._gluing_datum
 
-    def chart_index(self):
-        return self._chart_index
+def _glued_scheme_chart_embedding(parent, gluing_datum, chart_index):
+    r"""Construct the selected chart embedding in the generated scheme Mor."""
+    return parent.element_class(
+        parent,
+        None,
+        mor=parent,
+        gluing_datum=gluing_datum,
+        gluing_chart_index=gluing_datum.normalize_chart_index(chart_index),
+        gluing_role="chart_embedding",
+    )
 
-    def open_image(self):
-        return self._open_image
 
-    def chart_isomorphism(self):
-        return self._chart_isomorphism
-
-    def open_inclusion(self):
-        return self.open_image().inclusion()
-
-    def _in_mor(self, mor):
-        return _GluedSchemeChartEmbedding(
-            mor, self.gluing_datum(), self.chart_index(),
-            self.open_image(), self.chart_isomorphism(),
+def _glued_scheme_chart_map(parent, chart_embedding, chart_map):
+    r"""Construct a map through one selected affine chart as an element of its scheme Mor."""
+    datum = chart_embedding.gluing_datum()
+    index = datum.normalize_chart_index(chart_embedding.chart_index())
+    if chart_embedding is not datum.chart_embedding(index):
+        raise TypeError(
+            f"cannot build a morphism through the chart embedding {chart_embedding}: it is not the "
+            f"embedding of chart {index} chosen when the scheme was glued"
         )
-
-    def is_open_immersion(self) -> bool:
-        r"""True: ``e_i`` is the chart isomorphism onto its open image followed by that image's inclusion."""
-        return True
-
-    def __mul__(self, other):
-        if other.codomain() is not self.domain():
-            return NotImplemented
-        chart_map = other
-        return _GluedSchemeChartMap(
-            _scheme_composition_mor(self, other),
-            self.gluing_datum().chart_embedding(self.chart_index()),
-            chart_map,
+    if chart_map.codomain() is not chart_embedding.domain():
+        raise ValueError(
+            f"cannot build a morphism through the chart embedding {chart_embedding}: the map "
+            f"{chart_map} must land in the chart {chart_embedding.domain()}, but it lands in "
+            f"{chart_map.codomain()}"
         )
-
-    def _postcompose_with(self, after):
-        r"""``after o e_i`` is the local map of ``after`` on chart ``i``."""
-        if after.domain() is not self.codomain():
-            return NotImplemented
-        return after.local_map(self.chart_index())
-
-    def __eq__(self, other) -> bool:
-        if isinstance(other, _GluedSchemeChartMap):
-            return (
-                other.codomain() is self.codomain()
-                and other.gluing_datum() is self.gluing_datum()
-                and other.chart_index() == self.chart_index()
-                and other.chart_map()
-                == self.domain().categorical_identity_morphism()
-            )
-        return (
-            isinstance(other, _GluedSchemeChartEmbedding)
-            and other.gluing_datum() is self.gluing_datum()
-            and other.chart_index() == self.chart_index()
+    if chart_map.domain() is not parent.domain() or chart_embedding.codomain() is not parent.codomain():
+        raise ValueError(
+            f"cannot make the composite of {chart_map} and {chart_embedding} a morphism "
+            f"{parent.domain()} -> {parent.codomain()}: it is a morphism {chart_map.domain()} -> "
+            f"{chart_embedding.codomain()}"
         )
-
-    def __ne__(self, other) -> bool:
-        return not self == other
-
-    def __hash__(self) -> int:
-        position = self.gluing_datum().chart_index_set().ranking_map()(self.chart_index())
-        return hash((id(self.gluing_datum()), int(position)))
-
-    def _repr_(self):
-        return (
-            f"Open chart embedding {self.domain()} -> {self.codomain()} "
-            f"(chart {self.chart_index()})"
-        )
+    return parent.element_class(
+        parent,
+        None,
+        mor=parent,
+        gluing_datum=datum,
+        gluing_chart_index=index,
+        gluing_role="chart_map",
+        gluing_chart_map=chart_map,
+    )
 
 
-class _GluedSchemeChartMap(SchemeMorphism):
-    r"""A map into a glued scheme factoring through one selected affine chart."""
-
-    def __init__(self, parent, chart_embedding, chart_map) -> None:
-        super().__init__(None, mor=parent)
-        if chart_embedding is not chart_embedding.gluing_datum().chart_embedding(chart_embedding.chart_index()):
-            raise TypeError(
-                f"cannot build a morphism through the chart embedding {chart_embedding}: it is not the "
-                f"embedding of chart {chart_embedding.chart_index()} chosen when the scheme was glued"
-            )
-        if chart_map.codomain() is not chart_embedding.domain():
-            raise ValueError(
-                f"cannot build a morphism through the chart embedding {chart_embedding}: the map "
-                f"{chart_map} must land in the chart {chart_embedding.domain()}, but it lands in "
-                f"{chart_map.codomain()}"
-            )
-        if chart_map.domain() is not self.domain() or chart_embedding.codomain() is not self.codomain():
-            raise ValueError(
-                f"cannot make the composite of {chart_map} and {chart_embedding} a morphism "
-                f"{self.domain()} -> {self.codomain()}: it is a morphism {chart_map.domain()} -> "
-                f"{chart_embedding.codomain()}"
-            )
-        self._chart_embedding = chart_embedding
-        self._chart_map = chart_map
-
-    def chart_embedding(self):
-        return self._chart_embedding
-
-    def chart_index(self):
-        return self.chart_embedding().chart_index()
-
-    def chart_map(self):
-        return self._chart_map
-
-    def gluing_datum(self):
-        return self.chart_embedding().gluing_datum()
-
-    def _in_mor(self, mor):
-        chart_map = mor.mor_category().Mor(self.domain(), self.chart_embedding().domain())(self.chart_map())
-        return _GluedSchemeChartMap(mor, self.chart_embedding(), chart_map)
-
-    def __mul__(self, other):
-        composite = self.chart_map() * other
-        if composite is NotImplemented:
-            return NotImplemented
-        return _GluedSchemeChartMap(
-            _scheme_composition_mor(self, other), self.chart_embedding(), composite,
-        )
-
-    def _postcompose_with(self, after):
-        r"""``after o e_i o g`` is the local map of ``after`` on chart ``i`` after ``g``."""
-        if after.domain() is not self.codomain():
-            return NotImplemented
-        return after.local_map(self.chart_index()) * self.chart_map()
-
-    def __eq__(self, other) -> bool:
-        if isinstance(other, _GluedSchemeChartEmbedding):
-            return (
-                other.codomain() is self.codomain()
-                and other.gluing_datum() is self.gluing_datum()
-                and other.chart_index() == self.chart_index()
-                and self.chart_map()
-                == other.domain().categorical_identity_morphism()
-            )
-        if not isinstance(other, _GluedSchemeChartMap) or other.codomain() is not self.codomain():
-            return False
-        if self.chart_index() == other.chart_index():
-            return self.chart_map() == other.chart_map()
-        datum = self.gluing_datum()
-        if other.gluing_datum() is not datum:
-            return False
-        left_overlap = datum.overlap(self.chart_index(), other.chart_index())
-        right_overlap = datum.overlap(other.chart_index(), self.chart_index())
-        if not _lands_in_distinguished_open(self.chart_map(), left_overlap):
-            return False
-        if not _lands_in_distinguished_open(other.chart_map(), right_overlap):
-            return False
-        left = left_overlap.corestriction(self.chart_map())
-        right = right_overlap.corestriction(other.chart_map())
-        transition = datum.transition_between(
-            self.chart_index(), other.chart_index()
-        ).forward()
-        return transition * left == right
-
-    def __ne__(self, other) -> bool:
-        return not self == other
-
-    __hash__ = None
-
-
-class _GluedSchemeMorphism(SchemeMorphism):
-    r"""A morphism out of a glued scheme, represented by compatible chart maps."""
-
-    def __init__(self, parent, local_maps, *, verify_compatibility=True, cone_construction=None) -> None:
-        super().__init__(None, mor=parent, cone_construction=cone_construction)
-        datum = self.parent().gluing_datum()
-        raw_local_maps = _family_on_finite_ordered_set(
-            datum.chart_index_set(),
-            local_maps,
-            name="Raw local maps of a glued-scheme morphism",
-            noun="a glued-scheme morphism",
-        )
-        schemes = self.parent().mor_category()
-        self._local_maps = finite_indexed_family(
-            datum.chart_index_set(),
-            lambda index: schemes.Mor(datum.chart(index), self.codomain())(
-                raw_local_maps[index]
-            ),
-            name="Local maps of a glued-scheme morphism",
-        )
-        if verify_compatibility:
-            self._verify_overlap_compatibility()
-
-    def with_cone_construction(self, construction):
-        r"""Retain the inducing cone without discarding the compatible chart maps."""
-        return _GluedSchemeMorphism(
-            self.parent(), self.local_maps(), cone_construction=construction,
-        )
-
-    def local_maps(self):
-        return self._local_maps
-
-    def local_map(self, index):
-        return self.local_maps()[
-            self.parent().gluing_datum().normalize_chart_index(index)
-        ]
-
-    def _verify_overlap_compatibility(self) -> None:
-        datum = self.parent().gluing_datum()
+def _glued_scheme_morphism(parent, local_maps, *, verify_compatibility=True, cone_construction=None):
+    r"""Construct a map out of a glued scheme as an element of its generated Mor."""
+    datum = parent.domain().gluing_datum()
+    raw = _family_on_finite_ordered_set(
+        datum.chart_index_set(), local_maps,
+        name="Raw local maps of a glued-scheme morphism",
+        noun="a glued-scheme morphism",
+    )
+    schemes = parent.mor_category()
+    local_maps = finite_indexed_family(
+        datum.chart_index_set(),
+        lambda index: schemes.Mor(datum.chart(index), parent.codomain())(raw[index]),
+        name="Local maps of a glued-scheme morphism",
+    )
+    if verify_compatibility:
         for left_index, right_index in combinations(tuple(datum.chart_indices()), 2):
             left_overlap = datum.overlap(left_index, right_index)
             right_overlap = datum.overlap(right_index, left_index)
             transition = datum.transition_between(left_index, right_index).forward()
-            left_restriction = self.local_map(left_index) * left_overlap.inclusion()
-            right_restriction = (
-                self.local_map(right_index)
-                * right_overlap.inclusion()
-                * transition
-            )
-            if left_restriction != right_restriction:
+            left = local_maps[left_index] * left_overlap.inclusion()
+            right = local_maps[right_index] * right_overlap.inclusion() * transition
+            if left != right:
                 raise ValueError(
-                    f"the local morphisms of a morphism {self.domain()} -> {self.codomain()} do not glue: on "
+                    f"the local morphisms of a morphism {parent.domain()} -> {parent.codomain()} do not glue: on "
                     f"the overlap of charts {left_index} and {right_index} they disagree after the chart change"
                 )
-
-    def _postcompose_with(self, after):
-        if after.domain() is not self.codomain():
-            return NotImplemented
-        return _scheme_composition_mor(after, self)(
-            tuple(after * local_map for local_map in self.local_maps())
-        )
-
-    def __mul__(self, other):
-        r"""``self o other``, asked of ``other``, which knows how it reaches the glued scheme.
-
-        A morphism into the glued scheme through chart ``i`` composes with the
-        local map on chart ``i``; a morphism out of another glued scheme
-        composes chart by chart.  Both are its ``_postcompose_with``.
-        """
-        if other.codomain() is not self.domain():
-            return NotImplemented
-        if self._is_the_identity():
-            return other
-        if other._is_the_identity():
-            return self
-        return other._postcompose_with(self)
-
-    def __eq__(self, other) -> bool:
-        return (
-            isinstance(other, _GluedSchemeMorphism)
-            and other.domain() is self.domain()
-            and other.codomain() is self.codomain()
-            and all(
-                self.local_map(index) == other.local_map(index)
-                for index in self.parent().gluing_datum().chart_indices()
-            )
-        )
-
-    def __ne__(self, other) -> bool:
-        return not self == other
-
-    __hash__ = None
-
-    def _repr_(self):
-        return f"Scheme morphism from glued charts: {self.domain()} -> {self.codomain()}"
-
-
-class _FiniteAtlasSchemeMorphism(SchemeMorphism):
-    r"""A morphism glued from compatible maps on a selected finite affine atlas.
-
-    Unlike :class:`_GluedSchemeMorphism`, the domain need not itself use the
-    gluing realization privately.  This is the descent statement for maps out
-    of any represented scheme carrying a finite affine atlas, such as a
-    projective or multiprojective scheme with its standard atlas.
-    """
-
-    def __init__(self, parent, atlas, local_maps) -> None:
-        super().__init__(None, mor=parent)
-        match atlas.scheme() is self.domain():
-            case True:
-                pass
-            case False:
-                raise ValueError(
-                    f"cannot build a morphism out of {self.domain()} from local maps on {atlas}: the atlas must "
-                    f"cover {self.domain()}, but it covers {atlas.scheme()}"
-                )
-        self._atlas = atlas
-        raw = _family_on_finite_ordered_set(
-            atlas.chart_index_set(),
-            local_maps,
-            name="Raw local maps of a finite-atlas scheme morphism",
-            noun="a finite-atlas scheme morphism",
-        )
-        schemes = self.parent().mor_category()
-        self._local_maps = finite_indexed_family(
-            atlas.chart_index_set(),
-            lambda index: schemes.Mor(atlas.chart(index), self.codomain())(
-                raw[index]
-            ),
-            name="Local maps of a finite-atlas scheme morphism",
-        )
-        self._verify_overlap_compatibility()
-
-    def atlas(self):
-        return self._atlas
-
-    def local_maps(self):
-        return self._local_maps
-
-    def local_map(self, index):
-        return self.local_maps()[self.atlas().normalize_chart_index(index)]
-
-    def _verify_overlap_compatibility(self) -> None:
-        atlas = self.atlas()
-        for left_index, right_index in atlas.transition_index_set():
-            left_overlap = atlas.overlap(left_index, right_index)
-            right_overlap = atlas.overlap(right_index, left_index)
-            transition = atlas.transition_between(left_index, right_index).forward()
-            left = self.local_map(left_index) * left_overlap.inclusion()
-            right = self.local_map(right_index) * right_overlap.inclusion() * transition
-            match left == right:
-                case True:
-                    pass
-                case False:
-                    raise ValueError(
-                        f"the local morphisms of a morphism {self.domain()} -> {self.codomain()} do not glue: on "
-                        f"the overlap of charts {left_index} and {right_index} they disagree after the chart change"
-                    )
-
-    def _postcompose_with(self, after):
-        match after.domain() is self.codomain():
-            case True:
-                pass
-            case False:
-                return NotImplemented
-        return _FiniteAtlasSchemeMorphism(
-            _scheme_composition_mor(after, self),
-            self.atlas(),
-            self.local_maps().map(lambda local_map: after * local_map),
-        )
-
-    def __mul__(self, other):
-        match other:
-            case SchemeMorphismMethods():
-                pass
-            case _:
-                return NotImplemented
-        match (
-            other.codomain() is self.domain(),
-            self._is_the_identity(),
-            other._is_the_identity(),
-        ):
-            case (False, _, _):
-                return NotImplemented
-            case (True, True, _):
-                return other
-            case (True, False, True):
-                return self
-            case _:
-                pass
-        return other._postcompose_with(self)
-
-    def __eq__(self, other) -> bool:
-        match other:
-            case _ if self is other:
-                return True
-            case SchemeMorphismMethods() if (
-                other.domain() is self.domain()
-                and other.codomain() is self.codomain()
-            ):
-                pass
-            case _:
-                return False
-        match other:
-            case _FiniteAtlasSchemeMorphism() if other.atlas() is self.atlas():
-                return all(
-                    self.local_map(index) == other.local_map(index)
-                    for index in self.atlas().chart_indices()
-                )
-            case _ if other._is_the_identity():
-                return all(
-                    self.local_map(index) == self.atlas().chart_embedding(index)
-                    for index in self.atlas().chart_indices()
-                )
-            case _:
-                pass
-        return all(
-            self.local_map(index)
-            == other * self.atlas().chart_embedding(index)
-            for index in self.atlas().chart_indices()
-        )
-
-    def __ne__(self, other) -> bool:
-        return not self == other
-
-    __hash__ = None
+    return parent.element_class(
+        parent, None, mor=parent,
+        cone_construction=cone_construction,
+        gluing_datum=datum,
+        gluing_role="glued_domain",
+        glued_local_maps=local_maps,
+    )
 
 
 def _finite_atlas_scheme_morphism(domain, codomain, atlas, local_maps):
     r"""Construct a scheme morphism by descent from compatible atlas maps."""
-    return _FiniteAtlasSchemeMorphism(
-        Schemes(domain.scheme_base_ring()).Mor(domain, codomain),
-        atlas,
+    parent = Schemes(domain.scheme_base_ring()).Mor(domain, codomain)
+    if atlas.scheme() is not domain:
+        raise ValueError(
+            f"cannot build a morphism out of {domain} from local maps on {atlas}: the atlas must "
+            f"cover {domain}, but it covers {atlas.scheme()}"
+        )
+    raw = _family_on_finite_ordered_set(
+        atlas.chart_index_set(),
         local_maps,
+        name="Raw local maps of a finite-atlas scheme morphism",
+        noun="a finite-atlas scheme morphism",
+    )
+    local_maps = finite_indexed_family(
+        atlas.chart_index_set(),
+        lambda index: parent.mor_category().Mor(atlas.chart(index), codomain)(raw[index]),
+        name="Local maps of a finite-atlas scheme morphism",
+    )
+    for left_index, right_index in atlas.transition_index_set():
+        left_overlap = atlas.overlap(left_index, right_index)
+        right_overlap = atlas.overlap(right_index, left_index)
+        transition = atlas.transition_between(left_index, right_index).forward()
+        left = local_maps[left_index] * left_overlap.inclusion()
+        right = local_maps[right_index] * right_overlap.inclusion() * transition
+        if left != right:
+            raise ValueError(
+                f"the local morphisms of a morphism {domain} -> {codomain} do not glue: on "
+                f"the overlap of charts {left_index} and {right_index} they disagree after the chart change"
+            )
+    return parent.element_class(
+        parent, None, mor=parent,
+        gluing_role="finite_atlas",
+        finite_atlas=atlas,
+        atlas_local_maps=local_maps,
     )
 
 
@@ -671,7 +326,7 @@ class _GluedSchemeMorCategory(SchemeMorCategory):
         return self._gluing_datum
 
     def _element_constructor_(self, datum):
-        if isinstance(datum, _GluedSchemeMorphism):
+        if isinstance(datum, SchemeMorphismMethods) and datum._gluing_role == "glued_domain":
             if datum.domain() is not self.domain() or datum.codomain() is not self.codomain():
                 raise ValueError(
                     f"cannot make {datum} a morphism {self.domain()} -> {self.codomain()}: it is a morphism "
@@ -681,7 +336,7 @@ class _GluedSchemeMorCategory(SchemeMorCategory):
                 return datum
             raise TypeError(f"{datum} belongs to another Mor; apply the functor between the categories")
         if isinstance(datum, (tuple, list, IndexedFamily, Mapping)):
-            return _GluedSchemeMorphism(self, datum)
+            return _glued_scheme_morphism(self, datum)
         return super()._element_constructor_(datum)
 
     @object_level
@@ -692,7 +347,7 @@ class _GluedSchemeMorCategory(SchemeMorCategory):
                 f"{self} has no identity: its domain {self.domain()} is not its codomain {self.codomain()}"
             )
         datum = self.gluing_datum()
-        return _GluedSchemeMorphism(
+        return _glued_scheme_morphism(
             self,
             tuple(
                 datum.chart_embedding(index)
@@ -770,7 +425,7 @@ def _glued_chart_image(datum, index):
         datum.base_ring(),
         (OpenImmersions(scheme),),
         inclusion_codomain=scheme,
-        inclusion_datum=lambda mor: _GluedSchemeOpenInclusion(mor, datum, index),
+        inclusion_datum=lambda mor: _glued_scheme_open_inclusion(mor, datum, index),
     )
 
 
@@ -790,12 +445,8 @@ def _glued_chart_isomorphism(datum, index):
 def _glued_chart_embedding(datum, index):
     r"""``e_i : U_i -> X``, the chart isomorphism onto its open image followed by that image's inclusion."""
     chart = datum.chart(index)
-    return _GluedSchemeChartEmbedding(
-        Schemes(datum.base_ring()).Mor(chart, datum.scheme()),
-        datum,
-        index,
-        datum.chart_image(index),
-        datum.chart_isomorphism(index),
+    return _glued_scheme_chart_embedding(
+        Schemes(datum.base_ring()).Mor(chart, datum.scheme()), datum, index,
     )
 
 
@@ -4594,8 +4245,8 @@ class _FiniteAtlasAlgebraGluingDatumEngine:
         )
 
 
-class FiniteAtlasAlgebraGluingMorphism(Morphism):
-    r"""A morphism of finite-atlas algebra descent data."""
+class FiniteAtlasAlgebraGluingMorphismMethods(CategoricalMor.ElementMethods):
+    r"""Methods for a generated morphism of finite-atlas algebra descent data."""
 
     def __init__(self, parent, local_maps) -> None:
         Morphism.__init__(self, parent)
@@ -4721,7 +4372,7 @@ class FiniteAtlasAlgebraGluingMorphism(Morphism):
 class FiniteAtlasAlgebraGluingMor(CategoricalMor):
     r"""Compatible local algebra maps between two descent data on one finite atlas."""
 
-    Element = FiniteAtlasAlgebraGluingMorphism
+    ElementMethods = FiniteAtlasAlgebraGluingMorphismMethods
 
     def __init__(self, family, domain, codomain) -> None:
         if domain.gluing_datum() is not codomain.gluing_datum():
@@ -4733,15 +4384,15 @@ class FiniteAtlasAlgebraGluingMor(CategoricalMor):
         super().__init__(family, domain, codomain)
 
     def _element_constructor_(self, local_maps, *, check=False):
-        match local_maps:
-            case FiniteAtlasAlgebraGluingMorphism() if local_maps.parent() is self:
+        if (
+            isinstance(local_maps, CategoricalMor.ElementMethods)
+            and local_maps.parent().base_category() is self.base_category()
+        ):
+            if local_maps.parent() is self:
                 if check:
                     local_maps.validate_overlap_compatibility()
                 return local_maps
-            case FiniteAtlasAlgebraGluingMorphism():
-                raise TypeError(f"{local_maps} belongs to another Mor; apply the functor between the categories")
-            case _:
-                pass
+            raise TypeError(f"{local_maps} belongs to another Mor; apply the functor between the categories")
         morphism = self.element_class(self, local_maps)
         if check:
             morphism.validate_overlap_compatibility()
@@ -5713,8 +5364,8 @@ class _FiniteAtlasModuleCechPresheaf(_ModuleGluingCechPresheaf):
         return f"Finite-atlas Čech presheaf of {self.gluing_datum()}"
 
 
-class ModuleGluingMorphism(Morphism):
-    r"""A morphism between module descent data on one represented affine cover."""
+class ModuleGluingMorphismMethods(CategoricalMor.ElementMethods):
+    r"""Methods for a generated morphism between module descent data on one affine cover."""
 
     def __init__(self, parent, local_maps) -> None:
         super().__init__(parent)
@@ -5844,7 +5495,7 @@ class ModuleGluingMorphism(Morphism):
 class ModuleGluingMor(CategoricalMor):
     r"""The fixed Mor category between two module descent data on one cover."""
 
-    Element = ModuleGluingMorphism
+    ElementMethods = ModuleGluingMorphismMethods
 
     def __init__(self, family, domain, codomain) -> None:
         if domain.cover() is not codomain.cover():
@@ -5856,7 +5507,10 @@ class ModuleGluingMor(CategoricalMor):
         super().__init__(family, domain, codomain)
 
     def _element_constructor_(self, local_maps):
-        if isinstance(local_maps, ModuleGluingMorphism):
+        if (
+            isinstance(local_maps, CategoricalMor.ElementMethods)
+            and local_maps.parent().base_category() is self.base_category()
+        ):
             if local_maps.domain() is not self.domain() or local_maps.codomain() is not self.codomain():
                 raise ValueError(
                     f"cannot make {local_maps} a morphism {self.domain()} -> {self.codomain()}: it is a "
@@ -6579,11 +6233,8 @@ class _AlgebraGluingCechPresheaf(Functor):
         mor = _algebra_mor(source, target)
         if source_label == target_label:
             return mor.identity()
-        return mor(
-            SetMorphism(
-                Sets().Mor(source, target),
-                lambda element: self._restriction_value(source_label, target_label, element),
-            )
+        return mor._from_constructed_element_map(
+            lambda element: self._restriction_value(source_label, target_label, element)
         )
 
     def _repr_(self):
@@ -6670,7 +6321,7 @@ class AlgebraGluingMorphism(CategoricalMor.ElementMethods):
                 )
             )
 
-        return _algebra_mor(source, target)(SetMorphism(Sets().Mor(source, target), image))
+        return _algebra_mor(source, target)._from_constructed_element_map(image)
 
     def relative_spectrum_morphism(self):
         r"""Return the contravariant morphism of relative spectra induced by this algebra map."""
@@ -6696,7 +6347,7 @@ class AlgebraGluingMorphism(CategoricalMor.ElementMethods):
 
 
 class AlgebraGluingMor(CategoricalMor):
-    Element = AlgebraGluingMorphism
+    ElementMethods = AlgebraGluingMorphism
 
     def __init__(self, family, domain, codomain) -> None:
         if domain.cover() is not codomain.cover():
@@ -6982,56 +6633,55 @@ class _FiniteAtlasInverseImageModuleSheafEngine:
         return self.refinement().inverse_image_scalar_extension_functor()(self)
 
 
-class _FiniteAtlasInverseImageModuleMorphism(Morphism):
-    r"""Inverse image of one finite-atlas module-sheaf morphism."""
-
-    def __init__(self, parent, source_morphism) -> None:
-        Morphism.__init__(self, parent)
-        if source_morphism.domain() is not self.domain().source_sheaf():
-            raise ValueError(
-                f"cannot pull {source_morphism} back to a morphism {self.domain()} -> {self.codomain()}: "
-                f"it must start at {self.domain().source_sheaf()}, but it starts at "
-                f"{source_morphism.domain()}"
-            )
-        if source_morphism.codomain() is not self.codomain().source_sheaf():
-            raise ValueError(
-                f"cannot pull {source_morphism} back to a morphism {self.domain()} -> {self.codomain()}: "
-                f"it must end at {self.codomain().source_sheaf()}, but it ends at "
-                f"{source_morphism.codomain()}"
-            )
-        self._source_morphism = source_morphism
-
-    def source_morphism(self):
-        return self._source_morphism
-
-    def local_map(self, fine_index):
-        return self.source_morphism().local_map(
-            self.domain().coarse_index(fine_index)
-        )
-
-    def __mul__(self, other):
-        match other:
-            case _FiniteAtlasInverseImageModuleMorphism() if other.codomain() is self.domain():
-                return self.domain().category().Mor(other.domain(), self.codomain())(
-                    self.source_morphism() * other.source_morphism()
-                )
-            case _:
-                return NotImplemented
-
-
 class _FiniteAtlasInverseImageModuleMor(CategoricalMor):
     r"""Mor in ``Mod(f^{-1}O_Y)`` for one represented finite-atlas refinement."""
 
-    Element = _FiniteAtlasInverseImageModuleMorphism
+    class ElementMethods(CategoricalMor.ElementMethods):
+        r"""A generated arrow carrying the source sheaf morphism it pulls back."""
+
+        def __init__(self, parent, source_morphism) -> None:
+            super().__init__(parent)
+            if source_morphism.domain() is not self.domain().source_sheaf():
+                raise ValueError(
+                    f"cannot pull {source_morphism} back to a morphism {self.domain()} -> {self.codomain()}: "
+                    f"it must start at {self.domain().source_sheaf()}, but it starts at "
+                    f"{source_morphism.domain()}"
+                )
+            if source_morphism.codomain() is not self.codomain().source_sheaf():
+                raise ValueError(
+                    f"cannot pull {source_morphism} back to a morphism {self.domain()} -> {self.codomain()}: "
+                    f"it must end at {self.codomain().source_sheaf()}, but it ends at "
+                    f"{source_morphism.codomain()}"
+                )
+            self._source_morphism = source_morphism
+
+        def source_morphism(self):
+            return self._source_morphism
+
+        def local_map(self, fine_index):
+            return self.source_morphism().local_map(
+                self.domain().coarse_index(fine_index)
+            )
+
+        def __mul__(self, other):
+            if (
+                isinstance(other, CategoricalMor.ElementMethods)
+                and other.parent().base_category() is self.parent().base_category()
+                and other.codomain() is self.domain()
+            ):
+                return self.domain().category().Mor(other.domain(), self.codomain())(
+                    self.source_morphism() * other.source_morphism()
+                )
+            return NotImplemented
 
     def _element_constructor_(self, source_morphism):
-        match source_morphism:
-            case _FiniteAtlasInverseImageModuleMorphism() if source_morphism.parent() is self:
+        if (
+            isinstance(source_morphism, CategoricalMor.ElementMethods)
+            and source_morphism.parent().base_category() is self.base_category()
+        ):
+            if source_morphism.parent() is self:
                 return source_morphism
-            case _FiniteAtlasInverseImageModuleMorphism():
-                raise TypeError(f"{source_morphism} belongs to another Mor; apply the functor between the categories")
-            case _:
-                pass
+            raise TypeError(f"{source_morphism} belongs to another Mor; apply the functor between the categories")
         source_mor = self.base_category().source_category().Mor(
             self.domain().source_sheaf(),
             self.codomain().source_sheaf(),
@@ -7515,9 +7165,9 @@ def _glued_fiber_product_factorization(product, datum, labels, charts, left_cone
     source = left_cone_map.domain()
     product_datum = product.gluing_datum()
     match left_cone_map:
-        case _GluedSchemeChartMap():
+        case SchemeMorphismMethods() if left_cone_map._gluing_role == "chart_map":
             chart_map = left_cone_map.chart_map()
-        case _GluedSchemeChartEmbedding():
+        case SchemeMorphismMethods() if left_cone_map._gluing_role == "chart_embedding":
             chart_map = source.categorical_identity_morphism()
         case _:
             chart_map = None
@@ -7955,7 +7605,6 @@ __all__ = [
     "AlgebraGluingMor",
     "AlgebraGluingMorphism",
     "FiniteAtlasAlgebraGluingData",
-    "FiniteAtlasAlgebraGluingMorphism",
     "FiniteAtlasAlgebraTransition",
     "FiniteAffineAtlases",
     "FiniteAtlasInvertibleSheafRefinement",
@@ -7966,7 +7615,6 @@ __all__ = [
     "FiniteAtlasModuleTransition",
     "ModuleGluingData",
     "ModuleGluingMor",
-    "ModuleGluingMorphism",
     "SemilinearAlgebraMorphism",
     "SemilinearModuleMorphism",
 ]

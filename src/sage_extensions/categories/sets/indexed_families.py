@@ -133,7 +133,18 @@ class IndexedFamily[IndexT, ValueT]:
             # restricted to the matching Python hash bucket.
             candidates = (*self._cached_hashable_values, *self._unhashable_value_cache)
         for known, value in candidates:
-            equal = True if normalized is known else normalized == known
+            if normalized is known:
+                equal = True
+            else:
+                try:
+                    equal = normalized == known
+                except (TypeError, ValueError):
+                    # Some mathematical parents signal an undecided equality
+                    # by raising when their comparison cannot be decided.
+                    # That is not proof of inequality and must not abort value
+                    # selection; retain this presentation as a separate cache
+                    # entry below.
+                    continue
             if equal is True:
                 return value
             # Undecidable equality is not a reason to reuse a previous

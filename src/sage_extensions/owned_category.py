@@ -61,8 +61,8 @@ from __future__ import annotations
 
 import copyreg
 import hashlib
-from _abc import _abc_init
 from abc import ABCMeta
+from _abc import _abc_init
 from collections import Counter
 from collections.abc import Hashable
 from dataclasses import dataclass
@@ -165,10 +165,7 @@ class _OwnedOrderMetaclass(type):
         others = [base for base in cls.__bases__ if base not in own]
         glued = {
             provider
-            for ancestor in (
-                cls,
-                *(entry for base in cls.__bases__ for entry in base.__mro__),
-            )
+            for ancestor in (cls, *(entry for base in cls.__bases__ for entry in base.__mro__))
             for provider in _owned_providers(ancestor)
         }
 
@@ -191,9 +188,7 @@ class _OwnedOrderMetaclass(type):
         order = []
         for index, entry in enumerate(levels):
             order.append(entry)
-            order.extend(
-                provider for provider, owner in last_owner.items() if owner == index
-            )
+            order.extend(provider for provider, owner in last_owner.items() if owner == index)
         return order
 
 
@@ -203,9 +198,7 @@ class _OwnedOrderMetaclass(type):
 # only a common subclass lets Python resolve that class.  ``ABCMeta`` comes
 # first in the crossed one so its ``__new__`` runs ahead of the Cython
 # metaclasses and records the abstract methods.
-class _OwnedDynamicMetaclass(
-    _OwnedOrderMetaclass, DynamicInheritComparisonClasscallMetaclass
-):
+class _OwnedDynamicMetaclass(_OwnedOrderMetaclass, DynamicInheritComparisonClasscallMetaclass):
     pass
 
 
@@ -252,9 +245,7 @@ def _abc_metaclass_for(bases: tuple[type, ...]) -> type:
             metaclass = _DynamicABCMetaclass
         case False:
             metaclass = _OwnedDynamicMetaclass
-    assert all(issubclass(metaclass, type(base)) for base in bases), (
-        f"no owned metaclass dominates the bases of {bases}"
-    )
+    assert all(issubclass(metaclass, type(base)) for base in bases), f"no owned metaclass dominates the bases of {bases}"
     return metaclass
 
 
@@ -340,16 +331,24 @@ def _category_graph_depth(category: Category, memo=None) -> int:
     identity = id(category)
     cached = memo.get(identity)
     if cached is not None:
+        if cached is Ellipsis:
+            raise RuntimeError(
+                f"cycle in declared category graph while ordering {category}"
+            )
         return cached
     supers = tuple(category._super_categories)
+    # Mark the active recursion path before visiting parents. Without this
+    # marker, a malformed/cyclic declared graph recurses until Python's limit
+    # instead of identifying the category edge responsible for the cycle.
+    memo[identity] = Ellipsis
     if not supers:
         memo[identity] = 0
         return 0
-    depth = 1 + max(
-        _category_graph_depth(super_category, memo) for super_category in supers
-    )
+    depth = 1 + max(_category_graph_depth(super_category, memo) for super_category in supers)
     memo[identity] = depth
     return depth
+
+
 
 
 def _category_parameter_signature(category: Category):
@@ -408,77 +407,60 @@ def _category_parameter_signature(category: Category):
         return signature
     return ()
 
-
 def _stable_signature_integer(signature) -> int:
     r"""Encode a structural category signature as a deterministic positive integer."""
     digest = hashlib.blake2b(repr(signature).encode("utf-8"), digest_size=16).digest()
     return int.from_bytes(digest, "big")
 
 
+def _category_provider_order_key(category: Category, memo=None):
+    r"""Order category providers without modifying Sage's native ``_cmp_key``.
+
+    The controlled C3 merge requires a strict provider order, with each strict
+    subcategory before its supercategories. Sage's first native CmpKey field is
+    semantic flag data inherited by bitwise OR, so this structural ordering is
+    deliberately kept separate. Graph depth gives the edge order; the structural
+    graph signature and Sage's original session counter distinguish incomparable
+    and parameterized providers without constructing their Mor-family classes.
+    """
+    if memo is None:
+        memo = {}
+    identity = id(category)
+    cached = memo.get(identity)
+    if cached is None:
+        cached = (
+            _category_graph_depth(category),
+            repr(_category_graph_signature(category)),
+            category._cmp_key[1],
+        )
+        memo[identity] = cached
+    return cached
+
+
 class _OwnedCategoryComparisonKey:
     r"""Deterministic ``_cmp_key`` for owned categories.
 
-    Sage's native comparison key is ``(flags, creation_counter)``.  The flags
-    carry semantic ordering conventions, but the counter makes sibling order a
-    function of which category a session happened to touch first.  Owned
-    categories retain Sage's flags and replace only that counter by a structural
-    integer.  Graph depth occupies the high bits, so a strict owned subcategory
-    always compares below its owned supercategory; a digest of the category
-    graph resolves siblings reproducibly.
+    Sage's native ``CmpKey`` is a C-level pair ``(flags, counter)``. Its first
+    component is a C ``int`` assembled by OR-ing the *native flags of direct
+    supercategories*. It must never be replaced by an owned ordering key:
+    descendants inherit that first component as their own flags. The native
+    descriptor already supplies the correct pair; provider linearization uses
+    a separate controlled ordering below.
 
-    The structural integer does not separate two categories of one family whose
-    parameter is an object rather than a category: ``C/X`` and ``C/Y`` have the
-    same declaring class, the same supercategory ``C`` and the same base
-    category.  Sage's C3 merge (``C3_sorted_merge`` in
-    ``sage/misc/c3_controlled.pyx``) keys its tails by ``_cmp_key``, so two such
-    categories in one join -- an object of ``C/X`` and of ``C/Y`` at once --
-    need distinct keys.  Sage's session counter is kept as the last component;
-    it orders only categories whose structural keys agree.
-
-    This is a non-data descriptor.  Its first use writes the resulting tuple to
-    the category instance, exactly as Sage's Cython descriptor does, after which
-    normal instance lookup is the fast path.
+    This descriptor returns Sage's original native pair unchanged. Provider
+    order is computed separately by :func:`_category_provider_order_key`, where
+    the full parameter signature and native session counter distinguish
+    parameterized categories sharing the same implementation graph.
     """
-
-    _DEPTH_SHIFT = 160
-    _OWNED_FLOOR = 1 << 240
 
     def __get__(self, category: Category | None, owner=None):
         if category is None:
             return self
-        # Ask Sage's original descriptor for the flags and its session counter.
-        # It temporarily stores them on the instance; the assignment below
-        # immediately replaces that value with the owned structural key.
+        # Preserve Sage's native C-int flags and C-long session counter exactly.
+        # The category graph's provider order is controlled separately and must
+        # not be encoded into this inherited native flag field.
         native_descriptor = Category.__dict__["_cmp_key"]
-        flags, session_counter = native_descriptor.__get__(category, type(category))
-        # The comparison key is stored permanently on this category below.
-        # Retain the graph inputs at exactly that boundary: caching them before
-        # the key is fixed would freeze a category whose construction has not
-        # yet finished, while recomputing them afterward cannot change the key.
-        depth = _category_graph_depth(category)
-        graph_signature = _category_graph_signature(category)
-        category._owned_graph_depth = depth
-        category._owned_graph_signature = graph_signature
-        direct_graph = getattr(category, "_owned_direct_supercategories", None)
-        category._owned_graph_supercategories = (
-            tuple(category.super_categories())
-            if direct_graph is None
-            else direct_graph()
-        )
-        parameter_signature = _category_parameter_signature(category)
-        category._owned_parameter_signature = parameter_signature
-        signature = (
-            graph_signature,
-            parameter_signature,
-        )
-        structural = (
-            self._OWNED_FLOOR
-            + (depth << self._DEPTH_SHIFT)
-            + _stable_signature_integer(signature)
-        )
-        result = (flags, structural, session_counter)
-        category._cmp_key = result
-        return result
+        return native_descriptor.__get__(category, type(category))
 
 
 class CatConstructionsMixin:
@@ -514,9 +496,7 @@ class CatConstructionsMixin:
         picklable: bool = True,
     ) -> type:
         if name == "subcategory_class":
-            return self._subcategory_class_with_cat_constructions(
-                method_provider, cache=cache, picklable=picklable
-            )
+            return self._subcategory_class_with_cat_constructions(method_provider, cache=cache, picklable=picklable)
         return super()._make_named_class(  # type: ignore[misc]
             name, method_provider, cache=cache, picklable=picklable
         )
@@ -556,9 +536,7 @@ class CatConstructionsMixin:
             f"{category!r} is not a category, so it has no subcategory class"
         )
         cat_constructions = _cat_constructions()
-        provider, inherited = declared_implementation_types(
-            type(category), (method_provider,)
-        )
+        provider, inherited = declared_implementation_types(type(category), (method_provider,))
         assert not inherited, (
             f"the category {category} declares its subcategory methods ({method_provider}) "
             f"in more than one class: {inherited}; they must be declared once"
@@ -570,10 +548,7 @@ class CatConstructionsMixin:
                 cache=cache,
                 picklable=picklable,
             )
-        bases = tuple(
-            super_category.subcategory_class
-            for super_category in category._super_categories_for_classes
-        )
+        bases = tuple(super_category.subcategory_class for super_category in category._super_categories_for_classes)
         carried = any(cat_constructions in base.mro() for base in bases)
         if provider is not None and not any(provider in base.mro() for base in bases):
             bases = (provider,) + bases
@@ -655,15 +630,47 @@ def declared_implementation_types(
             inherited = ancestor.__dict__.get(provider_name)
             if inherited is None:
                 continue
-            assert isinstance(inherited, type), (
-                f"{ancestor.__name__}.{provider_name} must be a type"
-            )
+            assert isinstance(inherited, type), f"{ancestor.__name__}.{provider_name} must be a type"
             if any(issubclass(seen, inherited) for seen in declared):
                 continue
             declared.append(inherited)
     if not declared:
         return None, ()
     return declared[0], tuple(declared[1:])
+
+
+def _declared_category_linearization(category: Category) -> tuple[Category, ...]:
+    r"""Linearize the declared graph using Sage's controlled provider ordering.
+
+    ``C3_sorted_merge`` computes the provider order and, when plain C3 would
+    fail, the controlled order compatible with a total ordering of categories.
+    The returned suggestion is the direct-supercategory ordering Sage would
+    need to realize that linearization in a Python class MRO. We retain the
+    declared edges; only their provider order is controlled.
+    """
+    from sage.misc.c3_controlled import C3_sorted_merge
+
+    cache = {}
+    provider_order_cache = {}
+    provider_order_key = lambda node: _category_provider_order_key(node, provider_order_cache)
+
+    def linearize(node):
+        known = cache.get(id(node))
+        if known is not None:
+            return known
+        parents = tuple(
+            sorted(node.super_categories(), key=provider_order_key, reverse=True)
+        )
+        sequences = [list(linearize(parent)) for parent in parents]
+        sequences.append(list(parents))
+        merged, _suggestion = C3_sorted_merge(
+            sequences, key=provider_order_key
+        )
+        result = (node, *merged)
+        cache[id(node)] = result
+        return result
+
+    return linearize(category)
 
 
 def _owned_implementation_bases(
@@ -683,15 +690,20 @@ def _owned_implementation_bases(
     dynamic implementation classes.
     """
     bases: list[type] = []
-    for level in category._all_super_categories:
-        provider, inherited = declared_implementation_types(type(level), provider_names)
+    for level in _declared_category_linearization(category):
+        provider, inherited = declared_implementation_types(
+            type(level), provider_names
+        )
         candidates = (() if provider is None else (provider,)) + inherited
         for candidate in candidates:
             if any(
-                candidate is known or issubclass(known, candidate) for known in bases
+                candidate is known or issubclass(known, candidate)
+                for known in bases
             ):
                 continue
-            bases = [known for known in bases if not issubclass(candidate, known)]
+            bases = [
+                known for known in bases if not issubclass(candidate, known)
+            ]
             bases.append(candidate)
 
     # A stronger construction can consume one datum and derive a lower-level
@@ -713,7 +725,8 @@ def _owned_implementation_bases(
             parameter.name
             for parameter in parameters
             if parameter.name != "self"
-            and parameter.kind not in (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
+            and parameter.kind
+            not in (Parameter.VAR_POSITIONAL, Parameter.VAR_KEYWORD)
         )
 
     predecessors = {provider: set() for provider in bases}
@@ -727,7 +740,9 @@ def _owned_implementation_bases(
             provider for provider in bases if provider is not Objects.ParentMethods
         )
     for producer in bases:
-        derived = frozenset(getattr(producer, "_derived_construction_parameters", ()))
+        derived = frozenset(
+            getattr(producer, "_derived_construction_parameters", ())
+        )
         if not derived:
             continue
         for consumer in bases:
@@ -742,11 +757,10 @@ def _owned_implementation_bases(
         ready = tuple(
             provider
             for provider in bases
-            if provider in pending and not predecessors[provider].intersection(pending)
+            if provider in pending
+            and not predecessors[provider].intersection(pending)
         )
-        assert ready, (
-            "constructor-data dependencies among implementation providers are acyclic"
-        )
+        assert ready, "constructor-data dependencies among implementation providers are acyclic"
         selected = ready[0]
         ordered.append(selected)
         pending.remove(selected)
@@ -807,9 +821,7 @@ class OwnedCategoryMixin(CatConstructionsMixin):
         """
         super().__init_subclass__(**options)
         initializer = vars(cls).get("__init__")
-        if initializer is None or getattr(
-            initializer, "_retains_owned_category_call", False
-        ):
+        if initializer is None or getattr(initializer, "_retains_owned_category_call", False):
             return
 
         @wraps(initializer)
@@ -1021,9 +1033,7 @@ class OwnedCategoryMixin(CatConstructionsMixin):
                 # The parameter's category was refined while we built, so the
                 # key we would store is stale.  Sage's own override handles
                 # this the same way: discard and recompute.
-                return self._make_named_class(
-                    name, method_provider, cache=cache, picklable=picklable
-                )
+                return self._make_named_class(name, method_provider, cache=cache, picklable=picklable)
             category._make_named_class_cache[key] = result
         if name == "parent_class":
             result.ElementType = category.element_class
@@ -1050,9 +1060,7 @@ class OwnedJoinCategory(OwnedCategoryMixin, JoinCategory):
         r"""Decide an intersection of declared property categories by its branches."""
         branches = self._super_categories
         if all(
-            any(
-                "_certifying_predicate" in vars(level) for level in type(branch).__mro__
-            )
+            any("_certifying_predicate" in vars(level) for level in type(branch).__mro__)
             for branch in branches
         ):
             return all(value in branch for branch in branches)
@@ -1067,13 +1075,11 @@ class OwnedJoinCategory(OwnedCategoryMixin, JoinCategory):
         required properties were established.
         """
         constructors = tuple(
-            branch
-            for branch in self._super_categories
+            branch for branch in self._super_categories
             if type(branch)._call_ is not Category._call_
         )
         selected = tuple(
-            branch
-            for branch in constructors
+            branch for branch in constructors
             if not any(
                 other is not branch and other.is_subcategory(branch)
                 for other in constructors
@@ -1175,7 +1181,10 @@ def _owned_sort_uniq(categories) -> tuple[Category, ...]:
     )
     result = []
     for category in ordered:
-        if any(_declared_category_is_subcategory(known, category) for known in result):
+        if any(
+            _declared_category_is_subcategory(known, category)
+            for known in result
+        ):
             continue
         result.append(category)
     return tuple(result)
@@ -1212,7 +1221,8 @@ def _owned_join_as_tuple(categories) -> tuple[Category, ...]:
                 category._with_axiom_as_tuple(axiom)
             )
             if not any(
-                _declared_category_is_subcategory(known, new_category) for known in done
+                _declared_category_is_subcategory(known, new_category)
+                for known in done
             )
         )
         for known in tuple(done):
@@ -1279,9 +1289,7 @@ class ConstructionContract:
     hook_providers: tuple[type, ...]
 
     def named(self, name: str) -> tuple[ConstructionParameter, ...]:
-        return tuple(
-            parameter for parameter in self.parameters if parameter.name == name
-        )
+        return tuple(parameter for parameter in self.parameters if parameter.name == name)
 
     def derived_names(self) -> frozenset[str]:
         r"""Return lower-level constructor data supplied by a stronger provider.
@@ -1304,9 +1312,7 @@ class ConstructionContract:
         return required - self.derived_names()
 
     def optional_names(self) -> frozenset[str]:
-        return frozenset(
-            parameter.name for parameter in self.parameters if not parameter.required
-        )
+        return frozenset(parameter.name for parameter in self.parameters if not parameter.required)
 
     def is_open(self) -> bool:
         return bool(self.variadic_providers or self.opaque_providers)
@@ -1396,11 +1402,7 @@ def _construction_contract_from_type(
             if parameter.name == "category":
                 continue
             has_default = parameter.default is not Parameter.empty
-            annotation = (
-                None
-                if parameter.annotation is Parameter.empty
-                else parameter.annotation
-            )
+            annotation = None if parameter.annotation is Parameter.empty else parameter.annotation
             default = parameter.default if has_default else None
             parameters.append(
                 ConstructionParameter(
@@ -1454,9 +1456,7 @@ def _mor_construction_contract(
 
 
 @cached_function
-def _implementation_with_engine(
-    implementation: type, owner: type, engine: type
-) -> type:
+def _implementation_with_engine(implementation: type, owner: type, engine: type) -> type:
     r"""Insert a private engine immediately before its owner's implementation.
 
     This is the same native implementation-class mechanism as
@@ -1479,23 +1479,10 @@ def _implementation_with_engine(
         # such base, preserving the same semantic precedence as the ordinary
         # subclass path below: stronger providers first, engine computation,
         # then the owner's defaults and the weaker structure underneath it.
-        # The owner of a category that Sage builds (``Cat``) copies each
-        # method provider into its own class rather than inheriting it, and
-        # records the provider as ``_doccls`` (``dynamic_class_internal``,
-        # sage/structure/dynamic_class.py).  An owned join lists the provider
-        # class itself among its bases, so both name the owner's providers.
-        # The engine also precedes every base it specializes: a join may
-        # place the root ``Objects.ParentMethods``, which an engine of a
-        # Sage-built owner names as its base, before that owner's providers.
-        owner_mro = frozenset(owner.__mro__) | frozenset(
-            provider.__dict__["_doccls"][0]
-            for provider in owner.__mro__
-            if "_doccls" in provider.__dict__
-        )
         anchors = tuple(
             index
             for index, base in enumerate(implementation.__bases__)
-            if base in owner_mro or issubclass(engine, base)
+            if base in owner.__mro__
         )
         assert anchors, (
             f"cannot insert the computation class {engine.__name__} for objects of type "
@@ -1544,10 +1531,7 @@ def _implementation_with_engine(
         f"{implementation.__name__}[{engine.__name__}]",
         bases,
         {
-            "_reduction": (
-                _implementation_with_engine,
-                (implementation, owner, engine),
-            ),
+            "_reduction": (_implementation_with_engine, (implementation, owner, engine)),
             "_doccls": (engine,),
             "__doc__": engine.__doc__,
             "__module__": engine.__module__,
@@ -1558,29 +1542,13 @@ def _implementation_with_engine(
 
 
 @cached_function
-def _engine_object_type(
-    object_type,
-    owner_object_type,
-    object_engine,
-    element_type,
-    owner_element_type,
-    element_engine,
-):
+def _engine_object_type(object_type, owner_object_type, object_engine, element_type, owner_element_type, element_engine):
     r"""The native parent/element realization, without a second category node."""
-    realized = _implementation_with_engine(
-        object_type, owner_object_type, object_engine
-    )
+    realized = _implementation_with_engine(object_type, owner_object_type, object_engine)
     namespace = {
         "_reduction": (
             _engine_object_type,
-            (
-                object_type,
-                owner_object_type,
-                object_engine,
-                element_type,
-                owner_element_type,
-                element_engine,
-            ),
+            (object_type, owner_object_type, object_engine, element_type, owner_element_type, element_engine),
         ),
         "_doccls": (object_engine,),
         "__doc__": object_engine.__doc__,
@@ -1597,9 +1565,7 @@ def _engine_object_type(
             # type protocol already has the complete implementation.  Expose
             # it directly so Sage does not wrap it in a second dynamic class
             # carrying the same category element base.
-            elements = _implementation_with_engine(
-                element_type, owner_element_type, element_engine
-            )
+            elements = _implementation_with_engine(element_type, owner_element_type, element_engine)
             namespace["Element"] = elements
             namespace["ElementType"] = elements
             namespace["element_class"] = elements
@@ -1662,12 +1628,8 @@ def _object_of(
                 f"not a subcategory of {owner}"
             )
             implementation = _engine_object_type(
-                category.ObjectType,
-                owner.ObjectType,
-                object_engine,
-                category.ElementType,
-                owner.ElementType,
-                element_engine,
+                category.ObjectType, owner.ObjectType, object_engine,
+                category.ElementType, owner.ElementType, element_engine,
             )
     # The ambient category (ARC-07) is the placement category unless the
     # construction names the category of whose objects this is one, either
@@ -1689,7 +1651,7 @@ def _cat() -> Category:
     r"""``Cat()``, resolved late: the constructions it declares import this module."""
     from sage_extensions.categories.abstract_categories.cat import Cat
 
-    return Cat()
+    return Cat._construction_instance or Cat()
 
 
 def _cat_constructions() -> type:
@@ -1717,11 +1679,7 @@ class OwnedParent:
     """
 
     def __init__(
-        self,
-        category=None,
-        _defining_construction=None,
-        _constructing_category=None,
-        **rest,
+        self, category=None, _defining_construction=None, _constructing_category=None, **rest
     ) -> None:
         r"""Initialize the host shell without a second class rewrite.
 
@@ -1804,16 +1762,12 @@ class _BaseRingOfACategoryOverABase:
     one, and nothing is written on a Sage class.
     """
 
-    def __get__(
-        self, category: Category | None, owner: type | None = None
-    ) -> ConstantFunction | _BaseRingOfACategoryOverABase:
+    def __get__(self, category: Category | None, owner: type | None = None) -> ConstantFunction | _BaseRingOfACategoryOverABase:
         if category is None:
             return self
         base = category.base()
         if base is None:
-            raise AttributeError(
-                f"{type(category).__name__} is over no base, so it has no base ring"
-            )
+            raise AttributeError(f"{type(category).__name__} is over no base, so it has no base ring")
         return ConstantFunction(base)
 
 

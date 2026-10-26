@@ -700,8 +700,7 @@ class CochainMorphismMethods:
         )
 
 
-class CochainMorphism(CochainMorphismMethods, ModuleMorphism):
-    r"""Compatibility shell for private cochain-arrow realizations."""
+CochainMorphism = CochainMorphismMethods
 
 
 class CochainMor(CategoricalMor):

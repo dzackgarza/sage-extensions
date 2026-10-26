@@ -108,6 +108,9 @@ def _ade_parameter(letter, rank, variant, affine):
         # family and the ordinary unprimed parity rule.
         if _has(variant, "prime") and rank % 2 == 0:
             return rank // 2 + 1
+        # _call_ passes the validated low-level tuple: (short,long) is a
+        # left-short side pair, (long,short) is right-short, and
+        # (short,short) is the odd-rank both-short family.
         if _has(variant[:1], "short"):
             return (rank + 3) // 2
         if _has(variant[1:2], "short"):
@@ -131,9 +134,11 @@ def _affine_polygon_data(letter, rank, parameter):
 
 
 def _a_family_polygon_data(rank, variant, parameter):
+    # The polygon constructor receives the validated low-level side tuple,
+    # not the normalized public variant string.
     left_short = _has(variant[:1], "short")
     right_short = _has(variant[1:2], "short")
-    if _has(variant, "primed", "prime", "p"):
+    if _has(variant, "prime", "primed", "p"):
         # The two primed AT21 families have different indices: A'_{2n-1}
         # for odd-rank A pairs, and A'_{2n-3} for even-rank A^- pairs.
         # The latter's endpoint is one less than the pair rank; the former's
@@ -233,6 +238,13 @@ def _normalize_at21_variant(letter, rank, variant, affine):
             return "prime-odd"
         if letter == "A" and source_variant in ("'a^-", "'a⁻", "′a^-", "′a⁻"):
             return "prime-even"
+        if letter == "A" and rank == 0 and not affine and source_variant in ("^-a", "-a", "minus-a"):
+            # AT21 Table 1 includes the degenerate-rank endpoint A^-_0.
+            # At rank zero the one-short presentation has only its right
+            # short side, represented by the low-level ``(long, short)``
+            # tuple; the generic left-short alias would be rejected by the
+            # rank-zero admission rule below.
+            return "short"
         if letter == "A" and source_variant in ("^-a", "-a", "minus-a"):
             return "left-short"
         if letter == "A" and source_variant in ("a^-", "a⁻", "a-minus"):
@@ -332,25 +344,44 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
         r"""The base log pair of the ``A_1`` polygon."""
         return self("A", 1)
 
-    def _call_(self, dynkin_letter, dynkin_rank, variant=(), affine=False):
+    def _call_(
+        self,
+        dynkin_letter,
+        dynkin_rank,
+        variant=(),
+        affine=False,
+        *,
+        _source_variant=None,
+    ):
         r"""Construct the base log pair of one ADE type over this category's base."""
         letter = str(dynkin_letter).upper()
         assert letter in ("A", "D", "E"), (
             f"an ADE type has letter A, D or E, but the letter is {letter!r}"
         )
         rank = int(_engine_numeral(SageZZ, dynkin_rank))
-        source_variant = _normalize_at21_variant(letter, rank, variant, bool(affine))
+        source_variant = (
+            _normalize_at21_variant(letter, rank, variant, bool(affine))
+            if _source_variant is None
+            else _source_variant
+        )
         allow_a_zero = letter == "A" and rank == 0 and not affine and source_variant == "short"
         assert rank >= 1 or allow_a_zero, (
             f"an ADE type {letter}_n needs rank n >= 1, except for the pure A_0^- shape "
             f"(variant='short'); got rank {rank} and variant {source_variant!r}"
         )
-        variant = _validated_at21_low_level_variant(letter, rank, source_variant, bool(affine))
+        low_level_variant = _validated_at21_low_level_variant(
+            letter, rank, source_variant, bool(affine)
+        )
+        if _source_variant is not None:
+            assert tuple(variant) == low_level_variant, (
+                f"the supplied low-level ADE side tuple {variant!r} does not represent "
+                f"the retained source variant {source_variant!r}, whose tuple is {low_level_variant!r}"
+            )
 
         vertices, point, decorations = _ade_polygon_data(
             letter,
             rank,
-            variant,
+            low_level_variant,
             bool(affine),
         )
         polygon_lattice = _owned_integers().free_module(2)
@@ -364,7 +395,12 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
             construction_data={
                 "dynkin_letter": letter,
                 "dynkin_rank": rank,
-                "dynkin_variant": variant,
+                "source_variant": source_variant,
+                # Public normalized variant strings and polygon side tuples
+                # are different representations. Retain the latter here for
+                # side decorations; the AT21 wrapper separately retains the
+                # former as ``source_variant``.
+                "dynkin_variant": low_level_variant,
                 "is_affine_type": bool(affine),
                 "polygon": polygon,
                 "polygon_vertex_order": finite_family(
@@ -401,13 +437,24 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
             source_variant,
             affine,
         )
-        pair = self(letter, rank, variant=low_variant, affine=affine)
+        pair = self(
+            letter,
+            rank,
+            variant=low_variant,
+            affine=affine,
+            _source_variant=source_variant,
+        )
         surface = pair.log_scheme()
         branch_class = surface.polarizing_divisor()
         expected = _owned_integers()(2) * pair.complementary_divisor()
         # Lemma 3.4 is an identity of divisor classes: L and 2C' differ by the
         # divisor of a character, so they are compared in Cl(Y).
-        if surface.divisor_class(branch_class) != surface.divisor_class(expected):
+        actual_class = surface.divisor_class(branch_class)
+        expected_class = surface.divisor_class(expected)
+        classes_match = actual_class is expected_class or (
+            actual_class == expected_class
+        ) is True
+        if not classes_match:
             raise ArithmeticError(
                 f"the log pair {pair} of type {letter}_{rank} does not satisfy AT21 Lemma 3.4: "
                 f"the branch divisor L = -2(K_Y + C) = {branch_class} is not linearly equivalent "
@@ -437,6 +484,7 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
             self,
             dynkin_letter,
             dynkin_rank,
+            source_variant,
             dynkin_variant,
             is_affine_type,
             polygon,
@@ -447,6 +495,7 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
         ) -> None:
             self._dynkin_letter = dynkin_letter
             self._dynkin_rank = dynkin_rank
+            self._source_variant = source_variant
             self._dynkin_variant = dynkin_variant
             self._is_affine_type = is_affine_type
             self._polygon = polygon
@@ -470,6 +519,10 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
 
         def dynkin_rank(self):
             return _owned_integers()(self._dynkin_rank)
+
+        def source_variant(self) -> str:
+            r"""Return the normalized public variant spelling before side expansion."""
+            return self._source_variant
 
         def letter(self) -> str:
             r"""Return the ADE letter; archived synonym for :meth:`dynkin_letter`."""

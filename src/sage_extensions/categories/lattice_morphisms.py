@@ -12,7 +12,6 @@ from sage.matrix.constructor import matrix as engine_matrix
 from sage.misc.cachefunc import cached_function, cached_method
 from sage.misc.mrange import cantor_product as _engine_cantor_product
 from sage.quadratic_forms.binary_qf import BinaryQF
-from sage.quadratic_forms.quadratic_form import QuadraticForm
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import parent as element_parent
 
@@ -56,10 +55,6 @@ from sage_extensions.categories.abstract_categories.mor_foundation import (
 from sage_extensions.categories.modules.framed.formed.form_modules import (
     FormedModuleMorphism,
     _represented_value_module,
-)
-from sage_extensions.categories.modules.module_morphisms.module_morphisms import (
-    ModuleMorphism,
-    ModuleMorphismMethods,
 )
 from sage_extensions.categories.modules.pure.modules import Modules, ModulesOverIntegralDomains, _engine_matrix
 from sage_extensions.categories.rings.ring_foundation import (
@@ -404,7 +399,7 @@ class LatticeMorphismMethods:
         )
 
     def __mul__(self, other):
-        if not isinstance(other, LatticeMorphism):
+        if not isinstance(other, LatticeMorphismMethods):
             return super().__mul__(other)
         if other.codomain() is not self.domain():
             return NotImplemented
@@ -416,11 +411,7 @@ class LatticeMorphismMethods:
         return source.Mor(self.codomain())(lambda label: self(other(source.module_generator(label))))
 
 
-class LatticeMorphism(LatticeMorphismMethods, ModuleMorphism):
-    r"""Compatibility shell for private lattice-arrow realizations not yet graph-generated."""
-
-    def __init__(self, parent, images, *, elementwise=False) -> None:
-        ModuleMorphism.__init__(self, parent, images, elementwise=elementwise)
+LatticeMorphism = LatticeMorphismMethods
 
 
 class LatticeEmbeddingMethods:
@@ -904,8 +895,7 @@ def _subgroup_inclusion_into(subgroup, group):
     return inclusion
 
 
-class LatticeEmbedding(LatticeEmbeddingMethods, LatticeMorphism):
-    r"""Compatibility shell for private lattice-embedding realizations."""
+LatticeEmbedding = LatticeEmbeddingMethods
 
 
 class LatticeIsometryMethods:
@@ -1884,8 +1874,7 @@ def _hermitian_miranda_morrison_image(isometry, action):
     return orthogonal_group.subgroup_on(tuple(generators))
 
 
-class LatticeIsometry(LatticeIsometryMethods, LatticeEmbedding):
-    r"""Compatibility shell for private lattice-isometry realizations."""
+LatticeIsometry = LatticeIsometryMethods
 
 
 class LatticeMor(CategoricalMor):
@@ -3368,7 +3357,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         r"""Return Sage's private orthogonal-group engine when it is exact.
 
         The public group remains this Mor of live lattice isometries.  Sage's
-        ``GroupOfIsometries`` is used only to compute the finite group ``O(L)``
+        ``GroupOfIsometries`` retains the finite group ``O(L)`` computed by OSCAR
         of a definite lattice of finite rank over ``ZZ``
         (``orthogonalGroup_finite``); its matrices act on row vectors, hence
         are transposed when converted to this Mor's column-image convention.
@@ -3396,16 +3385,15 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             return MatrixGroup(tuple(engine_matrix(ring, [[solution]]) for solution in solutions if solution != ring.one()))
         self._assert_definite_over_integers("compute")
         from sage.modules.free_quadratic_module_integer_symmetric import IntegralLattice
+        from sage_extensions.categories.lattice_engines import _oscar_lattices
 
         gram = _engine_component_matrix(lattice.gram_tensor()).change_ring(SageZZ)
         signature = lattice.signature_pair()
         if signature.first() == lattice.base_ring().zero() and signature.second() != lattice.base_ring().zero():
             gram = -gram
-        engine = IntegralLattice(gram).orthogonal_group()
-        # PARI's ``qfauto`` (Plesken--Souvignier) returns |O(L)| with the
-        # generators; GAP would otherwise recompute the order of the matrix
-        # group by an orbit algorithm.  TRAPS.md records both wall times.
-        engine.gap().SetSize(SageZZ(QuadraticForm(SageZZ, 2 * gram).number_of_automorphisms()))
+        order, generators = _oscar_lattices.definite_isometry_group(lattice.gram_tensor())
+        engine = IntegralLattice(gram).orthogonal_group(gens=list(generators), is_finite=True)
+        engine.gap().SetSize(order)
         return engine
 
     def _from_engine(self, _engine_element):
@@ -4078,8 +4066,8 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
     def _witness_matrix(self):
         r"""The equivalence matrix the deciding search produces, or ``False`` when it finds none.
 
-        Private engine data, for a definite pair (Sage's exact equivalence
-        search, PARI ``qfisom``) or an indefinite binary pair (the cycle
+        Private engine data, for a definite pair (OSCAR's exact equivalence
+        search) or an indefinite binary pair (the cycle
         walk of :func:`_binary_indefinite_isometry_matrix`).  Its columns
         are the coordinates of the images of the domain generators.
         """
@@ -4087,10 +4075,10 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         signature = self.domain().signature_pair()
         positive, negative = signature.first(), signature.second()
         if positive == 0 or negative == 0:
-            sign = SageZZ.one() if negative == 0 else -SageZZ.one()
-            return QuadraticForm(SageZZ, 2 * sign * codomain_gram).is_globally_equivalent_to(
-                QuadraticForm(SageZZ, 2 * sign * domain_gram),
-                return_matrix=True,
+            from sage_extensions.categories.lattice_engines import _oscar_lattices
+
+            return _oscar_lattices.definite_isometry(
+                self.domain().gram_tensor(), self.codomain().gram_tensor()
             )
         assert int(self.domain().module_rank()) == 2, (
             f"an equivalence search between {self.domain()} and {self.codomain()} is run here only for a definite or a binary pair"

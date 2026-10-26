@@ -67,27 +67,26 @@ def _symmetric_algebra_of(module):
         relation_morphism(relation_morphism.domain().module_generator(label)) == relation_morphism.codomain().zero()
         for label in relation_labels
     ):
-        return _symmetric_algebra_on(base, labels, source_module=module)
+        # A zero relation morphism proves the presented module is free only
+        # when its parent carries the corresponding free-module structure.
+        # Otherwise retain the chosen module object as degree one through the
+        # sparse word quotient rather than falsely presenting it as a native
+        # polynomial algebra on a free module.
+        if module in FramedFreeModules(base):
+            return _symmetric_algebra_on(base, labels, source_module=module)
+        return _sparse_symmetric_algebra_of(module)
 
-    # Sage's univariate quotient constructor only accepts monic defining
-    # polynomials.  A one-variable symmetric algebra with a torsion relation
-    # such as ``2*x`` is instead represented by Sage's one-variable
-    # *multivariate* polynomial parent, whose ideal reduction is exact over ZZ.
-    if len(labels) == 1:
-        # A private presentation cover: this one-variable multivariate
-        # engine is not the engine of the polynomial ring on these labels.
-        from sage.all import PolynomialRing as _SagePolynomialRing
-
-        presentation_ring = _native_free_algebra(
-            _SagePolynomialRing(_engine_ring(base), 1, names=_variable_names(labels)),
-            module.framing_source(), "symmetric",
-        )
-    else:
-        presentation_ring = _symmetric_algebra_on(
-            base,
-            labels,
-            source_module=module.framing_source(),
-        )
+    # Keep the actual R[x] symmetric algebra as the owned presentation cover
+    # even when the relation is nonmonic (e.g. 2*x over ZZ). The finite-
+    # presentation constructor selects a one-variable multivariate engine as
+    # its private quotient backend and retains the cover map/lift there; making
+    # that backend the owned presentation ring would create a second R[x]
+    # object and lose the canonical polynomial-cover identity.
+    presentation_ring = _symmetric_algebra_on(
+        base,
+        labels,
+        source_module=module.framing_source(),
+    )
 
 
     engine = _engine_ring(presentation_ring)

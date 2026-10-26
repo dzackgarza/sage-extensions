@@ -8,12 +8,11 @@ from typing import TYPE_CHECKING, Any, overload
 from sage.categories.category import Category
 from sage.categories.map import Map
 from sage.categories.morphism import Morphism
-from sage.categories.objects import Objects as SageObjects
 from sage.misc.abstract_method import abstract_method
 from sage.misc.cachefunc import cached_method
 from sage.misc.classcall_metaclass import typecall
 from sage.structure.dynamic_class import DynamicMetaclass
-from sage.structure.element import Element, parent
+from sage.structure.element import parent
 from sage.structure.parent import Parent
 
 from sage_extensions.categories.abstract_categories.mor_categories import (
@@ -119,10 +118,21 @@ class Cat(CategoryPacketMethods, Category):
     """
 
     _MorCategory = FunctorMorCategoryConstruction
+    _construction_instance = None
 
     def __init__(self) -> None:
         self._arrows = {}
-        super().__init__()
+        if Cat._construction_instance is not None:
+            raise RuntimeError("Cat construction is re-entrant before its owned Objects root is initialized")
+        # Objects records Cat as its placement category. Publish this partially
+        # initialized instance only across the superclass construction, so
+        # Objects._init_cat_object can reuse it rather than recursively calling
+        # Cat() while Cat's supercategories are being assembled.
+        Cat._construction_instance = self
+        try:
+            super().__init__()
+        finally:
+            Cat._construction_instance = None
 
     def an_object(self) -> Category:
         r"""The category of sets, which every owned chain roots at."""
@@ -131,16 +141,9 @@ class Cat(CategoryPacketMethods, Category):
         return Sets()
 
     def super_categories(self):
-        # A category is an object.  This one edge names Sage's ``Objects`` and
-        # not the owned one: every owned category is an object of ``Cat``, so
-        # an owned supercategory here would have to be constructed while
-        # ``Cat`` itself is still under construction.  Measured 2026-10-07:
-        # declaring the owned ``Objects`` recurses at import, because Sage's
-        # ``Category.__init__`` builds ``subcategory_class`` from the
-        # supercategories, and ``Objects()`` records ``Cat()`` when it is
-        # built. Its objects are the actual categories, whose owned bases
-        # supply the operations of Cat.
-        return [SageObjects()]
+        from sage_extensions.categories.abstract_categories.objects import Objects
+
+        return [Objects()]
 
     def category(self) -> Cat:
         r"""``Cat`` is placed in itself."""
@@ -255,6 +258,100 @@ class Cat(CategoryPacketMethods, Category):
 
         def identity_functor(self):
             return Cat().identity(self)
+
+        def Diagram(self, index_category: Category) -> Category:
+            r"""Return the category of diagrams in ``self`` indexed by ``index_category``."""
+            return Cat().Mor(index_category, self)
+
+        def Product(self, factors) -> Category:
+            r"""Return the category of cones over the selected discrete product diagram."""
+            from sage_extensions.categories.abstract_categories.products import (
+                _ProductConeCategory,
+            )
+
+            return _ProductConeCategory(self.product_construction(factors).diagram())
+
+        def Coproduct(self, cofactors) -> Category:
+            r"""Return the category of cocones under the selected discrete coproduct diagram."""
+            from sage_extensions.categories.abstract_categories.products import (
+                _CoproductCoconeCategory,
+            )
+
+            return _CoproductCoconeCategory(self.coproduct_construction(cofactors).diagram())
+
+        def Biproduct(self, factors) -> Category:
+            r"""Return the owned category of the selected biproduct object."""
+            construction = getattr(self, "biproduct", None)
+            if construction is None:
+                raise TypeError(f"biproducts are not represented in {self}")
+            return construction(factors).category()
+
+        def TensorProduct(self, factors) -> Category:
+            r"""Return the owned category of the selected tensor-product object."""
+            construction = getattr(self, "tensor_product", None)
+            if construction is None:
+                raise TypeError(f"tensor products are not represented in {self}")
+            return construction(factors).category()
+
+        def DirectSum(self) -> Category:
+            r"""Return objects of ``self`` with a chosen direct-sum decomposition."""
+            from sage_extensions.categories.abstract_categories.direct_sum_objects import (
+                DirectSumObjects,
+            )
+
+            return DirectSumObjects(self)
+
+        def DirectedSystem(self, index_category: Category) -> Category:
+            r"""Return covariant diagrams in ``self`` on a directed index category."""
+            from sage_extensions.categories.abstract_categories.products import (
+                DirectedSystem,
+            )
+
+            return DirectedSystem(index_category, self)
+
+        def InverseSystem(self, index_category: Category) -> Category:
+            r"""Return inverse diagrams in ``self`` indexed by ``index_category``."""
+            from sage_extensions.categories.abstract_categories.products import (
+                InverseSystem,
+            )
+
+            return InverseSystem(index_category, self)
+
+        def Cone(self, diagram: Functor) -> Category:
+            r"""Return the category of cones over ``diagram`` in ``self``."""
+            from sage_extensions.categories.abstract_categories.products import (
+                _ConeCategory,
+            )
+
+            if diagram.codomain() is not self:
+                raise ValueError(f"the diagram {diagram} does not take values in {self}")
+            return _ConeCategory(diagram)
+
+        def Cocone(self, diagram: Functor) -> Category:
+            r"""Return the category of cocones under ``diagram`` in ``self``."""
+            from sage_extensions.categories.abstract_categories.products import (
+                _CoconeCategory,
+            )
+
+            if diagram.codomain() is not self:
+                raise ValueError(f"the diagram {diagram} does not take values in {self}")
+            return _CoconeCategory(diagram)
+
+        def Arrow(self) -> Category:
+            r"""Return the arrow category ``[1, self]`` through Cat's owned Mor construction."""
+            return self.ArrowCategory()
+
+        def IsoArrow(self) -> Category:
+            r"""Return the full subcategory of ``Arrow()`` on isomorphisms."""
+            return self.IsoArrowCategory()
+
+        def core(self):
+            r"""Return the core groupoid of this category."""
+            from sage_extensions.categories.abstract_categories.arrow_categories import (
+                _CoreCategory,
+            )
+
+            return _CoreCategory(self)
 
         def inclusion_into(self, supercategory: Category):
             r"""Return the canonical inclusion functor into a declared supercategory."""
@@ -911,6 +1008,11 @@ class Cat(CategoryPacketMethods, Category):
             )
 
             return SubobjectCategory(self, base_object)
+
+        def SubObject(self, base_object: Parent) -> Category:
+            r"""Return the subobject category under the legacy construction name."""
+            return self.SubobjectCategory(base_object)
+
         def SuperobjectCategory(self, base_object: Parent) -> Category:
             r"""Return the category of monic superobjects of ``base_object`` here."""
             from sage_extensions.categories.abstract_categories.arrow_categories import (
@@ -918,6 +1020,11 @@ class Cat(CategoryPacketMethods, Category):
             )
 
             return SuperobjectCategory(self, base_object)
+
+        def SuperObject(self, base_object: Parent) -> Category:
+            r"""Return the superobject category under the legacy construction name."""
+            return self.SuperobjectCategory(base_object)
+
         def CoveringObjectCategory(self, base_object: Parent) -> Category:
             r"""Return the category of epic objects covering ``base_object`` here."""
             from sage_extensions.categories.abstract_categories.arrow_categories import (
@@ -925,6 +1032,11 @@ class Cat(CategoryPacketMethods, Category):
             )
 
             return CoveringObjectCategory(self, base_object)
+
+        def CoveringObject(self, base_object: Parent) -> Category:
+            r"""Return the covering-object category under the legacy construction name."""
+            return self.CoveringObjectCategory(base_object)
+
         def CoveredObjectCategory(self, base_object: Parent) -> Category:
             r"""Return the category of epic quotients covered by ``base_object`` here."""
             from sage_extensions.categories.abstract_categories.arrow_categories import (
@@ -932,6 +1044,27 @@ class Cat(CategoryPacketMethods, Category):
             )
 
             return CoveredObjectCategory(self, base_object)
+
+        def CoveredObject(self, base_object: Parent) -> Category:
+            r"""Return the covered-object category under the legacy construction name."""
+            return self.CoveredObjectCategory(base_object)
+
+        def Kernel(self, morphism: Morphism) -> Category:
+            r"""Return the category of kernel subobjects of ``morphism``."""
+            from sage_extensions.categories.abstract_categories.arrow_categories import (
+                KernelCategory,
+            )
+
+            return KernelCategory(self, morphism)
+
+        def Cokernel(self, morphism: Morphism) -> Category:
+            r"""Return the category of cokernel quotients of ``morphism``."""
+            from sage_extensions.categories.abstract_categories.arrow_categories import (
+                CokernelCategory,
+            )
+
+            return CokernelCategory(self, morphism)
+
         def Subobjects(self, base_object: Parent) -> Category:
             return self.SubobjectCategory(base_object)
         def Superobjects(self, base_object: Parent) -> Category:
@@ -1067,7 +1200,7 @@ class Cat(CategoryPacketMethods, Category):
         return "Cat: categories with functors as morphisms"
 
 
-class NaturalTransformationMorphism(CategoricalArrow):
+class NaturalTransformationMorphism(CategoricalArrow, CategoricalMor.ElementMethods):
     r"""A natural transformation as a morphism in a functor category."""
 
     def __init__(
@@ -1075,7 +1208,7 @@ class NaturalTransformationMorphism(CategoricalArrow):
         parent: NaturalTransformationMor,
         transformation: NaturalTransformation,
     ) -> None:
-        CategoricalArrow.__init__(self, parent)
+        Morphism.__init__(self, parent)
         if transformation.source() is not parent.source():
             raise ValueError(
                 f"a morphism {self.domain()} -> {self.codomain()} in the functor category needs a natural "
@@ -1153,7 +1286,7 @@ class NaturalTransformationMorphism(CategoricalArrow):
 
 
 class NaturalTransformationMor(CategoricalMor):
-    Element = NaturalTransformationMorphism
+    ElementMethods = NaturalTransformationMorphism
 
     def __init__(
         self,
@@ -1191,7 +1324,7 @@ class NaturalTransformationMor(CategoricalMor):
                 transformation = NaturalTransformation(
                     self.source(), self.target(), transformation
                 )
-        selected = NaturalTransformationMorphism if element_class is None else element_class
+        selected = self.element_class if element_class is None else element_class
         return selected(self, transformation, **dict(construction_data or {}))
 
     @object_level

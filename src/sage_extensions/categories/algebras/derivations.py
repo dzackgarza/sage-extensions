@@ -12,7 +12,7 @@ from collections.abc import Mapping
 
 from sage.categories.map import Map
 from sage.categories.action import Action
-from sage.categories.morphism import Morphism, SetMorphism
+from sage.categories.morphism import Morphism
 from sage.misc.cachefunc import cached_function, cached_method
 from sage.misc.classcall_metaclass import typecall
 from sage.structure.element import ModuleElement, parent
@@ -310,11 +310,15 @@ class Derivation(ModuleElement):
 
     @cached_method
     def underlying_linear_morphism(self):
-        return DerivationUnderlyingLinearMorphism(
-            self.parent().arrow_set(),
-            self,
+        parent = self.parent().arrow_set()
+        morphism = parent.element_class(
+            parent,
             lambda element: self.restricted_codomain()(self._module_value(element)),
+            elementwise=True,
+            linearity_premises=(),
         )
+        morphism._originating_derivation = self
+        return morphism
 
     as_morphism = underlying_linear_morphism
 
@@ -379,32 +383,6 @@ class Derivation(ModuleElement):
             for label in self.parent().generator_labels()
         )
         return equal if op == op_EQ else negation(equal)
-
-
-class DerivationUnderlyingLinearMorphism(ModuleMorphism):
-    r"""The selected underlying linear morphism of one algebra derivation."""
-
-    def __init__(self, parent, derivation, function) -> None:
-        self._derivation = derivation
-        super().__init__(parent, function, elementwise=True)
-
-    def derivation(self):
-        return self._derivation
-
-    def _elementwise_linearity_derivation(self):
-        return True
-
-    def __rmul__(self, scalar):
-        return self.parent().algebra_multiple(scalar, self)
-
-    def _acted_upon_(self, actor, self_on_left):
-        try:
-            return self.parent().algebra_multiple(actor, self)
-        except (TypeError, ValueError):
-            return None
-
-    def _repr_(self):
-        return f"Derivation {self.domain()} -> {self.codomain()}"
 
 
 class _DerivationAlgebraAction(Action):
@@ -668,11 +646,10 @@ class DerivationSpace(RestrictedMorCategoryParent):
     def algebra_action(self):
 
         endomorphisms = Modules(self.algebra()).End(self)
-        return SetMorphism(
-            self.algebra().Mor(endomorphisms),
+        return self.algebra().Mor(endomorphisms)._from_constructed_element_map(
             lambda scalar: endomorphisms.elementwise(
                 lambda derivation: self.algebra_multiple(scalar, derivation)
-            ),
+            )
         )
 
     scalar_action = algebra_action
@@ -809,11 +786,15 @@ class GradedDerivation(ModuleElement):
 
     @cached_method
     def underlying_linear_morphism(self):
-        return GradedDerivationUnderlyingLinearMorphism(
-            self.parent().arrow_set(),
-            self,
+        parent = self.parent().arrow_set()
+        morphism = parent.element_class(
+            parent,
             lambda element: self(element),
+            elementwise=True,
+            linearity_premises=(),
         )
+        morphism._originating_derivation = self
+        return morphism
 
     as_morphism = underlying_linear_morphism
 
@@ -956,27 +937,6 @@ class _ConstructedGradedDerivation(GradedDerivation):
 
     def _graded_derivation_derivation(self):
         return True
-
-
-class GradedDerivationUnderlyingLinearMorphism(ModuleMorphism):
-    r"""The selected underlying linear morphism of one graded derivation."""
-
-    def __init__(self, parent, derivation, function) -> None:
-        self._derivation = derivation
-        super().__init__(
-            parent,
-            function,
-            elementwise=True,
-        )
-
-    def _elementwise_linearity_derivation(self):
-        return self.derivation().linearity_decision()
-
-    def derivation(self):
-        return self._derivation
-
-    def degree_shift(self):
-        return self.derivation().degree_shift()
 
 
 def _contraction_presentation(algebra, shift):

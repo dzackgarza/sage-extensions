@@ -581,7 +581,7 @@ class _IntegerTranslationOnZZ:
         return self._displacement
 
 
-class OwnedSetMorphism(SetMorphism):
+class OwnedSetMorphism:
     r"""A set map whose composition remains in the canonical owned Set Mor.
 
     Unverified construction specimens, including a subset inclusion and maps
@@ -610,7 +610,7 @@ class OwnedSetMorphism(SetMorphism):
         if composite_factors is not None:
             left, right = composite_factors
             function = lambda point, *args, **kwargs: left(right(point), *args, **kwargs)
-        SetMorphism.__init__(self, parent, function)
+        Morphism.__init__(self, parent)
         self._owned_function = function
 
     def _defining_function(self):
@@ -973,7 +973,7 @@ class SetMorCategory(CategoricalMor):
     discrete one -- so this is a category like every other `Mor`, and not a
     special set-valued case: `ARC-07` has `Mor` return a category at every
     level.  Sage's ``Mor``, reached through ``CategoricalMor``, remains
-    the runtime parent its ``SetMorphism`` elements require.
+    the runtime parent its generated ``Morphism`` elements require.
     """
 
     ElementMethods = OwnedSetMorphism

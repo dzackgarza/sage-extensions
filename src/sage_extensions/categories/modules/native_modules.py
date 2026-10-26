@@ -11,7 +11,6 @@ or second authoritative ring is involved.
 
 from sage.misc.cachefunc import cached_method
 
-from sage_extensions.categories.group.magmas import AdditiveGroups
 from sage_extensions.categories.modules.pure.modules import (
     Modules,
     _fix_selected_module_resolution,
@@ -97,6 +96,13 @@ def _power_module_basis(coefficient_ring, degree, power, coordinates):
         # zero, not a malformed basis expansion. Reject only a backend that
         # returns more coefficients than the selected remainder degree.
         values = tuple(coordinates(element))
+        # Some native quotient realizations retain explicit trailing zeros
+        # in their coefficient list. These do not contribute to the class
+        # and must be removed before checking the selected remainder degree;
+        # never truncate a nonzero high coefficient, which would change the
+        # represented element rather than normalize its coordinates.
+        while len(values) > int(degree) and values[-1] == 0:
+            values = values[:-1]
         assert len(values) <= int(degree), (
             f"the selected power-basis coordinates of {element} have length {len(values)}, "
             f"exceeding the quotient degree {degree}"
@@ -148,40 +154,6 @@ class _RingModulePresentation:
     def scalar_multiple(self, scalar, element):
         return self.module()(self._scalar_action(self.base_ring()(scalar), self.module()(element)))
 
-    @cached_method
-    def scalar_action_morphism(self, endomorphisms=None):
-        r"""The defining ``R -> End_Ab(U(M))`` map for this exact native action.
-
-        Construct the endomorphism parent from the supplied module's actual
-        underlying additive group. This is owned by the native presentation:
-        rebuilding the action from a generic module element can accidentally
-        use a module wrapper instead of the additive group on which it acts.
-        """
-        from sage_extensions.categories.rings.ring_foundation import OwnedRings
-
-        # This is called while Modules(R) is being constructed on a ring
-        # parent.  At that point the parent has its additive-group methods,
-        # but its Modules(R) methods have not yet been installed.  The native
-        # presentation's module is itself the underlying additive group, so
-        # use that exact object as End's argument rather than calling
-        # underlying_additive_group() before the module category exists.
-        module = self.module()
-        if endomorphisms is None:
-            endomorphisms = AdditiveGroups().AdditiveCommutative().End(module)
-        else:
-            assert (
-                endomorphisms.domain() is module
-                and endomorphisms.codomain() is module
-            ), (
-                f"the native scalar action of {module} can only be represented in "
-                f"End({module}), not {endomorphisms}"
-            )
-        return self.base_ring().Mor(endomorphisms, category=OwnedRings())(
-            lambda scalar: endomorphisms.elementwise(
-                lambda element: self.scalar_multiple(scalar, element)
-            )
-        )
-
     def is_regular(self):
         return self.module() is self.base_ring()
 
@@ -197,14 +169,6 @@ class _RingModulePresentation:
         )
         assert Modules.ParentMethods._native_module_presentation(module) is None, (
             f"{module} already has a scalar action by {self.base_ring()}; it cannot be given a second one"
-        )
-        # The ring constructor includes its abelian-group structure in the
-        # initial category before its regular module is built. Check that
-        # defining structure here; do not manufacture it by mutating the
-        # category during module construction.
-        assert module in AdditiveGroups().AdditiveCommutative(), (
-            f"{module} cannot be made an {self.base_ring()}-module: its ring addition must be commutative, "
-            f"but {module} is only known to be in {module.category()}"
         )
         Modules.ParentMethods._retain_native_module_presentation(module, self)
         if self.is_regular():
@@ -227,7 +191,7 @@ class _RingModulePresentation:
                 self.base_ring(),
                 labels,
                 self._basis.image,
-                source.framing_source,
+                lambda: source,
             )
             match self._basis.is_basis():
                 case True:
@@ -235,23 +199,23 @@ class _RingModulePresentation:
                     if labels.cardinality().is_finite():
                         placement = placement.FinitelyGenerated()
                     free_placement = placement
-        # Install the defining action only after the selected resolution is
-        # retained: constructing its Mor parent may run realization hooks that
-        # inspect module generators or coordinates. Conversely, do this before
-        # category refinement, so those hooks see both the resolution and the
-        # exact action on End_Ab(module).
-        self.scalar_action_morphism()
-        if free_placement is not None and module not in free_placement:
-            refine(module, free_placement)
-        # Installing the selected resolution above is part of construction,
-        # not a postcondition of module placement. Category realization hooks
-        # can ask for generators, coordinates, or the scalar-action morphism;
-        # refining first exposes a half-constructed module to those hooks.
+        # Register the selected resolution before exposing the module to any
+        # category realization hooks. The factory is lazy, so this retains the
+        # framing data without constructing its augmentation Mor. First place
+        # the module in Modules(R): its framing augmentation is an R-module Mor
+        # whose endpoint checks require this membership. Only then add the
+        # selected free-module refinement, whose hooks may request that Mor.
         match module in category:
             case True:
                 pass
             case False:
                 refine(module, category)
+        if free_placement is not None and module not in free_placement:
+            refine(module, free_placement)
+        # Do not materialize R -> End_Ab(U(module)) here: building that
+        # endomorphism ring can itself request module-Mor objects and recurse
+        # into construction. Modules.scalar_action() constructs its typed map
+        # lazily against the current canonical End parent.
         return module
 
     def module_basis(self):

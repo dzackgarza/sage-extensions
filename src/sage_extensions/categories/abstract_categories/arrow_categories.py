@@ -1444,8 +1444,8 @@ def _subobject_source(subobject):
     return inclusion.domain() if inclusion is subobject else subobject
 
 
-class SubobjectMorphism(Morphism):
-    r"""A factor map with its retained commuting triangle of subobjects.
+class SubobjectMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for a generated factor arrow with its commuting triangle of subobjects.
 
     Monic cancellation proves uniqueness only under the two actual triangle
     laws.  Undecided laws remain on their selected slice squares, rather than
@@ -1517,7 +1517,11 @@ class SubobjectMorphism(Morphism):
     def __eq__(self, other: Any):
         if self is other:
             return True
-        if parent(other) is not self.parent() or not isinstance(other, SubobjectMorphism):
+        if (
+            not isinstance(other, CategoricalMor.ElementMethods)
+            or other.parent().base_category() is not self.parent().base_category()
+            or parent(other) is not self.parent()
+        ):
             return False
         # A monomorphism cancels on the left: there is at most one factor
         # whose actual triangle commutes with the two chosen inclusions.
@@ -1537,20 +1541,24 @@ class SubobjectMorphism(Morphism):
         return hash(id(self.parent()))
 
     def __mul__(self, other):
-        if not isinstance(other, SubobjectMorphism) or not _precomposable(self, other):
+        if (
+            not isinstance(other, CategoricalMor.ElementMethods)
+            or other.parent().base_category() is not self.parent().base_category()
+            or not _precomposable(self, other)
+        ):
             return NotImplemented
         parent_mor = self.parent().subobject_category().Mor(
             other.domain(), self.codomain()
         )
         # If j f = i and k g = j, then k (g f) = i.
         square = self._slice_square * other._slice_square
-        return SubobjectMorphism(
+        return parent_mor.element_class(
             parent_mor, square.left(), _slice_square=square
         )
 
 
 class SubobjectMor(CategoricalMor):
-    Element = SubobjectMorphism
+    ElementMethods = SubobjectMorphism
 
     def __init__(
         self,
@@ -1592,12 +1600,12 @@ class SubobjectMor(CategoricalMor):
             is not None
         )
 
-    def canonical_morphism(self) -> SubobjectMorphism:
-        return SubobjectMorphism(self, self._canonical_factor(), verify=False)
+    def canonical_morphism(self):
+        return self.element_class(self, self._canonical_factor(), verify=False)
 
     def _element_constructor_(self, factor_morphism=None, *, check=False):
         match factor_morphism:
-            case SubobjectMorphism():
+            case CategoricalMor.ElementMethods() if factor_morphism.parent().base_category() is self.base_category():
                 if factor_morphism.parent() is self:
                     factor_morphism.validate_commutativity(check=check)
                     return factor_morphism
@@ -1606,16 +1614,16 @@ class SubobjectMor(CategoricalMor):
                 result = self.canonical_morphism()
                 result.validate_commutativity(check=check)
                 return result
-        return SubobjectMorphism(self, factor_morphism, verify=check)
+        return self.element_class(self, factor_morphism, verify=check)
 
     @object_level
-    def identity(self) -> SubobjectMorphism:
+    def identity(self):
         if self.domain() is not self.codomain():
             raise ValueError(
                 f"the identity morphism exists only on Mor(X, X), but this is Mor({self.domain()}, {self.codomain()})"
             )
         square = self._slice_mor().identity()
-        return SubobjectMorphism(self, square.left(), _slice_square=square)
+        return self.element_class(self, square.left(), _slice_square=square)
 
 
 class SubobjectMorCategoryConstruction(MorCategoryConstruction):
@@ -1998,6 +2006,48 @@ class CoveredObjectCategory(CosliceCategory):
         return f"Covered objects of {self.base_object()}"
 
 
+class KernelCategory(SubobjectCategory):
+    r"""The category of kernel objects as subobjects of a morphism's domain."""
+
+    @staticmethod
+    @cached_function(key=lambda cls, base_category, morphism: (cls, id(base_category), id(morphism)))
+    def __classcall__(cls, base_category: Category, morphism: Morphism):
+        match cls:
+            case DynamicMetaclass():
+                return cls.__base__(base_category, morphism)
+        return typecall(cls, base_category, morphism)
+
+    def __init__(self, base_category: Category, morphism: Morphism) -> None:
+        if morphism.domain() not in base_category or morphism.codomain() not in base_category:
+            raise TypeError(f"the kernel morphism {morphism} must be a morphism of {base_category}")
+        self._kernel_morphism = morphism
+        super().__init__(base_category, morphism.domain())
+
+    def super_categories(self):
+        return [SubobjectCategory(self.base_category(), self._kernel_morphism.domain())]
+
+
+class CokernelCategory(CoveredObjectCategory):
+    r"""The category of cokernel objects as quotients of a morphism's codomain."""
+
+    @staticmethod
+    @cached_function(key=lambda cls, base_category, morphism: (cls, id(base_category), id(morphism)))
+    def __classcall__(cls, base_category: Category, morphism: Morphism):
+        match cls:
+            case DynamicMetaclass():
+                return cls.__base__(base_category, morphism)
+        return typecall(cls, base_category, morphism)
+
+    def __init__(self, base_category: Category, morphism: Morphism) -> None:
+        if morphism.domain() not in base_category or morphism.codomain() not in base_category:
+            raise TypeError(f"the cokernel morphism {morphism} must be a morphism of {base_category}")
+        self._cokernel_morphism = morphism
+        super().__init__(base_category, morphism.codomain())
+
+    def super_categories(self):
+        return [CoveredObjectCategory(self.base_category(), self._cokernel_morphism.codomain())]
+
+
 class FixedWideMorCategory(FixedRestrictedMorCategory):
     r"""The selected arrows in one existing Mor of the underlying category.
 
@@ -2252,7 +2302,11 @@ class _WideSubcategory(OwnedCategoryBase):
 
 
 class CoreMor(CategoricalMor):
-    Element = CategoricalIsomorphism
+    # The isomorphism implementation is an arrow-method provider.  The
+    # concrete arrow class is generated from this Mor's declared category
+    # graph, so its instances are actual elements of the selected Mor rather
+    # than instances of a parallel handwritten host class.
+    ElementMethods = CategoricalIsomorphism
 
     def _cardinality_decision(self):
         r"""``|Iso_C(X, Y)|``, this realization of the ``Sets`` and ``OwnedGroups`` cardinality hook.
@@ -2395,7 +2449,11 @@ class CoreMor(CategoricalMor):
         if inverse is None:
             forward, inverse = forward
         self._require_base_morphisms(forward, inverse)
-        return self.element_class(self, forward, lambda: inverse)
+        # The inverse pair is the defining premise of this Mor construction.
+        # OWN-22 forbids re-proving it at construction; callers that derive an
+        # inverse use _from_known_inverse_pair, and explicit verification is a
+        # separate call to validate_inverse_pair(check=True).
+        return self.element_class(self, forward, lambda: inverse, verify=False)
 
     def _require_base_morphisms(self, forward: Morphism, inverse: Morphism) -> None:
         base = self.core_category().base_category()

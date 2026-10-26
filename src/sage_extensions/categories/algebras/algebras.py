@@ -70,7 +70,6 @@ from sage_extensions.categories.rings.ring_foundation import (
     _owned_ring,
     _OwnedRingElement,
     _OwnedRingParent,
-    _presented_ring_category,
 )
 from sage_extensions.categories.sets.finite_ordered_sets import (
     FiniteOrderedSets,
@@ -536,9 +535,15 @@ def _algebra_from_native_ring(
     selected_category = Cat().meet((Algebras(ring), category))
     match module in selected_category:
         case True:
-            return module
+            pass
         case False:
-            return refine(module, selected_category)
+            refine(module, selected_category)
+    # Keep the scalar action as defining constructor data, but do not eagerly
+    # realize R -> End_Ab(U(module)) here.  The End construction can itself
+    # demand module-Mor objects and recurse into this constructor.  The public
+    # scalar_action() owner realizes the map on demand against the final
+    # additive-group parent, preserving this exact pointwise action.
+    return module
 
 
 class AlgebraMorCategoryConstruction(MorCategoryConstruction):
@@ -3189,9 +3194,11 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
         def generating_module(self):
             r"""Return the exact module on which the selected free algebra is built."""
             generating = self.presentation_ring().generating_module()
-            assert (generating.module_generating_set() == self.algebra_generating_set()) is True, (
+            module_labels = generating.module_generating_set()
+            algebra_labels = self.algebra_generating_set()
+            assert module_labels is algebra_labels, (
                 f"the generators {generating.module_generating_set()} of the presentation algebra of {self} "
-                f"must equal its chosen algebra generators {self.algebra_generating_set()}"
+                f"must use the literal index set of its chosen algebra generators {self.algebra_generating_set()}"
             )
             return generating
 
@@ -3903,10 +3910,9 @@ class AlgebraMorphism:
             f"{self} has no images of algebra generators: its domain {self.domain()} has no chosen "
             "algebra generators"
         )
-        return SetMorphism(
-            Sets().Mor(self.domain().algebra_generating_set(), self.codomain()),
-            self._generator_images.value,
-        )
+        return Sets().Mor(
+            self.domain().algebra_generating_set(), self.codomain()
+        )(self._generator_images.value)
 
     def algebra_generator_images(self):
         assert self._generator_images is not None, (
@@ -4145,10 +4151,9 @@ class PresentedAlgebraMorphism:
         self.validate_presentation_relations(check=False)
 
     def algebra_generator_morphism(self):
-        return SetMorphism(
-            Sets().Mor(self.domain().algebra_generating_set(), self.codomain()),
-            self._generator_images.value,
-        )
+        return Sets().Mor(
+            self.domain().algebra_generating_set(), self.codomain()
+        )(self._generator_images.value)
 
     def algebra_generator_images(self):
         return self._generator_images
@@ -4399,6 +4404,8 @@ class _OwnedAlgebraParent(_OwnedRingParent):
         construction_data=(),
         law_decisions=(),
         algebra_framing_source=None,
+        algebra_generating_family=None,
+        algebra_framing_owner=None,
         constructing_category=None,
         ring_placement=None,
     ) -> None:
@@ -4421,18 +4428,32 @@ class _OwnedAlgebraParent(_OwnedRingParent):
         for name, value in construction_data:
             setattr(self, name, value)
         self._realized_scalar_structure = (lambda scalar: self(scalar)) if scalar_structure is None else scalar_structure
-        selected_labels = None if labels is None else finite_ordered_set(labels)
+        if labels is None:
+            selected_labels = None
+        else:
+            # Share the module owner's rank/cardinality/set normalization.
+            # In particular an owned set is retained literally, while a rank
+            # denotes the canonical ordinal rather than an ordered set built
+            # by iterating the integer.
+            from sage_extensions.categories.modules.framed.framed_free_modules import (
+                _module_generating_set,
+            )
+
+            selected_labels = _module_generating_set(labels)
         associative = Algebras(base).Associative().Unital()
         # A native algebra that is also a ring must retain the ring category
         # supplied by its constructor. Reading only its commutativity axiom
         # below loses inherited structure such as additive-group membership,
         # so the same object can fail the native ring-module prerequisite.
-        presented_ring = (
-            _presented_ring_category(engine)
-            if ring_placement is None
-            else owned_category_join((OwnedRings(), *ring_placement()))
+        if ring_placement is None:
+            raise TypeError(
+                f"{engine} has no selected ring-construction placement; "
+                "an algebra adapter must retain the placement supplied by its constructor"
+            )
+        presented_ring = owned_category_join((OwnedRings(), *ring_placement()))
+        framing_owner = (
+            associative if algebra_framing_owner is None else algebra_framing_owner
         )
-        framing_owner = associative
         # The algebra root constructs an additive-commutative group as part
         # of its underlying module.  A ring placement supplied by an engine
         # adapter need not materialize that inherited facet on the concrete
@@ -4446,10 +4467,31 @@ class _OwnedAlgebraParent(_OwnedRingParent):
             or any(category.is_subcategory(Magmas().Commutative()) for category in categories)
         ):
             case True:
-                framing_owner = associative.Commutative()
+                if algebra_framing_owner is None:
+                    framing_owner = associative.Commutative()
                 placement.append(framing_owner)
             case False:
                 pass
+        # Native free-algebra constructors already own the exact generator
+        # family and the category relative to which its resolution is stated.
+        # Retain those data instead of rebuilding a second family from backend
+        # positions or inferring the resolution owner from category inclusion.
+        if algebra_generating_family is not None:
+            assert selected_labels is not None, (
+                "a selected algebra generating family requires its index labels"
+            )
+            family_labels = algebra_generating_family.index_set()
+            assert family_labels is selected_labels, (
+                "the selected algebra generating family must be indexed by the "
+                "literal index-set object retained as the algebra framing"
+            )
+            if generator_values is None:
+                # Retain the family as a family until the common generator
+                # adapter sees it. Replacing it by its bound ``value`` method
+                # here bypasses the IndexedFamily branch below, preventing
+                # that owner from distinguishing matching labels from distinct
+                # index sets that require ordinal transport.
+                generator_values = algebra_generating_family
         placement.extend(categories)
         # Construction hooks run inside Parent.__init__. A native polynomial
         # or tensor algebra's selected generator resolution is installed only
@@ -4528,9 +4570,35 @@ class _OwnedAlgebraParent(_OwnedRingParent):
                         f"the algebra {engine} has {label_size} generators, but {generator_values.cardinality()} "
                         "generator values were given"
                     )
+                family_labels = generator_values.index_set()
+                # A family indexed by an equal-but-distinct set is not already
+                # indexed by the selected algebra framing. Treat it as a new
+                # presentation and use the explicit positional transport below.
+                same_labels = family_labels is selected_labels
+                if same_labels:
 
-                def value(label):
-                    return self(generator_values.value(selected_labels.ranking_map()(label)))
+                    def value(label):
+                        return self(generator_values.value(label))
+
+                else:
+                    # Equal cardinality does not identify two index sets.
+                    # When their labels differ, the constructors' selected
+                    # enumerations provide the only positional correspondence.
+                    # Keep the direct label path above so a finite index set
+                    # need not acquire an enumeration merely to use its own
+                    # already-matching generator family.
+                    enumerated = family_labels in EnumeratedSets()
+                    if enumerated is not True:
+                        raise TypeError(
+                            f"the generator family for {engine} is indexed by {family_labels}, "
+                            f"which differs from the selected algebra labels {selected_labels}; "
+                            "positional transport requires a proved selected enumeration of the supplied index set"
+                        )
+                    family_position = family_labels.ranking_map().inverse()
+
+                    def value(label):
+                        position = selected_labels.ranking_map()(label)
+                        return self(generator_values.value(family_position(position)))
             elif callable(generator_values):
 
                 def value(label):
@@ -4601,7 +4669,14 @@ class _OwnedAlgebraParent(_OwnedRingParent):
         # the algebra realization hooks this placement introduces.
         refine(self, Cat().meet(tuple(placement)))
 
-@cached_function
+@cached_function(key=lambda engine, base_ring, labels=None, categories=(), construction_data=(), law_decisions=(): (
+    id(engine),
+    id(base_ring),
+    None if labels is None else id(labels),
+    tuple(map(id, categories)),
+    tuple((name, id(value)) for name, value in construction_data),
+    tuple((name, id(value)) for name, value in law_decisions),
+))
 def _owned_algebra_view(
     engine,
     base_ring,
@@ -4609,6 +4684,7 @@ def _owned_algebra_view(
     categories=(),
     construction_data=(),
     law_decisions=(),
+    ring_placement=(),
 ):
     base = _owned_ring(base_ring)
     return _OwnedAlgebraParent(
@@ -4618,6 +4694,7 @@ def _owned_algebra_view(
         categories=tuple(categories),
         construction_data=tuple(construction_data),
         law_decisions=tuple(law_decisions),
+        ring_placement=lambda: ring_placement,
     )
 
 
@@ -4645,12 +4722,18 @@ def _algebra_with_structure(
     )
     if specialized is not None:
         return specialized
+    ring_placement = tuple(
+        category
+        for category in algebra.category().all_super_categories()
+        if category is OwnedRings()._with_axioms(category.axioms())
+    )
     return _owned_algebra_view(
         _engine_ring(algebra),
         base,
         labels,
         tuple(categories),
         tuple(construction_data),
+        ring_placement=ring_placement,
     )
 
 

@@ -26,8 +26,8 @@ if TYPE_CHECKING:
     from sage_extensions.logic import Predicate
 
 
-class OppositeMorphism(Morphism):
-    r"""An arrow of ``C^op`` represented by the reverse arrow in ``C``."""
+class OppositeMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for a generated arrow of ``C^op`` represented by the reverse arrow in ``C``."""
 
     def __init__(
         self,
@@ -76,7 +76,7 @@ class OppositeMorphism(Morphism):
 
 
 class OppositeMor(CategoricalMor):
-    Element = OppositeMorphism
+    ElementMethods = OppositeMorphism
 
     def __init__(
         self,
@@ -108,7 +108,7 @@ class OppositeMor(CategoricalMor):
                 f"{underlying_arrow} is not a morphism {self.codomain().underlying_object()} -> "
                 f"{self.domain().underlying_object()} of the base category"
             )
-        return OppositeMorphism(self, underlying_arrow)
+        return self.element_class(self, underlying_arrow)
 
     @object_level
     def identity(self) -> OppositeMorphism:
@@ -210,8 +210,8 @@ class _OppositeCategory(OwnedCategory):
 
 
 
-class ProductMorphism(Morphism):
-    r"""A pair of morphisms in a product category."""
+class ProductMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for a generated pair of morphisms in a product category."""
 
     def __init__(
         self,
@@ -268,7 +268,7 @@ class ProductMorphism(Morphism):
 
 
 class ProductMor(CategoricalMor):
-    Element = ProductMorphism
+    ElementMethods = ProductMorphism
 
     def __init__(
         self,
@@ -312,7 +312,7 @@ class ProductMor(CategoricalMor):
                 f"the second component {second} is not a morphism {self.domain().second()} -> "
                 f"{self.codomain().second()} of the second factor category"
             )
-        return ProductMorphism(self, first, second)
+        return self.element_class(self, first, second)
 
     @object_level
     def identity(self) -> ProductMorphism:

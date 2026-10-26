@@ -276,6 +276,12 @@ class FiniteOrderedSets(OwnedCategory):
         points are taken in order, with equal points identified.
         """
         match elements:
+            case _ if elements in self:
+                # Preserve the literal selected index set. Rewrapping an
+                # existing finite ordered set through its underlying Set
+                # presentation replaces its chosen labels by a new ordinal
+                # indexing and breaks constructors that retain this framing.
+                return elements
             case _ if elements in Sets():
                 return self._on_finite_set(elements)
             case _:

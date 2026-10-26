@@ -564,7 +564,7 @@ class OwnedNumberFields(CategoryPacketMethods, OwnedCategory):
             r"""Return a chosen normal closure of ``K/QQ``."""
 
             engine = _engine_ring(self)
-            return self if engine is SageQQ else _own_ring(engine.galois_closure())
+            return self if engine is SageQQ else _number_field_from_engine(engine.galois_closure())
 
         def normal_closure_galois_group(self):
             r"""Return the Galois group of a chosen normal closure of ``K``."""
@@ -698,6 +698,19 @@ class OwnedNumberFields(CategoryPacketMethods, OwnedCategory):
             match ring_map.domain() is rationals and self is not rationals:
                 case False:
                     return super()._module_basis_along(ring_map)
+            native_basis = self._native_module_basis
+            if (
+                native_basis is not None
+                and native_basis.is_basis()
+                and native_basis.source().base_ring() is ring_map.domain()
+            ):
+                # The number-field constructor already selected the power
+                # basis over its defining coefficient field. Do not rebuild
+                # that basis by asking ``as_algebra()`` for its framing: the
+                # latter is the algebra-generator presentation and may not
+                # yet have installed its framing while ring construction is
+                # asking for the module basis.
+                return native_basis
             algebra = self.as_algebra()
             framing = algebra.framing_morphism()
 
@@ -828,7 +841,7 @@ class NumberFieldsWithChosenPrimitiveElement(OwnedCategory):
             r"""Return the owned defining polynomial of the selected primitive element."""
 
             polynomial = _engine_ring(self).defining_polynomial()
-            parent = _own_ring(polynomial.parent())
+            parent = self.algebra_framing_source()
             return _owned_engine_element(parent, polynomial)
 
         def embedding_images(self, target):

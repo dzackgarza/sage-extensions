@@ -36,6 +36,7 @@ from sage.structure.sage_object import SageObject
 from sage_extensions.categories.sets.indexed_families import finite_indexed_family_from_values
 from sage_extensions.categories.lattices import Lattices
 from sage_extensions.categories._lattice import signature_pair
+from sage_extensions.categories.sets.cardinals import cardinal
 from sage_extensions.categories.rings.ring_foundation import (
     _owned_engine_element,
 )
@@ -261,12 +262,19 @@ class NumberFieldVinbergLattice(SageObject):
         selected_position = embeddings.ranking_map()(real_embedding)
         selected_signature = _signature_at_real_embedding(lattice, real_embedding)
         rank = int(lattice.module_rank())
-        if selected_signature.first() != rank - 1 or selected_signature.second() != 1:
+        if (
+            (selected_signature.first() == cardinal(rank - 1)) is not True
+            or (selected_signature.second() == cardinal(1)) is not True
+        ):
             raise ValueError(f"{lattice} is not hyperbolic at the real place {real_embedding}: it must have signature ({rank - 1}, 1) there, but has {selected_signature}")
         other_signatures = finite_ordered_set(
             tuple(_signature_at_real_embedding(lattice, embeddings[position]) for position in embeddings.index_set() if position != selected_position)
         )
-        if any(other.first() != rank or other.second() != 0 for other in other_signatures):
+        if any(
+            (other.first() == cardinal(rank)) is not True
+            or (other.second() == cardinal(0)) is not True
+            for other in other_signatures
+        ):
             raise ValueError(
                 f"cannot run Vinberg's algorithm on {lattice} with hyperbolic place "
                 f"{real_embedding}: at every other real place the form must be positive "
@@ -449,7 +457,9 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
         """
         signature = lattice.signature_pair()
         positive, negative = signature.first(), signature.second()
-        assert 1 in (positive, negative), (
+        positive_is_one = (positive == cardinal(1)) is True
+        negative_is_one = (negative == cardinal(1)) is True
+        assert positive_is_one or negative_is_one, (
             f"{lattice} is not a hyperbolic lattice: a hyperbolic lattice has signature (1, n) or (n, 1), but {lattice} has signature ({positive}, {negative})"
         )
         return refine(lattice, self)
@@ -464,13 +474,15 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             """
             signature = self.signature_pair()
             positive, negative = signature.first(), signature.second()
-            match positive, negative:
-                case _, 1:
-                    return _engine_component_matrix(self.gram_tensor()), False
-                case 1, _:
-                    return _engine_component_matrix(self.twist(-1).gram_tensor()), True
-                case _:
-                    assert False, f"cannot run a reflection algorithm on {self}: it needs signature (1, n) or (n, 1), but {self} has signature ({positive}, {negative})"
+            positive_is_one = (positive == cardinal(1)) is True
+            negative_is_one = (negative == cardinal(1)) is True
+            if negative_is_one:
+                return _engine_component_matrix(self.gram_tensor()), False
+            if positive_is_one:
+                return _engine_component_matrix(self.twist(-1).gram_tensor()), True
+            raise AssertionError(
+                f"cannot run a reflection algorithm on {self}: it needs signature (1, n) or (n, 1), but {self} has signature ({positive}, {negative})"
+            )
 
         @cached_method
         def _vinberg_search(self, controlling_vector, max_roots, max_decompositions):
@@ -552,7 +564,11 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             """
             signature = self.signature_pair()
             positive, negative = signature.first(), signature.second()
-            assert (positive, negative) != (1, 1), (
+            rank_one_inertia = (
+                (positive == cardinal(1)) is True
+                and (negative == cardinal(1)) is True
+            )
+            assert not rank_one_inertia, (
                 f"cannot decide whether {self} is reflective: it has signature (1, 1), "
                 f"where the fundamental domain is a half-line in H^1 of infinite "
                 f"volume, so no polyhedron criterion applies"
@@ -816,7 +832,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                 RationalPolyhedralCones,
             )
 
-            if self.signature_pair().second() == 1:
+            if (self.signature_pair().second() == cardinal(1)) is True:
                 return edgewalk_fundamental_domain(self)
             twist = Lattices(self.base_ring()).twist_functor(-1)
             working = HyperbolicLattices(self.base_ring())(twist(self))

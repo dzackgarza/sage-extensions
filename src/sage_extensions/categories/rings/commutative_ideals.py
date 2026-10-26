@@ -507,7 +507,7 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
                 return None
             if _realized_as_quotient(ring):
                 cover = _cover_lifted_ideal(self)
-                radical = _from_engine_ideal(_own_ring(cover.ring()), cover)._radical_decision()
+                radical = _from_engine_ideal(ring.quotient_source(), cover)._radical_decision()
                 return None if radical is None else _descend_cover_ideal(
                     ring, radical._engine_ideal()
                 )
@@ -682,7 +682,7 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
             _require_same_ring(self, other)
             ring = self.ring()
             left, right = _cover_lifted_ideal(self), _cover_lifted_ideal(other)
-            cover = _own_ring(left.ring())
+            cover = ring.quotient_source()
             left_ideal = _from_engine_ideal(cover, left)
             right_ideal = _from_engine_ideal(cover, right)
             if operation == "colon":
@@ -1165,7 +1165,7 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
             ring = self.ring()
             if _realized_as_quotient(ring):
                 cover = _cover_lifted_ideal(self)
-                cover_ideal = _from_engine_ideal(_own_ring(cover.ring()), cover)
+                cover_ideal = _from_engine_ideal(ring.quotient_source(), cover)
                 source_operation = {
                     "primary_decomposition": "_finite_primary_decomposition_decision",
                     "minimal_associated_primes": "finite_minimal_primes",

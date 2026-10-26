@@ -1153,8 +1153,7 @@ class GroupModuleMorphismMethods(ModuleMorphismMethods):
         )
 
 
-class GroupModuleMorphism(GroupModuleMorphismMethods, ModuleMorphism):
-    r"""Compatibility shell for private equivariant-module arrow realizations."""
+GroupModuleMorphism = GroupModuleMorphismMethods
 
 
 class GroupModuleMor(_ModuleMorCommonMethods, CategoricalMor):

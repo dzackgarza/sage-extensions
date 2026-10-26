@@ -251,7 +251,7 @@ def _action_with_canonical_endomorphism_parent(base_ring, additive_group, action
     rather than changing the module object or rejecting the defining action.
     """
     endomorphisms = AdditiveGroups().AdditiveCommutative().End(additive_group)
-    if action.codomain() is endomorphisms:
+    if action.domain() is base_ring and action.codomain() is endomorphisms:
         return action
     supplied_endomorphisms = action.codomain()
     assert (
@@ -2452,30 +2452,27 @@ class Modules(OwnedCategoryOverBaseRing):
                 source._element_of_unformed_module(element)
             )
 
-        @cached_method
-        def _ring_morphism_defining_module_action(self, endomorphisms=None):
+        def _ring_morphism_defining_module_action(
+            self, endomorphisms, additive_group, scalar_multiple=None
+        ):
             r"""Return ``rho_M : R -> End_Ab(U(M))``, ``r |-> (m |-> r m)``, from the scalar multiplication.
 
             A module whose datum is ``rho`` itself states it at its own level.
             """
             ring = self.base_ring()
-            if endomorphisms is None:
-                endomorphisms = AdditiveGroups().AdditiveCommutative().End(
-                    self.underlying_additive_group()
-                )
-            else:
-                additive_group = self.underlying_additive_group()
-                assert (
-                    endomorphisms.domain() is additive_group
-                    and endomorphisms.codomain() is additive_group
-                ), (
-                    f"the scalar action of {self} can only be represented in "
-                    f"End({additive_group}), not {endomorphisms}"
-                )
+            assert (
+                endomorphisms.domain() is additive_group
+                and endomorphisms.codomain() is additive_group
+            ), (
+                f"the scalar action of {self} can only be represented in "
+                f"End({additive_group}), not {endomorphisms}"
+            )
+            if scalar_multiple is None:
+                scalar_multiple = self._owned_scalar_multiple
 
             return ring.Mor(endomorphisms, category=OwnedRings())(
                 lambda scalar: endomorphisms.elementwise(
-                    lambda element: self._owned_scalar_multiple(scalar, element),
+                    lambda element: scalar_multiple(scalar, element),
                 ),
             )
 
@@ -2501,15 +2498,20 @@ class Modules(OwnedCategoryOverBaseRing):
             endomorphisms = AdditiveGroups().AdditiveCommutative().End(
                 additive_group
             )
-            if native is not None:
-                # Cache separately for each canonical End parent: refinement
-                # can intern a new endomorphism parent for this same module,
-                # and reusing a morphism into the pre-refinement parent makes
-                # subsequent module/form constructors disagree on codomain
-                # identity. The native datum retains the defining pointwise
-                # action and rebuilds only its typed morphism wrapper.
-                return native.scalar_action_morphism(endomorphisms)
-            return self._ring_morphism_defining_module_action(endomorphisms)
+            # Use the module owner's one construction for rho_M in both cases.
+            # During native construction U(M) is already specified by the
+            # retained module presentation, even if its category refinement has
+            # not yet installed underlying_additive_group() on the parent.
+            # Preserve the native constructor's actual scalar operation when
+            # supplied; reconstructing it through the generic module method
+            # can silently replace a selected coefficient embedding. The
+            # endpoint and ring-morphism construction remain common to both
+            # native and generic modules.
+            return self._ring_morphism_defining_module_action(
+                endomorphisms,
+                additive_group,
+                None if native is None else native.scalar_multiple,
+            )
 
         def annihilator(self):
             r"""Return ``Ann_R(M)=ker(rho_M: R -> End_Ab(U(M)))``.

@@ -17,9 +17,6 @@ from sage_extensions.categories.algebras.graded_algebras import (
     GradedAlgebras,
 )
 from sage_extensions.categories.modules.cochain_complexes import CochainComplexes
-from sage_extensions.categories.modules.module_morphisms.module_morphisms import (
-    ModuleMorphism,
-)
 from sage_extensions.categories.rings.ring_foundation import OwnedCategoryOverBaseRing
 from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
 from sage_extensions.logic import AtomicProposition, Propositions
@@ -27,45 +24,20 @@ from sage_extensions.validation import validator
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 
 
-class DegreewiseLinearMorphism(ModuleMorphism):
-    r"""An ``R``-linear map between two represented homogeneous pieces.
-
-    This is deliberately independent of a selected finite framing. When the
-    source and target pieces admit the finite module-morphism realization,
-    :meth:`represented_module_morphism` exposes it and therefore enables the
-    usual kernel/image algorithms; otherwise the component remains a genuine
-    morphism with exact evaluation but no fabricated finite presentation.
-    """
-
-    def __init__(self, domain, codomain, function) -> None:
-        if domain.base_ring() is not codomain.base_ring():
-            raise ValueError(
-                f"a component {domain} -> {codomain} of a differential needs both pieces over one base ring, but "
-                f"they are over {domain.base_ring()} and {codomain.base_ring()}"
-            )
-        self._function = function
-        ModuleMorphism.__init__(
-            self,
-            domain.module_category().Mor(domain, codomain),
-            function,
-            elementwise=True,
+def DegreewiseLinearMorphism(domain, codomain, function):
+    r"""Construct a degreewise map as an element of its actual module Mor."""
+    if domain.base_ring() is not codomain.base_ring():
+        raise ValueError(
+            f"a component {domain} -> {codomain} of a differential needs both pieces over one base ring, but "
+            f"they are over {domain.base_ring()} and {codomain.base_ring()}"
         )
+    parent = domain.module_category().Mor(domain, codomain)
+    morphism = parent.element_class(parent, function, elementwise=True, linearity_premises=())
+    morphism._elementwise_linearity_witness = True
+    return morphism
 
-    def represented_module_morphism(self):
-        return self
 
-
-class DifferentialComponentMorphism(DegreewiseLinearMorphism):
-    r"""A degreewise component of a represented DGA differential.
-
-    A differential of a differential graded ``R``-algebra is by definition an
-    ``R``-linear map of degree ``+1``, and constructing the algebra is the
-    caller's statement of that law (``OWN-22``), so each component is linear
-    by construction.
-    """
-
-    def _elementwise_linearity_derivation(self):
-        return True
+DifferentialComponentMorphism = DegreewiseLinearMorphism
 
 
 class DifferentialGradedAlgebras(OwnedCategoryOverBaseRing):

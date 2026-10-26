@@ -14,7 +14,12 @@ from sage.all import (
 )
 from sage.rings.finite_rings.finite_field_constructor import GF as _SageGF
 from sage.categories.fields import Fields as SageFields
+try:
+    from sage.categories.ordered_fields import OrderedFields as SageOrderedFields
+except ImportError:
+    SageOrderedFields = None
 from sage.categories.rings import Rings as SageRings
+from sage.rings.rational_field import QQ as SageQQ
 from sage.misc.cachefunc import cached_function, cached_method
 from sage.rings.abc import Order as SageNumberFieldOrder
 from sage.rings.fraction_field import FractionField_generic as SageFractionField
@@ -54,13 +59,13 @@ from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
     OwnedFields,
     OwnedIntegralDomains,
+    OwnedOrderedRings,
     OwnedOrders,
     OwnedPrincipalIdealDomains,
     OwnedRings,
     PrimeFields,
     _engine_element,
     _engine_krull_dimension,
-    _krull_dimension_of_engine,
     _engine_quotient_cover_ideal,
     _engine_ring,
     _engine_ring_value,
@@ -2129,7 +2134,13 @@ def _affine_quotient_normalization_data(quotient):
                 generator.sage_poly(normal_cover_engine)
                 for generator in singular("normap")
             )
-            normal_cover = _own_ring(normal_cover_engine)
+            # Singular returned a polynomial presentation with these literal
+            # coefficient ring and ordered variable labels. Reconstruct the
+            # owned cover from that datum rather than adopting the returned
+            # engine parent as a second ring object.
+            normal_cover = _own_ring(normal_cover_engine.base_ring()).polynomial_ring(
+                tuple(normal_cover_engine.variable_names())
+            )
             normal_ideal = normal_cover.ideal(
                 *(
                     _owned_engine_element(normal_cover, normal_cover_engine(generator))
@@ -3301,8 +3312,12 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
                     formal_parameter_labels
                 )
         placements = [AdicCompletions(), *extra_categories]
+        ring_placements = []
+        if source in OwnedRings().Commutative():
+            ring_placements.append(OwnedRings().Commutative())
         if source in OwnedRings().Noetherian():
             placements.append(OwnedRings().Noetherian())
+            ring_placements.append(OwnedRings().Noetherian())
         formal_base = algebra_base
         match formal_base:
             case None:
@@ -3337,9 +3352,13 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
             formal_base_is_local,
         ):
             case (True, _, _) | (_, True, _):
-                placements.append(OwnedRings().Commutative().Local().Complete())
+                local_complete = OwnedRings().Commutative().Local().Complete()
+                placements.append(local_complete)
+                ring_placements.append(local_complete)
             case (_, _, True):
-                placements.append(OwnedRings().Commutative().Local())
+                local = OwnedRings().Commutative().Local()
+                placements.append(local)
+                ring_placements.append(local)
             case _:
                 pass
         _OwnedAlgebraParent.__init__(
@@ -3348,6 +3367,7 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
             source if algebra_base is None else algebra_base,
             algebra_labels,
             categories=tuple(placements),
+            ring_placement=lambda: tuple(ring_placements),
         )
         completion_map = self.completion_map()
         match (formal_base_is_local, defining_ideal_is_maximal):
@@ -3563,6 +3583,23 @@ def _quotient_ring(source, defining_ideal):
     actual classes. This includes a further quotient of an engine-free
     quotient; neither its source nor its defining ideal is flattened away.
     """
+    # The one-variable maximal quotient QQ[t]/(f) is the number-field
+    # construction already interned by its monic defining polynomial. Route
+    # this presentation through that owner before making a generic quotient;
+    # otherwise the same field acquires a second owned parent with a different
+    # cache key and loses the number-field element operations/resolution.
+    if (
+        source.base_ring() is _owned_rationals()
+        and source in SymmetricAlgebras(source.base_ring())
+        and len(source.variable_names()) == 1
+        and Category.__contains__(CommutativeIdeals(source).Maximal(), defining_ideal)
+    ):
+        generators = tuple(defining_ideal.ideal_generators())
+        if len(generators) == 1:
+            from sage_extensions.categories.rings.number_fields import _number_field_of
+
+            return _number_field_of(generators[0].monic())
+
     exact_source_quotient = (
         source in LocalizationRings() or _engine_ring(source) is source
     )
@@ -3599,25 +3636,30 @@ def _quotient_ring(source, defining_ideal):
     # for n != 0 (``ZMod.fintype``, Mathlib/Data/ZMod/Defs.lean).  The
     # placement reads the source's construction and the ideal's generators,
     # never the class of a realization (ARC-08).
+    # A nonzero ideal of a finite-rank order has finite index, so its quotient
+    # is finite and Artinian. Read only the retained generators here: an
+    # undecided equality to zero is not a premise for finite placement.
     finite_order_quotient = (
         not exact_source_quotient
         and source in OwnedOrders()
-        and not defining.is_zero()
+        and any(
+            (generator == source.zero()) is False
+            for generator in defining_ideal.ideal_generators()
+        )
     )
-    dimension = None
-    # R/R has dimension -infinity, outside this finite-integer datum.
-    if finite_order_quotient and not defining.is_one():
-        dimension = 0
-    elif quotient_engine is not None and source in OwnedRings().Noetherian() and not defining.is_one():
-        dimension = _krull_dimension_of_engine(quotient_engine)
 
-    quotient_is_field = False
-    quotient_is_domain = False
-    if not exact_source_quotient:
-        quotient_is_field = defining_ideal.is_maximal() is True
-        quotient_is_domain = quotient_is_field or defining_ideal.is_prime() is True
-        if quotient_is_domain and dimension == 0:
-            quotient_is_field = True
+    # A field/domain placement is inherited from the ideal's construction
+    # category, never selected by asking its maximality/primality predicate.
+    # Unplaced ideals leave the quotient's corresponding property to the
+    # caller, as required by CON-07 and ARC-08.
+    quotient_is_field = (
+        not exact_source_quotient
+        and Category.__contains__(CommutativeIdeals(source).Maximal(), defining_ideal)
+    )
+    quotient_is_domain = quotient_is_field or (
+        not exact_source_quotient
+        and Category.__contains__(CommutativeIdeals(source).PrimeAsIdeal(), defining_ideal)
+    )
     # ZZ/(p) for a maximal (p) is the prime field F_p, one object for every
     # route (``GF(p)``, ``PrimeFields()(p)``, ``Zmod(p)``).  It has no proper
     # subfield: every ring map into ZZ/(p) is onto (Mathlib
@@ -3675,10 +3717,10 @@ def _quotient_ring(source, defining_ideal):
         placements.append(OwnedIntegralDomains())
     if source in FiniteSets() or finite_order_quotient or finite_extension_field:
         placements.append(FiniteSets())
-    if dimension == 0 or finite_extension_field:
+    if finite_order_quotient or finite_extension_field:
         placements.append(OwnedRings().Artinian())
 
-    return _object_of(
+    quotient = _object_of(
         owned_category_join((
             QuotientRings(),
             Algebras(source).Associative().Unital().Commutative(),
@@ -3688,6 +3730,34 @@ def _quotient_ring(source, defining_ideal):
         defining_ideal=defining_ideal,
         _engine_ring=quotient_engine,
     )
+
+    # For p prime and k > 1, an integer class modulo p^k is a unit exactly
+    # when it is not divisible by p.  Thus all nonunits lie in (p), making
+    # (p) the unique maximal ideal; the quotient by it is Z/p.  The selected
+    # integer generator is the construction datum; use its exact prime-power
+    # factorization rather than testing any property of the quotient or its
+    # engine realization.
+    if source is _owned_integers() and not exact_source_quotient:
+        integer_generators = tuple(defining_ideal.ideal_generators())
+        if len(integer_generators) == 1:
+            modulus = abs(int(integer_generators[0]))
+            if modulus > 1:
+                prime_power = SageZZ(modulus).is_prime_power(get_data=True)
+                if prime_power and int(prime_power[1]) > 1:
+                    prime, _exponent = prime_power
+                    maximal_ideal = CommutativeIdeals(quotient).Maximal()(
+                        quotient(_owned_integers()(prime))
+                    )
+                    residue_field = _owned_integers().quotient_ring(
+                        _owned_integers().ideal(_owned_integers()(prime))
+                    )
+                    residue_map = quotient.Mor(residue_field)(
+                        lambda element: residue_field(element.lift())
+                    )
+                    _install_local_ring_construction(
+                        quotient, maximal_ideal, residue_field, residue_map
+                    )
+    return quotient
 
 
 def _localization_descent(source, elements):
@@ -4160,6 +4230,25 @@ def _fraction_field_localization(source, submonoid):
     ]
     if source in OwnedRings().Noetherian():
         placements.append(OwnedRings().Noetherian())
+    # An ordered integral domain has a unique order extension to its fraction
+    # field. Newer Sage versions expose that contract as OrderedFields. Older
+    # supported Sage images lack the category module, so retain the order only
+    # for QQ or an unchanged field engine there; do not infer an order for an
+    # arbitrary rational-function or other field merely from field membership.
+    realizes_ordered_field = (
+        fraction_engine is SageQQ
+        or fraction_engine is engine
+        or (
+            SageOrderedFields is not None
+            and fraction_engine in SageOrderedFields()
+        )
+    )
+    if (
+        source in OwnedOrderedRings()
+        and fraction_engine in SageFields()
+        and realizes_ordered_field
+    ):
+        placements.append(OwnedOrderedRings())
     base = source.base_ring()
     algebra_source = (
         source
@@ -5160,18 +5249,26 @@ class _DualNumbersAlgebraParent(_OwnedAlgebraParent):
         self._quotient_defining_ideal = defining_ideal
         self._quotient_map_factory = quotient_map
         placements = [QuotientRings()]
+        ring_placements = []
+        if base in OwnedRings().Commutative():
+            ring_placements.append(OwnedRings().Commutative())
         if base in OwnedRings().Noetherian():
             placements.append(OwnedRings().Noetherian())
+            ring_placements.append(OwnedRings().Noetherian())
         if base in OwnedRings().Artinian():
             placements.append(OwnedRings().Artinian())
+            ring_placements.append(OwnedRings().Artinian())
         if base in OwnedRings().Commutative().Local():
-            placements.append(OwnedRings().Commutative().Local())
+            local = OwnedRings().Commutative().Local()
+            placements.append(local)
+            ring_placements.append(local)
         _OwnedAlgebraParent.__init__(
             self,
             engine,
             base,
             (label,),
             categories=tuple(placements),
+            ring_placement=lambda: tuple(ring_placements),
         )
         if base in OwnedRings().Commutative().Local():
             epsilon_bar = self._from_engine_element(engine.gen())

@@ -59,146 +59,60 @@ from sage_extensions.owned_category import _object_of
 from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 
 
-class _RelativeProjectivizationProjection(SchemeMorphism):
-    r"""The exact structure map ``Proj_X(Sym(F)) -> X`` retained by construction."""
-
-    def __init__(self, parent, source_sheaf) -> None:
-        self._source_sheaf = source_sheaf
-        super().__init__(None, mor=parent)
-
-    def source_sheaf(self):
-        return self._source_sheaf
-
-    def _in_mor(self, mor):
-        return _RelativeProjectivizationProjection(mor, self.source_sheaf())
-
-    def _postcompose_with(self, after):
-        match after is self.codomain().structure_morphism():
-            case True:
-                return self.domain().structure_morphism()
-            case False:
-                return None
-
-    def __eq__(self, other) -> bool:
-        return (
-            isinstance(other, _RelativeProjectivizationProjection)
-            and other.domain() is self.domain()
-            and other.codomain() is self.codomain()
-            and other.source_sheaf() is self.source_sheaf()
-        )
-
-    def __ne__(self, other) -> bool:
-        return not self == other
-
-    __hash__ = None
+def _relative_projectivization_projection(parent, source_sheaf):
+    r"""Construct the relative-Proj structure map as a generated scheme-Mor element."""
+    return parent.element_class(
+        parent,
+        None,
+        mor=parent,
+        relative_projectivization_source_sheaf=source_sheaf,
+    )
 
 
-class _RelativeProjectivizationBaseChangeComposite(SchemeMorphism):
-    r"""The common composite in one exact relative-Proj base-change square."""
-
-    def __init__(self, parent, comparison) -> None:
-        self._comparison = comparison
-        super().__init__(None, mor=parent)
-
-    def comparison(self):
-        return self._comparison
-
-    def _in_mor(self, mor):
-        return _RelativeProjectivizationBaseChangeComposite(mor, self.comparison())
+def _relative_projectivization_base_change_composite(parent, comparison):
+    r"""Construct the common square composite in the generated scheme Mor."""
+    return parent.element_class(
+        parent,
+        None,
+        mor=parent,
+        relative_projectivization_comparison=comparison,
+        relative_projectivization_role="base_change_composite",
+    )
 
 
-class _RelativeProjectivizationBaseChangeTotalMorphism(SchemeMorphism):
-    r"""The canonical map ``P(F_A') -> P(F)`` in an exact base-change square."""
-
-    def __init__(self, parent, comparison) -> None:
-        self._comparison = comparison
-        super().__init__(None, mor=parent)
-
-    def comparison(self):
-        return self._comparison
-
-    def _in_mor(self, mor):
-        return _RelativeProjectivizationBaseChangeTotalMorphism(mor, self.comparison())
-
-    def _postcompose_with(self, after):
-        if after is self.comparison().projectivization().projectivization_projection():
-            return self.comparison().square_composite()
-        return None
+def _relative_projectivization_base_change_total_morphism(parent, comparison):
+    r"""Construct the canonical total-space map in the generated scheme Mor."""
+    return parent.element_class(
+        parent,
+        None,
+        mor=parent,
+        relative_projectivization_comparison=comparison,
+        relative_projectivization_role="base_change_total",
+    )
 
 
-class _RelativeProjectivizationBaseChangeBaseMorphism(SchemeMorphism):
-    r"""The affine base map in one exact relative-Proj base-change square."""
-
-    def __init__(self, parent, comparison, ring_map) -> None:
-        self._comparison = comparison
-        super().__init__(None, mor=parent, pullback=ring_map)
-
-    def comparison(self):
-        return self._comparison
-
-    def _in_mor(self, mor):
-        return _RelativeProjectivizationBaseChangeBaseMorphism(
-            mor,
-            self.comparison(),
-            self.coordinate_algebra_morphism(),
-        )
-
-    def __mul__(self, other):
-        if (
-            other is self.comparison().changed_projectivization().arrow().domain().projectivization_projection()
-        ):
-            return self.comparison().square_composite()
-        return super().__mul__(other)
+def _relative_projectivization_base_change_base_morphism(parent, comparison, ring_map):
+    r"""Construct the affine base map in the generated scheme Mor."""
+    return parent.element_class(
+        parent,
+        None,
+        mor=parent,
+        pullback=ring_map,
+        relative_projectivization_comparison=comparison,
+        relative_projectivization_role="base_change_base",
+    )
 
 
-class _RelativeProjectivizationBaseProjectionMorphism(SchemeMorphism):
-    r"""The selected base projection in an exact finite-atlas Proj base-change square."""
-
-    def __init__(self, parent, comparison, underlying_projection) -> None:
-        self._comparison = comparison
-        self._underlying_projection = underlying_projection
-        super().__init__(None, mor=parent)
-
-    def comparison(self):
-        return self._comparison
-
-    def underlying_projection(self):
-        return self._underlying_projection
-
-    def _in_mor(self, mor):
-        return _RelativeProjectivizationBaseProjectionMorphism(
-            mor,
-            self.comparison(),
-            self.underlying_projection(),
-        )
-
-    def __mul__(self, other):
-        if (
-            other
-            is self.comparison()
-            .changed_projectivization()
-            .arrow()
-            .domain()
-            .projectivization_projection()
-        ):
-            return self.comparison().square_composite()
-        return self.underlying_projection() * other
-
-    def __eq__(self, other) -> bool:
-        if other is self.underlying_projection():
-            return True
-        if isinstance(other, _RelativeProjectivizationBaseProjectionMorphism):
-            return (
-                other.domain() is self.domain()
-                and other.codomain() is self.codomain()
-                and other.underlying_projection() == self.underlying_projection()
-            )
-        return self.underlying_projection() == other
-
-    def __ne__(self, other) -> bool:
-        return not self == other
-
-    __hash__ = None
+def _relative_projectivization_base_projection_morphism(parent, comparison, underlying_projection):
+    r"""Construct the selected base projection in the generated scheme Mor."""
+    return parent.element_class(
+        parent,
+        None,
+        mor=parent,
+        relative_projectivization_comparison=comparison,
+        relative_projectivization_role="base_projection",
+        relative_projectivization_underlying_projection=underlying_projection,
+    )
 
 
 class GeneralProjectivizationBaseChangeComparison(SageObject):
@@ -234,23 +148,13 @@ class GeneralProjectivizationBaseChangeComparison(SageObject):
         self._changed_source_sheaf = changed_sheaf
         self._changed_projectivization = changed_family
         self._square_composite = changed_total.Mor(source_scheme)(
-            lambda mor: _RelativeProjectivizationBaseChangeComposite(
-                mor,
-                self,
-            )
+            lambda mor: _relative_projectivization_base_change_composite(mor, self)
         )
         self._base_morphism = changed_scheme.Mor(source_scheme)(
-            lambda mor: _RelativeProjectivizationBaseChangeBaseMorphism(
-                mor,
-                self,
-                ring_map,
-            )
+            lambda mor: _relative_projectivization_base_change_base_morphism(mor, self, ring_map)
         )
         self._projection_to_original = changed_total.Mor(projectivization)(
-            lambda mor: _RelativeProjectivizationBaseChangeTotalMorphism(
-                mor,
-                self,
-            )
+            lambda mor: _relative_projectivization_base_change_total_morphism(mor, self)
         )
         if (
             projectivization.projectivization_projection()
@@ -316,23 +220,15 @@ class ExactProjectivizationBaseChangeComparison(SageObject):
         self._changed_projectivization = changed_family
         self._underlying_base_projection = underlying_base_projection
         self._square_composite = changed_total.Mor(source_scheme)(
-            lambda mor: _RelativeProjectivizationBaseChangeComposite(
-                mor,
-                self,
-            )
+            lambda mor: _relative_projectivization_base_change_composite(mor, self)
         )
         self._base_projection = changed_base.Mor(source_scheme)(
-            lambda mor: _RelativeProjectivizationBaseProjectionMorphism(
-                mor,
-                self,
-                underlying_base_projection,
+            lambda mor: _relative_projectivization_base_projection_morphism(
+                mor, self, underlying_base_projection
             )
         )
         self._total_projection = changed_total.Mor(projectivization)(
-            lambda mor: _RelativeProjectivizationBaseChangeTotalMorphism(
-                mor,
-                self,
-            )
+            lambda mor: _relative_projectivization_base_change_total_morphism(mor, self)
         )
         if (
             projectivization.projectivization_projection() * self.total_projection()
@@ -410,23 +306,15 @@ class ExactFiniteAtlasProjectivizationBaseChangeComparison(SageObject):
         self._changed_projectivization = changed_family
         self._underlying_base_projection = changed_base.left_projection()
         self._square_composite = changed_total.Mor(source_scheme)(
-            lambda mor: _RelativeProjectivizationBaseChangeComposite(
-                mor,
-                self,
-            )
+            lambda mor: _relative_projectivization_base_change_composite(mor, self)
         )
         self._base_projection = changed_base.Mor(source_scheme)(
-            lambda mor: _RelativeProjectivizationBaseProjectionMorphism(
-                mor,
-                self,
-                self._underlying_base_projection,
+            lambda mor: _relative_projectivization_base_projection_morphism(
+                mor, self, self._underlying_base_projection
             )
         )
         self._total_projection = changed_total.Mor(projectivization)(
-            lambda mor: _RelativeProjectivizationBaseChangeTotalMorphism(
-                mor,
-                self,
-            )
+            lambda mor: _relative_projectivization_base_change_total_morphism(mor, self)
         )
         if (
             projectivization.projectivization_projection() * self.total_projection()
@@ -694,9 +582,8 @@ class RelativeProjectivizations(OwnedCategoryOverBaseRing):
         def projectivization_projection(self):
             source_scheme = self.projectivization_source_sheaf().scheme()
             return self.Mor(source_scheme)(
-                lambda mor: _RelativeProjectivizationProjection(
-                    mor,
-                    self.projectivization_source_sheaf(),
+                lambda mor: _relative_projectivization_projection(
+                    mor, self.projectivization_source_sheaf()
                 )
             )
 
@@ -1699,37 +1586,15 @@ class ProjectivizationMapOnSurjectivityLocus(SageObject):
         return self._induced_morphism
 
 
-class _RelativeProjectivizationSurjectivityOpenInclusion(SchemeMorphism):
-    r"""Inclusion of the locus where the induced quotient of a line is surjective."""
-
-    def __init__(self, parent, sheaf_morphism) -> None:
-        self._sheaf_morphism = sheaf_morphism
-        super().__init__(None, mor=parent)
-
-    def sheaf_morphism(self):
-        return self._sheaf_morphism
-
-    def is_open_immersion(self) -> bool:
-        return True
-
-    def _in_mor(self, mor):
-        return _RelativeProjectivizationSurjectivityOpenInclusion(
-            mor,
-            self.sheaf_morphism(),
-        )
-
-    def __eq__(self, other) -> bool:
-        return (
-            isinstance(other, _RelativeProjectivizationSurjectivityOpenInclusion)
-            and other.domain() is self.domain()
-            and other.codomain() is self.codomain()
-            and other.sheaf_morphism() is self.sheaf_morphism()
-        )
-
-    def __ne__(self, other) -> bool:
-        return not self == other
-
-    __hash__ = None
+def _relative_projectivization_surjectivity_open_inclusion(parent, sheaf_morphism):
+    r"""Construct the surjectivity-locus inclusion in the generated scheme Mor."""
+    return parent.element_class(
+        parent,
+        None,
+        mor=parent,
+        relative_projectivization_sheaf_morphism=sheaf_morphism,
+        relative_projectivization_role="surjectivity_open_inclusion",
+    )
 
 
 class _RelativeProjectivizationSurjectivityLocusEngine:
@@ -1743,34 +1608,15 @@ class _RelativeProjectivizationSurjectivityLocusEngine:
         return self._projectivization_sheaf_morphism
 
 
-class _RelativeProjectivizationInducedMorphism(SchemeMorphism):
-    r"""The induced map to ``P_quot(F)`` on the quotient-surjectivity locus."""
-
-    def __init__(self, parent, sheaf_morphism) -> None:
-        self._sheaf_morphism = sheaf_morphism
-        super().__init__(None, mor=parent)
-
-    def sheaf_morphism(self):
-        return self._sheaf_morphism
-
-    def _in_mor(self, mor):
-        return _RelativeProjectivizationInducedMorphism(
-            mor,
-            self.sheaf_morphism(),
-        )
-
-    def __eq__(self, other) -> bool:
-        return (
-            isinstance(other, _RelativeProjectivizationInducedMorphism)
-            and other.domain() is self.domain()
-            and other.codomain() is self.codomain()
-            and other.sheaf_morphism() is self.sheaf_morphism()
-        )
-
-    def __ne__(self, other) -> bool:
-        return not self == other
-
-    __hash__ = None
+def _relative_projectivization_induced_morphism(parent, sheaf_morphism):
+    r"""Construct the induced surjectivity-locus map in the generated scheme Mor."""
+    return parent.element_class(
+        parent,
+        None,
+        mor=parent,
+        relative_projectivization_sheaf_morphism=sheaf_morphism,
+        relative_projectivization_role="surjectivity_induced_morphism",
+    )
 
 
 def _exact_projectivization_map(
@@ -1784,10 +1630,7 @@ def _exact_projectivization_map(
     category = OpenImmersions(target_total)
 
     def inclusion(mor):
-        return _RelativeProjectivizationSurjectivityOpenInclusion(
-            mor,
-            sheaf_morphism,
-        )
+        return _relative_projectivization_surjectivity_open_inclusion(mor, sheaf_morphism)
 
     locus = _object_of(
         category,
@@ -1799,10 +1642,7 @@ def _exact_projectivization_map(
         projectivization_sheaf_morphism=sheaf_morphism,
     )
     induced = locus.Mor(source_total)(
-        lambda mor: _RelativeProjectivizationInducedMorphism(
-            mor,
-            sheaf_morphism,
-        )
+        lambda mor: _relative_projectivization_induced_morphism(mor, sheaf_morphism)
     )
     return ProjectivizationMapOnSurjectivityLocus(
         sheaf_morphism,

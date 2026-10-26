@@ -51,7 +51,6 @@ from sage_extensions.categories.rings.ring_foundation import (
 from sage_extensions.categories.schemes.schemes import (
     AffineGSchemes,
     Schemes,
-    _RepresentedAffineSchemeMorphism,
     _affine_morphism_from_pullback,
     _evaluate_polynomial_in_algebra,
 )
@@ -59,148 +58,28 @@ from sage_extensions.categories.schemes.schemes import (
 
 
 
-class _AffineInvariantQuotientBaseChangeMorphism(_RepresentedAffineSchemeMorphism):
-    r"""Compare ``(X/G)_{k'}`` with ``X_{k'}/G`` for a scalar field extension.
-
-    The comparison map
-
-    ``X_{k'}/G -> (X/G)_{k'}``
-
-    is forced by the universal property of the target invariant quotient: the
-    base-changed quotient map ``X_{k'} -> (X/G)_{k'}`` remains invariant.  The
-    map exists whenever both represented invariant algebras do.
-
-    When ``|G|`` is invertible in ``k'``, Reynolds averaging makes invariants an
-    exact direct summand and they commute with the field extension.  In that
-    regime :meth:`reynolds_isomorphism` constructs the inverse explicitly by
-    expressing every new invariant generator in the base-changed old invariant
-    generators through the same maintained subalgebra-membership certificates
-    used by the affine quotient universal property.
-    """
-
-    def __init__(
-        self,
-        mor,
-        pullback,
-        *,
-        acted_scheme,
-        ring_map,
-        changed_acted_scheme,
-        base_changed_old_quotient,
-    ) -> None:
-        self._acted_scheme = acted_scheme
-        self._ring_map = ring_map
-        self._changed_acted_scheme = changed_acted_scheme
-        self._base_changed_old_quotient = base_changed_old_quotient
-        super().__init__(mor, pullback)
-
-    def source_acted_scheme(self):
-        return self._acted_scheme
-
-    def ring_map(self):
-        return self._ring_map
-
-    def base_changed_acted_scheme(self):
-        return self._changed_acted_scheme
-
-    def quotient_after_base_change(self):
-        return self.base_changed_acted_scheme().affine_quotient()
-
-    def base_change_after_quotient(self):
-        return self._base_changed_old_quotient
-
-    def comparison_morphism(self):
-        r"""Return this canonical comparison morphism itself."""
-        return self
-
-    def reynolds_hypothesis_holds(self) -> bool:
-        source = _owned_ring(self.ring_map().domain())
-        target = _owned_ring(self.ring_map().codomain())
-        match source in OwnedFields() and target in OwnedFields():
-            case False:
-                return False
-            case True:
-                pass
-        group = self.base_changed_acted_scheme().acting_group()
-        match group.is_finite():
-            case True:
-                return group.order_is_invertible_in(target)
-            case _:
-                return False
-
-    @cached_method
-    def reynolds_isomorphism(self):
-        assert self.reynolds_hypothesis_holds() is True, (
-            f"the comparison X_(k')/G -> (X/G)_(k') for {self.source_acted_scheme()} along "
-            f"{self.ring_map()} is proved an isomorphism only when the acting group "
-            f"{self.base_changed_acted_scheme().acting_group()} is finite and its order is invertible "
-            "in the target field (Reynolds operator)"
-        )
-
-        forward = self.comparison_morphism()
-        source_quotient = self.quotient_after_base_change()
-        target_quotient = self.base_change_after_quotient()
-        changed_acted = self.base_changed_acted_scheme()
-        changed_source_algebra = changed_acted.coordinate_algebra()
-        changed_invariants = source_quotient.coordinate_algebra()
-        changed_old_invariants = target_quotient.coordinate_algebra()
-        comparison_pullback = forward.coordinate_algebra_morphism()
-        invariant_inclusion = changed_acted.invariant_algebra_inclusion()
-
-        engine_source = _engine_ring(changed_source_algebra)
-        old_generator_images = tuple(
-            engine_source(
-                _engine_element(
-                    changed_source_algebra,
-                    invariant_inclusion(
-                        comparison_pullback(
-                            changed_old_invariants.algebra_generator(label)
-                        )
-                    ),
-                )
-            )
-            for label in changed_old_invariants.algebra_generating_set()
-        )
-
-        inverse_images = {}
-        for label in changed_invariants.algebra_generating_set():
-            invariant = invariant_inclusion(
-                changed_invariants.algebra_generator(label)
-            )
-            engine_invariant = engine_source(
-                _engine_element(changed_source_algebra, invariant)
-            )
-            certificate = engine_invariant.in_subalgebra(
-                old_generator_images,
-                algorithm="groebner",
-                certificate="invariant",
-            )
-            if certificate is None:
-                raise ArithmeticError(
-                    f"the Reynolds operator makes the comparison along {self.ring_map()} an "
-                    f"isomorphism, but the invariant {invariant} of the base-changed ring could not "
-                    "be written as a polynomial in the base changes of the original invariants"
-                )
-            inverse_images[label] = _evaluate_polynomial_in_algebra(
-                certificate,
-                changed_old_invariants,
-            )
-
-        inverse_pullback = changed_invariants.Mor(changed_old_invariants)(
-            inverse_images
-        )
-        inverse = _affine_morphism_from_pullback(
-            target_quotient,
-            source_quotient,
-            inverse_pullback,
-        )
-        return Schemes(source_quotient.scheme_base_ring()).Core().Mor(
-            source_quotient, target_quotient
-        )(forward, inverse)
-
-    def _repr_(self) -> str:
-        return f"Invariant-quotient base-change morphism along {self.ring_map()} for {self.source_acted_scheme()}"
-
+def _affine_invariant_quotient_base_change_morphism(
+    parent,
+    pullback,
+    *,
+    acted_scheme,
+    ring_map,
+    changed_acted_scheme,
+    base_changed_old_quotient,
+):
+    r"""Construct the invariant-quotient comparison in its generated scheme Mor."""
+    return parent.element_class(
+        parent,
+        None,
+        mor=parent,
+        pullback=pullback,
+        affine_quotient_base_change_data={
+            "acted_scheme": acted_scheme,
+            "ring_map": ring_map,
+            "changed_acted_scheme": changed_acted_scheme,
+            "base_changed_old_quotient": base_changed_old_quotient,
+        },
+    )
 
 def AffineInvariantQuotientBaseChangeComparison(
     acted_scheme, ring_map, *, _action_category=None
@@ -261,7 +140,7 @@ def AffineInvariantQuotientBaseChangeComparison(
     mor = comparison.parent()
     pullback = comparison.coordinate_algebra_morphism()
     return mor(
-        lambda selected_mor: _AffineInvariantQuotientBaseChangeMorphism(
+        lambda selected_mor: _affine_invariant_quotient_base_change_morphism(
             selected_mor,
             pullback,
             acted_scheme=acted_scheme,

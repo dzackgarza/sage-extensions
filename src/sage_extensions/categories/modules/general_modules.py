@@ -17,7 +17,6 @@ from sage.misc.cachefunc import cached_function, cached_method
 from sage.structure.element import ModuleElement, parent as element_parent
 from sage.structure.richcmp import op_EQ, op_NE
 
-from sage_extensions.categories.group.magmas import AdditiveGroups
 from sage_extensions.categories.modules.pure.modules import Modules
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
@@ -158,7 +157,7 @@ class GeneralModules(OwnedCategoryOverBaseRing):
                     f"morphism out of {ring}, but {rho} lies in {rho.parent()}"
                 )
                 underlying_set = rho.codomain().domain()
-                assert rho.codomain() is AdditiveGroups().AdditiveCommutative().End(underlying_set), (
+                assert rho.codomain().codomain() is underlying_set, (
                     f"cannot construct an {ring}-module from {rho}: the scalar action must take values in "
                     f"the endomorphism ring End(A) of an abelian group A, but its codomain is {rho.codomain()}"
                 )

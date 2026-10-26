@@ -142,8 +142,8 @@ class _AffineGroupSchemeEngine:
         return f"Affine group scheme on {self.scheme()}"
 
 
-class AffineGroupSchemeMorphism(Morphism):
-    r"""A scheme morphism preserving affine group-scheme multiplication."""
+class AffineGroupSchemeMorphismMethods(CategoricalMor.ElementMethods):
+    r"""Methods for a generated scheme morphism preserving group-scheme multiplication."""
 
     def __init__(self, parent, arrow) -> None:
         Morphism.__init__(self, parent)
@@ -166,7 +166,7 @@ class AffineGroupSchemeMorphism(Morphism):
 class AffineGroupSchemeMor(CategoricalMor):
     r"""Morphisms of affine group schemes over one represented base."""
 
-    Element = AffineGroupSchemeMorphism
+    ElementMethods = AffineGroupSchemeMorphismMethods
 
     def _element_constructor_(self, arrow):
         source = self.domain()
@@ -301,8 +301,8 @@ class _AffineGroupSchemeActionEngine:
         return f"{self.scheme()} with action of {self.group_scheme()}"
 
 
-class AffineGroupSchemeEquivariantMorphism(Morphism):
-    r"""A scheme morphism commuting with one affine group-scheme action."""
+class AffineGroupSchemeEquivariantMorphismMethods(CategoricalMor.ElementMethods):
+    r"""Methods for a generated scheme morphism commuting with an action."""
 
     def __init__(self, parent, arrow) -> None:
         Morphism.__init__(self, parent)
@@ -325,7 +325,7 @@ class AffineGroupSchemeEquivariantMorphism(Morphism):
 class AffineGroupSchemeActionMor(CategoricalMor):
     r"""Equivariant morphisms between two actions of the same affine group scheme."""
 
-    Element = AffineGroupSchemeEquivariantMorphism
+    ElementMethods = AffineGroupSchemeEquivariantMorphismMethods
 
     def __init__(self, family, domain, codomain) -> None:
         if domain.group_scheme() is not codomain.group_scheme():

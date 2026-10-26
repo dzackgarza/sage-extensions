@@ -3154,10 +3154,6 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
 
                 def pontryagin_dual_identification(self):
                     r"""Return ``A -> Hom(A,K/R)``, ``x |-> b(x,-)``, for perfect ``b``."""
-                    from sage.categories.morphism import SetMorphism
-
-
-
                     zero = self.zero()
                     generators = tuple(self.module_generators())
                     if any(
@@ -3180,7 +3176,7 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
                             }
                         )
 
-                    return SetMorphism(OwnedSets().Mor(self, characters), character)
+                    return OwnedSets().Mor(self, characters)(character)
 
 class QuadraticFormModules(OwnedCategoryOverBaseRing):
     def an_object(self):

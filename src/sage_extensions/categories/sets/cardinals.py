@@ -299,7 +299,7 @@ class CardinalComparison(Enum):
     INCOMPARABLE = 4
 
 
-class CardinalityMorphism(Morphism):
+class CardinalityMorphism(CategoricalMor.ElementMethods):
     def __init__(self, parent: CardinalityMor) -> None:
         Morphism.__init__(self, parent)
 
@@ -329,7 +329,7 @@ class CardinalityMorphism(Morphism):
 
 
 class CardinalityMor(CategoricalMor):
-    Element = CardinalityMorphism
+    ElementMethods = CardinalityMorphism
 
     def __init__(
         self,
@@ -1261,8 +1261,8 @@ class _CantorNormalForm(_OrdinalExpression):
         )
 
 
-class OrdinalMorphism(Morphism):
-    r"""The unique comparison arrow ``alpha -> beta`` when ``alpha <= beta``."""
+class OrdinalMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for the generated comparison arrow ``alpha -> beta`` when ``alpha <= beta``."""
 
     def __init__(self, parent: OrdinalMor) -> None:
         Morphism.__init__(self, parent)
@@ -1290,7 +1290,7 @@ class OrdinalMorphism(Morphism):
 class OrdinalMor(CategoricalMor):
     r"""The zero-or-one-element Mor object of the ordinal order."""
 
-    Element = OrdinalMorphism
+    ElementMethods = OrdinalMorphism
 
     def __init__(
         self,

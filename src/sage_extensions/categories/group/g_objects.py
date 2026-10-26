@@ -127,8 +127,8 @@ def _terminal_map(category, source):
     )
 
 
-class InternalGroupObjectMorphism(Morphism):
-    r"""A morphism of internal group objects preserving all group structure."""
+class InternalGroupObjectMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for a generated morphism of internal group objects."""
 
     def __init__(self, parent, arrow) -> None:
         Morphism.__init__(self, parent)
@@ -154,7 +154,7 @@ class InternalGroupObjectMorphism(Morphism):
 class InternalGroupObjectMor(CategoricalMor):
     r"""Morphisms in the category of internal group objects."""
 
-    Element = InternalGroupObjectMorphism
+    ElementMethods = InternalGroupObjectMorphism
 
     def underlying_mor(self):
         category = self.domain().underlying_category()
@@ -392,8 +392,8 @@ class _InternalGroupObjectEngine:
         return f"Internal group object on {self.underlying_object()}"
 
 
-class InternalGroupActionMorphism(Morphism):
-    r"""An equivariant morphism between actions of one internal group object."""
+class InternalGroupActionMorphism(CategoricalMor.ElementMethods):
+    r"""Methods for a generated equivariant morphism between internal group actions."""
 
     def __init__(self, parent, arrow) -> None:
         Morphism.__init__(self, parent)
@@ -414,7 +414,7 @@ class InternalGroupActionMorphism(Morphism):
 
 
 class InternalGroupActionMor(CategoricalMor):
-    Element = InternalGroupActionMorphism
+    ElementMethods = InternalGroupActionMorphism
 
     def underlying_mor(self):
         category = self.domain().group_object().underlying_category()

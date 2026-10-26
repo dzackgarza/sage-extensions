@@ -4,7 +4,6 @@ from collections.abc import Mapping
 
 from sage.categories.category import Category
 from sage.categories.category_with_axiom import all_axioms
-from sage.categories.morphism import SetMorphism
 from sage.misc.cachefunc import cached_function, cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import Element
@@ -585,16 +584,6 @@ class Connection(Element):
         return ConnectionDeRhamModule(self)
 
 
-class ConnectionUnderlyingLinearMorphism(ModuleMorphism):
-    r"""The selected underlying linear morphism of one algebraic connection."""
-
-    def __init__(self, parent, function) -> None:
-        super().__init__(parent, function, elementwise=True)
-
-    def _elementwise_linearity_derivation(self):
-        return True
-
-
 class ConnectionSpace(RestrictedMorCategoryParent):
     Element = Connection
 
@@ -635,20 +624,21 @@ class ConnectionSpace(RestrictedMorCategoryParent):
         # this restricted Mor when it lies in that recorded image.
         self._underlying_arrows = {}
         self._inclusion_preimages = {}
-        self._inclusion = SetMorphism(
-            Sets().Mor(self, self.arrow_set()),
-            self._underlying_arrow,
-        )
+        self._inclusion = Sets().Mor(self, self.arrow_set())(self._underlying_arrow)
 
     def _underlying_arrow(self, connection):
         arrow = self._underlying_arrows.get(id(connection))
         if arrow is not None:
             return arrow
         target = self.codomain_object()
-        arrow = ConnectionUnderlyingLinearMorphism(
-            self.arrow_set(),
+        parent = self.arrow_set()
+        arrow = parent.element_class(
+            parent,
             lambda element: target(connection(element.underlying_element())),
+            elementwise=True,
+            linearity_premises=(),
         )
+        arrow._elementwise_linearity_witness = True
         self._underlying_arrows[id(connection)] = arrow
         self._inclusion_preimages[id(arrow)] = connection
         return arrow
@@ -752,10 +742,15 @@ class ConnectionMorphism(Element):
     def __init__(self, parent, images, *, horizontality_premises=None) -> None:
         Element.__init__(self, parent)
         self._horizontality_premises = horizontality_premises
-        self._underlying_morphism = HorizontalConnectionUnderlyingMorphism(
-            parent.arrow_set(),
-            parent.arrow_set()(images),
+        arrow_parent = parent.arrow_set()
+        underlying = arrow_parent(images)
+        self._underlying_morphism = arrow_parent.element_class(
+            arrow_parent,
+            lambda element: underlying(element),
+            elementwise=True,
+            linearity_premises=(underlying,),
         )
+        self._underlying_morphism._elementwise_linearity_witness = underlying
 
     def _horizontality_derivation(self):
         r"""Return a construction-derived horizontality decision, or ``None``.
@@ -875,23 +870,8 @@ class ConnectionMorphism(Element):
         )
 
 
-class HorizontalConnectionUnderlyingMorphism(ModuleMorphism):
-    r"""The selected underlying module morphism of one horizontal map."""
-
-    def __init__(self, parent, underlying) -> None:
-        self._underlying_source_morphism = underlying
-        super().__init__(
-            parent,
-            lambda element: underlying(element),
-            elementwise=True,
-        )
-
-    def _elementwise_linearity_derivation(self):
-        return self._underlying_source_morphism.linearity_decision()
-
-
 class ConnectionMor(RestrictedMorCategoryParent):
-    Element = ConnectionMorphism
+    ElementMethods = ConnectionMorphism
 
     def __init__(self, family, domain, codomain, *, category) -> None:
         # Horizontality of an arbitrary linear map is decided only on module

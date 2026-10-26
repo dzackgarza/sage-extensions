@@ -356,18 +356,32 @@ def _gram_axiom_categories(lattices, gram):
     """
     ring = lattices.base_ring()
     placement = lattices
-    match _gram_rank(gram).is_finite():
-        case True:
-            placement = placement.FinitelyGenerated()
-    match _gram_is_nondegenerate(gram, ring):
-        case True:
-            placement = placement.Nondegenerate()
-            match _gram_is_unimodular(gram, ring):
-                case True:
-                    placement = placement.Unimodular()
-    match _gram_is_even(gram, ring):
-        case True:
-            placement = placement.Even()
+    finite_rank = _gram_rank(gram).is_finite()
+    if finite_rank:
+        placement = placement.FinitelyGenerated()
+    nondegenerate = _gram_is_nondegenerate(gram, ring)
+    unimodular = _gram_is_unimodular(gram, ring) if nondegenerate is True else False
+    even = _gram_is_even(gram, ring)
+    if nondegenerate is True:
+        placement = placement.Nondegenerate()
+        if unimodular is True:
+            placement = placement.Unimodular()
+    if even is True:
+        placement = placement.Even()
+    if (
+        _engine_ring(ring) is SageZZ
+        and finite_rank
+        and nondegenerate is True
+        and unimodular is True
+        and even is True
+    ):
+        # A unimodular discriminant group is trivial, hence 2-elementary.
+        # Record that stronger mathematical surface explicitly so operations
+        # such as Nikulin's delta are supplied by their defining category even
+        # when the generic even/unimodular join's flattened providers omit it.
+        from sage_extensions.categories.lattices import EvenTwoElementaryLattices
+
+        return placement, EvenTwoElementaryLattices(ring)
     return () if placement is lattices else (placement,)
 
 
@@ -1871,7 +1885,11 @@ def _lattice(
             return _lattice_from_gram_tensor(data, ring, names, module_generators, category)
         case Tensor() | Matrix():
             raise TypeError(f"{data} cannot be the Gram matrix of a lattice: it is a linear map, a tensor of type (1, 1), but a bilinear form is a tensor of type (0, 2)")
-        case _ if data in FormModules(ring) and data.module_rank().is_finite():
+        case _ if (
+            data in FormModules(ring)
+            and data.module_rank().is_finite()
+            and data.is_base_ring_valued() is True
+        ):
             rank = int(data.module_rank())
             gram = data.gram_tensor()
             return _lattice_on_gram(
@@ -1880,6 +1898,11 @@ def _lattice(
                 _nested_gram_tensor([[gram[row, column] for column in range(rank)] for row in range(rank)], ring),
                 _normalized_lattice_names(names, rank),
                 None,
+            )
+        case _ if data in FormModules(ring) and data.module_rank().is_finite():
+            raise TypeError(
+                f"Lattices({ring}) cannot construct an integral lattice from {data}: "
+                f"its selected form is not known to take values in {ring}"
             )
         case _ if data in FramedFreeModules(ring):
             return _identity_lattice(data, ring, names, module_generators, category)

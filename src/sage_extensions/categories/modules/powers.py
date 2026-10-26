@@ -13,7 +13,6 @@ from math import prod
 from sage.categories.category import Category
 
 from sage.arith.misc import binomial
-from sage.categories.morphism import SetMorphism
 from sage.misc.cachefunc import cached_function, cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import parent as element_parent
@@ -155,10 +154,7 @@ class _PowerModuleParentMethods:
             lift_is_section=True,
         )
         self.register_conversion(
-            SetMorphism(
-                Sets().Mor(algebra, self),
-                inclusion.lift,
-            )
+            Sets().Mor(algebra, self)(inclusion.lift)
         )
         return inclusion
 
