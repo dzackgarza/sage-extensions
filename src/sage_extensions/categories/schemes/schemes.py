@@ -1039,16 +1039,6 @@ class SchemeMorphismMethods:
             raise AttributeError(f"{self} has no selected closed complement")
         return self._closed_complement
 
-    def is_open_immersion(self):
-        r"""Whether this arrow is the open inclusion of a selected closed complement."""
-        return (
-            self._closed_complement is not None
-            or self._standard_projective_chart_embedding
-            or self._multiprojective_chart_embedding
-            or self._gluing_role in ("open_inclusion", "chart_embedding")
-            or self._relative_projectivization_role == "surjectivity_open_inclusion"
-        )
-
     def _in_mor(self, mor):
         r"""Re-site this representation in a Mor with the same endpoints.
 
@@ -2105,8 +2095,19 @@ class SchemeMorphismMethods:
         its inclusion (Stacks, Tag 01IN); here the open subscheme is placed in
         ``OpenImmersions(Y)`` at its construction and this arrow is its
         inclusion.  A representation whose arrows factor that way by their
-        construction states it by overriding this method.
+        construction states it by overriding this method.  The open inclusion
+        of a selected closed complement, a standard or multiprojective chart
+        embedding, a gluing chart embedding, and the open inclusion of a
+        relative projectivization are open immersions by their construction.
         """
+        if (
+            self._closed_complement is not None
+            or self._standard_projective_chart_embedding
+            or self._multiprojective_chart_embedding
+            or self._gluing_role in ("open_inclusion", "chart_embedding")
+            or self._relative_projectivization_role == "surjectivity_open_inclusion"
+        ):
+            return True
         if self._is_the_identity():
             return True
         source = self.domain()
