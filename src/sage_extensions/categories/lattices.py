@@ -6167,6 +6167,7 @@ class Lattices(OwnedCategoryOverBaseRing):
                 else self.discriminant_bilinear_form()
             )
 
+        @cached_method
         def discriminant_length(self):
             r"""Return the minimal number of generators of ``A_L`` over ``ZZ``."""
             if _engine_ring(self.base_ring()) is not SageZZ:
@@ -6184,6 +6185,7 @@ class Lattices(OwnedCategoryOverBaseRing):
                 )
             )
 
+        @cached_method
         def is_p_elementary(self, prime) -> bool:
             r"""Return whether ``A_L`` is an elementary abelian ``prime``-group."""
             if _engine_ring(self.base_ring()) is not SageZZ:
