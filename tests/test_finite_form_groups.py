@@ -9,6 +9,7 @@ import pytest
 import sage.all
 
 from sage_extensions.catalogue import NamedLattices
+from sage_extensions.categories.lattices import nikulin_invariants
 from sage_extensions.categories.sets.set_categories import Sets
 
 
@@ -64,4 +65,4 @@ def test_hyperbolic_plane_is_even_unimodular_and_two_elementary():
     lattice = NamedLattices.U
     assert lattice.is_even()
     assert lattice.is_unimodular()
-    assert lattice.two_elementary_invariants() == (2, 0, 0)
+    assert lattice.two_elementary_invariants() == nikulin_invariants(2, 0, 0)
