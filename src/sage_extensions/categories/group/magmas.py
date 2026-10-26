@@ -1,7 +1,6 @@
 """The owned operation spine below groups."""
 
 from sage.categories.map import Map
-from sage.categories.morphism import Morphism
 from sage.misc.abstract_method import abstract_method
 from sage.misc.cachefunc import cached_function, cached_method
 
@@ -12,13 +11,13 @@ from sage_extensions.categories.abstract_categories.mor_categories import (
 )
 from sage_extensions.categories.abstract_categories.mor_foundation import (
     CategoryPacketMethods,
+    object_level,
 )
 from sage_extensions.categories.abstract_categories.objects import OwnedCategory
 from sage_extensions.categories.functors.core import Functor
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook
 from sage_extensions.validation import validator
-from sage_extensions.categories.abstract_categories.mor_foundation import object_level
 
 
 class MagmaMorphism:
@@ -47,14 +46,18 @@ class MagmaMorphism:
         proposition; admission to this Mor alone is not a computation of
         that proposition.
         """
-        from sage_extensions.categories.sets.set_categories import EnumeratedSets, FiniteSets
+        from sage_extensions.categories.sets.set_categories import (
+            EnumeratedSets,
+            FiniteSets,
+        )
         from sage_extensions.logic import AtomicProposition, conjunction
 
         domain = self.domain()
         if domain in FiniteSets() and domain in EnumeratedSets():
             return conjunction(
                 self(left * right) == self(left) * self(right)
-                for left in domain for right in domain
+                for left in domain
+                for right in domain
             )
         return AtomicProposition("is_multiplicative", self)
 
@@ -119,14 +122,19 @@ class MagmaMor(CategoricalMor):
 
     def _element_constructor_(self, function):
         if isinstance(function, Map):
-            if function.domain() is not self.domain() or function.codomain() is not self.codomain():
+            if (
+                function.domain() is not self.domain()
+                or function.codomain() is not self.codomain()
+            ):
                 raise ValueError(
                     f"{function} is a morphism {function.domain()} -> {function.codomain()}, "
                     f"not a morphism {self.domain()} -> {self.codomain()}"
                 )
             if function.parent() is self:
                 return function
-            raise TypeError(f"{function} belongs to another Mor; apply the functor between the categories")
+            raise TypeError(
+                f"{function} belongs to another Mor; apply the functor between the categories"
+            )
         if not callable(function):
             raise TypeError(
                 f"a morphism {self.domain()} -> {self.codomain()} needs a map on elements, "
@@ -174,10 +182,8 @@ class Magmas(CategoryPacketMethods, OwnedCategory):
 
     def an_object(self):
         r"""The owned integers under multiplication."""
-        from sage.rings.integer_ring import ZZ as SageZZ
 
         from sage_extensions.categories.rings.ring_foundation import (
-            _own_ring,
             _owned_integers,
         )
 
@@ -505,7 +511,7 @@ class Monoids(CategoryPacketMethods, OwnedCategory):
             computation error; that does not establish that the element is a
             nonunit.
             """
-            return None
+            return
 
         def inverse_of_unit(self):
             r"""Return the unique two-sided inverse of this monoid unit."""
@@ -520,15 +526,49 @@ class Monoids(CategoryPacketMethods, OwnedCategory):
             return self * self.parent()(other).inverse_of_unit()
 
         def _pow_int(self, exponent):
-            r"""Integer powers by repeated squaring, from the monoid law."""
+            r"""Integer powers by repeated squaring, from the monoid law.
+
+            A negative power ``a^-n`` is ``(a^-1)^n`` for a unit ``a``.
+            """
             from sage.arith.power import generic_power
 
-            return generic_power(self, exponent)
+            exponent = int(exponent)
+            match exponent < 0:
+                case True:
+                    return generic_power(self.inverse_of_unit(), -exponent)
+                case False:
+                    return generic_power(self, exponent)
 
     class ParentMethods:
         def _emptiness_decision(self) -> bool:
             r"""A monoid is not empty: it contains its unit (``Sets``' emptiness hook)."""
             return False
+
+        def _get_action_(self, source, op, self_on_left):
+            r"""``a ^ n`` for ``n`` in the owned integers: the monoid's integer powers.
+
+            Sage's coercion model finds the power action only when the
+            exponent's parent passes ``parent_is_integers``
+            (``Parent._get_action_`` and ``discover_action``,
+            ``sage/structure/parent.pyx``), and the owned ``ZZ`` is a
+            different parent from Sage's.  Every integer literal in a session
+            is an owned integer, so without this action ``x^2`` fails in
+            every monoid but ``ZZ``.  The action is ``_pow_int`` of the
+            monoid law.
+            """
+            import operator
+
+            from sage.structure.coerce_actions import IntegerPowAction
+
+            from sage_extensions.categories.rings.ring_foundation import (
+                _owned_integers,
+            )
+
+            match (op is operator.pow, self_on_left, source is _owned_integers()):
+                case (True, True, True):
+                    return IntegerPowAction(source, self, False)
+                case _:
+                    return super()._get_action_(source, op, self_on_left)
 
         @cached_method
         def unit_group(self):
@@ -634,10 +674,8 @@ class AdditiveMagmas(CategoryPacketMethods, OwnedCategory):
 
     def an_object(self):
         r"""The owned integers under addition."""
-        from sage.rings.integer_ring import ZZ as SageZZ
 
         from sage_extensions.categories.rings.ring_foundation import (
-            _own_ring,
             _owned_integers,
         )
 
@@ -734,7 +772,9 @@ class AdditiveMonoids(CategoryPacketMethods, OwnedCategory):
             """
             from sage_extensions.categories.group.submonoids import _additive_submonoid
 
-            return _additive_submonoid(self, generators=generators, description=description)
+            return _additive_submonoid(
+                self, generators=generators, description=description
+            )
 
         def predicate_additive_submonoid(self, predicate, description):
             r"""Return the additive submonoid defined by a zero- and sum-closed predicate.
@@ -746,7 +786,9 @@ class AdditiveMonoids(CategoryPacketMethods, OwnedCategory):
             """
             from sage_extensions.categories.group.submonoids import _additive_submonoid
 
-            return _additive_submonoid(self, predicate=predicate, description=description)
+            return _additive_submonoid(
+                self, predicate=predicate, description=description
+            )
 
 
 class AdditiveGroups(CategoryPacketMethods, OwnedCategory):
@@ -760,10 +802,8 @@ class AdditiveGroups(CategoryPacketMethods, OwnedCategory):
 
     def an_object(self):
         r"""The additive group of the owned integers."""
-        from sage.rings.integer_ring import ZZ as SageZZ
 
         from sage_extensions.categories.rings.ring_foundation import (
-            _own_ring,
             _owned_integers,
         )
 
@@ -827,7 +867,14 @@ class MonoidMorphism:
     domain ``S`` itself (``submonoid_of_codomain``).
     """
 
-    def __init__(self, parent, function, *, injectivity_decision=None, submonoid_of_codomain=False) -> None:
+    def __init__(
+        self,
+        parent,
+        function,
+        *,
+        injectivity_decision=None,
+        submonoid_of_codomain=False,
+    ) -> None:
         self._injectivity_premise = injectivity_decision
         self._submonoid_premise = submonoid_of_codomain
         super().__init__(parent, function)
@@ -863,9 +910,13 @@ class MonoidMorphism:
         target = target_inclusion.domain()
         if target_inclusion is self:
             return Monoids().Mor(source, source).identity()
-        from sage_extensions.categories.group.submonoids import _submonoid_generator_containment
+        from sage_extensions.categories.group.submonoids import (
+            _submonoid_generator_containment,
+        )
 
-        contained = _submonoid_generator_containment(self, target_inclusion, source.monoid_generators())
+        contained = _submonoid_generator_containment(
+            self, target_inclusion, source.monoid_generators()
+        )
         if contained is False:
             return None
         assert contained is True, (
@@ -894,14 +945,19 @@ class MonoidMor(CategoricalMor):
 
     def _element_constructor_(self, function):
         if isinstance(function, Map):
-            if function.domain() is not self.domain() or function.codomain() is not self.codomain():
+            if (
+                function.domain() is not self.domain()
+                or function.codomain() is not self.codomain()
+            ):
                 raise ValueError(
                     f"{function} is a monoid morphism {function.domain()} -> "
                     f"{function.codomain()}, not a morphism {self.domain()} -> {self.codomain()}"
                 )
             if function.parent() is self:
                 return function
-            raise TypeError(f"{function} belongs to another Mor; apply the functor between the categories")
+            raise TypeError(
+                f"{function} belongs to another Mor; apply the functor between the categories"
+            )
         return self.element_class(self, function)
 
     @cached_method
@@ -959,9 +1015,7 @@ def _unit_group(monoid):
             return element.is_unit()
         return AtomicProposition("is_unit", monoid, element)
 
-    placement = (
-        AbelianGroups() if monoid in Monoids().Commutative() else OwnedGroups()
-    )
+    placement = AbelianGroups() if monoid in Monoids().Commutative() else OwnedGroups()
     return Monoids.ParentMethods.predicate_submonoid(
         monoid,
         unit_predicate,
@@ -1005,9 +1059,7 @@ class _UnitGroupMorphism:
     def _composition(self, right):
         r"""Compose two restrictions through their retained monoid arrows."""
         if isinstance(right, _UnitGroupMorphism):
-            return UnitGroupFunctor()(
-                self._monoid_morphism * right._monoid_morphism
-            )
+            return UnitGroupFunctor()(self._monoid_morphism * right._monoid_morphism)
         return super()._composition(right)
 
 
@@ -1034,8 +1086,10 @@ class UnitGroupFunctor(Functor):
 
         source = self.object_image(morphism.domain())
         target = self.object_image(morphism.codomain())
-        return OwnedGroups().Mor(source, target)._from_realization_engine(
-            _UnitGroupMorphism, morphism
+        return (
+            OwnedGroups()
+            .Mor(source, target)
+            ._from_realization_engine(_UnitGroupMorphism, morphism)
         )
 
     def _repr_(self):
