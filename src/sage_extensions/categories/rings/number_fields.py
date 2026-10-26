@@ -274,7 +274,11 @@ def _order_in(field, engine_order):
     assert _power_basis_lattice(canonical_order) == lattice_rows, (
         f"reconstructing the canonical lattice rows changed the order lattice of {engine_order}"
     )
-    return _OwnedRingParent(canonical_order, named_placement=_order_placements)
+    return _OwnedRingParent(
+        canonical_order,
+        named_placement=_order_placements,
+        order_basis=tuple(canonical_order.basis()),
+    )
 
 
 def _order_from_engine(engine_order):

@@ -52,6 +52,7 @@ from sage_extensions.categories.algebras.free_algebras import SymmetricAlgebras
 from sage_extensions.categories.functors.core import Functor
 from sage_extensions.categories.group.magmas import Monoids
 from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
+from sage_extensions.categories.rings.commutative_ideals import CommutativeIdeals
 from sage_extensions.categories.rings.ring_foundation import (
     LocalRingConstruction,
     LocalizationRings,
@@ -74,6 +75,7 @@ from sage_extensions.categories.rings.ring_foundation import (
     _ring_morphism_with_engine,
     _ring_morphisms_equal,
     _owned_integers,
+    _owned_rationals,
 )
 from sage_extensions.categories.sets.cardinals import aleph0, cardinal
 from sage_extensions.categories.sets.finite_ordered_sets import (
@@ -4140,7 +4142,7 @@ def _finite_generated_localization(source, submonoid):
         if base is not None and source in Algebras(base).Associative().Unital()
         else None
     )
-    algebra_categories = []
+    algebra_categories = [Algebras(base).Associative().Unital().Commutative()]
     if algebra_source is not None:
         algebra_base = algebra_source.base_ring()
         algebra_categories = [Algebras(algebra_base).Associative().Unital()]
@@ -4149,22 +4151,14 @@ def _finite_generated_localization(source, submonoid):
     full_placement = owned_category_join(
         (LocalizationRings(), *placements, *algebra_categories)
     )
-    initial_placement = (
-        owned_category_join((LocalizationRings(), *placements))
-        if algebra_source is not None
-        else full_placement
-    )
     return _object_of(
-        initial_placement,
+        full_placement,
         source=source,
         submonoid=submonoid,
         _engine_ring=localization_engine,
         _engine_source_decoder=engine_source_decoder,
         _engine_source_encoder=engine_source_encoder,
         algebra_source=algebra_source,
-        _preamble_pending_localization_placement=(
-            full_placement if initial_placement is not full_placement else None
-        ),
     )
 
 
@@ -4262,7 +4256,7 @@ def _fraction_field_localization(source, submonoid):
         if base is not None and source in Algebras(base).Associative().Unital()
         else None
     )
-    algebra_categories = []
+    algebra_categories = [Algebras(base).Associative().Unital().Commutative()]
     if algebra_source is not None:
         algebra_base = algebra_source.base_ring()
         algebra_categories = [Algebras(algebra_base).Associative().Unital()]
@@ -4273,20 +4267,12 @@ def _fraction_field_localization(source, submonoid):
     full_placement = owned_category_join(
         (LocalizationRings(), *placements, *algebra_categories)
     )
-    initial_placement = (
-        owned_category_join((LocalizationRings(), *placements))
-        if algebra_source is not None
-        else full_placement
-    )
     return _object_of(
-        initial_placement,
+        full_placement,
         source=source,
         submonoid=submonoid,
         _engine_ring=fraction_engine,
         algebra_source=algebra_source,
-        _preamble_pending_localization_placement=(
-            full_placement if initial_placement is not full_placement else None
-        ),
     )
 
 
@@ -4380,13 +4366,6 @@ def _localization_at_submonoid(source, submonoid):
                 else localization.base_ring()
             ),
         )
-    pending_placement = vars(localization).pop(
-        "_preamble_pending_localization_placement", None
-    )
-    if pending_placement is not None:
-        from sage_extensions.refine import refine
-
-        refine(localization, pending_placement)
     return localization
 
 
@@ -4661,7 +4640,7 @@ def _PrimeLocalizationFromSubmonoid(source, submonoid):
         if base is not None and source in Algebras(base).Associative().Unital()
         else None
     )
-    algebra_categories = []
+    algebra_categories = [Algebras(base).Associative().Unital().Commutative()]
     if algebra_source is not None:
         algebra_categories.append(Algebras(base).Associative().Unital())
         if source in Algebras(base).Associative().Unital().Commutative():
@@ -4669,20 +4648,12 @@ def _PrimeLocalizationFromSubmonoid(source, submonoid):
     full_placement = owned_category_join(
         (PrimeLocalizations(), *placements, *algebra_categories)
     )
-    initial_placement = (
-        owned_category_join((PrimeLocalizations(), *placements))
-        if algebra_source is not None
-        else full_placement
-    )
     return _object_of(
-        initial_placement,
+        full_placement,
         source=source,
         submonoid=submonoid,
         engine_ring=fraction_engine,
         algebra_source=algebra_source,
-        _preamble_pending_localization_placement=(
-            full_placement if initial_placement is not full_placement else None
-        ),
     )
 
 

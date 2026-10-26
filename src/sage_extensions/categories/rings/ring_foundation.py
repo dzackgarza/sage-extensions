@@ -62,7 +62,6 @@ from sage.rings.qqbar import AA as SageAA
 from sage.rings.finite_rings.finite_field_constructor import GF as SageGF
 from sage.structure.richcmp import op_EQ, op_GE, op_GT, op_LE, op_LT, op_NE, richcmp
 from sage.structure.sage_object import SageObject
-from sage.structure.unique_representation import UniqueRepresentation
 
 from sage_extensions.categories.abstract_categories.mor_categories import (
     CategoricalMor,
@@ -1142,21 +1141,6 @@ class LocalizationRings(OwnedCategory):
     class ParentMethods:
         _derived_construction_parameters = frozenset({"base_ring"})
 
-        def base_ring(self):
-            r"""The retained scalar base of this localization as a ring object.
-
-            Localization category placement can be deferred until its native
-            regular module is installed. In that phase the algebra category
-            that normally supplies ``base_ring`` is deliberately absent, so
-            derive the same value from the retained source algebra instead of
-            accidentally treating the localization as an algebra over itself.
-            A source with no selected scalar algebra remains self-based.
-            """
-            algebra_source = getattr(self, "algebra_source", None)
-            if algebra_source is not None:
-                return algebra_source.base_ring()
-            return self
-
         def _cardinality_decision(self):
             r"""Supply the cardinality for a zero source or an integral-domain source.
 
@@ -1283,6 +1267,7 @@ class LocalizationRings(OwnedCategory):
         ) -> None:
             self._localization_source = source
             self._localization_submonoid = submonoid
+            self.algebra_source = algebra_source
             self._localization_engine_source_decoder = _engine_source_decoder
             self._localization_engine_source_encoder = _engine_source_encoder
             self._preamble_engine_ring = _engine_ring
@@ -1304,7 +1289,14 @@ class LocalizationRings(OwnedCategory):
             super().__init__(
                 base_ring=coefficient_base,
                 _engine_product=lambda left, right: LocalizationRings.ElementMethods._mul_(left, right),
-                _engine_scalar_action=lambda scalar, element: LocalizationRings.ElementMethods._mul_(self(scalar), self(element)),
+                _engine_scalar_action=lambda scalar, element: LocalizationRings.ElementMethods._mul_(
+                    self(
+                        algebra_source._owned_scalar_multiple(scalar, algebra_source.one())
+                        if algebra_source is not None
+                        else source(scalar)
+                    ),
+                    self(element),
+                ),
                 _engine_unit=lambda algebra: LocalizationRings.ParentMethods.one(algebra),
                 **rest,
             )
@@ -5331,7 +5323,7 @@ class _OwnedIntegerElement(_OwnedRingElement):
         return integer_ring(self._backend())
 
 
-class _OwnedRingParent(UniqueRepresentation, Parent):
+class _OwnedRingParent(Parent):
     r"""An owned ring parent with one private computational realization.
 
     The parent and its elements belong to the preamble universe.  ``engine``
@@ -5359,7 +5351,8 @@ class _OwnedRingParent(UniqueRepresentation, Parent):
 
     def __init__(
         self, engine: Ring, *, base=None, category=None, constructing_category=None,
-        named_placement=None, named_cardinality=None, _defer_construction_facets=False,
+        named_placement=None, named_cardinality=None, order_basis=None,
+        _defer_construction_facets=False,
     ) -> None:
         r"""Construct over the scalar ring the level above declares.
 
@@ -5453,6 +5446,10 @@ class _OwnedRingParent(UniqueRepresentation, Parent):
                 # Retain the actual basis instead; the common native module
                 # constructor registers its resolution after Parent setup and
                 # before it exposes the module to construction hooks.
+                if order_basis is None:
+                    raise TypeError(
+                        "an owned number-field order must be constructed with its selected integral basis"
+                    )
                 from sage_extensions.categories.modules.native_modules import (
                     _NativeModuleBasis,
                 )
@@ -5461,7 +5458,10 @@ class _OwnedRingParent(UniqueRepresentation, Parent):
                 labels = owned_sets.finite_ordered_set(range(int(engine.rank())))
                 field_engine = engine.number_field()
                 degree = int(field_engine.degree())
-                basis_elements = tuple(engine.basis())
+                # The order constructor owns the selected integral basis.
+                # Generic ring construction must consume that retained datum,
+                # not ask the backend parent to choose it again.
+                basis_elements = tuple(order_basis)
                 basis_matrix = _SageMatrix(
                     SageQQ,
                     tuple(
@@ -6675,6 +6675,7 @@ def _owned_rationals() -> Ring:
     return rationals
 
 
+@cached_function
 def _owned_real_algebraic_numbers() -> _OwnedRingParent:
     r"""The canonical owned real algebraic numbers ``AA``."""
     return _OwnedRingParent(SageAA, named_placement=_real_algebraic_placements)
@@ -6692,6 +6693,7 @@ def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingPare
     )
 
 
+@cached_function
 def _owned_algebraic_numbers() -> _OwnedRingParent:
     r"""The canonical owned algebraic numbers ``QQbar``."""
     from sage.rings.qqbar import QQbar as SageQQbar
@@ -6699,6 +6701,7 @@ def _owned_algebraic_numbers() -> _OwnedRingParent:
     return _OwnedRingParent(SageQQbar, named_placement=_algebraic_number_placements)
 
 
+@cached_function
 def _owned_real_double_field() -> _OwnedRingParent:
     r"""The canonical owned double-precision real field ``RDF``."""
     from sage.rings.real_double import RDF as SageRDF
@@ -6710,6 +6713,7 @@ def _owned_real_double_field() -> _OwnedRingParent:
     )
 
 
+@cached_function
 def _owned_complex_double_field() -> _OwnedRingParent:
     r"""The canonical owned double-precision complex field ``CDF``."""
     from sage.rings.complex_double import CDF as SageCDF
