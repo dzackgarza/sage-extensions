@@ -40,3 +40,10 @@ def test_quotient_field_query_preserves_construction_placement() -> None:
     assert quotient.category() is placement
     maximal = CommutativeIdeals(polynomial).Maximal()(t * t + polynomial(1))
     assert polynomial.residue_field_at(maximal) in OwnedRings().Division()
+
+
+def test_residue_field_construction_from_maximal_ideal() -> None:
+    polynomial = _owned_rationals().polynomial_ring("s")
+    s = polynomial.algebra_generator("s")
+    maximal = CommutativeIdeals(polynomial).Maximal()(s * s + polynomial(1))
+    assert polynomial.residue_field_at(maximal) in OwnedRings().Division()
