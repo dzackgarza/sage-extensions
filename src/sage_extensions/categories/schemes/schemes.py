@@ -46,10 +46,14 @@ from sage.rings.polynomial.polynomial_ring import PolynomialRing_generic
 from sage.schemes.affine.affine_space import AffineSpace as _SageAffineSpace
 from sage.schemes.generic.algebraic_scheme import (
     AlgebraicScheme_quasi as _SageAlgebraicSchemeQuasi,
+)
+from sage.schemes.generic.algebraic_scheme import (
     AlgebraicScheme_subscheme as _SageAlgebraicSchemeSubscheme,
 )
 from sage.schemes.generic.morphism import SchemeMorphism as _SageSchemeMorphism
-from sage.schemes.generic.morphism import SchemeMorphism_id as _SageSchemeMorphismIdentity
+from sage.schemes.generic.morphism import (
+    SchemeMorphism_id as _SageSchemeMorphismIdentity,
+)
 from sage.schemes.generic.morphism import (
     SchemeMorphism_polynomial as _SageSchemeMorphismPolynomial,
 )
@@ -63,16 +67,21 @@ from sage.schemes.projective.projective_space import (
 )
 from sage.structure.element import parent as element_parent
 
-from sage_extensions.categories.abstract_categories.mor_foundation import CategoricalArrow
 from sage_extensions.categories.abstract_categories.mor_categories import (
     CategoricalMor,
     _MonoCategoryOf,
+)
+from sage_extensions.categories.abstract_categories.mor_foundation import (
+    CategoricalArrow,
+    object_level,
 )
 from sage_extensions.categories.abstract_categories.objects import (
     OwnedCategory,
     OwnedParameterizedCategory,
 )
-from sage_extensions.categories.abstract_categories.products import _finite_factor_family
+from sage_extensions.categories.abstract_categories.products import (
+    _finite_factor_family,
+)
 from sage_extensions.categories.algebras.algebras import (
     Algebras,
     _engine_algebra_morphism,
@@ -81,44 +90,44 @@ from sage_extensions.categories.algebras.finitely_presented_algebras import (
     AlgebrasWithChosenFinitePresentation,
 )
 from sage_extensions.categories.algebras.free_algebras import (
-    FreeAlgebras,
-    GradedFreeAlgebras,
     SymmetricAlgebras,
-    _symmetric_algebra_on,
 )
 from sage_extensions.categories.modules.pure.modules import BilinearMap
 from sage_extensions.categories.rings.commutative_algebra import (
     QuotientRings,
     _commutative_algebra_with_structure,
 )
-from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
 from sage_extensions.categories.rings.ring_foundation import (
     LocalizationRings,
     OwnedCategoryOverBaseRing,
     OwnedFields,
-    OwnedRings,
     OwnedIntegralDomains,
     OwnedPrincipalIdealDomains,
+    OwnedRings,
     _engine_element,
     _engine_numeral,
     _engine_ring,
     _own_ring,
-    _ring_morphisms_equal,
-    _selected_engine_ring_morphism,
-    _proper_restriction_base_ring,
-    _owned_integers,
     _owned_complex_field,
+    _owned_engine_element,
+    _owned_integers,
     _owned_rationals,
     _owned_ring,
+    _proper_restriction_base_ring,
+    _ring_morphisms_equal,
+    _selected_engine_ring_morphism,
 )
 from sage_extensions.categories.schemes.ringed_spaces import (
-    LocallyRingedSpaces,
     LocallyRingedMorCategoryConstruction,
+    LocallyRingedSpaces,
     PresheafObjects,
     QuasiCoherentSheaves,
 )
 from sage_extensions.categories.sets.finite_families import finite_family
-from sage_extensions.categories.sets.indexed_families import IndexedFamily, indexed_family
+from sage_extensions.categories.sets.indexed_families import (
+    IndexedFamily,
+    indexed_family,
+)
 from sage_extensions.categories.sets.set_categories import Sets
 from sage_extensions.lexicon.algebra import AlgebraHomomorphism
 from sage_extensions.lexicon.category_theory import (
@@ -126,10 +135,9 @@ from sage_extensions.lexicon.category_theory import (
     ObjectOfCategory,
 )
 from sage_extensions.logic import AtomicProposition, conjunction, negation
-from sage_extensions.refine import RealizationHook
 from sage_extensions.owned_category import _object_of, owned_category_join
 from sage_extensions.owned_category_bases import CategoryWithAxiom
-from sage_extensions.categories.abstract_categories.mor_foundation import object_level
+from sage_extensions.refine import RealizationHook
 
 for _scheme_axiom in (
     "Affine",
@@ -239,7 +247,9 @@ def _engine_coordinate_pullback_of(native, domain_algebra, codomain_algebra):
         case _SageSchemeMorphismIdentity():
             return codomain_algebra.Mor(domain_algebra).identity()
         case _SageSchemeMorphismSpec():
-            return codomain_algebra.Mor(domain_algebra)._from_engine_morphism(native.ring_homomorphism())
+            return codomain_algebra.Mor(domain_algebra)._from_engine_morphism(
+                native.ring_homomorphism()
+            )
         case _SageSchemeMorphismPolynomial():
             return codomain_algebra.Mor(domain_algebra)._from_engine_morphism(
                 _engine_ring(codomain_algebra).hom(
@@ -276,21 +286,7 @@ def _engine_polynomial_algebra(engine_polynomial_ring, base):
         _polynomial_ring,
     )
 
-    algebra = _polynomial_ring(
-        base, tuple(engine_polynomial_ring.variable_names())
-    )
-    # The polynomial-ring owner has already selected and retained the exact
-    # generator index set. Passing the engine's tuple of names directly to a
-    # later common refinement would normalize it to a second finite set and
-    # break the literal identity between the generating module and framing.
-    return _commutative_algebra_with_structure(
-        algebra,
-        base,
-        algebra.algebra_generating_set(),
-        FreeAlgebras(base),
-        GradedFreeAlgebras(base),
-        SymmetricAlgebras(base),
-    )
+    return _polynomial_ring(base, tuple(engine_polynomial_ring.variable_names()))
 
 
 def _engine_affine_spectrum(algebra, base):
@@ -327,7 +323,8 @@ def _engine_coercion_agreeing_on(pullback, determining):
         "generators from which to build one"
     )
     assert all(
-        engine_morphism(_engine_element(source, value)) == _engine_element(target, pullback(value))
+        engine_morphism(_engine_element(source, value))
+        == _engine_element(target, pullback(value))
         for value in determining
     ), (
         f"cannot compute with the coordinate pullback {pullback} in Sage: Sage's canonical map "
@@ -365,7 +362,9 @@ def _engine_coordinate_pullback(pullback):
         case _ if source.is_framed_algebra():
             return _engine_algebra_morphism(pullback)
         case _:
-            from sage_extensions.categories.functors.algebra_scalar_change import _engine_ring_map
+            from sage_extensions.categories.functors.algebra_scalar_change import (
+                _engine_ring_map,
+            )
 
             return _engine_ring_map(pullback)
 
@@ -402,7 +401,11 @@ def _copy_polynomial_by_exponents(
     result = target_ring.zero()
     for exponent, coefficient in polynomial.dict().items():
         term = target_ring(coefficient)
-        for variable, power in zip(target_variables, _polynomial_exponents(exponent, variable_count), strict=True):
+        for variable, power in zip(
+            target_variables,
+            _polynomial_exponents(exponent, variable_count),
+            strict=True,
+        ):
             term *= variable**power
         result += term
     return result
@@ -434,7 +437,11 @@ def _evaluate_owned_homogeneous_polynomial_on_coordinates(
         f"all lie in one ring (the first lies in {source_ring})"
     )
     base = polynomial_ring.base_ring()
-    scalar_map = _restriction_to_base(source_ring, base) if coefficient_map is None else coefficient_map
+    scalar_map = (
+        _restriction_to_base(source_ring, base)
+        if coefficient_map is None
+        else coefficient_map
+    )
     assert scalar_map.domain() is base and scalar_map.codomain() is source_ring, (
         f"cannot evaluate {polynomial} at the coordinates {coordinates}: the map on coefficients "
         f"{scalar_map} must be a ring map {base} -> {source_ring}, but it is "
@@ -523,14 +530,21 @@ def _elements_determining_maps_out_of(algebra, base):
             if scalar_generators is None:
                 return None
             structure = algebra.algebra_structure_morphism()
-            return generators + tuple(structure(element) for element in scalar_generators)
+            return generators + tuple(
+                structure(element) for element in scalar_generators
+            )
         case _ if algebra in LocalizationRings():
             if base in LocalizationRings():
                 if algebra.localization_source() is base:
                     return ()
-                if algebra.localization_source() is base.localization_source() and _localization_refines(algebra, base):
+                if (
+                    algebra.localization_source() is base.localization_source()
+                    and _localization_refines(algebra, base)
+                ):
                     return ()
-            below = _elements_determining_maps_out_of(algebra.localization_source(), base)
+            below = _elements_determining_maps_out_of(
+                algebra.localization_source(), base
+            )
             if below is None:
                 return None
             localization_map = algebra.localization_map()
@@ -542,10 +556,16 @@ def _elements_determining_maps_out_of(algebra, base):
 def _algebra_generator_label(algebra, generator):
     r"""The label of an element that is one of the algebra's chosen generators."""
     label = next(
-        (label for label in algebra.algebra_generating_set() if algebra.algebra_generator(label) == generator),
+        (
+            label
+            for label in algebra.algebra_generating_set()
+            if algebra.algebra_generator(label) == generator
+        ),
         None,
     )
-    assert label is not None, f"{generator} is not a chosen algebra generator of {algebra}"
+    assert label is not None, (
+        f"{generator} is not a chosen algebra generator of {algebra}"
+    )
     return label
 
 
@@ -579,7 +599,9 @@ class SchemeConeMorphismConstruction:
         One scheme may carry both a product and a pullback construction.
         The projections, not its category membership, select the cone.
         """
-        return next((leg for arrow, leg in self._projection_legs if arrow is projection), None)
+        return next(
+            (leg for arrow, leg in self._projection_legs if arrow is projection), None
+        )
 
     def image_of(self, image):
         r"""Return ``image`` retaining this cone as the datum it was induced by."""
@@ -631,6 +653,7 @@ class SchemeMorphismMethods:
 
     def __init__(
         self,
+        parent,
         native_morphism,
         *,
         mor,
@@ -667,8 +690,11 @@ class SchemeMorphismMethods:
         self._point_coordinates = point_coordinates
         self._closed_complement = closed_complement
         self._homogeneous_coordinates = (
-            None if homogeneous_coordinates is None
-            else finite_family(tuple(homogeneous_coordinates), name="Homogeneous coordinates")
+            None
+            if homogeneous_coordinates is None
+            else finite_family(
+                tuple(homogeneous_coordinates), name="Homogeneous coordinates"
+            )
         )
         self._coefficient_map = coefficient_map
         self._standard_projective_chart_embedding = standard_projective_chart_embedding
@@ -680,16 +706,24 @@ class SchemeMorphismMethods:
         self._finite_atlas = finite_atlas
         self._atlas_local_maps = atlas_local_maps
         self._glued_local_maps = glued_local_maps
-        self._relative_projectivization_source_sheaf = relative_projectivization_source_sheaf
-        self._relative_projectivization_comparison = relative_projectivization_comparison
+        self._relative_projectivization_source_sheaf = (
+            relative_projectivization_source_sheaf
+        )
+        self._relative_projectivization_comparison = (
+            relative_projectivization_comparison
+        )
         self._relative_projectivization_role = relative_projectivization_role
-        self._relative_projectivization_underlying_projection = relative_projectivization_underlying_projection
-        self._relative_projectivization_sheaf_morphism = relative_projectivization_sheaf_morphism
+        self._relative_projectivization_underlying_projection = (
+            relative_projectivization_underlying_projection
+        )
+        self._relative_projectivization_sheaf_morphism = (
+            relative_projectivization_sheaf_morphism
+        )
         self._toric_lattice_morphism = toric_lattice_morphism
         self._toric_chart_targets = toric_chart_targets
         self._toric_chart_pullbacks = toric_chart_pullbacks
         self._affine_quotient_base_change_datum = affine_quotient_base_change_data
-        super().__init__(mor)
+        super().__init__(parent)
 
     def with_cone_construction(self, construction):
         r"""This morphism, retaining the universal cone it was induced by."""
@@ -754,28 +788,38 @@ class SchemeMorphismMethods:
 
     def chart_map(self):
         if self._gluing_role != "chart_map":
-            raise AttributeError(f"{self} is not represented by a map through a selected gluing chart")
+            raise AttributeError(
+                f"{self} is not represented by a map through a selected gluing chart"
+            )
         return self._gluing_chart_map
 
     def atlas(self):
         if self._gluing_role != "finite_atlas":
-            raise AttributeError(f"{self} is not represented on a selected finite affine atlas")
+            raise AttributeError(
+                f"{self} is not represented on a selected finite affine atlas"
+            )
         return self._finite_atlas
 
     def local_maps(self):
         if self._gluing_role != "finite_atlas":
-            raise AttributeError(f"{self} is not represented by local maps on a finite atlas")
+            raise AttributeError(
+                f"{self} is not represented by local maps on a finite atlas"
+            )
         return self._atlas_local_maps
 
     def local_map(self, index):
         if self._toric_lattice_morphism is not None:
-            target_embedding = self.codomain().gluing_datum().chart_embedding(self.chart_target(index))
+            target_embedding = (
+                self.codomain().gluing_datum().chart_embedding(self.chart_target(index))
+            )
             return target_embedding * self.chart_morphism(index)
         return self.local_maps()[self.atlas().normalize_chart_index(index)]
 
     def glued_local_maps(self):
         if self._gluing_role != "glued_domain":
-            raise AttributeError(f"{self} is not represented by local maps on a glued domain")
+            raise AttributeError(
+                f"{self} is not represented by local maps on a glued domain"
+            )
         return self._glued_local_maps
 
     def glued_local_map(self, index):
@@ -783,12 +827,16 @@ class SchemeMorphismMethods:
 
     def source_sheaf(self):
         if self._relative_projectivization_source_sheaf is None:
-            raise AttributeError(f"{self} is not a relative-projectivization projection")
+            raise AttributeError(
+                f"{self} is not a relative-projectivization projection"
+            )
         return self._relative_projectivization_source_sheaf
 
     def comparison(self):
         if self._relative_projectivization_comparison is None:
-            raise AttributeError(f"{self} is not defined by a relative-projectivization comparison")
+            raise AttributeError(
+                f"{self} is not defined by a relative-projectivization comparison"
+            )
         return self._relative_projectivization_comparison
 
     def underlying_projection(self):
@@ -798,7 +846,9 @@ class SchemeMorphismMethods:
 
     def sheaf_morphism(self):
         if self._relative_projectivization_sheaf_morphism is None:
-            raise AttributeError(f"{self} is not defined by a relative-projectivization sheaf morphism")
+            raise AttributeError(
+                f"{self} is not defined by a relative-projectivization sheaf morphism"
+            )
         return self._relative_projectivization_sheaf_morphism
 
     def lattice_morphism(self):
@@ -823,7 +873,9 @@ class SchemeMorphismMethods:
 
     def _affine_quotient_base_change_data(self):
         if self._affine_quotient_base_change_datum is None:
-            raise AttributeError(f"{self} is not an invariant-quotient base-change comparison")
+            raise AttributeError(
+                f"{self} is not an invariant-quotient base-change comparison"
+            )
         return self._affine_quotient_base_change_datum
 
     def source_acted_scheme(self):
@@ -845,7 +897,11 @@ class SchemeMorphismMethods:
         return self
 
     def reynolds_hypothesis_holds(self) -> bool:
-        from sage_extensions.categories.rings.ring_foundation import OwnedFields, _owned_ring
+        from sage_extensions.categories.rings.ring_foundation import (
+            OwnedFields,
+            _owned_ring,
+        )
+
         source = _owned_ring(self.ring_map().domain())
         target = _owned_ring(self.ring_map().codomain())
         if source not in OwnedFields() or target not in OwnedFields():
@@ -855,8 +911,14 @@ class SchemeMorphismMethods:
 
     @cached_method
     def reynolds_isomorphism(self):
-        from sage_extensions.categories.rings.ring_foundation import _engine_element, _engine_ring
-        from sage_extensions.categories.schemes.quotients import _evaluate_polynomial_in_algebra
+        from sage_extensions.categories.rings.ring_foundation import (
+            _engine_element,
+            _engine_ring,
+        )
+        from sage_extensions.categories.schemes.quotients import (
+            _evaluate_polynomial_in_algebra,
+        )
+
         assert self.reynolds_hypothesis_holds() is True, (
             f"the comparison X_(k')/G -> (X/G)_(k') for {self.source_acted_scheme()} along "
             f"{self.ring_map()} is proved an isomorphism only when the acting group "
@@ -877,7 +939,11 @@ class SchemeMorphismMethods:
             engine_source(
                 _engine_element(
                     changed_source_algebra,
-                    invariant_inclusion(comparison_pullback(changed_old_invariants.algebra_generator(label))),
+                    invariant_inclusion(
+                        comparison_pullback(
+                            changed_old_invariants.algebra_generator(label)
+                        )
+                    ),
                 )
             )
             for label in changed_old_invariants.algebra_generating_set()
@@ -885,7 +951,9 @@ class SchemeMorphismMethods:
         inverse_images = {}
         for label in changed_invariants.algebra_generating_set():
             invariant = invariant_inclusion(changed_invariants.algebra_generator(label))
-            engine_invariant = engine_source(_engine_element(changed_source_algebra, invariant))
+            engine_invariant = engine_source(
+                _engine_element(changed_source_algebra, invariant)
+            )
             certificate = engine_invariant.in_subalgebra(
                 old_generator_images, algorithm="groebner", certificate="invariant"
             )
@@ -895,18 +963,30 @@ class SchemeMorphismMethods:
                     f"isomorphism, but the invariant {invariant} of the base-changed ring could not "
                     "be written as a polynomial in the base changes of the original invariants"
                 )
-            inverse_images[label] = _evaluate_polynomial_in_algebra(certificate, changed_old_invariants)
-        inverse_pullback = changed_invariants.Mor(changed_old_invariants)(inverse_images)
-        from sage_extensions.categories.schemes.schemes import _affine_morphism_from_pullback
-        inverse = _affine_morphism_from_pullback(target_quotient, source_quotient, inverse_pullback)
-        return Schemes(source_quotient.scheme_base_ring()).Core().Mor(
-            source_quotient, target_quotient
-        )(forward, inverse)
+            inverse_images[label] = _evaluate_polynomial_in_algebra(
+                certificate, changed_old_invariants
+            )
+        inverse_pullback = changed_invariants.Mor(changed_old_invariants)(
+            inverse_images
+        )
+        from sage_extensions.categories.schemes.schemes import (
+            _affine_morphism_from_pullback,
+        )
+
+        inverse = _affine_morphism_from_pullback(
+            target_quotient, source_quotient, inverse_pullback
+        )
+        return (
+            Schemes(source_quotient.scheme_base_ring())
+            .Core()
+            .Mor(source_quotient, target_quotient)(forward, inverse)
+        )
 
     def pullback_divisor(self, divisor):
         if self._toric_lattice_morphism is None:
             raise AttributeError(f"{self} is not a represented toric morphism")
         from sage_extensions.categories.schemes.toric.toric_schemes import _integers
+
         codomain = self.codomain()
         target_group = codomain.weil_divisor_group()
         divisor = target_group(divisor)
@@ -987,7 +1067,9 @@ class SchemeMorphismMethods:
                 name="Re-sited glued-domain local maps",
             )
         return mor.element_class(
-            mor, self._native_morphism, mor=mor,
+            mor,
+            self._native_morphism,
+            mor=mor,
             pullback=self._coordinate_pullback,
             scalar_pullback=self._scalar_pullback,
             cone_construction=self.cone_construction(),
@@ -1003,7 +1085,9 @@ class SchemeMorphismMethods:
             gluing_chart_map=gluing_chart_map,
             finite_atlas=self._finite_atlas,
             atlas_local_maps=(
-                None if self._atlas_local_maps is None else finite_indexed_family(
+                None
+                if self._atlas_local_maps is None
+                else finite_indexed_family(
                     self._finite_atlas.chart_index_set(),
                     lambda index: mor.mor_category().Mor(
                         self._finite_atlas.chart(index), self.codomain()
@@ -1065,7 +1149,9 @@ class SchemeMorphismMethods:
 
     def homogeneous_coordinates(self):
         if self._homogeneous_coordinates is None:
-            raise AttributeError(f"{self} is not represented by homogeneous coordinates")
+            raise AttributeError(
+                f"{self} is not represented by homogeneous coordinates"
+            )
         return self._homogeneous_coordinates
 
     def coefficient_map(self):
@@ -1080,28 +1166,46 @@ class SchemeMorphismMethods:
         ring = self.coefficient_map().codomain()
         base = self.coefficient_map().domain()
         native_scalar = _engine_ring(ring).coerce_map_from(_engine_ring(base))
-        assert native_scalar is not None, f"Sage has no canonical coefficient map {base} -> {ring} for {self}"
+        assert native_scalar is not None, (
+            f"Sage has no canonical coefficient map {base} -> {ring} for {self}"
+        )
         natural = OwnedRings().Mor(base, ring)(native_scalar)
         assert _ring_morphisms_equal(self.coefficient_map(), natural) is True, (
             f"the selected coefficient map of {self} is not Sage's canonical map {base} -> {ring}"
         )
         return _native_scheme_mor(self.domain(), self.codomain())(
-            [_engine_element(ring, value) for value in self.homogeneous_coordinates()], check=False,
+            [_engine_element(ring, value) for value in self.homogeneous_coordinates()],
+            check=False,
         )
 
     def __mul__(self, other):
         if self._relative_projectivization_role == "base_projection":
-            if other is self.comparison().changed_projectivization().arrow().domain().projectivization_projection():
+            if (
+                other
+                is self.comparison()
+                .changed_projectivization()
+                .arrow()
+                .domain()
+                .projectivization_projection()
+            ):
                 return self.comparison().square_composite()
             return self.underlying_projection() * other
         if self._relative_projectivization_role == "base_change_base":
             if (
-                other is self.comparison().changed_projectivization().arrow().domain().projectivization_projection()
+                other
+                is self.comparison()
+                .changed_projectivization()
+                .arrow()
+                .domain()
+                .projectivization_projection()
             ):
                 return self.comparison().square_composite()
             return super().__mul__(other)
         if self._gluing_role == "glued_domain":
-            if not isinstance(other, SchemeMorphismMethods) or other.codomain() is not self.domain():
+            if (
+                not isinstance(other, SchemeMorphismMethods)
+                or other.codomain() is not self.domain()
+            ):
                 return NotImplemented
             if self._is_the_identity():
                 return other
@@ -1109,7 +1213,10 @@ class SchemeMorphismMethods:
                 return self
             return other._postcompose_with(self)
         if self._gluing_role == "finite_atlas":
-            if not isinstance(other, SchemeMorphismMethods) or other.codomain() is not self.domain():
+            if (
+                not isinstance(other, SchemeMorphismMethods)
+                or other.codomain() is not self.domain()
+            ):
                 return NotImplemented
             if self._is_the_identity():
                 return other
@@ -1123,19 +1230,29 @@ class SchemeMorphismMethods:
         if self._gluing_role == "chart_embedding":
             if other.codomain() is not self.domain():
                 return NotImplemented
-            from sage_extensions.categories.schemes.gluing import _glued_scheme_chart_map
-            from sage_extensions.categories.schemes.gluing import _scheme_composition_mor
+            from sage_extensions.categories.schemes.gluing import (
+                _glued_scheme_chart_map,
+                _scheme_composition_mor,
+            )
+
             return _glued_scheme_chart_map(
-                _scheme_composition_mor(self, other), self, other,
+                _scheme_composition_mor(self, other),
+                self,
+                other,
             )
         if self._gluing_role == "chart_map":
             composite = self.chart_map() * other
             if composite is NotImplemented:
                 return NotImplemented
-            from sage_extensions.categories.schemes.gluing import _glued_scheme_chart_map
-            from sage_extensions.categories.schemes.gluing import _scheme_composition_mor
+            from sage_extensions.categories.schemes.gluing import (
+                _glued_scheme_chart_map,
+                _scheme_composition_mor,
+            )
+
             return _glued_scheme_chart_map(
-                _scheme_composition_mor(self, other), self.chart_embedding(), composite,
+                _scheme_composition_mor(self, other),
+                self.chart_embedding(),
+                composite,
             )
         if self._multiprojective_chart_embedding:
             if other.codomain() is not self.domain():
@@ -1143,7 +1260,9 @@ class SchemeMorphismMethods:
             return _projective_coordinate_morphism(self) * other
         if self._homogeneous_coordinates is None:
             return super().__mul__(other)
-        assert other.codomain() is self.domain(), f"{self} and {other} are not composable"
+        assert other.codomain() is self.domain(), (
+            f"{self} and {other} are not composable"
+        )
         cone_leg = self._projected_cone_leg(other)
         if cone_leg is not None:
             return cone_leg
@@ -1153,10 +1272,11 @@ class SchemeMorphismMethods:
         if self.domain() in Schemes(self.domain().scheme_base_ring()).Affine():
             pullback = other.coordinate_algebra_morphism()
             return _ProjectiveCoordinateMorphism(
-                mor, tuple(pullback(value) for value in self.homogeneous_coordinates()),
-                coefficient_map=OwnedRings().Mor(self.coefficient_map().domain(), pullback.codomain()).elementwise(
-                    lambda value: pullback(self.coefficient_map()(value))
-                ),
+                mor,
+                tuple(pullback(value) for value in self.homogeneous_coordinates()),
+                coefficient_map=OwnedRings()
+                .Mor(self.coefficient_map().domain(), pullback.codomain())
+                .elementwise(lambda value: pullback(self.coefficient_map()(value))),
             )
         if other.domain()._is_glued_from_affine_atlas():
             return other._postcompose_with(self)
@@ -1165,16 +1285,26 @@ class SchemeMorphismMethods:
 
         def substitute(polynomial):
             return _evaluate_owned_homogeneous_polynomial_on_coordinates(
-                polynomial, source_ring, tuple(before.homogeneous_coordinates()),
+                polynomial,
+                source_ring,
+                tuple(before.homogeneous_coordinates()),
                 coefficient_map=before.coefficient_map(),
             )
 
-        coefficients = OwnedRings().Mor(
-            self.coefficient_map().domain(), before.coefficient_map().codomain()
-        ).elementwise(lambda value: substitute(self.coefficient_map()(value)))
+        coefficients = (
+            OwnedRings()
+            .Mor(self.coefficient_map().domain(), before.coefficient_map().codomain())
+            .elementwise(lambda value: substitute(self.coefficient_map()(value)))
+        )
         values = tuple(substitute(value) for value in self.homogeneous_coordinates())
-        point_values = finite_family(values, name="Point coordinates") if before._represented_point_coordinates() is not None else None
-        return _ProjectiveCoordinateMorphism(mor, values, coefficient_map=coefficients, point_coordinates=point_values)
+        point_values = (
+            finite_family(values, name="Point coordinates")
+            if before._represented_point_coordinates() is not None
+            else None
+        )
+        return _ProjectiveCoordinateMorphism(
+            mor, values, coefficient_map=coefficients, point_coordinates=point_values
+        )
 
     def _postcompose_with(self, after):
         if self._toric_lattice_morphism is not None:
@@ -1186,7 +1316,10 @@ class SchemeMorphismMethods:
                 )
             )
         if self._relative_projectivization_role == "base_change_total":
-            if after is self.comparison().projectivization().projectivization_projection():
+            if (
+                after
+                is self.comparison().projectivization().projectivization_projection()
+            ):
                 return self.comparison().square_composite()
             return None
         if self._relative_projectivization_source_sheaf is not None:
@@ -1197,17 +1330,26 @@ class SchemeMorphismMethods:
             if after.domain() is not self.codomain():
                 return NotImplemented
             from sage_extensions.categories.schemes.gluing import _glued_scheme_morphism
+
             datum = self.gluing_datum()
             return _glued_scheme_morphism(
                 _scheme_composition_mor(after, self),
-                tuple(after * self.glued_local_map(index) for index in datum.chart_indices()),
+                tuple(
+                    after * self.glued_local_map(index)
+                    for index in datum.chart_indices()
+                ),
             )
         if self._gluing_role == "finite_atlas":
             if after.domain() is not self.codomain():
                 return NotImplemented
-            from sage_extensions.categories.schemes.gluing import _finite_atlas_scheme_morphism
+            from sage_extensions.categories.schemes.gluing import (
+                _finite_atlas_scheme_morphism,
+            )
+
             return _finite_atlas_scheme_morphism(
-                self.domain(), after.codomain(), self.atlas(),
+                self.domain(),
+                after.codomain(),
+                self.atlas(),
                 self.local_maps().map(lambda local_map: after * local_map),
             )
         if self._gluing_role == "open_inclusion":
@@ -1235,7 +1377,8 @@ class SchemeMorphismMethods:
         if self._relative_projectivization_role == "surjectivity_open_inclusion":
             return (
                 isinstance(other, SchemeMorphismMethods)
-                and other._relative_projectivization_role == "surjectivity_open_inclusion"
+                and other._relative_projectivization_role
+                == "surjectivity_open_inclusion"
                 and other.domain() is self.domain()
                 and other.codomain() is self.codomain()
                 and other.sheaf_morphism() is self.sheaf_morphism()
@@ -1243,7 +1386,8 @@ class SchemeMorphismMethods:
         if self._relative_projectivization_role == "surjectivity_induced_morphism":
             return (
                 isinstance(other, SchemeMorphismMethods)
-                and other._relative_projectivization_role == "surjectivity_induced_morphism"
+                and other._relative_projectivization_role
+                == "surjectivity_induced_morphism"
                 and other.domain() is self.domain()
                 and other.codomain() is self.codomain()
                 and other.sheaf_morphism() is self.sheaf_morphism()
@@ -1251,7 +1395,10 @@ class SchemeMorphismMethods:
         if self._relative_projectivization_role == "base_projection":
             if other is self.underlying_projection():
                 return True
-            if isinstance(other, SchemeMorphismMethods) and other._relative_projectivization_role == "base_projection":
+            if (
+                isinstance(other, SchemeMorphismMethods)
+                and other._relative_projectivization_role == "base_projection"
+            ):
                 return (
                     other.domain() is self.domain()
                     and other.codomain() is self.codomain()
@@ -1277,7 +1424,8 @@ class SchemeMorphismMethods:
         if self._relative_projectivization_source_sheaf is not None:
             return (
                 isinstance(other, SchemeMorphismMethods)
-                and other._relative_projectivization_source_sheaf is self._relative_projectivization_source_sheaf
+                and other._relative_projectivization_source_sheaf
+                is self._relative_projectivization_source_sheaf
                 and other.domain() is self.domain()
                 and other.codomain() is self.codomain()
             )
@@ -1294,7 +1442,11 @@ class SchemeMorphismMethods:
                 )
             )
         if self._gluing_role == "finite_atlas":
-            if not isinstance(other, SchemeMorphismMethods) or other.domain() is not self.domain() or other.codomain() is not self.codomain():
+            if (
+                not isinstance(other, SchemeMorphismMethods)
+                or other.domain() is not self.domain()
+                or other.codomain() is not self.codomain()
+            ):
                 return False
             if other._gluing_role == "finite_atlas" and other.atlas() is self.atlas():
                 return all(
@@ -1311,13 +1463,17 @@ class SchemeMorphismMethods:
                 for index in self.atlas().chart_indices()
             )
         if self._gluing_role == "chart_map":
-            if not isinstance(other, SchemeMorphismMethods) or other.codomain() is not self.codomain():
+            if (
+                not isinstance(other, SchemeMorphismMethods)
+                or other.codomain() is not self.codomain()
+            ):
                 return False
             if other._gluing_role == "chart_embedding":
                 return (
                     other.gluing_datum() is self.gluing_datum()
                     and other.chart_index() == self.chart_index()
-                    and self.chart_map() == other.domain().categorical_identity_morphism()
+                    and self.chart_map()
+                    == other.domain().categorical_identity_morphism()
                 )
             if other._gluing_role != "chart_map":
                 return False
@@ -1326,7 +1482,10 @@ class SchemeMorphismMethods:
             datum = self.gluing_datum()
             if other.gluing_datum() is not datum:
                 return False
-            from sage_extensions.categories.schemes.gluing import _lands_in_distinguished_open
+            from sage_extensions.categories.schemes.gluing import (
+                _lands_in_distinguished_open,
+            )
+
             left_overlap = datum.overlap(self.chart_index(), other.chart_index())
             right_overlap = datum.overlap(other.chart_index(), self.chart_index())
             if not _lands_in_distinguished_open(self.chart_map(), left_overlap):
@@ -1335,7 +1494,9 @@ class SchemeMorphismMethods:
                 return False
             left = left_overlap.corestriction(self.chart_map())
             right = right_overlap.corestriction(other.chart_map())
-            transition = datum.transition_between(self.chart_index(), other.chart_index()).forward()
+            transition = datum.transition_between(
+                self.chart_index(), other.chart_index()
+            ).forward()
             return transition * left == right
         if self._gluing_role == "chart_embedding":
             if getattr(other, "_gluing_role", None) == "chart_map":
@@ -1343,7 +1504,8 @@ class SchemeMorphismMethods:
                     other.codomain() is self.codomain()
                     and other.gluing_datum() is self.gluing_datum()
                     and other.chart_index() == self.chart_index()
-                    and other.chart_map() == self.domain().categorical_identity_morphism()
+                    and other.chart_map()
+                    == self.domain().categorical_identity_morphism()
                 )
             return (
                 isinstance(other, SchemeMorphismMethods)
@@ -1351,19 +1513,27 @@ class SchemeMorphismMethods:
                 and other.gluing_datum() is self.gluing_datum()
                 and other.chart_index() == self.chart_index()
             )
-        if self._gluing_role == "open_inclusion" or getattr(other, "_gluing_role", None) == "open_inclusion":
+        if (
+            self._gluing_role == "open_inclusion"
+            or getattr(other, "_gluing_role", None) == "open_inclusion"
+        ):
             return (
                 isinstance(other, SchemeMorphismMethods)
                 and self._gluing_role == other._gluing_role == "open_inclusion"
                 and self.gluing_datum() is other.gluing_datum()
                 and self.chart_index() == other.chart_index()
-                and self.domain() is other.domain() and self.codomain() is other.codomain()
+                and self.domain() is other.domain()
+                and self.codomain() is other.codomain()
             )
         if self._homogeneous_coordinates is None:
             return super().__eq__(other)
         if self is other:
             return True
-        if not isinstance(other, SchemeMorphismMethods) or other.domain() is not self.domain() or other.codomain() is not self.codomain():
+        if (
+            not isinstance(other, SchemeMorphismMethods)
+            or other.domain() is not self.domain()
+            or other.codomain() is not self.codomain()
+        ):
             return False
         other = _projective_coordinate_morphism(other)
         ring = self.coefficient_map().codomain()
@@ -1371,15 +1541,22 @@ class SchemeMorphismMethods:
         mor = OwnedRings().Mor(self.coefficient_map().domain(), restriction.codomain())
         coefficients_equal = _ring_morphisms_equal(
             mor.elementwise(lambda scalar: restriction(self.coefficient_map()(scalar))),
-            mor.elementwise(lambda scalar: restriction(ring(other.coefficient_map()(scalar)))),
+            mor.elementwise(
+                lambda scalar: restriction(ring(other.coefficient_map()(scalar)))
+            ),
         )
         if coefficients_equal is False:
             return False
-        left, right = tuple(self.homogeneous_coordinates()), tuple(ring(value) for value in other.homogeneous_coordinates())
+        left, right = (
+            tuple(self.homogeneous_coordinates()),
+            tuple(ring(value) for value in other.homogeneous_coordinates()),
+        )
         offset = 0
         for width in _projective_coordinate_blocks(self.codomain()):
-            if any(not restriction(left[i] * right[j] - left[j] * right[i]).is_zero()
-                   for i, j in combinations(range(offset, offset + width), 2)):
+            if any(
+                not restriction(left[i] * right[j] - left[j] * right[i]).is_zero()
+                for i, j in combinations(range(offset, offset + width), 2)
+            ):
                 return False
             offset += width
         return coefficients_equal
@@ -1393,16 +1570,17 @@ class SchemeMorphismMethods:
             )
             return self._native_morphism
         if self._gluing_role == "open_inclusion":
-            raise NotImplementedError("a glued open inclusion is represented by its gluing datum")
+            raise NotImplementedError(
+                "a glued open inclusion is represented by its gluing datum"
+            )
         if self._homogeneous_coordinates is not None:
             return self._projective_engine_morphism()
         if self._scalar_pullback is not None:
-            base_arrow = LocallyRingedSpaces().Mor(self.domain().base_scheme(), self.codomain())(
-                self._scalar_pullback
-            )
-            return (
-                _engine_scheme_morphism(base_arrow)
-                * _engine_scheme_morphism(self.domain().structure_morphism())
+            base_arrow = LocallyRingedSpaces().Mor(
+                self.domain().base_scheme(), self.codomain()
+            )(self._scalar_pullback)
+            return _engine_scheme_morphism(base_arrow) * _engine_scheme_morphism(
+                self.domain().structure_morphism()
             )
         if self._coordinate_pullback is not None:
             if self._is_the_identity():
@@ -1427,10 +1605,15 @@ class SchemeMorphismMethods:
 
     def _call_(self, point):
         if self._gluing_role in ("open_inclusion", "chart_embedding"):
-            from sage_extensions.categories.rings.commutative_algebra import PrimeSpectra
+            from sage_extensions.categories.rings.commutative_algebra import (
+                PrimeSpectra,
+            )
+
             if element_parent(point) in PrimeSpectra():
                 if element_parent(point) is not self.domain().underlying_space():
-                    raise ValueError(f"{point} is not a prime point of the chart {self.domain()}")
+                    raise ValueError(
+                        f"{point} is not a prime point of the chart {self.domain()}"
+                    )
                 return self.codomain()._glued_chart_point_map(self.chart_index())(point)
         r"""Evaluate a prime point or compose a scheme-valued point.
 
@@ -1524,14 +1707,21 @@ class SchemeMorphismMethods:
 
         mor = _scheme_composition_mor(self, other)
         point_coordinates = self._represented_point_coordinates()
-        if (point_coordinates is not None
-                and other.codomain() is other.domain().base_scheme()
-                and other == other.domain().structure_morphism()
-                and self.codomain() in Schemes(self.codomain().scheme_base_ring()).Projective()):
+        if (
+            point_coordinates is not None
+            and other.codomain() is other.domain().base_scheme()
+            and other == other.domain().structure_morphism()
+            and self.codomain()
+            in Schemes(self.codomain().scheme_base_ring()).Projective()
+        ):
             # The constant map T -> Spec R -> X at an R-point: its homogeneous
             # coordinates are the point's coordinates, read as sections on T.
             return _ProjectiveCoordinateMorphism(
-                mor, tuple(_constant_sections_ring(other.domain())(value) for value in point_coordinates),
+                mor,
+                tuple(
+                    _constant_sections_ring(other.domain())(value)
+                    for value in point_coordinates
+                ),
             )
         left_pullback = self._represented_coordinate_pullback()
         right_pullback = other._represented_coordinate_pullback()
@@ -1541,15 +1731,21 @@ class SchemeMorphismMethods:
             if left_scalar_pullback is None or right_scalar_pullback is None:
                 return False
             equal = _ring_morphisms_equal(left_scalar_pullback, right_scalar_pullback)
-            if equal is True or self.domain() in ProjectiveSpaces(self.domain().scheme_base_ring()):
+            if equal is True or self.domain() in ProjectiveSpaces(
+                self.domain().scheme_base_ring()
+            ):
                 return equal
             return AtomicProposition("equal", self, other)
         if left_pullback is not None and right_pullback is not None:
             return mor(right_pullback * left_pullback)
-        if (left_pullback is not None
-                and self.codomain() is Schemes(left_pullback.domain()).base_scheme()
-                and other.codomain() is other.domain().base_scheme()
-                and other.parent().mor_category().is_subcategory(Schemes(other.domain().scheme_base_ring()))):
+        if (
+            left_pullback is not None
+            and self.codomain() is Schemes(left_pullback.domain()).base_scheme()
+            and other.codomain() is other.domain().base_scheme()
+            and other.parent()
+            .mor_category()
+            .is_subcategory(Schemes(other.domain().scheme_base_ring()))
+        ):
             assert left_pullback.codomain() is mor.domain().scheme_base_ring(), (
                 f"cannot compose the structure morphism of {mor.domain()} with Spec of {left_pullback}: "
                 f"the ring map must land in the base ring {mor.domain().scheme_base_ring()} of {mor.domain()}, "
@@ -1574,7 +1770,7 @@ class SchemeMorphismMethods:
 
     def _postcompose_with(self, after):
         r"""``after o self`` for a representation with its own composite, else ``None``."""
-        return None
+        return
 
     def compose(self, before):
         return self * before
@@ -1623,7 +1819,9 @@ class SchemeMorphismMethods:
     def graph_morphism(self):
         r"""``Gamma_f = (id, f): X -> X x_S Y``."""
         identity = self.domain().categorical_identity_morphism()
-        return _scheme_product(self.domain(), self.codomain()).from_product_cone((identity, self))
+        return _scheme_product(self.domain(), self.codomain()).from_product_cone(
+            (identity, self)
+        )
 
     @cached_method
     def graph_subscheme(self):
@@ -1644,7 +1842,8 @@ class SchemeMorphismMethods:
         pullback = self.coordinate_algebra_morphism()
         algebra = self.codomain().coordinate_algebra()
         equations = tuple(
-            to_codomain(algebra.algebra_generator(label)) - to_domain(pullback(algebra.algebra_generator(label)))
+            to_codomain(algebra.algebra_generator(label))
+            - to_domain(pullback(algebra.algebra_generator(label)))
             for label in algebra.algebra_generating_set()
         )
         return product.closed_subscheme(equations)
@@ -1691,7 +1890,9 @@ class SchemeMorphismMethods:
                     f"cannot form the inverse image of {subscheme} under {self}: it is computed here for a "
                     f"distinguished open D(g) of an affine scheme, and {subscheme} is not known to be one"
                 )
-                element = self.codomain().coordinate_algebra()(subscheme.distinguished_open_element())
+                element = self.codomain().coordinate_algebra()(
+                    subscheme.distinguished_open_element()
+                )
                 if domain._is_glued_from_affine_atlas():
                     from sage_extensions.categories.schemes.gluing import (
                         _glued_chartwise_distinguished_open,
@@ -1705,7 +1906,9 @@ class SchemeMorphismMethods:
                         {label: label for label in labels},
                         {
                             label: datum.chart(label).distinguished_open(
-                                (self * datum.chart_embedding(label)).coordinate_algebra_morphism()(element)
+                                (
+                                    self * datum.chart_embedding(label)
+                                ).coordinate_algebra_morphism()(element)
                             )
                             for label in labels
                         },
@@ -1715,15 +1918,22 @@ class SchemeMorphismMethods:
                     f"cannot form the inverse image of {subscheme} under {self}: the domain must be affine "
                     f"or glued from affine charts, but it is an object of {domain.category()}"
                 )
-                return domain.distinguished_open(self.coordinate_algebra_morphism()(element))
+                return domain.distinguished_open(
+                    self.coordinate_algebra_morphism()(element)
+                )
             case _:
-                assert domain in Schemes(base).Affine() and self.codomain() in Schemes(base).Affine(), (
+                assert (
+                    domain in Schemes(base).Affine()
+                    and self.codomain() in Schemes(base).Affine()
+                ), (
                     f"cannot form the inverse image of {subscheme} under {self}: this computation "
                     f"requires affine schemes over {base}, but the domain is an object of "
                     f"{domain.category()} and the codomain an object of {self.codomain().category()}"
                 )
                 pullback = self.coordinate_algebra_morphism()
-                equations = tuple(pullback(equation) for equation in subscheme.defining_equations())
+                equations = tuple(
+                    pullback(equation) for equation in subscheme.defining_equations()
+                )
                 return domain.closed_subscheme(equations)
 
     def fixed_subscheme(self):
@@ -1761,7 +1971,8 @@ class SchemeMorphismMethods:
                     f"{len(moved_values)} homogeneous coordinates, but the projection has {len(fixed_values)}"
                 )
                 equations.extend(
-                    moved_values[left] * fixed_values[right] - moved_values[right] * fixed_values[left]
+                    moved_values[left] * fixed_values[right]
+                    - moved_values[right] * fixed_values[left]
                     for left, right in combinations(range(len(moved_values)), 2)
                 )
             return domain.closed_subscheme(tuple(equations))
@@ -1785,7 +1996,12 @@ class SchemeMorphismMethods:
         target_engine = _engine_ring(target_algebra)
         return _engine_ring(source_algebra).hom(
             [
-                target_engine(_engine_element(target_algebra, pullback(source_algebra.algebra_generator(label))))
+                target_engine(
+                    _engine_element(
+                        target_algebra,
+                        pullback(source_algebra.algebra_generator(label)),
+                    )
+                )
                 for label in source_algebra.algebra_generating_set()
             ],
             target_engine,
@@ -1801,14 +2017,19 @@ class SchemeMorphismMethods:
         elimination on the graph ideal.
         """
         base = self.domain().scheme_base_ring()
-        assert self.domain() in Schemes(base).Affine() and self.codomain() in Schemes(base).Affine(), (
+        assert (
+            self.domain() in Schemes(base).Affine()
+            and self.codomain() in Schemes(base).Affine()
+        ), (
             f"cannot form the scheme-theoretic image of {self}: this computation requires affine "
             f"schemes over {base}, but the domain is an object of {self.domain().category()} and the "
             f"codomain an object of {self.codomain().category()}"
         )
         kernel = self._engine_pullback_with_trivial_base_map().kernel()
         algebra = self.codomain().coordinate_algebra()
-        equations = tuple(_owned_engine_element(algebra, generator) for generator in kernel.gens())
+        equations = tuple(
+            _owned_engine_element(algebra, generator) for generator in kernel.gens()
+        )
         return self.codomain().closed_subscheme(equations)
 
     @cached_method
@@ -1894,7 +2115,10 @@ class SchemeMorphismMethods:
     def is_closed_immersion(self) -> bool:
         r"""Whether ``f^#`` is surjective, for affine ``f`` (Stacks, Tag 0H2N, Lemma 37.81.1)."""
         base = self.domain().scheme_base_ring()
-        assert self.domain() in Schemes(base).Affine() and self.codomain() in Schemes(base).Affine(), (
+        assert (
+            self.domain() in Schemes(base).Affine()
+            and self.codomain() in Schemes(base).Affine()
+        ), (
             f"cannot decide whether {self} is a closed immersion: this is decided here only for "
             f"morphisms of affine schemes over {base}, but the domain is an object of "
             f"{self.domain().category()} and the codomain an object of {self.codomain().category()}"
@@ -1960,40 +2184,61 @@ class SchemeMorphismMethods:
             return True
         if not isinstance(other, SchemeMorphismMethods):
             return False
-        if self.domain() is not other.domain() or self.codomain() is not other.codomain():
+        if (
+            self.domain() is not other.domain()
+            or self.codomain() is not other.codomain()
+        ):
             return False
         if self._closed_complement is not None or other._closed_complement is not None:
-            return self._closed_complement is not None and self._closed_complement is other._closed_complement
+            return (
+                self._closed_complement is not None
+                and self._closed_complement is other._closed_complement
+            )
         left_pullback = self._represented_coordinate_pullback()
         right_pullback = other._represented_coordinate_pullback()
         if left_pullback is not None and right_pullback is not None:
             base = self.codomain().scheme_base_ring()
-            determining = _elements_determining_maps_out_of(self.codomain().coordinate_algebra(), base)
+            determining = _elements_determining_maps_out_of(
+                self.codomain().coordinate_algebra(), base
+            )
             relative = Schemes(base)
             if (
                 determining is not None
                 and self.parent().mor_category().is_subcategory(relative)
                 and other.parent().mor_category().is_subcategory(relative)
             ):
-                return conjunction(left_pullback(element) == right_pullback(element) for element in determining)
+                return conjunction(
+                    left_pullback(element) == right_pullback(element)
+                    for element in determining
+                )
             return _ring_morphisms_equal(left_pullback, right_pullback)
-        return bool(
-            _engine_scheme_morphism(self)
-            == _engine_scheme_morphism(other)
-        )
+        return bool(_engine_scheme_morphism(self) == _engine_scheme_morphism(other))
 
     def __ne__(self, other):
         return negation(self == other)
 
     def __hash__(self) -> int:
-        if self._toric_lattice_morphism is not None or self._relative_projectivization_role in ("base_change_composite", "base_change_total", "base_change_base", "base_projection", "surjectivity_open_inclusion", "surjectivity_induced_morphism"):
+        if (
+            self._toric_lattice_morphism is not None
+            or self._relative_projectivization_role
+            in (
+                "base_change_composite",
+                "base_change_total",
+                "base_change_base",
+                "base_projection",
+                "surjectivity_open_inclusion",
+                "surjectivity_induced_morphism",
+            )
+        ):
             raise TypeError(f"unhashable type: {type(self).__name__}")
         if self._relative_projectivization_source_sheaf is not None:
             raise TypeError(f"unhashable type: {type(self).__name__}")
         if self._gluing_role in ("chart_map", "finite_atlas", "glued_domain"):
             raise TypeError(f"unhashable type: {type(self).__name__}")
         if self._gluing_role == "open_inclusion":
-            position = self.gluing_datum().chart_index_set().ranking_map()(self.chart_index())
+            position = (
+                self.gluing_datum().chart_index_set().ranking_map()(self.chart_index())
+            )
             return hash((id(self.gluing_datum()), int(position), "open-image"))
         return hash((id(self.domain()), id(self.codomain())))
 
@@ -2046,7 +2291,9 @@ def _open_complement_inclusion(closed_complement):
     r"""The arrow realization rule ``Mor -> (X - Z -> X)`` for the closed complement ``Z``."""
 
     def realize(mor):
-        return mor.element_class(mor, None, mor=mor, closed_complement=closed_complement)
+        return mor.element_class(
+            mor, None, mor=mor, closed_complement=closed_complement
+        )
 
     return realize
 
@@ -2056,7 +2303,9 @@ def _projective_coordinate_blocks(scheme):
     base = scheme.scheme_base_ring()
     match scheme:
         case _ if scheme in ProductProjectiveSpaces(base):
-            return tuple(int(factor.relative_dimension()) + 1 for factor in scheme.factors())
+            return tuple(
+                int(factor.relative_dimension()) + 1 for factor in scheme.factors()
+            )
         case _ if scheme in ProjectiveSpaces(base):
             return (int(scheme.relative_dimension()) + 1,)
         case _:
@@ -2075,17 +2324,29 @@ def _projective_coordinate_morphism(morphism):
     coordinates = morphism._represented_point_coordinates()
     if coordinates is not None:
         return _ProjectiveCoordinateMorphism(
-            morphism.parent(), tuple(coordinates), point_coordinates=coordinates,
+            morphism.parent(),
+            tuple(coordinates),
+            point_coordinates=coordinates,
         )
     ring = _constant_sections_ring(morphism.domain())
-    if morphism._is_the_identity() and morphism.domain() not in Schemes(morphism.domain().scheme_base_ring()).Affine():
+    if (
+        morphism._is_the_identity()
+        and morphism.domain()
+        not in Schemes(morphism.domain().scheme_base_ring()).Affine()
+    ):
         # id_X on a projective X is given by the homogeneous coordinates themselves.
         return _ProjectiveCoordinateMorphism(
-            morphism.parent(), tuple(ring.algebra_generator(name) for name in ring.algebra_generating_set()),
+            morphism.parent(),
+            tuple(
+                ring.algebra_generator(name) for name in ring.algebra_generating_set()
+            ),
         )
     native = _engine_scheme_morphism(morphism)
     engine = _engine_ring(ring)
-    values = tuple(_owned_engine_element(ring, engine(value)) for value in _engine_defining_polynomials(native))
+    values = tuple(
+        _owned_engine_element(ring, engine(value))
+        for value in _engine_defining_polynomials(native)
+    )
     return _ProjectiveCoordinateMorphism(morphism.parent(), values)
 
 
@@ -2127,16 +2388,18 @@ def _projective_section_restriction(scheme, ring):
     variables = tuple(engine.gens())
 
     def owned(polynomial):
-        return _owned_engine_element(ring,
-            _copy_polynomial_by_exponents(polynomial, engine, variables)
+        return _owned_engine_element(
+            ring, _copy_polynomial_by_exponents(polynomial, engine, variables)
         )
 
     ideal = ring.ideal(*(owned(equation) for equation in equations))
-    owned_variables = tuple(_owned_engine_element(ring, variable) for variable in variables)
+    owned_variables = tuple(
+        _owned_engine_element(ring, variable) for variable in variables
+    )
     blocks = []
     offset = 0
     for width in _projective_coordinate_blocks(scheme):
-        blocks.append(owned_variables[offset:offset + width])
+        blocks.append(owned_variables[offset : offset + width])
         offset += width
     assert offset == len(variables), (
         f"cannot restrict homogeneous polynomials to {scheme}: the homogeneous coordinate ring "
@@ -2145,11 +2408,15 @@ def _projective_section_restriction(scheme, ring):
     )
     from sage.misc.misc_c import prod
 
-    irrelevant = ring.ideal(*(prod(choice, ring.one()) for choice in cartesian_product(*blocks)))
+    irrelevant = ring.ideal(
+        *(prod(choice, ring.one()) for choice in cartesian_product(*blocks))
+    )
     ideal = ideal.ideal_saturation(irrelevant)
     match native:
         case _SageAlgebraicSchemeQuasi():
-            excluded = ring.ideal(*(owned(equation) for equation in native.Y().defining_polynomials()))
+            excluded = ring.ideal(
+                *(owned(equation) for equation in native.Y().defining_polynomials())
+            )
             ideal = ideal.ideal_saturation(excluded)
     return ring.quotient_ring(ideal).quotient_map()
 
@@ -2168,7 +2435,9 @@ def _scalar_maps_equal_on_scheme(scheme, left, right):
     else:
         ambient, _ = _engine_projective_ambient(_engine_scheme(scheme))
         ring = _engine_polynomial_algebra(ambient.coordinate_ring(), base)
-        restriction = _projective_section_restriction(scheme, ring) * _restriction_to_base(ring, base)
+        restriction = _projective_section_restriction(
+            scheme, ring
+        ) * _restriction_to_base(ring, base)
     mor = OwnedRings().Mor(left.domain(), restriction.codomain())
     return _ring_morphisms_equal(
         mor.elementwise(lambda scalar: restriction(left(scalar))),
@@ -2176,9 +2445,15 @@ def _scalar_maps_equal_on_scheme(scheme, left, right):
     )
 
 
-def _ProjectiveCoordinateMorphism(mor, coordinates, *, coefficient_map=None,
-                                 cone_construction=None, point_coordinates=None,
-                                 standard_projective_chart_embedding=False):
+def _ProjectiveCoordinateMorphism(
+    mor,
+    coordinates,
+    *,
+    coefficient_map=None,
+    cone_construction=None,
+    point_coordinates=None,
+    standard_projective_chart_embedding=False,
+):
     r"""Construct a projective-coordinate arrow in its actual SchemeMor parent.
 
     The homogeneous sections and coefficient map are defining data of the
@@ -2196,36 +2471,55 @@ def _ProjectiveCoordinateMorphism(mor, coordinates, *, coefficient_map=None,
     target_base = mor.codomain().scheme_base_ring()
     if coefficient_map is None:
         coefficient_map = _restriction_to_base(ring, target_base)
-    assert coefficient_map.domain() is target_base and coefficient_map.codomain() is ring, (
-        f"the coefficient map {coefficient_map} must have parent {target_base} -> {ring}"
-    )
+    assert (
+        coefficient_map.domain() is target_base and coefficient_map.codomain() is ring
+    ), f"the coefficient map {coefficient_map} must have parent {target_base} -> {ring}"
     assert sum(_projective_coordinate_blocks(mor.codomain())) == len(coordinates), (
         f"{mor.codomain()} needs {sum(_projective_coordinate_blocks(mor.codomain()))} homogeneous coordinates, "
         f"but {len(coordinates)} were given"
     )
     return mor.element_class(
-        mor, None, mor=mor, homogeneous_coordinates=coordinates, coefficient_map=coefficient_map,
-        cone_construction=cone_construction, point_coordinates=point_coordinates,
+        mor,
+        None,
+        mor=mor,
+        homogeneous_coordinates=coordinates,
+        coefficient_map=coefficient_map,
+        cone_construction=cone_construction,
+        point_coordinates=point_coordinates,
         standard_projective_chart_embedding=standard_projective_chart_embedding,
     )
 
 
-def _StandardProjectiveChartEmbedding(mor, coordinates, *, coefficient_map=None,
-                                      cone_construction=None, point_coordinates=None):
+def _StandardProjectiveChartEmbedding(
+    mor,
+    coordinates,
+    *,
+    coefficient_map=None,
+    cone_construction=None,
+    point_coordinates=None,
+):
     r"""Construct a standard projective chart inclusion as a generated Mor element."""
     return _ProjectiveCoordinateMorphism(
-        mor, coordinates, coefficient_map=coefficient_map,
-        cone_construction=cone_construction, point_coordinates=point_coordinates,
+        mor,
+        coordinates,
+        coefficient_map=coefficient_map,
+        cone_construction=cone_construction,
+        point_coordinates=point_coordinates,
         standard_projective_chart_embedding=True,
     )
 
 
-def _StandardMultiprojectiveChartEmbedding(native_morphism, *, mor,
-                                           cone_construction=None, point_coordinates=None):
+def _StandardMultiprojectiveChartEmbedding(
+    native_morphism, *, mor, cone_construction=None, point_coordinates=None
+):
     r"""Construct a product-chart inclusion as an element of its actual SchemeMor."""
     return mor.element_class(
-        mor, native_morphism, mor=mor, cone_construction=cone_construction,
-        point_coordinates=point_coordinates, multiprojective_chart_embedding=True,
+        mor,
+        native_morphism,
+        mor=mor,
+        cone_construction=cone_construction,
+        point_coordinates=point_coordinates,
+        multiprojective_chart_embedding=True,
     )
 
 
@@ -2269,42 +2563,69 @@ class SchemeMorCategory(CategoricalMor):
         or the construction's defining data.
         """
         domain, codomain = self.domain(), self.codomain()
-        assert datum.domain() is _engine_scheme(domain) and datum.codomain() is _engine_scheme(codomain)
-        if domain in Schemes(domain.scheme_base_ring()).Affine() and codomain in Schemes(codomain.scheme_base_ring()).Affine():
-            return self(_engine_coordinate_pullback_of(datum, domain.coordinate_algebra(), codomain.coordinate_algebra()))
+        assert datum.domain() is _engine_scheme(
+            domain
+        ) and datum.codomain() is _engine_scheme(codomain)
+        if (
+            domain in Schemes(domain.scheme_base_ring()).Affine()
+            and codomain in Schemes(codomain.scheme_base_ring()).Affine()
+        ):
+            return self(
+                _engine_coordinate_pullback_of(
+                    datum, domain.coordinate_algebra(), codomain.coordinate_algebra()
+                )
+            )
         return self.element_class(self, datum, mor=self)
 
     def _element_constructor_(self, datum):
         domain = self.domain()
         codomain = self.codomain()
         base = codomain.scheme_base_ring()
-        affine_endpoints = domain in Schemes(domain.scheme_base_ring()).Affine() and codomain in Schemes(base).Affine()
+        affine_endpoints = (
+            domain in Schemes(domain.scheme_base_ring()).Affine()
+            and codomain in Schemes(base).Affine()
+        )
         match datum:
             case SchemeMorphismMethods() if datum.parent() is self:
                 return datum
             case SchemeMorphismMethods() if affine_endpoints:
-                raise TypeError(f"{datum} belongs to another Mor; apply the functor between the categories")
+                raise TypeError(
+                    f"{datum} belongs to another Mor; apply the functor between the categories"
+                )
             case SchemeMorphismMethods():
-                raise TypeError(f"{datum} belongs to another Mor; apply the functor between the categories")
+                raise TypeError(
+                    f"{datum} belongs to another Mor; apply the functor between the categories"
+                )
             case _SageSchemeMorphism():
-                raise TypeError("a native scheme arrow is private engine output, not scheme-morphism defining data")
+                raise TypeError(
+                    "a native scheme arrow is private engine output, not scheme-morphism defining data"
+                )
             case Morphism() | CategoricalArrow():
                 assert affine_endpoints, (
                     f"cannot make the ring morphism {datum} a morphism {domain} -> {codomain}: a ring morphism "
                     f"defines a morphism of schemes only between affine schemes, and {domain} or {codomain} "
                     "is not affine"
                 )
-                assert datum.domain() is codomain.coordinate_algebra() and datum.codomain() is domain.coordinate_algebra(), (
+                assert (
+                    datum.domain() is codomain.coordinate_algebra()
+                    and datum.codomain() is domain.coordinate_algebra()
+                ), (
                     f"the pullback {datum} does not join the coordinate algebras of {codomain} and {domain}"
                 )
                 relative = Schemes(domain.scheme_base_ring())
                 if self.mor_category().is_subcategory(relative):
                     ring = relative.base_ring()
                     target_algebra = domain.coordinate_algebra()
-                    source_structure = codomain.structure_morphism().coordinate_algebra_morphism()
-                    target_structure = domain.structure_morphism().coordinate_algebra_morphism()
+                    source_structure = (
+                        codomain.structure_morphism().coordinate_algebra_morphism()
+                    )
+                    target_structure = (
+                        domain.structure_morphism().coordinate_algebra_morphism()
+                    )
                     ring_mor = OwnedRings().Mor(ring, target_algebra)
-                    composed = ring_mor.elementwise(lambda scalar: datum(source_structure(scalar)))
+                    composed = ring_mor.elementwise(
+                        lambda scalar: datum(source_structure(scalar))
+                    )
                     structural = ring_mor.elementwise(target_structure)
                     assert _ring_morphisms_equal(composed, structural) is not False, (
                         f"cannot make the pullback {datum} a morphism {domain} -> {codomain} over {ring}: it does "
@@ -2335,11 +2656,15 @@ class SchemeMorCategory(CategoricalMor):
         match scheme:
             case _ if scheme in Schemes(scheme.scheme_base_ring()).Affine():
                 algebra = scheme.coordinate_algebra()
-                return self.element_class(self, None, mor=self, pullback=algebra.Mor(algebra).identity())
+                return self.element_class(
+                    self, None, mor=self, pullback=algebra.Mor(algebra).identity()
+                )
             case _ if scheme._scheme_engine_realization is None:
                 return self.element_class(self, None, mor=self)
             case _:
-                return self.element_class(self, _engine_scheme(scheme).identity_morphism(), mor=self)
+                return self.element_class(
+                    self, _engine_scheme(scheme).identity_morphism(), mor=self
+                )
 
 
 def _restriction_to_base(ring, base_ring):
@@ -2409,7 +2734,10 @@ def _affine_structure_morphism_to_base(scheme, base_ring):
     )
     if own_base is base_ring:
         return scheme.structure_morphism()
-    scalar_map = scheme.structure_morphism().coordinate_algebra_morphism() * _restriction_to_base(own_base, base_ring)
+    scalar_map = (
+        scheme.structure_morphism().coordinate_algebra_morphism()
+        * _restriction_to_base(own_base, base_ring)
+    )
     return _scheme_mor_category(scheme, Schemes(base_ring).base_scheme())(scalar_map)
 
 
@@ -2420,7 +2748,10 @@ def _scheme_isomorphism(forward, inverse):
     sides.  Those placements strengthen the objects, not the category in which
     their transition is an isomorphism: chart changes are arrows in ``Sch/R``.
     """
-    assert forward.domain() is inverse.codomain() and forward.codomain() is inverse.domain(), (
+    assert (
+        forward.domain() is inverse.codomain()
+        and forward.codomain() is inverse.domain()
+    ), (
         f"{forward} and {inverse} are not mutually inverse: {forward} is "
         f"{forward.domain()} -> {forward.codomain()}, but {inverse} is "
         f"{inverse.domain()} -> {inverse.codomain()}"
@@ -2470,12 +2801,18 @@ def _affine_spec_morphism(algebra_morphism):
     r"""``Spec(phi): Spec B -> Spec A`` for an algebra morphism ``phi: A -> B``."""
     source_algebra = algebra_morphism.domain()
     target_algebra = algebra_morphism.codomain()
-    assert source_algebra in Algebras(source_algebra.base_ring()).Associative().Unital().Commutative(), (
+    assert (
+        source_algebra
+        in Algebras(source_algebra.base_ring()).Associative().Unital().Commutative()
+    ), (
         f"cannot apply Spec to {algebra_morphism}: its domain {source_algebra} must be a "
         f"commutative algebra over {source_algebra.base_ring()}, but it is an object of "
         f"{source_algebra.category()}"
     )
-    assert target_algebra in Algebras(target_algebra.base_ring()).Associative().Unital().Commutative(), (
+    assert (
+        target_algebra
+        in Algebras(target_algebra.base_ring()).Associative().Unital().Commutative()
+    ), (
         f"cannot apply Spec to {algebra_morphism}: its codomain {target_algebra} must be a "
         f"commutative algebra over {target_algebra.base_ring()}, but it is an object of "
         f"{target_algebra.category()}"
@@ -2575,10 +2912,14 @@ def _function_field_on_atlas(atlas, equations):
     for label in atlas.chart_index_set():
         algebra = atlas.chart(label).coordinate_algebra()
         coordinates = tuple(
-            _projective_coordinate_morphism(atlas.member(label).domain().arrow()).homogeneous_coordinates()
+            _projective_coordinate_morphism(
+                atlas.member(label).domain().arrow()
+            ).homogeneous_coordinates()
         )
         local_equations = tuple(
-            _evaluate_owned_homogeneous_polynomial_on_coordinates(equation, equation.parent(), coordinates)
+            _evaluate_owned_homogeneous_polynomial_on_coordinates(
+                equation, equation.parent(), coordinates
+            )
             for equation in equations
         )
         match local_equations:
@@ -2587,7 +2928,9 @@ def _function_field_on_atlas(atlas, equations):
             case ():
                 empty = algebra.one() == algebra.zero()
             case _:
-                empty = algebra.ideal(*local_equations).contains_ambient_element(algebra.one())
+                empty = algebra.ideal(*local_equations).contains_ambient_element(
+                    algebra.one()
+                )
         if empty is True:
             continue
         domain, _quotient_map = _quotient_by_algebra_elements_backend(
@@ -2618,7 +2961,10 @@ def _affine_scheme(algebra, base, placements=(), **level_data):
             categories.append(schemes.LocallyNoetherian())
         case False:
             pass
-    if algebra is base or (algebra.is_framed_algebra() and algebra.algebra_generating_set().cardinality().is_finite()):
+    if algebra is base or (
+        algebra.is_framed_algebra()
+        and algebra.algebra_generating_set().cardinality().is_finite()
+    ):
         categories.extend((schemes.FiniteType(), schemes.QuasiProjective()))
     if algebra is base:
         categories.append(schemes.Smooth())
@@ -2655,7 +3001,11 @@ def _affine_spectrum(ring_or_algebra, base_ring=None):
     match base_ring:
         case None:
             declared = algebra.base_ring()
-            base = algebra if declared is None or _engine_ring(declared) is _engine_ring(algebra) else _own_ring(declared)
+            base = (
+                algebra
+                if declared is None or _engine_ring(declared) is _engine_ring(algebra)
+                else _own_ring(declared)
+            )
         case _:
             base = _own_ring(base_ring)
     return Schemes(base).Affine()(algebra)
@@ -2794,9 +3144,7 @@ class Schemes(OwnedCategoryOverBaseRing):
                             cone.apex().structure_morphism()
                         )
                     case 1:
-                        apex_map = cone.structure_morphism(
-                            diagram.domain()(labels[0])
-                        )
+                        apex_map = cone.structure_morphism(diagram.domain()(labels[0]))
                     case _:
                         legs = indexed_family(
                             family.index_set(),
@@ -2806,8 +3154,10 @@ class Schemes(OwnedCategoryOverBaseRing):
                             name="Scheme product cone legs",
                         )
                         apex_map = product.from_product_cone(legs)
-                return diagram.Cones().Mor(cone, universal_cone)._from_commuting_apex_map(
-                    apex_map
+                return (
+                    diagram.Cones()
+                    .Mor(cone, universal_cone)
+                    ._from_commuting_apex_map(apex_map)
                 )
 
             return SelectedLimitConstruction(diagram, universal_cone, factorizer)
@@ -2828,7 +3178,9 @@ class Schemes(OwnedCategoryOverBaseRing):
 
         def equalizer(self, left, right):
             r"""Return the equalizer ``Eq(f, g) -> X`` of two parallel morphisms."""
-            assert left.domain() is right.domain() and left.codomain() is right.codomain(), (
+            assert (
+                left.domain() is right.domain() and left.codomain() is right.codomain()
+            ), (
                 f"cannot form the equalizer of {left} and {right}: they are not parallel; they are "
                 f"{left.domain()} -> {left.codomain()} and {right.domain()} -> {right.codomain()}"
             )
@@ -2847,7 +3199,9 @@ class Schemes(OwnedCategoryOverBaseRing):
             source = left.domain()
             target = left.codomain()
             base = source.scheme_base_ring()
-            assert source in Schemes(base).Affine() and target in Schemes(base).Affine(), (
+            assert (
+                source in Schemes(base).Affine() and target in Schemes(base).Affine()
+            ), (
                 f"cannot form the equalizer of {left} and {right}: this computation requires affine "
                 f"schemes over {base}, but the domain {source} is an object of {source.category()} and "
                 f"the codomain {target} an object of {target.category()}"
@@ -2861,7 +3215,8 @@ class Schemes(OwnedCategoryOverBaseRing):
             left_pullback = left.coordinate_algebra_morphism()
             right_pullback = right.coordinate_algebra_morphism()
             equations = tuple(
-                left_pullback(target_algebra.algebra_generator(label)) - right_pullback(target_algebra.algebra_generator(label))
+                left_pullback(target_algebra.algebra_generator(label))
+                - right_pullback(target_algebra.algebra_generator(label))
                 for label in target_algebra.algebra_generating_set()
             )
             equalizer = source.closed_subscheme(equations)
@@ -2961,7 +3316,9 @@ class Schemes(OwnedCategoryOverBaseRing):
             _TwoChartSchemeGluingDatum,
         )
 
-        return _TwoChartSchemeGluingDatum(self, left_chart, right_chart, transition).scheme()
+        return _TwoChartSchemeGluingDatum(
+            self, left_chart, right_chart, transition
+        ).scheme()
 
     def glue_affine_atlas(self, charts, transitions, placements=(), **level_data):
         r"""Glue a finite affine atlas with represented distinguished-open transitions.
@@ -3009,7 +3366,12 @@ class Schemes(OwnedCategoryOverBaseRing):
             if self._is_glued_from_affine_atlas():
                 return self._scheme_engine_realization.underlying_space()
             if self.has_selected_finite_affine_atlas():
-                return self.selected_finite_affine_atlas().presentation().scheme().underlying_space()
+                return (
+                    self.selected_finite_affine_atlas()
+                    .presentation()
+                    .scheme()
+                    .underlying_space()
+                )
             return self
 
         @cached_method
@@ -3021,15 +3383,20 @@ class Schemes(OwnedCategoryOverBaseRing):
             restrictions use the retained overlap maps (Hartshorne, II.1.22).
             """
             if self in Schemes(self.scheme_base_ring()).Affine():
-                from sage_extensions.categories.schemes.ringed_spaces import _structure_sheaf
+                from sage_extensions.categories.schemes.ringed_spaces import (
+                    _structure_sheaf,
+                )
 
                 return _structure_sheaf(self)
-            from sage_extensions.categories.schemes.gluing import _finite_atlas_structure_sheaf
+            from sage_extensions.categories.schemes.gluing import (
+                _finite_atlas_structure_sheaf,
+            )
 
             atlas = self.selected_finite_affine_atlas()
             functions = atlas.global_function_algebra()
             restrictions = indexed_family(
-                atlas.chart_index_set(), atlas.global_function_restriction,
+                atlas.chart_index_set(),
+                atlas.global_function_restriction,
                 name="Restrictions of compatible global functions to affine charts",
             )
             return _finite_atlas_structure_sheaf(atlas, functions, restrictions)
@@ -3045,7 +3412,12 @@ class Schemes(OwnedCategoryOverBaseRing):
             )
             if self._is_glued_from_affine_atlas():
                 return self._scheme_engine_realization.chart_point_map(index)
-            return self.selected_finite_affine_atlas().presentation().scheme()._glued_chart_point_map(index)
+            return (
+                self.selected_finite_affine_atlas()
+                .presentation()
+                .scheme()
+                ._glued_chart_point_map(index)
+            )
 
         def _glued_chart_image_subset(self, index):
             r"""Supply the point-space subset for a selected affine chart image.
@@ -3081,7 +3453,9 @@ class Schemes(OwnedCategoryOverBaseRing):
                     zariski_topology = _SchemeTopologyData()
                 case _:
                     zariski_topology = topology_data
-            super().__init__(base=scheme_base_ring, topology_data=zariski_topology, **rest)
+            super().__init__(
+                base=scheme_base_ring, topology_data=zariski_topology, **rest
+            )
 
         def _scheme_engine(self):
             r"""The private Sage scheme realizing this scheme (``OWN-06``)."""
@@ -3123,7 +3497,9 @@ class Schemes(OwnedCategoryOverBaseRing):
             :meth:`Schemes.glue_affine_charts`, whose charts, overlaps and
             chart embeddings are read from it.
             """
-            assert self._is_glued_from_affine_atlas(), f"{self} was not glued from an affine gluing datum"
+            assert self._is_glued_from_affine_atlas(), (
+                f"{self} was not glued from an affine gluing datum"
+            )
             return self._scheme_engine_realization.gluing_datum()
 
         @cached_method
@@ -3235,8 +3611,15 @@ class Schemes(OwnedCategoryOverBaseRing):
                 else:
                     break
             else:
-                if base_changes and all((base_change == base_changes[0]) is True for base_change in base_changes):
-                    return base_changes[0].codomain().is_covered_by_open_immersions(original_embeddings)
+                if base_changes and all(
+                    (base_change == base_changes[0]) is True
+                    for base_change in base_changes
+                ):
+                    return (
+                        base_changes[0]
+                        .codomain()
+                        .is_covered_by_open_immersions(original_embeddings)
+                    )
 
             match self._is_glued_from_affine_atlas():
                 case True:
@@ -3274,7 +3657,9 @@ class Schemes(OwnedCategoryOverBaseRing):
                         case False:
                             pass
                 case _ if self in ProductProjectiveSpaces(base):
-                    _choices, _charts, standard_embeddings = self._standard_affine_cover_charts_and_embeddings()
+                    _choices, _charts, standard_embeddings = (
+                        self._standard_affine_cover_charts_and_embeddings()
+                    )
                     match all(
                         any(embedding == standard_embedding for embedding in family)
                         for standard_embedding in standard_embeddings.values()
@@ -3342,7 +3727,9 @@ class Schemes(OwnedCategoryOverBaseRing):
             assert self._is_glued_from_affine_atlas(), (
                 f"cannot glue fixed subschemes of the charts of {self}: it was not glued from affine charts"
             )
-            return self._scheme_engine_realization.chartwise_fixed_subscheme(local_automorphisms)
+            return self._scheme_engine_realization.chartwise_fixed_subscheme(
+                local_automorphisms
+            )
 
         def c2_chartwise_invariant_quotient(
             self,
@@ -3428,7 +3815,9 @@ class Schemes(OwnedCategoryOverBaseRing):
                     mor = _scheme_mor_category(self, base_scheme)
                     return mor.element_class(mor, None, mor=mor)
                 case _:
-                    return _scheme_mor_category(self, base_scheme)._from_engine_morphism(_engine_scheme(self).base_morphism())
+                    return _scheme_mor_category(
+                        self, base_scheme
+                    )._from_engine_morphism(_engine_scheme(self).base_morphism())
 
         def dimension(self):
             r"""The Krull dimension of ``Spec A`` for affine ``X``, else the realization's."""
@@ -3455,7 +3844,9 @@ class Schemes(OwnedCategoryOverBaseRing):
                 case _ if self is self.base_scheme():
                     return _owned_engine_element(SageZZ, SageZZ.zero())
                 case _ if self in AffineSpaces(base):
-                    return self.coordinate_algebra().algebra_generating_set().cardinality()
+                    return (
+                        self.coordinate_algebra().algebra_generating_set().cardinality()
+                    )
                 case _ if self in ProductSchemes(base):
                     return _owned_engine_element(
                         SageZZ,
@@ -3580,11 +3971,17 @@ class Schemes(OwnedCategoryOverBaseRing):
                 f"cannot take the fibre of {self} over {base_morphism}: it must be a morphism into the "
                 f"base scheme {self.base_scheme()}, but its codomain is {base_morphism.codomain()}"
             )
-            return self.scheme_category().fiber_product(self.structure_morphism(), base_morphism)
+            return self.scheme_category().fiber_product(
+                self.structure_morphism(), base_morphism
+            )
 
         def fiber_over_ideal(self, ideal):
             r"""The fibre over the closed subscheme ``V(I) <= Spec R`` of an ideal ``I`` of ``R``."""
-            return self.fiber(self.base_scheme().closed_subscheme(tuple(ideal.ideal_generators())).inclusion())
+            return self.fiber(
+                self.base_scheme()
+                .closed_subscheme(tuple(ideal.ideal_generators()))
+                .inclusion()
+            )
 
         @cached_method
         def diagonal_morphism(self):
@@ -3612,7 +4009,9 @@ class Schemes(OwnedCategoryOverBaseRing):
             """
             base = self.scheme_base_ring()
             owned_coordinates = tuple(base(coordinate) for coordinate in coordinates)
-            selected = finite_family(owned_coordinates, name=f"Selected coordinates of point on {self}")
+            selected = finite_family(
+                owned_coordinates, name=f"Selected coordinates of point on {self}"
+            )
             mor = Schemes(base).Mor(self.base_scheme(), self)
             match self:
                 case _ if self in Schemes(base).Affine():
@@ -3628,10 +4027,21 @@ class Schemes(OwnedCategoryOverBaseRing):
                         f"has {len(labels)} chosen algebra generators, but {len(owned_coordinates)} coordinates "
                         "were given"
                     )
-                    pullback = algebra.Mor(base)(dict(zip(labels, owned_coordinates, strict=True)))
-                    return mor.element_class(mor, None, mor=mor, pullback=pullback, point_coordinates=selected)
+                    pullback = algebra.Mor(base)(
+                        dict(zip(labels, owned_coordinates, strict=True))
+                    )
+                    return mor.element_class(
+                        mor,
+                        None,
+                        mor=mor,
+                        pullback=pullback,
+                        point_coordinates=selected,
+                    )
                 case _ if self in ProductProjectiveSpaces(base):
-                    engine_coordinates = tuple(_engine_element(base, coordinate) for coordinate in owned_coordinates)
+                    engine_coordinates = tuple(
+                        _engine_element(base, coordinate)
+                        for coordinate in owned_coordinates
+                    )
                     factor_points = []
                     offset = 0
                     for factor in self.factors():
@@ -3642,23 +4052,36 @@ class Schemes(OwnedCategoryOverBaseRing):
                             f"{factor} needs {width} homogeneous coordinates, but only {len(block)} remain"
                         )
                         factor_engine = _engine_scheme(factor)
-                        factor_points.append(factor_engine._point(factor_engine.point_homset(), block, check=False))
+                        factor_points.append(
+                            factor_engine._point(
+                                factor_engine.point_homset(), block, check=False
+                            )
+                        )
                         offset += width
                     assert offset == len(engine_coordinates), (
                         f"cannot form the {base}-point of {self} with coordinates {owned_coordinates}: the factors "
                         f"need {offset} homogeneous coordinates in total, but {len(engine_coordinates)} were given"
                     )
                     engine = _engine_scheme(self)
-                    native = engine._point(engine.point_homset(), factor_points, check=False)
-                    return mor.element_class(mor, native, mor=mor, point_coordinates=selected)
+                    native = engine._point(
+                        engine.point_homset(), factor_points, check=False
+                    )
+                    return mor.element_class(
+                        mor, native, mor=mor, point_coordinates=selected
+                    )
                 case _:
                     engine = _engine_scheme(self)
                     native = engine._point(
                         engine.point_homset(),
-                        [_engine_element(base, coordinate) for coordinate in owned_coordinates],
+                        [
+                            _engine_element(base, coordinate)
+                            for coordinate in owned_coordinates
+                        ],
                         check=False,
                     )
-                    return mor.element_class(mor, native, mor=mor, point_coordinates=selected)
+                    return mor.element_class(
+                        mor, native, mor=mor, point_coordinates=selected
+                    )
 
         def projective_morphism_from_coordinates(self, target, coordinates):
             r"""Return the projective morphism defined by a basepoint-free coordinate family.
@@ -3680,7 +4103,9 @@ class Schemes(OwnedCategoryOverBaseRing):
                 f"{coordinates}: {target} needs {int(target.relative_dimension()) + 1} homogeneous "
                 f"coordinates, but {len(coordinates)} were given"
             )
-            return _ProjectiveCoordinateMorphism(_scheme_mor_category(self, target), coordinates)
+            return _ProjectiveCoordinateMorphism(
+                _scheme_mor_category(self, target), coordinates
+            )
 
         def categorical_identity_morphism(self):
             r"""``id_X``, the identity of this scheme's endomorphism Mor."""
@@ -3700,7 +4125,9 @@ class Schemes(OwnedCategoryOverBaseRing):
                 f"is not an object of {schemes}"
             )
             factors = (self, other)
-            return schemes.product(indexed_family(Sets.Δ[1], lambda index: factors[int(index)]))
+            return schemes.product(
+                indexed_family(Sets.Δ[1], lambda index: factors[int(index)])
+            )
 
         def point_counts(self, extension_degree):
             r"""Return ``(#X(F_q),...,#X(F_{q^n}))`` for a finite base field."""
@@ -3748,7 +4175,9 @@ class Schemes(OwnedCategoryOverBaseRing):
                 the missing Rees-algebra computation explicitly.
                 """
                 base = self.scheme_base_ring()
-                assert point.domain() is self.base_scheme() and point.codomain() is self, (
+                assert (
+                    point.domain() is self.base_scheme() and point.codomain() is self
+                ), (
                     f"cannot blow up {self} at {point}: the center must be an {base}-point "
                     f"Spec {base} -> {self}"
                 )
@@ -3997,7 +4426,9 @@ class Schemes(OwnedCategoryOverBaseRing):
             def an_object(self):
                 r"""The affine line when the base is a Noetherian domain."""
                 base = self.base_ring()
-                assert base in OwnedRings().Noetherian() and base in OwnedIntegralDomains(), (
+                assert (
+                    base in OwnedRings().Noetherian() and base in OwnedIntegralDomains()
+                ), (
                     f"the canonical locally Noetherian integral scheme over {base} used here is A^1_{base}, "
                     "which requires the base to be a Noetherian integral domain"
                 )
@@ -4105,11 +4536,15 @@ class Schemes(OwnedCategoryOverBaseRing):
                     case _ if self in Schemes(base).Affine():
                         return self.coordinate_algebra().fraction_field()
                     case _ if self.has_selected_finite_affine_atlas():
-                        return _function_field_on_atlas(self.selected_finite_affine_atlas(), ())
+                        return _function_field_on_atlas(
+                            self.selected_finite_affine_atlas(), ()
+                        )
                     case _ if (
                         self in ClosedSubschemes(base)
                         and self in Schemes(base).Projective()
-                        and self.inclusion().codomain().has_selected_finite_affine_atlas()
+                        and self.inclusion()
+                        .codomain()
+                        .has_selected_finite_affine_atlas()
                     ):
                         return _function_field_on_atlas(
                             self.inclusion().codomain().selected_finite_affine_atlas(),
@@ -4205,7 +4640,9 @@ class Schemes(OwnedCategoryOverBaseRing):
                     case _ if self in Schemes(base).Affine():
                         return _affine_de_rham_complex(self)
                     case _:
-                        assert False, "de_rham_complex on Schemes.Smooth: not implemented"
+                        assert False, (
+                            "de_rham_complex on Schemes.Smooth: not implemented"
+                        )
 
             def de_rham_hypercohomology(self):
                 r"""``RΓ(X, Ω^•_{X/R})``, an object of ``DerivedCategory(R)``.
@@ -4225,7 +4662,9 @@ class Schemes(OwnedCategoryOverBaseRing):
                     case _ if self in ProjectiveSpaces(base):
                         return _projective_space_de_rham_hypercohomology(self)
                     case _:
-                        assert False, "de_rham_hypercohomology on Schemes.Smooth: not implemented"
+                        assert False, (
+                            "de_rham_hypercohomology on Schemes.Smooth: not implemented"
+                        )
 
             def de_rham_cohomology(self, degree):
                 r"""``H^degree_dR(X/R) = H^degree(RΓ(X, Ω^•_{X/R}))``, an object of ``Modules(R)``."""
@@ -4239,7 +4678,9 @@ class Schemes(OwnedCategoryOverBaseRing):
                 multiplicative model of ``RΓ(X, Ω^•_{X/R})``, which the
                 derived category alone does not supply.
                 """
-                assert False, "de_rham_cohomology_algebra on Schemes.Smooth: not implemented"
+                assert False, (
+                    "de_rham_cohomology_algebra on Schemes.Smooth: not implemented"
+                )
 
         def an_object(self):
             r"""The affine line, which is smooth over the base ring."""
@@ -4313,7 +4754,8 @@ class Schemes(OwnedCategoryOverBaseRing):
                 right = product.projection(1).coordinate_algebra_morphism()
                 algebra = self.coordinate_algebra()
                 equations = tuple(
-                    left(algebra.algebra_generator(label)) - right(algebra.algebra_generator(label))
+                    left(algebra.algebra_generator(label))
+                    - right(algebra.algebra_generator(label))
                     for label in algebra.algebra_generating_set()
                 )
                 return product.closed_subscheme(equations)
@@ -4416,7 +4858,9 @@ class Schemes(OwnedCategoryOverBaseRing):
 
                 return _affine_weil_cycle_isomorphism(self)
 
-            def closed_subscheme(self, *equations, placements=(), _quotient_data=None, **level_data):
+            def closed_subscheme(
+                self, *equations, placements=(), _quotient_data=None, **level_data
+            ):
                 r"""``V(f_1, ..., f_k) = Spec A/(f_1, ..., f_k)``, with its closed immersion.
 
                 The equations are given one by one or as a single finite family.
@@ -4429,9 +4873,14 @@ class Schemes(OwnedCategoryOverBaseRing):
                 base = self.scheme_base_ring()
                 match _quotient_data:
                     case None:
-                        quotient, quotient_map = algebra._quotient_by_algebra_elements(tuple(equations))
+                        quotient, quotient_map = algebra._quotient_by_algebra_elements(
+                            tuple(equations)
+                        )
                     case (quotient, quotient_map):
-                        assert quotient_map.domain() is algebra and quotient_map.codomain() is quotient, (
+                        assert (
+                            quotient_map.domain() is algebra
+                            and quotient_map.codomain() is quotient
+                        ), (
                             f"cannot form the closed subscheme of {self} cut out by {equations}: the quotient map "
                             f"{quotient_map} must be {algebra} -> {quotient}, but it is "
                             f"{quotient_map.domain()} -> {quotient_map.codomain()}"
@@ -4481,8 +4930,13 @@ class Schemes(OwnedCategoryOverBaseRing):
                     f"by finitely many generators and relations, but it is an object of {algebra.category()}"
                 )
                 dimension = int(algebra.krull_dimension())
-                minimal_components = _engine_ring(algebra).defining_ideal().minimal_associated_primes()
-                assert all(int(component.dimension()) == dimension for component in minimal_components), (
+                minimal_components = (
+                    _engine_ring(algebra).defining_ideal().minimal_associated_primes()
+                )
+                assert all(
+                    int(component.dimension()) == dimension
+                    for component in minimal_components
+                ), (
                     f"cannot form the singular locus of {self}: the Fitting ideal criterion requires {self} to "
                     f"be equidimensional, but not all its irreducible components have dimension {dimension}"
                 )
@@ -4520,7 +4974,9 @@ class Schemes(OwnedCategoryOverBaseRing):
                     f"cannot form the relative non-smooth locus of {self}: the criterion is available only "
                     f"over a base k[t] with k a perfect field, but the base ring is {base}"
                 )
-                relative_dimension = algebra._represented_primitive_hypersurface_relative_dimension()
+                relative_dimension = (
+                    algebra._represented_primitive_hypersurface_relative_dimension()
+                )
                 return self.differential_rank_drop_subscheme(relative_dimension)
 
             @cached_method
@@ -4546,7 +5002,12 @@ class Schemes(OwnedCategoryOverBaseRing):
                     # The canonical R-algebra map is a |-> a/1. The
                     # localization's scalar action is R -> A -> S^-1 A,
                     # so this formula preserves scalars, product and unit.
-                    inclusion_datum=Algebras(base).Associative().Unital().Commutative().Mor(algebra, localized)._from_constructed_element_map(
+                    inclusion_datum=Algebras(base)
+                    .Associative()
+                    .Unital()
+                    .Commutative()
+                    .Mor(algebra, localized)
+                    ._from_constructed_element_map(
                         lambda element: localized.fraction(element)
                     ),
                 )
@@ -4561,13 +5022,12 @@ class Schemes(OwnedCategoryOverBaseRing):
                     DistinguishedAffineCovers,
                 )
 
-                return DistinguishedAffineCovers(self)(tuple(_equation_family(elements)))
+                return DistinguishedAffineCovers(self)(
+                    tuple(_equation_family(elements))
+                )
 
             def associated_module_sheaf(self, module):
                 r"""Return the quasi-coherent sheaf ``M~`` of an ``A``-module ``M``."""
-                from sage_extensions.categories.schemes.ringed_spaces import (
-                    QuasiCoherentSheaves,
-                )
 
                 return self.structure_sheaf().associated_module_sheaf(module)
 
@@ -4585,7 +5045,9 @@ class Schemes(OwnedCategoryOverBaseRing):
                     f"{algebra_structure.domain()}"
                 )
                 structure_morphism = _affine_morphism_from_pullback(
-                    algebra_structure.codomain().affine_spectrum(), self, algebra_structure
+                    algebra_structure.codomain().affine_spectrum(),
+                    self,
+                    algebra_structure,
                 )
                 return self.scheme_category().SliceOver(self)(structure_morphism)
 
@@ -4703,9 +5165,18 @@ def _projective_closed_subscheme(
     """
     equations = _projective_equation_family(_equation_family(equations))
     base = ambient.scheme_base_ring()
-    engine = _engine_projective_subscheme(_engine_scheme(ambient), equations) if _engine is None else _engine
+    engine = (
+        _engine_projective_subscheme(_engine_scheme(ambient), equations)
+        if _engine is None
+        else _engine
+    )
     category = owned_category_join(
-        (Schemes(base).Projective(), ClosedEmbeddings(ambient), ClosedSubschemes(base), *placements)
+        (
+            Schemes(base).Projective(),
+            ClosedEmbeddings(ambient),
+            ClosedSubschemes(base),
+            *placements,
+        )
     )
     data = dict(construction_data or {})
     match _object_engine:
@@ -4716,9 +5187,13 @@ def _projective_closed_subscheme(
     return _object_of(
         category,
         _engine=object_realization,
-        scheme_base_ring=base, scheme_engine=engine,
-        inclusion_codomain=ambient, inclusion_datum=_native_embedding_rule,
-        defining_equations=equations, **data, **level_data,
+        scheme_base_ring=base,
+        scheme_engine=engine,
+        inclusion_codomain=ambient,
+        inclusion_datum=_native_embedding_rule,
+        defining_equations=equations,
+        **data,
+        **level_data,
     )
 
 
@@ -4848,10 +5323,14 @@ def _native_embedding_rule(mor):
     Both realizations lie in one ambient space, and the inclusion keeps every
     homogeneous coordinate.
     """
-    ambient, _ambient_equations = _engine_projective_ambient(_engine_scheme(mor.codomain()))
+    ambient, _ambient_equations = _engine_projective_ambient(
+        _engine_scheme(mor.codomain())
+    )
     return mor.element_class(
         mor,
-        _native_scheme_mor(mor.domain(), mor.codomain())(list(ambient.coordinate_ring().gens()), check=False),
+        _native_scheme_mor(mor.domain(), mor.codomain())(
+            list(ambient.coordinate_ring().gens()), check=False
+        ),
         mor=mor,
     )
 
@@ -4933,7 +5412,9 @@ class AffineGSchemes(OwnedCategory):
         source_endomorphisms = Schemes(base).Mor(scheme, scheme)
 
         def action_pullback(group_element):
-            return source_endomorphisms(action(group_element)).coordinate_algebra_morphism()
+            return source_endomorphisms(
+                action(group_element)
+            ).coordinate_algebra_morphism()
 
         acted = _affine_scheme(
             scheme.coordinate_algebra(),
@@ -4965,7 +5446,7 @@ class AffineGSchemes(OwnedCategory):
             )
             try:
                 elements = iter(group)
-            except (TypeError, NotImplementedError):
+            except TypeError, NotImplementedError:
                 assert False, (
                     f"the nontrivial stabilizer subscheme of {self} requires a selected "
                     f"finite enumeration of {group}"
@@ -5025,13 +5506,16 @@ class AffineGSchemes(OwnedCategory):
             equations = []
             for group_generator in group.group_generators():
                 pullback = self.action_of(group_generator).coordinate_algebra_morphism()
-                assert pullback.domain() is algebra and pullback.codomain() is algebra, (
+                assert (
+                    pullback.domain() is algebra and pullback.codomain() is algebra
+                ), (
                     f"cannot form the ideal of the fixed locus of {group} on {self}: the pullback {pullback} "
                     f"of the group generator {group_generator} must be an endomorphism of {algebra}, but it is "
                     f"{pullback.domain()} -> {pullback.codomain()}"
                 )
                 equations.extend(
-                    pullback(algebra.algebra_generator(label)) - algebra.algebra_generator(label)
+                    pullback(algebra.algebra_generator(label))
+                    - algebra.algebra_generator(label)
                     for label in labels
                 )
             return algebra.ideal(*equations)
@@ -5064,9 +5548,13 @@ class AffineGSchemes(OwnedCategory):
             # Select the finite polynomial supplier before traversing its
             # determining family.  Unknown invariance is not a refutation;
             # an exact subalgebra certificate below can prove the lift.
-            invariant_algebra, inclusion, engine_invariants = self._invariant_algebra_data()
+            invariant_algebra, inclusion, engine_invariants = (
+                self._invariant_algebra_data()
+            )
             for group_generator in self.acting_group().group_generators():
-                image = self.action_of(group_generator).coordinate_algebra_morphism()(element)
+                image = self.action_of(group_generator).coordinate_algebra_morphism()(
+                    element
+                )
                 if (image == element) is False:
                     raise ValueError(
                         f"cannot express {element} in the invariant algebra of {self}: "
@@ -5075,7 +5563,9 @@ class AffineGSchemes(OwnedCategory):
             if not engine_invariants:
                 return invariant_algebra(element)
             engine_source = _engine_ring(source_algebra)
-            certificate = engine_source(_engine_element(source_algebra, element)).in_subalgebra(
+            certificate = engine_source(
+                _engine_element(source_algebra, element)
+            ).in_subalgebra(
                 engine_invariants,
                 algorithm="groebner",
                 certificate="invariant",
@@ -5093,9 +5583,11 @@ class AffineGSchemes(OwnedCategory):
             )
             # The selected polynomial realization checks the certificate
             # exactly even when the public equality diagnostic is undecided.
-            assert engine_source(_engine_element(source_algebra, image)) == engine_source(
-                _engine_element(source_algebra, element)
-            ), f"the polynomial certificate for {element} in {invariant_algebra} has the wrong image"
+            assert engine_source(
+                _engine_element(source_algebra, image)
+            ) == engine_source(_engine_element(source_algebra, element)), (
+                f"the polynomial certificate for {element} in {invariant_algebra} has the wrong image"
+            )
             return result
 
         def _factor_through_affine_quotient(self, morphism):
@@ -5133,11 +5625,20 @@ class AffineGSchemes(OwnedCategory):
                 f"has {labels.cardinality()}"
             )
             pullback = morphism.coordinate_algebra_morphism()
-            invariant_algebra, inclusion, _engine_invariants = self._invariant_algebra_data()
-            factor_pullback = target_algebra.Mor(invariant_algebra)(
-                {label: self.invariant_algebra_element(pullback(target_algebra.algebra_generator(label))) for label in labels}
+            invariant_algebra, inclusion, _engine_invariants = (
+                self._invariant_algebra_data()
             )
-            factor = _affine_morphism_from_pullback(self.affine_quotient(), target, factor_pullback)
+            factor_pullback = target_algebra.Mor(invariant_algebra)(
+                {
+                    label: self.invariant_algebra_element(
+                        pullback(target_algebra.algebra_generator(label))
+                    )
+                    for label in labels
+                }
+            )
+            factor = _affine_morphism_from_pullback(
+                self.affine_quotient(), target, factor_pullback
+            )
             # The exact lifts of the chosen algebra generators prove this
             # triangle.  Preserve an undecided general map comparison while
             # still refusing an explicitly refuted triangle.
@@ -5219,9 +5720,20 @@ def _affine_linear_invariant_algebra_data(
         pullbacks.append(pullback)
         rows = []
         for label in labels:
-            image = engine_algebra(_engine_element(algebra, pullback(algebra.algebra_generator(label))))
-            row = [engine_base(image.monomial_coefficient(variable)) for variable in variables]
-            linear_part = sum((coefficient * variable for coefficient, variable in zip(row, variables, strict=True)), engine_algebra.zero())
+            image = engine_algebra(
+                _engine_element(algebra, pullback(algebra.algebra_generator(label)))
+            )
+            row = [
+                engine_base(image.monomial_coefficient(variable))
+                for variable in variables
+            ]
+            linear_part = sum(
+                (
+                    coefficient * variable
+                    for coefficient, variable in zip(row, variables, strict=True)
+                ),
+                engine_algebra.zero(),
+            )
             assert image == linear_part, (
                 f"cannot compute the invariant algebra of {group} acting on {scheme}: the action must be "
                 f"linear in the variables, but {group_generator} sends the variable {label} to {image}"
@@ -5238,21 +5750,30 @@ def _affine_linear_invariant_algebra_data(
         f"{group} acting on {scheme}, whose coordinate algebra has {len(variables)} variables"
     )
     engine_invariants = tuple(
-        _copy_polynomial_by_exponents(invariant, engine_algebra, variables) for invariant in backend_invariants
+        _copy_polynomial_by_exponents(invariant, engine_algebra, variables)
+        for invariant in backend_invariants
     )
-    invariant_elements = tuple(_owned_engine_element(algebra, invariant) for invariant in engine_invariants)
+    invariant_elements = tuple(
+        _owned_engine_element(algebra, invariant) for invariant in engine_invariants
+    )
     for pullback in pullbacks:
-        for invariant, engine_invariant in zip(invariant_elements, engine_invariants, strict=True):
+        for invariant, engine_invariant in zip(
+            invariant_elements, engine_invariants, strict=True
+        ):
             image = pullback(invariant)
             assert (image == invariant) is not False, (
                 f"Sage's generator {invariant} of the invariant ring of {group} acting on {scheme} "
                 f"is not fixed by {pullback}"
             )
-            assert engine_algebra(_engine_element(algebra, image)) == engine_invariant, (
+            assert (
+                engine_algebra(_engine_element(algebra, image)) == engine_invariant
+            ), (
                 f"the polynomial realization of Sage's invariant {invariant} is not fixed by {pullback}"
             )
 
-    invariant_labels = tuple(f"invariant_{index}" for index in range(len(engine_invariants)))
+    invariant_labels = tuple(
+        f"invariant_{index}" for index in range(len(engine_invariants))
+    )
     presentation = base.free_module(invariant_labels).symmetric_algebra()
     presentation_engine = _engine_ring(presentation)
     ambient_count = len(variables)
@@ -5267,7 +5788,8 @@ def _affine_linear_invariant_algebra_data(
     invariant_variables = tuple(combined.gens()[ambient_count:])
     graph_ideal = combined.ideal(
         tuple(
-            invariant_variables[index] - _copy_polynomial_by_exponents(invariant, combined, ambient_variables)
+            invariant_variables[index]
+            - _copy_polynomial_by_exponents(invariant, combined, ambient_variables)
             for index, invariant in enumerate(engine_invariants)
         )
     )
@@ -5284,11 +5806,20 @@ def _affine_linear_invariant_algebra_data(
                 f"invariants of {group} returned {relation}, which still contains those variables"
             )
             relation_terms[powers[ambient_count:]] = coefficient
-        relations.append(_owned_engine_element(presentation, presentation_engine(relation_terms)))
-    invariant_algebra = presentation if not relations else presentation.quotient_by_relations(tuple(relations))
+        relations.append(
+            _owned_engine_element(presentation, presentation_engine(relation_terms))
+        )
+    invariant_algebra = (
+        presentation
+        if not relations
+        else presentation.quotient_by_relations(tuple(relations))
+    )
     invariant_labels = tuple(invariant_algebra.algebra_generating_set())
     inclusion = invariant_algebra.Mor(algebra)(
-        {label: invariant_elements[index] for index, label in enumerate(invariant_labels)}
+        {
+            label: invariant_elements[index]
+            for index, label in enumerate(invariant_labels)
+        }
     )
     return invariant_algebra, inclusion, engine_invariants
 
@@ -5341,7 +5872,9 @@ def _affine_space_coordinates(base, dimension, names):
     The coordinate algebra is the owned polynomial algebra on the coordinate
     names, which is the free, graded free and symmetric algebra on them.
     """
-    engine = _SageAffineSpace(int(dimension), _engine_ring(base), names=_normalized_space_names(names))
+    engine = _SageAffineSpace(
+        int(dimension), _engine_ring(base), names=_normalized_space_names(names)
+    )
     return engine, _engine_polynomial_algebra(engine.coordinate_ring(), base)
 
 
@@ -5358,11 +5891,13 @@ def _affine_space(base, coordinates, placements=(), **level_data):
         # A^0_R = Spec R is the identity over Spec R, hence projective.
         placements = (Schemes(base).Projective(), *placements)
     return _object_of(
-        owned_category_join((
-            AffineSpaces(base),
-            *_space_placements(base, dimension),
-            *placements,
-        )),
+        owned_category_join(
+            (
+                AffineSpaces(base),
+                *_space_placements(base, dimension),
+                *placements,
+            )
+        ),
         scheme_base_ring=base,
         scheme_engine=engine,
         coordinate_algebra=algebra,
@@ -5451,7 +5986,7 @@ class AffineSpaces(OwnedCategoryOverBaseRing):
                 f"but the base ring is {base}"
             )
             from sage_extensions.categories.divisors.class_groups import ClassGroups
-            from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+
             return ClassGroups().trivial(self)
 
         def _zeta_function(self):
@@ -5465,11 +6000,12 @@ class AffineSpaces(OwnedCategoryOverBaseRing):
 
 def _rational_functions_in_T():
     r"""The owned rational function field ``QQ(T)`` and its variable ``T``."""
-    from sage.rings.rational_field import QQ as SageQQ
 
     rationals = _owned_rationals()
     polynomial = rationals.polynomial_ring("T")
-    rational_functions = _commutative_algebra_with_structure(polynomial.fraction_field(), rationals, ("T",))
+    rational_functions = _commutative_algebra_with_structure(
+        polynomial.fraction_field(), rationals, ("T",)
+    )
     return rational_functions, rational_functions.algebra_generator("T")
 
 
@@ -5480,7 +6016,9 @@ def _projective_space(base, dimension, names, placements=(), **level_data):
     coordinates are the data it is built from.
     """
     dimension = int(dimension)
-    engine = _SageProjectiveSpace(dimension, _engine_ring(base), names=_normalized_space_names(names))
+    engine = _SageProjectiveSpace(
+        dimension, _engine_ring(base), names=_normalized_space_names(names)
+    )
     decided = list(_space_placements(base, dimension))
     match dimension:
         case 0:
@@ -5563,7 +6101,9 @@ class ProjectiveSpaces(OwnedCategoryOverBaseRing):
         @cached_method
         def fan(self):
             r"""Return the owned standard fan of ``P^n``."""
-            from sage_extensions.categories.schemes.toric.fans import RationalPolyhedralFans
+            from sage_extensions.categories.schemes.toric.fans import (
+                RationalPolyhedralFans,
+            )
 
             lattice = _owned_integers().free_module(int(self.relative_dimension()))
             return RationalPolyhedralFans(lattice).projective_space_fan()
@@ -5596,14 +6136,18 @@ class ProjectiveSpaces(OwnedCategoryOverBaseRing):
                         f"is not a field, the Picard group and class group of Spec {base} and the map between "
                         "them must be given"
                     )
-                    return _projective_space_over_field_picard_to_class_group_morphism(self)
+                    return _projective_space_over_field_picard_to_class_group_morphism(
+                        self
+                    )
                 case _:
                     assert all(value is not None for value in supplied), (
                         f"cannot compare the Picard and class groups of {self}: the Picard group, the class "
                         "group of the base and the map between them must be given together, but only some of "
                         "them were given"
                     )
-                    return _projective_space_picard_to_class_group_morphism(self, *supplied)
+                    return _projective_space_picard_to_class_group_morphism(
+                        self, *supplied
+                    )
 
         def _picard_group(self):
             r"""Return ``Pic(P^n_k) = ZZ[O(1)]`` over a field."""
@@ -5708,7 +6252,9 @@ class ProjectiveSpaces(OwnedCategoryOverBaseRing):
 
         def hyperplane(self, index=0):
             r"""The coordinate hyperplane ``V_+(x_index)``, the hypersurface of the degree-1 form ``x_index``."""
-            return self.hypersurface(tuple(self.homogeneous_coordinate_generators())[int(index)])
+            return self.hypersurface(
+                tuple(self.homogeneous_coordinate_generators())[int(index)]
+            )
 
         def hypersurface(self, f, placements=()):
             r"""The hypersurface ``V_+(f) = Proj k[x_0, ..., x_n]/(f)`` with its closed immersion into ``P^n_k``.
@@ -5750,7 +6296,9 @@ class ProjectiveSpaces(OwnedCategoryOverBaseRing):
         def _standard_chart_coordinate(self, chart_index, numerator_index):
             r"""``x_k / x_i`` as a generator of the ``i``-th chart's coordinate algebra."""
             algebra = self.standard_affine_chart(chart_index).coordinate_algebra()
-            return algebra.algebra_generator(self._standard_chart_coordinate_name(chart_index, numerator_index))
+            return algebra.algebra_generator(
+                self._standard_chart_coordinate_name(chart_index, numerator_index)
+            )
 
         @cached_method
         def standard_affine_charts(self):
@@ -5789,7 +6337,9 @@ class ProjectiveSpaces(OwnedCategoryOverBaseRing):
         def standard_chart_overlap(self, chart_index, other_index):
             r"""``U_i cap U_j = D(x_j/x_i)``, an open of the ``i``-th chart."""
             chart = self.standard_affine_chart(chart_index)
-            return chart.distinguished_open(self._standard_chart_coordinate(chart_index, other_index))
+            return chart.distinguished_open(
+                self._standard_chart_coordinate(chart_index, other_index)
+            )
 
         def _standard_chart_change(self, source_index, target_index):
             r"""``U_i cap U_j -> U_j cap U_i``, read on coordinates."""
@@ -5804,18 +6354,25 @@ class ProjectiveSpaces(OwnedCategoryOverBaseRing):
             target_overlap = self.standard_chart_overlap(target_index, source_index)
             target_chart = self.standard_affine_chart(target_index)
             restriction = source_overlap.inclusion().coordinate_algebra_morphism()
-            inverse_ratio = restriction(self._standard_chart_coordinate(source_index, target_index)).inverse_of_unit()
+            inverse_ratio = restriction(
+                self._standard_chart_coordinate(source_index, target_index)
+            ).inverse_of_unit()
             images = {
                 self._standard_chart_coordinate_name(target_index, numerator): (
                     inverse_ratio
                     if numerator == source_index
-                    else restriction(self._standard_chart_coordinate(source_index, numerator)) * inverse_ratio
+                    else restriction(
+                        self._standard_chart_coordinate(source_index, numerator)
+                    )
+                    * inverse_ratio
                 )
                 for numerator in range(dimension + 1)
                 if numerator != target_index
             }
             into_target_chart = _scheme_mor_category(source_overlap, target_chart)(
-                target_chart.coordinate_algebra().Mor(source_overlap.coordinate_algebra())(images)
+                target_chart.coordinate_algebra().Mor(
+                    source_overlap.coordinate_algebra()
+                )(images)
             )
             return target_overlap.corestriction(into_target_chart)
 
@@ -5851,7 +6408,9 @@ class ProjectiveSpaces(OwnedCategoryOverBaseRing):
                 _coordinate_hyperplane_section_restriction,
             )
 
-            return _coordinate_hyperplane_section_restriction(self, degree, coordinate_index)
+            return _coordinate_hyperplane_section_restriction(
+                self, degree, coordinate_index
+            )
 
         def coordinate_point_jet_evaluation(self, degree, coordinate_index, jet_order):
             r"""Evaluate ``O(degree)`` jets at the selected coordinate point."""
@@ -5859,19 +6418,29 @@ class ProjectiveSpaces(OwnedCategoryOverBaseRing):
                 _coordinate_point_jet_evaluation,
             )
 
-            return _coordinate_point_jet_evaluation(self, degree, coordinate_index, jet_order)
+            return _coordinate_point_jet_evaluation(
+                self, degree, coordinate_index, jet_order
+            )
 
-        def sections_vanishing_to_order(self, degree, coordinate_index, vanishing_order):
+        def sections_vanishing_to_order(
+            self, degree, coordinate_index, vanishing_order
+        ):
             r"""Return ``O(degree)`` sections vanishing to the stated order."""
-            return self.coordinate_point_jet_evaluation(degree, coordinate_index, vanishing_order).kernel()
+            return self.coordinate_point_jet_evaluation(
+                degree, coordinate_index, vanishing_order
+            ).kernel()
 
-        def imposed_multiplicity_linear_system(self, degree, coordinate_index, vanishing_order):
+        def imposed_multiplicity_linear_system(
+            self, degree, coordinate_index, vanishing_order
+        ):
             r"""Projectivize sections satisfying a coordinate-point multiplicity condition."""
             from sage_extensions.categories.divisors.linear_systems import (
                 _coordinate_imposed_multiplicity_linear_system,
             )
 
-            return _coordinate_imposed_multiplicity_linear_system(self, degree, coordinate_index, vanishing_order)
+            return _coordinate_imposed_multiplicity_linear_system(
+                self, degree, coordinate_index, vanishing_order
+            )
 
         @cached_method
         def _canonical_line_bundle(self):
@@ -5892,10 +6461,14 @@ class ProjectiveSpaces(OwnedCategoryOverBaseRing):
             atlas = self.standard_affine_atlas()
             restrictions = indexed_family(
                 atlas.chart_index_set(),
-                lambda index: atlas.chart(index).coordinate_algebra().algebra_structure_morphism(),
+                lambda index: (
+                    atlas.chart(index).coordinate_algebra().algebra_structure_morphism()
+                ),
                 name="Projective global-function restrictions",
             )
-            return _finite_atlas_structure_sheaf(atlas, self.scheme_base_ring(), restrictions)
+            return _finite_atlas_structure_sheaf(
+                atlas, self.scheme_base_ring(), restrictions
+            )
 
         @cached_method
         def standard_affine_atlas(self):
@@ -5907,7 +6480,10 @@ class ProjectiveSpaces(OwnedCategoryOverBaseRing):
             indices = tuple(range(int(self.relative_dimension()) + 1))
             return FiniteAffineAtlases(self)(
                 tuple(self.standard_affine_chart(index) for index in indices),
-                tuple(self.standard_chart_transition(left, right) for left, right in combinations(indices, 2)),
+                tuple(
+                    self.standard_chart_transition(left, right)
+                    for left, right in combinations(indices, 2)
+                ),
                 tuple(self.standard_affine_chart_embedding(index) for index in indices),
             )
 
@@ -5922,7 +6498,10 @@ class ProjectiveSpaces(OwnedCategoryOverBaseRing):
             indices = range(int(self.relative_dimension()) + 1)
             return Schemes(self.scheme_base_ring()).glue_affine_atlas(
                 tuple(self.standard_affine_chart(index) for index in indices),
-                tuple(self.standard_chart_transition(left, right) for left, right in combinations(indices, 2)),
+                tuple(
+                    self.standard_chart_transition(left, right)
+                    for left, right in combinations(indices, 2)
+                ),
             )
 
         def _zeta_function(self):
@@ -5933,7 +6512,9 @@ class ProjectiveSpaces(OwnedCategoryOverBaseRing):
             d = int(self.relative_dimension())
             result = rational_functions.one()
             for i in range(d + 1):
-                result *= rational_functions.one() / (rational_functions.one() - q**i * T)
+                result *= rational_functions.one() / (
+                    rational_functions.one() - q**i * T
+                )
             return result
 
 
@@ -5948,7 +6529,9 @@ def _standard_projective_chart_embedding(projective, chart_index):
     chart = projective.standard_affine_chart(chart_index)
     algebra = chart.coordinate_algebra()
     coordinates = tuple(
-        algebra.one() if numerator == chart_index else projective._standard_chart_coordinate(chart_index, numerator)
+        algebra.one()
+        if numerator == chart_index
+        else projective._standard_chart_coordinate(chart_index, numerator)
         for numerator in range(int(projective.relative_dimension()) + 1)
     )
     return _StandardProjectiveChartEmbedding(
@@ -5997,7 +6580,9 @@ class ProductSchemes(OwnedCategoryOverBaseRing):
         @cached_method
         def projection(self, index):
             r"""Return the projection to the factor at ``index``."""
-            return _scheme_mor_category(self, self.factors()[index])(self._projection_data[index])
+            return _scheme_mor_category(self, self.factors()[index])(
+                self._projection_data[index]
+            )
 
         @cached_method
         def projections(self):
@@ -6015,7 +6600,11 @@ class ProductSchemes(OwnedCategoryOverBaseRing):
                 f"{projection.domain()}"
             )
             label = next(
-                (label for label in self.factors().index_set() if projection is self.projection(label)),
+                (
+                    label
+                    for label in self.factors().index_set()
+                    if projection is self.projection(label)
+                ),
                 None,
             )
             assert label is not None, (
@@ -6046,7 +6635,9 @@ class ProductSchemes(OwnedCategoryOverBaseRing):
                 f"cannot form the map into the product {self} from the cone {legs}: its legs do not all "
                 f"start at one scheme (the first starts at {source})"
             )
-            assert all(legs[label].codomain() is factors[label] for label in factor_labels), (
+            assert all(
+                legs[label].codomain() is factors[label] for label in factor_labels
+            ), (
                 f"cannot form the map into the product {self} from the cone {legs}: each leg must land in "
                 f"its factor, and the leg at "
                 f"{next(label for label in factor_labels if legs[label].codomain() is not factors[label])} "
@@ -6072,11 +6663,19 @@ class ProductSchemes(OwnedCategoryOverBaseRing):
                                 f"base scheme must be the structure morphism of {source}"
                             )
                             continue
-                        projection_pullback = self.projection(factor_label).coordinate_algebra_morphism()
+                        projection_pullback = self.projection(
+                            factor_label
+                        ).coordinate_algebra_morphism()
                         leg_pullback = leg.coordinate_algebra_morphism()
                         for generator_label in factor_algebra.algebra_generating_set():
-                            generator = factor_algebra.algebra_generator(generator_label)
-                            images[_algebra_generator_label(product_algebra, projection_pullback(generator))] = leg_pullback(generator)
+                            generator = factor_algebra.algebra_generator(
+                                generator_label
+                            )
+                            images[
+                                _algebra_generator_label(
+                                    product_algebra, projection_pullback(generator)
+                                )
+                            ] = leg_pullback(generator)
                     pullback = (
                         source.structure_morphism().coordinate_algebra_morphism()
                         if product_algebra is base
@@ -6084,15 +6683,28 @@ class ProductSchemes(OwnedCategoryOverBaseRing):
                     )
                     cone = _affine_morphism_from_pullback(source, self, pullback)
                 case _ if self in ProductProjectiveSpaces(base):
-                    coordinate_legs = tuple(_projective_coordinate_morphism(legs[label]) for label in factor_labels)
+                    coordinate_legs = tuple(
+                        _projective_coordinate_morphism(legs[label])
+                        for label in factor_labels
+                    )
                     coefficients = coordinate_legs[0].coefficient_map()
-                    assert all(_ring_morphisms_equal(coefficients, leg.coefficient_map()) is True for leg in coordinate_legs), (
+                    assert all(
+                        _ring_morphisms_equal(coefficients, leg.coefficient_map())
+                        is True
+                        for leg in coordinate_legs
+                    ), (
                         f"cannot form the map into the product of projective spaces {self} from the cone {legs}: "
                         f"the legs must all use the same map {coefficients} on coefficients, and they do not"
                     )
-                    coordinates = tuple(value for leg in coordinate_legs for value in leg.homogeneous_coordinates())
+                    coordinates = tuple(
+                        value
+                        for leg in coordinate_legs
+                        for value in leg.homogeneous_coordinates()
+                    )
                     cone = _ProjectiveCoordinateMorphism(
-                        LocallyRingedSpaces().Mor(source, self), coordinates, coefficient_map=coefficients,
+                        LocallyRingedSpaces().Mor(source, self),
+                        coordinates,
+                        coefficient_map=coefficients,
                     )
                 case _:
                     assert False, (
@@ -6101,9 +6713,13 @@ class ProductSchemes(OwnedCategoryOverBaseRing):
                     )
 
             cone = SchemeConeMorphismConstruction(
-                self, legs, (self.projection(index) for index in factors.index_set()),
+                self,
+                legs,
+                (self.projection(index) for index in factors.index_set()),
             ).image_of(cone)
-            assert all(self.projection(label) * cone == legs[label] for label in factor_labels), (
+            assert all(
+                self.projection(label) * cone == legs[label] for label in factor_labels
+            ), (
                 f"the map {cone} into the product {self} is wrong: its composites with the projections "
                 f"are not the legs {legs}"
             )
@@ -6121,7 +6737,9 @@ def _projective_projection_rule(offset, width, scalar_map=None):
     def realize(mor):
         source = mor.domain()
         ambient, _ = _engine_projective_ambient(_engine_scheme(source))
-        ring = _engine_polynomial_algebra(ambient.coordinate_ring(), source.scheme_base_ring())
+        ring = _engine_polynomial_algebra(
+            ambient.coordinate_ring(), source.scheme_base_ring()
+        )
         coordinates = tuple(
             _owned_engine_element(ring, value)
             for value in ambient.coordinate_ring().gens()[offset : offset + width]
@@ -6129,10 +6747,14 @@ def _projective_projection_rule(offset, width, scalar_map=None):
         coefficient_map = None
         if scalar_map is not None:
             structure = _restriction_to_base(ring, scalar_map.codomain())
-            coefficient_map = OwnedRings().Mor(scalar_map.domain(), ring).elementwise(
-                lambda value: structure(scalar_map(value))
+            coefficient_map = (
+                OwnedRings()
+                .Mor(scalar_map.domain(), ring)
+                .elementwise(lambda value: structure(scalar_map(value)))
             )
-        return _ProjectiveCoordinateMorphism(mor, coordinates, coefficient_map=coefficient_map)
+        return _ProjectiveCoordinateMorphism(
+            mor, coordinates, coefficient_map=coefficient_map
+        )
 
     return realize
 
@@ -6169,9 +6791,16 @@ class ProductProjectiveSpaces(OwnedCategoryOverBaseRing):
             factors = self.factors()
             factor_indices = factors.index_set()
             factor_labels = tuple(factor_indices)
-            positions = {label: position for position, label in enumerate(factor_labels)}
+            positions = {
+                label: position for position, label in enumerate(factor_labels)
+            }
             choices = tuple(
-                cartesian_product(*(range(int(factors[label].relative_dimension()) + 1) for label in factor_labels))
+                cartesian_product(
+                    *(
+                        range(int(factors[label].relative_dimension()) + 1)
+                        for label in factor_labels
+                    )
+                )
             )
             charts = {}
             embeddings = {}
@@ -6179,7 +6808,9 @@ class ProductProjectiveSpaces(OwnedCategoryOverBaseRing):
                 chart = _scheme_product(
                     indexed_family(
                         factor_indices,
-                        lambda label, choice=choice: factors[label].standard_affine_chart(choice[positions[label]]),
+                        lambda label, choice=choice: factors[
+                            label
+                        ].standard_affine_chart(choice[positions[label]]),
                         name="Standard affine factors of a multiprojective chart",
                     )
                 )
@@ -6195,7 +6826,9 @@ class ProductProjectiveSpaces(OwnedCategoryOverBaseRing):
                             chart_algebra,
                             chart_algebra.one()
                             if coordinate == selected
-                            else pullback(factor._standard_chart_coordinate(selected, coordinate)),
+                            else pullback(
+                                factor._standard_chart_coordinate(selected, coordinate)
+                            ),
                         )
                         for coordinate in range(int(factor.relative_dimension()) + 1)
                     )
@@ -6216,8 +6849,12 @@ class ProductProjectiveSpaces(OwnedCategoryOverBaseRing):
             factors = self.factors()
             factor_indices = factors.index_set()
             factor_labels = tuple(factor_indices)
-            positions = {label: position for position, label in enumerate(factor_labels)}
-            choices, charts, embeddings = self._standard_affine_cover_charts_and_embeddings()
+            positions = {
+                label: position for position, label in enumerate(factor_labels)
+            }
+            choices, charts, embeddings = (
+                self._standard_affine_cover_charts_and_embeddings()
+            )
 
             @cached_function
             def overlap(source_choice, target_choice):
@@ -6228,7 +6865,11 @@ class ProductProjectiveSpaces(OwnedCategoryOverBaseRing):
                     target_index = target_choice[positions[label]]
                     if source_index != target_index:
                         pullback = chart.projection(label).coordinate_algebra_morphism()
-                        element *= pullback(factors[label]._standard_chart_coordinate(source_index, target_index))
+                        element *= pullback(
+                            factors[label]._standard_chart_coordinate(
+                                source_index, target_index
+                            )
+                        )
                 return chart.distinguished_open(element)
 
             def transition(source_choice, target_choice):
@@ -6242,17 +6883,33 @@ class ProductProjectiveSpaces(OwnedCategoryOverBaseRing):
                     local_projection = source_chart.projection(label) * inclusion
                     if source_index == target_index:
                         return local_projection
-                    into_factor_overlap = factor.standard_chart_overlap(source_index, target_index).corestriction(local_projection)
-                    changed = factor._standard_chart_change(source_index, target_index) * into_factor_overlap
-                    return factor.standard_chart_overlap(target_index, source_index).inclusion() * changed
+                    into_factor_overlap = factor.standard_chart_overlap(
+                        source_index, target_index
+                    ).corestriction(local_projection)
+                    changed = (
+                        factor._standard_chart_change(source_index, target_index)
+                        * into_factor_overlap
+                    )
+                    return (
+                        factor.standard_chart_overlap(
+                            target_index, source_index
+                        ).inclusion()
+                        * changed
+                    )
 
                 into_target = charts[target_choice].from_product_cone(
-                    indexed_family(factor_indices, leg, name="Coordinatewise multiprojective chart transition legs")
+                    indexed_family(
+                        factor_indices,
+                        leg,
+                        name="Coordinatewise multiprojective chart transition legs",
+                    )
                 )
                 return overlap(target_choice, source_choice).corestriction(into_target)
 
             transitions = {
-                (left, right): _scheme_isomorphism(transition(left, right), transition(right, left))
+                (left, right): _scheme_isomorphism(
+                    transition(left, right), transition(right, left)
+                )
                 for left, right in combinations(choices, 2)
             }
             return FiniteAffineAtlases(self)(
@@ -6271,7 +6928,9 @@ class ProductProjectiveSpaces(OwnedCategoryOverBaseRing):
 
         @cached_method
         def _canonical_line_bundle(self):
-            return self.O(*(-int(factor.relative_dimension()) - 1 for factor in self.factors()))
+            return self.O(
+                *(-int(factor.relative_dimension()) - 1 for factor in self.factors())
+            )
 
 
 def _scheme_product_cache_key(factors):
@@ -6310,7 +6969,10 @@ def _scheme_product(*schemes, placements=(), **level_data):
     )
     scheme_values = tuple(factors[label] for label in index_set)
     base = scheme_values[0].scheme_base_ring()
-    assert all(scheme in Schemes(base) and scheme.scheme_base_ring() is base for scheme in scheme_values), (
+    assert all(
+        scheme in Schemes(base) and scheme.scheme_base_ring() is base
+        for scheme in scheme_values
+    ), (
         f"cannot form the product of {factors}: every factor must be a scheme over the base ring "
         f"{base} of the first factor, and "
         f"{next(scheme for scheme in scheme_values if not (scheme in Schemes(base) and scheme.scheme_base_ring() is base))} "
@@ -6328,7 +6990,9 @@ def _scheme_product(*schemes, placements=(), **level_data):
 
     match scheme_values:
         case _ if all(scheme in AffineSpaces(base) for scheme in scheme_values):
-            dimensions = tuple(int(scheme.relative_dimension()) for scheme in scheme_values)
+            dimensions = tuple(
+                int(scheme.relative_dimension()) for scheme in scheme_values
+            )
             names = tuple(
                 f"x{factor}_{coordinate}"
                 for factor, dimension in enumerate(dimensions)
@@ -6344,8 +7008,12 @@ def _scheme_product(*schemes, placements=(), **level_data):
                 pullbacks.append(
                     factor_algebra.Mor(product_algebra)(
                         {
-                            label: product_algebra.algebra_generator(product_labels[offset + position])
-                            for position, label in enumerate(factor_algebra.algebra_generating_set())
+                            label: product_algebra.algebra_generator(
+                                product_labels[offset + position]
+                            )
+                            for position, label in enumerate(
+                                factor_algebra.algebra_generating_set()
+                            )
                         }
                     )
                 )
@@ -6359,7 +7027,9 @@ def _scheme_product(*schemes, placements=(), **level_data):
                 **level_data,
             )
         case _ if all(scheme in ProjectiveSpaces(base) for scheme in scheme_values):
-            widths = tuple(int(scheme.relative_dimension()) + 1 for scheme in scheme_values)
+            widths = tuple(
+                int(scheme.relative_dimension()) + 1 for scheme in scheme_values
+            )
             dimension = sum(width - 1 for width in widths)
             projective_surface_placement = ()
             if base in OwnedFields() and dimension == 2:
@@ -6378,19 +7048,36 @@ def _scheme_product(*schemes, placements=(), **level_data):
             )
             offsets = tuple(sum(widths[:position]) for position in range(len(widths)))
             return _object_of(
-                owned_category_join((ProductProjectiveSpaces(base), *_space_placements(base, dimension), *projective_surface_placement, *placements)),
+                owned_category_join(
+                    (
+                        ProductProjectiveSpaces(base),
+                        *_space_placements(base, dimension),
+                        *projective_surface_placement,
+                        *placements,
+                    )
+                ),
                 scheme_base_ring=base,
                 scheme_engine=engine,
                 factors=factors,
                 projection_data=projection_family(
-                    tuple(_projective_projection_rule(offset, width) for offset, width in zip(offsets, widths, strict=True))
+                    tuple(
+                        _projective_projection_rule(offset, width)
+                        for offset, width in zip(offsets, widths, strict=True)
+                    )
                 ),
                 **level_data,
             )
         case _ if all(scheme in Schemes(base).Affine() for scheme in scheme_values):
-            return _affine_scheme_product(factors, scheme_values, base, projection_family, placements, level_data)
-        case _ if all(scheme in Schemes(base).Affine() or scheme in ProjectiveSpaces(base) for scheme in scheme_values):
-            return _mixed_affine_projective_product(factors, base, placements, level_data)
+            return _affine_scheme_product(
+                factors, scheme_values, base, projection_family, placements, level_data
+            )
+        case _ if all(
+            scheme in Schemes(base).Affine() or scheme in ProjectiveSpaces(base)
+            for scheme in scheme_values
+        ):
+            return _mixed_affine_projective_product(
+                factors, base, placements, level_data
+            )
         case _:
             assert False, (
                 f"cannot form the product of {factors}: products are computed here only for affine "
@@ -6398,7 +7085,9 @@ def _scheme_product(*schemes, placements=(), **level_data):
             )
 
 
-def _affine_scheme_product(factors, scheme_values, base, projection_family, placements, level_data):
+def _affine_scheme_product(
+    factors, scheme_values, base, projection_family, placements, level_data
+):
     r"""``Spec(A_1 tensor_R ... tensor_R A_n)`` with the coproduct injections as projection pullbacks.
 
     ``Spec R`` is terminal in ``Sch/R``: a terminal factor contributes nothing
@@ -6406,7 +7095,11 @@ def _affine_scheme_product(factors, scheme_values, base, projection_family, plac
     whose pullback is the algebra structure morphism.
     """
     base_scheme = Schemes(base).base_scheme()
-    nonterminal_positions = tuple(position for position, scheme in enumerate(scheme_values) if scheme is not base_scheme)
+    nonterminal_positions = tuple(
+        position
+        for position, scheme in enumerate(scheme_values)
+        if scheme is not base_scheme
+    )
     commutative_algebras = Algebras(base).Associative().Unital().Commutative()
     match len(nonterminal_positions):
         case 0:
@@ -6416,7 +7109,10 @@ def _affine_scheme_product(factors, scheme_values, base, projection_family, plac
             algebra = scheme_values[nonterminal_positions[0]].coordinate_algebra()
             maps = [algebra.Mor(algebra).identity()]
         case _:
-            algebras = tuple(scheme_values[position].coordinate_algebra() for position in nonterminal_positions)
+            algebras = tuple(
+                scheme_values[position].coordinate_algebra()
+                for position in nonterminal_positions
+            )
             algebra = commutative_algebras.coproduct((algebras[0], algebras[1]))
             maps = list(algebra.coproduct_injections())
             for next_algebra in algebras[2:]:
@@ -6425,7 +7121,11 @@ def _affine_scheme_product(factors, scheme_values, base, projection_family, plac
                 maps = [left_map * factor_map for factor_map in maps] + [right_map]
                 algebra = extended
     injection_at = dict(zip(nonterminal_positions, maps, strict=True))
-    structure_pullback = base.Mor(base).identity() if algebra is base else algebra.algebra_structure_morphism()
+    structure_pullback = (
+        base.Mor(base).identity()
+        if algebra is base
+        else algebra.algebra_structure_morphism()
+    )
     pullbacks = tuple(
         injection_at[position] if position in injection_at else structure_pullback
         for position in range(len(scheme_values))
@@ -6454,13 +7154,28 @@ def _mixed_affine_projective_product(factors, base, placements, level_data):
     """
     factors = _finite_factor_family(factors, name="Product factors")
     schemes = tuple(factors)
-    projective_positions = tuple(position for position, scheme in enumerate(schemes) if scheme in ProjectiveSpaces(base))
-    chart_labels = tuple(cartesian_product(*(range(int(schemes[position].relative_dimension()) + 1) for position in projective_positions)))
-    projective_slot = {position: slot for slot, position in enumerate(projective_positions)}
+    projective_positions = tuple(
+        position
+        for position, scheme in enumerate(schemes)
+        if scheme in ProjectiveSpaces(base)
+    )
+    chart_labels = tuple(
+        cartesian_product(
+            *(
+                range(int(schemes[position].relative_dimension()) + 1)
+                for position in projective_positions
+            )
+        )
+    )
+    projective_slot = {
+        position: slot for slot, position in enumerate(projective_positions)
+    }
     charts = {
         label: _scheme_product(
             tuple(
-                scheme.standard_affine_chart(label[projective_slot[position]]) if position in projective_slot else scheme
+                scheme.standard_affine_chart(label[projective_slot[position]])
+                if position in projective_slot
+                else scheme
                 for position, scheme in enumerate(schemes)
             )
         )
@@ -6475,7 +7190,11 @@ def _mixed_affine_projective_product(factors, base, placements, level_data):
             slot = projective_slot[position]
             if source_label[slot] != target_label[slot]:
                 pullback = chart.projection(position).coordinate_algebra_morphism()
-                element *= pullback(schemes[position]._standard_chart_coordinate(source_label[slot], target_label[slot]))
+                element *= pullback(
+                    schemes[position]._standard_chart_coordinate(
+                        source_label[slot], target_label[slot]
+                    )
+                )
         return chart.distinguished_open(element)
 
     def transition(source_label, target_label):
@@ -6484,14 +7203,26 @@ def _mixed_affine_projective_product(factors, base, placements, level_data):
         legs = []
         for position, scheme in enumerate(schemes):
             local_projection = source_chart.projection(position) * inclusion
-            if position not in projective_slot or source_label[projective_slot[position]] == target_label[projective_slot[position]]:
+            if (
+                position not in projective_slot
+                or source_label[projective_slot[position]]
+                == target_label[projective_slot[position]]
+            ):
                 legs.append(local_projection)
                 continue
             source_index = source_label[projective_slot[position]]
             target_index = target_label[projective_slot[position]]
-            into_factor_overlap = scheme.standard_chart_overlap(source_index, target_index).corestriction(local_projection)
-            changed = scheme._standard_chart_change(source_index, target_index) * into_factor_overlap
-            legs.append(scheme.standard_chart_overlap(target_index, source_index).inclusion() * changed)
+            into_factor_overlap = scheme.standard_chart_overlap(
+                source_index, target_index
+            ).corestriction(local_projection)
+            changed = (
+                scheme._standard_chart_change(source_index, target_index)
+                * into_factor_overlap
+            )
+            legs.append(
+                scheme.standard_chart_overlap(target_index, source_index).inclusion()
+                * changed
+            )
         into_target_chart = charts[target_label].from_product_cone(tuple(legs))
         return overlap(target_label, source_label).corestriction(into_target_chart)
 
@@ -6504,7 +7235,10 @@ def _mixed_affine_projective_product(factors, base, placements, level_data):
     # its standard chart followed by that chart's embedding.
     local_projection_families = tuple(
         tuple(
-            _standard_projective_chart_embedding(factor, label[projective_slot[position]]) * charts[label].projection(position)
+            _standard_projective_chart_embedding(
+                factor, label[projective_slot[position]]
+            )
+            * charts[label].projection(position)
             if position in projective_slot
             else charts[label].projection(position)
             for label in chart_labels
@@ -6516,20 +7250,30 @@ def _mixed_affine_projective_product(factors, base, placements, level_data):
     placements = [ProductSchemes(base), *placements]
     placements.extend(
         placement
-        for placement in (schemes_over_base.Separated(), schemes_over_base.FiniteType(), schemes_over_base.Smooth())
+        for placement in (
+            schemes_over_base.Separated(),
+            schemes_over_base.FiniteType(),
+            schemes_over_base.Smooth(),
+        )
         if all(factor in placement for factor in schemes)
     )
     # A finite-type affine scheme is quasi-projective and projective spaces are
     # projective, so the product of those is quasi-projective.
     if all(
         factor in schemes_over_base.QuasiProjective()
-        or (factor in schemes_over_base.Affine() and factor in schemes_over_base.FiniteType())
+        or (
+            factor in schemes_over_base.Affine()
+            and factor in schemes_over_base.FiniteType()
+        )
         for factor in schemes
     ):
         placements.append(schemes_over_base.QuasiProjective())
     # For products of the standard spaces the charts are polynomial rings over
     # the base, so integral and normal placements are read from the base.
-    if all(factor in AffineSpaces(base) or factor in ProjectiveSpaces(base) for factor in schemes):
+    if all(
+        factor in AffineSpaces(base) or factor in ProjectiveSpaces(base)
+        for factor in schemes
+    ):
         placements.extend(
             _space_placements(
                 base,
@@ -6556,7 +7300,9 @@ def _mixed_affine_projective_product(factors, base, placements, level_data):
         factors=factors,
         projection_data=indexed_family(
             factors.index_set(),
-            lambda label: local_projection_families[int(factors.index_set().ranking_map()(label))],
+            lambda label: local_projection_families[
+                int(factors.index_set().ranking_map()(label))
+            ],
             name="Glued product projection data",
         ),
         **level_data,
@@ -6627,7 +7373,9 @@ class FiberProductSchemes(OwnedCategoryOverBaseRing):
     def an_object(self):
         r"""``A^1 x_{Spec R} A^1``, the affine plane as a fiber product."""
         line = AffineSpaces(self.base_ring())(1)
-        return _scheme_fiber_product(line.structure_morphism(), line.structure_morphism())
+        return _scheme_fiber_product(
+            line.structure_morphism(), line.structure_morphism()
+        )
 
     def _repr_object_names(self):
         return f"fiber products of schemes over {self.base_ring()}"
@@ -6654,12 +7402,18 @@ class FiberProductSchemes(OwnedCategoryOverBaseRing):
         def fiber_product_projections(self):
             r"""``(X x_S Y -> X, X x_S Y -> Y)``, built from their defining data."""
             left_leg, right_leg = self.fiber_product_cospan()
-            left_datum, right_datum = self.fiber_product_construction().projection_data()
+            left_datum, right_datum = (
+                self.fiber_product_construction().projection_data()
+            )
             relative = Schemes(self.scheme_base_ring())
-            category = relative if all(
-                leg.parent().mor_category().is_subcategory(relative)
-                for leg in (left_leg, right_leg)
-            ) else LocallyRingedSpaces()
+            category = (
+                relative
+                if all(
+                    leg.parent().mor_category().is_subcategory(relative)
+                    for leg in (left_leg, right_leg)
+                )
+                else LocallyRingedSpaces()
+            )
             return (
                 category.Mor(self, left_leg.domain())(left_datum),
                 category.Mor(self, right_leg.domain())(right_datum),
@@ -6702,7 +7456,10 @@ class FiberProductSchemes(OwnedCategoryOverBaseRing):
                     factorization = _affine_morphism_from_pullback(
                         left_map.domain(),
                         self,
-                        cocone_factorization(left_map.coordinate_algebra_morphism(), right_map.coordinate_algebra_morphism()),
+                        cocone_factorization(
+                            left_map.coordinate_algebra_morphism(),
+                            right_map.coordinate_algebra_morphism(),
+                        ),
                     )
                 case _:
                     algebra_pushout = construction.algebra_pushout()
@@ -6713,10 +7470,15 @@ class FiberProductSchemes(OwnedCategoryOverBaseRing):
                     factorization = _affine_morphism_from_pullback(
                         left_map.domain(),
                         self,
-                        algebra_pushout.from_pushout_cocone(left_map.coordinate_algebra_morphism(), right_map.coordinate_algebra_morphism()),
+                        algebra_pushout.from_pushout_cocone(
+                            left_map.coordinate_algebra_morphism(),
+                            right_map.coordinate_algebra_morphism(),
+                        ),
                     )
             return SchemeConeMorphismConstruction(
-                self, (left_map, right_map), (left_projection, right_projection),
+                self,
+                (left_map, right_map),
+                (left_projection, right_projection),
             ).image_of(factorization)
 
 
@@ -6761,7 +7523,9 @@ class _RelativeDeRhamCohomologySheafEngine:
         complex).  This needs the relative de Rham complex of ``X`` over
         ``S`` and its Cech hypercohomology on an affine cover of ``X``.
         """
-        assert False, "global_sections on relative de Rham cohomology sheaves: not implemented"
+        assert False, (
+            "global_sections on relative de Rham cohomology sheaves: not implemented"
+        )
 
     def sheaf_category(self):
         r"""``QCoh(S)``, the category this sheaf is an object of."""
@@ -6772,7 +7536,9 @@ class _RelativeDeRhamCohomologySheafEngine:
         return f"R^{self.degree()} f_*(Omega^*_(X/S)) for f: {f.domain()} -> {f.codomain()}"
 
 
-@cached_function(key=lambda family, degree, categories: (id(family), degree, categories))
+@cached_function(
+    key=lambda family, degree, categories: (id(family), degree, categories)
+)
 def _relative_de_rham_cohomology(family, degree, categories):
     r"""``H^k_dR(X/S) = R^k f_*(Omega^*_{X/S})`` in ``QCoh(S)`` joined with ``categories``.
 
@@ -6815,11 +7581,16 @@ def _localization_base_change_pushout(left_pullback, right_pullback):
     def is_localization_map(leg):
         localized = leg.codomain()
         match localized:
-            case _ if (localized in LocalizationRings()
-                       and localized.localization_source() is base
-                       and base.is_framed_algebra()):
+            case _ if (
+                localized in LocalizationRings()
+                and localized.localization_source() is base
+                and base.is_framed_algebra()
+            ):
                 canonical = localized.localization_map()
-                return all(leg(generator) == canonical(generator) for generator in base.finite_algebra_generators())
+                return all(
+                    leg(generator) == canonical(generator)
+                    for generator in base.finite_algebra_generators()
+                )
             case _:
                 return False
 
@@ -6849,13 +7620,21 @@ def _localization_base_change_pushout(left_pullback, right_pullback):
                 f"{right_to_target} must land in one ring, but they land in {left_to_target.codomain()} "
                 f"and {right_to_target.codomain()}"
             )
-            other_to_target = left_to_target if localization_on_right else right_to_target
-            return algebras.Mor(pushout, other_to_target.codomain())(pushout.induced_morphism(other_to_target))
+            other_to_target = (
+                left_to_target if localization_on_right else right_to_target
+            )
+            return algebras.Mor(pushout, other_to_target.codomain())(
+                pushout.induced_morphism(other_to_target)
+            )
 
         return pushout, maps[0], maps[1], factor
 
     represented = realize(left_pullback, right_pullback, True)
-    return represented if represented is not None else realize(right_pullback, left_pullback, False)
+    return (
+        represented
+        if represented is not None
+        else realize(right_pullback, left_pullback, False)
+    )
 
 
 def _quotient_base_change_pushout(left_pullback, right_pullback):
@@ -6884,7 +7663,9 @@ def _quotient_base_change_pushout(left_pullback, right_pullback):
     def kernel_generators(quotient_pullback):
         quotient = quotient_pullback.codomain()
         match quotient:
-            case _ if quotient in QuotientRings() and quotient.quotient_source() is base:
+            case _ if (
+                quotient in QuotientRings() and quotient.quotient_source() is base
+            ):
                 return tuple(quotient.defining_ideal().ideal_generators())
             case _ if quotient is base.base_ring() and base.is_framed_algebra():
                 return tuple(
@@ -6904,13 +7685,21 @@ def _quotient_base_change_pushout(left_pullback, right_pullback):
             return None
         equations = tuple(other_pullback(generator) for generator in kernel)
         pushout, other_to_pushout = other._quotient_by_algebra_elements(equations)
-        engine_quotient_to_pushout = _engine_ring(pushout).coerce_map_from(_engine_ring(quotient))
+        engine_quotient_to_pushout = _engine_ring(pushout).coerce_map_from(
+            _engine_ring(quotient)
+        )
         assert engine_quotient_to_pushout is not None, (
             f"cannot form the pushout {pushout} of {quotient} and {other}: Sage has no canonical map "
             f"from {quotient} to {pushout}"
         )
-        quotient_to_pushout = quotient.Mor(pushout)._from_engine_morphism(engine_quotient_to_pushout)
-        maps = (other_to_pushout, quotient_to_pushout) if quotient_on_right else (quotient_to_pushout, other_to_pushout)
+        quotient_to_pushout = quotient.Mor(pushout)._from_engine_morphism(
+            engine_quotient_to_pushout
+        )
+        maps = (
+            (other_to_pushout, quotient_to_pushout)
+            if quotient_on_right
+            else (quotient_to_pushout, other_to_pushout)
+        )
 
         def factor(left_to_target, right_to_target):
             assert left_to_target.codomain() is right_to_target.codomain(), (
@@ -6920,13 +7709,20 @@ def _quotient_base_change_pushout(left_pullback, right_pullback):
             )
             other_to_target = left_to_target if quotient_on_right else right_to_target
             return pushout.Mor(other_to_target.codomain())(
-                {label: other_to_target(other.algebra_generator(label)) for label in pushout.algebra_generating_set()}
+                {
+                    label: other_to_target(other.algebra_generator(label))
+                    for label in pushout.algebra_generating_set()
+                }
             )
 
         return pushout, maps[0], maps[1], factor
 
     represented = realize(left_pullback, right_pullback, True)
-    return represented if represented is not None else realize(right_pullback, left_pullback, False)
+    return (
+        represented
+        if represented is not None
+        else realize(right_pullback, left_pullback, False)
+    )
 
 
 def _projective_base_change_factorization(changed, projective_map, scalar_map):
@@ -6943,7 +7739,8 @@ def _projective_base_change_factorization(changed, projective_map, scalar_map):
             indexed_family(
                 datum.chart_index_set(),
                 lambda index: _projective_base_change_factorization(
-                    changed, projective_map * datum.chart_embedding(index),
+                    changed,
+                    projective_map * datum.chart_embedding(index),
                     scalar_map * datum.chart_embedding(index),
                 ),
                 name="Local projective base-change factorizations",
@@ -6961,7 +7758,8 @@ def _projective_base_change_factorization(changed, projective_map, scalar_map):
         coefficients = _restriction_to_base(ring, changed.scheme_base_ring())
     return _ProjectiveCoordinateMorphism(
         LocallyRingedSpaces().Mor(source, changed),
-        tuple(coordinates.homogeneous_coordinates()), coefficient_map=coefficients,
+        tuple(coordinates.homogeneous_coordinates()),
+        coefficient_map=coefficients,
     )
 
 
@@ -6976,29 +7774,42 @@ def _projective_space_scalar_base_change(left_map, right_map):
     base_scheme = left_map.codomain()
     if right_map.codomain() is not base_scheme:
         return None
-    for projective_leg, scalar_leg, projective_on_left in ((left_map, right_map, True), (right_map, left_map, False)):
+    for projective_leg, scalar_leg, projective_on_left in (
+        (left_map, right_map, True),
+        (right_map, left_map, False),
+    ):
         projective = projective_leg.domain()
         scalar_scheme = scalar_leg.domain()
         source_base = projective.scheme_base_ring()
-        if (projective not in ProjectiveSpaces(source_base)
-                or base_scheme is not projective.base_scheme()
-                or projective_leg != projective.structure_morphism()):
+        if (
+            projective not in ProjectiveSpaces(source_base)
+            or base_scheme is not projective.base_scheme()
+            or projective_leg != projective.structure_morphism()
+        ):
             continue
         if scalar_scheme is not scalar_scheme.base_scheme():
             continue
         target_base = scalar_scheme.scheme_base_ring()
         width = int(projective.relative_dimension()) + 1
-        projective_projection = _projective_projection_rule(0, width, scalar_leg.coordinate_algebra_morphism())
+        projective_projection = _projective_projection_rule(
+            0, width, scalar_leg.coordinate_algebra_morphism()
+        )
         projection_data = (
             (projective_projection, _structure_morphism_rule)
             if projective_on_left
             else (_structure_morphism_rule, projective_projection)
         )
 
-        def factor(left_cone_map, right_cone_map, projective_on_left=projective_on_left):
-            projective_cone_map = left_cone_map if projective_on_left else right_cone_map
+        def factor(
+            left_cone_map, right_cone_map, projective_on_left=projective_on_left
+        ):
+            projective_cone_map = (
+                left_cone_map if projective_on_left else right_cone_map
+            )
             scalar_cone_map = right_cone_map if projective_on_left else left_cone_map
-            return _projective_base_change_factorization(changed, projective_cone_map, scalar_cone_map)
+            return _projective_base_change_factorization(
+                changed, projective_cone_map, scalar_cone_map
+            )
 
         changed = _projective_space(
             target_base,
@@ -7030,12 +7841,19 @@ def _multiprojective_closed_fibre(left_map, right_map):
     ``X_y``).  A cone ``(S -> X, S -> Spec R)`` factors through it by the
     other blocks of ``S -> X -> P``.  Returns ``None`` outside this regime.
     """
-    for family, point, family_on_left in ((left_map, right_map, True), (right_map, left_map, False)):
+    for family, point, family_on_left in (
+        (left_map, right_map, True),
+        (right_map, left_map, False),
+    ):
         source = family.domain()
         base = source.scheme_base_ring()
         coordinates = point._represented_point_coordinates()
         residue = point.domain()
-        if coordinates is None or residue is not residue.base_scheme() or source not in ClosedSubschemes(base):
+        if (
+            coordinates is None
+            or residue is not residue.base_scheme()
+            or source not in ClosedSubschemes(base)
+        ):
             continue
         ambient = source.inclusion().codomain()
         if ambient not in ProductProjectiveSpaces(base):
@@ -7043,28 +7861,40 @@ def _multiprojective_closed_fibre(left_map, right_map):
         factors = ambient.factors()
         labels = tuple(factors.index_set())
         selected = next(
-            (label for label in labels
-             if factors[label] is family.codomain() and family == ambient.projection(label) * source.inclusion()),
+            (
+                label
+                for label in labels
+                if factors[label] is family.codomain()
+                and family == ambient.projection(label) * source.inclusion()
+            ),
             None,
         )
         if selected is None:
             continue
         others = tuple(label for label in labels if label != selected)
         remaining = (
-            factors[others[0]] if len(others) == 1
+            factors[others[0]]
+            if len(others) == 1
             else Schemes(base).product(tuple(factors[label] for label in others))
         )
         equations = tuple(source.defining_equations())
         ambient_ring = equations[0].parent()
         remaining_ring = _constant_sections_ring(remaining)
-        remaining_variables = iter(tuple(remaining_ring.algebra_generator(name) for name in remaining_ring.algebra_generating_set()))
+        remaining_variables = iter(
+            tuple(
+                remaining_ring.algebra_generator(name)
+                for name in remaining_ring.algebra_generating_set()
+            )
+        )
         point_values = iter(tuple(coordinates))
         ambient_variables = iter(tuple(ambient_ring.algebra_generating_set()))
         images = {}
         for label in labels:
             for _ in range(int(factors[label].relative_dimension()) + 1):
                 images[next(ambient_variables)] = (
-                    remaining_ring(next(point_values)) if label == selected else next(remaining_variables)
+                    remaining_ring(next(point_values))
+                    if label == selected
+                    else next(remaining_variables)
                 )
         substitution = ambient_ring.Mor(remaining_ring)(images)
 
@@ -7078,12 +7908,20 @@ def _multiprojective_closed_fibre(left_map, right_map):
                     for position, label in enumerate(others):
                         legs[label] = remaining.projection(position) * remaining_map
             return ambient.from_product_cone(
-                indexed_family(ambient.factors().index_set(), lambda label: legs[label], name=f"Map from {scheme} to {ambient}")
+                indexed_family(
+                    ambient.factors().index_set(),
+                    lambda label: legs[label],
+                    name=f"Map from {scheme} to {ambient}",
+                )
             )
 
         def to_source(mor):
             fibre = mor.domain()
-            return mor(source.corestriction(to_ambient(fibre, fibre.inclusion(), fibre.structure_morphism())))
+            return mor(
+                source.corestriction(
+                    to_ambient(fibre, fibre.inclusion(), fibre.structure_morphism())
+                )
+            )
 
         def factor(left_cone_map, right_cone_map, family_on_left=family_on_left):
             to_family = left_cone_map if family_on_left else right_cone_map
@@ -7095,7 +7933,9 @@ def _multiprojective_closed_fibre(left_map, right_map):
                     to_remaining = remaining.from_product_cone(
                         indexed_family(
                             remaining.factors().index_set(),
-                            lambda position: ambient.projection(others[position]) * through_ambient,
+                            lambda position: (
+                                ambient.projection(others[position]) * through_ambient
+                            ),
                             name="Remaining blocks of a cone into a fibre",
                         )
                     )
@@ -7106,7 +7946,9 @@ def _multiprojective_closed_fibre(left_map, right_map):
             placements=(FiberProductSchemes(base),),
             fiber_product_construction=SchemeFiberProductConstruction(
                 (left_map, right_map),
-                (to_source, _structure_morphism_rule) if family_on_left else (_structure_morphism_rule, to_source),
+                (to_source, _structure_morphism_rule)
+                if family_on_left
+                else (_structure_morphism_rule, to_source),
                 scheme_factorization=factor,
             ),
         )
@@ -7142,7 +7984,8 @@ def _projective_closed_affine_pullback(left_map, right_map):
         True
     """
     for closed_map, affine_map, closed_on_left in (
-        (left_map, right_map, True), (right_map, left_map, False),
+        (left_map, right_map, True),
+        (right_map, left_map, False),
     ):
         closed = closed_map.domain()
         affine = affine_map.domain()
@@ -7152,44 +7995,61 @@ def _projective_closed_affine_pullback(left_map, right_map):
             closed in ClosedSubschemes(base)
             and (closed_map == closed.inclusion()) is True
             and affine in Schemes(base).Affine()
-            and (ambient in ProjectiveSpaces(base) or ambient in ProductProjectiveSpaces(base))
+            and (
+                ambient in ProjectiveSpaces(base)
+                or ambient in ProductProjectiveSpaces(base)
+            )
         ):
             continue
         coordinate_map = _projective_coordinate_morphism(affine_map)
         coordinates = tuple(coordinate_map.homogeneous_coordinates())
         ring = affine.coordinate_algebra()
         if ambient in ProjectiveSpaces(base):
-            homogeneous_ring = ambient.O(1).global_sections().homogeneous_coordinate_ring()
+            homogeneous_ring = (
+                ambient.O(1).global_sections().homogeneous_coordinate_ring()
+            )
             equations = tuple(closed.homogeneous_defining_equations(homogeneous_ring))
         else:
             equations = tuple(closed.defining_equations())
         local_equations = tuple(
-            ring(_evaluate_owned_homogeneous_polynomial_on_coordinates(equation, equation.parent(), coordinates))
+            ring(
+                _evaluate_owned_homogeneous_polynomial_on_coordinates(
+                    equation, equation.parent(), coordinates
+                )
+            )
             for equation in equations
         )
         quotient, quotient_map = ring._quotient_by_algebra_elements(local_equations)
-        local_coordinates = tuple(quotient_map(ring(coordinate)) for coordinate in coordinates)
+        local_coordinates = tuple(
+            quotient_map(ring(coordinate)) for coordinate in coordinates
+        )
 
         def closed_projection(mor):
             return _ProjectiveCoordinateMorphism(
-                mor, local_coordinates,
+                mor,
+                local_coordinates,
                 coefficient_map=quotient_map * coordinate_map.coefficient_map(),
             )
 
         projection_data = (
-            (closed_projection, quotient_map) if closed_on_left
+            (closed_projection, quotient_map)
+            if closed_on_left
             else (quotient_map, closed_projection)
         )
 
         def factor(left_cone_map, right_cone_map):
-            return product.corestriction(right_cone_map if closed_on_left else left_cone_map)
+            return product.corestriction(
+                right_cone_map if closed_on_left else left_cone_map
+            )
 
         product = affine.closed_subscheme(
             local_equations,
             placements=(FiberProductSchemes(base),),
             _quotient_data=(quotient, quotient_map),
             fiber_product_construction=SchemeFiberProductConstruction(
-                (left_map, right_map), projection_data, scheme_factorization=factor,
+                (left_map, right_map),
+                projection_data,
+                scheme_factorization=factor,
             ),
         )
         return product
@@ -7216,7 +8076,11 @@ def _scheme_fiber_product(left_map, right_map):
     right = right_map.domain()
     base_scheme = left_map.codomain()
     affine_over_base = Schemes(left.scheme_base_ring()).Affine()
-    if left._is_glued_from_affine_atlas() and right in affine_over_base and base_scheme in affine_over_base:
+    if (
+        left._is_glued_from_affine_atlas()
+        and right in affine_over_base
+        and base_scheme in affine_over_base
+    ):
         from sage_extensions.categories.schemes.gluing import (
             _glued_fiber_product_over_affine_base,
         )
@@ -7224,15 +8088,24 @@ def _scheme_fiber_product(left_map, right_map):
         return _glued_fiber_product_over_affine_base(left_map, right_map)
     # Scalar base change includes noncanonical maps and endomorphisms of R.
     # Choose it before the coproduct shortcut for two R-linear structure maps.
-    for scheme_leg, scalar_leg, on_left in ((left_map, right_map, True), (right_map, left_map, False)):
+    for scheme_leg, scalar_leg, on_left in (
+        (left_map, right_map, True),
+        (right_map, left_map, False),
+    ):
         scheme = scheme_leg.domain()
         scalar_scheme = scalar_leg.domain()
-        if (scheme in Schemes(scheme.scheme_base_ring()).Affine()
-                and scheme_leg.codomain() is scheme.base_scheme()
-                and scalar_scheme is scalar_scheme.base_scheme()
-                and scheme_leg == scheme.structure_morphism()):
-            functor = Schemes(scheme.scheme_base_ring()).base_change_functor(scalar_leg.coordinate_algebra_morphism())
-            return functor._affine_object(scheme, cospan=(left_map, right_map), scheme_on_left=on_left)
+        if (
+            scheme in Schemes(scheme.scheme_base_ring()).Affine()
+            and scheme_leg.codomain() is scheme.base_scheme()
+            and scalar_scheme is scalar_scheme.base_scheme()
+            and scheme_leg == scheme.structure_morphism()
+        ):
+            functor = Schemes(scheme.scheme_base_ring()).base_change_functor(
+                scalar_leg.coordinate_algebra_morphism()
+            )
+            return functor._affine_object(
+                scheme, cospan=(left_map, right_map), scheme_on_left=on_left
+            )
     base_ring = left.scheme_base_ring()
     affine = Schemes(base_ring).Affine()
     assert left in affine and right in affine and base_scheme in affine, (
@@ -7244,27 +8117,42 @@ def _scheme_fiber_product(left_map, right_map):
     right_pullback = right_map.coordinate_algebra_morphism()
     commutative_algebras = Algebras(base_ring).Associative().Unital().Commutative()
     match base_scheme:
-        case _ if (base_scheme is left.base_scheme()
-                   and left_map.parent().mor_category().is_subcategory(Schemes(base_ring))
-                   and right_map.parent().mor_category().is_subcategory(Schemes(base_ring))):
+        case _ if (
+            base_scheme is left.base_scheme()
+            and left_map.parent().mor_category().is_subcategory(Schemes(base_ring))
+            and right_map.parent().mor_category().is_subcategory(Schemes(base_ring))
+        ):
             # Spec R is terminal in Sch/R, so both legs are structure morphisms
             # and the span sits under R, the initial object of CAlg_R: the
             # pushout is the coproduct A tensor_R B with its own factorization.
-            algebra_pushout = commutative_algebras.coproduct((left.coordinate_algebra(), right.coordinate_algebra()))
+            algebra_pushout = commutative_algebras.coproduct(
+                (left.coordinate_algebra(), right.coordinate_algebra())
+            )
             left_pushout_map, right_pushout_map = algebra_pushout.coproduct_injections()
             cocone_factorization = algebra_pushout.from_cocone
         case _:
-            quotient_base_change = _localization_base_change_pushout(left_pullback, right_pullback)
+            quotient_base_change = _localization_base_change_pushout(
+                left_pullback, right_pullback
+            )
             if quotient_base_change is None:
-                quotient_base_change = _quotient_base_change_pushout(left_pullback, right_pullback)
+                quotient_base_change = _quotient_base_change_pushout(
+                    left_pullback, right_pullback
+                )
             match quotient_base_change:
                 case None:
-                    algebra_pushout = commutative_algebras.pushout(left_pullback, right_pullback)
+                    algebra_pushout = commutative_algebras.pushout(
+                        left_pullback, right_pullback
+                    )
                     left_pushout_map = algebra_pushout.left_pushout_map()
                     right_pushout_map = algebra_pushout.right_pushout_map()
                     cocone_factorization = None
                 case _:
-                    algebra_pushout, left_pushout_map, right_pushout_map, cocone_factorization = quotient_base_change
+                    (
+                        algebra_pushout,
+                        left_pushout_map,
+                        right_pushout_map,
+                        cocone_factorization,
+                    ) = quotient_base_change
     return _affine_scheme(
         algebra_pushout,
         base_ring,
@@ -7300,7 +8188,11 @@ class _SchemeSubobjectsOf(OwnedParameterizedCategory):
         return f"{self.immersion_name} into {self.base_object()}"
 
     def super_categories(self):
-        return [Schemes(self.base_object().scheme_base_ring()).SubobjectCategory(self.base_object())]
+        return [
+            Schemes(self.base_object().scheme_base_ring()).SubobjectCategory(
+                self.base_object()
+            )
+        ]
 
     class ParentMethods:
         def __init__(self, inclusion_codomain, inclusion_datum, **rest) -> None:
@@ -7315,10 +8207,14 @@ class _SchemeSubobjectsOf(OwnedParameterizedCategory):
             The scheme it sits inside is ``i.codomain()`` and is never separate
             data.
             """
-            return _scheme_mor_category(self, self._inclusion_codomain)(self._inclusion_datum)
+            return _scheme_mor_category(self, self._inclusion_codomain)(
+                self._inclusion_datum
+            )
 
 
-def _distinguished_overlap_transition(left_chart, left_element, right_chart, right_element):
+def _distinguished_overlap_transition(
+    left_chart, left_element, right_chart, right_element
+):
     r"""The isomorphism ``D_i(f_j) -> D_j(f_i)`` of the two presentations of ``D(f_i f_j)``.
 
     For ``left_chart = D(f_i)`` and ``right_chart = D(f_j)`` inside one affine
@@ -7331,8 +8227,14 @@ def _distinguished_overlap_transition(left_chart, left_element, right_chart, rig
     left_overlap = left_chart.distinguished_open(right_element)
     right_overlap = right_chart.distinguished_open(left_element)
     return _scheme_isomorphism(
-        right_overlap.corestriction(right_chart.corestriction(left_chart.inclusion() * left_overlap.inclusion())),
-        left_overlap.corestriction(left_chart.corestriction(right_chart.inclusion() * right_overlap.inclusion())),
+        right_overlap.corestriction(
+            right_chart.corestriction(left_chart.inclusion() * left_overlap.inclusion())
+        ),
+        left_overlap.corestriction(
+            left_chart.corestriction(
+                right_chart.inclusion() * right_overlap.inclusion()
+            )
+        ),
     )
 
 
@@ -7352,7 +8254,6 @@ class ClosedEmbeddings(_SchemeSubobjectsOf):
         base_object = self.base_object()
         first = next(iter(base_object.coordinate_algebra().algebra_generators()))
         return base_object.closed_subscheme(first)
-
 
 
 class _LogarithmicDifferentialsSheafEngine:
@@ -7413,7 +8314,9 @@ class _LogarithmicDifferentialsSheafEngine:
         """
         X = self.scheme()
         match self.degree():
-            case p if X in ProjectiveSpaces(X.scheme_base_ring()) and p == X.dimension():
+            case p if (
+                X in ProjectiveSpaces(X.scheme_base_ring()) and p == X.dimension()
+            ):
                 return X.O(self.top_degree_twist()).global_sections()
             case _:
                 assert False, (
@@ -7540,7 +8443,11 @@ class EffectiveCartierDivisors(_SchemeSubobjectsOf):
             ambient = self.inclusion().codomain()
             n = ambient.dimension()
             match degree:
-                case p if ambient in ProjectiveSpaces(ambient.scheme_base_ring()) and p == n and n >= 2:
+                case p if (
+                    ambient in ProjectiveSpaces(ambient.scheme_base_ring())
+                    and p == n
+                    and n >= 2
+                ):
                     twist = self.logarithmic_differentials(p).top_degree_twist()
                     return ambient.O(twist).restriction_map(self)
                 case _:
@@ -7562,14 +8469,15 @@ class ClosedSubschemes(OwnedCategoryOverBaseRing):
     def an_object(self):
         r"""The origin of the affine line."""
         line = AffineSpaces(self.base_ring())(1)
-        return line.closed_subscheme(next(iter(line.coordinate_algebra().algebra_generators())))
+        return line.closed_subscheme(
+            next(iter(line.coordinate_algebra().algebra_generators()))
+        )
 
     def _repr_object_names(self):
         return f"closed subschemes of schemes over {self.base_ring()}"
 
     def super_categories(self):
         return [Schemes(self.base_ring())]
-
 
     class ParentMethods:
         @cached_method
@@ -7604,7 +8512,9 @@ class ClosedSubschemes(OwnedCategoryOverBaseRing):
             """
             ambient = self.inclusion().codomain()
             base = self.scheme_base_ring()
-            assert ambient in ProjectiveSpaces(base) or ambient in ProductProjectiveSpaces(base), (
+            assert ambient in ProjectiveSpaces(
+                base
+            ) or ambient in ProductProjectiveSpaces(base), (
                 "a standard closed-subscheme atlas requires a projective-space ambient atlas"
             )
             return ambient.standard_affine_atlas().pullback(self.inclusion())
@@ -7634,7 +8544,10 @@ class ClosedSubschemes(OwnedCategoryOverBaseRing):
                 case _ if codomain in Schemes(codomain.scheme_base_ring()).Affine():
                     coordinate_algebra = codomain.coordinate_algebra()
                     quotient = self.defining_ideal_owned().quotient_ring()
-                    return coordinate_algebra.krull_dimension() - quotient.krull_dimension()
+                    return (
+                        coordinate_algebra.krull_dimension()
+                        - quotient.krull_dimension()
+                    )
                 case _:
                     return codomain.dimension() - self.dimension()
 
@@ -7655,12 +8568,13 @@ class ClosedSubschemes(OwnedCategoryOverBaseRing):
             target_variables = tuple(engine_target.gens())
             return finite_family(
                 tuple(
-                    _owned_engine_element(coordinate_ring,
+                    _owned_engine_element(
+                        coordinate_ring,
                         _copy_polynomial_by_exponents(
                             _engine_element(equation.parent(), equation),
                             engine_target,
                             target_variables,
-                        )
+                        ),
                     )
                     for equation in self.defining_equations()
                 ),
@@ -7690,7 +8604,9 @@ class ClosedSubschemes(OwnedCategoryOverBaseRing):
             base = codomain.scheme_base_ring()
             match codomain:
                 case _ if codomain in Schemes(base).Affine():
-                    return self.defining_ideal_owned().contains_ambient_element(codomain.coordinate_algebra().one())
+                    return self.defining_ideal_owned().contains_ambient_element(
+                        codomain.coordinate_algebra().one()
+                    )
                 case _ if codomain in Schemes(base).Projective():
                     # Sage's projective dimension is -1 exactly for the empty Proj.
                     return int(self.dimension()) < 0
@@ -7718,15 +8634,27 @@ class ClosedSubschemes(OwnedCategoryOverBaseRing):
             source = morphism.domain()
             base = source.scheme_base_ring()
             match source:
-                case _ if source in Schemes(base).Affine() and self in Schemes(base).Affine():
+                case _ if (
+                    source in Schemes(base).Affine() and self in Schemes(base).Affine()
+                ):
                     pullback = morphism.coordinate_algebra_morphism()
-                    assert all(pullback(equation) == source.coordinate_algebra().zero() for equation in self.defining_equations()), (
+                    assert all(
+                        pullback(equation) == source.coordinate_algebra().zero()
+                        for equation in self.defining_equations()
+                    ), (
                         f"{morphism} does not factor through {self}: its pullback does not kill the defining equations"
                     )
                     algebra = self.coordinate_algebra()
                     factor = _scheme_mor_category(source, self)(
                         algebra.Mor(source.coordinate_algebra())(
-                            {label: pullback(codomain.coordinate_algebra().algebra_generator(label)) for label in algebra.algebra_generating_set()}
+                            {
+                                label: pullback(
+                                    codomain.coordinate_algebra().algebra_generator(
+                                        label
+                                    )
+                                )
+                                for label in algebra.algebra_generating_set()
+                            }
                         )
                     )
                     assert self.inclusion() * factor == morphism, (
@@ -7734,25 +8662,43 @@ class ClosedSubschemes(OwnedCategoryOverBaseRing):
                         f"inclusion of {self} into {codomain} is not {morphism}"
                     )
                     return factor
-                case _ if codomain in ProjectiveSpaces(base) or codomain in ProductProjectiveSpaces(base):
+                case _ if codomain in ProjectiveSpaces(
+                    base
+                ) or codomain in ProductProjectiveSpaces(base):
                     # A section on T vanishes when it does modulo the equations of T.
                     coordinates = tuple(
-                        _projective_coordinate_morphism(morphism).homogeneous_coordinates()
+                        _projective_coordinate_morphism(
+                            morphism
+                        ).homogeneous_coordinates()
                     )
                     if codomain in ProjectiveSpaces(base):
-                        target_ring = codomain.O(1).global_sections().homogeneous_coordinate_ring()
-                        equations = tuple(self.homogeneous_defining_equations(target_ring))
+                        target_ring = (
+                            codomain.O(1)
+                            .global_sections()
+                            .homogeneous_coordinate_ring()
+                        )
+                        equations = tuple(
+                            self.homogeneous_defining_equations(target_ring)
+                        )
                     else:
                         equations = tuple(self.defining_equations())
                         target_ring = equations[0].parent()
-                    on_source = _projective_section_restriction(source, coordinates[0].parent())
+                    on_source = _projective_section_restriction(
+                        source, coordinates[0].parent()
+                    )
                     assert all(
                         on_source(
-                            _evaluate_owned_homogeneous_polynomial_on_coordinates(equation, target_ring, coordinates)
+                            _evaluate_owned_homogeneous_polynomial_on_coordinates(
+                                equation, target_ring, coordinates
+                            )
                         ).is_zero()
                         for equation in equations
-                    ), f"{morphism} does not factor through {self}: a homogeneous defining equation does not vanish"
-                    return _ProjectiveCoordinateMorphism(_scheme_mor_category(source, self), coordinates)
+                    ), (
+                        f"{morphism} does not factor through {self}: a homogeneous defining equation does not vanish"
+                    )
+                    return _ProjectiveCoordinateMorphism(
+                        _scheme_mor_category(source, self), coordinates
+                    )
                 case _:
                     assert False, (
                         f"cannot factor {morphism} through {self}: this is computed here only for morphisms of "
@@ -7772,7 +8718,9 @@ class ClosedSubschemes(OwnedCategoryOverBaseRing):
                 f"cannot intersect {self} and {other}: they are closed subschemes of different schemes, "
                 f"{codomain} and {other.inclusion().codomain()}"
             )
-            return codomain.closed_subscheme((*self.defining_equations(), *other.defining_equations()))
+            return codomain.closed_subscheme(
+                (*self.defining_equations(), *other.defining_equations())
+            )
 
         @cached_method
         def O(self, degree):
@@ -7846,7 +8794,10 @@ class ClosedSubschemes(OwnedCategoryOverBaseRing):
                 f"cannot form the intersection multiplicity of {self} and {other} at {point}: the length "
                 f"formula requires a field as base ring, but the base ring is {base}"
             )
-            assert codomain in AffineSpaces(base) and int(codomain.relative_dimension()) == 2, (
+            assert (
+                codomain in AffineSpaces(base)
+                and int(codomain.relative_dimension()) == 2
+            ), (
                 f"cannot form the intersection multiplicity of {self} and {other} at {point}: the length "
                 f"formula requires them to lie in the affine plane over {base}, but they lie in {codomain}"
             )
@@ -7854,7 +8805,10 @@ class ClosedSubschemes(OwnedCategoryOverBaseRing):
                 f"cannot form the intersection multiplicity of {self} and {other} at {point}: the length "
                 "formula requires both to be hypersurfaces, of codimension 1"
             )
-            assert self.defining_equations().cardinality() == 1 and other.defining_equations().cardinality() == 1, (
+            assert (
+                self.defining_equations().cardinality() == 1
+                and other.defining_equations().cardinality() == 1
+            ), (
                 f"cannot form the intersection multiplicity of {self} and {other} at {point}: each "
                 f"hypersurface must be given by one equation, but they are given by "
                 f"{self.defining_equations().cardinality()} and {other.defining_equations().cardinality()}"
@@ -7910,19 +8864,28 @@ class ClosedSubschemes(OwnedCategoryOverBaseRing):
             match codomain:
                 case _ if codomain in Schemes(base).Projective():
                     return _object_of(
-                        owned_category_join((OpenImmersions(codomain), Schemes(base).QuasiProjective())),
+                        owned_category_join(
+                            (OpenImmersions(codomain), Schemes(base).QuasiProjective())
+                        ),
                         scheme_base_ring=base,
-                        scheme_engine=_SageAlgebraicSchemeSubscheme.complement(_engine_scheme(self), _engine_scheme(codomain)),
+                        scheme_engine=_SageAlgebraicSchemeSubscheme.complement(
+                            _engine_scheme(self), _engine_scheme(codomain)
+                        ),
                         inclusion_codomain=codomain,
                         inclusion_datum=_open_complement_inclusion(self),
                     )
                 case _ if codomain in Schemes(base).Affine():
                     equations = self.defining_equations()
                     indices = equations.index_set()
-                    charts = {index: codomain.distinguished_open(equations[index]) for index in indices}
+                    charts = {
+                        index: codomain.distinguished_open(equations[index])
+                        for index in indices
+                    }
                     match equations.cardinality():
                         case 0:
-                            return codomain.distinguished_open(codomain.coordinate_algebra().zero())
+                            return codomain.distinguished_open(
+                                codomain.coordinate_algebra().zero()
+                            )
                         case 1:
                             return charts[next(iter(indices))]
                         case _:
@@ -7930,13 +8893,19 @@ class ClosedSubschemes(OwnedCategoryOverBaseRing):
                                 charts,
                                 {
                                     (left, right): _distinguished_overlap_transition(
-                                        charts[left], equations[left], charts[right], equations[right]
+                                        charts[left],
+                                        equations[left],
+                                        charts[right],
+                                        equations[right],
                                     )
                                     for left, right in combinations(tuple(indices), 2)
                                 },
                                 placements=(OpenImmersions(codomain),),
                                 inclusion_codomain=codomain,
-                                inclusion_datum={index: chart.inclusion() for index, chart in charts.items()},
+                                inclusion_datum={
+                                    index: chart.inclusion()
+                                    for index, chart in charts.items()
+                                },
                             )
                 case _:
                     assert False, (
@@ -7960,7 +8929,9 @@ class OpenImmersions(_SchemeSubobjectsOf):
     def an_object(self):
         r"""\(D(f)\) for ``f`` the first coordinate of ``X``."""
         base_object = self.base_object()
-        return base_object.distinguished_open(next(iter(base_object.coordinate_algebra().algebra_generators())))
+        return base_object.distinguished_open(
+            next(iter(base_object.coordinate_algebra().algebra_generators()))
+        )
 
     class ParentMethods:
         @cached_method
@@ -7978,7 +8949,9 @@ class OpenImmersions(_SchemeSubobjectsOf):
                     if self is datum.chart_image(index):
                         return ambient._glued_chart_image_subset(index)
             if self.is_distinguished_open() is True:
-                return ambient.underlying_space().distinguished_open(self.distinguished_open_element())
+                return ambient.underlying_space().distinguished_open(
+                    self.distinguished_open_element()
+                )
             assert False, (
                 f"the point-space image of {self} requires an open-immersion image "
                 "construction beyond distinguished opens and selected affine chart images"
@@ -8016,7 +8989,8 @@ class OpenImmersions(_SchemeSubobjectsOf):
                     codomain in affine
                     and self in affine
                     and self.coordinate_algebra() in LocalizationRings()
-                    and self.coordinate_algebra().localization_source() is codomain.coordinate_algebra()
+                    and self.coordinate_algebra().localization_source()
+                    is codomain.coordinate_algebra()
                     and self.coordinate_algebra().inverted_elements().cardinality() == 1
                 ):
                     return True
@@ -8046,13 +9020,20 @@ class OpenImmersions(_SchemeSubobjectsOf):
                 f"codomain is {morphism.codomain()}, not {codomain}"
             )
             source = morphism.domain()
-            assert self.is_distinguished_open() is True and source in Schemes(source.scheme_base_ring()).Affine(), (
+            assert (
+                self.is_distinguished_open() is True
+                and source in Schemes(source.scheme_base_ring()).Affine()
+            ), (
                 f"cannot decide whether {morphism} lands in {self}: this is decided here only when {self} "
                 f"is a distinguished open D(f) and the domain is affine; the domain {source} is an object "
                 f"of {source.category()}"
             )
-            defining_element = codomain.coordinate_algebra()(self.distinguished_open_element())
-            return source.coordinate_algebra()(morphism.coordinate_algebra_morphism()(defining_element)).is_unit()
+            defining_element = codomain.coordinate_algebra()(
+                self.distinguished_open_element()
+            )
+            return source.coordinate_algebra()(
+                morphism.coordinate_algebra_morphism()(defining_element)
+            ).is_unit()
 
         def corestriction(self, morphism):
             r"""The factorization ``T -> U`` of a morphism ``g: T -> X`` landing in this open ``U``.
@@ -8067,7 +9048,9 @@ class OpenImmersions(_SchemeSubobjectsOf):
             )
             source = morphism.domain()
             return _scheme_mor_category(source, self)(
-                self.coordinate_algebra().induced_morphism(morphism.coordinate_algebra_morphism())
+                self.coordinate_algebra().induced_morphism(
+                    morphism.coordinate_algebra_morphism()
+                )
             )
 
         def inclusion_into(self, larger_open):
@@ -8087,13 +9070,16 @@ class OpenImmersions(_SchemeSubobjectsOf):
                 f"cannot include {self} into {larger_open}: they are open subschemes of different schemes, "
                 f"{codomain} and {larger_open.inclusion().codomain()}"
             )
-            restriction = _localization_restriction_map(larger_open.coordinate_algebra(), self.coordinate_algebra())
+            restriction = _localization_restriction_map(
+                larger_open.coordinate_algebra(), self.coordinate_algebra()
+            )
             inclusion = _scheme_mor_category(self, larger_open)(restriction)
             assert larger_open.inclusion() * inclusion == self.inclusion(), (
                 f"the map {inclusion} from {self} to {larger_open} is wrong: its composite with the "
                 f"inclusion of {larger_open} is not the inclusion of {self} into {codomain}"
             )
             return inclusion
+
 
 class DistinguishedOpenImmersions(_SchemeSubobjectsOf):
     r"""Open immersions represented by a distinguished localization ``D(f)``."""
@@ -8104,19 +9090,31 @@ class DistinguishedOpenImmersions(_SchemeSubobjectsOf):
         return [OpenImmersions(self.base_object())]
 
     def an_object(self):
-        return self(self.base_object().distinguished_open(next(iter(self.base_object().coordinate_algebra().algebra_generators()))))
+        return self(
+            self.base_object().distinguished_open(
+                next(iter(self.base_object().coordinate_algebra().algebra_generators()))
+            )
+        )
 
     def _call_(self, opened):
         from sage_extensions.refine import refine
 
-        if opened not in OpenImmersions(self.base_object()) or opened.is_distinguished_open() is not True:
-            raise ValueError("the localization-based pullback requires a distinguished open D(f)")
+        if (
+            opened not in OpenImmersions(self.base_object())
+            or opened.is_distinguished_open() is not True
+        ):
+            raise ValueError(
+                "the localization-based pullback requires a distinguished open D(f)"
+            )
         return refine(opened, self)
 
     class ParentMethods:
         def _flat_pullback_cycle(self, cycle):
             r"""Pull back a cycle through the selected localization ``D(f)``."""
-            from sage_extensions.categories.divisors.chow_groups import _distinguished_open_cycle_pullback
+            from sage_extensions.categories.divisors.chow_groups import (
+                _distinguished_open_cycle_pullback,
+            )
+
             return _distinguished_open_cycle_pullback(self, cycle)
 
 
@@ -8152,14 +9150,23 @@ class ProjectiveLines(OwnedCategoryOverBaseRing):
 
     def _call_(self, line):
         from sage_extensions.refine import refine
-        if line not in ProjectiveSpaces(self.base_ring()) or int(line.relative_dimension()) != 1:
-            raise ValueError("a projective line must be P^1 over the specified base ring")
+
+        if (
+            line not in ProjectiveSpaces(self.base_ring())
+            or int(line.relative_dimension()) != 1
+        ):
+            raise ValueError(
+                "a projective line must be P^1 over the specified base ring"
+            )
         return refine(line, self)
 
     class ParentMethods:
         def coordinate_swap_action(self, group=None):
             r"""The involution swapping the two homogeneous coordinates of P^1."""
-            from sage_extensions.categories.divisors.linearizations import _projective_line_coordinate_swap_action
+            from sage_extensions.categories.divisors.linearizations import (
+                _projective_line_coordinate_swap_action,
+            )
+
             return _projective_line_coordinate_swap_action(self, group)
 
 
@@ -8227,10 +9234,15 @@ class SchemesOverLocalRings(OwnedCategoryOverBaseRing):
 
         def base_change_to_completion(self):
             base = self.scheme_base_ring()
-            return self.base_change(base.adic_completion(base.maximal_ideal()).completion_map())
+            return self.base_change(
+                base.adic_completion(base.maximal_ideal()).completion_map()
+            )
 
         def special_fiber_comparison(self):
-            from sage_extensions.categories.schemes.families import _special_fiber_comparison
+            from sage_extensions.categories.schemes.families import (
+                _special_fiber_comparison,
+            )
+
             return _special_fiber_comparison(self)
 
 
@@ -8239,22 +9251,22 @@ __all__ = [
     "AffineSpaces",
     "ClosedEmbeddings",
     "ClosedSubschemes",
+    "DistinguishedOpenImmersions",
     "EffectiveCartierDivisors",
     "FiberProductSchemes",
     "IntegralSchemes",
     "NormalSchemes",
     "OpenImmersions",
-    "DistinguishedOpenImmersions",
-    "ProjectiveSchemes",
-    "ProjectiveSpaces",
-    "ProjectiveLines",
     "ProductProjectiveSpaces",
     "ProductSchemes",
+    "ProjectiveLines",
+    "ProjectiveSchemes",
+    "ProjectiveSpaces",
     "SchemeMonomorphisms",
+    "SchemeMorphism",
     "Schemes",
     "SchemesOverIntegralDomains",
     "SchemesOverLocalRings",
-    "SchemeMorphism",
     "SmoothSchemes",
 ]
 
