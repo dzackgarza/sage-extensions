@@ -1,0 +1,23 @@
+[project]
+name = "sage-extensions"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "networkx",
+    "sage-categories",
+    "sage-julia-bridge @ git+https://github.com/dzackgarza/sage-julia-bridge",
+    "vinal @ git+https://github.com/dzackgarza/vinal",
+]
+
+[build-system]
+requires = ["setuptools>=80"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+sage_extensions = ["py.typed", "categories/*.gp"]
+
+[tool.uv.sources]
+sage-categories = { git = "https://github.com/dzackgarza/sage-categories.git", rev = "484727f4f9605836ba409962e0c750c9366d3312" }

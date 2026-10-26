@@ -1,0 +1,142 @@
+"""Lazy public aggregation for owned Set-side constructions.
+
+The defining modules must remain independently importable. Python executes a
+package ``__init__`` before any submodule, so eager re-exports here create
+defining-module cycles: ``abstract_categories.mor_categories`` imports
+``sets.indexed_families`` at module level, which runs this file first, and
+every set module imports ``mor_categories`` back while it is only partly
+initialized.  Public names are resolved lazily until that module-level edge is
+removed at its owner.
+"""
+
+from importlib import import_module as _import_module
+
+_EXPORTS = {'AugmentedSimplexCategory': ('sage_extensions.categories.sets.set_categories',
+                                        'AugmentedSimplexCategory'),
+ 'CountableSets': ('sage_extensions.categories.sets.set_categories', 'CountableSets'),
+ 'CountablyInfiniteSets': ('sage_extensions.categories.sets.set_categories',
+                           'CountablyInfiniteSets'),
+ 'FiniteSets': ('sage_extensions.categories.sets.set_categories', 'FiniteSets'),
+ 'FinitelySupportedFunctionSets': ('sage_extensions.categories.sets.set_categories',
+                                   'FinitelySupportedFunctionSets'),
+ 'InfiniteSets': ('sage_extensions.categories.sets.set_categories', 'InfiniteSets'),
+ 'NN': ('sage_extensions.categories.sets.set_categories', 'NN'),
+ 'PartiallyOrderedSets': ('sage_extensions.categories.sets.set_categories',
+                          'PartiallyOrderedSets'),
+ 'Sets': ('sage_extensions.categories.sets.set_categories', 'Sets'),
+ 'TotallyOrderedSets': ('sage_extensions.categories.sets.set_categories',
+                        'TotallyOrderedSets'),
+ 'WellOrderedSets': ('sage_extensions.categories.sets.set_categories',
+                     'WellOrderedSets'),
+ 'UncountableSets': ('sage_extensions.categories.sets.set_categories', 'UncountableSets'),
+ 'register_set_axioms': ('sage_extensions.categories.sets.set_categories',
+                         'register_set_axioms'),
+ 'PowerSets': ('sage_extensions.categories.sets.set_categories', 'PowerSets'),
+ 'ObjectSetsOfDiscreteCategories': ('sage_extensions.categories.sets.set_categories',
+                                    'ObjectSetsOfDiscreteCategories'),
+ 'FinitePowerSets': ('sage_extensions.categories.sets.set_categories', 'FinitePowerSets'),
+ 'DisjointUnionsOfSets': ('sage_extensions.categories.sets.set_categories',
+                          'DisjointUnionsOfSets'),
+ 'CoproductsOfSets': ('sage_extensions.categories.sets.set_categories', 'CoproductsOfSets'),
+ 'CartesianProductsOfSets': ('sage_extensions.categories.sets.set_categories',
+                             'CartesianProductsOfSets'),
+ 'Set': ('sage_extensions.categories.sets.set_categories', 'Set'),
+ 'SetInjection': ('sage_extensions.categories.sets.set_categories', 'SetInjection'),
+ 'SetSurjection': ('sage_extensions.categories.sets.set_categories', 'SetSurjection'),
+ 'CardinalComparison': ('sage_extensions.categories.sets.cardinals', 'CardinalComparison'),
+ 'Cardinalities': ('sage_extensions.categories.sets.cardinals', 'Cardinalities'),
+ 'Ord': ('sage_extensions.categories.sets.cardinals', 'Ord'),
+ 'Ordinals': ('sage_extensions.categories.sets.cardinals', 'Ordinals'),
+ 'aleph': ('sage_extensions.categories.sets.cardinals', 'aleph'),
+ 'aleph0': ('sage_extensions.categories.sets.cardinals', 'aleph0'),
+ 'cardinal': ('sage_extensions.categories.sets.cardinals', 'cardinal'),
+ 'continuum': ('sage_extensions.categories.sets.cardinals', 'continuum'),
+ 'omega': ('sage_extensions.categories.sets.cardinals', 'omega'),
+ 'omega0': ('sage_extensions.categories.sets.cardinals', 'omega0'),
+ 'ordinal': ('sage_extensions.categories.sets.cardinals', 'ordinal'),
+ 'EnumeratedByIntegers': ('sage_extensions.categories.sets.enumerated',
+                          'EnumeratedByIntegers'),
+ 'EnumeratedByNaturals': ('sage_extensions.categories.sets.enumerated',
+                          'EnumeratedByNaturals'),
+ 'EnumeratedSets': ('sage_extensions.categories.sets.enumerated', 'EnumeratedSets'),
+ 'FourierCharacters': ('sage_extensions.categories.sets.enumerated', 'FourierCharacters'),
+ 'FunctionEnumeratedSets': ('sage_extensions.categories.sets.enumerated',
+                            'FunctionEnumeratedSets'),
+ 'HermitePolynomials': ('sage_extensions.categories.sets.enumerated', 'HermitePolynomials'),
+ 'LaurentMonomials': ('sage_extensions.categories.sets.enumerated', 'LaurentMonomials'),
+ 'SincTranslates': ('sage_extensions.categories.sets.enumerated', 'SincTranslates'),
+ 'FixedSizeSelectionElement': ('sage_extensions.categories.sets.fixed_size_selections',
+                               'FixedSizeSelectionElement'),
+ 'FixedSizeSelections': ('sage_extensions.categories.sets.fixed_size_selections',
+                         'FixedSizeSelections'),
+ 'IndexedFamily': ('sage_extensions.categories.sets.indexed_families', 'IndexedFamily'),
+ 'finite_indexed_family': ('sage_extensions.categories.sets.indexed_families',
+                           'finite_indexed_family'),
+ 'indexed_family': ('sage_extensions.categories.sets.indexed_families', 'indexed_family'),
+ 'FiniteOrderedSets': ('sage_extensions.categories.sets.finite_ordered_sets',
+                       'FiniteOrderedSets'),
+ 'OrderedEnumeratedSets': ('sage_extensions.categories.sets.finite_ordered_sets',
+                           'OrderedEnumeratedSets'),
+ 'finite_ordered_set': ('sage_extensions.categories.sets.finite_ordered_sets',
+                        'finite_ordered_set')}
+
+__all__ = [ 'AugmentedSimplexCategory',
+ 'PowerSets',
+ 'ObjectSetsOfDiscreteCategories',
+ 'FinitePowerSets',
+ 'DisjointUnionsOfSets',
+ 'CoproductsOfSets',
+ 'CartesianProductsOfSets',
+ 'register_set_axioms',
+ 'UncountableSets',
+ 'TotallyOrderedSets',
+ 'WellOrderedSets',
+ 'PartiallyOrderedSets',
+ 'InfiniteSets',
+ 'NN',
+ 'FinitelySupportedFunctionSets',
+ 'FiniteSets',
+ 'FixedSizeSelectionElement',
+ 'FixedSizeSelections',
+ 'CountablyInfiniteSets',
+ 'CountableSets',
+ 'Sets',
+ 'Set',
+ 'SetInjection',
+ 'SetSurjection',
+ 'CardinalComparison',
+ 'Cardinalities',
+ 'Ord',
+ 'Ordinals',
+ 'aleph',
+ 'aleph0',
+ 'cardinal',
+ 'continuum',
+ 'omega',
+ 'omega0',
+ 'ordinal',
+ 'EnumeratedByIntegers',
+ 'EnumeratedByNaturals',
+ 'EnumeratedSets',
+ 'FiniteOrderedSets',
+ 'OrderedEnumeratedSets',
+ 'FourierCharacters',
+ 'FunctionEnumeratedSets',
+ 'HermitePolynomials',
+ 'IndexedFamily',
+ 'LaurentMonomials',
+ 'SincTranslates',
+ 'finite_indexed_family',
+ 'finite_ordered_set',
+ 'indexed_family']
+
+def __getattr__(name):
+    if name not in _EXPORTS:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    module_name, attribute = _EXPORTS[name]
+    value = getattr(_import_module(module_name), attribute)
+    globals()[name] = value
+    return value
+
+def __dir__():
+    return sorted((*globals(), *__all__))
