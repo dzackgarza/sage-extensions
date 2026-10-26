@@ -5263,6 +5263,7 @@ class _DualNumbersAlgebraParent(_OwnedAlgebraParent):
             )
 
 
+@cached_function(key=lambda base_ring, name="epsilon": (_own_ring(base_ring), name))
 def _dual_numbers(base_ring, name="epsilon"):
     r"""Return the dual-number algebra ``R[epsilon]/(epsilon^2)``."""
     base = _own_ring(base_ring)

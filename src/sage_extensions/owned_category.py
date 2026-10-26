@@ -1507,6 +1507,22 @@ def _implementation_with_engine(implementation: type, owner: type, engine: type)
                 cache=False,
             )
         methods = dict(implementation.__dict__)
+        # Sage's dynamic parent-class builder can leave an abstract method in
+        # the implementation class dictionary even when the selected owned
+        # category contributes a concrete implementation later in the MRO.
+        # Copying that descriptor onto the engine-backed class would shadow
+        # the concrete category owner (for example Algebras.Unital.one).
+        # Preserve local abstract declarations only when no concrete provider
+        # exists among the selected bases.
+        for name, value in tuple(methods.items()):
+            if not getattr(value, "__isabstractmethod__", False):
+                continue
+            if any(
+                name in base.__dict__
+                and not getattr(base.__dict__[name], "__isabstractmethod__", False)
+                for base in bases
+            ):
+                methods.pop(name)
         for key in ("__dict__", "__weakref__", "__slots__"):
             methods.pop(key, None)
         methods.update(
