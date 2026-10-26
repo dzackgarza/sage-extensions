@@ -476,6 +476,52 @@ def _glued_chart_embedding(datum, index):
     )
 
 
+def is_projective_line_gluing(datum) -> bool:
+    r"""Whether ``datum`` glues ``Spec R[s]`` and ``Spec R[t]`` along ``D(s) -> D(t)``, ``t |-> 1/s``.
+
+    That gluing is ``P^1_R`` (Hartshorne, *Algebraic Geometry*, Example
+    II.2.3.5; its charts are the standard opens ``D_+(T_i)`` of Stacks, Tag
+    01NG).  The test reads the chart algebras, the two overlaps and the
+    pullback of the transition; any other datum answers ``False``.
+    """
+    from sage_extensions.categories.algebras.free_algebras import SymmetricAlgebras
+    from sage_extensions.categories.modules.framed.framed_free_modules import (
+        FramedFreeModules,
+    )
+    from sage_extensions.categories.sets.cardinals import cardinal
+
+    base = datum.base_ring()
+    if (datum.number_of_charts() == 2) is not True:
+        return False
+    first, second = tuple(datum.chart_indices())
+    coordinates = []
+    for index in (first, second):
+        algebra = datum.chart(index).coordinate_algebra()
+        if algebra not in SymmetricAlgebras(base):
+            return False
+        if algebra.generating_module() not in FramedFreeModules(base):
+            return False
+        labels = algebra.algebra_generating_set()
+        if (labels.cardinality() == cardinal(1)) is not True:
+            return False
+        coordinates.append(algebra.algebra_generator(next(iter(labels))))
+    s, t = coordinates
+    source_overlap = datum.overlap(first, second)
+    target_overlap = datum.overlap(second, first)
+    if source_overlap is not datum.chart(first).distinguished_open(s):
+        return False
+    if target_overlap is not datum.chart(second).distinguished_open(t):
+        return False
+    pullback = (
+        datum.transition_between(first, second).forward().coordinate_algebra_morphism()
+    )
+    restrict_source = source_overlap.inclusion().coordinate_algebra_morphism()
+    restrict_target = target_overlap.inclusion().coordinate_algebra_morphism()
+    return (
+        pullback(restrict_target(t)) == restrict_source(s).inverse_of_unit()
+    ) is True
+
+
 def _glued_scheme(datum, placements, level_data):
     r"""The scheme glued from ``datum``: an object of ``Schemes(R)``, built by its entry.
 
@@ -485,6 +531,11 @@ def _glued_scheme(datum, placements, level_data):
     """
     base = datum.base_ring()
     category = Schemes(base)
+    if is_projective_line_gluing(datum):
+        # The glued scheme is P^1_R.  It is projective over R, hence proper
+        # (Stacks, Tag 01WC), and covered by two copies of A^1_R (Tag 01NG),
+        # each smooth over R, hence smooth.
+        placements = (*placements, Schemes(base).Proper(), Schemes(base).Smooth())
     if placements:
         category = owned_category_join((category, *placements))
     data = dict(level_data)

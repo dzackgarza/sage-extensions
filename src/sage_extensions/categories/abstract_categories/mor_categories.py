@@ -1629,9 +1629,11 @@ class CategoricalIsomorphism(CategoricalArrow, CategoricalMor.ElementMethods):
         that composite, computed when it is first asked.  ``f`` may be any
         arrow of the core Mor, whatever type realizes it: its inverse is
         asked through ``f.inverse()``.  Composed with an arrow that is not an
-        isomorphism, it is the composite of the forward arrow with that arrow.
+        isomorphism, it is the composite of the forward arrow with that arrow;
+        such an arrow is admitted by the Mor of the forward arrow, since the
+        core's own Mor admits isomorphisms only.
         """
-        if not _precomposable(self, other):
+        if not (_precomposable(self, other) or _precomposable(self.forward(), other)):
             return NotImplemented
         core = self.parent().mor_category().Core()
         if other not in core.Mor(other.domain(), self.domain()):

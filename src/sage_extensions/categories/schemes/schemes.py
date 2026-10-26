@@ -2949,6 +2949,20 @@ def _is_segre_image(product, closed) -> bool:
     return (ring.ideal(tuple(equations)) == ring.ideal(minors)) is True
 
 
+def _is_projective_line(scheme) -> bool:
+    r"""Whether ``scheme`` is ``P^1_R`` by its construction: the projective line, or its standard gluing."""
+    from sage_extensions.categories.schemes.gluing import is_projective_line_gluing
+
+    base = scheme.scheme_base_ring()
+    match scheme:
+        case _ if scheme in ProjectiveSpaces(base):
+            return (scheme.relative_dimension() == 1) is True
+        case _ if scheme._is_glued_from_affine_atlas():
+            return is_projective_line_gluing(scheme.gluing_datum())
+        case _:
+            return False
+
+
 def _integral_placement(ring) -> bool:
     r"""Whether ``Spec`` of ``ring`` is integral: ``ring`` is placed as an integral domain.
 
@@ -3424,8 +3438,10 @@ class Schemes(OwnedCategoryOverBaseRing):
             Decided by a constructed isomorphism: the identity, and the
             Segre embedding ``P^n x P^m -> P^((n+1)(m+1)-1)``, a closed
             immersion (Stacks, Tag 01WD) onto ``V`` of the ``2 x 2`` minors of
-            ``(Z_{i+(n+1)j})``, ``Z_{i+(n+1)j} = X_i Y_j``. Any other pair
-            returns the proposition.
+            ``(Z_{i+(n+1)j})``, ``Z_{i+(n+1)j} = X_i Y_j``; and the gluing of
+            ``Spec R[s]`` and ``Spec R[t]`` along ``t |-> 1/s``, which is
+            ``P^1_R`` (Hartshorne, Example II.2.3.5). Any other pair returns
+            the proposition.
             """
             base = self.scheme_base_ring()
             assert other in Schemes(base), (
@@ -3436,6 +3452,8 @@ class Schemes(OwnedCategoryOverBaseRing):
                 case _ if other is self:
                     return True
                 case _ if _is_segre_image(self, other) or _is_segre_image(other, self):
+                    return True
+                case _ if _is_projective_line(self) and _is_projective_line(other):
                     return True
                 case _:
                     return AtomicProposition("is_isomorphic", self, other)
@@ -3916,10 +3934,21 @@ class Schemes(OwnedCategoryOverBaseRing):
                     )._from_engine_morphism(_engine_scheme(self).base_morphism())
 
         def dimension(self):
-            r"""The Krull dimension of ``Spec A`` for affine ``X``, else the realization's."""
+            r"""The Krull dimension of ``Spec A`` for affine ``X``, else the realization's.
+
+            For ``X`` glued from affine charts ``U_i``, ``dim X = sup_i dim U_i``:
+            ``dim X`` is the supremum of ``dim_x X`` (Stacks, Tag 04MU), and
+            ``dim_x X = dim_x U_i`` for ``x`` in the open ``U_i``.
+            """
             match self:
                 case _ if self in Schemes(self.scheme_base_ring()).Affine():
                     return self.coordinate_algebra().krull_dimension()
+                case _ if self._is_glued_from_affine_atlas():
+                    datum = self.gluing_datum()
+                    return max(
+                        datum.chart(index).dimension()
+                        for index in datum.chart_indices()
+                    )
                 case _:
                     return _owned_engine_element(
                         SageZZ,
@@ -4548,6 +4577,18 @@ class Schemes(OwnedCategoryOverBaseRing):
         class ParentMethods:
             def is_proper(self):
                 return True
+
+            @RealizationHook
+            def _affineness_decision(self):
+                r"""Not affine over a field in positive dimension.
+
+                Affine and proper is finite (Stacks, Tag 01WN), and a finite
+                scheme over a field has dimension ``0``.
+                """
+                base = self.scheme_base_ring()
+                if base in OwnedFields() and (self.dimension() > 0) is True:
+                    return False
+                return AtomicProposition("is_affine", self)
 
         def an_object(self):
             r"""The projective line, proper because it is projective (Stacks, Tag 01WC)."""
