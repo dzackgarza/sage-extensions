@@ -2301,6 +2301,10 @@ class InvertibleSheavesWithChosenTrivialization(OwnedParameterizedCategory):
         return self(ModuleGluingData(cover).an_object())
 
     class ParentMethods:
+        def base_ring(self):
+            r"""The base ring of the scheme on which this sheaf is defined."""
+            return self.scheme().scheme_base_ring()
+
         def trivializing_cover(self):
             r"""Return the selected affine cover on which this line bundle is trivialized."""
             return self.cover()
