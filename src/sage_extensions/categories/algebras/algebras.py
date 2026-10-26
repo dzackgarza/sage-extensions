@@ -4514,11 +4514,7 @@ class _OwnedAlgebraParent(_OwnedRingParent):
             self,
             engine,
             base=base,
-            # Select the full implementation type before Parent.__init__, but
-            # initialize it in the minimal category until the selected algebra
-            # resolution and native module datum have been installed.
-            category=Cat().meet(tuple(placement)),
-            initial_category=Cat().meet(initial_placement),
+            category=Cat().meet(initial_placement),
             constructing_category=(
                 associative if constructing_category is None else constructing_category
             ),
@@ -4544,14 +4540,15 @@ class _OwnedAlgebraParent(_OwnedRingParent):
             # native module. At this point the owner has returned from it and
             # the selected scalar base is retained, so construct the regular
             # module now, before exposing the algebra placement.
-            _algebra_from_native_ring(
-                self,
-                lambda left, right: left * right,
-                self._from_engine_element(engine.one()),
-                self._native_scalar_action,
-                module_basis=self._native_module_basis,
-                scalar_ring=base,
-            )
+            if Modules.ParentMethods._native_module_presentation(self) is None:
+                _algebra_from_native_ring(
+                    self,
+                    lambda left, right: left * right,
+                    self._from_engine_element(engine.one()),
+                    self._native_scalar_action,
+                    module_basis=self._native_module_basis,
+                    scalar_ring=base,
+                )
             refine(self, Cat().meet(tuple(placement)))
             return
 
@@ -4659,14 +4656,15 @@ class _OwnedAlgebraParent(_OwnedRingParent):
         # The selected algebra resolution has just been retained. The common
         # Parent initialization skipped module construction, so install the
         # native module only now, then expose the algebra category.
-        _algebra_from_native_ring(
-            self,
-            lambda left, right: left * right,
-            self._from_engine_element(engine.one()),
-            self._native_scalar_action,
-            module_basis=self._native_module_basis,
-            scalar_ring=base,
-        )
+        if Modules.ParentMethods._native_module_presentation(self) is None:
+            _algebra_from_native_ring(
+                self,
+                lambda left, right: left * right,
+                self._from_engine_element(engine.one()),
+                self._native_scalar_action,
+                module_basis=self._native_module_basis,
+                scalar_ring=base,
+            )
         # Both selected framing and native module datum are now queryable by
         # the algebra realization hooks this placement introduces.
         refine(self, Cat().meet(tuple(placement)))
