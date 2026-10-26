@@ -733,6 +733,7 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
             r"""Return the blue divisor ``C``; archived mathematical name."""
             return self.blue_divisor()
 
+        @cached_method
         def complementary_divisor(self):
             r"""``C'``: the rest of the toric boundary, so that ``C + C' = Delta``."""
             return self.boundary_divisor() - self.blue_divisor()
