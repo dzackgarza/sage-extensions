@@ -62,7 +62,6 @@ from sage.rings.qqbar import AA as SageAA
 from sage.rings.finite_rings.finite_field_constructor import GF as SageGF
 from sage.structure.richcmp import op_EQ, op_GE, op_GT, op_LE, op_LT, op_NE, richcmp
 from sage.structure.sage_object import SageObject
-from sage.structure.unique_representation import UniqueRepresentation
 
 from sage_extensions.categories.abstract_categories.mor_categories import (
     CategoricalMor,
@@ -5331,7 +5330,7 @@ class _OwnedIntegerElement(_OwnedRingElement):
         return integer_ring(self._backend())
 
 
-class _OwnedRingParent(UniqueRepresentation, Parent):
+class _OwnedRingParent(Parent):
     r"""An owned ring parent with one private computational realization.
 
     The parent and its elements belong to the preamble universe.  ``engine``
@@ -5359,7 +5358,8 @@ class _OwnedRingParent(UniqueRepresentation, Parent):
 
     def __init__(
         self, engine: Ring, *, base=None, category=None, constructing_category=None,
-        named_placement=None, named_cardinality=None, _defer_construction_facets=False,
+        named_placement=None, named_cardinality=None, order_basis=None,
+        _defer_construction_facets=False,
     ) -> None:
         r"""Construct over the scalar ring the level above declares.
 
@@ -5453,6 +5453,10 @@ class _OwnedRingParent(UniqueRepresentation, Parent):
                 # Retain the actual basis instead; the common native module
                 # constructor registers its resolution after Parent setup and
                 # before it exposes the module to construction hooks.
+                if order_basis is None:
+                    raise TypeError(
+                        "an owned number-field order must be constructed with its selected integral basis"
+                    )
                 from sage_extensions.categories.modules.native_modules import (
                     _NativeModuleBasis,
                 )
@@ -5461,7 +5465,10 @@ class _OwnedRingParent(UniqueRepresentation, Parent):
                 labels = owned_sets.finite_ordered_set(range(int(engine.rank())))
                 field_engine = engine.number_field()
                 degree = int(field_engine.degree())
-                basis_elements = tuple(engine.basis())
+                # The order constructor owns the selected integral basis.
+                # Generic ring construction must consume that retained datum,
+                # not ask the backend parent to choose it again.
+                basis_elements = tuple(order_basis)
                 basis_matrix = _SageMatrix(
                     SageQQ,
                     tuple(
