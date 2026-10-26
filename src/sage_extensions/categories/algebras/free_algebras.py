@@ -1217,7 +1217,8 @@ def _localized_coefficient_presentation_backend(
 def _finitely_presented_algebra_from_data(
     presentation_ring,
     relations,
-    *,
+    # Sage's cached_function argument fixer cannot read keyword-only
+    # defaults, so these construction data are ordinary keywords.
     _extra_categories=(),
     _extra_construction_data=None,
     _generating_module=None,
