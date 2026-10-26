@@ -178,7 +178,40 @@ def owned_parent_class(implementation: type, category: Category) -> type:
     carried = frozenset(inherited.__mro__)
     mixins = tuple(provider for provider in providers if provider is not object and provider not in carried)
     if not mixins:
-        return implementation
+        # Sage's category-backed dynamic class can carry an AbstractMethod in
+        # its own dictionary even though the selected category MRO has a
+        # concrete owner for that operation. Such a local descriptor shadows
+        # every category provider. Install the existing owner descriptor on a
+        # thin runtime class; do not duplicate the method implementation.
+        def is_abstract(value):
+            return isinstance(value, AbstractMethod) or getattr(
+                value, "__isabstractmethod__", False
+            )
+
+        overrides = {}
+        for name, value in implementation.__dict__.items():
+            if not is_abstract(value):
+                continue
+            for provider in providers:
+                candidate = vars(provider).get(name)
+                if candidate is None or is_abstract(candidate):
+                    continue
+                overrides[name] = candidate
+                break
+        if not overrides:
+            return implementation
+        new_class = _owned_dynamic_class(
+            f"Owned{implementation.__name__}ConcreteProviders",
+            (implementation,),
+            implementation,
+        )
+        for name, value in overrides.items():
+            setattr(new_class, name, value)
+        new_class._preamble_concrete = implementation.__dict__.get(
+            "_preamble_concrete", inherited
+        )
+        new_class._preamble_inherited = inherited
+        return new_class
 
     # ``inherited`` already contains the method providers reached by earlier
     # construction steps.  A later refinement prepends only newly reached

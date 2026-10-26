@@ -656,6 +656,7 @@ class OwnedNumberFields(CategoryPacketMethods, OwnedCategory):
                     )
             return Algebras(base_ring).Associative().Unital().Commutative().base_change_adjunction(ring_map).left_adjoint()
 
+        @cached_method
         def as_algebra(self):
             r"""Return this field with its selected finite ``QQ``-algebra presentation."""
             from sage_extensions.categories.algebras.free_algebras import (
