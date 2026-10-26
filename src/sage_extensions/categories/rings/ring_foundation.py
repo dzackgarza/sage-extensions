@@ -3728,6 +3728,10 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                 raise TypeError(f"cannot enumerate {self}: no selected finite engine enumeration is available")
             return iter(_owned_engine_element(self, point) for point in engine)
 
+        # A ring need not carry a selected module basis over its coefficient
+        # ring; localization and quotient constructors share this contract.
+        _native_module_basis = None
+
         @cached_method
         def as_ZZ_algebra(self):
             r"""Read this unital ring with its unique central integer action.

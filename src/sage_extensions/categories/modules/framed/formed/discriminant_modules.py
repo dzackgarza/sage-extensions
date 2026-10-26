@@ -42,12 +42,15 @@ def _fraction_field_value(value):
     r"""Read a scalar or a restricted scalar in its owned fraction field.
 
     The metric dual can have a form valued in its base ring or in the
-    restriction of its fraction field. Only the latter value carries an
-    ``underlying_element`` map; both give classes in the same quotient.
+    restricted regular module of its fraction field. The latter carries an
+    ``underlying_element`` map into the regular module, whose additive
+    isomorphism gives the scalar used in the quotient.
     """
     if value.parent() in OwnedRings():
         return value
-    return value.underlying_element()
+    scalar = value.underlying_element()
+    field = scalar.parent().base_ring()
+    return field.regular_module_isomorphism()(scalar)
 
 
 class DiscriminantModules(OwnedCategoryOverBaseRing):
