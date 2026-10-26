@@ -4667,7 +4667,8 @@ class _OwnedAlgebraParent(_OwnedRingParent):
         # the algebra realization hooks this placement introduces.
         refine(self, Cat().meet(tuple(placement)))
 
-@cached_function(key=lambda engine, base_ring, labels=None, categories=(), construction_data=(), law_decisions=(), ring_placement=(): (
+@cached_function(key=lambda algebra, base_ring, labels=None, categories=(), construction_data=(), law_decisions=(), ring_placement=(): (
+    algebra,
     base_ring,
     None if labels is None else id(labels),
     tuple(map(id, categories)),
@@ -4676,7 +4677,7 @@ class _OwnedAlgebraParent(_OwnedRingParent):
     tuple(map(id, ring_placement)),
 ))
 def _owned_algebra_view(
-    engine,
+    algebra,
     base_ring,
     labels=None,
     categories=(),
@@ -4684,11 +4685,11 @@ def _owned_algebra_view(
     law_decisions=(),
     ring_placement=(),
 ):
-    # The selected base, labels, categories and retained construction data
-    # identify this algebra view. The engine is only its private realization.
+    # A structure view retains its source algebra as defining data. The base
+    # and labels alone do not determine that algebra or its multiplication.
     base = _owned_ring(base_ring)
     return _OwnedAlgebraParent(
-        engine,
+        _engine_ring(algebra),
         base,
         labels,
         categories=tuple(categories),
@@ -4728,7 +4729,7 @@ def _algebra_with_structure(
         if category is OwnedRings()._with_axioms(category.axioms())
     )
     return _owned_algebra_view(
-        _engine_ring(algebra),
+        algebra,
         base,
         labels,
         tuple(categories),
