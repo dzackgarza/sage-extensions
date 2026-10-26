@@ -6,6 +6,7 @@ its roots are not rational; its principal ideal in QQ[x] is maximal.
 
 from sage_extensions.categories.rings.commutative_ideals import CommutativeIdeals
 from sage_extensions.categories.rings.ring_foundation import (
+    OwnedRings,
     _owned_integers,
     _owned_rationals,
 )
@@ -27,3 +28,15 @@ def test_prime_and_maximal_ideal_construction() -> None:
     placement = ideal.category()
     assert ideal in CommutativeIdeals(polynomial).Maximal()
     assert ideal.category() is placement
+
+
+def test_quotient_field_query_preserves_construction_placement() -> None:
+    polynomial = _owned_rationals().polynomial_ring("t")
+    t = polynomial.algebra_generator("t")
+    ideal = polynomial.ideal(t * t + polynomial(1))
+    quotient = polynomial.quotient_ring(ideal)
+    placement = quotient.category()
+    assert quotient in OwnedRings().Division()
+    assert quotient.category() is placement
+    maximal = CommutativeIdeals(polynomial).Maximal()(t * t + polynomial(1))
+    assert polynomial.residue_field_at(maximal) in OwnedRings().Division()
