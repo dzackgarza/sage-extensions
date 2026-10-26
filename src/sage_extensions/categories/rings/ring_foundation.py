@@ -3798,7 +3798,7 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
             Native/completed parents retain installed values, while a prime
             localization supplies its actual source-quotient construction.
             """
-            return None
+            return vars(self).get("_local_ring_construction")
 
         def _selected_engine_ring(self):
             r"""Return the private computation parent selected for this ring.

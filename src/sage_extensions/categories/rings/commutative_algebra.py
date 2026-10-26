@@ -3743,6 +3743,9 @@ def _quotient_ring(source, defining_ideal):
     # For p prime and k > 1, an integer class modulo p^k is a unit exactly
     # when it is not divisible by p.  Thus all nonunits lie in (p), making
     # (p) the unique maximal ideal; the quotient by it is Z/p.  The selected
+    # locality criterion is Stacks Project, Lemma 10.18.3 (Tag 00E9),
+    # https://stacks.math.columbia.edu/tag/00E9: all elements outside this
+    # maximal ideal are units, by Bezout applied to their lift and p^k.
     # integer generator is the construction datum; use its exact prime-power
     # factorization rather than testing any property of the quotient or its
     # engine realization.
