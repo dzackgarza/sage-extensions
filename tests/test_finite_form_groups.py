@@ -50,7 +50,7 @@ def test_reindexed_a2_simple_roots_have_an_integral_transporter():
 
 @pytest.mark.parametrize("multiple", [1, 2])
 def test_a2_bases_with_different_pairings_have_no_orthogonal_transporter(multiple):
-    r"""b(a,b)=-1 differs from b(a,m*a+b)=2m-1 for m=1,2."""
+    r"""The shear changes b(a,b) by m*q(a), which is nonzero for m=1,2."""
     lattice = NamedLattices.A2
     first, second = tuple(lattice.module_generators())
     source = Sets().Mor(Sets.Δ[1], lattice)(lambda i: (first, second)[int(i)])
