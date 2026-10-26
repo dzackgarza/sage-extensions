@@ -2693,6 +2693,9 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
             ring map and this category inherits the ring ``Mor``.
             """
 
+            def __contains__(self, candidate):
+                return OwnedRings.Division.__contains__(self, candidate)
+
             @classmethod
             def _repr_object_names(cls):
                 return "fields"
