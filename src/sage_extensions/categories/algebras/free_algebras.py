@@ -1083,6 +1083,16 @@ def _localized_coefficient_presentation_backend(
     return quotient_engine, generator_values, presentation_lift
 
 
+@cached_function(key=lambda presentation_ring, relations, _extra_categories=(), _extra_construction_data=None, _generating_module=None, _constructing_category=None: (
+    id(presentation_ring),
+    ("indexed-family", id(relations)) if isinstance(relations, IndexedFamily) else (
+        "values", tuple(id(relation) for relation in relations)
+    ) if isinstance(relations, (tuple, list)) else ("relation-object", id(relations)),
+    tuple(map(id, _extra_categories)),
+    tuple((name, id(value)) for name, value in (_extra_construction_data or ())),
+    id(_generating_module),
+    id(_constructing_category),
+))
 def _finitely_presented_algebra_from_data(
     presentation_ring,
     relations,
