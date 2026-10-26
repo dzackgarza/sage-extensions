@@ -2062,7 +2062,7 @@ class FiniteAffineAtlases(OwnedParameterizedCategory):
         target = self.slice_target()
         chart_objects = finite_indexed_family(
             indices,
-            lambda index: site.object(embeddings[index]),
+            lambda index: site(embeddings[index]),
             name="Affine charts in the scheme slice",
         )
         members = finite_indexed_family(
@@ -2077,7 +2077,7 @@ class FiniteAffineAtlases(OwnedParameterizedCategory):
             forward = presentation.transition_between(left, right).forward()
             left_leg = source_overlap.inclusion()
             right_leg = target_overlap.inclusion() * forward
-            overlap_object = site.object(embeddings[left] * left_leg)
+            overlap_object = site(embeddings[left] * left_leg)
             overlaps[left, right] = site.span(
                 site.Mor(overlap_object, chart_objects[left])(left_leg),
                 site.Mor(overlap_object, chart_objects[right])(right_leg),
