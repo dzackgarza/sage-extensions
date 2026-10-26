@@ -5350,8 +5350,7 @@ class _OwnedRingParent(Parent):
                 return _OwnedRingElement
 
     def __init__(
-        self, engine: Ring, *, base=None, category=None, initial_category=None,
-        constructing_category=None,
+        self, engine: Ring, *, base=None, category=None, constructing_category=None,
         named_placement=None, named_cardinality=None, order_basis=None,
         _defer_construction_facets=False,
     ) -> None:
@@ -5528,11 +5527,10 @@ class _OwnedRingParent(Parent):
             placement = owned_category_join(
                 (placement, AdditiveGroups().AdditiveCommutative())
             )
-            parent_category = category if initial_category is None else initial_category
-            if parent_category is not None:
+            if category is not None:
                 from sage_extensions.owned_category import owned_category_join
 
-                placement = owned_category_join((placement, parent_category))
+                placement = owned_category_join((placement, category))
             Parent.__init__(self, base=base, category=placement)
             realize_owned_category(self)
 
@@ -5575,8 +5573,8 @@ class _OwnedRingParent(Parent):
                 placement = owned_category_join(
                     (placement, AdditiveGroups().AdditiveCommutative())
                 )
-                if parent_category is not None:
-                    placement = owned_category_join((placement, parent_category))
+                if category is not None:
+                    placement = owned_category_join((placement, category))
                 refine(self, placement)
         except BaseException:
             # A failed constructor cannot leave its incomplete owned ring in
