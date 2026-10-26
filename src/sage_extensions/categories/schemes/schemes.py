@@ -92,6 +92,9 @@ from sage_extensions.categories.algebras.finitely_presented_algebras import (
 from sage_extensions.categories.algebras.free_algebras import (
     SymmetricAlgebras,
 )
+from sage_extensions.categories.modules.framed.framed_free_modules import (
+    FramedFreeModules,
+)
 from sage_extensions.categories.modules.pure.modules import BilinearMap
 from sage_extensions.categories.rings.commutative_algebra import (
     QuotientRings,
@@ -2978,8 +2981,16 @@ def _affine_scheme(algebra, base, placements=(), **level_data):
         categories.extend((schemes.FiniteType(), schemes.QuasiProjective()))
     if algebra is base:
         categories.append(schemes.Smooth())
-        if _normal_placement(base):
-            categories.append(schemes.Normal())
+    # R and the polynomial rings R[S] = Sym_R(F_R(S)) are integrally closed
+    # when R is (see _normal_placement), so Spec of either is normal.
+    if _normal_placement(base) and (
+        algebra is base
+        or (
+            algebra in SymmetricAlgebras(base)
+            and algebra.generating_module() in FramedFreeModules(base)
+        )
+    ):
+        categories.append(schemes.Normal())
     if _integral_placement(algebra):
         categories.append(schemes.Integral())
     return _object_of(
