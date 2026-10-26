@@ -3369,6 +3369,7 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
             source if algebra_base is None else algebra_base,
             algebra_labels,
             categories=tuple(placements),
+            constructing_category=AdicCompletions(),
             ring_placement=lambda: tuple(ring_placements),
         )
         completion_map = self.completion_map()
@@ -5187,7 +5188,7 @@ class _DualNumbersAlgebraParent(_OwnedAlgebraParent):
             """
             super().__init__(parent, backend_value)
             self._representative = _owned_engine_element(
-                parent.quotient_source(), backend_value.lift()
+                parent._quotient_source, backend_value.lift()
             )
 
     def algebra_base_ring(self):
@@ -5250,6 +5251,7 @@ class _DualNumbersAlgebraParent(_OwnedAlgebraParent):
             base,
             (label,),
             categories=tuple(placements),
+            constructing_category=QuotientRings(),
             ring_placement=lambda: tuple(ring_placements),
         )
         if base in OwnedRings().Commutative().Local():

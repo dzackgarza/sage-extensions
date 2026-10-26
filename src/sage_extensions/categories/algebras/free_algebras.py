@@ -773,7 +773,10 @@ class _PresentedAlgebraParent(_OwnedAlgebraParent):
             categories=tuple(placement),
         law_decisions=law_decisions,
         algebra_framing_source=presentation_ring,
-        constructing_category=constructing_category,
+        constructing_category=(
+            AlgebrasWithChosenFinitePresentation(base)
+            if constructing_category is None else constructing_category
+        ),
         ring_placement=lambda: tuple(
             category
             for category in (
@@ -1087,7 +1090,7 @@ def _localized_coefficient_presentation_backend(
 @cached_function(key=lambda presentation_ring, relations, _extra_categories=(), _extra_construction_data=None, _generating_module=None, _constructing_category=None: (
     id(presentation_ring),
     ("indexed-family", id(relations)) if isinstance(relations, IndexedFamily) else (
-        "values", tuple(id(relation) for relation in relations)
+        "values", tuple(relations)
     ) if isinstance(relations, (tuple, list)) else ("relation-object", id(relations)),
     tuple(map(id, _extra_categories)),
     tuple((name, id(value)) for name, value in (_extra_construction_data or ())),

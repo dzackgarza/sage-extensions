@@ -49,7 +49,9 @@ def test_number_field_and_maximal_quotient_are_one_field() -> None:
     assert a * a == field(-1)
     assert a.norm() == rationals(1)
     assert a.trace() == rationals(0)
-    assert a.minpoly() == f
+    minimal_polynomial_ring = rationals.polynomial_ring("x")
+    x = minimal_polynomial_ring.algebra_generator("x")
+    assert a.minpoly() == x * x + minimal_polynomial_ring(1)
     multiplication = a.multiplication_morphism()
     algebra = field.as_algebra()
     assert multiplication.domain() is algebra
