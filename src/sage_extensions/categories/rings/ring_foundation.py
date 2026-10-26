@@ -1055,13 +1055,17 @@ class LocalizationRings(OwnedCategory):
             return self._denominator
 
         def _add_(self, other):
-            return self.parent().fraction(
+            # Both denominators were admitted at construction; their product
+            # remains admitted by closure of the selected multiplicative set.
+            return self.parent()._fraction_with_admitted_denominator(
                 self.numerator() * other.denominator() + other.numerator() * self.denominator(),
                 self.denominator() * other.denominator(),
             )
 
         def _mul_(self, other):
-            return self.parent().fraction(
+            # Multiplication preserves the denominator witness by closure of
+            # the selected multiplicative set; do not re-decide ideal saturation.
+            return self.parent()._fraction_with_admitted_denominator(
                 self.numerator() * other.numerator(),
                 self.denominator() * other.denominator(),
             )
@@ -1077,7 +1081,11 @@ class LocalizationRings(OwnedCategory):
             parent = self.parent()
             match self.is_unit():
                 case True:
-                    return parent.fraction(self.denominator(), self.numerator())
+                    # A unit numerator is already proved to have an admissible
+                    # denominator, since its principal ideal meets the set.
+                    return parent._fraction_with_admitted_denominator(
+                        self.denominator(), self.numerator()
+                    )
                 case False:
                     raise ZeroDivisionError(f"{self} is not a unit of {parent}")
                 case _:
@@ -1517,6 +1525,17 @@ class LocalizationRings(OwnedCategory):
                         "becomes a unit"
                     )
             return self.element_class(self, numerator, denominator)
+
+        def _fraction_with_admitted_denominator(self, numerator, denominator):
+            r"""Construct a fraction when the caller supplies a proof of admissibility.
+
+            Arithmetic uses closure of the selected multiplicative set, and
+            inversion of a proved unit uses the unit criterion. Re-running the
+            general ideal-saturation decision here discards those construction
+            proofs and can ask the engine to decide an unrelated quotient ideal.
+            """
+            source = self.localization_source()
+            return self.element_class(self, source(numerator), source(denominator))
 
         def _element_constructor_(self, value):
             from sage.structure.element import parent as element_parent
