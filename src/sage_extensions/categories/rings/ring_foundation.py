@@ -1711,7 +1711,14 @@ class LocalizationRings(OwnedCategory):
 
         def _exact_coefficient_presentation_ring(self):
             if self._has_selected_exact_coefficient_presentation():
-                return _own_ring(self._preamble_engine_ring.cover_ring())
+                engine_cover = self._preamble_engine_ring.cover_ring()
+                # This selected localization backend is a flattened
+                # polynomial cover. Its owned presentation is determined by
+                # the retained coefficient ring and ordered variable labels;
+                # do not adopt the auxiliary Sage parent as a second ring.
+                return _own_ring(engine_cover.base_ring()).polynomial_ring(
+                    tuple(engine_cover.variable_names())
+                )
             return super()._exact_coefficient_presentation_ring()
 
         def _exact_coefficient_presentation_relations(self):
