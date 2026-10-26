@@ -8676,6 +8676,7 @@ class EvenTwoElementaryLattices(OwnedCategoryOverBaseRing):
             r"""Return Nikulin's invariant on the even 2-elementary lattice surface."""
             return Lattices.ParentMethods.delta(self)
 
+        @cached_method
         def two_elementary_invariants(self):
             r"""Return Nikulin's \((r,a,\delta)\) for an even 2-elementary lattice.
 
@@ -8683,10 +8684,9 @@ class EvenTwoElementaryLattices(OwnedCategoryOverBaseRing):
             three natural numbers, so the triple is a point of
             \(\mathbb N^3\).
             """
-            if not self.is_p_elementary(self.base_ring()(2)) or not self.is_even():
-                raise ValueError(
-                    f"{self!r} has no Nikulin invariants (r, a, delta): they are defined for an even 2-elementary lattice, and {self!r} is not both even and 2-elementary"
-                )
+            # Membership in this category already establishes evenness and
+            # 2-elementarity in its constructor.  Do not repeat those full
+            # discriminant-group decisions on every invariant read.
             return nikulin_invariants(
                 self.module_rank(), self.discriminant_length(), self.delta()
             )
