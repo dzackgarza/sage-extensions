@@ -3800,7 +3800,10 @@ class CommutativeAlgebraCoproducts(OwnedCategoryOverBaseRing):
                     for label in right.algebra_generating_set()
                 },
             }
-            induced = self.Mor(target)(images)
+            # The cocone vertex is any commutative algebra: the induced map
+            # is an arrow of commutative algebras, not of this object's
+            # constructing category.
+            induced = category.Mor(self, target)(images)
             # A coproduct is specified by its two injections, not merely
             # by the ambient polynomial presentation. Check the defining
             # triangles in the actual Mor graph on the chosen generators;
@@ -3857,7 +3860,15 @@ class CommutativeAlgebraPushouts(OwnedCategoryOverBaseRing):
         @cached_method
         def pushout_maps(self):
             coproduct = self._preamble_pushout_coproduct
-            quotient_map = coproduct.Mor(self)(
+            # The pushout is a quotient of the coproduct, not a symmetric
+            # algebra: the quotient map is an arrow of commutative algebras.
+            quotient_map = (
+                Algebras(self.algebra_base_ring())
+                .Associative()
+                .Unital()
+                .Commutative()
+                .Mor(coproduct, self)
+            )(
                 {
                     label: self.algebra_generator(label)
                     for label in coproduct.algebra_generating_set()
@@ -3933,7 +3944,10 @@ class CommutativeAlgebraPushouts(OwnedCategoryOverBaseRing):
                     for label in right_factor.algebra_generating_set()
                 },
             }
-            induced = self.Mor(target)(images)
+            # The cocone vertex is any commutative algebra: the induced map
+            # is an arrow of commutative algebras, not of this object's
+            # constructing category.
+            induced = category.Mor(self, target)(images)
             # The quotient presentation alone does not establish that the
             # admitted arrow has the required composites with the selected
             # pushout legs. Check the defining triangles at the generators.
