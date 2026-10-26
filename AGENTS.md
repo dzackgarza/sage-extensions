@@ -378,6 +378,13 @@ The live package is sage-extensions (`sage_extensions`), imported by the session
 the live package; `archives/preamble/` is prior implementation material, not an
 alternate API contract.
 
+All code lives here, in sage-extensions. The session preamble in `research`
+(`src/dzack_research/preamble/`) only imports this package into a session and
+holds no implementation. In this file, "the preamble" names the session surface
+that sage-extensions presents. A new operation, a repair or a missing
+capability "in the preamble" is code written in sage-extensions, never in
+`research`.
+
 The preamble is a layer over Sage, not a collection of helpers.
 Once a session loads it, the mathematician stops receiving raw Sage objects: everything reached from the preamble is an owned object, which may or may not use a Sage object underneath.
 The stated purpose is *owned uniformization*.
