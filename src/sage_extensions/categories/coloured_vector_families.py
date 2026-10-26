@@ -61,7 +61,7 @@ from math import factorial, gcd
 from sage.graphs.graph import Graph
 from sage.groups.perm_gps.permgroup_named import SymmetricGroup
 from sage.matrix.constructor import matrix as engine_matrix
-from sage.misc.cachefunc import cached_function, cached_method
+from sage.misc.cachefunc import cached_method, weak_cached_function
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.rational_field import QQ as SageQQ
 
@@ -153,13 +153,17 @@ class _LabelledPairingGraph:
         # The canonical forms must retain their actual colours and pairings.
         graph = Graph(loops=True, multiedges=False, weighted=True)
         graph.add_vertices(range(size))
+        edge_colours = {}
         for left in range(size):
             colour = self._colouring(self._position(left))
             graph.add_edge(left, left, ("vertex", colour, tuple(table[left, left] for table in tables)))
             for right in range(left):
                 pairings = tuple(table[left, right] for table in tables)
                 if any(pairings):
-                    graph.add_edge(left, right, ("pairing", pairings))
+                    # Sage retains the supplied Python label on every edge.
+                    # Equal pairings therefore share one exact label object.
+                    label = edge_colours.setdefault(pairings, ("pairing", pairings))
+                    graph.add_edge(left, right, label)
         return graph
 
     @cached_method
@@ -266,8 +270,10 @@ class _LabelledPairingGraph:
         if source != target:
             return None
         inverse_target = {image: vertex for vertex, image in target_certificate.items()}
+        source_ranking = self._positions.ranking_map()
+        target_unranking = other._positions.ranking_map().inverse()
         return Sets().Mor(self._positions, other._positions)(
-            lambda position: other._position(inverse_target[source_certificate[self._vertex(position)]])
+            lambda position: target_unranking(inverse_target[source_certificate[int(source_ranking(position))]])
         )
 
 
@@ -371,8 +377,9 @@ class _ColouredFamilyRealization:
             return self._lattice.gram_tensor()
         return self._lattice.gram_tensor().pullback(self.family_morphism())
 
-    @cached_method
     def pairing_graph(self):
+        # The graph is private computation data. Its returned index maps
+        # retain the owned rankings, not these quadratic-size graph tables.
         return _LabelledPairingGraph(
             self._indices, self._lattice.gram_tensor(), self.colouring(),
             self.family_morphism(),
@@ -769,7 +776,7 @@ class _ColouredFamilyRealization:
         return exponent, containing
 
 
-@cached_function(key=lambda lattice, family: (id(lattice), id(family)))
+@weak_cached_function(cache=0, key=lambda lattice, family: (id(lattice), id(family)))
 def _realization(lattice, family):
     return _ColouredFamilyRealization(lattice, family)
 
