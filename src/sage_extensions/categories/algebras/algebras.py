@@ -4642,8 +4642,8 @@ class _OwnedAlgebraParent(_OwnedRingParent):
             # that latter morphism here recursively asks the source for the
             # very framing this constructor is in the process of installing.
             if source is self:
-                return source.Mor(self).identity()
-            return source.Mor(self)(generator_morphism)
+                return framing_owner.Mor(source, self).identity()
+            return framing_owner.Mor(source, self)(generator_morphism)
 
         _fix_selected_algebra_resolution(
             self,
