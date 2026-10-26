@@ -1340,11 +1340,17 @@ def _pid_principal_ideal_generator(ideal):
 def _realized_as_quotient(ring) -> bool:
     r"""Return whether the realization of ``ring`` is a quotient ``P/K``.
 
-    Only a quotient realization presents a cover ring, and an ideal of one is
+    The selected owned category must also declare the quotient structure; a
+    Sage engine type alone does not place an owned free algebra in
+    ``QuotientRings``. Only a quotient realization presents a cover ring, and an ideal of one is
     a Singular ideal whose parent Singular itself refuses: the operation is
     offered and then declines when called.  So the routing is decided from the
     ring rather than from whether the operation is present.
     """
+    from sage_extensions.categories.rings.commutative_algebra import QuotientRings
+
+    if ring not in QuotientRings():
+        return False
     match _engine_ring(ring):
         case QuotientRing_generic():
             return True
