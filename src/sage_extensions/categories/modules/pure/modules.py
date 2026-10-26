@@ -1432,7 +1432,12 @@ class Modules(OwnedCategoryOverBaseRing):
             never a category claim or a deferred reconstruction. No engine
             handle crosses this contract.
             """
-            return self._preamble_native_module_presentation
+            # During deferred algebra construction this owner datum is queried
+            # before the module category has been added to the parent's Sage
+            # class. In that interval the category's class default is not in
+            # the MRO; absence means the same initial state as its declared
+            # default, not an unconstructed mathematical module.
+            return getattr(self, "_preamble_native_module_presentation", None)
 
         def _retain_native_module_presentation(self, presentation):
             r"""Install the native module datum at its Modules owner.
@@ -1443,7 +1448,7 @@ class Modules(OwnedCategoryOverBaseRing):
             scalar ring. Consumers read the retained owned constructor datum
             through the owner query rather than opening this object's storage.
             """
-            assert self._preamble_native_module_presentation is None, (
+            assert getattr(self, "_preamble_native_module_presentation", None) is None, (
                 f"the module structure of {self} over {self.base_ring()} is already defined and cannot be defined again"
             )
             assert self.base_ring() is presentation.base_ring(), (
