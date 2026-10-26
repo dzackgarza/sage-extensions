@@ -14,15 +14,16 @@ import logging
 import operator
 
 from sage.misc.cachefunc import cached_function, cached_method
-from sage.structure.element import ModuleElement, parent as element_parent
+from sage.structure.element import ModuleElement
+from sage.structure.element import parent as element_parent
 from sage.structure.richcmp import op_EQ, op_NE
 
 from sage_extensions.categories.modules.pure.modules import Modules
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
     OwnedRings,
-    _owned_ring,
     _enumerated_ring_elements,
+    _owned_ring,
 )
 from sage_extensions.categories.sets.set_categories import (
     EnumeratedSets,
@@ -147,12 +148,24 @@ class GeneralModules(OwnedCategoryOverBaseRing):
         ) -> None:
             ring = _owned_ring(base_ring)
             if rho is not None:
-                assert all(datum is None for datum in (underlying_set, addition, zero, negation, scalar_action)), (
+                assert all(
+                    datum is None
+                    for datum in (
+                        underlying_set,
+                        addition,
+                        zero,
+                        negation,
+                        scalar_action,
+                    )
+                ), (
                     f"cannot construct an {ring}-module from {rho}: a ring morphism rho: {ring} -> End(A) "
                     "already determines the additive group A, so no set, addition, zero, negation or "
                     "scalar multiplication may be given alongside it"
                 )
-                assert rho.parent().mor_category().is_subcategory(OwnedRings()) and rho.domain() is ring, (
+                assert (
+                    rho.parent().mor_category().is_subcategory(OwnedRings())
+                    and rho.domain() is ring
+                ), (
                     f"cannot construct an {ring}-module from {rho}: the scalar action must be a ring "
                     f"morphism out of {ring}, but {rho} lies in {rho.parent()}"
                 )
@@ -209,6 +222,14 @@ class GeneralModules(OwnedCategoryOverBaseRing):
             match self._rho:
                 case None:
                     return super()._ring_morphism_defining_module_action()
+                case rho:
+                    return rho
+
+        def scalar_action(self):
+            r"""Return ``rho : R -> End_Ab(A)``: the supplied defining datum, or the one the elementwise action defines."""
+            match self._rho:
+                case None:
+                    return super().scalar_action()
                 case rho:
                     return rho
 
@@ -303,7 +324,10 @@ class GeneralModules(OwnedCategoryOverBaseRing):
             return value in self.underlying_set()
 
         def __iter__(self):
-            return (self._element_from_underlying_set(value) for value in self.underlying_set())
+            return (
+                self._element_from_underlying_set(value)
+                for value in self.underlying_set()
+            )
 
         def zero(self):
             return self._element_from_underlying_set(self._zero_value)
@@ -368,7 +392,9 @@ class GeneralModules(OwnedCategoryOverBaseRing):
             from sage_extensions.logic import conjunction
 
             for scalar in scalars:
-                equations = (self.scalar_multiple(scalar, element) == zero for element in self)
+                equations = (
+                    self.scalar_multiple(scalar, element) == zero for element in self
+                )
                 decision = conjunction(equations)
                 if decision is True:
                     annihilating.append(scalar)
@@ -410,7 +436,9 @@ class GeneralModules(OwnedCategoryOverBaseRing):
 
             zero = self.zero()
             for element in elements:
-                assert (element + zero == element) is True and (zero + element == element) is True, (
+                assert (element + zero == element) is True and (
+                    zero + element == element
+                ) is True, (
                     f"{self} is not a module: the given zero {zero} is not an additive identity, "
                     f"since {element} + {zero} != {element}"
                 )
@@ -425,7 +453,9 @@ class GeneralModules(OwnedCategoryOverBaseRing):
                         f"since {left} + {right} != {right} + {left}"
                     )
                     for third in elements:
-                        assert ((left + right) + third == left + (right + third)) is True, (
+                        assert (
+                            (left + right) + third == left + (right + third)
+                        ) is True, (
                             f"{self} is not a module: its addition is not associative on "
                             f"{left}, {right}, {third}"
                         )
@@ -453,26 +483,33 @@ class GeneralModules(OwnedCategoryOverBaseRing):
                 )
                 for scalar in scalars:
                     for other in elements:
-                        assert (self.scalar_multiple(scalar, element + other) == (
-                            self.scalar_multiple(scalar, element)
-                            + self.scalar_multiple(scalar, other)
-                        )) is True, (
+                        assert (
+                            self.scalar_multiple(scalar, element + other)
+                            == (
+                                self.scalar_multiple(scalar, element)
+                                + self.scalar_multiple(scalar, other)
+                            )
+                        ) is True, (
                             f"{self} is not a module: scalar multiplication by {scalar} is not additive, "
                             f"since {scalar} * ({element} + {other}) != {scalar} * {element} + {scalar} * {other}"
                         )
                     for second_scalar in scalars:
-                        assert (self.scalar_multiple(scalar + second_scalar, element) == (
-                            self.scalar_multiple(scalar, element)
-                            + self.scalar_multiple(second_scalar, element)
-                        )) is True, (
+                        assert (
+                            self.scalar_multiple(scalar + second_scalar, element)
+                            == (
+                                self.scalar_multiple(scalar, element)
+                                + self.scalar_multiple(second_scalar, element)
+                            )
+                        ) is True, (
                             f"{self} is not a module: ({scalar} + {second_scalar}) * {element} != "
                             f"{scalar} * {element} + {second_scalar} * {element}"
                         )
-                        assert (self.scalar_multiple(
-                            scalar * second_scalar, element
-                        ) == self.scalar_multiple(
-                            scalar, self.scalar_multiple(second_scalar, element)
-                        )) is True, (
+                        assert (
+                            self.scalar_multiple(scalar * second_scalar, element)
+                            == self.scalar_multiple(
+                                scalar, self.scalar_multiple(second_scalar, element)
+                            )
+                        ) is True, (
                             f"{self} is not a module: ({scalar} * {second_scalar}) * {element} != "
                             f"{scalar} * ({second_scalar} * {element})"
                         )
@@ -507,7 +544,9 @@ class _PointwiseValues:
         return self._operands
 
     def __call__(self, point):
-        return self._operation(self._codomain, *(operand(point) for operand in self._operands))
+        return self._operation(
+            self._codomain, *(operand(point) for operand in self._operands)
+        )
 
 
 class _FunctionModuleElement:
@@ -739,7 +778,9 @@ def _condition_submodule_object(
     }
     if subobject:
         placement.append(ModuleSubobjects(ring))
-        data["subobject_inclusion_factory"] = lambda submodule: submodule.Mono(module)._from_constructed_embedding(
+        data["subobject_inclusion_factory"] = lambda submodule: submodule.Mono(
+            module
+        )._from_constructed_embedding(
             lambda element: module(submodule(element).underlying_element())
         )
     object_engine, element_engine = engine
@@ -752,7 +793,9 @@ def _condition_submodule_object(
     )
 
 
-def _condition_submodule(module, predicate, *, engine=None, engine_data=None, categories=()):
+def _condition_submodule(
+    module, predicate, *, engine=None, engine_data=None, categories=()
+):
     r"""Construct ``M.condition_submodule(P)``; the route of ``Modules.ParentMethods.condition_submodule``.
 
     Zero satisfies the condition by the submodule hypothesis, so the zero
