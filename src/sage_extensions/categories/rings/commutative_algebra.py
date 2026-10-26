@@ -3583,6 +3583,23 @@ def _quotient_ring(source, defining_ideal):
     actual classes. This includes a further quotient of an engine-free
     quotient; neither its source nor its defining ideal is flattened away.
     """
+    # The one-variable maximal quotient QQ[t]/(f) is the number-field
+    # construction already interned by its monic defining polynomial. Route
+    # this presentation through that owner before making a generic quotient;
+    # otherwise the same field acquires a second owned parent with a different
+    # cache key and loses the number-field element operations/resolution.
+    if (
+        source.base_ring() is _owned_rationals()
+        and source in SymmetricAlgebras(source.base_ring())
+        and len(source.variable_names()) == 1
+        and Category.__contains__(CommutativeIdeals(source).Maximal(), defining_ideal)
+    ):
+        generators = tuple(defining_ideal.ideal_generators())
+        if len(generators) == 1:
+            from sage_extensions.categories.rings.number_fields import _number_field_of
+
+            return _number_field_of(generators[0].monic())
+
     exact_source_quotient = (
         source in LocalizationRings() or _engine_ring(source) is source
     )
