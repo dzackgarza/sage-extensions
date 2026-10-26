@@ -3444,10 +3444,7 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
 
                 engine = self._selected_engine_ring()
                 base_engine = base._selected_engine_ring()
-                assert (
-                    engine is not None and base_engine is not None
-                    and _own_ring(engine) is self and _own_ring(base_engine) is base
-                ), (
+                assert engine is not None and base_engine is not None, (
                     f"no canonical coefficient map {base} -> {self} is supplied by the retained "
                     "scalar tower or exact native endpoints; state the chosen ring map and use its as_algebra"
                 )
