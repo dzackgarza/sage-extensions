@@ -720,6 +720,7 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
                 name="Distinguished ADE boundary points",
             )
 
+        @cached_method
         def blue_divisor(self):
             r"""``C``: the invariant divisors whose facet of ``Q`` contains ``p*``."""
             group = self.log_scheme().torus_invariant_divisor_group()
@@ -821,7 +822,7 @@ class _AT21ToricADEPairEngine:
 
     def blue_divisor(self):
         r"""The selected blue divisor of the retained ADE base pair."""
-        return self.base_pair().blue_divisor()
+        return self.boundary_divisor()
 
     def source_variant(self):
         return self._source_variant
