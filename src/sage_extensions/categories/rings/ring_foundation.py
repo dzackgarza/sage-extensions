@@ -6472,12 +6472,7 @@ def _owned_engine_ring(engine: Ring) -> Ring:
         case _ if engine is SageQQbar:
             return _owned_algebraic_numbers()
         case AlgebraicClosureFiniteField_generic():
-            characteristic = int(engine.characteristic())
-            closure = AlgebraicClosureFiniteField(characteristic)
-            return _OwnedRingParent(
-                closure,
-                named_placement=_algebraic_closure_finite_field_placements,
-            )
+            return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
         case _ if engine is SageRDF:
             return _owned_real_double_field()
         case _ if engine is SageCDF:
@@ -6683,6 +6678,18 @@ def _owned_rationals() -> Ring:
 def _owned_real_algebraic_numbers() -> _OwnedRingParent:
     r"""The canonical owned real algebraic numbers ``AA``."""
     return _OwnedRingParent(SageAA, named_placement=_real_algebraic_placements)
+
+
+@cached_function(key=lambda characteristic: int(characteristic))
+def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+    r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+    from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+
+    engine = AlgebraicClosureFiniteField(int(characteristic))
+    return _OwnedRingParent(
+        engine,
+        named_placement=_algebraic_closure_finite_field_placements,
+    )
 
 
 def _owned_algebraic_numbers() -> _OwnedRingParent:
