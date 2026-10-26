@@ -774,7 +774,18 @@ class _AbsoluteGaloisGroupEngine:
         field_engine, embedding_engine = _engine_ring(self._closure).subfield(
             total_degree
         )
-        extension_field = _own_ring(field_engine)
+        # The subfield is defined by its finite-field characteristic, selected
+        # variable label and exact modulus. Raise those data through the named
+        # finite-field constructor rather than adopting the native parent.
+        from sage_extensions.categories.rings.ring_foundation import (
+            _finite_field_with_modulus,
+        )
+
+        extension_field = _finite_field_with_modulus(
+            int(field_engine.characteristic()),
+            field_engine.variable_name(),
+            tuple(int(coefficient) for coefficient in field_engine.modulus().list()),
+        )
         closure_embedding = extension_field.Mor(self._closure)(embedding_engine)
         return self.extension_data(extension_field, embedding=closure_embedding)
 
@@ -1014,7 +1025,11 @@ class _OpenAbsoluteGaloisSubgroupEngine(_AbsoluteGaloisGroupEngine):
         normal_engine, base_backend = polynomial.splitting_field(
             "normal_closure", map=True
         )
-        normal_field = _own_ring(normal_engine)
+        from sage_extensions.categories.rings.number_fields import (
+            _number_field_from_engine,
+        )
+
+        normal_field = _number_field_from_engine(normal_engine)
         # K -> N on N's own realization (generator to generator).
         base_backend = (
             _engine_number_field_isomorphism(normal_engine, _engine_ring(normal_field))

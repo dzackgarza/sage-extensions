@@ -41,6 +41,8 @@ from sage.categories.rings import Rings as _SageRings
 from sage.misc.cachefunc import cached_function, cached_method
 from sage.rings.integer import Integer as SageInteger
 from sage.rings.integer_ring import ZZ as SageZZ
+from sage.rings.polynomial.multi_polynomial_ring_base import MPolynomialRing_base
+from sage.rings.polynomial.polynomial_ring import PolynomialRing_generic
 from sage.schemes.affine.affine_space import AffineSpace as _SageAffineSpace
 from sage.schemes.generic.algebraic_scheme import (
     AlgebraicScheme_quasi as _SageAlgebraicSchemeQuasi,
@@ -4777,6 +4779,14 @@ def _projective_equation_family(equations):
     for equation in equations:
         parent = equation.parent()
         match parent:
+            case PolynomialRing_generic() | MPolynomialRing_base():
+                # Homogeneous polynomial equations retain their selected
+                # coefficient ring and ordered variable names; reconstruct
+                # that polynomial ring rather than adopting this engine parent.
+                owned = _own_ring(parent.base_ring()).polynomial_ring(
+                    tuple(parent.variable_names())
+                )
+                raised.append(_owned_engine_element(owned, equation))
             case _ if parent in _SageRings():
                 owned = _own_ring(parent)
                 raised.append(_owned_engine_element(owned, equation))

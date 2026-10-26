@@ -247,10 +247,38 @@ def _order_in(field, engine_order):
     """
     if field is _owned_rationals():
         return _owned_integers()
-    assert _engine_ring(field) is engine_order.number_field(), (
+    canonical_field = _engine_ring(field)
+    source_field = engine_order.number_field()
+    if source_field is not canonical_field:
+        transport = _engine_number_field_isomorphism(source_field, canonical_field)
+        engine_order = canonical_field.order(
+            [transport(element) for element in engine_order.basis()]
+        )
+    assert engine_order.number_field() is canonical_field, (
         f"{engine_order} is not an order of {field}"
     )
-    return _OwnedRingParent(engine_order, named_placement=_order_placements)
+    # The cache key is the lattice in the canonical power basis, not the
+    # supplied Sage order object. Rebuild from the echelonized lattice rows so
+    # two engine orders with the same lattice cannot select different bases
+    # merely because they arrived with different generator families.
+    lattice_rows = _power_basis_lattice(engine_order)
+    canonical_generators = tuple(
+        sum(
+            (canonical_field(row[position]) * canonical_field.gen() ** position
+             for position in range(len(row))),
+            canonical_field.zero(),
+        )
+        for row in lattice_rows
+    )
+    canonical_order = canonical_field.order(canonical_generators)
+    assert _power_basis_lattice(canonical_order) == lattice_rows, (
+        f"reconstructing the canonical lattice rows changed the order lattice of {engine_order}"
+    )
+    return _OwnedRingParent(
+        canonical_order,
+        named_placement=_order_placements,
+        order_basis=tuple(canonical_order.basis()),
+    )
 
 
 def _order_from_engine(engine_order):
