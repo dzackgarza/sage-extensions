@@ -723,7 +723,14 @@ class SchemeMorphismMethods:
         self._toric_chart_targets = toric_chart_targets
         self._toric_chart_pullbacks = toric_chart_pullbacks
         self._affine_quotient_base_change_datum = affine_quotient_base_change_data
-        super().__init__(parent)
+        # A morphism of locally ringed spaces is a pair (f, f^#); its continuous
+        # map f is the point map this arrow defines in ``_call_`` (contraction of
+        # primes along the coordinate pullback). The set map is lazy: it stores
+        # the callable and evaluates nothing at construction.
+        super().__init__(
+            parent,
+            Sets().Mor(parent.domain(), parent.codomain())(lambda point: self(point)),
+        )
 
     def with_cone_construction(self, construction):
         r"""This morphism, retaining the universal cone it was induced by."""
