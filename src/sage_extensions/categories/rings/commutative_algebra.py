@@ -3754,11 +3754,12 @@ def _quotient_ring(source, defining_ideal):
                 prime_power = SageZZ(modulus).is_prime_power(get_data=True)
                 if prime_power and int(prime_power[1]) > 1:
                     prime, _exponent = prime_power
+                    owned_prime = _owned_engine_element(_owned_integers(), prime)
                     maximal_ideal = CommutativeIdeals(quotient).Maximal()(
-                        quotient(_owned_integers()(prime))
+                        quotient(owned_prime)
                     )
                     residue_field = _owned_integers().quotient_ring(
-                        _owned_integers().ideal(_owned_integers()(prime))
+                        _owned_integers().ideal(owned_prime)
                     )
                     residue_map = quotient.Mor(residue_field)(
                         lambda element: residue_field(element.lift())
