@@ -1141,21 +1141,6 @@ class LocalizationRings(OwnedCategory):
     class ParentMethods:
         _derived_construction_parameters = frozenset({"base_ring"})
 
-        def base_ring(self):
-            r"""The retained scalar base of this localization as a ring object.
-
-            Localization category placement can be deferred until its native
-            regular module is installed. In that phase the algebra category
-            that normally supplies ``base_ring`` is deliberately absent, so
-            derive the same value from the retained source algebra instead of
-            accidentally treating the localization as an algebra over itself.
-            A source with no selected scalar algebra remains self-based.
-            """
-            algebra_source = getattr(self, "algebra_source", None)
-            if algebra_source is not None:
-                return algebra_source.base_ring()
-            return self
-
         def _cardinality_decision(self):
             r"""Supply the cardinality for a zero source or an integral-domain source.
 
@@ -1282,6 +1267,7 @@ class LocalizationRings(OwnedCategory):
         ) -> None:
             self._localization_source = source
             self._localization_submonoid = submonoid
+            self.algebra_source = algebra_source
             self._localization_engine_source_decoder = _engine_source_decoder
             self._localization_engine_source_encoder = _engine_source_encoder
             self._preamble_engine_ring = _engine_ring
@@ -1303,7 +1289,14 @@ class LocalizationRings(OwnedCategory):
             super().__init__(
                 base_ring=coefficient_base,
                 _engine_product=lambda left, right: LocalizationRings.ElementMethods._mul_(left, right),
-                _engine_scalar_action=lambda scalar, element: LocalizationRings.ElementMethods._mul_(self(scalar), self(element)),
+                _engine_scalar_action=lambda scalar, element: LocalizationRings.ElementMethods._mul_(
+                    self(
+                        algebra_source._owned_scalar_multiple(scalar, algebra_source.one())
+                        if algebra_source is not None
+                        else source(scalar)
+                    ),
+                    self(element),
+                ),
                 _engine_unit=lambda algebra: LocalizationRings.ParentMethods.one(algebra),
                 **rest,
             )
