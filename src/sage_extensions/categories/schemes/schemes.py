@@ -812,6 +812,9 @@ class SchemeMorphismMethods:
         return self._finite_atlas
 
     def local_maps(self):
+        r"""The restrictions of this map to the charts of its glued or atlas domain."""
+        if self._gluing_role == "glued_domain":
+            return self.glued_local_maps()
         if self._gluing_role != "finite_atlas":
             raise AttributeError(
                 f"{self} is not represented by local maps on a finite atlas"
@@ -819,11 +822,14 @@ class SchemeMorphismMethods:
         return self._atlas_local_maps
 
     def local_map(self, index):
+        r"""The restriction of this map to the chart ``index`` of its domain."""
         if self._toric_lattice_morphism is not None:
             target_embedding = (
                 self.codomain().gluing_datum().chart_embedding(self.chart_target(index))
             )
             return target_embedding * self.chart_morphism(index)
+        if self._gluing_role == "glued_domain":
+            return self.glued_local_map(index)
         return self.local_maps()[self.atlas().normalize_chart_index(index)]
 
     def glued_local_maps(self):
@@ -1203,7 +1209,7 @@ class SchemeMorphismMethods:
                 .projectivization_projection()
             ):
                 return self.comparison().square_composite()
-            return super().__mul__(other)
+            return self._composite_of_represented_data(other)
         if self._gluing_role == "glued_domain":
             if (
                 not isinstance(other, SchemeMorphismMethods)
@@ -1235,7 +1241,6 @@ class SchemeMorphismMethods:
                 return NotImplemented
             from sage_extensions.categories.schemes.gluing import (
                 _glued_scheme_chart_map,
-                _scheme_composition_mor,
             )
 
             return _glued_scheme_chart_map(
@@ -1249,7 +1254,6 @@ class SchemeMorphismMethods:
                 return NotImplemented
             from sage_extensions.categories.schemes.gluing import (
                 _glued_scheme_chart_map,
-                _scheme_composition_mor,
             )
 
             return _glued_scheme_chart_map(
@@ -1262,7 +1266,7 @@ class SchemeMorphismMethods:
                 return NotImplemented
             return _projective_coordinate_morphism(self) * other
         if self._homogeneous_coordinates is None:
-            return super().__mul__(other)
+            return self._composite_of_represented_data(other)
         assert other.codomain() is self.domain(), (
             f"{self} and {other} are not composable"
         )
@@ -1366,7 +1370,9 @@ class SchemeMorphismMethods:
             if after.domain() is not self.codomain():
                 return NotImplemented
             return after.local_map(self.chart_index()) * self.chart_map()
-        return NotImplemented
+        # No representation-specific composite: the caller composes the
+        # represented data.
+        return None
 
     def __eq__(self, other):
         if self._toric_lattice_morphism is not None:
@@ -1529,7 +1535,7 @@ class SchemeMorphismMethods:
                 and self.codomain() is other.codomain()
             )
         if self._homogeneous_coordinates is None:
-            return super().__eq__(other)
+            return self._equality_of_represented_data(other)
         if self is other:
             return True
         if (
@@ -1680,8 +1686,8 @@ class SchemeMorphismMethods:
             return construction.leg_of_projection(self)
         return None
 
-    def __mul__(self, other):
-        r"""``self o other``, composition of scheme morphisms.
+    def _composite_of_represented_data(self, other):
+        r"""``self o other`` when no representation of ``self`` has its own composite.
 
         The identity is a two-sided unit; ``Spec R`` is terminal in ``Sch/R``,
         so a composite landing there is the structure morphism of its domain;
@@ -1770,10 +1776,6 @@ class SchemeMorphismMethods:
     def _is_the_identity(self) -> bool:
         r"""Whether this morphism is its Mor object's selected identity."""
         return self.domain() is self.codomain() and self is self.parent().identity()
-
-    def _postcompose_with(self, after):
-        r"""``after o self`` for a representation with its own composite, else ``None``."""
-        return
 
     def compose(self, before):
         return self * before
@@ -2191,8 +2193,10 @@ class SchemeMorphismMethods:
             **presheaves.presheaf_datum(bundle.open_sections_presheaf()),
         )
 
-    def __eq__(self, other) -> bool:
+    def _equality_of_represented_data(self, other) -> bool:
         r"""Decide equality on represented pullbacks, else on the native realizations.
+
+        The equality of every representation without its own comparison.
 
         Two affine morphisms are equal when their pullbacks agree on a set of
         elements on which maps out of the codomain algebra are determined; a
