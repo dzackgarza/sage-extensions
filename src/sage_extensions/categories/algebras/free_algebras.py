@@ -276,6 +276,7 @@ class _NativeFreeAlgebraParent(_NativeMonomialEvaluation, _OwnedAlgebraParent):
             algebra_generating_family=algebra_generators,
             algebra_framing_source=self,
             algebra_framing_owner=framing_owner,
+            constructing_category=algebra_category,
             ring_placement=ring_placement,
         )
         # Algebras.ParentMethods.__init__, entered through the common parent
