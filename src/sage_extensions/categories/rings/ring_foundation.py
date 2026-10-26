@@ -2648,6 +2648,27 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
     class Division(CategoryWithAxiom):
         r"""Nontrivial rings in which every nonzero element is a unit."""
 
+        def __contains__(self, candidate):
+            r"""Ask fieldhood for a commutative ring without changing its placement.
+
+            A commutative division ring is a field. The ring's field decision
+            supplies that proposition; the intersection below only checks any
+            further axioms requested by this category, and is not installed
+            on the candidate.
+            """
+            if Category.__contains__(self, candidate):
+                return True
+            if not Category.__contains__(OwnedRings().Commutative(), candidate):
+                return False
+            if candidate._field_decision() is not True:
+                return False
+            from sage_extensions.owned_category import owned_category_join
+
+            stated = owned_category_join((
+                candidate.category(), OwnedRings().Division().Commutative(),
+            ))
+            return stated.is_subcategory(self)
+
         @classmethod
         def _repr_object_names(cls):
             return "division rings"
@@ -2671,6 +2692,9 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
             Fields are a full subcategory of rings, so a map of fields is a
             ring map and this category inherits the ring ``Mor``.
             """
+
+            def __contains__(self, candidate):
+                return OwnedRings.Division.__contains__(self, candidate)
 
             @classmethod
             def _repr_object_names(cls):

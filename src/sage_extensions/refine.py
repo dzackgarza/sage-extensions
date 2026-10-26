@@ -229,7 +229,7 @@ def owned_parent_class(implementation: type, category: Category) -> type:
     }
     preferred = {}
     seen = set()
-    for provider in reversed(providers):
+    for provider in providers:
         for name, value in vars(provider).items():
             if name.startswith("_") or name in seen:
                 continue

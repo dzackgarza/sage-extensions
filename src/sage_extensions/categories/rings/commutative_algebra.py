@@ -3602,12 +3602,12 @@ def _quotient_ring(source, defining_ideal):
             # principal generator of their ideal. A maximal ideal need not
             # have a one-element selected generating family, so normalize the
             # whole family before entering the canonical number-field owner.
-            generator = generators[0]
+            generator = _engine_element(source, generators[0])
             for other in generators[1:]:
-                generator = generator.gcd(other)
+                generator = generator.gcd(_engine_element(source, other))
             from sage_extensions.categories.rings.number_fields import _number_field_of
 
-            return _number_field_of(generator.monic())
+            return _number_field_of(_owned_engine_element(source, generator.monic()))
 
     exact_source_quotient = (
         source in LocalizationRings() or _engine_ring(source) is source
