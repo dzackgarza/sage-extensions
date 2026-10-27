@@ -5316,6 +5316,7 @@ class Schemes(OwnedCategoryOverBaseRing):
                 *equations,
                 placements=(),
                 _object_engine=None,
+                _weighted_homogeneous=False,
                 construction_data=None,
                 **level_data,
             ):
@@ -5334,6 +5335,7 @@ class Schemes(OwnedCategoryOverBaseRing):
                     equations,
                     placements=placements,
                     _object_engine=_object_engine,
+                    _weighted_homogeneous=_weighted_homogeneous,
                     construction_data=construction_data,
                     **level_data,
                 )
@@ -5346,6 +5348,7 @@ def _projective_closed_subscheme(
     *,
     _engine=None,
     _object_engine=None,
+    _weighted_homogeneous=False,
     construction_data=None,
     **level_data,
 ):
@@ -5356,7 +5359,9 @@ def _projective_closed_subscheme(
     such as the complete-intersection criterion.  No owned provisional
     scheme is allocated to make that decision.
     """
-    equations = _projective_equation_family(_equation_family(equations))
+    equations = _projective_equation_family(
+        _equation_family(equations), require_ordinary_homogeneity=not _weighted_homogeneous
+    )
     base = ambient.scheme_base_ring()
     engine = (
         _engine_projective_subscheme(_engine_scheme(ambient), equations)
@@ -5435,7 +5440,7 @@ def _equation_family(equations):
     return finite_family(tuple(_family_ingress(equations)), name="Defining equations")
 
 
-def _projective_equation_family(equations):
+def _projective_equation_family(equations, *, require_ordinary_homogeneity=True):
     r"""Raise engine-ring equations into the owned ring of that engine; keep owned ones.
 
     A homogeneous equation already in an owned polynomial ring is retained as
@@ -5460,7 +5465,7 @@ def _projective_equation_family(equations):
                 raised.append(_owned_engine_element(owned, equation))
             case _:
                 raised.append(equation)
-    assert all(equation.is_homogeneous() for equation in raised), (
+    assert not require_ordinary_homogeneity or all(equation.is_homogeneous() for equation in raised), (
         f"cannot form a closed subscheme of a projective scheme from the equations "
         f"{tuple(raised)}: the equations must be homogeneous, and "
         f"{next(equation for equation in raised if not equation.is_homogeneous())} is not"

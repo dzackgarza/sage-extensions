@@ -372,33 +372,24 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
             # weight-one coordinate is the cone coordinate and does not occur
             # in the equation.  The four branch points are distinct, so the
             # double cover of P^1 is a smooth genus-one curve.
-            from sage_extensions.categories.schemes.toric.fans import RationalPolyhedralFans
-
             base = self.base_ring()
-            lattice = _owned_integers().free_module(3)
-            ambient = RationalPolyhedralFans(lattice).weighted_projective_space_fan(
-                (1, 1, 2, 1)
-            ).toric_variety(base)
-            # The fan realization is toric, separated and finite type, but
-            # ToricSchemes deliberately does not infer projectivity from its
-            # fan.  This weighted-projective fan is projective by construction;
-            # add that actual scheme placement before using the projective
-            # closed-subscheme owner for the homogeneous quartic.
+            from sage.schemes.toric.library import toric_varieties
             from sage_extensions.categories.schemes.schemes import Schemes, _scheme_with_structure
-            from sage_extensions.categories.schemes.toric.toric_schemes import ToricSchemes
 
-            ambient = _scheme_with_structure(
-                ambient,
-                owned_category_join((ToricSchemes(base), Schemes(base).Projective())),
+            # Use Sage's native realization of the same weighted projective
+            # ambient directly.  The generic projective-scheme owner then
+            # constructs the hypersurface; going through the fan's full
+            # affine-atlas gluing needlessly constructs all chart transitions
+            # before the single global homogeneous equation is imposed.
+            native_ambient = toric_varieties.WP(1, 1, 2, 1)
+            ambient = _object_of(
+                Schemes(base).Projective(),
+                scheme_base_ring=base,
+                scheme_engine=native_ambient,
             )
-            cox = ambient.cox_ring()
-            labels = tuple(str(label) for label in cox.algebra_generating_set())
-            assert labels == ("x0", "x1", "x2", "x3"), (
-                f"the weighted-projective Cox presentation must retain its four coordinate labels, got {labels}"
-            )
-            x, z, y, _cone = (cox.algebra_generator(label) for label in labels)
+            x, z, y, _cone = native_ambient.coordinate_ring().gens()
             equation = y**2 - x * z * (x - z) * (x + z)
-            surface = ambient.closed_subscheme(equation)
+            surface = ambient.closed_subscheme(equation, _weighted_homogeneous=True)
             from sage_extensions.categories.divisors.weil_divisor_groups import WeilDivisorGroups
             from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
 
