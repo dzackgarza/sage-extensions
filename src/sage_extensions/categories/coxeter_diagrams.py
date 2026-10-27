@@ -1434,7 +1434,18 @@ class CoxeterDiagrams(OwnedCategory):
 
 def _root_basis_diagram(roots, names=None, positions=None, type_label=None):
     r"""Return the rooted diagram of the owned family ``roots``, named ``type_label`` when it is the diagram of a type."""
-    roots = finite_indexed_family_from_values(None, roots)
+    # Rooted-diagram callers commonly already have a labelled IndexedFamily.
+    # Rewrapping it creates a new callback-backed family and then probes that
+    # callback for constancy/category evidence, repeatedly evaluating costly
+    # metric-dual root constructions. Preserve the selected family verbatim;
+    # only literal iterables need to be interpreted here.
+    if not isinstance(roots, IndexedFamily):
+        roots = finite_indexed_family_from_values(None, roots)
+    else:
+        from sage_extensions.categories.sets.set_categories import EnumeratedSets
+
+        assert roots.cardinality().is_finite() is True
+        assert roots.index_set() in EnumeratedSets()
     assert roots.cardinality() != 0, (
         "cannot form a Coxeter diagram from roots: no roots were given, and the "
         "diagram needs at least one to determine its lattice"
