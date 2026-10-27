@@ -4433,6 +4433,7 @@ class Lattices(OwnedCategoryOverBaseRing):
 
             return _discriminant_of_gram(self.gram_tensor())
 
+        @cached_method
         def determinant(self):
             r"""Return the determinant of a finite-rank lattice form."""
             assert self.module_rank().is_finite(), (
