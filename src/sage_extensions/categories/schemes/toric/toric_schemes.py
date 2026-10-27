@@ -188,6 +188,7 @@ def _affine_chart(cone, base_ring):
     return (_semigroup_algebra(cone, base_ring)).affine_spectrum(base_ring=base_ring)
 
 
+@cached_function
 def _face_localization(face, cone, base_ring):
     r"""``U_tau = D(chi^{m_sigma})`` inside ``U_sigma`` for a face ``tau`` of ``sigma``."""
     chart = _affine_chart(cone, base_ring)
