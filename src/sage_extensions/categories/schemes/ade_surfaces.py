@@ -465,7 +465,7 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
         # the pair's log_scheme accessor again during line-bundle construction.
         branch_line_bundle = surface.invertible_sheaf_of_divisor(branch_class)
         return ToricLogPairs(self.base_ring())(
-            pair.log_scheme(),
+            surface,
             pair.blue_divisor(),
             _engine=_AT21ToricADEPairEngine,
             construction_data={
