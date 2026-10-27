@@ -9,7 +9,11 @@ ADE shapes) ``C`` has exactly two components.
 """
 
 from sage_extensions.all import *
-from sage_extensions.categories.schemes.ade_surfaces import _validated_at21_low_level_variant
+from sage_extensions.categories.schemes.ade_surfaces import (
+    _ade_polygon_data,
+    _polygon_side_decorations,
+    _validated_at21_low_level_variant,
+)
 
 
 def _blue_component_count(pair):
