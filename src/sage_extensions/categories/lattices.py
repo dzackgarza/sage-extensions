@@ -1102,7 +1102,8 @@ def _genus_classes(gram):
     under improper equivalence.  In rank at least ``3`` one seed per
     improper spinor genus is a chain of ``p``-neighbours along a subset of
     Sage's spinor generators.  An indefinite spinor genus of rank at least
-    ``3`` is one class [CS10, Ch. 15, §9.1, Thm. 14, p. 388].  A definite
+    ``3`` is one class when the rational quadratic space is isotropic
+    [CS10, Ch. 15, §9.1, Thm. 14, p. 388].  A definite
     spinor genus is enumerated by ``p``-neighbours at a prime ``p`` not
     dividing the determinant, with ``p`` in the improper spinor kernel so
     that neighbours stay in the spinor genus.  The masses of the classes
