@@ -10,6 +10,8 @@ ADE shapes) ``C`` has exactly two components.
 
 from sage_extensions.all import *
 from sage_extensions.categories.schemes.ade_surfaces import (
+    _a_family_polygon_data,
+    _ade_parameter,
     _ade_polygon_data,
     _polygon_side_decorations,
     _validated_at21_low_level_variant,
