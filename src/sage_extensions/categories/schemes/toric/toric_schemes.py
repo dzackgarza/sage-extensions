@@ -234,8 +234,8 @@ def _character_on_overlap(character, face, cone, base_ring):
     # without repeated cone-membership tests and character allocations.
     pairings = tuple(
         (
-            int(_pairing_on_ray(cone.parent(), character, ray)),
-            int(_pairing_on_ray(cone.parent(), supporting, ray)),
+            int(cone.parent().character_cocharacter_value(character, ray)),
+            int(cone.parent().character_cocharacter_value(supporting, ray)),
         )
         for ray in cone.rays()
     )
