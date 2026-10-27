@@ -159,6 +159,7 @@ def _face_supporting_character_monomial(face, cone, chart):
     return monomial
 
 
+@cached_function
 def _character_monomial(character, cone, chart):
     r"""The monomial ``chi^m`` in ``k[S_sigma]`` of a character of ``S_sigma``.
 
