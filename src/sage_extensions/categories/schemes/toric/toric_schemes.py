@@ -151,12 +151,16 @@ def _face_supporting_character_monomial(face, cone, chart):
     product of the corresponding variables with no integer program to solve.
     """
     algebra = chart.coordinate_algebra()
+    presentation = algebra.presentation_ring()
     labels = tuple(algebra.algebra_generating_set())
     ranking = cone.semigroup_generators().ranking_map()
-    monomial = algebra.one()
+    monomial = presentation.one()
     for generator in cone.face_supporting_generators(face):
-        monomial = monomial * algebra.algebra_generator(labels[int(ranking(generator))])
-    return monomial
+        monomial *= presentation.algebra_generator(labels[int(ranking(generator))])
+    # Multiply in the polynomial presentation, then descend once. Multiplying
+    # in the quotient after every factor repeatedly reduces intermediate
+    # monomials modulo the toric ideal, although only the final class is needed.
+    return algebra.algebra_presentation_morphism()(monomial)
 
 
 @cached_function
@@ -170,19 +174,16 @@ def _character_monomial(character, cone, chart):
     \(k[S_\sigma]\) (CLS Prop. 1.1.9).
     """
     algebra = chart.coordinate_algebra()
+    presentation = algebra.presentation_ring()
     labels = tuple(algebra.algebra_generating_set())
-    factors = []
+    monomial = presentation.one()
     for position, multiplicity in enumerate(cone.semigroup_coefficients(character)):
         exponent = int(multiplicity)
         if exponent:
-            generator = algebra.algebra_generator(labels[position])
-            factors.append(generator if exponent == 1 else generator**exponent)
-    if not factors:
-        return algebra.one()
-    monomial = factors[0]
-    for factor in factors[1:]:
-        monomial = monomial * factor
-    return monomial
+            monomial *= presentation.algebra_generator(labels[position]) ** exponent
+    # Descend the complete monomial once, rather than reducing each product in
+    # the quotient algebra. This preserves its exact class in k[S_sigma].
+    return algebra.algebra_presentation_morphism()(monomial)
 
 
 @cached_function
