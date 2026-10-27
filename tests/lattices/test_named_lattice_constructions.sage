@@ -71,6 +71,10 @@ def test_the_dolgachev_pinkham_dual_lattice_retains_its_metric_form() -> None:
         ],
     )
     labels = tuple(lattice.module_generating_set())
+    assert tuple(map(str, labels)) == (
+        "e", "f", "ep", "fp", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8",
+        "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8",
+    )
     dual_gram = matrix(
         SageQQ,
         [
