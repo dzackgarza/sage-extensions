@@ -751,6 +751,9 @@ class ConvexPolytopes(OwnedParameterizedCategory):
                     lambda index: vertices[int(index)],
                     index_of=index_of,
                     contains=contains,
+                    equivalent=lambda left, right: (
+                        self.rational_point(left) == self.rational_point(right)
+                    ) is True,
                 )
             rationals = _owned_rationals()
             return finite_ordered_set(

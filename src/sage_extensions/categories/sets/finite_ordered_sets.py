@@ -66,6 +66,7 @@ class OrderedEnumeratedSets(OwnedCategory):
         *,
         index_of: Callable[[PointT], IndexT | None],
         contains: Callable[[PointT], bool] | None = None,
+        equivalent: Callable[[PointT, PointT], bool] | None = None,
         name: str | None = None,
     ) -> Sets().ObjectType:
         r"""Construct an ordered enumerated set from its chosen enumeration."""
@@ -75,7 +76,8 @@ class OrderedEnumeratedSets(OwnedCategory):
         match index_set:
             case _ if Sets().is_provably_finite(index_set):
                 return FiniteOrderedSets().from_indexed(
-                    index_set, element_at, index_of=index_of, contains=contains, name=name
+                    index_set, element_at, index_of=index_of, contains=contains,
+                    equivalent=equivalent, name=name
                 )
             case _ if index_set in Sets().Infinite():
                 placement = owned_category_join((self, Sets().Infinite()))
@@ -98,6 +100,7 @@ class OrderedEnumeratedSets(OwnedCategory):
             *,
             index_of: Callable[[PointT], IndexT | None],
             contains: Callable[[PointT], bool] | None = None,
+            equivalent: Callable[[PointT, PointT], bool] | None = None,
             name: str | None = None,
             **rest,
         ) -> None:
@@ -113,6 +116,7 @@ class OrderedEnumeratedSets(OwnedCategory):
             self._element_at_function = element_at
             self._index_of_function = index_of
             self._contains_function = contains
+            self._equivalent_function = equivalent or (lambda left, right: left == right)
             self._name = name
             super().__init__(facade=True, **rest)
 
@@ -224,7 +228,7 @@ class OrderedEnumeratedSets(OwnedCategory):
             if admissible_index is not True:
                 raise ValueError(f"the proposed index {index!r} of {element!r} is not established in {self.index_set()}")
             image = self._element_at_function(self.index_set()(index))
-            equal = True if image is element else image == element
+            equal = True if image is element else self._equivalent_function(image, element)
             if equal is not True:
                 raise ValueError(f"the proposed index of {element!r} does not establish the forward equation")
             return image
@@ -355,6 +359,7 @@ class FiniteOrderedSets(OwnedCategory):
         *,
         index_of: Callable[[PointT], IndexT | None] | None = None,
         contains: Callable[[PointT], bool] | None = None,
+        equivalent: Callable[[PointT, PointT], bool] | None = None,
         name: str | None = None,
     ) -> ObjectOfCategory:
         r"""Construct the finite ordered set enumerated by ``element_at`` on ``index_set``.
@@ -460,6 +465,7 @@ class FiniteOrderedSets(OwnedCategory):
             element_at=element_at,
             index_of=index_of,
             contains=contains,
+            equivalent=equivalent,
             name=name,
         )
 
