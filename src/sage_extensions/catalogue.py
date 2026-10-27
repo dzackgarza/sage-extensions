@@ -66,6 +66,18 @@ def _E8g():
     return NamedLattices.E8.gram_tensor()
 
 
+def _E8g_sage_basis_order():
+    r"""Return the E8 Gram tensor in Sage's integral-lattice basis order.
+
+    The owned E8 Cartan construction numbers its chain from the opposite end
+    of Sage's ``IntegralLattice('E8')`` basis.  The permutation below changes
+    only the basis order, not the isometry class or the form.
+    """
+    gram = _E8g()
+    order = (0, 7, 1, 2, 3, 4, 5, 6)
+    return tensor(ZZ, (), (8, 8), [[gram[i, j] for j in order] for i in order])
+
+
 class NamedLattices:
     r"""The named lattices, each constructed when its name is first read.
 
@@ -158,9 +170,9 @@ class NamedLattices:
     @lazy_class_attribute
     def Tco(cls):
         return _C(
-            _block_gram(_rank_one_2, 2 * _Ug(), 2 * _E8g()),
-            names="h,ep,fp,a1,a3,a4,a5,a6,a7,a8,a2",
-            module_generators=("h", "ep", "fp", "a1", "a3", "a4", "a5", "a6", "a7", "a8", "a2"),
+            _block_gram(_rank_one_2, 2 * _Ug(), 2 * _E8g_sage_basis_order()),
+            names="h,ep,fp,a1,a2,a3,a4,a5,a6,a7,a8",
+            module_generators=("h", "ep", "fp", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"),
         )
 
     @lazy_class_attribute
@@ -170,17 +182,17 @@ class NamedLattices:
     @lazy_class_attribute
     def TEn(cls):
         return _C(
-            _block_gram(_Ug(), 2 * _Ug(), 2 * _E8g()),
-            names="e,f,ep,fp,a1,a3,a4,a5,a6,a7,a8,a2",
-            module_generators=("e", "f", "ep", "fp", "a1", "a3", "a4", "a5", "a6", "a7", "a8", "a2"),
+            _block_gram(_Ug(), 2 * _Ug(), 2 * _E8g_sage_basis_order()),
+            names="e,f,ep,fp,a1,a2,a3,a4,a5,a6,a7,a8",
+            module_generators=("e", "f", "ep", "fp", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"),
         )
 
     @lazy_class_attribute
     def TdP(cls):
         return _C(
-            _block_gram(_Ug(), 2 * _Ug(), _E8g(), _E8g()),
-            names=("e,f,ep,fp,a1,a3,a4,a5,a6,a7,a8,a2,b1,b3,b4,b5,b6,b7,b8,b2"),
-            module_generators=("e", "f", "ep", "fp", "a1", "a3", "a4", "a5", "a6", "a7", "a8", "a2", "b1", "b3", "b4", "b5", "b6", "b7", "b8", "b2"),
+            _block_gram(_Ug(), 2 * _Ug(), _E8g_sage_basis_order(), _E8g_sage_basis_order()),
+            names=("e,f,ep,fp,a1,a2,a3,a4,a5,a6,a7,a8,b1,b2,b3,b4,b5,b6,b7,b8"),
+            module_generators=("e", "f", "ep", "fp", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8"),
         )
 
     @lazy_class_attribute
