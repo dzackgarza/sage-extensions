@@ -1,0 +1,55 @@
+name: Research issue 564 on an exact Sage source image
+
+on:
+  workflow_dispatch:
+    inputs:
+      sage_source_sha:
+        description: Full 40-character Sage fork commit whose isolated spinor image was published
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  spinor-generator-acceptance:
+    name: Public spinor-genus assertion on pinned Sage source
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/dzackgarza/sage:spinor-${{ inputs.sage_source_sha }}
+    timeout-minutes: 30
+    steps:
+      - name: Validate exact Sage revision and image identity
+        env:
+          SAGE_SOURCE_SHA: ${{ inputs.sage_source_sha }}
+        run: |
+          case "$SAGE_SOURCE_SHA" in
+            *[!0-9a-fA-F]*|'') echo "sage_source_sha must be a full commit SHA" >&2; exit 1 ;;
+          esac
+          test "${#SAGE_SOURCE_SHA}" -eq 40
+          test "$SAGE_BIN" = /sage/.venv/bin/sage
+          "$SAGE_BIN" --version
+          printf '%s\n' "Expected source revision: $SAGE_SOURCE_SHA"
+
+      - name: Check out public consumer assertions
+        uses: actions/checkout@v4
+
+      - name: Install the checked-out sage-extensions source
+        run: "$SAGE_BIN" -pip install --no-deps -e .
+
+      - name: Install the Sage pytest collector plugin
+        uses: actions/checkout@v4
+        with:
+          repository: dzackgarza/ai-review-ci
+          ref: main
+          path: .qc-infra
+
+      - name: Run the unchanged published four-spinor-genus assertion
+        env:
+          PYTHONPATH: ${{ github.workspace }}/.qc-infra/scripts/pytest_plugins
+        run: >-
+          "$SAGE_BIN" -python -m pytest
+          -p qc_sage_session
+          tests/lattices/test_genus.sage
+          -k test_published_four_spinor_genus_is_counted_from_all_generators
