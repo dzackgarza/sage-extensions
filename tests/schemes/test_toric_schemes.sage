@@ -115,6 +115,25 @@ def test_the_chart_of_the_a_one_cone_is_the_quadric_cone() -> None:
     assert not variety.is_smooth()
 
 
+def test_singular_rank_two_cone_coefficients_reconstruct_hilbert_generators() -> None:
+    r"""Exact unimodular-pair coordinates expand each Hilbert generator itself."""
+    fan = _plane_fans()((((0, 1), (2, -1)),))
+    cone = fan.maximal_cones()[0]
+    assert cone.dimension() == 2
+    assert not cone.is_smooth()
+    generators = tuple(cone.semigroup_generators())
+    zero = cone.character_lattice().zero()
+
+    for character in generators:
+        coefficients = cone.semigroup_coefficients(character)
+        assert all(int(coefficients[generator]) >= 0 for generator in generators)
+        reconstructed = sum(
+            (int(coefficients[generator]) * generator for generator in generators),
+            zero,
+        )
+        assert reconstructed == character
+
+
 
 
 

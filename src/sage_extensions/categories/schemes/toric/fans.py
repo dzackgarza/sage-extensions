@@ -599,6 +599,45 @@ class RationalPolyhedralFans(OwnedParameterizedCategory):
                         ),
                         name="Semigroup multiplicities of a character",
                     )
+            # In rank two, the Hilbert basis of a pointed saturated cone is
+            # ordered along its boundary and every adjacent pair is a lattice
+            # basis. Consequently every lattice point in the cone lies in a
+            # unimodular cone spanned by two Hilbert generators. Solve the two
+            # coordinates by Cramer's rule, selecting any pair with nonnegative
+            # coefficients. This is an exact finite search, avoiding Sage's
+            # general integer program on the singular surface cones that occur
+            # in AT21.
+            if int(self.lattice().module_rank()) == 2 and int(self.dimension()) == 2:
+                coordinates = tuple(
+                    tuple(
+                        int(generator.to_vector()(label))
+                        for label in self.character_lattice().module_generating_set()
+                    )
+                    for generator in generators
+                )
+                target = tuple(
+                    int(character.to_vector()(label))
+                    for label in self.character_lattice().module_generating_set()
+                )
+                for i, (x1, y1) in enumerate(coordinates):
+                    for j in range(i + 1, len(coordinates)):
+                        x2, y2 = coordinates[j]
+                        determinant = x1 * y2 - y1 * x2
+                        if abs(determinant) != 1:
+                            continue
+                        x, y = target
+                        left = (x * y2 - y * x2) // determinant
+                        right = (x1 * y - y1 * x) // determinant
+                        if left < 0 or right < 0:
+                            continue
+                        values = [integers.zero()] * len(generators)
+                        values[i] = integers(left)
+                        values[j] = integers(right)
+                        return finite_indexed_family(
+                            generators,
+                            lambda generator: values[int(generators.ranking_map()(generator))],
+                            name="Semigroup multiplicities of a character",
+                        )
             multiplicities = self._engine_cone().dual().Hilbert_coefficients(
                 list(_engine_vector(self.character_lattice(), character))
             )
