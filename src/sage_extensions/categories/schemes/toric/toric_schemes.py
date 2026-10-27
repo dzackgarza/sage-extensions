@@ -1946,9 +1946,20 @@ def _toric_variety(fan, base_ring, polarizing_polytope=None, placements=(), **le
     decided = [ToricSchemes(base)]
     if smooth:
         decided.append(GorensteinToricSchemes(base))
-    projective_fan = RationalPolyhedralFans(fan.cocharacter_lattice()).projective_space_fan()
-    if fan.is_isomorphic(projective_fan):
-        decided.append(ToricProjectiveSpaces(base))
+    # A fan isomorphic to the standard projective-space fan in dimension n
+    # must have n+1 rays and n+1 maximal cones. Use these exact combinatorial
+    # invariants to avoid running Sage's lattice fan-isomorphism search for
+    # every other fan; the isomorphism test remains the proof when the
+    # necessary counts agree.
+    if (
+        fan.rays().cardinality() == dimension + 1
+        and fan.maximal_cones().cardinality() == dimension + 1
+    ):
+        projective_fan = RationalPolyhedralFans(
+            fan.cocharacter_lattice()
+        ).projective_space_fan()
+        if fan.is_isomorphic(projective_fan):
+            decided.append(ToricProjectiveSpaces(base))
     if smooth:
         decided.append(Schemes(base).Smooth())
     if base in OwnedFields() and complete:
