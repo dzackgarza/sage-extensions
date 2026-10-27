@@ -32,7 +32,11 @@ def run_test(namespace: dict[str, object], name: str, start: float) -> None:
 
 def main() -> None:
     start = perf_counter()
-    print(f"ISSUE_388_COMMIT={os.environ.get('GITHUB_SHA', 'local-unpinned')}", flush=True)
+    print(
+        "ISSUE_388_TARGET_REVISION="
+        f"{os.environ.get('ISSUE_388_TARGET_REVISION', os.environ.get('GITHUB_SHA', 'local-unpinned'))}",
+        flush=True,
+    )
 
     named = load_tests("tests/lattices/test_named_lattice_constructions.sage")
     run_test(named, "test_the_dolgachev_pinkham_dual_lattice_retains_its_metric_form", start)

@@ -1,19 +1,12 @@
 name: Research issue 388 mathematical acceptance
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "src/sage_extensions/**"
-      - "tests/lattices/test_named_lattice_constructions.sage"
-      - "tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage"
-      - "tests/lattices/test_two_elementary.sage"
-      - "tests/lattices/test_sterk_elliptic_population_archive.sage"
-      - "tests/schemes/test_ade_pair_boundary_decomposition.sage"
-      - "tests/schemes/test_toric_schemes.sage"
-      - "tests/research_issue_388_acceptance.py"
-      - ".github/workflows/research-388-acceptance.yml"
   workflow_dispatch:
+    inputs:
+      revision:
+        description: "Exact sage-extensions commit SHA to test (not a branch name)"
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -28,13 +21,20 @@ jobs:
       - name: Checkout the exact triggering revision
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ inputs.revision }}
           fetch-depth: 1
       - name: Verify Sage and source revision
+        env:
+          ISSUE_388_TARGET_REVISION: ${{ inputs.revision }}
         run: |
+          if [[ ! "$ISSUE_388_TARGET_REVISION" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo "revision must be a full 40-character commit SHA" >&2
+            exit 1
+          fi
           sage --version
           git rev-parse HEAD
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD)" = "$(git rev-parse "$ISSUE_388_TARGET_REVISION^{commit}")"
+          echo "ISSUE_388_TARGET_REVISION=$ISSUE_388_TARGET_REVISION" >> "$GITHUB_ENV"
       - name: Execute original #388 mathematical assertions
         env:
           PYTHONPATH: src
