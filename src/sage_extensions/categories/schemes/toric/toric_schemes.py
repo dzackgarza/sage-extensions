@@ -228,6 +228,7 @@ def _character_on_overlap(character, face, cone, base_ring):
     ) * inverse**exponent
 
 
+@cached_function
 def _face_transition_morphism(face, source_cone, target_cone, base_ring):
     r"""``U_sigma cap U_tau -> U_tau cap U_sigma``, one direction of a transition.
 
