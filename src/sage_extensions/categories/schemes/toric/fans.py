@@ -553,8 +553,10 @@ class RationalPolyhedralFans(OwnedParameterizedCategory):
             monomial in the chart's coordinate algebra.  The Hilbert basis need
             not be linearly independent, so the multiplicities are not unique;
             two expansions of one ``m`` differ by the toric ideal and name the
-            same element of ``k[S_sigma]``.  The integer program that selects
-            one is Sage's ``Cone.Hilbert_coefficients``.
+            same element of ``k[S_sigma]``. In general, the integer program
+            that selects one is Sage's ``Cone.Hilbert_coefficients``; for a
+            full-dimensional smooth cone, the Hilbert basis is the dual lattice
+            basis and the unique coefficients are the ray pairings.
             """
             assert self.dual_cone_contains(character), (
                 f"the character {character} is not in the dual cone of {self}, so it is not in "
@@ -562,6 +564,41 @@ class RationalPolyhedralFans(OwnedParameterizedCategory):
             )
             integers = _integers()
             generators = self.semigroup_generators()
+            rays = self.rays()
+            # For a full-dimensional smooth cone, its primitive ray generators
+            # form a lattice basis and the Hilbert basis of the dual semigroup
+            # is the dual basis. Hence the unique coefficient of a character
+            # at the dual generator m_i is exactly <m,u_i>; Sage's general
+            # Hilbert-coefficient integer program is unnecessary in this case.
+            # Match by the exact Kronecker pairing rather than assuming the
+            # engine's Hilbert-basis order agrees with the fan's ray order.
+            if self.is_smooth() and len(rays) == int(self.lattice().module_rank()) == len(generators):
+                dual_ray = {}
+                for generator in generators:
+                    matches = tuple(
+                        ray
+                        for ray in rays
+                        if all(
+                            self.parent().character_cocharacter_value(generator, other)
+                            == (integers.one() if other == ray else integers.zero())
+                            for other in rays
+                        )
+                    )
+                    if len(matches) != 1:
+                        break
+                    dual_ray[generator] = matches[0]
+                else:
+                    return finite_indexed_family(
+                        generators,
+                        lambda generator: integers(
+                            int(
+                                self.parent().character_cocharacter_value(
+                                    character, dual_ray[generator]
+                                )
+                            )
+                        ),
+                        name="Semigroup multiplicities of a character",
+                    )
             multiplicities = self._engine_cone().dual().Hilbert_coefficients(
                 list(_engine_vector(self.character_lattice(), character))
             )
