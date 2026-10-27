@@ -2115,24 +2115,6 @@ def _toric_variety(fan, base_ring, polarizing_polytope=None, placements=(), **le
         if bool(engine_base.is_field())
         else None
     )
-    if native is not None:
-        # Over a field the exact Sage toric variety is already the selected
-        # realization.  Do not also build a second affine-chart gluing and all
-        # pairwise face-transition morphisms: that duplicates the scheme
-        # construction, and the transition machinery can dominate even small
-        # complete fans.  The fan and all proved placements remain owned data;
-        # over nonfields the gluing realization below remains necessary.
-        from sage_extensions.owned_category import _object_of, owned_category_join
-
-        category = owned_category_join((Schemes(base), *decided, *placements))
-        return _object_of(
-            category,
-            scheme_base_ring=base,
-            scheme_engine=native,
-            toric_fan=fan,
-            polarizing_polytope=polarizing_polytope,
-            **level_data,
-        )
     cones = fan.maximal_cones()
     return Schemes(base).glue_affine_atlas(
         {cone: _affine_chart(cone, base) for cone in cones},
