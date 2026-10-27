@@ -46,6 +46,8 @@ def test_the_distinguished_point_is_a_vertex_of_the_polygon() -> None:
         pair = ADELogPairs(QQ)(letter, rank)
 
         vertices = pair.polygon().vertices()
+        assert all(vertex.parent() is pair.polygon().ambient_lattice() for vertex in vertices)
+        assert pair.distinguished_point().parent() is pair.polygon().ambient_space()
         assert pair.distinguished_point() in vertices
         assert pair.distinguished_point() in pair.vertices()
         assert pair.polygon().ambient_space()((1, 1)) not in vertices
