@@ -145,6 +145,17 @@ def test_sterk_connected_elliptic_populations_match_the_committed_archive() -> N
         assert all(subdiagram.is_connected() for subdiagram in connected)
 
 
+def test_sterk_diagram_vertices_keep_the_zero_based_root_labels() -> None:
+    r"""The five published diagrams use the literal root indices ``r0,...,r(n-1)``."""
+    layouts = Sterk.diagram_layouts()
+    diagrams = Sterk.diagrams()
+    for name, layout in layouts.items():
+        expected = {f"r{index}" for index in range(len(layout))}
+        assert Set(diagrams[name].index_set()) == Set(expected)
+        assert Set(layout) == Set(range(len(layout)))
+        assert Set(diagrams[name].preferred_positions()) == Set(expected)
+
+
 def test_sterk_connected_elliptic_subdiagrams_have_the_recorded_types() -> None:
     r"""Each Sterk diagram's connected elliptic subdiagrams, counted by rank, Cartan
     letter and scale, form the multiset drawn in the committed artifacts."""
