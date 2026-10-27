@@ -7,12 +7,6 @@ from sage.schemes.toric.ideal import ToricIdeal as _SageToricIdeal
 from sage_extensions.categories.algebras.algebras import (
     AlgebrasWithChosenFinitePresentation,
     Algebras,
-    _algebra_with_structure,
-)
-from sage_extensions.categories.algebras.free_algebras import (
-    FreeAlgebras,
-    GradedFreeAlgebras,
-    SymmetricAlgebras,
 )
 from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
 from sage_extensions.categories.rings.ring_foundation import (
@@ -139,28 +133,21 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
         # ToricIdeal to rediscover this exact rank fact, and retain the selected
         # polynomial algebra directly.
         if columns.rank() == len(coordinates):
-            return _algebra_with_structure(
-                presentation,
-                base,
-                names,
-                FreeAlgebras(base),
-                GradedFreeAlgebras(base),
-                SymmetricAlgebras(base),
-                self,
-                *tuple(extra_categories),
-                construction_data=construction_data,
+            # The degree map is injective, so its toric ideal is zero.
+            # Retain the selected quotient construction and its owner-declared
+            # affine-semigroup data, but skip the backend ideal computation.
+            relations = ()
+        else:
+            engine_presentation = _engine_ring(presentation)
+            engine_ideal = _SageToricIdeal(
+                columns,
+                names=names,
+                base_ring=_engine_ring(base),
             )
-
-        engine_presentation = _engine_ring(presentation)
-        engine_ideal = _SageToricIdeal(
-            columns,
-            names=names,
-            base_ring=_engine_ring(base),
-        )
-        relations = tuple(
-            _owned_engine_element(presentation, engine_presentation(relation))
-            for relation in engine_ideal.gens()
-        )
+            relations = tuple(
+                _owned_engine_element(presentation, engine_presentation(relation))
+                for relation in engine_ideal.gens()
+            )
         return (presentation).quotient_by_relations(relations,
             _extra_categories=(self, *tuple(extra_categories)),
             _extra_construction_data=construction_data,
