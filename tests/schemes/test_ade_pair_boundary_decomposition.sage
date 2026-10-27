@@ -126,6 +126,11 @@ def test_at21_a_zero_minus_and_primed_even_polygon_conventions() -> None:
     }
 
     primed_even = ADELogPairs(QQ).at21("A", 4, variant="'A^-")
+    assert primed_even in ToricLogPairs(QQ)
+    assert primed_even.base_ring() is QQ
+    assert primed_even.log_scheme() is primed_even.base_pair().log_scheme()
+    assert primed_even.blue_divisor() is primed_even.base_pair().blue_divisor()
+    assert primed_even.complementary_divisor() is primed_even.base_pair().complementary_divisor()
     vertices = {
         tuple(int(c) for c in vertex)
         for vertex in primed_even.base_pair().polygon().vertices()
@@ -135,6 +140,9 @@ def test_at21_a_zero_minus_and_primed_even_polygon_conventions() -> None:
     assert primed_even.branch_line_bundle().scheme() is primed_even.scheme()
     assert primed_even.branch_line_bundle().base_ring() is QQ
     assert primed_even.branch_line_bundle().associated_divisor() == primed_even.branch_divisor_class()
+    assert primed_even.scheme().divisor_class(primed_even.branch_divisor_class()) == primed_even.scheme().divisor_class(
+        2 * primed_even.complementary_divisor()
+    )
 
 
 def test_at21_public_constructor_accepts_the_default_a_zero_minus_shape() -> None:
