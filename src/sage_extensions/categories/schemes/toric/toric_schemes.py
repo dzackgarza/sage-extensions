@@ -142,6 +142,7 @@ def _semigroup_algebra(cone, base_ring):
     )
 
 
+@cached_function
 def _face_supporting_character_monomial(face, cone, chart):
     r"""The monomial ``chi^m`` cutting ``face`` out of ``cone`` (CLS Prop. 1.3.16).
 
@@ -197,6 +198,7 @@ def _face_localization(face, cone, base_ring):
     )
 
 
+@cached_function
 def _character_on_overlap(character, face, cone, base_ring):
     r"""``chi^m`` in ``k[S_sigma][1/chi^{m_sigma}]`` for ``m`` a character of ``S_tau``.
 
