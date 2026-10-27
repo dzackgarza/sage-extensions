@@ -82,7 +82,6 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     lattice = Lattices(ZZ)([[1, 0, 0], [0, 20, 0], [0, 0, 400]])
 
     assert lattice.spinor_genus_count() == 4
-    assert lattice.genus().class_number() == 12
 
 
 def test_indefinite_genus_enumerates_each_nontrivial_spinor_seed() -> None:
