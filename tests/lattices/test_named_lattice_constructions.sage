@@ -63,6 +63,12 @@ def test_the_dolgachev_pinkham_dual_lattice_retains_its_metric_form() -> None:
 
     lattice = NamedLattices.TdP
     dual = lattice.dual_lattice()
+    assert tuple(map(str, NamedLattices.TEn.module_generating_set())) == (
+        "e", "f", "ep", "fp", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"
+    )
+    assert tuple(map(str, NamedLattices.Tco.module_generating_set())) == (
+        "h", "ep", "fp", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"
+    )
     gram = matrix(
         SageQQ,
         [
