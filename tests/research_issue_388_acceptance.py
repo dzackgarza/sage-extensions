@@ -18,6 +18,10 @@ ROOT = Path(__file__).resolve().parents[1]
 def load_tests(relative_path: str) -> dict[str, object]:
     path = ROOT / relative_path
     namespace: dict[str, object] = {"__file__": str(path), "__name__": "__issue_388_acceptance__"}
+    # The repository's .sage test files rely on Sage's usual test-runner
+    # prelude, which imports the public owned API before defining assertions.
+    # `exec` does not supply that prelude automatically.
+    exec("from sage_extensions.all import *", namespace)
     exec(compile(path.read_text(), str(path), "exec"), namespace)
     return namespace
 
