@@ -58,6 +58,7 @@ from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
     OwnedFields,
     OwnedIntegralDomains,
+    _engine_element,
     _engine_ring,
     _own_ring,
     _owned_engine_element,
@@ -301,16 +302,34 @@ def _face_transition_morphism(face, source_cone, target_cone, base_ring):
     target_open = _face_localization(face, target_cone, base_ring)
     target_chart = _affine_chart(target_cone, base_ring)
     target_algebra = target_chart.coordinate_algebra()
-    labels = tuple(target_algebra.algebra_generating_set())
-    extension = Algebras(base_ring).Associative().Unital().Commutative().Mor(
-        target_algebra, source_open.coordinate_algebra()
-    )(
-        {
-            labels[position]: _character_on_overlap(
-                generator, face, source_cone, base_ring
-            )
-            for position, generator in enumerate(target_cone.semigroup_generators())
-        }
+    target_open_algebra = source_open.coordinate_algebra()
+    generator_images = tuple(
+        _character_on_overlap(generator, face, source_cone, base_ring)
+        for generator in target_cone.semigroup_generators()
+    )
+    # A generic owned PresentedAlgebraMorphism rechecks each toric relation by
+    # comparing its image in the owned localization. For singular Hilbert
+    # bases this sends equality through the localization's ideal-saturation
+    # path and can dominate the entire gluing operation. Build the same map in
+    # the already selected private realizations instead: Sage's quotient-ring
+    # hom constructor verifies the defining toric ideal against the exact
+    # target images. Then cross the resulting hom back through the owned ring
+    # element adapters. The public arrow retains its literal owned endpoints;
+    # no engine map or element escapes this constructor.
+    target_engine = _engine_ring(target_algebra)
+    overlap_engine = _engine_ring(target_open_algebra)
+    engine_images = tuple(
+        _engine_element(target_open_algebra, image) for image in generator_images
+    )
+    engine_morphism = target_engine.hom(engine_images, overlap_engine)
+    extension_parent = Algebras(base_ring).Associative().Unital().Commutative().Mor(
+        target_algebra, target_open_algebra
+    )
+    extension = extension_parent._from_constructed_element_map(
+        lambda element: _owned_engine_element(
+            target_open_algebra,
+            engine_morphism(_engine_element(target_algebra, element)),
+        )
     )
     # The extension is built from characters on the common face. Each target
     # semigroup generator is sent to a source monomial times a power of the

@@ -232,6 +232,11 @@ def test_toric_face_transition_maps_are_mutual_inverses() -> None:
     assert supporting.parent() is singular_chart.coordinate_algebra()
     singular_open = _face_localization(singular_face, singular_cone, QQ)
     assert singular_open in Schemes(QQ)
+    singular_transition = _face_transition(singular_cone, adjacent, QQ)
+    assert singular_transition.forward().domain() is singular_open
+    assert singular_transition.inverse().forward() * singular_transition.forward() == (
+        singular_open.Mor(singular_open).identity()
+    )
 
 
 def test_the_chart_of_the_a_one_cone_is_the_quadric_cone() -> None:
