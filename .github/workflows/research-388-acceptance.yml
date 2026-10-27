@@ -1,0 +1,41 @@
+name: Research issue 388 mathematical acceptance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/sage_extensions/**"
+      - "tests/lattices/test_named_lattice_constructions.sage"
+      - "tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage"
+      - "tests/lattices/test_two_elementary.sage"
+      - "tests/lattices/test_sterk_elliptic_population_archive.sage"
+      - "tests/schemes/test_ade_pair_boundary_decomposition.sage"
+      - "tests/schemes/test_toric_schemes.sage"
+      - "tests/research_issue_388_acceptance.py"
+      - ".github/workflows/research-388-acceptance.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mathematical-acceptance:
+    name: Original #388 assertions on the exact commit
+    runs-on: ubuntu-latest
+    container: ghcr.io/dzackgarza/sage:develop
+    timeout-minutes: 120
+    steps:
+      - name: Checkout the exact triggering revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+      - name: Verify Sage and source revision
+        run: |
+          sage --version
+          git rev-parse HEAD
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Execute original #388 mathematical assertions
+        env:
+          PYTHONPATH: src
+        run: sage -python -u tests/research_issue_388_acceptance.py
