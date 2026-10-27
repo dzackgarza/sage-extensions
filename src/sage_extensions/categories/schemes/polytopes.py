@@ -48,6 +48,7 @@ from sage_extensions.categories.sets.finite_ordered_sets import (
     FiniteOrderedSets,
     finite_ordered_set,
 )
+from sage_extensions.categories.sets.set_categories import finite_ordinal_set
 from sage_extensions.categories.sets.finite_graded_posets import FiniteGradedPosets
 from sage_extensions.categories.sets.set_categories import PartiallyOrderedSets, Sets
 from sage_extensions.categories.triangulations import ChosenTriangulations
@@ -716,16 +717,30 @@ class ConvexPolytopes(OwnedParameterizedCategory):
 
         def vertices(self):
             if self.is_lattice_polytope():
-                return finite_ordered_set(
-                    tuple(
-                        self.ambient_lattice()(
-                            tuple(
-                                self._owned_integral_coordinate(coordinate)
-                                for coordinate in vertex
-                            )
+                vertices = tuple(
+                    self.ambient_lattice()(
+                        tuple(
+                            self._owned_integral_coordinate(coordinate)
+                            for coordinate in vertex
                         )
-                        for vertex in self._engine_polyhedron().vertices()
                     )
+                    for vertex in self._engine_polyhedron().vertices()
+                )
+                rational_vertices = tuple(self.rational_point(vertex) for vertex in vertices)
+
+                def contains(point):
+                    # Keep the enumerated vertices in the integral lattice,
+                    # but recognize their canonical images under M -> M_QQ.
+                    try:
+                        rational_point = self.rational_point(point)
+                    except (TypeError, ValueError, AttributeError):
+                        return False
+                    return any((rational_point == vertex) is True for vertex in rational_vertices)
+
+                return FiniteOrderedSets().from_indexed(
+                    finite_ordinal_set(len(vertices)),
+                    lambda index: vertices[int(index)],
+                    contains=contains,
                 )
             rationals = _owned_rationals()
             return finite_ordered_set(

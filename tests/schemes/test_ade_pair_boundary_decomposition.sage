@@ -45,7 +45,9 @@ def test_the_distinguished_point_is_a_vertex_of_the_polygon() -> None:
     for letter, rank in (("A", 2), ("D", 4), ("E", 6)):
         pair = ADELogPairs(QQ)(letter, rank)
 
-        assert pair.distinguished_point() in pair.polygon().vertices()
+        vertices = pair.polygon().vertices()
+        assert pair.distinguished_point() in vertices
+        assert pair.distinguished_point() in pair.vertices()
 
 
 def test_the_pair_records_its_dynkin_type() -> None:
