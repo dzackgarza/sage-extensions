@@ -389,7 +389,7 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
             )
             x, z, y, _cone = native_ambient.coordinate_ring().gens()
             equation = y**2 - x * z * (x - z) * (x + z)
-            surface = ambient.closed_subscheme(equation, _weighted_homogeneous=True)
+            surface = ambient.closed_subscheme(equation, _weighted_homogeneous=(1, 1, 2, 1))
             from sage_extensions.categories.divisors.weil_divisor_groups import WeilDivisorGroups
             from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
 

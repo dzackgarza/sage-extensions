@@ -5316,7 +5316,7 @@ class Schemes(OwnedCategoryOverBaseRing):
                 *equations,
                 placements=(),
                 _object_engine=None,
-                _weighted_homogeneous=False,
+                _weighted_homogeneous=None,
                 construction_data=None,
                 **level_data,
             ):
@@ -5348,7 +5348,7 @@ def _projective_closed_subscheme(
     *,
     _engine=None,
     _object_engine=None,
-    _weighted_homogeneous=False,
+    _weighted_homogeneous=None,
     construction_data=None,
     **level_data,
 ):
@@ -5360,7 +5360,8 @@ def _projective_closed_subscheme(
     scheme is allocated to make that decision.
     """
     equations = _projective_equation_family(
-        _equation_family(equations), require_ordinary_homogeneity=not _weighted_homogeneous
+        _equation_family(equations),
+        variable_weights=_weighted_homogeneous,
     )
     base = ambient.scheme_base_ring()
     engine = (
@@ -5440,7 +5441,7 @@ def _equation_family(equations):
     return finite_family(tuple(_family_ingress(equations)), name="Defining equations")
 
 
-def _projective_equation_family(equations, *, require_ordinary_homogeneity=True):
+def _projective_equation_family(equations, *, variable_weights=None):
     r"""Raise engine-ring equations into the owned ring of that engine; keep owned ones.
 
     A homogeneous equation already in an owned polynomial ring is retained as
@@ -5465,11 +5466,31 @@ def _projective_equation_family(equations, *, require_ordinary_homogeneity=True)
                 raised.append(_owned_engine_element(owned, equation))
             case _:
                 raised.append(equation)
-    assert not require_ordinary_homogeneity or all(equation.is_homogeneous() for equation in raised), (
-        f"cannot form a closed subscheme of a projective scheme from the equations "
-        f"{tuple(raised)}: the equations must be homogeneous, and "
-        f"{next(equation for equation in raised if not equation.is_homogeneous())} is not"
-    )
+    if variable_weights is None:
+        invalid = tuple(equation for equation in raised if not equation.is_homogeneous())
+        assert not invalid, (
+            f"cannot form a closed subscheme of a projective scheme from the equations "
+            f"{tuple(raised)}: the equations must be homogeneous, and {invalid[0]} is not"
+        )
+    else:
+        weights = tuple(int(weight) for weight in variable_weights)
+        assert weights and all(weight > 0 for weight in weights), (
+            f"weighted-projective coordinate weights must be positive, got {weights}"
+        )
+        for equation in raised:
+            terms = tuple(_engine_element(equation.parent(), equation).dict())
+            assert all(len(exponents) == len(weights) for exponents in terms), (
+                f"the weighted grading {weights} does not match the {len(terms[0]) if terms else 0}-variable "
+                f"polynomial {equation}"
+            )
+            degrees = {
+                sum(exponent * weight for exponent, weight in zip(term, weights, strict=True))
+                for term in terms
+            }
+            assert len(degrees) <= 1, (
+                f"cannot form a closed subscheme of a weighted projective scheme from {equation}: "
+                f"its monomials have distinct weighted degrees {sorted(degrees)} for weights {weights}"
+            )
     return finite_family(tuple(raised), name="Homogeneous defining equations")
 
 
