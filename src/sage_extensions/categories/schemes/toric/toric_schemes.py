@@ -233,15 +233,28 @@ def _character_on_overlap(character, face, cone, base_ring):
     For \(\tau=\sigma\cap m_\sigma^\perp\) one has
     \(S_\tau=S_\sigma+\mathbb Z_{\ge 0}(-m_\sigma)\) (CLS Prop. 1.3.16), so
     every character of \(S_\tau\) is \(m'=a-c\,m_\sigma\) with \(a\in S_\sigma\)
-    and \(c\ge 0\).  Raising \(m'\) by \(m_\sigma\) until it lies in
-    \(\sigma^\vee\) finds the least such \(c\), and the search terminates
-    because some \(c\) works; the answer is then the monomial of \(a\) divided
-    by that power of the inverted character.
+    and \(c\ge 0\).  The least such \(c\) is the maximum of the exact ceiling
+    bounds from the ray inequalities \(\langle m+c m_\sigma,u\rangle\ge0\).
+    The answer is the monomial of \(a=m+c m_\sigma\) divided by that power of
+    the inverted character.
     """
     chart, localized, supporting, rays, supporting_pairings = _overlap_character_context(
         face, cone, base_ring
     )
-    assert face.dual_cone_contains(character), (
+    # A face's primitive rays are among the selected cone's rays, so its dual
+    # membership condition is exactly nonnegativity on this subset. Use the
+    # same exact pairings as the shift calculation below instead of a second
+    # general cone-membership computation.
+    face_rays = set(face.rays())
+    character_pairings = tuple(
+        int(cone.parent().character_cocharacter_value(character, ray))
+        for ray in rays
+    )
+    assert all(
+        pairing >= 0
+        for ray, pairing in zip(rays, character_pairings)
+        if ray in face_rays
+    ), (
         f"the character {character} is not in the dual cone of the face {face} of {cone}, so "
         "chi^m is not a regular function on the chart of the face"
     )
@@ -252,10 +265,6 @@ def _character_on_overlap(character, face, cone, base_ring):
     # vanishes, m is already nonnegative because it lies in tau^vee. This is
     # exactly the least exponent found by the former repeated-addition loop,
     # without repeated cone-membership tests and character allocations.
-    character_pairings = tuple(
-        int(cone.parent().character_cocharacter_value(character, ray))
-        for ray in rays
-    )
     exponent = max(
         (
             (-value + denominator - 1) // denominator
