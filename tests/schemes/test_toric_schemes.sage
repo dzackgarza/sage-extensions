@@ -184,6 +184,7 @@ def test_toric_face_transition_maps_are_mutual_inverses() -> None:
         _face_supporting_character_monomial,
         _face_transition,
     )
+    from sage_extensions.categories.rings.ring_foundation import _owned_integers
 
     fan = _plane_fans().projective_space_fan()
     source, target = tuple(fan.maximal_cones())[:2]
@@ -216,7 +217,7 @@ def test_toric_face_transition_maps_are_mutual_inverses() -> None:
     # generators and the toric relation s0*s1 = s2^2. Its supporting character
     # must be built in the actual quotient algebra without asking for a second
     # finite-presentation resolution merely to multiply those generator classes.
-    singular_polygon = LatticePolygons(ZZ.free_module(2))(
+    singular_polygon = LatticePolygons(_owned_integers().free_module(2))(
         ((2, 2), (0, 1), (0, 0), (3, 0))
     )
     singular_cones = tuple(singular_polygon.normal_fan().maximal_cones())

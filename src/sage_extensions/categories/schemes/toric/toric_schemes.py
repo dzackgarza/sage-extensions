@@ -163,10 +163,13 @@ def _semigroup_monomial(algebra, exponents):
         return monomial
 
     engine = _engine_ring(algebra)
-    generators = tuple(
-        _engine_element(algebra, algebra.algebra_generator(label))
-        for label in labels
-    )
+    # The selected engine ring is the quotient of the selected polynomial
+    # presentation by precisely the toric ideal used by the owned parent. Its
+    # ordered ``gens()`` are therefore the private realizations of the owned
+    # algebra generators in the same index order. Avoid lowering each owned
+    # generator separately: that route reconstructs the presentation lift for
+    # every generator and is unnecessary for a monomial evaluation.
+    generators = tuple(engine.gens())
     monomial = engine.one()
     for generator, exponent in zip(generators, exponents, strict=True):
         if exponent:
@@ -185,8 +188,15 @@ def _face_supporting_character_monomial(face, cone, chart):
     generators = tuple(cone.semigroup_generators())
     ranking = cone.semigroup_generators().ranking_map()
     exponents = [0] * len(generators)
+    by_identity = {id(generator): position for position, generator in enumerate(generators)}
     for generator in cone.face_supporting_generators(face):
-        exponents[int(ranking(generator))] += 1
+        position = by_identity.get(id(generator))
+        if position is None:
+            # Preserve exact mathematical lookup for equivalent, noncanonical
+            # labels, but avoid comparing represented module morphisms for the
+            # canonical generators returned by this same cone.
+            position = int(ranking(generator))
+        exponents[position] += 1
     return _semigroup_monomial(algebra, tuple(exponents))
 
 
@@ -243,8 +253,17 @@ def _overlap_character_context(face, cone, base_ring):
         int(cone.parent().character_cocharacter_value(supporting, ray))
         for ray in rays
     )
-    face_rays = set(face.rays())
-    face_ray_mask = tuple(ray in face_rays for ray in rays)
+    face_rays = tuple(face.rays())
+    face_ray_ids = {id(ray) for ray in face_rays}
+    # Rays returned by faces of this fan are canonical objects from the same
+    # fan. Testing membership in a Python set of represented lattice maps
+    # invokes their structural equality (which recursively compares their
+    # source/target and defining morphisms). Use identity for canonical rays,
+    # and retain equality as a fallback for a noncanonical but equivalent ray.
+    face_ray_mask = tuple(
+        id(ray) in face_ray_ids or ray in face_rays
+        for ray in rays
+    )
     return chart, localized, supporting, rays, supporting_pairings, face_ray_mask
 
 
