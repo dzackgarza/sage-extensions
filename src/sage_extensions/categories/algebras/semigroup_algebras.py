@@ -7,6 +7,12 @@ from sage.schemes.toric.ideal import ToricIdeal as _SageToricIdeal
 from sage_extensions.categories.algebras.algebras import (
     AlgebrasWithChosenFinitePresentation,
     Algebras,
+    _algebra_with_structure,
+)
+from sage_extensions.categories.algebras.free_algebras import (
+    FreeAlgebras,
+    GradedFreeAlgebras,
+    SymmetricAlgebras,
 )
 from sage_extensions.categories.rings.ring_foundation import _owned_engine_element
 from sage_extensions.categories.rings.ring_foundation import (
@@ -137,6 +143,22 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
             ("_affine_semigroup_presentation", _AffineSemigroupPresentation(coordinates)),
             *tuple(extra_construction_data),
         )
+        if not relations:
+            # A free affine semigroup has no toric relations, so its algebra
+            # is the polynomial ring itself. Preserve that selected parent
+            # and add the semigroup construction data directly instead of
+            # building a quotient by the zero ideal.
+            return _algebra_with_structure(
+                presentation,
+                base,
+                names,
+                FreeAlgebras(base),
+                GradedFreeAlgebras(base),
+                SymmetricAlgebras(base),
+                self,
+                *tuple(extra_categories),
+                construction_data=construction_data,
+            )
         return (presentation).quotient_by_relations(relations,
             _extra_categories=(self, *tuple(extra_categories)),
             _extra_construction_data=construction_data,
