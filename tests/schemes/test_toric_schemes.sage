@@ -118,6 +118,21 @@ def test_overlap_characters_stay_in_the_selected_face_localization() -> None:
         image = _character_on_overlap(character, face, source, QQ)
         assert image.parent() is localization
 
+    invalid = next(
+        -character
+        for character in source.semigroup_generators()
+        if any(
+            fan.character_cocharacter_value(character, ray) > 0
+            for ray in face.rays()
+        )
+    )
+    try:
+        _character_on_overlap(invalid, face, source, QQ)
+    except AssertionError as error:
+        assert "not in the dual cone of the face" in str(error)
+    else:
+        raise AssertionError("an overlap character outside the face dual cone was accepted")
+
 
 def test_overlap_character_assignment_preserves_semigroup_addition() -> None:
     r"""The overlap character map respects chi^(m+n)=chi^m chi^n exactly."""
