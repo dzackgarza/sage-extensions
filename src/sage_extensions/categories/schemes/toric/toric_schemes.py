@@ -151,7 +151,16 @@ def _face_supporting_character_monomial(face, cone, chart):
     product of the corresponding variables with no integer program to solve.
     """
     algebra = chart.coordinate_algebra()
-    presentation = algebra.presentation_ring()
+    from sage_extensions.categories.algebras.free_algebras import SymmetricAlgebras
+
+    if algebra in SymmetricAlgebras(algebra.base_ring()):
+        # An injectively generated semigroup algebra is its polynomial
+        # presentation itself, so there is no quotient map to apply.
+        presentation = algebra
+        descend = lambda element: element
+    else:
+        presentation = algebra.presentation_ring()
+        descend = algebra.algebra_presentation_morphism()
     labels = tuple(algebra.algebra_generating_set())
     ranking = cone.semigroup_generators().ranking_map()
     monomial = presentation.one()
@@ -160,7 +169,7 @@ def _face_supporting_character_monomial(face, cone, chart):
     # Multiply in the polynomial presentation, then descend once. Multiplying
     # in the quotient after every factor repeatedly reduces intermediate
     # monomials modulo the toric ideal, although only the final class is needed.
-    return algebra.algebra_presentation_morphism()(monomial)
+    return descend(monomial)
 
 
 @cached_function
@@ -174,7 +183,14 @@ def _character_monomial(character, cone, chart):
     \(k[S_\sigma]\) (CLS Prop. 1.1.9).
     """
     algebra = chart.coordinate_algebra()
-    presentation = algebra.presentation_ring()
+    from sage_extensions.categories.algebras.free_algebras import SymmetricAlgebras
+
+    if algebra in SymmetricAlgebras(algebra.base_ring()):
+        presentation = algebra
+        descend = lambda element: element
+    else:
+        presentation = algebra.presentation_ring()
+        descend = algebra.algebra_presentation_morphism()
     labels = tuple(algebra.algebra_generating_set())
     monomial = presentation.one()
     for position, multiplicity in enumerate(cone.semigroup_coefficients(character)):
@@ -183,7 +199,7 @@ def _character_monomial(character, cone, chart):
             monomial *= presentation.algebra_generator(labels[position]) ** exponent
     # Descend the complete monomial once, rather than reducing each product in
     # the quotient algebra. This preserves its exact class in k[S_sigma].
-    return algebra.algebra_presentation_morphism()(monomial)
+    return descend(monomial)
 
 
 @cached_function
