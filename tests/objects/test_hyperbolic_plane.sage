@@ -64,6 +64,7 @@ def test_even_unimodular_gram_join_retains_delta_in_rank_twenty_eight() -> None:
     # explicit EvenTwoElementaryLattices cast that would hide a lost join.
     gram_lattice = lattices(lattice.gram_tensor())
     assert gram_lattice.module_rank() == 28
+    assert gram_lattice in EvenTwoElementaryLattices(ZZ)
     assert gram_lattice.is_even()
     assert gram_lattice.is_unimodular()
     assert gram_lattice.is_p_elementary(2)
