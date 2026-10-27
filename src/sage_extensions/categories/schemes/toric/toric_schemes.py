@@ -225,11 +225,32 @@ def _character_on_overlap(character, face, cone, base_ring):
         f"the character {character} is not in the dual cone of the face {face} of {cone}, so "
         "chi^m is not a regular function on the chart of the face"
     )
-    shifted = character
-    exponent = 0
-    while not cone.dual_cone_contains(shifted):
-        shifted = shifted + supporting
-        exponent += 1
+    # Find the least c with m + c*m_sigma in sigma^vee directly from the
+    # finitely many ray inequalities. On a ray u with <m_sigma,u> > 0 the
+    # condition is <m,u> + c<m_sigma,u> >= 0, hence
+    # c >= ceil(-<m,u>/<m_sigma,u>). On rays where the supporting character
+    # vanishes, m is already nonnegative because it lies in tau^vee. This is
+    # exactly the least exponent found by the former repeated-addition loop,
+    # without repeated cone-membership tests and character allocations.
+    pairings = tuple(
+        (
+            int(_pairing_on_ray(cone.parent(), character, ray)),
+            int(_pairing_on_ray(cone.parent(), supporting, ray)),
+        )
+        for ray in cone.rays()
+    )
+    exponent = max(
+        (
+            (-value + denominator - 1) // denominator
+            for value, denominator in pairings
+            if value < 0 and denominator > 0
+        ),
+        default=0,
+    )
+    assert all(value + exponent * denominator >= 0 for value, denominator in pairings), (
+        f"the supporting character {supporting} does not move {character} into the dual cone of {cone}"
+    )
+    shifted = character + _integers()(exponent) * supporting
     inverse = _inverse_face_supporting_unit(face, cone, base_ring)
     return localized.localization_map()(
         _character_monomial(shifted, cone, chart)
