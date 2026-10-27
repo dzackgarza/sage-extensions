@@ -946,6 +946,17 @@ class _FiniteSchemeGluingDatum(SageObject):
             name="Pair transitions of a finite scheme gluing",
             noun="finite scheme-gluing transition data",
         )
+        # The same selected forward and inverse maps are needed by both the
+        # endpoint/open checks and the inverse-composition validator below.
+        # Resolve them once from the selected transition family, preserving
+        # their exact domains and codomains for both proofs.
+        self._transition_directions = {
+            pair: (
+                self._transitions[pair].forward(),
+                self._transitions[pair].inverse().forward(),
+            )
+            for pair in pair_indices
+        }
         self._reverse_transitions = []
         self._triple_overlaps = []
         self._triple_transition_maps = []
@@ -1033,8 +1044,7 @@ class _FiniteSchemeGluingDatum(SageObject):
                     f"cannot glue along {transition} from chart {source_index} to chart {target_index}: it "
                     "must be an isomorphism of schemes between the two overlaps"
                 )
-            forward = transition.forward()
-            inverse = transition.inverse().forward()
+            forward, inverse = self._transition_directions[source_index, target_index]
             source_overlap = forward.domain()
             target_overlap = forward.codomain()
             source_chart = self.chart(source_index)
@@ -1077,9 +1087,7 @@ class _FiniteSchemeGluingDatum(SageObject):
         ``check=False``.
         """
         for source_index, target_index in self.transition_index_set():
-            transition = self.transitions()[source_index, target_index]
-            forward = transition.forward()
-            inverse = transition.inverse().forward()
+            forward, inverse = self._transition_directions[source_index, target_index]
             source_overlap = forward.domain()
             target_overlap = forward.codomain()
             if inverse * forward != source_overlap.categorical_identity_morphism():
