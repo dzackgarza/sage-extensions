@@ -372,7 +372,7 @@ class Sterk:
     @cache
     def _diagram(name):
         r"""Construct one immutable rooted Sterk diagram and cache its realization."""
-        roots = Sterk.sterk_roots()[name]
+        roots = Sterk._sterk_roots_cached()[name]
         return CoxeterDiagrams().from_roots(
             # Vertex names are the actual root-family labels. Passing a
             # separate ``names`` datum does not relabel the vertices in
