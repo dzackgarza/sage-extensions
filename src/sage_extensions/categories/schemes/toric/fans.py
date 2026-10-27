@@ -633,9 +633,10 @@ class RationalPolyhedralFans(OwnedParameterizedCategory):
                         values = [integers.zero()] * len(generators)
                         values[i] = integers(left)
                         values[j] = integers(right)
+                        ranking = generators.ranking_map()
                         return finite_indexed_family(
                             generators,
-                            lambda generator: values[int(generators.ranking_map()(generator))],
+                            lambda generator: values[int(ranking(generator))],
                             name="Semigroup multiplicities of a character",
                         )
             multiplicities = self._engine_cone().dual().Hilbert_coefficients(
