@@ -146,6 +146,7 @@ def test_overlap_character_assignment_preserves_semigroup_addition() -> None:
 def test_toric_face_transition_maps_are_mutual_inverses() -> None:
     r"""The two exact overlap pullbacks compose to identities on both selected opens."""
     from sage_extensions.categories.schemes.toric.toric_schemes import (
+        _affine_chart,
         _character_on_overlap,
         _face_localization,
         _face_transition,
