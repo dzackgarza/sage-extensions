@@ -228,6 +228,31 @@ def test_at21_accepts_the_printed_prime_and_minus_a_decorations() -> None:
     assert unicode_minus.source_variant() == "short"
     assert unicode_prefix_minus.source_variant() == "left-short"
     assert superscript_minus.base_pair().dynkin_rank() == 4
+
+    # Every public spelling denotes the same owned AT21 construction contract:
+    # the base ring and category are retained, and enhancement reuses the exact
+    # base-pair scheme and boundary divisors rather than rebuilding lookalikes.
+    for enhanced in (
+        primed,
+        doubly_marked_prime,
+        primed_minus,
+        generic_odd_prime,
+        generic_even_prime,
+        minus,
+        superscript_minus,
+        unicode_minus,
+        unicode_prefix_minus,
+    ):
+        assert enhanced in ToricLogPairs(QQ)
+        assert enhanced.base_ring() is QQ
+        assert enhanced.base_pair() in ADELogPairs(QQ)
+        assert enhanced.log_scheme() is enhanced.base_pair().log_scheme()
+        assert enhanced.blue_divisor() is enhanced.base_pair().blue_divisor()
+        assert enhanced.complementary_divisor() is enhanced.base_pair().complementary_divisor()
+        line_bundle = enhanced.branch_line_bundle()
+        assert line_bundle.scheme() is enhanced.scheme()
+        assert line_bundle.base_ring() is QQ
+        assert line_bundle.associated_divisor() == enhanced.branch_divisor_class()
     assert superscript_minus.base_pair().dynkin_variant() == ("long", "short")
     assert tuple_variant.source_variant() == "both-short"
     assert tuple_variant.base_pair().dynkin_rank() == 3
