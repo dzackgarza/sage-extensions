@@ -1930,25 +1930,32 @@ def _toric_variety(fan, base_ring, polarizing_polytope=None, placements=(), **le
     assert fan in RationalPolyhedralFans(fan.cocharacter_lattice()), (
         f"a toric variety is built from a rational polyhedral fan, but {fan} is in {fan.category()}"
     )
+    # These exact fan predicates may lower to nontrivial private Sage
+    # computations. They are invariants of this selected fan, so evaluate
+    # each once and reuse the verdict while determining the object's proven
+    # scheme placements.
+    smooth = fan.is_smooth()
+    complete = fan.is_complete()
+    dimension = int(fan.dimension())
     decided = [ToricSchemes(base)]
-    if fan.is_smooth():
+    if smooth:
         decided.append(GorensteinToricSchemes(base))
     projective_fan = RationalPolyhedralFans(fan.cocharacter_lattice()).projective_space_fan()
     if fan.is_isomorphic(projective_fan):
         decided.append(ToricProjectiveSpaces(base))
-    if fan.is_smooth():
+    if smooth:
         decided.append(Schemes(base).Smooth())
-    if base in OwnedFields() and fan.is_complete():
+    if base in OwnedFields() and complete:
         decided.append(Schemes(base).Proper())
     if base in OwnedIntegralDomains():
-        match int(fan.dimension()):
+        match dimension:
             case 1:
                 decided.append(Curves(base))
             case 2:
                 decided.append(Surfaces(base))
             case _:
                 pass
-    match (base in OwnedFields(), int(fan.dimension()), fan.is_complete()):
+    match (base in OwnedFields(), dimension, complete):
         case (True, 2, True):
             decided.append(Surfaces(base).Projective())
         case _:
