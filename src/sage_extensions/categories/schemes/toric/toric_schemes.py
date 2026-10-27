@@ -265,6 +265,7 @@ def _face_transition_morphism(face, source_cone, target_cone, base_ring):
     return _scheme_mor_category(source_open, target_open)(induced)
 
 
+@cached_function
 def _face_transition(source_cone, target_cone, base_ring):
     r"""The atlas transition between the charts of two cones of one fan.
 
