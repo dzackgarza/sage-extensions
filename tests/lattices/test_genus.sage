@@ -53,3 +53,21 @@ def test_definite_genus_mass_and_class_number_are_exact() -> None:
     assert genus.class_number() == 1
     assert genus.representatives().cardinality() == 1
     assert genus.mass() == ZZ(1) / 12
+
+
+def test_indefinite_isotropic_genus_has_complete_spinor_seed_enumeration() -> None:
+    r"""For an indefinite lattice of rank at least three, each spinor genus
+    contains one class (Conway--Sloane, *Sphere Packings, Lattices and Groups*,
+    3rd ed., Ch. 15, §9.1, Thm. 14).  This isotropic ternary specimen has trivial
+    improper spinor quotient, so the complete seed list is empty and the genus
+    enumeration must return its single class.
+    """
+    lattice = Lattices(ZZ)([[1, 0, 0], [0, 4, 0], [0, 0, -5]])
+    genus = lattice.genus()
+
+    assert lattice.signature_pair() == signature_pair(2, 1)
+    assert lattice([1, 1, 1]).norm() == 0
+    assert genus.spinor_genus_count() == 1
+    assert genus.class_number() == 1
+    assert genus.representatives().cardinality() == 1
+    assert tuple(lattice.spinor_genus_class_numbers()) == (ZZ(1),)
