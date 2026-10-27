@@ -39,6 +39,19 @@ def test_a_definite_lattice_is_not_hyperbolic() -> None:
         HyperbolicLattices(ZZ)(Lattices(ZZ)("A2"))
 
 
+def test_hyperbolic_refinement_preserves_both_signature_conventions() -> None:
+    r"""Both Lorentzian sign conventions are admitted without changing the lattice or its signature."""
+    for lattice, expected in (
+        (NamedLattices.E10, (1, 9)),
+        (NamedLattices.E10.twist(-1), (9, 1)),
+        (NamedLattices.U, (1, 1)),
+    ):
+        refined = HyperbolicLattices(ZZ)(lattice)
+        signature = refined.signature_pair()
+        assert refined is lattice
+        assert (int(signature.first()), int(signature.second())) == expected
+
+
 def test_vinberg_finds_the_ten_walls_of_ii_9_1() -> None:
     e10 = HyperbolicLattices(ZZ)(Lattices(ZZ)("U") + Lattices(ZZ)("E8"))
 
