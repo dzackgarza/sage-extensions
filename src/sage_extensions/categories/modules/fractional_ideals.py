@@ -472,6 +472,13 @@ def _fraction_field_backend_value(base_ring, value):
     field = ring.fraction_field()
     engine_field = _engine_ring(field)
     value_parent = element_parent(value)
+    # A value in Res_{R -> Frac(R)}(Frac(R)) is still a scalar of Frac(R),
+    # represented as an R-module element.  Convert it through the canonical
+    # regular-module identification before handing it to the fractional-ideal
+    # backend, which requires actual field scalars rather than module vectors.
+    if value_parent is not None and hasattr(value_parent, "regular_module_identification"):
+        value = value_parent.regular_module_identification()(value)
+        value_parent = element_parent(value)
     if value_parent in OwnedRings():
         return engine_field(_engine_element(value_parent, value))
     return engine_field(value)

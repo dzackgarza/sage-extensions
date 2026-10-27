@@ -88,6 +88,30 @@ def test_gram_delta_operation_enforces_the_two_elementary_hypothesis() -> None:
         raise AssertionError("delta must reject an even lattice with non-2-elementary discriminant")
 
 
+def test_field_dual_lattice_keeps_its_inverse_gram_as_a_tensor() -> None:
+    r"""Over a field, the metric dual is the vector-space dual with inverse Gram tensor."""
+    lattices = Lattices(QQ)
+    lattice = lattices([[1, 0], [0, 2]])
+    dual = lattice.dual_lattice()
+    gram = dual.gram_tensor()
+    assert gram._index_ranks() == (2, 2)
+    assert gram[0, 0] == 1
+    assert gram[0, 1] == 0
+    assert gram[1, 0] == 0
+    assert gram[1, 1] == QQ(1) / 2
+
+
+def test_callable_isometry_retains_its_inverse_pair() -> None:
+    r"""A callable defining an isometry constructs the required inverse in the lattice Mor."""
+    lattice = hyperbolic_plane()
+    identity = lattice.Isom(lattice)(
+        lambda label: lattice.module_generator(label)
+    )
+    inverse = identity.inverse()
+    assert all(inverse(identity(generator)) == generator for generator in lattice.module_generators())
+    assert all(identity(inverse(generator)) == generator for generator in lattice.module_generators())
+
+
 def test_the_vectors_of_square_minus_two() -> None:
     r"""$b(xe + yf, xe + yf) = 2xy = -2$ exactly for $(x, y) = \pm(1, -1)$."""
     plane = hyperbolic_plane()

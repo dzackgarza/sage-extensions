@@ -52,6 +52,7 @@ from sage_extensions.categories._lattice import (
     _lattice_from_gram_tensor,
     _lattice_latex,
     _lattice_object,
+    _lattice_on_gram,
     _nested_gram_tensor,
     _normalized_lattice_names,
     _orthogonal_sum,
@@ -5362,6 +5363,20 @@ class Lattices(OwnedCategoryOverBaseRing):
 
             fraction_field = ring.fraction_field()
             dual_gram = self.gram_tensor().change_ring(fraction_field).dual_pairing()
+            dual_module = self.dual_module()
+            if ring is fraction_field:
+                # Over a field the metric dual is again a vector space over
+                # that field, and the inverse Gram is an ordinary scalar
+                # tensor. Keep it as the defining datum rather than wrapping
+                # it in a module-valued bilinear map whose Gram is only an
+                # indexed family of evaluations.
+                return _lattice_on_gram(
+                    Lattices(ring),
+                    dual_module,
+                    dual_gram,
+                    _normalized_lattice_names(None, dual_module.module_rank()),
+                    None,
+                )
             scalars = fraction_field.regular_module()
             scalar_generator = next(iter(scalars.module_generators()))
             # The dual lattice has one value type in every case: the selected
@@ -5372,7 +5387,6 @@ class Lattices(OwnedCategoryOverBaseRing):
             value_module = Modules(fraction_field).restriction_of_scalars(
                 fraction_field.algebra_structure_morphism()
             )(scalars)
-            dual_module = self.dual_module()
             # ``dual_gram`` is a tensor over Frac(R), on the fraction-field
             # extension of the dual basis. Transfer its coefficients through
             # the selected R-basis by stating the bilinear evaluation in the

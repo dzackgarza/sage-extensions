@@ -908,10 +908,44 @@ class LatticeIsometryMethods:
         if images in domain.module_category().Core().Mor(domain, codomain):
             forward = domain.module_category().Mor(domain, codomain)(images.forward())
             self._underlying_module_isomorphism = images
-            super().__init__(parent, forward)
+            inverse_computation = inverse_computation or (
+                lambda: codomain.Mor(domain)(
+                    lambda label: images.inverse()(codomain.module_generator(label))
+                )
+            )
+            super().__init__(parent, forward, inverse_computation)
             return
         self._underlying_module_isomorphism = None
-        super().__init__(parent, images)
+        forward = domain.module_category().Mor(domain, codomain)(images)
+        if inverse_computation is None:
+            if domain.module_rank().is_finite() and codomain.module_rank().is_finite():
+                def inverse_computation():
+                    inverse_matrix = _engine_matrix(_module_matrix(forward)).inverse()
+                    domain_generators = tuple(domain.module_generators())
+                    inverse_ring = domain.base_ring()
+                    return codomain.Mor(domain)(
+                        tuple(
+                            sum(
+                                (
+                                    domain.scalar_multiple(
+                                        _owned_engine_element(inverse_ring, coefficient),
+                                        generator,
+                                    )
+                                    for coefficient, generator in zip(
+                                        column, domain_generators, strict=True
+                                    )
+                                ),
+                                domain.zero(),
+                            )
+                            for column in inverse_matrix.columns()
+                        )
+                    )
+            else:
+                inverse_computation = lambda: codomain.Mor(domain)(
+                    lambda label: forward.lift(codomain.module_generator(label))
+                )
+        self._isometry_inverse_computation = inverse_computation
+        super().__init__(parent, forward, inverse_computation)
 
     def is_surjective(self) -> bool:
         r"""True: membership in the isometry Mor states it (``OWN-22``)."""
