@@ -90,12 +90,11 @@ class Sterk:
     def roots_18_2_0():
         TdP = NamedLattices.TdP
         b = _named_generators(TdP)
-        dual = tuple(TdP.dual_lattice().module_generators())
-        _, _, _, _, w1, w2, w3, w4, w5, w6, w7, w8, w1t, w2t, w3t, w4t, w5t, w6t, w7t, w8t = dual
+        dual = _named_generators(TdP.dual_lattice())
         c = TdP.correlation()
         vectors = {
             "v1": b["b8"],
-            "v2": c.lift(c(b["ep"] + b["fp"]) + w1 + w8t),
+            "v2": c.lift(c(b["ep"] + b["fp"] + b["a1"]) + dual["b1"]),
             "v3": b["a1"],
             "v4": b["a3"],
             "v5": b["a4"],
@@ -103,19 +102,19 @@ class Sterk:
             "v7": b["a6"],
             "v8": b["a7"],
             "v9": b["a8"],
-            "v10": c.lift(c(b["ep"] + b["fp"]) + w8 + w1t),
+            "v10": c.lift(c(b["ep"] + b["fp"] + b["a8"]) + dual["a1"]),
             "v11": b["b1"],
             "v12": b["b3"],
             "v13": b["b4"],
             "v14": b["b5"],
             "v15": b["b6"],
             "v16": b["b7"],
-            "v17": c.lift(c(b["ep"]) + w8t),
+            "v17": c.lift(c(b["ep"]) + dual["b1"]),
             "v18": b["a2"],
-            "v19": c.lift(c(b["ep"]) + w8),
+            "v19": c.lift(c(b["ep"] + b["a8"])),
             "v20": b["b2"],
             "v21": b["fp"] - b["ep"],
-            "v22": c.lift(c(5 * b["ep"] + 3 * b["fp"]) + 2 * w2 + 2 * w2t),
+            "v22": c.lift(c(5 * b["ep"] + 3 * b["fp"] + 2 * b["a3"]) + 2 * dual["b2"]),
         }
         assert len(vectors) == 22
         return vectors
@@ -124,8 +123,7 @@ class Sterk:
     def roots_18_0_0():
         TdP = NamedLattices.TdP
         b = _named_generators(TdP)
-        dual = tuple(TdP.dual_lattice().module_generators())
-        _, _, _, _, w1, w2, w3, w4, w5, w6, w7, w8, w1t, w2t, w3t, w4t, w5t, w6t, w7t, w8t = dual
+        dual = _named_generators(TdP.dual_lattice())
         c = TdP.correlation()
         vectors = {
             "w1": b["a1"],
@@ -135,9 +133,9 @@ class Sterk:
             "w5": b["a6"],
             "w6": b["a7"],
             "w7": b["a8"],
-            "w8": c.lift(c(b["e"]) + w8),
+            "w8": c.lift(c(b["e"] + b["a8"])),
             "w9": b["f"] - b["e"],
-            "w10": c.lift(c(b["e"]) + w8t),
+            "w10": c.lift(c(b["e"]) + dual["b1"]),
             "w11": b["b8"],
             "w12": b["b7"],
             "w13": b["b6"],
