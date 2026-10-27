@@ -2639,7 +2639,7 @@ class _FiniteLiteralSet(Sets().ObjectType):
         """
         try:
             return point in self._points
-        except TypeError, ValueError:
+        except (TypeError, ValueError):
             from sage_extensions.logic import conjunction, negation
 
             return negation(
@@ -2872,7 +2872,7 @@ class SetInjection(OwnedSetMorphism):
                         raise ValueError(
                             "a set injection cannot identify distinct source points"
                         )
-                except TypeError, ValueError:
+                except (TypeError, ValueError):
                     for position, (key, _) in enumerate(pairs):
                         for previous, _ in pairs[:position]:
                             same = True if key is previous else key == previous
@@ -2899,7 +2899,7 @@ class SetInjection(OwnedSetMorphism):
                     def preimage(value):
                         try:
                             return lookup[value]
-                        except TypeError, ValueError:
+                        except (TypeError, ValueError):
                             # A query may have undecidable hash equality even
                             # when the image values established an injective
                             # hash table. A witnessed pair still has an
@@ -4207,7 +4207,7 @@ class _ImageSetEngine:
             return None
         try:
             return tuple(dict.fromkeys(values))
-        except TypeError, ValueError:
+        except (TypeError, ValueError):
             pass
         distinct = []
         for value in values:
@@ -4251,7 +4251,7 @@ class _ImageSetEngine:
             return None
         try:
             return frozenset(values)
-        except TypeError, ValueError:
+        except (TypeError, ValueError):
             return None
 
     def __iter__(self):
@@ -4310,7 +4310,7 @@ class _ImageSetEngine:
                 if hashed is not None:
                     try:
                         return element in hashed
-                    except TypeError, ValueError:
+                    except (TypeError, ValueError):
                         pass
                 # Membership is the finite existential proposition
                 # exists a in A, f(a) = element. It does not require
@@ -4527,7 +4527,7 @@ class CartesianProductsOfSets(OwnedCategory):
                     hash(normalized), []
                 )
                 candidates = (*bucket, *self._resolved_component_unhashable)
-            except TypeError, ValueError:
+            except (TypeError, ValueError):
                 bucket = self._resolved_component_unhashable
                 candidates = self._resolved_components
             for prior_index, resolved in candidates:
