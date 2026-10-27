@@ -46,4 +46,4 @@ jobs:
         env:
           PYTHONPATH: src
         run: |
-          "$SAGE_BIN" -python -c 'import runpy; runpy.run_path("tests/research_issue_388_acceptance.py", run_name="__main__")'
+          "$SAGE_BIN" -c 'exec(compile(open("tests/research_issue_388_acceptance.py").read(), "tests/research_issue_388_acceptance.py", "exec"), {"__name__": "__main__", "__file__": "tests/research_issue_388_acceptance.py"})'
