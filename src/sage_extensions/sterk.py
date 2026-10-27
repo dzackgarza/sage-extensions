@@ -369,24 +369,34 @@ class Sterk:
         return {"s4_12": s}
 
     @staticmethod
+    @cache
+    def _diagram(name):
+        r"""Construct one immutable rooted Sterk diagram and cache its realization."""
+        roots = Sterk.sterk_roots()[name]
+        return CoxeterDiagrams().from_roots(
+            # Vertex names are the actual root-family labels. Passing a
+            # separate ``names`` datum does not relabel the vertices in
+            # the rooted Coxeter diagram, and integer labels obscure the
+            # dissertation's explicit r_0,...,r_{n-1} indexing.
+            finite_indexed_family_from_values(
+                finite_ordered_set(tuple(f"r{i}" for i in range(len(roots)))),
+                tuple(roots),
+            ),
+            positions={
+                f"r{index}": point
+                for index, point in _STERK_DIAGRAM_LAYOUTS[name].items()
+            },
+        )
+
+    @staticmethod
     def diagrams():
-        return {
-            name: CoxeterDiagrams().from_roots(
-                # Vertex names are the actual root-family labels. Passing a
-                # separate ``names`` datum does not relabel the vertices in
-                # the rooted Coxeter diagram, and integer labels obscure the
-                # dissertation's explicit r_0,...,r_{n-1} indexing.
-                finite_indexed_family_from_values(
-                    finite_ordered_set(tuple(f"r{i}" for i in range(len(roots)))),
-                    tuple(roots),
-                ),
-                positions={
-                    f"r{index}": point
-                    for index, point in _STERK_DIAGRAM_LAYOUTS[name].items()
-                },
-            )
-            for name, roots in Sterk.sterk_roots().items()
-        }
+        r"""Return the five exact rooted diagrams in their documented order.
+
+        Rooted diagram construction includes the owned graph and root Gram
+        realizations. Cache each immutable diagram separately because the
+        public acceptance routines request the same diagrams repeatedly.
+        """
+        return {name: Sterk._diagram(name) for name in Sterk.sterk_roots()}
 
     @staticmethod
     def diagram_layouts():
