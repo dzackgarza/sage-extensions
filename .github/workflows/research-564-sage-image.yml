@@ -23,6 +23,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/dzackgarza/sage:spinor-${{ inputs.image_tag_sha }}
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     timeout-minutes: 30
     steps:
       - name: Validate exact image tag and applied Sage source revision
@@ -42,6 +45,8 @@ jobs:
 
       - name: Check out public consumer assertions
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Install the checked-out sage-extensions source
         run: '"$SAGE_BIN" -pip install --no-deps -e .'
