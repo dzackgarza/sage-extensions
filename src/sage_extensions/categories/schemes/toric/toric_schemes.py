@@ -213,6 +213,20 @@ def _inverse_face_supporting_unit(face, cone, base_ring):
 
 
 @cached_function
+def _overlap_character_context(face, cone, base_ring):
+    r"""Return the fixed chart, localization, supporting character and ray data."""
+    chart = _affine_chart(cone, base_ring)
+    localized = _face_localization(face, cone, base_ring).coordinate_algebra()
+    supporting = cone.face_supporting_character(face)
+    rays = tuple(cone.rays())
+    supporting_pairings = tuple(
+        int(cone.parent().character_cocharacter_value(supporting, ray))
+        for ray in rays
+    )
+    return chart, localized, supporting, rays, supporting_pairings
+
+
+@cached_function
 def _character_on_overlap(character, face, cone, base_ring):
     r"""``chi^m`` in ``k[S_sigma][1/chi^{m_sigma}]`` for ``m`` a character of ``S_tau``.
 
@@ -224,9 +238,9 @@ def _character_on_overlap(character, face, cone, base_ring):
     because some \(c\) works; the answer is then the monomial of \(a\) divided
     by that power of the inverted character.
     """
-    chart = _affine_chart(cone, base_ring)
-    localized = _face_localization(face, cone, base_ring).coordinate_algebra()
-    supporting = cone.face_supporting_character(face)
+    chart, localized, supporting, rays, supporting_pairings = _overlap_character_context(
+        face, cone, base_ring
+    )
     assert face.dual_cone_contains(character), (
         f"the character {character} is not in the dual cone of the face {face} of {cone}, so "
         "chi^m is not a regular function on the chart of the face"
@@ -238,22 +252,22 @@ def _character_on_overlap(character, face, cone, base_ring):
     # vanishes, m is already nonnegative because it lies in tau^vee. This is
     # exactly the least exponent found by the former repeated-addition loop,
     # without repeated cone-membership tests and character allocations.
-    pairings = tuple(
-        (
-            int(cone.parent().character_cocharacter_value(character, ray)),
-            int(cone.parent().character_cocharacter_value(supporting, ray)),
-        )
-        for ray in cone.rays()
+    character_pairings = tuple(
+        int(cone.parent().character_cocharacter_value(character, ray))
+        for ray in rays
     )
     exponent = max(
         (
             (-value + denominator - 1) // denominator
-            for value, denominator in pairings
+            for value, denominator in zip(character_pairings, supporting_pairings)
             if value < 0 and denominator > 0
         ),
         default=0,
     )
-    assert all(value + exponent * denominator >= 0 for value, denominator in pairings), (
+    assert all(
+        value + exponent * denominator >= 0
+        for value, denominator in zip(character_pairings, supporting_pairings)
+    ), (
         f"the supporting character {supporting} does not move {character} into the dual cone of {cone}"
     )
     shifted = character + _integers()(exponent) * supporting
