@@ -48,6 +48,28 @@ def test_the_invariants_of_u() -> None:
     assert plane.dual_lattice().is_isometric(plane)
 
 
+def test_even_unimodular_gram_join_retains_delta_in_rank_twenty_eight() -> None:
+    r"""The even-unimodular lattice ``2U + 3E8(-1)`` has trivial discriminant."""
+    lattices = Lattices(ZZ)
+    lattice = lattices.orthogonal_sum(
+        (
+            lattices("U"),
+            lattices("U"),
+            lattices("E8").twist(-1),
+            lattices("E8").twist(-1),
+            lattices("E8").twist(-1),
+        )
+    )
+    # Exercise the object produced by the actual Gram construction, not an
+    # explicit EvenTwoElementaryLattices cast that would hide a lost join.
+    gram_lattice = lattices(lattice.gram_tensor())
+    assert gram_lattice.module_rank() == 28
+    assert gram_lattice.is_even()
+    assert gram_lattice.is_unimodular()
+    assert gram_lattice.is_p_elementary(2)
+    assert gram_lattice.delta() == 0
+
+
 def test_the_vectors_of_square_minus_two() -> None:
     r"""$b(xe + yf, xe + yf) = 2xy = -2$ exactly for $(x, y) = \pm(1, -1)$."""
     plane = hyperbolic_plane()
