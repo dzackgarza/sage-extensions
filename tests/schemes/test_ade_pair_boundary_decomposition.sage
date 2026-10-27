@@ -48,6 +48,7 @@ def test_the_distinguished_point_is_a_vertex_of_the_polygon() -> None:
         vertices = pair.polygon().vertices()
         assert pair.distinguished_point() in vertices
         assert pair.distinguished_point() in pair.vertices()
+        assert pair.polygon().ambient_space()((1, 1)) not in vertices
 
 
 def test_the_pair_records_its_dynkin_type() -> None:
