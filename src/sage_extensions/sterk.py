@@ -1,5 +1,7 @@
 r"""Sterk cusp and root configurations for degree-two Enriques moduli."""
 
+from functools import cache
+
 from sage.rings.rational_field import QQ
 
 from sage_extensions.categories.sets.indexed_families import finite_indexed_family_from_values
@@ -152,7 +154,8 @@ class Sterk:
         return vectors
 
     @staticmethod
-    def sterk_roots():
+    @cache
+    def _sterk_roots_cached():
         v = Sterk.roots_18_2_0()
         w = Sterk.roots_18_0_0()
 
@@ -248,6 +251,17 @@ class Sterk:
         assert orbit_sum(v["v20"]) == v["v22"] + 2 * v["v20"]
         assert orbit_sum(v["v18"]) == v["v22"] + 2 * v["v18"]
         return configurations
+
+    @staticmethod
+    def sterk_roots():
+        r"""Return the five verified root configurations in documented order.
+
+        Root construction includes metric-dual lifts and exact square checks.
+        Cache that data so diagram construction does not repeat the work after
+        a caller has already requested the configurations. Return a fresh
+        dictionary so callers cannot mutate the cached mapping.
+        """
+        return dict(Sterk._sterk_roots_cached())
 
     @staticmethod
     def selected_isotropic_vectors():
