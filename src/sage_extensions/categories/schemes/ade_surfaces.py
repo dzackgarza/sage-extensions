@@ -38,7 +38,7 @@ from sage_extensions.categories.rings.ring_foundation import (
     _owned_integers,
     _owned_rationals,
 )
-from sage_extensions.categories.schemes.log_pairs import ToricLogPairs
+from sage_extensions.categories.schemes.log_pairs import LogPairs, ToricLogPairs
 from sage_extensions.categories.schemes.polytopes import (
     ConvexPolytopes,
     LatticePolygons,
@@ -51,7 +51,7 @@ from sage_extensions.categories.sets.indexed_families import (
     finite_indexed_family,
 )
 from sage_extensions.categories.sets.set_categories import NN
-from sage_extensions.owned_category import _object_of
+from sage_extensions.owned_category import _object_of, owned_category_join
 from sage_extensions.logic import AtomicProposition
 from sage_extensions.tensors.tensor import tensor
 from sage_extensions.static_types import ProductOfNaturalNumbers
@@ -364,6 +364,52 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
             if _source_variant is None
             else _source_variant
         )
+        if letter == "A" and rank == 3 and bool(affine) and _source_variant is None:
+            # AT21 §3B: the pure affine A_3 surface is the projective cone over
+            # the genus-two double-cover model's elliptic base curve, not a
+            # toric polygon.  In Cox coordinates of P(1,1,2,1), the quartic
+            # y^2=x*z*(x-z)*(x+z) cuts out its projective cone.  The fourth
+            # weight-one coordinate is the cone coordinate and does not occur
+            # in the equation.  The four branch points are distinct, so the
+            # double cover of P^1 is a smooth genus-one curve.
+            from sage_extensions.categories.schemes.toric.fans import RationalPolyhedralFans
+
+            base = self.base_ring()
+            lattice = _owned_integers().free_module(3)
+            ambient = RationalPolyhedralFans(lattice).weighted_projective_space_fan(
+                (1, 1, 2, 1)
+            ).toric_variety(base)
+            cox = ambient.cox_ring()
+            labels = tuple(str(label) for label in cox.algebra_generating_set())
+            assert labels == ("x0", "x1", "x2", "x3"), (
+                f"the weighted-projective Cox presentation must retain its four coordinate labels, got {labels}"
+            )
+            x, z, y, _cone = (cox.algebra_generator(label) for label in labels)
+            equation = y**2 - x * z * (x - z) * (x + z)
+            surface = ambient.closed_subscheme(equation)
+            from sage_extensions.categories.divisors.weil_divisor_groups import WeilDivisorGroups
+            from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+
+            zero_boundary = WeilDivisorGroups()(surface, finite_ordered_set(())).zero()
+            from sage_extensions.categories.schemes.schemes import _scheme_with_structure
+
+            return _scheme_with_structure(
+                surface,
+                self,
+                construction_data={
+                    "dynkin_letter": letter,
+                    "dynkin_rank": rank,
+                    "source_variant": source_variant,
+                    "dynkin_variant": (),
+                    "is_affine_type": True,
+                    "polygon": None,
+                    "polygon_vertex_order": None,
+                    "distinguished_point": None,
+                    "side_decorations": finite_family((), name="Nontoric ADE side decorations"),
+                    "log_scheme": surface,
+                    "boundary_divisor": zero_boundary,
+                },
+            )
         allow_a_zero = letter == "A" and rank == 0 and not affine and source_variant == "short"
         assert rank >= 1 or allow_a_zero, (
             f"an ADE type {letter}_n needs rank n >= 1, except for the pure A_0^- shape "
@@ -389,9 +435,10 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
         toric_base = polygon.toric_variety(self.base_ring())
         from sage_extensions.categories.schemes.schemes import _scheme_with_structure
 
+        toric_category = owned_category_join((self, ToricLogPairs(self.base_ring())))
         return _scheme_with_structure(
             toric_base,
-            self,
+            toric_category,
             construction_data={
                 "dynkin_letter": letter,
                 "dynkin_rank": rank,
@@ -480,7 +527,7 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
         return f"ADE log pairs over {self.base_ring()}"
 
     def super_categories(self):
-        return [ToricLogPairs(self.base_ring())]
+        return [LogPairs(self.base_ring())]
 
     class ParentMethods:
         def __init__(
