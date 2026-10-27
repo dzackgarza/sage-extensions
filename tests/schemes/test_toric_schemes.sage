@@ -160,10 +160,10 @@ def test_toric_face_transition_maps_are_mutual_inverses() -> None:
     assert transition.forward().codomain() is target_open
     assert transition.inverse().domain() is target_open
     assert transition.inverse().codomain() is source_open
-    assert transition.inverse() * transition.forward() == source_open.Mor(
+    assert transition.inverse().forward() * transition.forward() == source_open.Mor(
         source_open
     ).identity()
-    assert transition.forward() * transition.inverse() == target_open.Mor(
+    assert transition.forward() * transition.inverse().forward() == target_open.Mor(
         target_open
     ).identity()
 
