@@ -552,10 +552,6 @@ class RationalPolyhedralFans(OwnedParameterizedCategory):
             full-dimensional smooth cone, the Hilbert basis is the dual lattice
             basis and the unique coefficients are the ray pairings.
             """
-            assert self.dual_cone_contains(character), (
-                f"the character {character} is not in the dual cone of {self}, so it is not in "
-                "the semigroup S_sigma and has no expansion in its generators"
-            )
             integers = _integers()
             generators = self.semigroup_generators()
             rays = self.rays()
@@ -573,6 +569,11 @@ class RationalPolyhedralFans(OwnedParameterizedCategory):
             # backend smoothness predicate first: it is irrelevant to that
             # complete branch and can dominate repeated overlap-character
             # construction for the singular AT21 Hilbert bases.
+            if rank != 2 or dimension != 2:
+                assert self.dual_cone_contains(character), (
+                    f"the character {character} is not in the dual cone of {self}, so it is not in "
+                    "the semigroup S_sigma and has no expansion in its generators"
+                )
             if (
                 not (rank == 2 and dimension == 2)
                 and self.is_smooth()
@@ -663,6 +664,15 @@ class RationalPolyhedralFans(OwnedParameterizedCategory):
                             coefficient,
                             name="Semigroup multiplicities of a character",
                         )
+                # The exact rank-two search above both constructs an expansion
+                # when one exists and proves cone membership: a nonnegative
+                # combination of Hilbert generators lies in the cone. Only
+                # when no unimodular pair gives such an expansion do we need
+                # the general membership predicate before Sage's fallback.
+                assert self.dual_cone_contains(character), (
+                    f"the character {character} is not in the dual cone of {self}, so it is not in "
+                    "the semigroup S_sigma and has no expansion in its generators"
+                )
             multiplicities = self._engine_cone().dual().Hilbert_coefficients(
                 list(_engine_vector(self.character_lattice(), character))
             )
