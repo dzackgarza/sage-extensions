@@ -72,6 +72,7 @@ def main() -> None:
 
     toric = load_tests("tests/schemes/test_toric_schemes.sage")
     for name in (
+        "test_character_cocharacter_value_is_the_owned_functional_evaluation",
         "test_smooth_full_dimensional_cone_coefficients_are_dual_ray_pairings",
         "test_singular_rank_two_cone_coefficients_reconstruct_hilbert_generators",
         "test_overlap_characters_stay_in_the_selected_face_localization",

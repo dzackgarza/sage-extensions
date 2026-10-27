@@ -101,6 +101,23 @@ def test_smooth_full_dimensional_cone_coefficients_are_dual_ray_pairings() -> No
             )
 
 
+def test_character_cocharacter_value_is_the_owned_functional_evaluation() -> None:
+    r"""The scalar pairing is exactly evaluation in the selected dual frames."""
+    fan = _plane_fans().projective_space_fan()
+    characters = tuple(fan.character_lattice().module_generating_set())
+    cocharacters = tuple(fan.lattice().module_generating_set())
+    integers = ZZ
+
+    for i, character_label in enumerate(characters):
+        character = fan.character_lattice().module_generator(character_label)
+        for j, cocharacter_label in enumerate(cocharacters):
+            cocharacter = fan.lattice().module_generator(cocharacter_label)
+            value = fan.character_cocharacter_value(character, cocharacter)
+            assert value.parent() is integers
+            assert value == character(cocharacter)
+            assert int(value) == (1 if i == j else 0)
+
+
 def test_overlap_characters_stay_in_the_selected_face_localization() -> None:
     r"""Transition characters have the literal coordinate-algebra parent of their overlap."""
     from sage_extensions.categories.schemes.toric.toric_schemes import (

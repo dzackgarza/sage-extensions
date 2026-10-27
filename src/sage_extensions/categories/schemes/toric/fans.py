@@ -153,20 +153,14 @@ class RationalPolyhedralFans(OwnedParameterizedCategory):
     def character_cocharacter_value(self, character, cocharacter):
         r"""Return the scalar integer ``<character, cocharacter>``.
 
-        The bilinear classifier above lands in the rank-one module underlying
-        ``ZZ``.  Toric valuations use its scalar coefficient, which is extracted
-        here at the pairing owner rather than independently by each consumer.
+        Characters are the owned linear functionals on the cocharacter lattice,
+        so evaluation is already the defining perfect pairing.  Return that
+        scalar directly instead of routing each evaluation through the
+        rank-one ``ZZ`` module, constructing a bilinear-map element, and
+        extracting its sole coordinate.  This owner-level implementation is
+        exactly the same map as :meth:`character_cocharacter_pairing`.
         """
-        pairing = self.character_cocharacter_pairing()
-        values = pairing.codomain()
-        labels = values.module_generating_set()
-        assert labels.cardinality() == 1, (
-            f"the pairing of characters with cocharacters of {self} must take values in ZZ, a "
-            f"free module of rank 1, but it takes values in {values} of rank {labels.cardinality()}"
-        )
-        (label,) = labels
-        integers = _integers()
-        return integers(pairing(character, cocharacter).to_vector()(label))
+        return _integers()(character(cocharacter))
 
     def _repr_object_names(self):
         return f"rational polyhedral fans in {self.lattice()}"
