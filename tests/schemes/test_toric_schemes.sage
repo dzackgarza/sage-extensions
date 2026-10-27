@@ -118,6 +118,30 @@ def test_overlap_characters_stay_in_the_selected_face_localization() -> None:
         assert image.parent() is localization
 
 
+def test_overlap_character_assignment_preserves_semigroup_addition() -> None:
+    r"""The overlap character map respects chi^(m+n)=chi^m chi^n exactly."""
+    from sage_extensions.categories.schemes.toric.toric_schemes import (
+        _character_on_overlap,
+        _face_localization,
+    )
+
+    fan = _plane_fans().projective_space_fan()
+    source, target = tuple(fan.maximal_cones())[:2]
+    face = source.intersection(target)
+    localization = _face_localization(face, source, QQ).coordinate_algebra()
+    generators = tuple(target.semigroup_generators())
+
+    for left in generators:
+        for right in generators:
+            left_image = _character_on_overlap(left, face, source, QQ)
+            right_image = _character_on_overlap(right, face, source, QQ)
+            sum_image = _character_on_overlap(left + right, face, source, QQ)
+            assert left_image.parent() is localization
+            assert right_image.parent() is localization
+            assert sum_image.parent() is localization
+            assert sum_image == left_image * right_image
+
+
 def test_the_chart_of_the_a_one_cone_is_the_quadric_cone() -> None:
     r"""CLS Example 1.2.22: ``S_sigma`` needs three characters with one
     relation, so the chart is a hypersurface in three variables rather than an
