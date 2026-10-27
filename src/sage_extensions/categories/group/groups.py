@@ -5623,6 +5623,20 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             match self:
                 case _ if self in OwnedFiniteGroups():
                     return conjunction(left * right == right * left for left in self for right in self)
+                case _ if self in CoxeterGroups():
+                    # The Coxeter presentation itself decides commutativity:
+                    # W(M) is abelian exactly when every pair of distinct
+                    # simple reflections commutes, i.e. m_ij = 2 off the
+                    # diagonal.  Sage's CoxeterMatrixGroup.is_abelian() may
+                    # be unimplemented, so do not delegate this defining
+                    # property to that derived engine query.
+                    matrix = self.coxeter_matrix()
+                    indices = tuple(matrix.index_set())
+                    return all(
+                        matrix[left, right] == 2
+                        for position, left in enumerate(indices)
+                        for right in indices[position + 1 :]
+                    )
                 case _:
                     return AtomicProposition("is_abelian", self)
 
