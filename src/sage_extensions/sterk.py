@@ -284,12 +284,40 @@ class Sterk:
         configurations = {
             name: finite_ordered_set(roots) for name, roots in configurations.items()
         }
-        for name, roots in configurations.items():
-            for root in roots:
-                assert root.q() in (-2, -4), (
-                    f"the configuration {name} contains {root}, which is not a root: "
-                    f"its square is {root.q()}, not -2 or -4"
-                )
+        # Verify all root squares in one exact Gram contraction. Calling
+        # ``root.q()`` separately for each of the sixty configured roots
+        # repeatedly rebuilds the selected tensor-index machinery. In the
+        # chosen lattice basis, the entire root Gram is C G C^T, so its
+        # diagonal gives precisely the same individual norms in one batch.
+        lattice = NamedLattices.TdP
+        labels = tuple(lattice.module_generating_set())
+        roots_by_configuration = tuple(
+            (name, root)
+            for name, roots in configurations.items()
+            for root in roots
+        )
+        rooted_vectors = tuple(
+            (name, root, root.to_vector()) for name, root in roots_by_configuration
+        )
+        coordinate_vectors = tuple(
+            vector.parent()._selected_module_coefficients(vector)
+            for _name, _root, vector in rooted_vectors
+        )
+        coordinate_matrix = sage_matrix(
+            QQ,
+            [
+                [QQ(int(vector.get(label, 0))) for label in labels]
+                for vector in coordinate_vectors
+            ],
+        )
+        gram = _engine_component_matrix(lattice.gram_tensor()).change_ring(QQ)
+        root_gram = coordinate_matrix * gram * coordinate_matrix.transpose()
+        for position, (name, root, _vector) in enumerate(rooted_vectors):
+            square = root_gram[position, position]
+            assert square in (-2, -4), (
+                f"the configuration {name} contains {root}, which is not a root: "
+                f"its square is {square}, not -2 or -4"
+            )
         assert reflect(reflect(v["v20"])) == v["v20"]
         assert reflect(reflect(v["v18"])) == v["v18"]
         assert orbit_sum(v["v20"]) == v["v22"] + 2 * v["v20"]

@@ -64,6 +64,7 @@ def _engine_cartan_type_data(value):
     return value
 
 
+@cached_function
 def _coxeter_entry(ring, q1, q2, pairing):
     r"""Return the Coxeter matrix entry of the mirrors of two roots with squares ``q1``, ``q2``.
 
@@ -783,6 +784,7 @@ class CoxeterDiagrams(OwnedCategory):
             mirrors = self.cardinality()
             return tensor(real_algebraics, (), (mirrors, mirrors), values)
 
+        @cached_method
         def _inertia_counts(self):
             r"""Return \((n_+,n_-,n_0)\) of the Schlaefli form, by Sylvester.
 
@@ -866,12 +868,133 @@ class CoxeterDiagrams(OwnedCategory):
             )
 
         def _induced_subdiagrams(self, predicate, *, connected):
-            r"""Return the induced subdiagrams satisfying ``predicate``, in the order of :meth:`induced_subdiagrams`."""
+            r"""Return the induced subdiagrams satisfying ``predicate``.
+
+            With ``connected=True``, enumerate connected vertex subsets by
+            frontier growth in the Coxeter graph. Filtering all ``2^n`` subsets
+            and constructing a rooted subdiagram for each is needlessly
+            exponential for the five Sterk diagrams: only a small fraction of
+            their subsets are connected. The index sets are still ordered by
+            cardinality and then lexicographically, exactly as in
+            :meth:`induced_subdiagrams`.
+            """
+            vertices = tuple(self.index_set())
+            if not connected:
+                return finite_ordered_set(
+                    tuple(
+                        diagram
+                        for diagram in self.induced_subdiagrams()
+                        if predicate(diagram)
+                    )
+                )
+
+            adjacency = [set() for _vertex in vertices]
+            for i, left in enumerate(vertices):
+                for j in range(i + 1, len(vertices)):
+                    if self.coxeter_entry(left, vertices[j]) != 2:
+                        adjacency[i].add(j)
+                        adjacency[j].add(i)
+
+            # Grow from each singleton, deduplicating by integer vertex
+            # positions rather than comparing represented diagram objects.
+            seen = {frozenset((i,)) for i in range(len(vertices))}
+            frontier = list(seen)
+            while frontier:
+                subset = frontier.pop()
+                neighbors = set().union(*(adjacency[i] for i in subset)) - set(subset)
+                for neighbor in neighbors:
+                    enlarged = subset | {neighbor}
+                    if enlarged not in seen:
+                        seen.add(enlarged)
+                        frontier.append(enlarged)
+
+            ordered_subsets = sorted(seen, key=lambda subset: (len(subset), tuple(sorted(subset))))
             return finite_ordered_set(
                 tuple(
                     diagram
-                    for diagram in self.induced_subdiagrams()
-                    if predicate(diagram) and (not connected or diagram.is_connected())
+                    for positions in ordered_subsets
+                    if predicate(
+                        diagram := self.induced_subdiagram(
+                            tuple(vertices[i] for i in sorted(positions))
+                        )
+                    )
+                )
+            )
+
+        def _connected_elliptic_subdiagrams(self):
+            r"""Enumerate connected elliptic induced subdiagrams by positive-definite growth.
+
+            A principal submatrix of a non-positive-definite symmetric matrix
+            cannot become positive definite after adjoining more indices.
+            Grow connected vertex sets only while their Schlaefli principal
+            matrix is positive definite. This is exact Sylvester/LDL
+            elimination over the selected real algebraic field, and avoids
+            constructing every connected rooted subdiagram merely to reject it.
+            """
+            vertices = tuple(self.index_set())
+            matrix = _engine_component_matrix(self.schlafli_tensor())
+            adjacency = [set() for _vertex in vertices]
+            for i, left in enumerate(vertices):
+                for j in range(i + 1, len(vertices)):
+                    if self.coxeter_entry(left, vertices[j]) != 2:
+                        adjacency[i].add(j)
+                        adjacency[j].add(i)
+
+            # Each accepted subset carries an exact LDL^T factorization in
+            # its growth order. Adding one vertex needs only one Schur
+            # complement; recomputing a full principal-matrix elimination for
+            # every candidate repeats cubic work across all its subdiagrams.
+            # A candidate rejected by its Schur complement is not expanded,
+            # because a non-positive-definite principal submatrix cannot be a
+            # principal submatrix of any elliptic diagram.
+            states = {}
+            frontier = []
+            seen = set()
+            for i in range(len(vertices)):
+                subset = frozenset((i,))
+                seen.add(subset)
+                pivot = matrix[i, i]
+                if pivot > 0:
+                    states[subset] = ((i,), ((1,),), (pivot,))
+                    frontier.append(subset)
+
+            elliptic = []
+            while frontier:
+                subset = frontier.pop()
+                order, lower, diagonal = states[subset]
+                elliptic.append(tuple(sorted(subset)))
+                neighbors = set().union(*(adjacency[i] for i in subset)) - set(subset)
+                for neighbor in neighbors:
+                    enlarged = subset | {neighbor}
+                    if enlarged in seen:
+                        continue
+                    seen.add(enlarged)
+                    column = tuple(matrix[i, neighbor] for i in order)
+                    solved = []
+                    for i, value in enumerate(column):
+                        solved.append(
+                            value
+                            - sum(
+                                (lower[i][j] * solved[j] for j in range(i)),
+                                matrix.base_ring().zero(),
+                            )
+                        )
+                    pivot = matrix[neighbor, neighbor] - sum(
+                        (solved[i] * solved[i] / diagonal[i] for i in range(len(order))),
+                        matrix.base_ring().zero(),
+                    )
+                    if pivot <= 0:
+                        continue
+                    new_lower_row = tuple(solved[i] / diagonal[i] for i in range(len(order)))
+                    new_lower = tuple(row + (0,) for row in lower) + (new_lower_row + (1,),)
+                    states[enlarged] = (order + (neighbor,), new_lower, diagonal + (pivot,))
+                    frontier.append(enlarged)
+
+            elliptic.sort(key=lambda subset: (len(subset), subset))
+            return finite_ordered_set(
+                tuple(
+                    self.induced_subdiagram(tuple(vertices[i] for i in positions))
+                    for positions in elliptic
                 )
             )
 
@@ -883,9 +1006,9 @@ class CoxeterDiagrams(OwnedCategory):
             minimum of :meth:`subdiagram_poset`, and it is excluded by
             ``connected=True`` because it has no connected component at all.
             """
-            return self._induced_subdiagrams(
-                lambda diagram: diagram.is_elliptic(), connected=connected
-            )
+            if connected:
+                return self._connected_elliptic_subdiagrams()
+            return self._induced_subdiagrams(lambda diagram: diagram.is_elliptic(), connected=False)
 
         def parabolic_subdiagrams(self, *, connected=False):
             r"""Return the parabolic induced subdiagrams."""

@@ -8704,10 +8704,20 @@ class EvenTwoElementaryLattices(OwnedCategoryOverBaseRing):
             # 2-elementarity in its constructor. For a finite nondegenerate
             # integral lattice, |det(G)| is |A_L|; since A_L is elementary
             # abelian of exponent 2, |A_L| = 2^a where a is its length. Avoid
-            # recomputing Smith invariant factors merely to recover a.
+            # recomputing Smith invariant factors merely to recover a. Compute
+            # delta from the same integral Gram inverse without calling
+            # ``self.delta()``: that public validator repeats the evenness and
+            # 2-elementarity checks already proved by this category's
+            # constructor, including another discriminant-exponent check.
             determinant = abs(int(self.determinant()))
+            delta = self.base_ring().zero()
+            if determinant != 1:
+                inverse = self._integral_gram_inverse()
+                delta = self.base_ring()(
+                    int(any(inverse[i, i] not in SageZZ for i in range(inverse.nrows())))
+                )
             return nikulin_invariants(
-                self.module_rank(), self.base_ring()(determinant.bit_length() - 1), self.delta()
+                self.module_rank(), self.base_ring()(determinant.bit_length() - 1), delta
             )
 
     def an_object(self):
