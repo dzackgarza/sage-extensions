@@ -71,6 +71,19 @@ def test_even_unimodular_gram_join_retains_delta_in_rank_twenty_eight() -> None:
     assert gram_lattice.delta() == 0
 
 
+def test_gram_construction_places_only_even_two_elementary_lattices_on_delta_surface() -> None:
+    r"""Gram reconstruction retains the two-elementary hypothesis and its delta value."""
+    lattices = Lattices(ZZ)
+    two_elementary = lattices(NamedLattices.A1.gram_tensor())
+    assert two_elementary in EvenTwoElementaryLattices(ZZ)
+    assert two_elementary.delta() == 1
+
+    not_two_elementary = lattices(NamedLattices.A2.gram_tensor())
+    assert not_two_elementary.is_even()
+    assert not not_two_elementary.is_p_elementary(2)
+    assert not not_two_elementary in EvenTwoElementaryLattices(ZZ)
+
+
 def test_the_vectors_of_square_minus_two() -> None:
     r"""$b(xe + yf, xe + yf) = 2xy = -2$ exactly for $(x, y) = \pm(1, -1)$."""
     plane = hyperbolic_plane()
