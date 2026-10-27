@@ -3035,6 +3035,7 @@ class BilinearFormModules(OwnedCategoryOverBaseRing):
                 r"""Return a negative-square vector, or ``None`` if none exists."""
                 return self.vector_of_sign(-1)
 
+            @cached_method
             def signature_pair(self):
                 r"""Return the Sylvester inertia pair of a finite symmetric form.
 
