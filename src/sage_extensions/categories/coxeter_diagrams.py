@@ -432,6 +432,7 @@ class CoxeterDiagrams(OwnedCategory):
             names=None,
             positions=None,
             type_label=None,
+            root_gram_matrix=None,
             **rest,
         ) -> None:
             r"""Retain the owned Coxeter matrix \(m\colon V\times V\to\mathrm{Card}\).
@@ -446,6 +447,11 @@ class CoxeterDiagrams(OwnedCategory):
             self._coxeter_matrix = coxeter_matrix
             self._entries = _coxeter_entries_of(coxeter_matrix)
             self._type_label = type_label
+            # Rooted constructors may supply the exact private engine matrix
+            # already used to build the owned root-Gram tensor. Retain it so
+            # exact inertia algorithms do not lower every tensor coordinate
+            # through the finite-ordinal indexing boundary again.
+            self._root_gram_engine_matrix = root_gram_matrix
             vertices = tuple(dict.fromkeys(left for left, _right in self._entries))
             self._names = (
                 finite_ordered_set(tuple(f"s_{vertex}" for vertex in vertices))
@@ -716,22 +722,53 @@ class CoxeterDiagrams(OwnedCategory):
             if self.is_rooted():
                 root_gram = self.root_gram_tensor()
                 roots = indexed_family(chosen, self.root, name="Roots")
-                gram = tensor(
-                    root_gram.base_ring(),
-                    (),
-                    (chosen.cardinality(), chosen.cardinality()),
-                    [[root_gram[i, j] for j in positions] for i in positions],
-                )
+                engine_root_gram = self._root_gram_engine_matrix
+                if engine_root_gram is None:
+                    gram = tensor(
+                        root_gram.base_ring(),
+                        (),
+                        (chosen.cardinality(), chosen.cardinality()),
+                        [[root_gram[i, j] for j in positions] for i in positions],
+                    )
+                    engine_subgram = None
+                else:
+                    # Restrict the already selected private Gram matrix by
+                    # integer positions, then raise its entries to the owned
+                    # tensor. Repeatedly indexing the full owned tensor here
+                    # normalizes two finite ordinal indices for every matrix
+                    # entry, which dominates construction of the hundreds of
+                    # rooted elliptic subdiagrams in Sterk's archive.
+                    engine_subgram = sage_matrix(
+                        engine_root_gram.base_ring(),
+                        [
+                            [engine_root_gram[i, j] for j in positions]
+                            for i in positions
+                        ],
+                    )
+                    gram = tensor(
+                        root_gram.base_ring(),
+                        (),
+                        (chosen.cardinality(), chosen.cardinality()),
+                        [
+                            [
+                                _owned_engine_element(root_gram.base_ring(), engine_subgram[i, j])
+                                for j in range(engine_subgram.ncols())
+                            ]
+                            for i in range(engine_subgram.nrows())
+                        ],
+                    )
                 extra = (RootedCoxeterDiagrams(),)
             else:
                 roots = None
                 gram = None
+                engine_subgram = None
                 extra = ()
             restricted_diagram = _coxeter_diagram(
                 restricted,
                 names=names,
                 roots=roots,
                 root_gram=gram,
+                root_gram_matrix=engine_subgram,
                 positions=preferred_positions,
             )
             inclusion = restricted_diagram.Mor(self)(lambda vertex: vertex)
@@ -752,26 +789,31 @@ class CoxeterDiagrams(OwnedCategory):
 
             real_algebraics = _owned_real_algebraic_numbers()
             rooted_gram = self.root_gram_tensor() if self.is_rooted() else None
-            ranking = self.index_set().ranking_map()
+            rooted_gram_matrix = self._root_gram_engine_matrix
+            ordered_mirrors = tuple(self.index_set())
+            ranking = None if rooted_gram_matrix is not None else self.index_set().ranking_map()
             values = []
-            for left in self.index_set():
+            for i, left in enumerate(ordered_mirrors):
                 row = []
-                for right in self.index_set():
-                    if left == right:
+                for j, right in enumerate(ordered_mirrors):
+                    if i == j:
                         row.append(real_algebraics.one())
                         continue
                     if rooted_gram is not None:
-                        i = int(ranking(left))
-                        j = int(ranking(right))
-                        left_square = SageAA(
-                            _engine_element(rooted_gram.base_ring(), rooted_gram[i, i])
-                        )
-                        right_square = SageAA(
-                            _engine_element(rooted_gram.base_ring(), rooted_gram[j, j])
-                        )
-                        pairing = SageAA(
-                            _engine_element(rooted_gram.base_ring(), rooted_gram[i, j])
-                        )
+                        if rooted_gram_matrix is None:
+                            left_square = SageAA(
+                                _engine_element(rooted_gram.base_ring(), rooted_gram[i, i])
+                            )
+                            right_square = SageAA(
+                                _engine_element(rooted_gram.base_ring(), rooted_gram[j, j])
+                            )
+                            pairing = SageAA(
+                                _engine_element(rooted_gram.base_ring(), rooted_gram[i, j])
+                            )
+                        else:
+                            left_square = SageAA(rooted_gram_matrix[i, i])
+                            right_square = SageAA(rooted_gram_matrix[j, j])
+                            pairing = SageAA(rooted_gram_matrix[i, j])
                         normalized = -abs(pairing) / (left_square * right_square).sqrt()
                         row.append(_cross_engine_ring_value(normalized))
                         continue
@@ -793,9 +835,28 @@ class CoxeterDiagrams(OwnedCategory):
             \(n_0\) is part of the answer.  This is not a signature *pair*.
             """
 
-            # Symmetric congruence elimination computes inertia without
-            # factoring the characteristic polynomial over algebraic numbers.
-            matrix = _engine_component_matrix(self.schlafli_tensor())
+            # For a rooted integral diagram, the retained root Gram supplies
+            # an integral matrix congruent to the Schlaefli form by a positive
+            # diagonal scaling. Compute inertia from it directly rather than
+            # rebuilding the normalized tensor and lowering every entry.
+            if (
+                self.is_rooted()
+                and self._root_gram_engine_matrix is not None
+                and _engine_ring(self.root_gram_tensor().base_ring()) is SageZZ
+            ):
+                gram = self._root_gram_engine_matrix.change_ring(SageZZ)
+                matrix = sage_matrix(
+                    SageZZ,
+                    [
+                        [
+                            abs(gram[i, i]) if i == j else -abs(gram[i, j])
+                            for j in range(gram.ncols())
+                        ]
+                        for i in range(gram.nrows())
+                    ],
+                ).change_ring(QQ)
+            else:
+                matrix = _engine_component_matrix(self.schlafli_tensor())
             entries = [[matrix[i, j] for j in range(matrix.ncols())]
                        for i in range(matrix.nrows())]
             positive = negative = zero = 0
@@ -932,11 +993,37 @@ class CoxeterDiagrams(OwnedCategory):
             constructing every connected rooted subdiagram merely to reject it.
             """
             vertices = tuple(self.index_set())
-            matrix = _engine_component_matrix(self.schlafli_tensor())
+            if self.is_rooted() and _engine_ring(self.root_gram_tensor().base_ring()) is SageZZ:
+                # For an integral rooted diagram, let G be its root Gram and
+                # d_i=|G_ii|. Its Schlaefli matrix is congruent via the positive
+                # diagonal matrix diag(sqrt(d_i)) to the integral matrix
+                # A_ii=d_i, A_ij=-|G_ij|. Sylvester inertia is invariant under
+                # this congruence, so exact rational LDL avoids algebraic
+                # square roots entirely for Sterk's integral roots.
+                gram = self._root_gram_engine_matrix
+                if gram is None:
+                    gram = _engine_component_matrix(self.root_gram_tensor())
+                gram = gram.change_ring(SageZZ)
+                matrix = sage_matrix(
+                    SageZZ,
+                    [
+                        [
+                            abs(gram[i, i]) if i == j else -abs(gram[i, j])
+                            for j in range(gram.ncols())
+                        ]
+                        for i in range(gram.nrows())
+                    ],
+                ).change_ring(QQ)
+            else:
+                matrix = _engine_component_matrix(self.schlafli_tensor())
             adjacency = [set() for _vertex in vertices]
-            for i, left in enumerate(vertices):
+            for i, _left in enumerate(vertices):
                 for j in range(i + 1, len(vertices)):
-                    if self.coxeter_entry(left, vertices[j]) != 2:
+                    # The Schlaefli off-diagonal vanishes exactly when the
+                    # Coxeter entry is 2. Read adjacency from the already
+                    # computed exact matrix instead of reranking represented
+                    # vertex labels through the public Coxeter-entry accessor.
+                    if matrix[i, j] != 0:
                         adjacency[i].add(j)
                         adjacency[j].add(i)
 
@@ -1656,6 +1743,7 @@ def _root_basis_diagram(roots, names=None, positions=None, type_label=None):
         names=names,
         roots=roots,
         root_gram=gram,
+        root_gram_matrix=paired_matrix,
         positions=positions,
         type_label=type_label,
     )
