@@ -2599,7 +2599,9 @@ class FramedFreeAlgebraMorphism:
 
     def _tensor_terms(self, element):
         domain = self.domain()
-        if domain in AlgebrasWithChosenFinitePresentation(domain.base_ring()):
+        if domain in TensorAlgebras(domain.base_ring()):
+            presented = _engine_element(domain, element)
+        elif domain in AlgebrasWithChosenFinitePresentation(domain.base_ring()):
             presentation_ring = domain.presentation_ring()
             presented = _engine_element(
                 presentation_ring,
@@ -2621,7 +2623,9 @@ class FramedFreeAlgebraMorphism:
 
     def _symmetric_terms(self, element):
         domain = self.domain()
-        if domain in AlgebrasWithChosenFinitePresentation(domain.base_ring()):
+        if domain in SymmetricAlgebras(domain.base_ring()):
+            presented = _engine_element(domain, element)
+        elif domain in AlgebrasWithChosenFinitePresentation(domain.base_ring()):
             presentation_ring = domain.presentation_ring()
             presented = _engine_element(
                 presentation_ring,

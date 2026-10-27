@@ -157,10 +157,8 @@ def _face_supporting_character_monomial(face, cone, chart):
         # An injectively generated semigroup algebra is its polynomial
         # presentation itself, so there is no quotient map to apply.
         presentation = algebra
-        descend = lambda element: element
     else:
         presentation = algebra.presentation_ring()
-        descend = algebra.algebra_presentation_morphism()
     labels = tuple(algebra.algebra_generating_set())
     ranking = cone.semigroup_generators().ranking_map()
     monomial = presentation.one()
@@ -169,7 +167,11 @@ def _face_supporting_character_monomial(face, cone, chart):
     # Multiply in the polynomial presentation, then descend once. Multiplying
     # in the quotient after every factor repeatedly reduces intermediate
     # monomials modulo the toric ideal, although only the final class is needed.
-    return descend(monomial)
+    return (
+        monomial
+        if presentation is algebra
+        else algebra.algebra_presentation_morphism()(monomial)
+    )
 
 
 @cached_function
@@ -187,10 +189,8 @@ def _character_monomial(character, cone, chart):
 
     if algebra in SymmetricAlgebras(algebra.base_ring()):
         presentation = algebra
-        descend = lambda element: element
     else:
         presentation = algebra.presentation_ring()
-        descend = algebra.algebra_presentation_morphism()
     labels = tuple(algebra.algebra_generating_set())
     monomial = presentation.one()
     for position, multiplicity in enumerate(cone.semigroup_coefficients(character)):
@@ -199,7 +199,11 @@ def _character_monomial(character, cone, chart):
             monomial *= presentation.algebra_generator(labels[position]) ** exponent
     # Descend the complete monomial once, rather than reducing each product in
     # the quotient algebra. This preserves its exact class in k[S_sigma].
-    return descend(monomial)
+    return (
+        monomial
+        if presentation is algebra
+        else algebra.algebra_presentation_morphism()(monomial)
+    )
 
 
 @cached_function
