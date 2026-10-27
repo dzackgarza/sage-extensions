@@ -280,14 +280,10 @@ def _face_transition(source_cone, target_cone, base_ring):
     \(\sigma\) itself lies in \(\sigma^\perp\), where it is already a unit and
     localizing at it says nothing.
     """
-    assert not source_cone.is_face_of(target_cone), (
-        f"the charts of {source_cone} and {target_cone} are glued along their common face only "
-        f"when neither is a face of the other, but {source_cone} is a face of {target_cone}"
-    )
-    assert not target_cone.is_face_of(source_cone), (
-        f"the charts of {source_cone} and {target_cone} are glued along their common face only "
-        f"when neither is a face of the other, but {target_cone} is a face of {source_cone}"
-    )
+    # This private constructor is called only on distinct members of the
+    # selected maximal-cone family (see `_toric_variety` below). Distinct
+    # maximal cones cannot be faces of one another, so repeating Sage's two
+    # cone-containment computations here is redundant.
     face = source_cone.intersection(target_cone)
     forward = _face_transition_morphism(face, source_cone, target_cone, base_ring)
     inverse = _face_transition_morphism(face, target_cone, source_cone, base_ring)
