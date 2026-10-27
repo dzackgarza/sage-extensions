@@ -1885,7 +1885,6 @@ class Algebras(OwnedCategoryOverBaseRing):
                 case _:
                     return AtomicProposition("is_finitely_generated_as_algebra", self)
 
-        @cached_method
         def selected_algebra_resolution(self):
             return self.selected_resolution(self.algebra_framing_owner())
 
@@ -3377,7 +3376,6 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
         def _algebra_mor_class(self):
             return PresentedAlgebraMor
 
-        @cached_method
         def selected_algebra_presentation(self):
             r"""Return the one chosen truncation-one algebra resolution."""
             selected = self.selected_algebra_resolution()
@@ -3390,7 +3388,6 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                         f"is truncated in degree {selected.truncation()}"
                     )
 
-        @cached_method
         def presentation_ring(self):
             return self.selected_algebra_presentation().level(0)
 
@@ -3651,7 +3648,6 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             )
             return variable_count - 1
 
-        @cached_method
         def algebra_presentation_morphism(self):
             return self.selected_algebra_presentation().augmentation()
 
