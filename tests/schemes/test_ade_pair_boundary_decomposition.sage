@@ -110,6 +110,25 @@ def test_the_at21_enhancement_of_a1_is_a_log_pair_on_the_same_surface() -> None:
     assert generator_morphism("epsilon") == coefficients.algebra_generator("epsilon")
 
 
+def test_at21_a_zero_minus_and_primed_even_polygon_conventions() -> None:
+    r"""Retain the literal AT21 ``A_0^-`` and primed-even polygon conventions."""
+    minus = ADELogPairs(QQ).at21("A", 0, variant="A^-")
+    assert minus.dynkin_rank() == 0
+    assert minus.source_variant() == "short"
+    assert minus.base_pair().dynkin_variant() == ("long", "short")
+    assert {tuple(int(c) for c in vertex) for vertex in minus.base_pair().polygon().vertices()} == {
+        (0, 2), (0, 0), (1, 0)
+    }
+
+    primed_even = ADELogPairs(QQ).at21("A", 4, variant="'A^-")
+    vertices = {
+        tuple(int(c) for c in vertex)
+        for vertex in primed_even.base_pair().polygon().vertices()
+    }
+    assert (3, 0) in vertices
+    assert (4, 0) not in vertices
+
+
 def test_at21_public_constructor_accepts_the_default_a_zero_minus_shape() -> None:
     r"""AT21's A_0^- default is normalized before the public rank check."""
     pair = ADELogPairs(QQ).at21("A", 0)
