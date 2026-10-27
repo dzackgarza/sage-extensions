@@ -5665,7 +5665,7 @@ class AffineGSchemes(OwnedCategory):
             )
             try:
                 elements = iter(group)
-            except TypeError, NotImplementedError:
+            except (TypeError, NotImplementedError):
                 assert False, (
                     f"the nontrivial stabilizer subscheme of {self} requires a selected "
                     f"finite enumeration of {group}"

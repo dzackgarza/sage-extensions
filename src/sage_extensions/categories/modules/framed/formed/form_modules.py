@@ -467,7 +467,7 @@ class FormedModuleMorphism:
 
     def base_change(
         self, ring_map: Morphism | CategoricalArrow
-    ) -> FormedModuleMorphism:
+    ) -> "FormedModuleMorphism":
         r"""Extend both the module map and the value map along ``R -> S``.
 
         A formed morphism is a pair ``(f,h)`` satisfying the form square.
@@ -1773,8 +1773,8 @@ class FormModules(OwnedCategoryOverBaseRing):
             super().__init__(**rest)
 
         def _added_structure(
-            self, construction_data: dict[str, ConstructionData]
-        ) -> tuple[tuple[Category, ...], dict[str, ConstructionData]]:
+            self, construction_data: dict[str, "ConstructionData"]
+        ) -> tuple[tuple["Category", ...], dict[str, "ConstructionData"]]:
             r"""The form this level adds, kept when the module is constructed again (``OWN-05``; see ``Objects``)."""
             categories, data = super()._added_structure(construction_data)
             return categories, {"source_form": self.form(), **data}

@@ -365,12 +365,12 @@ class FlagType:
                 object.__setattr__(self, "dimensions", dimensions)
 
     @classmethod
-    def plane(cls, rank: int) -> FlagType:
+    def plane(cls, rank: int) -> "FlagType":
         r"""Return the type of a one-term flag of rank ``rank``."""
         return cls((int(rank),))
 
     @classmethod
-    def complete(cls, rank: int) -> FlagType:
+    def complete(cls, rank: int) -> "FlagType":
         r"""Return the complete flag type ``1 < 2 < ... < rank``."""
         return cls(tuple(range(1, int(rank) + 1)))
 
@@ -420,7 +420,7 @@ class IsotropicFlag:
     def top(self):
         return self._terms[-1]
 
-    def flag_type(self) -> FlagType:
+    def flag_type(self) -> "FlagType":
         r"""Return the ranks of the nested primitive isotropic terms."""
         return FlagType(tuple(int(term.module_rank()) for term in self._terms))
 

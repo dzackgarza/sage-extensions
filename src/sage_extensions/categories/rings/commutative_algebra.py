@@ -3307,7 +3307,7 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
         parent = self.parent()
         try:
             other = parent(other)
-        except TypeError, ValueError:
+        except (TypeError, ValueError):
             return False
         if self is other:
             return True

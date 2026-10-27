@@ -488,7 +488,7 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 .values()
             )
 
-        def primitive_part(self) -> FramedFreeModules.ElementMethods:
+        def primitive_part(self) -> "FramedFreeModules.ElementMethods":
             r"""Return ``v/content(v)`` for a nonzero vector over ``ZZ``.
 
             EXAMPLES::
@@ -509,7 +509,7 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 }
             )
 
-        def to_vector(self) -> FramedFreeModules.ElementMethods:
+        def to_vector(self) -> "FramedFreeModules.ElementMethods":
             r"""The coordinates of this element in the chosen basis ``I``.
 
             The finitely supported function \(a_v\colon I\to R\) with

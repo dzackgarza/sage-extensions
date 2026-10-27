@@ -714,7 +714,7 @@ def _ring_composite(second, first):
             return composite.elementwise(function)
 
 
-def _ring_mor_category(domain, codomain) -> RingMor:
+def _ring_mor_category(domain, codomain) -> "RingMor":
     r"""Build ``Mor_Ring(domain, codomain)`` from its owned Mor family."""
     return RingMorCategoryConstruction(OwnedRings()).Of(domain, codomain)
 
