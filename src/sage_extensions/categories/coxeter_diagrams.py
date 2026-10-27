@@ -7,6 +7,7 @@ from sage.categories.morphism import Morphism
 from sage.combinat.root_system.cartan_type import CartanType
 from sage.combinat.root_system.coxeter_matrix import CoxeterMatrix
 from sage.graphs.graph import Graph
+from sage.matrix.constructor import matrix as sage_matrix
 from sage.misc.cachefunc import cached_function, cached_method
 from sage.rings.infinity import Infinity
 from sage.rings.integer_ring import ZZ as SageZZ
@@ -26,6 +27,8 @@ from sage_extensions.categories.rings.ring_foundation import (
     _cross_engine_ring_value,
     _engine_element,
     _engine_numeral,
+    _engine_ring,
+    _owned_engine_element,
     _own_ring,
     _owned_integers,
     _owned_real_algebraic_numbers,
@@ -1455,13 +1458,26 @@ def _root_basis_diagram(roots, names=None, positions=None, type_label=None):
     # The lattice pairing is symmetric. Contract each unordered pair once
     # and retain both matrix entries; this halves the expensive exact tensor
     # contractions for the larger rooted diagrams (including Sterk's).
-    pairings = {}
-    ordered_mirrors = tuple(mirrors)
-    for position, left in enumerate(ordered_mirrors):
-        for right in ordered_mirrors[position:]:
-            value = form_gram.contract(coordinates[left], coordinates[right])
-            pairings[left, right] = value
-            pairings[right, left] = value
+    # Contracting two tensors independently for every root pair repeatedly
+    # traverses the owned tensor index machinery. Lower the selected scalar
+    # Gram and coordinate rows once, then use exact matrix multiplication.
+    # The coordinate matrix has one row per root and the original framing
+    # order, so its Gram is precisely C G C^T.
+    engine_ring = _engine_ring(ring)
+    coordinate_matrix = sage_matrix(
+        engine_ring,
+        [
+            [_engine_numeral(ring, coefficient) for coefficient in coordinates[index]]
+            for index in mirrors
+        ],
+    )
+    engine_gram = _engine_component_matrix(form_gram).change_ring(engine_ring)
+    paired_matrix = coordinate_matrix * engine_gram * coordinate_matrix.transpose()
+    pairings = {
+        (left, right): _owned_engine_element(ring, paired_matrix[i, j])
+        for i, left in enumerate(mirrors)
+        for j, right in enumerate(mirrors)
+    }
     gram = tensor(
         ring,
         (),
