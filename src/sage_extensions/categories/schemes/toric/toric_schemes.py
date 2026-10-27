@@ -257,10 +257,13 @@ def _character_on_overlap(character, face, cone, base_ring):
         f"the supporting character {supporting} does not move {character} into the dual cone of {cone}"
     )
     shifted = character + _integers()(exponent) * supporting
-    inverse = _inverse_face_supporting_unit(face, cone, base_ring)
-    return localized.localization_map()(
+    monomial = localized.localization_map()(
         _character_monomial(shifted, cone, chart)
-    ) * inverse**exponent
+    )
+    if exponent == 0:
+        return monomial
+    inverse = _inverse_face_supporting_unit(face, cone, base_ring)
+    return monomial * (inverse if exponent == 1 else inverse**exponent)
 
 
 @cached_function
