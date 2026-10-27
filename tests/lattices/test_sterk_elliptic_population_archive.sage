@@ -9,6 +9,8 @@ type, and a subdiagram mixing roots of square \(-2\) and \(-4\) is of type
 \(B_n = C_n\) at scale \(1\).
 """
 
+from fractions import Fraction
+
 from sage_extensions.all import *
 
 _ARCHIVED_TOTALS = {
@@ -173,7 +175,13 @@ def test_sterk_connected_elliptic_subdiagrams_have_the_recorded_types() -> None:
         rank = int(subdiagram.cardinality())
         if letter == "C" and rank != 2:
             letter = "B"
-        return (rank, letter, -subdiagram.root_scale())
+        scale = -subdiagram.root_scale()
+        # Localization elements deliberately remain unhashable: equivalent
+        # fractions need not share one numerator/denominator representation.
+        # Normalize only the test's multiset key to a canonical exact rational;
+        # the public root_scale result remains an owned QQ element.
+        scale_key = Fraction(int(scale.numerator()), int(scale.denominator()))
+        return (rank, letter, scale_key)
 
     for name, expected in _CONNECTED_ELLIPTIC_TYPES.items():
         connected = diagrams[name].elliptic_subdiagrams(connected=True)

@@ -99,8 +99,10 @@ def test_a_b3_root_basis_of_scale_one_half_has_the_b3_type_diagram() -> None:
     lattice = Lattices(ZZ)([[2, -1, 0], [-1, 2, -1], [0, -1, 1]])
     diagram = CoxeterDiagrams().from_roots(lattice.module_generators())
 
-    assert diagram.root_scale() == 1 / 2
+    assert diagram.root_scale().parent() is QQ
+    assert diagram.root_scale() == QQ(1) / QQ(2)
     assert diagram.label() == "B3"
     reference = diagram.scaled_cartan_type()
-    assert reference.root_scale() == 1 / 2
+    assert reference.root_scale().parent() is QQ
+    assert reference.root_scale() == QQ(1) / QQ(2)
     assert reference.coxeter_matrix() == diagram.coxeter_matrix()

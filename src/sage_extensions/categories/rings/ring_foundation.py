@@ -3,6 +3,7 @@
 from abc import ABCMeta
 from collections.abc import Mapping
 from functools import wraps
+from numbers import Rational
 
 from sage.all import (
     GF as _SageGF,
@@ -1111,8 +1112,22 @@ class LocalizationRings(OwnedCategory):
             )
 
         def equality_status(self, other):
-            if element_parent(other) is not self.parent():
-                return False
+            parent = self.parent()
+            if element_parent(other) is not parent:
+                # Python exact rational literals (Fraction and int) have no
+                # Sage Parent, but they denote legitimate scalar values when
+                # the corresponding fraction has an admitted denominator in
+                # this localization. Realize the literal through this exact
+                # localization's numerator/denominator construction before
+                # comparing. This keeps equality in the owned universe and
+                # correctly rejects rationals outside a proper localization.
+                if not isinstance(element_parent(other), Parent) and isinstance(other, Rational):
+                    try:
+                        other = parent.fraction(other.numerator, other.denominator)
+                    except (TypeError, ValueError, ArithmeticError):
+                        return False
+                else:
+                    return False
             return self.parent()._fraction_equality_status(self, other)
 
         def _richcmp_(self, other, op):
@@ -1124,6 +1139,16 @@ class LocalizationRings(OwnedCategory):
                     return status if op == op_EQ else negation(status)
                 case _:
                     return status if op == op_EQ else not bool(status)
+
+        # As with RingMorphism above, the owned-set element mixin appears
+        # before Sage's Element in this generated class's MRO. Its pointwise
+        # equality therefore bypasses this localization's mathematical
+        # equality_status/_richcmp_ contract unless equality is stated here.
+        def __eq__(self, other):
+            return self._richcmp_(other, op_EQ)
+
+        def __ne__(self, other):
+            return self._richcmp_(other, op_NE)
 
         def _repr_(self):
             if (self.denominator() == self.parent().localization_source().one()) is True:

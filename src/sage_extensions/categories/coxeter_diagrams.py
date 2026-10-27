@@ -1,6 +1,5 @@
 r"""Finite Coxeter diagrams, optionally rooted in an integral lattice."""
 
-from fractions import Fraction
 from itertools import combinations
 
 from sage.categories.map import Map
@@ -1876,18 +1875,15 @@ class RootedCoxeterDiagrams(OwnedCategory):
             return min(squares, key=abs) / 2
 
         def root_scale(self):
-            r"""Return the exact rational ``q(r)/2`` for a shortest root.
+            r"""Return the owned exact rational ``q(r)/2`` for a shortest root.
 
-            Root scale is a numerical classification invariant, not an owned
-            ring element. Returning the owned wrapper for the selected rational
-            makes equal scales compare unequal to ordinary exact rationals
-            (for example ``-root_scale() == 2``), which breaks type-set
-            classification. Cross this scalar boundary as a Python
-            ``Fraction``; the value is computed exactly in the private rational
-            field and no floating-point conversion occurs.
+            The private root-square computation is carried out in Sage's
+            rational field; cross that boundary through the owned rational
+            constructor. Equality with exact Python rational literals is
+            implemented by the owned scalar's canonical operand realization,
+            not by exposing a foreign ``Fraction`` as this public result.
             """
-            value = self._engine_root_scale()
-            return Fraction(int(value.numerator()), int(value.denominator()))
+            return _cross_engine_ring_value(self._engine_root_scale())
 
         def node_color(self, vertex):
             r"""Return the archived rooted-diagram fill convention determined by root square."""
