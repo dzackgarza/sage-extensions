@@ -1451,8 +1451,13 @@ def _root_basis_diagram(roots, names=None, positions=None, type_label=None):
         "diagram needs at least one to determine its lattice"
     )
     mirrors = roots.index_set()
-    realization = next(iter(roots.values())).parent()
-    assert all(root.parent() is realization for root in roots.values()), (
+    # Materialize the finite selected family exactly once. Repeatedly walking
+    # an owned IndexedFamily can rerun label normalization and value dispatch;
+    # the roots are subsequently needed both for the common-parent proof and
+    # for the coordinate matrix, so keep the same selected tuple for both.
+    root_values = tuple(roots.value(index) for index in mirrors)
+    realization = root_values[0].parent()
+    assert all(root.parent() is realization for root in root_values), (
         f"the roots {roots} do not all lie in one lattice: the first lies in "
         f"{realization}, and a Coxeter diagram of roots needs a single lattice"
     )
@@ -1463,8 +1468,8 @@ def _root_basis_diagram(roots, names=None, positions=None, type_label=None):
     ring = form_gram.base_ring()
     framing = realization.framing_morphism()
     coordinates = {
-        index: tensor.vector(ring, tuple(framing.lift(roots.value(index))))
-        for index in mirrors
+        index: tensor.vector(ring, tuple(framing.lift(root)))
+        for index, root in zip(mirrors, root_values, strict=True)
     }
     # The lattice pairing is symmetric. Contract each unordered pair once
     # and retain both matrix entries; this halves the expensive exact tensor
