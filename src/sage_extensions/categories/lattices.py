@@ -4738,17 +4738,15 @@ class Lattices(OwnedCategoryOverBaseRing):
             ring = self.base_ring()
             if self.is_unimodular() is True:
                 return ring.zero()
-            discriminant_form = self.discriminant_quadratic_form()
-            if discriminant_form.is_zero():
-                return ring.zero()
-            return ring(
-                int(
-                    any(
-                        discriminant_form.q(element).lift() not in ring
-                        for element in discriminant_form.smith_form_module_generators()
-                    )
-                )
-            )
+            # In the dual basis the discriminant quadratic form is
+            # q(z) = z^T G^(-1) z mod 2Z. Since 2-elementarity gives
+            # 2*G^(-1) integral, every cross term is integral; q is
+            # integer-valued exactly when each diagonal entry of G^(-1)
+            # is integral. This is the same Smith-generator criterion
+            # without constructing the discriminant quadratic module.
+            gram = _engine_component_matrix(self.gram_tensor()).change_ring(SageZZ)
+            inverse = gram.inverse()
+            return ring(int(any(inverse[i, i] not in SageZZ for i in range(gram.nrows()))))
 
         def level(self):
             r"""Return the level of a finite nondegenerate integral lattice.
