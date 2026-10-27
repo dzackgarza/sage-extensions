@@ -8,6 +8,7 @@ def test_delta_distinguishes_coeven_and_coodd_discriminant_forms() -> None:
 
 
 def test_two_elementary_catalogue_realizes_requested_invariants() -> None:
+    assert TwoElementary.validate() is True
     for rank, length, delta in TwoElementary:
         lattice = TwoElementary[rank, length, delta]
         assert lattice.module_rank() == rank
