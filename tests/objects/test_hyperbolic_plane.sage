@@ -37,6 +37,11 @@ def test_the_invariants_of_u() -> None:
     assert plane.is_unimodular()
     assert not plane.is_definite()
     assert plane.discriminant_group().cardinality() == 1
+    # The actual Lattices(ZZ) object must retain the Nikulin invariant on
+    # the even/unimodular join; requiring an explicit category cast masks the
+    # method-resolution defect exercised by the Gram constructor.
+    assert plane.delta() == 0
+    assert plane.is_p_elementary(2)
     assert EvenTwoElementaryLattices(ZZ)(plane).delta() == 0
     assert plane.level() == 1
     assert plane.is_isometric(plane) is True
