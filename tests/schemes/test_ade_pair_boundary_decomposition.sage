@@ -49,6 +49,9 @@ def test_the_distinguished_point_is_a_vertex_of_the_polygon() -> None:
         assert pair.distinguished_point() in vertices
         assert pair.distinguished_point() in pair.vertices()
         assert pair.polygon().ambient_space()((1, 1)) not in vertices
+        # The canonical M -> M_QQ inclusion must also commute with the
+        # selected finite enumeration's inverse/ranking contract.
+        pair.vertices().ranking_map()(pair.distinguished_point())
 
 
 def test_the_pair_records_its_dynkin_type() -> None:
