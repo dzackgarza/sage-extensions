@@ -379,6 +379,18 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
             ambient = RationalPolyhedralFans(lattice).weighted_projective_space_fan(
                 (1, 1, 2, 1)
             ).toric_variety(base)
+            # The fan realization is toric, separated and finite type, but
+            # ToricSchemes deliberately does not infer projectivity from its
+            # fan.  This weighted-projective fan is projective by construction;
+            # add that actual scheme placement before using the projective
+            # closed-subscheme owner for the homogeneous quartic.
+            from sage_extensions.categories.schemes.schemes import Schemes, _scheme_with_structure
+            from sage_extensions.categories.schemes.toric.toric_schemes import ToricSchemes
+
+            ambient = _scheme_with_structure(
+                ambient,
+                owned_category_join((ToricSchemes(base), Schemes(base).Projective())),
+            )
             cox = ambient.cox_ring()
             labels = tuple(str(label) for label in cox.algebra_generating_set())
             assert labels == ("x0", "x1", "x2", "x3"), (
@@ -391,8 +403,6 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
             from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
 
             zero_boundary = WeilDivisorGroups()(surface, finite_ordered_set(())).zero()
-            from sage_extensions.categories.schemes.schemes import _scheme_with_structure
-
             return _scheme_with_structure(
                 surface,
                 self,
