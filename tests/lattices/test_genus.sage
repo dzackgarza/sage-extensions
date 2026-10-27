@@ -71,3 +71,14 @@ def test_indefinite_isotropic_genus_has_complete_spinor_seed_enumeration() -> No
     assert genus.class_number() == 1
     assert genus.representatives().cardinality() == 1
     assert tuple(lattice.spinor_genus_class_numbers()) == (ZZ(1),)
+
+
+def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
+    r"""Benham--Hsia, *On spinor exceptional representations*, Nagoya Math. J.
+    87 (1982), §2.3, p. 252, identify ``diag(1, 20, 400)`` as a genus with four
+    spinor genera and twelve classes.  This checks the public consumer of Sage's
+    spinor-generator list against the independent four-way partition.
+    """
+    lattice = Lattices(ZZ)([[1, 0, 0], [0, 20, 0], [0, 0, 400]])
+
+    assert lattice.spinor_genus_count() == 4
