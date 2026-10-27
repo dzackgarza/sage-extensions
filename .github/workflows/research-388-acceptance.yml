@@ -38,6 +38,7 @@ jobs:
             exit 1
           fi
           "$SAGE_BIN" --version
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git rev-parse HEAD
           test "$(git rev-parse HEAD)" = "$(git rev-parse "$ISSUE_388_TARGET_REVISION^{commit}")"
           echo "ISSUE_388_TARGET_REVISION=$ISSUE_388_TARGET_REVISION" >> "$GITHUB_ENV"
