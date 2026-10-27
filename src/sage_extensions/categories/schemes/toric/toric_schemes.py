@@ -173,9 +173,9 @@ def _character_monomial(character, cone, chart):
     labels = tuple(algebra.algebra_generating_set())
     monomial = algebra.one()
     for position, multiplicity in enumerate(cone.semigroup_coefficients(character)):
-        monomial = monomial * algebra.algebra_generator(labels[position]) ** int(
-            multiplicity
-        )
+        exponent = int(multiplicity)
+        if exponent:
+            monomial = monomial * algebra.algebra_generator(labels[position]) ** exponent
     return monomial
 
 
@@ -197,6 +197,13 @@ def _face_localization(face, cone, base_ring):
     return chart.distinguished_open(
         _face_supporting_character_monomial(face, cone, chart)
     )
+
+
+@cached_function
+def _inverse_face_supporting_unit(face, cone, base_ring):
+    r"""The inverse of the selected supporting character in the face localization."""
+    localized = _face_localization(face, cone, base_ring).coordinate_algebra()
+    return localized.localization_map()(localized.inverted_element()).inverse_of_unit()
 
 
 @cached_function
@@ -223,9 +230,7 @@ def _character_on_overlap(character, face, cone, base_ring):
     while not cone.dual_cone_contains(shifted):
         shifted = shifted + supporting
         exponent += 1
-    inverse = localized.localization_map()(
-        localized.inverted_element()
-    ).inverse_of_unit()
+    inverse = _inverse_face_supporting_unit(face, cone, base_ring)
     return localized.localization_map()(
         _character_monomial(shifted, cone, chart)
     ) * inverse**exponent
