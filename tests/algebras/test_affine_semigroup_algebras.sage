@@ -6,13 +6,17 @@ from sage_extensions.all import *  # noqa: F401,F403
 def test_linearly_independent_semigroup_generators_give_the_polynomial_algebra() -> None:
     r"""An injective degree map N^2 -> Z^2 has zero toric ideal."""
     from sage_extensions.categories.algebras.semigroup_algebras import AffineSemigroupAlgebras
+    from sage_extensions.categories.algebras.free_algebras import FreeAlgebras, SymmetricAlgebras
     from sage_extensions.categories.rings.ring_foundation import _owned_integers
 
     ZZ = _owned_integers()
     algebra = AffineSemigroupAlgebras(ZZ)(((1, 0), (0, 1)), names=("x", "y"))
 
     assert algebra in AffineSemigroupAlgebras(ZZ)
+    assert algebra in FreeAlgebras(ZZ)
+    assert algebra in SymmetricAlgebras(ZZ)
     assert algebra.algebra_generating_set().cardinality() == 2
+    assert repr(algebra)
     coordinates = algebra.affine_semigroup_generator_coordinates()
     assert tuple(tuple(int(value) for value in coordinates[label]) for label in coordinates.index_set()) == (
         (1, 0),

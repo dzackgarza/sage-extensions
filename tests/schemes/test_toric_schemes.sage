@@ -187,6 +187,7 @@ def test_toric_face_transition_maps_are_mutual_inverses() -> None:
     fan = _plane_fans().projective_space_fan()
     source, target = tuple(fan.maximal_cones())[:2]
     face = source.intersection(target)
+    assert repr(_affine_chart(source, QQ))
     transition = _face_transition(source, target, QQ)
     source_open = _face_localization(face, source, QQ)
     target_open = _face_localization(face, target, QQ)

@@ -366,19 +366,30 @@ def _native_free_algebra(
             categories=categories,
         )
     data = dict(construction_data)
-    if set(data) != {"_preamble_coproduct_factors"}:
-        raise TypeError(
-            f"no category-level free-algebra constructor declares {tuple(data)}"
-        )
     from sage.misc.classcall_metaclass import typecall
 
     from sage_extensions.refine import _owned_dynamic_class
 
-    implementation = _owned_dynamic_class(
-        "NativeFreeAlgebraWithCoproductData",
-        (CommutativeAlgebraCoproducts.ParentMethods, _NativeFreeAlgebraParent),
-        _NativeFreeAlgebraParent,
-    )
+    if set(data) == {"_preamble_coproduct_factors"}:
+        implementation = _owned_dynamic_class(
+            "NativeFreeAlgebraWithCoproductData",
+            (CommutativeAlgebraCoproducts.ParentMethods, _NativeFreeAlgebraParent),
+            _NativeFreeAlgebraParent,
+        )
+    elif set(data) == {"_affine_semigroup_presentation"}:
+        from sage_extensions.categories.algebras.semigroup_algebras import (
+            AffineSemigroupAlgebras,
+        )
+
+        implementation = _owned_dynamic_class(
+            "NativeFreeAlgebraWithAffineSemigroupData",
+            (AffineSemigroupAlgebras.ParentMethods, _NativeFreeAlgebraParent),
+            _NativeFreeAlgebraParent,
+        )
+    else:
+        raise TypeError(
+            f"no category-level free-algebra constructor declares {tuple(data)}"
+        )
     return typecall(
         implementation,
         engine=engine,

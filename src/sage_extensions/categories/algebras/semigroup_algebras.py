@@ -43,6 +43,10 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
         return f"affine semigroup algebras over {self.base_ring()}"
 
     class ParentMethods:
+        def __init__(self, _affine_semigroup_presentation, **rest):
+            self._affine_semigroup_presentation = _affine_semigroup_presentation
+            super().__init__(**rest)
+
         def _cardinality_decision(self):
             r"""Return the cardinality of ``R[S]`` from its affine semigroup.
 
@@ -133,10 +137,32 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
         # ToricIdeal to rediscover this exact rank fact, and retain the selected
         # polynomial algebra directly.
         if columns.rank() == len(coordinates):
-            # The degree map is injective, so its toric ideal is zero.
-            # Retain the selected quotient construction and its owner-declared
-            # affine-semigroup data, but skip the backend ideal computation.
-            relations = ()
+            # The degree map is injective, so its toric ideal is zero. It is
+            # mathematically the polynomial algebra itself, not a quotient by
+            # the zero ideal: wrapping it in the presented-algebra constructor
+            # makes its selected resolution ask the presentation algebra for
+            # its own presentation, recursively, when its representation is
+            # requested (e.g. while hashing a chart in the gluing cache).
+            from sage_extensions.categories.algebras.algebras import (
+                _algebra_with_structure,
+            )
+            from sage_extensions.categories.algebras.free_algebras import (
+                FreeAlgebras,
+                GradedFreeAlgebras,
+                SymmetricAlgebras,
+            )
+
+            return _algebra_with_structure(
+                presentation,
+                base,
+                names,
+                FreeAlgebras(base),
+                GradedFreeAlgebras(base),
+                SymmetricAlgebras(base),
+                self,
+                *tuple(extra_categories),
+                construction_data=construction_data,
+            )
         else:
             engine_presentation = _engine_ring(presentation)
             engine_ideal = _SageToricIdeal(
