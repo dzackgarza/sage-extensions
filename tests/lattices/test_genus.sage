@@ -82,3 +82,20 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     lattice = Lattices(ZZ)([[1, 0, 0], [0, 20, 0], [0, 0, 400]])
 
     assert lattice.spinor_genus_count() == 4
+
+
+def test_indefinite_genus_enumerates_each_nontrivial_spinor_seed() -> None:
+    r"""The isotropic ternary lattice ``diag(1, 20, -400)`` has improper
+    spinor quotient of order two.  Conway--Sloane, *Sphere Packings, Lattices
+    and Groups*, 3rd ed., Ch. 15, §9.1, Thm. 14, says each indefinite spinor
+    genus of rank at least three is one class; hence this genus has exactly two.
+    """
+    lattice = Lattices(ZZ)([[1, 0, 0], [0, 20, 0], [0, 0, -400]])
+    genus = lattice.genus()
+
+    assert lattice.signature_pair() == signature_pair(2, 1)
+    assert lattice([20, 0, 1]).norm() == 0
+    assert genus.spinor_genus_count() == 2
+    assert genus.class_number() == 2
+    assert genus.representatives().cardinality() == 2
+    assert tuple(lattice.spinor_genus_class_numbers()) == (ZZ(1), ZZ(1))
