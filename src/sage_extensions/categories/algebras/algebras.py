@@ -3648,6 +3648,7 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             )
             return variable_count - 1
 
+        @cached_method
         def algebra_presentation_morphism(self):
             return self.selected_algebra_presentation().augmentation()
 
