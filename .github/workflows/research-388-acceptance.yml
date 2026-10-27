@@ -38,4 +38,4 @@ jobs:
       - name: Execute original #388 mathematical assertions
         env:
           PYTHONPATH: src
-        run: "$SAGE_BIN" -python -u tests/research_issue_388_acceptance.py
+        run: '"$SAGE_BIN" -python -u tests/research_issue_388_acceptance.py'
