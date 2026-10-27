@@ -181,6 +181,7 @@ def test_toric_face_transition_maps_are_mutual_inverses() -> None:
         _affine_chart,
         _character_on_overlap,
         _face_localization,
+        _face_supporting_character_monomial,
         _face_transition,
     )
 
@@ -210,6 +211,27 @@ def test_toric_face_transition_maps_are_mutual_inverses() -> None:
     assert transition.forward() * transition.inverse().forward() == target_open.Mor(
         target_open
     ).identity()
+
+    # The primed-even A_4 polygon has a normal-fan cone with three Hilbert
+    # generators and the toric relation s0*s1 = s2^2. Its supporting character
+    # must be built in the actual quotient algebra without asking for a second
+    # finite-presentation resolution merely to multiply those generator classes.
+    singular_polygon = LatticePolygons(ZZ.free_module(2))(
+        ((2, 2), (0, 1), (0, 0), (3, 0))
+    )
+    singular_cones = tuple(singular_polygon.normal_fan().maximal_cones())
+    singular_cone = next(
+        cone for cone in singular_cones if len(tuple(cone.semigroup_generators())) == 3
+    )
+    adjacent = singular_cones[(singular_cones.index(singular_cone) + 1) % len(singular_cones)]
+    singular_face = singular_cone.intersection(adjacent)
+    singular_chart = _affine_chart(singular_cone, QQ)
+    supporting = _face_supporting_character_monomial(
+        singular_face, singular_cone, singular_chart
+    )
+    assert supporting.parent() is singular_chart.coordinate_algebra()
+    singular_open = _face_localization(singular_face, singular_cone, QQ)
+    assert singular_open in Schemes(QQ)
 
 
 def test_the_chart_of_the_a_one_cone_is_the_quadric_cone() -> None:

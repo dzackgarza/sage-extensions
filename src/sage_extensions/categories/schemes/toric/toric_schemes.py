@@ -146,64 +146,33 @@ def _semigroup_algebra(cone, base_ring):
 def _face_supporting_character_monomial(face, cone, chart):
     r"""The monomial ``chi^m`` cutting ``face`` out of ``cone`` (CLS Prop. 1.3.16).
 
-    ``m`` is ``cone.face_supporting_character(face)``, a sum of chosen
-    semigroup generators, so in \(k[S_\sigma]\) the character \(\chi^m\) is the
-    product of the corresponding variables with no integer program to solve.
+    ``m`` is a sum of selected semigroup generators. Construct its character
+    class directly in the chart's actual coordinate algebra.
     """
     algebra = chart.coordinate_algebra()
-    from sage_extensions.categories.algebras.free_algebras import SymmetricAlgebras
-
-    if algebra in SymmetricAlgebras(algebra.base_ring()):
-        # An injectively generated semigroup algebra is its polynomial
-        # presentation itself, so there is no quotient map to apply.
-        presentation = algebra
-    else:
-        presentation = algebra.presentation_ring()
     labels = tuple(algebra.algebra_generating_set())
     ranking = cone.semigroup_generators().ranking_map()
-    monomial = presentation.one()
+    monomial = algebra.one()
     for generator in cone.face_supporting_generators(face):
-        monomial *= presentation.algebra_generator(labels[int(ranking(generator))])
-    # Multiply in the polynomial presentation, then descend once. Multiplying
-    # in the quotient after every factor repeatedly reduces intermediate
-    # monomials modulo the toric ideal, although only the final class is needed.
-    return (
-        monomial
-        if presentation is algebra
-        else algebra.algebra_presentation_morphism()(monomial)
-    )
+        monomial *= algebra.algebra_generator(labels[int(ranking(generator))])
+    return monomial
 
 
 @cached_function
 def _character_monomial(character, cone, chart):
     r"""The monomial ``chi^m`` in ``k[S_sigma]`` of a character of ``S_sigma``.
 
-    ``m`` is a nonnegative integer combination of the chosen semigroup
-    generators, and the cone reports one such family of multiplicities; the
-    monomial is the corresponding product of variables.  Two expansions of one
-    ``m`` differ by the toric ideal, so they name one element of
-    \(k[S_\sigma]\) (CLS Prop. 1.1.9).
+    The cone supplies a nonnegative integer expansion in its selected Hilbert
+    generators; multiply their classes in the actual coordinate algebra.
     """
     algebra = chart.coordinate_algebra()
-    from sage_extensions.categories.algebras.free_algebras import SymmetricAlgebras
-
-    if algebra in SymmetricAlgebras(algebra.base_ring()):
-        presentation = algebra
-    else:
-        presentation = algebra.presentation_ring()
     labels = tuple(algebra.algebra_generating_set())
-    monomial = presentation.one()
+    monomial = algebra.one()
     for position, multiplicity in enumerate(cone.semigroup_coefficients(character)):
         exponent = int(multiplicity)
         if exponent:
-            monomial *= presentation.algebra_generator(labels[position]) ** exponent
-    # Descend the complete monomial once, rather than reducing each product in
-    # the quotient algebra. This preserves its exact class in k[S_sigma].
-    return (
-        monomial
-        if presentation is algebra
-        else algebra.algebra_presentation_morphism()(monomial)
-    )
+            monomial *= algebra.algebra_generator(labels[position]) ** exponent
+    return monomial
 
 
 @cached_function
