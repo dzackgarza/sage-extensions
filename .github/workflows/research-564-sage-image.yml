@@ -3,10 +3,15 @@ name: Research issue 564 on an exact Sage source image
 on:
   workflow_dispatch:
     inputs:
-      sage_source_sha:
-        description: Full 40-character Sage fork commit whose isolated spinor image was published
+      image_tag_sha:
+        description: Full 40-character Sage fix-branch commit used in the immutable image tag
         required: true
         type: string
+      sage_source_sha:
+        description: Exact Sage PR source commit applied inside the image
+        required: true
+        type: string
+        default: be7579575935bc25bcebb595a5a3889ad4673420
 
 permissions:
   contents: read
@@ -17,17 +22,18 @@ jobs:
     name: Public spinor-genus assertion on pinned Sage source
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/dzackgarza/sage:spinor-${{ inputs.sage_source_sha }}
+      image: ghcr.io/dzackgarza/sage:spinor-${{ inputs.image_tag_sha }}
     timeout-minutes: 30
     steps:
-      - name: Validate exact Sage revision and image identity
+      - name: Validate exact image tag and applied Sage source revision
         env:
+          IMAGE_TAG_SHA: ${{ inputs.image_tag_sha }}
           SAGE_SOURCE_SHA: ${{ inputs.sage_source_sha }}
         run: |
-          case "$SAGE_SOURCE_SHA" in
-            *[!0-9a-fA-F]*|'') echo "sage_source_sha must be a full commit SHA" >&2; exit 1 ;;
+          case "$IMAGE_TAG_SHA" in
+            *[!0-9a-fA-F]*|'') echo "image_tag_sha must be a full commit SHA" >&2; exit 1 ;;
           esac
-          test "${#SAGE_SOURCE_SHA}" -eq 40
+          test "${#IMAGE_TAG_SHA}" -eq 40
           test "$SAGE_BIN" = /sage/.venv/bin/sage
           test "$(cat /sage/.spinor-source-revision)" = "$SAGE_SOURCE_SHA"
           "$SAGE_BIN" --version
@@ -47,11 +53,10 @@ jobs:
           ref: main
           path: .qc-infra
 
-      - name: Run the unchanged published four-spinor-genus assertion
+      - name: Run the complete unchanged public genus acceptance file
         env:
           PYTHONPATH: ${{ github.workspace }}/.qc-infra/scripts/pytest_plugins
         run: >-
           "$SAGE_BIN" -python -m pytest
           -p qc_sage_session
           tests/lattices/test_genus.sage
-          -k test_published_four_spinor_genus_is_counted_from_all_generators
