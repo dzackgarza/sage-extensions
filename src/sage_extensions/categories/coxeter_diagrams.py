@@ -1470,7 +1470,12 @@ def _root_basis_diagram(roots, names=None, positions=None, type_label=None):
     # ``framing_morphism().lift(root)`` invokes the generic module-morphism
     # preimage solver, which rebuilds framing data for every root; the element
     # API explicitly exposes ``to_vector()`` for this exact coordinate query.
-    coordinate_vectors = tuple(root.to_vector() for root in root_values)
+    chosen_vectors = tuple(root.to_vector() for root in root_values)
+    coordinate_vectors = tuple(
+        vector.parent()._selected_module_coefficients(vector)
+        for vector in chosen_vectors
+    )
+    basis_labels = tuple(realization.module_generating_set())
     # The lattice pairing is symmetric. Contract each unordered pair once
     # and retain both matrix entries; this halves the expensive exact tensor
     # contractions for the larger rooted diagrams (including Sterk's).
@@ -1483,7 +1488,10 @@ def _root_basis_diagram(roots, names=None, positions=None, type_label=None):
     coordinate_matrix = sage_matrix(
         engine_ring,
         [
-            [_engine_numeral(ring, coefficient) for coefficient in vector]
+            [
+                _engine_numeral(ring, vector.get(label, ring.zero()))
+                for label in basis_labels
+            ]
             for vector in coordinate_vectors
         ],
     )
