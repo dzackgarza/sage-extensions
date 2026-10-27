@@ -77,6 +77,8 @@ def main() -> None:
         "test_smooth_full_dimensional_cone_coefficients_are_dual_ray_pairings",
         "test_singular_rank_two_cone_coefficients_reconstruct_hilbert_generators",
         "test_overlap_characters_stay_in_the_selected_face_localization",
+        "test_overlap_character_assignment_preserves_semigroup_addition",
+        "test_toric_face_transition_maps_are_mutual_inverses",
     ):
         run_test(toric, name, start)
 

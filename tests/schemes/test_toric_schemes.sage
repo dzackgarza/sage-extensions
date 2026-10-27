@@ -142,6 +142,32 @@ def test_overlap_character_assignment_preserves_semigroup_addition() -> None:
             assert sum_image == left_image * right_image
 
 
+def test_toric_face_transition_maps_are_mutual_inverses() -> None:
+    r"""The two exact overlap pullbacks compose to identities on both selected opens."""
+    from sage_extensions.categories.schemes.toric.toric_schemes import (
+        _face_localization,
+        _face_transition,
+    )
+
+    fan = _plane_fans().projective_space_fan()
+    source, target = tuple(fan.maximal_cones())[:2]
+    face = source.intersection(target)
+    transition = _face_transition(source, target, QQ)
+    source_open = _face_localization(face, source, QQ)
+    target_open = _face_localization(face, target, QQ)
+
+    assert transition.forward().domain() is source_open
+    assert transition.forward().codomain() is target_open
+    assert transition.inverse().domain() is target_open
+    assert transition.inverse().codomain() is source_open
+    assert transition.inverse() * transition.forward() == source_open.Mor(
+        source_open
+    ).identity()
+    assert transition.forward() * transition.inverse() == target_open.Mor(
+        target_open
+    ).identity()
+
+
 def test_the_chart_of_the_a_one_cone_is_the_quadric_cone() -> None:
     r"""CLS Example 1.2.22: ``S_sigma`` needs three characters with one
     relation, so the chart is a hypersurface in three variables rather than an
