@@ -4718,6 +4718,13 @@ class Lattices(OwnedCategoryOverBaseRing):
 
             return _gram_is_unimodular(self.gram_tensor(), self.base_ring())
 
+        @cached_method
+        def _integral_gram_inverse(self):
+            r"""Return the exact rational inverse of a finite integral Gram matrix."""
+            if _engine_ring(self.base_ring()) is not SageZZ:
+                raise TypeError("the integral Gram inverse is defined here only over ZZ")
+            return _engine_component_matrix(self.gram_tensor()).change_ring(SageZZ).inverse()
+
         def delta(self):
             r"""Return Nikulin's ``delta`` for an even 2-elementary lattice.
 
@@ -4744,9 +4751,8 @@ class Lattices(OwnedCategoryOverBaseRing):
             # integer-valued exactly when each diagonal entry of G^(-1)
             # is integral. This is the same Smith-generator criterion
             # without constructing the discriminant quadratic module.
-            gram = _engine_component_matrix(self.gram_tensor()).change_ring(SageZZ)
-            inverse = gram.inverse()
-            return ring(int(any(inverse[i, i] not in SageZZ for i in range(gram.nrows()))))
+            inverse = self._integral_gram_inverse()
+            return ring(int(any(inverse[i, i] not in SageZZ for i in range(inverse.nrows()))))
 
         def level(self):
             r"""Return the level of a finite nondegenerate integral lattice.
@@ -6214,8 +6220,7 @@ class Lattices(OwnedCategoryOverBaseRing):
                 # p-elementarity is immediate for every prime. Avoid building
                 # the correlation cokernel merely to enumerate no invariants.
                 return True
-            gram = _engine_component_matrix(self.gram_tensor()).change_ring(SageZZ)
-            denominator = _owned_engine_element(ring, gram.inverse().denominator())
+            denominator = _owned_engine_element(ring, self._integral_gram_inverse().denominator())
             return denominator == ring.one() or denominator == prime
 
         def is_coeven(self) -> bool:
