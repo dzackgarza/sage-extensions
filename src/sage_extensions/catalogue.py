@@ -159,8 +159,8 @@ class NamedLattices:
     def Tco(cls):
         return _C(
             _block_gram(_rank_one_2, 2 * _Ug(), 2 * _E8g()),
-            names="h,ep,fp,a1,a2,a3,a4,a5,a6,a7,a8",
-            module_generators=("h", "ep", "fp", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"),
+            names="h,ep,fp,a1,a3,a4,a5,a6,a7,a8,a2",
+            module_generators=("h", "ep", "fp", "a1", "a3", "a4", "a5", "a6", "a7", "a8", "a2"),
         )
 
     @lazy_class_attribute
@@ -171,16 +171,16 @@ class NamedLattices:
     def TEn(cls):
         return _C(
             _block_gram(_Ug(), 2 * _Ug(), 2 * _E8g()),
-            names="e,f,ep,fp,a1,a2,a3,a4,a5,a6,a7,a8",
-            module_generators=("e", "f", "ep", "fp", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"),
+            names="e,f,ep,fp,a1,a3,a4,a5,a6,a7,a8,a2",
+            module_generators=("e", "f", "ep", "fp", "a1", "a3", "a4", "a5", "a6", "a7", "a8", "a2"),
         )
 
     @lazy_class_attribute
     def TdP(cls):
         return _C(
             _block_gram(_Ug(), 2 * _Ug(), _E8g(), _E8g()),
-            names=("e,f,ep,fp,a1,a2,a3,a4,a5,a6,a7,a8,b1,b2,b3,b4,b5,b6,b7,b8"),
-            module_generators=("e", "f", "ep", "fp", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8"),
+            names=("e,f,ep,fp,a1,a3,a4,a5,a6,a7,a8,a2,b1,b3,b4,b5,b6,b7,b8,b2"),
+            module_generators=("e", "f", "ep", "fp", "a1", "a3", "a4", "a5", "a6", "a7", "a8", "a2", "b1", "b3", "b4", "b5", "b6", "b7", "b8", "b2"),
         )
 
     @lazy_class_attribute
