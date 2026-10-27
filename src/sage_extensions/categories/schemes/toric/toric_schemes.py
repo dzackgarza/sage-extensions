@@ -293,6 +293,12 @@ def _face_transition(source_cone, target_cone, base_ring):
     )
 
 
+@cached_function
+def _native_toric_variety(fan, engine_base):
+    r"""The private Sage realization of a selected fan over a selected field."""
+    return _SageToricVariety(_engine_fan(fan), base_ring=engine_base)
+
+
 def _pullback_character(character, lattice_morphism, domain_fan, codomain_fan):
     r"""Return ``phi^*(m)`` in the domain character lattice.
 
@@ -1975,7 +1981,7 @@ def _toric_variety(fan, base_ring, polarizing_polytope=None, placements=(), **le
             pass
     engine_base = _engine_ring(base)
     native = (
-        _SageToricVariety(_engine_fan(fan), base_ring=engine_base)
+        _native_toric_variety(fan, engine_base)
         if bool(engine_base.is_field())
         else None
     )
