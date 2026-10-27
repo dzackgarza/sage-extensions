@@ -727,19 +727,29 @@ class ConvexPolytopes(OwnedParameterizedCategory):
                     for vertex in self._engine_polyhedron().vertices()
                 )
                 rational_vertices = tuple(self.rational_point(vertex) for vertex in vertices)
+                index_set = finite_ordinal_set(len(vertices))
+                indices = tuple(index_set)
 
-                def contains(point):
-                    # Keep the enumerated vertices in the integral lattice,
-                    # but recognize their canonical images under M -> M_QQ.
+                def index_of(point):
+                    # The selected integral enumeration has a canonical image
+                    # in M_QQ. Its inverse must recognize that image too, so
+                    # membership and the ordered-set ranking agree.
                     try:
                         rational_point = self.rational_point(point)
                     except (TypeError, ValueError, AttributeError):
-                        return False
-                    return any((rational_point == vertex) is True for vertex in rational_vertices)
+                        return None
+                    for index, vertex in zip(indices, rational_vertices, strict=True):
+                        if (rational_point == vertex) is True:
+                            return index
+                    return None
+
+                def contains(point):
+                    return index_of(point) is not None
 
                 return FiniteOrderedSets().from_indexed(
-                    finite_ordinal_set(len(vertices)),
+                    index_set,
                     lambda index: vertices[int(index)],
+                    index_of=index_of,
                     contains=contains,
                 )
             rationals = _owned_rationals()
