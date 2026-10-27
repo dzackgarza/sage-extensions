@@ -8697,10 +8697,13 @@ class EvenTwoElementaryLattices(OwnedCategoryOverBaseRing):
             \(\mathbb N^3\).
             """
             # Membership in this category already establishes evenness and
-            # 2-elementarity in its constructor.  Do not repeat those full
-            # discriminant-group decisions on every invariant read.
+            # 2-elementarity in its constructor. For a finite nondegenerate
+            # integral lattice, |det(G)| is |A_L|; since A_L is elementary
+            # abelian of exponent 2, |A_L| = 2^a where a is its length. Avoid
+            # recomputing Smith invariant factors merely to recover a.
+            determinant = abs(int(self.determinant()))
             return nikulin_invariants(
-                self.module_rank(), self.discriminant_length(), self.delta()
+                self.module_rank(), self.base_ring()(determinant.bit_length() - 1), self.delta()
             )
 
     def an_object(self):
