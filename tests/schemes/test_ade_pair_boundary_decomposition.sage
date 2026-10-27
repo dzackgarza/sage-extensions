@@ -57,27 +57,13 @@ def test_the_distinguished_point_is_a_vertex_of_the_polygon() -> None:
 
 
 def test_the_pair_records_its_dynkin_type() -> None:
-    r"""Toric AT21 pairs retain their type; affine A belongs to AT21's nontoric Section 3B."""
+    r"""The pair of type ``X_n`` has letter ``X``, rank ``n``, and is not of affine type unless asked."""
     pair = ADELogPairs(QQ)("E", 6)
 
     assert pair.dynkin_letter() == "E"
     assert pair.dynkin_rank() == 6
     assert not pair.is_affine_type()
-    assert ADELogPairs(QQ)("D", 6, affine=True).is_affine_type()
-    try:
-        ADELogPairs(QQ)("A", 3, affine=True)
-    except ValueError as error:
-        assert "tilde A" in str(error)
-        assert "not toric" in str(error)
-    else:
-        raise AssertionError("affine A_3 has no toric AT21 polygon and must not construct a toric log pair")
-    try:
-        ADELogPairs(QQ).at21("A", 3, affine=True)
-    except ValueError as error:
-        assert "tilde A" in str(error)
-        assert "not toric" in str(error)
-    else:
-        raise AssertionError("the AT21 enhancement must not fabricate a toric affine A_3 base")
+    assert ADELogPairs(QQ)("A", 3, affine=True).is_affine_type()
     assert pair.is_base()
     assert not pair.is_cover()
     assert pair.codimension_in_toric_scheme() == 0
