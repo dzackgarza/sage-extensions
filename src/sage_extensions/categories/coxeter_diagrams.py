@@ -1512,18 +1512,22 @@ def _root_basis_diagram(roots, names=None, positions=None, type_label=None):
         (mirrors.cardinality(), mirrors.cardinality()),
         [[pairings[left, right] for right in mirrors] for left in mirrors],
     )
-    entries = {
-        (left, right): cardinal(1)
-        if left == right
-        else _coxeter_entry(
-            ring,
-            pairings[left, left],
-            pairings[right, right],
-            pairings[left, right],
-        )
-        for left in mirrors
-        for right in mirrors
-    }
+    # The angle is symmetric in the two roots. Exact conversion to AA and
+    # QQbar in `_coxeter_entry` is comparatively expensive, so compute each
+    # unordered pair once and populate both matrix positions from that value.
+    entries = {}
+    ordered_mirrors = tuple(mirrors)
+    for i, left in enumerate(ordered_mirrors):
+        entries[left, left] = cardinal(1)
+        for right in ordered_mirrors[i + 1 :]:
+            value = _coxeter_entry(
+                ring,
+                pairings[left, left],
+                pairings[right, right],
+                pairings[left, right],
+            )
+            entries[left, right] = value
+            entries[right, left] = value
     return _coxeter_diagram(
         _owned_coxeter_matrix(mirrors, entries),
         names=names,
