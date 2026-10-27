@@ -1455,7 +1455,11 @@ def _root_basis_diagram(roots, names=None, positions=None, type_label=None):
     # an owned IndexedFamily can rerun label normalization and value dispatch;
     # the roots are subsequently needed both for the common-parent proof and
     # for the coordinate matrix, so keep the same selected tuple for both.
-    root_values = tuple(roots.value(index) for index in mirrors)
+    # Iterate the selected family instead of calling ``value(index)`` for
+    # every already-normalized label: IndexedFamily's iteration path enters
+    # its rank cache directly, whereas ``value`` re-applies the index-set
+    # constructor and ranking-map machinery to each label.
+    root_values = tuple(roots)
     realization = root_values[0].parent()
     assert all(root.parent() is realization for root in root_values), (
         f"the roots {roots} do not all lie in one lattice: the first lies in "
