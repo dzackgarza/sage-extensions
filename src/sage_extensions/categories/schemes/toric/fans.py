@@ -599,6 +599,7 @@ class RationalPolyhedralFans(OwnedParameterizedCategory):
             """
             return sum(self.face_supporting_generators(face), self.character_lattice().zero())
 
+        @cached_method
         def pair_with(self, character):
             r"""The evaluation ``<m, -> `` of a character on this cone's rays.
 
@@ -612,11 +613,13 @@ class RationalPolyhedralFans(OwnedParameterizedCategory):
                 )
             )
 
+        @cached_method
         def dual_cone_contains(self, character) -> bool:
             r"""Whether ``m`` is in ``sigma^vee``, i.e. ``<m,u> >= 0`` on every ray."""
             zero = _integers().zero()
             return all(value >= zero for value in self.pair_with(character))
 
+        @cached_method
         def orthogonal_contains(self, character) -> bool:
             r"""Whether ``m`` is in ``sigma^perp``, i.e. ``<m,u> = 0`` on every ray."""
             zero = _integers().zero()
