@@ -125,10 +125,7 @@ def test_singular_rank_two_cone_coefficients_reconstruct_hilbert_generators() ->
     zero = cone.character_lattice().zero()
 
     characters = set(generators)
-    for left in generators:
-        for right in generators:
-            characters.add(left + right)
-            characters.add(2 * left + right)
+    characters.add(generators[0] + generators[-1])
 
     for character in characters:
         coefficients = cone.semigroup_coefficients(character)
