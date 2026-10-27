@@ -49,6 +49,7 @@ def test_hyperbolic_refinement_preserves_both_signature_conventions() -> None:
         refined = HyperbolicLattices(ZZ)(lattice)
         signature = refined.signature_pair()
         assert refined is lattice
+        assert signature == signature_pair(*expected)
         assert (int(signature.first()), int(signature.second())) == expected
 
 
