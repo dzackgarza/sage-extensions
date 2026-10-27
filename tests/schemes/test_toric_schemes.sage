@@ -104,6 +104,7 @@ def test_smooth_full_dimensional_cone_coefficients_are_dual_ray_pairings() -> No
 def test_overlap_characters_stay_in_the_selected_face_localization() -> None:
     r"""Transition characters have the literal coordinate-algebra parent of their overlap."""
     from sage_extensions.categories.schemes.toric.toric_schemes import (
+        _affine_chart,
         _character_on_overlap,
         _face_localization,
     )
@@ -145,6 +146,7 @@ def test_overlap_character_assignment_preserves_semigroup_addition() -> None:
 def test_toric_face_transition_maps_are_mutual_inverses() -> None:
     r"""The two exact overlap pullbacks compose to identities on both selected opens."""
     from sage_extensions.categories.schemes.toric.toric_schemes import (
+        _character_on_overlap,
         _face_localization,
         _face_transition,
     )
@@ -160,6 +162,14 @@ def test_toric_face_transition_maps_are_mutual_inverses() -> None:
     assert transition.forward().codomain() is target_open
     assert transition.inverse().domain() is target_open
     assert transition.inverse().codomain() is source_open
+    pullback = transition.forward().coordinate_algebra_morphism()
+    target_chart = _affine_chart(target, QQ).coordinate_algebra()
+    for label, character in zip(
+        target_chart.algebra_generating_set(), target.semigroup_generators(), strict=True
+    ):
+        assert pullback(target_chart.algebra_generator(label)) == _character_on_overlap(
+            character, face, source, QQ
+        )
     assert transition.inverse().forward() * transition.forward() == source_open.Mor(
         source_open
     ).identity()
