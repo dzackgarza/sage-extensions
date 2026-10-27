@@ -966,7 +966,7 @@ def _group_generating_epimorphism(group, source, labels, generator_morphism):
     assert source.free_basis() is labels, (
         f"the free group {source} does not have {labels} as its free basis, so it cannot map onto {group} by sending the free generators to the elements indexed by {labels}"
     )
-    return OwnedGroups().Mor(source, group)(generator_morphism)
+    return IndexedFreeGroupMor(OwnedGroups().MorCategory(), source, group)(generator_morphism)
 
 
 def _fix_selected_group_resolution_data(
@@ -1093,16 +1093,14 @@ def _fix_selected_group_presentation(group, source, relations) -> None:
                 case "relation":
                     return selected_relations[int(tagged[1])]
 
-        first_face = degree_one.Mor(source)(
-            Sets().Mor(degree_one_labels, source)(first_face_value)
-        )
-        second_face = degree_one.Mor(source)(
-            Sets().Mor(degree_one_labels, source)(second_face_value)
-        )
+        # A homomorphism out of the free group is specified by a map from
+        # its free basis, not by wrapping that map as a set morphism and then
+        # passing the resulting whole arrow as the homomorphism constructor's
+        # argument.  The latter is rejected by GroupMor._element_constructor_.
+        first_face = degree_one.Mor(source)(first_face_value)
+        second_face = degree_one.Mor(source)(second_face_value)
         degeneracy = source.Mor(degree_one)(
-            Sets().Mor(labels, degree_one)(
-                lambda label: degree_one.free_generator(("generator", label))
-            )
+            lambda label: degree_one.free_generator(("generator", label))
         )
         augmentation = _group_generating_epimorphism(
             group, source, labels, generator_morphism
@@ -4076,9 +4074,8 @@ class IndexedFreeGroupMor(_GroupMorRealizationMixin, CategoricalMor):
         a finite ``S``, a dictionary naming every basis point.
         """
         indices = self.domain().free_basis()
-        set_mor = Sets().Mor(indices, self.codomain())
         match images:
-            case SetMorphism():
+            case SetMorphism() | OwnedSetMorphism():
                 assert images.domain() is indices and images.codomain() is self.codomain(), (
                     f"{images} cannot define a homomorphism {self.domain()} -> {self.codomain()}: a homomorphism out of a "
                     f"free group is a map from the free basis {indices} to {self.codomain()}, but {images} is a map "
@@ -4094,10 +4091,12 @@ class IndexedFreeGroupMor(_GroupMorRealizationMixin, CategoricalMor):
                     f"the dictionary does not define a homomorphism out of {self.domain()}: it must give an image for every "
                     f"element of the free basis {indices}, but it has keys {tuple(images)}"
                 )
+                set_mor = Sets().Mor(indices, self.codomain())
                 generator_morphism = set_mor(images.__getitem__)
             case Map():
                 raise TypeError(f"{images} is a whole arrow; the defining map must have the free basis as source")
             case _ if callable(images):
+                set_mor = Sets().Mor(indices, self.codomain())
                 generator_morphism = set_mor(images)
             case _ if self in AbelianGroupEndomorphismRings():
                 return self._scalar_identity(images)
