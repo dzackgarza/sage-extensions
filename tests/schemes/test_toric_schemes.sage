@@ -101,6 +101,23 @@ def test_smooth_full_dimensional_cone_coefficients_are_dual_ray_pairings() -> No
             )
 
 
+def test_overlap_characters_stay_in_the_selected_face_localization() -> None:
+    r"""Transition characters have the literal coordinate-algebra parent of their overlap."""
+    from sage_extensions.categories.schemes.toric.toric_schemes import (
+        _character_on_overlap,
+        _face_localization,
+    )
+
+    fan = _plane_fans().projective_space_fan()
+    source, target = tuple(fan.maximal_cones())
+    face = source.intersection(target)
+    localization = _face_localization(face, source, QQ).coordinate_algebra()
+
+    for character in target.semigroup_generators():
+        image = _character_on_overlap(character, face, source, QQ)
+        assert image.parent() is localization
+
+
 def test_the_chart_of_the_a_one_cone_is_the_quadric_cone() -> None:
     r"""CLS Example 1.2.22: ``S_sigma`` needs three characters with one
     relation, so the chart is a hypersurface in three variables rather than an
