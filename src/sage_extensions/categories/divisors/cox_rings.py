@@ -5,9 +5,6 @@ from sage_extensions.categories.abstract_categories.objects import (
 )
 from sage_extensions.categories.algebras.graded_algebras import GradedAlgebras
 from sage_extensions.categories.rings.ring_foundation import _engine_element
-from sage_extensions.categories.schemes.toric.toric_schemes import (
-    ToricSchemes,
-)
 from sage_extensions.categories.sets.indexed_families import (
     finite_indexed_family,
 )
@@ -30,6 +27,10 @@ class CoxRings(OwnedParameterizedCategory):
 
     def parameter_category(self):
         r"""The toric schemes over the parameter's own base."""
+        from sage_extensions.categories.schemes.toric.toric_schemes import (
+            ToricSchemes,
+        )
+
         return ToricSchemes(self.parameter().scheme_base_ring())
 
     def scheme(self):
