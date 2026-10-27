@@ -1466,9 +1466,12 @@ def _root_basis_diagram(roots, names=None, positions=None, type_label=None):
     # the values of the restricted module are not elements of the base ring.
     form_gram = realization.gram_tensor()
     ring = form_gram.base_ring()
-    framing = realization.framing_morphism()
+    # A lattice element already owns its chosen-basis coordinates. Calling
+    # ``framing_morphism().lift(root)`` invokes the generic module-morphism
+    # preimage solver, which rebuilds framing data for every root; the element
+    # API explicitly exposes ``to_vector()`` for this exact coordinate query.
     coordinates = {
-        index: tensor.vector(ring, tuple(framing.lift(root)))
+        index: tensor.vector(ring, tuple(root.to_vector()))
         for index, root in zip(mirrors, root_values, strict=True)
     }
     # The lattice pairing is symmetric. Contract each unordered pair once
