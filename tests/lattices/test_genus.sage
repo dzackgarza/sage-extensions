@@ -56,8 +56,8 @@ def test_definite_genus_mass_and_class_number_are_exact() -> None:
 
 
 def test_indefinite_isotropic_genus_has_complete_spinor_seed_enumeration() -> None:
-    r"""For an indefinite lattice of rank at least three, each spinor genus
-    contains one class (Conway--Sloane, *Sphere Packings, Lattices and Groups*,
+    r"""For an isotropic indefinite lattice of rank at least three, each spinor
+    genus contains one class (Conway--Sloane, *Sphere Packings, Lattices and Groups*,
     3rd ed., Ch. 15, §9.1, Thm. 14).  This isotropic ternary specimen has trivial
     improper spinor quotient, so the complete seed list is empty and the genus
     enumeration must return its single class.
@@ -87,8 +87,9 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
 def test_indefinite_genus_enumerates_each_nontrivial_spinor_seed() -> None:
     r"""The isotropic ternary lattice ``diag(1, 20, -400)`` has improper
     spinor quotient of order two.  Conway--Sloane, *Sphere Packings, Lattices
-    and Groups*, 3rd ed., Ch. 15, §9.1, Thm. 14, says each indefinite spinor
-    genus of rank at least three is one class; hence this genus has exactly two.
+    and Groups*, 3rd ed., Ch. 15, §9.1, Thm. 14, says each spinor genus of an
+    isotropic indefinite lattice of rank at least three is one class; hence
+    this genus has exactly two.
     """
     lattice = Lattices(ZZ)([[1, 0, 0], [0, 20, 0], [0, 0, -400]])
     genus = lattice.genus()
