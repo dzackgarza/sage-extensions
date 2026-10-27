@@ -160,6 +160,7 @@ class NamedLattices:
         return _C(
             _block_gram(_rank_one_2, 2 * _Ug(), 2 * _E8g()),
             names="h,ep,fp,a1,a2,a3,a4,a5,a6,a7,a8",
+            module_generators=("h", "ep", "fp", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"),
         )
 
     @lazy_class_attribute
@@ -171,6 +172,7 @@ class NamedLattices:
         return _C(
             _block_gram(_Ug(), 2 * _Ug(), 2 * _E8g()),
             names="e,f,ep,fp,a1,a2,a3,a4,a5,a6,a7,a8",
+            module_generators=("e", "f", "ep", "fp", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"),
         )
 
     @lazy_class_attribute
@@ -178,6 +180,7 @@ class NamedLattices:
         return _C(
             _block_gram(_Ug(), 2 * _Ug(), _E8g(), _E8g()),
             names=("e,f,ep,fp,a1,a2,a3,a4,a5,a6,a7,a8,b1,b2,b3,b4,b5,b6,b7,b8"),
+            module_generators=("e", "f", "ep", "fp", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8"),
         )
 
     @lazy_class_attribute
