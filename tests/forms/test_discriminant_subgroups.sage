@@ -8,6 +8,20 @@ def test_a2_discriminant_form_is_anisotropic_and_not_metabolic() -> None:
     assert not discriminant.is_metabolic()
 
 
+def test_unimodular_even_lattice_uses_generic_quadratic_descent() -> None:
+    r"""The generic descent constructs the zero discriminant form of an even unimodular lattice."""
+    lattice = Lattices(ZZ)([[-4, 1], [1, 0]])
+    discriminant = lattice.discriminant_module()
+    assert discriminant.cardinality() == 1
+    assert discriminant.norm(discriminant.zero()) == discriminant.quadratic_value_module().zero()
+    nonunimodular = Lattices(ZZ)([[2]])
+    unimodular_norm = lattice.dual_lattice().norm(lattice.dual_lattice().module_generator(0))
+    nonunimodular_norm = nonunimodular.dual_lattice().norm(
+        nonunimodular.dual_lattice().module_generator(0)
+    )
+    assert unimodular_norm.parent() is nonunimodular_norm.parent()
+
+
 def test_a1_four_has_diagonal_lagrangian_and_primary_component() -> None:
     a1 = Lattices(ZZ)("A1")
     discriminant = (a1 + a1 + a1 + a1).discriminant_module()

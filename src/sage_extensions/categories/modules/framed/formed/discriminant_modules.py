@@ -996,13 +996,9 @@ def _discriminant_module(lattice):
         construction_data["quadratic_value_module"] = quadratic_values
         categories.append(DiscriminantQuadraticModules(ring))
         quadratic_forms = quotient.quadratic_forms(quadratic_values)
-        form = (
-            quadratic_forms.zero()
-            if trivial_quotient
-            else quadratic_forms(
-                _descended_quadratic_gram(
-                    dual_lattice, labels, bilinear_values, quadratic_values
-                )
+        form = quadratic_forms(
+            _descended_quadratic_gram(
+                dual_lattice, labels, bilinear_values, quadratic_values
             )
         )
     else:
