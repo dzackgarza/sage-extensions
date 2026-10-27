@@ -223,7 +223,9 @@ def _overlap_character_context(face, cone, base_ring):
         int(cone.parent().character_cocharacter_value(supporting, ray))
         for ray in rays
     )
-    return chart, localized, supporting, rays, supporting_pairings
+    face_rays = set(face.rays())
+    face_ray_mask = tuple(ray in face_rays for ray in rays)
+    return chart, localized, supporting, rays, supporting_pairings, face_ray_mask
 
 
 @cached_function
@@ -238,22 +240,26 @@ def _character_on_overlap(character, face, cone, base_ring):
     The answer is the monomial of \(a=m+c m_\sigma\) divided by that power of
     the inverted character.
     """
-    chart, localized, supporting, rays, supporting_pairings = _overlap_character_context(
-        face, cone, base_ring
-    )
+    (
+        chart,
+        localized,
+        supporting,
+        rays,
+        supporting_pairings,
+        face_ray_mask,
+    ) = _overlap_character_context(face, cone, base_ring)
     # A face's primitive rays are among the selected cone's rays, so its dual
     # membership condition is exactly nonnegativity on this subset. Use the
     # same exact pairings as the shift calculation below instead of a second
     # general cone-membership computation.
-    face_rays = set(face.rays())
     character_pairings = tuple(
         int(cone.parent().character_cocharacter_value(character, ray))
         for ray in rays
     )
     assert all(
         pairing >= 0
-        for ray, pairing in zip(rays, character_pairings)
-        if ray in face_rays
+        for is_face_ray, pairing in zip(face_ray_mask, character_pairings)
+        if is_face_ray
     ), (
         f"the character {character} is not in the dual cone of the face {face} of {cone}, so "
         "chi^m is not a regular function on the chart of the face"
