@@ -460,7 +460,10 @@ class ADELogPairs(OwnedCategoryOverBaseRing):
                 f"the branch divisor L = -2(K_Y + C) = {branch_class} is not linearly equivalent "
                 f"to 2C' = {expected}"
             )
-        branch_line_bundle = pair.log_scheme().invertible_sheaf_of_divisor(branch_class)
+        # `surface` is the exact selected log-scheme object used to compute
+        # both divisor classes above. Reuse it rather than dispatching through
+        # the pair's log_scheme accessor again during line-bundle construction.
+        branch_line_bundle = surface.invertible_sheaf_of_divisor(branch_class)
         return ToricLogPairs(self.base_ring())(
             pair.log_scheme(),
             pair.blue_divisor(),
