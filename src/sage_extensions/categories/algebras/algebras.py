@@ -1885,6 +1885,7 @@ class Algebras(OwnedCategoryOverBaseRing):
                 case _:
                     return AtomicProposition("is_finitely_generated_as_algebra", self)
 
+        @cached_method
         def selected_algebra_resolution(self):
             return self.selected_resolution(self.algebra_framing_owner())
 
