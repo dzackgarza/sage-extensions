@@ -156,9 +156,18 @@ def _category_accepts_morphism(
     """
     selected = _category_mor(category, domain, codomain)
     if isinstance(selected, SageHomset):
+        parent = arrow.parent()
+        # Membership in the exact selected Homset is structural: the parent
+        # already fixes this hom family and these endpoints. Asking Sage's
+        # generic ``arrow in selected`` first can compare the full represented
+        # map against Homset coercions; for composed scheme maps that descends
+        # recursively through every generator image. Preserve the general
+        # membership and family/endpoints fallbacks for arrows with another
+        # parent, but do not redo it when the selected parent is identical.
+        if parent is selected:
+            return True
         if arrow in selected:
             return True
-        parent = arrow.parent()
         return (
             isinstance(parent, SageHomset)
             and parent.mor_family() is selected.mor_family()

@@ -273,6 +273,8 @@ def test_the_chart_of_the_a_one_cone_is_the_quadric_cone() -> None:
 
 def test_singular_rank_two_cone_coefficients_reconstruct_hilbert_generators() -> None:
     r"""Exact unimodular-pair coordinates expand each Hilbert generator itself."""
+    import pytest
+
     fan = _plane_fans()((((0, 1), (2, -1)),))
     cone = fan.maximal_cones()[0]
     assert cone.dimension() == 2
@@ -291,6 +293,14 @@ def test_singular_rank_two_cone_coefficients_reconstruct_hilbert_generators() ->
             zero,
         )
         assert reconstructed == character
+
+    # The fast rank-two branch proves membership when it finds a nonnegative
+    # unimodular-pair expansion. It must still reject a character outside the
+    # dual cone when no such expansion exists.
+    labels = tuple(cone.character_lattice().module_generating_set())
+    outside = cone.character_lattice().linear_combination({labels[0]: ZZ(-1)})
+    with pytest.raises(AssertionError):
+        cone.semigroup_coefficients(outside)
 
 
 
