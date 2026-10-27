@@ -118,6 +118,9 @@ def test_at21_a_zero_minus_and_primed_even_polygon_conventions() -> None:
     assert minus.dynkin_rank() == 0
     assert minus.source_variant() == "short"
     assert minus.base_pair().dynkin_variant() == ("long", "short")
+    assert minus.branch_line_bundle().scheme() is minus.scheme()
+    assert minus.branch_line_bundle().base_ring() is QQ
+    assert minus.branch_line_bundle().associated_divisor() == minus.branch_divisor_class()
     assert {tuple(int(c) for c in vertex) for vertex in minus.base_pair().polygon().vertices()} == {
         (0, 2), (0, 0), (1, 0)
     }
@@ -129,6 +132,9 @@ def test_at21_a_zero_minus_and_primed_even_polygon_conventions() -> None:
     }
     assert (3, 0) in vertices
     assert (4, 0) not in vertices
+    assert primed_even.branch_line_bundle().scheme() is primed_even.scheme()
+    assert primed_even.branch_line_bundle().base_ring() is QQ
+    assert primed_even.branch_line_bundle().associated_divisor() == primed_even.branch_divisor_class()
 
 
 def test_at21_public_constructor_accepts_the_default_a_zero_minus_shape() -> None:
