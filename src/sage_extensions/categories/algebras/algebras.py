@@ -3376,6 +3376,7 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
         def _algebra_mor_class(self):
             return PresentedAlgebraMor
 
+        @cached_method
         def selected_algebra_presentation(self):
             r"""Return the one chosen truncation-one algebra resolution."""
             selected = self.selected_algebra_resolution()
@@ -3388,6 +3389,7 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                         f"is truncated in degree {selected.truncation()}"
                     )
 
+        @cached_method
         def presentation_ring(self):
             return self.selected_algebra_presentation().level(0)
 
