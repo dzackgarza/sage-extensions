@@ -50,11 +50,9 @@ def main() -> None:
 
     two_elementary = load_tests("tests/lattices/test_two_elementary.sage")
     run_test(two_elementary, "test_two_elementary_catalogue_realizes_requested_invariants", start)
-    from sage_extensions.catalogue import TwoElementary
-
-    print("BEGIN TwoElementary.validate (all 75 rows)", flush=True)
-    TwoElementary.validate()
-    print(f"PASS TwoElementary.validate rows={len(TwoElementary)} elapsed={perf_counter() - start:.2f}s", flush=True)
+    # The selected original test calls TwoElementary.validate() and then
+    # checks the requested invariants and exact owned parents of every row.
+    # Do not run the same 75-row validation a second time here.
 
     sterk = load_tests("tests/lattices/test_sterk_elliptic_population_archive.sage")
     for name in (
