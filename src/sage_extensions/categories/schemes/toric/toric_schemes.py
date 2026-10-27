@@ -143,6 +143,37 @@ def _semigroup_algebra(cone, base_ring):
     )
 
 
+def _semigroup_monomial(algebra, exponents):
+    r"""Return the monomial with these exponents in the selected semigroup algebra.
+
+    Free semigroup algebras are their own polynomial presentation. For a
+    dependent Hilbert basis, evaluate the monomial in the selected private
+    quotient realization and raise the resulting class once. Repeated owned
+    quotient multiplication canonicalizes every intermediate product and is
+    disproportionately expensive for the singular AT21 charts.
+    """
+    from sage_extensions.categories.algebras.free_algebras import SymmetricAlgebras
+
+    labels = tuple(algebra.algebra_generating_set())
+    if algebra in SymmetricAlgebras(algebra.base_ring()):
+        monomial = algebra.one()
+        for label, exponent in zip(labels, exponents, strict=True):
+            if exponent:
+                monomial *= algebra.algebra_generator(label) ** exponent
+        return monomial
+
+    engine = _engine_ring(algebra)
+    generators = tuple(
+        _engine_element(algebra, algebra.algebra_generator(label))
+        for label in labels
+    )
+    monomial = engine.one()
+    for generator, exponent in zip(generators, exponents, strict=True):
+        if exponent:
+            monomial *= generator**int(exponent)
+    return _owned_engine_element(algebra, monomial)
+
+
 @cached_function
 def _face_supporting_character_monomial(face, cone, chart):
     r"""The monomial ``chi^m`` cutting ``face`` out of ``cone`` (CLS Prop. 1.3.16).
@@ -151,12 +182,12 @@ def _face_supporting_character_monomial(face, cone, chart):
     class directly in the chart's actual coordinate algebra.
     """
     algebra = chart.coordinate_algebra()
-    labels = tuple(algebra.algebra_generating_set())
+    generators = tuple(cone.semigroup_generators())
     ranking = cone.semigroup_generators().ranking_map()
-    monomial = algebra.one()
+    exponents = [0] * len(generators)
     for generator in cone.face_supporting_generators(face):
-        monomial *= algebra.algebra_generator(labels[int(ranking(generator))])
-    return monomial
+        exponents[int(ranking(generator))] += 1
+    return _semigroup_monomial(algebra, tuple(exponents))
 
 
 @cached_function
@@ -167,13 +198,11 @@ def _character_monomial(character, cone, chart):
     generators; multiply their classes in the actual coordinate algebra.
     """
     algebra = chart.coordinate_algebra()
-    labels = tuple(algebra.algebra_generating_set())
-    monomial = algebra.one()
-    for position, multiplicity in enumerate(cone.semigroup_coefficients(character)):
-        exponent = int(multiplicity)
-        if exponent:
-            monomial *= algebra.algebra_generator(labels[position]) ** exponent
-    return monomial
+    exponents = tuple(
+        int(multiplicity)
+        for multiplicity in cone.semigroup_coefficients(character)
+    )
+    return _semigroup_monomial(algebra, exponents)
 
 
 @cached_function
@@ -360,9 +389,18 @@ def _face_transition(source_cone, target_cone, base_ring):
     face = source_cone.intersection(target_cone)
     forward = _face_transition_morphism(face, source_cone, target_cone, base_ring)
     inverse = _face_transition_morphism(face, target_cone, source_cone, base_ring)
-    return Schemes(base_ring).Core().Mor(forward.domain(), forward.codomain())(
+    from sage_extensions.categories.abstract_categories.arrow_categories import (
+        _isomorphism_from_known_inverse_pair,
+    )
+
+    # The two maps are constructed from the exact localization universal
+    # property above. Retain that proved inverse-pair premise instead of asking
+    # the generic core constructor to rediscover identity equations by comparing
+    # every generator image in singular quotient localizations.
+    return _isomorphism_from_known_inverse_pair(
         forward,
         inverse,
+        base_category=Schemes(base_ring),
     )
 
 

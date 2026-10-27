@@ -238,6 +238,23 @@ def test_toric_face_transition_maps_are_mutual_inverses() -> None:
         singular_open.Mor(singular_open).identity()
     )
 
+    # Exercise the four-generator Hilbert basis as well: iterating the lazy
+    # semigroup-coefficient family must not rerank its represented generator
+    # morphisms through recursive mathematical equality for every coordinate.
+    four_generator_cone = next(
+        cone for cone in singular_cones if len(tuple(cone.semigroup_generators())) == 4
+    )
+    four_adjacent = singular_cones[
+        (singular_cones.index(four_generator_cone) + 1) % len(singular_cones)
+    ]
+    four_face = four_generator_cone.intersection(four_adjacent)
+    four_open = _face_localization(four_face, four_generator_cone, QQ)
+    four_transition = _face_transition(four_generator_cone, four_adjacent, QQ)
+    assert four_transition.forward().domain() is four_open
+    assert four_transition.inverse().forward() * four_transition.forward() == (
+        four_open.Mor(four_open).identity()
+    )
+
 
 def test_the_chart_of_the_a_one_cone_is_the_quadric_cone() -> None:
     r"""CLS Example 1.2.22: ``S_sigma`` needs three characters with one

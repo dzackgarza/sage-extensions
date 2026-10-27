@@ -566,7 +566,18 @@ class RationalPolyhedralFans(OwnedParameterizedCategory):
             # Hilbert-coefficient integer program is unnecessary in this case.
             # Match by the exact Kronecker pairing rather than assuming the
             # engine's Hilbert-basis order agrees with the fan's ray order.
-            if self.is_smooth() and len(rays) == int(self.lattice().module_rank()) == len(generators):
+            rank = int(self.lattice().module_rank())
+            dimension = int(self.dimension())
+            # The rank-two full-dimensional exact Cramer's-rule path below
+            # applies to smooth and singular cones alike. Do not ask the
+            # backend smoothness predicate first: it is irrelevant to that
+            # complete branch and can dominate repeated overlap-character
+            # construction for the singular AT21 Hilbert bases.
+            if (
+                not (rank == 2 and dimension == 2)
+                and self.is_smooth()
+                and len(rays) == rank == len(generators)
+            ):
                 dual_ray = {}
                 for generator in generators:
                     matches = tuple(
@@ -601,7 +612,7 @@ class RationalPolyhedralFans(OwnedParameterizedCategory):
             # coefficients. This is an exact finite search, avoiding Sage's
             # general integer program on the singular surface cones that occur
             # in AT21.
-            if int(self.lattice().module_rank()) == 2 and int(self.dimension()) == 2:
+            if rank == 2 and dimension == 2:
                 coordinates = tuple(
                     tuple(
                         int(generator.to_vector()(label))
@@ -628,19 +639,48 @@ class RationalPolyhedralFans(OwnedParameterizedCategory):
                         values[i] = integers(left)
                         values[j] = integers(right)
                         ranking = generators.ranking_map()
+                        # The family evaluates these values on the exact
+                        # canonical labels emitted by ``generators``. Ranking
+                        # each label again invokes mathematical equality on
+                        # represented module morphisms; those comparisons can
+                        # recursively compare their full defining maps. Use
+                        # identity for the normal iteration path, retaining
+                        # the exact ranking fallback for an equivalent label
+                        # supplied through a noncanonical representation.
+                        by_identity = {
+                            id(generator): values[position]
+                            for position, generator in enumerate(generators)
+                        }
+
+                        def coefficient(generator):
+                            value = by_identity.get(id(generator))
+                            if value is not None:
+                                return value
+                            return values[int(ranking(generator))]
+
                         return finite_indexed_family(
                             generators,
-                            lambda generator: values[int(ranking(generator))],
+                            coefficient,
                             name="Semigroup multiplicities of a character",
                         )
             multiplicities = self._engine_cone().dual().Hilbert_coefficients(
                 list(_engine_vector(self.character_lattice(), character))
             )
+            ranking = generators.ranking_map()
+            by_identity = {
+                id(generator): integers(int(multiplicities[position]))
+                for position, generator in enumerate(generators)
+            }
+
+            def coefficient(generator):
+                value = by_identity.get(id(generator))
+                if value is not None:
+                    return value
+                return integers(int(multiplicities[int(ranking(generator))]))
+
             return finite_indexed_family(
                 generators,
-                lambda generator: integers(
-                    int(multiplicities[int(generators.ranking_map()(generator))])
-                ),
+                coefficient,
                 name="Semigroup multiplicities of a character",
             )
 
