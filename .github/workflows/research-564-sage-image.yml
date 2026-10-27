@@ -29,8 +29,10 @@ jobs:
           esac
           test "${#SAGE_SOURCE_SHA}" -eq 40
           test "$SAGE_BIN" = /sage/.venv/bin/sage
+          test "$(cat /sage/.spinor-source-revision)" = "$SAGE_SOURCE_SHA"
           "$SAGE_BIN" --version
-          printf '%s\n' "Expected source revision: $SAGE_SOURCE_SHA"
+          printf 'Expected spinor patch revision: %s\n' "$SAGE_SOURCE_SHA"
+          printf 'Sage build base revision: %s\n' "$(cat /sage/.spinor-base-revision)"
 
       - name: Check out public consumer assertions
         uses: actions/checkout@v4
