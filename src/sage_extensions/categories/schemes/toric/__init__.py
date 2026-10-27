@@ -1,8 +1,5 @@
 r"""Fans, toric varieties, and the log pairs built on them."""
 
-from sage_extensions.categories.schemes.toric.blowups import (
-    ToricFixedPointBlowups,
-)
 from sage_extensions.categories.schemes.toric.fans import (
     RationalPolyhedralFans,
 )
@@ -11,6 +8,9 @@ from sage_extensions.categories.schemes.toric.toric_schemes import (
     ToricSchemes,
     ToricProjectiveSpaces,
     GorensteinToricSchemes,
+)
+from sage_extensions.categories.schemes.toric.blowups import (
+    ToricFixedPointBlowups,
 )
 
 __all__ = [
