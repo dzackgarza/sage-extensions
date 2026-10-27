@@ -2198,6 +2198,7 @@ class FormModules(OwnedCategoryOverBaseRing):
             r"""Return a negative-norm vector, or ``None`` if none exists."""
             return self.vector_of_sign(-1)
 
+        @cached_method
         def signature_pair(self):
             r"""Return cardinal inertia of the selected norm in its chosen ordering."""
             value_module = self.value_module()
