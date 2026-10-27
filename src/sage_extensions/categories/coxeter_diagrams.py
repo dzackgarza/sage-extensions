@@ -1,5 +1,6 @@
 r"""Finite Coxeter diagrams, optionally rooted in an integral lattice."""
 
+from fractions import Fraction
 from itertools import combinations
 
 from sage.categories.map import Map
@@ -840,9 +841,8 @@ class CoxeterDiagrams(OwnedCategory):
             # diagonal scaling. Compute inertia from it directly rather than
             # rebuilding the normalized tensor and lowering every entry.
             if (
-                self.is_rooted()
-                and self._root_gram_engine_matrix is not None
-                and _engine_ring(self.root_gram_tensor().base_ring()) is SageZZ
+                self._root_gram_engine_matrix is not None
+                and self._root_gram_engine_matrix.base_ring() is SageZZ
             ):
                 gram = self._root_gram_engine_matrix.change_ring(SageZZ)
                 matrix = sage_matrix(
@@ -993,7 +993,10 @@ class CoxeterDiagrams(OwnedCategory):
             constructing every connected rooted subdiagram merely to reject it.
             """
             vertices = tuple(self.index_set())
-            if self.is_rooted() and _engine_ring(self.root_gram_tensor().base_ring()) is SageZZ:
+            if (
+                self._root_gram_engine_matrix is not None
+                and self._root_gram_engine_matrix.base_ring() is SageZZ
+            ):
                 # For an integral rooted diagram, let G be its root Gram and
                 # d_i=|G_ii|. Its Schlaefli matrix is congruent via the positive
                 # diagonal matrix diag(sqrt(d_i)) to the integral matrix
@@ -1850,6 +1853,11 @@ class RootedCoxeterDiagrams(OwnedCategory):
             return self.roots().value(vertex)
 
         def _engine_root_squares(self):
+            if self._root_gram_engine_matrix is not None:
+                return tuple(
+                    QQ(self._root_gram_engine_matrix[index, index])
+                    for index in range(int(self.cardinality()))
+                )
             gram = self.root_gram_tensor()
             return tuple(
                 QQ(_engine_element(gram.base_ring(), gram[index, index]))
@@ -1868,8 +1876,18 @@ class RootedCoxeterDiagrams(OwnedCategory):
             return min(squares, key=abs) / 2
 
         def root_scale(self):
-            r"""Return ``q(r)/2`` for a shortest root of this rooted diagram."""
-            return _cross_engine_ring_value(self._engine_root_scale())
+            r"""Return the exact rational ``q(r)/2`` for a shortest root.
+
+            Root scale is a numerical classification invariant, not an owned
+            ring element. Returning the owned wrapper for the selected rational
+            makes equal scales compare unequal to ordinary exact rationals
+            (for example ``-root_scale() == 2``), which breaks type-set
+            classification. Cross this scalar boundary as a Python
+            ``Fraction``; the value is computed exactly in the private rational
+            field and no floating-point conversion occurs.
+            """
+            value = self._engine_root_scale()
+            return Fraction(int(value.numerator()), int(value.denominator()))
 
         def node_color(self, vertex):
             r"""Return the archived rooted-diagram fill convention determined by root square."""
@@ -1900,7 +1918,15 @@ class RootedCoxeterDiagrams(OwnedCategory):
             )
 
         def _engine_root_intersection_graph(self):
-            gram = self.root_gram_tensor()
+            # Graph isomorphism and exact type recognition compare edge/loop
+            # labels in Sage's graph backend. Use the selected private Gram
+            # realization when available: owned scalar wrappers intentionally
+            # retain their parent and do not compare equal to equal-valued
+            # Sage scalars, which otherwise makes an identical reference root
+            # graph fail its labelled isomorphism test.
+            gram = self._root_gram_engine_matrix
+            if gram is None:
+                gram = _engine_component_matrix(self.root_gram_tensor())
             graph = Graph(multiedges=False, loops=True)
             graph.add_vertices(tuple(self.index_set()))
             for position, vertex in enumerate(self.index_set()):
