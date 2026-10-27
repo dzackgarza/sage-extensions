@@ -109,7 +109,7 @@ def test_overlap_characters_stay_in_the_selected_face_localization() -> None:
     )
 
     fan = _plane_fans().projective_space_fan()
-    source, target = tuple(fan.maximal_cones())
+    source, target = tuple(fan.maximal_cones())[:2]
     face = source.intersection(target)
     localization = _face_localization(face, source, QQ).coordinate_algebra()
 
