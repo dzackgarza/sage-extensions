@@ -1452,11 +1452,16 @@ def _root_basis_diagram(roots, names=None, positions=None, type_label=None):
         index: tensor.vector(ring, tuple(framing.lift(roots.value(index))))
         for index in mirrors
     }
-    pairings = {
-        (left, right): form_gram.contract(coordinates[left], coordinates[right])
-        for left in mirrors
-        for right in mirrors
-    }
+    # The lattice pairing is symmetric. Contract each unordered pair once
+    # and retain both matrix entries; this halves the expensive exact tensor
+    # contractions for the larger rooted diagrams (including Sterk's).
+    pairings = {}
+    ordered_mirrors = tuple(mirrors)
+    for position, left in enumerate(ordered_mirrors):
+        for right in ordered_mirrors[position:]:
+            value = form_gram.contract(coordinates[left], coordinates[right])
+            pairings[left, right] = value
+            pairings[right, left] = value
     gram = tensor(
         ring,
         (),
