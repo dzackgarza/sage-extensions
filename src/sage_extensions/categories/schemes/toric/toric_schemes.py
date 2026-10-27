@@ -175,7 +175,10 @@ def _character_monomial(character, cone, chart):
     for position, multiplicity in enumerate(cone.semigroup_coefficients(character)):
         exponent = int(multiplicity)
         if exponent:
-            monomial = monomial * algebra.algebra_generator(labels[position]) ** exponent
+            generator = algebra.algebra_generator(labels[position])
+            monomial = monomial * (
+                generator if exponent == 1 else generator**exponent
+            )
     return monomial
 
 
