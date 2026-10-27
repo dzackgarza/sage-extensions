@@ -154,6 +154,9 @@ def test_sterk_diagram_vertices_keep_the_zero_based_root_labels() -> None:
         assert Set(diagrams[name].index_set()) == Set(expected)
         assert Set(layout) == Set(range(len(layout)))
         assert Set(diagrams[name].preferred_positions()) == Set(expected)
+        assert dict(diagrams[name].preferred_positions()) == {
+            f"r{index}": position for index, position in layout.items()
+        }
 
 
 def test_sterk_connected_elliptic_subdiagrams_have_the_recorded_types() -> None:
