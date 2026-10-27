@@ -127,27 +127,18 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
 
         base = self.base_ring()
         presentation = base.polynomial_ring(names)
-        engine_presentation = _engine_ring(presentation)
         # ToricIdeal reads the semigroup generators from the columns of its matrix.
         columns = _engine_column_matrix(SageZZ, coordinates)
-        engine_ideal = _SageToricIdeal(
-            columns,
-            names=names,
-            base_ring=_engine_ring(base),
-        )
-        relations = tuple(
-            _owned_engine_element(presentation, engine_presentation(relation))
-            for relation in engine_ideal.gens()
-        )
         construction_data = (
             ("_affine_semigroup_presentation", _AffineSemigroupPresentation(coordinates)),
             *tuple(extra_construction_data),
         )
-        if not relations:
-            # A free affine semigroup has no toric relations, so its algebra
-            # is the polynomial ring itself. Preserve that selected parent
-            # and add the semigroup construction data directly instead of
-            # building a quotient by the zero ideal.
+        # If the lattice generators are linearly independent over Q, the map
+        # N^r -> Z^n they define is injective. Thus distinct monomials have
+        # distinct semigroup degrees and the toric ideal is zero. Avoid asking
+        # ToricIdeal to rediscover this exact rank fact, and retain the selected
+        # polynomial algebra directly.
+        if columns.rank() == len(coordinates):
             return _algebra_with_structure(
                 presentation,
                 base,
@@ -159,6 +150,17 @@ class AffineSemigroupAlgebras(OwnedCategoryOverBaseRing):
                 *tuple(extra_categories),
                 construction_data=construction_data,
             )
+
+        engine_presentation = _engine_ring(presentation)
+        engine_ideal = _SageToricIdeal(
+            columns,
+            names=names,
+            base_ring=_engine_ring(base),
+        )
+        relations = tuple(
+            _owned_engine_element(presentation, engine_presentation(relation))
+            for relation in engine_ideal.gens()
+        )
         return (presentation).quotient_by_relations(relations,
             _extra_categories=(self, *tuple(extra_categories)),
             _extra_construction_data=construction_data,
