@@ -96,6 +96,8 @@ def test_the_at21_enhancement_of_a1_is_a_log_pair_on_the_same_surface() -> None:
         2 * enhanced.complementary_divisor()
     )
     assert enhanced.branch_line_bundle().base_ring() is QQ
+    assert enhanced.branch_line_bundle().scheme() is enhanced.scheme()
+    assert enhanced.branch_line_bundle().associated_divisor() == enhanced.branch_divisor_class()
     coefficients = enhanced.log_boundary_coefficient_ring()
     assert coefficients.algebra_framing_source() is coefficients
     assert coefficients.algebra_framing_morphism() == coefficients.Mor(coefficients).identity()
