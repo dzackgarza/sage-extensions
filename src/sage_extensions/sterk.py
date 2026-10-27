@@ -2,16 +2,46 @@ r"""Sterk cusp and root configurations for degree-two Enriques moduli."""
 
 from functools import cache
 
+from sage.matrix.constructor import matrix as sage_matrix
 from sage.rings.rational_field import QQ
 
 from sage_extensions.categories.sets.indexed_families import finite_indexed_family_from_values
 from sage_extensions.catalogue import NamedLattices
 from sage_extensions.categories.coxeter_diagrams import CoxeterDiagrams
 from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+from sage_extensions.tensors.tensor import _engine_component_matrix
 
 
 def _named_generators(lattice):
     return {str(label): lattice.module_generator(label) for label in lattice.module_generating_set()}
+
+
+def _correlation_preimage_from_gram_inverse(lattice, dual_element, inverse_gram):
+    r"""Compute the exact integral preimage under ``v |-> b(v,-)``.
+
+    In the selected lattice and metric-dual bases, the correlation morphism
+    has matrix ``G``. Thus the unique preimage of dual coordinates ``y`` is
+    ``G^(-1)y``. The caller supplies the exact rational inverse once for the
+    root family; integrality of every resulting coordinate is precisely the
+    image-membership condition for this finite-rank free lattice map.
+    """
+    labels = tuple(lattice.module_generating_set())
+    coordinates = tuple(dual_element.to_vector())
+    preimage = inverse_gram * sage_matrix(
+        QQ, len(coordinates), 1, [QQ(int(coefficient)) for coefficient in coordinates]
+    )
+    coefficients = tuple(preimage[i, 0] for i in range(len(labels)))
+    if any(coefficient.denominator() != 1 for coefficient in coefficients):
+        raise ValueError(
+            f"the dual vector {dual_element!r} is not in the image of the lattice correlation map"
+        )
+    return lattice.linear_combination(
+        {
+            label: lattice.base_ring()(int(coefficient))
+            for label, coefficient in zip(labels, coefficients, strict=True)
+            if coefficient
+        }
+    )
 
 
 _STERK_DIAGRAM_LAYOUTS = {
@@ -96,9 +126,10 @@ class Sterk:
         dual = tuple(TdP.dual_lattice().module_generators())
         _, _, _, _, w1, w2, w3, w4, w5, w6, w7, w8, w1t, w2t, w3t, w4t, w5t, w6t, w7t, w8t = dual
         c = TdP.correlation()
+        inverse_gram = _engine_component_matrix(TdP.gram_tensor()).change_ring(QQ).inverse()
         vectors = {
             "v1": b["b8"],
-            "v2": c.lift(c(b["ep"] + b["fp"]) + w1 + w8t),
+            "v2": _correlation_preimage_from_gram_inverse(TdP, c(b["ep"] + b["fp"]) + w1 + w8t, inverse_gram),
             "v3": b["a1"],
             "v4": b["a3"],
             "v5": b["a4"],
@@ -106,19 +137,19 @@ class Sterk:
             "v7": b["a6"],
             "v8": b["a7"],
             "v9": b["a8"],
-            "v10": c.lift(c(b["ep"] + b["fp"]) + w8 + w1t),
+            "v10": _correlation_preimage_from_gram_inverse(TdP, c(b["ep"] + b["fp"]) + w8 + w1t, inverse_gram),
             "v11": b["b1"],
             "v12": b["b3"],
             "v13": b["b4"],
             "v14": b["b5"],
             "v15": b["b6"],
             "v16": b["b7"],
-            "v17": c.lift(c(b["ep"]) + w8t),
+            "v17": _correlation_preimage_from_gram_inverse(TdP, c(b["ep"]) + w8t, inverse_gram),
             "v18": b["a2"],
-            "v19": c.lift(c(b["ep"]) + w8),
+            "v19": _correlation_preimage_from_gram_inverse(TdP, c(b["ep"]) + w8, inverse_gram),
             "v20": b["b2"],
             "v21": b["fp"] - b["ep"],
-            "v22": c.lift(c(5 * b["ep"] + 3 * b["fp"]) + 2 * w2 + 2 * w2t),
+            "v22": _correlation_preimage_from_gram_inverse(TdP, c(5 * b["ep"] + 3 * b["fp"]) + 2 * w2 + 2 * w2t, inverse_gram),
         }
         assert len(vectors) == 22
         return vectors
@@ -136,6 +167,7 @@ class Sterk:
         dual = tuple(TdP.dual_lattice().module_generators())
         _, _, _, _, w1, w2, w3, w4, w5, w6, w7, w8, w1t, w2t, w3t, w4t, w5t, w6t, w7t, w8t = dual
         c = TdP.correlation()
+        inverse_gram = _engine_component_matrix(TdP.gram_tensor()).change_ring(QQ).inverse()
         vectors = {
             "w1": b["a1"],
             "w2": b["a3"],
@@ -144,9 +176,9 @@ class Sterk:
             "w5": b["a6"],
             "w6": b["a7"],
             "w7": b["a8"],
-            "w8": c.lift(c(b["e"]) + w8),
+            "w8": _correlation_preimage_from_gram_inverse(TdP, c(b["e"]) + w8, inverse_gram),
             "w9": b["f"] - b["e"],
-            "w10": c.lift(c(b["e"]) + w8t),
+            "w10": _correlation_preimage_from_gram_inverse(TdP, c(b["e"]) + w8t, inverse_gram),
             "w11": b["b8"],
             "w12": b["b7"],
             "w13": b["b6"],
