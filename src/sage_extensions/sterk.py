@@ -89,7 +89,8 @@ _STERK_DIAGRAM_LAYOUTS = {
 
 class Sterk:
     @staticmethod
-    def roots_18_2_0():
+    @cache
+    def _roots_18_2_0_cached():
         TdP = NamedLattices.TdP
         b = _named_generators(TdP)
         dual = tuple(TdP.dual_lattice().module_generators())
@@ -123,7 +124,13 @@ class Sterk:
         return vectors
 
     @staticmethod
-    def roots_18_0_0():
+    def roots_18_2_0():
+        r"""Return the verified 22-root configuration in signature ``(18,2,0)``."""
+        return dict(Sterk._roots_18_2_0_cached())
+
+    @staticmethod
+    @cache
+    def _roots_18_0_0_cached():
         TdP = NamedLattices.TdP
         b = _named_generators(TdP)
         dual = tuple(TdP.dual_lattice().module_generators())
@@ -152,6 +159,11 @@ class Sterk:
         }
         assert len(vectors) == 19
         return vectors
+
+    @staticmethod
+    def roots_18_0_0():
+        r"""Return the verified 19-root configuration in signature ``(18,0,0)``."""
+        return dict(Sterk._roots_18_0_0_cached())
 
     @staticmethod
     @cache
