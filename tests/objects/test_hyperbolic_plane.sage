@@ -71,17 +71,21 @@ def test_even_unimodular_gram_join_retains_delta_in_rank_twenty_eight() -> None:
     assert gram_lattice.delta() == 0
 
 
-def test_gram_construction_places_only_even_two_elementary_lattices_on_delta_surface() -> None:
-    r"""Gram reconstruction retains the two-elementary hypothesis and its delta value."""
+def test_gram_delta_operation_enforces_the_two_elementary_hypothesis() -> None:
+    r"""Gram reconstruction computes delta on A1 and rejects the non-2-elementary A2."""
     lattices = Lattices(ZZ)
     two_elementary = lattices(NamedLattices.A1.gram_tensor())
-    assert two_elementary in EvenTwoElementaryLattices(ZZ)
     assert two_elementary.delta() == 1
 
     not_two_elementary = lattices(NamedLattices.A2.gram_tensor())
     assert not_two_elementary.is_even()
     assert not not_two_elementary.is_p_elementary(2)
-    assert not not_two_elementary in EvenTwoElementaryLattices(ZZ)
+    try:
+        not_two_elementary.delta()
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("delta must reject an even lattice with non-2-elementary discriminant")
 
 
 def test_the_vectors_of_square_minus_two() -> None:
