@@ -71,6 +71,13 @@ def test_the_pair_records_its_dynkin_type() -> None:
         assert "not toric" in str(error)
     else:
         raise AssertionError("affine A_3 has no toric AT21 polygon and must not construct a toric log pair")
+    try:
+        ADELogPairs(QQ).at21("A", 3, affine=True)
+    except ValueError as error:
+        assert "tilde A" in str(error)
+        assert "not toric" in str(error)
+    else:
+        raise AssertionError("the AT21 enhancement must not fabricate a toric affine A_3 base")
     assert pair.is_base()
     assert not pair.is_cover()
     assert pair.codimension_in_toric_scheme() == 0
