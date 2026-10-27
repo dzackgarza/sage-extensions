@@ -73,6 +73,34 @@ def test_the_chart_of_a_smooth_cone_is_the_affine_plane() -> None:
     assert chart.coordinate_algebra().algebra_generating_set().cardinality() == 2
 
 
+def test_smooth_full_dimensional_cone_coefficients_are_dual_ray_pairings() -> None:
+    r"""On a smooth full-dimensional cone, its dual Hilbert basis is the dual ray basis."""
+    fan = _plane_fans().projective_space_fan()
+    cone = fan.maximal_cones()[0]
+    assert cone.is_smooth()
+    assert cone.dimension() == fan.dimension()
+
+    generators = tuple(cone.semigroup_generators())
+    rays = tuple(cone.rays())
+    assert len(generators) == len(rays) == 2
+    for generator in generators:
+        coefficients = cone.semigroup_coefficients(generator)
+        for basis_character in generators:
+            matching_rays = tuple(
+                ray
+                for ray in rays
+                if all(
+                    fan.character_cocharacter_value(basis_character, other)
+                    == (ZZ.one() if other == ray else ZZ.zero())
+                    for other in rays
+                )
+            )
+            assert len(matching_rays) == 1
+            assert coefficients[basis_character] == fan.character_cocharacter_value(
+                generator, matching_rays[0]
+            )
+
+
 def test_the_chart_of_the_a_one_cone_is_the_quadric_cone() -> None:
     r"""CLS Example 1.2.22: ``S_sigma`` needs three characters with one
     relation, so the chart is a hypersurface in three variables rather than an
