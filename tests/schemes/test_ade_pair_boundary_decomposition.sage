@@ -57,7 +57,7 @@ def test_the_distinguished_point_is_a_vertex_of_the_polygon() -> None:
 
 
 def test_the_pair_records_its_dynkin_type() -> None:
-    r"""Toric AT21 pairs retain their type; affine A is outside this toric construction."""
+    r"""Toric AT21 pairs retain their type; affine A belongs to AT21's nontoric Section 3B."""
     pair = ADELogPairs(QQ)("E", 6)
 
     assert pair.dynkin_letter() == "E"
