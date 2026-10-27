@@ -314,17 +314,20 @@ class RationalPolyhedralFans(OwnedParameterizedCategory):
         def _cone(self, engine_cone):
             return self.element_class(self, engine_cone)
 
+        @cached_method
         def cones(self, dimension):
             r"""The cones of the stated dimension, as a finite ordered set."""
             return finite_ordered_set(
                 tuple(self._cone(cone) for cone in self._engine_fan().cones(int(dimension)))
             )
 
+        @cached_method
         def maximal_cones(self):
             return finite_ordered_set(
                 tuple(self._cone(cone) for cone in self._engine_fan().generating_cones())
             )
 
+        @cached_method
         def rays(self):
             r"""The primitive ray generators, as elements of ``N``."""
             lattice = self.lattice()
