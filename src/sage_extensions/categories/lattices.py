@@ -1185,18 +1185,17 @@ def _genus_classes(gram):
     total = form.conway_mass()
     found_mass = SageQQ.zero()
     classes = []
-    for position, seed in enumerate(seeds):
+    for seed in seeds:
         spinor_genus = neighbor_iteration(
             [seed],
             prime,
-            mass=total - found_mass if position == len(seeds) - 1 else None,
             algorithm="orbits",
             max_classes=10**6,
         )
-        # ``neighbor_iteration`` discovers classes by walking out from its
-        # seeds, but does not promise to return a seed first. Restore the
-        # public representative ordering contract by moving the seed's own
-        # isometry class to the front of this spinor-genus block.
+        # ``neighbor_iteration`` uses its seeds only as traversal roots; its
+        # returned class list starts empty and therefore need not contain a
+        # seed at all. Include the seed class explicitly, deduplicating it if
+        # a neighbour equivalent to the seed was discovered during traversal.
         seed_position = next(
             (
                 index
@@ -1205,10 +1204,10 @@ def _genus_classes(gram):
             ),
             None,
         )
-        assert seed_position is not None, (
-            f"the p-neighbour enumeration of the spinor genus of {seed} did not return its seed class"
-        )
-        spinor_genus.insert(0, spinor_genus.pop(seed_position))
+        if seed_position is None:
+            spinor_genus.insert(0, seed)
+        else:
+            spinor_genus.insert(0, spinor_genus.pop(seed_position))
         found_mass += sum(
             SageQQ.one() / found.number_of_automorphisms() for found in spinor_genus
         )
