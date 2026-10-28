@@ -1178,10 +1178,11 @@ def _genus_classes(gram):
             parent = chosen[:-1]
             spinor_prime = chosen[-1]
             parent_seed = seed_by_subset[parent]
+            cursor = None
             vector = None
             while True:
                 candidate = parent_seed.find_primitive_p_divisible_vector__next(
-                    spinor_prime, vector
+                    spinor_prime, cursor
                 )
                 if candidate is None:
                     break
@@ -1192,7 +1193,7 @@ def _genus_classes(gram):
                 if spinor_prime != 2 or parent_seed(candidate) % 4 == 0:
                     vector = candidate
                     break
-                vector = candidate
+                cursor = candidate
             assert vector is not None, (
                 f"the form {parent_seed} has no primitive vector suitable for a {spinor_prime}-neighbour"
             )
