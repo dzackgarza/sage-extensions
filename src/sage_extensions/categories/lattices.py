@@ -1111,9 +1111,9 @@ def _genus_classes(gram):
     A definite
     spinor genus is enumerated by ``p``-neighbours at a prime ``p`` not
     dividing the determinant, with ``p`` in the improper spinor kernel so
-    that neighbours stay in the spinor genus.  The masses of the classes
-    found must add up to the mass of the genus, which also stops the last
-    enumeration.
+    that neighbours stay in the spinor genus.  The masses of all enumerated
+    classes, including explicitly inserted seeds, must add up exactly to the
+    mass of the genus; this is the completeness check after enumeration.
     """
     from itertools import chain, combinations
 
