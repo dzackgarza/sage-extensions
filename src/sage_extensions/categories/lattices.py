@@ -1184,14 +1184,22 @@ def _genus_classes(gram):
             parent = chosen[:-1]
             spinor_prime = chosen[-1]
             parent_seed = seed_by_subset[parent]
-            # The iterator already guarantees q(v) is divisible by p. For
-            # these odd neighbour primes, the constructor adjusts a merely
-            # p-divisible vector to satisfy its bilinear divisibility checks.
+            # Since p is odd and p does not divide det(gram), the reduction
+            # of this rank-at-least-three form modulo p is nondegenerate.
+            # Every quadratic form of dimension at least three over a finite
+            # field is isotropic (equivalently, u(F_p) = 2; Lam, *Introduction
+            # to Quadratic Forms over Fields*, Ch. VI, §2). Hence the iterator
+            # over projective lines terminates with a primitive p-divisible
+            # vector. The constructor adjusts its norm to the stronger
+            # bilinear divisibility condition required for an odd p-neighbour.
             vector = parent_seed.find_primitive_p_divisible_vector__next(
                 spinor_prime
             )
             assert vector is not None, (
                 f"the form {parent_seed} has no primitive vector suitable for a {spinor_prime}-neighbour"
+            )
+            assert parent_seed(vector) % spinor_prime == 0, (
+                f"the vector {vector} does not satisfy the p-divisibility condition for a {spinor_prime}-neighbour"
             )
             seed_by_subset[chosen] = parent_seed.find_p_neighbor_from_vec(
                 spinor_prime, vector
