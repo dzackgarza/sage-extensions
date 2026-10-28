@@ -261,6 +261,7 @@ def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
     for prime in spinor_primes:
         prime_class = quotient(spinor_operators.delta(prime))
         assert not prime.divides(sage_genus.determinant())
+        assert prime_class.order() == 2
         previous_order = accumulated.order()
         accumulated = quotient.subgroup((prime_class,) + accumulated.gens())
         assert accumulated.order() > previous_order
