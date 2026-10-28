@@ -431,7 +431,9 @@ def _category_provider_order_key(category: Category, memo=None):
         cached = (
             _category_graph_depth(category),
             repr(_category_graph_signature(category)),
-            category._cmp_key[1],
+            _declared_category_class(category).__module__,
+            _declared_category_class(category).__qualname__,
+            str(category),
         )
         memo[identity] = cached
     return cached
@@ -1094,6 +1096,24 @@ class OwnedJoinCategory(OwnedCategoryMixin, JoinCategory):
             raise ValueError(f"{result!r} does not satisfy {self}")
         return result
 
+    def base_ring(self):
+        r"""Return the base ring of this join, taken from the first branch over a base ring."""
+        from sage.categories.category import Category_over_base_ring
+
+        for branch in self._super_categories:
+            if isinstance(branch, Category_over_base_ring):
+                return branch.base_ring()
+        assert False, f"{self} is over no base ring"
+
+    def base(self):
+        r"""Return the base of this join, taken from the first branch over a base."""
+        from sage.categories.category import Category_over_base
+
+        for branch in self._super_categories:
+            if isinstance(branch, Category_over_base):
+                return branch.base()
+        assert False, f"{self} is over no base"
+
     def is_subcategory(self, category):
         r"""Compare this intersection through its mathematical branches.
 
@@ -1336,6 +1356,11 @@ class ConstructionContract:
             raise TypeError(
                 f"{self.owner} construction is missing required data: {missing_names}"
             )
+        for name in self.required_names():
+            if data.get(name) is None:
+                raise ValueError(
+                    f"{self.owner} construction required datum '{name}' cannot be None"
+                )
         if self.is_open():
             return
         declared = self.required_names() | self.optional_names()
@@ -1657,12 +1682,16 @@ def _object_of(
     _construction_contract_from_type(
         category, implementation, owned_object_chain=True
     ).validate(data)
-    return implementation(
+    result = implementation(
         category=category,
         _defining_construction=(category, _engine, data),
         _constructing_category=category if ambient is None else ambient,
         **data,
     )
+    from sage_extensions.validation import run_object_validators, strict_checking
+    if strict_checking():
+        run_object_validators(result)
+    return result
 
 
 def _cat() -> Category:

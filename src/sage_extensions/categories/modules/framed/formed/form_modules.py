@@ -4092,6 +4092,10 @@ class FormBaseChanges(OwnedCategoryOverBaseRing):
         return [FormModules(self.base_ring())]
 
     def _call_(self, source, ring_map):
+        if ring_map.domain() is not source.base_ring():
+            raise ValueError(
+                f"the scalar extension domain {ring_map.domain()} does not match source base ring {source.base_ring()}"
+            )
         if ring_map.codomain() is not self.base_ring():
             raise ValueError(
                 "the scalar extension must end at this category's base ring"
