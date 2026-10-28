@@ -63,6 +63,11 @@ jobs:
           ref: main
           path: .qc-infra
 
+      - name: Install required public pytest plugins
+        run: >-
+          /root/.local/bin/uv pip install --python /sage/.venv/bin/python
+          pytest-timeout pytest-reportlog
+
       - name: Run the complete unchanged public genus acceptance file
         env:
           PYTHONPATH: ${{ github.workspace }}/.qc-infra/tool-artifacts/pytest_plugins
