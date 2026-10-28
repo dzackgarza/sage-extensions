@@ -1186,6 +1186,13 @@ def _genus_classes(gram):
     assert all(seed.det() == form.det() for seed in seeds), (
         f"a p-neighbour spinor-genus seed changed the determinant of {form}"
     )
+    for index, seed in enumerate(seeds):
+        assert all(
+            not seed.is_globally_equivalent_to(other)
+            for other in seeds[index + 1 :]
+        ), (
+            f"the p-neighbour construction produced duplicate isometry-class seeds for the genus of {gram}"
+        )
 
     def grams(forms):
         return tuple(
