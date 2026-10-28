@@ -1121,6 +1121,7 @@ def _genus_classes(gram):
     from sage.quadratic_forms.genera.genus import Genus as SageGenus
     from sage.quadratic_forms.quadratic_form import QuadraticForm
     from sage.quadratic_forms.quadratic_form__neighbors import neighbor_iteration
+    from sage.rings.infinity import Infinity
     from sage.rings.rational_field import QQ as SageQQ
     from sage.sets.primes import Primes
 
@@ -1194,7 +1195,11 @@ def _genus_classes(gram):
             [seed],
             prime,
             algorithm="orbits",
-            max_classes=10**6,
+            # The definite genus is finite, and the full mass equality below
+            # is the completeness criterion. An arbitrary class-count cap
+            # would reject otherwise supported genera with more than 10^6
+            # classes rather than enumerate them completely.
+            max_classes=Infinity,
         )
         # ``neighbor_iteration`` uses its seeds only as traversal roots; its
         # returned class list starts empty and therefore need not contain a
