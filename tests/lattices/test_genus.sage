@@ -144,6 +144,8 @@ def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
     assert lattice.signature_pair() == signature_pair(2, 1)
     assert lattice.is_isotropic() is False
     genus = lattice.genus()
+    # Eichler's theorem does not require rational isotropy: every improper
+    # spinor genus of an indefinite rational space of rank >= 3 has one class.
     assert genus.class_number() == genus.spinor_genus_count()
     assert genus.representatives().cardinality() == genus.spinor_genus_count()
     assert tuple(lattice.spinor_genus_class_numbers()) == tuple(
