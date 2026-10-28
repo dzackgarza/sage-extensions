@@ -65,7 +65,7 @@ jobs:
 
       - name: Run the complete unchanged public genus acceptance file
         env:
-          PYTHONPATH: ${{ github.workspace }}/.qc-infra/scripts/pytest_plugins
+          PYTHONPATH: ${{ github.workspace }}/.qc-infra/tool-artifacts/pytest_plugins
         run: >-
           /sage/.venv/bin/python -m pytest
           -p qc_sage_session
