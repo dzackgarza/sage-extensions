@@ -73,7 +73,9 @@ jobs:
       - name: Run the complete unchanged public genus acceptance file
         env:
           PYTHONPATH: ${{ github.workspace }}/.qc-infra/tool-artifacts/pytest_plugins
+        # Run through Sage's launcher so it initializes the runtime environment
+        # (including Maxima/ECL search paths) before importing sage.all. Calling
+        # the venv's Python executable directly leaves that environment unset.
         run: >-
-          /sage/.venv/bin/python -m pytest
-          -p qc_sage_session
-          tests/lattices/test_genus.sage
+          "$SAGE_BIN" -c
+          'import sys, pytest; sys.exit(pytest.main(["-p", "qc_sage_session", "tests/lattices/test_genus.sage"]))'
