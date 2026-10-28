@@ -94,6 +94,11 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     spinor_operators, kernel = sage_genus._improper_spinor_kernel()
     quotient = spinor_operators.quotient(kernel)
     assert quotient.order() == 4
+    # Independently checked prime classes [3, 11] generate this C2 x C2
+    # quotient; this fixes the expected quotient rather than only its order.
+    assert quotient.subgroup(
+        [quotient(spinor_operators.delta(prime)) for prime in (ZZ(3), ZZ(11))]
+    ).order() == 4
     assert Set(spinor_primes).cardinality() == 2
     assert all(not prime.divides(sage_genus.determinant()) for prime in spinor_primes)
     accumulated = quotient.subgroup([])
