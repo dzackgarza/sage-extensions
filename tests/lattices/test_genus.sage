@@ -111,6 +111,18 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
         quotient(spinor_operators.delta(prime)) for prime in spinor_primes
     }
     assert len(prime_classes) == 2
+
+    # The proper and improper quotients have the same order here, but their
+    # operator groups and kernels are distinct. Check the proper public
+    # generator list against its own independently computed quotient too.
+    proper_primes = sage_genus.spinor_generators(proper=True)
+    proper_operators, proper_kernel = sage_genus._proper_spinor_kernel()
+    proper_quotient = proper_operators.quotient(proper_kernel)
+    assert proper_quotient.order() == 4
+    proper_generated = proper_quotient.subgroup(
+        [proper_quotient(proper_operators.delta(prime)) for prime in proper_primes]
+    )
+    assert proper_generated.order() == proper_quotient.order()
     assert lattice.spinor_genus_count() == 4
     assert genus.class_number() == 12
     assert genus.representatives().cardinality() == 12
