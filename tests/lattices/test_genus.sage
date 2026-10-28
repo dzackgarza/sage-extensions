@@ -142,7 +142,10 @@ def test_indefinite_genus_enumerates_each_nontrivial_spinor_seed() -> None:
     assert Set(spinor_primes).cardinality() == 1
     assert quotient(spinor_operators.delta(spinor_primes[0])).order() == 2
     assert genus.class_number() == 2
-    assert genus.representatives().cardinality() == 2
+    representatives = genus.representatives()
+    assert representatives.cardinality() == 2
+    first, second = representatives
+    assert not Lattices(ZZ)(first).is_isometric(Lattices(ZZ)(second))
     assert tuple(lattice.spinor_genus_class_numbers()) == (ZZ(1), ZZ(1))
 
 
