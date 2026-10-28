@@ -1193,6 +1193,22 @@ def _genus_classes(gram):
             algorithm="orbits",
             max_classes=10**6,
         )
+        # ``neighbor_iteration`` discovers classes by walking out from its
+        # seeds, but does not promise to return a seed first. Restore the
+        # public representative ordering contract by moving the seed's own
+        # isometry class to the front of this spinor-genus block.
+        seed_position = next(
+            (
+                index
+                for index, found in enumerate(spinor_genus)
+                if seed.is_globally_equivalent_to(found)
+            ),
+            None,
+        )
+        assert seed_position is not None, (
+            f"the p-neighbour enumeration of the spinor genus of {seed} did not return its seed class"
+        )
+        spinor_genus.insert(0, spinor_genus.pop(seed_position))
         found_mass += sum(
             SageQQ.one() / found.number_of_automorphisms() for found in spinor_genus
         )
