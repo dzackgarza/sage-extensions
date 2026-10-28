@@ -1186,15 +1186,15 @@ def _genus_classes(gram):
                 if candidate is None:
                     break
                 # Sage's neighbour constructor requires q(v) divisible by
-                # p^2 when p=2; its helper only promises divisibility by p.
-                # Odd primes are adjusted internally, but enforcing the
-                # defining p^2 condition here gives one uniform contract.
-                if parent_seed(candidate) % spinor_prime**2 == 0:
+                # p^2 at p=2. For odd p it adjusts a merely p-divisible vector
+                # internally, so imposing p^2 there could exhaust valid
+                # candidates unnecessarily.
+                if spinor_prime != 2 or parent_seed(candidate) % 4 == 0:
                     vector = candidate
                     break
                 vector = candidate
             assert vector is not None, (
-                f"the form {parent_seed} has no primitive vector of norm divisible by {spinor_prime}^2"
+                f"the form {parent_seed} has no primitive vector suitable for a {spinor_prime}-neighbour"
             )
             seed_by_subset[chosen] = parent_seed.find_p_neighbor_from_vec(
                 spinor_prime, vector
