@@ -119,6 +119,8 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     proper_operators, proper_kernel = sage_genus._proper_spinor_kernel()
     proper_quotient = proper_operators.quotient(proper_kernel)
     assert proper_quotient.order() == 4
+    assert Set(proper_primes).cardinality() == 2
+    assert all(not prime.divides(sage_genus.determinant()) for prime in proper_primes)
     proper_generated = proper_quotient.subgroup([])
     assert proper_generated.order() == 1
     for step, prime in enumerate(proper_primes, start=1):
