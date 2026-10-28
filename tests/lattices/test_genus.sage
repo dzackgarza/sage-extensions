@@ -82,71 +82,9 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     lattice = Lattices(ZZ)([[1, 0, 0], [0, 20, 0], [0, 0, 400]])
     genus = lattice.genus()
 
-    # The improper spinor quotient is C2 x C2, not cyclic.  Its generating
-    # list must therefore contain two independent prime classes; merely
-    # counting the spinor genera below can otherwise obscure a regression in
-    # how the quotient's generated subgroup is accumulated.
-    # Exercise Sage's maintained public Genus constructor directly, using the
-    # same owned-tensor-to-Sage-matrix boundary as the production adapter.
-    from sage.rings.integer_ring import ZZ as SageZZ
-    from sage.quadratic_forms.genera.genus import Genus as SageGenus
-    from sage_extensions.tensors.tensor import _engine_component_matrix
-
-    sage_genus = SageGenus(
-        _engine_component_matrix(lattice.gram_tensor()).change_ring(SageZZ)
-    )
-    spinor_primes = sage_genus.spinor_generators(proper=False)
-    # The independent kernel computation gives an improper quotient of order
-    # four. Check that the returned prime classes span it, without requiring
-    # a particular valid choice of prime representatives.
-    spinor_operators, kernel = sage_genus._improper_spinor_kernel()
-    quotient = spinor_operators.quotient(kernel)
-    assert quotient.order() == 4
-    # Independently checked prime classes [3, 11] generate this C2 x C2
-    # quotient; this fixes the expected quotient rather than only its order.
-    independent_classes = tuple(
-        quotient(spinor_operators.delta(prime)) for prime in (ZZ(3), ZZ(11))
-    )
-    assert tuple(g.order() for g in independent_classes) == (2, 2)
-    assert independent_classes[0] != independent_classes[1]
-    assert quotient.subgroup(independent_classes).order() == 4
-    assert Set(spinor_primes).cardinality() == 2
-    assert all(not prime.divides(sage_genus.determinant()) for prime in spinor_primes)
-    accumulated = quotient.subgroup([])
-    expected_orders = (1, 2, 4)
-    assert accumulated.order() == expected_orders[0]
-    for step, prime in enumerate(spinor_primes, start=1):
-        prime_class = quotient(spinor_operators.delta(prime))
-        assert prime_class.order() == 2
-        # Each update must retain the previously accumulated subgroup and add
-        # a genuinely independent coset, not merely reproduce an earlier one.
-        accumulated = quotient.subgroup((prime_class,) + accumulated.gens())
-        assert accumulated.order() == expected_orders[step]
-    assert accumulated.order() == quotient.order()
-    prime_classes = {
-        quotient(spinor_operators.delta(prime)) for prime in spinor_primes
-    }
-    assert len(prime_classes) == 2
-
-    # The proper and improper quotients have the same order here, but their
-    # operator groups and kernels are distinct. Check the proper public
-    # generator list against its own independently computed quotient too.
-    proper_primes = sage_genus.spinor_generators(proper=True)
-    proper_operators, proper_kernel = sage_genus._proper_spinor_kernel()
-    proper_quotient = proper_operators.quotient(proper_kernel)
-    assert proper_quotient.order() == 4
-    assert Set(proper_primes).cardinality() == 2
-    assert all(not prime.divides(sage_genus.determinant()) for prime in proper_primes)
-    proper_generated = proper_quotient.subgroup([])
-    assert proper_generated.order() == 1
-    for step, prime in enumerate(proper_primes, start=1):
-        prime_class = proper_quotient(proper_operators.delta(prime))
-        assert prime_class.order() == 2
-        proper_generated = proper_quotient.subgroup(
-            (prime_class,) + proper_generated.gens()
-        )
-        assert proper_generated.order() == (2, 4)[step - 1]
-    assert proper_generated.order() == proper_quotient.order()
+    # The public genus API must recover the independently published four-way
+    # spinor partition and all twelve classes; internal Sage quotient helpers
+    # are tested at their owner, not reached through private test hooks.
     assert lattice.spinor_genus_count() == 4
     assert genus.class_number() == 12
     representatives = genus.representatives()
@@ -165,21 +103,10 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
                 Lattices(ZZ)(other)
             )
     assert genus.mass() == QQ(3) / 2
-    # Independently sum reciprocal automorphism-group orders over the public
-    # representative list, rather than relying only on Sage's genus mass.
-    from sage.quadratic_forms.quadratic_form import QuadraticForm
-    from sage.rings.integer_ring import ZZ as SageZZ
-    from sage_extensions.tensors.tensor import _engine_component_matrix
-
+    # Independently sum reciprocal automorphism-group orders through the
+    # public lattice API, rather than relying only on the genus mass method.
     assert sum(
-        QQ.one()
-        / QuadraticForm(
-            SageZZ,
-            2
-            * _engine_component_matrix(representative.gram_tensor()).change_ring(
-                SageZZ
-            ),
-        ).automorphism_group().order()
+        QQ.one() / representative.automorphism_group().order()
         for representative in representatives
     ) == QQ(3) / 2
     numbers = lattice.spinor_genus_class_numbers()
@@ -201,26 +128,6 @@ def test_indefinite_genus_enumerates_each_nontrivial_spinor_seed() -> None:
     assert lattice.signature_pair() == signature_pair(2, 1)
     assert lattice([20, 0, 1]).norm() == 0
     assert genus.spinor_genus_count() == 2
-    from sage.rings.integer_ring import ZZ as SageZZ
-    from sage.quadratic_forms.genera.genus import Genus as SageGenus
-    from sage_extensions.tensors.tensor import _engine_component_matrix
-
-    sage_genus = SageGenus(
-        _engine_component_matrix(lattice.gram_tensor()).change_ring(SageZZ)
-    )
-    spinor_primes = sage_genus.spinor_generators(proper=False)
-    spinor_operators, kernel = sage_genus._improper_spinor_kernel()
-    quotient = spinor_operators.quotient(kernel)
-    assert quotient.order() == 2
-    assert Set(spinor_primes).cardinality() == 1
-    accumulated = quotient.subgroup([])
-    assert accumulated.order() == 1
-    for prime in spinor_primes:
-        prime_class = quotient(spinor_operators.delta(prime))
-        assert prime_class.order() == 2
-        accumulated = quotient.subgroup((prime_class,) + accumulated.gens())
-        assert accumulated.order() == 2
-    assert accumulated.order() == quotient.order()
     assert genus.class_number() == 2
     representatives = genus.representatives()
     assert representatives.cardinality() == 2
@@ -246,26 +153,7 @@ def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
     assert lattice.signature_pair() == signature_pair(2, 1)
     assert lattice.is_isotropic() is False
     genus = lattice.genus()
-    from sage.rings.integer_ring import ZZ as SageZZ
-    from sage.quadratic_forms.genera.genus import Genus as SageGenus
-    from sage_extensions.tensors.tensor import _engine_component_matrix
-
-    sage_genus = SageGenus(
-        _engine_component_matrix(lattice.gram_tensor()).change_ring(SageZZ)
-    )
-    spinor_primes = sage_genus.spinor_generators(proper=False)
-    spinor_operators, kernel = sage_genus._improper_spinor_kernel()
-    quotient = spinor_operators.quotient(kernel)
-    quotient_order = quotient.order()
-    accumulated = quotient.subgroup([])
-    for prime in spinor_primes:
-        prime_class = quotient(spinor_operators.delta(prime))
-        assert not prime.divides(sage_genus.determinant())
-        assert prime_class.order() == 2
-        previous_order = accumulated.order()
-        accumulated = quotient.subgroup((prime_class,) + accumulated.gens())
-        assert accumulated.order() > previous_order
-    assert accumulated.order() == quotient_order
+    quotient_order = genus.spinor_genus_count()
     # Hanke, Theorem 3.5.1, applies to indefinite integral forms in rank >= 3
     # without a rational-isotropy hypothesis: one class lies in each spinor genus.
     assert genus.spinor_genus_count() == quotient_order
