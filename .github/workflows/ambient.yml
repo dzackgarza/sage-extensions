@@ -15,6 +15,6 @@ jobs:
       issues: read
     with:
       tier: ambient
-      profile: 'sage'
+      profile: 'python'
       infra_ref: 'main'
       setup_recipe: '_ci-tensor-tools'
