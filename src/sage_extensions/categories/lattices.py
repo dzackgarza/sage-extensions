@@ -1178,11 +1178,23 @@ def _genus_classes(gram):
             parent = chosen[:-1]
             spinor_prime = chosen[-1]
             parent_seed = seed_by_subset[parent]
-            vector = parent_seed.find_primitive_p_divisible_vector__next(
-                spinor_prime
-            )
+            vector = None
+            while True:
+                candidate = parent_seed.find_primitive_p_divisible_vector__next(
+                    spinor_prime, vector
+                )
+                if candidate is None:
+                    break
+                # Sage's neighbour constructor requires q(v) divisible by
+                # p^2 when p=2; its helper only promises divisibility by p.
+                # Odd primes are adjusted internally, but enforcing the
+                # defining p^2 condition here gives one uniform contract.
+                if parent_seed(candidate) % spinor_prime**2 == 0:
+                    vector = candidate
+                    break
+                vector = candidate
             assert vector is not None, (
-                f"the form {parent_seed} has no primitive vector of norm divisible by {spinor_prime}"
+                f"the form {parent_seed} has no primitive vector of norm divisible by {spinor_prime}^2"
             )
             seed_by_subset[chosen] = parent_seed.find_p_neighbor_from_vec(
                 spinor_prime, vector
