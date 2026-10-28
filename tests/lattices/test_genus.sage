@@ -148,12 +148,14 @@ def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
 
     sage_genus = SageGenus(matrix(ZZ, [[1, 0, 0], [0, 1, 0], [0, 0, -3]]))
     spinor_operators, kernel = sage_genus._improper_spinor_kernel()
-    quotient_order = spinor_operators.quotient(kernel).order()
+    quotient = spinor_operators.quotient(kernel)
+    quotient_order = quotient.order()
     # Eichler's theorem does not require rational isotropy: every improper
     # spinor genus of an indefinite rational space of rank >= 3 has one class.
     assert genus.spinor_genus_count() == quotient_order
     assert genus.class_number() == genus.spinor_genus_count()
     assert genus.representatives().cardinality() == genus.spinor_genus_count()
+    assert genus.class_number() == quotient_order
     assert tuple(lattice.spinor_genus_class_numbers()) == tuple(
         ZZ.one() for _ in range(int(genus.spinor_genus_count()))
     )
