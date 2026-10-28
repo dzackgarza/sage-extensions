@@ -98,7 +98,8 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     # Check the claimed class count against the public isometry decision, not
     # just the representative container's length.
     for i, representative in enumerate(representatives):
-        for other in representatives[i + 1 :]:
+        for j in range(i + 1, representatives.cardinality()):
+            other = representatives[j]
             assert not Lattices(ZZ)(representative).is_isometric(
                 Lattices(ZZ)(other)
             )
@@ -163,7 +164,8 @@ def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
     )
     assert Lattices(ZZ)(representatives[0]).is_isometric(lattice)
     for i, representative in enumerate(representatives):
-        for other in representatives[i + 1 :]:
+        for j in range(i + 1, representatives.cardinality()):
+            other = representatives[j]
             assert not Lattices(ZZ)(representative).is_isometric(
                 Lattices(ZZ)(other)
             )
