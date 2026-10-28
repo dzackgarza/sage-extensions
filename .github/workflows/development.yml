@@ -10,6 +10,6 @@ jobs:
       issues: read
     with:
       tier: test-ci
-      profile: 'python'
+      profile: 'sage'
       infra_ref: 'main'
       setup_recipe: '_ci-tensor-tools'

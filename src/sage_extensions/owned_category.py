@@ -1098,21 +1098,21 @@ class OwnedJoinCategory(OwnedCategoryMixin, JoinCategory):
 
     def base_ring(self):
         r"""Return the base ring of this join, taken from the first branch over a base ring."""
+        from sage.categories.category import Category_over_base_ring
+
         for branch in self._super_categories:
-            try:
+            if isinstance(branch, Category_over_base_ring):
                 return branch.base_ring()
-            except (AttributeError, ValueError):
-                pass
-        raise AttributeError(f"{self} is over no base ring")
+        assert False, f"{self} is over no base ring"
 
     def base(self):
         r"""Return the base of this join, taken from the first branch over a base."""
+        from sage.categories.category import Category_over_base
+
         for branch in self._super_categories:
-            try:
+            if isinstance(branch, Category_over_base):
                 return branch.base()
-            except (AttributeError, ValueError):
-                pass
-        raise AttributeError(f"{self} is over no base")
+        assert False, f"{self} is over no base"
 
     def is_subcategory(self, category):
         r"""Compare this intersection through its mathematical branches.

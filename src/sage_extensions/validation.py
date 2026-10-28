@@ -69,13 +69,10 @@ def run_object_validators(owner: object) -> None:
     r"""Run every registered validator defined on ``owner``."""
     if not strict_checking():
         return
-    for attr_name in dir(type(owner)):
+    owner_type = type(owner)
+    for attr_name in dir(owner_type):
         if attr_name.startswith("validate_") or attr_name.startswith("check_"):
-            try:
-                attr = getattr(owner, attr_name, None)
-                if callable(attr) and getattr(attr, "_is_validator", False):
-                    attr(check=True)
-            except (ValueError, TypeError):
-                raise
-            except Exception:
-                pass
+            attr = getattr(owner_type, attr_name, None)
+            if attr is not None and getattr(attr, "_is_validator", False):
+                bound_method = getattr(owner, attr_name)
+                bound_method(check=True)
