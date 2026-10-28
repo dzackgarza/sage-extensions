@@ -308,6 +308,12 @@ class CategoryWithAxiom_over_base_ring(
         self._init_cat_object()
         SageCategoryWithAxiomOverBaseRing.__init__(self, base_category)
 
+    def base_ring(self) -> ObjectOfCategory:
+        return self._base_category.base_ring()
+
+    def base(self) -> ObjectOfCategory:
+        return self._base_category.base()
+
 
 class Category_over_base(
     OwnedCategoryMixin, OwnedCategoryObject, SageCategoryOverBase, Parent
@@ -337,6 +343,9 @@ class Category_module(
     def __init__(self, base: CategoryObject, name: str | None = None) -> None:
         self._init_cat_object()
         SageCategoryModule.__init__(self, base, name)
+
+    def base_ring(self) -> CategoryObject:
+        return self.base()
 
 
 class Category_ideal(
