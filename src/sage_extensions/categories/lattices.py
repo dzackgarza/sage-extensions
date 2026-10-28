@@ -1186,6 +1186,10 @@ def _genus_classes(gram):
     found_mass = SageQQ.zero()
     classes = []
     for seed in seeds:
+        # Do not use ``neighbor_iteration``'s mass stopping condition here:
+        # it measures only discovered neighbours and excludes traversal seeds,
+        # whereas ``found_mass`` below counts each spinor genus including its
+        # seed. Completeness is checked against the full genus mass afterward.
         spinor_genus = neighbor_iteration(
             [seed],
             prime,
