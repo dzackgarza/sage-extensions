@@ -82,12 +82,19 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     lattice = Lattices(ZZ)([[1, 0, 0], [0, 20, 0], [0, 0, 400]])
     genus = lattice.genus()
 
+    # The improper spinor quotient is C2 x C2, not cyclic.  Its generating
+    # list must therefore contain two independent prime classes; merely
+    # counting the spinor genera below can otherwise obscure a regression in
+    # how the quotient's generated subgroup is accumulated.
+    spinor_primes = genus.spinor_generators(proper=False)
+    assert Set(spinor_primes).cardinality() == 2
+    assert all(not prime.divides(genus.determinant()) for prime in spinor_primes)
     assert lattice.spinor_genus_count() == 4
     assert genus.class_number() == 12
     assert genus.representatives().cardinality() == 12
     assert genus.mass() == QQ(3) / 2
-    numbers = tuple(lattice.spinor_genus_class_numbers())
-    assert len(numbers) == 4
+    numbers = Sequence(lattice.spinor_genus_class_numbers())
+    assert numbers.length() == 4
     assert sum(numbers) == 12
 
 
