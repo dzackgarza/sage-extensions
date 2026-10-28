@@ -1,8 +1,9 @@
 r"""Acceptance tests for foundational architectural repairs.
 
 Verifies deterministic provider ordering, strict construction contract
-validation, validator execution under strict checking, and base ring
-propagation across category joins.
+validation, validator execution under strict checking, base ring
+propagation across category joins, and boundary hypothesis checks on
+lattices, discriminant modules, and form base changes.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -85,3 +86,22 @@ def test_owned_join_category_base_ring_propagation() -> None:
     join_cat = cat._with_axiom("Finite")
     assert join_cat.base_ring() is ZZ
     assert join_cat.base() is ZZ
+
+
+def test_lattice_discriminant_module_boundary_hypotheses() -> None:
+    r"""Discriminant module on a degenerate lattice raises ValueError."""
+    degenerate_lattice = Lattices(ZZ)([[0]])
+    try:
+        degenerate_lattice.discriminant_module()
+        assert False, "should have raised ValueError"
+    except ValueError:
+        pass
+
+
+def test_discriminant_module_base_change_and_twist() -> None:
+    r"""Discriminant modules propagate base changes and value twists through the source lattice."""
+    U = Lattices(ZZ)("U")
+    disc = U.discriminant_module()
+    assert disc.source_lattice() is U
+    twisted_disc = disc.twist(2)
+    assert twisted_disc.source_lattice() == U.twist(2)

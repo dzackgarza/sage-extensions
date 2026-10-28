@@ -5572,8 +5572,11 @@ class Lattices(OwnedCategoryOverBaseRing):
 
         @cached_method
         def discriminant_module(self):
-            r"""Return ``A_L = coker(L -> L^#)`` with the selected dual-basis presentation."""
-
+            r"""Return A_L = coker(L -> L^#) with the selected dual-basis presentation."""
+            if not self.module_rank().is_finite():
+                raise TypeError(f"discriminant_module requires a lattice of finite rank, but {self} has rank {self.module_rank()}")
+            if not self.is_nondegenerate():
+                raise ValueError(f"discriminant_module is defined only for nondegenerate lattices, but {self} is degenerate")
             return _discriminant_module(self)
 
         def discriminant_projection(self):
