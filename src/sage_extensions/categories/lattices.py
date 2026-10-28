@@ -1115,7 +1115,7 @@ def _genus_classes(gram):
     classes, including explicitly inserted seeds, must add up exactly to the
     mass of the genus; this is the completeness check after enumeration.
     """
-    from itertools import chain, combinations
+    from itertools import combinations
 
     from sage.quadratic_forms.binary_qf import BinaryQF
     from sage.quadratic_forms.genera.genus import Genus as SageGenus
@@ -1168,18 +1168,30 @@ def _genus_classes(gram):
     assert generated.order() == spinor_classes.order(), (
         f"the improper spinor generators {spinor_primes} do not span the quotient of order {spinor_classes.order()}"
     )
-    seeds = []
-    for chosen in chain.from_iterable(
-        combinations(spinor_primes, size) for size in range(len(spinor_primes) + 1)
-    ):
-        seed = form
-        for spinor_prime in chosen:
-            vector = seed.find_primitive_p_divisible_vector__next(spinor_prime)
-            assert vector is not None, (
-                f"the form {seed} has no primitive vector of norm divisible by {spinor_prime}"
+    # Build the Boolean-lattice orbit recursively. Every nonempty subset has
+    # one canonical parent (remove its last prime), so each quotient element
+    # costs exactly one p-neighbour step instead of recomputing its entire
+    # chain from the original form.
+    seed_by_subset = {(): form}
+    for size in range(1, len(spinor_primes) + 1):
+        for chosen in combinations(spinor_primes, size):
+            parent = chosen[:-1]
+            spinor_prime = chosen[-1]
+            parent_seed = seed_by_subset[parent]
+            vector = parent_seed.find_primitive_p_divisible_vector__next(
+                spinor_prime
             )
-            seed = seed.find_p_neighbor_from_vec(spinor_prime, vector)
-        seeds.append(seed)
+            assert vector is not None, (
+                f"the form {parent_seed} has no primitive vector of norm divisible by {spinor_prime}"
+            )
+            seed_by_subset[chosen] = parent_seed.find_p_neighbor_from_vec(
+                spinor_prime, vector
+            )
+    seeds = [seed_by_subset[()]] + [
+        seed_by_subset[chosen]
+        for size in range(1, len(spinor_primes) + 1)
+        for chosen in combinations(spinor_primes, size)
+    ]
     assert len(seeds) == spinor_classes.order(), (
         f"constructed {len(seeds)} spinor-genus seeds for an improper quotient of order {spinor_classes.order()}"
     )
