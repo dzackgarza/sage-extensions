@@ -188,8 +188,14 @@ def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
     # without a rational-isotropy hypothesis: one class lies in each spinor genus.
     assert genus.spinor_genus_count() == quotient_order
     assert genus.class_number() == genus.spinor_genus_count()
-    assert genus.representatives().cardinality() == genus.spinor_genus_count()
+    representatives = genus.representatives()
+    assert representatives.cardinality() == genus.spinor_genus_count()
     assert genus.class_number() == quotient_order
+    for i, representative in enumerate(representatives):
+        for other in representatives[i + 1 :]:
+            assert not Lattices(ZZ)(representative).is_isometric(
+                Lattices(ZZ)(other)
+            )
     assert tuple(lattice.spinor_genus_class_numbers()) == tuple(
         ZZ.one() for _ in range(int(genus.spinor_genus_count()))
     )
