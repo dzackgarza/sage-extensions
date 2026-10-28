@@ -107,3 +107,17 @@ def test_indefinite_genus_enumerates_each_nontrivial_spinor_seed() -> None:
     assert genus.class_number() == 2
     assert genus.representatives().cardinality() == 2
     assert tuple(lattice.spinor_genus_class_numbers()) == (ZZ(1), ZZ(1))
+
+
+def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
+    r"""The isotropic spinor-genus theorem cannot be applied from signature alone.
+
+    For ``x^2 + y^2 = 3 z^2``, reduction modulo 3 forces ``x`` and ``y``
+    to be divisible by 3; substitution then forces ``z`` to be divisible by
+    3.  Thus ``diag(1, 1, -3)`` has no nonzero rational isotropic vector,
+    despite having real signature ``(2, 1)``.
+    """
+    lattice = Lattices(ZZ)([[1, 0, 0], [0, 1, 0], [0, 0, -3]])
+
+    assert lattice.signature_pair() == signature_pair(2, 1)
+    assert lattice.is_isotropic() is False

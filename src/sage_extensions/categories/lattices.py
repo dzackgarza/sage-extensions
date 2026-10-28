@@ -1101,9 +1101,10 @@ def _genus_classes(gram):
     an indefinite class has several reduced forms, so those are compared
     under improper equivalence.  In rank at least ``3`` one seed per
     improper spinor genus is a chain of ``p``-neighbours along a subset of
-    Sage's spinor generators.  An indefinite spinor genus of rank at least
-    ``3`` is one class when the rational quadratic space is isotropic
-    [CS10, Ch. 15, §9.1, Thm. 14, p. 388].  A definite
+    Sage's spinor generators.  For an indefinite rational quadratic space,
+    the cited one-class-per-spinor-genus theorem applies only in the isotropic
+    case [CS10, Ch. 15, §9.1, Thm. 14, p. 388]; real indefiniteness alone is
+    not its hypothesis.  A definite
     spinor genus is enumerated by ``p``-neighbours at a prime ``p`` not
     dividing the determinant, with ``p`` in the improper spinor kernel so
     that neighbours stay in the spinor genus.  The masses of the classes
