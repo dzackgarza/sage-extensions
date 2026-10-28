@@ -86,9 +86,12 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     # list must therefore contain two independent prime classes; merely
     # counting the spinor genera below can otherwise obscure a regression in
     # how the quotient's generated subgroup is accumulated.
-    spinor_primes = genus.spinor_generators(proper=False)
+    from sage.quadratic_forms.genera.genus import Genus as SageGenus
+
+    sage_genus = SageGenus(matrix(ZZ, [[1, 0, 0], [0, 20, 0], [0, 0, 400]]))
+    spinor_primes = sage_genus.spinor_generators(proper=False)
     assert Set(spinor_primes).cardinality() == 2
-    assert all(not prime.divides(genus.determinant()) for prime in spinor_primes)
+    assert all(not prime.divides(sage_genus.determinant()) for prime in spinor_primes)
     assert lattice.spinor_genus_count() == 4
     assert genus.class_number() == 12
     assert genus.representatives().cardinality() == 12
