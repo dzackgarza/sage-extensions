@@ -1206,9 +1206,10 @@ def _genus_classes(gram):
     # ``[L : L cap M] = [M : L cap M] = p``, so its spinor genus is that of
     # ``L`` moved by the spinor operator of ``p`` [CS10, Ch. 15, §9.2,
     # Thm. 15]; at a prime whose operator lies in the improper spinor kernel
-    # the neighbours stay in their spinor genus.  With one spinor genus every
-    # prime qualifies, and ``2`` is the cheapest for an even form.
-    prime = SageZZ(2) if genus.is_even() and not spinor_primes else SageZZ(3)
+    # the neighbours stay in their spinor genus. Start at the odd prime ``3``
+    # so the cited theorem's coprimality hypothesis with ``2 * det`` always
+    # applies, including to even lattices of odd determinant.
+    prime = SageZZ(3)
     while prime.divides(genus.determinant()) or (
         spinor_primes and not spinor_classes(spinor_operators.delta(prime)).is_one()
     ):
