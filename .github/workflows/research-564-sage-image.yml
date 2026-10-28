@@ -60,7 +60,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: dzackgarza/ai-review-ci
-          ref: main
+          # Pin the collector implementation too: a moving plugin branch
+          # would make the acceptance environment non-reproducible.
+          ref: adfd75d63bc2f931c3c472a68fa95a7e69aca6e7
           path: .qc-infra
 
       - name: Install required public pytest plugins
