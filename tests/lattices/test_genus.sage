@@ -151,6 +151,9 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     assert genus.class_number() == 12
     representatives = genus.representatives()
     assert representatives.cardinality() == 12
+    assert all(
+        Lattices(ZZ)(representative) in genus for representative in representatives
+    )
     # The public contract puts the input lattice's improper spinor genus first;
     # class count alone would not detect a wrong initial seed.
     assert Lattices(ZZ)(representatives[0]).is_isometric(lattice)
@@ -221,6 +224,9 @@ def test_indefinite_genus_enumerates_each_nontrivial_spinor_seed() -> None:
     assert genus.class_number() == 2
     representatives = genus.representatives()
     assert representatives.cardinality() == 2
+    assert all(
+        Lattices(ZZ)(representative) in genus for representative in representatives
+    )
     first, second = representatives
     assert Lattices(ZZ)(first).is_isometric(lattice)
     assert not Lattices(ZZ)(first).is_isometric(Lattices(ZZ)(second))
@@ -265,6 +271,9 @@ def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
     assert genus.class_number() == genus.spinor_genus_count()
     representatives = genus.representatives()
     assert representatives.cardinality() == genus.spinor_genus_count()
+    assert all(
+        Lattices(ZZ)(representative) in genus for representative in representatives
+    )
     assert Lattices(ZZ)(representatives[0]).is_isometric(lattice)
     assert genus.class_number() == quotient_order
     for i, representative in enumerate(representatives):
