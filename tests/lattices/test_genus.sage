@@ -124,6 +124,13 @@ def test_indefinite_genus_enumerates_each_nontrivial_spinor_seed() -> None:
     assert lattice.signature_pair() == signature_pair(2, 1)
     assert lattice([20, 0, 1]).norm() == 0
     assert genus.spinor_genus_count() == 2
+    sage_genus = genus._engine()
+    spinor_primes = sage_genus.spinor_generators(proper=False)
+    spinor_operators, kernel = sage_genus._improper_spinor_kernel()
+    quotient = spinor_operators.quotient(kernel)
+    assert quotient.order() == 2
+    assert Set(spinor_primes).cardinality() == 1
+    assert quotient(spinor_operators.delta(spinor_primes[0])).order() == 2
     assert genus.class_number() == 2
     assert genus.representatives().cardinality() == 2
     assert tuple(lattice.spinor_genus_class_numbers()) == (ZZ(1), ZZ(1))
