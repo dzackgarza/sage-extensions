@@ -86,9 +86,7 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     # list must therefore contain two independent prime classes; merely
     # counting the spinor genera below can otherwise obscure a regression in
     # how the quotient's generated subgroup is accumulated.
-    from sage.quadratic_forms.genera.genus import Genus as SageGenus
-
-    sage_genus = SageGenus(matrix(ZZ, [[1, 0, 0], [0, 20, 0], [0, 0, 400]]))
+    sage_genus = genus._engine()
     spinor_primes = sage_genus.spinor_generators(proper=False)
     # The independent kernel computation gives an improper quotient of order
     # four. Check that the returned prime classes span it, without requiring
@@ -144,9 +142,7 @@ def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
     assert lattice.signature_pair() == signature_pair(2, 1)
     assert lattice.is_isotropic() is False
     genus = lattice.genus()
-    from sage.quadratic_forms.genera.genus import Genus as SageGenus
-
-    sage_genus = SageGenus(matrix(ZZ, [[1, 0, 0], [0, 1, 0], [0, 0, -3]]))
+    sage_genus = genus._engine()
     spinor_operators, kernel = sage_genus._improper_spinor_kernel()
     quotient = spinor_operators.quotient(kernel)
     quotient_order = quotient.order()
