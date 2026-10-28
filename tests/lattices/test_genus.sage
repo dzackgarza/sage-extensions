@@ -91,8 +91,8 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     sage_genus = SageGenus(matrix(ZZ, [[1, 0, 0], [0, 20, 0], [0, 0, 400]]))
     spinor_primes = sage_genus.spinor_generators(proper=False)
     # The independent kernel computation gives an improper quotient of order
-    # four.  Check that the returned prime classes span that quotient without
-    # requiring a particular valid choice of prime representatives.
+    # four. Check that the returned prime classes span it, without requiring
+    # a particular valid choice of prime representatives.
     spinor_operators, kernel = sage_genus._improper_spinor_kernel()
     quotient = spinor_operators.quotient(kernel)
     assert quotient.order() == 4
@@ -132,7 +132,7 @@ def test_indefinite_genus_enumerates_each_nontrivial_spinor_seed() -> None:
 
 
 def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
-    r"""The isotropic spinor-genus theorem cannot be applied from signature alone.
+    r"""Eichler's theorem also covers anisotropic indefinite rational spaces.
 
     For ``x^2 + y^2 = 3 z^2``, reduction modulo 3 forces ``x`` and ``y``
     to be divisible by 3; substitution then forces ``z`` to be divisible by
@@ -143,3 +143,9 @@ def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
 
     assert lattice.signature_pair() == signature_pair(2, 1)
     assert lattice.is_isotropic() is False
+    genus = lattice.genus()
+    assert genus.class_number() == genus.spinor_genus_count()
+    assert genus.representatives().cardinality() == genus.spinor_genus_count()
+    assert tuple(lattice.spinor_genus_class_numbers()) == tuple(
+        ZZ.one() for _ in range(int(genus.spinor_genus_count()))
+    )

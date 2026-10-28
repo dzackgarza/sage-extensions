@@ -1101,10 +1101,12 @@ def _genus_classes(gram):
     an indefinite class has several reduced forms, so those are compared
     under improper equivalence.  In rank at least ``3`` one seed per
     improper spinor genus is a chain of ``p``-neighbours along a subset of
-    Sage's spinor generators.  For an indefinite rational quadratic space,
-    the cited one-class-per-spinor-genus theorem applies only in the isotropic
-    case [CS10, Ch. 15, §9.1, Thm. 14, p. 388]; real indefiniteness alone is
-    not its hypothesis.  A definite
+    Sage's spinor generators.  Eichler's one-class-per-spinor-genus theorem
+    applies to every indefinite rational quadratic space of rank at least
+    three, including spaces anisotropic over ``QQ``: strong approximation is
+    supplied by the noncompact real orthogonal group, not by a rational
+    isotropic vector [Cassels, *Rational Quadratic Forms*, Ch. 11, Thm. 1.4;
+    Hanke, *Quadratic Forms and Automorphic Forms* (2009), Thm. 3.5.1]. A definite
     spinor genus is enumerated by ``p``-neighbours at a prime ``p`` not
     dividing the determinant, with ``p`` in the improper spinor kernel so
     that neighbours stay in the spinor genus.  The masses of the classes
