@@ -4062,14 +4062,16 @@ class ModulesWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             return _module_invariant_factor_form(self)
 
         def base_change(self, ring_map, *, _extra_construction_data=None):
-            r"""Transport the selected finite presentation along ``R -> S``."""
+            r"""Transport the selected finite presentation along R -> S."""
             from sage_extensions.categories.modules.base_change import (
+                _base_change_codomain,
                 _base_change_scalar,
             )
             from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
                 _presented_module_from_morphism,
             )
 
+            _base_change_codomain(self, ring_map)
             if ring_map.is_identity() is True and not _extra_construction_data:
                 return self
             presentation = self.presentation()

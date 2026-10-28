@@ -210,6 +210,16 @@ class DiscriminantBilinearModules(OwnedCategoryOverBaseRing):
         def bilinear_value_module(self):
             return self._preamble_bilinear_value_module
 
+        def base_change(self, ring_map):
+            r"""Extend scalars of this bilinear discriminant module along R -> S."""
+            changed_lattice = self.source_lattice().base_change(ring_map)
+            return changed_lattice.discriminant_module()
+
+        def twist(self, scalar):
+            r"""Scale the form values of this bilinear discriminant module by scalar."""
+            scaled_lattice = self.source_lattice().twist(scalar)
+            return scaled_lattice.discriminant_module()
+
         def b(self, left, right):
             if left not in self or right not in self:
                 raise TypeError(
@@ -372,6 +382,16 @@ class DiscriminantQuadraticModules(OwnedCategoryOverBaseRing):
 
         def quadratic_value_module(self):
             return self._preamble_quadratic_value_module
+
+        def base_change(self, ring_map):
+            r"""Extend scalars of this quadratic discriminant module along R -> S."""
+            changed_lattice = self.source_lattice().base_change(ring_map)
+            return changed_lattice.discriminant_module()
+
+        def twist(self, scalar):
+            r"""Scale the form values of this quadratic discriminant module by scalar."""
+            scaled_lattice = self.source_lattice().twist(scalar)
+            return scaled_lattice.discriminant_module()
 
         @cached_method
         def isotropic_subgroups(self):

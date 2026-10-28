@@ -3,7 +3,7 @@ r"""Acceptance tests for foundational architectural repairs.
 Verifies deterministic provider ordering, strict construction contract
 validation, validator execution under strict checking, base ring
 propagation across category joins, and boundary hypothesis checks on
-lattices, discriminant modules, and form base changes.
+lattices, discriminant modules, form base changes, and pure modules.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -105,3 +105,11 @@ def test_discriminant_module_base_change_and_twist() -> None:
     assert disc.source_lattice() is U
     twisted_disc = disc.twist(2)
     assert twisted_disc.source_lattice() == U.twist(2)
+
+
+def test_module_base_change_domain_validation() -> None:
+    r"""Module base change verifies domain compatibility against base ring."""
+    M = Modules(ZZ)(Sets()("x"))
+    # Base change along identity on ZZ works
+    identity_map = ZZ.identity_morphism()
+    assert M.base_change(identity_map) is M
