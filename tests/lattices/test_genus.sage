@@ -80,8 +80,15 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     spinor-generator list against the independent four-way partition.
     """
     lattice = Lattices(ZZ)([[1, 0, 0], [0, 20, 0], [0, 0, 400]])
+    genus = lattice.genus()
 
     assert lattice.spinor_genus_count() == 4
+    assert genus.class_number() == 12
+    assert genus.representatives().cardinality() == 12
+    assert genus.mass() == QQ(3) / 2
+    numbers = tuple(lattice.spinor_genus_class_numbers())
+    assert len(numbers) == 4
+    assert sum(numbers) == 12
 
 
 def test_indefinite_genus_enumerates_each_nontrivial_spinor_seed() -> None:
