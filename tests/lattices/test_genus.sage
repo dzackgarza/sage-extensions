@@ -143,6 +143,14 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
                 Lattices(ZZ)(other)
             )
     assert genus.mass() == QQ(3) / 2
+    # Independently sum reciprocal automorphism-group orders over the public
+    # representative list, rather than relying only on Sage's genus mass.
+    from sage.quadratic_forms.quadratic_form import QuadraticForm
+
+    assert sum(
+        QQ.one() / QuadraticForm(ZZ, 2 * representative).automorphism_group().order()
+        for representative in representatives
+    ) == QQ(3) / 2
     numbers = lattice.spinor_genus_class_numbers()
     assert numbers.cardinality() == 4
     assert tuple(sorted(numbers)) == (ZZ(3), ZZ(3), ZZ(3), ZZ(3))
