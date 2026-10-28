@@ -1101,9 +1101,13 @@ def _genus_classes(gram):
     an indefinite class has several reduced forms, so those are compared
     under improper equivalence.  In rank at least ``3`` one seed per
     improper spinor genus is a chain of ``p``-neighbours along a subset of
-    Sage's spinor generators.  The one-class-per-spinor-genus theorem used
-    for the indefinite branch requires rational isotropy [CS10, Ch. 15,
-    §9.1, Thm. 14, p. 388]; real indefiniteness alone is not its hypothesis.
+    Sage's spinor generators. Hanke's one-class-per-spinor-genus theorem for
+    nondegenerate indefinite integral forms of rank at least three does not
+    require rational isotropy [Hanke, *Quadratic Forms and Automorphic Forms*,
+    revised 2009 notes, §3.5, Thm. 3.5.1, p. 52; Cassels (1978), Thm. 7.1,
+    p. 186]. The weaker isotropic formulation in [CS10, Ch. 15, §9.1,
+    Thm. 14, p. 388] is sufficient for the isotropic witness but not the
+    strongest available theorem used here.
     A definite
     spinor genus is enumerated by ``p``-neighbours at a prime ``p`` not
     dividing the determinant, with ``p`` in the improper spinor kernel so
