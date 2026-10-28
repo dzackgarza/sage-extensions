@@ -1191,11 +1191,9 @@ def _genus_classes(gram):
             seed_by_subset[chosen] = parent_seed.find_p_neighbor_from_vec(
                 spinor_prime, vector
             )
-    seeds = [seed_by_subset[()]] + [
-        seed_by_subset[chosen]
-        for size in range(1, len(spinor_primes) + 1)
-        for chosen in combinations(spinor_primes, size)
-    ]
+    # Dict insertion order is the same canonical subset order used above:
+    # empty subset first, then subsets by size and combinations order.
+    seeds = list(seed_by_subset.values())
     assert len(seeds) == spinor_classes.order(), (
         f"constructed {len(seeds)} spinor-genus seeds for an improper quotient of order {spinor_classes.order()}"
     )
