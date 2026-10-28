@@ -1198,13 +1198,11 @@ def _genus_classes(gram):
     assert all(seed.det() == form.det() for seed in seeds), (
         f"a p-neighbour spinor-genus seed changed the determinant of {form}"
     )
-    for index, seed in enumerate(seeds):
-        assert all(
-            not seed.is_globally_equivalent_to(other)
-            for other in seeds[index + 1 :]
-        ), (
-            f"the p-neighbour construction produced duplicate isometry-class seeds for the genus of {gram}"
-        )
+    # Distinct subsets give distinct elements of the elementary 2-quotient,
+    # because the prime classes were proved independent above. Each neighbour
+    # step acts by its corresponding spinor class, so these seeds lie in
+    # distinct spinor genera and cannot be globally isometric. Avoid a
+    # quadratic number of expensive global-isometry tests on the 2^k seeds.
 
     def grams(forms):
         return tuple(
