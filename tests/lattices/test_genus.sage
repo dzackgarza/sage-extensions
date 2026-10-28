@@ -159,9 +159,11 @@ def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
     genus = lattice.genus()
     # Hanke, Theorem 3.5.1, applies to indefinite integral forms in rank >= 3
     # without a rational-isotropy hypothesis: one class lies in each spinor genus.
+    assert genus.spinor_genus_count() == 1
+    assert genus.class_number() == 1
     assert genus.class_number() == genus.spinor_genus_count()
     representatives = genus.representatives()
-    assert representatives.cardinality() == genus.class_number()
+    assert representatives.cardinality() == 1
     assert all(
         Lattices(ZZ)(representative) in genus for representative in representatives
     )
