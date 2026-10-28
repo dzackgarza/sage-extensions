@@ -1216,6 +1216,12 @@ def _genus_classes(gram):
     assert all(seed.det() == form.det() for seed in seeds), (
         f"a p-neighbour spinor-genus seed changed the determinant of {form}"
     )
+    assert all(
+        SageGenus((seed.Hessian_matrix() / scale).change_ring(SageZZ)) == genus
+        for seed in seeds
+    ), (
+        f"a p-neighbour spinor-genus seed left the genus of {gram}"
+    )
     # Distinct subsets give distinct elements of the elementary 2-quotient,
     # because the prime classes were proved independent above. Each neighbour
     # step acts by its corresponding spinor class, so these seeds lie in
