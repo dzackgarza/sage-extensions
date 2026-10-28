@@ -46,7 +46,9 @@ jobs:
       - name: Check out public consumer assertions
         uses: actions/checkout@v4
         with:
-          ref: main
+          # Bind the consumer source to the exact workflow-dispatch revision;
+          # `main` could move between dispatch and checkout.
+          ref: ${{ github.sha }}
 
       - name: Install the checked-out sage-extensions source
         run: '"$SAGE_BIN" -pip install --no-deps -e .'
