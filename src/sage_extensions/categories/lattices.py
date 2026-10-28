@@ -1198,6 +1198,9 @@ def _genus_classes(gram):
             assert vector is not None, (
                 f"the form {parent_seed} has no primitive vector suitable for a {spinor_prime}-neighbour"
             )
+            assert any(coordinate % spinor_prime for coordinate in vector), (
+                f"the vector {vector} is not primitive modulo {spinor_prime}"
+            )
             assert parent_seed(vector) % spinor_prime == 0, (
                 f"the vector {vector} does not satisfy the p-divisibility condition for a {spinor_prime}-neighbour"
             )
