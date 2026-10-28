@@ -119,9 +119,15 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     proper_operators, proper_kernel = sage_genus._proper_spinor_kernel()
     proper_quotient = proper_operators.quotient(proper_kernel)
     assert proper_quotient.order() == 4
-    proper_generated = proper_quotient.subgroup(
-        [proper_quotient(proper_operators.delta(prime)) for prime in proper_primes]
-    )
+    proper_generated = proper_quotient.subgroup([])
+    assert proper_generated.order() == 1
+    for step, prime in enumerate(proper_primes, start=1):
+        prime_class = proper_quotient(proper_operators.delta(prime))
+        assert prime_class.order() == 2
+        proper_generated = proper_quotient.subgroup(
+            (prime_class,) + proper_generated.gens()
+        )
+        assert proper_generated.order() == (2, 4)[step - 1]
     assert proper_generated.order() == proper_quotient.order()
     assert lattice.spinor_genus_count() == 4
     assert genus.class_number() == 12
