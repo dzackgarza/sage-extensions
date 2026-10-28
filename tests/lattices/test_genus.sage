@@ -149,3 +149,17 @@ def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
 
     assert lattice.signature_pair() == signature_pair(2, 1)
     assert lattice.is_isotropic() is False
+    genus = lattice.genus()
+    sage_genus = genus._engine()
+    spinor_operators, kernel = sage_genus._improper_spinor_kernel()
+    quotient = spinor_operators.quotient(kernel)
+    quotient_order = quotient.order()
+    # Hanke, Theorem 3.5.1, applies to indefinite integral forms in rank >= 3
+    # without a rational-isotropy hypothesis: one class lies in each spinor genus.
+    assert genus.spinor_genus_count() == quotient_order
+    assert genus.class_number() == genus.spinor_genus_count()
+    assert genus.representatives().cardinality() == genus.spinor_genus_count()
+    assert genus.class_number() == quotient_order
+    assert tuple(lattice.spinor_genus_class_numbers()) == tuple(
+        ZZ.one() for _ in range(int(genus.spinor_genus_count()))
+    )
