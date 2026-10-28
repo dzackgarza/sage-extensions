@@ -97,11 +97,20 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     assert Set(spinor_primes).cardinality() == 2
     assert all(not prime.divides(sage_genus.determinant()) for prime in spinor_primes)
     accumulated = quotient.subgroup([])
-    for prime in spinor_primes:
+    expected_orders = (1, 2, 4)
+    assert accumulated.order() == expected_orders[0]
+    for step, prime in enumerate(spinor_primes, start=1):
         prime_class = quotient(spinor_operators.delta(prime))
         assert prime_class.order() == 2
+        # Each update must retain the previously accumulated subgroup and add
+        # a genuinely independent coset, not merely reproduce an earlier one.
         accumulated = quotient.subgroup((prime_class,) + accumulated.gens())
+        assert accumulated.order() == expected_orders[step]
     assert accumulated.order() == quotient.order()
+    prime_classes = {
+        quotient(spinor_operators.delta(prime)) for prime in spinor_primes
+    }
+    assert len(prime_classes) == 2
     assert lattice.spinor_genus_count() == 4
     assert genus.class_number() == 12
     assert genus.representatives().cardinality() == 12
