@@ -86,11 +86,15 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     # list must therefore contain two independent prime classes; merely
     # counting the spinor genera below can otherwise obscure a regression in
     # how the quotient's generated subgroup is accumulated.
-    # Exercise Sage's maintained public Genus constructor directly; the
-    # consumer must not depend on a private wrapper engine accessor.
+    # Exercise Sage's maintained public Genus constructor directly, using the
+    # same owned-tensor-to-Sage-matrix boundary as the production adapter.
+    from sage.rings.integer_ring import ZZ as SageZZ
     from sage.quadratic_forms.genera.genus import Genus as SageGenus
+    from sage_extensions.tensors.tensor import _engine_component_matrix
 
-    sage_genus = SageGenus(lattice.gram_matrix())
+    sage_genus = SageGenus(
+        _engine_component_matrix(lattice.gram_tensor()).change_ring(SageZZ)
+    )
     spinor_primes = sage_genus.spinor_generators(proper=False)
     # The independent kernel computation gives an improper quotient of order
     # four. Check that the returned prime classes span it, without requiring
@@ -182,9 +186,13 @@ def test_indefinite_genus_enumerates_each_nontrivial_spinor_seed() -> None:
     assert lattice.signature_pair() == signature_pair(2, 1)
     assert lattice([20, 0, 1]).norm() == 0
     assert genus.spinor_genus_count() == 2
+    from sage.rings.integer_ring import ZZ as SageZZ
     from sage.quadratic_forms.genera.genus import Genus as SageGenus
+    from sage_extensions.tensors.tensor import _engine_component_matrix
 
-    sage_genus = SageGenus(lattice.gram_matrix())
+    sage_genus = SageGenus(
+        _engine_component_matrix(lattice.gram_tensor()).change_ring(SageZZ)
+    )
     spinor_primes = sage_genus.spinor_generators(proper=False)
     spinor_operators, kernel = sage_genus._improper_spinor_kernel()
     quotient = spinor_operators.quotient(kernel)
@@ -219,9 +227,13 @@ def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
     assert lattice.signature_pair() == signature_pair(2, 1)
     assert lattice.is_isotropic() is False
     genus = lattice.genus()
+    from sage.rings.integer_ring import ZZ as SageZZ
     from sage.quadratic_forms.genera.genus import Genus as SageGenus
+    from sage_extensions.tensors.tensor import _engine_component_matrix
 
-    sage_genus = SageGenus(lattice.gram_matrix())
+    sage_genus = SageGenus(
+        _engine_component_matrix(lattice.gram_tensor()).change_ring(SageZZ)
+    )
     spinor_primes = sage_genus.spinor_generators(proper=False)
     spinor_operators, kernel = sage_genus._improper_spinor_kernel()
     quotient = spinor_operators.quotient(kernel)
