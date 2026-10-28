@@ -158,7 +158,14 @@ def test_indefinite_genus_enumerates_each_nontrivial_spinor_seed() -> None:
     quotient = spinor_operators.quotient(kernel)
     assert quotient.order() == 2
     assert Set(spinor_primes).cardinality() == 1
-    assert quotient(spinor_operators.delta(spinor_primes[0])).order() == 2
+    accumulated = quotient.subgroup([])
+    assert accumulated.order() == 1
+    for prime in spinor_primes:
+        prime_class = quotient(spinor_operators.delta(prime))
+        assert prime_class.order() == 2
+        accumulated = quotient.subgroup((prime_class,) + accumulated.gens())
+        assert accumulated.order() == 2
+    assert accumulated.order() == quotient.order()
     assert genus.class_number() == 2
     representatives = genus.representatives()
     assert representatives.cardinality() == 2
