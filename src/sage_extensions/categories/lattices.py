@@ -1153,6 +1153,9 @@ def _genus_classes(gram):
     spinor_classes = spinor_operators.quotient(kernel)
     generated = spinor_classes.subgroup([])
     for spinor_prime in spinor_primes:
+        assert spinor_prime.is_prime() and not spinor_prime.divides(genus.determinant()), (
+            f"the improper spinor generator {spinor_prime} is not a prime coprime to the determinant {genus.determinant()}"
+        )
         prime_class = spinor_classes(spinor_operators.delta(spinor_prime))
         assert prime_class.order() == 2, (
             f"the improper spinor generator {spinor_prime} does not define a nontrivial 2-torsion class"
