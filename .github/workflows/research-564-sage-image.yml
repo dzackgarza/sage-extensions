@@ -67,6 +67,6 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}/.qc-infra/scripts/pytest_plugins
         run: >-
-          "$SAGE_BIN" -python -m pytest
+          /sage/.venv/bin/python -m pytest
           -p qc_sage_session
           tests/lattices/test_genus.sage
