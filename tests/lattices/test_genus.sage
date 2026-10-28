@@ -59,8 +59,9 @@ def test_indefinite_isotropic_genus_has_complete_spinor_seed_enumeration() -> No
     r"""For an isotropic indefinite lattice of rank at least three, each spinor
     genus contains one class (Conway--Sloane, *Sphere Packings, Lattices and Groups*,
     3rd ed., Ch. 15, §9.1, Thm. 14).  This isotropic ternary specimen has trivial
-    improper spinor quotient, so the complete seed list is empty and the genus
-    enumeration must return its single class.
+    improper spinor quotient, so there are no nontrivial spinor generators.
+    The algorithm still retains the original lattice as the empty-subset seed,
+    and the genus enumeration must return that single class.
     """
     lattice = Lattices(ZZ)([[1, 0, 0], [0, 4, 0], [0, 0, -5]])
     genus = lattice.genus()
