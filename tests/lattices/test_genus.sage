@@ -100,9 +100,9 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     assert all(not prime.divides(sage_genus.determinant()) for prime in spinor_primes)
     accumulated = quotient.subgroup([])
     for prime in spinor_primes:
-        accumulated = quotient.subgroup(
-            (quotient(spinor_operators.delta(prime)),) + accumulated.gens()
-        )
+        prime_class = quotient(spinor_operators.delta(prime))
+        assert prime_class.order() == 2
+        accumulated = quotient.subgroup((prime_class,) + accumulated.gens())
     assert accumulated.order() == quotient.order()
     assert lattice.spinor_genus_count() == 4
     assert genus.class_number() == 12
