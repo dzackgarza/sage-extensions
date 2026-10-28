@@ -108,6 +108,7 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     assert genus.mass() == QQ(3) / 2
     numbers = lattice.spinor_genus_class_numbers()
     assert numbers.cardinality() == 4
+    assert tuple(sorted(numbers)) == (ZZ(3), ZZ(3), ZZ(3), ZZ(3))
     assert sum(numbers) == 12
 
 
