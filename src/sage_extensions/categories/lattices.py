@@ -1168,31 +1168,12 @@ def _genus_classes(gram):
     assert generated.order() == spinor_classes.order(), (
         f"the improper spinor generators {spinor_primes} do not span the quotient of order {spinor_classes.order()}"
     )
-    # The p-neighbour spinor-action theorem used below requires p coprime to
-    # 2*det(gram). Sage's spinor generators are only required to be coprime to
-    # det, so 2 itself can occur for an odd-determinant lattice. Replace that
-    # generator by an odd prime in the same quotient class before constructing
-    # neighbours; the quotient class, not the numerical prime, determines the
-    # spinor genus reached.
-    neighbor_prime_by_generator = {}
+    # Sage's maintained spinor_generators starts at 3. Its documented
+    # Chebotarev argument guarantees that omitting the prime 2 does not lose
+    # any quotient class, and every returned generator satisfies the
+    # p-neighbour theorem's coprimality hypothesis with 2*det(gram).
     for spinor_prime in spinor_primes:
-        neighbor_prime = spinor_prime
-        if neighbor_prime == 2:
-            target_class = spinor_classes(
-                spinor_operators.delta(spinor_prime)
-            )
-            neighbor_prime = SageZZ(3)
-            while neighbor_prime.divides(genus.determinant()) or (
-                spinor_classes(
-                    spinor_operators.delta(neighbor_prime)
-                ) != target_class
-            ):
-                neighbor_prime = Primes().next(neighbor_prime)
-        assert not neighbor_prime.divides(2 * genus.determinant())
-        assert spinor_classes(
-            spinor_operators.delta(neighbor_prime)
-        ) == spinor_classes(spinor_operators.delta(spinor_prime))
-        neighbor_prime_by_generator[spinor_prime] = neighbor_prime
+        assert spinor_prime > 2 and not spinor_prime.divides(genus.determinant())
     # Build the Boolean-lattice orbit recursively. Every nonempty subset has
     # one canonical parent (remove its last prime), so each quotient element
     # costs exactly one p-neighbour step instead of recomputing its entire
@@ -1201,7 +1182,7 @@ def _genus_classes(gram):
     for size in range(1, len(spinor_primes) + 1):
         for chosen in combinations(spinor_primes, size):
             parent = chosen[:-1]
-            spinor_prime = neighbor_prime_by_generator[chosen[-1]]
+            spinor_prime = chosen[-1]
             parent_seed = seed_by_subset[parent]
             # The iterator already guarantees q(v) is divisible by p. For
             # these odd neighbour primes, the constructor adjusts a merely
