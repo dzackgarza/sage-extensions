@@ -1233,12 +1233,19 @@ def _genus_classes(gram):
     # Thm. 15]; at a prime whose operator lies in the improper spinor kernel
     # the neighbours stay in their spinor genus. Start at the odd prime ``3``
     # so the cited theorem's coprimality hypothesis with ``2 * det`` always
-    # applies, including to even lattices of odd determinant.
+    # applies, including to even lattices of odd determinant. The search
+    # terminates: Chebotarev applied to the spinor class field gives infinitely
+    # many primes in the identity spinor class, and only finitely many divide
+    # the determinant (Neukirch, *Algebraic Number Theory*, Ch. VII, §13).
     prime = SageZZ(3)
     while prime.divides(genus.determinant()) or (
         spinor_primes and not spinor_classes(spinor_operators.delta(prime)).is_one()
     ):
         prime = Primes().next(prime)
+    assert prime > 2 and not prime.divides(genus.determinant())
+    assert not spinor_primes or spinor_classes(
+        spinor_operators.delta(prime)
+    ).is_one()
     total = form.conway_mass()
     found_mass = SageQQ.zero()
     classes = []
