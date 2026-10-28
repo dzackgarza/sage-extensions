@@ -51,7 +51,10 @@ jobs:
           ref: ${{ github.sha }}
 
       - name: Install the checked-out sage-extensions source
-        run: '"$SAGE_BIN" -pip install --no-deps -e .'
+        # The image uses a uv-managed Sage virtual environment. The Sage
+        # launcher has no `-pip` command, so install with that environment's
+        # Python interpreter rather than silently switching environments.
+        run: /root/.local/bin/uv pip install --python /sage/.venv/bin/python --no-deps -e .
 
       - name: Install the Sage pytest collector plugin
         uses: actions/checkout@v4
