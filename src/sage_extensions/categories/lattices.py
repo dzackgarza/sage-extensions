@@ -1177,6 +1177,12 @@ def _genus_classes(gram):
             )
             seed = seed.find_p_neighbor_from_vec(spinor_prime, vector)
         seeds.append(seed)
+    assert len(seeds) == spinor_classes.order(), (
+        f"constructed {len(seeds)} spinor-genus seeds for an improper quotient of order {spinor_classes.order()}"
+    )
+    assert all(seed.det() == form.det() for seed in seeds), (
+        f"a p-neighbour spinor-genus seed changed the determinant of {form}"
+    )
 
     def grams(forms):
         return tuple(
