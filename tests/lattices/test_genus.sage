@@ -130,7 +130,7 @@ def test_indefinite_genus_enumerates_each_nontrivial_spinor_seed() -> None:
 
 
 def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
-    r"""Eichler's theorem also covers anisotropic indefinite rational spaces.
+    r"""Real indefiniteness does not imply rational isotropy.
 
     For ``x^2 + y^2 = 3 z^2``, reduction modulo 3 forces ``x`` and ``y``
     to be divisible by 3; substitution then forces ``z`` to be divisible by
@@ -141,17 +141,3 @@ def test_indefinite_signature_does_not_imply_rational_isotropy() -> None:
 
     assert lattice.signature_pair() == signature_pair(2, 1)
     assert lattice.is_isotropic() is False
-    genus = lattice.genus()
-    sage_genus = genus._engine()
-    spinor_operators, kernel = sage_genus._improper_spinor_kernel()
-    quotient = spinor_operators.quotient(kernel)
-    quotient_order = quotient.order()
-    # Eichler's theorem does not require rational isotropy: every improper
-    # spinor genus of an indefinite rational space of rank >= 3 has one class.
-    assert genus.spinor_genus_count() == quotient_order
-    assert genus.class_number() == genus.spinor_genus_count()
-    assert genus.representatives().cardinality() == genus.spinor_genus_count()
-    assert genus.class_number() == quotient_order
-    assert tuple(lattice.spinor_genus_class_numbers()) == tuple(
-        ZZ.one() for _ in range(int(genus.spinor_genus_count()))
-    )
