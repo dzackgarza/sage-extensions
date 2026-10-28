@@ -1151,6 +1151,9 @@ def _genus_classes(gram):
     spinor_primes = genus.spinor_generators(proper=False)
     spinor_operators, kernel = genus._improper_spinor_kernel()
     spinor_classes = spinor_operators.quotient(kernel)
+    assert spinor_classes.is_abelian(), (
+        "the improper spinor norm quotient must be abelian"
+    )
     generated = spinor_classes.subgroup([])
     for spinor_prime in spinor_primes:
         assert spinor_prime.is_prime() and not spinor_prime.divides(genus.determinant()), (
