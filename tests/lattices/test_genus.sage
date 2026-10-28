@@ -70,7 +70,9 @@ def test_indefinite_isotropic_genus_has_complete_spinor_seed_enumeration() -> No
     assert lattice([1, 1, 1]).norm() == 0
     assert genus.spinor_genus_count() == 1
     assert genus.class_number() == 1
-    assert genus.representatives().cardinality() == 1
+    representatives = genus.representatives()
+    assert representatives.cardinality() == 1
+    assert Lattices(ZZ)(representatives[0]).is_isometric(lattice)
     assert tuple(lattice.spinor_genus_class_numbers()) == (ZZ(1),)
 
 
