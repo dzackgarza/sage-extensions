@@ -106,7 +106,7 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     # Independently sum reciprocal automorphism-group orders through the
     # public lattice API, rather than relying only on the genus mass method.
     assert sum(
-        QQ.one() / representative.automorphism_group().order()
+        QQ.one() / representative.orthogonal_group().cardinality()
         for representative in representatives
     ) == QQ(3) / 2
     numbers = lattice.spinor_genus_class_numbers()
