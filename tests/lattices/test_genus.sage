@@ -133,7 +133,15 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     assert proper_generated.order() == proper_quotient.order()
     assert lattice.spinor_genus_count() == 4
     assert genus.class_number() == 12
-    assert genus.representatives().cardinality() == 12
+    representatives = genus.representatives()
+    assert representatives.cardinality() == 12
+    # Check the claimed class count against the public isometry decision, not
+    # just the representative container's length.
+    for i, representative in enumerate(representatives):
+        for other in representatives[i + 1 :]:
+            assert not Lattices(ZZ)(representative).is_isometric(
+                Lattices(ZZ)(other)
+            )
     assert genus.mass() == QQ(3) / 2
     numbers = lattice.spinor_genus_class_numbers()
     assert numbers.cardinality() == 4
