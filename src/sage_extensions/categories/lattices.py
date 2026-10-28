@@ -1149,6 +1149,22 @@ def _genus_classes(gram):
     )
     form = QuadraticForm(SageZZ, scale * gram)
     spinor_primes = genus.spinor_generators(proper=False)
+    spinor_operators, kernel = genus._improper_spinor_kernel()
+    spinor_classes = spinor_operators.quotient(kernel)
+    generated = spinor_classes.subgroup([])
+    for spinor_prime in spinor_primes:
+        prime_class = spinor_classes(spinor_operators.delta(spinor_prime))
+        assert prime_class.order() == 2, (
+            f"the improper spinor generator {spinor_prime} does not define a nontrivial 2-torsion class"
+        )
+        previous_order = generated.order()
+        generated = spinor_classes.subgroup((prime_class,) + generated.gens())
+        assert generated.order() == 2 * previous_order, (
+            f"the improper spinor generator {spinor_prime} does not enlarge the accumulated subgroup"
+        )
+    assert generated.order() == spinor_classes.order(), (
+        f"the improper spinor generators {spinor_primes} do not span the quotient of order {spinor_classes.order()}"
+    )
     seeds = []
     for chosen in chain.from_iterable(
         combinations(spinor_primes, size) for size in range(len(spinor_primes) + 1)
@@ -1176,8 +1192,6 @@ def _genus_classes(gram):
     # Thm. 15]; at a prime whose operator lies in the improper spinor kernel
     # the neighbours stay in their spinor genus.  With one spinor genus every
     # prime qualifies, and ``2`` is the cheapest for an even form.
-    spinor_operators, kernel = genus._improper_spinor_kernel()
-    spinor_classes = spinor_operators.quotient(kernel)
     prime = SageZZ(2) if genus.is_even() and not spinor_primes else SageZZ(3)
     while prime.divides(genus.determinant()) or (
         spinor_primes and not spinor_classes(spinor_operators.delta(prime)).is_one()
