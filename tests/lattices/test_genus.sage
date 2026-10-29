@@ -101,15 +101,25 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     # that for all 66 pairs needlessly repeats the group computation and exceeds
     # the bounded public acceptance runtime.  Sage's quadratic-form convention
     # uses half the Gram matrix, hence the factor 2 here.
-    forms = [
-        QuadraticForm(ZZ, 2 * representative.gram_matrix())
-        for representative in representatives
-    ]
+    def norm_form(lattice):
+        gram = lattice.gram_matrix()
+        return QuadraticForm(
+            ZZ,
+            3,
+            [
+                gram[0, 0],
+                2 * gram[0, 1],
+                2 * gram[0, 2],
+                gram[1, 1],
+                2 * gram[1, 2],
+                gram[2, 2],
+            ],
+        )
+
+    forms = [norm_form(Lattices(ZZ)(representative)) for representative in representatives]
     # The public contract puts the input lattice's improper spinor genus first;
     # verify the seed with the same independent exact equivalence algorithm.
-    assert forms[0].is_globally_equivalent_to(
-        QuadraticForm(ZZ, 2 * lattice.gram_matrix())
-    )
+    assert forms[0].is_globally_equivalent_to(norm_form(lattice))
     for i, form in enumerate(forms):
         for other in forms[i + 1 :]:
             assert not form.is_globally_equivalent_to(other)
