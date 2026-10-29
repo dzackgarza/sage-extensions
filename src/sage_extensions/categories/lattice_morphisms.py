@@ -4081,7 +4081,9 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                     return (True, None)
                 return (False, "equivalent in the cycle classification of binary forms [CS99, Ch. 15, §3.3]")
             case True, _:
-                order = domain.orthogonal_group().cardinality()
+                # Cardinality parents are not scalar elements of the base ring;
+                # coerce their finite integer value before entering the fraction field.
+                order = int(domain.orthogonal_group().cardinality())
                 if domain.genus().mass() * domain.base_ring().fraction_field()(order) == 1:
                     return (False, "a genus of mass 1/|O(L)| is one class [Conway--Sloane, Low-dimensional lattices IV, eq. (1)]")
                 if self._witness_matrix() is False:
