@@ -101,8 +101,9 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     assert Lattices(ZZ)(representatives[0]).is_isometric(lattice)
     assert genus.mass() == QQ(3) / 2
     assert sum(
-        QQ.one() / representative.orthogonal_group().cardinality()
-        for representative in representatives
+        (QQ(1, int(representative.orthogonal_group().order()))
+         for representative in representatives),
+        QQ.zero(),
     ) == QQ(3) / 2
     for i, representative in enumerate(representatives):
         for j in range(i + 1, representatives.cardinality()):
