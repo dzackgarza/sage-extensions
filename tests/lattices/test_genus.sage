@@ -95,9 +95,6 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     assert all(
         Lattices(ZZ)(representative) in genus for representative in representatives
     )
-    # The public contract puts the input lattice's improper spinor genus first;
-    # class count alone would not detect a wrong initial seed.
-    assert Lattices(ZZ)(representatives[0]).is_isometric(lattice)
     # Independently certify pairwise nonisometry using Sage's exact PARI-backed
     # positive-definite quadratic-form equivalence algorithm.  The lattice API's
     # isometry decision also computes full orthogonal groups through Oscar; doing
@@ -106,7 +103,15 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     # uses half the Gram matrix, hence the factor 2 here.
     from sage.quadratic_forms.quadratic_form import QuadraticForm
 
-    forms = [QuadraticForm(ZZ, 2 * representative) for representative in representatives]
+    forms = [
+        QuadraticForm(ZZ, 2 * representative)
+        for representative in representatives
+    ]
+    # The public contract puts the input lattice's improper spinor genus first;
+    # verify the seed with the same independent exact equivalence algorithm.
+    assert forms[0].is_globally_equivalent_to(
+        QuadraticForm(ZZ, 2 * lattice.gram_matrix())
+    )
     for i, form in enumerate(forms):
         for other in forms[i + 1 :]:
             assert not form.is_globally_equivalent_to(other)
