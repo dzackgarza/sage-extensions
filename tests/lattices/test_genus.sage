@@ -98,14 +98,18 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     # The public contract puts the input lattice's improper spinor genus first;
     # class count alone would not detect a wrong initial seed.
     assert Lattices(ZZ)(representatives[0]).is_isometric(lattice)
-    # Check the claimed class count against the public isometry decision, not
-    # just the representative container's length.
-    for i, representative in enumerate(representatives):
-        for j in range(i + 1, representatives.cardinality()):
-            other = representatives[j]
-            assert not Lattices(ZZ)(representative).is_isometric(
-                Lattices(ZZ)(other)
-            )
+    # Independently certify pairwise nonisometry using Sage's exact PARI-backed
+    # positive-definite quadratic-form equivalence algorithm.  The lattice API's
+    # isometry decision also computes full orthogonal groups through Oscar; doing
+    # that for all 66 pairs needlessly repeats the group computation and exceeds
+    # the bounded public acceptance runtime.  Sage's quadratic-form convention
+    # uses half the Gram matrix, hence the factor 2 here.
+    from sage.quadratic_forms.quadratic_form import QuadraticForm
+
+    forms = [QuadraticForm(ZZ, 2 * representative) for representative in representatives]
+    for i, form in enumerate(forms):
+        for other in forms[i + 1 :]:
+            assert not form.is_globally_equivalent_to(other)
     assert genus.mass() == QQ(3) / 2
     # Independently sum reciprocal automorphism-group orders through the
     # public lattice API, rather than relying only on the genus mass method.
