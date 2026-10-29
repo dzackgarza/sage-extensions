@@ -104,16 +104,13 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     def norm_form(lattice):
         gram = lattice.gram_matrix()
         return QuadraticForm(
-            ZZ,
-            3,
-            [
-                gram[0, 0],
-                2 * gram[0, 1],
-                2 * gram[0, 2],
-                gram[1, 1],
-                2 * gram[1, 2],
-                gram[2, 2],
-            ],
+            matrix(
+                [
+                    [2 * gram[0, 0], 2 * gram[0, 1], 2 * gram[0, 2]],
+                    [2 * gram[1, 0], 2 * gram[1, 1], 2 * gram[1, 2]],
+                    [2 * gram[2, 0], 2 * gram[2, 1], 2 * gram[2, 2]],
+                ]
+            )
         )
 
     forms = [norm_form(Lattices(ZZ)(representative)) for representative in representatives]
