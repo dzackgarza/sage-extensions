@@ -101,8 +101,6 @@ def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
     # that for all 66 pairs needlessly repeats the group computation and exceeds
     # the bounded public acceptance runtime.  Sage's quadratic-form convention
     # uses half the Gram matrix, hence the factor 2 here.
-    from sage.quadratic_forms.quadratic_form import QuadraticForm
-
     forms = [
         QuadraticForm(ZZ, 2 * representative)
         for representative in representatives
