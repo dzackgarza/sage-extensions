@@ -160,13 +160,19 @@ class Cat(CategoryPacketMethods, Category):
     def __contains__(self, candidate: Any) -> bool:
         r"""Whether ``candidate`` is a category, read from its placement.
 
-        Placement answers it for every category whose ``category()`` records
-        ``Cat`` or a subcategory of it.  A Mor category realized on Sage's
-        ``Mor`` records its enrichment there instead, and its placement
-        among Mor categories is recorded by the family that built it, which
-        ``MorCategories`` reads.
+        A category placed in ``Cat`` is an object directly.  A represented
+        Mor category is placed in ``MorCategories()``, and a subcategory of
+        any category already in ``Cat`` is itself a category object.  The
+        last clause is needed for specialized functor categories such as
+        ``DirectedSystem(J, C)`: it is a subcategory of ``Cat().Mor(J, C)``,
+        but is not itself one of the Mor-family objects recorded by
+        ``MorCategories()``.
         """
-        return super().__contains__(candidate) or candidate in MorCategories()
+        if super().__contains__(candidate) or candidate in MorCategories():
+            return True
+        return isinstance(candidate, Category) and any(
+            super_category in self for super_category in candidate.super_categories()
+        )
 
     def object(self, category: Category) -> Category:
         r"""Admit the actual category as an object of ``Cat``."""

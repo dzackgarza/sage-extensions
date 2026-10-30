@@ -21,6 +21,21 @@ def test_cat_keeps_the_object_and_category_readings_of_mor():
     assert categories.Mor(target) is Cat().Mor(categories, target)
 
 
+def test_cat_contains_specialized_subcategories_of_functor_categories():
+    r"""A specialized diagram category is a subcategory, hence an object, of Cat."""
+    from sage_extensions.categories.group.groups import OwnedGroups
+
+    index = PosetCategory(Sets.Δ[1])
+    groups = OwnedGroups()
+    directed = groups.DirectedSystem(index)
+    inverse = groups.InverseSystem(index)
+
+    assert Cat().Mor(index, groups) in Cat()
+    assert directed.super_categories()[0] in MorCategories()
+    assert directed in Cat()
+    assert inverse in Cat()
+
+
 def test_a_category_with_a_chosen_functor_retains_its_category_operations():
     r"""The two-object chain equipped with its identity functor is an object of Cat/I."""
     chain = PosetCategory(Sets.Δ[1])
