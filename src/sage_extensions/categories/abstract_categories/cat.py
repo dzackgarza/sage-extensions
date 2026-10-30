@@ -168,6 +168,8 @@ class Cat(CategoryPacketMethods, Category):
         but is not itself one of the Mor-family objects recorded by
         ``MorCategories()``.
         """
+        if isinstance(candidate, Category) and candidate.category() is self:
+            return True
         if super().__contains__(candidate) or candidate in MorCategories():
             return True
         return isinstance(candidate, Category) and any(
