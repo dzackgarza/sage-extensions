@@ -14,6 +14,18 @@ def test_a_category_answers_its_own_endomorphisms_as_an_object_of_cat():
     assert endomorphisms(identity) is identity
 
 
+def test_owned_categories_are_objects_of_cat_by_placement():
+    r"""An owned category is an object of Cat through its recorded category, not its supercategories."""
+    from sage_extensions.categories.group.groups import OwnedGroups
+
+    groups = OwnedGroups()
+    categories = Cat()
+
+    assert groups.category() is categories
+    assert groups in categories
+    assert categories in categories
+
+
 def test_cat_keeps_the_object_and_category_readings_of_mor():
     categories = Cat()
     target = Sets()
