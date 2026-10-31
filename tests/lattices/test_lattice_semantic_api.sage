@@ -61,6 +61,16 @@ def test_the_infinite_rank_dual_is_the_product_and_evaluates_by_projections() ->
     assert correlation.is_injective()
     assert lattice.is_nondegenerate()
     assert not lattice.is_unimodular()
+
+    # Non-surjectivity is refuted by the retained witness, not by a cokernel:
+    # it is an element of the product whose component at every index is one,
+    # while every value of the correlation vanishes away from the finite
+    # support of its argument.
+    witness = correlation.non_surjectivity_witness()
+    assert witness is not None
+    assert witness.parent() is dual
+    assert Modules(ring).product_component(construction, witness, NN(0)) == unit
+    assert Modules(ring).product_component(construction, witness, NN(7)) == unit
     assert not correlation.is_surjective()
 
 

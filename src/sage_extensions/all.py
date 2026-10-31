@@ -135,6 +135,9 @@ from sage_extensions.categories.group.groups import (  # noqa: F401
     LieGroups,
     TopologicalGroups,
 )
+from sage_extensions.categories.group.magmas import (  # noqa: F401
+    AdditiveGroups,
+)
 from sage_extensions.categories.holomorphic_atlases import (  # noqa: F401
     HolomorphicAtlases,
 )

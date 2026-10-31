@@ -1613,6 +1613,16 @@ class ModuleMorphismMethods:
         self._require_established_linearity("injectivity")
         return self.kernel().is_zero()
 
+    def non_surjectivity_witness(self):
+        r"""Return the codomain element the construction exhibits outside the image, or ``None``.
+
+        A construction that knows an element of the codomain is not a finite
+        linear combination of the morphism's generator images retains that
+        element.  Its presence refutes surjectivity without a cokernel, and it
+        is readable so the refutation can be checked rather than trusted.
+        """
+        return vars(self).get("_preamble_non_surjectivity_witness")
+
     def is_surjective(self) -> bool:
         r"""Return whether ``coker(self)=0`` when the cokernel is computable."""
         if self._surjectivity_premise is not None:

@@ -304,7 +304,28 @@ def _algebraic_correlation_morphism(metric, *, injective=False):
                 )
                 return ModuleCategory(ring).product_element(construction, components)
 
-            return correlation_from_generator_images(infinite_generator_image)
+            correlation = correlation_from_generator_images(infinite_generator_image)
+            # Every generator image above is a coordinate functional e_s^*, whose
+            # support is the singleton {s}; a finite linear combination of them is
+            # therefore supported on a finite set of indices.  The product's
+            # constant family with a nonzero component has that component at
+            # every index, and the index set is infinite, so it is not such a
+            # combination.  Retain it as the witness rather than inventing a
+            # cokernel for morphisms between these two modules.
+            nonzero = ring.one()
+            match (nonzero == ring.zero()) is False:
+                case True:
+                    witness = ModuleCategory(ring).product_element(
+                        construction,
+                        IndexedFamily(
+                            source_labels, lambda _label: factor(nonzero)
+                        ),
+                    )
+                    correlation._preamble_non_surjectivity_witness = witness
+                    correlation._surjectivity_premise = False
+                case _:
+                    pass
+            return correlation
 
 
 def _correlation_isomorphism(metric):
