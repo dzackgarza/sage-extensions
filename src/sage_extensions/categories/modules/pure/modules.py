@@ -1660,6 +1660,18 @@ class Modules(OwnedCategoryOverBaseRing):
         def module_category(self):
             return Modules(self.base_ring())
 
+        def _module_base_ring(self):
+            r"""Return the ring of the module structure this object is read in.
+
+            A ring read as a module over itself states that structure as
+            constructor data (``_preamble_regular_module_base``): ``QQ`` is a
+            ``QQ``-module and a ``ZZ``-algebra at once, and the ring of scalars
+            of that module is ``QQ``.  Every other module answers the ring its
+            construction was over.
+            """
+            regular = vars(self).get("_preamble_regular_module_base")
+            return self.base_ring() if regular is None else regular
+
         def has_selected_module_resolution(self) -> bool:
             return self.has_selected_resolution(self.module_category())
 
@@ -5313,7 +5325,10 @@ def _restricted_scalars_view(
     already represented dimension is multiplied by that basis cardinality.
     This dimension transport does not require or create a finite frame of M.
     """
-    extension_ring = _owned_ring(module.base_ring())
+    # The module's scalar ring is the ring of the module structure it is read
+    # in; for a ring read as a module over itself that is the ring, not the
+    # ring's coefficient base.
+    extension_ring = _owned_ring(Modules.ParentMethods._module_base_ring(module))
     assert _owned_ring(ring_map.codomain()) is extension_ring, (
         f"{module} cannot be restricted along {ring_map}: the ring morphism must end at the scalar ring "
         f"{extension_ring} of the module, but its codomain is {ring_map.codomain()}"

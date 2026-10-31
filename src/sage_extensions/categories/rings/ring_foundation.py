@@ -5794,6 +5794,7 @@ class _OwnedRingParent(Parent):
                 if category is not None:
                     placement = owned_category_join((placement, category))
                 refine(self, placement)
+            _install_self_module_placement(self)
         except BaseException:
             # A failed constructor cannot leave its incomplete owned ring in
             # the canonical cache. Remove only this exact object's entries.
@@ -6640,6 +6641,29 @@ def _owned_ring_category(
         case _:
             pass
     return owned_category_join((presented, *extra))
+
+
+def _install_self_module_placement(ring) -> None:
+    r"""Place ``ring`` among the objects of ``Modules(ring)``.
+
+    A ring is a module over itself: its elements are the ring's elements and the
+    scalar action is the ring's multiplication. The coefficient module the ring
+    constructor already installed is a different structure, over the
+    coefficient base, and is untouched here. Only membership is stated, which is
+    what a construction asks when it reads a ring as the object of a module
+    category; the framing, the resolution and the action are read through the
+    module owner's own accessors.
+    """
+    from sage_extensions.categories.modules.pure.modules import Modules
+    from sage_extensions.refine import refine
+
+    placement = Modules(ring)
+    if ring in placement:
+        return
+    # The ring states that its self-module structure is the one this placement
+    # admits; the module owner reads it through `_module_base_ring`.
+    ring._preamble_regular_module_base = ring
+    refine(ring, placement)
 
 
 def _install_engine_selected_ring_data(ring, engine) -> None:

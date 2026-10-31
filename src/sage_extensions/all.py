@@ -227,6 +227,7 @@ from sage_extensions.categories.modules.hodge_structures import (  # noqa: F401
 from sage_extensions.categories.modules.pure.modules import (  # noqa: F401
     MatrixEndomorphismSpaces,
     MatrixSpaces,
+    Modules,
 )
 from sage_extensions.categories.orbifolds import (  # noqa: F401
     ComplexOrbifolds,

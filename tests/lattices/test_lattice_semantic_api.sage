@@ -14,6 +14,13 @@ def test_the_infinite_rank_dual_is_the_product_and_evaluates_by_projections() ->
     dual that vanishes nowhere, so it is not in the image.  Evaluation of a
     functional at a vector is the finite sum of the vector's coefficients
     against the functional's projections; no basis of the dual is chosen.
+
+    OPEN: `correlation.is_surjective()` raises `cannot compute the cokernel ...
+    no algorithm is available for these modules` (domain the direct-sum lattice,
+    codomain the product module). The assertion is kept rather than removed:
+    deciding it needs the comparison of the direct-sum image with the product
+    (the constant family lies outside the finite span), not a general
+    infinite-rank cokernel.
     """
     lattice = Lattices(QQ)(QQ**NN)
     ring = lattice.base_ring()
@@ -52,6 +59,9 @@ def test_the_infinite_rank_dual_is_the_product_and_evaluates_by_projections() ->
     assert Modules(ring).product_component(construction, constant, NN(7)) == unit
     assert lattice.dual_evaluation(first, e7) == ring.zero()
     assert correlation.is_injective()
+    assert lattice.is_nondegenerate()
+    assert not lattice.is_unimodular()
+    assert not correlation.is_surjective()
 
 
 def test_nondegenerate_and_unimodular_are_distinct_and_perfectness_retains_an_inverse() -> None:

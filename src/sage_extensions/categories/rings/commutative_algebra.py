@@ -3911,6 +3911,11 @@ def _quotient_ring(source, defining_ideal):
                     _install_local_ring_construction(
                         quotient, maximal_ideal, residue_field, residue_map
                     )
+    from sage_extensions.categories.rings.ring_foundation import (
+        _install_self_module_placement,
+    )
+
+    _install_self_module_placement(quotient)
     return quotient
 
 
@@ -4514,6 +4519,11 @@ def _localization_at_submonoid(source, submonoid):
                 else localization.base_ring()
             ),
         )
+    from sage_extensions.categories.rings.ring_foundation import (
+        _install_self_module_placement,
+    )
+
+    _install_self_module_placement(localization)
     return localization
 
 
