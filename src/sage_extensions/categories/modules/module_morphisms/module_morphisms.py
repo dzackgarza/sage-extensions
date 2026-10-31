@@ -2725,6 +2725,7 @@ def _initialize_module_mor_parent(
         MatrixSpaces,
         _fix_selected_module_resolution,
         _matrix_unit,
+        _matrix_functional,
     )
 
     # Fix the choice of every selected resolution before the Mor is
@@ -2734,14 +2735,30 @@ def _initialize_module_mor_parent(
     match placement:
         case _ if ring in OwnedRings().Commutative() and placement.is_subcategory(MatrixSpaces(ring)):
             # ``Hom_R(F_R(S), F_R(T))`` is free on the matrix units ``T x S``.
-            labels = codomain.module_generating_set().product_with(domain.module_generating_set())
-            _fix_selected_module_resolution(
-                parent,
-                ring,
-                labels,
-                lambda label: _matrix_unit(parent, label),
-                lambda: ring._fresh_free_module_on(labels),
-            )
+            match codomain is ring.regular_module():
+                case True:
+                    # ``Hom_R(M,R)`` is the linear dual of ``M``: its matrix has
+                    # one row, so its units are indexed by ``S`` itself and
+                    # ``e_s^*`` is the functional sending ``e_s`` to ``1``.
+                    labels = domain.module_generating_set()
+                    _fix_selected_module_resolution(
+                        parent,
+                        ring,
+                        labels,
+                        lambda label: _matrix_functional(parent, label),
+                        lambda: ring._fresh_free_module_on(labels),
+                    )
+                case False:
+                    labels = codomain.module_generating_set().product_with(
+                        domain.module_generating_set()
+                    )
+                    _fix_selected_module_resolution(
+                        parent,
+                        ring,
+                        labels,
+                        lambda label: _matrix_unit(parent, label),
+                        lambda: ring._fresh_free_module_on(labels),
+                    )
         case _ if placement.is_subcategory(_SelectedFinitePresentationModules(ring)):
             def selected_presentation_data():
                 from sage_extensions.categories.modules.internal_mor import (

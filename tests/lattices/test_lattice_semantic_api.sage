@@ -1,22 +1,6 @@
 from sage_extensions.all import *
 
-import pytest
 
-
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "the algebraic dual of an infinite-rank free module is not expressible yet. "
-        "Hom_R(L,R) is presented as a coordinate family of R.regular_module(), whose "
-        "element __call__ takes a basis label, so a functional cannot be applied to a "
-        "vector: the natural pairing L* x L -> R is missing. For infinite rank the dual "
-        "is the product R^S, not the direct sum, and no product-module presentation "
-        "exists; the correlation into it is injective and not surjective. Over QQ the "
-        "regular module is a substitute rank-one free module because a ring whose "
-        "coefficient ring is smaller is not placed as a module over itself. "
-        "Reproduction: Lattices(ZZ)('U').metric_map()(e)(e)."
-    ),
-)
 def test_the_correlation_of_QQ_to_the_NN_is_injective_but_not_onto_its_algebraic_dual() -> None:
     r"""With the standard form on \(\mathbb Q^{(\mathbb N)}\), \(b(v,-)\) has the finite
     support of \(v\), so the all-ones functional is not in the image of the

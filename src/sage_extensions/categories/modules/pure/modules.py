@@ -7235,17 +7235,45 @@ def _matrix_unit(mor, label):
     )
 
 
-def _matrix_coefficients(mor, morphism):
+def _matrix_functional(mor, label):
+    r"""The single-row matrix unit ``e_label^*`` of the linear dual ``Hom_R(M,R)``.
 
+    ``mor`` is ``Hom_R(M, R.regular_module())`` with its selected resolution
+    indexed by the basis labels of ``M``.  The functional sends the basis
+    vector at ``label`` to the regular module's unit and every other basis
+    vector to zero, so it is the coordinate functional ``e_label^*``.
+    """
+    label = mor.module_generating_set()(label)
+    unit = next(iter(mor.codomain().module_generating_set()))
+    return mor(
+        {
+            source_label: (
+                mor.codomain().module_generator(unit)
+                if source_label == label
+                else mor.codomain().zero()
+            )
+            for source_label in mor.column_index_set()
+        }
+    )
+
+
+def _matrix_coefficients(mor, morphism):
     morphism = mor(morphism)
     labels = mor.module_generating_set()
+    # ``Hom_R(M,R)`` has one row, so its coefficients are indexed by the
+    # domain's labels: the entry at ``s`` is ``e_s^*(f) = f(e_s)``, read in the
+    # regular module's unit coordinate.  A map between free modules of any rank
+    # is indexed by the matrix units ``T x S`` instead.
+    dual = mor.codomain() is mor.base_ring().regular_module()
     coefficients = {}
     for column_label in mor.column_index_set():
         column = morphism._matrix_column_coordinates(column_label)
         for row_label, coefficient in (
             column.parent()._selected_module_coefficients(column).items()
         ):
-            coefficients[labels((row_label, column_label))] = coefficient
+            coefficients[
+                labels(column_label) if dual else labels((row_label, column_label))
+            ] = coefficient
     return coefficients
 
 

@@ -3966,8 +3966,18 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
 
             @cached_method
             def dual_module(self):
+                r"""Return the linear dual ``Hom_R(M,R)`` of the underlying module.
 
-                return self.base_ring().free_module(self.module_generating_set())
+                The dual is the module of ``R``-valued linear functionals, so an
+                element is a morphism and ``f(v)`` is its evaluation at ``v``.
+                Its selected resolution is indexed by this module's own basis
+                labels, with ``e_l^*`` the functional sending ``e_l`` to ``1``;
+                a second free module of the same rank would carry no pairing and
+                could not express that application.
+                """
+                return self.module_category().Mor(
+                    self, self.base_ring().regular_module()
+                )
 
             @cached_method
             def radical(self):
