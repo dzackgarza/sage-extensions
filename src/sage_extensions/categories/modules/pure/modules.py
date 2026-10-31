@@ -1701,33 +1701,30 @@ class Modules(OwnedCategoryOverBaseRing):
             return self.base_ring() if base is None else base
 
         def _get_action_(self, source, op, self_on_left):
-            r"""Return this module's scalar action to the coercion machinery.
+            r"""Return this module's scalar action: the module owner's adapter.
 
-            ``r * m`` and ``m * r`` are the module's scalar action for ``r`` in
-            the base ring, so the module states that action here.  Without it
-            Sage discovers no action and falls back to a parent pushout, which
-            asks the owned ring for a construction.  The right action is offered
-            only over a commutative ring, where both sides agree.
+            ``_ModuleScalarAction`` is the owned action adapter for ``r * m``,
+            and for ``m * r`` over a commutative ring; its ``_act_`` calls this
+            module's ``scalar_multiple``, so the arithmetic is the module's own.
+            Handing the coercion machinery a host ``ModuleAction`` instead
+            imposes that class's element-type checks on owned elements and its
+            base extension on owned rings.  Nothing is registered here: the
+            coercion machinery caches the answer to this question.
             """
             import operator
-
-            from sage.structure.coerce_actions import (
-                LeftModuleAction,
-                RightModuleAction,
-            )
 
             ring = self.base_ring()
             if op is not operator.mul or source is not ring:
                 return super()._get_action_(source, op, self_on_left)
             match self_on_left:
-                case False:
-                    return LeftModuleAction(ring, self)
                 case True:
                     match ring in OwnedRings().Commutative():
                         case True:
-                            return RightModuleAction(ring, self)
+                            return _ModuleScalarAction(ring, self, False)
                         case _:
                             return None
+                case _:
+                    return _ModuleScalarAction(ring, self, True)
 
         def module_category(self):
             return Modules(self.base_ring())

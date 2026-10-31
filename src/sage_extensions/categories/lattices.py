@@ -1624,6 +1624,57 @@ class _MarkedLatticeMethods:
         return primitive_marking_classes(self, source, lattice)
 
 
+def _dynkin_numbering(lattice_gram, cartan):
+    r"""Return the numbering ``sigma`` with ``lattice_gram[i][j] == -cartan[sigma[i]][sigma[j]]``.
+
+    A simply-laced Cartan type is determined by its Dynkin graph, and two
+    numberings of the same graph differ by a permutation of the vertices.  The
+    lattice's pairing on its simple roots is the negative Cartan matrix, so the
+    permutation is found by matching adjacency: a vertex of the lattice's graph
+    maps to a Sage vertex whose row of the Cartan matrix agrees with the
+    lattice's row at the already-chosen positions.  ADE graphs, and the E-series
+    in particular, are rigid, so the matching is unique.
+    """
+    size = len(cartan.rows())
+    assert len(lattice_gram) == size, (
+        f"a Dynkin numbering needs one lattice simple root per Cartan vertex, but there are "
+        f"{len(lattice_gram)} and {size}"
+    )
+
+    def agrees(position, candidate, chosen):
+        for other_position, other_candidate in chosen.items():
+            expected = -lattice_gram[position][other_position]
+            if int(cartan[candidate][other_candidate]) != int(expected):
+                return False
+        return True
+
+    def search(chosen, used):
+        match len(chosen) == size:
+            case True:
+                return dict(chosen)
+            case _:
+                pass
+        position = len(chosen)
+        for candidate in range(size):
+            if candidate in used or not agrees(position, candidate, chosen):
+                continue
+            chosen[position] = candidate
+            used.add(candidate)
+            found = search(chosen, used)
+            if found is not None:
+                return found
+            used.discard(candidate)
+            del chosen[position]
+        return None
+
+    numbering = search({}, set())
+    assert numbering is not None, (
+        "the lattice's simple-root pairings are not the negative of the Cartan matrix of the "
+        "declared type, so its simple roots are not numbered by that type's Dynkin graph"
+    )
+    return tuple(numbering[position] for position in range(size))
+
+
 class Lattices(OwnedCategoryOverBaseRing):
     r"""
     The category of lattices over a base ring, and the constructor for
@@ -10304,12 +10355,21 @@ class RootLattices(OwnedCategory):
             coefficients = (
                 RootSystem(cartan_type).root_lattice().highest_root().to_vector()
             )
+            # Sage numbers a Cartan type's simple roots in its own order; this
+            # lattice fixed its order when the simple-root framing was chosen.
+            # The two orders are identified by the Dynkin graph, whose edges are
+            # the nonzero off-diagonal pairings, so the coefficient of each of
+            # this lattice's simple roots is read at the matched Sage index.
+            generators = tuple(self.simple_roots())
+            gram = [
+                [self.b(left, right) for right in generators] for left in generators
+            ]
+            cartan = RootSystem(cartan_type).cartan_matrix()
+            numbering = _dynkin_numbering(gram, cartan)
             vector = self.framing_source()(
                 {
-                    label: self.base_ring()(int(coefficient))
-                    for label, coefficient in zip(
-                        self.module_generating_set(), coefficients, strict=True
-                    )
+                    label: self.base_ring()(int(coefficients[numbering[position]]))
+                    for position, label in enumerate(self.module_generating_set())
                 }
             )
             return self.framing_morphism()(vector)

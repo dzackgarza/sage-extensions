@@ -62,8 +62,13 @@ def _Ug():
     return NamedLattices.U.gram_tensor()
 
 
-def _E8g():
-    return NamedLattices.E8.gram_tensor()
+def _E8g_owned_order():
+    r"""The E8 Gram tensor in the owned Cartan basis order.
+
+    This is the root-lattice recipe's own numbering, ``Lattices(ZZ)("E8")``, not
+    the order the catalogue's named roots are stated in.
+    """
+    return Lattices(ZZ)("E8").gram_tensor()
 
 
 # The owned E8 Cartan construction numbers its chain from the opposite end of
@@ -77,16 +82,26 @@ _SAGE_E8_POSITION = tuple(
 )
 
 
-def _E8g_sage_basis_order():
-    r"""Return the E8 Gram tensor in Sage's integral-lattice basis order.
+def _E8g():
+    r"""The E8 Gram tensor in Sage's integral-lattice basis order.
 
-    The permutation below changes only the basis order, not the isometry class
-    or the form, so a map between a lattice named in Sage's order and one named
-    in the owned order is the same permutation on its E8 coordinates.
+    Every named construction in this catalogue states its roots in Sage's
+    order — that of ``IntegralLattice('E8')``, which is also the order the
+    archived catalogue and notebook use — so this is the order of the
+    catalogue's E8, its twists, and the E8 blocks of the named lattices.
     """
-    gram = _E8g()
+    gram = _E8g_owned_order()
     order = _SAGE_E8_BASIS_ORDER
     return tensor(ZZ, (), (8, 8), [[gram[i, j] for j in order] for i in order])
+
+
+def _E8g_sage_basis_order():
+    r"""The E8 Gram tensor in Sage's integral-lattice basis order.
+
+    The named catalogue has one E8 order, so this is the same tensor as
+    ``_E8g()``; the name records why that order was chosen.
+    """
+    return _E8g()
 
 
 class NamedLattices:
@@ -156,7 +171,14 @@ class NamedLattices:
 
     @lazy_class_attribute
     def E8(cls):
-        return _C("E8")
+        r"""E8 with its simple roots in Sage's integral-lattice basis order.
+
+        That is the order the archived catalogue and notebook name the roots in,
+        and the order of every named lattice here that carries an E8 block.  The
+        root-lattice recipe ``Lattices(ZZ)("E8")`` keeps the owned Cartan
+        numbering.
+        """
+        return _C(_E8g())
 
     @lazy_class_attribute
     def E8_2(cls):
@@ -1099,18 +1121,14 @@ class Involutions:
 class Embeddings:
     @lazy_class_attribute
     def E8_2_into_TdP(cls):
-        r"""``E8(2) -> 2U + 2E8``, matching the owned E8 basis to TdP's sage-order blocks.
+        r"""``E8(2) -> 2U + 2E8``: ``a_i`` to the two E8 blocks' own ``a_i``.
 
-        ``TdP`` names its E8 blocks in Sage's integral-lattice basis order and
-        ``E8_2`` uses the owned Cartan order, so the images follow the order
-        change; without it adjacent named roots would not stay adjacent.
+        Both sides name their E8 roots in Sage's order, so the images are
+        positional.
         """
         tdp = _generators(NamedLattices.TdP)
         return NamedLattices.E8_2.Emb(NamedLattices.TdP)(
-            tuple(
-                tdp[4 + _SAGE_E8_POSITION[index]] + tdp[12 + _SAGE_E8_POSITION[index]]
-                for index in range(8)
-            )
+            tuple(tdp[4 + index] + tdp[12 + index] for index in range(8))
         )
 
     @lazy_class_attribute
@@ -1133,24 +1151,20 @@ class Embeddings:
 
     @lazy_class_attribute
     def TdP_into_LK3(cls):
-        r"""The inclusion ``2U + 2E8 -> 3U + 2E8`` with the named E8 bases matched.
+        r"""The inclusion ``2U + 2E8 -> 3U + 2E8``.
 
-        ``TdP`` names its E8 blocks in Sage's integral-lattice basis order and
-        ``LK3`` names them in the owned Cartan order, so the images of
-        ``a1..a8`` and ``b1..b8`` follow the order change; keeping the positions
-        would send adjacent named roots to non-adjacent ones and break
-        form preservation.
+        Every named lattice here names its E8 roots in Sage's order, so the
+        images are positional.
         """
         lk3 = _generators(NamedLattices.LK3)
-        order = _SAGE_E8_BASIS_ORDER
         return NamedLattices.TdP.Emb(NamedLattices.LK3)(
             (
                 lk3[0],
                 lk3[1],
                 lk3[2] - lk3[4],
                 lk3[3] - lk3[5],
-                *(lk3[6 + order[index]] for index in range(8)),
-                *(-lk3[14 + order[index]] for index in range(8)),
+                *lk3[6:14],
+                *(-generator for generator in lk3[14:22]),
             )
         )
 
@@ -1160,19 +1174,28 @@ class Embeddings:
 
     @lazy_class_attribute
     def U_E8_2_into_TEn(cls):
-        r"""``U + E8(2) -> U + U(2) + E8(2)``, block for block and order-matched.
+        r"""``U + E8(2) -> U + U(2) + E8(2)``, the Isometry Searching adapted basis.
 
-        The source is the first hyperbolic plane together with an ``E8(2)``
-        block named in the owned Cartan order; the target has that block named
-        in Sage's integral-lattice order, so the images follow the order change.
-        The remaining ``U(2)`` summand of the target is not used.
+        The archived catalogue (``archives/preamble/catalogue.sage`` at
+        ``24dc7a61``) states this arrow as the adapted basis
+
+            e~ = e + e' + f' - a1,   f~ = f + e' + f' - a1,
+            a1~ = e' - f',           a3~ = f' + a3,   a_i~ = a_i otherwise,
+
+        whose Gram is exactly ``U + E8(2)`` inside ``T_En`` and whose coordinate
+        matrix has a unimodular 10x10 minor, so the embedding is primitive.  It
+        is what makes Sterk 5's fourteen roots in the standalone ``U + E8(2)``
+        the same configuration as their ``T_En`` presentation.
         """
         ten = _generators(NamedLattices.TEn)
         return NamedLattices.U_E8_2.Emb(NamedLattices.TEn)(
             (
-                ten[0],
-                ten[1],
-                *(ten[4 + _SAGE_E8_POSITION[index]] for index in range(8)),
+                ten[0] + ten[2] + ten[3] - ten[4],
+                ten[1] + ten[2] + ten[3] - ten[4],
+                ten[2] - ten[3],
+                ten[5],
+                ten[3] + ten[6],
+                *ten[7:12],
             )
         )
 
