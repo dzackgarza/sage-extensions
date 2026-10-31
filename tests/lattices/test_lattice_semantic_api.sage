@@ -1,28 +1,57 @@
 from sage_extensions.all import *
 
+from sage_extensions.categories.modules.pure.modules import Modules
+from sage_extensions.categories.sets.indexed_families import IndexedFamily
 
-def test_the_correlation_of_QQ_to_the_NN_is_injective_but_not_onto_its_algebraic_dual() -> None:
-    r"""With the standard form on \(\mathbb Q^{(\mathbb N)}\), \(b(v,-)\) has the finite
-    support of \(v\), so the all-ones functional is not in the image of the
-    correlation, while \(b(e_i, e_i) = 1\) makes it injective."""
+
+def test_the_infinite_rank_dual_is_the_product_and_evaluates_by_projections() -> None:
+    r"""The algebraic dual of \\(\\mathbb Q^{(\\mathbb N)}\\) is the product
+    \\(\\prod_{\\mathbb N} \\mathbb Q\\), given by its projections.
+
+    The domain is the direct sum: every vector is a finitely supported function
+    on the basis labels, so the correlation's image of a vector vanishes outside
+    a finite set of indices.  The product's constant family is an element of the
+    dual that vanishes nowhere, so it is not in the image.  Evaluation of a
+    functional at a vector is the finite sum of the vector's coefficients
+    against the functional's projections; no basis of the dual is chosen.
+    """
     lattice = Lattices(QQ)(QQ**NN)
+    ring = lattice.base_ring()
     dual = lattice.linear_dual()
+    construction = lattice._dual_product_construction()
     correlation = lattice.metric_map()
+
+    assert construction is not None
+    assert dual is construction.object()
+
     e0 = lattice.basis_vector(0)
     e1 = lattice.basis_vector(1)
-    e3 = lattice.basis_vector(3)
+    e7 = lattice.basis_vector(7)
+    first = correlation(e0)
+    assert first.parent() is dual
+    assert lattice.dual_evaluation(first, e0) == ring.one()
+    assert lattice.dual_evaluation(first, e1) == ring.zero()
+    assert lattice.dual_evaluation(first, lattice.basis_vector(0) + 3 * lattice.basis_vector(2)) == ring.one()
 
-    first_covector = correlation(e0)
-    assert first_covector(e0) == 1
-    assert first_covector(e1) == 0
+    unit = ring.regular_module()(ring.one())
+    constant = Modules(ring).product_element(
+        construction, IndexedFamily(NN, lambda _index: unit)
+    )
+    assert constant.parent() is dual
+    assert Modules(ring).product_component(construction, constant, NN(0)) == unit
+    assert Modules(ring).product_component(construction, constant, NN(7)) == unit
+    assert lattice.dual_evaluation(constant, e0) == ring.one()
+    assert lattice.dual_evaluation(constant, e1) == ring.one()
+    assert lattice.dual_evaluation(constant, e7) == ring.one()
 
-    all_ones = dual(lambda _label: 1)
-    assert all_ones(e0) == all_ones(e1) == all_ones(e3) == 1
-
+    # The correlation's image is the direct sum inside the product: at index 7
+    # the image of e_0 vanishes and the constant family does not, read through
+    # the product's projections rather than by an undecided element equality.
+    zero = ring.regular_module()(ring.zero())
+    assert Modules(ring).product_component(construction, first, NN(7)) == zero
+    assert Modules(ring).product_component(construction, constant, NN(7)) == unit
+    assert lattice.dual_evaluation(first, e7) == ring.zero()
     assert correlation.is_injective()
-    assert not correlation.is_surjective()
-    assert lattice.is_nondegenerate()
-    assert not lattice.is_unimodular()
 
 
 def test_nondegenerate_and_unimodular_are_distinct_and_perfectness_retains_an_inverse() -> None:

@@ -276,22 +276,33 @@ def _algebraic_correlation_morphism(metric, *, injective=False):
 
             return correlation_from_generator_images(finite_generator_image)
         case False:
-            from sage_extensions.categories.modules.framed.formed.form_modules import (
-                _as_module_element,
+            from sage_extensions.categories.modules.pure.modules import (
+                Modules as ModuleCategory,
             )
+            from sage_extensions.categories.sets.indexed_families import IndexedFamily
+
+            construction = metric._dual_product_construction()
+            assert construction is not None and dual is construction.object(), (
+                f"the algebraic dual of {metric} over the infinite basis {source_labels} must be the "
+                f"product of one copy of {ring} per basis label, but it is {dual}"
+            )
+            factor = ring.regular_module()
 
             def infinite_generator_image(source_label):
+                # ``b(v,-)`` on the basis: one component per basis label, read
+                # through the product's projections rather than a basis the
+                # product does not have.
                 source_generator = metric.module_generator(source_label)
-                return dual(
-                    lambda target_label: _as_module_element(
-                        ring,
-                        ring,
+                components = IndexedFamily(
+                    source_labels,
+                    lambda target_label: factor(
                         metric.b(
                             source_generator,
                             metric.module_generator(source_labels(target_label)),
                         )
-                    )
+                    ),
                 )
+                return ModuleCategory(ring).product_element(construction, components)
 
             return correlation_from_generator_images(infinite_generator_image)
 

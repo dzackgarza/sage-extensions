@@ -710,6 +710,31 @@ class Modules(OwnedCategoryOverBaseRing):
             r"""Return $\prod_{i \in I} M_i$, created on underlying sets in general."""
             return self._categorical_product_construction(factors).object()
 
+        def _module_product_diagram_data(self, construction):
+            r"""Return ``(index_set, factor, index_object)`` for a module product.
+
+            A product's factors are read from its diagram.  The discrete diagram
+            of an enumerated family and the constant diagram of one repeated
+            factor present the same index set, and each factor is the diagram's
+            value at that index, so element assembly and projection have one
+            implementation for both.
+            """
+            diagram = construction.diagram()
+            match diagram.codomain() is self:
+                case True:
+                    pass
+                case False:
+                    raise ValueError(
+                        f"the product {construction.object()} is a limit in {diagram.codomain()}, not in {self}"
+                    )
+            index_category = diagram.domain()
+            index_set = index_category.object_set()
+
+            def index_object(index):
+                return index_category.object(index)
+
+            return index_set, lambda index: diagram(index_object(index)), index_object
+
         def product_element(self, construction, components):
             r"""Return the element of a selected module product with these components.
 
@@ -720,30 +745,25 @@ class Modules(OwnedCategoryOverBaseRing):
             operation at the module owner, not a representation choice for
             callers.
             """
-            diagram = construction.diagram()
-            match diagram.codomain() is self:
+            index_set, factor, index_object = self._module_product_diagram_data(
+                construction
+            )
+            match components.index_set() == index_set:
                 case True:
                     pass
                 case False:
                     raise ValueError(
-                        f"the product {construction.object()} is a limit in {diagram.codomain()}, not in {self}"
-                    )
-            factors = diagram.diagram_objects()
-            match components.index_set() == factors.index_set():
-                case True:
-                    pass
-                case False:
-                    raise ValueError(
-                        f"an element of the product of {factors} needs one component for each factor, "
-                        f"but the components are indexed by {components.index_set()}"
+                        f"an element of the product {construction.object()} needs one component for each "
+                        f"factor, but the components are indexed by {components.index_set()}, not by "
+                        f"{index_set}"
                     )
             product = construction.object()
             match product:
                 case _ if product in BiproductModules(self.base_ring()):
                     value = product.zero()
-                    for index in factors.index_set():
-                        value += product.injection(index)(
-                            factors.value(index)(components.value(index))
+                    for index in index_set:
+                        value += product.injection(index_object(index))(
+                            factor(index)(components.value(index))
                         )
                     return value
                 case _:
@@ -758,21 +778,14 @@ class Modules(OwnedCategoryOverBaseRing):
                     underlying = product.underlying_set()
                     return product(
                         underlying(
-                            lambda index: factors.value(index)(components.value(index))
+                            lambda index: factor(index)(components.value(index))
                         )
                     )
 
         def product_component(self, construction, element, index):
             r"""Project an element of a selected module product to one factor."""
-            diagram = construction.diagram()
-            match diagram.codomain() is self:
-                case True:
-                    pass
-                case False:
-                    raise ValueError(
-                        f"the product {construction.object()} is a limit in {diagram.codomain()}, not in {self}"
-                    )
-            return construction.structure_morphism(diagram.domain()(index))(element)
+            _, _, index_object = self._module_product_diagram_data(construction)
+            return construction.structure_morphism(index_object(index))(element)
 
         def equalizer_element(self, construction, ambient_element):
             r"""Lift an ambient element satisfying a selected equalizer relation."""
@@ -2728,6 +2741,66 @@ class Modules(OwnedCategoryOverBaseRing):
             underlying = self._underlying_additive_element(element)
             return self(self.scalar_action()(self.base_ring()(scalar))(underlying))
 
+        @cached_method
+        def _dual_product_construction(self):
+            r"""Return the product ``prod_S R`` that is ``Hom_R(R^(S), R)``, or ``None``.
+
+            For an infinite chosen basis ``S`` the algebraic dual of ``R^(S)`` is
+            the product of one copy of ``R`` for each basis label, given by its
+            projections and its universal property; it has no basis, so it is
+            retained as that construction rather than as a free module on the
+            labels.  A finite basis needs no product: there the dual is the
+            free module of the same rank.
+            """
+            if not self.has_selected_module_resolution():
+                return None
+            ring = self.base_ring()
+            if ring not in OwnedRings().Commutative():
+                return None
+            labels = self.module_generating_set()
+            if labels.cardinality().is_finite():
+                return None
+            from sage_extensions.categories.sets.indexed_families import (
+                IndexedFamily,
+            )
+
+            factors = IndexedFamily(labels, ring.regular_module())
+            return Modules(ring)._categorical_product_construction(factors)
+
+        def dual_evaluation(self, functional, vector):
+            r"""Return the pairing ``M^* x M -> R`` evaluated at ``vector``.
+
+            A vector is a finitely supported function on the chosen basis
+            labels, so its value under the functional is the finite sum of its
+            coefficients against the functional's projections.  No basis of the
+            dual is chosen: for an infinite basis the dual is the product, whose
+            projections are its defining data.
+            """
+            ring = self.base_ring()
+            construction = self._dual_product_construction()
+            if construction is None:
+                raise TypeError(
+                    f"cannot evaluate {functional} at {vector}: the algebraic dual of {self} is not a "
+                    f"product (its chosen basis is finite or it has none)"
+                )
+            to_ring = ring.regular_module_isomorphism()
+            coordinates = self.framing_morphism().lift(self(vector))
+            coefficients = coordinates.parent()._selected_module_coefficients(
+                coordinates
+            )
+            return sum(
+                (
+                    ring(coefficient)
+                    * to_ring(
+                        Modules(ring).product_component(
+                            construction, functional, label
+                        )
+                    )
+                    for label, coefficient in coefficients.items()
+                ),
+                ring.zero(),
+            )
+
         def dual_module(self):
             r"""Return the linear dual ``Hom_R(M, R)`` over a commutative ring.
 
@@ -2744,7 +2817,12 @@ class Modules(OwnedCategoryOverBaseRing):
                     f"the dual module Hom_R({self}, R) is a left module only over a commutative ring, "
                     f"and R = {ring} is not known to be commutative"
                 )
-            return self.module_category().Mor(self, ring.regular_module())
+            construction = self._dual_product_construction()
+            match construction:
+                case None:
+                    return self.module_category().Mor(self, ring.regular_module())
+                case _:
+                    return construction.object()
 
         @cached_method
         def projectivization(self):
