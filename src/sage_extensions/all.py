@@ -227,6 +227,10 @@ from sage_extensions.categories.modules.hodge_structures import (  # noqa: F401
     MixedHodgeStructures,
     PolarizedHodgeStructures,
 )
+from sage_extensions.categories.modules.framed.formed.form_modules import (  # noqa: F401
+    BilinearFormModules,
+    FormModules,
+)
 from sage_extensions.categories.modules.pure.modules import (  # noqa: F401
     MatrixEndomorphismSpaces,
     MatrixSpaces,

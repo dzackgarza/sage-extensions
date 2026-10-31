@@ -66,15 +66,26 @@ def _E8g():
     return NamedLattices.E8.gram_tensor()
 
 
+# The owned E8 Cartan construction numbers its chain from the opposite end of
+# Sage's ``IntegralLattice('E8')`` basis: position ``i`` of the Sage order is
+# position ``_SAGE_E8_BASIS_ORDER[i]`` of the owned order.
+_SAGE_E8_BASIS_ORDER = (0, 7, 1, 2, 3, 4, 5, 6)
+# The inverse: the position a named generator of an owned-order E8 block takes
+# in a block named in Sage's order.
+_SAGE_E8_POSITION = tuple(
+    _SAGE_E8_BASIS_ORDER.index(owned) for owned in range(len(_SAGE_E8_BASIS_ORDER))
+)
+
+
 def _E8g_sage_basis_order():
     r"""Return the E8 Gram tensor in Sage's integral-lattice basis order.
 
-    The owned E8 Cartan construction numbers its chain from the opposite end
-    of Sage's ``IntegralLattice('E8')`` basis.  The permutation below changes
-    only the basis order, not the isometry class or the form.
+    The permutation below changes only the basis order, not the isometry class
+    or the form, so a map between a lattice named in Sage's order and one named
+    in the owned order is the same permutation on its E8 coordinates.
     """
     gram = _E8g()
-    order = (0, 7, 1, 2, 3, 4, 5, 6)
+    order = _SAGE_E8_BASIS_ORDER
     return tensor(ZZ, (), (8, 8), [[gram[i, j] for j in order] for i in order])
 
 
@@ -1088,8 +1099,19 @@ class Involutions:
 class Embeddings:
     @lazy_class_attribute
     def E8_2_into_TdP(cls):
+        r"""``E8(2) -> 2U + 2E8``, matching the owned E8 basis to TdP's sage-order blocks.
+
+        ``TdP`` names its E8 blocks in Sage's integral-lattice basis order and
+        ``E8_2`` uses the owned Cartan order, so the images follow the order
+        change; without it adjacent named roots would not stay adjacent.
+        """
         tdp = _generators(NamedLattices.TdP)
-        return NamedLattices.E8_2.Emb(NamedLattices.TdP)(tuple(tdp[4 + index] + tdp[12 + index] for index in range(8)))
+        return NamedLattices.E8_2.Emb(NamedLattices.TdP)(
+            tuple(
+                tdp[4 + _SAGE_E8_POSITION[index]] + tdp[12 + _SAGE_E8_POSITION[index]]
+                for index in range(8)
+            )
+        )
 
     @lazy_class_attribute
     def TCo_into_TEn(cls):
@@ -1111,15 +1133,24 @@ class Embeddings:
 
     @lazy_class_attribute
     def TdP_into_LK3(cls):
+        r"""The inclusion ``2U + 2E8 -> 3U + 2E8`` with the named E8 bases matched.
+
+        ``TdP`` names its E8 blocks in Sage's integral-lattice basis order and
+        ``LK3`` names them in the owned Cartan order, so the images of
+        ``a1..a8`` and ``b1..b8`` follow the order change; keeping the positions
+        would send adjacent named roots to non-adjacent ones and break
+        form preservation.
+        """
         lk3 = _generators(NamedLattices.LK3)
+        order = _SAGE_E8_BASIS_ORDER
         return NamedLattices.TdP.Emb(NamedLattices.LK3)(
             (
                 lk3[0],
                 lk3[1],
                 lk3[2] - lk3[4],
                 lk3[3] - lk3[5],
-                *lk3[6:14],
-                *(-generator for generator in lk3[14:22]),
+                *(lk3[6 + order[index]] for index in range(8)),
+                *(-lk3[14 + order[index]] for index in range(8)),
             )
         )
 
