@@ -305,27 +305,53 @@ def _algebraic_correlation_morphism(metric, *, injective=False):
                 return ModuleCategory(ring).product_element(construction, components)
 
             correlation = correlation_from_generator_images(infinite_generator_image)
-            # Every generator image above is a coordinate functional e_s^*, whose
-            # support is the singleton {s}; a finite linear combination of them is
-            # therefore supported on a finite set of indices.  The product's
-            # constant family with a nonzero component has that component at
-            # every index, and the index set is infinite, so it is not such a
-            # combination.  Retain it as the witness rather than inventing a
-            # cokernel for morphisms between these two modules.
-            nonzero = ring.one()
-            match (nonzero == ring.zero()) is False:
-                case True:
-                    witness = ModuleCategory(ring).product_element(
-                        construction,
-                        IndexedFamily(
-                            source_labels, lambda _label: factor(nonzero)
-                        ),
-                    )
-                    correlation._preamble_non_surjectivity_witness = witness
-                    correlation._surjectivity_premise = False
-                case _:
-                    pass
+            _attach_diagonal_correlation_witness(metric, correlation, construction)
             return correlation
+
+
+def _attach_diagonal_correlation_witness(metric, correlation, construction):
+    r"""Retain the non-image witness for a correlation whose rows are singletons.
+
+    The correlation sends the basis vector ``e_s`` to the functional
+    ``b(e_s, -)``, whose value at ``t`` is the Gram entry ``b(e_s, e_t)``.  Its
+    image therefore consists of finite linear combinations of the rows, so it is
+    contained in the finitely supported product elements exactly when each row
+    is finitely supported.  That premise is a fact about the form's construction,
+    not about the index set: a diagonal Gram ``b(e_i, e_j) = delta_ij d_i``
+    states it, because every row is supported on its own index.  A form given
+    only by an evaluation, such as the symmetric ``b(e_i, e_j) = 1`` for every
+    pair, has infinite rows, and then the constant family *is* an image and this
+    refutation would be false.
+
+    So the witness is attached only for a retained diagonal Gram, with a
+    nonzero ring and an infinite basis.  Otherwise nothing is retained and
+    surjectivity stays undecided rather than wrongly refuted.
+    """
+    from sage_extensions.categories._lattice import _DiagonalGram
+    from sage_extensions.categories.modules.pure.modules import Modules
+    from sage_extensions.categories.sets.indexed_families import IndexedFamily
+
+    ring = metric.base_ring()
+    labels = metric.module_generating_set()
+    if labels.cardinality().is_finite() is not False:
+        return
+    try:
+        gram = metric.gram_tensor()
+    except (TypeError, ValueError, NotImplementedError):
+        return
+    if not isinstance(gram, _DiagonalGram):
+        return
+    nonzero = ring.one()
+    if (nonzero == ring.zero()) is not False:
+        return
+    factor = ring.regular_module()
+    if (factor(nonzero) == factor(ring.zero())) is not False:
+        return
+    witness = Modules(ring).product_element(
+        construction, IndexedFamily(labels, lambda _label: factor(nonzero))
+    )
+    correlation._preamble_non_surjectivity_witness = witness
+    correlation._surjectivity_premise = False
 
 
 def _correlation_isomorphism(metric):

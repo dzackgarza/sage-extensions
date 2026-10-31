@@ -1660,18 +1660,6 @@ class Modules(OwnedCategoryOverBaseRing):
         def module_category(self):
             return Modules(self.base_ring())
 
-        def _module_base_ring(self):
-            r"""Return the ring of the module structure this object is read in.
-
-            A ring read as a module over itself states that structure as
-            constructor data (``_preamble_regular_module_base``): ``QQ`` is a
-            ``QQ``-module and a ``ZZ``-algebra at once, and the ring of scalars
-            of that module is ``QQ``.  Every other module answers the ring its
-            construction was over.
-            """
-            regular = vars(self).get("_preamble_regular_module_base")
-            return self.base_ring() if regular is None else regular
-
         def has_selected_module_resolution(self) -> bool:
             return self.has_selected_resolution(self.module_category())
 
@@ -5037,6 +5025,18 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
             return extension._underlying_additive_element(element.underlying_element())
 
         @cached_method
+        def scalar_action(self):
+            r"""Return ``rho_M = rho_S compose f``: the restricted scalars' own action.
+
+            The generic module action would rebuild ``rho`` from this module's
+            coordinates over its base ring; here the defining datum is the
+            retained scalar map together with the extension module's action, and
+            the elements are the extension's elements.  Reusing those keeps the
+            extension's arithmetic (a field's, for ``Res_{ZZ -> QQ}(QQ)``) rather
+            than re-deriving it from ``ZZ``-coordinates.
+            """
+            return self._ring_morphism_defining_module_action()
+
         def _ring_morphism_defining_module_action(self):
             r"""Return ``rho_M compose f`` with this module's exact endomorphism parent.
 
@@ -5056,10 +5056,18 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
                 .End(self.underlying_additive_group())
             )
             ring_map = self.ring_map()
+            if extension_action.domain() is ring:
+                # The extension's own action already acts by this base ring, on
+                # this same underlying additive group: the restricted action *is*
+                # that action.  Nothing is rebuilt from coordinates, so the
+                # extension's arithmetic (a field's, here) is the arithmetic of
+                # the restricted module.
+                return extension_action
+            # Otherwise the extension is a module over a different ring and the
+            # action is its action at the image of the scalar, re-expressed in
+            # this module's exact endomorphism parent.
             return ring.Mor(endomorphisms, category=OwnedRings())(
-                lambda scalar: endomorphisms.elementwise(
-                    lambda element: extension_action(ring_map(scalar))(element)
-                ),
+                lambda scalar: endomorphisms(extension_action(ring_map(scalar))),
             )
 
         def scalar_multiple(self, scalar, element):
@@ -5325,14 +5333,23 @@ def _restricted_scalars_view(
     already represented dimension is multiplied by that basis cardinality.
     This dimension transport does not require or create a finite frame of M.
     """
-    # The module's scalar ring is the ring of the module structure it is read
-    # in; for a ring read as a module over itself that is the ring, not the
-    # ring's coefficient base.
-    extension_ring = _owned_ring(Modules.ParentMethods._module_base_ring(module))
-    assert _owned_ring(ring_map.codomain()) is extension_ring, (
-        f"{module} cannot be restricted along {ring_map}: the ring morphism must end at the scalar ring "
-        f"{extension_ring} of the module, but its codomain is {ring_map.codomain()}"
-    )
+    extension_ring = _owned_ring(module.base_ring())
+    if _owned_ring(ring_map.codomain()) is not extension_ring:
+        # A ring read as a module over ``R`` along its own structure map has
+        # that ring as its extension: ``Res_f(S)`` where ``f`` is the
+        # structure morphism of the ``R``-algebra ``S`` is ``S`` over ``R``.
+        # No other endpoint is admitted, and the coefficient base of ``S`` is
+        # not changed by reading it this way.
+        assert (
+            module in OwnedRings()
+            and _owned_ring(ring_map.codomain()) is module
+            and ring_map is module.algebra_structure_morphism()
+        ), (
+            f"{module} cannot be restricted along {ring_map}: the ring morphism must end at the scalar "
+            f"ring {extension_ring} of the module, or the module must be a ring restricted along its "
+            f"own structure morphism, but its codomain is {ring_map.codomain()}"
+        )
+        extension_ring = _owned_ring(module)
     from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
         _SelectedFinitePresentationModules,
     )

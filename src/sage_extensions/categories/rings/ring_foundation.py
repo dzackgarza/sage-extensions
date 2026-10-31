@@ -6647,12 +6647,12 @@ def _install_self_module_placement(ring) -> None:
     r"""Place ``ring`` among the objects of ``Modules(ring)``.
 
     A ring is a module over itself: its elements are the ring's elements and the
-    scalar action is the ring's multiplication. The coefficient module the ring
-    constructor already installed is a different structure, over the
-    coefficient base, and is untouched here. Only membership is stated, which is
-    what a construction asks when it reads a ring as the object of a module
-    category; the framing, the resolution and the action are read through the
-    module owner's own accessors.
+    scalar action is the ring's multiplication.  The coefficient module the ring
+    constructor already installed is a different structure, over the coefficient
+    base, and is untouched.  Only membership is stated here — which is what a
+    construction asks when it accepts a ring as the codomain of a module
+    morphism — and the ring's presentation, string form and hashing are
+    unchanged.
     """
     from sage_extensions.categories.modules.pure.modules import Modules
     from sage_extensions.refine import refine
@@ -6660,9 +6660,6 @@ def _install_self_module_placement(ring) -> None:
     placement = Modules(ring)
     if ring in placement:
         return
-    # The ring states that its self-module structure is the one this placement
-    # admits; the module owner reads it through `_module_base_ring`.
-    ring._preamble_regular_module_base = ring
     refine(ring, placement)
 
 
