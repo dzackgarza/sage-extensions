@@ -364,6 +364,21 @@ class Modules(OwnedCategoryOverBaseRing):
                 f"{datum} already determines its scalar action, so the separate scalar action {scalar_action} is not accepted"
             )
             return datum.construct(self)
+        from sage.rings.integer import Integer as SageInteger
+        from sage.structure.element import parent as _element_parent
+        from sage_extensions.categories.rings.ring_foundation import _owned_integers
+
+        integer_like = (
+            not isinstance(datum, bool)
+            and (
+                isinstance(datum, (int, SageInteger))
+                or _element_parent(datum) is _owned_integers()
+            )
+        )
+        if scalar_action is None and integer_like and int(datum) >= 0:
+            # ``Modules(R)(n)`` is the standard free module of rank ``n`` over
+            # ``R``, as ``Lattices(R)(n)`` is the standard lattice of that rank.
+            return self.base_ring().free_module(int(datum))
         if scalar_action is None:
             scalar_action = datum
             module = scalar_action.codomain().domain()
