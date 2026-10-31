@@ -913,6 +913,7 @@ class LatticeIsometryMethods:
                     lambda label: images.inverse()(codomain.module_generator(label))
                 )
             )
+            self._initialize_formed_module_arrow(parent, forward)
             super().__init__(parent, forward, inverse_computation)
             return
         self._underlying_module_isomorphism = None
@@ -945,7 +946,25 @@ class LatticeIsometryMethods:
                     lambda label: forward.lift(codomain.module_generator(label))
                 )
         self._isometry_inverse_computation = inverse_computation
+        self._initialize_formed_module_arrow(parent, forward)
         super().__init__(parent, forward, inverse_computation)
+
+    def _initialize_formed_module_arrow(self, parent, forward) -> None:
+        r"""Initialize this isometry as the formed-module arrow it is.
+
+        An isometry of lattices is a lattice morphism, so it carries the datum
+        :class:`FormedModuleMorphism` defines: the retained module component,
+        the value-object component and the element evaluation.  This class
+        enters through the isomorphism contract, whose own initializer stores
+        only the forward/inverse pair, so that half would otherwise be left
+        unset while the class is placed in ``ModuleMorphismMethods`` by
+        inheritance (``OWN-22``).
+
+        The module component is the one already retained by the caller: the
+        module Mor constructor returns an arrow of its own parent unchanged,
+        so nothing is rebuilt and no defining data is re-checked here.
+        """
+        LatticeMorphismMethods.__init__(self, parent, forward)
 
     def is_surjective(self) -> bool:
         r"""True: membership in the isometry Mor states it (``OWN-22``)."""
@@ -1470,11 +1489,20 @@ class LatticeIsometryMethods:
         return not self == other
 
     def __hash__(self) -> int:
+        r"""Hash the selected endpoints and the coordinate tensor.
+
+        The tensor's own designated cache key supplies a hashable key when
+        its scalars are unhashable owned elements (``Tensor._cache_key``).
+        An isometry that raises here is not merely unhashable: Sage's
+        ``cached_method`` then keys on the ``repr``, and every lattice
+        isometry between fixed endpoints has the same repr, so the first
+        computed value would be returned for every argument.
+        """
         return hash(
             (
                 id(self.domain()),
                 id(self.codomain()),
-                self._coordinate_tensor(),
+                self._coordinate_tensor()._cache_key(),
             )
         )
 

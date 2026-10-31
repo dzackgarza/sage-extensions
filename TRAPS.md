@@ -807,3 +807,29 @@ in expression starting at /repos/sage-julia-bridge/src/sage_julia_bridge/julia_b
 That is a false missing-package error: nothing is missing from the image. Checked in the shared image on 2026-10-31 by running the same probe with and without the variable.
 
 Route chosen here: the launcher passes the image's environment through to every Sage/Julia subprocess, `JULIA_DEPOT_PATH=/root/.julia:/opt/julia-depot:` (the writable user depot first, then the image depot) with `JULIA_CPU_TARGET=generic`, and creates the guest's `/root/.julia` once. Then `julia("1+1")` is `2`, `using Oscar; 2+2` is `4`, and the Oscar-backed lattice consumer answers (`E8.is_isometric_to(E8)` is `True`). No Julia package is installed by this project; a missing package is the image's to provision.
+
+### A lattice isometry built by a public homset had no formed-module datum, and its hash fell back to the repr
+
+Both halves are the same shape: an arrow placed in a class by inheritance while the initializer that defines that class's state never ran (``sage-extensions#5``).
+
+`LatticeIsometryMethods.__init__` hands its retained forward/inverse pair to `CategoricalIsomorphism.__init__` through `super()`. Since `LatticeEmbeddingMethods` defines no `__init__`, that is the very next initializer in the linearization, so `LatticeMorphismMethods.__init__` and `FormedModuleMorphism.__init__` never run. The arrow is then a `ModuleMorphismMethods` by placement and has none of its state:
+
+```python
+L = Lattices(ZZ)([[0, 1], [1, 0]])
+images = tuple(L.module_generators())
+L.Isom(L)(images).module_morphism()
+# AttributeError: 'OwnedLatticeIsometryMor...ArrowType' object has no attribute '_form_module_morphism'
+```
+
+The same object lacks `_element_function`, so `ModuleMorphism.__mul__`'s identity question raised on every composition of a module morphism with an isometry, e.g. the `prescribed = ... * self` line of `witt_extension_locus`. Fixed at the constructor: `_initialize_formed_module_arrow` runs `LatticeMorphismMethods.__init__` on the already retained module map (the module Mor constructor returns an arrow of its own parent unchanged, so nothing is rebuilt), and the isomorphism contract is built afterwards from the same map.
+
+The hash failure is worse than an error. `LatticeIsometryMethods.__hash__` hashed `self._coordinate_tensor()`, whose `_tensor_hash` hashes components that are owned module elements without `__hash__`, so `hash(isometry)` raised `TypeError: unhashable type: 'OwnedJoinCategory.element_class'`. Sage's `cached_method` then keys the call on the argument's `repr`, and every lattice isometry between fixed endpoints has the same `repr`:
+
+```python
+group = V.O().subgroup((exchange, transvection, reflection))   # three distinct isometries
+group.selected_group_resolution().augmentation()(free_generator_i)  # the first element, for every i
+```
+
+The first computed value is returned for every later argument, silently. It surfaced in the migrated port as `assert 2 == 48` in `test_isotropic_plane_and_flag_automorphism_generators_preserve_their_marks` — the plane-stabilizer generators had all collapsed onto the summand swap — and as `test_vector_stabilizer_has_oscars_order` returning the identity matrix alone. `__hash__` now uses the coordinate tensor's own designated `_cache_key`, which the tensor owner already provides for unhashable scalars. Equal isometries with distinct component objects therefore key distinct cache entries; correctness is restored, sharing is not.
+
+Rule: a class placed in a category by inheritance must run that category's initializer, and a method that takes library arrows must have a working `hash` or the cache it is keyed on is silently wrong. `tests/lattices/test_isometry_arrow_state.sage` states both, and fails at `ce855c6` on all three cases.
