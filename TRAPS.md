@@ -777,3 +777,20 @@ Two claims about the *infinite-rank rational* dual remain open, and both are con
 **Settled, 2026-10-31: the metric dual's value module is the restricted regular module.**
 `CONTRIBUTING.md:5613` (owner ruling 2026-10-16) requires identifying an algebra with its restricted regular module by a *morphism*, never by collapsing scalar structures through `base_ring`; commit `17a8390` selects restricted regular-module values deliberately, and issue #1 and `Lattices.dual_lattice` (`lattices.py:5450`-`5523`) agree. `RestrictedScalarsModules.regular_module_identification()` returns the actual Mor `Res_f(S^1) -> S`; it is not Python identity and does not make `Res_f(S^1)` be `S`.
 There is therefore no contract conflict to arbitrate. `tests/lattices/test_catalogue.sage::test_tdp_metric_dual_is_the_formed_linear_dual` was reconciled through that identification: it now asserts the value module *is* `Res_{ZZ->QQ}(QQ.regular_module())`, that the identification's domain is that module and its codomain is `QQ`, and it keeps every scalar-action, pairing, coefficient-base, inverse-Gram and correlation equation, exactly as `test_the_dolgachev_pinkham_dual_lattice_retains_its_metric_form` requires. The earlier text here (that the two catalogue requirements conflicted, and that the resolution was to make the restriction *be* the ring) was wrong and is withdrawn.
+
+### The named-coinvariant consumer is blocked by the port's pre-move imports, and the pair must be republished together
+
+`LatticeIsom.an_element` (`lattice_morphisms.py:4199`) routes indefinite isometry searches through `sage_indefinite_port.indefinite.marked_lattices`, which imports the pre-move research preamble:
+
+```text
+sage_indefinite_port/indefinite/marked_lattices.py:18  from dzack_research.preamble.all import ZZ, Cat, Lattices
+sage_indefinite_port/indefinite/marked_lattices.py:19  from dzack_research.preamble.categories.abstract_categories.arrow_categories import CosliceCategory
+sage_indefinite_port/indefinite/marked_lattices.py:20  from dzack_research.preamble.categories.abstract_categories.products import FiniteOrdinalCategory
+sage_indefinite_port/indefinite/marked_lattices.py:21  from dzack_research.preamble.categories.lattice_morphisms import LatticeIsometryMethods
+```
+
+Those modules do not exist: the preamble lives in `sage_extensions`. The shared image carries the port at `86d860a`, where eight modules import `dzack_research` (`indefinite/edgewalk.py`, `edgewalk_extensions.py`, `eichler.py`, `isotropic_induction.py`, `lorentzian_cells.py`, `marked_lattices.py`, `recursive.py`, `invariants.py`); the maintainers report ten at current port main, so updating the embedded checkout alone does not repair the consumer.
+
+The port's existing acceptance pair pins the old research `064cd6e8`, which cannot be the permanent dependency of current `sage-extensions` without putting two library identities in one process. So this is not a defect of either repository's source at its own revision: it is a dependency-pair mismatch.
+
+Consequence here: `tests/lattices/test_catalogue.sage::test_named_invariant_and_formed_coinvariant_lattices_are_exact` cannot run its isometry witness and fails at the import, not on a lattice computation. It stays explicitly open until the port publishes a coherent pair — its imports and contracts migrated to canonical `sage_extensions`, with the minimal `LatticeIsom.an_element`/named-coinvariant consumer and the bounded port acceptance green against it. Do not install the old research provider beside this library and do not patch the port from here.
