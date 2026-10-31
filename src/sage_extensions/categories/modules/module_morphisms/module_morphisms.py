@@ -311,6 +311,7 @@ class ModuleMorphismMethods:
     _linearity_premises = None
     _projective_section_restriction_data = None
     _surjectivity_premise = None
+    _injectivity_premise = None
 
     def _initialize_lower_arrow(self, parent) -> None:
         domain = parent.domain()
@@ -1609,7 +1610,15 @@ class ModuleMorphismMethods:
         return preimage
 
     def is_injective(self) -> bool:
-        r"""Return whether ``ker(self)=0`` when the kernel is computable."""
+        r"""Return whether ``ker(self)=0`` when the kernel is computable.
+
+        A construction that establishes injectivity retains it as
+        ``_injectivity_premise`` on the arrow, which is then read here without a
+        kernel computation; the arrow keeps the one linear Hom parent.
+        """
+        premise = vars(self).get("_injectivity_premise")
+        if premise is not None:
+            return premise
         self._require_established_linearity("injectivity")
         return self.kernel().is_zero()
 

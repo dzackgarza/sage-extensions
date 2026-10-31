@@ -1796,9 +1796,26 @@ class FormModules(OwnedCategoryOverBaseRing):
             )
 
         def algebraic_correlation_morphism(self):
-            r"""Return ``b^flat : M -> Hom_R(M,R)`` for this scalar-valued polar pairing."""
-            injective = self in FormModules(self.base_ring()).Nondegenerate()
-            return _algebraic_correlation_morphism(self, injective=injective)
+            r"""Return ``b^flat : M -> Hom_R(M,R)`` for this scalar-valued polar pairing.
+
+            The result is the linear arrow ``M -> M^*``, so it sits in one Mor
+            parent whatever the form's properties are and can be compared with
+            any other arrow between those endpoints — for instance the metric
+            correlation composed with the value identification
+            ``L^# -> L^*``.  That a nondegenerate form makes this arrow
+            injective is decided by ``is_injective()``; the perfect case has its
+            own isomorphism accessor, ``correlation_isomorphism()``.
+            """
+            correlation = _algebraic_correlation_morphism(self, injective=False)
+            match self in FormModules(self.base_ring()).Nondegenerate():
+                case True:
+                    # A nondegenerate form has zero radical, so this arrow is
+                    # injective by construction.  The arrow keeps the linear Hom
+                    # parent and states the injectivity for is_injective().
+                    correlation._injectivity_premise = True
+                case _:
+                    pass
+            return correlation
 
         def is_unimodular(self):
             r"""Whether the polar correlation is an isomorphism.

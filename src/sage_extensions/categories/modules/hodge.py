@@ -374,7 +374,9 @@ def _correlation_isomorphism(metric):
             assert False, (
                 f"the selected correlation-inverse computation cannot decide whether the scalar pairing on {metric} is perfect"
             )
-    forward = metric.algebraic_correlation_morphism()
+    # The perfect correlation is an embedding: build it as one, since the
+    # public correlation is the plain linear arrow.
+    forward = _algebraic_correlation_morphism(metric, injective=True)
     dual = forward.codomain()
     inverse = dual.module_category().Mor(dual, metric)(
         {
