@@ -3981,7 +3981,19 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
 
             @cached_method
             def radical(self):
-                r"""Return the left radical ``ker(M -> Hom_R(M,W))``."""
+                r"""Return the left radical ``ker(M -> Hom_R(M,W))``.
+
+                For an integral lattice the radical is the lattice owner's: the
+                orthogonal complement of the identity morphism, which is the
+                subobject ``{x : b(x, L) = 0}`` with its lattice embedding.  The
+                generic left radical is the formed module's kernel and does not
+                carry that presentation.
+                """
+                from sage_extensions.categories.lattices import Lattices
+
+                ring = self.base_ring()
+                if self in Lattices(ring) and _engine_ring(ring) is SageZZ:
+                    return self.identity_morphism().orthogonal_complement()
                 return self.left_radical()
 
             @cached_method
@@ -3995,6 +4007,25 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                 basis of that quotient, so the returned module need not be the
                 literal cokernel object.
                 """
+                from sage_extensions.categories.lattices import (
+                    IsotropicReductions,
+                    Lattices,
+                )
+
+                ring = self.base_ring()
+                if self in Lattices(ring) and _engine_ring(ring) is SageZZ:
+                    # An integral lattice quotients by its radical at the lattice
+                    # owner: ``I^perp/I`` is again a lattice over the same ring,
+                    # with the isotropic reduction's inclusion, orthogonal
+                    # complement, ``quotient_lattice`` and parabolic data.  The
+                    # generic descent below is for formed modules that are not
+                    # lattices; over a field it re-presents the quotient on a
+                    # basis, which is the field's intended behaviour.
+                    # The public ingress, in the lattice owner's own words:
+                    # ``IsotropicReductions(R)(L.radical().inclusion())``.
+                    return IsotropicReductions(ring)(
+                        self.identity_morphism().orthogonal_complement().inclusion()
+                    )
                 radical = self.left_radical().intersection(self.right_radical())
                 inclusion = radical.inclusion()
                 value_module = self.value_module()
