@@ -1160,15 +1160,19 @@ class Embeddings:
 
     @lazy_class_attribute
     def U_E8_2_into_TEn(cls):
+        r"""``U + E8(2) -> U + U(2) + E8(2)``, block for block and order-matched.
+
+        The source is the first hyperbolic plane together with an ``E8(2)``
+        block named in the owned Cartan order; the target has that block named
+        in Sage's integral-lattice order, so the images follow the order change.
+        The remaining ``U(2)`` summand of the target is not used.
+        """
         ten = _generators(NamedLattices.TEn)
         return NamedLattices.U_E8_2.Emb(NamedLattices.TEn)(
             (
-                ten[0] + ten[2] + ten[3] - ten[4],
-                ten[1] + ten[2] + ten[3] - ten[4],
-                ten[2] - ten[3],
-                ten[5],
-                ten[3] + ten[6],
-                *ten[7:12],
+                ten[0],
+                ten[1],
+                *(ten[4 + _SAGE_E8_POSITION[index]] for index in range(8)),
             )
         )
 

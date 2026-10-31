@@ -1672,6 +1672,63 @@ class Modules(OwnedCategoryOverBaseRing):
             """
             return Modules(self.base_ring()).Aut(self)
 
+        def _an_element_(self):
+            r"""Return an element of this module, as Sage's parent protocol asks."""
+            return self.zero()
+
+        def construction(self):
+            r"""Return this module's Sage-style construction, or ``None``.
+
+            The owned presentation carries no factorisation into an engine
+            functor and an engine parent: its construction datum is the retained
+            scalar action and the selected framing, and raising an engine parent
+            here would expose one.  ``None`` is Sage's "no chosen construction",
+            so a pushout that asks for one finds no common factor instead of an
+            engine parent.
+            """
+            return None
+
+        def base(self):
+            r"""Return the base of this module: its scalar ring.
+
+            The host ``Parent`` base is unset for modules whose scalar ring is
+            constructor data (``_preamble_base_ring``), and Sage's coercion
+            machinery reads ``base()`` when it builds a scalar action.  An
+            unset base there makes it attempt a parent pushout instead of the
+            scalar action this module already declares.
+            """
+            base = super().base()
+            return self.base_ring() if base is None else base
+
+        def _get_action_(self, source, op, self_on_left):
+            r"""Return this module's scalar action to the coercion machinery.
+
+            ``r * m`` and ``m * r`` are the module's scalar action for ``r`` in
+            the base ring, so the module states that action here.  Without it
+            Sage discovers no action and falls back to a parent pushout, which
+            asks the owned ring for a construction.  The right action is offered
+            only over a commutative ring, where both sides agree.
+            """
+            import operator
+
+            from sage.structure.coerce_actions import (
+                LeftModuleAction,
+                RightModuleAction,
+            )
+
+            ring = self.base_ring()
+            if op is not operator.mul or source is not ring:
+                return super()._get_action_(source, op, self_on_left)
+            match self_on_left:
+                case False:
+                    return LeftModuleAction(ring, self)
+                case True:
+                    match ring in OwnedRings().Commutative():
+                        case True:
+                            return RightModuleAction(ring, self)
+                        case _:
+                            return None
+
         def module_category(self):
             return Modules(self.base_ring())
 
