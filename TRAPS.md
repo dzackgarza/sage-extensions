@@ -794,3 +794,16 @@ Those modules do not exist: the preamble lives in `sage_extensions`. The shared 
 The port's existing acceptance pair pins the old research `064cd6e8`, which cannot be the permanent dependency of current `sage-extensions` without putting two library identities in one process. So this is not a defect of either repository's source at its own revision: it is a dependency-pair mismatch.
 
 Consequence here: `tests/lattices/test_catalogue.sage::test_named_invariant_and_formed_coinvariant_lattices_are_exact` cannot run its isometry witness and fails at the import, not on a lattice computation. It stays explicitly open until the port publishes a coherent pair — its imports and contracts migrated to canonical `sage_extensions`, with the minimal `LatticeIsom.an_element`/named-coinvariant consumer and the bounded port acceptance green against it. Do not install the old research provider beside this library and do not patch the port from here.
+
+### A raw rootfs launcher drops the image's Julia depot, and every Julia consumer then reports a missing package
+
+The shared image declares `JULIA_DEPOT_PATH=/opt/julia-depot:` and preinstalls JSON and Oscar there (`sage/docker/research-environment.Dockerfile`). A launcher that only sets `HOME`, `PATH` and `TMPDIR` leaves Julia with its default depot, so the bridge's own `import JSON` at `sage_julia_bridge/julia_bridge.jl:2` fails:
+
+```text
+ERROR: LoadError: ArgumentError: Package JSON [682c06a0-de6a-54ab-a142-c8b1cf79cde6] is required but does not seem to be installed:
+in expression starting at /repos/sage-julia-bridge/src/sage_julia_bridge/julia_bridge.jl:2
+```
+
+That is a false missing-package error: nothing is missing from the image. Checked in the shared image on 2026-10-31 by running the same probe with and without the variable.
+
+Route chosen here: the launcher passes the image's environment through to every Sage/Julia subprocess, `JULIA_DEPOT_PATH=/root/.julia:/opt/julia-depot:` (the writable user depot first, then the image depot) with `JULIA_CPU_TARGET=generic`, and creates the guest's `/root/.julia` once. Then `julia("1+1")` is `2`, `using Oscar; 2+2` is `4`, and the Oscar-backed lattice consumer answers (`E8.is_isometric_to(E8)` is `True`). No Julia package is installed by this project; a missing package is the image's to provision.
