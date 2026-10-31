@@ -3507,15 +3507,25 @@ class ModuleAutomorphismMethods:
 
     def __init__(self, parent, forward, inverse_computation) -> None:
         module = parent.domain()
-        self._inverse_computation = inverse_computation
+        # The automorphism stores its own inverse computation; the isomorphism
+        # contract below keeps the module inverse it produces.
+        self._automorphism_inverse_computation = inverse_computation
         self._forward_module_morphism = module.module_category().Mor(module, module)(forward)
-        super().__init__(parent, self._forward_module_morphism)
+        super().__init__(
+            parent,
+            self._forward_module_morphism,
+            lambda: module.module_category().Mor(module, module)(
+                self._automorphism_inverse_computation()
+            ),
+        )
 
     @cached_method
     def _inverse_morphism(self):
         r"""The inverse module map, computed once."""
         module = self.domain()
-        return module.module_category().Mor(module, module)(self._inverse_computation())
+        return module.module_category().Mor(module, module)(
+            self._automorphism_inverse_computation()
+        )
 
     def forward(self):
         return self._forward_module_morphism
