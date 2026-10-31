@@ -2074,23 +2074,30 @@ class FormModules(OwnedCategoryOverBaseRing):
                     f"the form on {self} pairs two of its elements, but {left} or {right} is not in {self}"
                 )
             form = self.form()
-            match _is_quadratic_form(form):
-                case False if form.codomain() in OwnedRings() and _has_finite_framing(
-                    self
-                ):
-                    # This module is constructed on the framing of the form's
-                    # module, so its coordinates are the Gram tensor's indices.
-                    framing = self.framing_morphism()
-                    values = form.codomain()
-                    return form.gram_tensor().contract(
-                        tensor.vector(values, tuple(framing.lift(left))),
-                        tensor.vector(values, tuple(framing.lift(right))),
-                    )
-                case is_quadratic:
-                    module = form.module()
-                    if module is not self:
-                        left, right = module(left), module(right)
-                    return form.b(left, right) if is_quadratic else form(left, right)
+            quadratic = _is_quadratic_form(form)
+            if (
+                quadratic is False
+                and form.codomain() in OwnedRings()
+                and _has_finite_framing(self)
+            ):
+                # This module is constructed on the framing of the form's
+                # module, so its coordinates are the Gram tensor's indices.
+                framing = self.framing_morphism()
+                values = form.codomain()
+                return form.gram_tensor().contract(
+                    tensor.vector(values, tuple(framing.lift(left))),
+                    tensor.vector(values, tuple(framing.lift(right))),
+                )
+            # An infinite framing has no coordinate vector for a Gram
+            # contraction, and a form valued in a module rather than in a ring
+            # has no Gram tensor at all.  The pairing is then the form itself
+            # on the pair, raised to the public value; a represented-module
+            # element is not the value the module's own category publishes.
+            module = form.module()
+            if module is not self:
+                left, right = module(left), module(right)
+            value = form.b(left, right) if quadratic is True else form(left, right)
+            return _value_from_module_element(self, value)
 
         def norm(self, element):
             r"""Return ``q(x)`` for a quadratic form, else ``b(x, x)``."""
@@ -2102,8 +2109,8 @@ class FormModules(OwnedCategoryOverBaseRing):
             if form.module() is not self:
                 element = self.unformed_module()(element)
             if _is_quadratic_form(form):
-                return form(element)
-            return form(element, element)
+                return _value_from_module_element(self, form(element))
+            return _value_from_module_element(self, form(element, element))
 
         def q(self, element):
             r"""Return the selected quadratic/norm value of ``element``."""
