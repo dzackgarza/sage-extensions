@@ -944,3 +944,21 @@ The placement is now applied at the construction that produces the field: `_frac
 **Correction, 2026-11-01.** An earlier report here said that the rerun of the frozen Enriques case "passed the 3.5-minute point where it previously died on `O_plus`". Elapsed time past the earlier stop is not evidence of that: the case was killed by its own 40-minute limit with no verdict and no output, and it says nothing about which call it was in. What establishes the repaired condition is the targeted regression `tests/rings/test_rational_field_placement.sage`, which drives `Lattices.O_plus` at the real place of `Frac(ZZ)` on the hyperbolic plane directly, in about a second, and fails at `d58660c` with the reported assertion. The consumer's own verdict is still outstanding, and until its log reaches that call or it returns, only that regression is evidence.
 
 The maximal elliptic family is now audited independently of itself as well: `tests/lattices/test_coxeter_maximal_subdiagram_audit.sage` enumerates every subset of four small fixtures, decides each induced subdiagram with the public `is_elliptic()`, derives the maximal family by inclusion, and compares it to the owner's query; it checks every survivor against every vertex it omits, and it pins that `max_rank` and `max_form_rank` are applied after maximality (the capped answer is the uncapped family filtered, at every threshold) and that the generic predicate receives every subset as labels.
+
+### A lattice display computed an index of inertia before deciding to show it
+
+Research issue 614, display clause only. `_lattice_latex` built its signature pair at the top and then chose the invariants line; for a base whose fraction field is not represented as ordered, that first line raised `AssertionError: the signature pair (p, q) needs a chosen ordering ...` (`_lattice.py`, `_ordered_fraction_field`) before the branch that would have omitted it. The display now computes the signature only when the fraction field is the rational field — the ordering the library represents — and otherwise shows rank, discriminant and the Gram matrix, inventing no ordering. `signature_pair()` itself still requires one, and the rational display is unchanged.
+
+Reproduction: the issue's specimen is cells 13, 16 and 20 of `computations/notebooks/lattices/integral-lattices/preamble-lattices.ipynb` — a rank-two lattice over `QuadraticField(2, "a")`, over its maximal order, and over `QuadraticField(-1, "i").maximal_order()`. Those three cells cannot run here: `QuadraticField(2, "a")` itself fails during construction, before any display, when its repr is hashed for a cache key —
+
+```text
+File ".../categories/rings/number_fields.py", line 344, in QuadraticField
+File ".../categories/rings/ring_foundation.py", line 5551, in __hash__
+File ".../categories/rings/ring_foundation.py", line 6059, in _repr_
+    f"{self.defining_polynomial()}"
+AttributeError: '_OwnedAlgebraParent_with_category' object has no attribute 'defining_polynomial'
+```
+
+— that is, `_preamble_is_number_field()` answers true for the algebra wrapper while the category that defines `defining_polynomial` is not in its placement. It is present unchanged at `d58660c`, so it is not a consequence of any change recorded here, and it is a different clause of the issue (a number-field construction/placement defect, not the display of a lattice), so it was not repaired here.
+
+The display clause was therefore reproduced on a lattice over `GF(5)`, whose fraction field is likewise not ordered, where it raised the identical assertion: `tests/lattices/test_lattice_display_without_ordering.sage` (3 cases; the display case fails at `d58660c` with the reported message, the ordering requirement and the rational display pass there unchanged). The three notebook cells remain blocked on the number-field defect above, not on the display.

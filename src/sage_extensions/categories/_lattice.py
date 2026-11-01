@@ -1555,22 +1555,29 @@ def _lattice_latex(lattice, ring_tex: str) -> str:
     r"""The archived lattice display: $L$ with its invariants, then $G_L$.
 
     The Gram tensor is the form of $L$, not $L$; $G_L$ typesets its components.
+
+    An index of inertia needs an ordering on the fraction field, and this
+    display does not invent one: the signature is computed and shown only when
+    the base field is the rational field, the one ordering the library
+    represents.  A lattice over a number field or a finite field therefore
+    displays its rank and discriminant, and :meth:`signature_pair` itself keeps
+    requiring a chosen ordering.
     """
     rank = lattice.module_rank()
     gram_latex = str(latex(lattice.gram_tensor()))
     gram_latex = re.sub(r"\b0\b", lambda _match: r"\cdot", gram_latex)
-    signature_field = _engine_ring(lattice.base_ring().fraction_field())
-    signature = _signature_pair_of_gram(lattice.gram_tensor())
+    rational_base = _engine_ring(lattice.base_ring().fraction_field()) is QQ
+    signature = _signature_pair_of_gram(lattice.gram_tensor()) if rational_base else None
 
     match cardinal(rank).is_finite():
         case False:
-            if signature_field is QQ and signature is not None:
+            if signature is not None:
                 pos, neg = signature.first(), signature.second()
                 invariants = f"L \\in \\mathrm{{Lattices}}({ring_tex}), \\quad \\mathrm{{rk}}(L) = {latex(rank)}, \\quad \\mathrm{{sig}}(L) = ({latex(pos)}, {neg}) \\\\"
             else:
                 invariants = f"L \\in \\mathrm{{Lattices}}({ring_tex}), \\quad \\mathrm{{rk}}(L) = {latex(rank)} \\\\"
         case True:
-            if signature_field is QQ:
+            if signature is not None:
                 pos, neg = signature.first(), signature.second()
                 disc_latex = _format_disc_latex(lattice.discriminant())
                 invariants = (
