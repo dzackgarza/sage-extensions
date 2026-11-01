@@ -826,17 +826,32 @@ class _CommutativeUnitalAlgebraParentMethods:
         return KahlerDifferentialModules(self)(self)
 
     def de_rham_algebra(self):
-        r"""Return the algebraic de Rham algebra ``Omega^*_{A/R}``."""
+        r"""Return the algebraic de Rham algebra ``Omega^*_{A/R}``.
+
+        ``R`` is the algebra's coefficient ring.  A polynomial quotient
+        ``R[x]/I`` states the cover as its base ring, so its coefficient ring
+        is read from the presentation it keeps.
+        """
         from sage_extensions.categories.algebras.de_rham_algebras import (
             DeRhamAlgebras,
         )
+        from sage_extensions.categories.algebras.derivations import (
+            _algebra_coefficient_ring,
+        )
 
-        return DeRhamAlgebras(self.base_ring())(self)
+        return DeRhamAlgebras(_algebra_coefficient_ring(self))(self)
 
     def de_rham_cohomology(self, degree):
         r"""``H^degree_dR(A/R)``, the image of this algebra under the de Rham cohomology functor."""
+        from sage_extensions.categories.algebras.derivations import (
+            _algebra_coefficient_ring,
+        )
+
         commutative_algebras = (
-            Algebras(self.base_ring()).Associative().Unital().Commutative()
+            Algebras(_algebra_coefficient_ring(self))
+            .Associative()
+            .Unital()
+            .Commutative()
         )
         return commutative_algebras.de_rham_cohomology(degree)(self)
 

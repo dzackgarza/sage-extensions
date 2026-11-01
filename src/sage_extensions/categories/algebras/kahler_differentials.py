@@ -151,10 +151,24 @@ class KahlerDifferentialModules(OwnedCategoryOverBaseRing):
                 if algebra in LocalizationRings()
                 else algebra
             )
+            from sage_extensions.categories.algebras.derivations import (
+                _commutative_presentation_data,
+                _quotient_polynomial_presentation,
+            )
+
+            if _quotient_polynomial_presentation(algebra) is not None:
+                # ``d`` is stated on the polynomial generators the quotient is
+                # presented by.  The quotient need not carry an algebra framing
+                # of its own for the calculus to run: the presentation supplies
+                # the labels, and ``d`` of each is the corresponding module
+                # generator of the differential module.
+                labels = _commutative_presentation_data(algebra)[1]
+            else:
+                labels = generator_algebra.algebra_generating_set()
             return algebra.derivations(self)(
                 {
                     label: self.differential_generator(label)
-                    for label in generator_algebra.algebra_generating_set()
+                    for label in labels
                 }
             )
 
@@ -243,6 +257,39 @@ class KahlerDifferentialModules(OwnedCategoryOverBaseRing):
         representing_isomorphism = derivation_classifier_isomorphism
 
 
+def _presentation_ideal(algebra, presentation, relations):
+    r"""The ideal ``I`` of the quotient ``algebra = presentation/I``.
+
+    A quotient retains the ideal it is built by, and that retained ideal is the
+    one the conormal module is formed from; a presented algebra keeps its
+    relations as an algebra family, and the ideal they generate is the
+    presentation's.  Both are ideals of the presentation ring.
+    """
+    from sage_extensions.categories.algebras.derivations import (
+        _quotient_polynomial_presentation,
+    )
+
+    if _quotient_polynomial_presentation(algebra) is presentation:
+        return algebra.defining_ideal()
+    return presentation.ideal(*tuple(relations))
+
+
+def _presentation_cover_map(algebra, presentation):
+    r"""The quotient map ``presentation -> algebra`` of the selected presentation."""
+    from sage_extensions.categories.algebras.derivations import (
+        _quotient_polynomial_presentation,
+    )
+
+    if _quotient_polynomial_presentation(algebra) is presentation:
+        quotient_map = algebra.quotient_map()
+        assert quotient_map.domain() is presentation, (
+            f"the quotient map of {algebra} starts at {quotient_map.domain()}, but its presentation "
+            f"is {presentation}"
+        )
+        return quotient_map
+    return algebra.algebra_presentation_morphism()
+
+
 @cached_function(key=lambda algebra: id(algebra))
 def _cached_kahler_differentials(algebra):
     return _construct_kahler_differentials(algebra)
@@ -301,7 +348,7 @@ def _construct_kahler_differentials(algebra):
         tuple(("d", label) for label in labels)
     )
     if relations.cardinality() != 0:
-        presentation_ideal = presentation.ideal(*tuple(relations))
+        presentation_ideal = _presentation_ideal(algebra, presentation, relations)
         presentation_omega = presentation.kahler_differentials()
         presentation_derivation = presentation_omega.universal_derivation()
         ideal_generators = dict(
@@ -311,7 +358,7 @@ def _construct_kahler_differentials(algebra):
                 strict=True,
             )
         )
-        quotient_map = algebra.algebra_presentation_morphism()
+        quotient_map = _presentation_cover_map(algebra, presentation)
         scalar_extension = Modules(quotient_map.domain()).scalar_extension(quotient_map)
         conormal_module = scalar_extension(presentation_ideal)
         ambient_differentials = algebra.free_module(differential_labels)

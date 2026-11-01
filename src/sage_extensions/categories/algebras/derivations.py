@@ -61,6 +61,43 @@ from sage_extensions.logic import AtomicProposition, Propositions, conjunction
 from sage_extensions.validation import validator
 
 
+def _quotient_polynomial_presentation(algebra):
+    r"""Return the polynomial ring ``P`` with ``algebra = P/I``, or ``None``.
+
+    A quotient ring retains its exact source and its defining ideal, so a
+    source that is a polynomial algebra over ``R`` presents the algebra as
+    ``R[x_1, ..., x_n]/(I)``.  The coefficient ring of that presentation is the
+    *source's* base ring: ``algebra.base_ring()`` is the source itself, which is
+    the cover the quotient is an algebra over, not the ring its differentials
+    are taken over.  A source that is not a polynomial algebra, or a ring that
+    is not a quotient at all, supplies no such presentation.
+    """
+    from sage_extensions.categories.rings.commutative_algebra import QuotientRings
+
+    if algebra not in QuotientRings():
+        return None
+    presentation = algebra.quotient_source()
+    if presentation is algebra or presentation.base_ring() is presentation:
+        return None
+    if presentation not in SymmetricAlgebras(presentation.base_ring()):
+        return None
+    return presentation
+
+
+def _algebra_coefficient_ring(algebra):
+    r"""The ring whose algebra ``algebra`` is, for the differential calculus.
+
+    ``R[x]/I`` is an ``R``-algebra, and the calculus ``Omega_{A/R}`` is taken
+    over ``R``.  The one base ring a quotient retains is the cover ``R[x]``, so
+    its coefficient ring is read from the presentation it keeps; every other
+    represented algebra is an algebra over its own base ring.
+    """
+    presentation = _quotient_polynomial_presentation(algebra)
+    if presentation is None:
+        return algebra.base_ring()
+    return presentation.base_ring()
+
+
 def _commutative_presentation_data(algebra):
     r"""Return ``(P, labels, variables, relations, lift)`` for ``A = P/I``."""
 
@@ -70,6 +107,26 @@ def _commutative_presentation_data(algebra):
             f"Kahler differentials are defined here for commutative algebras, but {algebra} is not known "
             "to be commutative"
         )
+
+    presentation = _quotient_polynomial_presentation(algebra)
+    if presentation is not None:
+        # A quotient retains the whole presentation: the polynomial cover, the
+        # ideal as its relations, and a representative of each class.  The
+        # calculus is over the cover's coefficient ring, so the polynomial
+        # source is the presentation ring and not the algebra itself.
+        relations = algebra.defining_ideal().ideal_generators()
+        lift = lambda element: algebra(element).lift()
+        labels = presentation.algebra_generating_set()
+        assert labels.cardinality().is_finite() is True, (
+            f"the selected conormal and differential computation for {algebra} requires "
+            "a known finite family of polynomial generators"
+        )
+        variables = FiniteOrderedSets().from_indexed(
+            labels,
+            presentation.algebra_generator,
+        )
+        return presentation, labels, variables, relations, lift
+
     assert (
         algebra in AlgebrasWithChosenFinitePresentation(base)
         or algebra in SymmetricAlgebras(base)
