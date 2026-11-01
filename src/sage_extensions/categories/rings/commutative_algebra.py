@@ -3352,6 +3352,10 @@ class _AdicQuotientInverseSystem(Functor):
         return self.completion().adic_transition_map(higher, lower)
 
 
+_EXACT_LITERAL_UNSUPPORTED = object()
+r"""Marker: an exact number the retained source is not read as a fraction of."""
+
+
 def _exact_integer_rational_parts(value, source):
     r"""Return ``(numerator, denominator)`` for an exact integer or rational, else ``None``.
 
@@ -3381,15 +3385,23 @@ def _exact_integer_rational_parts(value, source):
     parent = element_parent(value)
     if parent is None:
         return None
-    # An element of the source's own fraction field is read as a fraction only
-    # for the integers, where its numerator and denominator are integers.  A
-    # completion of another ring -- a polynomial ring at a point, whose fraction
-    # field is a rational function field -- keeps its own source expressions and
-    # is not reinterpreted here; the exact integer and rational literals above
-    # still cross, because they are exact numbers of any such source.
-    if parent is not source.fraction_field():
-        return None
+    # Recognizing a supported source comes first, before any fraction-field
+    # request: only the integers are read this way, and a non-domain source has
+    # no fraction field to ask for at all.  A completion of another ring -- a
+    # polynomial ring at a point, whose fraction field is a rational function
+    # field -- keeps its own source expressions and is not reinterpreted here;
+    # the exact integer and rational literals above still cross, because they
+    # are exact numbers of any such source.
     if _engine_ring(source) is not SageZZ:
+        # An element of another owned ring is an exact number this reduction
+        # does not read: the comparison is undecided, not false and not an
+        # error.  A host object is not an exact number at all and stays false.
+        from sage_extensions.categories.rings.ring_foundation import OwnedRings
+
+        if parent in OwnedRings():
+            return _EXACT_LITERAL_UNSUPPORTED
+        return None
+    if parent is not source.fraction_field():
         return None
     return int(value.numerator()), int(value.denominator())
 
@@ -3531,11 +3543,12 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
             return self, other
         if other_parent is source:
             return self, image(other)
-        match _exact_integer_rational_parts(other, source):
-            case None:
-                return None
-            case (numerator, denominator):
-                pass
+        parts = _exact_integer_rational_parts(other, source)
+        if parts is _EXACT_LITERAL_UNSUPPORTED:
+            return _EXACT_LITERAL_UNSUPPORTED
+        if parts is None:
+            return None
+        numerator, denominator = parts
         image_denominator = image(source(denominator))
         if image_denominator.is_unit() is not True:
             return None
@@ -3543,6 +3556,10 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
 
     def _completion_equal(self, other):
         pair = self._exact_operand_pair(other)
+        if pair is _EXACT_LITERAL_UNSUPPORTED:
+            # An exact number this completion does not reinterpret: unknown,
+            # neither false nor an exception.
+            return AtomicProposition("equal", self, other)
         if pair is None:
             return False
         self_element, other = pair

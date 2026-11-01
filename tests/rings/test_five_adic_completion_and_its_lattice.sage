@@ -134,3 +134,35 @@ def test_the_prime_of_zp_must_be_an_exact_integer() -> None:
             pass
         else:
             assert False, f"Zp accepted {not_a_prime!r} as a prime"
+
+
+def test_an_unsupported_source_is_never_asked_for_a_fraction_field() -> None:
+    r"""The supported-source recognition runs before any fraction-field request.
+
+    A non-domain source has no fraction field at all, so asking one would raise;
+    the exact-number reduction is stated for the integers, and every other
+    source is recognized first.
+    """
+    from sage_extensions.categories.rings.commutative_algebra import (
+        _EXACT_LITERAL_UNSUPPORTED,
+        _exact_integer_rational_parts,
+    )
+
+    six = ZZ.one() + ZZ.one() + ZZ.one() + ZZ.one() + ZZ.one() + ZZ.one()
+    quotient = ZZ.quotient_ring(ZZ.ideal(six))
+    assert not hasattr(quotient, "fraction_field")
+    assert _exact_integer_rational_parts(quotient.one(), quotient) is _EXACT_LITERAL_UNSUPPORTED
+
+
+def test_a_comparison_on_an_unsupported_source_stays_unknown() -> None:
+    r"""An exact operand the completed source is not read as a fraction of is
+    undecided, while a host object is simply not equal."""
+    from sage_extensions.logic import Predicate
+
+    polynomial = ZZ["x"]
+    completion = polynomial.adic_completion(polynomial.ideal(polynomial.gen()))
+
+    assert completion.one() == 1
+    decision = completion.one() == QQ(1) / QQ(1)
+    assert isinstance(decision, Predicate)
+    assert (completion.one() == "x") is False
