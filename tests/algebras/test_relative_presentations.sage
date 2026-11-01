@@ -1,6 +1,7 @@
 r"""Families, fibres, pushouts and tensor products of presented commutative algebras."""
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_special_fiber_of_xy_equals_t_is_the_node() -> None:

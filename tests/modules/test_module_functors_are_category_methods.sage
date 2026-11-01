@@ -7,6 +7,7 @@ two, and the involution of it that exchanges the two basis vectors.
 """
 
 from sage_extensions.all import *
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def _plane_with_swap():

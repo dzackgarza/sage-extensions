@@ -1,6 +1,7 @@
 r"""Kähler differentials and the algebraic de Rham complex of small algebras over ``QQ``."""
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def _axes():

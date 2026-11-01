@@ -1,6 +1,7 @@
 r"""Cohomology is a functor: on cochain complexes and, through de Rham, on algebras."""
 
 from sage_extensions.all import *
+from sage_extensions.categories.algebras.algebras import Algebras
 from sage_extensions.categories.modules.cochain_complexes import CochainComplexes
 
 

@@ -1,6 +1,7 @@
 r"""Two multiplications on one module give two different algebras."""
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def _multiplication(module, square_of_x):

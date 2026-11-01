@@ -9,6 +9,7 @@ commutative, with no unit (Riemann--Lebesgue: ``\hat f`` vanishes at infinity).
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 import pytest
 

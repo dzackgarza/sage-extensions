@@ -6,6 +6,7 @@ modules.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_z_mod_6_finite_presentation_is_a_degree_one_resolution_object() -> None:

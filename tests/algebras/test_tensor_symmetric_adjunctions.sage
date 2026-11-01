@@ -3,6 +3,7 @@ r"""Tensor and symmetric algebras of finitely presented abelian groups, and thei
 import pytest
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def _cyclic(order):

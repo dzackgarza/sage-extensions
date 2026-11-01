@@ -1,6 +1,7 @@
 r"""Affine schemes: spectra, products, fiber products, and fibers of a family."""
 
 from sage_extensions.all import *
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_global_functions_on_affine_space_are_polynomials_and_on_projective_space_are_constants() -> None:

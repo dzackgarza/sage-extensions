@@ -1,4 +1,5 @@
 from sage_extensions.all import *
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_the_integers_are_the_initial_ring() -> None:

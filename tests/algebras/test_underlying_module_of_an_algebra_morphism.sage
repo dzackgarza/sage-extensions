@@ -1,6 +1,7 @@
 r"""The linear map underlying the projection of the fat point onto the reduced point."""
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def _fat_point_projection():

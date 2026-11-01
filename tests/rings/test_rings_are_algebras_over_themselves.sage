@@ -1,6 +1,7 @@
 r"""The augmentation of a group algebra over a number field."""
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_the_augmentation_ideal_of_the_symmetric_group_algebra_has_codimension_one() -> None:

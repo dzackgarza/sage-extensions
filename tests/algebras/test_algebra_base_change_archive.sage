@@ -7,6 +7,7 @@ its two essential operations: carrying a finite presentation from ``ZZ`` to
 """
 
 from sage_extensions.all import *
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 ARCHIVE_RECONCILIATION = {

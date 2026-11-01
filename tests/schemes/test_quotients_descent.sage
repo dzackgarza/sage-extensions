@@ -7,6 +7,7 @@ Source: `\mathbb{Q}[x, y]^{C_2} = \mathbb{Q}[e_1, e_2]` with `e_1 = x + y`,
 """
 
 from sage_extensions.all import *
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_the_diagonal_translation_descends_to_e1_plus_2_and_e2_plus_e1_plus_1() -> None:

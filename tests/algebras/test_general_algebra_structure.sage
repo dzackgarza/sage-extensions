@@ -1,6 +1,7 @@
 r"""Algebras given by a multiplication on a module, and maps between them."""
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_x_to_zero_is_an_algebra_map_from_split_idempotents_to_dual_numbers() -> None:

@@ -17,6 +17,7 @@ the ideal ``(x - 2)``.
 import pytest
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_a_morphism_out_of_a_polynomial_ring_is_a_choice_of_images() -> None:

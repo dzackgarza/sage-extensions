@@ -1,6 +1,7 @@
 r"""Centres of associative and nonassociative algebras."""
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_center_of_the_two_by_two_matrix_algebra_is_the_scalars() -> None:
