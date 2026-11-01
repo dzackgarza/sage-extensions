@@ -1716,3 +1716,39 @@ Both sides are the *same* construction from the same datum: `type(...)` is `Owne
 A second symptom of the same construction: both print as `Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring`, i.e. the algebra's display is the coproduct frame's, not the `QQ[x, y]` that `_set_owned_ring_display` sets for the finite-label path.
 
 Pre-existing and scoped: the FAILED set on a clean worktree at `a0890d7` is byte-identical to the set with `da2cd8a` applied (13 failed, 13 passed, same test ids, compared as sorted lines), so this unit's graded-ideal work neither caused it nor is blocked by it. Not repaired here; the owner fix is to cache the native free algebra by its datum so one construction is one object.
+
+### A supplied stable containing bound made the finiteness query dead (2026-11-01)
+
+Two consumers asked whether their group is finite although the conjunction's *other* operand already decided the branch, so with a stable containing bound supplied the answer was computed and thrown away.  Both sites, before:
+
+```python
+# categories/rational_integral_stabilizers.py, invariant_module_construction
+if group.is_finite() is not True and containing is None:      # <- asked first
+    assert False, "…requires a known finite group or a justified finite stable containing module…"
+return GObjects(group, Modules(ring)).orbit_generated_submodule(..., containing=containing)
+
+# categories/modules/orbit_spans.py, OrbitSpanConstructions._call_
+if group.is_finite() is True and containing is None:          # <- asked first
+    span = ambient.subobject_on(...)                          # finite fast path
+else:
+    if containing is None: raise NotImplementedError(...)     # bounded ascending chain
+```
+
+Python evaluates left to right, so the finiteness query runs before the operand that decides it.  With a bound the result is `False` at both branches whatever the group's order is, and the bounded `else` branch is taken either way.  Without a bound the query is *required*: it decides between unbounded orbit closure and refusing.
+
+**Why this hurts.** `_finiteness_decision` returns the retained `OwnedFiniteGroups()` / `OwnedInfiniteGroups()` placement when one exists and otherwise falls through to `_engine_finiteness(_engine_group(self), compute=True)`, i.e. GAP `IsFinite` over the group's generators.  For the indefinite orthogonal groups a lattice consumer works with that is not cheap: the port's `cProfile` of one pointed-isometry unit measured **27.44 s of a 56.12 s unit** inside this one query (`libgap_mixin.py:181 is_finite` <- `_engine_finiteness` <- `_finiteness_decision` <- `is_finite` <- `invariant_module_construction`), for an answer the branch above discards.  That is the port's measurement of one unit, and it is *not* evidence that this query alone causes a larger run's memory failure; the defect recorded here is the lost premise, not a diagnosis of that run.
+
+**Repair: evaluation order, not assumption.**  Both sites now read `if containing is None and <the finiteness test>`.  The truth value of a conjunction of two pure predicates does not depend on their order, both branches stay as they were, and the query still runs wherever it can change the result.  No finiteness assumption is introduced, `IsFinite` is not bypassed, and the caller's responsibility -- supplying a justified stable containing bound -- is unchanged.
+
+**Verified independently of the port's profile**, on `U` over `QQ`, the isotropic line `ZZ e_0`, the supplied subgroup `⟨swap⟩` and the stable bound `ZZ e_0 + ZZ e_1` (a call counter on `is_finite`):
+
+| call | `is_finite` queries before | after |
+|---|---|---|
+| `invariant_module_construction()` with the bound (both sites on the path) | 2 | **0** |
+| `invariant_module_construction()` with no bound | 2 | 2 |
+| `orbit_generated_submodule(..., containing=bound)` alone | 1 | **0** |
+| `orbit_generated_submodule(...)` with no bound | 1 | 1 |
+
+and the answer provably cannot matter: with the bound attached, forcing `is_finite` to `True` and then to `False` builds the *same* span (compared on the orbit images, since elements are unhashable and two separately built spans are different parents), while with no bound and `is_finite` forced `False` the construction still refuses with "requires a known finite group or a justified finite stable containing module".  `tests/lattices/test_finiteness_premise_under_a_containing_bound.sage` states all of that, five tests.
+
+**Two stale-test facts this surfaced, both pre-existing.**  `tests/lattices/test_integral_stabilizers.sage` was failing on `space.submodule(...)`, which no module has (the maintained name is `subobject_on`), and on `O({e0: e1, e1: e0})`, whose keys are unhashable lattice elements -- an owned isometry is written as a function on the lattice's module generators, `O(lambda label: ...)`.  It also built the *whole* rational `O`, which supplies no finite generating set: `stabilizer()` needs one and the integral generator algorithm asserts instead (`the indefinite orthogonal-group algorithm computes O(L) for integral lattices over ZZ, but Lattice of rank 2 and signature (1, 1) is over Fraction Field of Integer Ring`).  The file is rewritten in that vocabulary with its four assertions unchanged -- supplied subgroups, `subobject_on`, isometries as functions on labels, `(QQ(1)/QQ(2)) * e1` rather than `e1 / 2` -- and passes, 2 tests.

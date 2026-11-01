@@ -369,7 +369,13 @@ class IntegralStructureAction(SageObject):
     def invariant_module_construction(self):
         group = self.rational_group()
         containing = self.stable_containing_bound()
-        if group.is_finite() is not True and containing is None:
+        # The bound is the premise that decides this branch: with it, the
+        # orbit closure is the bounded ascending chain and the group's order is
+        # never consulted.  Asking first would spend the query -- for an
+        # undecided group, a GAP `IsFinite` over its generators -- on an answer
+        # this conjunction discards.  The predicate is not weakened: without a
+        # bound it still decides between refusing and closing the orbit.
+        if containing is None and group.is_finite() is not True:
             assert False, (
                 f"computing the orbit-generated integral module for {group} requires a known finite group "
                 "or a justified finite stable containing module; supply the latter with "

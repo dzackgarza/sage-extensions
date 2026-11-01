@@ -42,7 +42,13 @@ class OrbitSpanConstructions(OwnedCategoryOverBaseRing):
             return tuple(action(arrows(element)) for element in elements)
 
         generators = tuple(seed(vector) for vector in seed.domain().module_generators())
-        if group.is_finite() is True and containing is None:
+        # The supplied bound decides the branch: it is the bounded ascending
+        # chain, and the group's order is never consulted.  Asking first would
+        # spend the finiteness query on an answer this conjunction discards
+        # (for an undecided group, a GAP `IsFinite` over its generators).  The
+        # predicate is unchanged: with no bound it still decides between the
+        # finite fast span and refusing below.
+        if containing is None and group.is_finite() is True:
             span = ambient.subobject_on(tuple(act(vector) for act in acting_maps(group) for vector in generators))
         else:
             if containing is None:
