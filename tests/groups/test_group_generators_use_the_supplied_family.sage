@@ -71,7 +71,32 @@ def test_a_generated_subgroup_states_the_generators_it_was_given() -> None:
         assert tuple(subgroup.group_generators()) == supplied
 
 
-def test_the_large_orthogonal_group_states_generators_without_enumerating() -> None:
+def test_a_fresh_group_states_generators_before_any_read_could_warm_it() -> None:
+    r"""First materialisation, not a warmed read.
+
+    The groups above have already answered once, so their generator datum is
+    materialised.  This builds a *distinct* form — the same Gram with explicit
+    module-generator labels is a different object, while the same Gram alone is
+    interned — poisons iterating its group's underlying set, and only then asks
+    for the generators for the first time.  A first read that enumerated the
+    group would raise here.
+    """
+    gram = [[0, 2, 0, 0], [2, 0, 0, 0], [0, 0, 0, 2], [0, 0, 2, 0]]
+    fresh_lattice = Lattices(ZZ)(gram, module_generators=("a", "b", "c", "d"))
+    shared_lattice = Lattices(ZZ)(gram)
+    assert fresh_lattice is not shared_lattice
+
+    fresh_group = fresh_lattice.discriminant_group().orthogonal_group()
+    assert fresh_group is not shared_lattice.discriminant_group().orthogonal_group()
+    assert fresh_group.cardinality() == 72
+
+    with _poison_whole_group_iteration(fresh_group):
+        generators = tuple(fresh_group.group_generators())
+        assert len(generators) == len(fresh_group._engine_group().gens())
+        assert fresh_group.subgroup_on(generators).cardinality() == 72
+
+
+def test_the_large_orthogonal_group_of_a_finite_form_states_its_generators() -> None:
     r"""``|O(A_N)| = 46998591897600``, and its four supplied generators are read directly.
 
     Enumerating this group is not slow, it is impossible; the assertion is that the

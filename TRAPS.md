@@ -1187,4 +1187,33 @@ So `Finite.ParentMethods.selected_group_resolution`'s canonical `F(U(G))` cover 
 
 **What was not done, deliberately.** No substitute generating set, no change to `selected_group_resolution`'s universal construction, and no fast path on `subgroup_on` — the owner's caution, and the measurements give no basis for one.
 
-**What was published instead** is the guard for the route that does work: `tests/groups/test_group_generators_use_the_supplied_family.sage`, three tests, all passing in 52 s. The small specimen (`O(A)` of `U+U`, order 72) states generators equal in number to the engine's supplied ones, checks that they generate the whole group (`subgroup_on(generators).cardinality() == 72`), and checks each one acts as an isometry on the form. A generated subgroup is checked to return exactly the generators it was given. The large specimen uses `O(A_N)` at order 46 998 591 897 600 and **makes whole-group iteration raise** (`type(group).__iter__` patched to refuse) around `group_generators()`, `group_generating_set()` and `group_generator_morphism()`, so a later change that routes generator enumeration back through the underlying set fails here instead of hanging a consumer. A subgroup of the large group is also confirmed to have the full order, which is what makes "supplied generators generate" exact rather than plausible.
+**What was published instead** is the guard for the route that does work: `tests/groups/test_group_generators_use_the_supplied_family.sage`, four tests, all passing in 60 s. The small specimen (`O(A)` of `U+U`, order 72) states generators equal in number to the engine's supplied ones, checks that they generate the whole group (`subgroup_on(generators).cardinality() == 72`), and checks each one acts as an isometry on the form. A generated subgroup is checked to return exactly the generators it was given. A **fresh** group — the same Gram with explicit module-generator labels is a distinct object, while the same Gram alone is interned — is checked with whole-group iteration poisoned *before* the first generator read, so the assertion covers first materialisation and not a warmed read. The large specimen is **`O(A_N)`**, order 46 998 591 897 600, with `type(group).__iter__` patched to refuse around `group_generators()`, `group_generating_set()` and `group_generator_morphism()`, and its supplied generators confirmed to generate a subgroup of the full order.
+
+Two scope corrections to the numbers above, from readback. First, the large specimen is `O(A_N)`, the orthogonal group of the discriminant form — **not** Γ_h; nothing measured here is about the arithmetic subgroup Γ_h, whose order is not established by anything in this entry. Second, 696 729 600 is the **frozen port test's recorded `group_order` for case 1** — the cardinality of a discriminant-image subgroup in that fixture, as consumed by `test_boundaries.sage` — and is not an established order for Γ_h; no computation of Γ_h's order appears in these measurements. **These tests do not establish Γ_h acceptance.** What they do establish is that `group_generators` reads the supplied family on a fresh finite group without enumerating its underlying set, at both orders above.
+
+
+### The quotient localization's characteristic, and `(ZZ/6)_(2) = FF_2` exactly
+
+The field decision for a prime localization is now made in the source ring (previous entry). Two things it left open are closed here, and both are the same lesson: a localization's arithmetic is the source's, modulo what the inverted set kills.
+
+**Characteristic.** `characteristic()` was unavailable for `(ZZ/6)_(2)` — the generic method asserts that no computation of the natural-number kernel exists. The naive repair is wrong: delegating to the source answers 6, while the localization's characteristic is 2, because `3 · 2 = 0` and `3` is inverted. `LocalizationRings.ParentMethods.characteristic` now answers the least `n` dividing the source's characteristic whose multiple of one the inverted set kills, decided as `n · 1` vanishing **or** its annihilator `(0 : (n·1))` meeting `S` — ideals and submonoid membership of the source, no element of the localization. An undecided membership returns `None` (the construction does not decide) rather than a wrong value; the first attempt raised on `0 ∈ ⟨2⟩`, whose membership in a finitely generated submonoid is undecided, and that case now stays unknown while the decided ones answer.
+
+**The specimen, exactly**, in `tests/rings/test_prime_localization_field_decisions.sage`:
+
+| assertion | value |
+| --- | --- |
+| residues `0, 2, 4` of the source | the localization's zero |
+| residues `1, 3, 5` | the localization's one |
+| `fraction(1, d)` for `d ∈ {1, 3, 5}` | admitted, equal to one |
+| `fraction(1, d)` for `d ∈ {2, 4}` | refused with `ValueError` |
+| source characteristic / localization characteristic | `6` / **`2`** |
+| residue field | a field; `residue_map(1) = 1`, `residue_map(0) = 0`, `residue_map(3) = 1` |
+| `is_field()`, `maximal_ideal().is_zero()` | `True`, `True` |
+
+Together the six residues collapsing onto `{0, 1}` with `2` and `4` killed *is* the statement that the localization is `FF_2`; it is asserted as arithmetic rather than inferred from a count.
+
+**One dependency that had to be repaired rather than assumed.** `is_isomorphic` read `characteristic()` and `_engine_ring()` unconditionally, so this field raised two different `AssertionError`s instead of answering. Both reads now leave an invariant the operands do not supply **unknown** — a skipped refutation, never a false decision — and the specimen asserts the shape of that answer: `(ZZ/6)_(2).is_isomorphic(GF(2))` is a proposition, not an exception and not `False`. It is not established as `True` here either, because this ring selects no executable model and its cardinality is undecided; saying so is the point.
+
+Targeted run: `test_prime_localization_field_decisions.sage`, `test_field_isomorphism_decisions.sage`, `test_fraction_field_localization.sage`, `test_localizations_of_the_integers.sage` — **27 passed, 1 failed**, the failure being the pre-existing `VectorSpaces(QQ)` refusal of the owned rational field as a base.
+
+Recorded, not fixed: `cardinality()` of a finite localization is also unavailable (`(ZZ/6)_(2)` supplies no exact value and no decided enumeration), and the residue field's cardinality likewise. That is the next contract in this family.
