@@ -8,7 +8,7 @@ def test_x_to_epsilon_extends_from_the_exterior_algebra_to_the_dual_numbers() ->
     algebra map ``Λ(M) -> A``.  For ``M = ZZ x`` and ``A = ZZ[ε]/(ε^2)``,
     ``x ↦ ε`` extends with ``x ∧ x ↦ 0`` and ``1 + 3x ↦ 1 + 3ε``."""
     polynomials = ZZ["e"]
-    dual_numbers = polynomials.quotient(polynomials.ideal([polynomials.gen() ** 2]))
+    dual_numbers = polynomials.quotient_ring(polynomials.ideal([polynomials.gen() ** 2]))
     epsilon = dual_numbers(polynomials.gen())
     line = Modules(ZZ).free_module(("x",))
     linear = line.Mor(dual_numbers)({line.module_generator("x"): epsilon})

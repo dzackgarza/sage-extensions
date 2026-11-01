@@ -15,7 +15,7 @@ def test_the_family_xy_equals_t_is_flat_with_torus_generic_fibre_and_nodal_speci
     A = P.localize_at_prime(P.ideal(t))
     B = A['x,y']
     x, y = B.algebra_generator("x"), B.algebra_generator("y")
-    family = B.quotient(B.ideal(x * y - t)).affine_spectrum()
+    family = B.quotient_ring(B.ideal(x * y - t)).affine_spectrum()
     generic = SchemesOverIntegralDomains(A)(family).generic_fiber()
     special = SchemesOverLocalRings(A)(family).special_fiber()
 
@@ -35,7 +35,7 @@ def test_scalar_killed_family_detects_nonflatness_over_the_same_dvr() -> None:
     t = P.gen()
     A = P.localize_at_prime(P.ideal(t))
     B = A['z']
-    nonflat = B.quotient(B.ideal(B(t))).affine_spectrum()
+    nonflat = B.quotient_ring(B.ideal(B(t))).affine_spectrum()
 
     assert not nonflat.structure_morphism().is_flat()
     assert SchemesOverIntegralDomains(A)(nonflat).generic_fiber().is_empty()

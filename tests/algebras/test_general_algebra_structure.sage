@@ -10,8 +10,8 @@ def test_x_to_zero_is_an_algebra_map_from_split_idempotents_to_dual_numbers() ->
     the target."""
     polynomials = QQ["x"]
     t = polynomials.gen()
-    split = Algebras(QQ)(polynomials.quotient(polynomials.ideal([t**2 - t])))
-    dual = Algebras(QQ)(polynomials.quotient(polynomials.ideal([t**2])))
+    split = Algebras(QQ)(polynomials.quotient_ring(polynomials.ideal([t**2 - t])))
+    dual = Algebras(QQ)(polynomials.quotient_ring(polynomials.ideal([t**2])))
     x_split, x_dual = split(t), dual(t)
     projection = split.Mor(dual)({x_split: dual.zero()})
 

@@ -11,7 +11,7 @@ def test_the_structure_sheaf_of_the_dual_numbers_has_rank_one_global_sections_an
     """
     R = QQ["e"]
     e = R.gen()
-    A = R.quotient(R.ideal(e**2))
+    A = R.quotient_ring(R.ideal(e**2))
     X = Schemes(QQ)(A)
     structure = X.structure_sheaf()
 

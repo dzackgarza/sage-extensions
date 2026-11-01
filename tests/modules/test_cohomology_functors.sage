@@ -33,7 +33,7 @@ def _dual_numbers_over_F2():
     r"""\(A = \mathbb F_2[x]/(x^2)\) and the algebra map \(x \mapsto 0\)."""
     polynomials = GF(2)["x"]
     x = polynomials.gen()
-    algebra = polynomials.quotient(x**2)
+    algebra = polynomials.quotient_ring(x**2)
     xbar = algebra(x)
     collapse = algebra.Mor(algebra)({xbar: algebra.zero()})
     return algebra, xbar, collapse

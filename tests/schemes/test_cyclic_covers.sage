@@ -87,8 +87,8 @@ def test_the_invariant_ring_of_the_double_cover_is_the_coordinate_ring_of_the_ba
     assert z**2 in invariants
     assert z not in invariants
     assert x * z not in invariants
-    assert Y.quotient(Y.deck_group()).coordinate_ring().krull_dimension() == 1
-    assert Y.quotient(Y.deck_group()).is_isomorphic(R.affine_spectrum())
+    assert Y.quotient_ring(Y.deck_group()).coordinate_ring().krull_dimension() == 1
+    assert Y.quotient_ring(Y.deck_group()).is_isomorphic(R.affine_spectrum())
 
 
 def test_the_cover_z2_equals_1_is_etale_with_free_deck_action() -> None:

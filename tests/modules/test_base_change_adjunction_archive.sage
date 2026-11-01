@@ -11,7 +11,7 @@ from sage_extensions.all import *
 def _gaussian_extension():
     polynomials = QQ["x"]
     x = polynomials.gen()
-    scalars = polynomials.quotient(x**2 + 1)
+    scalars = polynomials.quotient_ring(x**2 + 1)
     i = scalars(x)
     structure_map = scalars.algebra_structure_morphism()
     return scalars, i, structure_map

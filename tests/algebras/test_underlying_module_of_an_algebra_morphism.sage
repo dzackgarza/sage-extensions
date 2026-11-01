@@ -7,8 +7,8 @@ def _fat_point_projection():
     r"""``QQ[x]/(x^2) -> QQ[x]/(x) = QQ``, the reduction of the fat point."""
     line = QQ["x"]
     x = line.gen()
-    fat_point = line.quotient(line.ideal([x**2]))
-    point = line.quotient(line.ideal([x]))
+    fat_point = line.quotient_ring(line.ideal([x**2]))
+    point = line.quotient_ring(line.ideal([x]))
     projection = fat_point.Mor(point)({fat_point(x): point.zero()})
     return fat_point, point, projection
 

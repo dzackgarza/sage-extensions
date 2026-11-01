@@ -8,7 +8,7 @@ def test_qq_adjoin_sqrt_two_is_a_field_of_degree_two_with_inverse_of_1_plus_3z()
     ``QQ[z]/(z^2 - 2)`` is a field of dimension 2, and
     ``(1 + 3z)^{-1} = (3z - 1)/17`` since ``(1 + 3z)(3z - 1) = 9z^2 - 1 = 17``."""
     polynomials = QQ["z"]
-    extension = polynomials.quotient(polynomials.ideal([polynomials.gen() ** 2 - 2]))
+    extension = polynomials.quotient_ring(polynomials.ideal([polynomials.gen() ** 2 - 2]))
     z = extension(polynomials.gen())
 
     assert extension.module_rank() == 2

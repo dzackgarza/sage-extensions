@@ -23,6 +23,6 @@ def test_the_swap_on_p1_has_two_fixed_points_and_quotient_p1_by_a_degree_two_map
     assert P1.fixed_locus(swap).degree() == 2
     assert P1.fixed_locus(swap).defining_ideal() == P1.coordinate_ring().ideal(x**2 - y**2)
     assert not acted.is_free()
-    assert acted.quotient().is_isomorphic(P1)
+    assert acted.quotient_ring().is_isomorphic(P1)
     assert quotient_map * swap == quotient_map
     assert quotient_map.degree() == 2

@@ -27,7 +27,7 @@ def test_the_invariants_of_the_coordinate_swap_are_the_symmetric_polynomials() -
     assert x - y not in invariants
     assert (x - y) ** 2 in invariants
     assert invariants.is_isomorphic(QQ['u,v'])
-    assert acted.quotient().is_smooth()
+    assert acted.quotient_ring().is_smooth()
 
 
 def test_the_invariant_map_x_plus_y_factors_uniquely_through_the_swap_quotient() -> None:
@@ -59,9 +59,9 @@ def test_the_invariants_of_minus_one_on_the_plane_form_the_a1_cone() -> None:
     assert x**2 in invariants and x * y in invariants and y**2 in invariants
     assert x not in invariants
     assert x**3 not in invariants
-    assert invariants.is_isomorphic(B.quotient(B.ideal(u * w - v**2)))
-    assert acted.quotient().dimension() == 2
-    assert not acted.quotient().is_smooth()
+    assert invariants.is_isomorphic(B.quotient_ring(B.ideal(u * w - v**2)))
+    assert acted.quotient_ring().dimension() == 2
+    assert not acted.quotient_ring().is_smooth()
 
 
 def test_x2_minus_xy_plus_y2_is_invariant_under_the_order_three_rotation_and_descends() -> None:
@@ -82,4 +82,4 @@ def test_x2_minus_xy_plus_y2_is_invariant_under_the_order_three_rotation_and_des
     assert x + y not in acted.invariant_ring()
     assert x**2 + y**2 not in acted.invariant_ring()
     assert f.factor_through(q) * q == f
-    assert not acted.quotient().is_smooth()
+    assert not acted.quotient_ring().is_smooth()

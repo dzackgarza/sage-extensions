@@ -7,7 +7,7 @@ def _axes():
     r"""The coordinate axes ``A = QQ[x, y]/(xy)``."""
     plane = QQ["x,y"]
     x, y = plane.algebra_generator("x"), plane.algebra_generator("y")
-    axes = plane.quotient(plane.ideal([x * y]))
+    axes = plane.quotient_ring(plane.ideal([x * y]))
     return axes, axes(x), axes(y)
 
 
@@ -55,7 +55,7 @@ def test_relative_differentials_of_the_node_degeneration_xy_equals_t() -> None:
     t = base.gen()
     presentation = base["x,y"]
     x, y = presentation.algebra_generator("x"), presentation.algebra_generator("y")
-    algebra = presentation.quotient(presentation.ideal([x * y - t]))
+    algebra = presentation.quotient_ring(presentation.ideal([x * y - t]))
     xbar, ybar = algebra(x), algebra(y)
     omega = algebra.kahler_differentials()
     conormal_map = omega.conormal_morphism()
@@ -105,7 +105,7 @@ def test_de_rham_cohomology_of_the_rational_dual_numbers() -> None:
     onto ``Ω``, giving ``H^0 = QQ`` and ``H^1 = 0``."""
     polynomials = QQ["x"]
     x = polynomials.gen()
-    dual_numbers = polynomials.quotient(polynomials.ideal([x**2]))
+    dual_numbers = polynomials.quotient_ring(polynomials.ideal([x**2]))
     xbar = dual_numbers(x)
     omega = dual_numbers.kahler_differentials()
     dx = omega.universal_derivation()(xbar)

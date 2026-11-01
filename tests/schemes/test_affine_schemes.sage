@@ -24,8 +24,8 @@ def test_the_product_of_two_fat_points_is_the_spectrum_of_the_tensor_product() -
     """
     Rx = QQ["x"]
     Ry = QQ["y"]
-    left = Schemes(QQ)(Rx.quotient(Rx.ideal(Rx.gen() ** 2)))
-    right = Schemes(QQ)(Ry.quotient(Ry.ideal(Ry.gen() ** 3)))
+    left = Schemes(QQ)(Rx.quotient_ring(Rx.ideal(Rx.gen() ** 2)))
+    right = Schemes(QQ)(Ry.quotient_ring(Ry.ideal(Ry.gen() ** 3)))
 
     product = Schemes(QQ).product((left, right))
     first, second = product.projections()
@@ -87,8 +87,8 @@ def test_the_special_fiber_of_xy_equals_t_over_t_zero_is_the_node_xy_equals_zero
     t = parameter.gen()
     family_ring = parameter["x,y"]
     x, y = family_ring.algebra_generator("x"), family_ring.algebra_generator("y")
-    family = Schemes(parameter)(family_ring.quotient(family_ring.ideal(x * y - t)))
-    zero = Schemes(parameter)(parameter.quotient(parameter.ideal(t)))
+    family = Schemes(parameter)(family_ring.quotient_ring(family_ring.ideal(x * y - t)))
+    zero = Schemes(parameter)(parameter.quotient_ring(parameter.ideal(t)))
 
     special_fiber = Schemes(parameter).fiber_product(
         family.structure_morphism(),
