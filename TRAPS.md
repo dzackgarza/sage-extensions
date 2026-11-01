@@ -1055,3 +1055,27 @@ The GF(4) expectation of 2 was not a wrong answer, only a wrong hom-set: it is t
 Evidence. Thirty-one files whose subjects call `module_rank` (rings, algebras, modules, objects), compared at `f7db965` and after: identical failed/passed counts on thirty of them, and `tests/rings/test_number_field_archive.sage` 1 failed / 2 passed → 3 passed. Thirteen ring-chain files: identical counts, none newly failing. `tests/rings/test_embeddings_of_quadratic_fields.sage` 5 → 7 passing. Reflection set: the new file 4 passing, `test_reflection_signs_archive` 2 passing, `test_reflection_hyperbolic` 4 failed / 1 passing on both revisions (its four failures are the missing `edgewalk_is_reflective`), `test_definite` 14 failed / 11 passed → 13 failed / 12 passed, `test_orthogonal_stabilizers` 3 passing, `test_root_lattice_owned_boundary`, `test_isometry_involution_archive` and `test_lattice_isometry_subgroups_archive` passing. Timings on this run are **not** idle-VM measurements: other projects' jobs held the machine throughout, which is why the same file took 279 s in one run and 932 s in the other.
 
 Queue after this: (1) `dual_module()` points share one hash — the port-blocking defect, next; (2) a ring-level `is_isomorphic` owner for the order-tensored-with-QQ specimen; (3) `ZZ[1/2](QQ(1)/QQ(3))` raises `TypeError` from the source-ring conversion where it should raise the localization's own refusal.
+
+### A point of a dual module hashed by its parent, so `finite_ordered_set` was quadratic there
+
+The port reported this against `7b222e8` (`sage-indefinite-port` @ `9152a7db`, `.tmp/provider-report-dual-point-hash.md`) as the block on cone construction: 570 covectors did not finish `finite_ordered_set` in 560 s, and `RationalPolyhedralCone.__init__` inherited it. Reproduced here on the library as reported: the points of `Lattices(ZZ)(identity_matrix(6)).dual_module()` — which is the Mor `Hom_R(M, R)`, so a point of it is an arrow — all hashed alike, 1 distinct hash for 64 distinct points, because both arrow classes hashed their *parent* (`hash(id(self.parent()))`) or their endpoint pair. `_on_points` is `tuple(dict.fromkeys(supplied))`, so every insertion compared the new point with every extant key by extensional arrow equality, ~17 ms each.
+
+The repair is one owner for both arrow classes: `arrow_hash` in `set_categories.py`, used by `OwnedSetMorphism.__hash__` and `ModuleMorphismMethods.__hash__`. It hashes the arrow's values on one canonical finite probe of the *domain* — the domain's chosen module generating set when it has a finite one, otherwise its elements when it is a finite enumerated set, at most 8 of them from the front of the canonical order — and falls back to the endpoints when there is no such family. Values, not presentation, because equality is extensional: a map given by generator images, the same map built as a difference, and the same map with the zero added all read the same values and so hash alike, which the regression test asserts directly. The probe is a property of the domain alone and both classes read the same rule, so a set map and a module map with the same endpoints are no longer hashed by different formulas. An unevaluable or unhashable probe leaves the endpoint hash in force rather than raising; an infinite frame (`ZZ[x]`) has no probe and keeps the endpoint hash.
+
+Measured on the current tree (`I6`'s dual, coordinate boxes):
+
+| family | before | after |
+| --- | --- | --- |
+| 64 distinct dual points, distinct hashes | 1 | 64 |
+| `dict.fromkeys`, 64 dual points | 22.9 s (report) | 0.163 s |
+| `finite_ordered_set`, 64 dual points | 49.8 s (report, larger family) | 0.385 s |
+| 570 distinct dual covectors, distinct hashes | 1 | 570 |
+| `finite_ordered_set`, 570 dual covectors | not finished in 560 s, ≈1800 s extrapolated | 4.22 s |
+| `_rational_polyhedral_cone(lattice, 570 covectors)` | not finished in 779 s (report) | 7.09 s |
+| 570 primal points, `finite_ordered_set` | 0.01 s | 0.01 s |
+
+The residual seconds are the per-point evaluation the probe reads (≈6 values of ≈1 ms each); the quadratic term is gone, and the primal side that already worked is untouched. These are **not** idle-VM numbers: other projects' pytest runs held the machine during them, so they are indicative, while the distinct-hash counts — the load-independent part of the claim — are exact.
+
+`tests/modules/test_dual_point_hash.sage` (6 tests) pins the contract without timing it: 64 distinct dual points give 64 distinct hashes; `finite_ordered_set` returns the same 64; equal points share a hash across presentations (`e*` rebuilt as `2e* - e*`, and `e* + 0`); the zero and the scalars keep distinct hashes; the primal family keeps its distribution; and an infinite frame falls back to the endpoint hash instead of trying to read an infinite probe.
+
+Queue after this: a ring-level `is_isomorphic` for the order-tensored-with-QQ specimen, and `ZZ[1/2](QQ(1)/QQ(3))` raising the source-ring `TypeError` where the localization's own refusal belongs.

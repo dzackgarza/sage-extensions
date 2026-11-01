@@ -588,6 +588,88 @@ class _IntegerTranslationOnZZ:
         return self._displacement
 
 
+_ARROW_HASH_PROBE_SIZE = 8
+
+
+def arrow_probe(domain):
+    r"""Return one canonical finite probe of ``domain``, or ``None``.
+
+    An arrow's hash must read the arrow, not its presentation: two arrows of one
+    hom-set are equal exactly when they agree on the domain, so a hash of values
+    on a family determined by the *domain* alone keeps "equal implies equal
+    hash" for every way of naming the same arrow.  The family is the domain's
+    chosen finite module generating set when it has one, and otherwise its
+    elements when it is a finite enumerated set.  Both arrow classes read the
+    same probe for the same domain, so a set map and a module map with the same
+    endpoints agree in hash exactly when they agree in values.
+
+    At most ``_ARROW_HASH_PROBE_SIZE`` points are read, from the front of the
+    canonical order.  A prefix is still sound -- equal arrows agree on it -- and
+    it bounds the work hashing does, which matters because hashing happens once
+    per dictionary insertion while the collisions it prevents cost one arrow
+    comparison each.  Reading a whole large family to hash one arrow would trade
+    that saving away.
+
+    A domain with no such finite family supplies ``None``: there the arrow hash
+    states only its endpoints, which is sound -- equal arrows still share it --
+    and cannot distinguish arrows that the domain does not separate.
+    """
+    try:
+        generating_set = domain.module_generating_set()
+    except (AttributeError, TypeError, ValueError, NotImplementedError):
+        generating_set = None
+    if generating_set is not None and _probe_is_finite(generating_set):
+        labels = tuple(generating_set)[:_ARROW_HASH_PROBE_SIZE]
+        return tuple(domain.module_generator(label) for label in labels)
+    if Sets().is_provably_finite(domain) and domain in EnumeratedSets():
+        return tuple(domain)[:_ARROW_HASH_PROBE_SIZE]
+    return None
+
+
+def _probe_is_finite(family) -> bool:
+    r"""Whether a candidate probe family is a finite set that can be iterated."""
+    try:
+        return family.is_finite() is True
+    except (AttributeError, TypeError, ValueError, NotImplementedError):
+        return False
+
+
+def arrow_hash(arrow) -> int:
+    r"""Hash an arrow by its values on the domain's canonical finite probe.
+
+    Equality of arrows is extensional, within one Mor or across a stronger Mor
+    with the same endpoints, so this hash may not depend on the arrow's parent,
+    on how it was constructed, or on a defining datum all arrows share.  It
+    reads the values instead, which is what equality reads:
+
+    * equal arrows have equal values on the probe, so they share this hash;
+    * arrows that the probe separates -- the points of a dual module, for
+      instance, which are separated by their values on the module generators --
+      no longer collide.
+
+    Hashing only the endpoints, as this definition once did, made every point of
+    a dual module collide: ``dict.fromkeys`` over 64 distinct points of a rank-6
+    standard lattice collapsed to one bucket, so each insertion compared the new
+    point with every extant key by arrow equality (measured at ~17 ms each, 22.9 s
+    for 64 points, and minutes at the few hundred a polyhedral cone carries).
+
+    A probe that cannot be evaluated, or whose values are unhashable, leaves the
+    endpoint hash in force rather than raising: an arrow of an arbitrary map may
+    have a partial domain, and hashing is not the place to decide that.
+    """
+    domain = arrow.domain()
+    codomain = arrow.codomain()
+    endpoints = (id(domain), id(codomain))
+    probe = arrow_probe(domain)
+    if probe is None:
+        return hash(endpoints)
+    try:
+        values = tuple(arrow(element) for element in probe)
+        return hash((*endpoints, values))
+    except (TypeError, ValueError, ArithmeticError, AttributeError, NotImplementedError):
+        return hash(endpoints)
+
+
 class OwnedSetMorphism:
     r"""A set map whose composition remains in the canonical owned Set Mor.
 
@@ -735,10 +817,11 @@ class OwnedSetMorphism:
 
     def __hash__(self) -> int:
         # Equality is extensional, within one Mor or across a stronger Mor
-        # with the same endpoints.  An identity-based hash of the function
-        # would give equal maps different hashes; hashing only the endpoints
-        # also works when points of either endpoint are unhashable.
-        return hash((id(self.domain()), id(self.codomain())))
+        # with the same endpoints, so this hash reads the arrow on the domain,
+        # not on its presentation.  ``arrow_hash`` supplies the values on one
+        # canonical finite probe of the domain when there is one, and falls back
+        # to the endpoints when there is not.
+        return arrow_hash(self)
 
     def is_identity(self) -> bool | Predicate:
         r"""Decide identity on a finite enumeration; return the proposition otherwise.
