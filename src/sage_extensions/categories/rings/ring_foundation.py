@@ -2152,7 +2152,30 @@ class LocalizationRings(OwnedCategory):
                 regular.scalar_multiple(right.numerator(), generator),
                 right.denominator(),
             )
-            return left_image.equality_status(right_image)
+            status = left_image.equality_status(right_image)
+            if status is True or status is False:
+                return status
+            # The module route above establishes the answers it gives; where it
+            # says nothing, the same question is decidable in the *source*.  In
+            # general ``a/s = b/t`` exactly when some ``u`` in ``S`` kills
+            # ``at - bs`` (Mathlib ``IsLocalization.eq_iff_exists``), i.e. when
+            # ``S`` meets the annihilator ``(0 : (at - bs))`` -- the question
+            # ``inverted_submonoid_meets`` already answers, and the one
+            # ``characteristic`` and the prime localization's field decision ask.
+            # Consulted only after the module route, so no answer that route
+            # already gives can change.
+            annihilator = None
+            try:
+                annihilator = source.ideal(source.zero()).colon(source.ideal(difference))
+            except (NotImplementedError, AssertionError, AttributeError):
+                # The source supplies no selected colon algorithm here; the
+                # module route's own proposition stands.
+                annihilator = None
+            if annihilator is not None:
+                meets = self.inverted_submonoid_meets(annihilator)
+                if meets is True or meets is False:
+                    return meets
+            return status
 
         def _repr_(self):
             # (R-{0})^-1 R is Frac(R), and is named as the fraction field.

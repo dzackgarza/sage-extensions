@@ -1955,3 +1955,20 @@ Mathematically `y/1 = 0` in `(QQ[x,y]/(xy))_x` because `x y = 0` and `x` is inve
 * the prime localization's `maximal_ideal_is_zero` decides `g/1 = 0` the same way, and its docstring says why the element route is not used: element equality in `R_p` "is itself decided through the localization of the regular module, which needs a free module, whose placement asks whether this ring is a field -- this same decision".
 
 Element equality does take that route: `equality_status` → `_fraction_equality_status`, which compares through the *localization of the regular module*, and there the annihilator/containment decision comes out undecided for a quotient source. The route that would decide it is the one the two methods above already use — `a/s = b/t` iff `S` meets `(0 : (a t - b s))` in the source — and putting it in `_fraction_equality_status` (as a decided case, leaving the module route in force where the source side says nothing) is the next unit. Not attempted here: it changes the semantics of every localization equality, and this session's evidence for it is one test.
+
+**Implemented: the source-side criterion for fraction equality, as the module route's fallback (2026-11-01).** The entry above named the route; it is now in `_fraction_equality_status` and it is a *fallback*, not a predecessor:
+
+```python
+status = left_image.equality_status(right_image)          # the module route
+if status is True or status is False:
+    return status
+annihilator = source.ideal(source.zero()).colon(source.ideal(difference))   # (0 : (at - bs))
+meets = self.inverted_submonoid_meets(annihilator)
+return meets if meets is True or meets is False else status
+```
+
+Two things are deliberate. The module route keeps priority, so **no answer it already gives can change** — a necessary property here, since making the colon route a predecessor immediately regressed `(Z/5)[t]/(t^2)`'s localization, where the colon of a quotient-preimage ideal reaches `_polynomial_syzygy_rows` → `ideal.syzygy_module()` → `AttributeError: 'Ideal_1poly_field' object has no attribute 'syzygy_module'`; as a fallback that case never reaches the colon, and its decided answer stands. And where the ``colon`` owner supplies nothing (`NotImplementedError`/`AssertionError`/that Sage frontier) or `inverted_submonoid_meets` returns a proposition, the module route's own proposition is returned unchanged, so nothing is guessed.
+
+`tests/rings/test_localization_fraction_equality.sage`, six tests, states the cases that matter: `ZZ[1/2]` equal fractions (`1/2 = 2/4`, `3/2 = 6/4`), unequal ones (`1/2 != 3/2`, `!= 1/1`, `!= 0`), a unit written as a fraction (`4/2 = 2`), zero numerators (`0/1 = 0/2 = 0`), a quotient zero divisor (`(Z/6)[1/2]`: `3 = 0`, `2 != 0`, `3 != 2`), a nilpotent denominator (`(Z/5)[t]/(t^2)` at `t` is the zero ring, `1 = 0`), and one genuinely undecided question. Measured on `tests/rings tests/objects tests/algebras tests/modules` against the published `c94af7b`: **445 failed / 601 passed, nothing introduced**, the six extra passes being the new file.
+
+**Concrete blocker this leaves, inside the library: the colon of a word-framed presented algebra.** `QQ[x,y]/(xy)` at `x` still answers `Unknown` for `y/1 = 0`, because `CommutativeIdeals.ParentMethods._colon_decision` has no branch for a presented algebra's ideals — `_quotient_preimage_ideal` is `None`, the ring is not a localization, and `_selected_engine_ideal` is `None` — so `colon` asserts its frontier ("requires a selected exact source-ideal algorithm"). The preimage data that would decide it exists (the ideal owner already carries `source_relation_rows` for these ideals, and `(xy) : (y) = (x)` is an engine colon in the covering polynomial ring); wiring preimages into `_colon_decision` for that regime is the next unit, and until then equality there is honestly undecided.
