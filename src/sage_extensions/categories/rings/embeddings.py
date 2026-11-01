@@ -56,10 +56,26 @@ class OrderEmbedding:
             source_owned = source_field(domain(element))
             return codomain(field_embedding(source_owned))
 
-        linear = domain.module_category().Mor(domain, codomain).elementwise(
-            evaluate
+        # The map is the composite ``codomain <- fraction field <- field
+        # embedding <- fraction field <- domain``.  Every factor is a ring
+        # morphism or a coercions of orders, hence ZZ-linear, so the composite
+        # is linear by its construction: state that as the construction's
+        # premise rather than leaving the arrow merely "a function on elements",
+        # which is what made ``is_injective()`` refuse to read it.
+        linear = domain.module_category().Mor(domain, codomain)._from_constructed_element_map(
+            evaluate, premises=()
         )
+        # The composite is injective by its factors: the order includes into
+        # its fraction field, the field embedding is injective, and the image
+        # lies in the codomain order, where the coercion is the identity.  The
+        # construction therefore retains injectivity as a premise, which
+        # ``is_injective`` reads instead of asking for a kernel algorithm that
+        # these modules do not supply.
+        linear._injectivity_premise = True
         super().__init__(parent, linear)
+        # The arrow the caller holds is this embedding, so the premise is
+        # retained on it as well.
+        self._injectivity_premise = True
 
     def field_embedding(self) -> RingMorphism:
         return self._field_embedding
