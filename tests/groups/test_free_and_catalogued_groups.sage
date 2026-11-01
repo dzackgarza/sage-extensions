@@ -270,6 +270,16 @@ def test_a_symmetric_group_engine_is_the_symmetric_group_at_every_degree() -> No
     assert first.natural_g_set().act(product, first_points("s1")) == product(first_points("s1"))
     assert (~product)(product(first_points("s4"))) == first_points("s4")
 
+    # The retained contract: the same point set gives the same group, and the
+    # engine's labels are the point ranks raised by one, so an engine
+    # permutation and the labelled action agree.
+    assert SymmetricGroups()(first_points) is first
+    ranking = first_points.ranking_map()
+    engine_labels = tuple(int(ranking(first_points(label))) + 1 for label in ("s1", "s2", "s3", "s4"))
+    assert engine_labels == (1, 2, 3, 4)
+    assert first((1, 2))(first_points("s1")) == first_points("s2")
+    assert first((1, 2))(first_points("s2")) == first_points("s1")
+
     # Rejections at small degree are unchanged: a map that is not a bijection,
     # and a point outside the selected domain.
     try:
@@ -284,6 +294,15 @@ def test_a_symmetric_group_engine_is_the_symmetric_group_at_every_degree() -> No
         assert "outside the selected permutation domain" in str(error)
     else:
         assert False, "an element acted on a point outside its own point set"
+
+    # A permutation that is not of this degree is refused, not truncated to it.
+    for outside_the_degree in ((1, 2, 3, 4, 5), (0, 1)):
+        try:
+            first(outside_the_degree)
+        except ValueError:
+            pass
+        else:
+            assert False, f"the permutation {outside_the_degree} was admitted by a degree-4 group"
 
     # Large degree: construction and ingress of an explicit permutation, which
     # is what the orbit computation's permutation representation performs.
