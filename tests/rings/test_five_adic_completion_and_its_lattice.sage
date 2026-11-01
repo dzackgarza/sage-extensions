@@ -29,7 +29,6 @@ and once that was repaired the acceptance still gave ``False`` instead of
 from sage.all import latex
 
 from sage_extensions.all import Lattices, QQ, Zp, ZZ
-from sage_extensions.logic import Predicate
 
 
 def test_the_five_adic_integers_construct() -> None:
@@ -56,13 +55,18 @@ def test_exact_operands_are_read_through_the_completion_map_in_both_orders() -> 
     assert one != QQ(1) / QQ(5)
 
 
-def test_an_undecidable_comparison_is_the_proposition_not_a_negative() -> None:
-    r"""A raw host integer enters without exact provenance, so equality with an
-    exactly known element cannot be decided; it must not answer ``False``."""
+def test_a_foreign_host_object_is_refused_rather_than_admitted() -> None:
+    r"""The comparison normalizes the exact operands the contract names and no
+    others: a host object that is not an exact number is simply not equal.
+
+    With the operands read through the retained completion map, everything the
+    public ingress can build now carries its source expression, so an
+    undecidable comparison is no longer reachable from here; what must not
+    happen instead is a host object being converted and answered about.
+    """
     ring = Zp(5)
-    unknown = ring(ZZ.one())
-    decision = unknown == ring.one()
-    assert isinstance(decision, Predicate)
+    assert (ring.one() == "x") is False
+    assert (ring.one() == [1]) is False
 
 
 def test_the_original_lattice_constructs_computes_and_displays() -> None:
@@ -79,3 +83,54 @@ def test_the_original_lattice_constructs_computes_and_displays() -> None:
     rendered = str(latex(lattice))
     assert "rk}(L) = 2" in rendered
     assert "disc}(L)" in rendered
+
+
+def test_an_ordinary_quotient_ring_keeps_its_own_unit_map() -> None:
+    r"""The completion's structure map belongs to the completion's owner.
+
+    It was briefly installed on ``QuotientRings.ParentMethods``, where it asked
+    every ordinary quotient for a completion source; this pins the quotient's
+    own contract and the completion's override separately.
+    """
+    four = ZZ.one() + ZZ.one() + ZZ.one() + ZZ.one()
+    quotient = ZZ.quotient_ring(ZZ.ideal(four))
+    unit = quotient.unit_morphism()
+    assert unit.domain() is ZZ
+    assert unit.codomain() is quotient
+    assert unit(ZZ.one()) == quotient.one()
+
+
+def test_the_completion_structure_map_is_its_completion_map() -> None:
+    ring = Zp(5)
+    unit = ring.unit_morphism()
+    assert unit.domain() is ZZ
+    assert unit.codomain() is ring
+    two = unit(ZZ.one() + ZZ.one())
+    assert two == ring.one() + ring.one()
+    assert two.exact_source_expression() == ZZ.one() + ZZ.one()
+
+
+def test_a_completion_of_a_polynomial_ring_is_not_reinterpreted_as_integers() -> None:
+    r"""A completion whose source is not ``ZZ`` keeps its own source expressions.
+
+    The exact integer and rational literals still cross -- they are exact
+    numbers of any such source -- but an element of a rational function field is
+    not read as a fraction of integers.
+    """
+    polynomial = ZZ["x"]
+    completion = polynomial.adic_completion(polynomial.ideal(polynomial.gen()))
+    assert completion.completion_source() is polynomial
+    assert completion.one() == 1
+    assert completion.one() != completion.zero()
+
+
+def test_the_prime_of_zp_must_be_an_exact_integer() -> None:
+    r"""``5.9`` is not the prime ``5``, and neither is ``11/2``."""
+    assert Zp(QQ(5) / QQ(1)) == Zp(5)
+    for not_a_prime in (5.9, QQ(11) / QQ(2)):
+        try:
+            Zp(not_a_prime)
+        except TypeError:
+            pass
+        else:
+            assert False, f"Zp accepted {not_a_prime!r} as a prime"

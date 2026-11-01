@@ -1164,21 +1164,6 @@ class QuotientRings(OwnedCategory):
                 raise ZeroDivisionError(f"{element} is not a unit in {self}")
             return self._from_engine_element(represented**-1)
 
-        def unit_morphism(self):
-            r"""The structure map of a completion is its completion map.
-
-            Read over the ring it completes, ``r |-> r * 1`` *is* the completed
-            scalar map: both send a source element to its limit class, and the
-            completion map is the one that keeps the exact source expression.
-            Rebuilding the scalar image as ``r * 1`` discarded that datum, so
-            ``R^(1) == 1`` could not be decided.  A completion presented over a
-            formal base keeps the generic structure map, because there the
-            scalar ring is not the completed ring.
-            """
-            if self.completion_source() is self.algebra_base_ring():
-                return self.completion_map()
-            return super().unit_morphism()
-
         def zero(self):
             return self(self.quotient_source().zero())
 
@@ -2872,6 +2857,34 @@ class IdealExtensionData(SageObject):
         )
 
 
+def _exact_integral_input(value, ring, what):
+    r"""Read an exact integer the way a session writes it, or refuse it.
+
+    Under the preparser a literal arrives as a Sage integer, which an owned ring
+    refuses as a foreign element of a Sage ring; an exact integer therefore
+    enters by its value.  Nothing else does: a value that is not an exact
+    integer is refused rather than truncated, so ``5.9`` is not read as ``5``.
+    """
+    from sage.rings.integer import Integer as SageInteger
+    from sage.rings.rational import Rational as SageRational
+
+    match value:
+        case bool():
+            pass
+        case int():
+            return ring(int(value))
+        case SageInteger():
+            return ring(int(value))
+        case SageRational() if (value.denominator() == 1) is True:
+            return ring(int(value.numerator()))
+        case _:
+            pass
+    parent = element_parent(value)
+    if parent is not None and ring.is_parent_of(value) is True:
+        return ring(value)
+    raise TypeError(f"{what} must be an exact integer, but got {value!r}")
+
+
 class AdicCompletions(Category):
     r"""Adic completions equipped with a source ring and its chosen completion ideal."""
 
@@ -2924,6 +2937,21 @@ class AdicCompletions(Category):
             of this completed ring, returned by ``ideal_of_definition()``.
             """
             return self._adic_completion_ideal
+
+        def unit_morphism(self):
+            r"""The structure map of a completion is its completion map.
+
+            Read over the ring it completes, ``r |-> r * 1`` *is* the completed
+            scalar map: both send a source element to its limit class, and the
+            completion map is the one that keeps the exact source expression.
+            Rebuilding the scalar image as ``r * 1`` discarded that datum, so
+            ``R^(1) == 1`` could not be decided.  A completion presented over a
+            formal base keeps the generic structure map, because there the
+            scalar ring is not the completed ring.
+            """
+            if self.completion_source() is self.algebra_base_ring():
+                return self.completion_map()
+            return super().unit_morphism()
 
         def zero(self):
             r"""The completion's zero carries the exact source datum ``0``.
@@ -3344,9 +3372,14 @@ def _exact_integer_rational_parts(value, source):
 
     The numerator and denominator are Python integers so the caller can map
     them into the completion's own source ring; nothing here converts a host
-    object beyond the two exact number types the public contract names.
+    object beyond the two exact number types the public contract names.  Only
+    the integers carry such literals in the sense this reduction needs: a
+    completion of another ring -- a polynomial ring at a point, whose fraction
+    field is a rational function field -- keeps its own source expressions, and
+    this comparison does not reinterpret them as integers.
     """
     from sage.rings.integer import Integer as SageInteger
+    from sage.rings.integer_ring import ZZ as SageZZ
     from sage.rings.rational import Rational as SageRational
 
     match value:
@@ -3363,11 +3396,17 @@ def _exact_integer_rational_parts(value, source):
     parent = element_parent(value)
     if parent is None:
         return None
-    match parent is source.fraction_field():
-        case True:
-            return int(value.numerator()), int(value.denominator())
-        case False:
-            return None
+    # An element of the source's own fraction field is read as a fraction only
+    # for the integers, where its numerator and denominator are integers.  A
+    # completion of another ring -- a polynomial ring at a point, whose fraction
+    # field is a rational function field -- keeps its own source expressions and
+    # is not reinterpreted here; the exact integer and rational literals above
+    # still cross, because they are exact numbers of any such source.
+    if parent is not source.fraction_field():
+        return None
+    if _engine_ring(source) is not SageZZ:
+        return None
+    return int(value.numerator()), int(value.denominator())
 
 
 class _AdicCompletionElement(_OwnedAlgebraElement):
@@ -5536,10 +5575,7 @@ class FormalPowerSeriesRings(OwnedCategoryOverBaseRing):
 def Zp(*args, **kwargs):
     source = _owned_integers()
     prime_value = args[0] if args else kwargs.get("p")
-    # Under the preparser a session literal arrives as a Sage integer, which the
-    # owned integers refuse as a foreign element.  A prime here is a literal
-    # integer, so it enters by its value rather than by its element type.
-    owned_prime = source(int(prime_value))
+    owned_prime = _exact_integral_input(prime_value, source, "the prime of Zp")
     prime = SageZZ(_engine_element(source, owned_prime))
     engine_kwargs = dict(kwargs)
     # The precision is a session integer, which Sage's factory cannot read;
