@@ -219,12 +219,21 @@ class Cat(CategoryPacketMethods, Category):
         second: Functor,
         first: Functor,
     ) -> Functor:
-        if first.codomain() is not second.domain():
+        r"""``second o first``, defined when ``first`` lands where ``second`` starts.
+
+        The condition is the one the composite itself enforces: the first
+        functor's codomain need only be contained in the second's domain, since
+        every value it takes is then already an object (and every arrow an
+        arrow) of that domain.  The composite's own codomain is ``second``'s.
+        """
+        if not first.codomain().is_subcategory(second.domain()):
             raise ValueError(
                 f"cannot compose the functors {second} o {first}: {first} ends at {first.codomain()}, but "
-                f"{second} starts at {second.domain()}"
+                f"{second} starts at {second.domain()}, and the first is not a subcategory of the second"
             )
-        return second * first
+        from sage_extensions.categories.functors.core import _CompositeFunctor
+
+        return _CompositeFunctor(first, second)
 
     def SliceOver(self, base_object: Category) -> Category:
         r"""Return the slice ``Cat/base_object``."""
