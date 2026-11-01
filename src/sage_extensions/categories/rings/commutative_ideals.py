@@ -586,9 +586,9 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
                         + defining_generators
                     )
 
-                quotient = preimage(self._selected_engine_ideal).quotient(
-                    preimage(other._selected_engine_ideal)
-                )
+                lifted_left = preimage(self._selected_engine_ideal)
+                lifted_right = preimage(other._selected_engine_ideal)
+                quotient = _cover_colon(cover, lifted_left, lifted_right)
                 return _from_engine_ideal(
                     ring, engine.ideal(tuple(engine(generator) for generator in quotient.gens()))
                 )
@@ -1431,17 +1431,79 @@ def _descend_cover_ideal(ring, cover_ideal):
     return source.ideal(*(descended or (source.zero(),)))
 
 
+def _cover_colon(cover, left, right):
+    r"""Return ``(left : right)`` in a cover ring, by that ring's own colon.
+
+    A multivariate polynomial ring's ideals answer ``quotient`` themselves.  A
+    *univariate* one is a PID whose Sage ideal class does not, and there the
+    colon is the PID rule this owner already applies to an owned principal ideal
+    domain: with ``left = (g)`` and ``right = (h)``, ``a h in (g)`` exactly when
+    ``g | a h``, that is when ``g/gcd(g, h) | a``, so ``(g : h) = (g/gcd(g,h))``.
+    Stated here once for the cover, in the same terms as that branch.
+    """
+    from sage.rings.polynomial.multi_polynomial import MPolynomial
+
+    match left:
+        case _ if hasattr(left, "quotient"):
+            try:
+                return left.quotient(right)
+            except (AttributeError, TypeError, NotImplementedError):
+                pass
+    generator = left.gen()
+    other_generator = right.gen() if not right.is_zero() else cover.zero()
+    if other_generator == cover.zero():
+        return cover.ideal(cover.one())
+    common = generator.gcd(other_generator)
+    return cover.ideal(generator // common)
+
+
 def _polynomial_syzygy_rows(ideal):
     r"""Rows of the syzygy module of a polynomial-ring ideal's generators.
 
     Sage's ``syzygy_module`` requires a coefficient field; over ``ZZ``
     Singular's ``syz`` computes the same module (TRAPS.md).
     """
+    from sage.categories.principal_ideal_domains import (
+        PrincipalIdealDomains as _SagePrincipalIdealDomains,
+    )
+
+    from sage_extensions.categories.rings.ring_foundation import PrincipalIdealDomains
+
+    ring = ideal.ring()
+    # The kernel below is Sage's, over a Sage ring: the generators of a cover's
+    # ideal live in one, while an owned ideal's live in an owned ring, where
+    # ``ring ** n`` is the ring's own power and not a free module.  The
+    # realization that is its own engine is the Sage one, which is the library's
+    # usual test for exactly this boundary.
+    pid_host = (
+        _engine_ring(ring) is ring
+        and ring in _SagePrincipalIdealDomains()
+    )
     match ideal:
         case _ if _is_integral_multivariate_ideal(ideal):
             from sage.libs.singular.function import singular_function
 
             return tuple(tuple(row) for row in singular_function("syz")(ideal))
+        case _ if pid_host:
+            # Over a PID Sage owns this: the syzygy module of (a_1, ..., a_n) is
+            # the kernel of the map (x_1, ..., x_n) |-> sum x_i a_i, and the
+            # finitely generated module over a PID computes that kernel from the
+            # one-column matrix of the generators.  Reused rather than restated:
+            # over a univariate polynomial ring over a field the ideal class
+            # itself has no ``syzygy_module`` ("'Ideal_1poly_field' object has no
+            # attribute 'syzygy_module'"), and a Hermite or Smith form here would
+            # be a second algorithm for what this kernel already is.
+            from sage.modules.free_module import (
+                FreeModule as _SageFreeModule,
+            )
+
+            generators = tuple(ideal.gens()) or (ring.zero(),)
+            source = _SageFreeModule(ring, len(generators))
+            target = _SageFreeModule(ring, 1)
+            morphism = source.hom(
+                matrix(ring, len(generators), 1, list(generators)), target
+            )
+            return tuple(tuple(row) for row in morphism.kernel().gens())
         case _:
             syzygies = ideal.syzygy_module()
             return tuple(
