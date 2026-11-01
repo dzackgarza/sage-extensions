@@ -1905,3 +1905,14 @@ TypeError: Smith form only defined over Noetherian integral domains
 ```
 
 so the localization's cokernel comparison produces a map whose injectivity is decided by a Smith form over a ring that is not a Noetherian domain (the localization's own coefficient ring). Measured on the four directories `tests/rings tests/objects tests/algebras tests/modules` against a clean worktree at the published `c94af7b`: **447 failed / 582 passed → 446 failed / 594 passed, nothing introduced**, the one disappearance being the dual-numbers test closed earlier.
+
+**Closed: a map built with its inverse states that, instead of running a Smith form over the localization (2026-11-01).** The blocker recorded in the entry above was
+
+```
+assert comparison.forward().is_injective()
+TypeError: Smith form only defined over Noetherian integral domains
+```
+
+`_localization_cokernel_comparison` builds `S^-1 coker(f) -> coker(S^-1 f)` from the two projections and wraps the pair with `_isomorphism_from_known_inverse_pair`, but `.forward()` hands back the plain arrow, and deciding *its* injectivity went to the selected Smith form over the localization's coefficient ring — which is not a Noetherian integral domain. Each arrow is half of a known inverse pair, so it is injective and surjective by construction; the comparison now states that as the arrow's premise, which `is_injective`/`is_surjective` already read first (`_injectivity_premise`, `_surjectivity_premise`, module_morphisms.py:1627 and the surjectivity counterpart) — the mechanism the module owner documents as "a construction that establishes injectivity retains it as a premise ... read here without a kernel computation".
+
+`tests/rings/test_commutative_algebra.sage::test_localization_commutes_with_cokernels` passes. Measured on `tests/rings tests/objects tests/algebras tests/modules` against a clean worktree at the published `c94af7b`: **447 failed / 582 passed → 445 failed / 595 passed, nothing introduced**, two tests fixed (this one and the dual-numbers test closed earlier in the session).
