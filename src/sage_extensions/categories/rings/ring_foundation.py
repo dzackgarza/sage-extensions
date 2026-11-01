@@ -666,6 +666,9 @@ class RngMor(CategoricalMor):
     def identity(self):
         return _ringlike_mor_identity(self)
 
+    def _cardinality_decision(self):
+        return _free_commutative_hom_cardinality(self)
+
     def _repr_(self):
         return f"Mor_Ring({self.domain()}, {self.codomain()})"
 
@@ -867,6 +870,48 @@ def _engine_ring_morphisms_equal(left, right):
 
 
 
+def _free_commutative_hom_cardinality(mor_set):
+    r"""``|Hom_Ring(R[S], A)| = |A|^|S|`` for a free commutative algebra over a rigid ring.
+
+    A unital ring map out of ``R[S]`` is determined by a unital ring
+    endomorphism of ``R`` together with the images of the generators, and
+    those images are arbitrary elements of the target.  When ``R`` is rigid
+    -- the unital endomorphisms of ``ZZ`` and of ``QQ`` are the identity,
+    since such a map fixes ``1``, hence ``ZZ``, hence inverses -- the
+    coefficient part contributes exactly one choice, so the hom set is in
+    bijection with ``A^S`` and its cardinality is the cardinal power.
+
+    The hypotheses are stated, not guessed at: a base ring other than
+    ``ZZ`` or ``QQ``, a noncommutative target, a target whose cardinality is
+    not decided, or a domain that is not a free commutative algebra leaves
+    this undecided.  The target is asked through the same protected decision
+    the public ``cardinality()`` reads, but without its assertion, because
+    an undecided target must leave the hom set undecided rather than raise.
+    """
+    from sage_extensions.categories.algebras.free_algebras import (
+        SymmetricAlgebras,
+    )
+    from sage_extensions.categories.sets.cardinals import cardinal
+
+    domain = mor_set.domain()
+    codomain = mor_set.codomain()
+    if not hasattr(domain, "algebra_base_ring"):
+        return None
+    base = domain.algebra_base_ring()
+    if not (base is _owned_integers() or base is _owned_rationals()):
+        return None
+    if domain not in SymmetricAlgebras(base) or codomain not in OwnedRings().Commutative():
+        return None
+    labels = domain.generating_module().module_generating_set()
+    size = labels.cardinality()
+    if size.is_finite() is not True:
+        return None
+    target = codomain._cardinality_decision()
+    if target is None:
+        return None
+    return cardinal(target) ** cardinal(int(size.finite_value()))
+
+
 class RingMor(CategoricalMor):
     r"""The owned set ``Hom_Ring(A,B)`` generated from semiring and rng Mors."""
 
@@ -897,6 +942,9 @@ class RingMor(CategoricalMor):
     @object_level
     def identity(self):
         return _ringlike_mor_identity(self)
+
+    def _cardinality_decision(self):
+        return _free_commutative_hom_cardinality(self)
 
     def embeddings(self):
         r"""The elements of ``Mor(K, L)`` for fields ``K`` and ``L``, in the engine's deterministic order.
