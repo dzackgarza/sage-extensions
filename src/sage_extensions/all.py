@@ -381,6 +381,9 @@ _lazy_import(
     "sage_extensions.categories.schemes.cyclic_covers",
     "CyclicCovers",
 )
+from sage_extensions.categories.algebras.subalgebras import (  # noqa: F401
+    GeneratedSubalgebras,
+)
 from sage_extensions.categories.algebras.graded_lie_algebras import (  # noqa: F401
     GradedLieAlgebras,
 )

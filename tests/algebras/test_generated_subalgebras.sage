@@ -111,8 +111,38 @@ def test_the_generated_subalgebra_retains_its_ambient_algebra_and_generators() -
 
     assert generated.ambient_ring() is algebra
     assert generated.base_ring() is ZZ
-    assert generated in PredicateSubrings()
+    assert generated in GeneratedSubalgebras(ZZ)
+    assert generated.inclusion().domain() is generated
+    assert generated.inclusion().codomain() is algebra
+    assert tuple(generated.algebra_generators()) == (x,)
     assert x in generated and generated.defining_predicate()(x) is True
+
+
+def test_the_inclusion_is_an_algebra_morphism_in_both_characteristics() -> None:
+    r"""The subobject is an algebra, and its inclusion is an algebra morphism.
+
+    ``Subgroups(G)`` returns a group with an inclusion and ``ModuleSubobjects``
+    a module with an inclusion; this is that shape for algebras.  The product on
+    the subalgebra is transported through the degree inclusions -- the two
+    carriers stay distinct -- so the inclusion is unital and multiplicative, and
+    it sends the subalgebra's square of its degree-one generator to
+    ``2 gamma_2(x)`` over both ``ZZ`` and ``QQ``.
+    """
+    for base in (ZZ, QQ):
+        algebra = Modules(base).free_module(("x",)).divided_power_algebra()
+        x = algebra.degree_one_generator("x")
+        generated = algebra.subalgebra([x])
+        inclusion = generated.inclusion()
+        piece = generated.graded_piece(1)
+        generator = generated.from_component(
+            1, piece.module_generator(piece.module_generating_set()[0])
+        )
+
+        assert inclusion(generated.one()) == algebra.one()
+        assert inclusion(generator) == x
+        assert inclusion(generator * generator) == inclusion(generator) * inclusion(generator)
+        assert inclusion(generator * generator) == 2 * algebra.divided_power(x, 2)
+        assert generated.one() * generator == generator
 
 
 def test_a_generator_the_graded_realization_cannot_use_says_so() -> None:
