@@ -1026,7 +1026,18 @@ class SliceCategory(_SubcategoryOfArrows):
             return iter(self._underlying_slice_object())
 
         def __contains__(self, element):
-            r"""Membership in a slice object is membership in its underlying object."""
+            r"""Membership in a slice object is membership in its underlying object.
+
+            An element the slice itself constructed has the slice as its parent
+            and is a member by construction; asking the underlying object would
+            reject it, because that object is a different parent.  Everything
+            else is asked of the underlying object, whose membership is the
+            mathematical one.
+            """
+            from sage.structure.element import parent as element_parent
+
+            if element_parent(element) is self:
+                return True
             return element in self._underlying_slice_object()
 
         is_parent_of = __contains__

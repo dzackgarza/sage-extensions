@@ -2624,7 +2624,7 @@ class _PredicateSubringParent(Parent):
     def Element(self):
         return _PredicateSubringElement
 
-    def __init__(self, ambient_ring, predicate, description, category):
+    def __init__(self, ambient_ring, predicate, description, category, base_ring=None):
         SageObject.__init__(self)
         from sage_extensions.owned_category import owned_category_join
 
@@ -2647,7 +2647,9 @@ class _PredicateSubringParent(Parent):
         # algebra/category placement cannot take this partially initialized
         # object as the scalar ring: doing so recursively constructs
         # Algebras(self) before self has a subcategory_class.
-        base = _owned_integers()
+        # The subring is a ZZ-algebra unless the constructing owner states the
+        # coefficient ring of the algebra it is a subalgebra of.
+        base = _owned_integers() if base_ring is None else _owned_ring(base_ring)
         from sage_extensions.categories.algebras.algebras import Algebras
 
         algebra = Algebras(base).Associative().Unital()
@@ -2725,7 +2727,7 @@ class _PredicateSubringParent(Parent):
 _OwnedRingBootstrapParent.register(_PredicateSubringParent)
 
 
-def _predicate_subring(ambient_ring, predicate, description, category=None):
+def _predicate_subring(ambient_ring, predicate, description, category=None, *, base_ring=None):
     from sage_extensions.owned_category import owned_category_join
 
     placement = PredicateSubrings()
@@ -2736,6 +2738,7 @@ def _predicate_subring(ambient_ring, predicate, description, category=None):
         predicate,
         description,
         placement,
+        base_ring=base_ring,
     )
 
 
@@ -4581,9 +4584,15 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                 return result
             return result
 
-        def predicate_subring(self, predicate, description, category=None):
-            r"""Return the represented subring of elements satisfying ``predicate``."""
-            return _predicate_subring(self, predicate, description, category)
+        def predicate_subring(self, predicate, description, category=None, *, base_ring=None):
+            r"""Return the represented subring of elements satisfying ``predicate``.
+
+            ``base_ring`` states the coefficient ring the subring is an algebra
+            over; it is ``ZZ`` unless the caller is constructing an
+            ``R``-subalgebra of an ``R``-algebra (``Algebra.adjoin``'s
+            realization), where the scalar copy is ``R``'s own.
+            """
+            return _predicate_subring(self, predicate, description, category, base_ring=base_ring)
 
         @object_level
         def Mor(self, codomain, category=None):

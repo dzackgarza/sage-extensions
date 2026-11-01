@@ -37,7 +37,7 @@ def test_integral_divided_power_laws_on_two_generators() -> None:
     assert x * x == 2 * gamma2x
     assert gamma2x * x == 3 * divided.divided_power(x, 3)
     assert divided.divided_power(x + y, 2) == gamma2x + x * y + gamma2y
-    assert divided.augmentation(divided.one() + x + gamma2y) == 1
+    assert divided.augmentation()(divided.one() + x + gamma2y) == 1
 
 
 def test_exterior_and_divided_power_algebras_preserve_composition_on_torsion_modules() -> None:
@@ -56,7 +56,20 @@ def test_exterior_and_divided_power_algebras_preserve_composition_on_torsion_mod
         stepwise = functor(second) * functor(first)
         for probe in (algebra.one(), e0, e1, e0 * e1):
             assert composite(probe) == stepwise(probe)
-        assert functor(first)(e0 * e1) == 2 * functor(middle).degree_one_generator(0) * functor(middle).degree_one_generator(1)
+        assert functor(first)(e0 * e1) == functor(first)(e0) * functor(first)(e1)
+
+    # Gamma is not Lambda: ``f1 * f1 = 2 gamma_2(f1)`` survives, and
+    # ``4 gamma_2(f1)`` is nonzero in ``Gamma^2((ZZ/4)^2)``, whose invariant
+    # factors are [4, 8, 8].  So the image of ``e0 * e1`` under
+    # ``e0 |-> f0 + f1``, ``e1 |-> 2 f1`` carries that term
+    # (DividedPowers4, ``dp_mul``: ``dp 1 m * dp 1 m = 2 . dp 2 m``).
+    gamma_source = Modules(ZZ).divided_power_algebra()(source)
+    gamma_middle = Modules(ZZ).divided_power_algebra()(middle)
+    g0, g1 = gamma_source.degree_one_generator(0), gamma_source.degree_one_generator(1)
+    h0, h1 = gamma_middle.degree_one_generator(0), gamma_middle.degree_one_generator(1)
+    image_of_the_product = Modules(ZZ).divided_power_algebra()(first)(g0 * g1)
+    assert image_of_the_product == 2 * h0 * h1 + 4 * gamma_middle.divided_power(h1, 2)
+    assert image_of_the_product == Modules(ZZ).divided_power_algebra()(first)(g0) * Modules(ZZ).divided_power_algebra()(first)(g1)
 
     divided = Modules(ZZ).divided_power_algebra()
     gamma_3 = divided(source).divided_power(divided(source).degree_one_generator(0), 3)
