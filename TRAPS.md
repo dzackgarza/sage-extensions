@@ -1916,3 +1916,24 @@ TypeError: Smith form only defined over Noetherian integral domains
 `_localization_cokernel_comparison` builds `S^-1 coker(f) -> coker(S^-1 f)` from the two projections and wraps the pair with `_isomorphism_from_known_inverse_pair`, but `.forward()` hands back the plain arrow, and deciding *its* injectivity went to the selected Smith form over the localization's coefficient ring — which is not a Noetherian integral domain. Each arrow is half of a known inverse pair, so it is injective and surjective by construction; the comparison now states that as the arrow's premise, which `is_injective`/`is_surjective` already read first (`_injectivity_premise`, `_surjectivity_premise`, module_morphisms.py:1627 and the surjectivity counterpart) — the mechanism the module owner documents as "a construction that establishes injectivity retains it as a premise ... read here without a kernel computation".
 
 `tests/rings/test_commutative_algebra.sage::test_localization_commutes_with_cokernels` passes. Measured on `tests/rings tests/objects tests/algebras tests/modules` against a clean worktree at the published `c94af7b`: **447 failed / 582 passed → 445 failed / 595 passed, nothing introduced**, two tests fixed (this one and the dual-numbers test closed earlier in the session).
+
+**A quotient class is not a fraction: the localization's denotation route read it as one (2026-11-01).** `test_selected_presented_algebra_localization_has_exact_fraction_equality` died in the localization's element constructor:
+
+```
+localized(ybar)   ->  numerator, denominator = numerator(), denominator()
+AttributeError: 'QuotientRing_generic_with_category.element_class' object has no
+attribute 'numerator'
+```
+
+The route is the *fraction-field* reading — "an element of a fraction field denotes the fraction of its own numerator and denominator" — and it guarded with `getattr(candidate, "numerator", None)` plus `callable(...)`. That guard does not test what it needs: the ring element packet supplies `numerator`/`denominator` for every element it covers, and for a quotient class those methods dispatch to the private realization, which has no such parts. So an element of `QQ[x, y]/(xy)` passed the guard and failed inside. The candidate's ring *being a field* is the premise the reading actually needs, and it is now asked (`candidate_parent.is_field() is True`) before the parts are read.
+
+Neutral on the suite and recorded as such: `tests/rings tests/objects tests/algebras tests/modules` stays at **445 failed / 595 passed** against the published `c94af7b` (445 / 595 before this change too), nothing introduced. The test itself now stops at its next layer —
+
+```
+localized(ybar) == localized.zero()
+TypeError: the proposition contains_ambient_element(Finitely presented module on 1
+module generators over Localization of …/(x*y) at … , element of …/(x*y))
+has no Python truth value
+```
+
+— i.e. deciding that `ybar` dies in the localization needs ideal membership over the quotient `QQ[x,y]/(xy)` (equivalently an annihilator computation there), and that decision is undecided. That is the next item, named at its call.

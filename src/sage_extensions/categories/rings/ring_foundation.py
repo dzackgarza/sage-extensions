@@ -1669,6 +1669,17 @@ class LocalizationRings(OwnedCategory):
             # element of an owned field alike: the split is the same, and the
             # parts are read into the source by `fraction`.
             for candidate in self._fraction_denotations(value):
+                # This route reads a *fraction-field* value's own numerator and
+                # denominator.  Having callable attributes of those names is not
+                # that: the ring element packet supplies them for every element
+                # it covers, and for a quotient class they dispatch to the
+                # private realization, which has no such parts
+                # ("'QuotientRing_generic...element_class' object has no
+                # attribute 'numerator'").  The candidate's ring being a field is
+                # the premise this reading actually needs.
+                candidate_parent = element_parent(candidate)
+                if candidate_parent is None or candidate_parent in OwnedRings() and candidate_parent.is_field() is not True:
+                    continue
                 numerator = getattr(candidate, "numerator", None)
                 denominator = getattr(candidate, "denominator", None)
                 if not (callable(numerator) and callable(denominator)):
