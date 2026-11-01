@@ -1434,3 +1434,21 @@ So the quadratic concern recorded above is **refuted at this size**: the orbit-s
 The one crossing that is not cached is the elementwise group morphism: `mor.elementwise(rule)(generator)` recomputes the rule on every evaluation — the same generator costs 3.08 s again on a second call, and the returned permutation is a new object. `_orbit_labels` evaluates each generator once, so nothing pays twice *today*; the hazard is any future consumer that asks for the same permutation twice. The fix that would not disturb semantics is a cache at the g-set, where the permutation is a function of the retained action, rather than in the generic `P`-valued `Mor` — and it should wait for a consumer that actually pays twice, since no current path does.
 
 **The next blocking items are not in this library's orbit machinery.** The port's `recursive.py:154` owned-element crossing and its `OrbitCoverModel` generator search remain port-side, as recorded earlier.
+
+### Research issue 614, the three notebook specimens, checked one at a time
+
+The `preamble-lattices.ipynb` cells 18, 21 and 24 state the original acceptance. Reproduced on this main with focused probes, no sweeps:
+
+| specimen | acceptance | current state |
+| --- | --- | --- |
+| cell 18 — `Lattices(O)([[2, a], [a, 2]])` over `QuadraticField(2, "a").maximal_order()` | `u*u == 2`, `u*v == a`, `v*v == 2`, and `gram_tensor()` displays | **passes** |
+| cell 21 — `Lattices(Oi)(Oi^2)` over `QuadraticField(-1, "i").maximal_order()` | `ei*ei == 1`, `ei*fi == 0`, `fi*fi == 1` | **passes** |
+| cell 24 — `R = Zp(5)`, `Lattices(R)(R^2)` | the ring constructs, then `ep*ep == 1`, `ep*fp == 0`, `fp*fp == 1` | **fails at `Zp(5)` itself** |
+
+The two passing specimens were closed by the earlier number-field and display repairs; nothing in them needed changing, and they are now recorded as verified rather than assumed.
+
+`Zp(5)` raises `RecursionError` before any lattice exists: `Zp` -> `AdicCompletions()(ZZ, (5))` -> `_adic_completion_from_owned_data` -> `_AdicCompletionAlgebraParent(...)`. The cycle in the traceback is
+
+`algebras._mul_` -> multiplication bilinear map -> `domain().pure_tensor(...)` -> `tensor_quotients.pure` -> `reduced_terms` -> `module(value)` -> `algebras._element_constructor_` -> `self.algebra_base_ring()` -> `self.base_ring()` -> back to `_mul_`.
+
+So an element coercion inside the completion's own construction asks an algebra for its base ring, and answering that question re-enters the algebra's multiplication through the tensor construction. `_AdicCompletionAlgebraParent.__init__` does pass a base (`source if algebra_base is None else algebra_base`, i.e. `ZZ` here) to `_OwnedAlgebraParent`, so the base is retained in principle; which of the coerced factors recomputes it by arithmetic is the open question, and the repair belongs there — not in a memoization layer. No arithmetic was reimplemented and no assertion was weakened; the specimen stays open until that is settled.
