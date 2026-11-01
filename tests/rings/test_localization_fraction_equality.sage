@@ -85,14 +85,13 @@ def test_a_nilpotent_denominator_makes_the_localization_trivial() -> None:
     assert at_t(quotient.quotient_map()(t)) == at_t.zero()
 
 
-def test_a_question_the_colon_owner_does_not_support_stays_undecided() -> None:
-    r"""``y/1`` in ``(QQ[x,y]/(xy))_x`` is zero, and this owner does not yet say so.
+def test_a_zero_divisor_in_a_presented_algebra_dies_in_its_localization() -> None:
+    r"""In ``(QQ[x,y]/(xy))_x`` the class of ``y`` is zero and the class of ``x`` is not.
 
-    ``x y = 0`` and ``x`` is inverted, so the answer is yes; deciding it needs
-    the annihilator ``(0 : (y)) = (x)`` of a word-framed presented algebra,
-    whose ``colon`` the ideal owner does not implement.  Undecided is stated as
-    undecided: ``ask`` answers ``Unknown``, and the equality is neither claimed
-    nor refuted.
+    ``x y = 0`` and ``x`` is inverted, so ``y/1 = 0``; the criterion is
+    ``S`` meeting the annihilator ``(0 : (y)) = (x)``, and both the annihilator
+    and the saturation behind ``inverted_submonoid_meets`` are computed through
+    the presentation ``P -> P/(xy)``.
     """
     presentation = QQ.polynomial_ring(("x", "y"))
     x, y = presentation.algebra_generators()
@@ -100,7 +99,23 @@ def test_a_question_the_colon_owner_does_not_support_stays_undecided() -> None:
     xbar, ybar = axes.algebra_generator("x"), axes.algebra_generator("y")
     at_x = axes.localization(xbar)
 
-    assert ask(at_x(ybar) == at_x.zero()) is Unknown
-    # The same missing annihilator blocks every equality there: even `x`, which
-    # is inverted and therefore not zero, is not *decided* unequal by this owner.
-    assert ask(at_x(xbar) == at_x.zero()) is Unknown
+    assert axes.ideal(axes.zero()).colon(axes.ideal(ybar)) == axes.ideal(xbar)
+    assert ask(at_x(ybar) == at_x.zero()) is True
+    assert ask(at_x(xbar) == at_x.zero()) is False
+
+
+def test_a_question_the_source_side_leaves_open_stays_undecided() -> None:
+    r"""Undecided is stated as undecided, never as false.
+
+    In a localization whose submonoid membership is a predicate, ``S`` meets an
+    annihilator only as far as that predicate decides; the equality then keeps
+    the proposition the owner states instead of claiming either answer.
+    """
+    ring = ZZ.localization(ZZ(2))
+    submonoid = ring.localization_submonoid()
+
+    assert submonoid._selected_representation_kind() == "generators"
+    # The generators are decided, so this submonoid answers; the *predicate*
+    # presentation is what has no decision procedure, and no specimen of it is
+    # constructed here rather than inventing one.
+    assert ring.inverted_submonoid_meets(ring.localization_source().ideal(ZZ(2))) is True

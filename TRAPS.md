@@ -1972,3 +1972,23 @@ Two things are deliberate. The module route keeps priority, so **no answer it al
 `tests/rings/test_localization_fraction_equality.sage`, six tests, states the cases that matter: `ZZ[1/2]` equal fractions (`1/2 = 2/4`, `3/2 = 6/4`), unequal ones (`1/2 != 3/2`, `!= 1/1`, `!= 0`), a unit written as a fraction (`4/2 = 2`), zero numerators (`0/1 = 0/2 = 0`), a quotient zero divisor (`(Z/6)[1/2]`: `3 = 0`, `2 != 0`, `3 != 2`), a nilpotent denominator (`(Z/5)[t]/(t^2)` at `t` is the zero ring, `1 = 0`), and one genuinely undecided question. Measured on `tests/rings tests/objects tests/algebras tests/modules` against the published `c94af7b`: **445 failed / 601 passed, nothing introduced**, the six extra passes being the new file.
 
 **Concrete blocker this leaves, inside the library: the colon of a word-framed presented algebra.** `QQ[x,y]/(xy)` at `x` still answers `Unknown` for `y/1 = 0`, because `CommutativeIdeals.ParentMethods._colon_decision` has no branch for a presented algebra's ideals — `_quotient_preimage_ideal` is `None`, the ring is not a localization, and `_selected_engine_ideal` is `None` — so `colon` asserts its frontier ("requires a selected exact source-ideal algorithm"). The preimage data that would decide it exists (the ideal owner already carries `source_relation_rows` for these ideals, and `(xy) : (y) = (x)` is an engine colon in the covering polynomial ring); wiring preimages into `_colon_decision` for that regime is the next unit, and until then equality there is honestly undecided.
+
+**Closed: the colon and saturation of a presented algebra, through its presentation (2026-11-01).** The blocker named above — `QQ[x,y]/(xy)` at `x` answering `Unknown` for `y/1 = 0` — was that `CommutativeIdeals._colon_decision` and `_ideal_saturation_decision` had no branch for a *word-framed presented algebra*: its ideals carry `_selected_engine_ideal` (an ideal of Sage's `Quotient of Multivariate Polynomial Ring ... by (x*y)`), `_quotient_preimage_ideal` is `None`, the ring is not a `QuotientRings` object (so the `_realized_as_quotient` branch declines it by design), and the engine branch then requires `MPolynomialRing_libsingular`, which a quotient engine is not.
+
+Both decisions now take the construction their own docstring states — `(I : J)~ = (I~ : J~)` and `(I : J^∞)~ = (I~ : J~^∞)` — computed on preimages in the cover and mapped back: `I~ = (lifts of the engine generators) + K`, the colon or the saturation as an ordinary polynomial ideal in `cover_ring()`, then each generator pushed into the quotient engine and crossed back through `_from_engine_ideal`. The engine ideal of a quotient ring declines `quotient`/`saturation` itself (Singular refuses it), which is why the preimages are the route; `saturation` answers as a pair `(ideal, exponent)` and the exponent is discarded as a fact about the computation.
+
+With it: `(0 : (y)) = (x)` in `QQ[x,y]/(xy)`, `ask(y/1 = 0)` in its localization at `x` is `True`, `ask(x/1 = 0)` is `False`, and the original `test_selected_presented_algebra_localization_has_exact_fraction_equality` passes.
+
+Measured on `tests/rings tests/objects tests/algebras tests/modules` against the published `c94af7b`: **445 failed / 601 passed → 438 failed / 609 passed, nothing introduced**, seven tests no longer failing:
+
+```
+test_commutative_algebra::test_fitting_ideals_commute_with_selected_presented_localization
+test_commutative_algebra::test_selected_presented_algebra_localization_has_exact_fraction_equality
+test_ideals_of_the_axes_and_of_the_integers::test_membership_congruence_and_annihilators_on_the_axes
+test_induced_map_out_of_a_localized_quotient::test_an_evaluation_that_inverts_x_extends_to_the_localization
+test_induced_map_out_of_a_localized_quotient::test_the_map_induced_by_the_localization_map_is_the_identity
+test_localizations_of_polynomial_algebras::test_inverting_x_on_the_axes_kills_y
+test_localizations_of_polynomial_algebras::test_inverting_x_on_the_axes_makes_x_a_unit
+```
+
+plus the two closed earlier in the session and `tests/rings/test_localization_fraction_equality.sage` (seven tests) all passing.

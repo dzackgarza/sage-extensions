@@ -568,6 +568,30 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
                 return None
             if _realized_as_quotient(ring):
                 return self._binary_cover_ideal_result(other, "colon")
+            # A ring whose engine is a quotient ``P/K`` of a polynomial ring,
+            # without the ``QuotientRings`` placement the branch above requires:
+            # a word-framed presented algebra realizes its ideals as ideals of
+            # that engine quotient.  The colon is the preimage construction this
+            # owner's docstring already states -- ``(I : J)~ = (I~ : J~)`` with
+            # ``I~ = (lifts of generators) + K`` -- computed in the cover, where
+            # the ideals are ordinary polynomial ideals, and mapped back.
+            engine = self._selected_engine_ideal.ring()
+            if isinstance(engine, QuotientRing_generic):
+                cover = engine.cover_ring()
+                defining_generators = tuple(engine.defining_ideal().gens())
+
+                def preimage(engine_ideal):
+                    return cover.ideal(
+                        tuple(generator.lift() for generator in engine_ideal.gens())
+                        + defining_generators
+                    )
+
+                quotient = preimage(self._selected_engine_ideal).quotient(
+                    preimage(other._selected_engine_ideal)
+                )
+                return _from_engine_ideal(
+                    ring, engine.ideal(tuple(engine(generator) for generator in quotient.gens()))
+                )
             if ring in OwnedRings().Commutative().DedekindDomains():
                 match other.is_zero():
                     case True:
@@ -671,6 +695,30 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
                 return None
             if _realized_as_quotient(ring):
                 return self._binary_cover_ideal_result(other, "saturation")
+            # Same preimage construction as the colon, one power up: over a
+            # quotient ``P/K`` the saturation is ``(I~ : J~^infinity)`` mapped
+            # back, and the engine ideals of a quotient ring decline it
+            # themselves.  See ``_colon_decision`` for the branch and why a
+            # presented algebra's ideals reach it.
+            engine = self._selected_engine_ideal.ring()
+            if isinstance(engine, QuotientRing_generic):
+                cover = engine.cover_ring()
+                defining_generators = tuple(engine.defining_ideal().gens())
+
+                def preimage(engine_ideal):
+                    return cover.ideal(
+                        tuple(generator.lift() for generator in engine_ideal.gens())
+                        + defining_generators
+                    )
+
+                # Sage answers the saturation together with the exponent that
+                # reached it; the exponent is a fact about the computation.
+                saturated, _exponent = preimage(self._selected_engine_ideal).saturation(
+                    preimage(other._selected_engine_ideal)
+                )
+                return _from_engine_ideal(
+                    ring, engine.ideal(tuple(engine(generator) for generator in saturated.gens()))
+                )
             if ring in OwnedRings().Commutative().DedekindDomains():
                 match other.is_zero():
                     case True:
