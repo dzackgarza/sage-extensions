@@ -2032,16 +2032,31 @@ class LocalizationRings(OwnedCategory):
             )
 
             integers = _owned_integers()
-            trivial = self.one() == self.zero()
-            if trivial is True:
+            source = self.localization_source()
+            zero_ideal = source.ideal(source.zero())
+            # Triviality is "0 is inverted", and that is a question about the
+            # submonoid and the zero ideal of the *source*: ``S`` meets ``(0)``
+            # exactly when ``0`` lies in ``S``, and then ``1 = 0`` here.  It is
+            # not decided by comparing elements of this localization, whose
+            # equality goes through the localization of the regular module and
+            # the field decision of its coefficient ring -- a cycle that answers
+            # undecided as soon as the coefficient tower admits another ring.
+            inverted_zero = self.inverted_submonoid_meets(zero_ideal)
+            if inverted_zero is True:
                 return integers.one()
-            if trivial is not False:
+            if inverted_zero is not False:
                 # Whether 0 is inverted is undecided, so whether this ring is
                 # trivial is too; neither 1 nor a scan is justified.
                 return None
-            source = self.localization_source()
             source_characteristic = source.characteristic()
-            if (source_characteristic == source.zero()) is True:
+            # The characteristic is an integer, so "the source has
+            # characteristic zero" is a comparison in ``ZZ``.  Comparing it
+            # with ``source.zero()`` instead asks whether it vanishes *in the
+            # source*, which is true for every finite characteristic: in
+            # ``ZZ/6`` the integer ``6`` is the source's zero, and the branch
+            # then claimed a characteristic-zero source and answered undecided
+            # for a localization whose characteristic is 3.
+            if (source_characteristic == integers.zero()) is True:
                 # Characteristic zero with 0 not inverted.  A positive multiple
                 # of one vanishes here only if the inverted set kills it, which
                 # cannot happen when the canonical map is injective -- and
@@ -2053,7 +2068,6 @@ class LocalizationRings(OwnedCategory):
                 if source in OwnedIntegralDomains():
                     return integers.zero()
                 return None
-            zero_ideal = source.ideal(source.zero())
             smaller_candidate_undecided = False
             for candidate in source_characteristic.divisors():
                 multiple = source.scalar_multiple(source.one(), candidate)

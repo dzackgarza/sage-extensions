@@ -1446,6 +1446,22 @@ class QuotientRings(OwnedCategory):
                 )
             return morphism
 
+        def _coerce_map_from_(self, source):
+            r"""Say whether the canonical scalar map from ``source`` into this quotient exists."""
+            from sage_extensions.categories.rings.ring_foundation import (
+                OwnedRings,
+            )
+
+            if source is self:
+                return True
+            if source not in OwnedRings():
+                return None
+            if source is self.quotient_source():
+                return True
+            if self.quotient_source().has_coerce_map_from(source):
+                return True
+            return None
+
         def _module_basis_along(self, ring_map):
             r"""The basis ``1, a, ..., a^{d-1}`` of ``k[x]/(p)`` over ``k``, along the coefficient map.
 
