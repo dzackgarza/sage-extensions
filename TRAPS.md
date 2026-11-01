@@ -1843,3 +1843,16 @@ quotient.zero() == ZZ(0)                   False      # owned scalar: no map, so
 ```
 
 So a quotient ring carries its quotient map and its explicit ingress, but registers **no coercion from its source**, and therefore none from anything its source coerces from: `ZZ -> ZZ/5 -> (Z/5)[t] -> (Z/5)[t]/(t^2)` is a chain the mathematics has and the coercion graph does not. `(Z/5)` alone shows the same (`GF(5).has_coerce_map_from(ZZ)` is `False`), so this is the quotient owner in general, not the two-step case: `QuotientRings` must coerce from its source along the retained quotient map, and then Sage's transitivity carries the rest. Nothing is repaired here — the change is central enough (every scalar operation on every quotient) to need its own unit and its own regression set — and the original `tbar**2 == 0` assertion is left exactly as written, since it is the comparison that is wrong.
+
+### The quotient coercion seam: measured, with the two rules and why neither ships alone (2026-11-01)
+
+The seam is exactly here: `QuotientRings.ParentMethods` declares **no** `_coerce_map_from_` — `[c.__name__ for c in type(quotient).__mro__ if "_coerce_map_from_" in vars(c)]` is `['Parent']`, the Sage default — while the native ring realization's `_OwnedRingParent._coerce_map_from_` answers `True` (the "the coercion exists, construct through the element constructor" convention). So `GF(5) = ZZ/(5)` reports `has_coerce_map_from(ZZ)` `False`, and `(Z/5)[t]/(t^2)` reports `False` for its source, its base and `ZZ`.
+
+Two rules were written and measured, and **neither ships alone**:
+
+| rule | `q == ZZ(0)` | `tests/rings tests/objects tests/algebras` |
+|---|---|---|
+| `source is self.quotient_source()` only | still `False` — Sage does **not** compose our `True`-style declarations into a `ZZ -> polynomial -> quotient` path | no change |
+| that plus transitive `quotient_source().has_coerce_map_from(source)` | `True`, and `tbar**2 == 0` passes | **323 failed → 326 failed**: `test_localizations_of_the_integers::test_inverting_two_in_z_mod_six_leaves_z_mod_three` and `test_prime_localization_field_decisions::{test_a_generated_submonoid_localization_states_its_own_characteristic_and_size, test_the_localization_of_a_quotient_is_a_field_without_a_zero_prime}` regress, each as `localized.characteristic()` answering `None` where it used to answer `3`, `2`, … |
+
+So admitting `ZZ` into a quotient is right, and it is not free: `LocalizationRings` decides a localization's characteristic from its source's tower, and once `ZZ` reaches a quotient the decision no longer reaches its answer (`AssertionError`/`None` at `tests/rings/test_prime_localization_field_decisions.sage` and `test_localizations_of_the_integers.sage`). The unit that lands the coercion must land the localization characteristic decision with it, under the same measurements; shipping the coercion alone would trade one visible defect for three, so the edit was reverted rather than committed. The `tbar**2 == 0` assertion remains as written and still fails; `has_coerce_map_from` remains `False` on every quotient.
