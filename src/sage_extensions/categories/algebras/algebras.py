@@ -3633,7 +3633,8 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             If ``R`` and ``A`` are domains, torsion-freeness of ``A`` is instead
             equivalent to injectivity of ``R -> A``.  An undecided or refuted
             domain hypothesis proves neither answer, so the general module
-            predicate remains undecided when neither construction applies.
+            predicate remains undecided when neither construction applies,
+            unless a retained relation supplies a verified torsion element.
             """
             from sage_extensions.categories.algebras.free_algebras import (
                 SymmetricAlgebras,
@@ -3657,6 +3658,8 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                 case _ if self.is_integral_domain() is True:
                     return self._represented_structure_morphism_kernel_is_zero()
                 case _:
+                    if self._represented_relation_torsion_witness() is not None:
+                        return False
                     return Modules.ParentMethods._torsion_freeness_decision(self)
 
             assert generating in ModulesWithChosenFinitePresentation(base), (
@@ -3665,6 +3668,50 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                 "a chosen finite module presentation"
             )
             return generating.is_torsion_free()
+
+        def _represented_relation_torsion_witness(self):
+            r"""Return a retained relation's ``(scalar, element)`` torsion pair, or ``None``.
+
+            A defining relation that is one term ``c w`` with ``c`` a nonzero
+            non-unit of the coefficient ring and ``w`` a word whose class in
+            the algebra is nonzero is exactly a torsion element with its
+            annihilator: ``c * (w mod I) = 0`` in ``A`` while neither factor is
+            zero.  So ``Z[t]/(2t)`` is refuted by the relation ``2 t``, in
+            which ``2`` is not a unit and ``t`` is nonzero.
+
+            Both terms are read off the retained presentation: the word and
+            coefficient come from the existing word-framing decode of its
+            presentation ring, and the class of the word from the existing
+            presentation morphism.  No normal form is recomputed and no
+            relation is invented.  A relation with several terms, a unit
+            coefficient, or a word whose class is zero or undecided proves
+            nothing, so the caller states the undecided predicate instead; a
+            one-term relation is the only shape whose terms are separately
+            annihilated here.
+            """
+            presentation = self.presentation_ring()
+            decode = getattr(presentation, "_native_basis_coefficients", None)
+            evaluate = getattr(presentation, "_native_basis_image", None)
+            if decode is None or evaluate is None:
+                return None
+            base = self.base_ring()
+            for relation in self.relations():
+                try:
+                    terms = decode(relation)
+                except (AttributeError, AssertionError, TypeError, ValueError, NotImplementedError):
+                    continue
+                if len(terms) != 1:
+                    continue
+                ((label, scalar),) = terms.items()
+                if (scalar == base.zero()) is not False or scalar.is_unit() is not False:
+                    continue
+                element = self.algebra_presentation_morphism()(evaluate(label))
+                if (element == self.zero()) is not False:
+                    continue
+                if (scalar * element == self.zero()) is not True:
+                    continue
+                return scalar, element
+            return None
 
         def _represented_primitive_hypersurface_relative_dimension(self) -> int:
             r"""Return the pure dimension of every nonempty polynomial fibre.

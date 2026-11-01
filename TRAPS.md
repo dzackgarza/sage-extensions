@@ -1324,3 +1324,38 @@ The two failures left in those files are the same vocabulary split as the Hermit
 That is a strict improvement and it is *not* closure of the specimen: `is_torsion_free()` now answers the **proposition** `is_torsion_free(ZZ[t]/(2t))` rather than `False`, and the test asserts `not algebra.is_torsion_free()`, which a proposition refuses to answer (`ask(...)` is required). The library cannot yet decide torsion-freeness for a presented algebra over a non-PID: `2 · t = 0` with both nonzero settles it mathematically, but the generic presented-module torsion decision does not use a relation that is a nonzero multiple. That is a new algorithm and is recorded rather than improvised.
 
 Evidence over four files across `117b222` and after: 15 failed / 3 passed → **10 failed / 8 passed**, five released and none added — the three cusp tests, `test_an_algebra_over_a_field_is_torsion_free`, and `test_the_gaussian_integers_are_torsion_free_over_z`.
+
+### A one-term relation *is* a torsion witness, and that closes `Z[t]/(2t)`
+
+The previous entry left `Z[t]/(2t)` at the proposition because the generic presented-module decision does not read relations. It does not have to be read there: a defining relation that is a single term `c w` with `c` a nonzero non-unit of the coefficient ring and `w` a word whose class in the algebra is nonzero *is* a torsion element with its scalar, `c * (w mod I) = 0`. `AlgebrasWithChosenFinitePresentation._torsion_freeness_decision` now asks `_represented_relation_torsion_witness()` before falling through to the generic module predicate, and answers `False` when that returns a pair.
+
+Everything the witness needs was already maintained; nothing was invented and no normal form is recomputed:
+
+1. `self.relations()` gives the relation as an element of the presentation ring `P`;
+2. `P._native_basis_coefficients(relation)` decodes it in the word framing that `P` already uses for its own basis — for `2 t` that is exactly `{ι₁(t): 2}`, one term, so the relation has the shape the witness reads;
+3. `P._native_basis_image(label)` is the inverse evaluation, giving the word back as an element `w` of `P`;
+4. `self.algebra_presentation_morphism()(w)` is the class of `w` in `A`.
+
+Then the pair is *checked*, not assumed: `(c == 0) is False`, `c.is_unit() is False`, `(w̄ == 0) is False`, `(c * w̄ == 0) is True`. Every one of these has to be decided; an undecided comparison skips the relation, so an undecided word class cannot be turned into a false torsion claim. A positive answer is never produced here — the field branch, the framed-free branch and the integral-domain-kernel branch keep their own proof conditions, and this branch only ever returns `False`.
+
+Measured decisions (probe, and asserted in `tests/algebras/test_finite_presentations_of_commutative_algebras.sage`):
+
+| algebra | relation | decision | why |
+| --- | --- | --- | --- |
+| `Z[t]/(2t)` | `2t`, non-unit `2` | `False` (witness `(2, t̄)`) | `2 t̄ = 0`, `t̄ ≠ 0` |
+| `Z[t]/(2)` | `2·1` | `False` (witness `(2, 1)`) | `2 · 1 = 0`, `1 ≠ 0` — the word is the unit |
+| `Z[t]/(4t)` | `4t`, non-unit `4` | `False` (witness `(4, t̄)`) | the scalar need not be prime |
+| `Z[x,y]/(2xy)` | `2xy` | `False` (witness `(2, x̄ȳ)`) | the word may have length two |
+| `Z[t]/(t)` | `t`, unit coefficient | `True` | `Z[t]/(t) = Z`, freed by the framed-free/integral-domain branch |
+| `Z[t]/(t²+1)` | two terms | `True` | the Gaussian integers are a domain |
+| `Z[t]/(2t−2)` | two terms | **undecided** | `2(t−1) = 0` is real torsion, but no single term carries both a non-unit coefficient and a nonzero word class |
+
+The last row is the honest boundary and is asserted as an `AtomicProposition`, not papered over: the witness reads one-term relations only, and a multi-term relation would need coefficient elimination (a normal form) that this branch deliberately does not implement.
+
+**Vocabulary, again.** `test_swapping_the_axes_is_an_involutive_automorphism_of_qq_xy_mod_xy` had never run: `ring.quotient(ideal)` does not exist on an algebra, and its `axes(plane.gen(0))` spelling assumed a coercion form the owner does not offer. Restated as `plane.quotient_by_relations([x*y])` + `axes.algebra_generator(...)` it still did not construct the morphism, because a presented-algebra `Mor` takes its generator images **keyed by generator label** — `axes.Mor(axes)({x: y, y: x})` fails with "the images ... must be given for every generator, but ['x', 'y'] are missing", the dict keys being elements rather than labels. `axes.Mor(axes)({"x": y, "y": x})` is the owner's spelling, and all five assertions (generator images, `σ(x²+y) = y²+x`, `σ(xy) = 0`, `σ²(x³+2y) = x³+2y`, `σ(x) ≠ x`) hold.
+
+Also checked because the superclass already uses those getters: `algebra_generator(label)` is defined once, on `Algebras.ParentMethods`, and reads the selected resolution's generator, so a presented algebra returns an element of *itself* — `A.algebra_generator("t").parent() is A` for `Z[t]/(2t)`. What looks wrong in that specimen is only the **name**: a presented algebra reprs as `Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring/(2*t)`, because the presentation ring's own repr is module-flavoured. It is cosmetic and not touched here.
+
+**Evidence.** `tests/algebras/test_finite_presentations_of_commutative_algebras.sage` 9 passed (three new tests: the unit-word witness, the two-generator product witness, and the undecided two-term boundary); `tests/algebras/test_finitely_presented_algebras_archive.sage` 1 passed; `tests/modules/test_finitely_presented_module_archive.sage` and `tests/modules/test_cardinality_and_exponent_over_any_pid.sage` 5 passed, so `module.exponent()` still reads from the annihilator. Regression against `f01a702` in a clean worktree, same invocation both sides: `tests/algebras tests/modules` **230 failed / 164 passed → 228 failed / 166 passed**, and the difference is exactly the two intended files — `test_z_t_mod_two_t_has_two_torsion` and `test_swapping_the_axes_...` — with no new failure. `tests/rings/test_commutative_algebra.sage` is 16 failed / 9 passed on both sides with identical failure sets (the earlier "17" in this file was a stale count).
+
+**Withdrawn before it shipped.** An in-flight edit had made `Modules.ParentMethods._torsion_freeness_decision` consult `self.exponent()`. It was reverted rather than repaired: `def exponent` exists only on the finitely-presented-module class, whose own `_torsion_freeness_decision` answers first, so the hook could not fire for any object, and it would not have closed this specimen anyway (a presented algebra has no `exponent`; `annihilator()` asserts). Its witness filter was also inverted — `if (element == self.zero()) is not True: continue` skips the nonzero element instead of requiring it — a reminder that *"is not True"* and *"is False"* are not interchangeable when the comparison can be undecided. The patch is kept at `.scratch/torsion-inflight.patch`.
