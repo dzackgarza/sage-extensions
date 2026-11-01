@@ -440,13 +440,21 @@ class IntegralStructureAction(SageObject):
         r"""Return ``{g in G : g(L)=L}`` for the selected lattice ``L``."""
         rational_group = self.rational_group()
         lattice_inclusion = self.lattice_inclusion()
+        # The composite disjunct is asked first.  When it holds, the condition is
+        # True whatever the group's order is, so the finiteness query below is
+        # dead work -- and for an order the selected decision cannot reach, that
+        # work is a GAP `IsFinite` over the group's generators.  This is an
+        # evaluation-order change only: `A or B` and `B or A` agree, the branch
+        # is the same, and `is_finite()` still runs whenever the composite does
+        # not hold, where it decides between the finite representation and the
+        # predicate route below.
         if (
-            rational_group.is_finite() is True
-            or (
+            (
                 rational_group.has_selected_group_resolution()
                 and rational_group.has_selected_finite_group_generating_set()
                 and self.stable_containing_bound() is not None
             )
+            or rational_group.is_finite() is True
         ):
             return self.finite_representation().lattice_stabilizer()
 

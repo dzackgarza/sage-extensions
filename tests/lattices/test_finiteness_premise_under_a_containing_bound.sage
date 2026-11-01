@@ -205,3 +205,83 @@ def test_without_a_bound_an_infinite_group_is_still_refused() -> None:
     with _Answer(group, False):
         with pytest.raises(AssertionError):
             action.invariant_module_construction()
+
+
+def _standard_specimen():
+    r"""``U`` over ``QQ``, the *full* lattice ``ZZ e_0 + ZZ e_1``, and ``⟨swap⟩``.
+
+    ``stabilizer()`` needs a selected lattice of finite index in the stable
+    module it is closed up into, so this specimen uses the whole lattice as its
+    own containing bound; the group is the same supplied subgroup.
+    """
+    plane = Lattices(QQ)("U")
+    restriction = Modules(QQ).restriction_of_scalars(ZZ.Mor(QQ)(lambda n: QQ(n)))
+    space = restriction(plane)
+    labels = plane.module_generating_set()
+    basis = [plane.module_generator(label) for label in labels]
+    orthogonal_group = plane.Aut()
+    swap = orthogonal_group(lambda label: basis[1 - int(label)])
+    group = orthogonal_group.subgroup((swap,))
+    standard = space.subobject_on([space(basis[0]), space(basis[1])])
+    return group, standard
+
+
+def test_the_stabilizer_does_not_ask_the_order_when_its_composite_holds() -> None:
+    r"""With a resolution, a finite generating set and a bound, the order is dead.
+
+    The condition is ``<composite> or is_finite()``, so when the composite holds
+    the query cannot change the branch: it must not be asked at all.
+    """
+    group, standard = _standard_specimen()
+    bounded = IntegralStructureAction(group, standard.inclusion()).with_stable_containing_bound(
+        standard.inclusion(), check=True
+    )
+    assert group.has_selected_group_resolution() is True
+    assert group.has_selected_finite_group_generating_set() is True
+    assert bounded.stable_containing_bound() is not None
+
+    with _Questions(group) as asked:
+        stabilizer = bounded.stabilizer()
+
+    assert asked.count == 0, (
+        f"stabilizer() asked whether {group} is finite {asked.count} time(s) although its composite "
+        "premise holds"
+    )
+    assert stabilizer == bounded.finite_representation().lattice_stabilizer()
+
+
+def test_the_stabilizer_still_asks_the_order_and_branches_on_it_without_the_bound() -> None:
+    r"""Without a bound the composite fails, and the order decides the branch.
+
+    Forcing it ``True`` reaches the finite representation; forcing it ``False``
+    reaches the predicate route below.  Both are asked, and the answers differ,
+    which is exactly what the composite-first ordering must preserve.
+    """
+    group, standard = _standard_specimen()
+    action = IntegralStructureAction(group, standard.inclusion())
+
+    with _Questions(group) as asked:
+        finite_route = action.stabilizer()
+    assert asked.count >= 1
+
+    with _Answer(group, True):
+        assert action.stabilizer() == finite_route
+
+    with _Answer(group, False):
+        predicate_route = action.stabilizer()
+    assert predicate_route != finite_route
+
+
+def test_forcing_the_order_true_or_false_changes_nothing_with_the_bound() -> None:
+    r"""The discarded answer cannot matter: the composite decides the branch alone."""
+    group, standard = _standard_specimen()
+    bounded = IntegralStructureAction(group, standard.inclusion()).with_stable_containing_bound(
+        standard.inclusion(), check=True
+    )
+
+    with _Answer(group, True):
+        true_answer = bounded.stabilizer()
+    with _Answer(group, False):
+        false_answer = bounded.stabilizer()
+
+    assert true_answer == false_answer

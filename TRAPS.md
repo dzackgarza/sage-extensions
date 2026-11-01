@@ -2089,3 +2089,23 @@ Measured: on the eleven affected algebras/modules files, **30 failures → 26, n
 The failures it produced were of three shapes, all of them the same cause: `ValueError: base must be a ring or a subcategory of Rings()` (Sage's category over an owned ring), `KeyError: ((<class 'sage.categories.magmatic_algebras.MagmaticAlgebras'>, …), ())` (the cache-miss variant), and downstream `AttributeError`s from the objects Sage's constructor returned.
 
 Measured on the four-directory group against the published `c9ab0d5`: **409 failed / 641 passed → 398 failed / 652 passed, nothing introduced**, eleven tests no longer failing — the base-change adjunction's three triangle identities, the presented-algebra coproduct, the native free-algebra factor, the `QQ(√2)` field test, two `Algebras(QQ)`-as-a-category tests, the integers' category list, and `Q(a)` with `a^2 = 5`.
+
+**The third finiteness site: `IntegralStructureAction.stabilizer` (2026-11-01).** The port's handoff at `35e62829` established on the E10 specimen that all three conjuncts of
+
+```python
+if (
+    rational_group.is_finite() is True
+    or (
+        rational_group.has_selected_group_resolution()
+        and rational_group.has_selected_finite_group_generating_set()
+        and self.stable_containing_bound() is not None
+    )
+):
+    return self.finite_representation().lattice_stabilizer()
+```
+
+hold on that path, so the disjunction is `True` whatever the group's order is and the left operand is dead work — a GAP `IsFinite` that the port measured at 4 959 MiB of Python RSS and 413 s before an external kill. The disjunction is now written composite-first. Same truth value, same branch, no finiteness assumption added: `is_finite()` still runs whenever the composite fails, and there it still decides between the finite representation and the predicate route below.
+
+`tests/lattices/test_finiteness_premise_under_a_containing_bound.sage` gains three tests on the full-lattice specimen of `U` (a selected lattice of finite index is what `stabilizer()` needs): with the bound attached the query is asked **zero** times and the result is the finite representation's lattice stabilizer; without the bound it is asked, and forcing `True`/`False` reaches the two different routes; with the bound attached, forcing either answer changes nothing.
+
+Measured: the file is 8 of 8; the four-directory group is **identical to the published `cbf348f` (398 failed / 652 passed, same test ids)**; the four lattice files that exercise the stabilizer are identical to `cbf348f` as well (10 failed / 10 passed on both, same ids — those ten are cross-file pollution inside one pytest process and pass in isolation). A full `tests/lattices` run was started twice and **not completed** within the working window; it is recorded as unrun, not as passing.
