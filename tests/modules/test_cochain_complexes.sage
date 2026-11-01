@@ -1,6 +1,7 @@
 r"""Cohomology of two-term cochain complexes of abelian groups."""
 
 from sage_extensions.all import *
+from sage_extensions.categories.modules.cochain_complexes import CochainComplexes
 
 
 def test_the_complex_ZZ_times_two_ZZ_has_H0_zero_and_H1_ZZ_mod_2() -> None:

@@ -1,6 +1,7 @@
 r"""Cochain complexes of abelian groups graded by all of $\mathbb Z$."""
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.modules.cochain_complexes import CochainComplexes
 
 
 def test_z_by_3_to_z_in_degrees_minus_one_and_zero_has_h_minus_one_zero_and_h0_z_mod_3() -> None:

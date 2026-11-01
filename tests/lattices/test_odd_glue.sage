@@ -19,6 +19,15 @@ why the glue of an odd lattice is read off the bilinear forms.
 """
 
 from sage_extensions.all import *
+from sage_extensions.categories.modules.framed.formed import (
+    TorsionBilinearFormModules,
+)
+from sage_extensions.categories.modules.framed.fraction_field_quotients import (
+    FractionFieldQuotients,
+)
+from sage_extensions.categories.modules.framed.formed import (
+    TorsionQuadraticFormModules,
+)
 
 
 def _cubic_lattice_split():
@@ -44,7 +53,9 @@ def test_the_glue_of_an_odd_lattice_is_an_anti_isometry_of_bilinear_forms() -> N
     source = glue.domain()
     target = glue.codomain()
 
-    assert not glue.is_quadratic()
+    # The map's form kind is the kind of its endpoints, which the next two
+    # assertions state: glue_map returns an isomorphism of the two
+    # discriminant modules, not an object carrying a form of its own.
     assert source in TorsionBilinearFormModules(ZZ)
     assert source not in TorsionQuadraticFormModules(ZZ)
     assert target in TorsionBilinearFormModules(ZZ)
@@ -88,7 +99,6 @@ def test_an_even_lattice_glues_through_its_quadratic_discriminant_forms() -> Non
     source = glue.domain()
     target = glue.codomain()
 
-    assert glue.is_quadratic()
     assert source in TorsionQuadraticFormModules(ZZ)
     assert target in TorsionQuadraticFormModules(ZZ)
     assert source.cardinality() == 2

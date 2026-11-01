@@ -1,6 +1,7 @@
 r"""Cohomology is a functor: on cochain complexes and, through de Rham, on algebras."""
 
 from sage_extensions.all import *
+from sage_extensions.categories.modules.cochain_complexes import CochainComplexes
 
 
 def test_multiplication_by_three_induces_the_identity_on_H1_of_ZZ_times_two_ZZ() -> None:

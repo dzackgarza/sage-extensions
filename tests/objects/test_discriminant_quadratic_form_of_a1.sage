@@ -1,4 +1,10 @@
 from sage_extensions.all import *
+from sage_extensions.categories.modules.framed.fraction_field_quotients import (
+    FractionFieldQuotients,
+)
+from sage_extensions.categories.modules.framed.formed import (
+    TorsionQuadraticFormModules,
+)
 
 
 def values():
