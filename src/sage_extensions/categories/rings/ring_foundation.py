@@ -1929,6 +1929,65 @@ class LocalizationRings(OwnedCategory):
         def one(self):
             return self.fraction(self.localization_source().one())
 
+        def characteristic(self):
+            r"""Return the characteristic of ``S^{-1}R``, decided in the source ring.
+
+            ``n * 1`` vanishes in ``S^{-1}R`` exactly when some ``s`` in ``S``
+            kills ``n * 1`` in ``R``, so the answer is the least ``n`` dividing
+            the source's characteristic whose multiple of one the inverted set
+            kills.  The question is asked with ideals and submonoid membership of
+            the source, never with elements of the localization: equality there
+            is decided through the localization of the regular module, whose
+            placement asks for field decisions.
+
+            The answer is therefore *not* the source's characteristic.  ``ZZ/6``
+            at ``(2)`` has characteristic 2: ``3 * 2 = 0`` and ``3`` is inverted
+            because it lies outside ``(2)``, so ``2`` is already zero there while
+            the source's characteristic is 6.
+            """
+            from sage_extensions.categories.rings.ring_foundation import (
+                _owned_integers,
+            )
+
+            source = self.localization_source()
+            source_characteristic = source.characteristic()
+            integers = _owned_integers()
+            if (source_characteristic == source.zero()) is True:
+                return integers.zero()
+            zero_ideal = source.ideal(source.zero())
+            submonoid = self.localization_submonoid()
+
+            def inverted(element):
+                r"""Decide whether ``element`` is killed-away, or ``None`` when undecided."""
+                match submonoid._selected_representation_kind():
+                    case "predicate":
+                        membership = submonoid.defining_predicate()(element)
+                        return membership if membership in (True, False) else None
+                    case _:
+                        try:
+                            return element in submonoid
+                        except AssertionError:
+                            # Membership in a finitely generated submonoid is not
+                            # decidable here; the generator case is answered below.
+                            return None
+
+            undecided = False
+            for multiple_of_one in source_characteristic.divisors():
+                multiple = source.scalar_multiple(source.one(), multiple_of_one)
+                if (multiple == source.zero()) is True:
+                    return integers(multiple_of_one)
+                annihilator = zero_ideal.colon(source.ideal(multiple))
+                answers = tuple(
+                    inverted(killer) for killer in annihilator.ideal_generators()
+                )
+                if any(answer is True for answer in answers):
+                    return integers(multiple_of_one)
+                if any(answer is None for answer in answers):
+                    undecided = True
+            # ``None`` states that this construction does not decide the
+            # characteristic; it does not state one that is wrong.
+            return None if undecided else integers.zero()
+
         def _fraction_equality_status(self, left, right):
             r"""Compare ring fractions through localization of the actual regular module.
 
@@ -4096,16 +4155,28 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                 if theirs is True and mine is False:
                     return False
                 return AtomicProposition("is_isomorphic", self, other)
-            for left, right in (
-                (self.characteristic(), other.characteristic()),
-                (self._cardinality_decision(), other._cardinality_decision()),
+            for invariant in (
+                lambda: (self.characteristic(), other.characteristic()),
+                lambda: (self._cardinality_decision(), other._cardinality_decision()),
             ):
+                try:
+                    left, right = invariant()
+                except (AssertionError, TypeError, ValueError):
+                    # An invariant an operand does not supply refutes nothing:
+                    # a localization of a quotient states no characteristic
+                    # today, and that silence is not evidence of a difference.
+                    continue
                 if left is None or right is None:
                     continue
                 if (left != right) is True:
                     return False
-            engine = _engine_ring(self)
-            other_engine = _engine_ring(other)
+            try:
+                engine = _engine_ring(self)
+                other_engine = _engine_ring(other)
+            except (AssertionError, TypeError, ValueError):
+                # A field whose construction selects no executable model says
+                # nothing here; that silence is not a difference either.
+                return AtomicProposition("is_isomorphic", self, other)
             if (
                 isinstance(engine, NumberField)
                 and isinstance(other_engine, NumberField)

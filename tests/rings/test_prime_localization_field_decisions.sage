@@ -50,16 +50,45 @@ def test_the_localization_of_a_quotient_is_a_field_without_a_zero_prime() -> Non
     ``p = (2)`` is not the zero ideal, so a decision that reads ``p = 0`` would
     answer ``False`` here.  The general test -- ``(0 : (2)) = (3)`` is not
     contained in ``(2)`` -- answers ``True``, and it answers it without touching
-    an element of the localization.
+    an element of the localization.  Everything below is the exact arithmetic of
+    that answer, not a count: the six residues of the source collapse onto
+    ``{0, 1}`` with ``2`` and ``4`` killed, the inverted set admits exactly the
+    odd denominators, and the residue map is the identity onto ``FF_2``.
     """
     quotient = ZZ.quotient_ring(ZZ.ideal(6))
     localized = quotient.spectrum()(2).local_ring()
+    zero, one = localized.zero(), localized.one()
 
     assert localized.localization_source() is quotient
     assert localized.is_field() is True
     assert localized.maximal_ideal().is_zero() is True
+
+    # 2 and 4 are killed; 1, 3 and 5 are the unit of FF_2.
+    for residue in (0, 2, 4):
+        assert localized.fraction(quotient(residue)) == zero, residue
+    for residue in (1, 3, 5):
+        assert localized.fraction(quotient(residue)) == one, residue
     assert localized.fraction(quotient(2)) == localized.zero()
     assert localized.fraction(quotient(3)) != localized.zero()
+
+    # The inverted set is the complement of (2): odd denominators are admitted.
+    for denominator in (1, 3, 5):
+        assert localized.fraction(quotient(1), quotient(denominator)) == one
+    for denominator in (2, 4):
+        with pytest.raises(ValueError):
+            localized.fraction(quotient(1), quotient(denominator))
+
+    # The characteristic is the localization's, not the source's: 3 * 2 = 0.
+    assert quotient.characteristic() == 6
+    assert localized.characteristic() == 2
+
+    # The residue field is FF_2 and the residue map is the identity onto it.
+    residue_field = localized.residue_field()
+    residue_map = localized.residue_map()
+    assert residue_field.is_field() is True
+    assert residue_map(localized.one()) == residue_field.one()
+    assert residue_map(localized.zero()) == residue_field.zero()
+    assert residue_map(localized.fraction(quotient(3))) == residue_field.one()
 
 
 def test_an_undecided_killer_leaves_the_decision_undecided() -> None:
@@ -72,3 +101,19 @@ def test_an_undecided_killer_leaves_the_decision_undecided() -> None:
     localized = ZZ.spectrum()(3).local_ring()
 
     assert localized.is_field() in (True, False) or localized.is_field() in Propositions
+
+def test_the_isomorphism_decision_states_unknown_rather_than_raising() -> None:
+    r"""A field whose invariants are unavailable is undecided, never ``False``.
+
+    ``(ZZ/6)_(2)`` is ``FF_2`` and its characteristic is now stated, but it
+    selects no executable model and its cardinality is undecided, so no
+    isomorphism with ``GF(2)`` is established here.  What matters is the shape of
+    the answer: a proposition, not an exception and not a refutation.
+    """
+    localized = ZZ.quotient_ring(ZZ.ideal(6)).spectrum()(2).local_ring()
+
+    answer = localized.is_isomorphic(GF(2))
+
+    assert answer is not True
+    assert answer is not False
+    assert answer in Propositions
