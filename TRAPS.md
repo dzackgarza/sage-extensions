@@ -2011,3 +2011,15 @@ test_principal_maximal_ideals_in_k_t::test_a_quotient_by_an_irreducible_generato
 ```
 
 The cause is identity, not mathematics: the placement is part of an ideal's cache key, so the placed ideal is a *different* ideal and its quotient a different parent from the one the rest of the construction (and the tests) hold. Reverted. The next attempt must keep the quotient's identity and reach the same conclusion another way — either `_quotient_ring` reading the prime placement the *localization* states for its own `p`, or the residue-field construction supplying `Frac(R/p)` without asking the quotient for `fraction_field` — and it must keep those two tests green.
+
+**The concrete blocker behind both remaining routes: Sage's univariate ideal class has no syzygy module (2026-11-01).** The second attempt at the prime-localization residue field kept the quotient's identity — it built `Frac(R/p)` as `quotient.localize_at_prime(zero_ideal)`, the localization at the zero prime, which is what a fraction field is and which needs the caller's prime declaration rather than a domain placement. The `.fraction_field` blocker disappears, and both files stop at the next layer:
+
+```
+KeyError: ((Point Ideal (0) of … of Spec(…)), ())
+KeyError: (<id>, (0,), None)
+AttributeError: 'Ideal_1poly_field' object has no attribute 'syzygy_module'
+```
+
+That last one is the real blocker, and it is the same gap that stopped the colon route when it was a predecessor: `_polynomial_syzygy_rows` (`commutative_ideals.py:1434`) asks the ideal for its `syzygy_module`, and Sage's univariate-over-a-field ideal class (`Ideal_1poly_field`) does not have one — not on the ideal, and not on a `Matrix_polynomial_dense` either (`hasattr` is `False` for both `syzygies` and `syzygy_module`). Over `ZZ` and over a multivariate polynomial ring the function has routes (Singular `syz`, `syzygy_module`); for the univariate case there is none, so every construction that takes a univariate cover — the prime localization's residue field, and the colon/saturation of a quotient by a univariate-cover presentation — stops there.
+
+Two implementations are open, both requiring their own acceptance work: the PID syzygy module read off a Hermite/Smith form of the `1 x n` generator matrix, or the Koszul-type pair relations `(h_j, -h_i)` for the primitive row `h = g/gcd(g)`, which generate the syzygy module of a unimodular row over a PID. Neither is written here; the reverted attempt changed no test count (`429 failed / 618 passed` either way) and is not shipped.
