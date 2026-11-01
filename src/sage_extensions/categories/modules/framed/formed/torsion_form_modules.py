@@ -288,6 +288,10 @@ def _torsion_form_isometry(forward, inverse, *, quadratic: bool):
     value_identity = values.module_category().Mor(values, values).identity()
     forward_component = forward.module_morphism() if isinstance(forward, FormedModuleMorphism) else forward
     inverse_component = inverse.module_morphism() if isinstance(inverse, FormedModuleMorphism) else inverse
+    # The module Mor constructor already returns an arrow unchanged when it
+    # has this exact parent.  Keep that constructor as the ownership boundary;
+    # its existing-parent branch is constant-time and does not rebuild a
+    # finite presentation.
     formed_forward = category.Mor(source, target)((forward_component, value_identity))
     formed_inverse = category.Mor(target, source)((inverse_component, value_identity))
     return category.Core().Mor(source, target)._from_known_inverse_pair(
@@ -1123,7 +1127,14 @@ class TorsionFormAutomorphism(TorsionFormIsometry):
         return self._engine_element
 
     def inverse(self):
-        return self.parent()._from_engine(~self._engine())
+        # The exact inverse map is already owned and was validated when this
+        # isometry was constructed. Do not throw it away and reconstruct both
+        # maps from the inverse engine element.
+        return self.parent()._from_engine(
+            ~self._engine(),
+            forward=self.inverse_morphism(),
+            inverse=self.forward(),
+        )
 
     def __invert__(self):
         return self.inverse()
@@ -1339,9 +1350,20 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
             }
         )
 
-    def _from_engine(self, engine_automorphism):
-        r"""Raise one engine automorphism ``a``; its inverse is the transport of ``a^{-1}``."""
+    def _from_engine(self, engine_automorphism, *, forward=None, inverse=None):
+        r"""Raise one engine automorphism ``a``; its inverse is the transport of ``a^{-1}``.
+
+        A caller that already owns the exact form automorphism represented by
+        ``a`` may supply its forward and inverse maps.  This avoids rebuilding
+        two presented-module morphisms by conjugating the same engine action
+        back through the normalization isometry.  Supplying only one map is an
+        error: the owned group element always carries a certified inverse map.
+        """
         engine_automorphism = self._engine_group()(engine_automorphism)
+        if (forward is None) != (inverse is None):
+            raise ValueError("an owned form automorphism must be raised with both forward and inverse maps")
+        if forward is not None:
+            return self.element_class(self, forward, inverse, engine_automorphism)
         return self.element_class(
             self,
             self._transported_map(engine_automorphism),
@@ -1403,7 +1425,19 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
             len(labels),
             [entry for row in engine_rows for entry in row],
         )
-        return self._from_engine(self._engine_group()(engine_matrix))
+        engine_automorphism = self._engine_group()(engine_matrix)
+        if isinstance(morphism, TorsionFormIsometry):
+            # ``morphism`` is already the exact owned form isometry represented
+            # by this normalized engine matrix. Reuse its stored mutually
+            # inverse maps instead of reconstructing them through normalization
+            # in _from_engine. A general Core morphism does not promise an
+            # inverse, so it retains the ordinary engine-to-owned crossing.
+            return self._from_engine(
+                engine_automorphism,
+                forward=morphism.forward(),
+                inverse=morphism.inverse_morphism(),
+            )
+        return self._from_engine(engine_automorphism)
 
     def _element_constructor_(self, datum):
 

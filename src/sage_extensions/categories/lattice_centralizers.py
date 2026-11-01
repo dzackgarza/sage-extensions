@@ -927,6 +927,7 @@ class IsometryPrimitiveExtension:
         r"""Return ``rho_L(O(L,f)) <= O(A_L)``, the finite image of the centralizer."""
         return self.isometry.centralizer_discriminant_image()
 
+    @cached_method
     def _full_discriminant_glue_data(self):
         r"""Return the primitive glue data when both discriminant forms are glued in full."""
         glue = self.glue()
@@ -989,6 +990,65 @@ class IsometryPrimitiveExtension:
         )
         return self.orthogonal_complement.O().discriminant_preimage(allowed_discriminant_image)
 
+    @cached_method
+    def _coinvariant_glue_inverse_maps(self):
+        r"""Materialize the inverse maps for the fixed full-discriminant glue inclusions.
+
+        The full-glue cardinality checks establish that each inclusion is an
+        isomorphism of finite modules.  Build its inverse once from the
+        preimages of the codomain generators; repeated invariant
+        automorphisms then evaluate these explicit maps instead of rebuilding
+        the general framed-codomain preimage solver for every generator
+        image.
+        """
+        glue, invariant_form, coinvariant_form, glue_source, glue_target = (
+            self._full_discriminant_glue_data()
+        )
+        source_inclusion = glue_source.inclusion()
+        target_inclusion = glue_target.inclusion()
+        twisted_coinvariant_form = target_inclusion.codomain()
+
+        source_inverse_images = {
+            label: source_inclusion.lift(invariant_form.module_generator(label))
+            for label in invariant_form.module_generating_set()
+        }
+        source_inverse = invariant_form.module_category().Mor(
+            invariant_form, glue_source
+        )(source_inverse_images)
+        target_inverse_images = {
+            label: target_inclusion.lift(twisted_coinvariant_form.module_generator(label))
+            for label in twisted_coinvariant_form.module_generating_set()
+        }
+        target_inverse = twisted_coinvariant_form.module_category().Mor(
+            twisted_coinvariant_form, glue_target
+        )(target_inverse_images)
+
+        for label in invariant_form.module_generating_set():
+            element = invariant_form.module_generator(label)
+            if source_inclusion(source_inverse(element)) != element:
+                raise ArithmeticError(
+                    "the cached invariant glue-inclusion inverse fails on a module generator"
+                )
+        for label in twisted_coinvariant_form.module_generating_set():
+            element = twisted_coinvariant_form.module_generator(label)
+            if target_inclusion(target_inverse(element)) != element:
+                raise ArithmeticError(
+                    "the cached coinvariant glue-inclusion inverse fails on a module generator"
+                )
+
+        return (
+            glue,
+            invariant_form,
+            coinvariant_form,
+            glue_source,
+            glue_target,
+            source_inclusion,
+            target_inclusion,
+            source_inverse,
+            target_inverse,
+            glue.inverse().forward(),
+        )
+
     def _coinvariant_discriminant_from_invariant(self, invariant_automorphism):
         r"""Conjugate an invariant discriminant action across the primitive glue.
 
@@ -998,33 +1058,53 @@ class IsometryPrimitiveExtension:
         hypothesis is exactly the one required by
         :meth:`coinvariant_extension_subgroup`.
         """
-        glue, invariant_form, coinvariant_form, glue_source, glue_target = (
-            self._full_discriminant_glue_data()
-        )
-        source_inclusion = glue_source.inclusion()
-        target_inclusion = glue_target.inclusion()
+        (
+            glue,
+            invariant_form,
+            coinvariant_form,
+            _glue_source,
+            _glue_target,
+            source_inclusion,
+            target_inclusion,
+            source_inverse,
+            target_inverse,
+            glue_inverse,
+        ) = self._coinvariant_glue_inverse_maps()
         twisted_coinvariant_form = target_inclusion.codomain()
 
         invariant_automorphism = invariant_form.O()(invariant_automorphism)
-        images = {}
-        for label in coinvariant_form.module_generating_set():
-            element = coinvariant_form.module_generator(label)
-            twisted = twisted_coinvariant_form(element)
-            target_element = target_inclusion.lift(twisted)
-            source_element = glue.inverse().forward()(target_element)
-            invariant_class = source_inclusion(source_element)
-            moved_invariant_class = invariant_automorphism(invariant_class)
-            moved_source = source_inclusion.lift(moved_invariant_class)
-            moved_target = glue.forward()(moved_source)
-            moved_twisted = target_inclusion(moved_target)
-            images[label] = coinvariant_form(moved_twisted)
-        morphism = coinvariant_form.module_category().Mor(coinvariant_form, coinvariant_form)(images)
+        inverse_automorphism = invariant_automorphism.inverse()
+        group = coinvariant_form.O()
+        module_mor = coinvariant_form.module_category().Mor(
+            coinvariant_form, coinvariant_form
+        )
+
+        def conjugated_images(action):
+            images = {}
+            for label in coinvariant_form.module_generating_set():
+                element = coinvariant_form.module_generator(label)
+                twisted = twisted_coinvariant_form(element)
+                target_element = target_inverse(twisted)
+                source_element = glue_inverse(target_element)
+                invariant_class = source_inclusion(source_element)
+                moved_invariant_class = action(invariant_class)
+                moved_source = source_inverse(moved_invariant_class)
+                moved_target = glue.forward()(moved_source)
+                moved_twisted = target_inclusion(moved_target)
+                images[label] = coinvariant_form(moved_twisted)
+            return images
+
+        # Conjugation carries the already-certified inverse of the invariant
+        # automorphism to the inverse of the coinvariant action.  Construct
+        # both exact maps on the selected generators; do not solve a generic
+        # module inverse, which reconstructs finite presentations per call.
+        forward = module_mor(conjugated_images(invariant_automorphism))
+        inverse = module_mor(conjugated_images(inverse_automorphism))
         from sage_extensions.categories.modules.framed.formed.torsion_form_modules import (
             _torsion_form_isometry,
         )
 
-        group = coinvariant_form.O()
-        isometry = _torsion_form_isometry(morphism, morphism.inverse(), quadratic=group.is_quadratic())
+        isometry = _torsion_form_isometry(forward, inverse, quadratic=group.is_quadratic())
         return group.from_morphism(isometry)
 
     def lift_coinvariant_extension_element(self, coinvariant_part):
