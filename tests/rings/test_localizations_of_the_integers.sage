@@ -46,6 +46,26 @@ def test_a_denominator_outside_the_inverted_set_is_refused() -> None:
         ring.fraction(ZZ(1), ZZ(3))
 
 
+def test_an_owned_fraction_is_read_as_its_own_fraction() -> None:
+    r"""An element of the owned rational field denotes ``a/b``, and is refused when it must be.
+
+    ``ZZ[1/2]`` admits ``1/2`` and not ``1/3``.  Reading an owned ``QQ(1/3)``
+    through the source ring raised the source's conversion error -- "no
+    conversion of this rational to integer" -- which names ``ZZ`` for a decision
+    the localization owns.  Both values now take the localization's own path:
+    the admitted one becomes the fraction, and the refused one raises the
+    admission refusal.
+    """
+    ring = ZZ.localization(ZZ(2))
+
+    assert ring(QQ(1) / QQ(2)) == ring.fraction(ZZ(1), ZZ(2))
+    assert ring(QQ(3) / QQ(4)) == ring.fraction(ZZ(3), ZZ(4))
+    assert ring(QQ(2)) == ring(2)
+    assert ring(QQ(6) / QQ(3)) == ring(2)
+    with pytest.raises(ValueError):
+        ring(QQ(1) / QQ(3))
+
+
 def test_a_raw_sage_rational_denotes_its_own_fraction() -> None:
     r"""``QQ(1/2)`` is ``1/2``, not the source ring's rounding of it.
 

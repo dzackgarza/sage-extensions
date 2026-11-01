@@ -1591,22 +1591,47 @@ class LocalizationRings(OwnedCategory):
             # numerator and denominator.  Reading it through the source ring
             # alone would round it to an element of the source -- `ZZ(1/2)` is
             # `1`, not `1/2` -- so a non-integral value would silently denote a
-            # different element.  The denominator is still admitted through the
-            # selected submonoid, so a value outside a proper localization is
-            # refused here rather than truncated.
-            if source not in OwnedRings():
-                numerator = getattr(value, "numerator", None)
-                denominator = getattr(value, "denominator", None)
-                if callable(numerator) and callable(denominator):
-                    numerator, denominator = numerator(), denominator()
-                    source_engine = _engine_ring(self.localization_source())
-                    if all(
-                        element_parent(part) in OwnedRings()
-                        or element_parent(part) is source_engine
-                        for part in (numerator, denominator)
-                    ):
-                        return self.fraction(numerator, denominator)
+            # different element, and the source's own conversion refuses the
+            # value with a conversion error that names the wrong owner.  The
+            # denominator is admitted through the selected submonoid instead, so
+            # a value outside a proper localization is refused by the
+            # localization.  This covers an element of Sage's own field and an
+            # element of an owned field alike: the split is the same, and the
+            # parts are read into the source by `fraction`.
+            for candidate in self._fraction_denotations(value):
+                numerator = getattr(candidate, "numerator", None)
+                denominator = getattr(candidate, "denominator", None)
+                if not (callable(numerator) and callable(denominator)):
+                    continue
+                numerator, denominator = numerator(), denominator()
+                source_engine = _engine_ring(self.localization_source())
+                if all(
+                    element_parent(part) in OwnedRings()
+                    or element_parent(part) is source_engine
+                    for part in (numerator, denominator)
+                ):
+                    return self.fraction(numerator, denominator)
             return self.fraction(value)
+
+        def _fraction_denotations(self, value):
+            r"""Yield the ways ``value`` states a fraction, reduced form first.
+
+            An owned element of a fraction field retains the numerator and
+            denominator it was *given*: ``QQ(6)/QQ(3)`` is ``(6)/(3)``, and ``2``
+            is not its stated denominator.  Membership of such a value in
+            \(S^{-1}R\) is decided by the value, not by that presentation --
+            \((3):(6) = (1)\) meets the inverted set -- so the retained
+            realization's reduced pair is read first and the stated one kept as
+            the fallback.  A value with no fraction-field realization, or with
+            no numerator and denominator at all, contributes only what it states.
+            """
+            value_parent = element_parent(value)
+            if value_parent in OwnedRings() and value_parent.is_field() is True:
+                try:
+                    yield _engine_element(value_parent, value)
+                except (TypeError, ValueError, AttributeError):
+                    pass
+            yield value
 
         def __call__(self, value):
             return self._element_constructor_(value)
