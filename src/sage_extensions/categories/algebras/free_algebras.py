@@ -70,7 +70,10 @@ from sage_extensions.categories.rings.ring_foundation import (
 )
 from sage_extensions.categories.sets.cardinals import cardinal
 from sage_extensions.categories.sets.finite_families import finite_family
-from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+from sage_extensions.categories.sets.finite_ordered_sets import (
+    finite_ordered_set,
+    interned_finite_ordered_set,
+)
 from sage_extensions.categories.sets.indexed_families import (
     IndexedFamily,
     indexed_family,
@@ -435,8 +438,14 @@ def _variable_names(labels) -> tuple[str, ...]:
 
 @cached_function(key=lambda names: tuple(name.strip() for name in names))
 def _named_polynomial_variables(names):
-    """Intern a polynomial variable index set by its normalized ordered names."""
-    return finite_ordered_set(tuple(name.strip() for name in names))
+    """Intern a polynomial variable index set by its normalized ordered names.
+
+    This is the same intern the free-module route uses
+    (``sets.finite_ordered_sets.interned_labels``), so ``R[x, y]`` and
+    ``R.free_module(("x", "y")).symmetric_algebra()`` reach one label set and
+    therefore one algebra.
+    """
+    return interned_finite_ordered_set(tuple(name.strip() for name in names))
 
 
 def _polynomial_variables(variables):
