@@ -124,3 +124,82 @@ def test_a_resolution_augmentation_maps_each_free_generator_to_its_own_basis_ele
     assert tuple(group.group_generators()) == (exchange, transvection, reflection)
     assert all(generator in group for generator in (exchange, transvection, reflection))
     assert tuple(group.subgroup((transvection,)).group_generators()) == (transvection,)
+
+
+def _exchange_and_neighbours(space):
+    r"""One isometry of ``space`` built by a chosen route, plus distinct ones."""
+    labels = tuple(space.module_generating_set())
+    z, a, m, b = tuple(space.module_generators())
+
+    def build(images):
+        return space.Isom(space)(dict(zip(labels, images, strict=True)))
+
+    exchange = build((m, b, z, a))
+    shear = build((z + m, a, m, b - a))
+    reflection = build((-z, -a, m, b))
+    return exchange, shear, reflection
+
+
+def _check_equal_routes(space, ring_name) -> None:
+    r"""Equal isometries from different routes are one hash key and one dict key.
+
+    ``Tensor._cache_key`` documents a key for presentations with unhashable
+    scalars, not a mathematical hash, so the compatibility is measured here on
+    arrows built from separately constructed coordinates rather than assumed
+    from that comment.
+    """
+    labels = tuple(space.module_generating_set())
+    z, a, m, b = tuple(space.module_generators())
+    exchange, shear, reflection = _exchange_and_neighbours(space)
+    images = (m, b, z, a)
+
+    routes = {
+        "dict": space.Isom(space)(dict(zip(labels, images, strict=True))),
+        "generator images": space.Isom(space)(images),
+        "rebuilt dict": space.Isom(space)(
+            {label: image for label, image in zip(labels, images, strict=True)}
+        ),
+        "composite": (exchange * shear) * shear.inverse(),
+        "involution triple": (exchange * exchange) * exchange,
+        "inverse inverse": exchange.inverse().inverse(),
+    }
+    table = {exchange: "exchange", shear: "shear", reflection: "reflection"}
+    for route, candidate in routes.items():
+        assert candidate is not exchange, (ring_name, route)
+        assert candidate == exchange, (ring_name, route)
+        assert hash(candidate) == hash(exchange), (ring_name, route)
+        assert table.get(candidate) == "exchange", (ring_name, route)
+        assert len({exchange, candidate}) == 1, (ring_name, route)
+        assert len({exchange, shear, reflection}) == 3, (ring_name, route)
+        assert hash(shear) != hash(exchange), (ring_name, route)
+
+
+def test_equal_isometries_from_different_routes_share_a_hash_and_a_dictionary_key_over_zz() -> None:
+    _check_equal_routes(_two_hyperbolic_planes(), "ZZ")
+
+
+def test_equal_isometries_from_different_routes_share_a_hash_and_a_dictionary_key_over_qq() -> None:
+    _check_equal_routes(_two_hyperbolic_planes().vector_space(), "QQ")
+
+
+def test_distinct_isometries_remain_distinct_subgroup_generators() -> None:
+    r"""A subgroup keeps its supplied generators distinct, over both rings."""
+    for ring_name, space in (
+        ("ZZ", _two_hyperbolic_planes()),
+        ("QQ", _two_hyperbolic_planes().vector_space()),
+    ):
+        exchange, shear, reflection = _exchange_and_neighbours(space)
+        group = space.O().subgroup((exchange, shear, reflection))
+
+        assert tuple(group.group_generators()) == (exchange, shear, reflection), ring_name
+        assert len(set(group.group_generators())) == 3, ring_name
+        assert all(generator in group for generator in (exchange, shear, reflection)), ring_name
+
+        # An equal arrow from another route is the same element of the group,
+        # not a fourth generator.
+        rebuilt = space.Isom(space)(
+            dict(zip(tuple(space.module_generating_set()), (exchange(g) for g in space.module_generators()), strict=True))
+        )
+        assert rebuilt == exchange, ring_name
+        assert rebuilt in group, ring_name
+        assert tuple(group.subgroup((shear,)).group_generators()) == (shear,), ring_name
