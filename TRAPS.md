@@ -1766,3 +1766,21 @@ Two evaluator-visible defects, both reached from `test_the_categories_of_qq_x` a
 Measured on the seven files that build these algebras (`tests/objects/test_polynomial_ring_qq_x.sage`, `test_symmetric_algebra_of_qq2.sage`, `test_tensor_algebra_of_qq2.sage`, `test_exterior_algebra_of_qq2.sage`, `tests/algebras/test_morphisms_of_presented_commutative_algebras.sage`, `test_one_construction_per_label_set.sage`, `tests/rings/test_commutative_algebra.sage`) against a clean worktree at the published `cdafca8`: **33 failed / 32 passed → 29 failed / 36 passed, four fixed, none introduced** (`test_qq_x_has_one_endomorphism_category`, `test_the_categories_of_qq_x`, `test_the_symmetric_algebra_has_one_endomorphism_category`, `test_the_tensor_algebra_has_one_endomorphism_category`). The other 29 failures in that set — the localization, Fitting, Nakayama, fiber-rank, coproduct and pushout tests in `test_commutative_algebra.sage` among them — are unchanged by this work and stay open.
 
 **Open naming question this raised, recorded rather than decided.** The test lint asks for `TL01 from … import …: take every name from the session`, i.e. it wants tests to use the session names — but this session deliberately exports no catalogue constructors, so the only way two files can state the *owned* `Algebras` is an explicit import, which TL01 flags. Exporting `Algebras` in `all.py` would make the bare name in every `.sage` file mean this library's category instead of Sage's (today the pytest plugin supplies Sage's), which is a suite-wide semantic change and is not made here on the back of a two-file vocabulary repair. Recorded as the decision it is: local explicit imports now, one session-export question for the owner.
+
+### The affine line's de Rham cohomology is past a stated owner limit (2026-11-01, open, not a defect to guess at)
+
+`tests/objects/test_polynomial_ring_qq_x.sage::test_the_de_rham_cohomology_of_the_affine_line` asserts `de_rham.cohomology(0).module_rank() == 1` and `cohomology(1).cardinality() == 1` for `QQ[x]`, and fails further down than the de Rham algebra itself:
+
+```
+cohomology(0) -> _cohomology_along -> cycles(0) -> differential_component(0).kernel()
+AssertionError: cannot compute the kernel of Free module on {[0]} over
+  Free module on Coproduct of the family over NN = {0, 1, 2, ...} over QQ
+  restricted to Fraction Field of Integer Ring
+-> Free module on {[('d', 'x')]} over the same restricted module:
+  no algorithm is available for these modules
+  (domain and codomain both in Join of restricted-scalars modules over QQ and vector spaces over QQ)
+```
+
+The algebra and its Kähler differentials are fine — `test_the_kahler_differentials_of_qq_x` passes (`module_rank() == 1`, `d(x^3) = 3 x^2 dx`). What fails is the **cohomology owner**, and the library already says why, in `DeRhamAlgebras.an_object`'s own docstring: "A polynomial algebra over `R` is infinite as an `R`-module, while the current cohomology owner retains finite presentations of cycles and boundaries. The selected quotient `R[x]/(x^2)` is still nontrivial Kähler calculus and is finite free over `R`."
+
+So this is a stated boundary, not a mis-construction: `QQ[x]` is infinite-dimensional, its graded pieces are not finitely presented, and `ModuleMorphismMethods.kernel` has no algorithm for the restricted-scalars modules they become. Two honest routes exist and neither is taken here: extend the cohomology owner to non-finitely-presented pieces (a feature, with its own design and acceptance), or state a finite specimen — but `H^0_{dR}(A^1) = QQ`, `H^1_{dR}(A^1) = 0` is the mathematical claim the test makes, and replacing `QQ[x]` by `QQ[x]/(x^2)` would change what it asserts, so it is left failing rather than rewritten. Recorded as the next unit in this file with its exact chain.
