@@ -5683,9 +5683,26 @@ class _DualNumbersAlgebraParent(_OwnedAlgebraParent):
             enter through this selected element class. The public lift
             operation remains at QuotientRings.ElementMethods.
             """
-            if element_parent(backend_value) is parent._quotient_source:
+            source = element_parent(backend_value)
+            if source is parent._quotient_source:
                 backend_value = parent._engine(
                     _engine_element(parent._quotient_source, backend_value)
+                )
+            elif source is parent:
+                # This ring's own element: the engine value is its datum.
+                backend_value = backend_value._backend()
+            elif source is parent._engine:
+                # The engine element itself, which is what a coercion map hands
+                # back: the private realization is exactly this ring's datum.
+                pass
+            else:
+                # A scalar of the tower or a host number.  The coefficient map is
+                # the constant term, so the value enters through the polynomial
+                # source, where the whole tower already lands: ``ZZ -> R -> R[eps]``.
+                # The polynomial ring's own constructor decides what it admits;
+                # this class does not invent a second scalar ingress.
+                backend_value = parent._engine(
+                    _engine_element(parent._quotient_source, parent._quotient_source(backend_value))
                 )
             super().__init__(parent, backend_value)
             self._representative = _owned_engine_element(
