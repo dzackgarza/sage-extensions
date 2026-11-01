@@ -15,7 +15,7 @@ def test_z_mod_6_plus_z_has_the_length_one_resolution_z_to_z2_by_6_0() -> None:
     """
     F = ZZ**2
     x = F.module_generator(0)
-    M = F / F.submodule([6 * x])
+    M = F.subobject_on([6 * x]).inclusion().cokernel()
     resolution = M.free_resolution()
 
     assert resolution.is_exact()

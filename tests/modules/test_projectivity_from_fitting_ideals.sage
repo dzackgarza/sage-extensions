@@ -14,7 +14,7 @@ def test_z2_modulo_a_basis_vector_is_projective_with_fitting_ideals_0_and_z() ->
     Source: Eisenbud 20.8; by hand from the relation matrix (1, 0).
     """
     F = ZZ**2
-    M = F / F.submodule([F.module_generator(0)])
+    M = F.subobject_on([F.module_generator(0)]).inclusion().cokernel()
     assert M.fitting_ideal(0) == ZZ.ideal(0)
     assert M.fitting_ideal(1) == ZZ.ideal(1)
     assert M.is_projective()
@@ -27,7 +27,7 @@ def test_z_mod_6_plus_z_is_not_projective_since_its_first_fitting_ideal_is_6z() 
     Source: Eisenbud 20.8; by hand from the relation matrix (6, 0).
     """
     F = ZZ**2
-    M = F / F.submodule([6 * F.module_generator(0)])
+    M = F.subobject_on([6 * F.module_generator(0)]).inclusion().cokernel()
     assert M.fitting_ideal(0) == ZZ.ideal(0)
     assert M.fitting_ideal(1) == ZZ.ideal(6)
     assert M.fitting_ideal(2) == ZZ.ideal(1)

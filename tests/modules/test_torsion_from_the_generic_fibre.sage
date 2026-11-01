@@ -21,7 +21,7 @@ def test_z_mod_6_is_torsion_with_generic_rank_0_and_is_its_own_torsion_submodule
 def test_z_mod_6_plus_z_has_generic_rank_1_and_is_neither_torsion_nor_torsion_free() -> None:
     """Q (x) (Z/6 + Z) = Q; the torsion submodule is Z/6."""
     F = ZZ**2
-    M = F / F.submodule([6 * F.module_generator(0)])
+    M = F.subobject_on([6 * F.module_generator(0)]).inclusion().cokernel()
     assert M.generic_rank() == 1
     assert not M.is_torsion()
     assert not M.is_torsion_free()

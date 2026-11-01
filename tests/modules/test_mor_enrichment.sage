@@ -57,9 +57,9 @@ def test_the_kernel_of_x_on_the_coordinate_axes_is_yA_which_x_kills_and_is_not_f
 def test_the_kernel_of_z_mod_4_onto_z_mod_2_is_z_mod_2_generated_by_2x() -> None:
     """Source: by hand."""
     F = ZZ**1
-    source = F / F.submodule([4 * F.module_generator(0)])
+    source = F.subobject_on([4 * F.module_generator(0)]).inclusion().cokernel()
     G = ZZ**1
-    target = G / G.submodule([2 * G.module_generator(0)])
+    target = G.subobject_on([2 * G.module_generator(0)]).inclusion().cokernel()
     x = source.module_generator(0)
     reduction = source.Mor(target)({0: target.module_generator(0)})
 

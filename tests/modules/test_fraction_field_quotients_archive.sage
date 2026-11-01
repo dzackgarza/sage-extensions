@@ -10,7 +10,7 @@ from sage_extensions.all import *  # noqa: F401,F403
 
 def rationals_modulo(n):
     Q = Modules(ZZ)(QQ)
-    return Q / Q.submodule([Q(n)])
+    return Q.subobject_on([Q(n)]).inclusion().cokernel()
 
 
 def test_in_q_mod_6z_the_classes_of_3_and_2_generate_subgroups_of_orders_2_and_3() -> None:
@@ -19,8 +19,8 @@ def test_in_q_mod_6z_the_classes_of_3_and_2_generate_subgroups_of_orders_2_and_3
     Source: by hand.
     """
     T = rationals_modulo(6)
-    order_two = T.submodule([T(3)])
-    order_three = T.submodule([T(2)])
+    order_two = T.subobject_on([T(3)])
+    order_three = T.subobject_on([T(2)])
     assert order_two.cardinality() == 2
     assert order_three.cardinality() == 3
 
@@ -37,15 +37,15 @@ def test_in_q_mod_z_the_classes_of_1_4_and_1_6_generate_the_cyclic_group_of_orde
     Source: by hand.
     """
     T = rationals_modulo(1)
-    generated = T.submodule([T(QQ(1) / 4), T(QQ(1) / 6)])
+    generated = T.subobject_on([T(QQ(1) / 4), T(QQ(1) / 6)])
     assert generated.cardinality() == 12
-    assert generated == T.submodule([T(QQ(1) / 12)])
+    assert generated == T.subobject_on([T(QQ(1) / 12)])
     assert T(QQ(1) / 12) * 12 == T.zero()
     assert 6 * T(QQ(1) / 12) != T.zero()
 
     T2 = rationals_modulo(2)
-    assert T2.submodule([T2(QQ(4) / 3)]).cardinality() == 3
-    assert T2.submodule([T2(QQ(4) / 3)]) == T2.submodule([T2(QQ(2) / 3)])
+    assert T2.subobject_on([T2(QQ(4) / 3)]).cardinality() == 3
+    assert T2.subobject_on([T2(QQ(4) / 3)]) == T2.subobject_on([T2(QQ(2) / 3)])
 
 
 def test_archived_a2_discriminant_scales_are_value_submodules() -> None:

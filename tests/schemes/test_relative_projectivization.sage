@@ -17,7 +17,7 @@ def test_projectivization_of_a_non_locally_free_sheaf_jumps_at_its_torsion() -> 
     ring = line.coordinate_ring()
     x = ring.algebra_generator("x")
     free = ring.free_module(("u", "v"))
-    module = free.quotient(free.submodule((x * free.module_generator("u"),)))
+    module = free.quotient(free.subobject_on((x * free.module_generator("u"),)))
     projection = line.associated_module_sheaf(module).projectivization()
 
     over_origin = projection.fiber(line.point((0,)))

@@ -13,7 +13,7 @@ def torsion_plus_free():
     R = QQ["x"]
     x = R.gen()
     F = R**2
-    M = F / F.submodule([x * F.module_generator(0)])
+    M = F.subobject_on([x * F.module_generator(0)]).inclusion().cokernel()
     spectrum = R.spectrum()
     return R, x, M, spectrum.generic_point(), spectrum(R.ideal(x))
 
@@ -59,6 +59,6 @@ def test_the_annihilator_of_q_x_y_mod_x_plus_q_x_y_mod_y_is_xy() -> None:
     R = QQ["x,y"]
     x, y = R.algebra_generator("x"), R.algebra_generator("y")
     F = R**2
-    M = F / F.submodule([x * F.module_generator(0), y * F.module_generator(1)])
+    M = F.subobject_on([x * F.module_generator(0), y * F.module_generator(1)]).inclusion().cokernel()
     assert M.annihilator() == R.ideal(x * y)
     assert M.annihilator() != R.ideal(x)

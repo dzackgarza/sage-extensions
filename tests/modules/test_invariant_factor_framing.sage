@@ -12,7 +12,7 @@ def test_z2_mod_x_is_free_of_rank_one_and_z2_mod_2x_is_not_projective() -> None:
     """
     F = ZZ**2
     x = F.module_generator(0)
-    free_quotient = F / F.submodule([x])
+    free_quotient = F.subobject_on([x]).inclusion().cokernel()
     assert free_quotient.is_torsion_free()
     assert free_quotient.is_free()
     assert free_quotient.is_projective()
@@ -22,7 +22,7 @@ def test_z2_mod_x_is_free_of_rank_one_and_z2_mod_2x_is_not_projective() -> None:
     local = free_quotient.local_free_trivialization(ZZ.spectrum()(ZZ.ideal(5)))
     assert local.is_isomorphism()
 
-    torsion_quotient = F / F.submodule([2 * x])
+    torsion_quotient = F.subobject_on([2 * x]).inclusion().cokernel()
     assert not torsion_quotient.is_torsion_free()
     assert not torsion_quotient.is_projective()
     assert not torsion_quotient.is_locally_free()

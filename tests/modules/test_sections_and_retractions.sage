@@ -11,8 +11,8 @@ def test_z2_mod_g_is_free_and_z2_mod_6g_is_not() -> None:
     """
     F = ZZ**2
     g = F.module_generator(0)
-    torsion_free = F / F.submodule([g])
-    with_torsion = F / F.submodule([6 * g])
+    torsion_free = F.subobject_on([g]).inclusion().cokernel()
+    with_torsion = F.subobject_on([6 * g]).inclusion().cokernel()
 
     assert torsion_free.is_free()
     assert torsion_free.module_rank() == 1
