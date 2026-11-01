@@ -56,6 +56,7 @@ from sage.rings.polynomial.polynomial_quotient_ring import PolynomialQuotientRin
 from sage.rings.polynomial.polynomial_ring import PolynomialRing_generic
 from sage.rings.quotient_ring import QuotientRing_generic
 from sage.rings.rational_field import QQ as SageQQ
+from sage.rings.number_field.number_field_base import NumberField
 from sage.rings.ring import Ring
 from sage.structure.element import CommutativeRingElement, RingElement, parent as element_parent
 from sage.structure.parent import Parent
@@ -2857,6 +2858,7 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
             def __contains__(self, candidate):
                 return OwnedRings.Division.__contains__(self, candidate)
 
+
             @classmethod
             def _repr_object_names(cls):
                 return "fields"
@@ -3986,6 +3988,73 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                     return True
                 case _:
                     return self._field_decision()
+
+        def is_isomorphic(self, other):
+            r"""Return whether these two fields are isomorphic.
+
+            A field is decided against another field by what the two operands
+            already state.  Being a field is invariant under isomorphism, so a
+            field and a ring that is decided not to be one are not isomorphic;
+            an isomorphism preserves the characteristic and the cardinality; and
+            two number fields are isomorphic exactly when the number-field
+            realizations they retain are.  That last case is the one that
+            decides \(\mathbb{Q}(\sqrt 5)\) against \(\mathbb{Q}(\sqrt{20})\) --
+            the same field in two presentations, so one presentation's defining
+            polynomial says nothing -- and refuses \(\mathbb{Q}(\sqrt 5)\)
+            against \(\mathbb{Q}(\sqrt 2)\), which agree in degree and
+            characteristic.
+
+            Anything else states the proposition instead of guessing.  This is a
+            decision, not a heuristic: an undecided pair must not be reported as
+            non-isomorphic, and an isomorphism is never inferred from an
+            invariant that isomorphic fields share with non-isomorphic ones.
+            The decision reads the realizations the operands retain
+            (``OWN-06``); it constructs no further model to compare against.
+
+            EXAMPLES::
+
+                sage: from sage_extensions.all import QQ, QuadraticField
+                sage: QuadraticField(5).is_isomorphic(QuadraticField(20))
+                True
+                sage: QuadraticField(5).is_isomorphic(QuadraticField(-5))
+                False
+                sage: QuadraticField(5).is_isomorphic(QQ)
+                is_isomorphic(Free module on {1, a} over Fraction Field of Integer Ring, Rational field QQ)
+            """
+            if other is self:
+                return True
+            if other not in OwnedRings():
+                raise TypeError(
+                    f"an isomorphism of {self} is asked of {other}, which is not a ring of this session"
+                )
+            mine = self.is_field()
+            theirs = other.is_field()
+            if mine is not True or theirs is not True:
+                if mine is True and theirs is False:
+                    return False
+                if theirs is True and mine is False:
+                    return False
+                return AtomicProposition("is_isomorphic", self, other)
+            for left, right in (
+                (self.characteristic(), other.characteristic()),
+                (self._cardinality_decision(), other._cardinality_decision()),
+            ):
+                if left is None or right is None:
+                    continue
+                if (left != right) is True:
+                    return False
+            engine = _engine_ring(self)
+            other_engine = _engine_ring(other)
+            if (
+                isinstance(engine, NumberField)
+                and isinstance(other_engine, NumberField)
+                and hasattr(engine, "is_isomorphic")
+                and hasattr(other_engine, "is_isomorphic")
+            ):
+                return bool(engine.is_isomorphic(other_engine))
+            return AtomicProposition("is_isomorphic", self, other)
+
+        is_isomorphic_to = is_isomorphic
 
         def _selected_local_ring_construction(self):
             r"""Return selected local-ring quotient data, or ``None``.
