@@ -64,6 +64,42 @@ def test_over_the_rationals_the_divided_power_is_generated() -> None:
     assert x in generated
 
 
+def test_several_generators_generate_exactly_their_words() -> None:
+    r"""Two generators generate the words in both, and no divided power of one.
+
+    ``Gamma(ZZ[x, y])`` in degree ``n`` is spanned by ``x^a y^b`` with ``a + b = n``,
+    so ``x``, ``y``, ``x*y``, ``x*x`` and ``x^2 y`` are generated.  ``gamma_2(x)``
+    is not: a word of degree two is a multiple of ``x*x = 2 gamma_2(x)``,
+    ``x*y`` or ``y*y = 2 gamma_2(y)``, and no integer combination of those is
+    ``gamma_2(x)`` or ``gamma_2(x) + gamma_2(y)``.
+    """
+    algebra = Modules(ZZ).free_module(("x", "y")).divided_power_algebra()
+    x, y = algebra.degree_one_generator("x"), algebra.degree_one_generator("y")
+    generated = algebra.subalgebra([x, y])
+
+    assert x in generated and y in generated
+    assert x * y in generated
+    assert x * x in generated
+    assert x * x * y in generated
+    assert algebra.divided_power(x, 2) not in generated
+    assert algebra.divided_power(x, 2) + algebra.divided_power(y, 2) not in generated
+
+
+def test_over_the_rationals_two_generators_generate_their_divided_powers() -> None:
+    r"""Over ``QQ`` the same two generators do generate ``gamma_2`` of each.
+
+    ``gamma_2(x) = (x*x)/2`` and ``2`` is a unit there, so the integral exclusion
+    is arithmetic again; both fields are decided by the same construction.
+    """
+    algebra = Modules(QQ).free_module(("x", "y")).divided_power_algebra()
+    x, y = algebra.degree_one_generator("x"), algebra.degree_one_generator("y")
+    generated = algebra.subalgebra([x, y])
+
+    assert algebra.divided_power(x, 2) in generated
+    assert algebra.divided_power(x, 2) + algebra.divided_power(y, 2) in generated
+    assert x * y in generated
+
+
 def test_the_generated_subalgebra_retains_its_ambient_algebra_and_generators() -> None:
     r"""The subalgebra is a subobject: it names the ambient algebra and its generators.
 
