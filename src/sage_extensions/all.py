@@ -384,6 +384,9 @@ _lazy_import(
 from sage_extensions.categories.algebras.subalgebras import (  # noqa: F401
     GeneratedSubalgebras,
 )
+from sage_extensions.categories.algebras.algebra_ideals import (  # noqa: F401
+    GeneratedAlgebraIdeals,
+)
 from sage_extensions.categories.algebras.graded_lie_algebras import (  # noqa: F401
     GradedLieAlgebras,
 )

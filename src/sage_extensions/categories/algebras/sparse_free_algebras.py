@@ -16,6 +16,7 @@ from sage_extensions.categories.algebras.algebras import (
 )
 from sage_extensions.categories.algebras.free_algebras import (
     FreeAlgebras, GradedFreeAlgebras, TensorAlgebras, SymmetricAlgebras,
+    _generator_images_by_label,
     _symmetric_generator_images_commute,
 )
 from sage_extensions.categories.modules.general_modules import GeneralModules
@@ -252,6 +253,7 @@ class SparseFreeAlgebraMorphism:
                     f"a dictionary of generator images needs finitely many algebra generators of {domain}, but it "
                     f"has {labels.cardinality()}; give a function or an indexed family"
                 )
+            images = _generator_images_by_label(domain, labels, images)
             missing = [label for label in labels if label not in images]
             if missing:
                 raise ValueError(

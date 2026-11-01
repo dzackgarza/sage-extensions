@@ -2458,6 +2458,26 @@ class DividedPowerAlgebras(OwnedCategoryOverBaseRing):
 
         gamma = divided_power
 
+        def divided_power_ideal(self, *generators):
+            r"""The divided-power ideal of ``Gamma(M)`` generated in degree one.
+
+            A divided power ``gamma_j(k)`` with ``j >= 2`` is not a polynomial
+            in ``k`` over ``ZZ``, so the ideal a presentation of ``Gamma(M)``
+            states is larger than the ordinary one: in degree ``d`` it also
+            contains ``gamma_j(k) A_{d-j}``.  That is the ideal this names, and
+            it is decided degree by degree through the retained frames.  In
+            ``Gamma(ZZ x)`` the two are told apart by ``2x``: ``gamma_3(2x) =
+            8 gamma_3(x)`` lies in the divided-power ideal and not in the
+            ordinary one, whose degree-three part is ``6 ZZ gamma_3(x)``.
+            """
+            from sage_extensions.categories.algebras.algebra_ideals import (
+                _generated_algebra_ideal,
+            )
+
+            if len(generators) == 1 and isinstance(generators[0], (tuple, list)):
+                generators = tuple(generators[0])
+            return _generated_algebra_ideal(self, generators, divided_powers=True)
+
 
 def _symmetric_generator_images_commute(codomain, images):
     r"""Decide the commuting-image condition for a symmetric extension.
@@ -2481,6 +2501,43 @@ def _symmetric_generator_images_commute(codomain, images):
         for position, left in enumerate(values)
         for right in values[position + 1 :]
     )
+
+
+def _generator_images_by_label(domain, labels, images):
+    r"""Read a dictionary of generator images whose keys may be the generators.
+
+    A map of free algebras is written on the generators themselves --
+    ``x |-> v, y |-> w`` -- while the selected generating family stores a
+    *label* for each generator.  Both name the same datum, and the caller must
+    not have to know which vehicle the chosen family uses: a key that is a
+    label passes through, a key that is the generator ``algebra_generator(label)``
+    is renamed to that label.  Anything else is left for the missing-generator
+    diagnostic to refuse.
+
+    The label case is tested first and costs nothing there; the generator
+    elements are built only for a dictionary that actually names them.
+    """
+    if not isinstance(images, dict):
+        return images
+    if all((key in labels) is True for key in images):
+        return images
+    by_element = {domain.algebra_generator(label): label for label in labels}
+    renamed = {}
+    for key, value in images.items():
+        if (key in labels) is True:
+            label = key
+        elif key in by_element:
+            label = by_element[key]
+        else:
+            renamed[key] = value
+            continue
+        if label in renamed and (renamed[label] == value) is not True:
+            raise ValueError(
+                f"the generator {domain.algebra_generator(label)} of {domain} is given two images, "
+                f"{renamed[label]} and {value}"
+            )
+        renamed[label] = value
+    return renamed
 
 
 class FramedFreeAlgebraMorphism:
@@ -2584,6 +2641,7 @@ class FramedFreeAlgebraMorphism:
                     f"a dictionary of generator images needs finitely many algebra generators of {domain}, but it "
                     f"has {labels.cardinality()}; give a function or an indexed family"
                 )
+            images = _generator_images_by_label(domain, labels, images)
             missing = [label for label in labels if label not in images]
             if missing:
                 raise ValueError(
