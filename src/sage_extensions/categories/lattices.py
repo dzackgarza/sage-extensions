@@ -6560,9 +6560,17 @@ class Lattices(OwnedCategoryOverBaseRing):
         def reflection(self, root):
             r"""Return the integral orthogonal reflection in ``root``.
 
-            The reflection exists exactly when ``root`` is an integral reflection vector: for every selected
-            module generator ``e_i``, ``2*b(e_i,root)/b(root,root)`` must lie
-            in the base ring.
+            The reflection is a function of the rational line \(\mathbb{Q}\) of
+            ``root``, not of the vector: \(s_{\lambda r} = s_r\) for every
+            nonzero scalar \(\lambda\), since
+            \(2b(x,\lambda r)/b(\lambda r,\lambda r)\,\lambda r =
+            2b(x,r)/b(r,r)\,r\).  So the isometry exists exactly when some
+            vector on that line is an integral reflection vector, and the
+            coefficients \(2b(e_i, r)/b(r, r)\) themselves are not: they change
+            with the representative.  For a vector of square \(-2\) the
+            reflection exists, while its double has half-integral coefficients
+            and the same integral images.  The primitive vector of the line is
+            that representative, so the reflection is computed in it.
 
             EXAMPLES::
 
@@ -6571,6 +6579,9 @@ class Lattices(OwnedCategoryOverBaseRing):
                 sage: root = U.basis_vector(0) + U.basis_vector(1)
                 sage: U.reflection(root)(U.basis_vector(0))
                 -e_1
+                sage: doubled = U.basis_vector(0) - U.basis_vector(1)
+                sage: U.reflection(ZZ(2) * doubled) == U.reflection(doubled)
+                True
             """
             if root.parent() is not self:
                 raise TypeError(
@@ -6579,18 +6590,26 @@ class Lattices(OwnedCategoryOverBaseRing):
             assert root.q() != self.base_ring().zero(), (
                 f"there is no reflection of {self!r} in {root}: s_r is defined only for b(r, r) != 0"
             )
-            if not root.is_integral_reflection_vector():
-                raise ValueError(
-                    f"the reflection of {self!r} in {root} is not an isometry of the lattice: 2 b(x, r)/b(r, r) is not in {self.base_ring()} for every x, so {root} is not an integral reflection vector"
-                )
             ring = self.base_ring()
+            vector = root
+            if _engine_ring(ring) is SageZZ and vector.content() != ring.one():
+                # The line's primitive vector is the representative whose
+                # coefficients are the integral ones whenever any are, so the
+                # decision and the formula both read it.
+                vector = vector.primitive_part()
+            if not vector.is_integral_reflection_vector():
+                raise ValueError(
+                    f"the reflection of {self!r} in {root} is not an isometry of the lattice: no vector on "
+                    f"the line of {root} is an integral reflection vector, since 2 b(x, r)/b(r, r) leaves "
+                    f"{ring} for some x at the primitive representative {vector}"
+                )
             fraction_field = ring.fraction_field()
-            norm = fraction_field(root.q())
+            norm = fraction_field(vector.q())
 
             def image(label):
                 generator = self.module_generator(label)
-                coefficient = ring(fraction_field(ring(2) * generator.b(root)) / norm)
-                return generator - self.scalar_multiple(coefficient, root)
+                coefficient = ring(fraction_field(ring(2) * generator.b(vector)) / norm)
+                return generator - self.scalar_multiple(coefficient, vector)
 
             return self.Aut()(image)
 
@@ -8548,11 +8567,17 @@ class Lattices(OwnedCategoryOverBaseRing):
             )
 
         def is_integral_reflection_vector(self) -> bool:
-            r"""Return whether ``s_r(x) = x - 2 b(x, r)/b(r, r) r`` maps the lattice into itself.
+            r"""Return whether ``2 b(x, r)/b(r, r)`` is integral for every ``x``.
 
             ``lean-categories`` FOUNDATIONS §60.1 (*integral reflection
             vector*): ``2 b(x, r)/b(r, r)`` is integral for every ``x``.  No
             primitivity is required; :meth:`is_root` adds it.
+
+            The coefficients are those of this representative: they change with
+            it, while the reflection does not, since \(s_{\lambda r} = s_r\).
+            Over ``ZZ`` this test agrees with ``s_r`` preserving the lattice
+            exactly on primitive vectors, and :meth:`reflection` therefore asks
+            it of the line's primitive vector.
             """
 
             parent = self.parent()

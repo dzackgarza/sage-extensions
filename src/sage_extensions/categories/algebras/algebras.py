@@ -472,16 +472,83 @@ class UnitalMultiplicativeAlgebraMor(MultiplicativeAlgebraMor):
     r"""``Mor`` of unital algebras: the multiplicative linear maps preserving the unit."""
 
     def embeddings(self):
-        r"""The embeddings of one field into another, when both endpoints are fields.
+        r"""The unital algebra maps from the domain into the codomain.
 
-        A ring map between fields is injective, so the field ``Mor``'s
-        enumeration is this hom-set's too.  An algebra ``Mor`` between the same
-        two fields is selected because it is the stronger structure, and it
-        answers from that one owner instead of enumerating the same maps again.
+        The ring embeddings ``A -> B`` are enumerated by their one owner, the
+        ring Mor, because a ring map between fields is injective.  Membership
+        here is stricter than being a ring embedding: an arrow of a Mor of
+        algebras over \(R\) is \(R\)-linear, so it intertwines the two retained
+        structure maps,
+
+        \[
+            f \circ \rho_A = \rho_B .
+        \]
+
+        That square is the whole of the extra condition: for a multiplicative
+        \(f\), \(R\)-linearity reads \(f(\rho_A(r)\, a) = \rho_B(r)\, f(a)\), and
+        at \(a = 1\) it is the square, while the square and multiplicativity
+        give it back for every \(a\).  It is tested as an equality of ring
+        arrows \(R \to B\), so it is decided exactly rather than sampled on some
+        chosen generators of \(R\).
+
+        The square is a real condition, and it fails whenever the structure
+        map is not forgetful.  Reading a field \(K\) as a \(K\)-algebra with the
+        identity structure admits only the identity: conjugation is a ring
+        automorphism but \(f(\rho(x) a) = f(x) f(a)\), which is \(x f(a)\) only
+        for \(x\) in the fixed field.  A field presented by generators and
+        relations is the same phenomenon, since its structure map is the
+        quotient map: \(F_4 = F_2[z_2]/(z_2^2 + z_2 + 1)\) records the class of
+        \(z_2\) as a structure-bearing element, so Frobenius, which sends it to
+        \(z_2 + 1\), is not an arrow of that presented algebra.  Both are ring
+        automorphisms of the field, which is why the ring Mor still enumerates
+        them.
+
+        A survivor is an arrow of this Mor by elementwise action on elements,
+        retaining the square and the ring map's own multiplicativity as the
+        sufficient equations for its algebra laws; its linearity is not
+        asserted beyond what those equations give.
         """
         from sage_extensions.categories.rings.ring_foundation import OwnedRings
 
-        return OwnedRings().Mor(self.domain(), self.codomain()).embeddings()
+        domain = self.domain()
+        codomain = self.codomain()
+        domain_structure = domain.algebra_structure_morphism()
+        codomain_structure = codomain.algebra_structure_morphism()
+        ring = domain_structure.domain()
+        if codomain_structure.domain() is not ring:
+            raise ValueError(
+                f"an algebra map {domain} -> {codomain} must intertwine structure maps of one "
+                f"base ring, but the two are defined on {ring} and {codomain_structure.domain()}"
+            )
+        ring_embeddings = OwnedRings().Mor(domain, codomain)
+        arrows_into_codomain = OwnedRings().Mor(ring, codomain)
+        structure = arrows_into_codomain(codomain_structure)
+        linear_mor = domain.module_category().Mor(domain, codomain)
+        kept = []
+        for embedding in ring_embeddings.embeddings():
+            if embedding * domain_structure != structure:
+                continue
+            if domain is codomain and embedding == ring_embeddings.identity():
+                # The surviving ring map is the identity function, whose laws
+                # this Mor already states; do not restate it as a proposition.
+                kept.append(self.identity())
+                continue
+            # The square is decided here; with multiplicativity it is what
+            # makes the elementwise formula R-linear, so it is retained as the
+            # construction's first equation rather than as an evaluated claim.
+            kept.append(
+                self.element_class(
+                    self,
+                    linear_mor.elementwise(
+                        lambda element, embedding=embedding: embedding(element)
+                    ),
+                    _construction_premises=(
+                        (),
+                        (True, embedding.is_multiplicative()),
+                    ),
+                )
+            )
+        return finite_ordered_set(tuple(kept))
 
     ElementMethods = UnitalMultiplicativeAlgebraMorphism
 
@@ -4753,6 +4820,27 @@ class _OwnedAlgebraParent(_OwnedRingParent):
     def _defer_native_algebra_construction(self):
         r"""The algebra owner installs its selected resolution before its regular module."""
         return True
+
+    def _rank_decision(self):
+        r"""Return the rank this algebra's own frame states, when it is framed free.
+
+        \(R^{(S)}\) is free on its frame \(S\), so its rank is the cardinality
+        of \(S\) -- the cardinal is the frame's, not a natural number, since a
+        frame may be infinite.  The algebra retains that frame as its module
+        generating set.  This is the realization's answer to the generic
+        ``module_rank``'s hook: on an algebra's class the framed-free category's
+        own ``module_rank`` is answered after the generic module methods, so the
+        construction states the datum here instead.  An algebra stated on a
+        module without a chosen frame has no answer of its own and leaves the
+        generic cases in force.
+        """
+        from sage_extensions.categories.modules.framed.framed_free_modules import (
+            FramedFreeModules,
+        )
+
+        if self in FramedFreeModules(self.base_ring()):
+            return self.module_generating_set().cardinality()
+        return super()._rank_decision()
 
     def _native_scalar_action(self, scalar, element):
         r"""Apply the retained algebra structure map, not the engine's default embedding.

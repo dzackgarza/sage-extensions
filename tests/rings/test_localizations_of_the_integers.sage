@@ -46,6 +46,47 @@ def test_a_denominator_outside_the_inverted_set_is_refused() -> None:
         ring.fraction(ZZ(1), ZZ(3))
 
 
+def test_a_raw_sage_rational_denotes_its_own_fraction() -> None:
+    r"""``QQ(1/2)`` is ``1/2``, not the source ring's rounding of it.
+
+    A rational of Sage's own field is a value this session has not constructed,
+    and ``ZZ(1/2)`` is ``0`` or ``1`` depending on the rounding, never ``1/2``.
+    Reading such a value through the localization's source ring alone would
+    therefore denote a different element, so the localization constructor splits
+    it into its own numerator and denominator and admits the denominator through
+    the selected submonoid.  A proper localization refuses a denominator it does
+    not invert, which is the same admission decision ``fraction`` asks.
+    """
+    from sage.rings.integer_ring import ZZ as SageIntegers
+    from sage.rings.rational_field import QQ as SageRationals
+
+    def raw(numerator: int, denominator: int = 1):
+        return SageRationals(SageIntegers(numerator)) / SageRationals(
+            SageIntegers(denominator)
+        )
+
+    half = raw(1, 2)
+    third = raw(1, 3)
+
+    assert QQ(half) == QQ(1) / QQ(2)
+    assert QQ(half) != QQ(1)
+    assert QQ(half).denominator() == ZZ(2)
+    assert QQ(third) == QQ(1) / QQ(3)
+    assert QQ(raw(4, 2)) == QQ(2)
+
+    ring = ZZ.localization(ZZ(2))
+    assert ring(half) == ring.fraction(ZZ(1), ZZ(2))
+    assert ring(raw(3, 4)) == ring.fraction(ZZ(3), ZZ(4))
+    with pytest.raises(ValueError):
+        ring(third)
+
+    # The reverse comparison is Sage's answer, not this localization's: Sage's
+    # own rational field does not admit an element of this session, so
+    # ``half == QQ(half)`` stays ``False`` there.  Equality in the owned
+    # universe is the direction stated above.
+    assert QQ(half) == half
+
+
 def test_the_localization_map_and_its_source() -> None:
     ring = ZZ.localization(ZZ(2))
     localization = ring.localization_map()

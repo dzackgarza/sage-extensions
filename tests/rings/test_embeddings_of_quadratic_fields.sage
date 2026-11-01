@@ -9,6 +9,11 @@ precomposition with ``sigma``.  A field automorphism preserves integrality, so
 ``sigma`` restricts to the ring of integers, sending the golden ratio
 ``(1 + sqrt 5)/2`` to ``(1 - sqrt 5)/2``.  ``F_4`` has exactly two automorphisms,
 the identity and Frobenius ``a -> a^2``.
+
+An algebra endomorphism is more than a field automorphism: it must fix what the
+retained structure map marks.  ``F_4`` is presented as ``F_2[z_2]/(z_2^2 + z_2 +
+1)``, so its algebra Mor is taken over that presentation ring and its only
+endomorphism is the identity, while Frobenius remains a ring automorphism.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -63,6 +68,58 @@ def test_conjugation_restricts_to_the_ring_of_integers() -> None:
 
 
 def test_frobenius_is_the_nontrivial_automorphism_of_the_field_with_four_elements() -> None:
-    field = GF(4)
+    from sage_extensions.categories.rings.ring_foundation import OwnedRings
 
-    assert field.Mor(field).embeddings().cardinality() == 2
+    field = GF(4)
+    automorphisms = OwnedRings().Mor(field, field).embeddings()
+
+    assert automorphisms.cardinality() == 2
+    identity = OwnedRings().Mor(field, field).identity()
+    frobenius = tuple(e for e in automorphisms if e != identity)[0]
+    assert frobenius * frobenius == identity
+
+
+def test_a_presented_field_has_only_the_identity_as_an_algebra_endomorphism() -> None:
+    r"""``F_4 = F_2[z_2]/(z_2^2 + z_2 + 1)`` remembers the class of ``z_2``.
+
+    ``Mor(F_4, F_4)`` is the unital algebra Mor over the presentation ring
+    ``F_2[z_2]``, so its arrows are the maps fixing the class of ``z_2``.  That
+    class generates the field, so only the identity qualifies; Frobenius is a
+    ring automorphism (the test above), not an algebra endomorphism of this
+    presented structure, because it sends the class of ``z_2`` to ``z_2 + 1``
+    and so fails \(f \circ \rho = \rho\).
+    """
+    from sage_extensions.categories.rings.ring_foundation import OwnedRings
+
+    field = GF(4)
+    structure = field.algebra_structure_morphism()
+    base_generator = tuple(field.algebra_base_ring().algebra_generating_set())[0]
+    structural_element = structure(base_generator)
+    endomorphisms = field.Mor(field).embeddings()
+
+    assert endomorphisms.cardinality() == 1
+    identity = tuple(endomorphisms)[0]
+    assert identity is field.Mor(field).identity()
+    assert identity.linearity_decision() is True
+    assert identity(structural_element) == structural_element
+
+    identity_ring_map = OwnedRings().Mor(field, field).identity()
+    frobenius = tuple(
+        embedding
+        for embedding in OwnedRings().Mor(field, field).embeddings()
+        if embedding != identity_ring_map
+    )[0]
+    assert frobenius(structural_element) != structural_element
+    assert frobenius * structure != structure
+
+
+def test_the_presentation_of_the_field_with_eight_elements_fixes_its_generator_too() -> None:
+    from sage_extensions.categories.rings.ring_foundation import OwnedRings
+
+    field = GF(8)
+    structure = field.algebra_structure_morphism()
+    base_generator = tuple(field.algebra_base_ring().algebra_generating_set())[0]
+
+    assert OwnedRings().Mor(field, field).embeddings().cardinality() == 3
+    assert field.Mor(field).embeddings().cardinality() == 1
+    assert tuple(field.Mor(field).embeddings())[0](structure(base_generator)) == structure(base_generator)

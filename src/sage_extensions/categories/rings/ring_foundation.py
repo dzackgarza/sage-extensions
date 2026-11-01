@@ -1586,6 +1586,25 @@ class LocalizationRings(OwnedCategory):
                 return value
             if isinstance(value, tuple) and len(value) == 2:
                 return self.fraction(value[0], value[1])
+            # An element of a fraction field denotes the fraction of its own
+            # numerator and denominator.  Reading it through the source ring
+            # alone would round it to an element of the source -- `ZZ(1/2)` is
+            # `1`, not `1/2` -- so a non-integral value would silently denote a
+            # different element.  The denominator is still admitted through the
+            # selected submonoid, so a value outside a proper localization is
+            # refused here rather than truncated.
+            if source not in OwnedRings():
+                numerator = getattr(value, "numerator", None)
+                denominator = getattr(value, "denominator", None)
+                if callable(numerator) and callable(denominator):
+                    numerator, denominator = numerator(), denominator()
+                    source_engine = _engine_ring(self.localization_source())
+                    if all(
+                        element_parent(part) in OwnedRings()
+                        or element_parent(part) is source_engine
+                        for part in (numerator, denominator)
+                    ):
+                        return self.fraction(numerator, denominator)
             return self.fraction(value)
 
         def __call__(self, value):
