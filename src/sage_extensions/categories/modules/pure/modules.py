@@ -517,6 +517,17 @@ class Modules(OwnedCategoryOverBaseRing):
             r"""Return this category with the axiom that its objects are finitely presented."""
             return self._with_axiom("FinitelyPresented")
 
+        def direct_sum_of_cyclics(self, orders):
+            r"""Return ``\bigoplus_i R/(a_i)``, the direct sum of the cyclic modules.
+
+            A direct sum of cyclic modules is a finitely presented torsion
+            module, and its diagonal presentation is stated once, by
+            ``Modules(R).FinitelyPresented().Torsion()``.  This accessor states
+            the same construction where a caller naming a module *by its orders*
+            asks for it, and delegates rather than restating the presentation.
+            """
+            return self.FinitelyPresented().Torsion().direct_sum_of_cyclics(orders)
+
         def Free(self):
             r"""Return this category with the axiom that its objects are free."""
             return self._with_axiom("Free")

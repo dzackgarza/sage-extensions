@@ -2109,3 +2109,18 @@ hold on that path, so the disjunction is `True` whatever the group's order is an
 `tests/lattices/test_finiteness_premise_under_a_containing_bound.sage` gains three tests on the full-lattice specimen of `U` (a selected lattice of finite index is what `stabilizer()` needs): with the bound attached the query is asked **zero** times and the result is the finite representation's lattice stabilizer; without the bound it is asked, and forcing `True`/`False` reaches the two different routes; with the bound attached, forcing either answer changes nothing.
 
 Measured: the file is 8 of 8; the four-directory group is **identical to the published `cbf348f` (398 failed / 652 passed, same test ids)**; the four lattice files that exercise the stabilizer are identical to `cbf348f` as well (10 failed / 10 passed on both, same ids — those ten are cross-file pollution inside one pytest process and pass in isolation). A full `tests/lattices` run was started twice and **not completed** within the working window; it is recorded as unrun, not as passing.
+
+**`Modules(R).direct_sum_of_cyclics` names the torsion owner's construction (2026-11-01).** Seven tests name a module *by its orders* — `Modules(ZZ).direct_sum_of_cyclics((6,))` — while the construction was defined only on `Modules(R).FinitelyPresented().Torsion()`, so the call raised `AttributeError: 'Modules_with_category' object has no attribute 'direct_sum_of_cyclics'`. The category now carries the accessor and delegates:
+
+```python
+def direct_sum_of_cyclics(self, orders):
+    return self.FinitelyPresented().Torsion().direct_sum_of_cyclics(orders)
+```
+
+No second presentation is written: the diagonal presentation, its PID premise and its refusal of a zero order all stay with the torsion owner, and the accessor only states where a caller who has the orders reaches it.
+
+Two facts about that construction, measured rather than assumed, and stated in the regression so neither is claimed later: it is **not interned** (two calls build two *equal* objects, so the test asserts equality and equal invariant factors, not identity), and `Modules(ZZ).direct_sum_of_cyclics(())` is the zero module of rank 0 while a zero order is refused (`R/(0) = R` is free, not torsion).
+
+`tests/modules/test_direct_sum_of_cyclics_accessor.sage`, four tests. Measured on the four-directory group against the published `565fc6b`: **398 failed / 652 passed → 395 failed / 659 passed, nothing introduced**, three tests no longer failing (`test_word_modules::test_degree_two_of_the_tensor_and_symmetric_algebra_on_z2_plus_z3_has_order_six`, `test_word_quotient_representatives::test_z2_tensor_z3_is_zero_and_four_equals_one_in_z3`, `test_commutative_algebra::test_z_mod_six_with_two_inverted_is_z_mod_three`).
+
+`tests/groups/test_group_adjunctions.sage` — which also calls the accessor — fails three of its four tests **identically at the published `cbf348f`** (a `Sets(C_2)` category construction raising `TypeError: Category.__init__() takes 1 positional argument but 2 were given`), so that is its own defect and not this accessor's.
