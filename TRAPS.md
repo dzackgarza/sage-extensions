@@ -1130,3 +1130,21 @@ The Type II inventory is recorded above as a count; here is the decomposition th
 Sixteen in total, and the two of rank eleven are exactly the two whose components are three rather than two. The filters give 16 for "any union", 14 for "exactly two components", 2 for "three components", and four distinct component-rank shapes `(8,2)`, `(7,3)`, `(5,5)`, `(4,4,3)`. None of those is five, so a consumer's "five Type II cases" is not any of these conditions, and it is not the library's count under a different reading of the same partition: the distinguishing condition is the consumer's to state. Nothing here needs a new owner method — `connected_component_vertex_sets()`, `is_componentwise_affine()`, `is_parabolic_union()` and `is_parabolic()` compose to every one of those filters already.
 
 The archive test that compares the recorded type multiset is green after the later Coxeter edits: `tests/lattices/test_sterk_elliptic_population_archive.sage` 3 passing in 41 s, so the `Counter`-multiset comparison recorded earlier still holds.
+
+### The prime localization's fraction field, and the circle its field decision closed
+
+`test_the_fraction_field_of_a_prime_localization_of_the_integers_is_the_rationals` died in `RecursionError` at `construction.maximal_ideal()`. The cycle was exact and is worth writing down, because every step is individually correct:
+
+1. placing a module asks whether its coefficient ring is a field — `_finitely_generated_free_placement` tests `ring in OwnedFields()`;
+2. the field decision of a local ring asks whether its maximal ideal is zero — `_field_decision` reads `construction.maximal_ideal()`;
+3. that ideal for a prime localization is the extension `p R_p`, built by `prime.extension_to_localization(self)`;
+4. the extension is a localized ideal, which needs `localization_ring.regular_module()`;
+5. a regular module is `self.free_module(1)`, which is placed as a module — back to step 1.
+
+`R_(p)` is local, so its fieldhood is the single question "is `p R_p` zero", and the construction knows it without building the ideal: `p R_p = 0` exactly when `p` lies in the kernel of `R -> R_p`, which is asked generator by generator in the localization, whose equality is decided there. `LocalRingConstruction` now accepts that decision (`maximal_ideal_is_zero`, or a factory), and `_field_decision` reads it first and returns it when stated; a construction that states nothing leaves the previous ideal route in force, so nothing else moves. The prime localization supplies it from its own datum, so the circle stays open at step 2 and steps 3–5 are never the price of asking whether `R_p` is a field.
+
+The test is the general one rather than the domain special case: with nilpotents `p R_p` can vanish while `p` does not, as for `ZZ/6` at `(2)`, where `3 * 2 = 0` with `3` outside `p`. That instance is deliberately **not** claimed: the localization of a quotient has its own `zero()` cycle through `quotient_source()`, which fails before this decision is reached, and it is recorded below rather than papered over.
+
+Evidence, per file at `f7db965` and after. `test_commutative_algebra.sage` and `test_fraction_field_localization.sage` together: **19 failed / 11 passed → 18 failed / 12 passed**, the single movement being the recursion test, with the other eighteen unchanged; the remaining `test_fraction_field_localization` failure is `VectorSpaces(QQ)` refusing the owned rational field as a base, which is Sage's category and unrelated. `test_localizations_of_the_integers.sage` 10 passing, `test_rational_field_placement.sage` 5, `test_prime_and_maximal_ideals.py` passing, `test_localization_restrictions.sage` 1 pre-existing failure, all unchanged. Directly after the fix, `ZZ_(3)`: `is_field()` is `False` (was `RecursionError`), `maximal_ideal()` is non-zero, `residue_field()` is `ZZ/(3)`, `fraction_field_map()` sends `1/2` to `1/2`, and `fraction_field()` is `QQ`; `ZZ_(0)` reports `is_field()` `True`, which is right because localizing at the zero prime is the fraction field.
+
+Queue after this: the localization of a quotient, whose `zero()` re-enters through `quotient_source()` — `ZZ/6` at `(2)` does not get as far as its own field decision.

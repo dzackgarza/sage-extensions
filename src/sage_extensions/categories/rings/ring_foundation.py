@@ -2657,11 +2657,14 @@ class LocalRingConstruction:
         maximal_ideal_factory=None,
         residue_field_factory=None,
         residue_map_factory=None,
+        maximal_ideal_is_zero=None,
+        maximal_ideal_is_zero_factory=None,
     ) -> None:
         for name, value, factory in (
             ("maximal ideal", maximal_ideal, maximal_ideal_factory),
             ("residue field", residue_field, residue_field_factory),
             ("residue map", residue_map, residue_map_factory),
+            ("zero ideal decision", maximal_ideal_is_zero, maximal_ideal_is_zero_factory),
         ):
             if value is not None and factory is not None:
                 raise ValueError(f"the selected {name} needs one value or factory, not both")
@@ -2675,12 +2678,30 @@ class LocalRingConstruction:
         self._maximal_ideal_factory = maximal_ideal_factory
         self._residue_field_factory = residue_field_factory
         self._residue_map_factory = residue_map_factory
+        self._maximal_ideal_is_zero = maximal_ideal_is_zero
+        self._maximal_ideal_is_zero_factory = maximal_ideal_is_zero_factory
 
     @cached_method
     def maximal_ideal(self):
         if self._maximal_ideal_factory is not None:
             return self._maximal_ideal_factory()
         return self._maximal_ideal
+
+    @cached_method
+    def maximal_ideal_is_zero_decision(self):
+        r"""Return the stated decision whether the maximal ideal is zero, or ``None``.
+
+        The local-ring field decision is exactly this question, and a
+        construction that can state it must be able to do so without building
+        the ideal.  A prime localization cannot: its maximal ideal is the
+        extension ``p R_p``, whose construction needs the localization's regular
+        module, whose placement asks whether the coefficient ring is a field --
+        that same decision.  ``None`` states that this construction says nothing
+        here, leaving the ideal route in force.
+        """
+        if self._maximal_ideal_is_zero_factory is not None:
+            return self._maximal_ideal_is_zero_factory()
+        return self._maximal_ideal_is_zero
 
     @cached_method
     def residue_field(self):
@@ -3365,10 +3386,25 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                     return selected
 
                 def _field_decision(self):
-                    r"""A local ring is a field exactly when its maximal ideal is zero."""
+                    r"""A local ring is a field exactly when its maximal ideal is zero.
+
+                    A construction that states that decision answers here. Reading
+                    the stated decision is not an optimisation: for a prime
+                    localization the maximal ideal is the extension ``p R_p``,
+                    whose construction needs the localization's regular module,
+                    whose placement asks whether its coefficient ring is a field
+                    -- this decision again. Stating the zero-ideal decision at the
+                    construction is what keeps that circle open, which is why the
+                    construction states it rather than the alternative being
+                    reached and recursing. A construction that says nothing here
+                    leaves the ideal route below in force.
+                    """
                     construction = self._selected_local_ring_construction()
                     if construction is None:
                         return super()._field_decision()
+                    stated = construction.maximal_ideal_is_zero_decision()
+                    if stated is not None:
+                        return stated
                     from sage_extensions.categories.rings.commutative_ideals import (
                         CommutativeIdeals,
                     )

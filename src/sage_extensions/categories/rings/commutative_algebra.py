@@ -2683,10 +2683,39 @@ class PrimeLocalizations(OwnedCategory):
                     source_map = _canonical_map(quotient, residue) * source_map
                 return self._induced_morphism_from_unit_images(source_map)
 
+            def maximal_ideal_is_zero():
+                r"""Decide ``p R_p = 0`` without building the extended ideal.
+
+                The maximal ideal of ``R_p`` is the extension of ``p``, and it is
+                zero exactly when every element of ``p`` becomes zero in
+                ``R_p``: ``p R_p = 0`` iff ``p`` is contained in the kernel of
+                ``R -> R_p``.  That is asked generator by generator in the
+                localization, whose equality is already decided there, and it
+                never asks whether ``R_p`` is a field -- which is the question
+                this decision answers.  Over a domain the answer is therefore
+                ``p = 0``.
+
+                The test is the general one, not the domain special case: with
+                nilpotents ``p R_p`` can vanish while ``p`` does not, as for
+                ``R = ZZ/6`` at ``p = (2)``, where ``3 * 2 = 0`` with ``3``
+                outside ``p``.  That instance is not exercised here: the
+                localization of a *quotient* has its own ``zero()`` cycle through
+                ``quotient_source()``, which is a separate defect and would fail
+                before this decision is reached.
+                """
+                image_of_zero = self.zero()
+                return conjunction(
+                    tuple(
+                        self.fraction(generator) == image_of_zero
+                        for generator in prime.ideal_generators()
+                    )
+                )
+
             construction = LocalRingConstruction(
                 maximal_ideal_factory=lambda: prime.extension_to_localization(self),
                 residue_field_factory=residue_field,
                 residue_map_factory=residue_map,
+                maximal_ideal_is_zero_factory=maximal_ideal_is_zero,
             )
             return construction
 
