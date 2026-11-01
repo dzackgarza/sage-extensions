@@ -8074,9 +8074,11 @@ class Lattices(OwnedCategoryOverBaseRing):
                 else "Lattice"
             )
             rank = self.module_rank()
-            # The signature is read over the fraction field, which a complete
-            # local ring such as the 5-adic integers does not have; it states
-            # rank and scalar ring instead of raising.
+            # The signature is read over the fraction field.  The 5-adic
+            # integers have one mathematically -- Q_5 -- but this completion
+            # retains no fraction-field construction, so the display states rank
+            # and scalar ring rather than asking for data the ring does not
+            # supply.  Unavailable data is not nonexistence.
             from sage_extensions.categories.rings.ring_foundation import (
                 OwnedIntegralDomains,
             )

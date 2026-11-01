@@ -2938,21 +2938,6 @@ class AdicCompletions(Category):
             """
             return self._adic_completion_ideal
 
-        def unit_morphism(self):
-            r"""The structure map of a completion is its completion map.
-
-            Read over the ring it completes, ``r |-> r * 1`` *is* the completed
-            scalar map: both send a source element to its limit class, and the
-            completion map is the one that keeps the exact source expression.
-            Rebuilding the scalar image as ``r * 1`` discarded that datum, so
-            ``R^(1) == 1`` could not be decided.  A completion presented over a
-            formal base keeps the generic structure map, because there the
-            scalar ring is not the completed ring.
-            """
-            if self.completion_source() is self.algebra_base_ring():
-                return self.completion_map()
-            return super().unit_morphism()
-
         def zero(self):
             r"""The completion's zero carries the exact source datum ``0``.
 
@@ -3752,11 +3737,27 @@ class _AdicCompletionAlgebraParent(_OwnedAlgebraParent):
                 ring_placements.append(local)
             case _:
                 pass
+        def retained_scalar_structure(scalar):
+            r"""The scalar image through the retained completion map.
+
+            The algebra's scalar action and its module unit arrow both read this
+            structure map, so the image of ``r`` is the completed scalar map's
+            value -- the one that carries the exact source expression -- rather
+            than a fresh engine element built from the base ring.
+            """
+            selected = source(scalar)
+            return self._completion_element(
+                completion_image(selected), source_expression=selected
+            )
+
         _OwnedAlgebraParent.__init__(
             self,
             engine,
             source if algebra_base is None else algebra_base,
             algebra_labels,
+            scalar_structure=(
+                None if algebra_base is not None else retained_scalar_structure
+            ),
             categories=tuple(placements),
             constructing_category=AdicCompletions(),
             ring_placement=lambda: tuple(ring_placements),
