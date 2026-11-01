@@ -2047,3 +2047,19 @@ The cover colon needs the same treatment: the preimage ideals live in the cover,
 The predicate now states what it is when the computation is unavailable: `AtomicProposition("is_maximal_ideal", self)`, the same proposition its earlier branch already used. `QuotientRings._field_decision` normalises the three outcomes (True / False / proposition → `None`), because a *decision* is True, False or undecided and its callers ask `is True`/`is not True` of it.
 
 Measured on the four-directory group against the published `c473b0f`: **429 failed / 618 passed → 428 failed / 622 passed, nothing introduced**, one test no longer failing (`test_completion_arithmetic::test_presented_completion_preserves_genuine_nilpotence_not_truncation_nilpotence`) and the three new cover tests passing. The dependent test `test_special_fiber_of_xy_equals_t_is_the_node_with_its_local_ring_at_the_origin` advances past the `NotImplementedError` to its next layer (`0 is not a basis label of Free module … the basis is indexed by Coproduct of the family over NN`), which is recorded as the next item.
+
+**Attempted and reverted: reading a rank-one coordinate at its own label (2026-11-01).** `test_special_fiber_of_xy_equals_t_is_the_node_with_its_local_ring_at_the_origin` reached `LocalizationRings.fraction`'s `source_element`, which read a rank-one coordinate as `underlying.to_vector()(0)` — a literal `0` that is not a basis label when the frame is an infinite coproduct:
+
+```
+AssertionError: 0 is not a basis label of Free module on Coproduct of the family over
+NN = {0, 1, 2, ...}; the basis is indexed by Coproduct of the family over NN
+```
+
+Reading it at the one label the frame has (`(label,) = tuple(coordinates.parent().module_generating_set())`) clears that and the node test advances to its next layer —
+
+```
+AssertionError: the ranking map of Coproduct of the family over NN = {0, 1, 2, ...}
+has codomain NN = {0, 1, 2, ...}, not a finite or countably infinite standard well-order
+```
+
+— but it regresses one accepted test on the four-directory group (`test_quadratic_and_cyclotomic_field_invariants::test_a_relative_quadratic_extension_of_q_root_two`: 428 failed / 622 passed → 429 failed / 621 passed). The literal `0` is load-bearing somewhere else, so the repair is not "read the label the frame has": it is a rank-one-coordinate accessor that does not depend on the frame being the ordinal `{0}`, with the relative-extension caller kept green. Reverted; both layers are recorded for that unit.
