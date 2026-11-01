@@ -7,6 +7,8 @@ fields that it extends to.
 
 from sage.misc.cachefunc import cached_method
 
+from sage_extensions.logic import ask
+
 from sage_extensions.categories.abstract_categories.mor_categories import (
     CategoricalMor,
 )
@@ -38,7 +40,10 @@ class OrderEmbedding:
         for basis_element in domain.integral_basis():
             source_owned = source_field(basis_element)
             image = field_embedding(source_owned)
-            if image not in codomain:
+            # Membership in an owned order is a proposition; ``in`` would
+            # coerce it to a bool before it could be asked.
+            contained = ask(codomain.is_parent_of(image))
+            if contained is not True:
                 raise ValueError(
                     f"{field_embedding} does not restrict to a morphism of orders {domain} -> {codomain}: "
                     f"it sends the basis element {basis_element} to {image}, which is not in {codomain}"

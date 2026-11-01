@@ -87,7 +87,7 @@ from sage_extensions.categories.sets.set_categories import (
     OwnedSetMorphism,
     Sets,
 )
-from sage_extensions.logic import AtomicProposition, Propositions, conjunction, negation
+from sage_extensions.logic import AtomicProposition, Propositions, ask, conjunction, negation
 from sage_extensions.owned_category import owned_category_join
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook, refine
@@ -2999,7 +2999,11 @@ class Algebras(OwnedCategoryOverBaseRing):
                     case _ if (
                         source not in Modules(ring)
                         and source in OwnedRings()
-                        and value in ring
+                        # Membership in an owned ring is a proposition, and
+                        # ``in`` would coerce it to a bool before it could be
+                        # asked.  Read the predicate and decide it explicitly;
+                        # an undecided answer does not take this branch.
+                        and ask(ring.is_parent_of(value)) is True
                     ):
                         return self.unit_morphism()(ring(value))
                     case _:
