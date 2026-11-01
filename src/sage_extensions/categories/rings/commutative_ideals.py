@@ -1766,8 +1766,14 @@ def _commutative_ideal(source, generators):
     and ``(0)`` is prime because ``ZZ`` is a domain (``Ideal.isPrime_bot``,
     ``Mathlib/RingTheory/Ideal/Maximal.lean``); the integers' ideals are routed
     by these theorems, asking ``|n|.is_prime()`` (``CON-07``).  Other ideals of
-    ``ZZ`` are placed only as ideals.  No other ring's ideal is placed by a
-    computation.
+    ``ZZ`` are placed only as ideals.
+
+    The same theorem holds one variable up: for a field ``k`` and ``0 != f`` in
+    ``k[t]``, ``(f)`` is maximal exactly when ``f`` is irreducible, because
+    ``k[t]`` is a PID and ``k[t]/(f)`` is a field exactly for a prime ``(f)``.
+    ``k[t]`` is factorial, so the placement reads the *one* generator the ideal
+    has -- its normalized gcd -- and asks whether it is irreducible; anything
+    else is placed only as an ideal.
     """
     from sage_extensions.categories.rings.ring_foundation import _owned_integers
 
@@ -1780,7 +1786,53 @@ def _commutative_ideal(source, generators):
             placement = CommutativeIdeals(source).PrimeAsIdeal()
         elif SageZZ(generator).abs().is_prime():
             placement = CommutativeIdeals(source).Maximal()
+    else:
+        placement = _univariate_polynomial_ideal_placement(source, generators)
     return _placed_commutative_ideal(source, generators, placement)
+
+
+def _univariate_polynomial_ideal_placement(source, generators):
+    r"""Place ``(f)`` in ``k[t]`` as maximal when ``f`` is irreducible, else nothing.
+
+    ``k[t]`` is a PID, so ``k[t]/(f)`` is a field exactly when ``(f)`` is prime,
+    and that holds exactly at the irreducible ``f``.  The ring is factorial, so
+    the ideal's own generator is the normalized gcd of the written family and
+    the question is asked of that one element.  Undecided irreducibility leaves
+    the ideal unplaced rather than guessing, and a ring that is not a
+    one-variable polynomial ring over a field supplies no such theorem here.
+    """
+    from sage_extensions.categories.algebras.free_algebras import SymmetricAlgebras
+    from sage_extensions.categories.rings.ring_foundation import (
+        _engine_ring,
+        _engine_ring_value,
+        OwnedFields,
+    )
+
+    # The coefficient field is asked first: a ring that is not a polynomial ring
+    # over a field must not be asked for variable names at all.
+    base = source.base_ring() if hasattr(source, "base_ring") else None
+    if base is None or base not in OwnedFields():
+        return None
+    # Stated for a finite coefficient field first.  Over `QQ` the quotient of a
+    # one-variable polynomial ring by a maximal ideal is the number-field
+    # construction, and that route does not carry the class map from the
+    # polynomial ring that a residue map needs; placing the ideal there changes
+    # which parent the localization's residue field receives, and that route
+    # has to gain its map before this theorem is stated for it.
+    if base.characteristic() == 0:
+        return None
+    if source not in SymmetricAlgebras(base) or len(source.variable_names()) != 1:
+        return None
+    engine = _engine_ring(source)
+    values = tuple(_engine_ring_value(source, generator) for generator in generators)
+    if not values:
+        return None
+    generator = engine.ideal(values).gen()
+    if generator == engine.zero():
+        return None
+    if generator.is_irreducible() is True:
+        return CommutativeIdeals(source).Maximal()
+    return None
 
 
 @cached_function(
