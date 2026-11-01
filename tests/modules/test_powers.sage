@@ -8,6 +8,9 @@ so $\Gamma^2 = \mathbb Z/4$, $\Gamma^3 = \mathbb Z/2$, $\Gamma^4 = \mathbb Z/8$.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.abstract_categories.mor_categories import (
+    CategoricalIsomorphism,
+)
 
 
 def test_ranks_of_the_powers_of_z2() -> None:
@@ -87,5 +90,5 @@ def test_symmetric_and_divided_squares_and_cubes_are_functors() -> None:
     ):
         assert power(scale * shear) == power(scale) * power(shear)
         assert power(M.End().one()) == power(M.End().one()).domain().End().one()
-        assert power(shear).is_isomorphism()
+        assert isinstance(power(shear), CategoricalIsomorphism)
         assert not power(scale).is_surjective()

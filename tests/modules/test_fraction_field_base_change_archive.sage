@@ -1,6 +1,9 @@
 r"""Scalar extension from $\mathbb Z$ to $\mathbb Q$."""
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.abstract_categories.mor_categories import (
+    CategoricalIsomorphism,
+)
 
 
 def test_a_determinant_two_endomorphism_of_z2_becomes_invertible_over_q() -> None:
@@ -18,7 +21,7 @@ def test_a_determinant_two_endomorphism_of_z2_becomes_invertible_over_q() -> Non
     extension = Modules(ZZ).scalar_extension(ZZ.fraction_field_map())
     extended = extension(endomorphism)
     assert extended.domain().base_ring() == QQ
-    assert extended.is_isomorphism()
+    assert isinstance(extended, CategoricalIsomorphism)
 
 
 def test_the_unit_z2_to_q2_of_scalar_extension_is_injective_and_not_surjective() -> None:

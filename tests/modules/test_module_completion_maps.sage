@@ -7,6 +7,9 @@ kernels and cokernels of maps between them.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.abstract_categories.mor_categories import (
+    CategoricalIsomorphism,
+)
 
 
 def cyclic(R, a):
@@ -70,6 +73,6 @@ def test_q_x_mod_x4_is_already_x_adically_complete_and_projects_to_q_x_mod_x3() 
     unit = M.completion_unit(completion)
     projection = M.adic_module_projection(completion, 3)
 
-    assert unit.is_isomorphism()
+    assert isinstance(unit, CategoricalIsomorphism)
     assert projection(unit(x**3 * g)) == projection.codomain().zero()
     assert projection(unit(x**2 * g)) != projection.codomain().zero()

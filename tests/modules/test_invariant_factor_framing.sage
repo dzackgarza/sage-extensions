@@ -1,6 +1,9 @@
 r"""Invariant factors of finitely generated abelian groups and of discriminant groups."""
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.abstract_categories.mor_categories import (
+    CategoricalIsomorphism,
+)
 
 
 def test_z2_mod_x_is_free_of_rank_one_and_z2_mod_2x_is_not_projective() -> None:
@@ -18,9 +21,9 @@ def test_z2_mod_x_is_free_of_rank_one_and_z2_mod_2x_is_not_projective() -> None:
     assert free_quotient.is_projective()
     assert free_quotient.is_locally_free()
     assert free_quotient.module_rank() == 1
-    assert free_quotient.finite_free_trivialization().is_isomorphism()
+    assert isinstance(free_quotient.finite_free_trivialization(), CategoricalIsomorphism)
     local = free_quotient.local_free_trivialization(ZZ.spectrum()(ZZ.ideal(5)))
-    assert local.is_isomorphism()
+    assert isinstance(local, CategoricalIsomorphism)
 
     torsion_quotient = F.subobject_on([2 * x]).inclusion().cokernel()
     assert not torsion_quotient.is_torsion_free()
@@ -46,7 +49,7 @@ def test_u2_has_discriminant_group_z_mod_2_squared_generated_by_the_half_basis_c
     assert discriminant.cardinality() == 4
     assert tuple(discriminant.invariant_factor_form().codomain().invariant_factors()) == (2, 2)
     assert all(generator.additive_order() == 2 for generator in discriminant.module_generators())
-    assert discriminant.invariant_factor_form().is_isomorphism()
+    assert isinstance(discriminant.invariant_factor_form(), CategoricalIsomorphism)
 
 
 def test_the_a2_discriminant_quadratic_form_lives_on_z_mod_3_and_normalization_preserves_q() -> None:
@@ -61,7 +64,7 @@ def test_the_a2_discriminant_quadratic_form_lives_on_z_mod_3_and_normalization_p
     assert discriminant.cardinality() == 3
     assert generator.q() == discriminant.value_module()(QQ(4) / 3)
     assert tuple(normalized.invariant_factors()) == (3,)
-    assert normalization.is_isomorphism()
+    assert isinstance(normalization, CategoricalIsomorphism)
     for generator in discriminant.module_generators():
         assert normalized.q(normalization(generator)) == discriminant.q(generator)
 
