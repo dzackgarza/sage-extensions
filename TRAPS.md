@@ -910,3 +910,18 @@ The guard reads `field in PrimeFields() and field.characteristic() == 0`.  For t
 That is the next owner repair for this consumer: give the rational field its declared placement at the construction that produces it (or have the localization carry the named placements for `Frac(ZZ)` specifically), not at the three guards.
 
 Separately: a whole-directory `tests/groups` run still dies at 69% with no pytest summary, with the repaired module installed, so that crash is not the Bliss ABI one and the directory scan remains unavailable; the five-file before/after comparison is the regression evidence for the group-export change.
+
+### A boundary ray of Type II is a union of affine components, which `is_parabolic()` does not name
+
+`is_parabolic()` means negative inertia index 0 and radical of dimension **one**, and it keeps that documented meaning. The nullity of a disjoint union is the sum of its components' nullities, so affine \(E_7\) together with affine \(A_1\) has radical of dimension two and is not parabolic by that predicate; neither is affine \(B_4\) with affine \(B_4\). Rather than reinterpret the existing predicate for its callers, the owner now states the union explicitly:
+
+- `is_parabolic_union()` — at least two connected components, each parabolic, decided by `induced_subdiagram(component).is_parabolic()` on the components `connected_component_vertex_sets()` reports. Finite components are excluded, a single affine component is excluded (it is not a union), and the empty diagram is excluded (no components).
+- `maximal_subdiagrams(predicate, *, max_rank=None)` — the general query; `predicate` is decided on a **vertex tuple**, so the owner enumerates subsets and constructs only the survivors, the same route `maximal_elliptic_subdiagrams` takes.
+- `maximal_parabolic_union_subdiagrams(*, max_rank=None)` — the Type II query.
+- `maximal_elliptic_subdiagrams(*, connected=False, max_rank=None)` — the existing query, now with the same optional cap.
+
+`max_rank` caps the **returned** subdiagrams after maximality is decided over every subset (`_maximal_vertex_sets`), so a capped query is exactly the uncapped one filtered by rank; it can never promote a subdiagram contained in a larger accepted one. The survivors are the induced subdiagrams, with labels, vertex names, roots, root Gram and the inclusion arrow.
+
+Cost is the subset route: the five Sterk diagrams give their whole inventory in about 38 s, the fourteen-root `Sterk_5` alone taking 24 s for its 16,384 subsets.
+
+Inventory of maximal affine unions on the five Sterk diagrams as this owner computes it: `Sterk_1` 3, `Sterk_2` 0, `Sterk_3` 3, `Sterk_4` 1, `Sterk_5` 9 (two of rank 11, the rest rank 10) — 16 in total. If a consumer's "five Type II cases" is a different count, the distinguishing condition is not part of the contract stated here; the named examples affine \(E_7\) + affine \(A_1\) and affine \(B_4\) + affine \(B_4\) are both recognised.
