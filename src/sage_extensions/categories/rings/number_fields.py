@@ -946,6 +946,30 @@ class OrdersWithChosenIntegralBasis(OwnedCategory):
         ]
 
     class ParentMethods:
+        def index_in(self, other):
+            r"""Return \([\\mathrm{other} : \\mathrm{self}]\), the index of this order in ``other``.
+
+            Both orders are full \(\\mathbb Z\)-lattices in one number field, so
+            the index is the absolute determinant of the change-of-basis matrix
+            between their selected integral bases (Neukirch, *Algebraic Number
+            Theory*, I.2.10); \([\\mathcal O_K : \\mathbb Z[\\sqrt d]] = 2\) for
+            \(d \\equiv 1 \\pmod 4\), for instance.  The retained realizations
+            answer that determinant exactly, and the result is an owned integer.
+            """
+            if other not in OrdersWithChosenIntegralBasis():
+                raise TypeError(
+                    f"an index needs another order carrying its integral basis, but {other} is not one"
+                )
+            if self.fraction_field() is not other.fraction_field():
+                raise ValueError(
+                    f"the index of {self} in {other} needs both orders in one number field, "
+                    f"but they lie in {self.fraction_field()} and {other.fraction_field()}"
+                )
+            return _owned_engine_element(
+                _owned_integers(),
+                SageZZ(_engine_ring(self).index_in(_engine_ring(other))),
+            )
+
         def _repr_(self):
             r"""Represent an order without recursively printing its framed basis.
 

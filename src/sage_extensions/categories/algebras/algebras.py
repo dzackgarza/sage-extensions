@@ -471,6 +471,18 @@ class UnitalMultiplicativeAlgebraMorphism:
 class UnitalMultiplicativeAlgebraMor(MultiplicativeAlgebraMor):
     r"""``Mor`` of unital algebras: the multiplicative linear maps preserving the unit."""
 
+    def embeddings(self):
+        r"""The embeddings of one field into another, when both endpoints are fields.
+
+        A ring map between fields is injective, so the field ``Mor``'s
+        enumeration is this hom-set's too.  An algebra ``Mor`` between the same
+        two fields is selected because it is the stronger structure, and it
+        answers from that one owner instead of enumerating the same maps again.
+        """
+        from sage_extensions.categories.rings.ring_foundation import OwnedRings
+
+        return OwnedRings().Mor(self.domain(), self.codomain()).embeddings()
+
     ElementMethods = UnitalMultiplicativeAlgebraMorphism
 
     def _from_constructed_element_map(
