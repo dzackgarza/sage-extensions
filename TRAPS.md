@@ -2063,3 +2063,13 @@ has codomain NN = {0, 1, 2, ...}, not a finite or countably infinite standard we
 ```
 
 — but it regresses one accepted test on the four-directory group (`test_quadratic_and_cyclotomic_field_invariants::test_a_relative_quadratic_extension_of_q_root_two`: 428 failed / 622 passed → 429 failed / 621 passed). The literal `0` is load-bearing somewhere else, so the repair is not "read the label the frame has": it is a rank-one-coordinate accessor that does not depend on the frame being the ordinal `{0}`, with the relative-extension caller kept green. Reverted; both layers are recorded for that unit.
+
+**The rank-one coordinate read: three readings measured, none correct (2026-11-01, next unit).** `LocalizationRings.fraction`'s `source_element` converts a value into the source ring by reading a rank-one coordinate as `underlying.to_vector()(0)`. Three readings were measured on the two specimens that reach it:
+
+| reading | `test_special_fiber_…_node` | `test_a_relative_quadratic_extension_of_q_root_two` |
+|---|---|---|
+| `to_vector()(0)` (current) | `0 is not a basis label … indexed by Coproduct of the family over NN` | passes |
+| the one label the frame has | advances past it (to the frame's ranking-map assertion) | **fails**: `too many values to unpack (expected 1, got 2)` — the frame there has two labels for a rank-one module |
+| that label when the frame is a singleton, else `0` | unchanged failure | passes |
+
+So the frame in the *node* specimen is the infinite coproduct, where no single label names the scalar: the element is a finitely supported function on an infinite frame and "the coefficient" is not one entry of it. A single-coordinate read is therefore not the right conversion at all; what is needed is the module's own rank-one structure — a linear functional or the retained presentation — with the relative-extension caller (a two-label frame, rank one) still green. All three attempts are reverted and none is shipped; this is the next unit's statement of the problem, not a plan to try a fourth spelling of the same read.
