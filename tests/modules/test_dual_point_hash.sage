@@ -126,3 +126,59 @@ def test_a_domain_without_a_finite_probe_falls_back_to_its_endpoints() -> None:
 
     assert hash(doubling) == hash(rebuilt)
     assert isinstance(hash(doubling), int)
+
+
+def test_the_probe_reads_at_most_eight_elements_of_a_finite_family() -> None:
+    r"""The bound is on what is read, not on what the family claims to be.
+
+    A finite family may be enormous, so the probe takes a prefix by iteration and
+    stops.  These families raise if a ninth element is ever requested and count
+    every read, which is how the bound is proved rather than timed: materializing
+    the family first would raise instead of returning.
+    """
+    from sage_extensions.categories.sets.set_categories import (
+        arrow_probe,
+        _probe_prefix,
+    )
+
+    class CountingFamily:
+        def __init__(self, size: int) -> None:
+            self.size = size
+            self.consumed = 0
+
+        def is_finite(self) -> bool:
+            return True
+
+        def __iter__(self):
+            for position in range(self.size):
+                if self.consumed >= 8:
+                    raise AssertionError(
+                        "the probe read past its eight-element bound"
+                    )
+                self.consumed += 1
+                yield position
+
+    family = CountingFamily(10_000)
+    assert _probe_prefix(family) == tuple(range(8))
+    assert family.consumed == 8
+
+    class CountingFramedDomain:
+        r"""The two methods the probe is allowed to read from a module domain."""
+
+        def __init__(self, size: int) -> None:
+            self.family = CountingFamily(size)
+            self.generators_read = 0
+
+        def module_generating_set(self):
+            return self.family
+
+        def module_generator(self, label):
+            self.generators_read += 1
+            return ("generator", label)
+
+    domain = CountingFramedDomain(10_000)
+    probe = arrow_probe(domain)
+
+    assert probe == tuple(("generator", position) for position in range(8))
+    assert domain.family.consumed == 8
+    assert domain.generators_read == 8

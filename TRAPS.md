@@ -1083,3 +1083,11 @@ Queue after this: a ring-level `is_isomorphic` for the order-tensored-with-QQ sp
 #### Evidence for the arrow hash, complete
 
 The modules/sets sweep finished: `tests/modules` and `tests/sets`, 95 files, one pytest per file, compared at `f7db965` and at `69907ae`. Per-file failed/passed counts are identical on 94 of them (176 failed / 222 passed before, 176 failed / 228 passed after) and the one difference is the new `test_dual_point_hash.sage`, 0 → 6 passing. No test in that sweep newly fails, and no test there other than the new file changes state.
+
+#### The probe's bound was on the slice, not on the read
+
+`arrow_probe` documented "at most eight points" and then wrote `tuple(generating_set)[:8]` and `tuple(domain)[:8]`: it materialized an arbitrarily large finite family before slicing, so one hash cost the whole domain whenever the domain was finite and big — a million-element finite set, or a frame with a thousand labels, paid a million or a thousand reads per insertion. The bound was on what the *slice* kept, not what the probe read.
+
+Both branches now read their prefix through `_probe_prefix`, which is `tuple(islice(family, 8))`: the read stops at the bound, and the finiteness predicates (`is_finite()` for a frame, `is_provably_finite` with `EnumeratedSets()` for a domain) are the same ones as before. Reading lazily also removes the hang risk a family that is finite only by its own claim used to carry. Equality still implies equality of hash, because both branches read the same canonical prefix of the same domain through the same function.
+
+`test_the_probe_reads_at_most_eight_elements_of_a_finite_family` proves the bound instead of timing it: a family whose iterable raises when a ninth element is requested and counts every read, asked through `_probe_prefix` and through `arrow_probe` on a framed domain of ten thousand labels — eight reads in both, and the framing accessor is asked for exactly eight generators. Materializing first fails that test rather than slowing it. The dual-side acceptance is unchanged after the change: 64 distinct points give 64 distinct hashes with `dict.fromkeys` at 0.145 s, and the owned cone from 570 halfspace covectors returns in 5.10 s.

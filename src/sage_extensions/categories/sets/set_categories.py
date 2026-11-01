@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
-from itertools import count, product
+from itertools import count, islice, product
 from math import comb
 from operator import index as integer_index
 from typing import TYPE_CHECKING, Any, Self, SupportsIndex, TypeVar
@@ -608,7 +608,9 @@ def arrow_probe(domain):
     it bounds the work hashing does, which matters because hashing happens once
     per dictionary insertion while the collisions it prevents cost one arrow
     comparison each.  Reading a whole large family to hash one arrow would trade
-    that saving away.
+    that saving away, so the prefix is taken by greedy iteration and not by
+    materializing the family first: a finite family may be enormous, and hashing
+    must cost at most the bound whatever the domain's cardinality.
 
     A domain with no such finite family supplies ``None``: there the arrow hash
     states only its endpoints, which is sound -- equal arrows still share it --
@@ -619,11 +621,28 @@ def arrow_probe(domain):
     except (AttributeError, TypeError, ValueError, NotImplementedError):
         generating_set = None
     if generating_set is not None and _probe_is_finite(generating_set):
-        labels = tuple(generating_set)[:_ARROW_HASH_PROBE_SIZE]
-        return tuple(domain.module_generator(label) for label in labels)
+        return tuple(
+            domain.module_generator(label) for label in _probe_prefix(generating_set)
+        )
     if Sets().is_provably_finite(domain) and domain in EnumeratedSets():
-        return tuple(domain)[:_ARROW_HASH_PROBE_SIZE]
+        return _probe_prefix(domain)
     return None
+
+
+def _probe_prefix(family):
+    r"""Return at most ``_ARROW_HASH_PROBE_SIZE`` elements of ``family``, lazily.
+
+    ``islice`` reads the prefix and stops, so the cost is the bound and not the
+    family's size.  Materializing a finite family first -- ``tuple(family)[:n]``
+    -- would make one hash cost the whole domain, which for a finite enumerated
+    set of a million elements, or a frame with a thousand labels, is the
+    difference between a hash and a computation.  Reading lazily also means a
+    family that is finite only by its own claim cannot make hashing hang.
+
+    Both probe branches read the prefix through this one function, so the bound
+    is a property of the probe and not of a branch.
+    """
+    return tuple(islice(family, _ARROW_HASH_PROBE_SIZE))
 
 
 def _probe_is_finite(family) -> bool:
