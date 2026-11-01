@@ -61,6 +61,44 @@ def test_cell_16_the_standard_form_over_the_maximal_order_of_q_sqrt_two() -> Non
     assert f * f == 1
 
 
+def test_cell_7_the_identity_lattice_over_the_integers() -> None:
+    r"""``Lattices(ZZ)(ZZ**2)``: ``e*e = 1``, ``e*f = 0``, ``f*f = 1``.
+
+    The notebook also states the chosen frame of the same lattice —
+    ``linear_combination({0: 1}) = e`` and ``linear_combination({1: 1}) = f`` —
+    which is what makes the three products statements about those two vectors.
+    """
+    lattice = Lattices(ZZ)(ZZ**2)
+    e, f = tuple(lattice.module_generators())
+
+    assert lattice.linear_combination({0: 1}) == e
+    assert lattice.linear_combination({1: 1}) == f
+    assert e * e == 1
+    assert e * f == 0
+    assert f * f == 1
+
+
+def test_cell_11_the_identity_lattice_over_the_rationals() -> None:
+    r"""``Lattices(QQ)(QQ**2)``: ``eQ*eQ = 1``, ``eQ*fQ = 0``, ``fQ*fQ = 1``."""
+    lattice = Lattices(QQ)(QQ**2)
+    e, f = tuple(lattice.module_generators())
+
+    assert e * e == 1
+    assert e * f == 0
+    assert f * f == 1
+
+
+def test_cell_14_the_identity_lattice_over_q_sqrt_two() -> None:
+    r"""``Lattices(K)(K**2)``: ``eK*eK = 1``, ``eK*fK = 0``, ``fK*fK = 1``."""
+    field = QuadraticField(2, "a")
+    lattice = Lattices(field)(field**2)
+    e, f = tuple(lattice.module_generators())
+
+    assert e * e == 1
+    assert e * f == 0
+    assert f * f == 1
+
+
 def test_cell_21_the_identity_form_over_the_gaussian_integers() -> None:
     r"""``Lattices(Oi)(Oi**2)``: ``ei*ei = 1``, ``ei*fi = 0``, ``fi*fi = 1``.
 
