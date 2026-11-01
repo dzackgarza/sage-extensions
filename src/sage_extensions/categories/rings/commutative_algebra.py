@@ -4417,6 +4417,19 @@ def _fraction_field_localization(source, submonoid):
             algebra_categories.append(
                 Algebras(algebra_base).Associative().Unital().Commutative()
             )
+    # ``Frac(ZZ)`` is the *named* rational field, so it carries the placement
+    # that names it: the prime field of characteristic 0, ordered, and the
+    # number field of degree one (``_rational_placements``).  The localization
+    # construction above supplies only the localization and field placements,
+    # so without this a guard reading ``QQ in PrimeFields()`` -- the spinor-norm
+    # entry points of ``Lattices.O_plus`` among them -- rejects the field whose
+    # own placement declares it.  Other fraction fields are unaffected.
+    if source is _owned_integers():
+        from sage_extensions.categories.rings.ring_foundation import (
+            _rational_placements,
+        )
+
+        placements = [*placements, *_rational_placements()]
     full_placement = owned_category_join(
         (LocalizationRings(), *placements, *algebra_categories)
     )

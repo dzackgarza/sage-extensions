@@ -842,7 +842,7 @@ Rule: a class placed in a category by inheritance must run that category's initi
 - `_coinvariant_discriminant_from_invariant` conjugates the invariant automorphism *and its stored inverse* to build both arrows on selected generators, instead of constructing one map and asking the generic solver for its inverse.
 - `TorsionFormOrthogonalGroup._from_engine` accepts an owned forward/inverse pair (both or neither), `_normalized_form_automorphism` passes the pair it already holds, and `TorsionFormAutomorphism.inverse()` reverses its own stored pair rather than conjugating `a^{-1}` back through normalization.
 
-Measured on the canonical pair's own specimens, in separate processes on an otherwise idle VM.  The first conversion pays the one-off setup of the fixed glue data, the coinvariant module's presentation and the finite engine; every later conversion on the same fixed forms is the steady cost the consumer repeats (the port performs 19 per form):
+Measured on the canonical pair's own specimens, one process at a time.  The host is shared (four CPUs, 16 GB, no swap) and other projects' Sage jobs were **not** controlled during these runs, so the seconds below are indicative, not an idle-machine benchmark: the pre-port steady figure alone moved between 11.7 s and 26.3 s across two runs.  What the measurement is meant to establish is the per-conversion ratio and the construction counts within one run, both of which are stable, not the absolute wall time.  The first conversion pays the one-off setup of the fixed glue data, the coinvariant module's presentation and the finite engine; every later conversion on the same fixed forms is the steady cost the consumer repeats (the port performs 19 per form):
 
 | case | invariant form | coinvariant form | before the port (`7b222e8`) | after the port (`297bf69`) |
 | --- | --- | --- | --- | --- |
@@ -925,3 +925,18 @@ Separately: a whole-directory `tests/groups` run still dies at 69% with no pytes
 Cost is the subset route: the five Sterk diagrams give their whole inventory in about 38 s, the fourteen-root `Sterk_5` alone taking 24 s for its 16,384 subsets.
 
 Inventory of maximal affine unions on the five Sterk diagrams as this owner computes it: `Sterk_1` 3, `Sterk_2` 0, `Sterk_3` 3, `Sterk_4` 1, `Sterk_5` 9 (two of rank 11, the rest rank 10) — 16 in total. If a consumer's "five Type II cases" is a different count, the distinguishing condition is not part of the contract stated here; the named examples affine \(E_7\) + affine \(A_1\) and affine \(B_4\) + affine \(B_4\) are both recognised.
+
+### `Frac(ZZ)` did not carry the placement that names it, so `QQ in PrimeFields()` was false
+
+`_rational_placements()` documents the named rational field as "the prime field of characteristic 0, ordered, and the number field of degree 1" and returns exactly those categories, but nothing applied it: `_owned_rationals()` is `_owned_integers().fraction_field_localization()`, and the localization construction supplied only `LocalizationRings()`, the field placements, and the algebra categories.  Consequently
+
+```python
+QQ.characteristic()            # 0
+QQ in PrimeFields()            # False
+QQ.category()                  # local nontrivial localization rings, commutative algebras,
+                               # owned ordered rings, fields, modules over the fraction field
+```
+
+and every guard of the form `field in PrimeFields() and field.characteristic() == 0` rejected the rational field — `Lattices.O_plus` at `lattices.py:4110`, `9189` and `9250`, which is where the frozen Enriques consumer stopped with "QQ has exactly one, but Frac(R) = Fraction Field of Integer Ring: pass a real embedding of it to spinor_kernel".
+
+The placement is now applied at the construction that produces the field: `_fraction_field_localization` adds `_rational_placements()` when the source is the owned integers, so `Frac(ZZ)` carries the categories its own name declares, and `QQ in PrimeFields()` is `True`.  No guard was relaxed.  Other fraction fields are untouched, and the three ring files that exercise this construction (`test_fraction_field_localization`, `test_commutative_algebra`, `test_elementary_arithmetic_of_owned_rings`) have an identical failure set before and after (24 failed / 19 passed, no test changed).
