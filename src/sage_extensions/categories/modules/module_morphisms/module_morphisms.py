@@ -2292,17 +2292,20 @@ class ModuleMorphismMethods:
         r"""Return ``self . other`` for a composable arrow, or ``other * self`` for a scalar."""
         match other:
             case _ if _precomposable(self, other):
-                if other.parent() is self.parent() and self.domain() is self.codomain():
-                    return self.parent()._compose_endomorphisms(self, other)
-                source = other.domain()
-                target = self.codomain()
                 # The identity is a two-sided unit.  That is a theorem, so the
                 # composite is the other factor itself rather than a fresh
-                # morphism that would then have to be compared with it.
+                # morphism that would then have to be compared with it.  This
+                # comes before the endomorphism specialization below, or
+                # ``id * id`` would be rebuilt as a new endomorphism whose
+                # equality with ``id`` is not decided by any selected data.
                 if self._is_the_identity() is True:
                     return other
                 if other._is_the_identity() is True:
                     return self
+                if other.parent() is self.parent() and self.domain() is self.codomain():
+                    return self.parent()._compose_endomorphisms(self, other)
+                source = other.domain()
+                target = self.codomain()
                 # Keep the Mor theory in which both arrows were admitted.
                 # Redispatching Modules(R) from the source's scalar ring can
                 # select a stricter chosen-action category on a group algebra,
