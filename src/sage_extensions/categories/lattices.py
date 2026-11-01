@@ -8074,7 +8074,17 @@ class Lattices(OwnedCategoryOverBaseRing):
                 else "Lattice"
             )
             rank = self.module_rank()
-            if _engine_ring(self.base_ring().fraction_field()) is QQ:
+            # The signature is read over the fraction field, which a complete
+            # local ring such as the 5-adic integers does not have; it states
+            # rank and scalar ring instead of raising.
+            from sage_extensions.categories.rings.ring_foundation import (
+                OwnedIntegralDomains,
+            )
+
+            if (
+                self.base_ring() in OwnedIntegralDomains()
+                and _engine_ring(self.base_ring().fraction_field()) is QQ
+            ):
                 _signature = _signature_pair_of_gram(self.gram_tensor())
                 if _signature is not None:
                     pos, neg = _signature.first(), _signature.second()

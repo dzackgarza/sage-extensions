@@ -1531,7 +1531,13 @@ def _discriminant_of_gram(gram: Tensor):
 
 def _format_disc_latex(disc) -> str:
     r"""Format the discriminant with its prime factorization."""
-    if disc in (-1, 0, 1):
+    from sage_extensions.categories.rings.ring_foundation import OwnedIntegralDomains
+
+    parent = disc.parent()
+    zero, one = parent.zero(), parent.one()
+    if (disc == zero) is True or (disc == one) is True or (disc == -one) is True:
+        return str(disc)
+    if parent not in OwnedIntegralDomains():
         return str(disc)
     # Factorization is the engine's; the owned integer crosses once, here.
     factorization = factor(_engine_element(disc.parent(), disc))
@@ -1566,7 +1572,12 @@ def _lattice_latex(lattice, ring_tex: str) -> str:
     rank = lattice.module_rank()
     gram_latex = str(latex(lattice.gram_tensor()))
     gram_latex = re.sub(r"\b0\b", lambda _match: r"\cdot", gram_latex)
-    rational_base = _engine_ring(lattice.base_ring().fraction_field()) is QQ
+    from sage_extensions.categories.rings.ring_foundation import OwnedIntegralDomains
+
+    rational_base = (
+        lattice.base_ring() in OwnedIntegralDomains()
+        and _engine_ring(lattice.base_ring().fraction_field()) is QQ
+    )
     signature = _signature_pair_of_gram(lattice.gram_tensor()) if rational_base else None
 
     match cardinal(rank).is_finite():

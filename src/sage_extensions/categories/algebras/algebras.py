@@ -1446,6 +1446,7 @@ class Algebras(OwnedCategoryOverBaseRing):
         return _algebra_on_module(module, multiplication, placement=(self,))
 
     class ElementMethods:
+        @RealizationHook
         def _mul_(self, other):
             r"""``x * y`` is the multiplication evaluated on ``x (x) y`` in the module it is stated on.
 

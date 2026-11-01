@@ -1164,6 +1164,21 @@ class QuotientRings(OwnedCategory):
                 raise ZeroDivisionError(f"{element} is not a unit in {self}")
             return self._from_engine_element(represented**-1)
 
+        def unit_morphism(self):
+            r"""The structure map of a completion is its completion map.
+
+            Read over the ring it completes, ``r |-> r * 1`` *is* the completed
+            scalar map: both send a source element to its limit class, and the
+            completion map is the one that keeps the exact source expression.
+            Rebuilding the scalar image as ``r * 1`` discarded that datum, so
+            ``R^(1) == 1`` could not be decided.  A completion presented over a
+            formal base keeps the generic structure map, because there the
+            scalar ring is not the completed ring.
+            """
+            if self.completion_source() is self.algebra_base_ring():
+                return self.completion_map()
+            return super().unit_morphism()
+
         def zero(self):
             return self(self.quotient_source().zero())
 
@@ -2910,6 +2925,26 @@ class AdicCompletions(Category):
             """
             return self._adic_completion_ideal
 
+        def zero(self):
+            r"""The completion's zero carries the exact source datum ``0``.
+
+            The value is the retained engine's zero; the source expression is
+            what makes a comparison with an exact operand decidable, and it is
+            attached here rather than by going through the completion map,
+            whose construction reads this unit.
+            """
+            source = self.completion_source()
+            return self._completion_element(
+                self._engine.zero(), source_expression=source.zero()
+            )
+
+        def one(self):
+            r"""The completion's one carries the exact source datum ``1``."""
+            source = self.completion_source()
+            return self._completion_element(
+                self._engine.one(), source_expression=source.one()
+            )
+
         def completion_map(self):
             morphism = self._realized_completion_map
             if morphism is None:
@@ -3304,6 +3339,37 @@ class _AdicQuotientInverseSystem(Functor):
         return self.completion().adic_transition_map(higher, lower)
 
 
+def _exact_integer_rational_parts(value, source):
+    r"""Return ``(numerator, denominator)`` for an exact integer or rational, else ``None``.
+
+    The numerator and denominator are Python integers so the caller can map
+    them into the completion's own source ring; nothing here converts a host
+    object beyond the two exact number types the public contract names.
+    """
+    from sage.rings.integer import Integer as SageInteger
+    from sage.rings.rational import Rational as SageRational
+
+    match value:
+        case bool():
+            return None
+        case int():
+            return int(value), 1
+        case SageInteger():
+            return int(value), 1
+        case SageRational():
+            return int(value.numerator()), int(value.denominator())
+        case _:
+            pass
+    parent = element_parent(value)
+    if parent is None:
+        return None
+    match parent is source.fraction_field():
+        case True:
+            return int(value.numerator()), int(value.denominator())
+        case False:
+            return None
+
+
 class _AdicCompletionElement(_OwnedAlgebraElement):
     r"""An element of a completion with equality respecting its information model."""
 
@@ -3419,17 +3485,49 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
             return None
         return kernel.contains_ambient_element(difference)
 
-    def _completion_equal(self, other):
+    def _exact_operand_pair(self, other):
+        r"""Return the pair of exact completion elements this comparison reduces to.
+
+        The public contract admits an element of the completion, an element of
+        the ring it completes, an exact integer, and an exact rational whose
+        denominator is a unit of the completion.  Each supported operand enters
+        through the retained completion map, so it keeps the exact source
+        expression the comparison is decided on; a rational is compared by
+        cross-multiplication with its denominator, which is exact and keeps the
+        same provenance.  ``None`` means the operand is not one this contract
+        supports -- a raw host object of any other kind is not admitted, and an
+        exact rational with a non-unit denominator names no element of the
+        completion.
+        """
         parent = self.parent()
-        try:
-            other = parent(other)
-        except (TypeError, ValueError):
+        source = parent.completion_source()
+        image = parent.completion_map()
+        other_parent = element_parent(other)
+        if other_parent is parent:
+            return self, other
+        if other_parent is source:
+            return self, image(other)
+        match _exact_integer_rational_parts(other, source):
+            case None:
+                return None
+            case (numerator, denominator):
+                pass
+        image_denominator = image(source(denominator))
+        if image_denominator.is_unit() is not True:
+            return None
+        return self * image_denominator, image(source(numerator))
+
+    def _completion_equal(self, other):
+        pair = self._exact_operand_pair(other)
+        if pair is None:
             return False
-        if self is other:
+        self_element, other = pair
+        if self_element is other:
             return True
-        left = self._backend()
+        parent = self_element.parent()
+        left = self_element._backend()
         right = other._backend()
-        source_status = self._exact_source_equality_status(other)
+        source_status = self_element._exact_source_equality_status(other)
         if source_status is not None:
             return source_status
         mode = parent.completion_arithmetic_mode()
@@ -3446,7 +3544,7 @@ class _AdicCompletionElement(_OwnedAlgebraElement):
         difference = left - right
         if bool(difference):
             return False
-        return AtomicProposition("equal", self, other)
+        return AtomicProposition("equal", self_element, other)
 
     def __eq__(self, other):
         return self._completion_equal(other)
@@ -5438,7 +5536,10 @@ class FormalPowerSeriesRings(OwnedCategoryOverBaseRing):
 def Zp(*args, **kwargs):
     source = _owned_integers()
     prime_value = args[0] if args else kwargs.get("p")
-    owned_prime = source(prime_value)
+    # Under the preparser a session literal arrives as a Sage integer, which the
+    # owned integers refuse as a foreign element.  A prime here is a literal
+    # integer, so it enters by its value rather than by its element type.
+    owned_prime = source(int(prime_value))
     prime = SageZZ(_engine_element(source, owned_prime))
     engine_kwargs = dict(kwargs)
     # The precision is a session integer, which Sage's factory cannot read;
