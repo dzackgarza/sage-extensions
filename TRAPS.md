@@ -1805,3 +1805,24 @@ _maximal_ideal_over_local_base
 Choosing a placement for a free module asks whether its coefficient ring is a field; for a local ring that decision asks whether the maximal ideal is zero; the power series ring's maximal ideal is built by extending an ideal along the completion map, which builds a free module over the same ring. The library already has the seam for this — `LocalRings._field_decision` reads `construction.maximal_ideal_is_zero_decision()` first, and its docstring states the circle for prime localizations — but the two constructions over a *local base* stated nothing, so they fell to the ideal route. They now state `maximal_ideal_is_zero=False`: the formal parameters and the dual-number `epsilon` generate the maximal ideal and are not zero. `tests/rings/test_commutative_algebra.sage` goes 15 failed / 10 passed → **14 failed / 11 passed**, that test fixed, none introduced.
 
 **Next in that file, named not guessed.** `test_quotient_residue_field_dual_numbers_and_adic_completion` fails on `tbar**2 == 0` in `(Z/5)[t]/(t^2)`: the class of `t` squares to something printing `t mod Ideal (t^2) of Free module on Coproduct … over Integer Ring / Ideal (5) of Integer Ring ** 2`, i.e. the reduction by `t^2` does not reach zero in this two-step quotient — quotient arithmetic, a different owner from the local-ring construction above.
+
+**A quotient element is not equal to a scalar zero of its coefficient tower (2026-11-01, open, reproduced).** `test_quotient_residue_field_dual_numbers_and_adic_completion` fails on `tbar**2 == 0` in `(Z/5)[t]/(t^2)`, and the whole file's arithmetic is fine. Inside the pytest `.sage` environment the two sides are:
+
+```
+POWER is zero            True
+POWER == quotient.zero() True
+POWER == 0               False          # <- the assertion
+EXPONENT type            _OwnedRingParent_with_category.element_class
+```
+
+The Sage preparser turns the literal `0` in a `.sage` file into this library's `ZZ(0)` (`Integer` in the module's builtins is Sage's, but the preparsed literal goes through the session's `ZZ`), so the comparison is **quotient element vs an owned element of `ZZ`, one step up the coefficient tower** — not vs a host `int`. The minimal reproduction, provider-only, no pytest:
+
+```python
+quotient = GF(5).polynomial_ring("t").quotient_ring(t**2)
+quotient.zero() == 0        # True   (host int coerces)
+quotient.zero() == ZZ(0)    # False  (owned ZZ zero does not)
+quotient.zero() == QQ(0)    # False
+quotient(5) == 0            # True
+```
+
+So `ZZ -> ZZ/5 -> (Z/5)[t] -> (Z/5)[t]/(t^2)` is a chain of maps the ring carries, but the comparison against an element of its *bottom* ring answers `False` instead of coercing along it — the same family as the exact-literal comparison recorded for `ZZ[x]` at `(x)`, where an exact operand from another owned ring stops the numeric route. Nothing here is a preparation artefact to be worked around in the test: `t**2 = 0` in that quotient is the assertion's mathematical content, and the comparison is what is wrong. Not repaired here: the owner is the ring comparison across the registered scalar tower (coerce the exact scalar, then compare classes), which needs its own change and its own regression rather than a test-side `== quotient.zero()`.
