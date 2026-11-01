@@ -1079,3 +1079,7 @@ The residual seconds are the per-point evaluation the probe reads (≈6 values o
 `tests/modules/test_dual_point_hash.sage` (6 tests) pins the contract without timing it: 64 distinct dual points give 64 distinct hashes; `finite_ordered_set` returns the same 64; equal points share a hash across presentations (`e*` rebuilt as `2e* - e*`, and `e* + 0`); the zero and the scalars keep distinct hashes; the primal family keeps its distribution; and an infinite frame falls back to the endpoint hash instead of trying to read an infinite probe.
 
 Queue after this: a ring-level `is_isomorphic` for the order-tensored-with-QQ specimen, and `ZZ[1/2](QQ(1)/QQ(3))` raising the source-ring `TypeError` where the localization's own refusal belongs.
+
+#### Evidence for the arrow hash, complete
+
+The modules/sets sweep finished: `tests/modules` and `tests/sets`, 95 files, one pytest per file, compared at `f7db965` and at `69907ae`. Per-file failed/passed counts are identical on 94 of them (176 failed / 222 passed before, 176 failed / 228 passed after) and the one difference is the new `test_dual_point_hash.sage`, 0 → 6 passing. No test in that sweep newly fails, and no test there other than the new file changes state.
