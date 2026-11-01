@@ -117,7 +117,13 @@ class ModuleLocalizationFunctor(_ScalarExtensionFunctor):
         # Flatness preserves a selected monomorphism.  Read its mathematical
         # Mor placement, not its concrete morphism implementation.
         source_mor = morphism.parent().mor_category()
-        monomorphisms = morphism.domain().module_category().Mono()
+        # The packet's ``Mono`` is asked for the monomorphisms *into the
+        # morphism's codomain*; without that argument it is the packet operation
+        # itself, which needs a codomain and raised
+        # "Mono() missing 1 required positional argument: 'codomain'".
+        monomorphisms = morphism.domain().module_category().Mono(
+            morphism.domain(), morphism.codomain()
+        )
         match source_mor.is_subcategory(monomorphisms):
             case True:
                 return source.Mono(target)._from_constructed_embedding(

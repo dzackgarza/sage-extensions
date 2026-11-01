@@ -1886,3 +1886,22 @@ With that, `tests/rings/test_commutative_algebra.sage::test_quotient_residue_fie
 With that, `_univariate_polynomial_ideal_placement` is stated for every coefficient field: `QQ[t]/(t^2 - 1)` is unplaced because `t^2 - 1` splits, `QQ[t]/(t)` and `QQ[t]/(t^2 - 2)` are fields, and the residue-map route of a prime localization — which composes `quotient.quotient_map()` with `_canonical_map` — works over `QQ` again: `tests/rings/test_local_module_maps_frontier.sage::test_prime_local_units_and_residue_map_use_the_selected_local_ring` passes.
 
 Measured on the 158-file set against the published `c94af7b`: **322 failed / 455 passed**, nothing introduced and nothing lost (the same totals as with the theorem staged at characteristic p, now carrying two more passing tests in the placement file). `tests/rings/test_principal_maximal_ideals_in_k_t.sage` has five tests, including the characteristic-zero pair.
+
+**The localization functor asked the Mor packet for monomorphisms without a codomain (2026-11-01).** `test_localization_commutes_with_cokernels` died in `ModuleLocalizationFunctor._apply_morphism` at
+
+```python
+monomorphisms = morphism.domain().module_category().Mono()      # <- no arguments
+match source_mor.is_subcategory(monomorphisms):
+TypeError: CategoryPacketMethods.Mono() missing 1 required positional argument: 'codomain'
+```
+
+The packet's `Mono` is asked as ``Mono(source, codomain)`` everywhere else in the library (`pure/modules.py:1650`, `mor_foundation.py:436`, `orbit_spans.py:150`), so the zero-argument call was not a spelling of "the monomorphisms" at all — it was the packet operation with its codomain missing. It is now `module_category().Mono(morphism.domain(), morphism.codomain())`.
+
+That is a structural repair, not the test's fix: the test now runs past it and stops at its real blocker, which is the next item —
+
+```
+assert comparison.forward().is_injective()
+TypeError: Smith form only defined over Noetherian integral domains
+```
+
+so the localization's cokernel comparison produces a map whose injectivity is decided by a Smith form over a ring that is not a Noetherian domain (the localization's own coefficient ring). Measured on the four directories `tests/rings tests/objects tests/algebras tests/modules` against a clean worktree at the published `c94af7b`: **447 failed / 582 passed → 446 failed / 594 passed, nothing introduced**, the one disappearance being the dual-numbers test closed earlier.
