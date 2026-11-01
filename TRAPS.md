@@ -1402,7 +1402,15 @@ Identity survives the sharing. Sage caches `SymmetricGroup(n)`, so both point se
 
 No validation was weakened. Membership and form checks still run where they are the answer: the symmetric-group parent's own constructor is what admits the permutation, an invalid non-bijective point map still raises "not represented by a permutation", and an element still refuses a point outside its selected permutation domain. Nothing was made `check=False`.
 
-**The Coble materialization now completes.** `D.orbits()` returns in **72.1 s** (of which ~40 s is the one-time Oscar/Julia initialisation) with **6 orbits of sizes [527, 527, 496, 496, 1, 1]**, summing to 2048 — the two 527s are the nonzero isotropic classes the research consumer counts, and the two singletons are `0` and the other fixed point. `_orbit_labels` on the 2048 points costs 0.0 s once the four generator permutations exist (one `_permutation_from_point_map` per generator, counted). The generator resolution itself is unchanged and cached: `_engine_group()` through Oscar once (41.8 s), `group_generators()` 0.3 s, the same family on re-read.
+**The Coble materialization now completes.** `D.orbits()` returns in **72.1 s** (of which ~40 s is the one-time Oscar/Julia initialisation) with **6 orbits of sizes [527, 527, 496, 496, 1, 1]**, summing to 2048.
+
+**Corrected reading of those sizes.** Sizes alone do not classify the orbits, and my first statement that *both* 527s are the isotropic classes was wrong: the `q = 0` fibre has 528 elements in total, independently counted, so only one 527 orbit can be its nonzero part. Measured by quadratic value, the six orbits are
+
+| orbit size | 1 | 527 | 496 | 1 | 527 | 496 |
+| --- | --- | --- | --- | --- | --- | --- |
+| `q` | 0 | 0 | 1 | 1/2 | 1/2 | 3/2 |
+
+so the fibres are `q = 0` 528 (the isotropic set: `{0}` plus one 527), `q = 1/2` 528 (a singleton plus the second 527), `q = 1` 496 and `q = 3/2` 496. The value partition `528, 528, 496, 496` is what the orbit decomposition must reproduce, and it is now asserted exactly, point by point, in `tests/lattices/test_coble_discriminant_orbit_values.sage`. `_orbit_labels` on the 2048 points costs 0.0 s once the four generator permutations exist (one `_permutation_from_point_map` per generator, counted). The generator resolution itself is unchanged and cached: `_engine_group()` through Oscar once (41.8 s), `group_generators()` 0.3 s, the same family on re-read.
 
 Evidence: `.scratch/coble-after-engine.log` (the `D.orbits()` run and orbit sizes), `.scratch/probe-coble-stack2.py` (the ingress timing), `.scratch/eng-base.txt` and `.scratch/eng-after.txt` (targeted before/after: 22 failed / 20 passed -> 22 failed / 21 passed, identical failure sets, the extra pass being the new regression).
 
