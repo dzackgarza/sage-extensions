@@ -144,3 +144,77 @@ def test_the_five_sterk_diagrams_have_their_type_two_inventory() -> None:
                 entry.induced_subdiagram(tuple(component)).is_parabolic()
                 for component in components
             ), name
+
+
+def test_a_single_affine_component_satisfies_the_componentwise_contract() -> None:
+    r"""``is_componentwise_affine()`` is the complete contract; the union predicate stays as documented."""
+    for label in (["E", 7, 1], ["A", 1, 1], ["B", 4, 1]):
+        diagram = CoxeterDiagrams()(list(label))
+        assert diagram.is_componentwise_affine() is True, label
+        assert diagram.is_parabolic_union() is False, label
+        assert int(diagram.form_rank()) == int(diagram.cardinality()) - 1, label
+
+
+def test_componentwise_affine_excludes_finite_components() -> None:
+    for name, diagram in {
+        "finite A2": CoxeterDiagrams()(["A", 2]),
+        "finite E7 + finite A1": union(["E", 7], ["A", 1]),
+        "affine E7 + finite A1": union(["E", 7, 1], ["A", 1]),
+    }.items():
+        assert diagram.is_componentwise_affine() is False, name
+
+
+def test_maximality_is_global_across_the_componentwise_affine_family() -> None:
+    r"""An affine component inside a larger affine union is not maximal."""
+    diagram = union(["E", 7, 1], ["A", 1, 1], ["A", 2])
+
+    maximal = tuple(diagram.maximal_componentwise_affine_subdiagrams())
+    assert len(maximal) == 1
+    assert int(maximal[0].cardinality()) == 10
+    assert int(maximal[0].form_rank()) == 8
+    assert maximal[0].is_componentwise_affine()
+    assert maximal[0].is_parabolic_union()
+    assert maximal[0].arrow().codomain() is diagram
+
+
+def test_the_form_rank_cap_is_geometric_not_the_vertex_count() -> None:
+    r"""A union of three affine components has two more vertices than form rank."""
+    diagram = union(["E", 7, 1], ["A", 1, 1], ["A", 1, 1])
+    assert int(diagram.cardinality()) == 12
+    assert int(diagram.form_rank()) == 9
+
+    # Selecting by vertex count truncates the geometric rank by two here: the
+    # rank-nine form is twelve vertices wide, so a vertex cap of eleven loses it.
+    assert tuple(diagram.maximal_componentwise_affine_subdiagrams(max_rank=11)) == ()
+    capped = tuple(diagram.maximal_componentwise_affine_subdiagrams(max_form_rank=9))
+    assert len(capped) == 1 and int(capped[0].form_rank()) == 9
+    assert tuple(diagram.maximal_componentwise_affine_subdiagrams(max_form_rank=8)) == ()
+
+    union_of_two = union(["E", 7, 1], ["A", 1, 1])
+    assert int(union_of_two.cardinality()) == 10
+    assert int(union_of_two.form_rank()) == 8
+
+
+def test_the_generic_query_passes_labels_not_positions() -> None:
+    r"""The documented boundary is the vertex labels, which need not be integers."""
+    from sage_extensions.categories.coxeter_diagrams import _owned_coxeter_matrix
+    from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+
+    vertices = finite_ordered_set(("x", "y", "z"))
+    entries = {
+        (left, right): 1 if left == right else 3 for left in vertices for right in vertices
+    }
+    diagram = CoxeterDiagrams().from_coxeter_matrix(_owned_coxeter_matrix(vertices, entries))
+    assert tuple(diagram.index_set()) == ("x", "y", "z")
+
+    received = []
+
+    def predicate(labels):
+        received.append(tuple(labels))
+        return len(labels) == 2
+
+    maximal = tuple(diagram.maximal_subdiagrams(predicate))
+    assert all(all(isinstance(label, str) for label in labels) for labels in received)
+    assert tuple(diagram.index_set()) in received
+    assert len(maximal) == 3
+    assert {tuple(entry.index_set()) for entry in maximal} == {("x", "y"), ("x", "z"), ("y", "z")}
