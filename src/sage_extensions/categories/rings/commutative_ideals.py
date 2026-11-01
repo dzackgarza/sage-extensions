@@ -438,7 +438,15 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
                     # quotient has Krull dimension zero.
                     return bool(selected.is_prime() and selected.dimension() == 0)
                 case _:
-                    return bool(selected.is_maximal())
+                    try:
+                        return bool(selected.is_maximal())
+                    except NotImplementedError:
+                        # The engine's answer routes through its Krull
+                        # dimension, which a quotient engine declines
+                        # ("NotImplementedError").  An unavailable computation
+                        # states the proposition this predicate is, not a Python
+                        # exception.
+                        return AtomicProposition("is_maximal_ideal", self)
 
         def _ideal_primality_engine(self):
             r"""Ideal in the ring where primality and maximality are decided."""

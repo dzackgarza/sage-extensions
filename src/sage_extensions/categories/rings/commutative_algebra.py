@@ -1353,10 +1353,22 @@ class QuotientRings(OwnedCategory):
             return cardinal(coefficient_size) ** cardinal(degree)
 
         def _field_decision(self):
-            r"""Return whether R/I is a field, equivalently whether I is maximal."""
+            r"""Return whether R/I is a field, equivalently whether I is maximal.
+
+            A maximality question the ideal owner decides answers here as it
+            stands; one it states as a proposition is undecided, and this
+            decision says ``None`` for it rather than handing a proposition to
+            callers that ask ``is True``/``is not True`` of a decision.
+            """
             if self._is_zero_ring() is True:
                 return False
-            return self.defining_ideal().is_maximal()
+            match self.defining_ideal().is_maximal():
+                case True:
+                    return True
+                case False:
+                    return False
+                case _:
+                    return None
 
         def _integral_domain_decision(self):
             if self._is_zero_ring() is True:
