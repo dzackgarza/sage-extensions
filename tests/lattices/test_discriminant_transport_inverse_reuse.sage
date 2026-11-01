@@ -71,3 +71,37 @@ def test_the_glue_data_and_its_inclusion_inverses_are_built_once() -> None:
     for label in target_inclusion.codomain().module_generating_set():
         element = target_inclusion.codomain().module_generator(label)
         assert target_inclusion(target_inverse(element)) == element
+
+
+def test_one_conversion_constructs_no_presented_module_per_arrow() -> None:
+    r"""The conjugation is a composite of retained maps, not a new presentation.
+
+    ``research#621`` prices a conversion by the presented-module constructions
+    it triggers.  The first conversion on a fixed form builds the coinvariant
+    module's presentation once; every later conversion must build none.
+    """
+    from sage_extensions.categories.modules.framed.finitely_generated import (
+        finitely_presented_modules,
+    )
+
+    extension = _exchange_extension()
+    generators = tuple(extension.invariant.discriminant_image().group_generators())
+    # Warm the fixed glue data and the module's own presentation.
+    extension._coinvariant_discriminant_from_invariant(generators[0])
+
+    owner = finitely_presented_modules
+    original = owner._presented_module_from_morphism
+    constructed = []
+
+    def counted(*args, **kwargs):
+        constructed.append(1)
+        return original(*args, **kwargs)
+
+    owner._presented_module_from_morphism = counted
+    try:
+        for generator in generators:
+            extension._coinvariant_discriminant_from_invariant(generator)
+    finally:
+        owner._presented_module_from_morphism = original
+
+    assert constructed == []
