@@ -1273,3 +1273,23 @@ The `F5[t]/(t^2)` module cardinality was the last piece of that specimen, and it
 **One finding that corrects my own test expectation.** Over a field `(2t²) = (t²)`, and the owned ideal *normalizes* its generator: `polynomials.ideal(2·t²)` retains `t²`. So a non-monic presentation never reaches this branch as non-monic, and answering 25 for it is right rather than a leak. The refusal is therefore asserted where the hypotheses genuinely fail — a ring with more than one generator (`QQ[x,y]/(x²)`, where this branch returns `None` while another owner correctly answers `aleph_0`) — and the normalization itself is asserted, rather than a refusal that cannot occur.
 
 **Evidence.** `tests/rings/test_monic_polynomial_quotient_cardinality.sage` (6 tests) plus the original acceptance, the free-algebra generator file and the prime-localization file: 21 passed. Regression over four quotient-heavy files across `117b222` and here: 26 failed / 8 passed → **25 failed / 9 passed**, no new failure and one newly passing — `test_polynomial_prime_localization_has_expected_residue_field` — which the coefficient-field branch released.
+
+### The Hermite-form failure was vocabulary, and the normal form is sound
+
+`test_the_relations_2x_and_4x_have_hermite_form_2x` died on its first two lines, not in the normal form: `F.submodule([...])` and `F / S` raised `AttributeError: ... has no attribute 'submodule'`. This library's names for those are `subobject_on(...)` and the cokernel of the retained inclusion, and neither `submodule` nor `__truediv__` nor `quotient` exists on a module — no `def submodule` appears anywhere in `src/`, while 31 archive call sites still spell it that way and 41 spell `subobject_on`.
+
+Restated at the owner, the Hermite contract holds as Cohen 2.4.2 states it, and the checks are now explicit rather than implied:
+
+| claim | evidence |
+| --- | --- |
+| the relation span is `2Zx` | the subobject's single generator maps to `2x` under `inclusion()` |
+| redundant relations change nothing | `subobject_on([2x, 4x, 6x])` is the same subobject domain |
+| reordered relations change nothing | `subobject_on([4x, 2x])` has the same quotient cardinality 2 |
+| the quotient map kills the relation and keeps the generator | `cokernel_projection()(2x) = 0`, `cokernel_projection()(x) ≠ 0` |
+| the normal form's relation column is `2x` | `relations(gen) = 2 · relations.codomain().module_generator(0)` |
+| the normalization is an isomorphism | the returned arrow is a `CategoricalIsomorphism`; there is no `is_isomorphism` predicate to ask |
+| the quotient invariant | `M.cardinality() = 2` and `normalized.cardinality() = 2` |
+
+The companion specimen in the same file (`ZZ^2/(2x+4y) = Z/2 ⊕ Z`, Smith form `(2,0)`) had the same two vocabulary failures plus `hermite_form().is_isomorphism()`; restated the same way it passes with torsion cardinality 2, vector-space rank 1, and the invariant-factor form carrying the same torsion.
+
+`tests/modules/test_finitely_presented_module_archive.sage` 2 passed. No library source changed: the normal form, the inclusion, the projection and the quotient invariants were already correct, and adding a `submodule` alias to satisfy a stale spelling would have been a consumer workaround rather than an owner repair.
