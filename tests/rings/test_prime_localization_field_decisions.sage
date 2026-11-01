@@ -82,6 +82,10 @@ def test_the_localization_of_a_quotient_is_a_field_without_a_zero_prime() -> Non
     assert quotient.characteristic() == 6
     assert localized.characteristic() == 2
 
+    # The cardinality is the source's over the killed ideal: 6 / 3 = 2.
+    assert quotient.cardinality() == 6
+    assert localized.cardinality() == 2
+
     # The residue field is FF_2 and the residue map is the identity onto it.
     residue_field = localized.residue_field()
     residue_map = localized.residue_map()

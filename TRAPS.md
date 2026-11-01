@@ -1217,3 +1217,15 @@ Together the six residues collapsing onto `{0, 1}` with `2` and `4` killed *is* 
 Targeted run: `test_prime_localization_field_decisions.sage`, `test_field_isomorphism_decisions.sage`, `test_fraction_field_localization.sage`, `test_localizations_of_the_integers.sage` — **27 passed, 1 failed**, the failure being the pre-existing `VectorSpaces(QQ)` refusal of the owned rational field as a base.
 
 Recorded, not fixed: `cardinality()` of a finite localization is also unavailable (`(ZZ/6)_(2)` supplies no exact value and no decided enumeration), and the residue field's cardinality likewise. That is the next contract in this family.
+
+### A finite localization's cardinality, and the owner I nearly shadowed
+
+`(ZZ/6)_(2).cardinality()` was unavailable — "its construction supplies no exact value or decided finite enumeration" — although the ring is `FF_2`. `LocalizationRings.ParentMethods._cardinality_decision` handled a zero source, and an integral-domain source (where `R -> S^{-1}R` is injective, so `|S^{-1}R| = |R|`), and fell through to `super()` otherwise. A quotient source is exactly the "otherwise".
+
+For a finite source the map is **surjective** — `a/s` is `a · s^{-1}` — so the localization is the quotient of `R` by the ideal of elements that some inverted element kills, and `|S^{-1}R| = |R| / |{a : a/1 = 0}|`. That branch is now in the same owner, counting the killed elements by asking the localization's own equality once per element of the finite source, returning `None` rather than a value when an equality is undecided. `(ZZ/6)_(2)` is 2 (6 killed by 3 elements), `ZZ[1/2]` keeps `ℵ_0`, `QQ[x]`'s fraction field keeps its `ℵ_0`, and `ZZ_(3)` is untouched as an integral-domain source.
+
+**The trap worth recording**: `LocalizationRings.ParentMethods` already had a `_cardinality_decision`, and the first version of this repair *added a second one* to the same class two hundred lines lower. Python takes the last definition, so my new method silently replaced the domain/infinite logic — `test_fraction_fields_of_countable_polynomial_domains_remain_countable` failed immediately. The repair is a branch in the existing owner, not a new method beside it; a duplicate of a hook in one class body is not an override, it is an erasure.
+
+Targeted: `test_prime_localization_field_decisions`, `test_localizations_of_the_integers`, `test_fraction_field_localization`, `test_field_isomorphism_decisions`, `test_cardinality_and_exponent_over_any_pid` — **29 passed, 2 failed**, both pre-existing and unrelated: the `VectorSpaces(QQ)` refusal, and `test_F5t_mod_t_squared_has_25_elements_and_exponent_t_squared` failing at the *previous* commit too with `'Owned_NativeFreeAlgebraParent' object has no attribute 'gen'` (checked by stashing the change and re-running).
+
+Still open, same family: the **residue field** of `(ZZ/6)_(2)` — which is `ZZ/6` modulo `(2)`, a quotient ring, not a localization — still has no cardinality decision, so the owner there is `QuotientRings`. That is the next contract.
