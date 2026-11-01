@@ -101,6 +101,14 @@ def test_a_resolution_augmentation_maps_each_free_generator_to_its_own_basis_ele
     assert hash(exchange) != hash(transvection)
     assert hash(exchange) != hash(reflection)
 
+    # A hash that is not equality-consistent would make a set or a cache miss
+    # an equal arrow built from the same images.
+    rebuilt = isometry((m, b, z, a))
+    assert rebuilt is not exchange
+    assert rebuilt == exchange
+    assert hash(rebuilt) == hash(exchange)
+    assert len({rebuilt, exchange}) == 1
+
     group = vector_space.O().subgroup((exchange, transvection, reflection))
     resolution = group.selected_group_resolution()
     augmentation = resolution.augmentation()
@@ -109,3 +117,10 @@ def test_a_resolution_augmentation_maps_each_free_generator_to_its_own_basis_ele
 
     assert len(free_generators) == len(basis)
     assert tuple(augmentation(generator) for generator in free_generators) == tuple(basis)
+
+    # The subgroup construction keeps the supplied generators distinct, and a
+    # subgroup of it keeps them too: generator selection must not collapse
+    # equal-but-distinct or distinct elements.
+    assert tuple(group.group_generators()) == (exchange, transvection, reflection)
+    assert all(generator in group for generator in (exchange, transvection, reflection))
+    assert tuple(group.subgroup((transvection,)).group_generators()) == (transvection,)
