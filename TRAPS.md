@@ -1229,3 +1229,21 @@ For a finite source the map is **surjective** — `a/s` is `a · s^{-1}` — so 
 Targeted: `test_prime_localization_field_decisions`, `test_localizations_of_the_integers`, `test_fraction_field_localization`, `test_field_isomorphism_decisions`, `test_cardinality_and_exponent_over_any_pid` — **29 passed, 2 failed**, both pre-existing and unrelated: the `VectorSpaces(QQ)` refusal, and `test_F5t_mod_t_squared_has_25_elements_and_exponent_t_squared` failing at the *previous* commit too with `'Owned_NativeFreeAlgebraParent' object has no attribute 'gen'` (checked by stashing the change and re-running).
 
 Still open, same family: the **residue field** of `(ZZ/6)_(2)` — which is `ZZ/6` modulo `(2)`, a quotient ring, not a localization — still has no cardinality decision, so the owner there is `QuotientRings`. That is the next contract.
+
+### Correction: the localization cardinality branch was announced but not shipped
+
+`d1908c9` claimed the finite-kernel cardinality branch for localizations. It did not contain it: that commit changed `TRAPS.md` and a test, and `LocalizationRings.ParentMethods._cardinality_decision` still had only the zero-source and integral-domain branches, with the non-domain case falling to `super()`. The branch had been lost in a `git stash push` / `pop` round trip used to check whether an unrelated failure pre-existed; the stash was popped, and the pop put back the older copy of the file. **A commit message is not evidence that a branch shipped**: the check is `git show <sha>:<path>` on the remote tree plus a targeted run with a clean working tree, both of which the owner's readback applied and neither of which I had.
+
+The branch is now in `9fd2357` and verified there (`1` occurrence in the committed `ring_foundation.py`, `ZZ/6` with `2` inverted → cardinality 3), together with the quotient branch in the committed `commutative_algebra.py` (`(ZZ/6)/(2)` → 2).
+
+**Three further corrections to `characteristic`, all from readback, all soundness.**
+
+*Meets, not generators.* The scan tested whether individual generators of `(0 : (n·1))` lie in `S`. That is not the annihilator meeting `S`: an ideal can meet `S` through a combination of generators that no single generator witnesses, so "no generator in `S`" was not evidence of "no meeting". It now calls this ring's own `inverted_submonoid_meets(ideal)`, whose contract already distinguishes the prime-complement, the nonzero-elements and the finitely-generated cases (for `S = <f>` it decides `1 ∈ I : f^∞`).
+
+*Minimality under an undecided smaller candidate.* The scan returned the first divisor it saw kill one, even when a smaller divisor had been undecided. That asserts the minimum without establishing it: the undecided smaller candidate might also kill one. An undecided smaller candidate now keeps the answer unknown even when a later one is seen to kill.
+
+*The trivial localization first.* A localization that inverts `0` is the trivial ring, whose characteristic is `1`; the characteristic-zero shortcut is taken only after that, because a characteristic-zero source localized at a set containing zero is not a characteristic-zero ring. The instance is constructible — the zero quotient ring localized at its own one — and is now a regression: `one == zero`, characteristic `1`, cardinality `1`.
+
+**Residue field versus localization versus quotient** stays explicit in `test_the_residue_field_is_a_quotient_with_its_own_cardinality`: the residue field is *not* the localization, its `quotient_source()` is `ZZ/6`, its `defining_ideal()` is `(2)`, its cardinality is `2` decided at the quotient owner from the finite source and the killed ideal (no owned ideal supplies a cardinality of its own), and the maps that identify the three objects are asserted rather than used implicitly: `localization_map: ZZ/6 -> (ZZ/6)_(2)` and `residue_map: (ZZ/6)_(2) -> ZZ/6/(2)`.
+
+Evidence at `9fd2357`, working tree clean and the in-image checkout at the same revision: `test_prime_localization_field_decisions.sage` 8 passed; with `test_localizations_of_the_integers.sage` 18 passed; the wider targeted set 32 passed / 19 failed, of which 17 are `test_commutative_algebra.sage`'s pre-existing seventeen (identical at baseline), one is the `VectorSpaces(QQ)` refusal and one the `F5[t]/t^2` test that fails at the previous commit too.
