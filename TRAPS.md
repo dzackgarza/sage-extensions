@@ -1415,3 +1415,22 @@ so the fibres are `q = 0` 528 (the isotropic set: `{0}` plus one 527), `q = 1/2`
 Evidence: `.scratch/coble-after-engine.log` (the `D.orbits()` run and orbit sizes), `.scratch/probe-coble-stack2.py` (the ingress timing), `.scratch/eng-base.txt` and `.scratch/eng-after.txt` (targeted before/after: 22 failed / 20 passed -> 22 failed / 21 passed, identical failure sets, the extra pass being the new regression).
 
 The exact Sage condition is worth naming, because it is the difference between admission and bypass. `PermutationGroup._element_constructor_` first checks that the element's domain is compatible, then admits when `isinstance(self, SymmetricGroup) or x.gap() in self.gap()`. Using the maintained `SymmetricGroup(degree)` therefore selects Sage's own full-symmetric admission semantics — the same constructor, the same domain check — and not an unchecked path; nothing is passed `check=False`. On the ownership side the sharing is safe because `_own_group`'s key includes `id(symmetric_points)`: one internal Sage `S_n` per degree, still one owned group per retained labelled point set. The regression pins these directly: the same point set gives the same group object, the engine labels are the point ranks raised by one (`(1, 2, 3, 4)` for four labelled points), the engine permutation `(1, 2)` swaps exactly the two points of least rank, and a permutation outside the degree — `(1, 2, 3, 4, 5)` or `(0, 1)` in a degree-4 group — is refused rather than truncated.
+
+### Where the Coble orbit time actually goes, and the one uncached crossing left
+
+Measured in one process on the exact `D` (`|D| = 2048`), in order:
+
+| phase | time |
+| --- | --- |
+| `D.automorphism_group()` | 0.0 s |
+| `group_generators()` — the Oscar/Julia engine | 45.0 s |
+| `element_action()` — building the represented `G`-set | 14.5 s |
+| `_orbit_labels()`, first call (4 generators + 2048 GAP orbits) | 12.9 s |
+| `_orbit_labels()`, second call | 0.000001 s |
+| `action.orbits()` object, iterating it, `points()` per orbit | 1.5 s total |
+
+So the quadratic concern recorded above is **refuted at this size**: the orbit-set engine's pairwise part is ~1.5 s, not a blocking term. What dominates is the one-time Oscar initialisation and, per generator, the isometry applied to all 2048 points (~3.1 s each). Both are inherent to the maintained construction rather than defects.
+
+The one crossing that is not cached is the elementwise group morphism: `mor.elementwise(rule)(generator)` recomputes the rule on every evaluation — the same generator costs 3.08 s again on a second call, and the returned permutation is a new object. `_orbit_labels` evaluates each generator once, so nothing pays twice *today*; the hazard is any future consumer that asks for the same permutation twice. The fix that would not disturb semantics is a cache at the g-set, where the permutation is a function of the retained action, rather than in the generic `P`-valued `Mor` — and it should wait for a consumer that actually pays twice, since no current path does.
+
+**The next blocking items are not in this library's orbit machinery.** The port's `recursive.py:154` owned-element crossing and its `OrbitCoverModel` generator search remain port-side, as recorded earlier.
