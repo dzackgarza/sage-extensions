@@ -2110,7 +2110,6 @@ def _symmetric_group(points):
     ``natural_points()`` returns and which the action and its validation use;
     only the naming is degree-based.
     """
-    from sage.groups.perm_gps.permgroup import PermutationGroup
     from sage.groups.perm_gps.permgroup_named import SymmetricGroup
 
     assert points in FiniteSets(), (
@@ -2125,14 +2124,13 @@ def _symmetric_group(points):
         *((OwnedGroups().Commutative(),) if size <= 2 else ()),
     )
     degree = int(size)
-    if standard:
-        engine = SymmetricGroup(degree)
-    elif degree <= 1:
-        engine = PermutationGroup(())
-    else:
-        transposition = [2, 1, *range(3, degree + 1)]
-        cycle = [*range(2, degree + 1), 1]
-        engine = PermutationGroup((transposition, cycle))
+    # ``Sym(Omega)`` is the full symmetric group on the ranked degree whatever
+    # the labels are, so the engine is the symmetric-group parent itself.  Its
+    # element constructor knows that every permutation of the degree lies in
+    # it; a generic two-generator permutation group carries the same
+    # generators and the same group but not that knowledge, so admitting an
+    # element ran a GAP membership test on the whole group instead.
+    engine = SymmetricGroup(degree)
     return _own_group(
         engine,
         refinements=refinements,
