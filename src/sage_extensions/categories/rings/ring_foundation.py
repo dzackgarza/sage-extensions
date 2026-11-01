@@ -1984,12 +1984,27 @@ class LocalizationRings(OwnedCategory):
             )
 
             integers = _owned_integers()
-            if (self.one() == self.zero()) is True:
+            trivial = self.one() == self.zero()
+            if trivial is True:
                 return integers.one()
+            if trivial is not False:
+                # Whether 0 is inverted is undecided, so whether this ring is
+                # trivial is too; neither 1 nor a scan is justified.
+                return None
             source = self.localization_source()
             source_characteristic = source.characteristic()
             if (source_characteristic == source.zero()) is True:
-                return integers.zero()
+                # Characteristic zero with 0 not inverted.  A positive multiple
+                # of one vanishes here only if the inverted set kills it, which
+                # cannot happen when the canonical map is injective -- and
+                # injectivity is what a domain supplies.  A characteristic-zero
+                # ring that is not a domain can collapse to positive
+                # characteristic: localizing ``ZZ x FF_2`` at the idempotent
+                # ``(0, 1)`` gives ``FF_2``, of characteristic 2.  Without an
+                # injectivity proof the answer stays unknown.
+                if source in OwnedIntegralDomains():
+                    return integers.zero()
+                return None
             zero_ideal = source.ideal(source.zero())
             smaller_candidate_undecided = False
             for candidate in source_characteristic.divisors():

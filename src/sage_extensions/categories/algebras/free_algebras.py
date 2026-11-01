@@ -1513,6 +1513,42 @@ class FreeAlgebras(OwnedCategoryOverBaseRing):
         def is_free(self) -> bool:
             return True
 
+        def gen(self, index=0):
+            r"""Return the ``index``-th selected algebra generator.
+
+            The family is the retained one: :meth:`algebra_generating_set` names
+            the generators, and :meth:`algebra_generator` raises a name to an
+            element of this algebra.  The argument is a position in that ordered
+            family, so a free algebra on one generator answers ``gen()`` and
+            ``gen(0)`` alike, and a polynomial ring on ``x, y`` answers
+            ``gen(0) = x`` and ``gen(1) = y``.  Nothing here consults the
+            underlying computer-algebra model: the generator is the owned
+            element the construction selected.
+
+            EXAMPLES::
+
+                sage: from sage_extensions.all import ZZ
+                sage: ZZ["x"].gen()
+                x
+                sage: ZZ["x,y"].gen(1)
+                y
+            """
+            from operator import index as integer_index
+
+            position = integer_index(index)
+            generators = self.gens()
+            assert 0 <= position < len(generators), (
+                f"{self} has {len(generators)} selected algebra generators, so gen({position}) does not exist"
+            )
+            return generators[position]
+
+        def gens(self):
+            r"""Return the selected algebra generators, in their retained order."""
+            return tuple(
+                self.algebra_generator(label)
+                for label in self.algebra_generating_set()
+            )
+
         def _algebra_mor_class(self):
             return FramedFreeAlgebraMor
 
