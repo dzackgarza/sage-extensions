@@ -325,6 +325,51 @@ class CoxeterDiagramMorCategoryConstruction(MorCategoryConstruction):
     FixedCategoryClass = CoxeterDiagramMor
 
 
+def _inertia_of_entries(entries):
+    r"""Return \((n_+,n_-,n_0)\) of the symmetric form ``entries``, by Sylvester.
+
+    This is the one inertia computation: it classifies a diagram's Schlaefli
+    form and, applied to a principal submatrix, the form of an induced
+    subdiagram.  The form may be degenerate, so the zero index is part of the
+    answer; it is not a signature pair.
+    """
+    entries = [list(row) for row in entries]
+    positive = negative = zero = 0
+    while entries:
+        n = len(entries)
+        pivot = next((i for i in range(n) if entries[i][i] != 0), None)
+        if pivot is None:
+            off = next(
+                ((i, j) for i in range(n) for j in range(i + 1, n) if entries[i][j] != 0),
+                None,
+            )
+            if off is None:
+                zero += n
+                break
+            i, j = off
+            # A nonzero off-diagonal pairing gives a nonisotropic vector
+            # e_i + e_j; change basis by replacing e_i.
+            for k in range(n):
+                entries[i][k] += entries[j][k]
+            for k in range(n):
+                entries[k][i] += entries[k][j]
+            pivot = i
+        if pivot:
+            entries[0], entries[pivot] = entries[pivot], entries[0]
+            for row in entries:
+                row[0], row[pivot] = row[pivot], row[0]
+        d = entries[0][0]
+        if d > 0:
+            positive += 1
+        else:
+            negative += 1
+        entries = [
+            [entries[i][j] - entries[i][0] * entries[0][j] / d for j in range(1, n)]
+            for i in range(1, n)
+        ]
+    return cardinal(positive), cardinal(negative), cardinal(zero)
+
+
 class CoxeterDiagrams(OwnedCategory):
     r"""Finite Coxeter diagrams: labelled graphs encoding a symmetric angle matrix."""
 
@@ -827,24 +872,23 @@ class CoxeterDiagrams(OwnedCategory):
             return tensor(real_algebraics, (), (mirrors, mirrors), values)
 
         @cached_method
-        def _inertia_counts(self):
-            r"""Return \((n_+,n_-,n_0)\) of the Schlaefli form, by Sylvester.
+        def _inertia_matrix(self):
+            r"""Return the exact matrix whose inertia classifies the Schlaefli form.
 
-            The Coxeter diagram is classified by the inertia of its Schlaefli
-            form, and that form is allowed to be degenerate, so the zero index
-            \(n_0\) is part of the answer.  This is not a signature *pair*.
+            For a rooted integral diagram the retained root Gram supplies an
+            integral matrix congruent to the Schlaefli form by a positive
+            diagonal scaling; otherwise the normalized Schlaefli tensor does.
+            :meth:`_inertia_counts` and the vertex-subset decision behind
+            :meth:`maximal_elliptic_subdiagrams` read this one matrix, so a
+            subdiagram's inertia is the inertia of its principal submatrix and
+            never requires building the subdiagram.
             """
-
-            # For a rooted integral diagram, the retained root Gram supplies
-            # an integral matrix congruent to the Schlaefli form by a positive
-            # diagonal scaling. Compute inertia from it directly rather than
-            # rebuilding the normalized tensor and lowering every entry.
             if (
                 self._root_gram_engine_matrix is not None
                 and self._root_gram_engine_matrix.base_ring() is SageZZ
             ):
                 gram = self._root_gram_engine_matrix.change_ring(SageZZ)
-                matrix = sage_matrix(
+                return sage_matrix(
                     SageZZ,
                     [
                         [
@@ -854,40 +898,35 @@ class CoxeterDiagrams(OwnedCategory):
                         for i in range(gram.nrows())
                     ],
                 ).change_ring(QQ)
-            else:
-                matrix = _engine_component_matrix(self.schlafli_tensor())
-            entries = [[matrix[i, j] for j in range(matrix.ncols())]
-                       for i in range(matrix.nrows())]
-            positive = negative = zero = 0
-            while entries:
-                n = len(entries)
-                pivot = next((i for i in range(n) if entries[i][i] != 0), None)
-                if pivot is None:
-                    off = next(((i, j) for i in range(n)
-                                for j in range(i + 1, n) if entries[i][j] != 0), None)
-                    if off is None:
-                        zero += n
-                        break
-                    i, j = off
-                    # A nonzero off-diagonal pairing gives a nonisotropic
-                    # vector e_i+e_j; change basis by replacing e_i.
-                    for k in range(n):
-                        entries[i][k] += entries[j][k]
-                    for k in range(n):
-                        entries[k][i] += entries[k][j]
-                    pivot = i
-                if pivot:
-                    entries[0], entries[pivot] = entries[pivot], entries[0]
-                    for row in entries:
-                        row[0], row[pivot] = row[pivot], row[0]
-                d = entries[0][0]
-                if d > 0:
-                    positive += 1
-                else:
-                    negative += 1
-                entries = [[entries[i][j] - entries[i][0] * entries[0][j] / d
-                            for j in range(1, n)] for i in range(1, n)]
-            return cardinal(positive), cardinal(negative), cardinal(zero)
+            return _engine_component_matrix(self.schlafli_tensor())
+
+        def _principal_inertia_counts(self, positions):
+            r"""Return the inertia of the principal submatrix on ``positions``.
+
+            The Schlaefli form of the subdiagram induced on a vertex subset is
+            the principal submatrix of this diagram's Schlaefli form, so this
+            decides ellipticity for the subset without constructing it.
+            """
+            matrix = self._inertia_matrix()
+            return _inertia_of_entries(
+                [[matrix[i, j] for j in positions] for i in positions]
+            )
+
+        def _inertia_counts(self):
+            r"""Return \((n_+,n_-,n_0)\) of the Schlaefli form, by Sylvester.
+
+            The Coxeter diagram is classified by the inertia of its Schlaefli
+            form, and that form is allowed to be degenerate, so the zero index
+            \(n_0\) is part of the answer.  This is not a signature *pair*.
+            """
+            matrix = self._inertia_matrix()
+            return _inertia_of_entries(
+                [
+                    [matrix[i, j] for j in range(matrix.ncols())]
+                    for i in range(matrix.nrows())
+                ]
+            )
+
 
         def positive_inertia_index(self):
             r"""Return \(n_+\), the positive index of inertia of the Schlaefli form."""
@@ -1291,9 +1330,51 @@ class CoxeterDiagrams(OwnedCategory):
             )
 
         def maximal_elliptic_subdiagrams(self, *, connected=False):
-            r"""Return the elliptic induced subdiagrams maximal for inclusion."""
-            return self._maximal_by_vertex_inclusion(
-                self.elliptic_subdiagrams(connected=connected)
+            r"""Return the elliptic induced subdiagrams maximal for inclusion.
+
+            Maximality is a property of vertex sets, and the Schlaefli form of
+            an induced subdiagram is the principal submatrix of this diagram's
+            form on that vertex subset, so both the ellipticity filter and the
+            maximality decision are made on subsets and only the surviving
+            subdiagrams are constructed.  Building every induced subdiagram
+            first costs \(2^n\) rooted diagrams with their root Grams and
+            inclusion arrows -- 85 s for Sterk's ten-root diagram and about
+            twenty minutes for its fourteen-root one -- while the subsets
+            themselves are decided in milliseconds each.
+            """
+            if connected:
+                return self._maximal_by_vertex_inclusion(
+                    self.elliptic_subdiagrams(connected=True)
+                )
+            return finite_ordered_set(
+                tuple(
+                    self.induced_subdiagram(vertices)
+                    for vertices in self._maximal_elliptic_vertex_sets()
+                )
+            )
+
+        def _maximal_elliptic_vertex_sets(self):
+            r"""Return the vertex sets of the elliptic induced subdiagrams maximal for inclusion.
+
+            Enumerated by cardinality and then lexicographically, exactly as
+            :meth:`induced_subdiagrams` orders its members, so the subdiagrams
+            built from these sets keep that order.
+            """
+            vertices = tuple(self.index_set())
+            ranking = self.index_set().ranking_map()
+            positions = {vertex: int(ranking(vertex)) for vertex in vertices}
+            elliptic = []
+            for size in range(len(vertices) + 1):
+                for subset in combinations(vertices, size):
+                    _positive, negative, zero = self._principal_inertia_counts(
+                        tuple(positions[vertex] for vertex in subset)
+                    )
+                    if negative == 0 and zero == 0:
+                        elliptic.append(frozenset(subset))
+            return tuple(
+                tuple(vertex for vertex in vertices if vertex in candidate)
+                for candidate in elliptic
+                if not any(candidate < other for other in elliptic)
             )
 
         def maximal_parabolic_subdiagrams(self, *, connected=False):
