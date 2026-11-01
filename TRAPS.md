@@ -1826,3 +1826,20 @@ quotient(5) == 0            # True
 ```
 
 So `ZZ -> ZZ/5 -> (Z/5)[t] -> (Z/5)[t]/(t^2)` is a chain of maps the ring carries, but the comparison against an element of its *bottom* ring answers `False` instead of coercing along it — the same family as the exact-literal comparison recorded for `ZZ[x]` at `(x)`, where an exact operand from another owned ring stops the numeric route. Nothing here is a preparation artefact to be worked around in the test: `t**2 = 0` in that quotient is the assertion's mathematical content, and the comparison is what is wrong. Not repaired here: the owner is the ring comparison across the registered scalar tower (coerce the exact scalar, then compare classes), which needs its own change and its own regression rather than a test-side `== quotient.zero()`.
+
+**The scalar tower does not reach a quotient ring at all (2026-11-01, open, localized).** The `tbar**2 == 0` failure is a coercion defect, not arithmetic, and it is sharper than "comparison against a scalar":
+
+```
+quotient = GF(5).polynomial_ring("t").quotient_ring(t**2)
+quotient.has_coerce_map_from(polynomial)   False      # its own source
+quotient.has_coerce_map_from(GF(5))        False      # its base ring
+quotient.has_coerce_map_from(ZZ)           False      # the bottom of the tower
+quotient.quotient_map()                    A -> A/(t^2), endpoints correct
+quotient(ZZ(1))                             works      # explicit ingress only
+tbar + 1                                   TypeError: unsupported operand type(s) for +: '...element_class' and 'int'
+tbar + ZZ(1)                               TypeError: unsupported operand parent(s)
+quotient.zero() == 0                       True       # host int: comparison path
+quotient.zero() == ZZ(0)                   False      # owned scalar: no map, so "not equal"
+```
+
+So a quotient ring carries its quotient map and its explicit ingress, but registers **no coercion from its source**, and therefore none from anything its source coerces from: `ZZ -> ZZ/5 -> (Z/5)[t] -> (Z/5)[t]/(t^2)` is a chain the mathematics has and the coercion graph does not. `(Z/5)` alone shows the same (`GF(5).has_coerce_map_from(ZZ)` is `False`), so this is the quotient owner in general, not the two-step case: `QuotientRings` must coerce from its source along the retained quotient map, and then Sage's transitivity carries the rest. Nothing is repaired here — the change is central enough (every scalar operation on every quotient) to need its own unit and its own regression set — and the original `tbar**2 == 0` assertion is left exactly as written, since it is the comparison that is wrong.
