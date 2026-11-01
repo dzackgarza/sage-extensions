@@ -1114,3 +1114,19 @@ Two things worth recording for whoever touches this next.
 Writing that test surfaced the adjacent defect, which is the one worth keeping: an owned element of a fraction field retains the numerator and denominator it was *given*, so `QQ(6)/QQ(3)` is `(6)/(3)` and its stated denominator, `3`, is not inverted by `ZZ[1/2]` — the constructor refused a value that belongs to the ring. Membership is decided by the value, not by its presentation: `(3):(6) = (1)` meets the inverted set. `_fraction_denotations` therefore yields the retained realization's *reduced* pair first (`QQ(6)/QQ(3)` is `2`) and the stated pair as the fallback, so the value decides and the admitted form is constructed. A value with no fraction-field realization, or without numerator and denominator, contributes only what it states, which is the previous behaviour.
 
 `tests/rings/test_localizations_of_the_integers.sage` 9 → 10 passing: admitted halves and quarters, an integral value, the unreduced `6/3`, and the refused third. Targeted neighbours keep exactly their pre-existing failures, checked per file at `f7db965`: `test_fraction_field_localization.sage` 2 (the recursion in the maximal-adic datum, and `VectorSpaces(QQ)` refusing the owned rational field as a base), `test_localization_restrictions.sage` 1, `test_localized_fraction_equality_from_the_presentation.sage` 3 — identical before and after — while `test_rational_field_placement.sage` (5), `test_field_isomorphism_decisions.sage` (8) and `test_number_field_archive.sage` (3) pass.
+
+#### The five Sterk diagrams' maximal affine unions, measured
+
+The Type II inventory is recorded above as a count; here is the decomposition the count comes from, so a consumer's condition can be checked against data rather than guessed at. Every maximal affine union on the five diagrams, with its connected components (all components affine, so `is_componentwise_affine()` holds and `is_parabolic_union()` reports the at-least-two meaning):
+
+| diagram | unions | component ranks |
+| --- | --- | --- |
+| `Sterk_1` | 3 | (8, 2), (8, 2), (8, 2) |
+| `Sterk_2` | 0 | — |
+| `Sterk_3` | 3 | (7, 3), (7, 3), (8, 2) |
+| `Sterk_4` | 1 | (5, 5) |
+| `Sterk_5` | 9 | (8, 2), (7, 3), (5, 5), (7, 3), (7, 3), (5, 5), (7, 3), (4, 4, 3), (4, 4, 3) |
+
+Sixteen in total, and the two of rank eleven are exactly the two whose components are three rather than two. The filters give 16 for "any union", 14 for "exactly two components", 2 for "three components", and four distinct component-rank shapes `(8,2)`, `(7,3)`, `(5,5)`, `(4,4,3)`. None of those is five, so a consumer's "five Type II cases" is not any of these conditions, and it is not the library's count under a different reading of the same partition: the distinguishing condition is the consumer's to state. Nothing here needs a new owner method — `connected_component_vertex_sets()`, `is_componentwise_affine()`, `is_parabolic_union()` and `is_parabolic()` compose to every one of those filters already.
+
+The archive test that compares the recorded type multiset is green after the later Coxeter edits: `tests/lattices/test_sterk_elliptic_population_archive.sage` 3 passing in 41 s, so the `Counter`-multiset comparison recorded earlier still holds.
