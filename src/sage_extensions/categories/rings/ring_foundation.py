@@ -6269,7 +6269,18 @@ class _OwnedRingParent(Parent):
         return self._engine.is_commutative()
 
     def _integral_domain_decision(self):
-        return self._engine.is_integral_domain()
+        r"""Return the engine's integral-domain decision, or the proposition.
+
+        A computer-algebra model may be unable to decide whether the defining
+        ideal is prime — Sage raises ``NotImplementedError`` for the multivariate
+        ideals over ``ZZ`` it cannot analyse — and that silence is neither a
+        domain nor a non-domain.  The library's three-valued contract keeps it as
+        the proposition instead of a crash or a guessed ``False``.
+        """
+        try:
+            return self._engine.is_integral_domain()
+        except NotImplementedError:
+            return AtomicProposition("is_integral_domain", self)
 
     def _finiteness_decision(self):
         decision = _engine_finiteness_decision(self._engine)

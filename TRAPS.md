@@ -1316,3 +1316,11 @@ So the name of an object was asked for before the object had the datum its name 
 A wider algebra regression across five files: 17 failed / 2 passed → **16 failed / 3 passed**, no new failure and one more released (`test_a_morphism_out_of_a_polynomial_ring_is_a_choice_of_images`).
 
 The two failures left in those files are the same vocabulary split as the Hermite specimen: `test_z_t_mod_two_t_has_two_torsion` and `test_swapping_the_axes_is_an_involutive_automorphism_of_qq_xy_mod_xy` call `ring.quotient(...)`, which no algebra exposes — the owner's constructor is `quotient_by_relations(...)` (or `quotient_ring(ideal)`). That is the next thing to restate and verify.
+
+### An engine that cannot decide primality is not a crash
+
+`ZZ[t]/(2t)`'s torsion test died in `NotImplementedError` from Sage: `is_torsion_free` → `_torsion_freeness_decision` → `is_integral_domain()` → `_integral_domain_decision` → `self._engine.is_integral_domain()` → Sage's quotient `defining_ideal().is_prime()`, which refuses for a multivariate ideal over `ZZ`. An engine that cannot decide a question states nothing, and this library's three-valued contract already has the answer for that — the proposition, exactly as `_finiteness_decision` right beside it does. `_integral_domain_decision` now catches the refusal and returns `AtomicProposition("is_integral_domain", self)` instead of letting it escape.
+
+That is a strict improvement and it is *not* closure of the specimen: `is_torsion_free()` now answers the **proposition** `is_torsion_free(ZZ[t]/(2t))` rather than `False`, and the test asserts `not algebra.is_torsion_free()`, which a proposition refuses to answer (`ask(...)` is required). The library cannot yet decide torsion-freeness for a presented algebra over a non-PID: `2 · t = 0` with both nonzero settles it mathematically, but the generic presented-module torsion decision does not use a relation that is a nonzero multiple. That is a new algorithm and is recorded rather than improvised.
+
+Evidence over four files across `117b222` and after: 15 failed / 3 passed → **10 failed / 8 passed**, five released and none added — the three cusp tests, `test_an_algebra_over_a_field_is_torsion_free`, and `test_the_gaussian_integers_are_torsion_free_over_z`.
