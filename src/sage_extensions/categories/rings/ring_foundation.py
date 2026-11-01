@@ -5542,11 +5542,16 @@ class _OwnedRingParent(Parent):
     def __hash__(self):
         # Owned parents are identity-bearing objects: equal engine values in
         # distinct owned parents do not make the parents interchangeable.
-        # Parent's fallback hash formats the object, but an order is also a
-        # framed module whose basis elements format through the order again.
-        # Identity hashing avoids recursion in category/cache keys and agrees
-        # with the parent's identity equality contract.
-        if self._preamble_is_number_field_order():
+        # Parent's fallback hash formats the object, and an order is also a
+        # framed module whose basis elements format through the order again,
+        # while a number field's format reads ``defining_polynomial`` from a
+        # placement its constructor installs only after the first Parent
+        # initialization. Hashing either of them by formatting therefore
+        # recurses or fails inside construction itself (the self-module
+        # membership installed at the end of ``__init__`` hashes the ring).
+        # Identity hashing avoids that and agrees with the parent's identity
+        # equality contract.
+        if self._preamble_is_number_field_order() or self._preamble_is_number_field():
             return id(self)
         return super().__hash__()
 

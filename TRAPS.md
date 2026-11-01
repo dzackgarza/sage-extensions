@@ -962,3 +962,23 @@ AttributeError: '_OwnedAlgebraParent_with_category' object has no attribute 'def
 — that is, `_preamble_is_number_field()` answers true for the algebra wrapper while the category that defines `defining_polynomial` is not in its placement. It is present unchanged at `d58660c`, so it is not a consequence of any change recorded here, and it is a different clause of the issue (a number-field construction/placement defect, not the display of a lattice), so it was not repaired here.
 
 The display clause was therefore reproduced on a lattice over `GF(5)`, whose fraction field is likewise not ordered, where it raised the identical assertion: `tests/lattices/test_lattice_display_without_ordering.sage` (3 cases; the display case fails at `d58660c` with the reported message, the ordering requirement and the rational display pass there unchanged). The three notebook cells remain blocked on the number-field defect above, not on the display.
+
+### A number field could not be constructed: its own hash formatted it before its placement existed
+
+`QuadraticField(2, "a")` failed during construction, so the three number-field specimens of research issue 614 could not even be built:
+
+```text
+number_fields.py:344 QuadraticField → :151 _number_field_of
+algebras.py:4879 _OwnedAlgebraParent.__init__ → ring_foundation.py:5797 __init__
+ring_foundation.py:6660 _install_self_module_placement → modules.py:303 __classcall__
+ring_foundation.py:5551 __hash__ → :6059 _repr_  f"{self.defining_polynomial()}"
+AttributeError: '_OwnedAlgebraParent_with_category' object has no attribute 'defining_polynomial'
+```
+
+The ring installs its self-module membership at the end of `Parent.__init__`, which hashes the ring; `CategoryObject.__hash__` formats it; the number-field branch of `_repr_` reads `defining_polynomial`; and that method arrives with `_number_field_placements`, which the algebra constructor installs only *after* the first initialization by design ("install the complete stated placement only after the selected resolution and native module datum are available"). So the ring formatted itself through a placement it did not yet have.
+
+The owning repair is in the ring's identity contract, where the same recursion was already handled for orders: `__hash__` returns `id(self)` for number fields as well as for orders. Owned parents are identity-bearing, so this agrees with their identity equality, and it removes nothing: the repr, the predicates and the placement are untouched. `tests/rings/test_number_field_construction_and_display.sage` states it — the field constructs, `defining_polynomial()` answers `a^2 - 2`, the generator squares to 2, the field is in `OwnedNumberFields()`, and it hashes — and then runs the three original specimens (over `QQ(sqrt 2)`, over its maximal order, over `Z[i]`'s maximal order) through `repr` and `latex`, with the ordering guard still refusing `signature_pair()` on each.
+
+Bounded regression over the five number-field test files: `test_embeddings_of_quadratic_fields`, `test_number_field_archive`, `test_number_field_arithmetic_archive`, `test_number_field_base_change_archive`, `test_ideal_extension_and_contraction` — **15 failed / 3 passed before, 9 failed / 9 passed after, no test newly failing**.
+
+Residual, recorded and not repaired: a number field still displays as `Free module on {1, a} over Fraction Field of Integer Ring` rather than the "Number field defined by a^2 - 2" that `_number_field_of` sets, because its regular-module presentation overrides the ring display. That is a display-text defect of the ring, not the construction blocker and not the lattice clause.
