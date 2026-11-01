@@ -1166,3 +1166,25 @@ Both cases now behave, over the domain and over the quotient:
 `(ZZ/6)_(2)` is the case that separates the general criterion from the domain special case: `(0 : (2)) = (3)` is not contained in `(2)` because `3 · 2 = 0` and `3 ∉ p`, so `p R_p = 0` although `p ≠ 0`, and the localization is `FF_2`. A decision that read `p = 0` would answer `False` there.
 
 `tests/rings/test_prime_localization_field_decisions.sage` pins the three cases and the three-valued combination. Targeted run: that file plus `test_fraction_field_localization.sage`, `test_localizations_of_the_integers.sage`, `test_field_isomorphism_decisions.sage` and `test_prime_and_maximal_ideals.py` — **29 passed, 1 failed**, the failure being the pre-existing `VectorSpaces(QQ)` refusal of the owned rational field as a base. One correction recorded while writing it: `ZZ_(0).fraction_field()` is `ZZ_(0)` itself, not the interned `QQ` — a field's fraction field is itself, and the two are equal fields with different constructions, so the test asserts the former rather than object identity with `QQ`.
+
+### `group_generators` is not where Γ_h's time goes, and the retained family is what it reads
+
+The reported blocker was `target.subgroup_on(tuple(g.discriminant_morphism() for g in group.group_generators()))` spending 300–1680 s, with whole-group enumeration in `group_generators` named as the defect. Measured on the library at the port's own scale, the enumeration does not happen, and the phases separate as follows.
+
+| phase | measurement |
+| --- | --- |
+| Γ_h build (`_gamma_h`, *outside* the timed line) | 172–201 s over three runs |
+| `target = O(A_N)` | 0.00 s (cached from Γ_h) |
+| `O(A_N)` engine parent for N, `_engine_orthogonal_group` | 0.06 s (OSCAR) + 0.03 s (`FqfOrthogonalGroup(gens=…)`) + 0.00 s (GAP) |
+| `group_generators()` on `O(A_N)`, order 46 998 591 897 600 | 0.26 s, four supplied generators |
+| `group_generators()` on a generated subgroup of it | 0.08 s, the same four |
+| `subgroup_on(supplied).cardinality()` | 0.01 s, equal to the group's order |
+| `Γ_h.selected_group_resolution()` | exceeded the remaining 700 s of a 900 s cap |
+
+So `Finite.ParentMethods.selected_group_resolution`'s canonical `F(U(G))` cover — the whole underlying set, which would cost Γ_h's 696 729 600 elements — is **not** reached by either route a consumer uses: the torsion-form orthogonal group carries the generators its finite-form engine was built from, a generated subgroup carries `selected_subgroup_generators`, and both reported resolutions were already selected before any generator was requested. A rank-4 form's OSCAR cost (31.7 s of 34 s on `U+U`) does not transfer either: at rank 12 with invariants `(2,…,2)` the same call is 0.06 s, so that was OSCAR's behaviour on a particular form, not a scaling law.
+
+Γ_h's cost is in its **retained** datum, materialised: the intersection of a preimage subgroup `ρ_L(g) ∈ K` with the character subgroup `sn_RR(g) = 1` installs `_restricted_character_generating_morphism`, whose Schreier restriction asks the preimage subgroup for *its* generators. That subgroup's generating family is the Eichler/orbit-cover construction, which this library dispatches to the port by design — `eichler_criterion.py:332`, `:351`, `:357` call `OrbitCoverModel.split_generating_family` / `split_covering_vectors` / `split_full_generating_data` — and a run of that path also raised, inside the port, `TypeError: int() argument must be … not 'OwnedJoinCategory.element_class'` at `sage_indefinite_port/indefinite/recursive.py:154` (`int(coordinates(label))`) while `Γ_h.order()` was being computed. Both facts are the port's to act on: its orbit-cover conversion does not accept the owned coordinate elements the library hands it, and its generator search is what the 300–1680 s is spent in.
+
+**What was not done, deliberately.** No substitute generating set, no change to `selected_group_resolution`'s universal construction, and no fast path on `subgroup_on` — the owner's caution, and the measurements give no basis for one.
+
+**What was published instead** is the guard for the route that does work: `tests/groups/test_group_generators_use_the_supplied_family.sage`, three tests, all passing in 52 s. The small specimen (`O(A)` of `U+U`, order 72) states generators equal in number to the engine's supplied ones, checks that they generate the whole group (`subgroup_on(generators).cardinality() == 72`), and checks each one acts as an isometry on the form. A generated subgroup is checked to return exactly the generators it was given. The large specimen uses `O(A_N)` at order 46 998 591 897 600 and **makes whole-group iteration raise** (`type(group).__iter__` patched to refuse) around `group_generators()`, `group_generating_set()` and `group_generator_morphism()`, so a later change that routes generator enumeration back through the underlying set fails here instead of hanging a consumer. A subgroup of the large group is also confirmed to have the full order, which is what makes "supplied generators generate" exact rather than plausible.
