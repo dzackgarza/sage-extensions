@@ -765,6 +765,10 @@ class _PresentedAlgebraParent(_OwnedAlgebraParent):
         finite_free_coordinates=None,
         constructing_category=None,
     ) -> None:
+        # The module placement installed by the lower constructor hashes this
+        # algebra through its repr before the selected presentation exists, so
+        # the defining presentation ring is recorded here, at the first instant.
+        self._preamble_presentation_ring = presentation_ring
         # An auxiliary native polynomial cover retains its actual map from
         # the chosen presentation.  Other realizations have no such cover.
         self._presentation_cover_map = None
@@ -916,12 +920,27 @@ class _PresentedAlgebraParent(_OwnedAlgebraParent):
         )
 
     def _repr_(self):
-        r"""``P/(r_1, ..., r_k)``: the quotient named by its chosen presentation."""
+        r"""``P/(r_1, ..., r_k)``: the quotient named by its chosen presentation.
+
+        The defining presentation ring is kept from the first instant of
+        construction, and the relations are read only once they are installed.
+        Both are needed: the constructor installs this algebra's module
+        placement, that placement builds ``Modules(self)``, the category is keyed
+        by the algebra, and ``CategoryObject.__hash__`` is ``hash(repr(self))`` --
+        so this name is asked for while the object is still half built.  Reading
+        the selected presentation there raises, and reading it again is not
+        required: before it is installed the name states the datum that is
+        already fixed.
+        """
         display = self._preamble_ring_display
         if display is not None:
             return display
-        relations = ", ".join(repr(relation) for relation in self.relations())
-        return f"{self.presentation_ring()}/({relations})"
+        presentation_ring = vars(self).get("_preamble_presentation_ring")
+        try:
+            relations = ", ".join(repr(relation) for relation in self.relations())
+        except (AttributeError, AssertionError):
+            return f"{presentation_ring}/(presented quotient)"
+        return f"{presentation_ring}/({relations})"
 
 
 class _WordFramedPresentedAlgebra(_NativeMonomialEvaluation, _PresentedAlgebraParent):

@@ -1293,3 +1293,26 @@ Restated at the owner, the Hermite contract holds as Cohen 2.4.2 states it, and 
 The companion specimen in the same file (`ZZ^2/(2x+4y) = Z/2 ⊕ Z`, Smith form `(2,0)`) had the same two vocabulary failures plus `hermite_form().is_isomorphism()`; restated the same way it passes with torsion cardinality 2, vector-space rank 1, and the invariant-factor form carrying the same torsion.
 
 `tests/modules/test_finitely_presented_module_archive.sage` 2 passed. No library source changed: the normal form, the inclusion, the projection and the quotient invariants were already correct, and adding a `submodule` alias to satisfy a stale spelling would have been a consumer workaround rather than an owner repair.
+
+### A presented algebra was repr'd before it had a presentation
+
+`QQ[x,y]/(x² − y³)` could not be constructed at all: `AttributeError: '_WordFramedPresentedAlgebra_with_category' object has no attribute 'relations'`. The stack is an ordering defect, and every step of it is ordinary:
+
+1. `_PresentedAlgebraParent.__init__` calls the lower constructor,
+2. which installs this algebra's module placement — `_install_self_module_placement`,
+3. which builds `Modules(self)`, whose interning key includes the algebra,
+4. so the algebra is **hashed**, and `CategoryObject.__hash__` is `hash(repr(self))`,
+5. so `_repr_` runs — and it formatted `self.presentation_ring()` and `self.relations()`,
+6. neither of which exists yet: the selected presentation is fixed *after* the lower constructor returns.
+
+So the name of an object was asked for before the object had the datum its name states. `_PresentedAlgebraParent` now records `presentation_ring` as `_preamble_presentation_ring` in its first instant, and `_repr_` reads the relations only when they are installed, stating `P/(presented quotient)` in the window before that. Nothing else about the presentation changed, and the name is stable once the object is complete (`QQ[x,y]/(-y^3 + x^2)`).
+
+**Result: five tests released by one ordering fix**, measured across `117b222` and after on the same two files — 7 failed → **2 failed / 5 passed**, no new failure:
+
+- `test_the_cusp_is_generated_as_an_algebra_by_a_module_of_rank_two` — the assertion of record: `generating_module()` is the free module on `{[x], [y]}` over `QQ`, rank **2**;
+- `test_the_cusp_retains_its_presentation` and `test_the_presentation_ideal_of_the_cusp_contains_its_relation`;
+- `test_an_algebra_over_a_field_is_torsion_free` and `test_the_gaussian_integers_are_torsion_free_over_z`.
+
+A wider algebra regression across five files: 17 failed / 2 passed → **16 failed / 3 passed**, no new failure and one more released (`test_a_morphism_out_of_a_polynomial_ring_is_a_choice_of_images`).
+
+The two failures left in those files are the same vocabulary split as the Hermite specimen: `test_z_t_mod_two_t_has_two_torsion` and `test_swapping_the_axes_is_an_involutive_automorphism_of_qq_xy_mod_xy` call `ring.quotient(...)`, which no algebra exposes — the owner's constructor is `quotient_by_relations(...)` (or `quotient_ring(ideal)`). That is the next thing to restate and verify.
