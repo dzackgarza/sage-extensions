@@ -1937,3 +1937,21 @@ has no Python truth value
 ```
 
 — i.e. deciding that `ybar` dies in the localization needs ideal membership over the quotient `QQ[x,y]/(xy)` (equivalently an annihilator computation there), and that decision is undecided. That is the next item, named at its call.
+
+### Localization element equality: the source-side route exists and is not taken (2026-11-01, next unit, not attempted)
+
+`test_selected_presented_algebra_localization_has_exact_fraction_equality` now stops where the mathematics is easy and the machinery is not:
+
+```
+localized(ybar) == localized.zero()
+TypeError: the proposition contains_ambient_element(Finitely presented module on 1
+module generators over Localization of QQ[x,y]/(xy) at <x> , element of QQ[x,y]/(xy))
+has no Python truth value
+```
+
+Mathematically `y/1 = 0` in `(QQ[x,y]/(xy))_x` because `x y = 0` and `x` is inverted. The library already owns exactly this decision in two other places, both stated in the *source*:
+
+* `LocalizationRings.ParentMethods.characteristic` decides `n·1 = 0` here by `inverted_submonoid_meets((0 : (n·1)))`;
+* the prime localization's `maximal_ideal_is_zero` decides `g/1 = 0` the same way, and its docstring says why the element route is not used: element equality in `R_p` "is itself decided through the localization of the regular module, which needs a free module, whose placement asks whether this ring is a field -- this same decision".
+
+Element equality does take that route: `equality_status` → `_fraction_equality_status`, which compares through the *localization of the regular module*, and there the annihilator/containment decision comes out undecided for a quotient source. The route that would decide it is the one the two methods above already use — `a/s = b/t` iff `S` meets `(0 : (a t - b s))` in the source — and putting it in `_fraction_equality_status` (as a decided case, leaving the module route in force where the source side says nothing) is the next unit. Not attempted here: it changes the semantics of every localization equality, and this session's evidence for it is one test.
