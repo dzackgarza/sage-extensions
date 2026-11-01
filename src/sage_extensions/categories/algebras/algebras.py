@@ -952,21 +952,28 @@ def _install_selected_algebra_generators(
     match source:
         case None:
             module = algebra.base_ring().free_module(labels)
+            # The free module on a label set is cached by equality of label
+            # sets, and a free algebra states its generator family on the label
+            # set of the module it is built on, so that module supplies the
+            # labels the resolution is stated on.  The free algebra itself is
+            # the resolution's source and is built when the resolution is first
+            # asked for (``_fix_selected_algebra_resolution``): an algebra's
+            # construction must not build a free algebra on its generators,
+            # which for an infinite generating family is the whole word
+            # construction.
+            labels = module.module_generating_set()
             match owner is associative:
                 case True:
-                    source = module.tensor_algebra()
+                    source_factory = module.tensor_algebra
                 case False:
-                    source = module.symmetric_algebra()
-            # The free module on a label set is cached by equality of label
-            # sets, so the free algebra states its maps on its own label set.
-            labels = source.algebra_generating_set()
+                    source_factory = module.symmetric_algebra
         case _:
-            pass
+            source_factory = lambda: source
     generator_morphism = Sets().Mor(labels, algebra)(values.value)
     _fix_selected_algebra_resolution(
         algebra,
         owner,
-        lambda: source,
+        source_factory,
         labels,
         generator_morphism,
         (

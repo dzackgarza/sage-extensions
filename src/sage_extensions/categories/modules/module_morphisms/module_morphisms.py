@@ -781,7 +781,11 @@ class ModuleMorphismMethods:
         if not domain.has_selected_module_resolution():
             return None
         label_set = domain.module_generating_set()
-        if not label_set.cardinality().is_finite():
+        size = label_set.cardinality()
+        if not size.expression().is_normal_form() or not size.is_finite():
+            # A framing whose cardinality is an unevaluated sum over an
+            # infinite index set is not a finite basis, so there is no finite
+            # enumeration to verify against.
             return None
         labels = tuple(label_set)
         if not labels:
@@ -3258,6 +3262,7 @@ class TensorProductModuleMorphismMethods:
         lift=None,
         linearity_premises=None,
         bilinear_evaluation=None,
+        surjectivity_premise=None,
     ) -> None:
         self._bilinear_evaluation = bilinear_evaluation
         super().__init__(
@@ -3268,6 +3273,7 @@ class TensorProductModuleMorphismMethods:
             scalar_extension_functor=scalar_extension_functor,
             lift=lift,
             linearity_premises=linearity_premises,
+            surjectivity_premise=surjectivity_premise,
         )
 
     def _generator_image_linearity_derivation(self):

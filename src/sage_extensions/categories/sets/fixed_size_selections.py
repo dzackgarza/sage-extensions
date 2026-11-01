@@ -295,6 +295,20 @@ class FixedSizeSelections(EnumeratedSets().ObjectType):
             repetition=self.allows_repetition(),
         )
 
+    def an_element(self) -> FixedSizeSelectionElement:
+        r"""The first selection in this set's combinadic enumeration.
+
+        Rank zero is the least selection: the increasing one ``(0, ..., k-1)``
+        for a subset, and the one that repeats the source's first point for a
+        multiset.  A selection of ``k`` points needs its source to have them,
+        so an empty set of selections has no point to choose.
+        """
+        assert self.cardinality() != cardinal(0), (
+            f"cannot choose a point of {self}: no {self.selection_size()}-element "
+            f"selection of {self.source()} exists"
+        )
+        return self.element_class(self, 0)
+
     def _cardinality_decision(self) -> Cardinalities.ObjectType:
         r"""The number of \(k\)-selections from \(S\).
 

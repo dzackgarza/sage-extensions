@@ -469,8 +469,14 @@ class GradedModules(OwnedCategoryOverBaseRing):
         self._parity_key = parity_key
         super().__init__(base_ring)
 
-    def _call_(self, pieces, *, placements=(), **construction_data):
-        r"""The graded direct sum of the supplied family of R-modules."""
+    def _call_(self, pieces, *, placements=(), componentwise_framing=None, **construction_data):
+        r"""The graded direct sum of the supplied family of R-modules.
+
+        ``componentwise_framing`` states whether every summand carries a
+        chosen generating family.  A finite grading set is asked of its
+        summands; an infinite one cannot be visited, so the caller that
+        supplies framed pieces states the fact here.
+        """
         from sage_extensions.categories.modules.graded_direct_sums import _direct_sum_of_modules
 
         return _direct_sum_of_modules(
@@ -478,6 +484,7 @@ class GradedModules(OwnedCategoryOverBaseRing):
             extra_categories=((*placements, IntegerGradedModules(self.base_ring()))
                               if self.grading_index_set() is _owned_integers() else placements),
             construction_data=construction_data,
+            componentwise_framing=componentwise_framing,
         )
 
     def grading_index_set(self) -> SetObject:

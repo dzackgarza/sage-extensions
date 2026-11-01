@@ -131,6 +131,12 @@ from sage_extensions.categories.graph_categories import (  # noqa: F401
     LabelledDigraphs,
     LabelledGraphs,
 )
+from sage_extensions.categories.group.g_objects import (  # noqa: F401
+    GObjects,
+)
+from sage_extensions.categories.group.g_sets import (  # noqa: F401
+    FiniteGSets,
+)
 from sage_extensions.categories.group.groups import (  # noqa: F401
     Groups,
     LieGroups,

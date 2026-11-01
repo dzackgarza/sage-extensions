@@ -1108,6 +1108,11 @@ def _forms_are_isomorphic(left, right, *, quadratic: bool) -> bool:
 class TorsionFormAutomorphism(TorsionFormIsometry):
     r"""A live form-preserving automorphism, parented by its orthogonal group."""
 
+    # The retained hash digest of this element's engine matrix; ``None`` until
+    # it is first hashed.  An automorphism is immutable once constructed, so
+    # one digest serves every hash, and a hash never needs to be computed twice.
+    _hash_digest = None
+
     def __init__(self, parent, forward, inverse, _engine_element) -> None:
         super().__init__(
             parent,
@@ -1162,12 +1167,26 @@ class TorsionFormAutomorphism(TorsionFormIsometry):
         return not self == other
 
     def __hash__(self) -> int:
-        return hash(
-            (
-                id(self.parent()),
-                tuple(int(entry) for entry in self._engine().matrix().list()),
+        r"""Hash by the engine matrix this automorphism *is*, computed once.
+
+        Equality is the engine element's, so the digest is taken from the same
+        matrix: the coordinate tuple of the engine automorphism, not any
+        derived or approximate invariant.  The element is immutable, so the
+        digest is retained and every later hash reads it; without that, each
+        hash rebuilt the matrix through ``FqfOrthogonalGroup.matrix()``, which
+        crosses into GAP, and a coset action hashes its acting element once per
+        point.
+        """
+        digest = self._hash_digest
+        if digest is None:
+            digest = hash(
+                (
+                    id(self.parent()),
+                    tuple(int(entry) for entry in self._engine().matrix().list()),
+                )
             )
-        )
+            self._hash_digest = digest
+        return digest
 
     def _repr_(self):
         return f"Form automorphism of {self.domain()}"

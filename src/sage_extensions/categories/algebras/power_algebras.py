@@ -46,6 +46,30 @@ class _PowerAlgebra:
         source = self.generating_module()
         return self.from_component(1, source.module_generator(label))
 
+    def algebra_generator(self, label):
+        r"""Return the algebra generator named by ``label``.
+
+        The selected generating family of ``Γ(M)`` carries the positive-degree
+        frames, because over ``ZZ`` no divided power ``γ_n(x)`` with ``n >= 2``
+        is a polynomial in ``x``, so degree one alone does not generate the
+        ordinary algebra.  A label of ``M``'s own chosen frame still names the
+        degree-one generator that is its image: that is the generator ``Λ(M)``
+        has under the same label, and ``Γ^1(M) = M`` states it.  The selected
+        family is asked first, so a label the resolution already states is
+        never renamed.
+        """
+        selected = self.algebra_generating_set()
+        match label in selected:
+            case True:
+                return self.selected_algebra_resolution().generator(label)
+            case _:
+                pass
+        match label in self.generating_module().module_generating_set():
+            case True:
+                return self.degree_one_generator(label)
+            case _:
+                return self.selected_algebra_resolution().generator(label)
+
     def _power_algebra_mor_class(self):
         return PowerAlgebraMor
 
@@ -410,7 +434,7 @@ def _power_algebra_of(source, flavor):
             case False:
                 return power(degree)
 
-    module = graded(indexed_family(graded.grading_monoid(), piece))
+    module = graded(indexed_family(graded.grading_monoid(), piece), componentwise_framing=True)
     multiplication = _graded_multiplication_from_components(module, product)
     unit = module.from_component(0, module.graded_piece(0).module_generator(0))
     law_decisions = {"associativity": True, "unit": True, "grading": True}

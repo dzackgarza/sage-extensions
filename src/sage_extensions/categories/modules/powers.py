@@ -309,6 +309,7 @@ class QuadraticModuleMorphism:
         linearity_premises=None,
         lift_gram_tensor=None,
         lift_coordinate_values=None,
+        surjectivity_premise=None,
     ) -> None:
         self._lift_gram_tensor = lift_gram_tensor
         self._lift_coordinate_values = lift_coordinate_values
@@ -317,6 +318,7 @@ class QuadraticModuleMorphism:
             images,
             elementwise=elementwise,
             linearity_premises=linearity_premises,
+            surjectivity_premise=surjectivity_premise,
         )
 
     def module(self):
@@ -877,7 +879,18 @@ def _tensor_power(module, degree):
             underlying = module
         case _:
             return _tensor_power_nontrivial(module, degree)
-    return underlying._with_structure(
+    # ``M^{\otimes 0}`` is the rank-one free module ``R`` on ``{1}`` and
+    # ``M^{\otimes 1}`` is ``M``: in both degrees the added data is the tensor
+    # grading of the same module, so the module owner constructs the piece
+    # (``_module_with_structure``) and it keeps the chosen frame its underlying
+    # module states.  In degree zero the underlying module is the regular
+    # module, whose frame ``{0} |-> 1`` the native module realization already
+    # installed; going through ``_with_structure`` instead reaches the ring's
+    # algebra level, which constructs the piece again on the ring's *unformed*
+    # module and so returns a rank-one module with no chosen frame.  That is
+    # the frame ``graded_piece`` reads for its basis, so every differential
+    # graded construction would lose its degree-zero piece.
+    return underlying._module_with_structure(
         (TensorPowerModules(module.base_ring()),),
         {"power_source": module, "power_degree": degree},
     )

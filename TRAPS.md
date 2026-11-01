@@ -1465,7 +1465,7 @@ Seven families from `preamble-lattices.ipynb`. Status is exact, with the regress
 | discriminant normal form | 57 | `TEn.discriminant_group().normal_form()` is an isomorphism, 12 -> 10 generators, both round trips | **accepted** | `tests/lattices/test_discriminant_normal_form.sage` |
 | isotropic reduction | 58 | `E8.is_elliptic()`, `U.q(e0) = 0`, `e0.e1 = 1`, `e0.e_perp_mod_e()` | **accepted** | `tests/lattices/test_isotropic_reduction_and_correlation.sage` |
 | correlation isomorphism | 63 | valence `(1,1)`, `lower_index` returns the Gram, both inverse identities on their own generator families | **accepted** | same file |
-| free algebras | 61, 84 | tensor and divided-power algebra identities; infinite symmetric-algebra substitution | **not accepted** — both cells fail, see below | — |
+| free algebras | 61, 84 | tensor and divided-power algebra identities; infinite symmetric-algebra substitution | **accepted** | `tests/algebras/test_free_algebra_issue614_cells.sage` (5 tests); the repairs are below |
 
 **Cell 61 fails at both constructions, and the failures are the chosen-resolution contract, not the module.** With `M = coker(2: ZZ -> ZZ)` built exactly as the notebook builds it:
 
@@ -1487,3 +1487,103 @@ That correction lets construction past the guard and exposes the next defect, wh
 The represented cokernel does retain the endpoint's presentation — `ModuleMorphismMethods.cokernel` dispatches to `_presented_module_from_morphism`, which keeps the codomain's generators and relations and adds the map's images, and `_GeneralPresentedModule.__init__` passes that to `_SelectedFinitePresentationModules.__init__`, which fixes the selected presentation and resolution. `Mor(F, F)` alone invents no frame.
 
 The error names `Integer Ring as an algebra over Integer Ring`, not the quotient, which is the tell: the frame that `native_modules.py` installs for the regular module is recorded on the ring, and the demand arrives from the algebra realization wrapped around that ring. `selected_resolution(owner)` is a registry lookup keyed by the owner category, and the wrapper asks under its own identity. So the datum is not missing — the lookup is at the wrong owner. Repairing it means making the algebra realization read the frame its endpoint retained, which is where the next attempt belongs; the alternative, choosing another basis for `ZZ` or substituting `ZZ^1` for `M`, is exactly what the ruling forbids.
+
+### Cells 61 and 84 accepted: seven owners, named exactly
+
+Both notebook cells now run as written. Nothing invented a basis, substituted a free module, or fabricated a resolution; each repair is at an owner that was asked a question it could not answer, or answered from data another owner held.
+
+**Cell 84 was not a framing defect at all.** `SparseFreeAlgebraMorphism.__init__` builds its elementwise module map *before* `CategoricalMor.__init__` installs the arrow's endpoints, and `elementwise` runs its zero check as it builds the map, so that evaluation re-entered `_call_`, which reads `self.domain()`. The attribute was still `None`, so `self.domain()` was a call on `None`: `TypeError: 'NoneType' object is not callable`, which looked exactly like a missing framing. The evaluator now takes its endpoints as arguments (`_evaluate_element(domain, codomain, element)`, with `_image`, `_basis_image`, `_component_map` threaded the same way); `_call_` supplies the installed pair. Binding `self.domain = domain` first is *not* the fix: `domain` is a method on that class, and shadowing it makes `self.domain()` call the algebra parent instead.
+
+**Cell 61's tensor half was `T^0`.** `_tensor_power(module, 0)` returned `R.regular_module()._with_structure(...)`, and a ring's `_with_structure` is the *algebra* level: it reconstructs on the ring's unformed module, so the result was `Integer Ring as an algebra over Integer Ring` with an empty selected-resolution registry. `graded_piece(0)` reads that piece's frame, so every differential graded construction lost its degree-zero piece. The repair routes degrees 0 and 1 through the module owner (`_module_with_structure`), which keeps the regular module's canonical `{1}` frame.
+
+**A tensor-product module morphism refused its own framing.** `_framing_morphism` always states `surjectivity_premise=True`, and `TensorProductModuleMorphismMethods.__init__` did not accept that keyword, so `M^{⊗2}`'s framing morphism could not be constructed at all. Both it and `QuadraticModuleMorphism` now accept and forward `surjectivity_premise`, as the base `ModuleMorphismMethods` declares it.
+
+**The graded direct sum's frame was decided by the wrong caller.** `_direct_sum_of_modules` decides "every summand carries a chosen frame" by visiting the summands, which is impossible over an infinite grading set, where its own docstring says the caller must state the fact with `componentwise_framing=True`. Two callers could not: `GradedModules.__call__` had no way to pass it, and `_FramedDirectSumOfModules._module_with_structure` dropped it when adding structure to an already-framed sum. Both now state it; `_power_algebra_of` supplies `componentwise_framing=True` because every piece is a `divided_power_module`/`exterior_power`, which retains a frame in every degree.
+
+**The algebra resolution was built during construction.** `_install_selected_algebra_generators` built the free algebra source eagerly (`module.symmetric_algebra()`) only to re-read its generator labels, which contradicts `_fix_selected_algebra_resolution`'s own contract ("an algebra whose construction registers its resolution must not build a tensor algebra while it is constructed"). For `Γ(M)` the generating family is infinite, so that eager build was a sparse commutative word algebra on every divided power of the frame, built and discarded at construction time. The free module's label set is the free algebra's label set (verified: the same object), so the labels come from the module and the source is a factory.
+
+**An augmentation built one category weaker than the slice it enters.** `_constructed_algebra_morphism` used `Algebras(R).Unital()`, while the scalar slice `AugmentedAlgebras(R)` is `SliceCategory(Algebras(R).Associative().Unital(), R)`, so `_augmented_algebra` refused the arrow with `CON-17` even though both sides print as `Mor_Alg(Γ(M), ZZ)`. The constructed morphism now refines to the associative family when both endpoints are associative: associativity is a law of the endpoints, so the stronger placement asks nothing more of the map.
+
+**A multiset on a coproduct had no construction.** `Sets().coproduct` over an infinite index set is not `EnumeratedSets`, so `multisets_of_size` fell off the `FixedSizeSelections` path, and the symmetric word basis of a free algebra over the graded frame could not be built. `FixedCardinalityMultisetSets` (`Sets().ParentMethods.multisets_of_size` for a set that states no enumeration, `src/sage_extensions/categories/sets/set_categories.py`) states a multiset by its multiplicity map, which needs no ranking, and `Cardinalities().set_multiset_category` states its count from the same classification as the fixed-size selections. Enumerated alphabets keep the combinadic construction.
+
+**Three places asked `is_finite()` of an unevaluated cardinal.** The free module's `_repr_`, `_coordinate_framed_free_module` and `_finite_source_elements_for_verification` each read `cardinality().is_finite()` on a cardinal that is `sum_{i in ZZ} kappa_i`, which asserts rather than answering. Each now requires the expression to be in normal form first, and answers "not a finite basis" (or names the label set) otherwise: a representation never decides a cardinality, and a finite matrix calculation needs a finite basis, not a proposition.
+
+**`Γ(M)`'s generator label, and why `algebra_generator(0)` is a degree-one name.** Over `ZZ`, `γ_2(x)` is not a polynomial in `x`, so `Γ(M)`'s selected algebra generating family is the positive-degree frames, not `M`'s frame; that is what the library's own `test_gamma_2_of_x_is_not_in_the_subalgebra_generated_by_x_over_the_integers` states. The notebook asks for `Γ.algebra_generator(0)`, the label `M`'s frame carries, so a power algebra resolves a label of `M`'s chosen frame to the degree-one generator that is its image (`_PowerAlgebra.algebra_generator`), asking the selected family first and never renaming a label it already states.
+
+### Still open: the divided power algebra's laws beyond cell 61
+
+`tests/algebras/test_power_algebras.sage` had 0 of 5 tests passing before this work: every one of them failed earlier, at the graded sum's missing frame. With the frame and the resolution repaired, 2 of 5 pass and the remaining three are three *different* defects, each measured:
+
+- `test_integral_divided_power_laws_on_two_generators`, at its fourth assertion (`divided.divided_power(x + y, 2) == gamma2x + x*y + gamma2y`, line 40) raises `TypeError: __call__() takes exactly 0 positional arguments (1 given)`: the divided power of a *sum* is the polynomial law `γ_2(x+y) = γ_2(x) + xy + γ_2(y)`, and the split-power path calls something that takes no arguments. The three assertions before it pass.
+- `test_exterior_and_divided_power_algebras_preserve_composition_on_torsion_modules`, at `functor(first)(e0 * e1) == 2 * functor(middle).degree_one_generator(0) * functor(middle).degree_one_generator(1)` (line 59), computes `2*[0 1] + 4*[1^2]` for the left side against the pure product `2·f_0·f_1`: the *image of a degree-two element* under the divided-power functor gains the term `4·[1^2]`. The round-trip assertions in the loop above it pass and the exterior half of the same test passes.
+- `test_gamma_2_of_x_is_not_in_the_subalgebra_generated_by_x_over_the_integers` at line 101: `AttributeError: 'OwnedJoinCategory.parent_class[_FramedDirectSumOfModules].ObjectType' object has no attribute 'subalgebra'`. The power algebra is a graded-sum object and no `subalgebra` is stated on it, so the library's own statement that `γ_2 ∉ Z[x]` cannot be expressed as written.
+
+All three are on the divided-power side and none of them is reached by cell 61.
+
+Cell 61 does not touch any of the three: it asks for the tensor identities, `Γ^2`'s invariant factor and one divided-power identity, all of which hold.
+
+### The corpus on the two contracts these cell-61/84 repairs decided (2026-11-01)
+
+Searched before deciding, not after: `lean-reference-corpus` at `formalization-corpus.dzackgarza.com/api/search`, plus the pinned Mathlib checkout at `/opt/mathlib`. Queries run: `structure Sym (α : Type*) (n : ℕ) file:\.lean$`, `Sym α n multiset quotient file:\.lean$`, `TensorPower zero equiv file:\.lean$`, `divided power algebra file:\.lean$`; the local files were then read rather than trusted by name. Access note: **`lean-categories` is not checked out in this container** — `research/LeanCategories` holds only `AlgebraicGeometry/AdjointRootData.lean` — so its definitions could not be inspected here. That is an access failure and not a negative result about what it contains.
+
+**Multisets of size \(k\) on a set are `Sym X k`, and their datum is a multiplicity map.** `Mathlib/Data/Sym/Basic.lean:43` states `Sym (α : Type*) (n : ℕ) := { s : Multiset α // Multiset.card s = n }` and its docstring calls it "the nth symmetric power … n-tuples up to permutation … a subtype of `Multiset`"; `Multiset.count` and `Multiset.toFinset` are the multiplicity and support. `Mathlib/Data/Sym/Card.lean:46,48` states `card (Sym α k) = multichoose (card α) k` and `= choose (card α + k - 1) k`, both under `[Fintype α]`, and `card (Sym α 0) = 1`. So `FixedCardinalityMultisetSets` implements `Sym X k` with the multiset as the datum and no ranking of `X`, and its `_cardinality_decision` is the corpus's stars-and-bars theorem. The corpus states no infinite-\(X\) cardinality there; that case is the library's existing classification, which `Cardinalities().set_multiset_category` delegates to rather than a theorem this session invented.
+
+**The graded divided power's basis is the multisets, and `Γ(M)`'s basis is all of `ι →₀ ℕ`.** The corpus holds `AntoineChambert-Loir/DividedPowers4`; reading `DividedPowers/DPAlgebra/Free.lean` gives `noncomputable def basis (b : Basis ι R M) : Basis (ι →₀ ℕ) R (DividedPowerAlgebra R M)` (line 516), `Int.basis_grade (d) : Basis {n : ι →₀ ℕ // n.sum = d} ℤ (Γ^d)` (line 450), and `basis_eq' … (x : Sym ι n)` (line 574), which indexes its graded part by `Sym ι n` directly. Two decisions of this session are therefore the corpus's, not local choices: the frame of `Γ^d(M)` is the \(d\)-element multisets of a frame of `M` (which is exactly what `_free_degree_labels(..., "divided")` already said at `powers.py:672` by calling `multisets_of_size`), and `γ_2(x)` is a basis element rather than a polynomial in `x`, so the selected generating family of `Γ(M)` carries the positive-degree frames and `algebra_generator(0)` is the degree-one image of `M`'s label.
+
+**`T^0(M)` is the rank-one free module.** `Mathlib/LinearAlgebra/TensorPower/Basic.lean:38` defines `TensorPower R n M := ⨂[R] _ : Fin n, M`, and `Mathlib/LinearAlgebra/PiTensorProduct/Basic.lean:779` states `isEmptyEquiv [IsEmpty ι] : (⨂[R] i : ι, s i) ≃ₗ[R] R`. Degree zero is `R` — the thing `_tensor_power` now returns with the regular module's canonical frame, rather than an `R`-shaped object with no frame.
+
+**Where the open divided-power product defect is owned.** `DividedPowers/DPAlgebra/Graded/Basic.lean` and `Graded/GradeOne.lean` in that repository are the corpus's owners of the graded law, to be read before repairing `_divided_power_product`; the Stacks citation in the code is not a substitute for reading them.
+
+### Hashing a torsion-form automorphism: the digest is retained, and the crossing is gone (2026-11-01)
+
+Consumer: `sage-indefinite-port` `fc6a022f` (`handoff-owner-torsionform-hash.md`). Its instrumented 3600 s Enriques `case_1` run put 14 of 16 complete stack dumps in `_permutation_from_point_map` -> `act` -> `TorsionFormAutomorphism.__hash__` -> `_engine().matrix()` -> GAP. The eager-description fix is confirmed gone; this is the next cost, and it is a cost question, not a correctness one.
+
+The chain is now read in full: `_TransversalCosets._multiplier` is a `@cached_method` **keyed by the acting element**, so a left-coset action hashes its element once per point, and `TorsionFormAutomorphism.__hash__` rebuilt the engine coordinate matrix on every call.
+
+Measured on the port's own specimen (`B = <1> + U + E8(-1)`, `D = B.twist(2).discriminant_quadratic_form()`, `|D| = 2048`, 11 x 11 engine matrices, 121 entries), same process, before and after:
+
+| operation | before | after |
+| --- | --- | --- |
+| `g._engine().matrix()` | 0.64 ms | 0.72 ms (not called by a hash any more) |
+| `hash(g)`, 200 calls | 0.86 ms each | 0.0001 ms each |
+| `{g: 1}[g]` | 1.12 ms each | 0.0001 ms each |
+
+The fix keeps the *same* digest expression — `(id(parent), engine matrix entries)` — and retains it on the immutable element (`_hash_digest`, `None` until the first hash, which is a safe absence marker because `hash` never returns `None`). The value is unchanged, so no dictionary is rehashed, no equality changes, no representation is invented and no validation is skipped; what disappears is the repeated GAP conversion. Construction stays cheap: an element nobody hashes converts nothing.
+
+A detail that matters for reading the storage: iterating the group raises *fresh* element objects from the engine each time, so the retention pays where one object is reused — exactly the cached-multiplier case — and not across two iterations of the group.
+
+Correctness, `tests/lattices/test_torsion_form_automorphism_hashing.sage` (4 tests, passing): the digest is absent until the first hash and is that hash afterwards; an equal automorphism built as another object hashes equally and finds its dictionary key; across `O(D_4)` (six elements) equal elements hash equally and the six digests are distinct; and a cache keyed by automorphisms answers a rebuilt-but-equal key.
+
+**Provider pin: not updated.** A pin names a published `sage-extensions` commit, and this session's commits are local only — see the push blocker below.
+
+### A subgroup acts through its inclusion, and a group has no action of its own (2026-11-01)
+
+Consumer: `sage-indefinite-port` `5b7b72382c`. Its Coble polarization stabilizer `H` (`q(h) = 1`, `|H| = 94755225600`, 1984 generators) is a subgroup of `G = D.orthogonal_group()`, and the run called `H.orbits()`. That call cannot work at any size: `orbits()` is an operation of the `G`-*set* (the coequalizer of the action and the projection), and `H` is a group. The action is a datum of the object being acted on, not of a group.
+
+The maintained route, verified on a small form and stated as `tests/groups/test_a_subgroup_acts_through_its_inclusion.sage` (4 tests, passing):
+
+```python
+G = form.automorphism_group()
+elements = G.element_action()                 # the retained G-set on form.elements()
+H = G.subgroup_on(generators)                 # the subgroup keeps its ambient automorphisms
+inclusion = H.inclusion()                     # the retained H -> G
+restricted = elements.restrict_action(inclusion)   # the H-set on the same points
+restricted.act(h, x) == elements.act(inclusion(h), x)
+
+isotropic = form.isotropic_elements()         # an invariant point set
+on_isotropic = FiniteGSets(H)(isotropic, lambda h, x: h(x))   # what _torsion_form_element_action does
+# or, keeping the restricted functor and stating the points:
+GObjects(H, Sets()).on_set(isotropic, restricted.act)
+```
+
+`GObjects.restriction` is the functor behind `restrict_action`, and `H.inclusion()` is the morphism it is applied to; `lattices.py:7334` already restricts a vector-fibre action along a subgroup's inclusion this way. Both presentations of the isotropic points agree point for point with the ambient action through the inclusion, and `validate_point_closure` refuses a stated action whose points leave the set.
+
+For the orbit count at `|H| = 94755225600`, `orbits()` cannot enumerate the group; the maintained presentation is `restricted.orbits_presented_by(covering)` with a stated finite covering meeting every orbit (the route `lattices.py:7300` uses), whose `section` is the orbit-to-representative map.
+
+Two facts a consumer should not have to rediscover: `_GroupEngine` subgroups do not carry `coset_space()` (only predicate subgroups — kernels, stabilizers, preimages — have the data a coset space needs), and the orbit set's orbits are keyed by their parent, so two orbit sets are compared by the partition of the points they induce, not by orbit equality.
+
+**Genuine gap, named and not worked around:** a `G`-set has no construction for its restriction to an invariant *subset* (a `G`-subobject retaining the action functor). Today the subset action is presented afresh by `on_set` or `FiniteGSets`, so the resulting object is a new `H`-set on those points rather than the subobject of the restricted one. Nothing about that is wrong for orbit computation, but the subobject arrow is missing from the G-set vocabulary.
+
+### Blocker: this session could not push (2026-11-01)
+
+`git push --dry-run origin main` answers `fatal: could not read Username for 'https://github.com': No such device or address`; the platform's GitHub connection reports `github_not_connected`; there is no credential helper and no stored credential (and storing one is not permitted). The commits below are on this checkout's `main` and verified by the tests quoted with them, but `origin/main` is still `6b10b0854b3b2a4faf454de23f865993ab066215`. A provider pin that names a published commit — including the one the port's handoffs ask for — therefore cannot be produced until the repository is connected or a push credential is supplied out of band.

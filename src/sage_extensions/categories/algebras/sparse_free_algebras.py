@@ -286,7 +286,15 @@ class SparseFreeAlgebraMorphism:
             # The retained generating map and (for Sym) commutation equations
             # supply linearity above. An arbitrary word evaluator carries no
             # empty-premise certificate at this ordinary module ingress.
-            linear = linear_mor.elementwise(lambda element: self._call_(element))
+            #
+            # ``elementwise`` decides linearity as it builds the map, and its
+            # zero check evaluates the evaluator below.  That evaluation reads
+            # this arrow's endpoints, which ``CategoricalMor.__init__`` installs
+            # only in the ``super().__init__`` at the end of this constructor,
+            # so the endpoints word evaluation needs are passed with it.
+            linear = linear_mor.elementwise(
+                lambda element: self._evaluate_element(domain, codomain, element)
+            )
         super().__init__(
             parent, linear, _construction_premises=_construction_premises,
             _transported_morphism=_transported_morphism,
@@ -300,13 +308,13 @@ class SparseFreeAlgebraMorphism:
             self.domain().algebra_generating_set(), self.codomain()
         )(self._generator_images.value)
 
-    def _component_map(self, key):
+    def _component_map(self, domain, codomain, key):
         cached = self._component_maps.get(key)
         if cached is not None:
             return cached
-        source = self.domain().generating_module()
+        source = domain.generating_module()
         component = source.module_component(key)
-        certified = component.module_category().Mor(component, self.codomain())(
+        certified = component.module_category().Mor(component, codomain)(
             lambda component_label: self._raw_image(
                 source.module_label_from_component(key, component_label)
             )
@@ -320,32 +328,53 @@ class SparseFreeAlgebraMorphism:
         self._component_maps[key] = certified
         return certified
 
-    def _image(self, label):
-        source = self.domain().generating_module()
-        if not self.domain()._source_has_component_protocol():
+    def _image(self, domain, codomain, label):
+        source = domain.generating_module()
+        if not domain._source_has_component_protocol():
             return self._raw_image(label)
         key = source.module_component_key(label)
         component_label = source.module_component_generator_label(label)
         component = source.module_component(key)
-        return self._component_map(key)(component.module_generator(component_label))
+        return self._component_map(domain, codomain, key)(
+            component.module_generator(component_label)
+        )
 
-    def _basis_image(self, basis_label):
-        basis_label = self.domain().module_generating_set()(basis_label)
+    def _basis_image(self, domain, codomain, basis_label):
+        basis_label = domain.module_generating_set()(basis_label)
         inner = basis_label.summand_element()
-        if self.domain().flavor() == "tensor":
-            factors = (self._image(inner.component(position)) for position in inner.parent().index_set())
+        if domain.flavor() == "tensor":
+            factors = (
+                self._image(domain, codomain, inner.component(position))
+                for position in inner.parent().index_set()
+            )
         else:
-            factors = (self._image(label) for label in inner.support() for _ in range(int(inner.multiplicity(label))))
-        return prod(factors, start=self.codomain().one())
+            factors = (
+                self._image(domain, codomain, label)
+                for label in inner.support()
+                for _ in range(int(inner.multiplicity(label)))
+            )
+        return prod(factors, start=codomain.one())
+
+    def _evaluate_element(self, domain, codomain, element):
+        r"""Evaluate at ``element``, with the endpoints of this arrow given.
+
+        Construction supplies them because ``elementwise`` evaluates the map
+        before ``CategoricalMor.__init__`` installs the arrow's endpoints;
+        :meth:`_call_` supplies the installed pair.
+        """
+        if self._source_element_map is not None:
+            return codomain(self._source_element_map(domain(element)))
+        coordinates = domain.framing_morphism().lift(element)
+        return sum(
+            (
+                coordinates(label) * self._basis_image(domain, codomain, label)
+                for label in coordinates.support().domain()
+            ),
+            codomain.zero(),
+        )
 
     def _call_(self, element):
-        if self._source_element_map is not None:
-            return self.codomain()(self._source_element_map(self.domain()(element)))
-        coordinates = self.domain().framing_morphism().lift(element)
-        return sum(
-            (coordinates(label) * self._basis_image(label) for label in coordinates.support().domain()),
-            self.codomain().zero(),
-        )
+        return self._evaluate_element(self.domain(), self.codomain(), element)
 
     def __call__(self, element):
         return self._call_(element)

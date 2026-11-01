@@ -2470,6 +2470,19 @@ class Sets(CategoryPacketMethods, OwnedCategory):
             r"""All finite multisets in this alphabet, including the empty multiset."""
             return _finite_words(self, commutative=True)
 
+        def multisets_of_size(self, size):
+            r"""The ``size``-element multisets on this set.
+
+            An enumerated set ranks them by its combinadic selections; a set
+            that states no enumeration names each multiset by the multiplicity
+            of every point it uses (``FixedCardinalityMultisetSets``).
+            """
+            match self in EnumeratedSets():
+                case True:
+                    return self.fixed_size_selections(size, repetition=True)
+                case False:
+                    return _multisets_of_size(self, size)
+
         # Recorded by the construction that builds the object (``_object_of``
         # through the root ``OwnedParent``, or the ring route); ``None`` for an
         # object no category's constructor built.
@@ -3919,6 +3932,211 @@ class _EnumeratedFinitePowerSetEngine:
 @cached_function
 def _finite_subsets(source: Parent) -> Sets().ObjectType:
     return FinitePowerSets()(source)
+
+
+class FixedCardinalityMultisetSets(OwnedCategory):
+    r"""The sets ``Mult_k(X)`` of \(k\)-element multisets on a set \(X\).
+
+    A \(k\)-element multiset on \(X\) is a function \(X \to \mathbb{N}\) of finite
+    support whose values total \(k\), so one multiset *is* its multiplicity map
+    and stating it needs no enumeration of \(X\).  That is the construction this
+    category states, and it is the one an unenumerated alphabet requires: the
+    componentwise framing of a graded sum is a disjoint union, and a symmetric
+    algebra on it has multisets of those labels for its monomials.  An
+    enumerated alphabet ranks its multisets by the combinadic selections
+    (``EnumeratedSets.multisets_of_size``); the two constructions name the same
+    multisets, each in the datum its own representation carries.
+    """
+
+    def an_object(self) -> ObjectOfCategory:
+        r"""The two-element multisets on \(\{0, 1\}\): ``00``, ``01``, ``11``.
+
+        Constructed through this category rather than through
+        ``multisets_of_size``, which ranks them by their combinadic selections
+        because \(\{0,1\}\) is enumerated; these are the same three multisets,
+        stated by their multiplicities.
+        """
+        return _multisets_of_size(Sets.Δ[1], 2)
+
+    def super_categories(self):
+        return [Sets()]
+
+    def _call_(self, source, multiset_size):
+        r"""Construct the ``multiset_size``-element multisets on ``source``."""
+        if source not in Sets():
+            raise ValueError(f"multisets require a set source, not {source!r}")
+        selected_size = int(multiset_size)
+        if selected_size < 0 or multiset_size != selected_size:
+            raise ValueError(
+                f"the cardinality of a multiset must be a nonnegative integer, not {multiset_size!r}"
+            )
+        return _object_of(
+            owned_category_join(
+                (
+                    self,
+                    _cardinalities().set_multiset_category(
+                        source, fixed_size=selected_size
+                    ),
+                )
+            ),
+            source=source,
+            multiset_size=selected_size,
+        )
+
+    class ElementMethods(Element):
+        r"""One multiset, retained as the multiplicity of each of its points.
+
+        Its points are the source points it uses, so ``support`` and
+        ``multiplicity`` read the retained map; nothing ranks the source.
+        """
+
+        def __init__(self, parent, multiplicities) -> None:
+            Element.__init__(self, parent)
+            source = parent.source()
+            retained = {}
+            for label, multiplicity in multiplicities.items():
+                count = int(multiplicity)
+                assert count >= 0 and multiplicity == count, (
+                    f"the multiplicity of {label} in a multiset on {source} is a natural "
+                    f"number, but {multiplicity!r} is not"
+                )
+                if count == 0:
+                    continue
+                membership = source.__contains__(label)
+                assert membership is True, (
+                    f"the points of a multiset on {source} are points of {source}, and "
+                    f"{label} is not decided to be one"
+                )
+                retained[label] = count
+            total = sum(retained.values())
+            assert total == parent.multiset_size(), (
+                f"a multiset of {parent} has {parent.multiset_size()} points, but the "
+                f"multiplicities {multiplicities} have total {total}"
+            )
+            self._multiplicities = retained
+
+        def multiplicities(self):
+            r"""The retained multiplicity of each used point, as a mapping."""
+            return dict(self._multiplicities)
+
+        def support(self):
+            r"""The set of points occurring in this multiset, each at least once."""
+            from sage_extensions.categories.sets.finite_ordered_sets import (
+                finite_ordered_set,
+            )
+
+            return finite_ordered_set(tuple(self._multiplicities))
+
+        def multiplicity(self, label) -> int:
+            r"""How many times ``label`` occurs here; zero when it does not."""
+            return self._multiplicities.get(label, 0)
+
+        def degree(self) -> int:
+            return sum(self._multiplicities.values())
+
+        def __eq__(self, other) -> bool:
+            return (
+                element_parent(other) is self.parent()
+                and other.multiplicities() == self._multiplicities
+            )
+
+        def __ne__(self, other) -> bool:
+            return not self == other
+
+        def __hash__(self) -> int:
+            return hash((id(self.parent()), frozenset(self._multiplicities.items())))
+
+        def _repr_(self) -> str:
+            if not self._multiplicities:
+                return "1"
+            return " ".join(
+                repr(label)
+                if count == 1
+                else f"{label!r}^{count}"
+                for label, count in self._multiplicities.items()
+            )
+
+    class ParentMethods:
+        def __init__(self, source: Parent, multiset_size: int, **rest) -> None:
+            self._source = source
+            self._multiset_size = int(multiset_size)
+            assert self._multiset_size >= 0, (
+                f"the multisets on {source} have a natural number of points, but "
+                f"{multiset_size!r} is not one"
+            )
+            super().__init__(**rest)
+
+        def source(self) -> Sets().ObjectType:
+            return self._source
+
+        def multiset_size(self) -> int:
+            return self._multiset_size
+
+        def __call__(self, *args, **kwargs):
+            r"""Construct through the owned set representation directly."""
+            return self._element_constructor_(*args, **kwargs)
+
+        def _element_constructor_(self, multiplicities):
+            source = element_parent(multiplicities)
+            match source:
+                case _ if source is self:
+                    return multiplicities
+                case _ if source is not None and source in FixedCardinalityMultisetSets():
+                    raise ValueError(
+                        f"{multiplicities} is a multiset of {source}, not of {self}: its "
+                        f"points are points of the wrong set"
+                    )
+                case _:
+                    return self.element_class(self, multiplicities)
+
+        def from_multiplicities(self, multiplicities):
+            r"""The multiset whose multiplicity of ``label`` is ``multiplicities[label]``.
+
+            This is the constructor the word and free-algebra constructions call
+            when they add two multisets point by point.
+            """
+            return self.element_class(self, multiplicities)
+
+        def an_element(self):
+            r"""``k`` copies of a chosen point of the source."""
+            return self.element_class(
+                self, {self.source().an_element(): self.multiset_size()}
+            )
+
+        def __contains__(self, candidate):
+            return element_parent(candidate) is self
+
+        is_parent_of = __contains__
+
+        def _cardinality_decision(self):
+            r"""\(|\mathrm{Mult}_k(X)|\): one for \(k = 0\), \(\binom{|X|+k-1}{k}\)
+            for finite \(X\), and \(|X|\) for infinite \(X\).
+
+            The last two agree with the count of \(k\)-element selections on
+            \(X\), which is the count of the stateable case; an undecided source
+            cardinality leaves this undecided.
+            """
+            size = self.multiset_size()
+            if size == 0:
+                return cardinal(1)
+            source_size = self.source()._cardinality_decision()
+            if source_size is None:
+                return None
+            source_size = cardinal(source_size)
+            if not source_size.expression().is_normal_form():
+                return None
+            if source_size.is_finite():
+                return cardinal(comb(int(source_size.finite_value()) + size - 1, size))
+            return source_size
+
+        def _repr_(self) -> str:
+            return f"Multisets of {self.source()} of size {self.multiset_size()}"
+
+
+@cached_function(key=lambda source, multiset_size: (id(source), int(multiset_size)))
+def _multisets_of_size(source: Parent, multiset_size: int) -> Sets().ObjectType:
+    r"""The ``multiset_size``-element multisets on ``source``, by multiplicity."""
+    return FixedCardinalityMultisetSets()(source, multiset_size)
 
 
 def _condition_set(

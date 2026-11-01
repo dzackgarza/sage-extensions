@@ -549,6 +549,18 @@ class Cardinalities(OwnedCategory):
             case _:
                 return Sets()
 
+    def set_multiset_category(self, source, *, fixed_size):
+        r"""Place the ``fixed_size``-element multisets on ``source``.
+
+        A \(k\)-element multiset on \(X\) is a multiplicity function on \(X\)
+        with total \(k\).  For infinite \(X\) there are \(|X|\) of them (fix one
+        point and its multiplicity), and for finite \(X\) there are
+        \(\binom{|X|+k-1}{k}\), which is finite.  That is the same
+        classification this category states for the \(k\)-element subsets of
+        \(X\), so the placement is the one already stated there.
+        """
+        return self.set_subset_category(source, fixed_size=fixed_size)
+
     def set_indexed_category(self, family, *, operation):
         r"""Place a finite-index product or coproduct from its defining factors.
 

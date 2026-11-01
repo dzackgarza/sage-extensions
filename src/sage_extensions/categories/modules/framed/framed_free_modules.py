@@ -544,7 +544,13 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 return f"Order of rank {int(engine.rank())} over Integer Ring{suffix}"
             labels = self.module_generating_set()
             size = cardinal(labels.cardinality())
-            match (labels in EnumeratedSets(), size.is_finite()):
+            # Printing the basis vectors is possible only when the number of
+            # them is a decided finite number; a basis whose cardinality is an
+            # unevaluated sum over an infinite index set (a graded sum's
+            # componentwise framing) is named by its label set instead.  A
+            # representation never decides that question.
+            decided = size.expression().is_normal_form()
+            match (labels in EnumeratedSets(), decided and size.is_finite()):
                 case (True, True) if int(size.finite_value()) <= 12:
                     basis = ", ".join(
                         repr(self.module_generator(label)) for label in labels
