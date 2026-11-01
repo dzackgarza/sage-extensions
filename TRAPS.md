@@ -1148,3 +1148,21 @@ The test is the general one rather than the domain special case: with nilpotents
 Evidence, per file at `f7db965` and after. `test_commutative_algebra.sage` and `test_fraction_field_localization.sage` together: **19 failed / 11 passed → 18 failed / 12 passed**, the single movement being the recursion test, with the other eighteen unchanged; the remaining `test_fraction_field_localization` failure is `VectorSpaces(QQ)` refusing the owned rational field as a base, which is Sage's category and unrelated. `test_localizations_of_the_integers.sage` 10 passing, `test_rational_field_placement.sage` 5, `test_prime_and_maximal_ideals.py` passing, `test_localization_restrictions.sage` 1 pre-existing failure, all unchanged. Directly after the fix, `ZZ_(3)`: `is_field()` is `False` (was `RecursionError`), `maximal_ideal()` is non-zero, `residue_field()` is `ZZ/(3)`, `fraction_field_map()` sends `1/2` to `1/2`, and `fraction_field()` is `QQ`; `ZZ_(0)` reports `is_field()` `True`, which is right because localizing at the zero prime is the fraction field.
 
 Queue after this: the localization of a quotient, whose `zero()` re-enters through `quotient_source()` — `ZZ/6` at `(2)` does not get as far as its own field decision.
+
+### A field decision may not be asked through element equality
+
+The previous entry closed the *domain* case of the prime-localization field decision by stating `p R_p = 0` at the construction — but it stated it as `self.fraction(g) == self.zero()`, which is element equality in the localization. Over a quotient that is the wrong question to ask, and the 1111-frame cycle shows why: `_finitely_generated_free_placement → OwnedFields() membership → _field_decision → maximal_ideal_is_zero → element equality → _fraction_equality_status →` the localization functor on the **regular module** `→ free_module → placement →` back to the membership test. Equality of fractions over a non-domain source is decided by localizing the regular module, and a free module's placement asks whether its coefficient ring is a field. Asking fieldhood through equality therefore closes the circle one turn later, with the same radius.
+
+The decision is now made in the source ring, where the criterion lives: `g/1 = 0` in `S^{-1}R` exactly when some `s ∈ S = R \ p` kills `g`, that is when the annihilator `(0 : (g))` is not contained in `p`. Both sides are ideals of `R`, so it costs `colon` (which this ideal owner already has), the prime's membership predicate on the annihilator's generators, and nothing else — no element of the localization is constructed, and no regular module is built. Per-generator answers are combined with `conjunction`, so an undecided killer membership stays a proposition instead of becoming `False`.
+
+Both cases now behave, over the domain and over the quotient:
+
+| ring | `is_field()` | `maximal_ideal().is_zero()` |
+| --- | --- | --- |
+| `ZZ_(3)` | `False` | `False` |
+| `ZZ_(0)` | `True` | `True` (zero generators) |
+| `(ZZ/6)_(2)` | `True` | `True` |
+
+`(ZZ/6)_(2)` is the case that separates the general criterion from the domain special case: `(0 : (2)) = (3)` is not contained in `(2)` because `3 · 2 = 0` and `3 ∉ p`, so `p R_p = 0` although `p ≠ 0`, and the localization is `FF_2`. A decision that read `p = 0` would answer `False` there.
+
+`tests/rings/test_prime_localization_field_decisions.sage` pins the three cases and the three-valued combination. Targeted run: that file plus `test_fraction_field_localization.sage`, `test_localizations_of_the_integers.sage`, `test_field_isomorphism_decisions.sage` and `test_prime_and_maximal_ideals.py` — **29 passed, 1 failed**, the failure being the pre-existing `VectorSpaces(QQ)` refusal of the owned rational field as a base. One correction recorded while writing it: `ZZ_(0).fraction_field()` is `ZZ_(0)` itself, not the interned `QQ` — a field's fraction field is itself, and the two are equal fields with different constructions, so the test asserts the former rather than object identity with `QQ`.

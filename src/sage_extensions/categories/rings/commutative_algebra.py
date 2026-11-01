@@ -2684,32 +2684,43 @@ class PrimeLocalizations(OwnedCategory):
                 return self._induced_morphism_from_unit_images(source_map)
 
             def maximal_ideal_is_zero():
-                r"""Decide ``p R_p = 0`` without building the extended ideal.
+                r"""Decide ``p R_p = 0`` in the source ring, without elements of ``R_p``.
 
-                The maximal ideal of ``R_p`` is the extension of ``p``, and it is
-                zero exactly when every element of ``p`` becomes zero in
-                ``R_p``: ``p R_p = 0`` iff ``p`` is contained in the kernel of
-                ``R -> R_p``.  That is asked generator by generator in the
-                localization, whose equality is already decided there, and it
-                never asks whether ``R_p`` is a field -- which is the question
-                this decision answers.  Over a domain the answer is therefore
-                ``p = 0``.
+                ``g/1 = 0`` in ``S^{-1}R`` exactly when some ``s`` in ``S = R \ p``
+                kills ``g``, that is when the annihilator ``(0 : (g))`` is not
+                contained in ``p``.  Both sides of that question live in ``R``, so
+                it is answered with ideals of the source and never with elements
+                of the localization: element equality in ``R_p`` is itself
+                decided through the localization of the regular module, which
+                needs a free module, whose placement asks whether this ring is a
+                field -- this same decision.  That is why the question is asked
+                here rather than recovered from ``self.fraction(g) == self.zero()``,
+                which closes the circle instead of opening it.
 
-                The test is the general one, not the domain special case: with
-                nilpotents ``p R_p`` can vanish while ``p`` does not, as for
-                ``R = ZZ/6`` at ``p = (2)``, where ``3 * 2 = 0`` with ``3``
-                outside ``p``.  That instance is not exercised here: the
-                localization of a *quotient* has its own ``zero()`` cycle through
-                ``quotient_source()``, which is a separate defect and would fail
-                before this decision is reached.
+                Over a domain the answer is ``p = 0``.  With nilpotents ``p R_p``
+                can vanish while ``p`` does not, as for ``ZZ/6`` at ``(2)``, where
+                ``(0 : (2)) = (3)`` is not contained in ``(2)`` because
+                ``3 * 2 = 0`` and ``3`` lies outside ``p``.
                 """
-                image_of_zero = self.zero()
-                return conjunction(
-                    tuple(
-                        self.fraction(generator) == image_of_zero
-                        for generator in prime.ideal_generators()
-                    )
-                )
+                source = self.localization_source()
+                zero_ideal = source.ideal(source.zero())
+                decisions = []
+                for generator in prime.ideal_generators():
+                    annihilator = zero_ideal.colon(source.ideal(generator))
+                    for killer in annihilator.ideal_generators():
+                        matches = prime.contains_ambient_element(killer)
+                        if matches is False:
+                            # A killer outside p: this generator dies in R_p.
+                            decisions.append(True)
+                            break
+                        if matches is not True:
+                            decisions.append(
+                                AtomicProposition("is_zero", self, source(generator))
+                            )
+                            break
+                    else:
+                        decisions.append(False)
+                return conjunction(tuple(decisions))
 
             construction = LocalRingConstruction(
                 maximal_ideal_factory=lambda: prime.extension_to_localization(self),
