@@ -203,15 +203,24 @@ def _number_field_from_engine(engine):
     return _number_field_extension(base, polynomial)
 
 
-def _order_placements(*, dedekind=False):
+def _order_placements(*, dedekind=False, principal=False):
     r"""Place an order by its defining lattice, adding Dedekind for the integral closure.
 
     The order is also a Noetherian domain, free of finite rank over ``ZZ``,
     countably infinite, and carries the integral basis selected by its
-    construction (``OrdersWithChosenIntegralBasis``). A maximal order is
-    Dedekind; no class-number computation participates in this placement.
+    construction (``OrdersWithChosenIntegralBasis``).  A maximal order is
+    Dedekind, and a maximal order is a principal ideal domain exactly when the
+    class number of its field is one: the ring of integers of a number field is
+    a PID iff ``h = 1`` (Neukirch I.6, the ideal class group is the Picard
+    group).  ``principal`` carries that exact owned decision, computed once by
+    :func:`_order_in` from ``K.class_number()``; it is never inferred from the
+    Dedekind placement, and it is not claimed for a non-maximal order, where
+    ``h = 1`` alone does not make the order a PID.
     """
-    from sage_extensions.categories.rings.ring_foundation import OwnedIntegralDomains
+    from sage_extensions.categories.rings.ring_foundation import (
+        OwnedIntegralDomains,
+        OwnedPrincipalIdealDomains,
+    )
     from sage_extensions.categories.sets.set_categories import CountablyInfiniteSets
 
     placements = (
@@ -224,6 +233,7 @@ def _order_placements(*, dedekind=False):
     return (
         *placements,
         *((OwnedRings().Commutative().DedekindDomains(),) if dedekind else ()),
+        *((OwnedPrincipalIdealDomains(),) if principal else ()),
     )
 
 
@@ -288,9 +298,16 @@ def _order_in(field, engine_order):
     assert _power_basis_lattice(canonical_order) == lattice_rows, (
         f"reconstructing the canonical lattice rows changed the order lattice of {engine_order}"
     )
+    # A maximal order is a PID exactly when its field has class number one;
+    # the decision is the owned exact one, taken here so the placement states a
+    # theorem rather than a guess.  Non-maximal orders are left unplaced: h = 1
+    # does not make an arbitrary order a PID.
+    principal_ideal_domain = bool(dedekind and field.class_number() == 1)
     return _OwnedRingParent(
         canonical_order,
-        named_placement=lambda: _order_placements(dedekind=dedekind),
+        named_placement=lambda: _order_placements(
+            dedekind=dedekind, principal=principal_ideal_domain
+        ),
         order_basis=tuple(canonical_order.basis()),
     )
 

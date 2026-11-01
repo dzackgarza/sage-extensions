@@ -1127,7 +1127,19 @@ class LocalizationRings(OwnedCategory):
                     except (TypeError, ValueError, ArithmeticError):
                         return False
                 else:
-                    return False
+                    # An element of another represented ring -- a Sage integer
+                    # or rational literal, or an element of a subring of this
+                    # localization -- denotes a value here.  Realize it through
+                    # this localization's own construction, which admits it
+                    # exactly when its denominator is admitted: a rational
+                    # outside a proper localization is refused there and so does
+                    # not compare equal.  Refusing the operand before trying is
+                    # a representation mismatch, not an arithmetic one: the
+                    # value may well be an honest element.
+                    try:
+                        other = parent(other)
+                    except (TypeError, ValueError, ArithmeticError):
+                        return False
             return self.parent()._fraction_equality_status(self, other)
 
         def _richcmp_(self, other, op):
