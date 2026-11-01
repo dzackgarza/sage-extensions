@@ -887,3 +887,26 @@ Two follow-on items this exposed, neither repaired here:
 ### The Sterk archive type table was right; the comparison made its two scales unequal
 
 `tests/lattices/test_sterk_elliptic_population_archive.sage` compared the computed type multiset to the recorded one through `Set(...)`.  The recorded table states the scale as an integer and the test's own `scaled_type` states it as `Fraction(...)`, and the owned set decides a tuple's element identity by its entries, so `(5, 'D', 2)` and `(5, 'D', Fraction(2, 1))` did not meet even though the numbers agree.  The failure was a representation artefact: recomputing the multiset key-for-key gives `missing {}` and `extra {}` for all five diagrams (`Sterk_1` 120, `Sterk_2` 64, `Sterk_3` 66, `Sterk_4` 77, `Sterk_5` 118 entries, each equal to `sum(_CONNECTED_ELLIPTIC_TYPES[...])`).  The test now compares `Counter` multisets with both sides in one representation, which states the same numbers more exactly than the set comparison did; the recorded table is unchanged.
+
+### The Bliss repair is already deployed in this rootfs, and the v1 script correctly refuses to touch it
+
+`/opt/bliss-repair.json` records `base_revision b0cd7d86e21eb450ed90e4c83707920e1d5d429a`, the v1 patch digest `baf4b826e8093c7891de3650789c7f1e13c7d9e82de362a124486956e53f32b3`, the v2 patch digest, and the installed module's digest `d941337e3a69b8256771c2fbbff5c2604e724b717dcc41352e12a3f7f9b75a75` — the owner's v1 module hash.  The installed `sage/graphs/bliss.cpython-314-x86_64-linux-gnu.so` hashes to that value, and the script's own smoke tests pass against it (both `canonical_label` backends on the labelled case, `K4` of order 8, `PetersenGraph` of order 120).  So the deployment is a no-op verified by artifact identity, and the published image is not rebuilt.
+
+Running the v1 script against this copy stops at its own guard, which is correct: this copy carries the **v2** source, whose `meson.build` hunk differs from v1's, so `git apply --reverse --check` cannot recognise the patch and the pre-patch cleanliness check then reports `src/sage/graphs/meson.build has local changes; this copy is not the published image`.  Nothing was patched, rebuilt, installed or re-stamped by that run.  Do not "make it pass" by rewriting the script or the source: that would be the library-local variant the deployment forbids.
+
+### With Bliss repaired, the frozen Enriques consumer reaches the owner and stops on QQ not being placed in `PrimeFields`
+
+`tests/acceptance/test_boundaries.sage::test_enriques_modular_groups_match_dutour_sikiric_hulek[case_1]` no longer dies in the automorphism search.  It now runs `_gamma_h` through `lattice(_E10["gram"]).twist(2).Isom(invariant).an_element()`, `polarized(...)`, `coinvariant_extension_subgroup()` and stops at
+
+```text
+sage_extensions/categories/lattices.py:4110  O_plus
+AssertionError: O^+(Integral lattice of rank 12 and signature (2, 10)) is the kernel of the real
+spinor norm at the real place of Frac(R); QQ has exactly one, but Frac(R) = Fraction Field of
+Integer Ring: pass a real embedding of it to spinor_kernel
+```
+
+The guard reads `field in PrimeFields() and field.characteristic() == 0`.  For the owned rational field the second half holds (`characteristic()` is 0) and the first does not: `QQ in PrimeFields()` is `False`.  The placement is *declared* — `_rational_placements()` in `ring_foundation.py` is documented as "the prime field of characteristic 0, ordered, and the number field of degree 1" and returns `*_field_placements(), PrimeFields(), OwnedOrderedRings(), OwnedNumberFields(), CountablyInfiniteSets()` — but it is never applied: `_owned_rationals()` is `_owned_integers().fraction_field_localization()`, a localization object whose category join is "local nontrivial localization rings, commutative algebras, owned ordered rings, fields, modules over the fraction field", with no `prime fields`.  The same guard appears at `lattices.py:9189` and `9250`, so three owner entry points depend on the placement.
+
+That is the next owner repair for this consumer: give the rational field its declared placement at the construction that produces it (or have the localization carry the named placements for `Frac(ZZ)` specifically), not at the three guards.
+
+Separately: a whole-directory `tests/groups` run still dies at 69% with no pytest summary, with the repaired module installed, so that crash is not the Bliss ABI one and the directory scan remains unavailable; the five-file before/after comparison is the regression evidence for the group-export change.
