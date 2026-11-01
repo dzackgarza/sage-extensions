@@ -30,6 +30,18 @@ def test_the_quadratic_field_constructs_before_its_placement_is_installed() -> N
     assert hash(field) == hash(field)
     assert field == field
 
+    # Identity equality and identity hashing must agree for repeated equal
+    # constructor parents: a dictionary keyed by one field answers for another
+    # object that compares equal to it, which for this contract means the same
+    # object returned again.
+    rebuilt = QuadraticField(2, "a")
+    assert rebuilt is field
+    assert rebuilt == field
+    assert hash(rebuilt) == hash(field)
+    table = {field: "Q(sqrt 2)"}
+    assert table.get(rebuilt) == "Q(sqrt 2)"
+    assert len({field, rebuilt}) == 1
+
 
 def test_the_field_and_its_maximal_order_carry_lattices_that_display() -> None:
     field = QuadraticField(2, "a")

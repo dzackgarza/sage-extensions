@@ -992,3 +992,16 @@ Residual, recorded and not repaired: a number field still displays as `Free modu
 The first one is a plain coercion bug at an owner boundary: membership in an owned ring is a **proposition**, and `x in ring` makes Python call `bool()` on it before anything can ask, so `algebras._element_constructor_` raised on `value in ring` and `OrderEmbedding` raised on `image not in codomain`. Both sites now read the predicate and decide it with `ask(...)`, the library's own idiom; an undecided answer does not take the branch.
 
 That repair does not close its test: with the coercion fixed, `integers.Mor(integers)(conjugation)` proceeds and recurses, `scalar_multiple → _ring_morphism_defining_module_action → elementwise ring morphism → algebras._element_constructor_ (unit branch) → unit_morphism → scalar action → ...`, 1003 frames. The five number-field files are unchanged at 9 failed / 9 passed, so this is recorded as the next unit rather than claimed as a repair of the specimen: the unit-morphism branch fires for an order element read inside the coefficient field and cycles through the order's scalar action.
+
+### The restricted-conjugation recursion is a knot, not an ingress bug: what four layers of it showed
+
+`integers.Mor(integers)(conjugation)` for `QQ(sqrt 5)` now passes the two membership repairs and then recurses, 1003 frames. Traversed in order, each repair moved the failure one layer and closed nothing:
+
+1. `algebras._element_constructor_` and `OrderEmbedding.__init__` coerced a membership proposition with `in` — repaired (`ask(...)`), published at `fdd9bb3`;
+2. the coordinate element re-entered `algebras._element_constructor_` with `source is self`, so an identity ingress was added — the cycle simply moved to
+3. `modules.scalar_multiple → scalar_action → _ring_morphism_defining_module_action`, the construction of `rho_M : R -> End(U(M))`; preferring the retained native scalar operation moved it again to
+4. `native_modules.scalar_multiple → _native_scalar_action → _lmul_ → ring __call__ → algebras._element_constructor_ → set_categories.__call__ → algebras.py:641 <lambda> → modules.scalar_multiple`: element construction calls the algebra structure morphism `r |-> rho(r)(1)`, which calls the scalar action, which constructs an element again.
+
+That last loop is the actual defect: element construction, the structure morphism and the scalar action are mutually recursive for a ring that is a module over its prime ring, and breaking it is a structural change to the algebra construction, not an ingress repair. Layers 2 and 3 were tried, moved the exception without closing it, and were reverted rather than published as progress; the tree at `fdd9bb3` carries only layer 1, which is a genuine bug fix but does not close the specimen. The five number-field files remain 9 failed / 9 passed, and the conjugation case is **not** accepted.
+
+The next owner task is that knot. A repair should make the algebra structure morphism and the module scalar action read one retained datum instead of constructing each other.
