@@ -912,6 +912,23 @@ class NumberFieldsWithChosenPrimitiveElement(OwnedCategory):
             parent = self.algebra_framing_source()
             return _owned_engine_element(parent, polynomial)
 
+        def quotient_map(self):
+            r"""Return the class map ``R[t] -> R[t]/(f) = K``, ``t |-> theta``.
+
+            The quotient this field *is* was part of its construction
+            (``_number_field_of``: "the quotient map is part of this
+            construction, so the field is constructed with it as its chosen
+            degree-zero algebra resolution").  That resolution keeps the map on
+            the *labelled* generators, which is not the ring map a consumer
+            needing ``R[t] -> K`` can compose with.  This accessor states the
+            same quotient map on the polynomial ring, under the name the
+            quotient owner uses: the class of ``t`` is the selected primitive
+            element, and the polynomial variable's image is exactly that.
+            """
+            ring = self.defining_polynomial().parent()
+            (label,) = ring.variable_names()
+            return ring.Mor(self)({label: self.algebra_generator(label)})
+
         def embedding_images(self, target):
             r"""Return the images of the selected primitive element under ``K -> target``."""
 

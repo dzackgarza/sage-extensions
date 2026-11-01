@@ -1813,14 +1813,6 @@ def _univariate_polynomial_ideal_placement(source, generators):
     base = source.base_ring() if hasattr(source, "base_ring") else None
     if base is None or base not in OwnedFields():
         return None
-    # Stated for a finite coefficient field first.  Over `QQ` the quotient of a
-    # one-variable polynomial ring by a maximal ideal is the number-field
-    # construction, and that route does not carry the class map from the
-    # polynomial ring that a residue map needs; placing the ideal there changes
-    # which parent the localization's residue field receives, and that route
-    # has to gain its map before this theorem is stated for it.
-    if base.characteristic() == 0:
-        return None
     if source not in SymmetricAlgebras(base) or len(source.variable_names()) != 1:
         return None
     engine = _engine_ring(source)
