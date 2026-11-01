@@ -1452,3 +1452,26 @@ The two passing specimens were closed by the earlier number-field and display re
 `algebras._mul_` -> multiplication bilinear map -> `domain().pure_tensor(...)` -> `tensor_quotients.pure` -> `reduced_terms` -> `module(value)` -> `algebras._element_constructor_` -> `self.algebra_base_ring()` -> `self.base_ring()` -> back to `_mul_`.
 
 So an element coercion inside the completion's own construction asks an algebra for its base ring, and answering that question re-enters the algebra's multiplication through the tensor construction. `_AdicCompletionAlgebraParent.__init__` does pass a base (`source if algebra_base is None else algebra_base`, i.e. `ZZ` here) to `_OwnedAlgebraParent`, so the base is retained in principle; which of the coerced factors recomputes it by arithmetic is the open question, and the repair belongs there — not in a memoization layer. No arithmetic was reimplemented and no assertion was weakened; the specimen stays open until that is settled.
+
+### Research issue 614: the acceptance matrix, family by family
+
+Seven families from `preamble-lattices.ipynb`. Status is exact, with the regression that carries it; a failing family is named as failing, not folded into an unrelated repair.
+
+| family | notebook cell | acceptance | status | carried by |
+| --- | --- | --- | --- | --- |
+| lattice over an order | 18 | `Lattices(O)([[2,a],[a,2]])` builds; `u*u = 2`, `u*v = a`, `v*v = 2` | **accepted** | `.scratch/probe-614-A.py`; display half in `tests/rings/test_number_field_construction_and_display.sage` |
+| multiplication over `Z[i]` | 21 | `ei*ei = 1`, `ei*fi = 0`, `fi*fi = 1` | **accepted** | `.scratch/probe-614-B.py` |
+| the 5-adic completion and a lattice over it | 23, 24 | `Zp(5)` constructs; `ep*ep = 1`, `ep*fp = 0`, `fp*fp = 1`; repr and latex render | **accepted** | `tests/rings/test_five_adic_completion_and_its_lattice.sage` (10 tests) |
+| discriminant normal form | 57 | `TEn.discriminant_group().normal_form()` is an isomorphism, 12 -> 10 generators, both round trips | **accepted** | `tests/lattices/test_discriminant_normal_form.sage` |
+| isotropic reduction | 58 | `E8.is_elliptic()`, `U.q(e0) = 0`, `e0.e1 = 1`, `e0.e_perp_mod_e()` | **accepted** | `tests/lattices/test_isotropic_reduction_and_correlation.sage` |
+| correlation isomorphism | 63 | valence `(1,1)`, `lower_index` returns the Gram, both inverse identities on their own generator families | **accepted** | same file |
+| free algebras | 61, 84 | tensor and divided-power algebra identities; infinite symmetric-algebra substitution | **not accepted** — both cells fail, see below | — |
+
+**Cell 61 fails at both constructions, and the failures are the chosen-resolution contract, not the module.** With `M = coker(2: ZZ -> ZZ)` built exactly as the notebook builds it:
+
+- `M.tensor_algebra()` raises `ValueError: Integer Ring as an algebra over Integer Ring has no chosen resolution relative to Category of modules over Integer Ring` (from `modules.py`'s tensor-algebra route);
+- `M.divided_power_algebra()` raises `ValueError: Direct sum over Integer Ring has no chosen resolution relative to Category of modules over Integer Ring` (`power_algebras.py`'s `PowerAlgebra(module, "divided")`).
+
+`M` itself is fine — a finitely presented module on one generator with invariant factor 2, and `M.module_generating_set()` already fails the same way, so the demand is made before either power algebra is reached. The repair is to make the maintained chosen-resolution contract supply the resolution `M`'s own presentation states; inventing a resolution in the constructor, or substituting a free module, would be exactly the substitution the owner forbids.
+
+**Cell 84 fails at one assertion, about placement.** Building `ZZ.free_module(NN).symmetric_algebra()` raises in `_algebra_on_module`: "an algebra on the Integer Ring-module Module of symmetric words on Free module on NN = {0, 1, 2, ...} over Integer Ring must be placed in categories of algebras over Integer Ring, but got (Category of symmetric algebras over Integer Ring, Category of integer graded modules, Category of free algebras over Integer Ring, Category of graded free algebras over Integer Ring, Category of projective modules over Integer Ring)". One entry in that placement, the integer graded *module* category, is not a subcategory of `Algebras(ZZ)`, so the all-algebra guard rejects the list. Whether a graded algebra's placement legitimately carries its graded-module refinement is the question to settle; it must be settled by reading that guard's contract, not by dropping the assertion.
