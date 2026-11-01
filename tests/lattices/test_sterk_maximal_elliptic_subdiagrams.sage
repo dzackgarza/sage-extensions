@@ -71,9 +71,9 @@ def test_each_maximal_elliptic_subdiagram_admits_no_further_vertex() -> None:
         vertex_sets = tuple(frozenset(entry.index_set()) for entry in maximal)
         assert not any(left < right for left in vertex_sets for right in vertex_sets), name
 
-        # Every maximal member is closed against adding any single vertex; two
-        # per diagram keeps the check bounded while still exercising both ranks.
-        for entry in maximal[:2]:
+        # Every returned maximal member is closed against adding any single
+        # vertex it omits, decided by the public subdiagram contract.
+        for entry in maximal:
             selected = tuple(entry.index_set())
             for vertex in diagram.index_set():
                 if vertex in selected:
