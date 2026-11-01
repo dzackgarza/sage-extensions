@@ -1788,3 +1788,20 @@ So this is a stated boundary, not a mis-construction: `QQ[x]` is infinite-dimens
 **The same bare-`Algebras` vocabulary defect in `tests/rings/test_commutative_algebra.sage` (2026-11-01).** Three sites there write `Algebras(QQ).Associative().Unital().Commutative()` for a spectrum, a pushout and a coproduct; under pytest the name is Sage's class (`qc_sage_session` injects `sage.all_cmdline`) and each site constructed Sage's `MagmaticAlgebras` over the owned `QQ`, failing as `KeyError: ((<class 'sage.categories.magmatic_algebras.MagmaticAlgebras'>, Fraction Field of Integer Ring), ())` — the cache-miss variant of the pair recorded above. With the owned `Algebras` imported the file goes 16 failed / 9 passed → **15 failed / 10 passed**, one fixed (`test_commutative_algebra_pushout_imposes_common_source_relations`), none introduced; the spectrum and coproduct tests at the other two sites keep failing for their own reasons.
 
 **Next defect in that file, named with its owner: `direct_sum_of_cyclics` is on the torsion branch only.** Five tests fail with `AttributeError: 'Modules_with_category' object has no attribute 'direct_sum_of_cyclics'`. The construction exists — `categories/modules/pure/modules.py:3245`, on `Modules(R).FinitelyPresented().Torsion()` — and the library itself calls it through that path (`discriminant_modules.py:653`, `module_morphisms.py:1394`), while the tests call it on `Modules(R)` directly. Whether the method belongs on the general module category (a direct sum of cyclics is built from orders, not from a presentation) or the tests should state the torsion refinement is an owner decision, not a guess: it is recorded here rather than moved, because widening a construction's placement changes what every caller may ask of it.
+
+**Recursion broken: a local construction must state that its maximal ideal is nonzero (2026-11-01).** `test_formal_power_series_ring_is_complete_local_over_a_field` died with `RecursionError` and a 69-deep `KeyError: (<id>, <id>)` chain, whose innermost frame is the real story:
+
+```
+_maximal_ideal_over_local_base
+ -> algebra.completion_map().extension_of_ideal(source_ideal)
+   -> _flat_extension_commutative_ideal -> source_ideal.base_change(morphism)
+     -> _framed_free_base_change -> target_ring._fresh_free_module_on(...)
+       -> _new_sparse_free_module -> _finitely_generated_free_placement
+         -> `if ring in OwnedFields():`          # the power series ring
+           -> OwnedRings.Division.__contains__ -> candidate._field_decision()
+             -> construction.maximal_ideal()     # back to the first line
+```
+
+Choosing a placement for a free module asks whether its coefficient ring is a field; for a local ring that decision asks whether the maximal ideal is zero; the power series ring's maximal ideal is built by extending an ideal along the completion map, which builds a free module over the same ring. The library already has the seam for this — `LocalRings._field_decision` reads `construction.maximal_ideal_is_zero_decision()` first, and its docstring states the circle for prime localizations — but the two constructions over a *local base* stated nothing, so they fell to the ideal route. They now state `maximal_ideal_is_zero=False`: the formal parameters and the dual-number `epsilon` generate the maximal ideal and are not zero. `tests/rings/test_commutative_algebra.sage` goes 15 failed / 10 passed → **14 failed / 11 passed**, that test fixed, none introduced.
+
+**Next in that file, named not guessed.** `test_quotient_residue_field_dual_numbers_and_adic_completion` fails on `tbar**2 == 0` in `(Z/5)[t]/(t^2)`: the class of `t` squares to something printing `t mod Ideal (t^2) of Free module on Coproduct … over Integer Ring / Ideal (5) of Integer Ring ** 2`, i.e. the reduction by `t^2` does not reach zero in this two-step quotient — quotient arithmetic, a different owner from the local-ring construction above.
