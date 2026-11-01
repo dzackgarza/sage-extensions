@@ -866,3 +866,22 @@ Maximality is a property of vertex sets, and the Schlaefli form of an induced su
 Measured on `Sterk.diagrams()`: `Sterk_2` 52.7 s → 1.4 s with an element-for-element identical list of maximal vertex sets in identical order; all five diagrams 40 s in total, where the previous owner implementation needed roughly 38 min.  Counts and ranks: `Sterk_1` 44 (30 of rank 8, 14 of rank 9), `Sterk_2` 9 (1 of rank 8, 8 of rank 9), `Sterk_3` 34 (5, 29), `Sterk_4` 29 (8, 21), `Sterk_5` 132 (30, 102) — every diagram has a rank-9 maximal elliptic subdiagram, which a Type III ray needs.  `tests/lattices/test_sterk_maximal_elliptic_subdiagrams.sage` holds the owner to those counts and to what the consumer reads off them: ellipticity, maximality against every single added vertex through the public `induced_subdiagram(...).is_elliptic()`, retained vertex labels and vertex names, retained roots and root Gram, the inclusion arrow's codomain, and the connected components of a disconnected member.
 
 Boundary: the equality against the previous implementation was checked element-for-element on `Sterk_2`; for the other four diagrams the acceptance is the invariant set above plus the shared code path, not a second full old-code run (each of those costs tens of minutes by construction).
+
+### The session export never bound the library's group owner, so `Groups` was Sage's category in every test
+
+`sage_extensions.all` exported `AdditiveGroups`, `Modules`, `Lattices`, `Sets` and `CoxeterDiagrams`, but neither `Groups` nor `OwnedGroups` from `sage_extensions.categories.group.groups`, where `Groups = groups = OwnedGroups` is the library's group owner.  A `.sage` test that writes `from sage_extensions.all import *` therefore still saw Sage's `sage.categories.groups.Groups`, which has no `S`, `C`, `V4`, `Free` or `Coxeter`:
+
+```text
+tests/lattices/test_coxeter_subdiagrams.sage:53: AttributeError: type object 'Groups' has no attribute 'S'
+```
+
+Both names are now exported.  Checked on the five files that use the bare name most heavily (`test_adjunctions`, `test_selected_pullbacks_and_pushouts`, `test_group_algebras`, `test_isotropic_binary_orthogonal_groups_are_finite`, `test_rational_definite_orthogonal_groups`): **20 failed / 13 passed before, 14 failed / 19 passed after, with no test newly failing** — the six that changed are the ones that had aborted at `Groups.S(...)`.
+
+Two follow-on items this exposed, neither repaired here:
+
+- `tests/categories/test_group_owned_meets.sage` now reaches `s3.cardinality() / subgroup.cardinality()` and fails with `TypeError: unsupported operand type(s) for /: 'Cardinalities.parent_class' and 'Cardinalities.parent_class'` — owned cardinalities have no division.  That is a cardinal-arithmetic gap, not a group one.
+- The Coxeter contract itself used `Aut().is_isomorphic(...)`, and no group parent has ever had that name (the owner has `is_isomorphic_to` since the initial import); `Groups` was equally wrong there.  The test now states the owner's method and keeps a negative case (`not ... is_isomorphic_to(Groups.C(6))`) so the decision cannot be vacuous.
+
+### The Sterk archive type table was right; the comparison made its two scales unequal
+
+`tests/lattices/test_sterk_elliptic_population_archive.sage` compared the computed type multiset to the recorded one through `Set(...)`.  The recorded table states the scale as an integer and the test's own `scaled_type` states it as `Fraction(...)`, and the owned set decides a tuple's element identity by its entries, so `(5, 'D', 2)` and `(5, 'D', Fraction(2, 1))` did not meet even though the numbers agree.  The failure was a representation artefact: recomputing the multiset key-for-key gives `missing {}` and `extra {}` for all five diagrams (`Sterk_1` 120, `Sterk_2` 64, `Sterk_3` 66, `Sterk_4` 77, `Sterk_5` 118 entries, each equal to `sum(_CONNECTED_ELLIPTIC_TYPES[...])`).  The test now compares `Counter` multisets with both sides in one representation, which states the same numbers more exactly than the set comparison did; the recorded table is unchanged.

@@ -132,7 +132,9 @@ from sage_extensions.categories.graph_categories import (  # noqa: F401
     LabelledGraphs,
 )
 from sage_extensions.categories.group.groups import (  # noqa: F401
+    Groups,
     LieGroups,
+    OwnedGroups,
     TopologicalGroups,
 )
 from sage_extensions.categories.group.magmas import (  # noqa: F401
