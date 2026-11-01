@@ -1206,6 +1206,28 @@ class LocalizationRings(OwnedCategory):
                 )
 
                 return Cardinalities().one()
+            if source in owned_sets.FiniteSets():
+                # A finite source maps onto its localization -- ``a/s`` is
+                # ``a * s^{-1}`` -- so the localization is the quotient of ``R``
+                # by the ideal of elements some inverted element kills, and
+                # ``|S^{-1}R| = |R| / |{a : a/1 = 0}|``.  The count is taken by
+                # this ring's own equality, one element of the finite source at a
+                # time; an undecided equality leaves the cardinality undecided.
+                source_cardinality = source._cardinality_decision()
+                if source_cardinality is None:
+                    return None
+                size = int(owned_sets.cardinal(source_cardinality).finite_value())
+                image_of_zero = self.zero()
+                killed = 0
+                for element in source:
+                    matched = self.fraction(element) == image_of_zero
+                    if matched is True:
+                        killed += 1
+                    elif matched is not False:
+                        return None
+                if killed == 0 or size % killed:
+                    return None
+                return owned_sets.cardinal(size // killed)
             match source in OwnedIntegralDomains():
                 case True:
                     from sage_extensions.categories.rings.commutative_algebra import (
@@ -1934,59 +1956,64 @@ class LocalizationRings(OwnedCategory):
 
             ``n * 1`` vanishes in ``S^{-1}R`` exactly when some ``s`` in ``S``
             kills ``n * 1`` in ``R``, so the answer is the least ``n`` dividing
-            the source's characteristic whose multiple of one the inverted set
-            kills.  The question is asked with ideals and submonoid membership of
-            the source, never with elements of the localization: equality there
-            is decided through the localization of the regular module, whose
-            placement asks for field decisions.
+            the source's characteristic with that property.  The property is
+            ``inverted_submonoid_meets`` of the annihilator ``(0 : (n·1))`` —
+            this ring's own contract for "``S`` meets ``I``" — and not a test of
+            the annihilator's generators one by one: an ideal can meet ``S``
+            through a combination of generators that no single generator
+            witnesses.  Both sides of the question are ideals and submonoid
+            membership of the source, never elements of the localization.
 
             The answer is therefore *not* the source's characteristic.  ``ZZ/6``
             at ``(2)`` has characteristic 2: ``3 * 2 = 0`` and ``3`` is inverted
             because it lies outside ``(2)``, so ``2`` is already zero there while
             the source's characteristic is 6.
+
+            Two cases are stated before the scan.  If ``0`` is inverted the ring
+            is trivial, and the trivial ring has characteristic one, not zero —
+            so that is answered first and a characteristic-zero source does not
+            short-circuit it.  If the source has characteristic zero and ``0`` is
+            not inverted, nothing kills a positive multiple of one and the answer
+            is zero.  A smaller candidate whose decision is undecided keeps the
+            answer undecided even when a later candidate is seen to kill one:
+            returning the later one would assert a minimality that was not
+            established.
             """
             from sage_extensions.categories.rings.ring_foundation import (
                 _owned_integers,
             )
 
+            integers = _owned_integers()
+            if (self.one() == self.zero()) is True:
+                return integers.one()
             source = self.localization_source()
             source_characteristic = source.characteristic()
-            integers = _owned_integers()
             if (source_characteristic == source.zero()) is True:
                 return integers.zero()
             zero_ideal = source.ideal(source.zero())
-            submonoid = self.localization_submonoid()
-
-            def inverted(element):
-                r"""Decide whether ``element`` is killed-away, or ``None`` when undecided."""
-                match submonoid._selected_representation_kind():
-                    case "predicate":
-                        membership = submonoid.defining_predicate()(element)
-                        return membership if membership in (True, False) else None
-                    case _:
-                        try:
-                            return element in submonoid
-                        except AssertionError:
-                            # Membership in a finitely generated submonoid is not
-                            # decidable here; the generator case is answered below.
+            smaller_candidate_undecided = False
+            for candidate in source_characteristic.divisors():
+                multiple = source.scalar_multiple(source.one(), candidate)
+                vanishing = multiple == source.zero()
+                if vanishing is True:
+                    decision = True
+                elif vanishing is False:
+                    decision = self.inverted_submonoid_meets(
+                        zero_ideal.colon(source.ideal(multiple))
+                    )
+                else:
+                    decision = vanishing
+                match decision:
+                    case True:
+                        if smaller_candidate_undecided:
                             return None
-
-            undecided = False
-            for multiple_of_one in source_characteristic.divisors():
-                multiple = source.scalar_multiple(source.one(), multiple_of_one)
-                if (multiple == source.zero()) is True:
-                    return integers(multiple_of_one)
-                annihilator = zero_ideal.colon(source.ideal(multiple))
-                answers = tuple(
-                    inverted(killer) for killer in annihilator.ideal_generators()
-                )
-                if any(answer is True for answer in answers):
-                    return integers(multiple_of_one)
-                if any(answer is None for answer in answers):
-                    undecided = True
-            # ``None`` states that this construction does not decide the
-            # characteristic; it does not state one that is wrong.
-            return None if undecided else integers.zero()
+                        return integers(candidate)
+                    case False:
+                        continue
+                    case _:
+                        smaller_candidate_undecided = True
+                        continue
+            return None if smaller_candidate_undecided else integers.zero()
 
         def _fraction_equality_status(self, left, right):
             r"""Compare ring fractions through localization of the actual regular module.

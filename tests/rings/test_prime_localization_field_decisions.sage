@@ -121,3 +121,62 @@ def test_the_isomorphism_decision_states_unknown_rather_than_raising() -> None:
     assert answer is not True
     assert answer is not False
     assert answer in Propositions
+
+def test_a_generated_submonoid_localization_states_its_own_characteristic_and_size() -> None:
+    r"""``ZZ/6`` with ``2`` inverted is ``ZZ/3``: characteristic 3, three elements.
+
+    This is the case that separates "some annihilator generator lies in ``S``"
+    from "the annihilator meets ``S``": ``S = <2>`` in ``ZZ/6`` is ``{1, 2, 4}``,
+    and the answer comes from this ring's own ``inverted_submonoid_meets``
+    contract, not from testing generators one at a time.
+    """
+    quotient = ZZ.quotient_ring(ZZ.ideal(6))
+    inverted = quotient.localization(quotient(2))
+
+    assert quotient.characteristic() == 6
+    assert inverted.characteristic() == 3
+    assert inverted.cardinality() == 3
+
+
+def test_the_trivial_localization_has_characteristic_one() -> None:
+    r"""A localization that inverts ``0`` is trivial, and the trivial ring has characteristic 1.
+
+    Not ``0``: the characteristic-zero shortcut is taken only after the trivial
+    case, because a characteristic-zero source localized at a set containing zero
+    is not a characteristic-zero ring.
+    """
+    zero_ring = ZZ.quotient_ring(ZZ.ideal(1))
+    trivial = zero_ring.localization(zero_ring.one())
+
+    assert (trivial.one() == trivial.zero()) is True
+    assert trivial.characteristic() == 1
+    assert trivial.cardinality() == 1
+
+
+def test_the_residue_field_is_a_quotient_with_its_own_cardinality() -> None:
+    r"""The residue field is ``ZZ/6`` modulo ``(2)``, not the localization itself.
+
+    Three representations meet here and stay distinct: the localization, its
+    residue field, and the quotient presentation of that field.  The residue
+    field's cardinality is decided at the quotient owner, from the finite source
+    and the killed ideal, and the maps that identify things are explicit --
+    ``localization_map`` into the localization and ``residue_map`` out of it.
+    """
+    quotient = ZZ.quotient_ring(ZZ.ideal(6))
+    localized = quotient.spectrum()(2).local_ring()
+    residue_field = localized.residue_field()
+
+    assert residue_field is not localized
+    assert residue_field.quotient_source() is quotient
+    assert residue_field.defining_ideal().ideal_generators() is not None
+    assert residue_field.cardinality() == 2
+    assert residue_field.is_field() is True
+
+    localization_map = localized.localization_map()
+    residue_map = localized.residue_map()
+    assert localization_map.domain() is quotient
+    assert localization_map.codomain() is localized
+    assert residue_map.domain() is localized
+    assert residue_map.codomain() is residue_field
+    assert residue_map(localized.fraction(quotient(3))) == residue_field.one()
+    assert residue_map(localized.fraction(quotient(2))) == residue_field.zero()

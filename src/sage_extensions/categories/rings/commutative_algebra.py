@@ -1242,6 +1242,30 @@ class QuotientRings(OwnedCategory):
                     else comparison.domain()._cardinality_decision()
                 )
             source = self.quotient_source()
+            if source in FiniteSets():
+                # A finite source maps onto its quotient, so ``R/I`` is the image
+                # of that map and ``|R/I| = |R| / |I|``: the killed elements are
+                # exactly the ideal.  The size of the ideal is counted here
+                # because an owned ideal states no cardinality of its own, and
+                # asking the quotient's elements instead would be asking the
+                # question being answered.  An undecided comparison leaves the
+                # cardinality undecided rather than guessed.
+                source_cardinality = source._cardinality_decision()
+                if source_cardinality is None:
+                    return None
+                size = int(cardinal(source_cardinality).finite_value())
+                projection = self.quotient_map()
+                image_of_zero = self.zero()
+                killed = 0
+                for element in source:
+                    matched = projection(element) == image_of_zero
+                    if matched is True:
+                        killed += 1
+                    elif matched is not False:
+                        return None
+                if killed == 0 or size % killed:
+                    return None
+                return cardinal(size // killed)
             source_engine = source._selected_engine_ring()
             if source_engine is None:
                 return None
