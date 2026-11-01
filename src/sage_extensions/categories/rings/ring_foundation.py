@@ -3883,7 +3883,17 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                 on a proper subring. Use an explicit central ring map and
                 its ``as_algebra`` operation to select another action.
                 """
+                from sage_extensions.categories.algebras.algebras import (
+                    _carry_polynomial_presentation,
+                )
+
                 base = _own_ring(base_ring)
+                view = self._algebra_view_over(base)
+                if view is self:
+                    return view
+                return _carry_polynomial_presentation(view, self, base)
+
+            def _algebra_view_over(self, base):
                 from sage_extensions.categories.algebras.algebras import (
                     Algebras,
                 )

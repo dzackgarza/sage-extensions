@@ -266,27 +266,42 @@ def _presentation_ideal(algebra, presentation, relations):
     presentation's.  Both are ideals of the presentation ring.
     """
     from sage_extensions.categories.algebras.derivations import (
+        _presented_ring,
         _quotient_polynomial_presentation,
     )
 
     if _quotient_polynomial_presentation(algebra) is presentation:
-        return algebra.defining_ideal()
+        return _presented_ring(algebra).defining_ideal()
     return presentation.ideal(*tuple(relations))
 
 
 def _presentation_cover_map(algebra, presentation):
-    r"""The quotient map ``presentation -> algebra`` of the selected presentation."""
+    r"""The quotient map ``presentation -> algebra`` of the selected presentation.
+
+    A scalar view of a quotient is the same ring through a coarser scalar
+    structure, so the map the conormal sequence needs is the quotient map read
+    into the view: every class is taken through the view, and the conormal
+    module and the ambient differentials then live over one ring instead of two.
+    """
     from sage_extensions.categories.algebras.derivations import (
+        _presented_ring,
         _quotient_polynomial_presentation,
     )
 
     if _quotient_polynomial_presentation(algebra) is presentation:
-        quotient_map = algebra.quotient_map()
+        ring = _presented_ring(algebra)
+        quotient_map = ring.quotient_map()
         assert quotient_map.domain() is presentation, (
             f"the quotient map of {algebra} starts at {quotient_map.domain()}, but its presentation "
             f"is {presentation}"
         )
-        return quotient_map
+        if ring is algebra:
+            return quotient_map
+        from sage_extensions.categories.rings.ring_foundation import OwnedRings
+
+        return OwnedRings().Mor(presentation, algebra)(
+            lambda element: algebra(quotient_map(element))
+        )
     return algebra.algebra_presentation_morphism()
 
 

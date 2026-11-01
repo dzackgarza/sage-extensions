@@ -5366,6 +5366,20 @@ class _ScalarAlgebraEngine:
         self._preamble_engine_ring = native_ring._selected_engine_ring()
         super().__init__(**rest)
 
+    def native_ring(self):
+        r"""Return the literal ring this scalar structure is built on.
+
+        The view is one scalar structure on an existing ring: its elements are
+        that ring's elements, read through the module action the structure map
+        supplies (``OWN-06``), and ``_algebra_structure_on`` retains the ring as
+        the view's ``native_ring`` construction datum rather than copying it.
+        Everything the ring's own constructor retains — its presentation, its
+        defining ideal, its quotient map — is therefore reachable here, which is
+        what lets the differential owners compute over the coefficient ring
+        without the view having to state a presentation it does not claim.
+        """
+        return self._native_ring
+
     def _element_constructor_(self, value):
         source = element_parent(value)
         if source is self:
@@ -5598,6 +5612,79 @@ def _unit_from_multiplication(multiplication):
                 f"fails on the generator {generator}"
             )
     return unit
+
+
+def _carry_polynomial_presentation(view, ring, base):
+    r"""Give the ``R``-algebra view of a polynomial quotient its presentation.
+
+    A quotient ``A = R[x]/I`` states the cover ``P = R[x]`` as its base ring, so
+    ``A`` itself cannot present itself over ``R``: its one algebra Mor is over
+    ``P``.  Its ``R``-algebra view — ``A.as_algebra_over(R)``, the same ring
+    through the coefficient structure, built on ``A`` and retaining it — can:
+    ``R[x]/I`` *is* the view's presentation as an ``R``-algebra, with the same
+    generators, the same relations and a class lifting through ``A`` to ``P``.
+    The presentation is installed from the ring's own retained data and the view
+    is placed in the presented category, so a map out of the view is read
+    against the ideal's relations.
+
+    Nothing is guessed and nothing is rebuilt: without a source that is a
+    polynomial algebra over exactly ``base``, or with an infinite generator
+    family, there is nothing to install and the view is returned unchanged.
+    """
+    from sage_extensions.categories.algebras.algebras import (
+        Algebras,
+        AlgebrasWithChosenFinitePresentation,
+        _fix_selected_algebra_presentation,
+        _install_selected_algebra_generators,
+    )
+    from sage_extensions.categories.algebras.free_algebras import SymmetricAlgebras
+    from sage_extensions.categories.rings.commutative_algebra import QuotientRings
+    from sage_extensions.categories.sets.indexed_families import indexed_family
+    from sage_extensions.refine import refine
+
+    if view is ring:
+        return view
+    if ring not in QuotientRings():
+        return view
+    presentation = ring.quotient_source()
+    if presentation is ring or presentation.base_ring() is not base:
+        return view
+    if presentation not in SymmetricAlgebras(base):
+        return view
+    labels = presentation.algebra_generating_set()
+    if labels.cardinality().is_finite() is not True:
+        return view
+    if view in AlgebrasWithChosenFinitePresentation(base):
+        return view
+
+    ideal = ring.defining_ideal()
+    _install_selected_algebra_generators(
+        view,
+        indexed_family(
+            labels,
+            presentation.algebra_generator,
+            name="Coefficient-ring algebra generators",
+        ),
+        source=presentation,
+    )
+    _fix_selected_algebra_presentation(
+        view,
+        presentation,
+        indexed_family(
+            ideal.ideal_generators().index_set(),
+            lambda index: presentation(ideal.ideal_generators().value(index)),
+            name="Defining relation family",
+        ),
+        ideal,
+        lambda element: ring(view(element)).lift(),
+    )
+    refine(view, AlgebrasWithChosenFinitePresentation(base))
+    assert view in AlgebrasWithChosenFinitePresentation(base), (
+        f"the coefficient-ring view {view} must be placed in the algebras with a chosen finite "
+        "presentation over its base once that presentation is installed"
+    )
+    assert view in Algebras(base).Associative().Unital().Commutative()
+    return view
 
 
 def _own_algebra(structure_map):

@@ -31,12 +31,20 @@ def test_multiplication_by_three_induces_the_identity_on_H1_of_ZZ_times_two_ZZ()
 
 
 def _dual_numbers_over_F2():
-    r"""\(A = \mathbb F_2[x]/(x^2)\) and the algebra map \(x \mapsto 0\)."""
+    r"""\(A = \mathbb F_2[x]/(x^2)\) as an \(\mathbb F_2\)-algebra, and \(x \mapsto 0\).
+
+    ``A`` is the coefficient-ring view of the polynomial quotient: the same ring
+    over ``F_2``, retaining the quotient and with it the presentation ``F_2[x]/(x^2)``,
+    which is what a map out of it is read against.
+    """
     polynomials = GF(2)["x"]
     x = polynomials.gen()
-    algebra = polynomials.quotient_ring(x**2)
-    xbar = algebra(x)
-    collapse = algebra.Mor(algebra)({xbar: algebra.zero()})
+    quotient = polynomials.quotient_ring(x**2)
+    algebra = quotient.as_algebra_over(GF(2))
+    xbar = algebra(quotient(x))
+    collapse = algebra.Mor(algebra)(
+        {label: algebra.zero() for label in algebra.algebra_generating_set()}
+    )
     return algebra, xbar, collapse
 
 
@@ -51,10 +59,10 @@ def test_x_dx_is_a_nonzero_de_rham_class_of_F2_dual_numbers_killed_by_x_to_zero(
     x_form = de_rham(xbar)
     x_dx = x_form * de_rham.d(x_form)
 
-    alpha = h1.class_of_cycle(x_dx)
+    alpha = h1.class_of_cycle(x_dx.homogeneous_components()[1])
 
     assert alpha != h1.zero()
-    assert h1.class_of_cycle(de_rham.d(x_form)) == h1.zero()
+    assert h1.class_of_cycle(de_rham.d(x_form).homogeneous_components()[1]) == h1.zero()
     assert functor(collapse)(alpha) == h1.zero()
 
 
@@ -67,7 +75,10 @@ def test_de_rham_cohomology_of_F2_dual_numbers_is_a_ring_functor_under_x_to_zero
     de_rham = algebra.de_rham_algebra()
     x_form = de_rham(xbar)
     alpha = cohomology.from_component(
-        1, cohomology.graded_piece(1).class_of_cycle(x_form * de_rham.d(x_form))
+        1,
+        cohomology.graded_piece(1).class_of_cycle(
+            (x_form * de_rham.d(x_form)).homogeneous_components()[1]
+        ),
     )
     induced = functor(collapse)
 

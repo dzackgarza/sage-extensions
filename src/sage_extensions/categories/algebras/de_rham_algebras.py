@@ -16,9 +16,20 @@ from sage_extensions.categories.rings.ring_foundation import OwnedCategoryOverBa
 class _DeRhamAlgebra:
     r"""The differential on the constructed restricted exterior algebra."""
 
-    def __init__(self, de_rham_source_algebra, kahler_differentials, **rest) -> None:
+    def __init__(
+        self,
+        de_rham_source_algebra,
+        kahler_differentials,
+        coefficient_algebra=None,
+        **rest,
+    ) -> None:
         self._de_rham_source_algebra = de_rham_source_algebra
         self._kahler_differentials = kahler_differentials
+        self._coefficient_algebra = (
+            de_rham_source_algebra
+            if coefficient_algebra is None
+            else coefficient_algebra
+        )
         super().__init__(**rest)
         exterior = self.extension_algebra()
         omega = self.kahler_differentials()
@@ -97,6 +108,18 @@ class DeRhamAlgebras(OwnedCategoryOverBaseRing):
     class ParentMethods(_DeRhamAlgebra):
         def de_rham_source_algebra(self):
             return self._de_rham_source_algebra
+
+        def coefficient_algebra(self):
+            r"""Return the algebra this complex is built on, over the base ring.
+
+            For an algebra that states its own coefficient ring this is the
+            source algebra.  For a polynomial quotient ``R[x]/I`` the calculus
+            is taken over ``R`` on the quotient's ``R``-algebra view — the same
+            ring through the coefficient structure, retaining the ring and with
+            it the presentation — and that view is what the graded pieces, the
+            differential and the base change are built on.
+            """
+            return self._coefficient_algebra
 
         def kahler_differentials(self):
             return self._kahler_differentials
@@ -199,36 +222,19 @@ def _de_rham_differential_on_extension(exterior_algebra, omega, universal_deriva
 
 
 
-def _coefficient_structure_morphism(algebra):
-    r"""The structure map ``R -> A`` of ``algebra`` over its coefficient ring ``R``.
+def _coefficient_algebra(algebra, base):
+    r"""``algebra`` read as an algebra over its coefficient ring ``base``.
 
-    For a polynomial quotient the retained structure is the tower
-    ``R -> P -> A``: the cover's coefficient map followed by the quotient map.
-    Every other represented algebra states that map directly.  The composite is
-    what makes ``R``, and not the cover, the ring the calculus and the de Rham
-    algebra are taken over.
+    An algebra that already states ``base`` is that algebra.  A polynomial
+    quotient ``R[x]/I`` states the cover instead; its ``R``-algebra view —
+    ``A.as_algebra_over(R)``, the same ring through the coefficient structure,
+    retaining the ring itself — is what the graded construction and the de Rham
+    functor need.  Nothing is rebuilt: the view is the documented reading of the
+    same ring, and the differential calculus reads the presentation through it.
     """
-    from sage_extensions.categories.algebras.derivations import (
-        _quotient_polynomial_presentation,
-    )
-    from sage_extensions.categories.rings.ring_foundation import OwnedRings
-
-    presentation = _quotient_polynomial_presentation(algebra)
-    if presentation is None:
-        return algebra.algebra_structure_morphism()
-    coefficient_map = presentation.algebra_structure_morphism()
-    quotient_map = algebra.quotient_map()
-    assert coefficient_map.codomain() is presentation, (
-        f"the coefficient map of {presentation} ends at {coefficient_map.codomain()}, but the "
-        f"quotient {algebra} is presented by {presentation}"
-    )
-    structure = quotient_map * coefficient_map
-    coefficient_ring = coefficient_map.domain()
-    assert structure.domain() is coefficient_ring and structure.codomain() is algebra, (
-        f"the composite of the quotient map of {algebra} with the coefficient map of its "
-        f"presentation must be the structure map {coefficient_ring} -> {algebra}"
-    )
-    return OwnedRings().Mor(coefficient_ring, algebra)(structure)
+    if algebra.base_ring() is base:
+        return algebra
+    return algebra.as_algebra_over(base)
 
 
 @cached_function(key=lambda algebra: id(algebra))
@@ -238,13 +244,19 @@ def _de_rham_algebra_from_source(algebra):
     )
 
     base = _algebra_coefficient_ring(algebra)
-    omega = algebra.kahler_differentials()
+    source = _coefficient_algebra(algebra, base)
+    omega = source.kahler_differentials()
     exterior = omega.exterior_algebra()
-    ring_map = _coefficient_structure_morphism(algebra)
+    ring_map = source.algebra_structure_morphism()
+    assert ring_map.domain() is base and ring_map.codomain() is source, (
+        f"the structure map of {source} must be {base} -> {source}, but it is "
+        f"{ring_map.domain()} -> {ring_map.codomain()}"
+    )
     return _restricted_graded_algebra(
         exterior, ring_map, extra_categories=(DeRhamAlgebras(base),),
         construction_data={
-            "de_rham_source_algebra": algebra,
+            "de_rham_source_algebra": source,
+            "coefficient_algebra": source,
             "kahler_differentials": omega,
         },
     )

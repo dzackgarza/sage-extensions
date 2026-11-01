@@ -61,6 +61,22 @@ from sage_extensions.logic import AtomicProposition, Propositions, conjunction
 from sage_extensions.validation import validator
 
 
+def _presented_ring(algebra):
+    r"""The ring whose presentation ``algebra`` carries, or ``algebra`` itself.
+
+    An algebra view built by ``as_algebra_over`` states a coefficient ring and
+    keeps the literal ring underneath it (``_ScalarAlgebraEngine.native_ring``);
+    the presentation, the defining ideal and the quotient map are that ring's,
+    not the view's.  Reading them there is what keeps one represented
+    presentation instead of a second, guessed frame.
+    """
+    from sage_extensions.categories.algebras.algebras import _ScalarAlgebraEngine
+
+    if isinstance(algebra, _ScalarAlgebraEngine):
+        return algebra.native_ring()
+    return algebra
+
+
 def _quotient_polynomial_presentation(algebra):
     r"""Return the polynomial ring ``P`` with ``algebra = P/I``, or ``None``.
 
@@ -69,15 +85,21 @@ def _quotient_polynomial_presentation(algebra):
     ``R[x_1, ..., x_n]/(I)``.  The coefficient ring of that presentation is the
     *source's* base ring: ``algebra.base_ring()`` is the source itself, which is
     the cover the quotient is an algebra over, not the ring its differentials
-    are taken over.  A source that is not a polynomial algebra, or a ring that
-    is not a quotient at all, supplies no such presentation.
+    are taken over.  A scalar view of such a quotient over the same coefficient
+    ring presents it the same way.  A source that is not a polynomial algebra,
+    or a ring that is not a quotient at all, supplies no such presentation.
     """
     from sage_extensions.categories.rings.commutative_algebra import QuotientRings
 
-    if algebra not in QuotientRings():
+    ring = _presented_ring(algebra)
+    if ring not in QuotientRings():
         return None
-    presentation = algebra.quotient_source()
-    if presentation is algebra or presentation.base_ring() is presentation:
+    presentation = ring.quotient_source()
+    if presentation is ring or presentation.base_ring() is presentation:
+        return None
+    if ring is not algebra and presentation.base_ring() is not algebra.base_ring():
+        # A scalar view is over the coefficient ring it states; presenting it
+        # over any other ring would be a different calculus.
         return None
     if presentation not in SymmetricAlgebras(presentation.base_ring()):
         return None
@@ -113,9 +135,12 @@ def _commutative_presentation_data(algebra):
         # A quotient retains the whole presentation: the polynomial cover, the
         # ideal as its relations, and a representative of each class.  The
         # calculus is over the cover's coefficient ring, so the polynomial
-        # source is the presentation ring and not the algebra itself.
-        relations = algebra.defining_ideal().ideal_generators()
-        lift = lambda element: algebra(element).lift()
+        # source is the presentation ring and not the algebra itself.  A view of
+        # the quotient over that coefficient ring reads the same presentation
+        # from the ring it is built on, and its classes lift through that ring.
+        ring = _presented_ring(algebra)
+        relations = ring.defining_ideal().ideal_generators()
+        lift = lambda element: ring(algebra(element)).lift()
         labels = presentation.algebra_generating_set()
         assert labels.cardinality().is_finite() is True, (
             f"the selected conormal and differential computation for {algebra} requires "
@@ -162,10 +187,10 @@ def _commutative_presentation_data(algebra):
 
 
 def _differentiate_representative(algebra, representative, variables):
-    presentation, _labels, _variables, _relations, _lift = _commutative_presentation_data(
+    presentation, _labels, _variables, _relations, lift = _commutative_presentation_data(
         algebra
     )
-    source = _engine_element(presentation, presentation(representative))
+    source = _engine_element(presentation, presentation(lift(representative)))
     target = _engine_ring(algebra)
 
     def derivative(variable):
