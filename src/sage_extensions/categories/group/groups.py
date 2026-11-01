@@ -2100,6 +2100,15 @@ def _symmetric_group(points):
     ``Omega`` is read through the ranking of ``Omega``.  The cache key is the
     defining datum ``Omega`` under its own equality, so equal point sets give
     one group and the engine is built once per point set.
+
+    The description names the degree and never formats the point set.  A
+    point set's display is not free data: a coset set's ``_repr_`` materializes
+    and validates every representative, so interpolating ``Omega`` here made
+    building ``Sym(Omega)`` cost as much as presenting ``Omega`` -- on the
+    port's Enriques case, 1800 s without returning.  The points themselves are
+    retained as the separately supplied ``symmetric_points``, which
+    ``natural_points()`` returns and which the action and its validation use;
+    only the naming is degree-based.
     """
     from sage.groups.perm_gps.permgroup import PermutationGroup
     from sage.groups.perm_gps.permgroup_named import SymmetricGroup
@@ -2130,7 +2139,7 @@ def _symmetric_group(points):
         description=(
             f"Symmetric group S_{size}"
             if standard
-            else f"Symmetric group on {points}"
+            else f"Symmetric group on {size} points"
         ),
         symmetric_points=points,
         constructing_category=OwnedGroups(),

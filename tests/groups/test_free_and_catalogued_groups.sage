@@ -149,6 +149,60 @@ def test_the_cyclic_subgroups_of_c4_have_orders_four_and_two() -> None:
     assert (generator**2).cyclic_subgroup().order() == 2
 
 
+def test_a_symmetric_group_is_named_by_its_degree_and_never_presents_its_point_set() -> None:
+    r"""``Sym(\Omega)`` is named by ``|\Omega|``, so neither building nor displaying
+    it formats or enumerates ``\Omega``.
+
+    A point set's presentation is not free data: a coset set's ``_repr_``
+    materializes and validates every representative, so interpolating the point
+    set into this group's description made *constructing* the group cost as much
+    as presenting the set.  The two operations are replaced by raising ones for
+    the duration, which is the expensive presentation in its smallest form.
+    ``natural_points`` and the exact action are untouched, so the action is still
+    checked against the retained points.
+    """
+    from sage_extensions.categories.group.groups import SymmetricGroups
+    from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+
+    points = finite_ordered_set(("w", "x", "y", "z"))
+    point_set_class = type(points)
+    original_repr = point_set_class._repr_
+
+    def forbidden_repr(self):
+        raise AssertionError("Sym(Omega) rendered its point set")
+
+    point_set_class._repr_ = forbidden_repr
+    try:
+        group = SymmetricGroups()(points)
+        description = group._description
+        displayed = repr(group)
+        latex = group._latex_()
+    finally:
+        point_set_class._repr_ = original_repr
+
+    assert group.natural_points() is points
+    assert description == "Symmetric group on 4 points"
+    assert "4 points" in displayed
+    assert "4 points" in latex
+
+    original_iter = point_set_class.__iter__
+
+    def forbidden_iter(self):
+        raise AssertionError("Sym(Omega) iterated its point set to describe itself")
+
+    point_set_class.__iter__ = forbidden_iter
+    try:
+        assert group._description == description
+        assert repr(group) == displayed
+        assert group._latex_() == latex
+    finally:
+        point_set_class.__iter__ = original_iter
+
+    assert group.order() == 24
+    assert group((1, 2))(points("w")) == points("x")
+    assert group.natural_g_set().act(group((1, 2)), points("x")) == points("w")
+
+
 def test_symmetric_group_retains_its_chosen_point_set_and_action() -> None:
     points = Sets.Δ[2]
     group = SymmetricGroups()(points)
