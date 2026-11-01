@@ -477,8 +477,25 @@ def _sparse_free_algebra_of(source, flavor):
         source.module_generating_set(),
         lambda label: module.from_component(1, source.module_generator(label)),
     )
+    # ``placement`` is the categories of algebras the construction established;
+    # ``categories`` is the further, non-algebra data those same levels add.
+    # ``IntegerGradedModules`` and ``Projective`` are module refinements: they
+    # belong to the realization owner (unchanged below, and still in the meet)
+    # and to the algebra's extra categories, not to its algebra placement.
+    algebra_placements = tuple(
+        category
+        for category in categories
+        if bool(category.is_subcategory(Algebras(ring)))
+    )
+    module_refinements = tuple(
+        category
+        for category in categories
+        if not bool(category.is_subcategory(Algebras(ring)))
+    )
     return _algebra_on_module(
-        module, multiplication, placement=categories,
+        module, multiplication,
+        placement=algebra_placements,
+        categories=module_refinements,
         unit=module.from_component(0, unit_piece.module_generator(0)),
         construction_data={
             "_engine": (realization_owner, _SparseFreeAlgebra, _WordModuleElement),
