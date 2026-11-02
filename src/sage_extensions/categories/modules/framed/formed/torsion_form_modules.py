@@ -313,7 +313,17 @@ def _torsion_form_isometry(forward, inverse, *, quadratic: bool, check: bool = F
     # finite presentation.
     formed_forward = category.Mor(source, target)((forward_component, value_identity))
     formed_inverse = category.Mor(target, source)((inverse_component, value_identity))
-    return category.Iso(source, target)(formed_forward, formed_inverse, check=check)
+    family = category.Iso(source, target)
+    if isinstance(family, TorsionFormIsometryMor):
+        return family(formed_forward, formed_inverse, check=check)
+    # An automorphism lands in the orthogonal group, whose element constructor
+    # reads an engine datum rather than a forward/inverse pair (callers that have
+    # one reach it through ``_from_engine`` or ``from_morphism``).  The pair is
+    # kept as the Core arrow it was, so those callers keep their route.
+    return category.Core().Mor(source, target)._from_known_inverse_pair(
+        formed_forward,
+        formed_inverse,
+    )
 
 
 def _representative_gram(form, *, quadratic: bool):
