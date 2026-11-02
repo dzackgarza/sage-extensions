@@ -5392,6 +5392,51 @@ def _owned_ring_element_text(element) -> str:
     return f"element of {parent}"
 
 
+def _sage_numeral(value):
+    r"""A Python integer as the owned integer it denotes, and anything else unchanged.
+
+    ``sage.structure.element.parent`` answers with the *Python* type for an
+    ``int``, so an operand normalization that reads a parent would leave the ring
+    for a value that is an ordinary numeral: ``a + 3`` would ask the Python
+    integer rather than the class of ``3``.  ``int`` becomes the owned integer —
+    the ring this library's unital rings all receive, and the only numeral the
+    specimen arithmetic needs — and every other Python numeral is left alone, so
+    nothing is claimed about floats or complex numbers that was not claimed
+    before.  A ``bool`` is left alone too: it is a numeral in Python but not a
+    member of a ring here.
+    """
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, int):
+        return _owned_integers()(value)
+    return value
+
+
+def _operand_in_ring(ring, value):
+    r"""``value`` read in ``ring`` along the canonical map, or ``NotImplemented``.
+
+    When the canonical map runs from ``ring`` into the other operand's ring and
+    not back, the operation lives in the other ring, and ``NotImplemented`` lets
+    Python ask the other operand: ``2 * q.one()`` for a quotient ``q`` of
+    ``QQ[x,y]`` is an element of ``q``, not the integer that the lift of ``1``
+    would convert to.  Otherwise the value is read in ``ring`` when it is one of
+    its elements, which is what makes literal arithmetic — ``a + 3``, ``3 + a``
+    — the arithmetic of ``ring`` rather than a Python refusal.
+    """
+    value = _sage_numeral(value)
+    other_parent = element_parent(value)
+    if (
+        other_parent is not ring
+        and other_parent in OwnedRings()
+        and _engine_ring(other_parent).has_coerce_map_from(_engine_ring(ring))
+        and not _engine_ring(ring).has_coerce_map_from(_engine_ring(other_parent))
+    ):
+        return NotImplemented
+    if value not in ring:
+        return NotImplemented
+    return ring(value)
+
+
 class _OwnedRingElement(RingElement):
     r"""An element of an owned ring with a private backend realization."""
 
@@ -5413,18 +5458,7 @@ class _OwnedRingElement(RingElement):
         integer that the lift of ``1`` would convert to.  Otherwise the value
         is read in this ring when it is one of its elements.
         """
-        ring = self.parent()
-        other_parent = element_parent(value)
-        if (
-            other_parent is not ring
-            and other_parent in OwnedRings()
-            and _engine_ring(other_parent).has_coerce_map_from(_engine_ring(ring))
-            and not _engine_ring(ring).has_coerce_map_from(_engine_ring(other_parent))
-        ):
-            return NotImplemented
-        if value not in ring:
-            return NotImplemented
-        return ring(value)
+        return _operand_in_ring(self.parent(), value)
     def _add_(self, other):
         parent = self.parent()
         return _owned_engine_element(parent, self._backend() + other._backend())

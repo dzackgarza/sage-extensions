@@ -1468,6 +1468,42 @@ class Algebras(OwnedCategoryOverBaseRing):
         return _algebra_on_module(module, multiplication, placement=(self,))
 
     class ElementMethods:
+        def _operator_operand(self, value):
+            r"""``value`` read in this algebra along the canonical map, or ``NotImplemented``.
+
+            Arithmetic on an algebra element is arithmetic in the algebra, and
+            an owned algebra receives its scalars along the canonical maps it
+            retains: its base ring, its source, and everything those receive.  A
+            Python integer is one of those scalars — ``a + 3`` is the class of
+            ``a + 3`` in the algebra, not a Python refusal — which is the rule
+            the native ring elements state at ``_OwnedRingElement``.
+            """
+            from sage_extensions.categories.rings.ring_foundation import (
+                _operand_in_ring,
+            )
+
+            return _operand_in_ring(self.parent(), value)
+
+        def __add__(self, other):
+            other = self._operator_operand(other)
+            if other is NotImplemented:
+                return NotImplemented
+            return self._add_(other)
+
+        __radd__ = __add__
+
+        def __sub__(self, other):
+            other = self._operator_operand(other)
+            if other is NotImplemented:
+                return NotImplemented
+            return self._add_(-other)
+
+        def __rsub__(self, other):
+            other = self._operator_operand(other)
+            if other is NotImplemented:
+                return NotImplemented
+            return other._add_(-self)
+
         @RealizationHook
         def _mul_(self, other):
             r"""``x * y`` is the multiplication evaluated on ``x (x) y`` in the module it is stated on.
