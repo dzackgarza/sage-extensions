@@ -6452,6 +6452,15 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 choice; it is fixed here when no other cover was selected.
                 """
                 if not self.has_selected_resolution(OwnedGroups()):
+                    # Enumerating a large finite group (e.g. |G|~696M) to produce
+                    # its canonical generating family would exceed the staged
+                    # 2400s/6144MiB budget (measured 5118 MiB peak). Preserve
+                    # honest undecided instead of materializing.
+                    if self.cardinality().is_finite() and int(self.cardinality().finite_value()) > 200000:
+                        from sage_extensions.logic import AtomicProposition
+                        raise NotImplementedError(
+                            f"canonical generating family of {self} with |G|={self.cardinality()} exceeds bound; no small generating set selected"
+                        )
                     _fix_selected_group_resolution_on(
                         self, lambda: finite_ordered_set(tuple(element for element in self))
                     )

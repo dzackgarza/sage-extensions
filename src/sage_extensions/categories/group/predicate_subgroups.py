@@ -395,11 +395,8 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     return cardinal(order * subgroup_image_size // image_size)
                 if supergroup_cardinality.is_countably_infinite():
                     return supergroup_cardinality
-            assert supergroup_cardinality.is_finite(), (
-                f"cannot compute the order of the subgroup {self}: its group "
-                f"{self.supergroup()} has order {supergroup_cardinality}, which is not finite, "
-                f"and the subgroup is not known as the preimage of a subgroup of a finite quotient"
-            )
+            if not supergroup_cardinality.is_finite():
+                return AtomicProposition("cardinality", self)
             return cardinal(sum(1 for _element in self))
 
         @cached_method
