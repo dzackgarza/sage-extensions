@@ -1,0 +1,23 @@
+Launching heavy Enriques: port 7b0f45d provider 835cbdf
+code 124
+[t=     0.0s] imports
+[t=     1.0s] fixtures loaded: 87 Enriques cases
+[t=     1.0s] Involutions.I_En, primitive_extension().invariant
+[t=     3.7s] invariant: Integral lattice of rank 10 and signature (1, 9)
+[t=     3.7s] lattice(_E10['gram']).twist(2).Isom(invariant)
+[t=     3.8s] transport domain: Integral lattice of rank 10 and signature (1, 9)
+[t=     3.8s] Isom homset built; asking an_element()
+[t=    20.6s] transport isometry found
+
+===== case_3: order 92897280, L/P/F 5/10/19 =====
+[t=    20.6s] case_3 polarized(polarization).coinvariant_extension_subgroup()
+[t=   209.6s] case_3 coinvariant subgroup built
+[t=   209.6s] case_3 anti-invariant lattice: rank 12, signature (2, 10)
+[t=   209.6s] case_3 intersection with O_plus
+[t=   209.7s] case_3 group G_h built
+[t=   209.7s] case_3 discriminant orthogonal group + discriminant morphisms
+[peakrss] enriques-heavy: child waited=124 shell_code=124 samples=1200
+[peakrss] peak tree RSS      : 4541 MiB
+[peakrss] low-water MemAvail : 5432 MiB
+[peakrss] peak single VmHWM  : 4549 MiB
+first stage verified

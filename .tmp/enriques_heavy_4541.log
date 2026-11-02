@@ -1,0 +1,86 @@
+[t=     0.0s] imports
+[t=     1.0s] fixtures loaded: 87 Enriques cases
+[t=     1.0s] Involutions.I_En, primitive_extension().invariant
+[t=     3.7s] invariant: Integral lattice of rank 10 and signature (1, 9)
+[t=     3.7s] lattice(_E10['gram']).twist(2).Isom(invariant)
+[t=     3.8s] transport domain: Integral lattice of rank 10 and signature (1, 9)
+[t=     3.8s] Isom homset built; asking an_element()
+[t=    20.6s] transport isometry found
+
+===== case_3: order 92897280, L/P/F 5/10/19 =====
+[t=    20.6s] case_3 polarized(polarization).coinvariant_extension_subgroup()
+[t=   209.6s] case_3 coinvariant subgroup built
+[t=   209.6s] case_3 anti-invariant lattice: rank 12, signature (2, 10)
+[t=   209.6s] case_3 intersection with O_plus
+[t=   209.7s] case_3 group G_h built
+[t=   209.7s] case_3 discriminant orthogonal group + discriminant morphisms
+[peakrss] enriques-heavy: child waited=124 shell_code=124 samples=1200
+[peakrss] peak tree RSS      : 4541 MiB
+[peakrss] low-water MemAvail : 5432 MiB
+[peakrss] peak single VmHWM  : 4549 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      3226 MiB peak
+[peakrss]   python                     1312 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  2373.2s procs=  4 rss=  4541 MiB hwm=  4549 MiB avail=  8814 MiB
+[peakrss]   t=  2375.2s procs=  4 rss=  4541 MiB hwm=  4549 MiB avail=  8814 MiB
+[peakrss]   t=  2377.2s procs=  4 rss=  4541 MiB hwm=  4549 MiB avail=  8814 MiB
+[peakrss]   t=  2379.2s procs=  4 rss=  4541 MiB hwm=  4549 MiB avail=  8814 MiB
+[peakrss]   t=  2381.2s procs=  4 rss=  4541 MiB hwm=  4549 MiB avail=  8814 MiB
+------------------------------------------------------------------------
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x86e5) [0x73fad007b6e5]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8786) [0x73fad007b786]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8b54) [0x73fad007bb54]
+/lib/x86_64-linux-gnu/libc.so.6(+0x3fd70) [0x73fad1d86d70]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa06a6) [0x73fad1de76a6]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa1eeb) [0x73fad1de8eeb]
+/lib/x86_64-linux-gnu/libc.so.6(malloc+0xfe) [0x73fad1de99ce]
+/sage/.venv/bin/python() [0x1803a33]
+/sage/.venv/bin/python() [0x1851875]
+/sage/.venv/bin/python(PyDict_SetItem+0x4af) [0x1850347]
+/sage/.venv/lib/python3.14/site-packages/sage/libs/gap/util.cpython-314-x86_64-linux-gnu.so(+0xd493) [0x73fa5bfb3493]
+/sage/.venv/lib/python3.14/site-packages/sage/libs/gap/element.cpython-314-x86_64-linux-gnu.so(+0x2fd32) [0x73fa5bff7d32]
+/sage/.venv/lib/python3.14/site-packages/sage/libs/gap/element.cpython-314-x86_64-linux-gnu.so(+0x1cd50) [0x73fa5bfe4d50]
+/sage/.venv/lib/python3.14/site-packages/sage/libs/gap/element.cpython-314-x86_64-linux-gnu.so(+0x2d8e1) [0x73fa5bff58e1]
+/sage/.venv/lib/python3.14/site-packages/sage/libs/gap/element.cpython-314-x86_64-linux-gnu.so(+0x46129) [0x73fa5c00e129]
+/sage/.venv/lib/python3.14/site-packages/sage/libs/gap/element.cpython-314-x86_64-linux-gnu.so(+0x46f4b) [0x73fa5c00ef4b]
+/sage/.venv/bin/python() [0x182dd50]
+/sage/.venv/lib/python3.14/site-packages/sage/libs/gap/element.cpython-314-x86_64-linux-gnu.so(+0x2be4c) [0x73fa5bff3e4c]
+/sage/.venv/bin/python() [0x1807764]
+/sage/.venv/bin/python() [0x1812dbd]
+/sage/.venv/lib/python3.14/site-packages/sage/categories/action.cpython-314-x86_64-linux-gnu.so(+0x11a89) [0x73facf98ba89]
+/sage/.venv/lib/python3.14/site-packages/sage/structure/coerce.cpython-314-x86_64-linux-gnu.so(+0x29c7f) [0x73facfd10c7f]
+/sage/.venv/lib/python3.14/site-packages/sage/structure/element.cpython-314-x86_64-linux-gnu.so(+0x28705) [0x73fad04ca705]
+/sage/.venv/bin/python() [0x18c22fd]
+/sage/.venv/bin/python() [0x18c19c2]
+/sage/.venv/bin/python(PyNumber_Multiply+0x6f) [0x1862849]
+/sage/.venv/bin/python() [0x1801270]
+/sage/.venv/bin/python() [0x1812dbd]
+/sage/.venv/bin/python() [0x1812656]
+/sage/.venv/bin/python() [0x1831230]
+/sage/.venv/bin/python() [0x1812dbd]
+/sage/.venv/bin/python() [0x1930c55]
+/sage/.venv/bin/python() [0x1807764]
+/sage/.venv/bin/python() [0x1812dbd]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x182cc) [0x73fad02412cc]
+/sage/.venv/bin/python() [0x1807764]
+/sage/.venv/bin/python() [0x1812dc6]
+/sage/.venv/bin/python() [0x1813512]
+/sage/.venv/bin/python() [0x18079ad]
+/sage/.venv/bin/python() [0x1856fc0]
+/sage/.venv/bin/python() [0x1855b91]
+/sage/.venv/bin/python(PyEval_EvalCode+0xa6) [0x189b67c]
+/sage/.venv/bin/python() [0x18e2351]
+/sage/.venv/bin/python() [0x1a7048d]
+/sage/.venv/bin/python() [0x1a702c1]
+/sage/.venv/bin/python() [0x1984486]
+/sage/.venv/bin/python() [0x19843d4]
+/sage/.venv/bin/python() [0x19842e3]
+/sage/.venv/bin/python(Py_RunMain+0x40c) [0x1984f0c]
+/sage/.venv/bin/python() [0x1984ad6]
+/sage/.venv/bin/python() [0x198492c]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29ca8) [0x73fad1d70ca8]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x85) [0x73fad1d70d65]
+/sage/.venv/bin/python(_start+0x29) [0x19fab29]
+------------------------------------------------------------------------
