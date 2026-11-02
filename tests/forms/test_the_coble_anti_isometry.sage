@@ -33,12 +33,11 @@ def _coble_discriminant_forms():
     The construction is the report's own, called directly: ``S`` with Gram
     ``diagonal_matrix(ZZ, [2] + [-2]*10)`` and ``T`` with Gram
     ``block_diagonal_matrix(matrix(ZZ, [[2]]), 2*U, 2*(-E8 Cartan))``, where the
-    E8 Cartan matrix comes from ``CartanMatrix(["E", 8])``.  Two spellings are
-    forced by this session and change no number: ``int(8)`` because the preparser
-    makes the literal a library integer, which Sage's ``CartanMatrix`` rejects,
-    and ``int(2)`` for the scalar factors because a library integer has no action
-    on a Sage matrix space (recorded in ``TRAPS.md``); Sage's own ``Integer``
-    gives exactly these matrices, as the assertions on the assembled Gram show.
+    E8 Cartan matrix comes from ``CartanMatrix(["E", 8])``.  One spelling is
+    forced by this session and changes no number: ``int(8)``, because the
+    preparser makes the literal a library integer and Sage's ``CartanMatrix``
+    rejects that — a different contract from the scalar action, which now works,
+    so the scalar factors keep the report's own ``2 * U`` spelling.
     """
     from sage.combinat.root_system.cartan_matrix import CartanMatrix
     from sage.matrix.constructor import (
@@ -51,10 +50,8 @@ def _coble_discriminant_forms():
     e8 = -CartanMatrix(["E", int(8)])
     assert e8.nrows() == 8 and e8.base_ring() is SageZZ
     hyperbolic = matrix(SageZZ, [[0, 1], [1, 0]])
-    s_gram = diagonal_matrix(SageZZ, [int(2)] + [int(-2)] * 10)
-    t_gram = block_diagonal_matrix(
-        matrix(SageZZ, [[int(2)]]), int(2) * hyperbolic, int(2) * e8
-    )
+    s_gram = diagonal_matrix(SageZZ, [2] + [-2] * 10)
+    t_gram = block_diagonal_matrix(matrix(SageZZ, [[2]]), 2 * hyperbolic, 2 * e8)
     assert s_gram.nrows() == 11 and t_gram.nrows() == 11
 
     coble_s = Lattices(ZZ)([list(row) for row in s_gram.rows()])

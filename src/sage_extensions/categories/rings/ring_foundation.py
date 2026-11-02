@@ -1,5 +1,7 @@
 """Owned scalar hierarchy and the boundary to Sage computation rings."""
 
+import operator
+
 from abc import ABCMeta
 from collections.abc import Mapping
 from functools import wraps
@@ -26,6 +28,7 @@ from sage.all import (
 from sage.all import (
     matrix as _SageMatrix,
 )
+from sage.categories.action import Action
 from sage.arith.misc import (
     euler_phi as _engine_euler_phi,
 )
@@ -4501,6 +4504,39 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
 
             return FormalPowerSeriesRings(self)(*args, **kwargs)
 
+        def _get_action_(self, source, op, self_on_left):
+            r"""Return ``r * M`` and ``M * r`` for a Sage matrix ``M`` and a scalar here.
+
+            Sage's coercion model asks the *actor's* parent for an action, and for
+            ``MatrixSpace`` it has none from an owned ring: the scalar of an
+            integer literal in a session belongs to this library's integers, not
+            to Sage's, so ``2 * M`` for a Sage matrix ``M`` fails with
+            ``unsupported operand parent(s)`` even though ``M * 2`` and
+            ``2 * M.rows()[0][0]`` work.  This is the same shape as the power
+            action the monoid owner states for owned exponents: the action is
+            declared where the actor is owned, and it scales the matrix in the
+            matrix's own base ring — no new representation and no change to the
+            caller's scalar type.
+
+            The action is offered only when the matrix's base ring admits the
+            scalar: an owned base admits it by coercion, and a Sage base must
+            coerce from the owned ring's engine realization.  Otherwise the
+            question falls through to ``super()``, so a matrix space that cannot
+            be scaled is not given a bogus action.
+            """
+            import operator
+
+            from sage.matrix.matrix_space import MatrixSpace
+
+            if op is not operator.mul or not isinstance(source, MatrixSpace):
+                return super()._get_action_(source, op, self_on_left)
+            base = source.base_ring()
+            if not _matrix_base_admits_scalars_from(self, base):
+                return super()._get_action_(source, op, self_on_left)
+            if self_on_left is False and _matrix_base_is_commutative(base) is not True:
+                return super()._get_action_(source, op, self_on_left)
+            return _OwnedScalarOnSageMatrices(self, source, self_on_left)
+
         def matrix_space(self, nrows=1, ncols=None):
             r"""Return the finite matrix Mor over this ring, as an algebra when square.
 
@@ -7472,6 +7508,64 @@ def _owned_complex_field():
     from sage_extensions.rings.complex import CC
 
     return CC
+
+
+class _OwnedScalarOnSageMatrices(Action):
+    r"""The action of an owned scalar on a Sage matrix space, entry by entry.
+
+    ``r * M`` and ``M * r`` are the matrix whose entries are ``r`` multiplied in
+    the matrix's own base ring.  The scalar crosses into that ring first — by
+    coercion when the base ring is owned, and through the owned ring's engine
+    realization when the base ring is a Sage ring — so the arithmetic is the base
+    ring's and nothing is rebuilt in a second representation.
+    """
+
+    def __init__(self, ring, matrix_space, is_left) -> None:
+        Action.__init__(self, ring, matrix_space, is_left, operator.mul)
+
+    def _act_(self, scalar, matrix):
+        base = matrix.parent().base_ring()
+        coefficient = _owned_scalar_in_matrix_base(scalar, base)
+        return matrix * coefficient
+
+
+def _matrix_base_is_commutative(base):
+    r"""Whether ``base`` is known to be commutative, as a matrix base ring."""
+    from sage_extensions.categories.rings.ring_foundation import OwnedRings
+
+    if base in OwnedRings():
+        return base in OwnedRings().Commutative()
+    try:
+        return bool(base.is_commutative())
+    except AttributeError:
+        return None
+
+
+def _matrix_base_admits_scalars_from(ring, base) -> bool:
+    r"""Whether ``base`` reads a scalar of ``ring``, so that scaling is defined.
+
+    An owned base reads it by coercion.  A Sage base reads it when it coerces
+    from the owned ring's engine realization, which is the same statement the
+    engine adapters make elsewhere; a base with no such coercion declines the
+    action rather than receiving a guessed one.
+    """
+    from sage_extensions.categories.rings.ring_foundation import OwnedRings
+
+    if base in OwnedRings():
+        return bool(base is ring or base.has_coerce_map_from(ring))
+    engine = _engine_ring(ring)
+    if engine is None:
+        return False
+    return bool(base is engine or base.has_coerce_map_from(engine))
+
+
+def _owned_scalar_in_matrix_base(scalar, base):
+    r"""Return ``scalar`` read in ``base``, the matrix's own base ring."""
+    from sage_extensions.categories.rings.ring_foundation import OwnedRings
+
+    if base in OwnedRings():
+        return base(scalar)
+    return base(scalar.parent()._engine_element(scalar))
 
 
 def _owned_ring(ring):
