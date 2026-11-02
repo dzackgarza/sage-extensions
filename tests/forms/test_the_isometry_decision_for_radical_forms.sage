@@ -23,6 +23,7 @@ radical order separates them), and ``(Z/4)^2`` with ``diag(1/2, 1/2)``.
 
 from sage_extensions.all import *  # noqa: F401,F403
 from sage_extensions.categories.modules.framed.formed import (
+    TorsionBilinearFormModules,
     TorsionQuadraticFormModules,
 )
 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import (
@@ -150,3 +151,37 @@ def test_an_undecided_pair_is_reported_as_undecided_not_as_isometric() -> None:
     )
     with pytest.raises(TypeError, match="undecided"):
         copy.is_isomorphic(other)
+
+
+def test_the_bilinear_flavour_reduces_and_decides_the_same_way() -> None:
+    r"""``b`` on ``Z/4``: the radical is order two, the quotient exists, and the decision answers.
+
+    A bilinear form always descends to ``M/R`` — its polar form vanishes on its own
+    radical by definition — so the reduction is available there without the
+    quadratic vanishing condition, while the witness remains a typed isometry of
+    the bilinear flavour.
+    """
+    values = FractionFieldQuotients(ZZ)(1)
+
+    def bilinear(relation_rows, gram):
+        return TorsionBilinearFormModules(ZZ).from_relations_and_gram(
+            relation_rows, gram, values
+        )
+
+    first, second = bilinear([[4]], [[HALF]]), bilinear([[4]], [[HALF]])
+    zero = bilinear([[4]], [[0]])
+
+    assert first.polar_radical().cardinality() == 2
+    assert first.nondegenerate_quotient().cardinality() == 2
+    assert first.is_isomorphic(second) is True
+    witness = first.isometry_to(second)
+    assert isinstance(witness, TorsionFormIsometry)
+    assert witness.is_quadratic() is False
+    generator = first.module_generators()[0]
+    assert second.b(witness.forward()(generator), witness.forward()(generator)) == first.b(
+        generator, generator
+    )
+
+    assert zero.polar_radical().cardinality() == 4
+    assert first.is_isomorphic(zero) is False
+    assert first.isometry_to(zero) is None

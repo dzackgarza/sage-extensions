@@ -2605,6 +2605,70 @@ class FormModules(OwnedCategoryOverBaseRing):
                         for right in elements
                     )
 
+                def polar_radical(self):
+                    r"""Return the radical of the polar form, as a subobject of this form.
+
+                    The radical is ``{x : b(x, y) = 0 for every y}``, the kernel of
+                    ``x |-> b(x, -)``; it is built by the module's own kernel owner
+                    and carries this form, so it can be used wherever a subobject of
+                    this form is expected.
+                    """
+                    return _torsion_form_polar_radical(
+                        self, quadratic=self._torsion_form_is_quadratic()
+                    )
+
+                def nondegenerate_quotient(self):
+                    r"""Return this form reduced by its polar radical.
+
+                    The polar form vanishes on its own radical by definition, so a
+                    *bilinear* form always descends to ``M/R``.  A quadratic form
+                    descends exactly when ``q`` vanishes on the radical, since
+                    ``q(x + r) = q(x) + q(r) + b(x, r) = q(x) + q(r)``; otherwise
+                    the quotient would silently lose the functional ``q|_R``, and
+                    that case is refused.
+
+                    The quotient module is the cokernel of the radical's inclusion,
+                    and the Gram is read on the images of this form's generators —
+                    the same statement as the general subquotient, without its
+                    enumeration of the module (measured: 0.33 s against 10.6 s on
+                    ``(Z/4)^2``).  The subquotient stays the fallback when the
+                    generator counts do not line up.
+                    """
+                    quadratic = self._torsion_form_is_quadratic()
+                    radical = self.polar_radical()
+                    inclusion = radical.inclusion()
+                    if quadratic:
+                        embedded = tuple(
+                            inclusion(generator)
+                            for generator in radical.module_generators()
+                        )
+                        if not self.form_vanishes_on(embedded):
+                            raise ValueError(
+                                f"the form of {self} descends to the quotient by its polar radical only "
+                                f"when it vanishes on that radical, and it does not"
+                            )
+                    quotient_module = inclusion.cokernel()
+                    generators = tuple(self.module_generators())
+                    if len(generators) != len(
+                        tuple(quotient_module.module_generating_set())
+                    ):
+                        return _torsion_form_subquotient(
+                            self,
+                            radical,
+                            self.subobject_generated_by(self.module_generators()),
+                            quadratic=quadratic,
+                        )
+                    category = (
+                        TorsionQuadraticFormModules(self.base_ring())
+                        if quadratic
+                        else TorsionBilinearFormModules(self.base_ring())
+                    )
+                    return category.from_module(
+                        quotient_module,
+                        _form_gram_on(self, generators, quadratic=quadratic),
+                        self.value_module(),
+                    )
+
                 def gram_matrix(self):
                     representative = _representative_gram(
                         self,
@@ -3616,62 +3680,6 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                     return all(
                         self.q(element) == self.value_module().zero()
                         for element in elements
-                    )
-
-                def polar_radical(self):
-                    r"""Return the radical of the polar form, as a subobject of this form.
-
-                    The radical is ``{x : b(x, y) = 0 for every y}``; it is the
-                    kernel of the module morphism ``x |-> b(x, -)``, built by the
-                    module's own kernel owner.
-                    """
-                    return _torsion_form_polar_radical(self, quadratic=True)
-
-                def nondegenerate_quotient(self):
-                    r"""Return this form reduced by its polar radical.
-
-                    ``q(x + r) = q(x) + q(r) + b(x, r) = q(x) + q(r)`` for ``r`` in
-                    the radical, so the quotient carries the descended ``q``
-                    exactly when ``q`` vanishes on the radical — refused otherwise,
-                    since the quotient would silently lose that functional.  The
-                    quotient module is the cokernel of the radical's inclusion and
-                    the Gram is read on the images of this form's generators, which
-                    is the same statement as the general subquotient but without
-                    enumerating the module to check containment and perpendicularity
-                    (measured: 0.33 s against 10.6 s on ``(Z/4)^2``).
-
-                    The reduction is a necessary invariant of an isometry, not a
-                    sufficient one: two forms with isomorphic quotients may still
-                    differ by how the radical sits inside them.
-                    """
-                    radical = self.polar_radical()
-                    inclusion = radical.inclusion()
-                    embedded = tuple(
-                        inclusion(generator)
-                        for generator in radical.module_generators()
-                    )
-                    if not self.form_vanishes_on(embedded):
-                        raise ValueError(
-                            f"the form of {self} descends to the quotient by its polar radical only when "
-                            f"it vanishes on that radical, and it does not"
-                        )
-                    quotient_module = inclusion.cokernel()
-                    generators = tuple(self.module_generators())
-                    if len(generators) != len(
-                        tuple(quotient_module.module_generating_set())
-                    ):
-                        # A different generator count: let the general subquotient
-                        # state the reduction rather than aligning a Gram by hand.
-                        return _torsion_form_subquotient(
-                            self,
-                            radical,
-                            self.subobject_generated_by(self.module_generators()),
-                            quadratic=True,
-                        )
-                    return TorsionQuadraticFormModules(self.base_ring()).from_module(
-                        quotient_module,
-                        _form_gram_on(self, generators, quadratic=True),
-                        self.value_module(),
                     )
 
                 def gram_matrix(self):

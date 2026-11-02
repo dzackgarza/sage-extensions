@@ -989,19 +989,25 @@ def _radical_isometry_decision(first, second, *, quadratic: bool):
     # Where the form vanishes on the radical it descends to the quotient, and an
     # isometry of the forms restricts to one of the quotient forms; that gives a
     # second necessary condition, and a proof of ``False`` when it fails.
+    # Whether q vanishes on the radical is an isometry invariant (the radical goes
+    # to the radical), so a difference decides against isometry.  For a bilinear
+    # form b vanishes there by definition and the question does not arise.
+    first_vanishes = _torsion_form_vanishes_on_radical(
+        first, first_radical, quadratic=quadratic
+    )
+    second_vanishes = _torsion_form_vanishes_on_radical(
+        second, second_radical, quadratic=quadratic
+    )
+    if quadratic and first_vanishes is not second_vanishes:
+        return False
     # The reduction's own containment checks enumerate the module, so it is
     # taken only where that is bounded; past that the quotient form contributes
     # nothing and the decision falls through to the witness search.
     if (
-        quadratic
-        and int(first.cardinality()) <= 256
+        int(first.cardinality()) <= 256
         and int(second.cardinality()) <= 256
-        and _torsion_form_vanishes_on_radical(
-            first, first_radical, quadratic=quadratic
-        )
-        and _torsion_form_vanishes_on_radical(
-            second, second_radical, quadratic=quadratic
-        )
+        and (first_vanishes or not quadratic)
+        and (second_vanishes or not quadratic)
     ):
         try:
             first_quotient = first.nondegenerate_quotient()
