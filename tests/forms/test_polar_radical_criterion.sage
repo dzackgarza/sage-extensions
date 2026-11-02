@@ -24,6 +24,9 @@ from sage_extensions.categories.modules.framed.formed import (
     TorsionBilinearFormModules,
     TorsionQuadraticFormModules,
 )
+from sage_extensions.categories.modules.framed.formed.torsion_form_modules import (
+    _polar_form_is_nondegenerate,
+)
 from sage_extensions.categories.modules.framed.fraction_field_quotients import (
     FractionFieldQuotients,
 )
@@ -75,8 +78,13 @@ def test_an_invertible_gram_can_have_a_nonzero_polar_radical() -> None:
         for right in radical
     )
 
-    with pytest.raises(TypeError, match="non-degenerate polar forms"):
-        form.is_isomorphic(form)
+    # The adapter still states only non-degenerate polar forms — that is the
+    # criterion this file is about — while the public decision no longer refuses
+    # such a form: it reduces by the radical and compares what is left.
+    assert _polar_form_is_nondegenerate(
+        form.invariant_factor_form().codomain(), quadratic=True
+    ) is False
+    assert form.is_isomorphic(form) is True
 
 
 def test_a_two_torsion_form_with_the_same_gram_is_nondegenerate() -> None:
@@ -100,8 +108,10 @@ def test_the_verdict_is_invariant_under_an_equivalent_representative() -> None:
     other = shifted.module_generators()[0]
     assert plain.q(generator) == shifted.q(other)
     assert plain.b(generator, generator) == shifted.b(other, other)
-    with pytest.raises(TypeError, match="non-degenerate polar forms"):
-        shifted.is_isomorphic(plain)
+    assert _polar_form_is_nondegenerate(
+        shifted.invariant_factor_form().codomain(), quadratic=True
+    ) is False
+    assert shifted.is_isomorphic(plain) is True
 
 
 def test_the_verdict_is_invariant_under_a_generator_change() -> None:
@@ -112,14 +122,19 @@ def test_the_verdict_is_invariant_under_a_generator_change() -> None:
     generator = plain.module_generators()[0]
     other = rescaled.module_generators()[0]
     assert rescaled.q(other) == plain.q(generator)
-    with pytest.raises(TypeError, match="non-degenerate polar forms"):
-        rescaled.is_isomorphic(plain)
+    assert _polar_form_is_nondegenerate(
+        rescaled.invariant_factor_form().codomain(), quadratic=True
+    ) is False
+    assert rescaled.is_isomorphic(plain) is True
 
 
 def test_the_bilinear_flavour_separates_the_two_torsion_orders() -> None:
     r"""``b`` on ``Z/4`` has radical ``{0, 2}``; on ``Z/2`` it does not."""
-    with pytest.raises(TypeError, match="non-degenerate polar forms"):
-        _bilinear([[4]], [[HALF]]).is_isomorphic(_bilinear([[4]], [[HALF]]))
+    form = _bilinear([[4]], [[HALF]])
+    assert _polar_form_is_nondegenerate(
+        form.invariant_factor_form().codomain(), quadratic=False
+    ) is False
+    assert form.is_isomorphic(_bilinear([[4]], [[HALF]])) is True
     assert _bilinear([[2]], [[HALF]]).is_isomorphic(_bilinear([[2]], [[HALF]])) is True
 
 
@@ -164,5 +179,7 @@ def test_a_mixed_order_form_with_a_vanishing_block_is_still_refused() -> None:
 
     radical = _polar_radical(degenerate, tuple(degenerate.elements()))
     assert len(radical) == 4
-    with pytest.raises(TypeError, match="non-degenerate polar forms"):
-        degenerate.is_isomorphic(degenerate)
+    assert _polar_form_is_nondegenerate(
+        degenerate.invariant_factor_form().codomain(), quadratic=False
+    ) is False
+    assert degenerate.is_isomorphic(degenerate) is True

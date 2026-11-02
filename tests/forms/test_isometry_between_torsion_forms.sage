@@ -128,13 +128,13 @@ def test_the_bilinear_flavour_has_the_same_witness_contract() -> None:
     assert source.b(generator, generator) == target.b(image, image)
 
 
-def test_a_radical_polar_form_is_a_form_but_outside_the_normal_form_engine() -> None:
-    r"""The refusal names the boundary instead of failing on a cardinality.
+def test_a_radical_polar_form_is_a_form_and_is_now_decided() -> None:
+    r"""``(Z/2)^2`` with a unit radical: the decision reduces instead of refusing.
 
-    ``(Z/2)^2`` with ``q = 1/2`` on both generators and ``b(e_0,e_1) = 1/2`` has
-    polar radical ``<(1,1)>``, and ``q`` is still constant on classes, so the
-    object is a form.  The engine's adapter states only non-degenerate polar
-    forms, which it must, so the decision refuses and says why.
+    ``q = 1/2`` on both generators with ``b(e_0,e_1) = 1/2`` has polar radical
+    ``<(1,1)>``, and ``q`` is constant on classes there, so the object is a form.
+    The engine's adapter states only non-degenerate polar forms, so the decision
+    goes through the reduction — a form is isometric to itself, with a witness.
     """
     values = FractionFieldQuotients(ZZ)(2)
     half = QQ(1) / QQ(2)
@@ -146,7 +146,11 @@ def test_a_radical_polar_form_is_a_form_but_outside_the_normal_form_engine() -> 
     assert (element == element + 2 * first) is True
     assert form.q(element) == form.q(element + 2 * first)
 
-    with pytest.raises(TypeError, match="non-degenerate polar forms"):
-        form.is_isomorphic(form)
-    with pytest.raises(TypeError, match="non-degenerate polar forms"):
-        form.isometry_to(form)
+    assert form.polar_radical().cardinality() == 2
+    assert form.is_isomorphic(form) is True
+    copy = TorsionQuadraticFormModules(ZZ).from_relations_and_gram(
+        [[2, 0], [0, 2]], [[half, half], [half, half]], values
+    )
+    witness = form.isometry_to(copy)
+    assert isinstance(witness, TorsionFormIsometry)
+    assert copy.q(witness.forward()(first)) == form.q(first)
