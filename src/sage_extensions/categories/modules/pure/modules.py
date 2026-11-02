@@ -5238,12 +5238,18 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
                 .lift(element.underlying_element())
             )
             framing = self.module_generating_set()
+            extension_ring = self._ring_map.codomain()
             coefficients = {}
             for module_label, coefficient in (
                 module_coordinates.parent()
                 ._selected_module_coefficients(module_coordinates)
                 .items()
             ):
+                # The frame of the extension is stated over *its* base ring, while
+                # the scalar basis is stated over the extension ring itself; for
+                # the regular reading these differ, and the coefficient is the
+                # class the base coefficient defines.
+                coefficient = extension_ring(coefficient)
                 scalar_coordinates = self._scalar_basis.coordinates(coefficient)
                 for scalar_label, value in scalar_coordinates.items():
                     coefficients[framing((scalar_label, module_label))] = (
