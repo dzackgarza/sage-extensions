@@ -7092,23 +7092,46 @@ def _owned_ring_category(
 
 
 def _install_self_module_placement(ring) -> None:
-    r"""Place ``ring`` among the objects of ``Modules(ring)``.
+    r"""Place ``ring`` among the objects of its module category, with its basis.
 
-    A ring is a module over itself: its elements are the ring's elements and the
-    scalar action is the ring's multiplication.  The coefficient module the ring
-    constructor already installed is a different structure, over the coefficient
-    base, and is untouched.  Only membership is stated here — which is what a
-    construction asks when it accepts a ring as the codomain of a module
-    morphism — and the ring's presentation, string form and hashing are
-    unchanged.
+    A ring is a module over its base ring — ``module_category()`` reports
+    ``Modules(ring.base_ring())`` — and that reading is cyclic: the class of the
+    unit generates it, so its canonical basis is ``{1}``, the same basis the
+    native module frames state for a regular module.  The frame is registered
+    under exactly the owner ``module_category()`` answers with, which is what
+    ``module_generating_set()`` and ``has_selected_module_resolution()`` look up.
+    A ring whose own module construction already supplies that basis (a native
+    free algebra and its regular module) keeps it: this owner only fills the gap
+    for the rings that state no basis of themselves, and it states the same one.
     """
-    from sage_extensions.categories.modules.pure.modules import Modules
+    from sage_extensions.categories.modules.pure.modules import (
+        Modules,
+        _fix_selected_module_resolution,
+    )
+    from sage_extensions.categories.rings.commutative_algebra import QuotientRings
     from sage_extensions.refine import refine
 
     placement = Modules(ring)
-    if ring in placement:
+    if ring not in placement:
+        refine(ring, placement)
+    if ring not in QuotientRings():
+        # A native free algebra supplies this basis through its own module
+        # construction, and a localization is read over its source; the class
+        # of the unit generates a quotient over its cover, which is what is
+        # stated here.
         return
-    refine(ring, placement)
+    if ring.has_selected_module_resolution():
+        return
+    base = ring.base_ring()
+    free = base.free_module(1)
+    labels = free.module_generating_set()
+    _fix_selected_module_resolution(
+        ring,
+        base,
+        labels,
+        lambda label: ring.one(),
+        lambda: free,
+    )
 
 
 def _install_engine_selected_ring_data(ring, engine) -> None:
