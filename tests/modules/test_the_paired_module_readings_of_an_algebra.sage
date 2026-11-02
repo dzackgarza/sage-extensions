@@ -106,3 +106,33 @@ def test_one_generator_over_the_cover_still_does_not_make_the_quotient_projectiv
     assert residues.module_generating_set().cardinality() == 1
     with pytest.raises(ValueError):
         refine(residues, FramedFreeModules(ZZ).FinitelyGenerated())
+
+
+def test_the_restricted_frame_answers_its_pair_labelled_generators() -> None:
+    r"""``module_generator`` on a pair label is the retained basis image ``s_i m_j``.
+
+    The framing labels of ``Res_f(M)`` are pairs — a label of the scalar basis and
+    a generator of ``M`` — and the generator map must read them as such: the image
+    is the action of the scalar on the module generator, which for the regular
+    reading is the extension ring's own multiplication.  Reading it through the
+    *coefficient* action instead converts a class where a polynomial is expected,
+    which is what this pins.
+    """
+    polynomials, algebra, coefficient_composite = _specimens()
+    x = polynomials.gen()
+    reading = RestrictedScalarsModules(QQ)(algebra, coefficient_composite)
+    labels = reading.module_generating_set()
+
+    assert labels.cardinality() == 2
+    images = tuple(reading.module_generator(label) for label in labels)
+    assert images[0].underlying_element() == algebra.one()
+    assert images[1].underlying_element() == algebra(x)
+
+
+def test_the_restricted_reading_has_the_zero_relation_morphism() -> None:
+    r"""The regular reading has no relations, so its relation source is empty."""
+    _polynomials, algebra, coefficient_composite = _specimens()
+    reading = RestrictedScalarsModules(QQ)(algebra, coefficient_composite)
+
+    relations = reading.presentation()
+    assert relations.domain().module_generating_set().cardinality() == 0
