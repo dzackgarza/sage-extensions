@@ -142,13 +142,14 @@ def test_the_side_of_the_action_is_the_side_of_the_product() -> None:
     i, j, k = quaternions.gens()
     matrix_ = sage_matrix(quaternions, [[i, j], [k, i * j]])
 
+    # A scalar of a commutative ring is central, so both sides are defined over a
+    # noncommutative base and agree; noncommutation alone does not make right
+    # multiplication undefined.
+    two = quaternions(int(2))
     assert 2 * matrix_ == matrix_ + matrix_
     assert 2 * matrix_ == matrix_.parent()([int(2) * entry for entry in matrix_.list()])
-    # The right action is refused where it is not defined: a noncommutative base
-    # makes ``M * r`` a different statement, so the refusal says so instead of
-    # silently producing a product.
-    with pytest.raises(TypeError, match="cannot be acted on from the right"):
-        matrix_ * 2
+    assert matrix_ * 2 == matrix_.parent()([entry * two for entry in matrix_.list()])
+    assert 2 * matrix_ == matrix_ * 2
 
     left = _OwnedScalarOnSageMatrices(ZZ, matrix_.parent(), True)
     right = _OwnedScalarOnSageMatrices(ZZ, matrix_.parent(), False)

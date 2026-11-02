@@ -4533,11 +4533,21 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
             base = source.base_ring()
             if not _matrix_base_admits_scalars_from(self, base):
                 return super()._get_action_(source, op, self_on_left)
-            if self_on_left is False and _matrix_base_is_commutative(base) is not True:
+            if (
+                self_on_left is False
+                and _matrix_base_is_commutative(base) is not True
+                and self not in OwnedRings().Commutative()
+            ):
+                # A right action needs the scalar to be central in the base ring.
+                # A commutative scalar ring has central image, and a commutative
+                # base ring needs no assumption at all; with both sides merely not
+                # known commutative, that centrality is not established, so the
+                # statement is refused rather than guessed.  Noncommutativity of
+                # the base alone is not such a case.
                 raise TypeError(
                     f"a matrix over {base} cannot be acted on from the right by a scalar of {self}: "
-                    f"that base ring is not known to be commutative, so only the left action "
-                    f"{self} * M is defined — write the scalar on the left"
+                    f"neither ring is known to be commutative, so the scalar is not known to be "
+                    f"central in the base ring — write the scalar on the left"
                 )
             return _OwnedScalarOnSageMatrices(self, source, self_on_left)
 
