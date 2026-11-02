@@ -3481,7 +3481,7 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                     _subobject_lift=_subobject_lift,
                     _subobject_inclusion_factory=_subobject_inclusion_factory,
                 )
-                formed.validate_descent(check=False)
+                formed.validate_descent()
                 return formed
 
             def from_relations_and_gram(self, relation_rows, gram, value_module):
