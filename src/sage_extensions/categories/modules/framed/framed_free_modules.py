@@ -888,7 +888,18 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 return _poincare_duality(self, volume, degree)
 
             def _represented_vector_space_dimension(self):
-                return self.module_rank()
+                r"""Return the dimension of the selected canonical basis.
+
+                ``FramedFreeModules`` is free modules equipped with the
+                canonical *basis* map, so the cardinality of the selected basis
+                is the rank, and over a field it is the dimension.  The value is
+                read from the framing rather than through ``module_rank``: on a
+                module that is also given a chosen finite presentation, that
+                rank is computed *from* this method (over a field it reads the
+                Smith form of the relations), and delegating back to it would
+                have the two wait for each other.
+                """
+                return self.module_generating_set().cardinality()
 
             def _represented_vector_space_basis_generator_labels(self):
                 return self.module_generating_set()
@@ -905,12 +916,26 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 )
 
             @cached_method
-            def _selected_relation_morphism(self):
-                r"""Return the relation morphism ``0: F(∅) -> M``: a free module has no relations."""
+            def _free_relation_morphism(self):
+                r"""Return the relation morphism ``0: F(∅) -> M``: a free module has no relations.
+
+                This is the framed-free owner's own statement about its own
+                retained basis, so it is named here directly.  The general
+                ``_selected_relation_morphism`` contract is answered by
+                ``Modules`` for a module that states no presentation, and a
+                joined parent can resolve that name before this one; the
+                presentation of a framed free module is not something a
+                shadowing generic answer may replace.
+                """
                 relations = _fresh_free_module_on(self.base_ring(), Sets.Δ[-1])
                 return relations.module_category().Mor(relations, self)(
                     lambda label: self.zero()
                 )
+
+            @cached_method
+            def _selected_relation_morphism(self):
+                r"""Return the relation morphism ``0: F(∅) -> M``: a free module has no relations."""
+                return self._free_relation_morphism()
 
             def presentation(self):
                 r"""Return the chosen presentation ``0: F_1 = R^(∅) -> F_0 = M`` of this framed free module.
@@ -927,7 +952,7 @@ class FramedFreeModules(OwnedCategoryOverBaseRing):
                 selected = self.selected_module_resolution()
                 match selected.truncation():
                     case 0:
-                        return self._selected_relation_morphism()
+                        return self._free_relation_morphism()
                     case _:
                         return selected.differential(1)
 

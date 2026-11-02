@@ -3617,7 +3617,16 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                 quotient, self.zero_subobject().inclusion()
             )
 
-        def presentation(self):
+        def algebra_presentation(self):
+            r"""Return the selected finite algebra presentation as a labelled family.
+
+            ``presentation()`` is the *module* owner's name — the relation
+            morphism ``F_1 -> F_0`` of a chosen finite module presentation — and
+            an algebra that is also a module with one answers it with that
+            morphism.  The algebra presentation is the free algebra on the
+            algebra generators together with the relations, which is a
+            different datum and is named for the structure it presents here.
+            """
             labels = finite_ordered_set(("presentation_ring", "relations"))
             values = {
                 "presentation_ring": self.presentation_ring(),
@@ -5552,7 +5561,24 @@ def _algebra_structure_on(
             lambda element: scalar_action(scalar, element)
         )
     )
-    module = Modules(base)(rho)
+    from sage_extensions.categories.modules.pure.modules import (
+        _restricted_scalars_view,
+    )
+
+    if (
+        selected_ring in OwnedRings()
+        and selected_ring._module_basis_along(structure_map) is not None
+    ):
+        # The module this algebra is built on is the ring read as an ``R``-module
+        # along its own structure map, and the ring states a basis for exactly
+        # that reading.  Building it through the restriction-of-scalars
+        # constructor keeps the stated basis, the finite presentation and the
+        # module's own arithmetic; the bare scalar action ``rho`` below states
+        # the same group and action but no basis, and a basis is not invented
+        # here.
+        module = _restricted_scalars_view(selected_ring, structure_map)
+    else:
+        module = Modules(base)(rho)
     tensor = Modules(base).tensor_product((module, module))
     multiplication = tensor.from_bilinear_map(
         module,

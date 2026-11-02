@@ -33,6 +33,7 @@ from sage_extensions.categories.modules.pure.modules import (
     ModulesWithChosenFinitePresentation,
     VectorSpaces,
     _biproduct_label,
+    _coordinate_framed_free_module,
     _coordinate_images,
     _engine_matrix,
     _morphism_from_engine_matrix,
@@ -666,9 +667,13 @@ class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
             return _selected_presentation_kernel(morphism)
 
         def _represented_cokernel_of_morphism(self, morphism):
-            if morphism.codomain() is not self:
-                return NotImplemented
-            return _presented_module_from_morphism(morphism, _cokernel_morphism=morphism)
+            if morphism.codomain() is self:
+                return _presented_module_from_morphism(
+                    morphism, _cokernel_morphism=morphism
+                )
+            if morphism.domain() is self:
+                return _cokernel_into_a_framed_free_codomain(morphism)
+            return NotImplemented
 
         def _presented_module_from_relation_morphism(
             self,
@@ -2353,11 +2358,44 @@ def _relation_morphism(module):
             f"{module} has no relation morphism: it is not a module with chosen finitely many "
             f"generators and relations, but is in {module.category()}"
         )
-    relations = module._selected_relation_morphism()
+    relations = module.presentation()
     if relations is None:
         raise TypeError(f"{module} is finitely presented, but its relations are not known explicitly")
     return relations._framed_coordinate_morphism()
 
+
+def _cokernel_into_a_framed_free_codomain(morphism):
+    r"""Return ``coker(f: M -> N)`` for a presented domain ``M`` and a framed free ``N``.
+
+    The domain states a chosen presentation ``M = coker(r)`` and the codomain's
+    selected framing ``F(N) -> N`` is a *basis*, hence an isomorphism, so the
+    quotient ``N/f(M)`` is the cokernel of the composite ``F(M) -> M -> N``
+    read in coordinates: ``coker(F(M) -> F(N))``.  The framing of ``N`` is
+    never assumed to be a basis — ``_coordinate_framed_free_module`` decides
+    that — and ``M``'s own relations are not needed, because they are killed by
+    any map out of ``M``.  The kernel counterpart is
+    :func:`_selected_presentation_kernel`, which needs the codomain's relations
+    because the preimage of them is what it computes.
+    """
+    domain = morphism.domain()
+    codomain = morphism.codomain()
+    ring = _owned_ring(domain.base_ring())
+    if _owned_ring(codomain.base_ring()) is not ring:
+        return NotImplemented
+    if domain not in ModulesWithChosenFinitePresentation(ring):
+        return NotImplemented
+    if not _coordinate_framed_free_module(codomain, ring):
+        return NotImplemented
+    source = domain.framing_source()
+    target = codomain.framing_source()
+    framing = codomain.framing_morphism()
+    lift = source.module_category().Mor(source, target)(
+        {
+            label: framing.lift(morphism(domain.module_generator(label)))
+            for label in source.module_generating_set()
+        }
+    )
+    return _presented_module_from_morphism(lift)
 
 
 def _selected_presentation_kernel(morphism):
@@ -2390,7 +2428,15 @@ def _selected_presentation_kernel(morphism):
     selected = ModulesWithChosenFinitePresentation(ring)
     if domain not in selected or codomain not in selected:
         return NotImplemented
-    if domain._selected_relation_morphism() is None or codomain._selected_relation_morphism() is None:
+    try:
+        for endpoint in (domain, codomain):
+            _relation_morphism(endpoint)
+    except TypeError:
+        # ``_relation_morphism`` raises exactly when an endpoint does not state
+        # its relations explicitly; that is this adapter's refusal, not an
+        # error.  A framed free endpoint states the zero relation morphism from
+        # ``F(∅)`` — an empty relation family, which is the statement a basis
+        # makes — and the preimage argument below runs with no target relations.
         return NotImplemented
     labels = domain.module_generating_set()
     if labels.cardinality().is_finite() and all(

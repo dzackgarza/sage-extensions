@@ -5019,7 +5019,39 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
 
         def is_zero(self) -> bool:
             r"""Return whether the unchanged underlying additive group is zero."""
-            return self.module_over_extension().is_zero()
+            extension = self.module_over_extension()
+            if extension in OwnedRings() and self.ring_map().codomain() is extension:
+                # The reading is the ring along a map that ends at it: its
+                # additive group is the ring's, which is zero exactly when the
+                # ring is the zero ring, i.e. when its unit is its zero.  An
+                # undecided equality states no zero predicate rather than
+                # answering one.
+                match extension.one() == extension.zero():
+                    case True:
+                        return True
+                    case False:
+                        return False
+                    case _:
+                        return NotImplemented
+            return extension.is_zero()
+
+        def _module_with_structure(self, categories, construction_data):
+            r"""Retain this restriction of scalars and add ``categories`` to it.
+
+            The reading is defined by its pair ``(module_over_extension,
+            ring_map)``, not by its presentation: rebuilding it from the
+            presentation would give a different realization whose elements are
+            coordinates rather than the extension's elements.  So the
+            constructor that made this reading is the one that adds the
+            stronger structure, keeping the retained scalar basis and
+            presentation.
+            """
+            return _restricted_scalars_view(
+                self.module_over_extension(),
+                self.ring_map(),
+                _extra_categories=tuple(categories),
+                _extra_construction_data=construction_data,
+            )
 
         def _finiteness_decision(self):
             r"""``Res_f(M)`` is the set of ``M``, so it is finite exactly when ``M`` is."""
@@ -5111,6 +5143,17 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
             element = self(element)
             extension = self.module_over_extension()
             return extension._underlying_additive_element(element.underlying_element())
+
+        def _element_from_underlying_set(self, value):
+            r"""Read a datum of the extension's underlying set as this reading's element.
+
+            Restriction of scalars keeps the underlying set — ``|Res_f(M)| =
+            |M|`` — so the datum is read in the extension module and wrapped
+            here.  There are no coordinates and no coefficient computation on
+            this path, which is what makes the reading's elements the
+            extension's elements.
+            """
+            return self.wrap(self.module_over_extension()(value))
 
         @cached_method
         def scalar_action(self):
@@ -5440,6 +5483,8 @@ def _restricted_scalars_view(
     _subobject_generator_images=None,
     _subobject_lift=None,
     _subobject_inclusion_factory=None,
+    _extra_categories=(),
+    _extra_construction_data=None,
 ):
     r"""Return ``Res_f(M)`` along ``f: R -> S``, placed by what ``M`` and ``S`` already are.
 
@@ -5453,6 +5498,11 @@ def _restricted_scalars_view(
     Along a field-to-field map with a selected finite scalar basis, an
     already represented dimension is multiplied by that basis cardinality.
     This dimension transport does not require or create a finite frame of M.
+
+    ``_extra_categories`` and ``_extra_construction_data`` are what a stronger
+    object on this exact data adds — an algebra structure, for instance — so
+    that the reading keeps its own realization instead of being rebuilt from
+    its presentation.  ``_module_with_structure`` is the caller.
     """
     extension_ring = _owned_ring(module.base_ring())
     selected_basis = (
@@ -5603,6 +5653,14 @@ def _restricted_scalars_view(
             subobject_lift=_subobject_lift,
             subobject_inclusion_factory=_subobject_inclusion_factory,
         )
+
+    # A stronger object on this reading's data (``_module_with_structure``)
+    # states its own categories and datum; the realization above stays the
+    # one this constructor selected, so the reading is never rebuilt from its
+    # presentation and loses the restriction that defines it.
+    placement.extend(_extra_categories)
+    if _extra_construction_data is not None:
+        data.update(_extra_construction_data)
 
     from sage_extensions.owned_category import _object_of, owned_category_join
 
