@@ -2394,3 +2394,15 @@ Measured, and pinned in `tests/forms/test_polar_radical_criterion.sage` (five te
 * the restriction of `q` to the radical is *checked*, not assumed: on `(Z/2)^2` skew the radical is `{0, e_0+e_1}` and on `(Z/4)^2` it is `{0, 2e_0, 2e_1, 2e_0+2e_1}`; `q` vanishes on both and is additive there. A radical form therefore reduces to a nondegenerate quotient form **only when `q` vanishes on the radical**; when `q|_R` is a nonzero homomorphism `R -> Q/2Z` the quotient loses that datum, and this is not claimed.
 
 `tests/forms`: **46 failed / 57 passed**, the same 46 FAILED ids as a clean `d4070d6` worktree, so nothing is introduced.
+
+**The published research specimen validates through the typed witness (2026-11-02, measured).** The report `dzackgarza/research` `computations/reports/coble_gluing_discriminants.py` (the artifact the capability request came from) builds `S = <2> + <-2>^{10}`, `T = <2> + 2U + 2*(-E_8 Cartan)`, `DS = S.discriminant_group()`, `DT = T.discriminant_group()`, `DTm = DT.twist(-1)`, and asks for the graph of the anti-isometry `A_S -> A_T(-1)`. Run against this library:
+
+* `|A_S| = 2048`, `|A_T| = 2048`, `DS.is_anti_isometric(DT) is True`, `DS.is_isomorphic(DTm) is True`.
+* `DS.isometry_to(DTm)` returns a **typed** `TorsionFormIsometry` whose endpoints are exactly `DS` and `DTm` (11 generators): `q` is preserved on every generator, the inverse composes to the identity there, and the anti-isometry relation `q_T(gamma x) = -q_S(x)` holds on every generator — so the twist's sign is checked, not assumed.
+* Cost: 40 s in one probe (the port's own attempt at the gluing stalled on `isometry_to` failing, which is what the request recorded).
+
+`tests/forms/test_the_coble_anti_isometry.sage` pins both statements (two tests; the pair test takes ~40 s). The Gram data are written as integers so the specimen depends only on the report's numbers; measured while building it: the *affine* `E_8` diagram (semidefinite) has a degenerate discriminant form and is refused by the criterion, while Sage's unimodular `E_8` Cartan matrix passes — a concrete instance of the criterion doing its job rather than accepting a plausible-looking matrix.
+
+Measured: `tests/forms` **46 failed / 59 passed** with the same 46 FAILED ids as a clean `d4070d6` worktree (42 passed there; the 17 extra are `test_quadratic_form_descent` 4, `test_isometry_between_torsion_forms` 6, `test_polar_radical_criterion` 5, and the Coble pair 2).
+
+**Still open in this family.** A form whose polar form has a radical (e.g. `Z/4` with `q = 1/2`) is a legitimate object that the shared API refuses with a named boundary; deciding isometry for it needs the radical split, and the reduction is only valid when the restriction of `q` to the radical vanishes (checked on the measured specimens, where it does). Nothing in that reduction is claimed beyond the measurement.
