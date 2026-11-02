@@ -3022,12 +3022,18 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
     def discriminant_lift(self, automorphism):
         r"""Return ``g in O(L)`` inducing ``automorphism`` on ``A_L``, or ``None``.
 
-        The image of ``O(L) -> O(A_L)`` is finite.  Starting from the known
-        arithmetic generators of ``O(L)``, enumerate that finite image while
-        retaining one live lattice isometry above every image element.  The
-        search is exhaustive in the generated image and therefore returns
-        ``None`` exactly when the selected discriminant automorphism is not in
-        that image; no denominator bound or lattice-vector search is used.
+        The image of ``O(L) -> O(A_L)`` is finite, but already for the
+        Enriques coinvariant lattice its order (~5*10^13) exceeds every
+        listing bound, so the image is never enumerated.  Starting from the
+        known arithmetic generators of ``O(L)``, the generated image is
+        handed to GAP, whose stabilizer-chain machinery decides membership
+        and factors ``automorphism`` as a word in the selected generator
+        images exactly when it lies in the image.  The word evaluates in the
+        selected generators of ``O(L)`` to the lift, which is then checked
+        once against ``rho_L`` itself; the answer is ``None`` exactly when
+        the automorphism is not induced by ``O(L)``, and an engine
+        inconsistency raises ``ArithmeticError`` instead of returning a wrong
+        element.
         """
         if self.domain() is not self.codomain():
             raise ValueError(
@@ -3035,11 +3041,53 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                 f"{self.codomain()}: lifts along O(L) -> O(A_L) require an orthogonal group "
                 f"O(L), and these are different lattices"
             )
-        target = self.domain().discriminant_group().orthogonal_group()
+        from sage_extensions.categories.group.groups import (
+            _element_to_engine,
+            _law_reversed,
+        )
+
+        lattice = self.domain()
+        target = lattice.discriminant_group().orthogonal_group()
         automorphism = target(automorphism)
-        representation = self.discriminant_representation()
-        witnesses = self.finite_image_lifts(representation)
-        return witnesses.get(automorphism)
+        generators = tuple(self.group_generators())
+        section = self._discriminant_word_section()
+        probe = _element_to_engine(target, automorphism)
+        if probe not in section.gap_group:
+            return None
+        letters = section.letters_of(probe)
+        if _law_reversed(target):
+            letters = letters[::-1]
+        lift = self.one()
+        for index in letters:
+            lift = lift * (generators[index - 1] if index > 0 else ~generators[-index - 1])
+        if lift.discriminant_morphism() != automorphism:
+            raise ArithmeticError(
+                f"the word-section lift of {automorphism} in O({lattice}) was checked against "
+                f"rho_L and induces {lift.discriminant_morphism()}: the retained word section is "
+                "inconsistent with the discriminant representation, so the lift cannot be trusted"
+            )
+        return lift
+
+    @cached_method
+    def _discriminant_word_section(self):
+        r"""The generated discriminant image of ``O(L)`` with its word section.
+
+        The section's factorization answers words in the positions of this
+        group's selected group generators; retaining it avoids recomputing
+        the stabilizer chain of the image subgroup on every lift.
+        """
+        from sage_extensions.categories.group.groups import (
+            _element_to_engine,
+        )
+        from sage_extensions.categories.orthogonal_quotients import _GapWordSection
+
+        lattice = self.domain()
+        target = lattice.discriminant_group().orthogonal_group()
+        images = [
+            _element_to_engine(target, generator.discriminant_morphism())
+            for generator in self.group_generators()
+        ]
+        return _GapWordSection(images)
 
     def discriminant_orthogonal_group_generator_lifts(self):
         r"""Return lifts along ``rho_L: O(L) -> O(A_L)`` of the group generators of ``O(A_L)``.

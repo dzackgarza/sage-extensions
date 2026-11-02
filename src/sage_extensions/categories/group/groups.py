@@ -7896,6 +7896,20 @@ class Subgroups(OwnedParameterizedCategory):
             match self:
                 case _ if self in GeneratedSubgroups(self.supergroup()):
                     generators = self.selected_subgroup_generators()
+                case _ if (
+                    hasattr(self, "character_data_is_complete")
+                    and self.character_data_is_complete()
+                    and hasattr(self.supergroup(), "discriminant_representation")
+                    and morphism is self.supergroup().discriminant_representation()
+                ):
+                    # A subgroup retained as chi^-1(S) by complete character
+                    # data knows its discriminant image as a generated
+                    # subgroup of O(A_L): the meet of its preimage targets
+                    # with the rho-images of the sign kernels it intersects.
+                    # Computing it from a generating family of the subgroup is
+                    # what this case avoids; it is exact by the character
+                    # quotient's construction.
+                    return self.discriminant_image()
                 case _ if self.has_selected_group_resolution():
                     generators = self.group_generators()
                 case _ if self in OwnedFiniteGroups():

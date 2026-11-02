@@ -1107,15 +1107,72 @@ class IsometryPrimitiveExtension:
         isometry = _torsion_form_isometry(forward, inverse, quadratic=group.is_quadratic())
         return group.from_morphism(isometry)
 
+    def _coinvariant_discriminant_to_invariant(self, coinvariant_automorphism):
+        r"""Conjugate a coinvariant discriminant action back across the primitive glue.
+
+        The full-discriminant hypothesis makes the conjugation of
+        :meth:`_coinvariant_discriminant_from_invariant` an isomorphism
+        ``O(A_{L^f}) -> O(A_{L^-})``; this is its inverse, written down from
+        the same retained glue maps.  It exists exactly when
+        :meth:`coinvariant_extension_subgroup` does.
+        """
+        (
+            glue,
+            invariant_form,
+            coinvariant_form,
+            _glue_source,
+            _glue_target,
+            source_inclusion,
+            target_inclusion,
+            source_inverse,
+            target_inverse,
+            glue_inverse,
+        ) = self._coinvariant_glue_inverse_maps()
+        twisted_coinvariant_form = target_inclusion.codomain()
+
+        coinvariant_automorphism = coinvariant_form.O()(coinvariant_automorphism)
+        inverse_automorphism = coinvariant_automorphism.inverse()
+        group = invariant_form.O()
+        module_mor = invariant_form.module_category().Mor(
+            invariant_form, invariant_form
+        )
+
+        def conjugated_images(action):
+            images = {}
+            for label in invariant_form.module_generating_set():
+                element = invariant_form.module_generator(label)
+                source_element = source_inverse(element)
+                target_element = glue.forward()(source_element)
+                twisted = target_inclusion(target_element)
+                coinvariant_class = coinvariant_form(twisted)
+                moved_coinvariant_class = action(coinvariant_class)
+                moved_twisted = twisted_coinvariant_form(moved_coinvariant_class)
+                moved_target = target_inverse(moved_twisted)
+                moved_source = glue_inverse(moved_target)
+                images[label] = invariant_form(source_inclusion(moved_source))
+            return images
+
+        forward = module_mor(conjugated_images(coinvariant_automorphism))
+        inverse = module_mor(conjugated_images(inverse_automorphism))
+        from sage_extensions.categories.modules.framed.formed.torsion_form_modules import (
+            _torsion_form_isometry,
+        )
+
+        isometry = _torsion_form_isometry(forward, inverse, quadratic=group.is_quadratic())
+        return group.from_morphism(isometry)
+
     def lift_coinvariant_extension_element(self, coinvariant_part):
         r"""Lift ``g_-`` from the anti-invariant extension group to ``O(L,f)``.
 
         The selected ``g_-`` already has discriminant action in the conjugate
-        of the invariant discriminant image.  Enumerate that finite image,
-        choose the matching invariant discriminant action, lift it to an
-        actual isometry of ``L^f``, and assemble the pair through the retained
-        primitive glue.  The result is an ambient centralizer element whose
-        coinvariant restriction is literally ``g_-``.
+        of the invariant discriminant image.  The full glue makes conjugation
+        an isomorphism of the two discriminant orthogonal groups, so the
+        matching invariant action is the inverse conjugate applied, lifted to
+        an actual isometry of ``L^f`` by the generated-image word section
+        (``LatticeIsometryMor.discriminant_lift``); the pair assembles
+        through the retained primitive glue.  Nothing enumerates either
+        discriminant image.  The result is an ambient centralizer element
+        whose coinvariant restriction is literally ``g_-``.
         """
         subgroup = self.coinvariant_extension_subgroup()
         if coinvariant_part not in subgroup:
@@ -1127,15 +1184,14 @@ class IsometryPrimitiveExtension:
         coinvariant_part = self.orthogonal_complement.O()(coinvariant_part)
         target_action = coinvariant_part.discriminant_morphism()
         invariant_group = self.invariant.O()
-        invariant_image = self.invariant.discriminant_image()
 
-        invariant_part = None
-        for invariant_action in invariant_image:
-            if self._coinvariant_discriminant_from_invariant(invariant_action) != target_action:
-                continue
-            invariant_part = invariant_group.discriminant_lift(invariant_action)
-            if invariant_part is not None:
-                break
+        # The glue is full, so conjugation across it is an isomorphism
+        # O(A_{L^f}) -> O(A_{L^-}) with an inverse written down by the same
+        # retained maps; the unique invariant action matching target_action is
+        # that inverse applied, not a search through the invariant image (an
+        # enumeration no listing bound survives).
+        invariant_action = self._coinvariant_discriminant_to_invariant(target_action)
+        invariant_part = invariant_group.discriminant_lift(invariant_action)
         if invariant_part is None:
             raise ArithmeticError(
                 f"{coinvariant_part} preserves the glue, but no isometry of L^f in "

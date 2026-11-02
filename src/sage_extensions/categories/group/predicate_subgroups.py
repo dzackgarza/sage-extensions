@@ -388,8 +388,8 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             supergroup_cardinality = self.supergroup().cardinality()
             if self.contains_character_kernel():
                 quotient = self.finite_character_quotient()
-                image_size = int(quotient.image_keys().cardinality())
-                subgroup_image_size = int(quotient.subgroup_image_keys().cardinality())
+                image_size = quotient.image_order()
+                subgroup_image_size = quotient.subgroup_image_order()
                 if supergroup_cardinality.is_finite():
                     order = int(supergroup_cardinality.finite_value())
                     return cardinal(order * subgroup_image_size // image_size)
@@ -468,6 +468,20 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     f"determinant, spinor norm and discriminant characters"
                 )
             return OrthogonalCharacterQuotient(self)
+
+        def discriminant_image(self):
+            r"""``rho(self)`` in ``O(A_L)``, exactly, from the retained character data.
+
+            This subgroup is ``chi^-1(S)`` for the joint character map
+            ``chi = (rho, det, sn)``; its discriminant image is the meet of
+            the retained discriminant-preimage targets with the rho-images of
+            the sign kernels it intersects, a finitely generated subgroup of
+            ``O(A_L)`` computed without any generating family of this
+            subgroup itself (``OrthogonalCharacterQuotient.discriminant_image``).
+            Incomplete character data makes the image uncharacterized, and
+            the quotient's ``ValueError`` propagates.
+            """
+            return self.finite_character_quotient().discriminant_image()
 
         def has_finite_coset_space(self) -> bool:
             r"""Whether complete finite characters realize ``G/self`` as a finite ``G``-set."""
@@ -1177,10 +1191,7 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
             subgroup of ``G`` is assumed.
             """
             quotient = character_subgroup.finite_character_quotient()
-            index_bound = (
-                int(quotient.image_keys().cardinality())
-                // int(quotient.subgroup_image_keys().cardinality())
-            )
+            index_bound = quotient.index()
             inclusion = generated.inclusion()
             restricted = generated.predicate_subgroup(
                 lambda element: inclusion(element) in character_subgroup,
@@ -1202,12 +1213,15 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
             # not yet complete (ValueError: no finite character quotient), not on arbitrary errors.
             try:
                 q = self.finite_character_quotient()
-                index_bound = int(q.image_keys().cardinality()) // int(q.subgroup_image_keys().cardinality())
+                # The intersection retains merged character data, so its own
+                # character quotient answers the exact index from the group
+                # orders of the generated image; no image element is listed.
+                index_bound = q.index()
             except ValueError:
                 index_bound = 1
                 for cs in intersected_subgroups:
                     q = cs.finite_character_quotient()
-                    index_bound *= int(q.image_keys().cardinality()) // int(q.subgroup_image_keys().cardinality())
+                    index_bound *= q.index()
             return self.finite_index_schreier_generating_morphism(
                 index_bound=index_bound,
                 generators=group.group_generators(),

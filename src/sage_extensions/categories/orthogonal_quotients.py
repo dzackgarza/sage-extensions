@@ -14,6 +14,62 @@ from sage_extensions.categories.rings.ring_foundation import _owned_integers
 from sage_extensions.categories.sets.set_categories import NN, Set, Sets
 
 
+def _letters_in_owned_order(factor_groups, letters):
+    r"""Read a GAP factorization word in the owned multiplication order.
+
+    ``letters`` are the signed generator indices GAP's ``Factorization``
+    returns, a product in the GAP group's own law.  An engine that
+    multiplies by the reversed law (permutation, word and automorphism
+    engines act on the right, ``groups._law_reversed``) reverses the same
+    letters when they are evaluated by the owned product.  The discriminant
+    factor is the only nonabelian candidate among the character factors, so
+    the first factor's law decides the flip; sign factors are abelian and
+    insensitive to it.
+    """
+    from sage_extensions.categories.group.groups import _law_reversed
+
+    if factor_groups and _law_reversed(factor_groups[0][1]):
+        return letters[::-1]
+    return letters
+
+
+class _GapWordSection:
+    r"""A GAP stabilizer-chain word section of a finitely generated group.
+
+    ``gap_generators`` is a tuple of libgap elements.  GAP computes a
+    stabilizer chain of the group they generate once, and ``Factorization``
+    then returns, for any element of the generated group, a word in the free
+    group on the generator positions; ``letters_of`` reads that word as a
+    tuple of signed 1-based generator indices.  No element of the generated
+    group is ever listed: the cost is that of stabilizer-chain machinery,
+    which scales in the acting degree, not in the group order.  This is the
+    engine behind the generated-model reads of ``OrthogonalCharacterQuotient``
+    and behind ``LatticeIsometryMor.discriminant_lift``; the owning layers
+    evaluate the letters in their own generators and verify the result against
+    the requested image element, so an engine inconsistency surfaces as an
+    ``ArithmeticError``, never as a wrong element.
+    """
+
+    def __init__(self, gap_generators) -> None:
+        self.gap_group = libgap.Group(list(gap_generators))
+        self._to_permutation = libgap.IsomorphismPermGroup(self.gap_group)
+        self.permutation_group = libgap.Range(self._to_permutation)
+
+    def order(self) -> int:
+        return int(libgap.Order(self.gap_group))
+
+    def letters_of(self, gap_element) -> tuple:
+        r"""Signed generator indices whose word maps to ``gap_element``."""
+        point = libgap.Image(self._to_permutation, gap_element)
+        word = libgap.Factorization(self.permutation_group, point)
+        return tuple(int(index) for index in libgap.LetterRepAssocWord(word))
+
+    def letters_of_permutation(self, point) -> tuple:
+        r"""Signed generator indices for an element of the permutation model."""
+        word = libgap.Factorization(self.permutation_group, point)
+        return tuple(int(index) for index in libgap.LetterRepAssocWord(word))
+
+
 class OrthogonalCharacterQuotient:
     r"""The finite image of ``O(L)`` under the characters defining a subgroup.
 
@@ -89,7 +145,25 @@ class OrthogonalCharacterQuotient:
                 name="Orthogonal character quotient factors",
             )
         )
-        self._witnesses = self._enumerate_image()
+
+    @property
+    def _witnesses(self):
+        r"""One live lift above every image element, enumerated elementwise.
+
+        Retained for the elementwise reads (``image_keys``, ``section``,
+        ``subgroup_image_keys`` and ``_gap_regular_model``), whose contract is
+        a listed image.  It realizes only when one of those reads asks for it;
+        construction of the quotient stays free of it, and the generated-group
+        reads (``image_order``, ``subgroup_image_order``,
+        ``right_coset_transversal``, ``splitting_isometries``,
+        ``adjust_witness_into_subgroup``, ``discriminant_image``) never need a
+        listed image.
+        """
+        witnesses = self.__dict__.get("_witnesses_cache")
+        if witnesses is None:
+            witnesses = self._enumerate_image()
+            self.__dict__["_witnesses_cache"] = witnesses
+        return witnesses
 
     def image_space(self):
         r"""Return the owned product in which all character images live."""
@@ -173,6 +247,234 @@ class OrthogonalCharacterQuotient:
             tuple(key for key in self._witnesses if self._allowed(key))
         )
 
+    # ------------------------------------------------------------------
+    # The generated model: the character image as a GAP-generated group.
+    #
+    # The elementwise views above list the finite image with one live lift
+    # per element.  For arithmetic subgroups their image is far too large
+    # for any listing (O(A_N) of the Enriques coinvariant lattice has order
+    # ~5*10^13), so the image is instead realized *by generators*: the
+    # character images of the ambient group's selected finite generating
+    # family generate chi(O(L)); the subgroup's image is the meet of its
+    # discriminant-preimage targets with the kernels of the sign characters
+    # it intersects.  Both are subgroups of one direct product of the
+    # character codomains, and GAP's stabilizer-chain methods then answer
+    # orders, transversals, double cosets and coset memberships exactly.  A
+    # ``_GapWordSection`` carries every returned quotient element back to a
+    # word in the *ambient* generators, so every lift is a live lattice
+    # isometry, checked once against the character map before it is
+    # delivered.
+
+    def _model_factors(self):
+        r"""``(label, owned group)`` per character factor, in image order."""
+        from sage_extensions.categories.group.groups import OwnedGroups
+
+        factors = []
+        for label in self._image_labels:
+            if label == "discriminant":
+                factors.append((label, self._discriminant_group))
+            else:
+                factors.append((label, OwnedGroups().C(2)))
+        return tuple(factors)
+
+    def _sign_factor_group(self):
+        r"""The order-two cyclic group modelling every sign-character factor."""
+        return next(
+            group for label, group in self._model_factors() if label != "discriminant"
+        )
+
+    def _c2_of_sign(self, sign):
+        r"""The ``{+-1}`` ring element as an element of the cyclic group of order two."""
+        factor_group = self._sign_factor_group()
+        ring = self.lattice.base_ring()
+        if sign == ring.one():
+            return factor_group.one()
+        assert sign == -ring.one(), (
+            f"the sign character of an isometry of {self.lattice} is +-1, but got {sign}"
+        )
+        return next(iter(factor_group.group_generators()))
+
+    def _sign_of_c2(self, element):
+        r"""The ``{+-1}`` reading of an element of the order-two factor group."""
+        factor_group = self._sign_factor_group()
+        ring = self.lattice.base_ring()
+        return ring.one() if element == factor_group.one() else -ring.one()
+
+    @cached_method
+    def _gap_product(self):
+        r"""The GAP direct product of the character codomains, with structure maps."""
+        from sage_extensions.categories.group.groups import _gap_model
+
+        factors = self._model_factors()
+        models = tuple(_gap_model(group) for _label, group in factors)
+        if len(models) == 1:
+            product = models[0]
+            return factors, product, (libgap.IdentityMapping(product),), (libgap.IdentityMapping(product),)
+        product = libgap.DirectProduct(*models)
+        embeddings = tuple(libgap.Embedding(product, position + 1) for position in range(len(models)))
+        projections = tuple(libgap.Projection(product, position + 1) for position in range(len(models)))
+        return factors, product, embeddings, projections
+
+    def _ambient_generators(self):
+        r"""The selected finite generating family of ``O(L)`` driving this quotient."""
+        ambient = self.supergroup
+        if not (
+            ambient.has_selected_group_resolution()
+            and ambient.has_selected_finite_group_generating_set()
+        ):
+            raise ValueError(
+                f"the character image of {ambient} for {self.subgroup} cannot be realized as a "
+                f"generated group: the ambient group retains no finite generating family; this "
+                "quotient is explicitly generator-driven"
+            )
+        return tuple(ambient.group_generators())
+
+    def _gap_of_key(self, key):
+        r"""An owned character key as an element of the GAP direct product."""
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        factors, product, embeddings, _projections = self._gap_product()
+        element = libgap.One(product)
+        for position, (label, group) in enumerate(factors):
+            if label == "discriminant":
+                component = _element_to_engine(group, key[label])
+            else:
+                component = _element_to_engine(group, self._c2_of_sign(key[label]))
+            element = element * libgap.Image(embeddings[position], component)
+        return element
+
+    def _key_of_gap(self, element):
+        r"""An element of the GAP direct product as an owned character key."""
+        from sage_extensions.categories.group.groups import _element_from_engine
+
+        factors, _product, _embeddings, projections = self._gap_product()
+        components = {}
+        for position, (label, group) in enumerate(factors):
+            component = libgap.Image(projections[position], element)
+            owned = _element_from_engine(group, component)
+            components[label] = owned if label == "discriminant" else self._sign_of_c2(owned)
+        return self.image_space()(components.__getitem__)
+
+    @cached_method
+    def _image_section(self):
+        r"""The generated character image ``chi(O(L))`` with its word section."""
+        generators = self._ambient_generators()
+        images = tuple(self._gap_of_key(self.image(generator)) for generator in generators)
+        return generators, images, _GapWordSection(images)
+
+    def _gap_image(self):
+        r"""``chi(O(L))`` as a generated group of the direct product."""
+        return self._image_section()[2].gap_group
+
+    @cached_method
+    def _gap_subgroup(self):
+        r"""``chi(self.subgroup)`` as a generated subgroup of the character image.
+
+        ``self.subgroup`` is, by its complete character data, exactly
+        ``chi^-1(S)`` for ``S`` the meet of the discriminant-preimage targets
+        with the kernels of the sign characters it intersects; that meet is
+        formed here inside the direct product, from the targets' retained
+        generating families and one projection kernel per sign factor.
+        """
+        factors, _product, _embeddings, projections = self._gap_product()
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        image = self._gap_image()
+        pieces = []
+        for target in self.discriminant_preimages:
+            position = next(
+                index for index, (label, _group) in enumerate(factors) if label == "discriminant"
+            )
+            generators = tuple(target.group_generators())
+            targets_gap = [
+                _element_to_engine(self._discriminant_group, generator)
+                for generator in generators
+            ]
+            pieces.append(
+                libgap.Subgroup(
+                    image,
+                    [libgap.Image(_embeddings[position], generator) for generator in targets_gap],
+                )
+            )
+        for position, (label, group) in enumerate(factors):
+            if label == "discriminant":
+                continue
+            projection = projections[position]
+            restricted = libgap.GroupHomomorphismByImages(
+                image,
+                libgap.Range(projection),
+                list(libgap.GeneratorsOfGroup(image)),
+                [libgap.Image(projection, element) for element in libgap.GeneratorsOfGroup(image)],
+            )
+            pieces.append(libgap.Kernel(restricted))
+        if not pieces:
+            return image
+        return libgap.Intersection(image, *pieces)
+
+    def image_order(self) -> int:
+        r"""``|chi(O(L))|``, from the generated image; no image element is listed."""
+        return self._image_section()[2].order()
+
+    def subgroup_image_order(self) -> int:
+        r"""``|chi(self.subgroup)|``, from the generated image; no image element is listed."""
+        return int(libgap.Order(self._gap_subgroup()))
+
+    def index(self) -> int:
+        r"""``[O(L):self.subgroup] = |chi(O(L))| / |chi(self.subgroup)|``, exactly.
+
+        The subgroup is ``chi^-1`` of its own character image, so the cosets
+        of ``self.subgroup`` in ``O(L)`` are in bijection with the cosets of
+        ``chi(self.subgroup)`` in ``chi(O(L))``; the quotient of the two GAP
+        orders is that index, with divisibility checked.
+        """
+        image_order = self.image_order()
+        subgroup_order = self.subgroup_image_order()
+        index, remainder = divmod(image_order, subgroup_order)
+        if remainder:
+            raise ArithmeticError(
+                f"the character image of {self.subgroup} has order {subgroup_order}, which does "
+                f"not divide the ambient image order {image_order}: the retained character data "
+                "are inconsistent with a subgroup of the character image"
+            )
+        return index
+
+    def _evaluate_letters(self, letters):
+        r"""Signed generator indices evaluated in the ambient group's generators.
+
+        The word section factors elements in the GAP group's own
+        multiplication.  When the discriminant factor's engine multiplies by
+        the reversed law (automorphism engines act on the right), the owned
+        product reads the same letters in the opposite order; the sign
+        factors are abelian and insensitive to the flip.  The check against
+        the character map (:meth:`_checked_lift`) catches any remaining
+        mismatch as an ``ArithmeticError``.
+        """
+        letters = _letters_in_owned_order(self._model_factors(), letters)
+        generators, _images, _section = self._image_section()
+        value = self.supergroup.one()
+        for index in letters:
+            value = value * (generators[index - 1] if index > 0 else ~generators[-index - 1])
+        return value
+
+    def _checked_lift(self, element, letters):
+        r"""Evaluate ``letters`` and verify the lift carries the expected character image.
+
+        The word section is maintained by GAP's stabilizer-chain machinery;
+        this one character-map evaluation per delivered lift is the check that
+        the chain agrees with the retained characters.  A disagreement is an
+        engine inconsistency and raises ``ArithmeticError``; it never yields a
+        silently wrong isometry.
+        """
+        live = self._evaluate_letters(letters)
+        image = self.image(live)
+        if image != element:
+            raise ArithmeticError(
+                f"the word-section lift of the character image {element} was checked against the "
+                f"character map of {self.subgroup} and maps to {image}: the retained word section "
+                "is inconsistent with the character map, so the lift cannot be trusted"
+            )
+        return live
+
     def stabilizer_image_keys(self, stabilizer_generators):
         return frozenset(self.stabilizer_image_witnesses(stabilizer_generators))
 
@@ -217,63 +519,35 @@ class OrthogonalCharacterQuotient:
         Here ``Q = rho(O(L))`` is the represented finite character image and
         ``H = rho(Gamma)`` is the image of the selected arithmetic subgroup.
         A right coset is therefore the subset ``H r = {h r : h in H}`` of
-        ``Q``.  GAP computes representatives in the private regular-action
-        model; before crossing them back, this method reconstructs those
-        subsets with :meth:`_multiply` and verifies that they are disjoint and
-        cover all of ``Q``.  The public result consists only of live lattice
-        isometries lifting the chosen quotient representatives.
+        ``Q``.  GAP computes the representatives in the generated model (the
+        documented contract of ``RightTransversal``: exactly one element of
+        ``Q`` from every right coset ``H\Q``), and each is carried back to a
+        word in the ambient generators by the word section.  Before a lift is
+        delivered it is checked against the character map itself
+        (:meth:`_checked_lift`), and the count is checked against the group
+        orders: a transversal of ``H\Q`` has exactly ``|Q|/|H|`` elements.
         """
-        subgroup = self.subgroup_image_keys()
-        keys, permutations, group = self._gap_regular_model()
-        gap_subgroup = libgap.Subgroup(
-            group,
-            [permutations[key] for key in subgroup],
+        generators, _images, section = self._image_section()
+        to_permutation = section._to_permutation
+        permutation_image = section.permutation_group
+        subgroup_permutation = libgap.Image(to_permutation, self._gap_subgroup())
+        transversal = libgap.AsList(
+            libgap.RightTransversal(permutation_image, subgroup_permutation)
         )
-        quotient_representatives = []
-        for right_coset in libgap.RightCosets(group, gap_subgroup):
-            gap_representative = right_coset.Representative()
-            quotient_representative = next(
-                (
-                    key
-                    for key in keys
-                    if permutations[key] == gap_representative
-                ),
-                None,
-            )
-            if quotient_representative is None:
-                raise ArithmeticError(
-                    f"GAP returned the right-coset representative {gap_representative}, "
-                    f"which is not the permutation of any element of the character image "
-                    f"of O({self.lattice})"
-                )
-            quotient_representatives.append(quotient_representative)
-
-        owned_cosets = tuple(
-            frozenset(
-                self._multiply(subgroup_element, representative)
-                for subgroup_element in subgroup
-            )
-            for representative in quotient_representatives
-        )
-        if len(set(owned_cosets)) != len(owned_cosets):
+        if len(transversal) * self.subgroup_image_order() != self.image_order():
             raise ArithmeticError(
-                f"the right-coset representatives of the image of {self.subgroup} in the "
-                f"character image of O({self.lattice}) are not a transversal: two of "
-                f"them lie in the same coset"
+                f"GAP returned {len(transversal)} right-coset representatives of the image of "
+                f"{self.subgroup} in the character image of O({self.lattice}), but the group "
+                f"orders say the coset space has {self.index()} elements"
             )
-        covered = frozenset().union(*owned_cosets) if owned_cosets else frozenset()
-        if Set(covered) != self.image_keys():
-            raise ArithmeticError(
-                f"the right cosets of the image of {self.subgroup} do not cover the "
-                f"character image of O({self.lattice}): they cover {len(covered)} of its "
-                f"elements"
+        lifts = []
+        for point in transversal:
+            letters = section.letters_of_permutation(point)
+            key = self._key_of_gap(
+                libgap.PreImagesRepresentative(to_permutation, point)
             )
-        return finite_ordered_set(
-            tuple(
-                self._witnesses[representative]
-                for representative in quotient_representatives
-            )
-        )
+            lifts.append(self._checked_lift(key, letters))
+        return finite_ordered_set(tuple(lifts))
 
     def splitting_isometries(self, stabilizer_generators):
         r"""Return one lift ``g`` per double coset ``Gamma g Stab`` of ``O(L)``.
@@ -292,39 +566,29 @@ class OrthogonalCharacterQuotient:
         not abelian: a transversal of ``rho(Stab) \ Q / rho(Gamma)`` need not
         be one of ``rho(Gamma) \ Q / rho(Stab)``.
         """
-        stabilizer = self.stabilizer_image_keys(stabilizer_generators)
-        subgroup = self.subgroup_image_keys()
-        keys, permutations, group = self._gap_regular_model()
-        # GAP's DoubleCosets(G, U, V) lists the double cosets U g V.  The
-        # key-to-permutation map is a homomorphism (GAP composes left to
-        # right, and each key acts by right multiplication), so U is the
-        # image of Gamma and V the image of the stabilizer.
-        left = libgap.Subgroup(
-            group,
-            [permutations[key] for key in subgroup],
+        generators, _images, section = self._image_section()
+        to_permutation = section._to_permutation
+        permutation_image = section.permutation_group
+        # The image of the stabilizer is the subgroup generated by the
+        # character images of its retained generators: chi is a homomorphism,
+        # so chi(<S>) = <chi(S)>.  No element of the stabilizer's image is
+        # listed.
+        stabilizer_gap = libgap.Subgroup(
+            self._gap_image(),
+            [self._gap_of_key(self.image(generator)) for generator in stabilizer_generators],
         )
-        right = libgap.Subgroup(
-            group,
-            [permutations[key] for key in stabilizer],
-        )
+        # GAP's DoubleCosets(G, U, V) lists the double cosets U g V, so U is
+        # the image of Gamma and V the image of the stabilizer.
+        left = libgap.Image(to_permutation, self._gap_subgroup())
+        right = libgap.Image(to_permutation, stabilizer_gap)
         representatives = []
-        for double_coset in libgap.DoubleCosets(group, left, right):
-            gap_representative = double_coset.Representative()
-            quotient_representative = next(
-                (
-                    key
-                    for key in keys
-                    if permutations[key] == gap_representative
-                ),
-                None,
+        for double_coset in libgap.AsList(libgap.DoubleCosets(permutation_image, left, right)):
+            point = libgap.Representative(double_coset)
+            letters = section.letters_of_permutation(point)
+            key = self._key_of_gap(
+                libgap.PreImagesRepresentative(to_permutation, point)
             )
-            if quotient_representative is None:
-                raise ArithmeticError(
-                    f"GAP returned the double-coset representative {gap_representative}, "
-                    f"which is not the permutation of any element of the character image "
-                    f"of O({self.lattice})"
-                )
-            representatives.append(self._witnesses[quotient_representative])
+            representatives.append(self._checked_lift(key, letters))
         return finite_ordered_set(tuple(representatives))
 
     def witness_meets_subgroup(self, witness, stabilizer_generators) -> bool:
@@ -338,25 +602,128 @@ class OrthogonalCharacterQuotient:
         is ``rho(t) rho(witness) in rho(Gamma)``.  Right multiplication by a
         target stabilizer would instead act on the source and is not the same
         transporter problem.
+
+        A stabilizer element ``t`` meets that condition exactly when it lies
+        in ``H g^-1``, for ``H = rho(Gamma)`` and ``g = rho(witness)``: GAP
+        intersects the generated stabilizer image with that right coset
+        directly, instead of listing the stabilizer's image.  The chosen
+        element is carried back to a word in the stabilizer generators by
+        their own word section, and the composed candidate is then admitted by
+        the subgroup's defining predicate; a characters-only candidate the
+        predicate rejects is an ``ArithmeticError``, never a silent wrong
+        witness.
         """
         if witness in self.subgroup:
             return witness
-        subgroup_keys = self.subgroup_image_keys()
-        for stabilizer_key, stabilizer_witness in self.stabilizer_image_witnesses(
-            target_stabilizer_generators
-        ).items():
-            candidate_key = self._multiply(stabilizer_key, self.image(witness))
-            if candidate_key not in subgroup_keys:
-                continue
-            candidate = stabilizer_witness * witness
-            if candidate not in self.subgroup:
-                raise ArithmeticError(
-                    f"the characters say {candidate} lies in {self.subgroup}, but the "
-                    f"subgroup's defining predicate rejects it: the characters do not "
-                    f"determine {self.subgroup}"
+        generators, _images, section = self._image_section()
+        to_permutation = section._to_permutation
+        point = libgap.Image(to_permutation, self._gap_of_key(self.image(witness)))
+        stabilizer_gaps = [
+            self._gap_of_key(self.image(generator)) for generator in target_stabilizer_generators
+        ]
+        stabilizer_gap = libgap.Subgroup(self._gap_image(), stabilizer_gaps)
+        stabilizer_permutation = libgap.Image(to_permutation, stabilizer_gap)
+        subgroup_permutation = libgap.Image(to_permutation, self._gap_subgroup())
+        candidates = libgap.Intersection(
+            stabilizer_permutation,
+            libgap.RightCoset(subgroup_permutation, point ** -1),
+        )
+        if bool(libgap.IsEmpty(candidates)):
+            return None
+        chosen = libgap.Representative(candidates)
+        # Factor the chosen stabilizer image over the stabilizer's own
+        # generators, so the adjustment is a live element of the stabilizer.
+        stabilizer_section = _GapWordSection(
+            [libgap.Image(to_permutation, element) for element in stabilizer_gaps]
+        )
+        letters = stabilizer_section.letters_of_permutation(chosen)
+        letters = _letters_in_owned_order(self._model_factors(), letters)
+        stabilizer_generators = tuple(target_stabilizer_generators)
+        adjustment = self.supergroup.one()
+        for index in letters:
+            adjustment = adjustment * (
+                stabilizer_generators[index - 1]
+                if index > 0
+                else ~stabilizer_generators[-index - 1]
+            )
+        candidate = adjustment * witness
+        if candidate not in self.subgroup:
+            raise ArithmeticError(
+                f"the characters say {candidate} lies in {self.subgroup}, but the "
+                f"subgroup's defining predicate rejects it: the characters do not "
+                f"determine {self.subgroup}"
+            )
+        return candidate
+
+    def discriminant_image(self):
+        r"""``rho(self.subgroup)`` in ``O(A_L)``, exactly, from the retained characters.
+
+        The subgroup is ``chi^-1(S)`` for the joint character
+        ``chi = (rho, det, sn)``, so its image under ``rho`` is
+
+            ``meet H_i cap rho(ker sn) cap rho(ker det)``
+
+        over the retained discriminant-preimage targets ``H_i`` and the sign
+        characters it intersects; the ambient rho-image itself drops out,
+        since every target lies in it.  Each factor is a generated subgroup
+        of ``O(A_L)``: the targets retain their generators, and
+        ``rho(ker sn)`` (resp. ``det``) is generated by the images of the
+        selected generators of ``O^+(L)`` (resp. ``SO(L)``), because ``rho``
+        is a homomorphism.  GAP then meets those finitely generated
+        subgroups; no element of ``rho(self.subgroup)`` and no generator of
+        the subgroup itself is ever listed.
+        """
+        if not self._has_discriminant:
+            raise ValueError(
+                f"{self.subgroup} retains no discriminant preimage: its image under the "
+                "discriminant representation is not characterized by its characters"
+            )
+        from sage_extensions.categories.group.groups import (
+            _element_to_engine,
+            _gap_model,
+            _subgroup_from_gap,
+        )
+
+        orthogonal_group = self._discriminant_group
+        ambient_gap = _gap_model(orthogonal_group)
+        rho = self.lattice.discriminant_representation()
+
+        pieces = [
+            libgap.Subgroup(
+                ambient_gap,
+                [
+                    _element_to_engine(orthogonal_group, generator)
+                    for generator in target.group_generators()
+                ],
+            )
+            for target in self.discriminant_preimages
+        ]
+        if self.spinor_kernel:
+            positive = self.lattice.O_plus()
+            generators = tuple(positive.group_generators())
+            pieces.append(
+                libgap.Subgroup(
+                    ambient_gap,
+                    [
+                        _element_to_engine(orthogonal_group, rho(generator))
+                        for generator in generators
+                    ],
                 )
-            return candidate
-        return None
+            )
+        if self.determinant_kernel:
+            special = self.lattice.SO()
+            generators = tuple(special.group_generators())
+            pieces.append(
+                libgap.Subgroup(
+                    ambient_gap,
+                    [
+                        _element_to_engine(orthogonal_group, rho(generator))
+                        for generator in generators
+                    ],
+                )
+            )
+        intersection = pieces[0] if len(pieces) == 1 else libgap.Intersection(*pieces)
+        return _subgroup_from_gap(orthogonal_group, intersection)
 
 
 _MISSING_ARITHMETIC_GENERATING_SET = (
