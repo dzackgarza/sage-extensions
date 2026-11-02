@@ -98,3 +98,21 @@ def test_an_owned_matrix_still_scales_by_an_owned_scalar() -> None:
     element = space.an_element()
 
     assert 3 * element == element + element + element
+
+
+def test_the_route_from_an_owned_scalar_into_a_sage_ring_is_the_engine_adapter() -> None:
+    r"""``SageZZ(x)`` reads the integer protocol; ``SageQQ(x)`` is not a coercion here.
+
+    Sage's ``Integer`` reads ``x._integer_``, which this library's integers
+    implement, so an owned integer converts into Sage's ``ZZ``.  Sage's ``QQ``
+    reads no such protocol: ``SageQQ(x)`` would need a coercion from the owned
+    ring into ``QQ``, and none is installed — silently coercing library scalars
+    into ``QQ`` is exactly what this library does not do.  The supported route is
+    the engine realization, which is what the matrix action uses internally.
+    """
+    three = ZZ(3)
+
+    assert SageZZ(three) == int(3)
+    assert three.parent()._engine_element(three) == int(3)
+    with pytest.raises(ValueError):
+        SageQQ(three)
