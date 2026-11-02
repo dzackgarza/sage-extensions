@@ -26,9 +26,22 @@ _E10 = load_e10_fundamental_domain()
 stage(f"fixtures loaded: {len(_ENRIQUES)} Enriques cases")
 # Print actual source/provider/runtime identifiers from launch environment; retain uncertainty where historical logs do not prove a pin.
 import subprocess, os
-for path,label in [("/work/.git/HEAD","port /work"),("/repos/sage-extensions/.git/HEAD","provider /repos/sage-extensions")]:
+def resolved_head(git_dir):
+    head = open(os.path.join(git_dir, "HEAD")).read().strip()
+    if head.startswith("ref:"):
+        ref = head.split(None, 1)[1].strip()
+        try:
+            return open(os.path.join(git_dir, ref)).read().strip()
+        except OSError:
+            packed = open(os.path.join(git_dir, "packed-refs")).read()
+            for line in packed.splitlines():
+                if line.endswith(ref):
+                    return line.split(None, 1)[0].strip()
+            raise FileNotFoundError(ref)
+    return head
+for path,label in [("/work/.git","port /work"),("/repos/sage-extensions/.git","provider /repos/sage-extensions")]:
     try:
-        stage(f"{label} HEAD: {open(path).read().strip()}")
+        stage(f"{label} HEAD: {resolved_head(path)}")
     except Exception as e:
         stage(f"{label} HEAD unavailable inside container: {e} (historical logs do not prove a pin)")
 stage(f"runtime env: SAGE_BIN={os.environ.get('SAGE_BIN','?')}, PATH={os.environ.get('PATH','?')[:80]}")
