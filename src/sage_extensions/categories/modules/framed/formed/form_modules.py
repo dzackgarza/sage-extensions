@@ -2648,16 +2648,31 @@ class FormModules(OwnedCategoryOverBaseRing):
                                 f"when it vanishes on that radical, and it does not"
                             )
                     quotient_module = inclusion.cokernel()
-                    generators = tuple(self.module_generators())
-                    if len(generators) != len(
-                        tuple(quotient_module.module_generating_set())
-                    ):
-                        return _torsion_form_subquotient(
-                            self,
-                            radical,
-                            self.subobject_generated_by(self.module_generators()),
-                            quadratic=quadratic,
-                        )
+                    # The cokernel is presented on the codomain's generators and its
+                    # projection sends each generator to the generator of the same
+                    # name (``ModuleMorphismMethods.cokernel_projection``).  The Gram
+                    # is therefore indexed by that correspondence, read off the
+                    # quotient's own labels, and each image is checked against the
+                    # projection: equal generator counts alone would not establish
+                    # the alignment.
+                    projection = inclusion.cokernel_projection()
+                    source_labels = tuple(self.module_generating_set())
+                    quotient_labels = tuple(quotient_module.module_generating_set())
+                    generators = []
+                    for label in quotient_labels:
+                        if label not in source_labels or projection(
+                            self.module_generator(label)
+                        ) != quotient_module.module_generator(label):
+                            return _torsion_form_subquotient(
+                                self,
+                                radical,
+                                self.subobject_generated_by(
+                                    self.module_generators()
+                                ),
+                                quadratic=quadratic,
+                            )
+                        generators.append(self.module_generator(label))
+                    generators = tuple(generators)
                     category = (
                         TorsionQuadraticFormModules(self.base_ring())
                         if quadratic

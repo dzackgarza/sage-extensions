@@ -18,6 +18,9 @@ from sage_extensions.all import *  # noqa: F401,F403
 from sage_extensions.categories.modules.framed.formed import (
     TorsionQuadraticFormModules,
 )
+from sage_extensions.categories.modules.framed.formed.torsion_form_modules import (
+    _regenerate_form_on_generators,
+)
 from sage_extensions.categories.modules.framed.fraction_field_quotients import (
     FractionFieldQuotients,
 )
@@ -94,3 +97,54 @@ def test_the_reduction_is_refused_when_the_form_does_not_vanish_on_the_radical()
     assert form.form_vanishes_on(embedded) is False
     with pytest.raises(ValueError, match="descends"):
         form.nondegenerate_quotient()
+
+
+def test_the_quotient_gram_is_indexed_by_the_retained_projection_contract() -> None:
+    r"""The reduced form's Gram is read through the cokernel projection's own contract.
+
+    ``cokernel_projection`` states that the cokernel is presented on the
+    codomain's generators and that the projection sends each generator to the
+    generator of the same name; the operation reads the Gram in exactly that
+    indexing and checks each image, because an equal generator count on its own
+    says nothing about which generator is which.
+    """
+    form = _quadratic([[4, 0], [0, 4]], [[HALF, 0], [0, HALF]])
+    inclusion = form.polar_radical().inclusion()
+    quotient_module = inclusion.cokernel()
+    projection = inclusion.cokernel_projection()
+
+    assert tuple(quotient_module.module_generating_set()) == tuple(
+        form.module_generating_set()
+    )
+    for label in quotient_module.module_generating_set():
+        assert projection(form.module_generator(label)) == quotient_module.module_generator(
+            label
+        )
+
+    quotient = form.nondegenerate_quotient()
+    assert quotient.cardinality() == 4
+    assert tuple(quotient.invariants()) == (2, 2)
+    assert quotient.polar_radical().cardinality() == 1
+
+
+def test_a_reframed_copy_has_an_isometric_quotient() -> None:
+    r"""A permuted presentation of the same form reduces to an isometric quotient.
+
+    The framing changes — the generators are exchanged — so the two quotient
+    presentations are not literally the same object; the decision on them, and the
+    reduction's dependence on the retained projection, must still line up.
+    """
+    form = _quadratic([[4, 0], [0, 4]], [[HALF, 0], [0, HALF]])
+    first_generator, second_generator = form.module_generators()
+    reframed = _regenerate_form_on_generators(
+        form, (second_generator, first_generator), quadratic=True
+    ).codomain()
+
+    assert reframed.cardinality() == form.cardinality()
+    assert form.is_isomorphic(reframed) is True
+    assert form.polar_radical().cardinality() == reframed.polar_radical().cardinality()
+
+    quotient = form.nondegenerate_quotient()
+    reframed_quotient = reframed.nondegenerate_quotient()
+    assert reframed_quotient.cardinality() == quotient.cardinality()
+    assert quotient.is_isomorphic(reframed_quotient) is True
