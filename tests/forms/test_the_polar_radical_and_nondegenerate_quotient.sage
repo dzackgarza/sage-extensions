@@ -171,8 +171,11 @@ def test_the_orthogonal_complement_is_the_same_kernel_not_an_enumeration() -> No
         if (form.b(element, generator) == zero) is True
     )
     inclusion = perpendicular.inclusion()
-    # It is not a count: every orthogonal element lies in the subobject, and a
-    # non-orthogonal one does not.
+    # Cardinality for size and inclusion for membership, together exact:
+    # expected (|perp|) elements lie inside, one non-orthogonal element does
+    # not, and there is no room for a spurious member.
+    assert perpendicular.cardinality() == len(expected)
+    assert perpendicular.cardinality() == 8
     assert all(inclusion.is_in_image(element) is True for element in expected)
     non_member = next(
         element
@@ -180,3 +183,9 @@ def test_the_orthogonal_complement_is_the_same_kernel_not_an_enumeration() -> No
         if (form.b(element, generator) == zero) is not True
     )
     assert inclusion.is_in_image(non_member) is not True
+    # And zero inadvertent members, by the ambient membership sweep: the
+    # inclusion's image and the computed set are the same elements.
+    for element in form.elements():
+        assert (inclusion.is_in_image(element) is True) == any(
+            (element == other) is True for other in expected
+        )

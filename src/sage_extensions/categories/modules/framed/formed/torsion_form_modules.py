@@ -1095,6 +1095,51 @@ def _radical_isometry_decision(first, second, *, quadratic: bool):
             )
         except (ValueError, TypeError):
             continue
+
+    # Transpositions of coordinates with the same invariant: isomorphism of the
+    # quotient does not force block order there either (the normal form is
+    # order-sensitive only as a statement about generators), and a diagonal
+    # rescaling cannot exchange the blocks.  Each transposition is verified the
+    # same way; none of these unlocks is claimed to suffice in general.
+    frames_have = [
+        (left, right)
+        for left in range(len(labels))
+        for right in range(left + 1, len(labels))
+        if invariants[left] == invariants[right]
+    ]
+    for left, right in frames_have:
+        swapped = list(labels)
+        swapped[left], swapped[right] = swapped[right], swapped[left]
+        images = {
+            label: second_frame.module_generator(swapped[position])
+            for position, label in enumerate(labels)
+        }
+        try:
+            bridge = first_frame.module_category().Mor(first_frame, second_frame)(images)
+        except Exception:
+            continue
+        try:
+            forward = first.module_category().Mor(first, second)(
+                {
+                    label: second_normalization.inverse()(
+                        bridge(first_normalization.forward()(first.module_generator(label)))
+                    )
+                    for label in first.module_generating_set()
+                }
+            )
+            inverse = second.module_category().Mor(second, first)(
+                {
+                    label: first_normalization.inverse()(
+                        bridge(second_normalization.forward()(second.module_generator(label)))
+                    )
+                    for label in second.module_generating_set()
+                }
+            )
+            return _torsion_form_isometry(
+                forward, inverse, quadratic=quadratic, check=True
+            )
+        except (ValueError, TypeError):
+            continue
     return NotImplemented
 
 

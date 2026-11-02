@@ -185,3 +185,28 @@ def test_the_bilinear_flavour_reduces_and_decides_the_same_way() -> None:
     assert zero.polar_radical().cardinality() == 4
     assert first.is_isomorphic(zero) is False
     assert first.isometry_to(zero) is None
+
+
+def test_an_isometry_through_a_coordinate_transposition_is_found() -> None:
+    r"""``diag(1/2, 3/2)`` and ``diag(3/2, 1/2)`` on ``(Z/4)^2``: carried by a transposition.
+
+    No diagonal rescaling can carry ``1/2`` to ``3/2`` (the units of ``Z/4`` square
+    to 1), so the scale candidates fail, and the swap of the two equal-invariant
+    coordinates is the transport that verifies.  Quotient forms are isomorphic too,
+    which is necessary but not the witness itself.
+    """
+    first = _quadratic([[4, 0], [0, 4]], [[HALF, 0], [0, 3 * HALF]])
+    second = _quadratic([[4, 0], [0, 4]], [[3 * HALF, 0], [0, HALF]])
+
+    assert first.polar_radical().cardinality() == second.polar_radical().cardinality()
+    assert first.nondegenerate_quotient().is_isomorphic(
+        second.nondegenerate_quotient()
+    ) is True
+
+    assert first.is_isomorphic(second) is True
+    witness = first.isometry_to(second)
+    assert isinstance(witness, TorsionFormIsometry)
+    assert [
+        second.q(witness.forward()(generator))
+        for generator in first.module_generators()
+    ] == [first.q(generator) for generator in first.module_generators()]
