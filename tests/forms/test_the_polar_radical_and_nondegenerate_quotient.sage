@@ -170,5 +170,13 @@ def test_the_orthogonal_complement_is_the_same_kernel_not_an_enumeration() -> No
         for element in form.elements()
         if (form.b(element, generator) == zero) is True
     )
-    assert perpendicular.cardinality() == len(expected)
-    assert perpendicular.cardinality() == 8
+    inclusion = perpendicular.inclusion()
+    # It is not a count: every orthogonal element lies in the subobject, and a
+    # non-orthogonal one does not.
+    assert all(inclusion.is_in_image(element) is True for element in expected)
+    non_member = next(
+        element
+        for element in form.elements()
+        if (form.b(element, generator) == zero) is not True
+    )
+    assert inclusion.is_in_image(non_member) is not True

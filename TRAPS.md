@@ -2514,4 +2514,9 @@ One precondition was wrong and is fixed: the kernel used to require one generato
 
 Measured on the Coble chain after the change: `|A_S| = 2048` (4.0 s), `|H| = 2`, `|H^perp| = 1024` (8.5 s), `H^perp/H` of order 512 (27.3 s), nondegenerate — where the same chain previously did not finish.
 
-**What the downstream chain does not produce, measured.** Every subquotient `K/H` of a *nondegenerate* form with `H <= K <= H^perp` is nondegenerate (the form restricted to `H^perp/H` is), and the generator-span restrictions of the Coble form measured here are nondegenerate too (orders 4, 8, 16, 64, trivial radicals). So a degenerate torsion form does not arise from that chain; it arises from a degenerate datum (a form stated on a finite module directly, as in the specimens) and from a restriction whose polar radical is nonzero. The radical capability's acceptance therefore stays on the concrete degenerate and heterogeneous specimens (29 focused tests), and the Coble chain's contribution is the machinery's scaling, stated as such.
+**What the downstream chain produces, measured.** The earlier claim here — that every subquotient or restriction of a nondegenerate form is nondegenerate — was **wrong**, and the specimens now show the exact boundary. On the Coble form's discriminant group:
+
+* `H^perp/H` for an isotropic `H` is nondegenerate (order 512), which is the statement the hypotheses justify;
+* an isotropic class `x` of order 2 and a partner `w` in `x^perp` with nonzero `q`, restricted as `DS.subobject_generated_by((x, w))`, give a form of order 4 with **polar radical of order 2 — genuinely degenerate** (the radical is `<x>`), the reduction descends to the order-2 form (because `q(x) = 0`), and the decision answers with a typed, checked witness against its invariant-factor reframing (12.7 s end to end).
+
+So the nondegenerate guarantee is only for `H^perp/H` under its isotropy hypotheses; smaller `K` *can* have a nonzero radical, and this specimen is one. `tests/forms/test_degenerate_restrictions_and_subquotients.sage` pins it: the isotropic class, the degenerate restriction, the reduction, and the decision, all on the published Coble object.
