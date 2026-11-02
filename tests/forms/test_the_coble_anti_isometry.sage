@@ -27,65 +27,38 @@ from sage_extensions.categories.modules.framed.formed.torsion_form_modules impor
 
 
 
-def _block_diagonal(blocks):
-    r"""Assemble integer blocks into one Gram matrix, as lists of lists."""
-    size = sum(len(block) for block in blocks)
-    rows = [[0] * size for _ in range(size)]
-    offset = 0
-    for block in blocks:
-        for row_index, row in enumerate(block):
-            for column_index, entry in enumerate(row):
-                rows[offset + row_index][offset + column_index] = entry
-        offset += len(block)
-    return rows
-
-
 def _coble_discriminant_forms():
     r"""``A_{S_{Co}}`` and the twisted ``A_{T_{Co}}(-1)`` of the published report.
 
-    The report's own construction is used: ``S`` with Gram ``<2> + <-2>^{10}`` and
-    ``T`` with Gram ``<2> + 2U + 2*(-E_8 Cartan)``, where the E8 Cartan matrix is
-    the one Sage's combinatorics states.  The matrices are assembled as integer
-    lists only because Sage's block-diagonal assembly coerces through the owned
-    ring's ``matrix_space`` protocol in this session; the *numbers* are the
-    published constructor's, not an approximation — a hand-written diagram of the
-    wrong shape (the affine one, say) is semidefinite and has a degenerate
-    discriminant form, which the polar-radical criterion then refuses.
+    The construction is the report's own, called directly: ``S`` with Gram
+    ``diagonal_matrix(ZZ, [2] + [-2]*10)`` and ``T`` with Gram
+    ``block_diagonal_matrix(matrix(ZZ, [[2]]), 2*U, 2*(-E8 Cartan))``, where the
+    E8 Cartan matrix comes from ``CartanMatrix(["E", 8])``.  Two spellings are
+    forced by this session and change no number: ``int(8)`` because the preparser
+    makes the literal a library integer, which Sage's ``CartanMatrix`` rejects,
+    and ``int(2)`` for the scalar factors because a library integer has no action
+    on a Sage matrix space (recorded in ``TRAPS.md``); Sage's own ``Integer``
+    gives exactly these matrices, as the assertions on the assembled Gram show.
     """
     from sage.combinat.root_system.cartan_matrix import CartanMatrix
-
-    cartan = [
-        [int(entry) for entry in row]
-        for row in CartanMatrix(["E", int(8)]).rows()
-    ]
-    # ``int(8)``: this session's preparser makes the literal a Sage Integer, which
-    # Sage's CartanMatrix rejects here; the type argument is the same E8.
-    assert len(cartan) == 8
-    assert all(cartan[i][i] == 2 for i in range(8))
-    assert all(
-        cartan[i][j] == cartan[j][i] and cartan[i][j] in (0, -1)
-        for i in range(8)
-        for j in range(8)
-        if i != j
+    from sage.matrix.constructor import (
+        block_diagonal_matrix,
+        diagonal_matrix,
+        matrix,
     )
-    e8 = [[-entry for entry in row] for row in cartan]
-    hyperbolic = [[0, 2], [2, 0]]
+    from sage.rings.integer_ring import ZZ as SageZZ
 
-    diagonal = [2] + [-2] * 10
-    s_gram = [
-        [diagonal[row] if index == row else 0 for index in range(11)]
-        for row in range(11)
-    ]
-    t_gram = _block_diagonal(
-        [
-            [[2]],
-            hyperbolic,
-            [[2 * entry for entry in row] for row in e8],
-        ]
+    e8 = -CartanMatrix(["E", int(8)])
+    assert e8.nrows() == 8 and e8.base_ring() is SageZZ
+    hyperbolic = matrix(SageZZ, [[0, 1], [1, 0]])
+    s_gram = diagonal_matrix(SageZZ, [int(2)] + [int(-2)] * 10)
+    t_gram = block_diagonal_matrix(
+        matrix(SageZZ, [[int(2)]]), int(2) * hyperbolic, int(2) * e8
     )
+    assert s_gram.nrows() == 11 and t_gram.nrows() == 11
 
-    coble_s = Lattices(ZZ)(s_gram)
-    coble_t = Lattices(ZZ)(t_gram)
+    coble_s = Lattices(ZZ)([list(row) for row in s_gram.rows()])
+    coble_t = Lattices(ZZ)([list(row) for row in t_gram.rows()])
     return (
         coble_s.discriminant_group(),
         coble_t.discriminant_group(),

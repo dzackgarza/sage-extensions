@@ -4501,8 +4501,20 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
 
             return FormalPowerSeriesRings(self)(*args, **kwargs)
 
-        def matrix_space(self, nrows, ncols=None):
-            r"""Return the finite matrix Mor over this ring, as an algebra when square."""
+        def matrix_space(self, nrows=1, ncols=None):
+            r"""Return the finite matrix Mor over this ring, as an algebra when square.
+
+            Called with no arguments this answers the ``1 x 1`` matrix space over
+            the ring.  That case is not decoration: Sage's
+            ``MatrixSpace._coerce_map_from_`` probes *any* parent ``S`` for a
+            zero-argument ``S.matrix_space()`` when it looks for a coercion into
+            a matrix space, and a ring is such a parent.  Without the default
+            that probe raises ``TypeError``, so an ordinary product such as
+            ``2 * M`` for a Sage matrix ``M`` and this library's integer literal
+            fails with a signature error from inside the coercion model.  The
+            probe's answer is harmless for a ring: the coercion then declines
+            through its own ``has_coerce_map_from`` test.
+            """
             from sage_extensions.categories.algebras.algebras import (
                 _require_matrix_algebra,
             )
