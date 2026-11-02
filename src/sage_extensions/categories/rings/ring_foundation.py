@@ -7092,17 +7092,20 @@ def _owned_ring_category(
 
 
 def _install_self_module_placement(ring) -> None:
-    r"""Place ``ring`` among the objects of its module category, with its basis.
+    r"""Place ``ring`` among the objects of its module category, with its frame.
 
-    A ring is a module over its base ring — ``module_category()`` reports
-    ``Modules(ring.base_ring())`` — and that reading is cyclic: the class of the
-    unit generates it, so its canonical basis is ``{1}``, the same basis the
-    native module frames state for a regular module.  The frame is registered
-    under exactly the owner ``module_category()`` answers with, which is what
-    ``module_generating_set()`` and ``has_selected_module_resolution()`` look up.
-    A ring whose own module construction already supplies that basis (a native
-    free algebra and its regular module) keeps it: this owner only fills the gap
-    for the rings that state no basis of themselves, and it states the same one.
+    A ring is a module over its base ring: ``module_category()`` reports
+    ``Modules(ring.base_ring())``.  For a quotient ``A = R[x]/I`` that reading is
+    a *cyclic generating family* — the quotient map is onto, so the class of
+    ``1`` generates ``A`` over its cover — and it is **not** a basis: every
+    element of ``I`` multiplies that class to zero, so the frame is a surjection
+    ``R[x]^1 -> A`` and the relations are the ideal's chosen generators.  The
+    frame and, when the ideal's generating family is decided finite, the
+    truncation-one presentation are registered under exactly the owner
+    ``module_category()`` answers with.  No freeness, projectivity or finite
+    presentation is inferred from the label count: ``ZZ/2`` is not projective
+    over ``ZZ``, and an ideal with no decided finite generating family gets the
+    generating family alone.
     """
     from sage_extensions.categories.modules.pure.modules import (
         Modules,
@@ -7115,10 +7118,9 @@ def _install_self_module_placement(ring) -> None:
     if ring not in placement:
         refine(ring, placement)
     if ring not in QuotientRings():
-        # A native free algebra supplies this basis through its own module
-        # construction, and a localization is read over its source; the class
-        # of the unit generates a quotient over its cover, which is what is
-        # stated here.
+        # A native free algebra supplies its own basis, and a localization is
+        # read over its source; the cyclic generating family is what a quotient
+        # states over its cover.
         return
     if ring.has_selected_module_resolution():
         return
@@ -7132,6 +7134,20 @@ def _install_self_module_placement(ring) -> None:
         lambda label: ring.one(),
         lambda: free,
     )
+    # The regular module — the ring over *itself* — is free of rank one on the
+    # same class of the unit, and that reading has no relations.  It is stated
+    # under its own owner so a construction that reads the ring as a module over
+    # itself (restriction of scalars of the regular module) finds it.
+    self_module_category = Modules(ring)
+    if not ring.has_selected_resolution(self_module_category):
+        ring_free = ring.free_module(1)
+        _fix_selected_module_resolution(
+            ring,
+            ring,
+            ring_free.module_generating_set(),
+            lambda label: ring.one(),
+            lambda: ring_free,
+        )
 
 
 def _install_engine_selected_ring_data(ring, engine) -> None:

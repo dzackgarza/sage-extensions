@@ -5422,20 +5422,29 @@ def _restricted_scalars_view(
     This dimension transport does not require or create a finite frame of M.
     """
     extension_ring = _owned_ring(module.base_ring())
+    selected_basis = (
+        module._module_basis_along(ring_map) if module in OwnedRings() else None
+    )
     if _owned_ring(ring_map.codomain()) is not extension_ring:
         # A ring read as a module over ``R`` along its own structure map has
         # that ring as its extension: ``Res_f(S)`` where ``f`` is the
         # structure morphism of the ``R``-algebra ``S`` is ``S`` over ``R``.
-        # No other endpoint is admitted, and the coefficient base of ``S`` is
-        # not changed by reading it this way.
+        # A ring that instead selects a finite basis of itself along ``f``
+        # (``_module_basis_along``) is read along exactly that basis too: the
+        # coefficient composite ``R -> P -> R[x]/I`` is such a map, and the
+        # basis it selects is the one the ring states, not one supplied here.
         assert (
             module in OwnedRings()
             and _owned_ring(ring_map.codomain()) is module
-            and ring_map is module.algebra_structure_morphism()
+            and (
+                ring_map is module.algebra_structure_morphism()
+                or selected_basis is not None
+            )
         ), (
             f"{module} cannot be restricted along {ring_map}: the ring morphism must end at the scalar "
             f"ring {extension_ring} of the module, or the module must be a ring restricted along its "
-            f"own structure morphism, but its codomain is {ring_map.codomain()}"
+            f"own structure morphism or along a map it selects a basis for, but its codomain is "
+            f"{ring_map.codomain()}"
         )
         extension_ring = _owned_ring(module)
     from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
@@ -5469,9 +5478,13 @@ def _restricted_scalars_view(
         and ring_map.codomain() is extension_ring
     )
     scalar_basis = (
-        extension_ring._module_basis_along(ring_map)
-        if finitely_framed or field_tower
-        else None
+        selected_basis
+        if selected_basis is not None
+        else (
+            extension_ring._module_basis_along(ring_map)
+            if finitely_framed or field_tower
+            else None
+        )
     )
     finite_scalar_basis = (
         scalar_basis is not None
