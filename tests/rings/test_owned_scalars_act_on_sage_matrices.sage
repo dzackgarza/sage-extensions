@@ -123,12 +123,15 @@ def test_the_side_of_the_action_is_the_side_of_the_product() -> None:
 
     ``QQ`` and ``GF(2)`` cannot tell the two sides apart, so the adapter's side is
     checked where it is visible: matrices over the quaternion algebra
-    ``(-1, -1)`` over ``QQ``.  A central scalar (one from an owned ring, which is
-    the only kind the coercion model hands the adapter) multiplies the same way on
-    either side; a noncentral coefficient, applied to the adapter directly, must
-    not: the left adapter is the entrywise left product and the right adapter the
-    entrywise right product, and an adapter that always wrote ``M * x`` would
-    return the right product for both.
+    ``(-1, -1)`` over ``QQ``.  Both sides are *defined* there for a scalar the base
+    ring can read — entrywise multiplication on the named side — and centrality is
+    only what makes them agree.  The integer ``2`` has central image (the image of
+    ``Z`` is central in any unital ring), so ``2 * M == M * 2``; a noncentral
+    coefficient, applied to the adapter directly, must not agree: the left
+    adapter is the entrywise left product and the right adapter the entrywise
+    right product, and an adapter that always wrote ``M * x`` would return the
+    right product for both.  No centrality is inferred from a source ring being
+    commutative, so nothing here depends on that false implication.
     """
     from sage.algebras.quatalg.quaternion_algebra import QuaternionAlgebra
 

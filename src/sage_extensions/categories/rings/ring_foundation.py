@@ -4533,22 +4533,13 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
             base = source.base_ring()
             if not _matrix_base_admits_scalars_from(self, base):
                 return super()._get_action_(source, op, self_on_left)
-            if (
-                self_on_left is False
-                and _matrix_base_is_commutative(base) is not True
-                and self not in OwnedRings().Commutative()
-            ):
-                # A right action needs the scalar to be central in the base ring.
-                # A commutative scalar ring has central image, and a commutative
-                # base ring needs no assumption at all; with both sides merely not
-                # known commutative, that centrality is not established, so the
-                # statement is refused rather than guessed.  Noncommutativity of
-                # the base alone is not such a case.
-                raise TypeError(
-                    f"a matrix over {base} cannot be acted on from the right by a scalar of {self}: "
-                    f"neither ring is known to be commutative, so the scalar is not known to be "
-                    f"central in the base ring — write the scalar on the left"
-                )
+            # Both sides are defined as soon as the base ring reads the scalar:
+            # ``r * M`` is the entrywise left product and ``M * r`` the entrywise
+            # right one, and neither needs the scalar to be central.  Centrality
+            # decides only whether the two products *agree*, so it is not a
+            # permission to grant or withhold — in particular, no centrality is
+            # inferred from the scalar's ring being commutative, which would be
+            # false for a ring whose image in the base is not central.
             return _OwnedScalarOnSageMatrices(self, source, self_on_left)
 
         def matrix_space(self, nrows=1, ncols=None):
@@ -7530,12 +7521,17 @@ class _OwnedScalarOnSageMatrices(Action):
     ``r * M`` multiplies every entry of ``M`` on the *left* by ``r`` and
     ``M * r`` on the right, both in the matrix's own base ring.  The side is the
     side of the action, not a convention: over a noncommutative base ring
-    (a quaternion algebra, a matrix ring) left and right products differ, and an
+    (a quaternion algebra, a matrix ring) the two products differ, and an
     adapter that always wrote ``matrix * coefficient`` would silently reverse
     ``r * M``.  The scalar crosses into that ring first — by coercion when the
     base ring is owned, and through the owned ring's engine realization when the
     base ring is a Sage ring — so the arithmetic is the base ring's own and
     nothing is rebuilt in a second representation.
+
+    Neither side needs the scalar to be *central*: entrywise multiplication on
+    the named side is defined for any scalar the base ring can read.  Centrality
+    is the hypothesis under which the two sides coincide, not the hypothesis
+    under which right multiplication exists.
     """
 
     def __init__(self, ring, matrix_space, is_left) -> None:
@@ -7548,18 +7544,6 @@ class _OwnedScalarOnSageMatrices(Action):
         if self._is_left:
             return parent([coefficient * entry for entry in matrix.list()])
         return parent([entry * coefficient for entry in matrix.list()])
-
-
-def _matrix_base_is_commutative(base):
-    r"""Whether ``base`` is known to be commutative, as a matrix base ring."""
-    from sage_extensions.categories.rings.ring_foundation import OwnedRings
-
-    if base in OwnedRings():
-        return base in OwnedRings().Commutative()
-    try:
-        return bool(base.is_commutative())
-    except AttributeError:
-        return None
 
 
 def _matrix_base_admits_scalars_from(ring, base) -> bool:
