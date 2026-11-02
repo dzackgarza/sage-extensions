@@ -1127,6 +1127,20 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
                             ),
                         )
                         return
+                # Both sides are finite-index character kernels (e.g. discriminant
+                # preimage ∩ spinor kernel for Γ_h). Neither is generated, but
+                # the ambient O(N) is — use its finite-index Schreier.
+                if all(
+                    sg in PredicateSubgroups(group) and sg.contains_character_kernel()
+                    for sg in intersected_subgroups
+                ) and group.has_selected_group_resolution():
+                    _fix_selected_generating_morphism(
+                        self,
+                        lambda intersection, intersected_subgroups=intersected_subgroups: (
+                            intersection._character_intersection_generating_morphism(intersected_subgroups)
+                        ),
+                    )
+                    return
 
         def intersected_subgroups(self):
             return self._intersected_subgroups
@@ -1162,6 +1176,32 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
                 generators=generated.group_generators(),
             )
             return (inclusion * restricted.inclusion() * augmentation).factor_through(self.inclusion())
+
+        def _character_intersection_generating_morphism(self, intersected_subgroups):
+            group = self.supergroup()
+            # Iterative finite-index intersection: each character kernel has finite index
+            cur = group
+            last_augmentation = None
+            last_restricted = None
+            for character_subgroup in intersected_subgroups:
+                quotient = character_subgroup.finite_character_quotient()
+                index_bound = int(quotient.image_keys().cardinality()) // int(quotient.subgroup_image_keys().cardinality())
+                # predicate subgroup of cur via pullback of character_subgroup through cur inclusion
+                nxt = cur.predicate_subgroup(
+                    lambda element, cs=character_subgroup, cur=cur: cur.inclusion()(element) in cs,
+                    f"element of {cur} lies in {character_subgroup}",
+                )
+                augmentation = nxt.finite_index_schreier_generating_morphism(
+                    index_bound=index_bound,
+                    generators=cur.group_generators(),
+                )
+                # Compose for final factor: E_{i+1} -> nxt -> cur -> ... -> group
+                # For next iteration, cur becomes nxt
+                last_augmentation = augmentation
+                last_restricted = nxt
+                cur = nxt
+            # last_augmentation: E -> cur, cur equals intersection as set; factor to self
+            return (last_restricted.inclusion() * last_augmentation).factor_through(self.inclusion()) if last_augmentation else self.supergroup().selected_group_resolution().augmentation().factor_through(self.inclusion())
 
 __all__ = [
     "CentralizerSubgroups",
