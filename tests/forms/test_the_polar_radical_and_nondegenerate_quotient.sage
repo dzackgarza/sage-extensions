@@ -20,6 +20,7 @@ from sage_extensions.categories.modules.framed.formed import (
 )
 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import (
     _regenerate_form_on_generators,
+    _torsion_form_orthogonal_subobject,
 )
 from sage_extensions.categories.modules.framed.fraction_field_quotients import (
     FractionFieldQuotients,
@@ -148,3 +149,26 @@ def test_a_reframed_copy_has_an_isometric_quotient() -> None:
     reframed_quotient = reframed.nondegenerate_quotient()
     assert reframed_quotient.cardinality() == quotient.cardinality()
     assert quotient.is_isomorphic(reframed_quotient) is True
+
+
+def test_the_orthogonal_complement_is_the_same_kernel_not_an_enumeration() -> None:
+    r"""``S^perp`` is ``{x : b(x, s) = 0}`` computed from the pairing, and agrees with the elementwise form.
+
+    The radical is this kernel with the form's own generators as the pairing
+    family, so an orthogonal complement is the same computation for another
+    family — not a scan of the module, which on a 2048-element discriminant form
+    took the shared subquotient construction past fifteen minutes.
+    """
+    form = _quadratic([[4, 0], [0, 4]], [[HALF, 0], [0, HALF]])
+    generator = form.module_generators()[0]
+    subobject = form.subobject_generated_by((generator,))
+    perpendicular = _torsion_form_orthogonal_subobject(form, subobject, quadratic=True)
+
+    zero = form.b(generator, generator) * 0
+    expected = tuple(
+        element
+        for element in form.elements()
+        if (form.b(element, generator) == zero) is True
+    )
+    assert perpendicular.cardinality() == len(expected)
+    assert perpendicular.cardinality() == 8

@@ -683,14 +683,10 @@ def _torsion_form_orthogonal_subobject(form, subobject, *, quadratic: bool):
             f"the orthogonal complement in {form} is taken of a submodule of {form}, but {subobject} "
             f"is a submodule of {inclusion.codomain()}"
         )
-    generators = tuple(subobject.embedded_module_generators())
-    zero = form.associated_bilinear_form().value_module().zero() if quadratic else form.value_module().zero()
-    selected = tuple(
-        element
-        for element in form.elements()
-        if all(form.b(element, generator) == zero for generator in generators)
+    generators = tuple(
+        inclusion(generator) for generator in subobject.module_generators()
     )
-    return _torsion_form_subobject_on(form, selected, quadratic=quadratic)
+    return _torsion_form_orthogonal_kernel(form, generators, quadratic=quadratic)
 
 
 def _torsion_form_lagrangian_subobjects(form, *, quadratic: bool):
@@ -874,41 +870,46 @@ def _regenerate_form_on_generators(form, generators, *, quadratic: bool):
     return _torsion_form_isometry(forward, inverse, quadratic=quadratic)
 
 
-def _torsion_form_polar_radical(form, *, quadratic: bool):
-    r"""Return the radical of the polar form of ``form``, as a subobject of it.
+def _torsion_form_orthogonal_kernel(form, pairing_generators, *, quadratic: bool):
+    r"""Return ``{x : b(x, g) = 0 for every g in pairing_generators}`` as a subobject.
 
-    The radical is the kernel of ``x |-> b(x, -)``, which on the invariant-factor
-    framing is the kernel of the homomorphism ``M -> (Z/N)^n`` carrying the
-    ``i``-th generator to the ``i``-th row of the cleared Gram matrix, with
-    ``N = denominator * value_modulus``.  It is built as the kernel of that
-    module morphism, so the generators come from the module's own kernel owner
-    rather than from a second normal-form algorithm, and the result is the
-    form-bearing subobject the subquotient constructor takes.
+    On the invariant-factor framing this is the kernel of the homomorphism
+    ``M -> (Z/N)^k`` carrying ``x`` to the pairings ``b(x, g_j)``, with ``N``
+    clearing the Gram's denominators times the value modulus.  It is built through
+    the module's own kernel owner rather than by enumerating the module, so the
+    radical (the pairing family is the form's own generators) and an orthogonal
+    complement (the family is a subobject's generators) are one computation.
     """
     from sage_extensions.categories.modules.framed.formed.form_modules import (
         _relation_morphism,
     )
 
+    pairing_generators = tuple(pairing_generators)
     module = _underlying_presented_module(form)
     ring = _owned_ring(module.base_ring())
-    invariants = tuple(int(invariant) for invariant in module.invariants())
-    rank = len(invariants)
+    # The map is determined by its values on the form's chosen generators, however
+    # many of them there are; a presented subquotient may carry a redundant
+    # generating family, so the generator count is the matrix width and the Mor
+    # constructor is what checks well-definedness on the relations.
     generators = tuple(form.module_generators())
-    if len(generators) != rank:
-        raise ValueError(
-            f"the invariant-factor framing of {form} has {rank} invariants but "
-            f"{len(generators)} generators; the radical needs one generator per invariant"
-        )
+    rank = len(generators)
+    pairing_count = len(pairing_generators)
+    if pairing_count == 0:
+        return form.subobject_generated_by(generators)
 
     def lifted_pairing(left, right):
         value = form.b(left, right).lift()
         return value.parent()._engine_element(value)
 
-    gram = _engine_matrix(
+    pairing = _engine_matrix(
         SageQQ,
+        pairing_count,
         rank,
-        rank,
-        [lifted_pairing(left, right) for left in generators for right in generators],
+        [
+            lifted_pairing(generator, pairing_generator)
+            for pairing_generator in pairing_generators
+            for generator in generators
+        ],
     )
     if quadratic:
         value_modulus = SageQQ(1)
@@ -918,35 +919,43 @@ def _torsion_form_polar_radical(form, *, quadratic: bool):
                 form.value_module().modulus()
             )
         )
-    integral, denominator = gram._clear_denom()
+    integral, denominator = pairing._clear_denom()
     modulus = SageZZ(denominator) * SageZZ(value_modulus)
-    relation_rows = [
-        [int(modulus) if row == column else 0 for column in range(rank)]
-        for row in range(rank)
-    ]
     target = Modules(ring).FinitelyPresented().Torsion()(
-        _relation_morphism(ring, relation_rows)
+        _relation_morphism(
+            ring,
+            [
+                [int(modulus) if row == column else 0 for column in range(pairing_count)]
+                for row in range(pairing_count)
+            ],
+        )
     )
     labels = tuple(target.module_generating_set())
     images = {
         module.module_generating_set()[column]: target.linear_combination(
             {
-                labels[row]: ring(int(integral[column, row]))
-                for row in range(rank)
-                if int(integral[column, row]) % int(modulus)
+                labels[row]: ring(int(integral[row, column]))
+                for row in range(pairing_count)
+                if int(integral[row, column]) % int(modulus)
             }
         )
         for column in range(rank)
     }
     kernel = module.module_category().Mor(module, target)(images).kernel()
-    # The kernel is its own presented module: its generators are read into the
-    # ambient module by the kernel's inclusion, which is the actual embedding,
-    # not by a coerced element of the same label.
+    # The kernel is its own presented module: its generators enter the ambient
+    # module through the kernel's inclusion, not by coercing a same-named element.
     return form.subobject_generated_by(
         tuple(
             form(kernel.inclusion()(generator))
             for generator in kernel.module_generators()
         )
+    )
+
+
+def _torsion_form_polar_radical(form, *, quadratic: bool):
+    r"""Return the radical of the polar form, as a subobject of ``form``."""
+    return _torsion_form_orthogonal_kernel(
+        form, form.module_generators(), quadratic=quadratic
     )
 
 
