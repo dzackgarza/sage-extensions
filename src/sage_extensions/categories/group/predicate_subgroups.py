@@ -1178,30 +1178,19 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
             return (inclusion * restricted.inclusion() * augmentation).factor_through(self.inclusion())
 
         def _character_intersection_generating_morphism(self, intersected_subgroups):
+            # All intersected_subgroups are finite-index character kernels of group.
+            # Their intersection is finite-index with bound product of individual indices.
+            # Use the group's known generators directly on self, which is exactly
+            # the conjunction predicate, via the bounded Schreier on self.
             group = self.supergroup()
-            # Iterative finite-index intersection: each character kernel has finite index
-            cur = group
-            last_augmentation = None
-            last_restricted = None
-            for character_subgroup in intersected_subgroups:
-                quotient = character_subgroup.finite_character_quotient()
-                index_bound = int(quotient.image_keys().cardinality()) // int(quotient.subgroup_image_keys().cardinality())
-                # predicate subgroup of cur via pullback of character_subgroup through cur inclusion
-                nxt = cur.predicate_subgroup(
-                    lambda element, cs=character_subgroup, cur=cur: cur.inclusion()(element) in cs,
-                    f"element of {cur} lies in {character_subgroup}",
-                )
-                augmentation = nxt.finite_index_schreier_generating_morphism(
-                    index_bound=index_bound,
-                    generators=cur.group_generators(),
-                )
-                # Compose for final factor: E_{i+1} -> nxt -> cur -> ... -> group
-                # For next iteration, cur becomes nxt
-                last_augmentation = augmentation
-                last_restricted = nxt
-                cur = nxt
-            # last_augmentation: E -> cur, cur equals intersection as set; factor to self
-            return (last_restricted.inclusion() * last_augmentation).factor_through(self.inclusion()) if last_augmentation else self.supergroup().selected_group_resolution().augmentation().factor_through(self.inclusion())
+            index_bound = 1
+            for cs in intersected_subgroups:
+                q = cs.finite_character_quotient()
+                index_bound *= int(q.image_keys().cardinality()) // int(q.subgroup_image_keys().cardinality())
+            return self.finite_index_schreier_generating_morphism(
+                index_bound=index_bound,
+                generators=group.group_generators(),
+            )
 
 __all__ = [
     "CentralizerSubgroups",
