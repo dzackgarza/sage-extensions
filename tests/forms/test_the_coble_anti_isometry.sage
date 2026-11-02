@@ -43,34 +43,44 @@ def _block_diagonal(blocks):
 def _coble_discriminant_forms():
     r"""``A_{S_{Co}}`` and the twisted ``A_{T_{Co}}(-1)`` of the published report.
 
-    ``S = <2> + <-2>^{10}`` and ``T = <2> + 2U + 2*(-E_8 Cartan)``, the Gram
-    matrices of the report, written out as integers so that the specimen depends
-    only on the numbers it states.
+    The report's own construction is used: ``S`` with Gram ``<2> + <-2>^{10}`` and
+    ``T`` with Gram ``<2> + 2U + 2*(-E_8 Cartan)``, where the E8 Cartan matrix is
+    the one Sage's combinatorics states.  The matrices are assembled as integer
+    lists only because Sage's block-diagonal assembly coerces through the owned
+    ring's ``matrix_space`` protocol in this session; the *numbers* are the
+    published constructor's, not an approximation — a hand-written diagram of the
+    wrong shape (the affine one, say) is semidefinite and has a degenerate
+    discriminant form, which the polar-radical criterion then refuses.
     """
+    from sage.combinat.root_system.cartan_matrix import CartanMatrix
+
+    cartan = [
+        [int(entry) for entry in row]
+        for row in CartanMatrix(["E", int(8)]).rows()
+    ]
+    # ``int(8)``: this session's preparser makes the literal a Sage Integer, which
+    # Sage's CartanMatrix rejects here; the type argument is the same E8.
+    assert len(cartan) == 8
+    assert all(cartan[i][i] == 2 for i in range(8))
+    assert all(
+        cartan[i][j] == cartan[j][i] and cartan[i][j] in (0, -1)
+        for i in range(8)
+        for j in range(8)
+        if i != j
+    )
+    e8 = [[-entry for entry in row] for row in cartan]
+    hyperbolic = [[0, 2], [2, 0]]
+
     diagonal = [2] + [-2] * 10
     s_gram = [
         [diagonal[row] if index == row else 0 for index in range(11)]
         for row in range(11)
     ]
-    # The E8 Cartan matrix as Sage's combinatorics states it, negated: the
-    # specimen's 2*(-E8 Cartan).  It is unimodular; a Bourbaki relabelling would
-    # be the same lattice, but a diagram of the wrong shape (the affine one, for
-    # instance) is not, and its discriminant form has a radical.
-    cartan_e8 = [
-        [-2, 0, 1, 0, 0, 0, 0, 0],
-        [0, -2, 0, 1, 0, 0, 0, 0],
-        [1, 0, -2, 1, 0, 0, 0, 0],
-        [0, 1, 1, -2, 1, 0, 0, 0],
-        [0, 0, 0, 1, -2, 1, 0, 0],
-        [0, 0, 0, 0, 1, -2, 1, 0],
-        [0, 0, 0, 0, 0, 1, -2, 1],
-        [0, 0, 0, 0, 0, 0, 1, -2],
-    ]
     t_gram = _block_diagonal(
         [
             [[2]],
-            [[0, 2], [2, 0]],
-            [[2 * entry for entry in row] for row in cartan_e8],
+            hyperbolic,
+            [[2 * entry for entry in row] for row in e8],
         ]
     )
 
@@ -94,7 +104,15 @@ def test_the_two_coble_discriminant_forms_are_anti_isometric() -> None:
 
 
 def test_the_witness_is_a_typed_isometry_realizing_the_anti_isometry() -> None:
-    r"""``q_T(gamma x) = -q_S(x)`` on every generator, and the inverse composes."""
+    r"""``q`` and ``b`` at once, the sign included, with inverse and composition.
+
+    The source form is ``q``-valued in ``Q/2Z``; the codomain is the twist by
+    ``-1``.  A witness is accepted only if it preserves the codomain form
+    exactly — ``q`` on generators and on pair sums, ``b`` on every pair of
+    generators — and that is what makes
+    ``q_T(gamma x) = -q_S(x)`` and ``b_T(gamma x, gamma y) = -b_S(x, y)`` hold
+    against the *untwisted* form.
+    """
     source, plain, twisted = _coble_discriminant_forms()
     witness = source.isometry_to(twisted)
 
@@ -105,8 +123,39 @@ def test_the_witness_is_a_typed_isometry_realizing_the_anti_isometry() -> None:
 
     generators = tuple(source.module_generators())
     assert len(generators) == 11
-    for generator in generators:
-        image = witness.forward()(generator)
+    images = tuple(witness.forward()(generator) for generator in generators)
+
+    # The codomain form is preserved exactly.
+    for generator, image in zip(generators, images, strict=True):
         assert twisted.q(image) == source.q(generator)
+    for left in generators:
+        for right in generators:
+            assert twisted.q(witness.forward()(left + right)) == source.q(left + right)
+            assert (
+                twisted.b(witness.forward()(left), witness.forward()(right))
+                == source.b(left, right)
+            )
+
+    # Against the untwisted form this is an anti-isometry, sign included.
+    for generator, image in zip(generators, images, strict=True):
         assert plain.q(image) == -source.q(generator)
+    for left in generators:
+        for right in generators:
+            assert plain.q(witness.forward()(left + right)) == -source.q(left + right)
+            assert (
+                plain.b(witness.forward()(left), witness.forward()(right))
+                == -source.b(left, right)
+            )
+
+    # The inverse pair and the two composites, on the generators.
+    for generator, image in zip(generators, images, strict=True):
         assert witness.inverse()(image) == generator
+    for image in images:
+        assert witness.forward()(witness.inverse()(image)) == image
+    # ``f.then(g)`` is ``g`` after ``f``, so each composite fixes the end it ends at.
+    forward_then_inverse = witness.then(witness.inverse())
+    inverse_then_forward = witness.inverse().then(witness)
+    for generator in generators:
+        assert forward_then_inverse(generator) == generator
+    for image in images:
+        assert inverse_then_forward(image) == image

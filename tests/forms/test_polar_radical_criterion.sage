@@ -121,3 +121,48 @@ def test_the_bilinear_flavour_separates_the_two_torsion_orders() -> None:
     with pytest.raises(TypeError, match="non-degenerate polar forms"):
         _bilinear([[4]], [[HALF]]).is_isomorphic(_bilinear([[4]], [[HALF]]))
     assert _bilinear([[2]], [[HALF]]).is_isomorphic(_bilinear([[2]], [[HALF]])) is True
+
+
+def test_a_mixed_order_perfect_pairing_is_accepted() -> None:
+    r"""``Z/2 + Z/4`` with the diagonal pairing ``1/2, 1/4`` is perfect.
+
+    Clearing denominators gives ``H = diag(2, 1)`` with ``N = 4`` and Smith
+    invariants ``(1, 2)``, while the module's invariants are ``(2, 4)``.  The
+    Smith order is not the invariant order — a Smith transformation mixes
+    coordinates — so a criterion that pairs ``D_i`` with ``s_i`` position by
+    position rejects this perfect form.  The order of the radical is
+    ``prod_i D_i * gcd(s_i, N) / N^n = 8 * 2 / 16 = 1``.
+    """
+    first = _bilinear([[2, 0], [0, 4]], [[QQ(1) / QQ(2), 0], [0, QQ(1) / QQ(4)]])
+    second = _bilinear([[2, 0], [0, 4]], [[QQ(1) / QQ(2), 0], [0, QQ(1) / QQ(4)]])
+
+    generators = tuple(first.module_generators())
+    assert len(_polar_radical(first, tuple(first.elements()))) == 1
+    assert first is not second
+    assert first.is_isomorphic(second) is True
+
+
+def test_the_mixed_order_verdict_survives_a_generator_permutation() -> None:
+    r"""The same pairing with the two generators exchanged."""
+    permuted = _bilinear([[4, 0], [0, 2]], [[QQ(1) / QQ(4), 0], [0, QQ(1) / QQ(2)]])
+
+    assert len(_polar_radical(permuted, tuple(permuted.elements()))) == 1
+    assert permuted.is_isomorphic(permuted) is True
+
+
+def test_the_mixed_order_verdict_survives_a_unit_rescaling() -> None:
+    r"""``3`` is a unit of ``Z/4`` with ``9 = 1`` modulo ``4``: the same form."""
+    rescaled = _bilinear([[2, 0], [0, 4]], [[QQ(1) / QQ(2), 0], [0, QQ(9) / QQ(4)]])
+
+    assert len(_polar_radical(rescaled, tuple(rescaled.elements()))) == 1
+    assert rescaled.is_isomorphic(rescaled) is True
+
+
+def test_a_mixed_order_form_with_a_vanishing_block_is_still_refused() -> None:
+    r"""``diag(1/2, 0)`` on ``Z/2 + Z/4``: the whole ``Z/4`` is radical."""
+    degenerate = _bilinear([[2, 0], [0, 4]], [[QQ(1) / QQ(2), 0], [0, 0]])
+
+    radical = _polar_radical(degenerate, tuple(degenerate.elements()))
+    assert len(radical) == 4
+    with pytest.raises(TypeError, match="non-degenerate polar forms"):
+        degenerate.is_isomorphic(degenerate)
