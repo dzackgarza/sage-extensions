@@ -5333,7 +5333,7 @@ def _restricted_scalar_framing_labels(module, scalar_basis):
     )
 
 
-def _restricted_scalar_presentation(module, ring_map, labels, scalar_basis):
+def _restricted_scalar_presentation(module, ring_map, labels, scalar_basis, relations=None):
     r"""Return the relation morphism of ``Res_f(M)`` induced by the one of ``M``.
 
     Suppose ``Res_f(S)`` is finite free over ``R`` on ``(s_i)`` and ``M`` is
@@ -5350,11 +5350,12 @@ def _restricted_scalar_presentation(module, ring_map, labels, scalar_basis):
     ring = _owned_ring(ring_map.domain())
     extension_ring = _owned_ring(module.base_ring())
     scalar_labels = scalar_basis.source().module_generating_set()
-    relations = module._selected_relation_morphism()
-    assert relations is not None, (
-        f"the restriction of scalars of {module} needs the relations of its finite presentation, "
-        f"but {module} has none"
-    )
+    if relations is None:
+        relations = module._selected_relation_morphism()
+        assert relations is not None, (
+            f"the restriction of scalars of {module} needs the relations of its finite presentation, "
+            f"but {module} has none"
+        )
     generators = ring._fresh_free_module_on(labels)
 
     def restricted_relation(relation_label, scalar_label):
@@ -5500,6 +5501,18 @@ def _restricted_scalars_view(
         and scalar_basis.source() in FinitelyGeneratedFreeModules(base_ring)
     )
     framed_over_finite_free_scalars = finitely_framed and finite_scalar_basis
+    regular_relations = None
+    if ring_as_module_reading and framed_over_finite_free_scalars:
+        # The reading is the ring taken along a map into itself, so the module it
+        # reads is the ring over its own regular module: cyclic on the class of
+        # the unit, with no relations.  That is a fact of this reading, not an
+        # inference from the ring's codomain, and the scalar basis above is what
+        # states that the reading is finite over the coefficient ring.
+        relation_source = module.free_module(0)
+        relation_target = module.free_module(1)
+        regular_relations = relation_source.module_category().Mor(
+            relation_source, relation_target
+        )({})
     restriction_data = None
     if not framed_over_finite_free_scalars:
         restriction_data = module._scalar_restriction_data(ring_map)
@@ -5516,13 +5529,17 @@ def _restricted_scalars_view(
     match module:
         case _ if (
             framed_over_finite_free_scalars
-            and module in ModulesWithChosenFinitePresentation(extension_ring)
+            and (
+                module in ModulesWithChosenFinitePresentation(extension_ring)
+                or regular_relations is not None
+            )
         ):
             presentation = _restricted_scalar_presentation(
                 module,
                 ring_map,
                 _restricted_scalar_framing_labels(module, scalar_basis),
                 scalar_basis,
+                relations=regular_relations,
             )
             placement.append(_SelectedFinitePresentationModules(base_ring))
             data.update(
