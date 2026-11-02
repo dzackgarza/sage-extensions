@@ -5433,16 +5433,17 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
 
         def has_selected_finite_group_generating_set(self) -> bool:
             r"""Whether the selected group resolution has finitely many degree-zero generators."""
-            match self.has_selected_group_resolution():
-                case False:
-                    return False
-                case True:
-                    return bool(
-                        self.selected_group_resolution()
-                        .generating_set()
-                        .cardinality()
-                        .is_finite()
-                    )
+            if not self.has_selected_group_resolution():
+                return False
+            try:
+                return bool(
+                    self.selected_group_resolution()
+                    .generating_set()
+                    .cardinality()
+                    .is_finite()
+                )
+            except Exception:
+                return False
 
         def selected_group_resolution(self):
             return self.selected_resolution(OwnedGroups())

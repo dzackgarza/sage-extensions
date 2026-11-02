@@ -1055,6 +1055,26 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
                 f"{[subgroup for subgroup in subgroups if subgroup.supergroup() is not group]} "
                 f"are not subgroups of {group}"
             )
+        # Retain character_data from intersected subgroups when not supplied explicitly
+        # (e.g. Γ_h = ρ⁻¹(H) ∩ O⁺(N) via G.intersection): merged data makes
+        # finite_character_quotient available on the intersection itself.
+        if character_data is None and character_data_complete is None:
+            merged = {}
+            complete = True
+            for sg in subgroups:
+                if sg in PredicateSubgroups(group):
+                    snap = sg._character_data_snapshot()
+                    # merge deterministically: OR for kernels, concat for preimages
+                    merged["determinant_kernel"] = bool(merged.get("determinant_kernel", False) or snap.get("determinant_kernel", False))
+                    merged["spinor_kernel"] = bool(merged.get("spinor_kernel", False) or snap.get("spinor_kernel", False))
+                    if snap.get("discriminant_preimages", ()):
+                        merged["discriminant_preimages"] = tuple(merged.get("discriminant_preimages", ())) + tuple(snap.get("discriminant_preimages", ()))
+                    complete = complete and sg.character_data_is_complete()
+                else:
+                    complete = False
+            if merged:
+                character_data = {k: v for k, v in merged.items() if v}
+                character_data_complete = complete
         return _object_of(
             _predicate_subgroup_category(self),
             _ambient=OwnedGroups(),
@@ -1082,7 +1102,7 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
                 if all(
                     sg in PredicateSubgroups(group) and sg.contains_character_kernel()
                     for sg in intersected_subgroups
-                ) and group.has_selected_group_resolution() and group.has_selected_finite_group_generating_set():
+                ) and group.has_selected_group_resolution():
                     _fix_selected_generating_morphism(
                         self,
                         lambda intersection, intersected_subgroups=intersected_subgroups: (
@@ -1173,15 +1193,20 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
             return (inclusion * restricted.inclusion() * augmentation).factor_through(self.inclusion())
 
         def _character_intersection_generating_morphism(self, intersected_subgroups):
-            # All intersected_subgroups are finite-index character kernels of group.
-            # Their intersection is finite-index with bound product of individual indices.
-            # Use the group's known generators directly on self, which is exactly
-            # the conjunction predicate, via the bounded Schreier on self.
+            # Lazy: finite-family prerequisite is checked at realization, not construction
             group = self.supergroup()
-            index_bound = 1
-            for cs in intersected_subgroups:
-                q = cs.finite_character_quotient()
-                index_bound *= int(q.image_keys().cardinality()) // int(q.subgroup_image_keys().cardinality())
+            if not group.has_selected_finite_group_generating_set():
+                raise ValueError(f"cannot generate {self}: ambient {group} has no retained finite generating family")
+            # Exact index is available on the intersection itself now that character_data is retained;
+            # fall back to product bound only if that quotient is not yet realizable.
+            try:
+                q = self.finite_character_quotient()
+                index_bound = int(q.image_keys().cardinality()) // int(q.subgroup_image_keys().cardinality())
+            except Exception:
+                index_bound = 1
+                for cs in intersected_subgroups:
+                    q = cs.finite_character_quotient()
+                    index_bound *= int(q.image_keys().cardinality()) // int(q.subgroup_image_keys().cardinality())
             return self.finite_index_schreier_generating_morphism(
                 index_bound=index_bound,
                 generators=group.group_generators(),

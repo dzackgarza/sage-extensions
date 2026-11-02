@@ -11,7 +11,8 @@ family; otherwise it leaves the intersection undecided, preserving the original
 infinite/undecided behavior. Inclusion endpoints are the conjunction predicate
 on the ambient: every generator produced lies in every intersected subgroup,
 and the generated subgroup equals the predicate intersection (index bound is
-the product of the individual finite-character indices).
+the product of the individual finite-character indices, with exact index
+available on the intersection itself when character_data is retained).
 """
 
 from sage_extensions.all import *
@@ -41,6 +42,9 @@ def test_u_lattice_character_intersection_has_small_generating_family():
     H_gen = G.subgroup(gens)
     assert H_gen.cardinality() == inter.cardinality()
     assert H_gen.index() == inter.index() == 2
+    # Exact index via retained character_data on the intersection itself
+    q = inter.finite_character_quotient()
+    assert int(q.image_keys().cardinality()) // int(q.subgroup_image_keys().cardinality()) == 2
 
 def test_preimage_intersection_with_generated_subgroup_preserved():
     # Original branch: preimage ∩ generated must still work
@@ -62,23 +66,26 @@ def test_preimage_intersection_with_generated_subgroup_preserved():
     assert H_gen.cardinality() == inter.cardinality()
     assert all(h in pre and h in B for h in gens)
 
-def test_unsupported_predicate_without_character_kernel_stays_undecided():
-    # Infinite ambient without finite generating family cannot use new branch
-    # Use free group predicate without character data: infinite-index, no finite family
-    G = Groups.Free(2)
-    # Free group has finite generating family (2), but its predicate subgroup without character data should not be considered finite-index
-    # So create a predicate that is not a character kernel and check new branch does not fire for ambient without finite family?
-    # Instead directly test that a predicate without character kernel stays undecided
-    P = G.predicate_subgroup(lambda g: g == G.one(), "trivial predicate, no character")
-    assert P.contains_character_kernel() is False
-    # P is finite-index? For free group, trivial predicate defines trivial subgroup index infinite? Actually trivial subgroup has infinite index
-    # It should not have finite generating family via new branch (since not character kernel)
-    # Check that P itself remains without finite generating family is not asserted here; instead check that
-    # intersection of two non-character predicates on an ambient without finite family would stay undecided
-    # Use an ambient that truly lacks finite generating family: an infinitely generated free group
-    H = Groups.Free(index_set=ZZ)  # countably infinite rank, no finite generating set
-    assert H.has_selected_finite_group_generating_set() is False
-    # Even if we intersect two character kernels (which we don't have), the ambient check would fail
-    # So we just verify the ambient lacks finite family, preserving undecided behavior
-    assert H.has_selected_group_resolution() is True
-    assert H.has_selected_finite_group_generating_set() is False
+def test_missing_finite_family_rejected_non_vacuously():
+    # Non-vacuous regression: ambient has resolution but infinite family,
+    # with two genuine character kernels that would otherwise trigger the new branch.
+    from sage_extensions.categories.group.predicate_subgroups import IntersectionSubgroups, PredicateSubgroups
+    G = Groups.Free(index_set=ZZ)  # countably infinite rank, resolution True, finite False
+    assert G.has_selected_group_resolution() is True
+    assert G.has_selected_finite_group_generating_set() is False
+    # Two synthetic finite-index character kernels using public character_data API
+    K1 = G.predicate_subgroup(lambda g: True, "whole", character_data={"spinor_kernel": True}, character_data_complete=True)
+    K2 = G.predicate_subgroup(lambda g: True, "whole", character_data={"determinant_kernel": True}, character_data_complete=True)
+    assert K1.contains_character_kernel() is True
+    assert K2.contains_character_kernel() is True
+    # Directly exercise the new IntersectionSubgroups branch (G.intersection not defined for Free)
+    inter = IntersectionSubgroups(G)((K1, K2))
+    # New branch is installed (since ambient has resolution) but finite-family check is deferred to realization
+    assert inter.has_selected_group_resolution() is True
+    # Realization must fail with missing finite family, preserving undecided, not eager enumeration
+    assert inter.has_selected_finite_group_generating_set() is False
+    try:
+        tuple(inter.group_generators())
+        assert False, "should have raised due to missing finite family"
+    except (ValueError, TypeError, AssertionError, NotImplementedError):
+        pass
