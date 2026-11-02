@@ -52,6 +52,7 @@ from sage_extensions.categories.rings.ring_foundation import (
     _engine_ring,
     _own_ring,
     _owned_integers,
+    _owned_ring,
 )
 from sage_extensions.categories.sets.finite_ordered_sets import (
     FiniteOrderedSets,
@@ -861,6 +862,82 @@ def _regenerate_form_on_generators(form, generators, *, quadratic: bool):
         )
     forward = form.module_category().Mor(form, regenerated)(forward_images)
     return _torsion_form_isometry(forward, inverse, quadratic=quadratic)
+
+
+def _torsion_form_polar_radical(form, *, quadratic: bool):
+    r"""Return the radical of the polar form of ``form``, as a subobject of it.
+
+    The radical is the kernel of ``x |-> b(x, -)``, which on the invariant-factor
+    framing is the kernel of the homomorphism ``M -> (Z/N)^n`` carrying the
+    ``i``-th generator to the ``i``-th row of the cleared Gram matrix, with
+    ``N = denominator * value_modulus``.  It is built as the kernel of that
+    module morphism, so the generators come from the module's own kernel owner
+    rather than from a second normal-form algorithm, and the result is the
+    form-bearing subobject the subquotient constructor takes.
+    """
+    from sage_extensions.categories.modules.framed.formed.form_modules import (
+        _relation_morphism,
+    )
+
+    module = _underlying_presented_module(form)
+    ring = _owned_ring(module.base_ring())
+    invariants = tuple(int(invariant) for invariant in module.invariants())
+    rank = len(invariants)
+    generators = tuple(form.module_generators())
+    if len(generators) != rank:
+        raise ValueError(
+            f"the invariant-factor framing of {form} has {rank} invariants but "
+            f"{len(generators)} generators; the radical needs one generator per invariant"
+        )
+
+    def lifted_pairing(left, right):
+        value = form.b(left, right).lift()
+        return value.parent()._engine_element(value)
+
+    gram = _engine_matrix(
+        SageQQ,
+        rank,
+        rank,
+        [lifted_pairing(left, right) for left in generators for right in generators],
+    )
+    if quadratic:
+        value_modulus = SageQQ(1)
+    else:
+        value_modulus = SageQQ(
+            form.value_module().modulus().parent()._engine_element(
+                form.value_module().modulus()
+            )
+        )
+    integral, denominator = gram._clear_denom()
+    modulus = SageZZ(denominator) * SageZZ(value_modulus)
+    relation_rows = [
+        [int(modulus) if row == column else 0 for column in range(rank)]
+        for row in range(rank)
+    ]
+    target = Modules(ring).FinitelyPresented().Torsion()(
+        _relation_morphism(ring, relation_rows)
+    )
+    labels = tuple(target.module_generating_set())
+    images = {
+        module.module_generating_set()[column]: target.linear_combination(
+            {
+                labels[row]: ring(int(integral[column, row]))
+                for row in range(rank)
+                if int(integral[column, row]) % int(modulus)
+            }
+        )
+        for column in range(rank)
+    }
+    kernel = module.module_category().Mor(module, target)(images).kernel()
+    # The kernel is its own presented module: its generators are read into the
+    # ambient module by the kernel's inclusion, which is the actual embedding,
+    # not by a coerced element of the same label.
+    return form.subobject_generated_by(
+        tuple(
+            form(kernel.inclusion()(generator))
+            for generator in kernel.module_generators()
+        )
+    )
 
 
 def _normal_form_bridge(first_normal, second_normal, *, quadratic: bool):

@@ -60,6 +60,7 @@ from sage_extensions.categories.modules.framed.formed.torsion_form_modules impor
     _torsion_form_lagrangian_subobjects,
     _torsion_form_maximal_isotropic_subobjects,
     _torsion_form_orthogonal_subobject,
+    _torsion_form_polar_radical,
     _torsion_form_primary_part,
     _torsion_form_subobject_on,
     _torsion_form_subobject_orbits,
@@ -3614,6 +3615,33 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                     return all(
                         self.q(element) == self.value_module().zero()
                         for element in elements
+                    )
+
+                def polar_radical(self):
+                    r"""Return the radical of the polar form, as a subobject of this form.
+
+                    The radical is ``{x : b(x, y) = 0 for every y}``; it is the
+                    kernel of the module morphism ``x |-> b(x, -)``, built by the
+                    module's own kernel owner.
+                    """
+                    return _torsion_form_polar_radical(self, quadratic=True)
+
+                def nondegenerate_quotient(self):
+                    r"""Return this form reduced by its polar radical.
+
+                    ``q(x + r) = q(x) + q(r) + b(x, r) = q(x) + q(r)`` for ``r`` in
+                    the radical, so the quotient carries the descended ``q``
+                    exactly when ``q`` vanishes on the radical; the subquotient
+                    constructor states that condition and refuses otherwise.  The
+                    reduction is a necessary invariant of an isometry, not a
+                    sufficient one: two forms with isomorphic quotients may still
+                    differ by how the radical sits inside them.
+                    """
+                    return _torsion_form_subquotient(
+                        self,
+                        self.polar_radical(),
+                        self.subobject_generated_by(self.module_generators()),
+                        quadratic=True,
                     )
 
                 def gram_matrix(self):
