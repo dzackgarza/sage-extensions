@@ -128,12 +128,15 @@ def test_a_degenerate_form_of_higher_rank_is_decided() -> None:
         assert second.q(witness.forward()(generator)) == first.q(generator)
 
 
-def test_an_undecided_pair_is_reported_as_undecided_not_as_isometric() -> None:
-    r"""Three generators of order ``16``: wider searches are refused, not guessed.
+def test_the_two_diagonal_forms_on_order_sixteen_cubes_are_decided() -> None:
+    r"""The ``(Z/16)^3`` diagonal pair: a copy is isometric, the ``3/8`` form is not.
 
-    The identity of the two framings decides a copy at once; a *different* form on
-    the same module needs a search wider than the transport cap, and the answer is
-    then the undecided error, which says so.
+    Both forms have radical ``8M`` of order eight with ``q`` vanishing there, so
+    every invariant the quotient comparison would state agrees, and the quotient
+    itself used to sit above the enumeration cap that left this pair undecided.
+    The order-qualified value profile separates them — the second form attains
+    ``7/8`` nowhere while the first attains it on 128 elements — so the decision
+    is ``False``, proved, with no search at all.
     """
     copy = _quadratic(
         [[16, 0, 0], [0, 16, 0], [0, 0, 16]],
@@ -149,8 +152,9 @@ def test_an_undecided_pair_is_reported_as_undecided_not_as_isometric() -> None:
         [[16, 0, 0], [0, 16, 0], [0, 0, 16]],
         [[QQ(1) / QQ(8), 0, 0], [0, QQ(1) / QQ(8), 0], [0, 0, QQ(3) / QQ(8)]],
     )
-    with pytest.raises(TypeError, match="undecided"):
-        copy.is_isomorphic(other)
+    assert copy.polar_radical().cardinality() == other.polar_radical().cardinality()
+    assert copy.is_isomorphic(other) is False
+    assert copy.isometry_to(other) is None
 
 
 def test_the_bilinear_flavour_reduces_and_decides_the_same_way() -> None:
