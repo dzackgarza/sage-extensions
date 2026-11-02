@@ -5207,10 +5207,20 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
             extension_module = self.module_over_extension()
             scalar = self._scalar_basis.image(label.component(0))
             module_generator = extension_module.module_generator(label.component(1))
-            return self.element_class(
-                self,
-                extension_module.scalar_multiple(scalar, module_generator),
-            )
+            if (
+                extension_module in OwnedRings()
+                and self._ring_map.codomain() is extension_module
+            ):
+                # The regular reading: the module is the extension ring itself,
+                # so the action of ``S`` on it is the ring's multiplication.
+                # ``scalar_multiple`` would be the action of ``S``'s *coefficient*
+                # ring on the ring read as a module over it, which is a different
+                # one (``A.scalar_multiple`` over ``P`` here), and it hands a
+                # class to a polynomial constructor.
+                product = extension_module(scalar * module_generator)
+            else:
+                product = extension_module.scalar_multiple(scalar, module_generator)
+            return self.element_class(self, product)
 
         def _selected_module_coefficients(self, element):
             r"""``m = sum_j t_j m_j`` and ``t_j = sum_i c_ij s_i`` give ``m = sum_ij c_ij s_i m_j``."""
