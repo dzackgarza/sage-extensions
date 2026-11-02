@@ -967,11 +967,14 @@ def _automorphism_orbit_steps(invariants):
 
     Each matrix holds, in column ``j``, the coordinates of the image of the
     ``j``-th standard generator, with row entries meaningful modulo that row's
-    invariant factor.  Unit rescalings, transpositions of equal-invariant
-    coordinates and the admissible transvections ``e_j |-> e_j + c e_i`` with
-    ``c d_j = 0 mod d_i`` generate all of ``Aut(Z^n/D)`` (Levi's theorem),
-    verified against brute-force automorphism enumeration on the small
-    invariant-factor types.  ``c = 0`` and the identity rescaling are left out.
+    invariant factor.  These maps — unit rescalings, transpositions of
+    equal-invariant coordinates and the admissible transvections
+    ``e_j |-> e_j + c e_i`` with ``c d_j = 0 mod d_i`` — are the elementary
+    automorphisms of the presentation.  That they generate all of
+    ``Aut(Z^n/D)`` is verified by brute-force closure on the small
+    invariant-factor types recorded in ``TRAPS.md``; it is not assumed as a
+    theorem for an arbitrary actual type, and the caller relies on it nowhere
+    for a negative answer.  ``c = 0`` and the identity rescaling are left out.
     """
     rank = len(invariants)
     steps = []
@@ -1067,27 +1070,29 @@ def _radical_isometry_decision(first, second, *, quadratic: bool):
     The three outcomes are separated by proof obligation, and nothing else is
     ever returned:
 
-    * ``False`` only with a proof.  Either a represented invariant differs —
-      the order, the invariant factors of the module and of the polar radical
-      (an isometry maps the radical onto the radical because it preserves the
-      polar form), the vanishing of the form on the radical, the quotient form
-      when the form descends, or the order-qualified value profile (the
-      multiset of element orders and values, preserved by any bijection that
-      preserves the form) — or the witness search below has *exhausted* the
-      automorphism orbit of the framing: the elementary automorphisms generate
-      ``Aut(Z^n/D)`` (Levi's theorem, verified against brute-force enumeration
-      on the small invariant-factor types), so if no candidate in the full
-      orbit carries one Gram array to the other, no isometry exists.
+    * ``False`` only with a proof, and the proof is always a named necessary
+      invariant that failed: the order, the invariant factors of the module
+      and of the polar radical (an isometry maps the radical onto the radical
+      because it preserves the polar form), the vanishing of the form on the
+      radical, the quotient form when the form descends, or the
+      order-qualified value profile (the multiset of element orders and
+      values, preserved by any bijection that preserves the form).
     * A typed isometry only with a checked witness: both forms are transported
       to their invariant-factor framings, a module automorphism of that
       framing is screened on the Gram data — which determine the form — and
       the composite is admitted by the typed isometry constructor with
       ``check``.  A form is never called isometric because its invariants
       agree, and no classification is claimed.
-    * ``NotImplemented`` otherwise: when the framings do not share a
-      presentation, or when the bounded orbit search runs past its candidate
-      budget.  Exhausting the *budget* is not exhausting the orbit, so the
-      answer there is undecided, never ``False``.
+    * ``NotImplemented`` otherwise, and never ``False``: when the framings do
+      not share a presentation, when the bounded orbit search spends its
+      candidate budget, or when it empties its queue.  Spending the budget is
+      not exhausting the orbit, and an emptied queue is not documented here as
+      exhausting it either — "the elementary steps generate all of
+      ``Aut(Z^n/D)``" is established only for the small invariant-factor
+      types enumerated in ``TRAPS.md``, not as a cited theorem for the actual
+      type, and an unexamined possibility is not an exclusion.  A constructor
+      or validation failure of a well-formed candidate is likewise refusal,
+      not exclusion: the answer is undecided there too.
     """
     if first.base_ring() is not second.base_ring():
         return False
@@ -1165,15 +1170,15 @@ def _radical_isometry_decision(first, second, *, quadratic: bool):
         return NotImplemented
     invariants = tuple(int(invariant) for invariant in first_frame.invariants())
     # The witness search walks the orbit of the framing under the elementary
-    # automorphisms of the presented module, which generate all of
-    # ``Aut(Z^n/D)``: unit rescalings of the coordinates, transpositions of
-    # equal-invariant coordinates, and the admissible transvections
+    # automorphisms of the presented module — unit rescalings, transpositions
+    # of equal-invariant coordinates, and the admissible transvections
     # ``e_j |-> e_j + c e_i`` with ``c d_j = 0 mod d_i``.  The old candidate
     # set was monomial (identity, rescalings, transpositions) and provably
     # cannot see a shear; the orbit search can.  It is breadth-first and
-    # bounded, so a large orbit still leaves the pair undecided rather than
-    # answered unsoundly — but the named specimens all lie within a few
-    # elementary steps of the identity framing.
+    # bounded, and a spent budget or an emptied queue both leave the pair
+    # undecided, never ``False``: a negative answer here is only ever a
+    # failed necessary invariant above, because the elementary steps are not
+    # relied on to cover every automorphism of the actual type.
     rank = len(labels)
     identity = tuple(
         tuple(1 if row == column else 0 for column in range(rank))
@@ -1212,8 +1217,12 @@ def _radical_isometry_decision(first, second, *, quadratic: bool):
         images = _frame_images(second_frame, mapping)
         try:
             bridge = first_frame.module_category().Mor(first_frame, second_frame)(images)
-        except Exception:
-            continue
+        except (ValueError, TypeError):
+            # The candidates are well-defined automorphisms by construction,
+            # so a constructor failure is unexplained interference, not the
+            # exclusion of one candidate: the orbit was never examined, and
+            # nothing is proved in either direction.
+            return NotImplemented
         transported = {
             label: second_normalization.inverse()(
                 bridge(first_normalization.forward()(first.module_generator(label)))
@@ -1244,7 +1253,10 @@ def _radical_isometry_decision(first, second, *, quadratic: bool):
                     forward, inverse, quadratic=quadratic, check=True
                 )
             except (ValueError, TypeError):
-                pass
+                # The screen is exact, so this candidate *is* an isometry; a
+                # validation failure refuses the witness, it does not exclude
+                # the pair.  Undecided, never ``False``.
+                return NotImplemented
         tested += 1
         if tested >= _AUTOMORPHISM_ORBIT_CANDIDATE_CAP:
             # The budget is spent, not the orbit: undecided, never False.
@@ -1255,10 +1267,12 @@ def _radical_isometry_decision(first, second, *, quadratic: bool):
                 continue
             seen.add(follow)
             queue.append((follow, _compose(inverse_mapping, step_inverse)))
-    # The elementary automorphisms generate all of Aut(Z^n/D), the queue is
-    # empty, and no candidate carried the first Gram array to the second:
-    # the search was genuinely exhaustive, and no isometry exists.
-    return False
+    # The queue is empty, but "the elementary steps generate all of
+    # Aut(Z^n/D)" is established here only for the enumerated small
+    # invariant-factor types (TRAPS.md), not as a cited theorem for the
+    # actual type.  An unexamined possibility is not an exclusion, so this is
+    # undecided too — never ``False``.
+    return NotImplemented
 
 
 def _torsion_form_vanishes_on_radical(form, radical, *, quadratic: bool) -> bool:

@@ -113,6 +113,58 @@ def test_the_nonsplit_obstruction_pair_is_decided_false_by_the_profile() -> None
     assert first.isometry_to(second) is None
 
 
+def test_a_refused_witness_is_undecided_never_false(monkeypatch) -> None:
+    r"""A validation failure of a proved candidate reports undecided, not False.
+
+    The orbit screen is exact, so a candidate it admits *is* an isometry; when
+    the typed isometry constructor is forced to refuse, the decision must
+    degrade to the supported undecided error — a refused witness is not the
+    pair's exclusion, and the answer is never ``False`` and never a bare
+    arrow without the check.  Nonvacuity is pinned: the pair is shown to
+    admit the checked typed witness *before* the injection, and the stub
+    records that execution actually reached the patched constructor, so the
+    test cannot pass on an incidental earlier undecided.
+    """
+    from sage_extensions.categories.modules.framed.formed import (
+        torsion_form_modules,
+    )
+
+    base = _quadratic(
+        [[2, 0, 0], [0, 2, 0], [0, 0, 2]],
+        [[HALF, 0, 0], [0, HALF, 0], [0, 0, 1]],
+    )
+    twisted = _quadratic(
+        [[2, 0, 0], [0, 2, 0], [0, 0, 2]],
+        [[3 * HALF, 0, 0], [0, 3 * HALF, 0], [0, 0, 3]],
+    )
+    # Nonvacuity: before the injection the pair admits the checked typed
+    # witness, so its later "undecided" can only come from the refusal path.
+    pre_witness = base.isometry_to(twisted)
+    assert isinstance(pre_witness, TorsionFormIsometry)
+
+    refusal_calls = []
+
+    def forced_refusal(*args, **kwargs):
+        refusal_calls.append((args, kwargs))
+        raise ValueError("forced refusal for the regression")
+
+    monkeypatch.setattr(
+        torsion_form_modules, "_torsion_form_isometry", forced_refusal
+    )
+    with pytest.raises(TypeError, match="undecided"):
+        base.is_isomorphic(twisted)
+    assert (
+        torsion_form_modules._radical_isometry_decision(
+            base, twisted, quadratic=True
+        )
+        is NotImplemented
+    )
+    assert refusal_calls, (
+        "the patched constructor was never reached: the test passed without "
+        "exercising the swallowed-refusal path it pins"
+    )
+
+
 def test_a_deep_regrading_past_the_search_budget_is_undecided_not_false() -> None:
     r"""An isometric regrading of ``(Z/16)^3`` buried past the candidate budget.
 
