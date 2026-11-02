@@ -363,11 +363,24 @@ def _engine_torsion_form(normalized_form, *, quadratic: bool):
         TorsionQuadraticModule,
     )
 
-    engine = TorsionQuadraticForm(
-        _engine_component_matrix(
-            _representative_gram(normalized_form, quadratic=quadratic)
-        )
+    gram = _engine_component_matrix(
+        _representative_gram(normalized_form, quadratic=quadratic)
     )
+    rank = int(gram.nrows())
+    if gram.rank() != rank:
+        # Sage's adapter builds the finite module from the Smith form of the
+        # Gram matrix, which states a *non-degenerate* polar form: its module is
+        # the cokernel of that matrix.  A form whose polar form has a radical is
+        # a legitimate object (a subform, for instance) but not one this adapter
+        # represents, and the matrix it would build has the wrong order.  That is
+        # a boundary of the adapter, stated here, not a cardinality failure of
+        # the form.
+        raise TypeError(
+            f"the normal-form engine represents only non-degenerate polar forms, but the polar form "
+            f"of {normalized_form} has a radical: its Gram matrix {gram} has rank {int(gram.rank())} "
+            f"on {rank} generators"
+        )
+    engine = TorsionQuadraticForm(gram)
     if int(engine.cardinality()) != int(normalized_form.cardinality()):
         raise ArithmeticError(
             f"the finite quadratic module built from the Gram matrix of {normalized_form} has order "
