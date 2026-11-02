@@ -5442,8 +5442,10 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                     .cardinality()
                     .is_finite()
                 )
-            except Exception:
-                return False
+            except ValueError as e:
+                if "no retained finite generating family" in str(e):
+                    return False
+                raise
 
         def selected_group_resolution(self):
             return self.selected_resolution(OwnedGroups())

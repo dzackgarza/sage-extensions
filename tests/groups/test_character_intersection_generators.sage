@@ -68,24 +68,49 @@ def test_preimage_intersection_with_generated_subgroup_preserved():
 
 def test_missing_finite_family_rejected_non_vacuously():
     # Non-vacuous regression: ambient has resolution but infinite family,
-    # with two genuine character kernels that would otherwise trigger the new branch.
-    from sage_extensions.categories.group.predicate_subgroups import IntersectionSubgroups, PredicateSubgroups
+    # with two genuine finite-index character kernels via valid retained-character contract.
+    # Prior implementation would claim a generating family and fail at tuple materialization
+    # with hidden error; new lazy branch must preserve undecided and raise exact ValueError.
+    from sage_extensions.categories.group.predicate_subgroups import IntersectionSubgroups
     G = Groups.Free(index_set=ZZ)  # countably infinite rank, resolution True, finite False
     assert G.has_selected_group_resolution() is True
     assert G.has_selected_finite_group_generating_set() is False
-    # Two synthetic finite-index character kernels using public character_data API
-    K1 = G.predicate_subgroup(lambda g: True, "whole", character_data={"spinor_kernel": True}, character_data_complete=True)
-    K2 = G.predicate_subgroup(lambda g: True, "whole", character_data={"determinant_kernel": True}, character_data_complete=True)
+    C2 = Groups.C(2)
+    c = next(iter(C2.group_generators()))
+    m1 = G.Mor(C2)(lambda n: c if int(n) % 2 == 0 else C2.one())
+    m2 = G.Mor(C2)(lambda n: c if int(n) % 3 == 0 else C2.one())
+    # Valid character kernels: predicate is kernel of map to finite group, with correct character_data
+    K1 = G.predicate_subgroup(lambda g: m1(g) == C2.one(), "ker m1", character_data={"spinor_kernel": True}, character_data_complete=True)
+    K2 = G.predicate_subgroup(lambda g: m2(g) == C2.one(), "ker m2", character_data={"determinant_kernel": True}, character_data_complete=True)
     assert K1.contains_character_kernel() is True
     assert K2.contains_character_kernel() is True
-    # Directly exercise the new IntersectionSubgroups branch (G.intersection not defined for Free)
     inter = IntersectionSubgroups(G)((K1, K2))
-    # New branch is installed (since ambient has resolution) but finite-family check is deferred to realization
     assert inter.has_selected_group_resolution() is True
-    # Realization must fail with missing finite family, preserving undecided, not eager enumeration
+    # has_selected_finite must return False (no finite family), preserving undecided, not raise
     assert inter.has_selected_finite_group_generating_set() is False
+    # Non-vacuous exact exception: tuple materialization must raise exact ValueError
     try:
         tuple(inter.group_generators())
-        assert False, "should have raised due to missing finite family"
-    except (ValueError, TypeError, AssertionError, NotImplementedError):
-        pass
+        raise AssertionError("expected ValueError for missing finite family")
+    except ValueError as e:
+        assert "no retained finite generating family" in str(e)
+    # Forced unexpected-error regression: ensure arbitrary errors are not hidden as False
+    L2 = Lattices(ZZ)([[0,1],[1,0]])
+    G2 = L2.O()
+    A2 = L2.discriminant_group()
+    OG2 = A2.orthogonal_group()
+    H2 = OG2.trivial_subgroup()
+    pre2 = G2.discriminant_preimage(H2)
+    Op2 = L2.O_plus()
+    inter2 = G2.intersection(pre2, Op2)
+    orig_q = inter2.finite_character_quotient
+    def bad_q():
+        raise RuntimeError("unexpected")
+    inter2.finite_character_quotient = bad_q
+    try:
+        inter2.has_selected_finite_group_generating_set()
+        assert False, "unexpected error should propagate, not become False"
+    except RuntimeError as e:
+        assert "unexpected" in str(e)
+    finally:
+        inter2.finite_character_quotient = orig_q

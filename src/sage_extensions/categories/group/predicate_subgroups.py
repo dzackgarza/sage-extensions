@@ -1197,12 +1197,13 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
             group = self.supergroup()
             if not group.has_selected_finite_group_generating_set():
                 raise ValueError(f"cannot generate {self}: ambient {group} has no retained finite generating family")
-            # Exact index is available on the intersection itself now that character_data is retained;
-            # fall back to product bound only if that quotient is not yet realizable.
+            # Exact index is available on the intersection itself now that character_data is retained.
+            # Only fall back to product bound when the intersection's character quotient is
+            # not yet complete (ValueError: no finite character quotient), not on arbitrary errors.
             try:
                 q = self.finite_character_quotient()
                 index_bound = int(q.image_keys().cardinality()) // int(q.subgroup_image_keys().cardinality())
-            except Exception:
+            except ValueError:
                 index_bound = 1
                 for cs in intersected_subgroups:
                     q = cs.finite_character_quotient()
