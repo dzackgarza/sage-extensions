@@ -2414,7 +2414,28 @@ class Modules(OwnedCategoryOverBaseRing):
             return NotImplemented
 
         def _selected_relation_morphism(self):
-            return None
+            r"""Return the relation morphism ``F_1 -> F_0`` of the selected presentation, or ``None``.
+
+            Read from the retained selected presentation, not from this owner's
+            position in a joined parent's method order.  A module that carries a
+            chosen finite presentation states its relations through
+            :meth:`presentation` — the zero morphism from the empty free module
+            when its framing is a basis — and every other module states none.
+            Answering a static ``None`` here shadowed the specific owners
+            whenever a joined parent resolved this name before theirs (measured:
+            ``QQ[x]/(x)``, whose MRO puts ``Modules`` ahead of the framed-free
+            facet), so the protected contract reported "relations unknown" for an
+            object that had stated them.
+            """
+            if self not in ModulesWithChosenFinitePresentation(self.base_ring()):
+                return None
+            try:
+                return self.presentation()
+            except TypeError:
+                # A resolution truncated in degree zero states generators without
+                # a relation morphism; that is "not known explicitly", not a
+                # second representation of one.
+                return None
 
         def _selected_module_coefficients(self, element):
             r"""Read the coefficients of the chosen preimage of ``element`` under the framing.
