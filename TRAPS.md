@@ -2443,3 +2443,22 @@ The witness assertions are now the full typed contract, not `q` on generators on
 **The owned → Sage conversion route is the engine adapter, and the implicit one is refused by design (2026-11-02, pinned).** Sage's `Integer` reads `x._integer_`, which this library's integers implement, so an owned integer converts into Sage's `ZZ`. Sage's `QQ` reads no such protocol: `SageQQ(owned)` looks for a coercion from the owned ring into `QQ`, finds none, and fails with `ValueError: Integer Ring is not in Category of sets with partial maps`. That refusal is kept, not papered over: silently coercing library scalars into `QQ` is the coercion this library deliberately does not perform, and the supported route is the engine realization (`ring._engine_element(value)`, which the matrix action itself uses). Measured and pinned in `tests/rings/test_owned_scalars_act_on_sage_matrices.sage`: `SageZZ(owned) == int(3)`, `owned.parent()._engine_element(owned) == int(3)`, and `SageQQ(owned)` raises. The one place this mattered — building an expected rational matrix in a test — now uses Sage's own scalar multiplication and says why.
 
 Measured: the combined run of `tests/forms` plus the new file plus `tests/rings/test_rings_as_algebras_over_their_base.sage` plus `tests/objects/test_integers.sage` gave **50 failed / 77 passed**. Of those, the 46 `tests/forms` ids are exactly the ones that fail at a clean `d4070d6`, and the 4 are `test_integers.sage`'s own pre-existing failures (verified: the same 4 fail and 8 pass on the `d4070d6` worktree). `tests/rings` as a directory is **not** measured and is not claimed.
+
+**Handedness of the owned-scalar matrix action, and the `tests/rings` evidence (2026-11-02, shipped).** The action adapter first returned `matrix * coefficient` for both sides, which is the *right* product even when the scalar is on the left. Over a commutative base that is invisible, which is why the `ZZ`/`QQ`/`GF(2)` tests could not have caught it. Measured on a noncommutative base — matrices over the quaternion algebra `(-1, -1)` over `QQ`, with the noncentral coefficient `i`:
+
+    left  action on [[i, j], [k, i*j]]  ->  [[-1, k], [-j, -j]]   (entrywise  i * entry)
+    right action on the same matrix      ->  [[-1, -k], [j, j]]   (entrywise  entry * i)
+    the old `matrix * coefficient`       ->  the right product
+
+The adapter now multiplies on the side of the action: `parent([coefficient * entry ...])` for the left action and `parent([entry * coefficient ...])` for the right. `_get_action_` still offers the left action for a noncommutative base and now *refuses* the right one with a named error (`a matrix over … cannot be acted on from the right by a scalar of …: that base ring is not known to be commutative, so only the left action … is defined`), instead of falling through to Sage's generic "unsupported operand". Only the coercion model's own path is affected: the noncentral coefficient above reaches the adapter directly, because every scalar discovery can supply comes from an owned ring and lands in the centre. `_owned_scalar_in_matrix_base` now also reads a scalar that is already in the base ring, which is what makes the side observable in a test.
+
+`tests/rings/test_owned_scalars_act_on_sage_matrices.sage`, eight tests: the side of the action over the quaternion algebra (central scalar agrees on both sides, noncentral coefficient distinguishes them, entrywise left and right both), plus the earlier seven.
+
+**`tests/rings` is now measured for the whole scalar-action / `matrix_space` change**, in the same file order (`-p no:randomly`), against a clean `d4070d6` worktree:
+
+| tree | result |
+|---|---|
+| this tree | **74 failed / 243 passed** |
+| clean `d4070d6` | **77 failed / 232 passed** |
+
+No FAILED id is new. Three are fixed, and they are pre-existing failures of `d4070d6`, not new work: `tests/rings/test_commutative_algebra.sage::test_nakayama_minimal_generators_and_surjectivity_are_local_module_operations`, `tests/rings/test_local_regularities.sage::test_affine_plane_origin_has_dimension_and_embedding_dimension_two`, `tests/rings/test_points_of_the_spectrum_of_the_integers.sage::test_the_local_ring_at_a_closed_point_is_a_regular_ring_of_embedding_dimension_one`. The remaining 74 failures are identical in id set on both trees.

@@ -4534,7 +4534,11 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
             if not _matrix_base_admits_scalars_from(self, base):
                 return super()._get_action_(source, op, self_on_left)
             if self_on_left is False and _matrix_base_is_commutative(base) is not True:
-                return super()._get_action_(source, op, self_on_left)
+                raise TypeError(
+                    f"a matrix over {base} cannot be acted on from the right by a scalar of {self}: "
+                    f"that base ring is not known to be commutative, so only the left action "
+                    f"{self} * M is defined — write the scalar on the left"
+                )
             return _OwnedScalarOnSageMatrices(self, source, self_on_left)
 
         def matrix_space(self, nrows=1, ncols=None):
@@ -7513,11 +7517,15 @@ def _owned_complex_field():
 class _OwnedScalarOnSageMatrices(Action):
     r"""The action of an owned scalar on a Sage matrix space, entry by entry.
 
-    ``r * M`` and ``M * r`` are the matrix whose entries are ``r`` multiplied in
-    the matrix's own base ring.  The scalar crosses into that ring first — by
-    coercion when the base ring is owned, and through the owned ring's engine
-    realization when the base ring is a Sage ring — so the arithmetic is the base
-    ring's and nothing is rebuilt in a second representation.
+    ``r * M`` multiplies every entry of ``M`` on the *left* by ``r`` and
+    ``M * r`` on the right, both in the matrix's own base ring.  The side is the
+    side of the action, not a convention: over a noncommutative base ring
+    (a quaternion algebra, a matrix ring) left and right products differ, and an
+    adapter that always wrote ``matrix * coefficient`` would silently reverse
+    ``r * M``.  The scalar crosses into that ring first — by coercion when the
+    base ring is owned, and through the owned ring's engine realization when the
+    base ring is a Sage ring — so the arithmetic is the base ring's own and
+    nothing is rebuilt in a second representation.
     """
 
     def __init__(self, ring, matrix_space, is_left) -> None:
@@ -7526,7 +7534,10 @@ class _OwnedScalarOnSageMatrices(Action):
     def _act_(self, scalar, matrix):
         base = matrix.parent().base_ring()
         coefficient = _owned_scalar_in_matrix_base(scalar, base)
-        return matrix * coefficient
+        parent = matrix.parent()
+        if self._is_left:
+            return parent([coefficient * entry for entry in matrix.list()])
+        return parent([entry * coefficient for entry in matrix.list()])
 
 
 def _matrix_base_is_commutative(base):
@@ -7560,12 +7571,21 @@ def _matrix_base_admits_scalars_from(ring, base) -> bool:
 
 
 def _owned_scalar_in_matrix_base(scalar, base):
-    r"""Return ``scalar`` read in ``base``, the matrix's own base ring."""
+    r"""Return ``scalar`` read in ``base``, the matrix's own base ring.
+
+    An owned base reads it by coercion.  A scalar from an owned ring crosses
+    into a Sage base through the owned ring's engine realization.  Any other
+    scalar is read by the base ring directly: the adapter then states the same
+    entry-by-entry action for a coefficient that is already in the base ring,
+    which is what makes the side of the action observable rather than inferred.
+    """
     from sage_extensions.categories.rings.ring_foundation import OwnedRings
 
     if base in OwnedRings():
         return base(scalar)
-    return base(scalar.parent()._engine_element(scalar))
+    if scalar.parent() in OwnedRings():
+        return base(scalar.parent()._engine_element(scalar))
+    return base(scalar)
 
 
 def _owned_ring(ring):

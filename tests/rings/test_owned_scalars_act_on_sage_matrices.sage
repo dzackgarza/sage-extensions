@@ -116,3 +116,46 @@ def test_the_route_from_an_owned_scalar_into_a_sage_ring_is_the_engine_adapter()
     assert three.parent()._engine_element(three) == int(3)
     with pytest.raises(ValueError):
         SageQQ(three)
+
+
+def test_the_side_of_the_action_is_the_side_of_the_product() -> None:
+    r"""Over a noncommutative base ``r * M`` left-multiplies and ``M * r`` right-multiplies.
+
+    ``QQ`` and ``GF(2)`` cannot tell the two sides apart, so the adapter's side is
+    checked where it is visible: matrices over the quaternion algebra
+    ``(-1, -1)`` over ``QQ``.  A central scalar (one from an owned ring, which is
+    the only kind the coercion model hands the adapter) multiplies the same way on
+    either side; a noncentral coefficient, applied to the adapter directly, must
+    not: the left adapter is the entrywise left product and the right adapter the
+    entrywise right product, and an adapter that always wrote ``M * x`` would
+    return the right product for both.
+    """
+    from sage.algebras.quatalg.quaternion_algebra import QuaternionAlgebra
+
+    from sage_extensions.categories.rings.ring_foundation import (
+        _OwnedScalarOnSageMatrices,
+    )
+
+    # ``int``: the literals are this library's integers, which do not coerce into
+    # a Sage ring (the contract pinned above); the algebra is the same.
+    quaternions = QuaternionAlgebra(SageQQ, int(-1), int(-1))
+    i, j, k = quaternions.gens()
+    matrix_ = sage_matrix(quaternions, [[i, j], [k, i * j]])
+
+    assert 2 * matrix_ == matrix_ + matrix_
+    assert 2 * matrix_ == matrix_.parent()([int(2) * entry for entry in matrix_.list()])
+    # The right action is refused where it is not defined: a noncommutative base
+    # makes ``M * r`` a different statement, so the refusal says so instead of
+    # silently producing a product.
+    with pytest.raises(TypeError, match="cannot be acted on from the right"):
+        matrix_ * 2
+
+    left = _OwnedScalarOnSageMatrices(ZZ, matrix_.parent(), True)
+    right = _OwnedScalarOnSageMatrices(ZZ, matrix_.parent(), False)
+    assert left._act_(i, matrix_) != right._act_(i, matrix_)
+    assert left._act_(i, matrix_) == matrix_.parent()(
+        [i * entry for entry in matrix_.list()]
+    )
+    assert right._act_(i, matrix_) == matrix_.parent()(
+        [entry * i for entry in matrix_.list()]
+    )
