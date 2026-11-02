@@ -1074,12 +1074,22 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
         def __init__(self, intersected_subgroups, **rest) -> None:
             self._intersected_subgroups = intersected_subgroups
             super().__init__(**rest)
-            # For f: G -> F finite, K <= F and B <= G finitely generated with
-            # inclusion i, f^-1(K) cap B = i((f i)^-1(K)); the Schreier family
-            # of that restricted preimage, pushed into G, generates this
-            # intersection.
+            # Both sides are finite-index character kernels (e.g. discriminant
+            # preimage ∩ spinor kernel for Γ_h). Neither is generated, but
+            # the ambient O(N) is — use its finite-index Schreier.
             if not _retains_group_resolution(self) and intersected_subgroups.cardinality() == cardinal(2):
                 group = self.supergroup()
+                if all(
+                    sg in PredicateSubgroups(group) and sg.contains_character_kernel()
+                    for sg in intersected_subgroups
+                ) and group.has_selected_group_resolution() and group.has_selected_finite_group_generating_set():
+                    _fix_selected_generating_morphism(
+                        self,
+                        lambda intersection, intersected_subgroups=intersected_subgroups: (
+                            intersection._character_intersection_generating_morphism(intersected_subgroups)
+                        ),
+                    )
+                    return
                 for preimage in intersected_subgroups:
                     match preimage:
                         case _ if preimage in KernelSubgroups(group):
@@ -1127,21 +1137,6 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
                             ),
                         )
                         return
-                # Both sides are finite-index character kernels (e.g. discriminant
-                # preimage ∩ spinor kernel for Γ_h). Neither is generated, but
-                # the ambient O(N) is — use its finite-index Schreier.
-                if all(
-                    sg in PredicateSubgroups(group) and sg.contains_character_kernel()
-                    for sg in intersected_subgroups
-                ) and group.has_selected_group_resolution():
-                    _fix_selected_generating_morphism(
-                        self,
-                        lambda intersection, intersected_subgroups=intersected_subgroups: (
-                            intersection._character_intersection_generating_morphism(intersected_subgroups)
-                        ),
-                    )
-                    return
-
         def intersected_subgroups(self):
             return self._intersected_subgroups
 
