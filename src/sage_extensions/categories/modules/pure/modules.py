@@ -5468,7 +5468,16 @@ def _restricted_scalars_view(
         placement.append(VectorSpaces(base_ring))
     data = {"module_over_extension": module, "ring_map": ring_map}
 
-    finitely_framed = (
+    # The reading is the pair (module, ring_map), so a ring read as a module
+    # along a map that ends at it is framed whenever that reading supplies a
+    # basis — here the coefficient composite, whose basis is the retained power
+    # basis.  Asking the ring's own projectivity/placement question instead would
+    # ask it about a different reading: `Modules(self.base_ring())` is the
+    # ring's reading over its cover, not this one.
+    ring_as_module_reading = (
+        module in OwnedRings() and _owned_ring(ring_map.codomain()) is module
+    )
+    finitely_framed = ring_as_module_reading or (
         module.has_selected_module_resolution()
         and module in Modules(extension_ring).FinitelyGenerated()
     )

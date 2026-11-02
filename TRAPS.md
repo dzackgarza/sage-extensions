@@ -2283,3 +2283,19 @@ So the frame may be *stated* on the view but the placement must not be carried b
 * That same case **breaks** `test_one_generator_over_the_cover_does_not_make_the_quotient_projective`: with it, `refine(ZZ/2, FramedFreeModules(ZZ).FinitelyGenerated())` no longer raises (`DID NOT RAISE ValueError`). `projectivity_decision()` takes no reading argument: it is asked by `Modules(self.base_ring())`, i.e. about the **cover** reading, so a case that answers for the *regular* reading certifies the wrong one.
 
 So the conflict is exact and is in the predicate's signature, not in the quotient's base ring: a reading-aware certificate is required — `projectivity_decision()` (or the placement's certification) must be asked *for the owner the reading names*, exactly as `has_selected_resolution(owner)` and `module_generating_set()` already are. Both readings are retained: `ZZ/2` over `ZZ` stays non-projective, `A` over its cover stays cyclic-not-free, and `A` over `A` is free of rank one. Every edit here is reverted; the tree is re-measured at 12 passed / 1 failed (the fat-point kernel), and the next unit is that signature change, with the executable construction above as its acceptance test.
+
+**The certificate is scoped to the reading, and the separate parent is framed (2026-11-01, shipped).** `_restricted_scalars_view` computed `finitely_framed` by asking the *ring's* own placement question — `module in Modules(extension_ring).FinitelyGenerated()` — which is a question about `Modules(module.base_ring())`, i.e. the ring's reading over its **cover**, not about the reading the call actually names. The pair `(module, ring_map)` is the reading, exactly as the registry's `has_selected_resolution(owner)` and `selected_resolution_generating_set(owner)` are owner-keyed; the constructor now says so:
+
+```python
+    ring_as_module_reading = (
+        module in OwnedRings() and _owned_ring(ring_map.codomain()) is module
+    )
+    finitely_framed = ring_as_module_reading or (
+        module.has_selected_module_resolution()
+        and module in Modules(extension_ring).FinitelyGenerated()
+    )
+```
+
+With that, `RestrictedScalarsModules(QQ)(A, coef)` — the constructor, not a refinement of the algebra parent — answers `module_generating_set().cardinality() == 2` from the retained power basis. No element class changes, no base ring changes, and no projectivity predicate is touched: the blind-global-blessing route (a no-argument `projectivity_decision` case) is not used and `ZZ/2` over `ZZ` still refuses the projective placement, which `tests/rings/test_a_quotient_is_a_cyclic_module_over_its_cover.sage` pins. Measured across the fat-point, quotient-frame, generated-subgroup, cohomology-functor and numeral-arithmetic files: **19 passed, 1 failed**, the failure being the fat-point kernel.
+
+**What the kernel still needs, exactly.** Branch one of the constructor requires `module in ModulesWithChosenFinitePresentation(extension_ring)` — `A` presented over itself — and then `_restricted_scalar_presentation` (`modules.py:5336`) `assert relations is not None`, because it induces the restricted relation morphism from `module._selected_relation_morphism()`. For the *regular* reading that morphism is the **zero** one: `S` over itself is free of rank one on the unit and has no relations, which the reading knows by construction and does not have to look up. So the next step is the regular-reading branch of `_restricted_scalar_presentation` (a zero-column relation morphism from the rank-zero free module), gated on `ring_as_module_reading` — not a placement on the algebra parent, and not a change to any predicate.
