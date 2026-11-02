@@ -222,6 +222,16 @@ class TorsionFormIsometry(CategoricalIsomorphism):
         r"""Return ``True``: membership in this Core Mor carries the inverse pair."""
         return True
 
+    def _is_the_identity(self) -> bool:
+        r"""Whether the forward map fixes every selected generator.
+
+        Protected module-arrow predicate: composition asks it of a factor
+        before rebuilding a composite, and a typed isometry is a legitimate
+        factor.  It is the identity exactly when its forward map is, its inverse
+        then being the same map.
+        """
+        return self.forward()._is_the_identity()
+
     def inverse_morphism(self):
         r"""Return the underlying inverse module morphism."""
         return self._inverse_morphism()
@@ -274,8 +284,16 @@ class TorsionFormIsometryMor(CoreMor):
         return self._from_known_inverse_pair(forward, inverse_computation())
 
 
-def _torsion_form_isometry(forward, inverse, *, quadratic: bool):
-    r"""Return the form isometry represented by mutually inverse module maps."""
+def _torsion_form_isometry(forward, inverse, *, quadratic: bool, check: bool = False):
+    r"""Return the form isometry represented by mutually inverse module maps.
+
+    The element is built in the typed isometry family
+    (:class:`TorsionFormIsometryMor`), whose element class is
+    :class:`TorsionFormIsometry` and carries the form-preservation and
+    inverse-pair validators.  Building it in a generic Core family would return
+    an arrow that is an isomorphism of the underlying modules only, with the
+    validators never in play; ``check=True`` runs them here.
+    """
     from sage_extensions.categories.modules.framed.formed.form_modules import (
         FormedModuleMorphism,
         _represented_value_module,
@@ -294,10 +312,7 @@ def _torsion_form_isometry(forward, inverse, *, quadratic: bool):
     # finite presentation.
     formed_forward = category.Mor(source, target)((forward_component, value_identity))
     formed_inverse = category.Mor(target, source)((inverse_component, value_identity))
-    return category.Core().Mor(source, target)._from_known_inverse_pair(
-        formed_forward,
-        formed_inverse,
-    )
+    return category.Iso(source, target)(formed_forward, formed_inverse, check=check)
 
 
 def _representative_gram(form, *, quadratic: bool):
@@ -836,6 +851,114 @@ def _regenerate_form_on_generators(form, generators, *, quadratic: bool):
         )
     forward = form.module_category().Mor(form, regenerated)(forward_images)
     return _torsion_form_isometry(forward, inverse, quadratic=quadratic)
+
+
+def _normal_form_bridge(first_normal, second_normal, *, quadratic: bool):
+    r"""Return the label-preserving isometry between two normalized framings.
+
+    A normal form states the same form on a normalized framing: chosen
+    generators indexed by one finite ordered set, carrying the invariant factors
+    and the Gram data of that framing.  Two isomorphic forms therefore state
+    equal normal data, and the map sending each normal generator to the one with
+    the same label is an isometry.  The data are compared first — invariants and
+    every Gram entry — so a mismatch is reported as an inconsistency rather than
+    bridged by a guess.
+    """
+    first_labels = tuple(first_normal.module_generating_set())
+    second_labels = tuple(second_normal.module_generating_set())
+    if first_labels != second_labels:
+        raise ValueError(
+            f"the normal framings of {first_normal} and {second_normal} are indexed by "
+            f"{first_labels} and {second_labels}; a normal form does not depend on the framing"
+        )
+    if tuple(first_normal.invariants()) != tuple(second_normal.invariants()):
+        raise ValueError(
+            f"the normal framings {first_normal} and {second_normal} have invariants "
+            f"{tuple(first_normal.invariants())} and {tuple(second_normal.invariants())}"
+        )
+    first_generators = tuple(first_normal.module_generators())
+    second_generators = tuple(second_normal.module_generators())
+    if quadratic:
+        mismatch = tuple(
+            position
+            for position, (left, right) in enumerate(
+                zip(first_generators, second_generators, strict=True)
+            )
+            if (first_normal.q(left) == second_normal.q(right)) is not True
+        )
+    else:
+        mismatch = tuple(
+            (left, right)
+            for left in first_labels
+            for right in first_labels
+            if (
+                first_normal.b(
+                    first_normal.module_generator(left),
+                    first_normal.module_generator(right),
+                )
+                == second_normal.b(
+                    second_normal.module_generator(left),
+                    second_normal.module_generator(right),
+                )
+            )
+            is not True
+        )
+    if mismatch:
+        raise ValueError(
+            f"the normal forms {first_normal} and {second_normal} state different form data on their "
+            f"normal framings, so no label-preserving isometry exists between them"
+        )
+    forward = first_normal.module_category().Mor(first_normal, second_normal)(
+        {label: second_normal.module_generator(label) for label in first_labels}
+    )
+    inverse = second_normal.module_category().Mor(second_normal, first_normal)(
+        {label: first_normal.module_generator(label) for label in second_labels}
+    )
+    return forward, inverse
+
+
+def _torsion_form_isometry_between(first, second, *, quadratic: bool):
+    r"""Return a typed isometry ``first -> second``, or ``None`` when there is none.
+
+    This is the supported typed transport: each form's selected normal form is
+    an exact isometry onto its own normalized framing
+    (:func:`_regenerate_form_on_generators`), the two normalized framings are
+    bridged by the label-preserving map once their invariants and Gram data are
+    seen to agree, and the composite is admitted by the typed isometry
+    constructor, which re-validates ``q`` (or ``b``) on the generators.  No
+    abstract group isomorphism and no engine matrix substitutes for that
+    validation.
+    """
+    if first.base_ring() is not second.base_ring():
+        return None
+    if not _forms_are_isomorphic(first, second, quadratic=quadratic):
+        return None
+    first_normalization = first.normal_form()
+    second_normalization = second.normal_form()
+    bridge, bridge_inverse = _normal_form_bridge(
+        first_normalization.codomain(),
+        second_normalization.codomain(),
+        quadratic=quadratic,
+    )
+    forward = first.module_category().Mor(first, second)(
+        {
+            label: second_normalization.inverse()(
+                bridge(first_normalization.forward()(first.module_generator(label)))
+            )
+            for label in first.module_generating_set()
+        }
+    )
+    inverse = second.module_category().Mor(second, first)(
+        {
+            label: first_normalization.inverse()(
+                bridge_inverse(
+                    second_normalization.forward()(second.module_generator(label))
+                )
+            )
+            for label in second.module_generating_set()
+        }
+    )
+    return _torsion_form_isometry(forward, inverse, quadratic=quadratic, check=True)
 
 
 def _prime_indexed_generators(generators_by_prime):

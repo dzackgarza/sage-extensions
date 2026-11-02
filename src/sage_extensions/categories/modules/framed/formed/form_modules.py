@@ -55,6 +55,7 @@ from sage_extensions.categories.modules.framed.formed.torsion_form_modules impor
     _torsion_form_all_subobjects,
     _torsion_form_automorphism_group,
     _torsion_form_element_action,
+    _torsion_form_isometry_between,
     _torsion_form_isotropic_subobjects,
     _torsion_form_lagrangian_subobjects,
     _torsion_form_maximal_isotropic_subobjects,
@@ -2769,6 +2770,37 @@ class FormModules(OwnedCategoryOverBaseRing):
                     return _forms_are_isomorphic(self, other, quadratic=quadratic)
 
                 is_isometric_to = is_isomorphic
+
+                def isometry_to(self, other):
+                    r"""Return a typed isometry ``self -> other``, or ``None`` when there is none.
+
+                    The witness is a form isometry in the typed sense: a pair of
+                    mutually inverse module maps preserving this form's ``q``
+                    (quadratic) or ``b`` (bilinear) exactly, in the form's own
+                    value module.  It is not an abstract group isomorphism, and
+                    the typed constructor re-validates the form on the
+                    generators.
+
+                    The route is the normal-form transport: :meth:`normal_form`
+                    is an exact isometry onto a normalized framing for each side,
+                    and two isomorphic forms state equal normal data, so the
+                    label-preserving map bridges the two framings.
+                    """
+                    quadratic = self._torsion_form_is_quadratic()
+                    category = (
+                        TorsionQuadraticFormModules(self.base_ring())
+                        if quadratic
+                        else TorsionBilinearFormModules(self.base_ring())
+                    )
+                    if other not in category:
+                        raise TypeError(
+                            f"an isometry of {self} lands in {category}, but {other} is in "
+                            f"{other.category()}"
+                        )
+                    return _torsion_form_isometry_between(
+                        self, other, quadratic=quadratic
+                    )
+
 
                 def is_anti_isometric(self, other) -> bool:
                     quadratic = self._torsion_form_is_quadratic()
