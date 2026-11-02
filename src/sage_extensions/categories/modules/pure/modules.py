@@ -5144,6 +5144,22 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
                 .End(self.underlying_additive_group())
             )
             ring_map = self.ring_map()
+            extension_module = self.module_over_extension()
+            if (
+                extension_module in OwnedRings()
+                and ring_map.codomain() is extension_module
+            ):
+                # The regular reading: the module *is* the extension ring, so the
+                # coefficient ring acts by multiplication by the class the scalar
+                # maps to — not by the extension's own action, which is that
+                # ring's action by its base ring (a different ring here).
+                return ring.Mor(endomorphisms, category=OwnedRings())(
+                    lambda scalar: endomorphisms.elementwise(
+                        lambda element: extension_module(
+                            ring_map(scalar) * element
+                        )
+                    ),
+                )
             if extension_action.domain() is ring:
                 # The extension's own action already acts by this base ring, on
                 # this same underlying additive group: the restricted action *is*
