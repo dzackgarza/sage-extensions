@@ -149,11 +149,14 @@ def test_the_deduped_generating_morphism_presents_the_same_subgroup_once_each() 
 
     full = list(tuple(sch(letter) for letter in sch.domain().group_generators()))
     reduced = list(tuple(deduped(letter) for letter in deduped.domain().group_generators()))
+    # genuine duplicates in the full family: six Schreier words, two distinct images
+    assert len(full) == 6 and len(set(full)) == 2
     # every image of the full family appears in the reduced one, and vice versa
     assert set(full) == set(reduced)
-    # the reduced family reads each distinct image exactly once
-    assert len(set(reduced)) == len(reduced)
-    assert len(reduced) <= len(full)
+    # the reduced family reads each distinct image exactly once -- here, both of them
+    assert len(set(reduced)) == len(reduced) == 2
+    # the reduced family consists of first occurrences, so it is shorter here
+    assert reduced[0] == full[0]
     # first-occurrence order: the reduced family begins with the first image,
     # and each later one is the first not yet seen
     assert reduced[0] == full[0]
