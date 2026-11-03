@@ -57,7 +57,7 @@ class GSetMorCategoryConstruction(MorCategoryConstruction):
         return GSetMor
 
 
-def _orbit_schreier_morphism(orbit, word_section, augmentation):
+def _orbit_schreier_morphism(orbit, word_section, augmentation, *, transitions=None):
     r"""Schreier's lemma on a pointed finite orbit: ``E -> G`` onto the base-point stabilizer.
 
     ``orbit`` is a finite ``G``-set, ``augmentation`` a free cover
@@ -68,15 +68,36 @@ def _orbit_schreier_morphism(orbit, word_section, augmentation):
     from the free group on them to ``G`` has that stabilizer's image as image.
     This is the one Schreier construction; its callers corestrict it to the
     subgroup they present.
+
+    ``transitions``, when the caller retained one, is the position table
+    ``(point position, letter position) -> image position`` of the ONE sweep
+    that already evaluated every ``s.p``: ``s.p`` is then read from the table
+    instead of recomputed by the action.  The words are the same words -- the
+    table selects exactly the images the comprehension would recompute.
     """
     from sage_extensions.categories.sets.set_categories import finite_ordinal_set
 
     free = augmentation.domain()
-    words = tuple(
-        (~word_section(orbit.act(augmentation(generator), point))) * generator * word_section(point)
-        for point in orbit
-        for generator in free.group_generators()
-    )
+    letter_words = tuple(free.group_generators())
+    if transitions is not None:
+        table, letter_count = transitions
+        points = tuple(orbit)
+        sections = tuple(word_section(point) for point in points)
+        assert len(table) == len(points) * len(letter_words) == len(points) * letter_count, (
+            f"the retained transition table of {orbit} covers {len(table)} pairs, but the Schreier "
+            f"family needs {len(points)} points x {len(letter_words)} letters"
+        )
+        words = tuple(
+            (~sections[table[(position, letter_position)]]) * letter * sections[position]
+            for position in range(len(points))
+            for letter_position, letter in enumerate(letter_words)
+        )
+    else:
+        words = tuple(
+            (~word_section(orbit.act(augmentation(generator), point))) * generator * word_section(point)
+            for point in orbit
+            for generator in letter_words
+        )
     labels = finite_ordinal_set(len(words))
     source = OwnedGroups.Free(index_set=labels)
     word_map = source.Mor(free)(
@@ -134,7 +155,7 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         r"""Equip ``point_set`` with the trivial action of this category's group."""
         return self(point_set, lambda _group_element, point: point)
 
-    def _orbit_words(self, seeds, action, augmentation, *, point_key=None):
+    def _orbit_words(self, seeds, action, augmentation, *, point_key=None, retain_transitions=False):
         r"""The one orbit search: the union of the orbits of ``seeds``, each point with a word.
 
         ``augmentation`` is a free cover ``pi: F ->> G``.  Breadth-first search
@@ -142,7 +163,13 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         ``s t_y``.  Points are recorded by rank in a dictionary keyed by the
         point, or by its supplied injective rank key when the points are
         unhashable. The caller supplies an effective action and the
-        hypothesis that these orbits are finite.
+        hypothesis that these orbits are finite.  ``retain_transitions`` also
+        returns the position table ``(point position, letter position) -> image
+        position`` of the sweep itself: the search evaluates every pair
+        exactly once, and callers of the Schreier construction read each
+        ``s.p`` from that table instead of paying the action evaluations
+        again.  The table's letter positions index
+        ``free.group_generators()``.
         """
         free = augmentation.domain()
         steps = tuple((word, augmentation(word)) for word in free.group_generators())
@@ -150,16 +177,21 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         key = (lambda point: point) if point_key is None else point_key
         rank = {key(point): position for position, point in enumerate(points)}
         words = [free.one() for _point in points]
+        transitions = {} if retain_transitions else None
         position = 0
         while position < len(points):
-            for word, element in steps:
+            for letter_position, (word, element) in enumerate(steps):
                 image = action(element, points[position])
                 image_key = key(image)
                 if image_key not in rank:
                     rank[image_key] = len(points)
                     points.append(image)
                     words.append(word * words[position])
+                if transitions is not None:
+                    transitions[(position, letter_position)] = rank[image_key]
             position += 1
+        if retain_transitions:
+            return points, words, transitions
         return points, words
 
     def from_finite_orbits(self, seeds, action):
@@ -168,11 +200,26 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         The caller supplies an effective action and the hypothesis that these
         orbits are finite. Enumerating generator images then terminates at
         exactly their union; no search bound is a finiteness certificate.
+        The one breadth-first sweep is retained on the resulting ``G``-set
+        with its point-transition table, so the Schreier and coset operations
+        of THIS action do not evaluate the same pairs a second and third
+        time (``_orbit_of``, ``orbit_schreier_morphism``).
         """
-        points, _words = self._orbit_words(
-            seeds, action, self.group().selected_group_resolution().augmentation()
+        points, words, transitions = self._orbit_words(
+            seeds, action, self.group().selected_group_resolution().augmentation(),
+            retain_transitions=True,
         )
-        return self(finite_ordered_set(tuple(points)), action)
+        g_set = self(finite_ordered_set(tuple(points)), action)
+        g_set.__dict__["_retained_orbit_bfs"] = {
+            "seeds": tuple(seeds),
+            "points": tuple(points),
+            "words": words,
+            "transitions": transitions,
+            "letter_count": len(tuple(
+                self.group().selected_group_resolution().augmentation().domain().group_generators()
+            )),
+        }
+        return g_set
 
     def pointed_orbit(self, subgroup, base, action, augmentation=None):
         r"""``G/H`` realized as the orbit of ``base``, for ``H`` the stabilizer of ``base``.
@@ -502,9 +549,28 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
 
         @cached_method(key=lambda self, point: self.ranking_map()(point))
         def _orbit_of(self, point):
-            r"""The single orbit datum of ``point``: its orbit ``G``-set and its words, by the selected cover."""
+            r"""The single orbit datum of ``point``: its orbit ``G``-set and its words, by the selected cover.
+
+            A ``G``-set built by ``from_finite_orbits`` retains that one
+            breadth-first sweep; when ``point`` is its first seed and the
+            sweep covers every point of this ``G``-set, the orbit of ``point``
+            IS this set with the retained words and transitions, and searching
+            a second time is refused work, not a construction. Any other
+            point searches as before.
+            """
             augmentation = self.acting_group().selected_group_resolution().augmentation()
             category = FiniteGSets(self.acting_group())
+            retained = self.__dict__.get("_retained_orbit_bfs")
+            if (
+                retained is not None
+                and len(retained["seeds"]) == 1
+                and point == retained["seeds"][0]
+                and len(retained["points"]) == int(self.point_set().cardinality())
+                and retained["letter_count"] == len(tuple(augmentation.domain().group_generators()))
+            ):
+                orbit = category(finite_ordered_set(retained["points"]), self.act)
+                orbit.__dict__["_retained_transitions"] = (retained["transitions"], retained["letter_count"])
+                return orbit, retained["words"], augmentation
             points, words = category._orbit_words(
                 (point,), self.act, augmentation, point_key=self.ranking_map(),
             )
@@ -517,7 +583,12 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             word_section = Sets().Mor(orbit, augmentation.domain())(
                 lambda image: words[int(ranking(image))]
             )
-            return _orbit_schreier_morphism(orbit, word_section, augmentation)
+            return _orbit_schreier_morphism(
+                orbit,
+                word_section,
+                augmentation,
+                transitions=orbit.__dict__.get("_retained_transitions"),
+            )
 
         @cached_method(key=lambda self, point: self.ranking_map()(point))
         def orbit_as_coset_space(self, point):
