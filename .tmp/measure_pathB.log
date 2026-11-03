@@ -1,0 +1,22 @@
+[t=    0.0s] imports
+[t=  422.4s] 223 ambient generators
+[t=  465.6s] 223 rho images
+[t=  465.6s] PATH B: Subgroup(parent, gens) + Order
+[t=  465.6s] bound
+[t=  465.6s] Order(sub) = 46998591897600
+[t=  465.6s] PATH B done
+MEASURE_OK
+[peakrss] pathB-only: child waited=0 shell_code=0 samples=236
+[peakrss] peak tree RSS      : 4180 MiB
+[peakrss] low-water MemAvail : 9780 MiB
+[peakrss] peak single VmHWM  : 4273 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      3379 MiB peak
+[peakrss]   python                      883 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   438.2s procs=  4 rss=  4180 MiB hwm=  4180 MiB avail=  9856 MiB
+[peakrss]   t=   466.2s procs=  4 rss=  4151 MiB hwm=  4273 MiB avail=  9869 MiB
+[peakrss]   t=   464.2s procs=  4 rss=  4149 MiB hwm=  4272 MiB avail=  9860 MiB
+[peakrss]   t=   462.2s procs=  4 rss=  4148 MiB hwm=  4270 MiB avail=  9854 MiB
+[peakrss]   t=   460.2s procs=  4 rss=  4146 MiB hwm=  4269 MiB avail=  9847 MiB
