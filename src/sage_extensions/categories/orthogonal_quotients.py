@@ -47,24 +47,64 @@ def _letters_in_owned_order(factor_groups, letters):
 class _GapWordSection:
     r"""A GAP stabilizer-chain word section of a finitely generated group.
 
-    ``gap_generators`` is a tuple of libgap elements.  GAP computes a
-    stabilizer chain of the group they generate once, and ``Factorization``
-    then returns, for any element of the generated group, a word in the free
-    group on the generator positions; ``letters_of`` reads that word as a
-    tuple of signed 1-based generator indices.  No element of the generated
-    group is ever listed: the cost is that of stabilizer-chain machinery,
-    which scales in the acting degree, not in the group order.  This is the
-    engine behind the generated-model reads of ``OrthogonalCharacterQuotient``
-    and behind ``LatticeIsometryMor.discriminant_lift``; the owning layers
-    evaluate the letters in their own generators and verify the result against
-    the requested image element, so an engine inconsistency surfaces as an
-    ``ArithmeticError``, never as a wrong element.
+    ``gap_generators`` is a tuple of libgap elements, and ``parent`` the libgap
+    group that contains them when it has a stabilizer chain of its own.  With a
+    parent, the generated group is bound as ``Subgroup(parent, gens)`` and GAP
+    reuses the parent's chain — building ``Group(gens)`` fresh instead pays a
+    new stabilizer-chain construction whose cost at the Enriques discriminant
+    image sizes was measured over the guard (`.tmp/enriques_staged2b.log`,
+    A5), while parent reuse is the documented GAP mechanism for subgroups of a
+    chained group.  Without a parent the fresh ``Group(gens)`` is used.
+
+    ``Factorization`` then returns, for any element of the generated group, a
+    word in the free group on the generator positions; ``letters_of`` reads that
+    word as a tuple of signed 1-based generator indices.  No element of the
+    generated group is ever listed: the cost is that of stabilizer-chain
+    machinery, which scales in the acting degree, not in the group order.  This
+    is the engine behind the generated-model reads of
+    ``OrthogonalCharacterQuotient`` and behind
+    ``LatticeIsometryMor.discriminant_lift``; the owning layers evaluate the
+    letters in their own generators and verify the result against the requested
+    image element, so an engine inconsistency surfaces as an ``ArithmeticError``,
+    never as a wrong element.
     """
 
-    def __init__(self, gap_generators) -> None:
-        self.gap_group = libgap.Group(list(gap_generators))
-        self._to_permutation = libgap.IsomorphismPermGroup(self.gap_group)
-        self.permutation_group = libgap.Range(self._to_permutation)
+    def __init__(self, gap_generators, parent=None) -> None:
+        self._generators = list(gap_generators)
+        self._parent = parent
+        self._permutation_model = None
+
+    @property
+    def gap_group(self):
+        r"""The generated group: parent-bound when a chained parent is given."""
+        if self._parent is not None:
+            # GAP's Subgroup(parent, gens) checks membership and raises when a
+            # generator lies outside the parent, so a wrong binding is loud.
+            return libgap.Subgroup(self._parent, self._generators)
+        return libgap.Group(self._generators)
+
+    @property
+    def permutation_group(self):
+        r"""The fresh permutation model, built only when letters are requested.
+
+        Orders never need it (they reuse the parent chain via
+        :attr:`gap_group`); the fresh model is built lazily because its
+        construction is the measured memory wall at the Enriques image sizes
+        (`.tmp/enriques_staged2b.log`, A5) while letter factorization through a
+        parent-bound subgroup chain follows a different convention and is not
+        interchangeable (caught by the `_checked_lift` guard in
+        `splitting_isometries`).
+        """
+        if self._permutation_model is None:
+            to_permutation = libgap.IsomorphismPermGroup(libgap.Group(self._generators))
+            self._permutation_model = (to_permutation, libgap.Range(to_permutation))
+        return self._permutation_model[1]
+
+    @property
+    def _to_permutation(self):
+        if self._permutation_model is None:
+            self.permutation_group
+        return self._permutation_model[0]
 
     def order(self) -> int:
         return int(libgap.Order(self.gap_group))
@@ -368,10 +408,15 @@ class OrthogonalCharacterQuotient:
 
     @cached_method
     def _image_section(self):
-        r"""The generated character image ``chi(O(L))`` with its word section."""
+        r"""The generated character image ``chi(O(L))`` with its word section.
+
+        The section's group is bound to the direct product's own engine
+        (``Subgroup(product, images)``), reusing its stabilizer chain instead of
+        building a fresh one for the generated subgroup.
+        """
         generators = self._ambient_generators()
         images = tuple(self._gap_of_key(self.image(generator)) for generator in generators)
-        return generators, images, _GapWordSection(images)
+        return generators, images, _GapWordSection(images, parent=self._gap_product()[1])
 
     def _gap_image(self):
         r"""``chi(O(L))`` as a generated group of the direct product."""
@@ -829,7 +874,8 @@ class OrthogonalCharacterQuotient:
         # Factor the chosen stabilizer image over the stabilizer's own
         # generators, so the adjustment is a live element of the stabilizer.
         stabilizer_section = _GapWordSection(
-            [libgap.Image(to_permutation, element) for element in stabilizer_gaps]
+            [libgap.Image(to_permutation, element) for element in stabilizer_gaps],
+            parent=section.permutation_group,
         )
         letters = stabilizer_section.letters_of_permutation(chosen)
         letters = _letters_in_owned_order(self._model_factors(), letters)

@@ -3043,6 +3043,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             )
         from sage_extensions.categories.group.groups import (
             _element_to_engine,
+            _gap_model,
             _law_reversed,
         )
 
@@ -3078,6 +3079,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         """
         from sage_extensions.categories.group.groups import (
             _element_to_engine,
+            _gap_model,
         )
         from sage_extensions.categories.orthogonal_quotients import _GapWordSection
 
@@ -3087,7 +3089,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             _element_to_engine(target, generator.discriminant_morphism())
             for generator in self.group_generators()
         ]
-        return _GapWordSection(images)
+        return _GapWordSection(images, parent=_gap_model(target))
 
     def discriminant_orthogonal_group_generator_lifts(self):
         r"""Return lifts along ``rho_L: O(L) -> O(A_L)`` of the group generators of ``O(A_L)``.
