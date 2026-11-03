@@ -1376,20 +1376,44 @@ class LatticeIsometryMethods:
         target_inclusion = ModulesOverIntegralDomains(ring)(target).generic_fibre_map()
         rational_source = self.domain()
         rational_target = self.codomain()
-        linear = rational_source.module_category().Mor(rational_source, rational_target)(self)
-        forward = (restrict(linear) * source_inclusion).factor_through_or_none(target_inclusion)
-        if forward is None:
-            return None
         if (
             source.module_rank().is_finite()
             and target.module_rank().is_finite()
             and source.module_rank() == target.module_rank()
             and ring is _owned_integers()
         ):
-            coordinates = _module_matrix(forward)
+            # The lattice frame carried by each base change is the integral
+            # basis itself, so integral membership of the forward map is read
+            # directly from rational coordinates against that frame, and the
+            # same rows feed the unimodular gate: a square integral matrix
+            # has an integral two-sided inverse exactly when its determinant
+            # is +-1, and that inverse's coordinates are what the general
+            # route computes as the second rational preimage.  The whole
+            # per-element factor/preimage machinery of the general route is
+            # thereby answered from one coordinate pass per conversion
+            # (measured on the rank-12 Enriques line: ~75 ms per conversion
+            # inside twelve element preimages plus their solves, before the
+            # wrapping - this pass computes the same data once).
+            target_labels = tuple(target.module_generating_set())
+            rows = []
+            forward_images = []
+            for label in tuple(source.module_generating_set()):
+                coordinates = self(rational_source.module_generator(label)).to_vector()
+                terms = {}
+                row = []
+                for target_label in target_labels:
+                    coefficient = coordinates(target_label)
+                    if coefficient not in ring:
+                        return None
+                    terms[target_label] = ring(coefficient)
+                    row.append(int(_own_ring(ring)._engine_element(coefficient)))
+                rows.append(row)
+                forward_images.append(target.linear_combination(terms))
+            forward = source.module_category().Mor(source, target)(tuple(forward_images))
+            coordinates = engine_matrix(SageZZ, rows)
             if int(coordinates.determinant()) not in (1, -1):
                 return None
-            inverse_matrix = _engine_matrix(coordinates).inverse()
+            inverse_matrix = coordinates.inverse()
             source_generators = tuple(source.module_generators())
             backward = source.module_category().Mor(target, source)(
                 tuple(
@@ -1409,6 +1433,10 @@ class LatticeIsometryMethods:
                 )
             )
         else:
+            linear = rational_source.module_category().Mor(rational_source, rational_target)(self)
+            forward = (restrict(linear) * source_inclusion).factor_through_or_none(target_inclusion)
+            if forward is None:
+                return None
             inverse = self.inverse()
             inverse_linear = rational_target.module_category().Mor(rational_target, rational_source)(inverse)
             backward = (restrict(inverse_linear) * target_inclusion).factor_through_or_none(source_inclusion)
