@@ -1,0 +1,18 @@
+[t=     0.0s] imports
+[t=     1.3s] fixture N gram: det 1024, signature [2, 10]
+[t=     1.3s] direct-gram N built: rank 12, signature (2, 10)
+[t=     1.4s] line I_1_1 (Z e1 (from U)): build marked sublattice
+[t=     1.5s] line I_1_1: DIRECT INDUCTION.line_automorphism_generators(N, v)
+[peakrss] repro-marked-stab: child waited=124 shell_code=124 samples=1200
+[peakrss] peak tree RSS      : 1430 MiB
+[peakrss] low-water MemAvail : 526 MiB
+[peakrss] peak single VmHWM  : 1435 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1425 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  2399.1s procs=  3 rss=  1430 MiB hwm=  1435 MiB avail= 11054 MiB
+[peakrss]   t=  2397.1s procs=  3 rss=  1428 MiB hwm=  1433 MiB avail= 11054 MiB
+[peakrss]   t=  2395.1s procs=  3 rss=  1426 MiB hwm=  1431 MiB avail= 11064 MiB
+[peakrss]   t=  2393.1s procs=  3 rss=  1423 MiB hwm=  1429 MiB avail= 11064 MiB
+[peakrss]   t=  2391.1s procs=  3 rss=  1421 MiB hwm=  1427 MiB avail= 11064 MiB

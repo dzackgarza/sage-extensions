@@ -25,6 +25,11 @@ tests/acceptance consumer: subgroup_classes(G_h, lines)
 
 Expected semantic result: the generators of `Aut((N, Z e_i))` = the apex isometries generating the stabilizer action, returned as a finite ordered set of live lattice isometries; the consumer uses them to produce the double-coset splittings of each `O(N)`-line orbit under `G_h` (published counts: 5 lines / 10 planes / 19 flags; the port test asserts only these counts).
 
+## Measured result of the reproduction (job `jmw0lhx6q`, terminal)
+
+- **The direct innermost call `INDUCTION.line_automorphism_generators(N, e₁)` never returned within the 2400s inner cap** (exit 124), with the process tree flat at 1430 MiB RSS (peak 1435 MiB, host MemAvail ~11 GiB throughout) — a pure time wall at the innermost call itself, no memory component.  The published `I_1_1` representative (`Z e1`) was the first input processed; the category-level wrapper `automorphism_group_generators(category, marked)` was never reached, and the second line (`I_1_2`, `Z e3`) was never attempted.
+- This is the minimal, byte-exact reproduction of the case_3 stage-D block: direct-gram `N` from the fixture's own gram (det 1024, signature (2,10)), published line representative, original 6144 MiB process-tree guard, unique log [repro_marked_stabilizer.log](.tmp/repro_marked_stabilizer.log). Isolation scoping stands (cache state differs from the embedded `G_h` path; no involution/transport involved).
+
 ## What is being asked of the port owner
 
 1. Reproduce and time `INDUCTION.line_automorphism_generators(N, e1)` on the direct-gram N built from the fixture gram (repro script above pins every argument byte-exactly).
