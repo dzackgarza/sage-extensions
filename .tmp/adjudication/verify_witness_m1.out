@@ -1,0 +1,15 @@
+OK  e isotropic
+OK  (e,r0) = 0
+OK  (r0,r0) = -4
+OK  isometry on M
+OK  t(N) subset N: a1
+OK  t(N) subset N: b1
+OK  t(N) subset N: 2a2
+OK  t(N) subset N: b2
+OK  t(N) subset N: E8 block
+OK  t(a2,-r0) preserves N
+OK  t trivial on D(M): displacement in M
+OK  b2/2 in N^v
+OK  t(b2/2)-b2/2 = a2 + r0/2 as a vector
+OK  difference has odd a2 coefficient -> not in N
+ALL OK

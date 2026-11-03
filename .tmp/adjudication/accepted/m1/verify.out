@@ -1,0 +1,64 @@
+======================================================================
+H1  embedding N subset M = U+U+E8(-2)
+  det G   = |A_M| = 256    |A_N| = det G_N = 1024
+  [M:N] =  2    [N^v:M^v] = |A_N|/([M:N]*|A_M|) = 2
+  |A_N| enumerated = 1024   q_N values: {Fraction(0, 1)}
+  zeros of q_N (isotropic classes) = 528 (split 2m=10 form: 2^9+2^4=528)
+  A_N = A_{U(2)} (+) A_M orthogonal: <a2,e1/2> = 0 ; <b2/2,e1/2> = 0
+  q_N(a2),q_N(b2/2),q_N(a2+b2/2) = 0 0 1/2
+  |O(q_N)| by repo recursion (tests/test_finite_form_groups.py:3-4), m=5: 46998591897600
+  in-repo value 46998591897600 : True   = 2^21*3^5*5^2*7*17*31 : True
+======================================================================
+Lemma T: T_{e,x}(y)=y+<y,e>x-<y,x>e-q(x)<y,e>e
+    e=a1 isotropic, x=a2 isotropic : <e,x> = 0  q(e) = 0  isometry: True
+    e=a1, x=r0 root : <e,x> = 0  q(e) = 0  isometry: True
+    e=a2, x=r0 root : <e,x> = 0  q(e) = 0  isometry: True
+    e=b2, x=r0 root : <e,x> = 0  q(e) = 0  isometry: True
+   counter-check WITHOUT x perp e (e=a1, x=b1+a2): isometry: False  <e,x> = 1  q(x) = -2   (so x perp e is genuinely needed)
+======================================================================
+H3 witness:  T = E_{a2,r0}  (a2 = canonical isotropic vector, r0 = root of E8(-2))
+  r0 in a2^perp(M): True  r0 in E8(-2) subset M: True  q(r0) = -2
+  T(N) subset N : True
+  T(M) subset M : True
+  T^{-1}=T_{a2,-r0} (additivity, tex:1446) fixes N too: True
+  T acts trivially on A_M = (1/2)Z^8/Z^8 : True
+   (A_M = (1/2)Z^8/Z^8 : T(1/2 e_i) - 1/2 e_i = [Fraction(0, 1), Fraction(0, 1), Fraction(2, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1)] )
+  1/2 b2 in N^v: True
+  T(1/2 b2) - 1/2 b2 = [Fraction(0, 1), Fraction(0, 1), Fraction(1, 1), Fraction(0, 1), Fraction(1, 2), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1)]  in N ? False
+  => T acts NON-trivially on A_N  (moves the class [1/2 b2])
+  reflection factorisation  T = sigma_{r0} o sigma_{r0+q(r0)a2} : True
+  both reflections integral on N: True
+  spinor: theta(T)=q(r0)*q(r0+q(r0)a2) = 4 == 1 mod squares
+======================================================================
+H3/H4 reflections in small-norm vectors do NOT act trivially
+  v = 2a2+b2 in N, q(v) = 2  theta(sigma_v) = q(v) = 2 = 2 mod squares (not 1)
+  sigma_v(1/2 b2) - 1/2 b2 = [Fraction(0, 1), Fraction(0, 1), Fraction(-1, 1), Fraction(-1, 2), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1)]  in N ? False
+  sigma_v integral on N: True
+  r_adj = e3 (adjacent simple root): B_E8(r0,r_adj) = 2
+  sigma_r0(1/2 e3) - 1/2 e3 = [Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(1, 2), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1)]  in N (i.e. in E8(-2)) ? False
+  => sigma_r0 acts NON-trivially on D(N) although (r0,r0) = -4 and sn(sigma_r0) = -(r0,r0)/2 = 2
+======================================================================
+W(E8) orbits on A_{E8(-2)} = (1/2)Z^8/Z^8  (tex:1459-1460 says 1,120,135)
+  W(E8)-orbit sizes on A_{E8(-2)} = [1, 120, 135]  (sum = 256 )
+======================================================================
+rank_2 (GHS 0810.1614 p.3: max rank of a sublattice with det coprime to 2)
+   rank of the mod-2 form on M/2M (12 dims) = 4 -> rank_2(M) <= 4
+   rank of the mod-2 form on N/2N (12 dims) = 2 -> rank_2(N) <= 2
+   (GHS Prop 3.4 needs rank_2 >= 6 and two hyperbolic planes; M has 2 planes but rank_2 = 4;
+    N has only ONE hyperbolic plane: div_N(e) = 2 for 0 != e in N cap U(2) isotropic)
+======================================================================
+divisibility of the canonical isotropic vectors
+   div_M(a2): (a2,b2) = 1   div_M(a1): (a1,b1) = 1
+   (a2, N^v): (a2, 1/2 b2) = 1/2   => (a2,N^v)=1/2 Z ; 2a2 in N => div_N(2a2)=2
+======================================================================
+H4: the four elementary block maps of SL_2(Z)^2 on U(+)U are Eichler transvections
+   left by [[1,1],[0,1]] : matrix on (a1,b1,a2,b2) = [[Fraction(1, 1), Fraction(0, 1), Fraction(0, 1), Fraction(-1, 1)], [Fraction(0, 1), Fraction(1, 1), Fraction(0, 1), Fraction(0, 1)], [Fraction(0, 1), Fraction(1, 1), Fraction(1, 1), Fraction(0, 1)], [Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(1, 1)]]
+       = T_{[Fraction(1, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1)],[Fraction(0, 1), Fraction(0, 1), Fraction(1, 1), Fraction(0, 1)]}  with q(x) = 0
+   left by [[1,0],[1,1]] : matrix on (a1,b1,a2,b2) = [[Fraction(1, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1)], [Fraction(0, 1), Fraction(1, 1), Fraction(1, 1), Fraction(0, 1)], [Fraction(0, 1), Fraction(0, 1), Fraction(1, 1), Fraction(0, 1)], [Fraction(-1, 1), Fraction(0, 1), Fraction(0, 1), Fraction(1, 1)]]
+       = T_{[Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(1, 1)],[Fraction(0, 1), Fraction(1, 1), Fraction(0, 1), Fraction(0, 1)]}  with q(x) = 0
+   right by [[1,1],[0,1]] : matrix on (a1,b1,a2,b2) = [[Fraction(1, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1)], [Fraction(0, 1), Fraction(1, 1), Fraction(0, 1), Fraction(1, 1)], [Fraction(-1, 1), Fraction(0, 1), Fraction(1, 1), Fraction(0, 1)], [Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(1, 1)]]
+       = T_{[Fraction(0, 1), Fraction(0, 1), Fraction(1, 1), Fraction(0, 1)],[Fraction(0, 1), Fraction(1, 1), Fraction(0, 1), Fraction(0, 1)]}  with q(x) = 0
+   right by [[1,0],[1,1]] : matrix on (a1,b1,a2,b2) = [[Fraction(1, 1), Fraction(0, 1), Fraction(-1, 1), Fraction(0, 1)], [Fraction(0, 1), Fraction(1, 1), Fraction(0, 1), Fraction(0, 1)], [Fraction(0, 1), Fraction(0, 1), Fraction(1, 1), Fraction(0, 1)], [Fraction(0, 1), Fraction(1, 1), Fraction(0, 1), Fraction(1, 1)]]
+       = T_{[Fraction(1, 1), Fraction(0, 1), Fraction(0, 1), Fraction(0, 1)],[Fraction(0, 1), Fraction(0, 1), Fraction(0, 1), Fraction(1, 1)]}  with q(x) = 0
+  additivity check: T_{a1,a2+r0} = T_{a1,r0} o T_{a1,a2} : True
+  => theta(T_{a1,a2}) = theta(T_{a1,a2+r0})/theta(T_{a1,r0}) = (q(x+r0)^2)/(q(r0)^2) = 1

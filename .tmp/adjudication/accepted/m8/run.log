@@ -1,0 +1,130 @@
+==============================================================================
+S0  the lattices
+[PASS] G_L, G_N, G_M4 even
+[PASS] det G_L = 2^8 (A_L=(Z/2)^8)
+[PASS] det G_N = 2^10 (A_N=(Z/2)^10)
+[PASS] det G_M4 = 2^2
+[PASS] [L:N] = |det B_N| = 2
+[PASS] N's first block = U (+) U(2)
+==============================================================================
+S1  H1: the index-2 embedding and the dual/discriminant maps
+[PASS] dual basis of L in L^v
+[PASS] dual basis of N in N^v
+[PASS] e2/2 in N^v
+[PASS] e2/2 not in N
+[PASS] f2 in N^v
+[PASS] f2 not in N
+[PASS] 2f2 in N
+[PASS] [A_N : im(A_L)] = 8
+[PASS] A_N = <[f2],[e2/2]> (+) (Z/2)^8, order 4*256 = 1024
+==============================================================================
+S2  Theorem B: isotropic transvections; quote line 1446 (composition) and line 1457 (triviality on the discriminant)
+[PASS] (e1,f2): e isotropic, x perp e
+[PASS]   (e1,f2): E isometry of L, trivial on A_L
+[PASS] (e1,c1): e isotropic, x perp e
+[PASS]   (e1,c1): E isometry of L, trivial on A_L
+[PASS] (e2,c1): e isotropic, x perp e
+[PASS]   (e2,c1): E isometry of L, trivial on A_L
+[PASS] (e2,f1): e isotropic, x perp e
+[PASS]   (e2,f1): E isometry of L, trivial on A_L
+[PASS] composition law E_{e,x}E_{e,y} = E_{e,x+y} (tex:1446)
+[PASS] composition law E_{e,x}E_{e,y} = E_{e,x+y} (tex:1446)
+[PASS] E_{e2,c1} (e in the U(2) summand): isometry of N, trivial on A_N
+[PASS] E_{e2,f1} (e in the U(2) summand): isometry of N, trivial on A_N
+[PASS] E_{e2,e1} (e in the U(2) summand): isometry of N, trivial on A_N
+==============================================================================
+S3  Which of the quoted ambient generators even preserve N?
+    quoted ambient transvections E_{e_i,x}, x over a Z-basis of e_i^perp cap L:
+      total 44
+      32 preserve N and act trivially on A_N  (in Stab_E(N) cap ker)
+      8 preserve N but act NON-trivially on A_N : [('f2', 'c1'), ('f2', 'c2'), ('f2', 'c3'), ('f2', 'c4'), ('f2', 'c5'), ('f2', 'c6'), ('f2', 'c7'), ('f2', 'c8')]
+      4 do not preserve N (Alg 1 discards them) : [('e1', 'f2'), ('f1', 'f2'), ('f2', 'e1'), ('f2', 'f1')]
+[PASS] 44 quoted transvections in total (4(n-1) with n=12)
+[PASS] Stab_E(N) is NOT contained in ker(O(N)->O(A_N)) -- witnesses above
+[PASS] 4 of the 44 do not even preserve N
+[PASS] g = E_{f2,c1}: isometry of L, trivial on A_L
+[PASS] g preserves N
+[PASS] g(e2/2) = e2/2 + f2 + c1/2
+[PASS] g(e2/2)-e2/2 = f2 + c1/2 is NOT in N  => g not in ker(O(N)->O(A_N))
+==============================================================================
+S4  Containment: ker(O(N)->O(A_N)) is contained in O(L) for every N subset L subset N^v
+[PASS] f2 lies in N^v
+[PASS] 2f2 lies in N
+[PASS] a kernel reflection fixes f2 mod N, hence preserves L:  s(f2)-f2 in N
+[PASS] ...and it preserves L as a matrix
+[PASS]   e1 is isotropic in N
+[PASS]   f1 is isotropic in N
+[PASS]   e2 is isotropic in N
+[PASS]   2f2 is isotropic in N
+[PASS] all 44 intrinsic transvections E_(e_i,x) (e_i in N isotropic, x a basis of e_i^perp cap N) are isometries of N, lie in ker(O(N)->O(A_N)), and preserve L
+==============================================================================
+S5  Theorem C: tau_v in ker(O(N)->O(A_N)) <=> v in ((v,v)/2)N
+[PASS] norm 2: e1+f1: (v,v)=2, a=1, predicted kernel=True, observed=True
+[PASS] norm -2: e1-f1: (v,v)=-2, a=-1, predicted kernel=True, observed=True
+[PASS] norm 4: e2+2f2: (v,v)=4, a=2, predicted kernel=False, observed=False
+[PASS] norm -2: c1+ ... c2: (v,v)=-4, a=-2, predicted kernel=False, observed=False
+==============================================================================
+S6  H4: det and spinor norm of the named generators
+    E_{e1,f2} on L                 det= 1 #refl= 4 sn_ghs=       66564 class=(False, ())  in O^+  in O~SO+ (spinorial kernel)
+    E_{e2,c1} on L                 det= 1 #refl= 2 sn_ghs=         144 class=(False, ())  in O^+  in O~SO+ (spinorial kernel)
+    E_{f2,c1} on L (=witness)      det= 1 #refl= 2 sn_ghs=         196 class=(False, ())  in O^+  in O~SO+ (spinorial kernel)
+    E_{e1,c1} on N                 det= 1 #refl= 2 sn_ghs=         144 class=(False, ())  in O^+  in O~SO+ (spinorial kernel)
+    s_{e1+f1} (norm 2)             det=-1 #refl= 1 sn_ghs=          -1 class=(True, ())  NOT in O^+  
+    s_{e1-f1} (norm -2)            det=-1 #refl= 1 sn_ghs=           9 class=(False, ())  in O^+  in O~SO+ (spinorial kernel)
+    s_{e2+2f2} (norm 4)            det=-1 #refl= 1 sn_ghs=          -2 class=(True, (2,))  NOT in O^+  
+    -id on N                       det= 1 #refl=12 sn_ghs=24984637240869126144 class=(False, ())  in O^+  in O~SO+ (spinorial kernel)
+[PASS] E_{e1,f2}: det 1, sn a square => in the spinorial kernel O'(L) = O~SO+(L)
+[PASS] E_{e2,c1}: det 1, sn a square
+[PASS] E_{f2,c1} (the descent witness): det 1, sn a square (it is in O^+, just not in ker)
+[PASS] sigma_{e1-f1}, (v,v)=-2: sn=+1 => in O^+  (GHS convention -(v,v)/2)
+[PASS] sigma_{e1+f1}, (v,v)=+2: sn=-1 => NOT in O^+
+[PASS] sigma_{e2+2f2}, (v,v)=+4: sn=-2 => NOT in O^+
+[PASS] -id: det 1, in O^+
+-- block SL_2(Z)^2 on the determinant model M_{2,2}(Z) = U (+) U (E11->e1, E22->f1, E12->e2, E21->-f2)
+[PASS] leftmult(S1) isometry of U(+)U
+[PASS] leftmult(S1): sn_ghs class (False, ()) => in O' and trivial on A_L
+    leftmult(S1)     det=1 #refl=4 prod norms=4096 class=(False, ()) preserves N? True
+[PASS] leftmult(S2) isometry of U(+)U
+[PASS] leftmult(S2): sn_ghs class (False, ()) => in O' and trivial on A_L
+    leftmult(S2)     det=1 #refl=4 prod norms=1024 class=(False, ()) preserves N? False
+[PASS] rightmult(S1) isometry of U(+)U
+[PASS] rightmult(S1): sn_ghs class (False, ()) => in O' and trivial on A_L
+    rightmult(S1)    det=1 #refl=4 prod norms=4096 class=(False, ()) preserves N? False
+[PASS] rightmult(S2) isometry of U(+)U
+[PASS] rightmult(S2): sn_ghs class (False, ()) => in O' and trivial on A_L
+    rightmult(S2)    det=1 #refl=4 prod norms=1024 class=(False, ()) preserves N? True
+==============================================================================
+S7  |O(A)| for A = (hyperbolic plane)^p over F_2; repo fixture p=5 -> 46998591897600
+[PASS] recursion vs brute force at p=1 -- 2 vs 2
+[PASS] recursion vs brute force at p=2 -- 72 vs 72
+[PASS] recursion vs brute force at p=3 -- 40320 vs 40320
+[PASS] |O((plane)^1)| = 2 -- got 2
+[PASS] |O((plane)^2)| = 72 -- got 72
+[PASS] |O((plane)^3)| = 40320 -- got 40320
+[PASS] |O((plane)^4)| = 348364800 -- got 348364800
+[PASS] |O((plane)^5)| = 46998591897600 -- got 46998591897600
+[PASS] |O(A_N)| = 2^21*3^5*5^2*7*17*31
+    |O(E8/2E8)| = 348364800 ; |W(E8)| = 696729600 ; ratio 2
+==============================================================================
+S8  Gamma(2) = ker(O(N)->O(N/2N)) strictly inside ker(O(N)->O(A_N))
+[PASS] s_{e1+f1} in ker(O(N)->O(A_N)) (norm 2 => always)
+[PASS] exists x in N with (x, e1+f1) odd => that kernel element is outside ker(O(N)->O(N/2N))
+[PASS] consequently ker(O(N)->O(N/2N)) is strictly smaller than ker(O(N)->O(A_N))
+[PASS] there is no transvection with (v,v)=+-4 in ker(O(N)->O(A_N)): v in ((v,v)/2)N=2N would give (v,v)=4(w,w) in 8Z
+==============================================================================
+S9  Which lattices satisfy Kneser's conditions?  rank_p = max rank of M in L with p | det M
+    N = U+U(2)+E8(-2)          rank_2 =  2   rank_3 = 12   Kneser (rank_3>=5, rank_2>=6): NO
+    ambient L = U+U+E8(-2)     rank_2 =  4   rank_3 = 12   Kneser (rank_3>=5, rank_2>=6): NO
+    L' = U+U(2)+E8(-1)         rank_2 = 10   rank_3 = 12   Kneser (rank_3>=5, rank_2>=6): YES
+[PASS] rank_2(N) = 2  (matches GHS, verbatim: 'L = U(2)+U+E8(-2) ... has 2-rank 2')
+[PASS] rank_2(ambient L) = 4 < 6: Kneser/GHS generation theorem does not apply to L either
+[PASS] rank_2(L') = 10 >= 6 and rank_3(L') = 12 >= 5: L' satisfies the Kneser conditions
+[PASS] L' represents -2 (E8(-1) root)
+[PASS] N represents -2 (e1-f1)
+[PASS] div(e2) = 2 in N  (so e2 CANNOT be completed to an integral U in N; GHS Prop ET needs div=1)
+[PASS] div(e1) = 1 in N (the U-direction is unimodular)
+[PASS] div(f2) = 1 in L (f2 is unimodular in the ambient lattice)
+[PASS] div(2f2) = 2 in N (the second U(2) isotropic direction is not unimodular either)
+[PASS] det L'(2) = 2^14 and det N = 2^10 => [L'(2) : N] = 4 (GHS's transport relation)
+==============================================================================
+SUMMARY: ALL CHECKS PASSED
