@@ -487,8 +487,101 @@ class OrthogonalCharacterQuotient:
         return libgap.Intersection(image, *pieces)
 
     def image_order(self) -> int:
-        r"""``|chi(O(L))|``, from the generated image; no image element is listed."""
-        return self._image_section()[2].order()
+        r"""``|chi(O(L))|`` without any group built inside the direct product.
+
+        ``|im chi| = |im rho| * 2^j`` where ``j`` is the F2-dimension of the
+        sign patterns realized on ``ker rho``.  A sign product
+        ``prod s_i^{e_i}`` is trivial on ``ker rho`` exactly when it descends
+        to a homomorphism on ``im rho``; the descent of each of the ``2^m``
+        sign products is tested by ``GroupHomomorphismByImages`` on the
+        generators of ``im rho`` — all inside the ``O(A_L)`` engine, whose
+        parent-bound chains are measured instant at the Enriques size
+        (`.tmp/measure_pathB.log`), while the direct product's own chain is
+        the measured wall (`.scratch/measure_a5_atoms.log`, t_b).  No image
+        element is listed; no ambient-order substitution.
+        """
+        from itertools import product as _product_tuples
+
+        from sage_extensions.categories.group.groups import (
+            OwnedGroups,
+            _element_to_engine,
+            _gap_model,
+        )
+
+        sign_labels = [
+            label for label in self._image_labels if label != "discriminant"
+        ]
+        ambient = self._ambient_generators()
+        if not self._has_discriminant:
+            # Sign-only quotient: the joint image lives in C2^m itself; build it
+            # there directly (at most 2^m elements, no engine chains needed).
+            ring = self.lattice.base_ring()
+            c2 = _gap_model(OwnedGroups().C(2))
+            c2gen = list(libgap.GeneratorsOfGroup(c2))[0]
+            m0 = len(sign_labels)
+            product_engine = c2 if m0 == 1 else libgap.DirectProduct(*([c2] * m0))
+            embeddings = (
+                (libgap.IdentityMapping(c2),)
+                if m0 == 1
+                else tuple(libgap.Embedding(product_engine, k + 1) for k in range(m0))
+            )
+            tuples = []
+            for generator in ambient:
+                point = libgap.One(product_engine)
+                for k, label in enumerate(sign_labels):
+                    if label == "spinor":
+                        value = self.lattice.O_plus().preimage_morphism()(generator).is_one()
+                    else:
+                        value = ring(generator.determinant()) == ring.one()
+                    if not value:
+                        point = point * libgap.Image(embeddings[k], c2gen)
+                tuples.append(point)
+            return int(libgap.Order(libgap.Group(tuples)))
+        og = self._discriminant_group
+        engine = _gap_model(og)
+        rho = self.lattice.discriminant_representation()
+        rho_images = [
+            _element_to_engine(og, rho(generator)) for generator in ambient
+        ]
+        im_rho = libgap.Subgroup(engine, rho_images)
+        ambient_order = int(libgap.Order(im_rho))
+        if not sign_labels:
+            return ambient_order
+        # sign value (+1/-1) of each ambient generator per sign factor
+        ring = self.lattice.base_ring()
+        factor_values = []
+        for label in sign_labels:
+            if label == "spinor":
+                morphism = self.lattice.O_plus().preimage_morphism()
+                values = [
+                    1 if morphism(generator).is_one() else 0 for generator in ambient
+                ]
+            else:
+                values = [
+                    1 if ring(generator.determinant()) == ring.one() else 0
+                    for generator in ambient
+                ]
+            factor_values.append(values)
+        m = len(sign_labels)
+        c2 = _gap_model(OwnedGroups().C(2))
+        c2gen = list(libgap.GeneratorsOfGroup(c2))[0]
+        descended_rank = 0
+        for exponents in _product_tuples((0, 1), repeat=m):
+            if not any(exponents):
+                continue
+            combined = [
+                (1 if (sum(e * v for e, v in zip(exponents, col)) % 2 == 0) else 0)
+                for col in zip(*factor_values)
+            ]
+            # combined[k] is the sign (0=even/+, 1=odd/-) of ambient gen k under s^e
+            target_images = [
+                libgap.One(c2) if value == 0 else c2gen for value in combined
+            ]
+            hom = libgap.GroupHomomorphismByImages(im_rho, c2, rho_images, target_images)
+            if bool(hom):
+                descended_rank += 1  # descends to im rho: trivial on ker rho
+        j = m - descended_rank
+        return ambient_order * (1 << j)
 
     @cached_method
     def _joint_discriminant_image_gap(self):
