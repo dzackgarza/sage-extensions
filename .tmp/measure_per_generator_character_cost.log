@@ -1,0 +1,687 @@
+[t=   0.0s] imports
+[t=   0.9s] N = U + U(2) + E8(-2) direct block gram
+[t=   1.0s] N: rank 12, signature (2, 10)
+[t=   1.0s] O(N) object
+[t=   1.0s] O(N): Orthogonal group O(Integral lattice of rank 12 and signature (2, 10))
+[t=   1.0s] ambient generating family (group_generators length only)
+[t= 408.0s] 221 ambient generators
+[t= 408.0s] O_plus construction (spinor morphism cold start)
+[t= 408.1s] spinor morphism ready
+[t= 408.1s] generator 0: discriminant_morphism()
+[t= 429.3s] generator 0: morphism done; spinor evaluation
+[t= 429.3s] generator 0: spinor done (is_one=True)
+[t= 429.3s] generator 1: discriminant_morphism()
+[t= 429.5s] generator 1: morphism done; spinor evaluation
+[t= 429.5s] generator 1: spinor done (is_one=True)
+[t= 429.5s] generator 2: discriminant_morphism()
+[t= 429.6s] generator 2: morphism done; spinor evaluation
+[t= 429.6s] generator 2: spinor done (is_one=True)
+[t= 429.6s] generator 3: discriminant_morphism()
+[t= 429.8s] generator 3: morphism done; spinor evaluation
+[t= 429.8s] generator 3: spinor done (is_one=True)
+[t= 429.8s] generator 4: discriminant_morphism()
+[t= 429.9s] generator 4: morphism done; spinor evaluation
+[t= 429.9s] generator 4: spinor done (is_one=True)
+[t= 429.9s] generator 5: discriminant_morphism()
+[t= 430.0s] generator 5: morphism done; spinor evaluation
+[t= 430.1s] generator 5: spinor done (is_one=True)
+[t= 430.1s] generator 6: discriminant_morphism()
+[t= 430.2s] generator 6: morphism done; spinor evaluation
+[t= 430.2s] generator 6: spinor done (is_one=True)
+[t= 430.2s] generator 7: discriminant_morphism()
+[t= 430.3s] generator 7: morphism done; spinor evaluation
+[t= 430.4s] generator 7: spinor done (is_one=True)
+[t= 430.4s] generator 8: discriminant_morphism()
+[t= 430.5s] generator 8: morphism done; spinor evaluation
+[t= 430.5s] generator 8: spinor done (is_one=True)
+[t= 430.5s] generator 9: discriminant_morphism()
+[t= 430.6s] generator 9: morphism done; spinor evaluation
+[t= 430.7s] generator 9: spinor done (is_one=True)
+[t= 430.7s] generator 10: discriminant_morphism()
+[t= 430.8s] generator 10: morphism done; spinor evaluation
+[t= 430.8s] generator 10: spinor done (is_one=True)
+[t= 430.8s] generator 11: discriminant_morphism()
+[t= 430.9s] generator 11: morphism done; spinor evaluation
+[t= 431.0s] generator 11: spinor done (is_one=True)
+[t= 431.0s] generator 12: discriminant_morphism()
+[t= 431.1s] generator 12: morphism done; spinor evaluation
+[t= 431.1s] generator 12: spinor done (is_one=True)
+[t= 431.1s] generator 13: discriminant_morphism()
+[t= 431.2s] generator 13: morphism done; spinor evaluation
+[t= 431.3s] generator 13: spinor done (is_one=True)
+[t= 431.3s] generator 14: discriminant_morphism()
+[t= 431.4s] generator 14: morphism done; spinor evaluation
+[t= 431.4s] generator 14: spinor done (is_one=True)
+[t= 431.4s] generator 15: discriminant_morphism()
+[t= 431.5s] generator 15: morphism done; spinor evaluation
+[t= 431.5s] generator 15: spinor done (is_one=True)
+[t= 431.5s] generator 16: discriminant_morphism()
+[t= 431.7s] generator 16: morphism done; spinor evaluation
+[t= 431.7s] generator 16: spinor done (is_one=True)
+[t= 431.7s] generator 17: discriminant_morphism()
+[t= 431.8s] generator 17: morphism done; spinor evaluation
+[t= 431.9s] generator 17: spinor done (is_one=True)
+[t= 431.9s] generator 18: discriminant_morphism()
+[t= 432.0s] generator 18: morphism done; spinor evaluation
+[t= 432.0s] generator 18: spinor done (is_one=True)
+[t= 432.0s] generator 19: discriminant_morphism()
+[t= 432.1s] generator 19: morphism done; spinor evaluation
+[t= 432.1s] generator 19: spinor done (is_one=True)
+[t= 432.1s] generator 20: discriminant_morphism()
+[t= 432.2s] generator 20: morphism done; spinor evaluation
+[t= 432.3s] generator 20: spinor done (is_one=True)
+[t= 432.3s] generator 21: discriminant_morphism()
+[t= 432.4s] generator 21: morphism done; spinor evaluation
+[t= 432.4s] generator 21: spinor done (is_one=True)
+[t= 432.4s] generator 22: discriminant_morphism()
+[t= 432.5s] generator 22: morphism done; spinor evaluation
+[t= 432.5s] generator 22: spinor done (is_one=True)
+[t= 432.5s] generator 23: discriminant_morphism()
+[t= 432.6s] generator 23: morphism done; spinor evaluation
+[t= 432.7s] generator 23: spinor done (is_one=True)
+[t= 432.7s] generator 24: discriminant_morphism()
+[t= 432.8s] generator 24: morphism done; spinor evaluation
+[t= 432.8s] generator 24: spinor done (is_one=False)
+[t= 432.8s] generator 25: discriminant_morphism()
+[t= 432.9s] generator 25: morphism done; spinor evaluation
+[t= 432.9s] generator 25: spinor done (is_one=False)
+[t= 432.9s] generator 26: discriminant_morphism()
+[t= 433.1s] generator 26: morphism done; spinor evaluation
+[t= 433.1s] generator 26: spinor done (is_one=True)
+[t= 433.1s] generator 27: discriminant_morphism()
+[t= 433.2s] generator 27: morphism done; spinor evaluation
+[t= 433.3s] generator 27: spinor done (is_one=True)
+[t= 433.3s] generator 28: discriminant_morphism()
+[t= 433.4s] generator 28: morphism done; spinor evaluation
+[t= 433.4s] generator 28: spinor done (is_one=True)
+[t= 433.4s] generator 29: discriminant_morphism()
+[t= 433.5s] generator 29: morphism done; spinor evaluation
+[t= 433.5s] generator 29: spinor done (is_one=True)
+[t= 433.5s] generator 30: discriminant_morphism()
+[t= 433.7s] generator 30: morphism done; spinor evaluation
+[t= 433.8s] generator 30: spinor done (is_one=True)
+[t= 433.8s] generator 31: discriminant_morphism()
+[t= 434.0s] generator 31: morphism done; spinor evaluation
+[t= 434.0s] generator 31: spinor done (is_one=True)
+[t= 434.0s] generator 32: discriminant_morphism()
+[t= 434.1s] generator 32: morphism done; spinor evaluation
+[t= 434.1s] generator 32: spinor done (is_one=True)
+[t= 434.1s] generator 33: discriminant_morphism()
+[t= 434.3s] generator 33: morphism done; spinor evaluation
+[t= 434.4s] generator 33: spinor done (is_one=True)
+[t= 434.4s] generator 34: discriminant_morphism()
+[t= 434.5s] generator 34: morphism done; spinor evaluation
+[t= 434.5s] generator 34: spinor done (is_one=True)
+[t= 434.5s] generator 35: discriminant_morphism()
+[t= 434.6s] generator 35: morphism done; spinor evaluation
+[t= 434.6s] generator 35: spinor done (is_one=True)
+[t= 434.6s] generator 36: discriminant_morphism()
+[t= 434.8s] generator 36: morphism done; spinor evaluation
+[t= 434.8s] generator 36: spinor done (is_one=True)
+[t= 434.8s] generator 37: discriminant_morphism()
+[t= 435.0s] generator 37: morphism done; spinor evaluation
+[t= 435.0s] generator 37: spinor done (is_one=True)
+[t= 435.0s] generator 38: discriminant_morphism()
+[t= 435.1s] generator 38: morphism done; spinor evaluation
+[t= 435.2s] generator 38: spinor done (is_one=True)
+[t= 435.2s] generator 39: discriminant_morphism()
+[t= 435.4s] generator 39: morphism done; spinor evaluation
+[t= 435.4s] generator 39: spinor done (is_one=True)
+[t= 435.4s] generator 40: discriminant_morphism()
+[t= 435.5s] generator 40: morphism done; spinor evaluation
+[t= 435.5s] generator 40: spinor done (is_one=True)
+[t= 435.5s] generator 41: discriminant_morphism()
+[t= 435.7s] generator 41: morphism done; spinor evaluation
+[t= 435.7s] generator 41: spinor done (is_one=True)
+[t= 435.7s] generator 42: discriminant_morphism()
+[t= 435.8s] generator 42: morphism done; spinor evaluation
+[t= 435.9s] generator 42: spinor done (is_one=True)
+[t= 435.9s] generator 43: discriminant_morphism()
+[t= 436.0s] generator 43: morphism done; spinor evaluation
+[t= 436.0s] generator 43: spinor done (is_one=True)
+[t= 436.0s] generator 44: discriminant_morphism()
+[t= 436.3s] generator 44: morphism done; spinor evaluation
+[t= 436.3s] generator 44: spinor done (is_one=True)
+[t= 436.3s] generator 45: discriminant_morphism()
+[t= 436.4s] generator 45: morphism done; spinor evaluation
+[t= 436.4s] generator 45: spinor done (is_one=True)
+[t= 436.4s] generator 46: discriminant_morphism()
+[t= 436.5s] generator 46: morphism done; spinor evaluation
+[t= 436.6s] generator 46: spinor done (is_one=True)
+[t= 436.6s] generator 47: discriminant_morphism()
+[t= 436.7s] generator 47: morphism done; spinor evaluation
+[t= 436.7s] generator 47: spinor done (is_one=True)
+[t= 436.7s] generator 48: discriminant_morphism()
+[t= 436.8s] generator 48: morphism done; spinor evaluation
+[t= 436.9s] generator 48: spinor done (is_one=True)
+[t= 436.9s] generator 49: discriminant_morphism()
+[t= 437.0s] generator 49: morphism done; spinor evaluation
+[t= 437.0s] generator 49: spinor done (is_one=True)
+[t= 437.0s] generator 50: discriminant_morphism()
+[t= 437.1s] generator 50: morphism done; spinor evaluation
+[t= 437.2s] generator 50: spinor done (is_one=True)
+[t= 437.2s] generator 51: discriminant_morphism()
+[t= 437.3s] generator 51: morphism done; spinor evaluation
+[t= 437.3s] generator 51: spinor done (is_one=True)
+[t= 437.3s] generator 52: discriminant_morphism()
+[t= 437.5s] generator 52: morphism done; spinor evaluation
+[t= 437.5s] generator 52: spinor done (is_one=True)
+[t= 437.5s] generator 53: discriminant_morphism()
+[t= 437.6s] generator 53: morphism done; spinor evaluation
+[t= 437.6s] generator 53: spinor done (is_one=True)
+[t= 437.6s] generator 54: discriminant_morphism()
+[t= 437.7s] generator 54: morphism done; spinor evaluation
+[t= 437.8s] generator 54: spinor done (is_one=True)
+[t= 437.8s] generator 55: discriminant_morphism()
+[t= 437.9s] generator 55: morphism done; spinor evaluation
+[t= 437.9s] generator 55: spinor done (is_one=True)
+[t= 437.9s] generator 56: discriminant_morphism()
+[t= 438.0s] generator 56: morphism done; spinor evaluation
+[t= 438.1s] generator 56: spinor done (is_one=True)
+[t= 438.1s] generator 57: discriminant_morphism()
+[t= 438.2s] generator 57: morphism done; spinor evaluation
+[t= 438.3s] generator 57: spinor done (is_one=True)
+[t= 438.3s] generator 58: discriminant_morphism()
+[t= 438.4s] generator 58: morphism done; spinor evaluation
+[t= 438.4s] generator 58: spinor done (is_one=True)
+[t= 438.4s] generator 59: discriminant_morphism()
+[t= 438.6s] generator 59: morphism done; spinor evaluation
+[t= 438.6s] generator 59: spinor done (is_one=True)
+[t= 438.6s] generator 60: discriminant_morphism()
+[t= 438.7s] generator 60: morphism done; spinor evaluation
+[t= 438.8s] generator 60: spinor done (is_one=True)
+[t= 438.8s] generator 61: discriminant_morphism()
+[t= 438.9s] generator 61: morphism done; spinor evaluation
+[t= 438.9s] generator 61: spinor done (is_one=True)
+[t= 438.9s] generator 62: discriminant_morphism()
+[t= 439.0s] generator 62: morphism done; spinor evaluation
+[t= 439.0s] generator 62: spinor done (is_one=True)
+[t= 439.0s] generator 63: discriminant_morphism()
+[t= 439.2s] generator 63: morphism done; spinor evaluation
+[t= 439.2s] generator 63: spinor done (is_one=True)
+[t= 439.2s] generator 64: discriminant_morphism()
+[t= 439.3s] generator 64: morphism done; spinor evaluation
+[t= 439.4s] generator 64: spinor done (is_one=False)
+[t= 439.4s] generator 65: discriminant_morphism()
+[t= 439.5s] generator 65: morphism done; spinor evaluation
+[t= 439.5s] generator 65: spinor done (is_one=True)
+[t= 439.5s] generator 66: discriminant_morphism()
+[t= 439.6s] generator 66: morphism done; spinor evaluation
+[t= 439.6s] generator 66: spinor done (is_one=True)
+[t= 439.6s] generator 67: discriminant_morphism()
+[t= 439.8s] generator 67: morphism done; spinor evaluation
+[t= 439.8s] generator 67: spinor done (is_one=False)
+[t= 439.8s] generator 68: discriminant_morphism()
+[t= 439.9s] generator 68: morphism done; spinor evaluation
+[t= 439.9s] generator 68: spinor done (is_one=False)
+[t= 439.9s] generator 69: discriminant_morphism()
+[t= 440.0s] generator 69: morphism done; spinor evaluation
+[t= 440.1s] generator 69: spinor done (is_one=False)
+[t= 440.1s] generator 70: discriminant_morphism()
+[t= 440.2s] generator 70: morphism done; spinor evaluation
+[t= 440.2s] generator 70: spinor done (is_one=False)
+[t= 440.2s] generator 71: discriminant_morphism()
+[t= 440.3s] generator 71: morphism done; spinor evaluation
+[t= 440.4s] generator 71: spinor done (is_one=False)
+[t= 440.4s] generator 72: discriminant_morphism()
+[t= 440.6s] generator 72: morphism done; spinor evaluation
+[t= 440.6s] generator 72: spinor done (is_one=True)
+[t= 440.6s] generator 73: discriminant_morphism()
+[t= 440.7s] generator 73: morphism done; spinor evaluation
+[t= 440.7s] generator 73: spinor done (is_one=True)
+[t= 440.7s] generator 74: discriminant_morphism()
+[t= 440.8s] generator 74: morphism done; spinor evaluation
+[t= 440.9s] generator 74: spinor done (is_one=True)
+[t= 440.9s] generator 75: discriminant_morphism()
+[t= 441.0s] generator 75: morphism done; spinor evaluation
+[t= 441.0s] generator 75: spinor done (is_one=True)
+[t= 441.0s] generator 76: discriminant_morphism()
+[t= 441.1s] generator 76: morphism done; spinor evaluation
+[t= 441.2s] generator 76: spinor done (is_one=True)
+[t= 441.2s] generator 77: discriminant_morphism()
+[t= 441.3s] generator 77: morphism done; spinor evaluation
+[t= 441.3s] generator 77: spinor done (is_one=True)
+[t= 441.3s] generator 78: discriminant_morphism()
+[t= 441.5s] generator 78: morphism done; spinor evaluation
+[t= 441.5s] generator 78: spinor done (is_one=True)
+[t= 441.5s] generator 79: discriminant_morphism()
+[t= 441.6s] generator 79: morphism done; spinor evaluation
+[t= 441.7s] generator 79: spinor done (is_one=True)
+[t= 441.7s] generator 80: discriminant_morphism()
+[t= 441.8s] generator 80: morphism done; spinor evaluation
+[t= 441.8s] generator 80: spinor done (is_one=True)
+[t= 441.8s] generator 81: discriminant_morphism()
+[t= 442.0s] generator 81: morphism done; spinor evaluation
+[t= 442.1s] generator 81: spinor done (is_one=True)
+[t= 442.1s] generator 82: discriminant_morphism()
+[t= 442.3s] generator 82: morphism done; spinor evaluation
+[t= 442.3s] generator 82: spinor done (is_one=True)
+[t= 442.3s] generator 83: discriminant_morphism()
+[t= 442.4s] generator 83: morphism done; spinor evaluation
+[t= 442.4s] generator 83: spinor done (is_one=True)
+[t= 442.4s] generator 84: discriminant_morphism()
+[t= 442.6s] generator 84: morphism done; spinor evaluation
+[t= 442.6s] generator 84: spinor done (is_one=True)
+[t= 442.6s] generator 85: discriminant_morphism()
+[t= 442.9s] generator 85: morphism done; spinor evaluation
+[t= 442.9s] generator 85: spinor done (is_one=True)
+[t= 442.9s] generator 86: discriminant_morphism()
+[t= 443.1s] generator 86: morphism done; spinor evaluation
+[t= 443.1s] generator 86: spinor done (is_one=True)
+[t= 443.1s] generator 87: discriminant_morphism()
+[t= 443.2s] generator 87: morphism done; spinor evaluation
+[t= 443.2s] generator 87: spinor done (is_one=True)
+[t= 443.2s] generator 88: discriminant_morphism()
+[t= 443.4s] generator 88: morphism done; spinor evaluation
+[t= 443.4s] generator 88: spinor done (is_one=True)
+[t= 443.4s] generator 89: discriminant_morphism()
+[t= 443.6s] generator 89: morphism done; spinor evaluation
+[t= 443.6s] generator 89: spinor done (is_one=True)
+[t= 443.6s] generator 90: discriminant_morphism()
+[t= 443.7s] generator 90: morphism done; spinor evaluation
+[t= 443.8s] generator 90: spinor done (is_one=True)
+[t= 443.8s] generator 91: discriminant_morphism()
+[t= 444.0s] generator 91: morphism done; spinor evaluation
+[t= 444.0s] generator 91: spinor done (is_one=True)
+[t= 444.0s] generator 92: discriminant_morphism()
+[t= 444.1s] generator 92: morphism done; spinor evaluation
+[t= 444.1s] generator 92: spinor done (is_one=True)
+[t= 444.1s] generator 93: discriminant_morphism()
+[t= 444.3s] generator 93: morphism done; spinor evaluation
+[t= 444.3s] generator 93: spinor done (is_one=False)
+[t= 444.3s] generator 94: discriminant_morphism()
+[t= 444.4s] generator 94: morphism done; spinor evaluation
+[t= 444.4s] generator 94: spinor done (is_one=False)
+[t= 444.4s] generator 95: discriminant_morphism()
+[t= 444.6s] generator 95: morphism done; spinor evaluation
+[t= 444.6s] generator 95: spinor done (is_one=True)
+[t= 444.6s] generator 96: discriminant_morphism()
+[t= 444.7s] generator 96: morphism done; spinor evaluation
+[t= 444.8s] generator 96: spinor done (is_one=True)
+[t= 444.8s] generator 97: discriminant_morphism()
+[t= 444.9s] generator 97: morphism done; spinor evaluation
+[t= 445.0s] generator 97: spinor done (is_one=True)
+[t= 445.0s] generator 98: discriminant_morphism()
+[t= 445.1s] generator 98: morphism done; spinor evaluation
+[t= 445.1s] generator 98: spinor done (is_one=True)
+[t= 445.1s] generator 99: discriminant_morphism()
+[t= 445.3s] generator 99: morphism done; spinor evaluation
+[t= 445.3s] generator 99: spinor done (is_one=True)
+[t= 445.3s] generator 100: discriminant_morphism()
+[t= 445.5s] generator 100: morphism done; spinor evaluation
+[t= 445.6s] generator 100: spinor done (is_one=True)
+[t= 445.6s] generator 101: discriminant_morphism()
+[t= 445.8s] generator 101: morphism done; spinor evaluation
+[t= 445.9s] generator 101: spinor done (is_one=True)
+[t= 445.9s] generator 102: discriminant_morphism()
+[t= 446.1s] generator 102: morphism done; spinor evaluation
+[t= 446.2s] generator 102: spinor done (is_one=True)
+[t= 446.2s] generator 103: discriminant_morphism()
+[t= 446.4s] generator 103: morphism done; spinor evaluation
+[t= 446.4s] generator 103: spinor done (is_one=True)
+[t= 446.4s] generator 104: discriminant_morphism()
+[t= 446.7s] generator 104: morphism done; spinor evaluation
+[t= 446.7s] generator 104: spinor done (is_one=True)
+[t= 446.7s] generator 105: discriminant_morphism()
+[t= 446.9s] generator 105: morphism done; spinor evaluation
+[t= 447.0s] generator 105: spinor done (is_one=True)
+[t= 447.0s] generator 106: discriminant_morphism()
+[t= 447.2s] generator 106: morphism done; spinor evaluation
+[t= 447.3s] generator 106: spinor done (is_one=True)
+[t= 447.3s] generator 107: discriminant_morphism()
+[t= 447.5s] generator 107: morphism done; spinor evaluation
+[t= 447.6s] generator 107: spinor done (is_one=True)
+[t= 447.6s] generator 108: discriminant_morphism()
+[t= 447.8s] generator 108: morphism done; spinor evaluation
+[t= 447.8s] generator 108: spinor done (is_one=True)
+[t= 447.8s] generator 109: discriminant_morphism()
+[t= 448.1s] generator 109: morphism done; spinor evaluation
+[t= 448.1s] generator 109: spinor done (is_one=True)
+[t= 448.1s] generator 110: discriminant_morphism()
+[t= 448.3s] generator 110: morphism done; spinor evaluation
+[t= 448.4s] generator 110: spinor done (is_one=True)
+[t= 448.4s] generator 111: discriminant_morphism()
+[t= 448.6s] generator 111: morphism done; spinor evaluation
+[t= 448.7s] generator 111: spinor done (is_one=True)
+[t= 448.7s] generator 112: discriminant_morphism()
+[t= 448.9s] generator 112: morphism done; spinor evaluation
+[t= 448.9s] generator 112: spinor done (is_one=True)
+[t= 448.9s] generator 113: discriminant_morphism()
+[t= 449.2s] generator 113: morphism done; spinor evaluation
+[t= 449.2s] generator 113: spinor done (is_one=True)
+[t= 449.2s] generator 114: discriminant_morphism()
+[t= 449.4s] generator 114: morphism done; spinor evaluation
+[t= 449.5s] generator 114: spinor done (is_one=False)
+[t= 449.5s] generator 115: discriminant_morphism()
+[t= 449.7s] generator 115: morphism done; spinor evaluation
+[t= 449.7s] generator 115: spinor done (is_one=False)
+[t= 449.7s] generator 116: discriminant_morphism()
+[t= 450.0s] generator 116: morphism done; spinor evaluation
+[t= 450.0s] generator 116: spinor done (is_one=True)
+[t= 450.0s] generator 117: discriminant_morphism()
+[t= 450.2s] generator 117: morphism done; spinor evaluation
+[t= 450.3s] generator 117: spinor done (is_one=True)
+[t= 450.3s] generator 118: discriminant_morphism()
+[t= 450.5s] generator 118: morphism done; spinor evaluation
+[t= 450.5s] generator 118: spinor done (is_one=True)
+[t= 450.5s] generator 119: discriminant_morphism()
+[t= 450.8s] generator 119: morphism done; spinor evaluation
+[t= 450.8s] generator 119: spinor done (is_one=True)
+[t= 450.8s] generator 120: discriminant_morphism()
+[t= 451.1s] generator 120: morphism done; spinor evaluation
+[t= 451.1s] generator 120: spinor done (is_one=True)
+[t= 451.1s] generator 121: discriminant_morphism()
+[t= 451.4s] generator 121: morphism done; spinor evaluation
+[t= 451.4s] generator 121: spinor done (is_one=True)
+[t= 451.4s] generator 122: discriminant_morphism()
+[t= 451.6s] generator 122: morphism done; spinor evaluation
+[t= 451.7s] generator 122: spinor done (is_one=True)
+[t= 451.7s] generator 123: discriminant_morphism()
+[t= 451.9s] generator 123: morphism done; spinor evaluation
+[t= 452.0s] generator 123: spinor done (is_one=True)
+[t= 452.0s] generator 124: discriminant_morphism()
+[t= 452.2s] generator 124: morphism done; spinor evaluation
+[t= 452.2s] generator 124: spinor done (is_one=True)
+[t= 452.2s] generator 125: discriminant_morphism()
+[t= 452.5s] generator 125: morphism done; spinor evaluation
+[t= 452.5s] generator 125: spinor done (is_one=True)
+[t= 452.5s] generator 126: discriminant_morphism()
+[t= 452.7s] generator 126: morphism done; spinor evaluation
+[t= 452.8s] generator 126: spinor done (is_one=False)
+[t= 452.8s] generator 127: discriminant_morphism()
+[t= 452.9s] generator 127: morphism done; spinor evaluation
+[t= 452.9s] generator 127: spinor done (is_one=True)
+[t= 452.9s] generator 128: discriminant_morphism()
+[t= 453.1s] generator 128: morphism done; spinor evaluation
+[t= 453.1s] generator 128: spinor done (is_one=True)
+[t= 453.1s] generator 129: discriminant_morphism()
+[t= 453.3s] generator 129: morphism done; spinor evaluation
+[t= 453.3s] generator 129: spinor done (is_one=True)
+[t= 453.3s] generator 130: discriminant_morphism()
+[t= 453.4s] generator 130: morphism done; spinor evaluation
+[t= 453.5s] generator 130: spinor done (is_one=True)
+[t= 453.5s] generator 131: discriminant_morphism()
+[t= 453.6s] generator 131: morphism done; spinor evaluation
+[t= 453.7s] generator 131: spinor done (is_one=True)
+[t= 453.7s] generator 132: discriminant_morphism()
+[t= 453.8s] generator 132: morphism done; spinor evaluation
+[t= 453.9s] generator 132: spinor done (is_one=True)
+[t= 453.9s] generator 133: discriminant_morphism()
+[t= 454.0s] generator 133: morphism done; spinor evaluation
+[t= 454.0s] generator 133: spinor done (is_one=True)
+[t= 454.0s] generator 134: discriminant_morphism()
+[t= 454.2s] generator 134: morphism done; spinor evaluation
+[t= 454.2s] generator 134: spinor done (is_one=True)
+[t= 454.2s] generator 135: discriminant_morphism()
+[t= 454.4s] generator 135: morphism done; spinor evaluation
+[t= 454.4s] generator 135: spinor done (is_one=False)
+[t= 454.4s] generator 136: discriminant_morphism()
+[t= 454.5s] generator 136: morphism done; spinor evaluation
+[t= 454.5s] generator 136: spinor done (is_one=False)
+[t= 454.5s] generator 137: discriminant_morphism()
+[t= 454.7s] generator 137: morphism done; spinor evaluation
+[t= 454.7s] generator 137: spinor done (is_one=False)
+[t= 454.7s] generator 138: discriminant_morphism()
+[t= 454.9s] generator 138: morphism done; spinor evaluation
+[t= 454.9s] generator 138: spinor done (is_one=True)
+[t= 454.9s] generator 139: discriminant_morphism()
+[t= 455.0s] generator 139: morphism done; spinor evaluation
+[t= 455.0s] generator 139: spinor done (is_one=True)
+[t= 455.0s] generator 140: discriminant_morphism()
+[t= 455.2s] generator 140: morphism done; spinor evaluation
+[t= 455.2s] generator 140: spinor done (is_one=True)
+[t= 455.2s] generator 141: discriminant_morphism()
+[t= 455.4s] generator 141: morphism done; spinor evaluation
+[t= 455.4s] generator 141: spinor done (is_one=True)
+[t= 455.4s] generator 142: discriminant_morphism()
+[t= 455.5s] generator 142: morphism done; spinor evaluation
+[t= 455.6s] generator 142: spinor done (is_one=True)
+[t= 455.6s] generator 143: discriminant_morphism()
+[t= 455.8s] generator 143: morphism done; spinor evaluation
+[t= 455.8s] generator 143: spinor done (is_one=True)
+[t= 455.8s] generator 144: discriminant_morphism()
+[t= 455.9s] generator 144: morphism done; spinor evaluation
+[t= 455.9s] generator 144: spinor done (is_one=True)
+[t= 455.9s] generator 145: discriminant_morphism()
+[t= 456.1s] generator 145: morphism done; spinor evaluation
+[t= 456.1s] generator 145: spinor done (is_one=True)
+[t= 456.1s] generator 146: discriminant_morphism()
+[t= 456.2s] generator 146: morphism done; spinor evaluation
+[t= 456.3s] generator 146: spinor done (is_one=True)
+[t= 456.3s] generator 147: discriminant_morphism()
+[t= 456.5s] generator 147: morphism done; spinor evaluation
+[t= 456.6s] generator 147: spinor done (is_one=True)
+[t= 456.6s] generator 148: discriminant_morphism()
+[t= 456.8s] generator 148: morphism done; spinor evaluation
+[t= 456.8s] generator 148: spinor done (is_one=True)
+[t= 456.8s] generator 149: discriminant_morphism()
+[t= 456.9s] generator 149: morphism done; spinor evaluation
+[t= 456.9s] generator 149: spinor done (is_one=True)
+[t= 456.9s] generator 150: discriminant_morphism()
+[t= 457.1s] generator 150: morphism done; spinor evaluation
+[t= 457.1s] generator 150: spinor done (is_one=True)
+[t= 457.1s] generator 151: discriminant_morphism()
+[t= 457.2s] generator 151: morphism done; spinor evaluation
+[t= 457.3s] generator 151: spinor done (is_one=True)
+[t= 457.3s] generator 152: discriminant_morphism()
+[t= 457.4s] generator 152: morphism done; spinor evaluation
+[t= 457.4s] generator 152: spinor done (is_one=True)
+[t= 457.4s] generator 153: discriminant_morphism()
+[t= 457.5s] generator 153: morphism done; spinor evaluation
+[t= 457.6s] generator 153: spinor done (is_one=True)
+[t= 457.6s] generator 154: discriminant_morphism()
+[t= 457.7s] generator 154: morphism done; spinor evaluation
+[t= 457.8s] generator 154: spinor done (is_one=True)
+[t= 457.8s] generator 155: discriminant_morphism()
+[t= 457.9s] generator 155: morphism done; spinor evaluation
+[t= 457.9s] generator 155: spinor done (is_one=True)
+[t= 457.9s] generator 156: discriminant_morphism()
+[t= 458.1s] generator 156: morphism done; spinor evaluation
+[t= 458.1s] generator 156: spinor done (is_one=True)
+[t= 458.1s] generator 157: discriminant_morphism()
+[t= 458.2s] generator 157: morphism done; spinor evaluation
+[t= 458.3s] generator 157: spinor done (is_one=True)
+[t= 458.3s] generator 158: discriminant_morphism()
+[t= 458.4s] generator 158: morphism done; spinor evaluation
+[t= 458.4s] generator 158: spinor done (is_one=True)
+[t= 458.4s] generator 159: discriminant_morphism()
+[t= 458.6s] generator 159: morphism done; spinor evaluation
+[t= 458.6s] generator 159: spinor done (is_one=True)
+[t= 458.6s] generator 160: discriminant_morphism()
+[t= 458.7s] generator 160: morphism done; spinor evaluation
+[t= 458.7s] generator 160: spinor done (is_one=False)
+[t= 458.7s] generator 161: discriminant_morphism()
+[t= 458.8s] generator 161: morphism done; spinor evaluation
+[t= 458.9s] generator 161: spinor done (is_one=True)
+[t= 458.9s] generator 162: discriminant_morphism()
+[t= 459.0s] generator 162: morphism done; spinor evaluation
+[t= 459.0s] generator 162: spinor done (is_one=True)
+[t= 459.0s] generator 163: discriminant_morphism()
+[t= 459.2s] generator 163: morphism done; spinor evaluation
+[t= 459.2s] generator 163: spinor done (is_one=False)
+[t= 459.2s] generator 164: discriminant_morphism()
+[t= 459.3s] generator 164: morphism done; spinor evaluation
+[t= 459.4s] generator 164: spinor done (is_one=True)
+[t= 459.4s] generator 165: discriminant_morphism()
+[t= 459.5s] generator 165: morphism done; spinor evaluation
+[t= 459.5s] generator 165: spinor done (is_one=True)
+[t= 459.5s] generator 166: discriminant_morphism()
+[t= 459.7s] generator 166: morphism done; spinor evaluation
+[t= 459.7s] generator 166: spinor done (is_one=False)
+[t= 459.7s] generator 167: discriminant_morphism()
+[t= 459.8s] generator 167: morphism done; spinor evaluation
+[t= 459.9s] generator 167: spinor done (is_one=False)
+[t= 459.9s] generator 168: discriminant_morphism()
+[t= 460.0s] generator 168: morphism done; spinor evaluation
+[t= 460.1s] generator 168: spinor done (is_one=False)
+[t= 460.1s] generator 169: discriminant_morphism()
+[t= 460.2s] generator 169: morphism done; spinor evaluation
+[t= 460.2s] generator 169: spinor done (is_one=True)
+[t= 460.2s] generator 170: discriminant_morphism()
+[t= 460.3s] generator 170: morphism done; spinor evaluation
+[t= 460.4s] generator 170: spinor done (is_one=True)
+[t= 460.4s] generator 171: discriminant_morphism()
+[t= 460.5s] generator 171: morphism done; spinor evaluation
+[t= 460.5s] generator 171: spinor done (is_one=True)
+[t= 460.5s] generator 172: discriminant_morphism()
+[t= 460.7s] generator 172: morphism done; spinor evaluation
+[t= 460.7s] generator 172: spinor done (is_one=True)
+[t= 460.7s] generator 173: discriminant_morphism()
+[t= 460.9s] generator 173: morphism done; spinor evaluation
+[t= 460.9s] generator 173: spinor done (is_one=True)
+[t= 460.9s] generator 174: discriminant_morphism()
+[t= 461.0s] generator 174: morphism done; spinor evaluation
+[t= 461.1s] generator 174: spinor done (is_one=True)
+[t= 461.1s] generator 175: discriminant_morphism()
+[t= 461.2s] generator 175: morphism done; spinor evaluation
+[t= 461.2s] generator 175: spinor done (is_one=True)
+[t= 461.2s] generator 176: discriminant_morphism()
+[t= 461.4s] generator 176: morphism done; spinor evaluation
+[t= 461.4s] generator 176: spinor done (is_one=True)
+[t= 461.4s] generator 177: discriminant_morphism()
+[t= 461.5s] generator 177: morphism done; spinor evaluation
+[t= 461.6s] generator 177: spinor done (is_one=True)
+[t= 461.6s] generator 178: discriminant_morphism()
+[t= 461.7s] generator 178: morphism done; spinor evaluation
+[t= 461.7s] generator 178: spinor done (is_one=True)
+[t= 461.7s] generator 179: discriminant_morphism()
+[t= 461.9s] generator 179: morphism done; spinor evaluation
+[t= 461.9s] generator 179: spinor done (is_one=True)
+[t= 461.9s] generator 180: discriminant_morphism()
+[t= 462.0s] generator 180: morphism done; spinor evaluation
+[t= 462.0s] generator 180: spinor done (is_one=True)
+[t= 462.0s] generator 181: discriminant_morphism()
+[t= 462.2s] generator 181: morphism done; spinor evaluation
+[t= 462.2s] generator 181: spinor done (is_one=True)
+[t= 462.2s] generator 182: discriminant_morphism()
+[t= 462.3s] generator 182: morphism done; spinor evaluation
+[t= 462.4s] generator 182: spinor done (is_one=True)
+[t= 462.4s] generator 183: discriminant_morphism()
+[t= 462.5s] generator 183: morphism done; spinor evaluation
+[t= 462.5s] generator 183: spinor done (is_one=True)
+[t= 462.5s] generator 184: discriminant_morphism()
+[t= 462.7s] generator 184: morphism done; spinor evaluation
+[t= 462.7s] generator 184: spinor done (is_one=True)
+[t= 462.7s] generator 185: discriminant_morphism()
+[t= 462.9s] generator 185: morphism done; spinor evaluation
+[t= 462.9s] generator 185: spinor done (is_one=True)
+[t= 462.9s] generator 186: discriminant_morphism()
+[t= 463.0s] generator 186: morphism done; spinor evaluation
+[t= 463.1s] generator 186: spinor done (is_one=True)
+[t= 463.1s] generator 187: discriminant_morphism()
+[t= 463.2s] generator 187: morphism done; spinor evaluation
+[t= 463.3s] generator 187: spinor done (is_one=True)
+[t= 463.3s] generator 188: discriminant_morphism()
+[t= 463.5s] generator 188: morphism done; spinor evaluation
+[t= 463.5s] generator 188: spinor done (is_one=True)
+[t= 463.5s] generator 189: discriminant_morphism()
+[t= 463.7s] generator 189: morphism done; spinor evaluation
+[t= 463.7s] generator 189: spinor done (is_one=True)
+[t= 463.7s] generator 190: discriminant_morphism()
+[t= 463.9s] generator 190: morphism done; spinor evaluation
+[t= 463.9s] generator 190: spinor done (is_one=True)
+[t= 463.9s] generator 191: discriminant_morphism()
+[t= 464.0s] generator 191: morphism done; spinor evaluation
+[t= 464.1s] generator 191: spinor done (is_one=True)
+[t= 464.1s] generator 192: discriminant_morphism()
+[t= 464.2s] generator 192: morphism done; spinor evaluation
+[t= 464.2s] generator 192: spinor done (is_one=True)
+[t= 464.2s] generator 193: discriminant_morphism()
+[t= 464.4s] generator 193: morphism done; spinor evaluation
+[t= 464.4s] generator 193: spinor done (is_one=True)
+[t= 464.4s] generator 194: discriminant_morphism()
+[t= 464.6s] generator 194: morphism done; spinor evaluation
+[t= 464.6s] generator 194: spinor done (is_one=True)
+[t= 464.6s] generator 195: discriminant_morphism()
+[t= 464.8s] generator 195: morphism done; spinor evaluation
+[t= 464.9s] generator 195: spinor done (is_one=True)
+[t= 464.9s] generator 196: discriminant_morphism()
+[t= 465.1s] generator 196: morphism done; spinor evaluation
+[t= 465.2s] generator 196: spinor done (is_one=True)
+[t= 465.2s] generator 197: discriminant_morphism()
+[t= 465.4s] generator 197: morphism done; spinor evaluation
+[t= 465.4s] generator 197: spinor done (is_one=True)
+[t= 465.4s] generator 198: discriminant_morphism()
+[t= 465.5s] generator 198: morphism done; spinor evaluation
+[t= 465.6s] generator 198: spinor done (is_one=True)
+[t= 465.6s] generator 199: discriminant_morphism()
+[t= 465.7s] generator 199: morphism done; spinor evaluation
+[t= 465.7s] generator 199: spinor done (is_one=True)
+[t= 465.7s] generator 200: discriminant_morphism()
+[t= 465.9s] generator 200: morphism done; spinor evaluation
+[t= 465.9s] generator 200: spinor done (is_one=True)
+[t= 465.9s] generator 201: discriminant_morphism()
+[t= 466.0s] generator 201: morphism done; spinor evaluation
+[t= 466.1s] generator 201: spinor done (is_one=True)
+[t= 466.1s] generator 202: discriminant_morphism()
+[t= 466.2s] generator 202: morphism done; spinor evaluation
+[t= 466.2s] generator 202: spinor done (is_one=True)
+[t= 466.2s] generator 203: discriminant_morphism()
+[t= 466.4s] generator 203: morphism done; spinor evaluation
+[t= 466.4s] generator 203: spinor done (is_one=True)
+[t= 466.4s] generator 204: discriminant_morphism()
+[t= 466.6s] generator 204: morphism done; spinor evaluation
+[t= 466.6s] generator 204: spinor done (is_one=True)
+[t= 466.6s] generator 205: discriminant_morphism()
+[t= 466.8s] generator 205: morphism done; spinor evaluation
+[t= 466.8s] generator 205: spinor done (is_one=True)
+[t= 466.8s] generator 206: discriminant_morphism()
+[t= 467.1s] generator 206: morphism done; spinor evaluation
+[t= 467.2s] generator 206: spinor done (is_one=True)
+[t= 467.2s] generator 207: discriminant_morphism()
+[t= 467.4s] generator 207: morphism done; spinor evaluation
+[t= 467.5s] generator 207: spinor done (is_one=True)
+[t= 467.5s] generator 208: discriminant_morphism()
+[t= 467.6s] generator 208: morphism done; spinor evaluation
+[t= 467.6s] generator 208: spinor done (is_one=True)
+[t= 467.6s] generator 209: discriminant_morphism()
+[t= 467.7s] generator 209: morphism done; spinor evaluation
+[t= 467.8s] generator 209: spinor done (is_one=True)
+[t= 467.8s] generator 210: discriminant_morphism()
+[t= 468.0s] generator 210: morphism done; spinor evaluation
+[t= 468.1s] generator 210: spinor done (is_one=True)
+[t= 468.1s] generator 211: discriminant_morphism()
+[t= 468.3s] generator 211: morphism done; spinor evaluation
+[t= 468.4s] generator 211: spinor done (is_one=True)
+[t= 468.4s] generator 212: discriminant_morphism()
+[t= 468.5s] generator 212: morphism done; spinor evaluation
+[t= 468.5s] generator 212: spinor done (is_one=True)
+[t= 468.5s] generator 213: discriminant_morphism()
+[t= 468.8s] generator 213: morphism done; spinor evaluation
+[t= 468.8s] generator 213: spinor done (is_one=True)
+[t= 468.8s] generator 214: discriminant_morphism()
+[t= 469.0s] generator 214: morphism done; spinor evaluation
+[t= 469.0s] generator 214: spinor done (is_one=True)
+[t= 469.0s] generator 215: discriminant_morphism()
+[t= 469.3s] generator 215: morphism done; spinor evaluation
+[t= 469.3s] generator 215: spinor done (is_one=True)
+[t= 469.3s] generator 216: discriminant_morphism()
+[t= 469.4s] generator 216: morphism done; spinor evaluation
+[t= 469.4s] generator 216: spinor done (is_one=True)
+[t= 469.4s] generator 217: discriminant_morphism()
+[t= 469.6s] generator 217: morphism done; spinor evaluation
+[t= 469.6s] generator 217: spinor done (is_one=True)
+[t= 469.6s] generator 218: discriminant_morphism()
+[t= 469.8s] generator 218: morphism done; spinor evaluation
+[t= 469.8s] generator 218: spinor done (is_one=True)
+[t= 469.8s] generator 219: discriminant_morphism()
+[t= 469.9s] generator 219: morphism done; spinor evaluation
+[t= 470.0s] generator 219: spinor done (is_one=True)
+[t= 470.0s] generator 220: discriminant_morphism()
+[t= 470.1s] generator 220: morphism done; spinor evaluation
+[t= 470.1s] generator 220: spinor done (is_one=False)
+MEASURE_OK
+[peakrss] pergen-character-cost-5444cb9: child waited=0 shell_code=0 samples=239
+[peakrss] peak tree RSS      : 3848 MiB
+[peakrss] low-water MemAvail : 6200 MiB
+[peakrss] peak single VmHWM  : 3978 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      3157 MiB peak
+[peakrss]   python                      816 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   278.1s procs=  4 rss=  3848 MiB hwm=  3853 MiB avail= 10291 MiB
+[peakrss]   t=   274.1s procs=  4 rss=  3846 MiB hwm=  3851 MiB avail= 10305 MiB
+[peakrss]   t=   276.1s procs=  4 rss=  3846 MiB hwm=  3851 MiB avail= 10294 MiB
+[peakrss]   t=   272.1s procs=  4 rss=  3844 MiB hwm=  3849 MiB avail= 10290 MiB
+[peakrss]   t=   270.1s procs=  4 rss=  3837 MiB hwm=  3842 MiB avail= 10313 MiB
