@@ -387,10 +387,25 @@ class OrthogonalCharacterQuotient:
         formed here inside the direct product, from the targets' retained
         generating families and one projection kernel per sign factor.
         """
-        factors, _product, _embeddings, projections = self._gap_product()
+        factors, _product, embeddings, projections = self._gap_product()
         from sage_extensions.categories.group.groups import _element_to_engine
 
         image = self._gap_image()
+        if self._has_discriminant and not (self.determinant_kernel and self.spinor_kernel):
+            # Injectivity of pi_1 on Q cap S (proof at
+            # _joint_discriminant_image_gap): Q cap S = {(a, +1) : a in T_tot},
+            # so the joint subgroup is the embedding of T_tot, never a meet in
+            # the product model.  Every embedded generator lies in Q because
+            # T_tot lives in rho(K_0), and a lift of gamma has all signs +1.
+            joint = self._joint_discriminant_image_gap()
+            position = next(
+                index for index, (label, _group) in enumerate(factors) if label == "discriminant"
+            )
+            embedded = [
+                libgap.Image(embeddings[position], generator)
+                for generator in libgap.GeneratorsOfGroup(joint)
+            ]
+            return libgap.Subgroup(image, embedded)
         pieces = []
         for target in self.discriminant_preimages:
             position = next(
@@ -408,7 +423,7 @@ class OrthogonalCharacterQuotient:
             pieces.append(
                 libgap.Subgroup(
                     _product,
-                    [libgap.Image(_embeddings[position], generator) for generator in targets_gap],
+                    [libgap.Image(embeddings[position], generator) for generator in targets_gap],
                 )
             )
         for position, (label, group) in enumerate(factors):
@@ -430,8 +445,90 @@ class OrthogonalCharacterQuotient:
         r"""``|chi(O(L))|``, from the generated image; no image element is listed."""
         return self._image_section()[2].order()
 
+    @cached_method
+    def _joint_discriminant_image_gap(self):
+        r"""``pi_1(Q cap S) = (cap_i H_i) cap rho(K_0)``, one meet inside ``O(A_L)``.
+
+        Here ``S`` is the retained joint condition: every element of ``S`` has
+        all sign components ``+1`` (the kernel of every sign projection is part
+        of ``S`` by construction).  Hence ``pi_1`` is **injective** on
+        ``Q cap S`` (each ``q`` is determined by its discriminant component),
+        and
+
+            ``pi_1(Q cap S) = T_tot := (cap_i H_i) cap rho(K_0)``,
+
+        with ``K_0`` the **joint** sign kernel ``cap ker sn_j`` of the ambient
+        group ``O(L)`` — no surjectivity, no containment of the targets, no
+        separate marginals: ``K_0`` is one object, its rho-image is one
+        subgroup pushed through ``rho`` from ``K_0``'s retained generating
+        family, and the meet is one ``Intersection`` of small generated
+        subgroups of ``O(A_L)``.  With more than one sign factor and
+        supergroup-family requirements the joint ``K_0`` family is not
+        currently formed here, and the honest legacy branch below is kept;
+        in that case this statement does not claim computation.
+        """
+        from sage_extensions.categories.group.groups import (
+            _element_to_engine,
+            _gap_model,
+        )
+
+        og_engine = _gap_model(self._discriminant_group)
+        pieces = []
+        for target in self.discriminant_preimages:
+            pieces.append(
+                libgap.Subgroup(
+                    og_engine,
+                    [
+                        _element_to_engine(self._discriminant_group, generator)
+                        for generator in target.group_generators()
+                    ],
+                )
+            )
+        if self.determinant_kernel and self.spinor_kernel:
+            raise NotImplementedError(
+                "the joint intersection of two sign kernels inside O(L) is not "
+                "currently generated in this route; the legacy product-model "
+                "computation is used instead"
+            )
+        lattice = self.lattice
+        if self.spinor_kernel:
+            kernel_selection = lattice.O_plus()
+        elif self.determinant_kernel:
+            kernel_selection = lattice.SO()
+        else:
+            # No sign factor: K_0 is the whole ambient group, and its
+            # rho-image piece is exactly what carries rho(O(L)) into the meet
+            # (dropping it reintroduces the refuted target-alone answer on
+            # nonsurjective rho).
+            kernel_selection = self.supergroup
+        rho = lattice.discriminant_representation()
+        pieces.append(
+            libgap.Subgroup(
+                og_engine,
+                [
+                    _element_to_engine(self._discriminant_group, rho(g))
+                    for g in kernel_selection.group_generators()
+                ],
+            )
+        )
+        if not pieces:
+            raise ValueError(
+                f"{self.subgroup} retains no discriminant preimage: its joint "
+                "discriminant image is not characterized by its characters"
+            )
+        return libgap.Intersection(*pieces) if len(pieces) > 1 else pieces[0]
+
     def subgroup_image_order(self) -> int:
-        r"""``|chi(self.subgroup)|``, from the generated image; no image element is listed."""
+        r"""``|chi(self.subgroup)|``, from the generated image; no image element is listed.
+
+        The joint subgroup's discriminant image equals ``pi_1(Q cap S)`` (with
+        an explicit proof at :meth:`_joint_discriminant_image_gap`), and
+        ``pi_1|_{Q cap S}`` is injective, so ``|chi(self.subgroup)| = |T_tot|``
+        and computing the joint subgroup in the full product model is never
+        required here.  Sign-kernel-only data keeps the legacy kernel route.
+        """
+        if self._has_discriminant and not (self.determinant_kernel and self.spinor_kernel):
+            return int(libgap.Order(self._joint_discriminant_image_gap()))
         return int(libgap.Order(self._gap_subgroup()))
 
     def index(self) -> int:
@@ -770,26 +867,23 @@ class OrthogonalCharacterQuotient:
     def discriminant_image(self):
         r"""``rho(self.subgroup)`` in ``O(A_L)``, exactly, from the retained characters.
 
-        The subgroup is ``Gamma = chi^-1(S)`` for the joint character
-        ``chi = (rho, det, sn)`` — exactly, because its character data is
-        complete.  Every element of ``rho(Gamma)`` is ``rho(g) = pi_1(chi(g))``
-        for a ``g`` with ``chi(g) in S``, and every element of ``pi_1(S cap Q)``
-        (``Q = chi(O(L))``) arises this way, because ``Gamma`` is the *full*
-        preimage.  Hence
+        ``Gamma`` is ``chi^-1(S)`` for the joint character ``chi = (rho, det, sn)``,
+        exactly, because its character data is complete, and
+        ``pi_1(chi(Gamma)) = pi_1(Q cap S)`` follows immediately since ``Gamma``
+        is the *full* preimage.  By the proof at
+        :meth:`_joint_discriminant_image_gap` — every element of the retained
+        condition ``S`` carries all sign components ``+1``, so ``pi_1|_{Q cap S}``
+        is injective and
 
-            ``rho(Gamma) = pi_1( chi(Gamma) ) = pi_1( S cap Q )``,
+            ``rho(Gamma) = (cap_i H_i) cap rho(K_0)``
 
-        computed exactly: the joint image subgroup ``S cap Q`` is taken first
-        (:meth:`_gap_subgroup`), then projected to the discriminant factor.
-        Images of intersections need not equal intersections of images —
-        correlated determinant and spinor kernels break the separate-image
-        formula ``(meet H_i) cap rho(ker sn) cap rho(ker det)`` precisely when
-        the two signs need different witnesses — so no separate kernel image
-        is ever formed.  No surjectivity of ``rho`` and no containment of the
-        targets in the ambient rho-image is assumed: the meet happens inside
-        the direct product, where the embedded targets may reach outside
-        ``Q``.  ``Gamma``'s image is a generated subgroup of ``O(A_L)``;
-        no element of it, and no generator of ``Gamma`` itself, is listed.
+        as ONE meet inside ``O(A_L)``, with ``K_0`` the joint sign kernel
+        ``cap ker sn_j`` (never the disproved separate-marginal formula
+        ``(cap_i H_i) cap rho(ker sn) cap rho(ker det)``).  No surjectivity of
+        ``rho``, no containment of the targets, no separate kernel spreads.
+        When both sign kernels are present the joint ``K_0`` family is not
+        formed in this route either, and the projection of the joint product-
+        model subgroup is used instead.
         """
         if not self._has_discriminant:
             raise ValueError(
@@ -800,6 +894,10 @@ class OrthogonalCharacterQuotient:
             _subgroup_from_gap,
         )
 
+        if not (self.determinant_kernel and self.spinor_kernel):
+            return _subgroup_from_gap(
+                self._discriminant_group, self._joint_discriminant_image_gap()
+            )
         factors, _product, _embeddings, projections = self._gap_product()
         position = next(
             index for index, (label, _group) in enumerate(factors) if label == "discriminant"
