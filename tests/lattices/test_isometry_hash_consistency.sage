@@ -110,3 +110,75 @@ def test_cold_hash_path_avoids_both_old_repr_and_cache_key_routes() -> None:
         t_type._cache_key = original_cache_key
     assert isinstance(h, int)
     assert calls == {"repr": 0, "cache_key": 0}, calls
+
+
+def test_rational_scalar_isometry_hash_is_total_and_faithful() -> None:
+    r"""Isometries with owned QQ scalars hash by value, never raising.
+
+    Q: owned rational elements are unhashable (their joined element class
+    has ``__hash__ = None``), so the mor hash reaches the tensor hash with
+    no hashable components at all.  The tensor hash then substitutes the
+    cache-protocol component key.  Two genuinely different maps must not
+    share one mathematical hash-key behaviour beyond ordinary collisions.
+    """
+    L = Lattices(ZZ)([[0, 1], [1, 0]])
+    V = L.base_change(L.base_ring().fraction_field_map())
+    labels = tuple(V.module_generating_set())
+    first, second = labels
+    e1, e2 = V.module_generator(first), V.module_generator(second)
+    neg = V.Isom(V)(lambda label: -V.module_generator(label))
+    swap = V.Isom(V)({first: e2, second: e1})
+    h_neg = hash(neg)
+    h_swap = hash(swap)
+    assert isinstance(h_neg, int) and isinstance(h_swap, int)
+    assert not (neg == swap)
+    assert h_neg != h_swap  # observed for these particular maps
+    assert neg == neg and hash(neg) == h_neg
+    lookup = {neg: True}
+    assert lookup[neg] is True
+    neg_again = V.Isom(V)(lambda label: -V.module_generator(label))
+    assert neg == neg_again
+    assert lookup[neg_again] is True
+
+
+def test_subgroup_augmentation_letters_evaluate_to_their_own_images() -> None:
+    r"""A subgroup resolution's augmentation sends every letter to ITS generator.
+
+    The letters of the free cover of a supplied subgroup of ``O(V)`` are
+    evaluated by a cached letter-image read whose argument is the group
+    element itself.  With unhashable owned QQ scalars the cache key used
+    to collapse every letter onto the first letter's image (measured on
+    the integral-stabilizer chain: every stabilizer generator carried the
+    first rational generator's tensor).  Each letter must evaluate to the
+    generator its basis point names, and a two-letter word to the product.
+    """
+    L = Lattices(ZZ)([[0, 1], [1, 0]])
+    V = L.base_change(L.base_ring().fraction_field_map())
+    labels = tuple(V.module_generating_set())
+    first, second = labels
+    e1, e2 = V.module_generator(first), V.module_generator(second)
+    dilation = V.Isom(V)(
+        {
+            first: V.scalar_multiple(QQ(2), e1),
+            second: V.scalar_multiple(QQ(1) / QQ(2), e2),
+        }
+    )
+    swap = V.Isom(V)({first: e2, second: e1})
+    H = V.O().subgroup((dilation, swap))
+    resolution = H.selected_group_resolution()
+    supplied = tuple(resolution.generating_set())
+    assert supplied == (dilation, swap)
+    augmentation = resolution.augmentation()
+    free = augmentation.domain()
+    letters = tuple(free.free_generator(label) for label in supplied)
+    # letter images in the collapse order that surfaced: the first letter,
+    # then a second one whose image used to be the first's cache entry.
+    first_image = augmentation(letters[0])
+    second_image = augmentation(letters[1])
+    assert first_image == dilation
+    assert second_image == swap
+    assert not (first_image == second_image)
+    # a two-letter word evaluates to the product of the two images
+    word_image = augmentation(letters[0] * letters[1])
+    assert word_image == first_image * second_image
+    assert word_image == dilation * swap

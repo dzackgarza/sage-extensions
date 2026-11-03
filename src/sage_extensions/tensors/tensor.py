@@ -413,13 +413,28 @@ class Tensor:
         Equal tensors hash equally, so a tensor may key a cache and may be
         a constructor argument of a unique representation.  At infinite
         rank there is no component list and equality is identity, so the
-        identity hash is the honest one.
+        identity hash is the honest one.  An owned scalar of the component
+        ring need not be hashable (a joined ring element class has
+        ``__hash__ = None``); equality there is still by value, so the hash
+        substitutes the cache-protocol component key for the raw component
+        tuple rather than raising.  Both keys are functions of the same
+        component data, and equal tensors share one element class of their
+        engine base ring, so they take one branch.
         """
         if Infinity in self._index_ranks():
             return object.__hash__(self)
-        return hash(
-            (self.tensor_valence(), self._index_ranks(), tuple(self._flat_components()))
-        )
+        try:
+            return hash(
+                (self.tensor_valence(), self._index_ranks(), tuple(self._flat_components()))
+            )
+        except TypeError:
+            return hash(
+                (
+                    self.tensor_valence(),
+                    self._index_ranks(),
+                    cache_key(tuple(self._flat_components())),
+                )
+            )
 
     def _cache_key(self):
         r"""Key a finite presentation even when its scalars are unhashable.
