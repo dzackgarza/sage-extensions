@@ -109,23 +109,41 @@ from sage_extensions.categories.sets.set_categories import Sets, finite_ordinal_
 from sage_extensions.logic import ask
 from sage_extensions.validation import validator
 
+def _unique_image_family(images):
+    r"""The distinct members of an image family, each read once, in first-occurrence order.
+
+    Hash and equality decide distinctness; the elements' mathematical hash
+    being total is the tensor repair's standing premise.  Images without a
+    Python hash are not an unexplained failure: the same first-occurrence
+    dedupe is then the stated equality scan, explicit about its quadratic
+    cost in the number of DISTINCT images, so an unhashable supported
+    element meets a stated boundary, never a bare ``TypeError``.
+    """
+    try:
+        return list(dict.fromkeys(images))
+    except TypeError:
+        unique = []
+        for image in images:
+            if all(image != kept for kept in unique):
+                unique.append(image)
+        return unique
+
+
 def _deduplicated_generating_morphism(group, morphism):
     r"""The image of ``morphism`` in ``group`` presented with each distinct image read once.
 
     ``morphism`` is a free-group generating datum (for example an orbit
-    Schreier cover): its image generates the subgroup the caller presents.
-    The retained family is the first-occurrence subsequence of the images of
-    the free letters, so the presented subgroup and every generator word are
-    exactly the full family's, while their concrete downstream use
+    Schreier cover).  What is preserved is the presented image family and
+    the subgroup it generates: the first-occurrence subsequence of the
+    images of the free letters, so the generated subgroup is exactly the
+    full family's subgroup and every downstream stage priced by family size
     (integral restrictions, orbit splits, conversions) pays one element per
-    distinct image.  Hash and equality of the group elements decide
-    distinctness; the elements' mathematical hash being total is the tensor
-    repair's standing premise.  A group morphism ``F(S) -> group`` from a
-    finite subset is exactly a function on the subset, so the reduced family
-    is returned as ``Free(unique) -> group`` without derivation.
+    distinct image.  What is deliberately not preserved is the literal free
+    domain and its enumeration of words: the reduced family is a different
+    free cover of the same image, which is the point of calling it.
     """
     letters = tuple(morphism.domain().group_generators())
-    unique = list(dict.fromkeys(morphism(letter) for letter in letters))
+    unique = _unique_image_family([morphism(letter) for letter in letters])
     labels = finite_ordinal_set(len(unique))
     free = OwnedGroups.Free(index_set=labels)
     return free.Mor(group)(
@@ -254,23 +272,22 @@ class _FiniteIntegralRepresentation(SageObject):
 
         The lattice orbit is the coset space ``G/G_L``; its orbit Schreier
         morphism ``E -> G`` (selected cover of ``G``) is the generating datum
-        of the literal preimage.  The preimage is presented by the images of
-        the Schreier words with each distinct image read once, in
-        first-occurrence order: the full orbit times the letter count is the
-        factual redundancy of the construction (measured 1024 x 25 = 25600
-        words on the rank-12 Enriques line, whose per-image integral
-        restrictions then capped the acceptance run), and removing it changes
-        no subgroup, predicate or word.
+        of the literal preimage.  The family is the full Schreier family:
+        presenting the first-occurrence subsequence of its images costs one
+        coordinate-tensor digest per image (measured cost-negative on the
+        rank-12 Enriques line, where this call must complete; the verbatim
+        family completes in ~1900 s), so deduplication is offered by
+        ``_deduplicated_generating_morphism`` to callers whose own stage is
+        priced by family size, not paid from inside this construction.
         """
         group = self.action().rational_group()
         assert group.has_selected_group_resolution() and group.has_selected_finite_group_generating_set(), (
             f"the lattice stabilizer in {group} is generated from its lattice orbit, which needs a "
             f"selected finite generating set of {group}"
         )
-        schreier = self.g_set().orbit_schreier_morphism(self._selected_point())
         return self.permutation_representation().preimage_subgroup(
             self.finite_stabilizer(),
-            generating_morphism=_deduplicated_generating_morphism(group, schreier),
+            generating_morphism=self.g_set().orbit_schreier_morphism(self._selected_point()),
         )
 
     @cached_method

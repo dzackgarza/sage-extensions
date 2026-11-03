@@ -165,3 +165,37 @@ def test_the_deduped_generating_morphism_presents_the_same_subgroup_once_each() 
     # the presented subgroup is unchanged, and it is the order-2 centralizer here
     assert int(group.subgroup(reduced).cardinality()) == 2
     assert int(group.subgroup(full).cardinality()) == 2
+
+
+def test_the_image_dedupe_states_its_unhashable_boundary() -> None:
+    r"""First-occurrence dedupe works for unhashable images too, through the stated scan."""
+    from sage_extensions.categories.rational_integral_stabilizers import (
+        _unique_image_family,
+    )
+
+    class Unhashable:
+        __hash__ = None
+
+        def __init__(self, value):
+            self.value = value
+
+        def __eq__(self, other):
+            return isinstance(other, Unhashable) and self.value == other.value
+
+        def __ne__(self, other):
+            return not self == other
+
+    one, two = Unhashable(1), Unhashable(2)
+    family = [one, two, Unhashable(1), Unhashable(2), Unhashable(1)]
+    unique = _unique_image_family(family)
+    assert len(unique) == 2
+    assert unique[0] is one and unique[1] is two
+    try:
+        hash(unique[0])
+    except TypeError:
+        pass
+    else:
+        raise AssertionError("the specimen images must be unhashable to exercise the stated fallback")
+
+    hashable_family = ["a", "b", "a", "b", "a"]
+    assert _unique_image_family(hashable_family) == ["a", "b"]
