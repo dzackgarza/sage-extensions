@@ -1043,10 +1043,23 @@ class OrthogonalCharacterQuotient:
         epi = libgap.GroupHomomorphismByImagesNC(
             free, im_rho, list(free.GeneratorsOfGroup()), rho_images
         )
-        for double_coset in libgap.AsList(libgap.DoubleCosets(im_rho_perm, left, right_perm)):
+        import os as _os
+        import time as _time
+
+        _dbg = bool(_os.environ.get("SE_DEBUG_STAGES"))
+        _t0 = _time.monotonic()
+        if _dbg:
+            print(f"[se-stage] before DoubleCosets: left={int(libgap.Order(left))} right={int(libgap.Order(right))} image={int(libgap.Order(im_rho))}", flush=True)
+        _dcs = libgap.AsList(libgap.DoubleCosets(im_rho_perm, left, right_perm))
+        if _dbg:
+            print(f"[se-stage] DoubleCosets done in {_time.monotonic()-_t0:.1f}s: {len(_dcs)} cosets", flush=True)
+        for _n, double_coset in enumerate(_dcs):
             point = libgap.Representative(double_coset)
+            _t1 = _time.monotonic()
             element = libgap.PreImagesRepresentative(to_perm, point)
             word = libgap.PreImagesRepresentative(epi, element)
+            if _dbg and (_n < 5 or _n % 50 == 0):
+                print(f"[se-stage] rep {_n}: extract {_time.monotonic()-_t1:.2f}s", flush=True)
             letters = tuple(int(x) for x in libgap.LetterRepAssocWord(word))
             if _law_reversed(self._discriminant_group):
                 letters = letters[::-1]
