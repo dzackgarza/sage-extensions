@@ -105,9 +105,33 @@ from sage_extensions.categories.rings.ring_foundation import (
     _owned_integers,
 )
 from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
-from sage_extensions.categories.sets.set_categories import Sets
+from sage_extensions.categories.sets.set_categories import Sets, finite_ordinal_set
 from sage_extensions.logic import ask
 from sage_extensions.validation import validator
+
+def _deduplicated_generating_morphism(group, morphism):
+    r"""The image of ``morphism`` in ``group`` presented with each distinct image read once.
+
+    ``morphism`` is a free-group generating datum (for example an orbit
+    Schreier cover): its image generates the subgroup the caller presents.
+    The retained family is the first-occurrence subsequence of the images of
+    the free letters, so the presented subgroup and every generator word are
+    exactly the full family's, while their concrete downstream use
+    (integral restrictions, orbit splits, conversions) pays one element per
+    distinct image.  Hash and equality of the group elements decide
+    distinctness; the elements' mathematical hash being total is the tensor
+    repair's standing premise.  A group morphism ``F(S) -> group`` from a
+    finite subset is exactly a function on the subset, so the reduced family
+    is returned as ``Free(unique) -> group`` without derivation.
+    """
+    letters = tuple(morphism.domain().group_generators())
+    unique = list(dict.fromkeys(morphism(letter) for letter in letters))
+    labels = finite_ordinal_set(len(unique))
+    free = OwnedGroups.Free(index_set=labels)
+    return free.Mor(group)(
+        Sets().Mor(labels, group)(lambda label: unique[int(label)])
+    )
+
 
 class _FiniteIntegralRepresentation(SageObject):
     r"""The finite lattice orbit, retaining its action and free-word maps.
@@ -230,16 +254,23 @@ class _FiniteIntegralRepresentation(SageObject):
 
         The lattice orbit is the coset space ``G/G_L``; its orbit Schreier
         morphism ``E -> G`` (selected cover of ``G``) is the generating datum
-        of the literal preimage.
+        of the literal preimage.  The preimage is presented by the images of
+        the Schreier words with each distinct image read once, in
+        first-occurrence order: the full orbit times the letter count is the
+        factual redundancy of the construction (measured 1024 x 25 = 25600
+        words on the rank-12 Enriques line, whose per-image integral
+        restrictions then capped the acceptance run), and removing it changes
+        no subgroup, predicate or word.
         """
         group = self.action().rational_group()
         assert group.has_selected_group_resolution() and group.has_selected_finite_group_generating_set(), (
             f"the lattice stabilizer in {group} is generated from its lattice orbit, which needs a "
             f"selected finite generating set of {group}"
         )
+        schreier = self.g_set().orbit_schreier_morphism(self._selected_point())
         return self.permutation_representation().preimage_subgroup(
             self.finite_stabilizer(),
-            generating_morphism=self.g_set().orbit_schreier_morphism(self._selected_point()),
+            generating_morphism=_deduplicated_generating_morphism(group, schreier),
         )
 
     @cached_method

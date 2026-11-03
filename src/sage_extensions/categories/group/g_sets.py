@@ -203,21 +203,26 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         The one breadth-first sweep is retained on the resulting ``G``-set
         with its point-transition table, so the Schreier and coset operations
         of THIS action do not evaluate the same pairs a second and third
-        time (``_orbit_of``, ``orbit_schreier_morphism``).
+        time (``_orbit_of``, ``orbit_schreier_morphism``).  The retained
+        augmentation is the sweep's own: the maintained selection contract
+        (one resolution per object/owner, realized once) already fixes its
+        letter order, and retaining the object makes that binding explicit.
+        The seeds are materialized once, so a one-shot iterable is consumed
+        before, not after, the sweep.
         """
+        seeds = tuple(seeds)
+        augmentation = self.group().selected_group_resolution().augmentation()
         points, words, transitions = self._orbit_words(
-            seeds, action, self.group().selected_group_resolution().augmentation(),
-            retain_transitions=True,
+            seeds, action, augmentation, retain_transitions=True,
         )
         g_set = self(finite_ordered_set(tuple(points)), action)
         g_set.__dict__["_retained_orbit_bfs"] = {
-            "seeds": tuple(seeds),
+            "seeds": seeds,
+            "augmentation": augmentation,
             "points": tuple(points),
             "words": words,
             "transitions": transitions,
-            "letter_count": len(tuple(
-                self.group().selected_group_resolution().augmentation().domain().group_generators()
-            )),
+            "letter_count": len(tuple(augmentation.domain().group_generators())),
         }
         return g_set
 
@@ -566,11 +571,12 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                 and len(retained["seeds"]) == 1
                 and point == retained["seeds"][0]
                 and len(retained["points"]) == int(self.point_set().cardinality())
+                and retained["augmentation"] is augmentation
                 and retained["letter_count"] == len(tuple(augmentation.domain().group_generators()))
             ):
                 orbit = category(finite_ordered_set(retained["points"]), self.act)
                 orbit.__dict__["_retained_transitions"] = (retained["transitions"], retained["letter_count"])
-                return orbit, retained["words"], augmentation
+                return orbit, retained["words"], retained["augmentation"]
             points, words = category._orbit_words(
                 (point,), self.act, augmentation, point_key=self.ranking_map(),
             )
