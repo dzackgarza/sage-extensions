@@ -1489,20 +1489,24 @@ class LatticeIsometryMethods:
         return not self == other
 
     def __hash__(self) -> int:
-        r"""Hash the selected endpoints and the coordinate tensor.
+        r"""Hash the selected endpoints and the coordinate tensor's mathematical hash.
 
-        The tensor's own designated cache key supplies a hashable key when
-        its scalars are unhashable owned elements (``Tensor._cache_key``).
-        An isometry that raises here is not merely unhashable: Sage's
-        ``cached_method`` then keys on the ``repr``, and every lattice
-        isometry between fixed endpoints has the same repr, so the first
-        computed value would be returned for every argument.
+        ``Tensor.__hash__`` is the maintained mathematical key of a finite
+        tensor ((valence, index ranks, coordinate components), each scalar
+        hashed by its own engine digest - measured 2.7 us against the 58.3 us
+        repr construction the previous ``tensor._cache_key()`` path payed at
+        every orbit step; `.scratch/measure_hash_paths.py`).  Sage's
+        ``cached_method`` keying on ``repr`` is the failure mode this must not
+        relapse into: every lattice isometry between fixed endpoints has the
+        same repr, so a hash error would return the first cached value for
+        every argument.  ``_cache_key`` stays available for Sage's own cache
+        protocol; it is not used for hashing here.
         """
         return hash(
             (
                 id(self.domain()),
                 id(self.codomain()),
-                self._coordinate_tensor()._cache_key(),
+                self._coordinate_tensor(),
             )
         )
 
