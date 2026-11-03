@@ -1349,16 +1349,21 @@ class LatticeIsometryMethods:
         ``target`` as endpoints. Both the map and its inverse must preserve
         the respective lattices; an integral embedding alone is insufficient.
 
-        On finite equal ranks the forward factor answers alone, by the exact
-        unimodular reading: a square integral matrix has an integral
-        two-sided inverse exactly when its determinant is ``+-1``, and that
-        inverse is the coordinate matrix of what the general route below
-        computes as the rational preimage of the lattice map's inverse.  A
-        non-unit determinant is therefore ``None`` without the second
-        preimage computation or the engine inverse of the lattice map, and
-        a unit determinant gives the backward factor by integer matrix
-        inversion; every other shape (unequal or non-finite ranks) keeps
-        the maintained inverse-then-preimage route.
+        On finite equal ranks over the owned integers the forward factor
+        answers alone, by the exact unimodular reading: a square integral
+        matrix has an integral two-sided inverse exactly when its
+        determinant is ``+-1``, and that inverse is the coordinate matrix of
+        what the general route below computes as the rational preimage of
+        the lattice map's inverse.  A non-unit determinant is therefore
+        ``None`` without the second preimage computation or the engine
+        inverse of the lattice map, and a unit determinant gives the
+        backward factor by integer matrix inversion.  The reading is gated
+        to the owned integers: over a general common base ring its units
+        are not ``+-1`` and a plain integer cast can refuse or truncate a
+        valid scalar (measured on ``GF(5)``: det ``2`` is a unit with the
+        maintained preimage machinery working), so outside the owned
+        integers the maintained inverse-then-preimage route answers, and
+        unequal or non-finite ranks keep it too.
         """
         ring = source.base_ring()
         if target.base_ring() is not ring:
@@ -1379,6 +1384,7 @@ class LatticeIsometryMethods:
             source.module_rank().is_finite()
             and target.module_rank().is_finite()
             and source.module_rank() == target.module_rank()
+            and ring is _owned_integers()
         ):
             coordinates = _module_matrix(forward)
             if int(coordinates.determinant()) not in (1, -1):

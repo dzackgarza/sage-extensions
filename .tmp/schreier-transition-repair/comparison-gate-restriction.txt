@@ -1,0 +1,9 @@
+Fifth failed-ID comparison: the unimodular gate restricted to the owned-integers base ring.
+Same command as comparison-unimodular.txt; same baseline as comparison-unimodular.txt (failed-unimodular-baseline.txt).
+
+3c3
+< 2 failed, 25 passed in 82.27s (0:01:22)
+---
+> 2 failed, 38 passed in 79.35s (0:01:19)
+
+2 FAILED ids byte-identical; passing 25 -> 38: the 3 original unimodular tests, the 3 new contract tests (forward-integral nonunit on <8>-><2>, differing frames [[2,0],[0,2]]<->[[0,2],[2,0]] both ways, the GF(5) gate-excluded case), and the 7 Schreier contract tests.
