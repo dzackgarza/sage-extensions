@@ -882,6 +882,79 @@ class OrthogonalCharacterQuotient:
             lifts.append(self._checked_lift(key, letters))
         return finite_ordered_set(tuple(lifts))
 
+    @cached_method
+    def _im_rho_engine_and_section(self):
+        r"""``im rho`` inside the ``O(A_L)`` engine, with a parent-bound word section.
+
+        The subgroup is bound to the FQF engine of ``O(A_L)`` (whose chains are
+        measured instant at the Enriques size, `.tmp/measure_pathB.log`), and
+        letters index the ambient ``O(L)`` generators through ``rho``.
+        """
+        from sage_extensions.categories.group.groups import (
+            _element_to_engine,
+            _gap_model,
+        )
+
+        og = self._discriminant_group
+        engine = _gap_model(og)
+        ambient = self._ambient_generators()
+        rho = self.lattice.discriminant_representation()
+        images = [_element_to_engine(og, rho(g)) for g in ambient]
+        subgroup = libgap.Subgroup(engine, images)
+        section = _GapWordSection(images, parent=engine)
+        return engine, subgroup, section, ambient
+
+    def _sign_descent_rank(self):
+        r"""``(j, sign_labels)``: F2-dimension of sign patterns realized on ``ker rho``.
+
+        A sign product is trivial on ``ker rho`` exactly when it descends to a
+        homomorphism on ``im rho``; each of the ``2^m`` products is tested by
+        ``GroupHomomorphismByImages`` on the rho-images of the ambient
+        generators, inside the ``O(A_L)`` engine only.
+        """
+        from itertools import product as _product_tuples
+
+        from sage_extensions.categories.group.groups import (
+            OwnedGroups,
+            _element_to_engine,
+            _gap_model,
+        )
+
+        sign_labels = [
+            label for label in self._image_labels if label != "discriminant"
+        ]
+        m = len(sign_labels)
+        if not self._has_discriminant or m == 0:
+            return m, sign_labels
+        _engine, im_rho, _section, ambient = self._im_rho_engine_and_section()
+        rho = self.lattice.discriminant_representation()
+        rho_images = [_element_to_engine(self._discriminant_group, rho(g)) for g in ambient]
+        ring = self.lattice.base_ring()
+        factor_values = []
+        for label in sign_labels:
+            if label == "spinor":
+                morphism = self.lattice.O_plus().preimage_morphism()
+                factor_values.append([1 if morphism(g).is_one() else 0 for g in ambient])
+            else:
+                factor_values.append(
+                    [1 if ring(g.determinant()) == ring.one() else 0 for g in ambient]
+                )
+        c2 = _gap_model(OwnedGroups().C(2))
+        c2gen = list(libgap.GeneratorsOfGroup(c2))[0]
+        descended = 0
+        for exponents in _product_tuples((0, 1), repeat=m):
+            if not any(exponents):
+                continue
+            combined = [
+                1 if (sum(e * v for e, v in zip(exponents, col)) % 2 == 0) else 0
+                for col in zip(*factor_values)
+            ]
+            target_images = [libgap.One(c2) if v == 0 else c2gen for v in combined]
+            hom = libgap.GroupHomomorphismByImages(im_rho, c2, rho_images, target_images)
+            if bool(hom):
+                descended += 1
+        return m - descended, sign_labels
+
     def splitting_isometries(self, stabilizer_generators):
         r"""Return one lift ``g`` per double coset ``Gamma g Stab`` of ``O(L)``.
 
@@ -899,6 +972,8 @@ class OrthogonalCharacterQuotient:
         not abelian: a transversal of ``rho(Stab) \ Q / rho(Gamma)`` need not
         be one of ``rho(Gamma) \ Q / rho(Stab)``.
         """
+        if self._has_discriminant and not (self.determinant_kernel and self.spinor_kernel):
+            return self._splitting_isometries_in_im_rho(stabilizer_generators)
         generators, _images, section = self._image_section()
         to_permutation = section._to_permutation
         permutation_image = section.permutation_group
@@ -922,6 +997,75 @@ class OrthogonalCharacterQuotient:
                 libgap.PreImagesRepresentative(to_permutation, point)
             )
             representatives.append(self._checked_lift(key, letters))
+        return finite_ordered_set(tuple(representatives))
+
+    def _splitting_isometries_in_im_rho(self, stabilizer_generators):
+        r"""Double cosets computed inside ``im rho`` (the ``O(A_L)`` engine); see
+        :meth:`splitting_isometries` for the exact sign bookkeeping."""
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        j, sign_labels = self._sign_descent_rank()
+        engine, im_rho, _section, ambient = self._im_rho_engine_and_section()
+        to_perm = libgap.IsomorphismPermGroup(im_rho)
+        im_rho_perm = libgap.Range(to_perm)
+        left = libgap.Image(to_perm, self._joint_discriminant_image_gap())
+        rho = self.lattice.discriminant_representation()
+        right = libgap.Subgroup(
+            im_rho,
+            [_element_to_engine(self._discriminant_group, rho(s)) for s in stabilizer_generators],
+        )
+        right_perm = libgap.Image(to_perm, right)
+        ring = self.lattice.base_ring()
+
+        def sign_of(element, label):
+            if label == "spinor":
+                return self.lattice.O_plus().preimage_morphism()(element).is_one()
+            return ring(element.determinant()) == ring.one()
+
+        stab_sign_flip = any(
+            not sign_of(s, label) for s in stabilizer_generators for label in sign_labels
+        )
+        flip_element = None
+        if j >= 1 and sign_labels:
+            for label in sign_labels:
+                for g in ambient:
+                    if not sign_of(g, label):
+                        flip_element = g
+                        break
+                if flip_element is not None:
+                    break
+        representatives = []
+        # Words in the rho-images of the ambient generators, via the
+        # epimorphism F(S) ->> im rho: PreImagesRepresentative reuses the
+        # parent chain, and the letters index the ambient O(L) generators.
+        from sage_extensions.categories.group.groups import _law_reversed
+
+        rho_images = [_element_to_engine(self._discriminant_group, rho(g)) for g in ambient]
+        free = libgap.FreeGroup(len(rho_images))
+        epi = libgap.GroupHomomorphismByImagesNC(
+            free, im_rho, list(free.GeneratorsOfGroup()), rho_images
+        )
+        for double_coset in libgap.AsList(libgap.DoubleCosets(im_rho_perm, left, right_perm)):
+            point = libgap.Representative(double_coset)
+            element = libgap.PreImagesRepresentative(to_perm, point)
+            word = libgap.PreImagesRepresentative(epi, element)
+            letters = tuple(int(x) for x in libgap.LetterRepAssocWord(word))
+            if _law_reversed(self._discriminant_group):
+                letters = letters[::-1]
+            key_disc = self._discriminant_group._from_engine(element)
+            value = self.supergroup.one()
+            for index in letters:
+                value = value * (ambient[index - 1] if index > 0 else ~ambient[-index - 1])
+            lifts = [value]
+            if j >= 1 and len(sign_labels) == 1 and not stab_sign_flip and flip_element is not None:
+                lifts.append(flip_element * value)
+            for lift in lifts:
+                image_of_lift = self.image(lift)
+                if image_of_lift["discriminant"] != key_disc:
+                    raise ArithmeticError(
+                        "splitting lift's discriminant image disagrees with the word section"
+                    )
+                representatives.append(lift)
         return finite_ordered_set(tuple(representatives))
 
     def witness_meets_subgroup(self, witness, stabilizer_generators) -> bool:
