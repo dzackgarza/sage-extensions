@@ -1348,6 +1348,17 @@ class LatticeIsometryMethods:
         ``self`` must have the fraction-field extensions of ``source`` and
         ``target`` as endpoints. Both the map and its inverse must preserve
         the respective lattices; an integral embedding alone is insufficient.
+
+        On finite equal ranks the forward factor answers alone, by the exact
+        unimodular reading: a square integral matrix has an integral
+        two-sided inverse exactly when its determinant is ``+-1``, and that
+        inverse is the coordinate matrix of what the general route below
+        computes as the rational preimage of the lattice map's inverse.  A
+        non-unit determinant is therefore ``None`` without the second
+        preimage computation or the engine inverse of the lattice map, and
+        a unit determinant gives the backward factor by integer matrix
+        inversion; every other shape (unequal or non-finite ranks) keeps
+        the maintained inverse-then-preimage route.
         """
         ring = source.base_ring()
         if target.base_ring() is not ring:
@@ -1364,11 +1375,39 @@ class LatticeIsometryMethods:
         forward = (restrict(linear) * source_inclusion).factor_through_or_none(target_inclusion)
         if forward is None:
             return None
-        inverse = self.inverse()
-        inverse_linear = rational_target.module_category().Mor(rational_target, rational_source)(inverse)
-        backward = (restrict(inverse_linear) * target_inclusion).factor_through_or_none(source_inclusion)
-        if backward is None:
-            return None
+        if (
+            source.module_rank().is_finite()
+            and target.module_rank().is_finite()
+            and source.module_rank() == target.module_rank()
+        ):
+            coordinates = _module_matrix(forward)
+            if int(coordinates.determinant()) not in (1, -1):
+                return None
+            inverse_matrix = _engine_matrix(coordinates).inverse()
+            source_generators = tuple(source.module_generators())
+            backward = source.module_category().Mor(target, source)(
+                tuple(
+                    sum(
+                        (
+                            source.scalar_multiple(
+                                _owned_engine_element(ring, coefficient),
+                                generator,
+                            )
+                            for coefficient, generator in zip(
+                                column, source_generators, strict=True
+                            )
+                        ),
+                        source.zero(),
+                    )
+                    for column in inverse_matrix.columns()
+                )
+            )
+        else:
+            inverse = self.inverse()
+            inverse_linear = rational_target.module_category().Mor(rational_target, rational_source)(inverse)
+            backward = (restrict(inverse_linear) * target_inclusion).factor_through_or_none(source_inclusion)
+            if backward is None:
+                return None
         module_isomorphism = Modules(ring).Core().Mor(source, target)(forward, backward)
         homset = source.Isom(target)
         return homset.element_class(homset, module_isomorphism)
