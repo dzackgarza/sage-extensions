@@ -1,0 +1,10 @@
+[t=     0.0s] imports
+[t=     0.9s] case_3: order 92897280, L/P/F 5/10/19
+[t=    11.4s] coinvariant_extension_subgroup()
+[se-stage] _marked_automorphism_generators start t=229977.6
+[se-stage] _marked_automorphism_generators done in 123.3s: 24 gens
+[t=   190.5s] G_h built
+[t=   190.5s] isotropic_classes(N, 1)
+[t=   395.7s] 2 O(N)-orbits of lines
+[t=   395.7s] subgroup_classes(G_h, lines)  <- the capped operation, instrumented
+[se-stage] _marked_automorphism_generators start t=230340.9
