@@ -3745,9 +3745,12 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             print(f"[se-stage] _marked_automorphism_generators start t={_time.monotonic():.1f}", flush=True)
         _t = _time.monotonic()
         result = lattice.lattice_category()._marked_automorphism_generators(category, marked)
+        # Materialize the returned family once, so the debug count below
+        # never consumes a one-shot iterator ahead of the real consumer.
+        counted = list(result)
         if _os.environ.get("SE_DEBUG_STAGES"):
-            print(f"[se-stage] _marked_automorphism_generators done in {_time.monotonic()-_t:.1f}s: {len(tuple(result))} gens", flush=True)
-        return result
+            print(f"[se-stage] _marked_automorphism_generators done in {_time.monotonic()-_t:.1f}s: {len(counted)} gens", flush=True)
+        return finite_ordered_set(tuple(counted))
 
     def _marking_category(self, marked):
         r"""The category of marked lattices with apex ``L`` of which ``marked`` is an object.
