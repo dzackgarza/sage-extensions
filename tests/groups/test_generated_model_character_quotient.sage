@@ -323,6 +323,67 @@ def test_generator_lifts_of_the_discriminant_image_generate_it_as_a_subgroup() -
         assert all(g in realized for g in image.group_generators())
 
 
+def test_two_sign_factors_image_order_matches_the_listed_oracle() -> None:
+    # Both determinant and spinor in the retained data, on three models whose
+    # (det, sn) correlation differs; the oracle is the elementwise listed joint
+    # image.  Covers fully-descending, correlated and independent sign cases.
+    from sage_extensions.categories.group.predicate_subgroups import IntersectionSubgroups
+
+    for gram, note in (
+        ([[2, 0], [0, 2]], "definite: sn = det, correlated pair"),
+        ([[0, 1], [1, 0]], "U: rho trivial, det and sn compared directly"),
+        ([[2, 0], [0, -2]], "indefinite diag: independence check"),
+        ([[0, 2], [2, 0]], "U(2): spinor vs rho factorization"),
+    ):
+        L = Lattices(ZZ)(gram)
+        G = L.O()
+        OG = L.discriminant_group().orthogonal_group()
+        pre = G.discriminant_preimage(OG.trivial_subgroup())
+        det_kernel = G.predicate_subgroup(
+            lambda g: g.determinant() == 1,
+            "determinant one",
+            character_data={"determinant_kernel": True},
+            character_data_complete=True,
+        )
+        inter = IntersectionSubgroups(G)((pre, det_kernel, L.O_plus()))
+        q = inter.finite_character_quotient()
+        oracle = int(q.image_keys().cardinality())
+        got = q.image_order()
+        assert got == oracle, (note, got, oracle)
+        j, labels = q._sign_descent_rank()
+        assert len(labels) == 2
+        # j must be the exact 2-adic exponent: oracle = |im rho| * 2^j
+        engine_order = int(
+            __import__("sage.libs.gap.libgap", fromlist=["libgap"])
+            .libgap.Order(
+                __import__(
+                    "sage_extensions.categories.group.groups", fromlist=["_gap_model"]
+                )._gap_model(OG)
+            )
+        )
+        im_rho_order = engine_order if oracle % engine_order == 0 else None
+        # direct check: |im rho| divides oracle and j = log2(oracle / |im rho|)
+        from sage_extensions.categories.group.groups import _element_to_engine, _gap_model
+        rho = L.discriminant_representation()
+        ambient = tuple(G.group_generators())
+        im_rho = __import__("sage.libs.gap.libgap", fromlist=["libgap"]).libgap.Subgroup(
+            _gap_model(OG), [_element_to_engine(OG, rho(g)) for g in ambient]
+        )
+        a_order = int(__import__("sage.libs.gap.libgap", fromlist=["libgap"]).libgap.Order(im_rho))
+        assert oracle % a_order == 0
+        assert oracle // a_order == 2**int(j), (note, a_order, j, oracle)
+
+
+def test_f2_rank_counts_dimension_not_vectors() -> None:
+    from sage_extensions.categories.orthogonal_quotients import _f2_rank
+
+    assert _f2_rank([], 2) == 0
+    assert _f2_rank([(1, 0)], 2) == 1
+    # a 2-dimensional descent space has THREE nonzero vectors; the rank is 2
+    assert _f2_rank([(1, 0), (0, 1), (1, 1)], 2) == 2
+    assert _f2_rank([(1, 1), (1, 1)], 2) == 1
+
+
 def test_discriminant_lift_follows_the_image_exactly() -> None:
     L = Lattices(ZZ)([[6, 0], [0, 6]])
     G = L.O()

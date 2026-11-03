@@ -44,6 +44,20 @@ def _letters_in_owned_order(factor_groups, letters):
     return letters
 
 
+def _f2_rank(vectors, width):
+    r"""F2-rank of a list of 0/1 vectors of the given width (Gaussian elimination)."""
+    basis = []
+    for vector in vectors:
+        row = list(vector)
+        for pivot, base in basis:
+            if row[pivot]:
+                row = [(a + b) % 2 for a, b in zip(row, base)]
+        pivot = next((i for i, bit in enumerate(row) if bit), None)
+        if pivot is not None:
+            basis.append((pivot, row))
+    return len(basis)
+
+
 class _GapWordSection:
     r"""A GAP stabilizer-chain word section of a finitely generated group.
 
@@ -562,25 +576,7 @@ class OrthogonalCharacterQuotient:
                     for generator in ambient
                 ]
             factor_values.append(values)
-        m = len(sign_labels)
-        c2 = _gap_model(OwnedGroups().C(2))
-        c2gen = list(libgap.GeneratorsOfGroup(c2))[0]
-        descended_rank = 0
-        for exponents in _product_tuples((0, 1), repeat=m):
-            if not any(exponents):
-                continue
-            combined = [
-                (1 if (sum(e * v for e, v in zip(exponents, col)) % 2 == 0) else 0)
-                for col in zip(*factor_values)
-            ]
-            # combined[k] is the sign (0=even/+, 1=odd/-) of ambient gen k under s^e
-            target_images = [
-                libgap.One(c2) if value == 0 else c2gen for value in combined
-            ]
-            hom = libgap.GroupHomomorphismByImages(im_rho, c2, rho_images, target_images)
-            if bool(hom):
-                descended_rank += 1  # descends to im rho: trivial on ker rho
-        j = m - descended_rank
+        j, _labels = self._sign_descent_rank()
         return ambient_order * (1 << j)
 
     @cached_method
@@ -930,30 +926,37 @@ class OrthogonalCharacterQuotient:
         rho = self.lattice.discriminant_representation()
         rho_images = [_element_to_engine(self._discriminant_group, rho(g)) for g in ambient]
         ring = self.lattice.base_ring()
+        # F2 encoding of signs: 0 = +1 (trivial), 1 = -1, so the sign of a
+        # product is the F2 sum of the selected values.
         factor_values = []
         for label in sign_labels:
             if label == "spinor":
                 morphism = self.lattice.O_plus().preimage_morphism()
-                factor_values.append([1 if morphism(g).is_one() else 0 for g in ambient])
+                factor_values.append([0 if morphism(g).is_one() else 1 for g in ambient])
             else:
                 factor_values.append(
-                    [1 if ring(g.determinant()) == ring.one() else 0 for g in ambient]
+                    [0 if ring(g.determinant()) == ring.one() else 1 for g in ambient]
                 )
         c2 = _gap_model(OwnedGroups().C(2))
         c2gen = list(libgap.GeneratorsOfGroup(c2))[0]
-        descended = 0
+        # The descended exponent set is an F2-subspace of C2^m (products of
+        # descended characters descend), so its dimension is the F2-rank of the
+        # collected vectors -- not the count of nonzero vectors, which would
+        # overcount a 2-dimensional descent space by 3 and could drive j < 0.
+        descended_vectors = []
         for exponents in _product_tuples((0, 1), repeat=m):
             if not any(exponents):
                 continue
             combined = [
-                1 if (sum(e * v for e, v in zip(exponents, col)) % 2 == 0) else 0
+                sum(e * v for e, v in zip(exponents, col)) % 2
                 for col in zip(*factor_values)
             ]
             target_images = [libgap.One(c2) if v == 0 else c2gen for v in combined]
             hom = libgap.GroupHomomorphismByImages(im_rho, c2, rho_images, target_images)
             if bool(hom):
-                descended += 1
-        return m - descended, sign_labels
+                descended_vectors.append(exponents)
+        rank = _f2_rank(descended_vectors, m)
+        return m - rank, sign_labels
 
     def splitting_isometries(self, stabilizer_generators):
         r"""Return one lift ``g`` per double coset ``Gamma g Stab`` of ``O(L)``.
