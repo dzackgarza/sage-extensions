@@ -45,17 +45,12 @@ def _letters_in_owned_order(factor_groups, letters):
 
 
 def _f2_rank(vectors, width):
-    r"""F2-rank of a list of 0/1 vectors of the given width (Gaussian elimination)."""
-    basis = []
-    for vector in vectors:
-        row = list(vector)
-        for pivot, base in basis:
-            if row[pivot]:
-                row = [(a + b) % 2 for a, b in zip(row, base)]
-        pivot = next((i for i, bit in enumerate(row) if bit), None)
-        if pivot is not None:
-            basis.append((pivot, row))
-    return len(basis)
+    r"""F2-rank of a list of 0/1 vectors: Sage's maintained ``GF(2)`` matrix rank."""
+    from sage.all import GF, matrix
+
+    if not vectors:
+        return 0
+    return matrix(GF(2), [[int(x) for x in v] for v in vectors]).rank()
 
 
 class _GapWordSection:

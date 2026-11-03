@@ -329,11 +329,18 @@ def test_two_sign_factors_image_order_matches_the_listed_oracle() -> None:
     # image.  Covers fully-descending, correlated and independent sign cases.
     from sage_extensions.categories.group.predicate_subgroups import IntersectionSubgroups
 
-    for gram, note in (
-        ([[2, 0], [0, 2]], "definite: sn = det, correlated pair"),
-        ([[0, 1], [1, 0]], "U: rho trivial, det and sn compared directly"),
-        ([[2, 0], [0, -2]], "indefinite diag: independence check"),
-        ([[0, 2], [2, 0]], "U(2): spinor vs rho factorization"),
+    # expected_j is j = m - rank(descent subspace): the number of independent
+    # sign patterns on ker rho.  j=0 means FULL rank-two descent (both signs
+    # factor through rho); j=2 means rank-zero descent (both signs independent
+    # of rho).  <4>+<4> is the rank-two-descent specimen; U is the
+    # identity-rho-image obstruction specimen (every rho image is the identity
+    # while det/sn are nontrivial on those generators).
+    for gram, note, expected_j in (
+        ([[2, 0], [0, 2]], "definite <2>+<2>: sn = det, correlated pair, descent rank 1", 1),
+        ([[0, 1], [1, 0]], "U: rho trivial, det and sn independent on identity rho-images", 2),
+        ([[2, 0], [0, -2]], "indefinite diag: independent signs, descent rank 0", 2),
+        ([[0, 2], [2, 0]], "U(2): correlated with rho, descent rank 1", 1),
+        ([[4, 0], [0, 4]], "<4>+<4>: BOTH signs descend through rho, descent rank 2 (j=0)", 0),
     ):
         L = Lattices(ZZ)(gram)
         G = L.O()
@@ -352,6 +359,10 @@ def test_two_sign_factors_image_order_matches_the_listed_oracle() -> None:
         assert got == oracle, (note, got, oracle)
         j, labels = q._sign_descent_rank()
         assert len(labels) == 2
+        # j is exactly the asserted count of independent signs on ker rho, so
+        # the descent subspace has dimension 2 - j (non-vacuous: <4>+<4> has
+        # descent rank 2, U has rank 0)
+        assert int(j) == expected_j, (note, j, expected_j)
         # j must be the exact 2-adic exponent: oracle = |im rho| * 2^j
         engine_order = int(
             __import__("sage.libs.gap.libgap", fromlist=["libgap"])
