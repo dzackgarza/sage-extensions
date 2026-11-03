@@ -12,6 +12,8 @@ O(A_M) of order 2, spinor-kernel intersection Gamma of index 4, where the
 separate character indices are 2 and 2 and the exact index exceeds both).
 """
 
+from sage.libs.gap.libgap import libgap
+
 from sage_extensions.all import *
 
 
@@ -26,6 +28,26 @@ def _m_model(with_op=True):
     else:
         inter = pre
     return L, G, OG, pre, inter
+
+
+def test_discriminant_image_of_the_full_target_is_the_true_rho_image_not_the_target() -> None:
+    # m8's refutation specimen, reproduced: H = O(A_L) is a legal retained
+    # target, its preimage is all of O(L), so rho(Gamma) = rho(O(L)) of order
+    # 8 -- where the fd5ab11 separate-marginal formula returned O(A_L), order
+    # 16.  Complete character data, no sign kernels; the joint preimage then
+    # projection is the only formula that is right here.
+    L = Lattices(ZZ)([[6, 0], [0, 6]])
+    G = L.O()
+    OG = L.discriminant_group().orthogonal_group()
+    assert int(OG.cardinality()) == 16
+    ambient_image = L.discriminant_image()
+    assert int(ambient_image.cardinality()) == 8
+    preimage = G.discriminant_preimage(OG)
+    assert preimage.character_data_is_complete()
+    image = preimage.discriminant_image()
+    assert int(image.cardinality()) == 8
+    assert all(a in ambient_image for a in image.group_generators())
+    assert all(a in image for a in ambient_image.group_generators())
 
 
 def test_generated_orders_and_index_match_the_listed_image() -> None:
@@ -185,6 +207,86 @@ def test_single_character_factors_are_generated_without_a_direct_product() -> No
             pass
     image = qp.discriminant_image()
     assert image.cardinality() == 1
+
+
+def test_discriminant_image_is_the_joint_preimage_then_projection_on_three_correlated_characters() -> None:
+    from sage_extensions.categories.group.predicate_subgroups import IntersectionSubgroups
+
+    L = Lattices(ZZ)([[0, 2], [2, 0]])
+    G = L.O()
+    OG = L.discriminant_group().orthogonal_group()
+    pre = G.discriminant_preimage(OG.trivial_subgroup())
+    spinor_kernel = L.O_plus()
+    det_kernel = G.predicate_subgroup(
+        lambda g: g.determinant() == 1,
+        "determinant one",
+        character_data={"determinant_kernel": True},
+        character_data_complete=True,
+    )
+    inter = IntersectionSubgroups(G)((pre, spinor_kernel, det_kernel))
+    q = inter.finite_character_quotient()
+
+    # Exact oracle: the listed joint image, filtered by the conjunction of
+    # the three characters, projected to the discriminant factor.  Compare by
+    # subgroup content: elements of a subgroup and elements of O(A_L) have
+    # different parents, so equality is membership plus cardinality.
+    allowed = [key for key in q.image_keys() if q._allowed(key)]
+    oracle = OG.subgroup_on(tuple(key["discriminant"] for key in allowed))
+    image = q.discriminant_image()
+    assert int(image.cardinality()) == 1
+    assert int(image.cardinality()) == int(oracle.cardinality())
+    assert all(g in image for g in oracle.group_generators())
+    # On this lattice the marginal separate-image formula happens to agree:
+    # the stable kernel supplies every sign pattern, so the correlated-sign
+    # distinction is not witnessed here; what is checked is exactness against
+    # the listed oracle, with three character factors present.
+    rho = L.discriminant_representation()
+    marginal_pieces = [OG.trivial_subgroup()]
+    for kernel in (spinor_kernel, L.SO()):
+        marginal_pieces.append(
+            OG.subgroup_on(tuple(rho(g) for g in tuple(kernel.group_generators())))
+        )
+    from sage_extensions.categories.group.groups import (
+        _element_to_engine,
+        _gap_model,
+        _subgroup_from_gap,
+    )
+
+    marginal = marginal_pieces[0]
+    for piece in marginal_pieces[1:]:
+        marginal = _subgroup_from_gap(
+            OG,
+            libgap.Intersection(
+                libgap.Subgroup(
+                    _gap_model(OG), [_element_to_engine(OG, g) for g in marginal.group_generators()]
+                ),
+                libgap.Subgroup(
+                    _gap_model(OG), [_element_to_engine(OG, g) for g in piece.group_generators()]
+                ),
+            )
+        )
+    assert int(marginal.cardinality()) == int(image.cardinality())
+
+
+def test_discriminant_image_over_a_nonsurjective_representation_meets_the_target_with_the_joint_image() -> None:
+    L = Lattices(ZZ)([[6, 0], [0, 6]])
+    G = L.O()
+    OG = L.discriminant_group().orthogonal_group()
+    ambient_image = L.discriminant_image()
+    outsider = next(a for a in OG if a not in ambient_image)
+    target = OG.subgroup_on((outsider,))
+    assert int(target.cardinality()) == 4
+    preimage = G.discriminant_preimage(target)
+    image = preimage.discriminant_image()
+    # rho(preimage) is the target's MEET with the joint image, not the
+    # target itself: taking the embedded target alone overcounts by the
+    # elements rho never reaches.  Compare content by membership in both
+    # directions plus cardinality: subgroup elements and O(A_L) elements
+    # carry different parents.
+    assert int(image.cardinality()) == 2
+    expected_members = [a for a in target if a in ambient_image]
+    assert len(expected_members) == 2
+    assert all(a in image for a in expected_members)
 
 
 def test_discriminant_lift_follows_the_image_exactly() -> None:
