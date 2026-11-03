@@ -453,6 +453,89 @@ class OrthogonalCharacterQuotient:
             )
         return index
 
+    def subgroup_generator_lifts(self):
+        r"""Live isometries of ``self.subgroup`` above the generators of its discriminant image.
+
+        Write ``Q = chi(O(L))`` and ``S`` for the retained joint condition;
+        then ``chi(Gamma) = Q cap S`` (the subgroup is ``chi``'s full
+        preimage, by the completeness of its character data), and the
+        discriminant image is ``pi_1(Q cap S)``.  For ``gamma`` ranging over
+        the selected group generators of that projected image, the point
+        ``(gamma, 1, ...)`` lies in ``Q cap S``: it is the image of the
+        discriminant factor because ``gamma`` was projected, and its sign
+        components are all one.  The ambient word section therefore factors
+        that point over the character images of the ambient generators, and
+        the owned word evaluates to an isometry of ``L`` whose character
+        image is ``(gamma, 1, ...)`` exactly, so it lies in ``Gamma``.  Every
+        returned lift is checked against the character map
+        (:meth:`_checked_lift`) and admitted by the subgroup's defining
+        predicate; every discriminant morphism of a returned lift is a
+        constructible, typed element of ``O(A_L)``, so the family realizes
+        ``rho(Gamma)`` as ``<rho(lift_i)>``.  That generated subgroup is
+        asserted to equal :meth:`discriminant_image` (equal order, every
+        image generator lying in the image, every projected generator induced
+        by a lift), as an object of ``Subgroups(O(A_L))`` of the same
+        containing group.
+
+        This is the presented generator family whose discriminator images a
+        consumer can build itself; it contains no claim about generating
+        ``Gamma`` itself (the stable kernel of ``O(L) -> O(A_L)`` inside the
+        subgroup is needed for that: an open capability of the lattice-engine
+        owner, named by ``_MISSING_ARITHMETIC_GENERATING_SET``).
+        """
+        if not self._has_discriminant:
+            raise ValueError(
+                f"{self.subgroup} retains no discriminant preimage: the discriminant "
+                "image of its generators is not characterized by its characters"
+            )
+        from sage_extensions.categories.group.groups import (
+            _element_to_engine,
+            _gap_model,
+        )
+
+        image = self.discriminant_image()
+        image_generators = tuple(image.group_generators())
+        generators, _images, section = self._image_section()
+        to_permutation = section._to_permutation
+        ring = self.lattice.base_ring()
+        lifts = []
+        for gamma in image_generators:
+            key = self.image_space()(
+                lambda label: gamma if label == "discriminant" else ring.one()
+            )
+            point = libgap.Image(to_permutation, self._gap_of_key(key))
+            letters = section.letters_of_permutation(point)
+            lift = self._checked_lift(key, letters)
+            if lift not in self.subgroup:
+                raise ArithmeticError(
+                    f"the character image of {lift} is {key}, which lies in the retained "
+                    f"condition of {self.subgroup}, but the subgroup's defining predicate "
+                    f"rejects it: the retained character data do not determine {self.subgroup}"
+                )
+            lifts.append(lift)
+        # The warrant that generators have been lifted over the whole image:
+        # group equality of the lifted images with the projected image, as
+        # subgroups of O(A_L)'s engine model.
+        engine_model = _gap_model(self._discriminant_group)
+        lifted_images = [
+            _element_to_engine(self._discriminant_group, lift.discriminant_morphism())
+            for lift in lifts
+        ]
+        realized = libgap.Subgroup(engine_model, lifted_images)
+        image_generators_gap = [
+            _element_to_engine(self._discriminant_group, generator)
+            for generator in image_generators
+        ]
+        if int(libgap.Order(realized)) != int(image.cardinality()) or any(
+            candidate not in realized for candidate in image_generators_gap
+        ):
+            raise ArithmeticError(
+                f"the lifts returned by {self.subgroup}.finite_character_quotient() generate a "
+                "discriminant subgroup strictly smaller than the discriminant image: the "
+                "retained condition does not generate what it projects to"
+            )
+        return finite_ordered_set(tuple(lifts))
+
     def _evaluate_letters(self, letters):
         r"""Signed generator indices evaluated in the ambient group's generators.
 

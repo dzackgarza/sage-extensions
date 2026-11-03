@@ -289,6 +289,40 @@ def test_discriminant_image_over_a_nonsurjective_representation_meets_the_target
     assert all(a in image for a in expected_members)
 
 
+def test_generator_lifts_of_the_discriminant_image_generate_it_as_a_subgroup() -> None:
+    # On both models the lifted family must (a) live in the retained
+    # subgroup, (b) present rho at every lift as a typed element of the same
+    # O(A_L), and (c) generate exactly the discriminant image -- subgroup
+    # equality, which is stronger than equal cardinality (three of S_3's C2s).
+    for gram, index_hint in (
+        ([[2, 0], [0, 2]], "H-trivial + spinor"),
+        ([[6, 0], [0, 6]], "full target"),
+    ):
+        L = Lattices(ZZ)(gram)
+        G = L.O()
+        OG = L.discriminant_group().orthogonal_group()
+        match gram:
+            case [[2, 0], [0, 2]]:
+                inter = G.intersection(G.discriminant_preimage(OG.trivial_subgroup()), L.O_plus())
+            case _:
+                inter = G.discriminant_preimage(OG)
+        image = inter.discriminant_image()
+        lifts = inter.discriminant_generator_lifts()
+        rho = L.discriminant_representation()
+        # Endpoint identity is a property of the objects, not a cardinality:
+        # every rho image is an element of the same OG.
+        for lift in lifts:
+            assert lift in inter
+            assert lift.parent() is G
+            morphism = lift.discriminant_morphism()
+            assert morphism.parent() is OG
+            assert morphism in image
+        realized = OG.subgroup_on(tuple(lift.discriminant_morphism() for lift in lifts))
+        assert int(realized.cardinality()) == int(image.cardinality())
+        assert all(g in image for g in realized.group_generators())
+        assert all(g in realized for g in image.group_generators())
+
+
 def test_discriminant_lift_follows_the_image_exactly() -> None:
     L = Lattices(ZZ)([[6, 0], [0, 6]])
     G = L.O()
