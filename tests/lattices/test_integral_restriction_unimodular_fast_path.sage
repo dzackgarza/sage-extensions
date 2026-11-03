@@ -100,44 +100,63 @@ def test_forward_integral_with_a_nonunit_determinant_stays_refused_on_differing_
 
 
 def test_differing_frames_with_unit_determinants_still_descend_both_ways() -> None:
-    r"""``[[2,0],[0,2]] -> [[0,2],[2,0]]`` by the swap on genuinely distinct objects, both ways.
+    r"""Genuinely congruent distinct frames: ``[[2,0],[0,2]]`` and ``[[4,2],[2,2]]``, both ways.
 
-    Equal-gram interning cannot fake the frames here: the two presented
-    lattices are different objects of the same rank, the swap has determinant
-    ``-1``, and the unimodular reading must return its lattice isometry from
-    both directions, with the pointwise actions asserted.
+    ``[[4,2],[2,2]] = Q (2I) Q^T`` with ``Q = [[1,1],[0,1]]``: the same form
+    on a genuinely different basis, on a genuinely different object (the two
+    Gram matrices differ, so interning cannot collapse them).  The modified
+    map is checked against every generator pairing of both lattices, then its
+    integral restriction and the restriction of its inverse with both inverse
+    compositions verified pointwise.
     """
     La = Lattices(ZZ)([[2, 0], [0, 2]])
-    Lb = Lattices(ZZ)([[0, 2], [2, 0]])
+    Lb = Lattices(ZZ)([[4, 2], [2, 2]])
     assert La is not Lb
     Va = La.vector_space()
     Vb = Lb.vector_space()
     la1, la2 = tuple(Va.module_generating_set())
     lb1, lb2 = tuple(Vb.module_generating_set())
-    swap = Va.Isom(Vb)({la1: Vb.module_generator(lb2), la2: Vb.module_generator(lb1)})
-    forward = swap.integral_restriction(La, Lb)
+    fb1, fb2 = Vb.module_generator(lb1), Vb.module_generator(lb2)
+    congruence = Va.Isom(Vb)(
+        {
+            la1: fb1 - fb2,
+            la2: fb2,
+        }
+    )
+    # the arrow is a genuine isometry: every pairing of the two bases agrees
+    for x_label, y_label in ((la1, la1), (la1, la2), (la2, la2)):
+        assert Vb.b(congruence(Va.module_generator(x_label)), congruence(Va.module_generator(y_label))) == Va.b(
+            Va.module_generator(x_label), Va.module_generator(y_label)
+        ), (x_label, y_label)
+    forward = congruence.integral_restriction(La, Lb)
     ia1, ia2 = tuple(La.module_generating_set())
     ib1, ib2 = tuple(Lb.module_generating_set())
     e_a1, e_a2 = La.module_generator(ia1), La.module_generator(ia2)
     e_b1, e_b2 = Lb.module_generator(ib1), Lb.module_generator(ib2)
-    assert forward(e_a1) == e_b2 and forward(e_a2) == e_b1
-    backward = swap.inverse().integral_restriction(Lb, La)
-    assert backward(e_b1) == e_a2 and backward(e_b2) == e_a1
+    assert forward(e_a1) == e_b1 - e_b2 and forward(e_a2) == e_b2
+    backward = congruence.inverse().integral_restriction(Lb, La)
+    assert backward(e_b1) == e_a1 + e_a2 and backward(e_b2) == e_a2
+    # both inverse compositions on the integral models, pointwise
+    assert backward(forward(e_a1)) == e_a1 and backward(forward(e_a2)) == e_a2
+    assert forward(backward(e_b1)) == e_b1 and forward(backward(e_b2)) == e_b2
 
 
-def test_over_a_finite_field_the_gate_stays_out_and_the_maintained_route_decides() -> None:
-    r"""Outside the owned integers the unimodular gate never fires.
+def test_over_a_finite_field_the_gate_stays_out_while_the_route_has_a_known_old_failure() -> None:
+    r"""Known old failure, not demonstrated functionality: the gate stays out over ``GF(5)``.
 
     ``M=2`` joins ``<2>`` to ``<3>`` over ``GF(5)`` (``3*2^2 = 12 =_5 2``);
     its determinant ``2`` is a unit of ``GF(5)`` but not ``+-1``; an ungated
     integer reading of it is exactly the ``TypeError: int() ... not
     'OwnedJoinCategory.element_class'`` the gate originally raised on this
-    specimen.  With the gate restricted to the owned integers the decision
-    is entirely the maintained route's: when it answers, its isometry is
-    checked pointwise; when it errors, the error must be the separate
-    pre-existing defect of its backward restricted-scalars composition over
-    this quotient ring (verifiable on code without the gate by the identical
-    failure), never the gate's integer cast.
+    specimen.  With the gate restricted to the owned integers the gate no
+    longer fires; today's maintained backward route has a registered old
+    defect over this quotient ring (TRAPS.md: the backward restricted-scalars
+    composition reads a lattice morphism as a scalar, identical on pre-gate
+    code), so the specimen cannot demonstrate a returned isometry.  What it
+    pins, and only that: the gate cast never fires, and any error met here is
+    that pre-existing route defect, not the gate's.  The defendant branch is
+    retained so a future repair of that defect demonstrates the isometry
+    pointwise without a test rewrite.
     """
     FF5 = GF(5)
     source = Lattices(FF5)([[2]])
