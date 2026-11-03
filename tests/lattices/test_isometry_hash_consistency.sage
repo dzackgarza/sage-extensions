@@ -71,11 +71,22 @@ def test_independent_equal_constructions_and_set_alias_contract() -> None:
     # set non-aliasing: two constructions of one map collapse into a single set member
     family = {swap, swap.inverse(), swap * swap.inverse()}
     assert len(family) == 2  # {swap, identity}
-    # distinct tensors differ in one cell; their hashes are observed unlike
-    neg = G({e_one: -e_one, e_two: e_one})
-    distinct_family = {swap, neg}
+    # a genuinely distinct ISOMETRY of U: the sign-flipped swap, which is
+    # (-1) composed with the swap and so preserves the hyperbolic form
+    all(x.q() == 0 for x in (e_one, e_two))
+    neg_swap = G({e_one: -e_two, e_two: -e_one})
+    # validated against the actual form, not assumed from its images alone:
+    for x in (e_one, e_two):
+        for y in (e_one, e_two):
+            assert L.b(neg_swap(x), neg_swap(y)) == L.b(x, y)
+    # the earlier specimen {e_one: -e_one, e_two: e_one} is not an isometry
+    # here (b(-e_one, e_one) = 0, but b(e_one, e_two) = 1); the distinctness
+    # below is between real members of O(U) = {+-1} . {1, swap}
+    assert not (neg_swap == swap)
+    assert not (neg_swap == G(lambda label: -L.module_generator(label)))
+    distinct_family = {swap, neg_swap}
     assert len(distinct_family) == 2
-    assert hash(swap) != hash(neg)  # observed for these particular maps
+    assert hash(swap) != hash(neg_swap)  # observed for these particular maps
 
 
 def test_cold_hash_path_avoids_both_old_repr_and_cache_key_routes() -> None:
