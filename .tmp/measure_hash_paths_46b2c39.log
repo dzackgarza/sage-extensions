@@ -1,0 +1,8 @@
+fiber components: 4 types: {'_OwnedRingParent_with_category.element_class'}
+hash(scalar): 0.2 us
+hash((valence,ranks,flat)) tensor.__hash__: 2.8 us
+tensor._cache_key(): 62.6 us
+str(tensor components): 61.4 us
+hash(mor) current: 4.0 us
+consistency check: hash(g) id-parts: 134391287516240 134391287516240
+equal g == g2: True | same tensor hash: True
