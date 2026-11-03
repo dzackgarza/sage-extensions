@@ -1,0 +1,36 @@
+# Stage-D handoff: apex-stabilizer generation does not return on the Enriques coinvariant lattice (port #403)
+
+Measured at 2026-11-03 on the real case_3 inputs under the original 6144 MiB process-tree RSS guard.
+
+## Measured evidence spine
+
+- Probe job `jmw0d7uq2` (source `3588c8f`, [log](.tmp/enriques_stageD_job_jmw0d7uq2_source_3588c8f.log)): `subgroup_classes(G_h, lines)` entered at probe-t 395.7s; the `SE_DEBUG_STAGES` marker inside `LatticeIsometryMor._marking_stabilizer_generators` printed `_marked_automorphism_generators start` and never printed `done` before the job's inner 2400s cap (exit 124, tree RSS 4917 MiB under guard). The `DoubleCosets`-side markers inside `_splitting_isometries_in_im_rho` never fired, so the non-returned call is attributed by before/after markers on the actual call path, not by a wrapper name alone.
+- Earlier full runs (jobs `jmw075b47`, `jmw09ixev`) hit the same position: stage C accepted |rho(Gamma_h)| = 92897280 (published), then the line split never printed within the 2400s cap.
+- A minimal exact reproduction script is committed at `.tmp/repro_marked_stabilizer.py` (launched by `.scratch/launch_repro_stab.sh`): it exercises **only** the innermost measured call `INDUCTION.line_automorphism_generators(N, e_i)` on the two published line representatives of `N = U(1) + U(2) + E8(-2)` — fixture ids `I_1_1` (`Z e1`, `[1,0,...,0]`) and `I_1_2` (`Z e3`, `[0,0,1,0,...,0]`, gram read from `tests/fixtures/unpolarized_enriques.json`, det 1024, signature (2,10)) — and then the port wrapper at the category level. The repro is deliberately one process with stage prints before each call, so a cap still leaves ordered before/after evidence. A launch is pending only its background move (agent-side `background:true` stopped materializing background jobs this session). The handoff below holds independently of that run: the failing call is already identified by markers.
+
+## Exact owning call path and arguments (as measured)
+
+```
+tests/acceptance consumer: subgroup_classes(G_h, lines)
+  -> sage-indefinite-port consumer split: lattice_.O().split_orbit(marked, subgroup)      (library: lattice_morphisms.py SplitOrbit)
+  -> LatticeIsometryMor._marking_stabilizer_generators(category, marked)                  (library: lattice_morphisms.py)
+  -> Lattices..._marked_automorphism_generators(diagram_category, marked)                 (library: lattices.py:1862, defer to port #403)
+  -> sage_indefinite_port.indefinite.marked_lattices.automorphism_group_generators(category, marked)
+       category = Ar(Lattices) sublattice category; marked = a rank-1 sublattice marking
+  -> (sublattice rank 1 branch) INDUCTION.line_automorphism_generators(marked.arrow().codomain() = N, e)
+       with e = INDUCTION.plane_vectors(sublattice)[0]  (the line's first vector; here Z e1 or Z e3)
+  -> IsotropicInduction._stabilizer_generators((line,), ((-line,),))                       (isotropic_induction.py:306)
+  -> recursion.isotropic_stabilizer_action(isotropic, radical_images) -> action.stabilizer().group_generators()
+```
+
+Expected semantic result: the generators of `Aut((N, Z e_i))` = the apex isometries generating the stabilizer action, returned as a finite ordered set of live lattice isometries; the consumer uses them to produce the double-coset splittings of each `O(N)`-line orbit under `G_h` (published counts: 5 lines / 10 planes / 19 flags; the port test asserts only these counts).
+
+## What is being asked of the port owner
+
+1. Reproduce and time `INDUCTION.line_automorphism_generators(N, e1)` on the direct-gram N built from the fixture gram (repro script above pins every argument byte-exactly).
+2. Attribute inside `isotropic_stabilizer_action` vs `stabilizer()` vs `integral_isometry` conversion: which of these does not return — the repro's stage prints will name it without a full consumer run.
+3. If the algorithm is an intractable variant for this lattice class (signature (2,10), discriminant 2^10), say so explicitly with the measured trajectory — the library's stage-C/C accepted results and the DoubleCosets-measured splitting path stand independently, and a smaller stabilizer API (e.g. expect `stabilizer` only for lines in the two published orbit classes with discriminant indices 1 and 527 as recorded in the fixture) is a valid reduced contract for the consumer's needs.
+
+## What is NOT asked
+
+Nothing here asks for a patch from this repository, and none was made: the port consultation is the documented owner only. The original case_3 line/plane/flag acceptance (5/10/19) and the per-generator S1 obligation remain open on their own terms; image order 92897280 and index 1011840 are published and measured, but are not substitutes for either.
