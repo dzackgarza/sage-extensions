@@ -3738,7 +3738,16 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         lattice = self.lattice()
         if lattice.is_definite():
             return self._finite_subgroup_generators(stabilizer)
-        return lattice.lattice_category()._marked_automorphism_generators(category, marked)
+        import os as _os
+        import time as _time
+
+        if _os.environ.get("SE_DEBUG_STAGES"):
+            print(f"[se-stage] _marked_automorphism_generators start t={_time.monotonic():.1f}", flush=True)
+        _t = _time.monotonic()
+        result = lattice.lattice_category()._marked_automorphism_generators(category, marked)
+        if _os.environ.get("SE_DEBUG_STAGES"):
+            print(f"[se-stage] _marked_automorphism_generators done in {_time.monotonic()-_t:.1f}s: {len(tuple(result))} gens", flush=True)
+        return result
 
     def _marking_category(self, marked):
         r"""The category of marked lattices with apex ``L`` of which ``marked`` is an object.
