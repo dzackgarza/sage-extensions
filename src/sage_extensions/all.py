@@ -417,6 +417,7 @@ from sage_extensions.categories.sets import (  # noqa: F401
     EnumeratedByNaturals,
     EnumeratedSets,
     FinitelySupportedFunctionSets,
+    FunctionSets,
     FinitePowerSets,
     FiniteSets,
     FourierCharacters,

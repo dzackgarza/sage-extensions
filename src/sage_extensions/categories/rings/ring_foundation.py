@@ -5738,7 +5738,13 @@ class _OwnedRingElement(RingElement):
         else:
             try:
                 exponent = exponent.__index__()
-            except AttributeError:
+            except (AttributeError, TypeError):
+                # An exponent that is not an integer index is not this ring's
+                # power: return ``NotImplemented`` so the reflected operation
+                # answers.  An infinite cardinal reports exactly this way --
+                # ``Cardinal.__index__`` refuses with ``TypeError`` -- and
+                # ``Cardinal.__rpow__`` is the maintained ``2 ** aleph0 =
+                # continuum``.
                 return NotImplemented
             value = self._backend() ** exponent
         value_parent = element_parent(value)

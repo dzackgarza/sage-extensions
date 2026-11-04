@@ -3489,14 +3489,27 @@ class PowerSets(OwnedCategory):
             if candidate is self.base_set():
                 return self.top()
             if candidate in Sets():
-                assert (
-                    Sets().is_provably_finite(candidate)
-                    and candidate in EnumeratedSets()
-                ), (
+                assert Sets().is_provably_finite(candidate), (
                     f"cannot read {candidate} as a subset of {self.base_set()}: a set is read as a subset here only "
-                    "through its elements, which needs it finite and enumerated"
+                    "through its elements, which needs it finite"
                 )
-                return self._from_finite_members(candidate)
+                if candidate in EnumeratedSets():
+                    return self._from_finite_members(candidate)
+                # A finite set whose points are presented without an owned
+                # ranking is still read through them: a Sage enumerated set is
+                # finite and iterable but carries no ranking map onto the
+                # standard well-order, so requiring ``EnumeratedSets()`` here
+                # rejected the very points the ``Iterable`` branch below
+                # accepts from a tuple.  Only an unenumerable finite set is
+                # refused, and the refusal says so.
+                try:
+                    members = tuple(candidate)
+                except TypeError:
+                    raise ValueError(
+                        f"cannot read {candidate} as a subset of {self.base_set()}: it is provably finite but "
+                        "presents no enumeration of its elements"
+                    ) from None
+                return self._from_finite_members(members)
             if isinstance(candidate, Iterable):
                 return self._from_finite_members(candidate)
             raise TypeError(
