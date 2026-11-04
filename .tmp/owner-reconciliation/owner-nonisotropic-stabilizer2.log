@@ -1,0 +1,17 @@
+[t=     0.0s] L (1, 9)
+[t=     0.1s] v = -11*e_0 - 30*e_1 + 23*e_2 + 23*e_3, q(v) = -398, content = 1
+[t=     0.1s] S: {g in Orthogonal group O(Integral lattice of rank 10 and signature (1, 9)) : g fixes -11*e_0 - 30*e_1 + 23*e_2 + 23*e_3}
+[peakrss] STOPPED_AT_MEMORY_LIMIT: tree RSS 6292 MiB exceeded 6144 MiB
+[peakrss] owner-nonisotropic-stab2: child waited=143 shell_code=143 samples=69
+[peakrss] peak tree RSS      : 6292 MiB
+[peakrss] low-water MemAvail : 5873 MiB
+[peakrss] peak single VmHWM  : 6295 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     6284 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   136.1s procs=  3 rss=  6292 MiB hwm=  6295 MiB avail=  5873 MiB
+[peakrss]   t=   134.1s procs=  3 rss=  5969 MiB hwm=  5970 MiB avail=  6207 MiB
+[peakrss]   t=   132.1s procs=  3 rss=  5745 MiB hwm=  5745 MiB avail=  6396 MiB
+[peakrss]   t=   130.1s procs=  3 rss=  5546 MiB hwm=  5546 MiB avail=  6614 MiB
+[peakrss]   t=   128.1s procs=  3 rss=  5285 MiB hwm=  5285 MiB avail=  6879 MiB
