@@ -54,7 +54,8 @@ from sage_extensions.categories.abstract_categories.functors import (  # noqa: F
     DiscreteCategory,
     ObjectSetFunctor,
 )
-from sage_extensions.categories.algebras.algebras import (
+from sage_extensions.categories.algebras.algebras import (  # noqa: F401
+    Algebras,
     MatrixAlgebras as MatrixAlgebras,
 )
 from sage_extensions.categories.cell_complexes import (  # noqa: F401
@@ -243,6 +244,7 @@ from sage_extensions.categories.modules.framed.fraction_field_quotients import (
     FractionFieldQuotients,
 )
 from sage_extensions.categories.modules.pure.modules import (  # noqa: F401
+    FreeModules,
     MatrixEndomorphismSpaces,
     MatrixSpaces,
     Modules,
