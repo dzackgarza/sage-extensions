@@ -171,6 +171,10 @@ def _engine_finiteness(engine, *, compute=False):
     return None
 
 
+_GAP_ELM_LIST = None
+"""GAP's ``ELM_LIST``, read on first use by :func:`_gap_elm_list`."""
+
+
 def _gap_model(group):
     r"""Return the GAP group modelling ``group``."""
     match group:
@@ -178,6 +182,36 @@ def _gap_model(group):
             return group._libgap_()
         case _:
             return _gap_model_of_engine(_engine_group(group))
+
+
+def _gap_elm_list():
+    r"""GAP's ``ELM_LIST`` function, read once per session."""
+    global _GAP_ELM_LIST
+    if _GAP_ELM_LIST is None:
+        _GAP_ELM_LIST = libgap.eval("ELM_LIST")
+    return _GAP_ELM_LIST
+
+
+def _gap_list_entry(list_object, position):
+    r"""The ``position``-th entry (zero-based) of a GAP list, at GAP's own index width.
+
+    ``GapElement_List.__getitem__`` casts its index through ``cdef int``, so
+    any position at or beyond ``2**31`` raises ``OverflowError: value too
+    large to convert to int`` although the position names a real entry --
+    a right transversal of index ``|O(A_L)| = 46998591897600`` is one such
+    list.  GAP's ``ELM_LIST`` takes the index as a GAP integer and answers
+    the same entry (measured on a list of length ``3*10**9``: position
+    ``2**31 + 5`` reads correctly through ``ELM_LIST`` and raises through
+    ``__getitem__``).  For every position a machine int can hold the two
+    agree, so this is one list read at the width its data requires.
+
+    ``position`` is zero-based, as every position this module retains is;
+    GAP's ``ELM_LIST`` is one-based, so the index handed over is
+    ``position + 1``.
+    """
+    if position < 0:
+        raise IndexError(f"{position} is not a position in a GAP list")
+    return _gap_elm_list()(list_object, position + 1)
 
 
 def _gap_model_of_engine(engine):
@@ -527,6 +561,16 @@ class _TransversalCosets(Parent):
     When the owned group law reverses the engine law, gH instead maps
     directly to H*engine(g). In either case left translation becomes right
     multiplication in the transversal. No elements of H are enumerated.
+
+    Positions are read through GAP's own ``ELM_LIST``, not through Sage's
+    ``GapElement_List.__getitem__``. The latter binds its index with
+    ``cdef int``, so a transversal whose index exceeds ``2**31`` -- an
+    orthogonal group of the discriminant form of a rank-12 lattice already
+    has order ``46998591897600`` -- raises ``OverflowError: value too large
+    to convert to int`` on a perfectly valid position, while GAP's
+    ``ELM_LIST`` answers the same index exactly. Both agree on every
+    position a machine int could hold, so this is the same list read with
+    the index width the data needs.
     """
 
     def __init__(self, group, subgroup):
@@ -539,6 +583,10 @@ class _TransversalCosets(Parent):
             self._permutations.Image(_gap_model(subgroup)),
         )
         Parent.__init__(self, category=Sets())
+
+    def _entry(self, position):
+        r"""The transversal's ``position``-th entry (zero-based) at full GAP index width."""
+        return _gap_list_entry(self._transversal, position)
 
     @cached_method
     def _multiplier(self, element):
@@ -553,11 +601,11 @@ class _TransversalCosets(Parent):
         return _TransversalCoset(self, position)
 
     def representative(self, position):
-        encoded = self._permutations.PreImagesRepresentative(self._transversal[position])
+        encoded = self._permutations.PreImagesRepresentative(self._entry(position))
         return _element_from_engine(self.group, encoded if self._reversed else encoded.Inverse())
 
     def act(self, element, point):
-        image = self._transversal[point._position] * self._multiplier(element)
+        image = self._entry(point._position) * self._multiplier(element)
         return self.point(int(libgap.PositionCanonical(self._transversal, image)) - 1)
 
 
