@@ -139,8 +139,12 @@ from sage_extensions.categories.group.g_sets import (  # noqa: F401
     FiniteGSets,
 )
 from sage_extensions.categories.group.groups import (  # noqa: F401
+    AbelianGroups,
+    FiniteAbelianGroups,
     Groups,
     LieGroups,
+    OwnedAbelianGroups,
+    OwnedFiniteAbelianGroups,
     OwnedGroups,
     TopologicalGroups,
 )
@@ -244,6 +248,7 @@ from sage_extensions.categories.modules.framed.fraction_field_quotients import (
     FractionFieldQuotients,
 )
 from sage_extensions.categories.modules.pure.modules import (  # noqa: F401
+    FinitelyPresentedTorsionModules,
     FreeModules,
     MatrixEndomorphismSpaces,
     MatrixSpaces,
