@@ -308,6 +308,12 @@ class CategoryWithAxiom_over_base_ring(
         self._init_cat_object()
         SageCategoryWithAxiomOverBaseRing.__init__(self, base_category)
 
+    def base_ring(self) -> ObjectOfCategory:
+        return self._base_category.base_ring()
+
+    def base(self) -> ObjectOfCategory:
+        return self._base_category.base()
+
 
 class Category_over_base(
     OwnedCategoryMixin, OwnedCategoryObject, SageCategoryOverBase, Parent
@@ -317,6 +323,9 @@ class Category_over_base(
     def __init__(self, base: CategoryObject, name: str | None = None) -> None:
         self._init_cat_object()
         SageCategoryOverBase.__init__(self, base, name)
+
+    def base_object(self) -> CategoryObject:
+        return self.base()
 
 
 class Category_over_base_ring(
@@ -328,6 +337,9 @@ class Category_over_base_ring(
         self._init_cat_object()
         SageCategoryOverBaseRing.__init__(self, base, name)
 
+    def base_ring(self) -> CategoryObject:
+        return self.base()
+
 
 class Category_module(
     OwnedCategoryMixin, OwnedCategoryObject, SageCategoryModule, Parent
@@ -338,6 +350,9 @@ class Category_module(
         self._init_cat_object()
         SageCategoryModule.__init__(self, base, name)
 
+    def base_ring(self) -> CategoryObject:
+        return self.base()
+
 
 class Category_ideal(
     OwnedCategoryMixin, OwnedCategoryObject, SageCategoryIdeal, Parent
@@ -347,6 +362,12 @@ class Category_ideal(
     def __init__(self, ring: CategoryObject, name: str | None = None) -> None:
         self._init_cat_object()
         SageCategoryIdeal.__init__(self, ring, name)
+
+    def ring(self) -> CategoryObject:
+        return self._base
+
+    def base_ring(self) -> CategoryObject:
+        return self.ring()
 
 
 class MorCategoryConstruction(
@@ -601,6 +622,12 @@ class AlgebrasCategory(
     def __init__(self, category: SageCategory, base_ring: CategoryObject) -> None:
         self._init_cat_object()
         SageAlgebrasCategory.__init__(self, category, base_ring)
+
+    def base_ring(self) -> CategoryObject:
+        return self._base_ring
+
+    def base(self) -> CategoryObject:
+        return self.base_ring()
 
 
 class FilteredModulesCategory(

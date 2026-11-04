@@ -172,6 +172,16 @@ class DiscriminantModules(OwnedCategoryOverBaseRing):
                 {label: coordinates(label) for label in coordinates.support().domain()}
             )
 
+        def base_change(self, ring_map):
+            r"""Extend scalars of this discriminant module along R -> S."""
+            changed_lattice = self.source_lattice().base_change(ring_map)
+            return changed_lattice.discriminant_module()
+
+        def twist(self, scalar):
+            r"""Scale the form values of this discriminant module by scalar."""
+            scaled_lattice = self.source_lattice().twist(scalar)
+            return scaled_lattice.discriminant_module()
+
 
 class DiscriminantBilinearModules(OwnedCategoryOverBaseRing):
     r"""Discriminant modules with ``K/R``-valued bilinear form."""
@@ -199,6 +209,16 @@ class DiscriminantBilinearModules(OwnedCategoryOverBaseRing):
 
         def bilinear_value_module(self):
             return self._preamble_bilinear_value_module
+
+        def base_change(self, ring_map):
+            r"""Extend scalars of this bilinear discriminant module along R -> S."""
+            changed_lattice = self.source_lattice().base_change(ring_map)
+            return changed_lattice.discriminant_module()
+
+        def twist(self, scalar):
+            r"""Scale the form values of this bilinear discriminant module by scalar."""
+            scaled_lattice = self.source_lattice().twist(scalar)
+            return scaled_lattice.discriminant_module()
 
         def b(self, left, right):
             if left not in self or right not in self:
@@ -362,6 +382,16 @@ class DiscriminantQuadraticModules(OwnedCategoryOverBaseRing):
 
         def quadratic_value_module(self):
             return self._preamble_quadratic_value_module
+
+        def base_change(self, ring_map):
+            r"""Extend scalars of this quadratic discriminant module along R -> S."""
+            changed_lattice = self.source_lattice().base_change(ring_map)
+            return changed_lattice.discriminant_module()
+
+        def twist(self, scalar):
+            r"""Scale the form values of this quadratic discriminant module by scalar."""
+            scaled_lattice = self.source_lattice().twist(scalar)
+            return scaled_lattice.discriminant_module()
 
         @cached_method
         def isotropic_subgroups(self):
@@ -971,7 +1001,10 @@ def _discriminant_module(lattice):
     form descended to ``A_L = coker(L -> L^#)``: built on the data of ``A_L``,
     which it retains as ``unformed_module()``.
     """
-    assert lattice.module_rank().is_finite() and lattice.is_nondegenerate()
+    if not lattice.module_rank().is_finite():
+        raise TypeError(f"discriminant_module requires a lattice of finite rank, but {lattice} has rank {lattice.module_rank()}")
+    if not lattice.is_nondegenerate():
+        raise ValueError(f"discriminant_module is defined only for nondegenerate lattices, but {lattice} is degenerate")
 
     quotient = lattice.correlation_morphism().cokernel()
     dual_lattice = lattice.dual_lattice()
