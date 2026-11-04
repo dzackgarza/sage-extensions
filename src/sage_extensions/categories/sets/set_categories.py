@@ -2848,6 +2848,32 @@ class _FiniteLiteralSet(Sets().ObjectType):
     def __ne__(self, other) -> bool:
         return not self == other
 
+    def __le__(self, other) -> bool:
+        r"""Subset decision over the retained finite points of two literal sets.
+
+        ``A <= B`` iff every retained point of A is a point of B; the
+        presented states alone decide it, no ambient search or claimed
+        enumeration between the two objects.
+        """
+        if not isinstance(other, _FiniteLiteralSet):
+            return NotImplemented
+        return self._points.issubset(other._points)
+
+    def __lt__(self, other) -> bool:
+        if not isinstance(other, _FiniteLiteralSet):
+            return NotImplemented
+        return self <= other and self != other
+
+    def __ge__(self, other) -> bool:
+        if not isinstance(other, _FiniteLiteralSet):
+            return NotImplemented
+        return other <= self
+
+    def __gt__(self, other) -> bool:
+        if not isinstance(other, _FiniteLiteralSet):
+            return NotImplemented
+        return other < self
+
     def __hash__(self) -> int:
         return hash(self._points)
 

@@ -2268,8 +2268,15 @@ def _SL(degree, ring, var="a"):
     # Do not allow a nonintegral rank through either the arithmetic witness
     # or the generic engine adapter. This is a defining group parameter,
     # not an approximate numerical argument to be rounded or truncated.
-    if degree not in ZZ or degree != ZZ(degree):
+    # Hosted integer elements are integral by design: their int() is exact,
+    # and a rank that cannot be read as one is the error being guarded.
+    try:
+        rank_int = int(degree)
+    except (TypeError, ValueError):
+        raise ValueError("SL_n(R) requires an integral rank") from None
+    if rank_int != degree:
         raise ValueError("SL_n(R) requires an integral rank")
+    degree = rank_int
     if degree < 1:
         raise ValueError("SL_n(R) requires a positive rank")
     # SL_n(ZZ) is constructed as the integral points of SL_n inside
@@ -5914,7 +5921,11 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 )
                 image_bound = int(codomain.cardinality())
             original_bound = image_bound
-            image_bound = int(image_bound)
+            try:
+                bound_int = image_bound.__index__()
+            except (TypeError, ValueError, AttributeError):
+                raise ValueError("the finite-image cardinality bound must be an integer") from None
+            image_bound = bound_int
             if image_bound != original_bound:
                 raise ValueError("the finite-image cardinality bound must be an integer")
             if image_bound < 1:

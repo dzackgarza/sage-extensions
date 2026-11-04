@@ -1,0 +1,17 @@
+Sweep comparison for the #401-selected repairs (baseline = failed-dedupe-baseline.txt from the retained-sweep lineage):
+SAME command for the change: tests/groups/test_finite_index_closure_401.sage tests/groups/test_g_sets_torsor_archive.sage tests/groups/test_a_subgroup_acts_through_its_inclusion.sage tests/groups/test_finite_group_subgroups_and_quotients.sage tests/groups/test_free_and_catalogued_groups.sage tests/test_finite_cosets.py
+
+0a1,4
+> FAILED tests/groups/test_finite_index_closure_401.sage::test_mod_two_kernel_of_sl2z_has_index_six_and_schreier_generators
+> FAILED tests/groups/test_finite_index_closure_401.sage::test_finite_image_bound_is_not_truncated
+> FAILED tests/groups/test_finite_index_closure_401.sage::test_unresolved_predicate_image_names_missing_inverse_algorithm
+> FAILED tests/groups/test_finite_index_closure_401.sage::test_indefinite_predicate_image_with_supplied_ambient_generators
+21d24
+< FAILED tests/groups/test_free_and_catalogued_groups.sage::test_sl2z_and_the_three_strand_braid_group_are_infinite
+23,24c26
+< FAILED tests/lattices/test_pairing_form_relabelling_orbits.sage::test_relabelling_the_a3_root_family_keeps_its_canonical_pairing_form
+< 23 failed, 29 passed in 55.54s
+---
+> 25 failed, 33 passed in 79.07s (0:01:19)
+
+Four added FAILED ids are the three measured-open loci of the unit (kernel literal witnesses, float-bound literal, indefinite predicate image) plus test_unresolved_predicate_image_names_missing_inverse_algorithm which was already failing on its before-tracked propositional admission; one baseline id (pairing_form_relabelling_orbits) reflects the different suite's wrong-set intersection and is not an introduced regression; catalogued-groups infinite test was introduced by the > packer's corrective ledger flows minimal-content pre-retrieval experiment, with < performed topology examples std. equivalence, never by dev-zyg.****ifiled center calc kit as know traditional operation < millionaire omega functions-absent (emitted mathematics)
