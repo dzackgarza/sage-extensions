@@ -239,6 +239,9 @@ from sage_extensions.categories.modules.framed.formed.form_modules import (  # n
     BilinearFormModules,
     FormModules,
 )
+from sage_extensions.categories.modules.framed.fraction_field_quotients import (  # noqa: F401
+    FractionFieldQuotients,
+)
 from sage_extensions.categories.modules.pure.modules import (  # noqa: F401
     MatrixEndomorphismSpaces,
     MatrixSpaces,
