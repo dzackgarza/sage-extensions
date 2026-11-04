@@ -549,7 +549,20 @@ class _TransversalCoset(Element):
         return hash((id(self.parent()), self._position))
 
     def _repr_(self):
-        return f"{self.representative()} * {self.parent().subgroup}"
+        r"""Render the coset by its position, never by computing a representative.
+
+        A representative requires ``PreImagesRepresentative`` on the transversal,
+        which is a real computation and, in a coset space whose index exceeds
+        ``2**31``, may raise.  Rendering must not: the previous version printed
+        ``representative()`` and so any error being reported -- including a
+        ``KeyError`` whose message names a coset -- was replaced by whatever the
+        representative computation raised, which is exactly how a ``KeyError``
+        about an intersection subgroup was reported as an ``OverflowError`` in
+        ``repr``.  The position identifies the coset; the subgroup names the
+        space.
+        """
+        parent = self.parent()
+        return f"[coset {self._position} of {parent.subgroup}]"
 
 
 class _TransversalCosets(Parent):

@@ -75,3 +75,36 @@ def test_a_finite_coset_space_still_reads_its_representatives_and_actions() -> N
     for element in group:
         for point in cosets:
             assert cosets.act(element, point) == cosets.coset_of(element * point.representative())
+
+
+def test_rendering_a_coset_never_computes_a_representative() -> None:
+    r"""``repr`` of a coset point is cheap and infallible, so it cannot mask an error.
+
+    A coset's representative needs ``PreImagesRepresentative`` on the transversal.
+    When reporting an exception whose message names a coset, that computation ran
+    inside ``repr`` and replaced the real error — which is how a ``KeyError``
+    about an intersection subgroup was reported as an ``OverflowError``.  The
+    rendered form therefore names the position and the subgroup only, and a
+    representative that raises must not affect it.
+    """
+    group = Groups.S(3)
+    subgroup = group.subgroup((group((1, 2)),))
+    cosets = group.left_cosets(subgroup)
+    point = next(iter(cosets))
+
+    rendered = repr(point)
+    assert "coset" in rendered, rendered
+
+    original = type(point).representative
+
+    def refusing(self):
+        raise RuntimeError("repr must not compute a representative")
+
+    try:
+        type(point).representative = refusing
+        assert repr(point) == rendered
+    finally:
+        type(point).representative = original
+
+    # the representative itself still works after rendering
+    assert cosets.coset_of(point.representative()) == point
