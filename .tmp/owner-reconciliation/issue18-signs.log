@@ -1,0 +1,21 @@
+[t=     0.0s] N rank 12 sig (2, 10); line I_1_1
+[t=    20.9s] isotropic_stabilizer_action 20.8s
+[t=  1520.3s] stabilizer().group_generators() 1499.4s: 25600 generators
+[t=  1537.2s] converted 240 of 25600 in 16.9s
+SIGNS prefix=240 plus=230 minus=10 other=0
+NEGATIVE INDICES [14, 39, 64, 89, 114, 139, 164, 189, 214, 239]
+SETWISE YES
+SIGNS_OK
+[peakrss] issue18-signs: child waited=0 shell_code=0 samples=794
+[peakrss] peak tree RSS      : 3336 MiB
+[peakrss] low-water MemAvail : 5882 MiB
+[peakrss] peak single VmHWM  : 3342 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     3331 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  1577.2s procs=  3 rss=  3336 MiB hwm=  3342 MiB avail=  8744 MiB
+[peakrss]   t=  1579.2s procs=  3 rss=  3336 MiB hwm=  3342 MiB avail=  8721 MiB
+[peakrss]   t=  1581.2s procs=  3 rss=  3336 MiB hwm=  3342 MiB avail=  8693 MiB
+[peakrss]   t=  1583.2s procs=  3 rss=  3336 MiB hwm=  3342 MiB avail=  8654 MiB
+[peakrss]   t=  1585.2s procs=  3 rss=  3336 MiB hwm=  3342 MiB avail=  8637 MiB
