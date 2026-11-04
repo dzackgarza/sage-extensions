@@ -1,0 +1,25 @@
+[t=     0.0s] fixture
+[t=     0.0s] fixture N gram det 1024 signature [2, 10]
+[t=     0.0s] N: rank 12 signature (2, 10)
+[t=     0.0s] -- stage A: orthogonal group selection (its Schreier data via group_generators) --
+[t=     0.0s] Aut(N) constructed 0.0s
+[t=   316.0s] Aut(N).group_generators() 315.9s: 221 generators
+[t=   316.0s] -- stage B: stable kernel selection V O+(N) --
+[t=   321.5s] stable_orthogonal_group constructed 5.5s as PreimageSubgroups.parent_class
+[t=   321.5s] -- stage C: the unit's two acceptance verbs --
+[t=   359.2s] stable.image_under(rho).cardinality() 37.7s: 1
+[peakrss] STOPPED_AT_MEMORY_LIMIT: tree RSS 6164 MiB exceeded 6144 MiB
+[peakrss] issue17-stable-kernel-fix1: child waited=143 shell_code=143 samples=277
+[peakrss] peak tree RSS      : 6164 MiB
+[peakrss] low-water MemAvail : 6088 MiB
+[peakrss] peak single VmHWM  : 6596 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     3466 MiB peak
+[peakrss]   julia                      3119 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   552.3s procs=  4 rss=  6164 MiB hwm=  6596 MiB avail=  6088 MiB
+[peakrss]   t=   550.3s procs=  4 rss=  6144 MiB hwm=  6576 MiB avail=  6103 MiB
+[peakrss]   t=   548.3s procs=  4 rss=  6114 MiB hwm=  6547 MiB avail=  6136 MiB
+[peakrss]   t=   546.3s procs=  4 rss=  6086 MiB hwm=  6518 MiB avail=  6181 MiB
+[peakrss]   t=   544.3s procs=  4 rss=  6056 MiB hwm=  6488 MiB avail=  6194 MiB
