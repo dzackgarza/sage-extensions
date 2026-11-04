@@ -198,7 +198,7 @@ present the correct object while a requested decision procedure is unavailable
 or undecidable. Do not confuse that with nonexistence of the object.
 
 When this comparison exposes an actual gap, record it in the
-[native issue tree](https://github.com/dzackgarza/research/issues/46) under `DEV-59`. Explain the missing mathematics
+[issue tree](https://github.com/dzackgarza/sage-extensions/issues/14) under `DEV-59`. Explain the missing mathematics
 and the dependency path that exposed it, not only the failing method. Search
 broadly enough to distinguish absent machinery from undiscovered machinery;
 record the inspected boundary and unresolved questions honestly. For missing

@@ -11,14 +11,14 @@ These rules govern writing the mathematical library.
 
 Read the normative [preamble architecture specification](CONTRIBUTING.md#preamble-architecture-specification)
 before changing preamble construction, representation, or engine integration.
-It owns the intended architecture; the TODO owns only the unfinished work.
-Read the relevant issues in the [native issue tree](https://github.com/dzackgarza/research/issues/46)
+It owns the intended architecture; the issue tree owns only the unfinished work.
+Read the relevant issues in this repository's [issue tree](https://github.com/dzackgarza/sage-extensions/issues/14)
 for observed foundational gaps and papercuts. Each issue owns its requirements,
 evidence, acceptance, dependencies, and closure.
 
 When the owner calls an engineering move "standard", "the usual way" or "how it is done", the standard is this repository's own `CONTRIBUTING.md`, this file and the terminology dictionary before it is anything external (for mathematics the standard is `lean-categories`): look the move up there first, and survey prior art only for what they do not state. On 2026-09-17 the qualified-predicate rule (`LEX-02`) was looked up in Sage, which has no such notion, instead of in `CONTRIBUTING.md`, which does.
 
-Before writing or editing code under `src/dzack_research/preamble/` or in sage-extensions (`sage_extensions`), first read the root [TODO.md](https://github.com/dzackgarza/research/blob/main/TODO.md). It contains only unfinished work, its priorities, mathematical contracts, dependencies, acceptance criteria, and active file reservations. Use it according to the rules below.
+Before writing or editing code in `sage_extensions`, first read the owning issue, its ancestors and its siblings in this repository's [issue tree](https://github.com/dzackgarza/sage-extensions/issues/14); `itree next dzackgarza/sage-extensions` selects the next work unit. Each issue contains its unfinished work, mathematical contract, dependencies and acceptance criteria. The preamble programme's `Phase:` issues under the root realize the research milestones under [research #46](https://github.com/dzackgarza/research/issues/46), which keep the cross-repository roadmap and ordering; the research [crosswalk](https://github.com/dzackgarza/research/blob/main/docs/issue-migration/preamble-issues.md) maps former source identifiers to their issues. In a transferred issue body, `src/dzack_research/preamble/<path>` names the current `src/sage_extensions/<path>`, and `tests/...` names the research expectation suite.
 
 Use [COMPLEXITY.md](https://github.com/dzackgarza/research/blob/main/COMPLEXITY.md) to score work and select a model and reasoning effort.
 The [TODO workstream table](https://github.com/dzackgarza/research/blob/main/TODO.md#workstreams) records the DAG task scores and their reasons.

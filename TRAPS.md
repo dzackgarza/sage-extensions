@@ -3,7 +3,7 @@
 Measured facts about the engines this repository delegates to, kept because each one is the product of the work and costs an afternoon to rediscover (`CONTRIBUTING.md`: *The artifacts are instruments; the product is a map of Sage*; `DEV-63` owns this file).
 A row is a finding, never a hypothesis: it records the operation, the spelling measured, the specimen and its size parameter, the wall times, the version, the command that reproduces it, and the route chosen.
 A cost is a curve in the size parameter, or it is a single data point and says so.
-The [native issue tree](https://github.com/dzackgarza/research/issues/46) holds unresolved needs; this file holds measured facts.
+The [issue tree](https://github.com/dzackgarza/sage-extensions/issues/14) holds unresolved needs; this file holds measured facts.
 
 Read this file before choosing any engine route.
 Write to it in the turn the measurement is made.
