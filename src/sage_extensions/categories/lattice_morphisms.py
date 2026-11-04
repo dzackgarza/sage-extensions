@@ -1415,6 +1415,14 @@ class LatticeIsometryMethods:
                 return None
             inverse_matrix = coordinates.inverse()
             source_generators = tuple(source.module_generators())
+            # ``coordinates`` carries the images in its *rows* (row ``i`` is the
+            # image of the ``i``-th source generator, a row vector acting on the
+            # right), so the backward map's images are the rows of the inverse:
+            # ``g(e_j) = sum_i inverse[j][i] e_i``.  Reading its columns instead
+            # builds ``(F^-1)^T``, which is the inverse only when ``F`` is
+            # symmetric — true of ``-id`` and of a root reflection, and false of
+            # the Enriques stabilizer generators, where it produced an isometry
+            # whose stored inverse is not its inverse.
             backward = source.module_category().Mor(target, source)(
                 tuple(
                     sum(
@@ -1424,12 +1432,12 @@ class LatticeIsometryMethods:
                                 generator,
                             )
                             for coefficient, generator in zip(
-                                column, source_generators, strict=True
+                                row, source_generators, strict=True
                             )
                         ),
                         source.zero(),
                     )
-                    for column in inverse_matrix.columns()
+                    for row in inverse_matrix.rows()
                 )
             )
         else:
