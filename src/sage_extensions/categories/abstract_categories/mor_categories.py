@@ -1697,6 +1697,27 @@ class FixedIsoCategory(FixedRestrictedMorCategory):
             self.domain_object(), self.codomain_object()
         )
 
+    def cardinality(self):
+        r"""``|Iso_C(A,B)|``: the core's arrows between these two objects.
+
+        ``accepts`` above defines an arrow of ``Iso_C(A,B)`` as one of
+        ``Core(C)(A,B)``, so the two classify the same arrows and the count is
+        that core Mor's, not a second rule.  The core decides the finite-set
+        case (``m!`` when ``|A| = |B| = m``, ``0`` otherwise) and the
+        vertex-group case, and states no count elsewhere — where this raises
+        the set owner's assertion instead of inventing a number.  The infinite
+        case, ``|A|^|A|``, is one such place: it is not decided here.
+
+        ``Iso_C(A,B)`` is only a group on the diagonal ``Aut_C(A)``, so the
+        group-order name is that object's, not this one's.
+        """
+        return (
+            self.base_category()
+            .Core()
+            .Mor(self.domain_object(), self.codomain_object())
+            .cardinality()
+        )
+
     def super_categories(self):
         packet = _category_packet(self.base_category())
         domain = self.domain_object()
