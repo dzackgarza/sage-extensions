@@ -1575,6 +1575,17 @@ class Modules(OwnedCategoryOverBaseRing):
                 case _:
                     return self.parent().scalar_multiple(scalar, self)
 
+        def __truediv__(self, scalar):
+            r"""Return ``r^{-1} v``: division by a unit of the scalar ring.
+
+            ``v / r`` is the scalar action of the inverse of ``r`` in the
+            module's scalar ring, so an integer divides a vector of a
+            ``QQ``-module through its image in ``QQ``.  A scalar that is not a
+            unit there is refused by the ring's own unit division.
+            """
+            ring = self.parent().base_ring()
+            return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
+
     class ParentMethods:
         # The ring acting on this module: the datum this level introduces.
         _preamble_base_ring = None
