@@ -24,7 +24,7 @@ Use [COMPLEXITY.md](https://github.com/dzackgarza/research/blob/main/COMPLEXITY.
 The [TODO workstream table](https://github.com/dzackgarza/research/blob/main/TODO.md#workstreams) records the DAG task scores and their reasons.
 Apply the guide to the responsibility actually assigned, including any shared contract design or orchestration it requires.
 
-Read the megadoc's usage guide and the affected entries as routed by the [reading index](https://github.com/dzackgarza/research/blob/main/docs/edit-reading-index.md#generated-reference-lookup) before writing code. Reading `src/dzack_research/utilities/megadoc.py`, the generator script, does **not** satisfy this requirement. When execution is authorized, regenerate a stale megadoc with `just preamble-megadoc` and read the affected entries. While `DEV-58` suspends execution, use the existing megadoc as an index, inspect live source for the affected owners, and retain regeneration under terminal T. The prerequisite never overrides the execution phase.
+Read the megadoc's usage guide and the affected entries as routed by the [reading index](https://github.com/dzackgarza/research/blob/main/docs/edit-reading-index.md#generated-reference-lookup) before writing code. Reading `src/dzack_research/utilities/megadoc.py`, the generator script, does **not** satisfy this requirement. Regenerate a stale megadoc with `just preamble-megadoc` and read the affected entries.
 
 `just preamble-megadoc` surveys a live session, so it also writes `docs/preamble-graph.json` — every category with its supercategories, subcategories, ancestry and the operations it introduces, plus every functor's domain and codomain — and `docs/preamble-graph.dot` with the rendered `docs/preamble-graph.html`. Query the JSON with `jq` for the questions the prose cannot index, such as which category owns a given operation.
 
@@ -87,7 +87,7 @@ Neither correct numerical output nor private naming excuses a different path.
   convenient substitute; source review establishes architectural reuse. Both are
   engineering review and certify nothing about correctness, which only the
   `lean-cas-dsl` acceptance suite judges.
-  Follow `DEV-58` for the execution phase, not a new local checking workflow.
+  Run the delivered construction before its issue closes (research `DEV-58`).
 
 The architecture specification also owns the required construction factorizations
 and upstream discovery references. Update that contract when the user decides an

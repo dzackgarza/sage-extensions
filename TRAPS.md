@@ -540,7 +540,7 @@ The definite fixed-square enumerator now uses Hecke 0.39.22
 `forqfvec`. The maintained route uses rational pseudo-Cholesky enumeration
 and transports vectors back from the Gram LLL basis; the adapter restores
 both signs. This is a source repair, with the scaled A2 and empty-shell
-runtime specimens still pending under DEV-58. It does not change the
+runtime specimens not yet run. It does not change the
 unbounded root-generation semi-decision described above.
 
 ### Two distinct symbolic variables take about 0.3 ms to compare, so a lattice basis label comparison is a symbolic decision

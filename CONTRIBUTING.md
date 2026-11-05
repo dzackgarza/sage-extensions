@@ -1054,7 +1054,7 @@ Distinguishing specimens include a diagram with parallel arrows, both an empty
 limit and empty colimit, a directed index with incomparable elements, an inverse
 system with non-surjective transitions, and a direct system with non-injective
 transitions. Select specimens for the contract being delivered, preserve broader
-unfinished cases in TODO, and follow terminal T for execution (`DEV-58`). Record
+unfinished cases in TODO, and run them (`DEV-58`). Record
 observed missing foundations in the native issue tree, with the `lean-categories` request
 for missing mathematics, not invented failures inferred merely from the breadth
 of this specification.
@@ -1121,8 +1121,8 @@ of this specification.
   Establish architectural reuse by reading the implementation and upstream
   contract. Research's specimens exercise observable behavior; do not turn
   them into source scanners or mock expectations that a particular helper was
-  called. Respect the protected expectation subtrees and `DEV-58`: written
-  specimens remain unverified until the authorized execution phase. A policy
+  called. Respect the protected expectation subtrees and run the specimens
+  (`DEV-58`). A policy
   edit specifies the architecture; it does not establish code conformance.
 - **Rationale:** Numerical agreement alone rewards a shortcut that leaves the
   construction and its future consumers structurally wrong.
