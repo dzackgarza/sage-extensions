@@ -288,12 +288,15 @@ class TorsionFormIsometryMor(CoreMor):
 def _torsion_form_isometry(forward, inverse, *, quadratic: bool, check: bool = False):
     r"""Return the form isometry represented by mutually inverse module maps.
 
-    The element is built in the typed isometry family
-    (:class:`TorsionFormIsometryMor`), whose element class is
-    :class:`TorsionFormIsometry` and carries the form-preservation and
-    inverse-pair validators.  Building it in a generic Core family would return
-    an arrow that is an isomorphism of the underlying modules only, with the
-    validators never in play; ``check=True`` runs them here.
+    The element is built through the Iso family of the torsion-form category,
+    whose two constructors state one contract
+    ``(forward, inverse=None, *, check=False)``: between two forms that is
+    :class:`TorsionFormIsometryMor`, and on the diagonal it is
+    :class:`TorsionFormOrthogonalGroup`, which crosses the pair through the
+    core and normalizes it into the group.  Either answer is the typed element
+    carrying the form-preservation and inverse-pair validators, and
+    ``check=True`` runs them.  There is no second construction path: an
+    automorphism is a group element, not a bare core arrow.
     """
     from sage_extensions.categories.modules.framed.formed.form_modules import (
         FormedModuleMorphism,
@@ -313,17 +316,7 @@ def _torsion_form_isometry(forward, inverse, *, quadratic: bool, check: bool = F
     # finite presentation.
     formed_forward = category.Mor(source, target)((forward_component, value_identity))
     formed_inverse = category.Mor(target, source)((inverse_component, value_identity))
-    family = category.Iso(source, target)
-    if isinstance(family, TorsionFormIsometryMor):
-        return family(formed_forward, formed_inverse, check=check)
-    # An automorphism lands in the orthogonal group, whose element constructor
-    # reads an engine datum rather than a forward/inverse pair (callers that have
-    # one reach it through ``_from_engine`` or ``from_morphism``).  The pair is
-    # kept as the Core arrow it was, so those callers keep their route.
-    return category.Core().Mor(source, target)._from_known_inverse_pair(
-        formed_forward,
-        formed_inverse,
-    )
+    return category.Iso(source, target)(formed_forward, formed_inverse, check=check)
 
 
 def _representative_gram(form, *, quadratic: bool):
@@ -2067,12 +2060,27 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
         r"""Return the group homomorphism from the form Core to this finite realization."""
         return self._normalization_homomorphism()
 
-    def from_morphism(self, morphism):
-        r"""Apply the normalization homomorphism to an automorphism of the formed-module core."""
-        homomorphism = self._normalization_homomorphism()
-        if not homomorphism.domain().accepts(morphism):
-            raise TypeError(f"{morphism} must be an isometry of the formed-module core before normalization")
-        return homomorphism(morphism)
+    def from_morphism(self, morphism, *, check: bool = False):
+        r"""Apply the normalization homomorphism to an automorphism of the formed-module core.
+
+        An element already in this group *is* the normalization image of itself,
+        so it is returned unchanged rather than re-entered through the core: the
+        pair constructors below produce such elements directly, and a caller
+        that has one must not have to know which of the two routes built it.
+        ``check=True`` runs the element's own validators, which is where
+        checking belongs (``OWN-22``): after the object exists, once.
+        """
+        if isinstance(morphism, TorsionFormAutomorphism) and morphism.parent() is self:
+            element = morphism
+        else:
+            homomorphism = self._normalization_homomorphism()
+            if not homomorphism.domain().accepts(morphism):
+                raise TypeError(f"{morphism} must be an isometry of the formed-module core before normalization")
+            element = homomorphism(morphism)
+        if check:
+            element.validate_inverse(check=True)
+            element.validate_form_preservation(check=True)
+        return element
 
     def _normalized_form_automorphism(self, morphism):
         r"""Compute the normalization homomorphism on one admitted form isometry."""
@@ -2124,8 +2132,24 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
             )
         return self._from_engine(engine_automorphism)
 
-    def _element_constructor_(self, datum):
+    def _element_constructor_(self, datum, inverse=None, *, check: bool = False):
+        r"""An automorphism, from an engine datum or from a mutually inverse pair.
 
+        This is one contract with :meth:`TorsionFormIsometryMor._element_constructor_`:
+        ``(forward, inverse=None, *, check=False)``, where a pair of base
+        module morphisms names the automorphism by its action and a single
+        engine datum names it by the normalized matrix.  A pair is crossed by
+        the core's own isomorphism constructor and then normalized by
+        :meth:`from_morphism`, which is the one place that turns a core
+        isometry into a group element; ``check`` reaches the same validators
+        either way.
+        """
+        if inverse is None and isinstance(datum, tuple) and len(datum) == 2:
+            datum, inverse = datum
+        if inverse is not None:
+            category = _torsion_form_modules(self.domain().base_ring(), quadratic=self.is_quadratic())
+            core = category.Core().Mor(self.domain(), self.domain())
+            return self.from_morphism(core._from_known_inverse_pair(datum, inverse), check=check)
         if isinstance(datum, TorsionFormAutomorphism):
             if datum.domain() is not self.domain():
                 raise ValueError(
