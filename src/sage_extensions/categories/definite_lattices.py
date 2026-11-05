@@ -1149,9 +1149,19 @@ def _theta_series(lattice, precision=20, variable="q"):
     backend_series = quadratic_form.theta_series(
         int(precision), var_str=variable
     )
-    series_ring = lattice.base_ring().power_series_ring(variable)
+    series_ring = lattice.base_ring().power_series_ring(
+        variable, default_prec=int(precision)
+    )
     engine = _engine_ring(series_ring)
     return _owned_engine_element(series_ring, engine(backend_series))
+
+
+def _covolume(lattice):
+    from sage.symbolic.ring import SR
+
+    _definite_sign(lattice)
+    determinant = _engine_element(lattice.base_ring(), abs(lattice.determinant()))
+    return _owned_real_from_engine_expression(SR(determinant).sqrt())
 
 
 def _hermite_invariant(lattice):

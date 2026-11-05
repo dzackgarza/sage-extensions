@@ -86,6 +86,7 @@ from sage_extensions.categories.definite_lattices import (
     _closest_vector,
     _contact_polytope,
     _covering_radius,
+    _covolume,
     _exact_cvp_engine,
     _first_unrepresented_value,
     _gaussian_heuristic,
@@ -7633,7 +7634,24 @@ class Lattices(OwnedCategoryOverBaseRing):
             return _shortest_vectors(self)
 
         def theta_series(self, precision=20, variable="q"):
+            r"""Return ``sum_x q^{b(x, x)}`` modulo ``q^precision``, for a definite lattice.
+
+            The exponent is ``b(x, x)`` of the positive-definite form (the
+            negated form for a negative-definite lattice).  The coefficients
+            are exact integers counted by ``QuadraticForm.theta_series``, and
+            the result has absolute precision ``precision``.  For an even
+            lattice the coefficient of ``q^{2m}`` is the coefficient of
+            ``q^m`` in Serre's ``sum_x q^{(x.x)/2}`` (*A Course in
+            Arithmetic*, VII.6.1).
+            """
             return _theta_series(self, precision=precision, variable=variable)
+
+        def covolume(self):
+            r"""Return ``sqrt(|det G|)``, the exact volume of a fundamental domain of a definite lattice.
+
+            Conway--Sloane, *Sphere Packings, Lattices and Groups*, 1.2.4.
+            """
+            return _covolume(self)
 
         def theta_series_cuspidal_component(self, precision=20, variable="q"):
             r"""Return ``theta_L - theta_gen(L)``, the cuspidal component of the theta series of this definite integral lattice.

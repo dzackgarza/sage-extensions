@@ -13,19 +13,14 @@ Groups*, 4.6.1 (\(A_2\): \(1 + 6q + 6q^3 + 6q^4 + 12q^7 + \dots\)) and 1.2.4
 from sage_extensions.all import *
 
 
-def _sigma_3(m):
-    return sum(d**3 for d in range(1, m + 1) if m % d == 0)
-
-
 def test_e8_theta_series_is_the_weight_four_eisenstein_series_modulo_q_11() -> None:
+    r"""\(240\sigma_3(m)\) for \(m = 1, \dots, 5\) is 240, 2160, 6720, 17520, 30240."""
     lattice = Lattices(ZZ)("E8").twist(-1)
     theta = lattice.theta_series(11)
 
     assert theta.precision_absolute() == 11
-    assert theta[0] == 1
-    for m in range(1, 6):
-        assert theta[2 * m] == 240 * _sigma_3(m)
-        assert theta[2 * m - 1] == 0
+    assert [theta[2 * m] for m in range(6)] == [1, 240, 2160, 6720, 17520, 30240]
+    assert [theta[2 * m + 1] for m in range(5)] == [0, 0, 0, 0, 0]
 
 
 def test_a2_theta_series_counts_the_norms_of_the_eisenstein_integers() -> None:
