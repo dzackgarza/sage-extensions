@@ -5434,6 +5434,14 @@ def _owned_ring_element_text(element) -> str:
             f"p-adic element with residue {int(residue)}, "
             f"valuation {valuation}, precision {precision}"
         )
+    from sage_extensions.categories.algebras.algebras import (
+        AlgebrasWithChosenFinitePresentation,
+    )
+
+    if parent in AlgebrasWithChosenFinitePresentation(parent.base_ring()):
+        # OWN-21: the class of the lift to the presentation ring the
+        # construction names, never the engine's quotient notation.
+        return f"[{parent.lift_to_presentation(element)}]"
     if isinstance(engine, QuotientRing_generic) and isinstance(
         engine.cover_ring(), (PolynomialRing_generic, MPolynomialRing_base)
     ):
