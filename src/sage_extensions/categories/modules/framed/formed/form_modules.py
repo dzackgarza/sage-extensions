@@ -417,12 +417,12 @@ class FormedModuleMorphism:
         if value_morphism.domain() is not source_values:
             raise ValueError(
                 f"the value map {value_morphism} must start at the value module {source_values} of "
-                f"{self.domain()}, but starts at {value_morphism.domain()}"
+                f"{domain}, but starts at {value_morphism.domain()}"
             )
         if value_morphism.codomain() is not target_values:
             raise ValueError(
                 f"the value map {value_morphism} must end at the value module {target_values} of "
-                f"{self.codomain()}, but ends at {value_morphism.codomain()}"
+                f"{codomain}, but ends at {value_morphism.codomain()}"
             )
         self._form_module_morphism = module_morphism
         self._value_morphism = value_morphism
@@ -4143,14 +4143,15 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                 )
 
                 ring = self.base_ring()
-                if self in Lattices(ring) and _engine_ring(ring) is SageZZ:
-                    # An integral lattice quotients by its radical at the lattice
-                    # owner: ``I^perp/I`` is again a lattice over the same ring,
-                    # with the isotropic reduction's inclusion, orthogonal
-                    # complement, ``quotient_lattice`` and parabolic data.  The
+                if self in Lattices(ring):
+                    # A lattice quotients by its radical at the lattice owner:
+                    # ``I^perp/I`` is again a lattice over the same ring, with
+                    # the isotropic reduction's inclusion, orthogonal
+                    # complement, ``quotient_lattice`` and parabolic data.  This
+                    # holds over a field as over ``ZZ``: the quotient keeps rank
+                    # ``rank(L) - rank(rad L)`` and the descended form.  The
                     # generic descent below is for formed modules that are not
-                    # lattices; over a field it re-presents the quotient on a
-                    # basis, which is the field's intended behaviour.
+                    # lattices.
                     # The public ingress, in the lattice owner's own words:
                     # ``IsotropicReductions(R)(L.radical().inclusion())``.
                     return IsotropicReductions(ring)(
@@ -4237,7 +4238,7 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                             )
                         )
                     )
-                values = self.value_module()
+                values = _represented_value_module(self)
                 value_identity = values.module_category().Mor(values, values).identity()
                 return FormModules(self.base_ring()).Mor(self, quotient)(
                     (projection, value_identity)
