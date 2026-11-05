@@ -10,7 +10,7 @@ permissions:
 jobs:
   readme:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     container:
       image: ghcr.io/dzackgarza/sage:develop
       credentials:
