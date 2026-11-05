@@ -1,0 +1,25 @@
+[wall=     0.0s cpu=     0.0s] imports
+[wall=     1.6s cpu=     1.1s] case_3: order 92897280, L/P/F 5/10/19
+[wall=    22.6s cpu=    21.3s] polarization transported
+[se-stage] _marked_automorphism_generators start t=356246.3
+[se-stage] _marked_automorphism_generators done in 115.3s: 24 gens
+[wall=   206.3s cpu=   124.5s] coinvariant_extension_subgroup()
+[wall=   206.3s cpu=   124.5s] G_h built; N = Integral lattice of rank 12 and signature (2, 10)
+---- the acceptance obligation: the generating family of G_h, and T1..T4 ----
+[wall=   818.1s cpu=   726.0s] BUDGET: group_generators() exceeded 600 CPU seconds
+FAMILY_OVER_BUDGET
+[peakrss] enriques-family-cpu: child waited=3 shell_code=3 samples=414
+[peakrss] peak tree RSS      : 3709 MiB
+[peakrss] low-water MemAvail : 1125 MiB
+[peakrss] peak single VmHWM  : 3904 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2892 MiB peak
+[peakrss]   python                     1006 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   813.5s procs=  4 rss=  3709 MiB hwm=  3901 MiB avail=  3388 MiB
+[peakrss]   t=   815.5s procs=  4 rss=  3709 MiB hwm=  3901 MiB avail=  3393 MiB
+[peakrss]   t=   797.4s procs=  4 rss=  3708 MiB hwm=  3900 MiB avail=  3411 MiB
+[peakrss]   t=   807.5s procs=  4 rss=  3708 MiB hwm=  3901 MiB avail=  3401 MiB
+[peakrss]   t=   809.5s procs=  4 rss=  3708 MiB hwm=  3901 MiB avail=  3391 MiB
+launcher exit: 3

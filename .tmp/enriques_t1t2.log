@@ -1,0 +1,24 @@
+[se-stage] _marked_automorphism_generators start t=357214.7
+[se-stage] _marked_automorphism_generators done in 121.4s: 24 gens
+[wall=   192.2s cpu=   113.5s] N = Integral lattice of rank 12 and signature (2, 10)
+[T1] N.discriminant_group(): wall 0.00s cpu 0.00s -> Finitely presented module on 12 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]
+[T2] T1.orthogonal_group(): wall 0.00s cpu 0.00s
+[T2.order] T2.cardinality(): wall 0.00s cpu 0.00s -> 46998591897600
+[T2.order] equals |O(A_N)| = 46998591897600: True
+[wall=   192.2s cpu=   113.5s] T1/T2 published
+T1T2_MEASURED
+[peakrss] enriques-t1t2: child waited=0 shell_code=0 samples=99
+[peakrss] peak tree RSS      : 3308 MiB
+[peakrss] low-water MemAvail : 3809 MiB
+[peakrss] peak single VmHWM  : 3398 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2923 MiB peak
+[peakrss]   python                      473 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   166.1s procs=  4 rss=  3308 MiB hwm=  3356 MiB avail=  3809 MiB
+[peakrss]   t=   188.1s procs=  4 rss=  3222 MiB hwm=  3398 MiB avail=  3914 MiB
+[peakrss]   t=   160.1s procs=  4 rss=  3209 MiB hwm=  3263 MiB avail=  3938 MiB
+[peakrss]   t=   164.1s procs=  4 rss=  3208 MiB hwm=  3263 MiB avail=  3925 MiB
+[peakrss]   t=   168.1s procs=  4 rss=  3172 MiB hwm=  3369 MiB avail=  3941 MiB
+launcher exit: 0
