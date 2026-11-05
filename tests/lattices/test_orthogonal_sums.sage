@@ -22,3 +22,11 @@ def test_a_definite_power_keeps_its_definiteness_and_squares_its_discriminant() 
     assert (root_lattice ** 2).signature_pair() == signature_pair(0, 4)
     assert (root_lattice ** 2).determinant() == 9
     assert (root_lattice ** 2).is_negative_definite()
+
+
+def test_two_hyperbolic_planes_plus_a_negative_root_lattice_has_signature_two_four() -> None:
+    lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)("A2")
+
+    assert lattice.module_rank() == 6
+    assert lattice.signature_pair() == signature_pair(2, 4)
+    assert lattice.determinant() == 3
