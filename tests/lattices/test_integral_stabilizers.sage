@@ -61,3 +61,32 @@ def test_the_swap_stabilizes_the_standard_lattice_but_not_a_commensurable_one() 
 
     assert swap in IntegralStructureAction(group, standard.inclusion()).stabilizer()
     assert swap not in IntegralStructureAction(group, finer.inclusion()).stabilizer()
+
+
+def test_a_completed_orbit_span_gives_the_least_module_and_lattice_cosets() -> None:
+    r"""Swapping e0 with 2e1 gives M = (1/2)ZZ e0 + ZZ e1, with [M:L]=2."""
+    from sage_extensions.categories.modules.orbit_spans import OrbitSpanConstructions
+
+    plane, space, basis, orthogonal_group = _rational_hyperbolic_plane()
+    e0, e1 = basis
+    half = QQ(1) / QQ(2)
+    involution = orthogonal_group(
+        lambda label: 2 * e1 if int(label) == 0 else half * e0
+    )
+    group = orthogonal_group.subgroup((involution,))
+    selected = space.subobject_on((space(e0), space(e1))).inclusion()
+    bound = space.subobject_on((space(half * e0), space(half * e1))).inclusion()
+    action = IntegralStructureAction(group, selected)
+    construction = OrbitSpanConstructions(ZZ)(
+        action.ambient_action_functor(), selected, containing=bound,
+    )
+    retained = action.with_invariant_module_construction(construction)
+    invariant = retained.invariant_module()
+    assert invariant.is_in_image(space(half * e0))
+    assert invariant.is_in_image(space(e1))
+    assert not invariant.is_in_image(space(half * e1))
+    assert retained.quotient_exponent() == 2
+    assert len(tuple(retained.right_cosets())) == 2
+    stabilizer = retained.finite_representation().lattice_stabilizer()
+    assert group.one() in stabilizer
+    assert involution not in stabilizer
