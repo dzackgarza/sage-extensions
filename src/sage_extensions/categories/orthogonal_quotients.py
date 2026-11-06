@@ -1,4 +1,6 @@
 r"""Finite character quotients controlling arithmetic-subgroup orbit splitting."""
+from functools import cached_property
+
 from sage.libs.gap.libgap import libgap
 from sage.misc.cachefunc import cached_method
 from sage.structure.element import parent as element_parent
@@ -89,7 +91,15 @@ class OrthogonalCharacterQuotient:
                 name="Orthogonal character quotient factors",
             )
         )
-        self._witnesses = self._enumerate_image()
+
+    @cached_property
+    def _witnesses(self):
+        r"""Compute the full character image only for operations consuming it.
+
+        Transporter adjustment uses the target stabilizer image and the
+        subgroup predicate; it needs no generators of the full O(L).
+        """
+        return self._enumerate_image()
 
     def image_space(self):
         r"""Return the owned product in which all character images live."""
@@ -341,12 +351,11 @@ class OrthogonalCharacterQuotient:
         """
         if witness in self.subgroup:
             return witness
-        subgroup_keys = self.subgroup_image_keys()
         for stabilizer_key, stabilizer_witness in self.stabilizer_image_witnesses(
             target_stabilizer_generators
         ).items():
             candidate_key = self._multiply(stabilizer_key, self.image(witness))
-            if candidate_key not in subgroup_keys:
+            if not self._allowed(candidate_key):
                 continue
             candidate = stabilizer_witness * witness
             if candidate not in self.subgroup:
