@@ -3153,3 +3153,19 @@ The raised object is ours: `_vector_denominator` builds `Modules(QQ).Mor(line.ba
 ```
 **Every one of the top ten is 0.0 MiB.** Over the same 90 s the process's RSS grew at the rate item 1 measured (27–55 MiB/s). So the retention is not Python objects at all: it is allocation made below `tracemalloc`'s hook — Sage's Cython matrices and FLINT/GMP payloads, whose Python wrappers are a handful of blocks and whose bulk is invisible. Two things follow. First, "a cache keyed on vectors" or "transversals materialized as Python lists" is **ruled out** by this measurement, so the fix is not a Python-side cache eviction. Second, `tracemalloc` is the wrong instrument for the next step: it needs a C-level heap profile (heaptrack or an allocator hook), and this sandbox has neither installed.
 *Where the growth is being made:* the only Python frame running during those 90 s is the port's `recursive.py:1771` loop over `pointed_isometry` calls, each entering `recursive.py:1720 → isotropic_lifts.integral_members → _integral_lift_locus → integral_parameter_quotient`, which builds tensors and matrices of the ambient lattice on every candidate. So the candidate sites are the port's per-candidate loop and our `isotropic_lifts`/`tensor` C-level constructions inside it — named, not yet attributed to one of the two by measurement.
+
+**#286 item 3: no lattice under rank 10 reaches `_vector_denominator`, so the repair has no affordable regression test (2026-11-06).** The instruction was to find the smallest lattice on which the old line raised. With the **old** line restored locally (`.scratch/isotropic_lifts.fixed.py` holds the repair, restored afterwards), `isotropic_orbit_representatives(1)` returns normally and in about a second on every small lattice tried:
+```
+U(2) + A1   rank 3   1 orbit in 0.71 s   primitive and isotropic True
+U + <2>     rank 3   1 orbit in 0.16 s   True
+U           rank 2   1 orbit in 0.04 s   True
+U + U       rank 4   1 orbit in 0.13 s   True
+```
+so none of them raises, which means none of them reaches the line at all. Instrumenting `_vector_denominator` with a call counter and running further:
+```
+U + A1        rank  3   1 orbit in  1.7 s   _vector_denominator calls: 0
+U + U + <2>   rank  5   1 orbit in 53.3 s   calls: 0
+U + U + U     rank  6   1 orbit in  0.1 s   calls: 0
+E8(-2) + U    rank 10   2 orbits in 40.5 s  calls: 0
+```
+**The only call observed to reach the line is `NamedLattices.Tco.Aut().isotropic_orbit_representatives(1)`**, and its cost is the one item 1 measured: 320–375 s for `group_generators()` (438, 444, 372, 360, 442, 353 generators on six runs) plus at least 130 s of a search that does not terminate under any cap tried. So the repair cannot be given a regression test on a lattice that finishes: the smallest lattice that exercises the line is the one that cannot be run to completion, which is why no test was written for it rather than a test that would have to be skipped or weakened. The trigger is not rank but structure — 2-elementary with a large isometry group, where the port's pointed-isometry test reaches the *reversing* lift fibre and asks for its integral members, which is the only caller of `_vector_denominator`.
