@@ -2995,6 +2995,32 @@ class Lattices(OwnedCategoryOverBaseRing):
             r"""Return the base-ring lattice category owning this object."""
             return Lattices(self.base_ring())
 
+        def __reduce__(self):
+            r"""Persist this lattice by the data its construction is keyed by.
+
+            A lattice is its module together with its form, and
+            :func:`_lattice_on_gram` is the one cached constructor for that pair,
+            keyed by the category, the module (by identity) and the Gram (by
+            value).  Naming it directly recurses, because the arguments it needs
+            are lattice-owned and pickling them re-enters this method; so this
+            persists the Gram's *components* -- plain owned ring elements read
+            through :meth:`Tensor.entries` -- and rebuilds through the public
+            constructor, which builds the same interned module and an equal Gram
+            and therefore reaches the same cached lattice (issue #20).
+            """
+            from sage_extensions.categories._lattice import _rebuild_lattice
+
+            shape = self.gram_tensor().tensor_shape()
+            return (
+                _rebuild_lattice,
+                (
+                    self.base_ring(),
+                    int(shape[0]),
+                    tuple(self.gram_tensor().entries()),
+                    vars(self).get("_names"),
+                ),
+            )
+
         def subobject_on(self, module_generating_set):
             r"""Return the span with the restricted lattice form."""
 

@@ -1887,6 +1887,18 @@ class _CoordinateTensor(ModuleElement, Tensor):
         self._entries = entries
         ModuleElement.__init__(self, parent)
 
+    def entries(self) -> tuple:
+        r"""The components in row-major order, as owned ring elements.
+
+        This is the tensor's stored datum, returned as data rather than as another
+        tensor: a caller that has to persist or rebuild the tensor reads the
+        components here and hands the same tuple back to the tensor module's
+        element constructor (issue #20).  Nothing is recomputed and no coordinate
+        convention is introduced at this boundary -- the array order is the one
+        ``_CoordinateTensor`` was constructed with.
+        """
+        return self._entries
+
     def __call__(self, *args):
         r"""Feed vectors into the covariant slots, from left to right.
 

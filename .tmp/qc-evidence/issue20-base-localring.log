@@ -1,0 +1,41 @@
+### pytest tests/modules/test_direct_local_exact_maps.sage at 2026-11-06T13:03:10Z
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_the_cokernel_of_x_on_the_local_ring_at_the_origin_is_the_residue_field __
+sage/categories/category_singleton.pyx:74: in sage.categories.category_singleton.Category_contains_method_by_parent_class.__call__
+    y = x
+E   TypeError: Cannot convert DynamicMetaclass to sage.structure.category_object.CategoryObject
+
+During handling of the above exception, another exception occurred:
+tests/modules/test_direct_local_exact_maps.sage:14: in test_the_cokernel_of_x_on_the_local_ring_at_the_origin_is_the_residue_field
+    A = R.localization_at_prime(R.ideal(x))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:3016: in localize_at_prime
+    localization_ring = ring.spectrum()(prime).local_ring()
+                        ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:535: in __call__
+    return self._element_constructor_(ideal)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:590: in _element_constructor_
+    candidate = _owned_ideal(self.ring(), ideal)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:765: in _owned_ideal
+    backend = _engine_ideal(source, ideal)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/commutative_algebra.py:748: in _engine_ideal
+    return engine.ideal(_engine_ring_value(ring, ideal))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:622: in _engine_ring_value
+    if value_parent is engine or value_parent in SageRings():
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/categories/category_singleton.pyx:80: in sage.categories.category_singleton.Category_contains_method_by_parent_class.__call__
+    ???
+E   TypeError: category() needs an argument
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:720 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+FAILED tests/modules/test_direct_local_exact_maps.sage::test_the_cokernel_of_x_on_the_local_ring_at_the_origin_is_the_residue_field
+1 failed in 2.32s
+### exit=1
+2026-11-06T13:03:13Z

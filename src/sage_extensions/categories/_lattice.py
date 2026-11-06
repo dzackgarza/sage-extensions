@@ -385,6 +385,32 @@ def _gram_axiom_categories(lattices, gram):
     return () if placement is lattices else (placement,)
 
 
+def _rebuild_lattice(ring, rank, entries, names):
+    r"""Rebuild a lattice from its Gram components, through its own constructor.
+
+    ``entries`` are the Gram tensor's components in row-major order, read through
+    the tensor's own accessor.  They are plain owned ring elements, so they
+    persist; the arguments that a direct :func:`_lattice_on_gram` call would need
+    -- the module and the Gram tensor itself -- are lattice-owned and cannot be
+    pickled without re-entering the lattice (issue #20).  Rebuilding through
+    ``Lattices(ring)(rows)`` builds the same interned module and an equal Gram,
+    so the construction cache returns the lattice that was persisted.
+    """
+
+    from sage_extensions.categories.lattices import Lattices
+
+    rows = [
+        [entries[position * rank + offset] for offset in range(rank)]
+        for position in range(rank)
+    ]
+    lattice = Lattices(ring)(rows)
+    if names is not None and tuple(lattice.module_generating_set()) != tuple(names):
+        raise ValueError(
+            f"a lattice persisted with names {names} rebuilt under {tuple(lattice.module_generating_set())}"
+        )
+    return lattice
+
+
 class _DeferredFormOfGram:
     r"""The bilinear form of a Gram tensor, computed when a lattice first asks for it.
 

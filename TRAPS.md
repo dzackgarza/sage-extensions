@@ -2988,3 +2988,14 @@ base 63be56c  : 182 failed, 385 passed in 463.40 s    (.tmp/qc-evidence/sweep-cl
 FAILED ids    : 182 vs 182, 0 new, 0 fixed
 ```
 So the reverts left no residue: what is published is the eight closure removals plus `_OwnedRingParent.__reduce__`, and the suites read exactly as they did before that work. This is the check that matters after a session with three reverts, because a revert that restores the wrong thing is invisible in a focused test and loud here.
+
+**Issue #20: three of five specimens round trip with the *same* parent — the lattice persists through its Gram's components (2026-11-06).** The working shape for a lattice: `__reduce__` returns the Gram tensor's **components** (read through a new `Tensor.entries()` accessor at the tensor owner), and `_rebuild_lattice` reshapes them into rows and calls the public `Lattices(ring)(rows)`. That rebuilds the same interned module and a Gram the construction cache compares by *value*, so `_lattice_on_gram` returns the lattice that was persisted. Naming `_lattice_on_gram` directly cannot work — its arguments are lattice-owned and pickling them re-enters the reduction (the earlier `RecursionError`); the components are plain owned ring elements, so they persist.
+```
+-- ZZ element:               equal True | same parent True | bytes 825
+-- QQ element:               RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+-- lattice element:          equal True | same parent True | bytes 2108
+-- named lattice U element:  equal True | same parent True | bytes 2070
+-- coble torsion form element: RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+```
+*Regression:* 9 passed, 1 failed in 4.18 s over `tests/lattices/test_integral_stabilizers.sage`, `test_schreier_factors_rebuild_the_stabilizer_family.sage`, `test_orthogonal_sums.sage`, `tests/sets/test_isomorphisms_between_finite_sets_are_counted.sage` and `tests/modules/test_direct_local_exact_maps.sage`; the single failure (`test_the_cokernel_of_x_on_the_local_ring_at_the_origin_is_the_residue_field`, `TypeError: category() needs an argument`) fails identically in a worktree at `63be56c`, so it is pre-existing and not from this change.
+*Still open, one cause for both:* `QQ`'s parent and the Coble torsion form's module are `OwnedJoinCategory.parent_class` instances, which this reduction does not reach; they need the same treatment at that owner.
