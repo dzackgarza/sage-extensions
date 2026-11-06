@@ -2929,3 +2929,11 @@ So the lattice path no longer has a closure either: it now fails exactly where `
 2. **`__reduce__` returning `None`** — `QQ`. This is a memberwise state-free reduce on a parent whose construction Sage cannot express, which no amount of child state fixes.
 Both are what an explicit `__reduce__`/`__getstate__` for `_OwnedRingParent` has to answer: the class, the construction data that rebuilds it, and a `__setstate__` that installs the state the constructor would have. `tensors/tensor.py:2178` and `:2236` are the pattern already in this tree.
 *Separate defect surfaced by the same probe, not part of #20:* `QuadraticField(2,"a").maximal_order()` cannot be indexed by `field.gen()` — `'Owned_OwnedAlgebraParent_with_category' object has no attribute 'gen'` — so the number-field-order specimen cannot be built at all. Recorded here so it is not mistaken for a serialization result.
+
+**The eight closure removals are clear across three suites, base-diffed (2026-11-06).** Same command both sides (`.scratch/sweep.sh`, `pytest tests/forms tests/sets tests/modules -q -o addopts="" -p qc_sage_session --tb=no -rf`):
+```
+HEAD 9a72620        : 182 failed, 385 passed in 482.20 s     (.tmp/qc-evidence/sweep-closures-head.log)
+base 63be56c        : 182 failed, 385 passed in 463.40 s     (.tmp/qc-evidence/sweep-closures-base.log)
+FAILED ids: 182 vs 182, 0 new, 0 fixed
+```
+So the four `wip:` commits that turned eight retained closures into module-level callables changed no test outcome anywhere in the ring, module, form or set layers — which is the check those commits needed, since they touch `_OwnedRingParent.__init__`, the finite ordinal, the ordered-set default equivalence, `_RingModulePresentation` and the lattice's retained form datum.
