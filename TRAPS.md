@@ -2980,3 +2980,11 @@ That is the acceptance's own wording for this specimen: an equal element whose p
 -- coble torsion form element:  RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
 ```
 The reason is specific and not a wording problem: the arguments the recipe needs — the module's *labels* from `module_generating_set()` and the Gram tensor's elements — are owned by the lattice itself, so pickling them re-enters the lattice's `__reduce__` before it can be memoised, and the recursion never bottoms out. Stating this contract therefore needs a datum that does not point back at the lattice: the retained generating *labels* as an interned set, or a module accessor whose own persistence is independent. The change was reverted; the tree carries `ZZ`'s reduction (`0b19b7d`) and nothing unverified.
+
+**Current `main` after every reverted attempt, base-diffed again (2026-11-06).** Same command as the earlier pair, at `a81fc9b` — the tip after the closure removals, `ZZ`'s construction-based reduction, and the three attempts that were reverted:
+```
+HEAD a81fc9b  : 182 failed, 385 passed in 475.85 s    (.tmp/qc-evidence/sweep-main-a81fc9b.log)
+base 63be56c  : 182 failed, 385 passed in 463.40 s    (.tmp/qc-evidence/sweep-closures-base.log)
+FAILED ids    : 182 vs 182, 0 new, 0 fixed
+```
+So the reverts left no residue: what is published is the eight closure removals plus `_OwnedRingParent.__reduce__`, and the suites read exactly as they did before that work. This is the check that matters after a session with three reverts, because a revert that restores the wrong thing is invisible in a focused test and loud here.
