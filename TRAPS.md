@@ -2999,3 +2999,13 @@ So the reverts left no residue: what is published is the eight closure removals 
 ```
 *Regression:* 9 passed, 1 failed in 4.18 s over `tests/lattices/test_integral_stabilizers.sage`, `test_schreier_factors_rebuild_the_stabilizer_family.sage`, `test_orthogonal_sums.sage`, `tests/sets/test_isomorphisms_between_finite_sets_are_counted.sage` and `tests/modules/test_direct_local_exact_maps.sage`; the single failure (`test_the_cokernel_of_x_on_the_local_ring_at_the_origin_is_the_residue_field`, `TypeError: category() needs an argument`) fails identically in a worktree at `63be56c`, so it is pre-existing and not from this change.
 *Still open, one cause for both:* `QQ`'s parent and the Coble torsion form's module are `OwnedJoinCategory.parent_class` instances, which this reduction does not reach; they need the same treatment at that owner.
+
+**#275 follow-up, from the port's #70: the Schreier letters are not isometries of `L`, and the orbit lattices are now exposed (2026-11-06).** A letter `s` carries `L_p = t_p(L)` onto `L_(s.p)`, so converting it against `L` converts a map whose domain is the wrong lattice — which is why the port saw a `ValueError` on `letter[2]`/`transversal[1]` for the `U(4)+<-8>`/`Ze1` specimen. Fixes at the same owners: `FiniteGSets.orbit_lattices(point)` and, above it, `_FiniteIntegralRepresentation.stabilizer_schreier_orbit_lattices()` / `IntegralStructureAction.stabilizer_schreier_orbit_lattices()`, returning `L_p` for every orbit point in the transversals' own order.
+Measured on the provider-built `U` action (`.tmp/qc-evidence/issue275-orbit-lattices-probe.log`):
+```
+U line: |letters|=1 transversals=1 orbit_lattices=1
+U line: counts aligned: True
+U line: orbit lattices are the coset points, in order: True
+```
+So the accessor is aligned with `stabilizer_schreier_factors()` element for element, which is what a consumer needs to read a letter between lattices.
+*Not yet asserted in the suite:* the composite built from converted letters, through the accessor. My first attempt failed because `tuple(action.right_cosets())` yields coset-space points that `integral_restriction` does not accept as lattices (`AttributeError: … object has no attribute 'base_change'`), so the test must take `L_p` as *lattices* — from the G-set's own points rather than the coset space — and the composition order verified. That test was removed rather than left red; the accessor stays, and the suite reads `3 passed in 2.20 s`.

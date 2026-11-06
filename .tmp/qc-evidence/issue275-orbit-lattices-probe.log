@@ -1,0 +1,33 @@
+[     0.5s] U line: |letters|=1 transversals=1 orbit_lattices=1
+U line: counts aligned: True
+U line: orbit lattices are the coset points, in order: True
+Traceback (most recent call last):
+  File "/probe.py", line 61, in <module>
+    check(name, build)
+    ~~~~~^^^^^^^^^^^^^
+  File "/probe.py", line 31, in check
+    carries = all(
+              ^^^
+  File "/probe.py", line 32, in <genexpr>
+    section(point)(base.module_generator(l)) in orbit_lattices[i]
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1631, in __call__
+    return self.forward()(element)
+           ~~~~~~~~~~~~~~^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 809, in __call__
+    point = source(element)
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 330, in __call__
+    return self._element_constructor_(value)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 395, in _element_constructor_
+    raise TypeError(f"{value!r} does not describe an element of {self}")
+TypeError: [0] does not describe an element of Lattice of rank 2 and signature (1, 1)
+DONE
+[peakrss] issue275: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 13850 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       2 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13850 MiB
+launcher exit: 0
