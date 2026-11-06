@@ -1,0 +1,16 @@
+[     0.1s] summands rank 22 signature (3, 19) even True
+[    56.3s] A = Finitely presented module on 22 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, ...] (20 entries) cardinality 1048576
+[peakrss] issue275: child waited=124 shell_code=124 samples=600
+[peakrss] peak tree RSS      : 1683 MiB
+[peakrss] low-water MemAvail : 10957 MiB
+[peakrss] peak single VmHWM  : 1683 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1673 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   232.1s procs=  3 rss=  1683 MiB hwm=  1683 MiB avail= 12282 MiB
+[peakrss]   t=   422.2s procs=  3 rss=  1683 MiB hwm=  1683 MiB avail= 12200 MiB
+[peakrss]   t=   434.2s procs=  3 rss=  1683 MiB hwm=  1683 MiB avail= 11003 MiB
+[peakrss]   t=  1128.6s procs=  3 rss=  1683 MiB hwm=  1683 MiB avail= 12266 MiB
+[peakrss]   t=   856.4s procs=  3 rss=  1682 MiB hwm=  1683 MiB avail= 11978 MiB
+launcher exit: 124

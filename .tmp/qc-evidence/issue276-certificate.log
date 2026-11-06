@@ -1,0 +1,5 @@
+### pytest (repo configuration) -o addopts= -p sage_extensions.testing.test_lint tests/lattices/test_gluing_anti_isometry.sage tests/lattices/test_centralizer_gluing.sage at 2026-11-06T15:15:05Z
+...........                                                              [100%]
+11 passed in 100.21s (0:01:40)
+### exit=0
+2026-11-06T15:16:49Z

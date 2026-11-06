@@ -706,6 +706,91 @@ class LatticeEmbeddingMethods:
         )
         return discriminant.subobject_generated_by(classes)
 
+    @cached_method
+    def gluing_anti_isometry(self, left_summand):
+        r"""Return the anti-isometry ``A_S ⊇ H_S -> A_T(-1)`` this glue induces.
+
+        For the finite-index embedding ``j: M -> L`` with ``M = S ⊥ T``, the
+        glue ``L/M`` is the graph of an anti-isometry ``gamma: A_S -> A_T``
+        (Nikulin, *Integral symmetric bilinear forms and some of their
+        applications*, Prop. 1.5.1): ``L`` is integral, so its values satisfy
+        ``q_S(s) + q_T(t) = 0`` on the graph, respectively ``b_S(s_1, s_2) +
+        b_T(t_1, t_2) = 0`` when ``L`` is odd.  The codomain is therefore
+        ``A_T`` carrying the negated form, and the returned witness is an
+        ordinary isometry onto it.
+
+        ``left_summand`` is the subobject ``S``, either of ``M`` or already of
+        ``L``: ``T`` is its orthogonal complement in whichever of the two it
+        lies in, computed here.  The construction is
+        :meth:`Lattices.ParentMethods.glue_map` on the two summands' images in
+        ``L``: that owner already builds the graph from ``L``'s own generators
+        and states both parities, so this method states the embedding-level
+        identity and checks the scope, and duplicates no arithmetic.
+
+        What is checked here rather than assumed is that the two summands are
+        the whole of ``M``, which is what makes this glue *this* embedding's:
+        ``[L : M]`` must equal the order of the glue the summands induce, and
+        it must also be the order of :meth:`gluing_subgroup`.  If ``S`` and
+        ``T`` spanned a proper sublattice of ``M``, the summands' glue would be
+        strictly larger than ``L/M`` and the first equality would fail.
+        """
+        self._assert_finite_index_overlattice()
+        source = self.domain()
+        lattice = self.codomain()
+        ring = source.base_ring()
+        from sage_extensions.categories.modules.pure.modules import ModuleSubobjects
+
+        left = left_summand
+        if left not in ModuleSubobjects(ring):
+            raise ValueError(
+                f"cannot form the gluing anti-isometry of {self} along {left}: the left summand "
+                f"must be a sublattice of {source} or of {lattice}"
+            )
+        ambient = left.inclusion().codomain()
+        match ambient is lattice, ambient is source:
+            case True, _:
+                left_image = left
+                right_image = lattice.orthogonal_complement(left)
+            case False, True:
+                def image_in_codomain(summand):
+                    inclusion = summand.inclusion()
+                    return lattice.subobject_on(
+                        tuple(
+                            self(inclusion(summand.module_generator(label)))
+                            for label in summand.module_generating_set()
+                        )
+                    )
+
+                right = source.orthogonal_complement(left)
+                right_image = image_in_codomain(right)
+                left_image = image_in_codomain(left)
+            case _:
+                raise ValueError(
+                    f"cannot form the gluing anti-isometry of {self} along {left}: the summand is a "
+                    f"sublattice of {ambient}, which is neither {source} nor {lattice}"
+                )
+        ranks = (
+            int(left_image.module_rank()),
+            int(right_image.module_rank()),
+            int(source.module_rank()),
+        )
+        assert ranks[0] + ranks[1] == ranks[2], (
+            f"cannot read {source} as the orthogonal sum of {left} and its complement: their ranks "
+            f"are {ranks[0]} and {ranks[1]}, and {source} has rank {ranks[2]}; the glue of {self} is "
+            f"the graph of an anti-isometry only for a primitive extension"
+        )
+        witness = lattice.glue_map(left_image, right_image)
+
+        index = self.index()
+        graph_order = witness.domain().cardinality()
+        assert index == graph_order, (
+            f"the summands of {self} do not present its own glue: [{lattice} : {source}] is "
+            f"{index}, but {left} and its complement induce a glue of order {graph_order}; the "
+            f"summands span a proper sublattice of {source}, so their anti-isometry is not the "
+            f"graph of {self}'s glue"
+        )
+        return witness
+
     def discriminant_isometry_extension(self, automorphism):
         r"""Descend a glue-preserving isometry of ``A_M`` to ``A_L``.
 
