@@ -1538,6 +1538,7 @@ class LatticeIsometryMethods:
                 return IsotropicFlag(
                     self.codomain(),
                     tuple(self(element) for element in obj.isotropic_basis()),
+                    flag_type=obj.flag_type(),
                 )
 
     @cached_method

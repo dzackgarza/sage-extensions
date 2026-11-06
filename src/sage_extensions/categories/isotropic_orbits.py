@@ -384,12 +384,16 @@ class FlagType:
 class IsotropicFlag:
     r"""A primitive totally isotropic flag, recorded by its nested lattice subobjects."""
 
-    def __init__(self, lattice, basis) -> None:
+    def __init__(self, lattice, basis, *, flag_type=None) -> None:
+        r"""Select the stated prefixes of an adapted basis; default to every prefix."""
         self._lattice = lattice
         self._basis = tuple(_held(lattice, element) for element in basis)
         if not self._basis:
             raise ValueError(f"cannot form an isotropic flag in {lattice} from an empty basis")
-        self._terms = tuple(lattice.primitive_isotropic_subobject(*self._basis[: rank + 1]) for rank in range(len(self._basis)))
+        shape = FlagType.complete(len(self._basis)) if flag_type is None else flag_type
+        if shape.dimensions[-1] != len(self._basis):
+            raise ValueError(f"the flag has top rank {shape.dimensions[-1]}, but its basis has {len(self._basis)} elements")
+        self._terms = tuple(lattice.primitive_isotropic_subobject(*self._basis[:rank]) for rank in shape.dimensions)
 
     def lattice(self):
         return self._lattice
@@ -856,7 +860,7 @@ def _zero_isotropic_shape(lattice, rank):
     )
 
 
-def _marked_isotropic_category(lattice, *, flag):
+def _marked_isotropic_category(lattice, *, number_of_terms):
     from sage_extensions.categories.abstract_categories.cat import Cat
     from sage_extensions.categories.abstract_categories.products import (
         FiniteOrdinalCategory,
@@ -864,7 +868,7 @@ def _marked_isotropic_category(lattice, *, flag):
     from sage_extensions.categories.lattices import Lattices
 
     return Cat().Mor(
-        FiniteOrdinalCategory(3 if flag else 2),
+        FiniteOrdinalCategory(number_of_terms + 1),
         Lattices(lattice.base_ring()),
     )
 
@@ -873,26 +877,23 @@ def _marked_isotropic_object(obj, *, flag):
     r"""Read a represented isotropic subobject/flag as the corresponding marked lattice."""
     match flag:
         case False:
-            return _marked_isotropic_category(obj.ambient_lattice(), flag=False).object(
+            return _marked_isotropic_category(obj.ambient_lattice(), number_of_terms=1).object(
                 obj.inclusion()
             )
         case True:
             terms = tuple(obj.terms())
-            if len(terms) != 2:
-                raise ValueError(
-                    f"the frozen isotropic flag algorithm accepts a rank-(1,2) flag, but {obj} has {len(terms)} terms"
-                )
-            line, plane = terms
-            line_into_plane = line.inclusion().factor_through(plane.inclusion())
-            return _marked_isotropic_category(obj.lattice(), flag=True)(
-                (line_into_plane, plane.inclusion())
+            category = _marked_isotropic_category(obj.lattice(), number_of_terms=len(terms))
+            arrows = (
+                *(smaller.inclusion().factor_through(larger.inclusion()) for smaller, larger in zip(terms, terms[1:])),
+                terms[-1].inclusion(),
             )
+            return category.object(arrows[0]) if len(arrows) == 1 else category(arrows)
 
 
-def _isotropic_object_from_marked(marked, *, flag):
+def _isotropic_object_from_marked(marked, *, flag_type):
     r"""Return the existing research isotropic object represented by a marked lattice."""
-    match flag:
-        case False:
+    match flag_type:
+        case None:
             arrow = marked.arrow()
             lattice = arrow.codomain()
             vectors = tuple(
@@ -900,61 +901,42 @@ def _isotropic_object_from_marked(marked, *, flag):
                 for label in arrow.domain().module_generating_set()
             )
             return lattice.primitive_isotropic_subobject(*vectors)
-        case True:
-            first, second = marked.arrows()
-            lattice = second.codomain()
-            line_label = next(iter(first.domain().module_generating_set()))
-            line_vector = second(first(first.domain().module_generator(line_label)))
-            line = lattice.primitive_isotropic_subobject(line_vector)
-            plane_vectors = tuple(
-                second(second.domain().module_generator(label))
-                for label in second.domain().module_generating_set()
-            )
-            plane = lattice.primitive_isotropic_subobject(*plane_vectors)
-            line_into_plane = line.inclusion().factor_through(plane.inclusion())
-            quotient = line_into_plane.cokernel()
-            if quotient.is_torsion_free() is not True or int(quotient.module_rank()) != 1:
-                raise ArithmeticError(
-                    f"the marked flag {marked} does not present a primitive line in a primitive plane"
-                )
-            trivialization = quotient.finite_free_trivialization()
-            normalized = trivialization.codomain()
-            quotient_label = next(iter(normalized.module_generating_set()))
-            quotient_generator = trivialization.inverse()(
-                normalized.module_generator(quotient_label)
-            )
-            complement_in_plane = line_into_plane.cokernel_projection().preimage(
-                quotient_generator
-            )
-            complement = plane.inclusion()(complement_in_plane)
-            return IsotropicFlag(lattice, (line_vector, complement))
+        case FlagType():
+            arrows = (marked.arrow(),) if len(flag_type.dimensions) == 1 else tuple(marked.arrows())
+            inclusion = arrows[-1]
+            domain = inclusion.domain()
+            composite = domain.identity_morphism()
+            terms = []
+            for arrow in reversed(arrows[:-1]):
+                composite = composite * arrow
+                terms.append(composite.image())
+            change = domain.general_linear_group().flag_stabilizer(tuple(reversed(terms))).basis_change()
+            basis = tuple(inclusion(change(point)) for point in domain.module_generators())
+            return IsotropicFlag(inclusion.codomain(), basis, flag_type=flag_type)
 
 
 def _isotropic_orbit_representatives(orthogonal_group, rank, *, flag=False):
-    r"""Return full-``O(L)`` orbit representatives of primitive isotropic subobjects/flags."""
+    r"""Return full-``O(L)`` classes of the specified isotropic marking shape.
+
+    For flags, an integer specifies the complete flag and a ``FlagType``
+    specifies its cumulative ranks (the port's pinned ``SeqDims`` route).
+    """
     lattice = orthogonal_group.domain()
-    rank = lattice.base_ring()(rank)
-    if rank <= lattice.base_ring().zero():
-        raise ValueError(f"there are no isotropic sublattices of rank {rank} in {lattice}: the rank must be positive")
+    shape_type = rank if isinstance(rank, FlagType) else (FlagType.complete(int(rank)) if flag else FlagType.plane(int(rank)))
     from sage_indefinite_port.indefinite.marked_lattices import (
         primitive_marking_classes,
     )
 
-    category = _marked_isotropic_category(lattice, flag=flag)
+    category = _marked_isotropic_category(lattice, number_of_terms=len(shape_type.dimensions))
     if flag:
-        if int(rank) != 2:
-            raise ValueError(
-                f"the frozen isotropic flag algorithm classifies rank-(1,2) flags, not flags with top rank {rank}"
-            )
-        line = _zero_isotropic_shape(lattice, 1)
-        plane = _zero_isotropic_shape(lattice, 2)
-        plane_label = next(iter(plane.module_generating_set()))
-        shape = line.Mor(plane)(lambda _label: plane.module_generator(plane_label))
+        shapes = tuple(_zero_isotropic_shape(lattice, dimension) for dimension in shape_type.dimensions)
+        arrows = tuple(left.Mor(right)(lambda label, target=right: target.module_generator(label)) for left, right in zip(shapes, shapes[1:]))
+        shape = shapes[0] if not arrows else (arrows[0] if len(arrows) == 1 else _marked_isotropic_category(lattice, number_of_terms=len(arrows))(arrows))
     else:
-        shape = _zero_isotropic_shape(lattice, int(rank))
+        shape = _zero_isotropic_shape(lattice, shape_type.dimensions[-1])
     classes = primitive_marking_classes(category, shape, lattice)
     return finite_ordered_set(tuple(
-        _isotropic_object_from_marked(marked, flag=flag)
+        _isotropic_object_from_marked(marked, flag_type=shape_type if flag else None)
         for marked in classes
     ))
 
@@ -974,7 +956,7 @@ def _isotropic_equivalence_witness(orthogonal_group, left, right, *, flag=False)
         isometry,
     )
 
-    category = _marked_isotropic_category(orthogonal_group.domain(), flag=flag)
+    category = _marked_isotropic_category(orthogonal_group.domain(), number_of_terms=len(left_terms) if flag else 1)
     return isometry(
         category,
         _marked_isotropic_object(left, flag=flag),
@@ -988,7 +970,7 @@ def _isotropic_stabilizer_generators(orthogonal_group, obj, *, flag=False):
         automorphism_group_generators,
     )
 
-    category = _marked_isotropic_category(orthogonal_group.domain(), flag=flag)
+    category = _marked_isotropic_category(orthogonal_group.domain(), number_of_terms=len(tuple(obj.terms())) if flag else 1)
     return automorphism_group_generators(
         category,
         _marked_isotropic_object(obj, flag=flag),
