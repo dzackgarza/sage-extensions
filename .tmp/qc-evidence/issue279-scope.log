@@ -1,0 +1,32 @@
+[     0.1s] T = T_En: rank 12, signature (2, 10), even True
+[     0.1s] C = T_Co: rank 11, signature (2, 9), even True
+|A_T| = 1024
+|A_C| = 2048
+[    10.6s] the catalogue embedding: rank 11 -> 12
+primitive: True
+[    10.7s] orthogonal complement built
+complement type: OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+complement rank: 1
+complement signature: (0, 1)
+delta: e_0 | square: -2 | primitive: True
+delta perp is C: ?
+rank of <delta> + C: 12
+[    10.7s] generator of the overlattice built
+[    15.4s] covering_discriminant_classes(-2): 1 classes in 4.7s
+covering RAISED AttributeError 'FiniteOrderedSets.parent_class' object has no attribute 'elements'
+[    15.4s] vectors_of_square_and_divisibility(-2, 1): Subset of Subset of Integral lattice of rank 12 and signature (2, 10) cut out by <function Sets.SubcategoryMethods._categorical_equalizer_construction.<locals>.<lambda> at 0x7153609d8ca0> cut out by <function _vectors_of_square_and_divisibility.<locals>.<lambda> at 0x7153609b6a30> in 0.0s
+DONE
+[peakrss] issue275: child waited=0 shell_code=0 samples=9
+[peakrss] peak tree RSS      : 303 MiB
+[peakrss] low-water MemAvail : 13692 MiB
+[peakrss] peak single VmHWM  : 303 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      292 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.0s procs=  3 rss=   303 MiB hwm=   303 MiB avail= 13692 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   303 MiB hwm=   303 MiB avail= 13692 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   290 MiB hwm=   291 MiB avail= 13694 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   290 MiB hwm=   291 MiB avail= 13694 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   288 MiB hwm=   288 MiB avail= 13694 MiB
+launcher exit: 0
