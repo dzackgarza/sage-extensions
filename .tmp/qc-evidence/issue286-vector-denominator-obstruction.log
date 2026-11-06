@@ -1,0 +1,99 @@
+[     0.0s] port imported from /work/src/sage_indefinite_port/__init__.py
+[     0.1s] T_Co: rank 11, signature (2, 9), even True
+[     0.1s] O(T_Co) built
+[   338.7s] O(T_Co).group_generators(): 444 generators in 338.7s
+isotropic_orbit_representatives RAISED
+Traceback (most recent call last):
+  File "/probe.py", line 35, in <module>
+    representatives = tuple(O.isotropic_orbit_representatives(1))
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 4083, in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 955, in _isotropic_orbit_representatives
+    classes = primitive_marking_classes(category, shape, lattice)
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 195, in primitive_marking_classes
+    classes = tuple(ARROWS.object(lattice.primitive_isotropic_subobject(vector_).inclusion()) for vector_ in INDUCTION.isotropic_vector_classes(lattice))
+                                                                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 75, in isotropic_vector_classes
+    self._line_classes[id(lattice)] = (lattice, self._computed_isotropic_vector_classes(lattice))
+                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 109, in _computed_isotropic_vector_classes
+    return tuple(vector_class.representative for vector_class in self.recursion.primitive_vector_classes(lattice, 0))
+                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1771, in primitive_vector_classes
+    match next(((witnesses, isometry) for kept, witnesses in bucket if (isometry := self.pointed_isometry(kept, candidate)) is not None), None):
+          ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1771, in <genexpr>
+    match next(((witnesses, isometry) for kept, witnesses in bucket if (isometry := self.pointed_isometry(kept, candidate)) is not None), None):
+                                                                                    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1597, in pointed_isometry
+    return self._isotropic_pointed_isometry(source, target)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1720, in _isotropic_pointed_isometry
+    if torsor.integral_members().is_empty() is False:
+       ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "sage/misc/cachefunc.pyx", line 2328, in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 271, in integral_members
+    integral_kernel, locus = self._integral_lift_locus()
+                             ~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "sage/misc/cachefunc.pyx", line 2328, in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 223, in _integral_lift_locus
+    residue = self.integral_parameter_quotient()
+  File "sage/misc/cachefunc.pyx", line 2328, in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 343, in integral_parameter_quotient
+    denominator = _vector_denominator(source_vector, source)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 27, in _vector_denominator
+    arrow = Modules(field_map.codomain()).Mor(line.base_change(field_map), vector.parent())(
+        lambda label: vector
+    )
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 3181, in __call__
+    return CategoricalMor.__call__(self, images)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 996, in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line 61, in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 2945, in _element_constructor_
+    morphism = self.element_class(self, images)
+  File "sage/misc/classcall_metaclass.pyx", line 331, in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    return (<PyTypeObject*>type).tp_call(cls, args, kwds)
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 430, in __init__
+    self._initialize_lower_arrow(parent)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 326, in _initialize_lower_arrow
+    super().__init__(
+    ~~~~~~~~~~~~~~~~^
+        parent,
+        ^^^^^^^
+        scalar_map,
+        ^^^^^^^^^^^
+        evaluator=self._call_,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/fibered_modules.py", line 72, in __init__
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: a semilinear map into Lattice of rank 11 and signature (2, 9) lies over a ring map into its base ring Fraction Field of Integer Ring, but Generic endomorphism of Integer Ring ends at Integer Ring
+DONE
+[peakrss] issue286: child waited=0 shell_code=0 samples=232
+[peakrss] peak tree RSS      : 4245 MiB
+[peakrss] low-water MemAvail : 9990 MiB
+[peakrss] peak single VmHWM  : 4248 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      3177 MiB peak
+[peakrss]   python                     1061 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   454.2s procs=  4 rss=  4245 MiB hwm=  4245 MiB avail=  9990 MiB
+[peakrss]   t=   452.2s procs=  4 rss=  4244 MiB hwm=  4244 MiB avail=  9990 MiB
+[peakrss]   t=   450.2s procs=  4 rss=  4242 MiB hwm=  4242 MiB avail=  9998 MiB
+[peakrss]   t=   446.2s procs=  4 rss=  4238 MiB hwm=  4238 MiB avail=  9999 MiB
+[peakrss]   t=   448.2s procs=  4 rss=  4238 MiB hwm=  4238 MiB avail=  9998 MiB
+launcher exit: 0
