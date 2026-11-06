@@ -1,0 +1,8 @@
+[se-stage] _marked_automorphism_generators start t=393040.8
+[se-stage] _marked_automorphism_generators done in 104.9s: 24 gens
+[wall=   171.6s cpu=   105.0s] G_h built; N = Integral lattice of rank 12 and signature (2, 10)
+group.has_finite_coset_space: <bound method PredicateSubgroups.ParentMethods.has_finite_coset_space of {g in Orthogonal group O(Integral lattice of rank 12 and signature (2, 10)) : g lies in every selected subgroup}>
+group.kernel_morphism: absent
+group.coset_space: <bound method PredicateSubgroups.ParentMethods.coset_space of {g in Orthogonal group O(Integral lattice of rank 12 and signature (2, 10)) : g lies in every selected subgroup}>
+group.has_selected_group_resolution: <bound method OwnedGroups.ParentMethods.has_selected_group_resolution of {g in Orthogonal group O(Integral lattice of rank 12 and signature (2, 10)) : g lies in every selected subgroup}>
+has_finite_coset_space() = True in 0.0s cpu
