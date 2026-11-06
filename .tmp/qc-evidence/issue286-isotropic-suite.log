@@ -1,0 +1,163 @@
+### pytest tests/lattices/test_enriques_anti_invariant_cusps.sage tests/lattices/test_isotropic_orbit_collections.sage tests/lattices/test_definite.sage at 2026-11-06T17:44:40Z
+.F....F.F...F...FF..F...FF..F                                            [100%]
+=================================== FAILURES ===================================
+_ test_the_enriques_period_lattice_has_two_isotropic_line_orbits_and_five_isotropic_plane_orbits _
+tests/lattices/test_enriques_anti_invariant_cusps.sage:27: in test_the_enriques_period_lattice_has_two_isotropic_line_orbits_and_five_isotropic_plane_orbits
+    assert group.isotropic_orbit_representatives(1).cardinality() == 2
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:547: in isotropic_orbit_representatives
+    return _subgroup_isotropic_orbit_representatives(
+src/sage_extensions/categories/orthogonal_quotients.py:1370: in _subgroup_isotropic_orbit_representatives
+    for representative in orthogonal_group.isotropic_orbit_representatives(
+src/sage_extensions/categories/lattice_morphisms.py:4083: in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/isotropic_orbits.py:955: in _isotropic_orbit_representatives
+    classes = primitive_marking_classes(category, shape, lattice)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/marked_lattices.py:195: in primitive_marking_classes
+    classes = tuple(ARROWS.object(lattice.primitive_isotropic_subobject(vector_).inclusion()) for vector_ in INDUCTION.isotropic_vector_classes(lattice))
+                                                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/isotropic_induction.py:74: in isotropic_vector_classes
+    self._line_classes[id(lattice)] = (lattice, self._computed_isotropic_vector_classes(lattice))
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/isotropic_induction.py:108: in _computed_isotropic_vector_classes
+    return tuple(vector_class.representative for vector_class in self.recursion.primitive_vector_classes(lattice, 0))
+                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/recursive.py:778: in primitive_vector_classes
+    for candidate in self._model(profile.signed_view).primitive_covering_vectors(profile.sign * int(square)):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/eichler.py:999: in primitive_covering_vectors
+    cosets = envelope.right_coset_transversal()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/eichler.py:488: in right_coset_transversal
+    coset_space = self.stabilizer_of_lattice().right_cosets()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/eichler.py:464: in stabilizer_of_lattice
+    generators = tuple(_isometry_from_row_matrix(rational_envelope, generator) for generator in OrbitCoverModel.source_generator_matrices(self.model))
+                 ^^^^^
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/eichler.py:464: in <genexpr>
+    generators = tuple(_isometry_from_row_matrix(rational_envelope, generator) for generator in OrbitCoverModel.source_generator_matrices(self.model))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/eichler.py:74: in _isometry_from_row_matrix
+    return checked_row_isometry(lattice, lattice, rows)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/recursive.py:154: in _isometry_from_row_matrix
+    source_coordinates = tuple(int(coordinates(label)) for label in source_labels)
+                         ^^^^^
+../sage-indefinite-port/src/sage_indefinite_port/indefinite/recursive.py:154: in <genexpr>
+    source_coordinates = tuple(int(coordinates(label)) for label in source_labels)
+                               ^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: int() argument must be a string, a bytes-like object or a real number, not 'OwnedJoinCategory.element_class'
+_____________ test_square_lattice_minimum_theta_and_packing_radius _____________
+tests/lattices/test_definite.sage:45: in test_square_lattice_minimum_theta_and_packing_radius
+    assert lattice.packing_radius() == QQ(1) / 2
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:8181: in packing_radius
+    return _packing_radius(self)
+           ^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/definite_lattices.py:1184: in _packing_radius
+    return RR(_engine_element(lattice.base_ring(), metric_minimum)).sqrt() / 2
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:1587: in __truediv__
+    return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:1587: in __truediv__
+    return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   RecursionError: maximum recursion depth exceeded
+!!! Recursion detected (same locals & position)
+______ test_exact_cvp_babai_minima_and_voronoi_geometry_on_square_lattice ______
+tests/lattices/test_definite.sage:81: in test_exact_cvp_babai_minima_and_voronoi_geometry_on_square_lattice
+    assert lattice.covering_radius() ** 2 == QQ(1) / 2
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:8184: in covering_radius
+    return _covering_radius(self)
+           ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/definite_lattices.py:1095: in _covering_radius
+    squared = max(
+E   TypeError: '>' not supported between instances of 'OwnedJoinCategory.element_class' and 'OwnedJoinCategory.element_class'
+______ test_definite_target_embedding_mor_enumerates_all_a1_into_a2_roots ______
+tests/lattices/test_definite.sage:130: in test_definite_target_embedding_mor_enumerates_all_a1_into_a2_roots
+    assert mor.cardinality() == 6
+           ^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:2497: in cardinality
+    assert construction_cardinality is not None, (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: cannot compute the cardinality of Emb(Integral lattice of rank 1 and signature (0, 1), Integral lattice of rank 2 and signature (0, 2)): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of homsets of sets and Category of sets)
+_ test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6 __
+tests/lattices/test_definite.sage:205: in test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6
+    assert determinant_one.cardinality() == 6
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:2497: in cardinality
+    assert construction_cardinality is not None, (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: cannot compute the cardinality of Subset of Orthogonal group O(Integral lattice of rank 2 and signature (0, 2)) cut out by <function test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6.<locals>.<lambda> at 0x7a1348b6fed0>: its construction supplies no exact value or decided finite enumeration (it is in Join of Category of finite sets and Category of facade sets and Category of finite countable sets)
+__________ test_discriminant_group_of_a1_plus_a2_is_cyclic_of_order_6 __________
+sage/structure/category_object.pyx:858: in sage.structure.category_object.CategoryObject.getattr_from_category
+    return self._cached_methods[name]
+E   KeyError: 'is_cyclic'
+
+During handling of the above exception, another exception occurred:
+tests/lattices/test_definite.sage:218: in test_discriminant_group_of_a1_plus_a2_is_cyclic_of_order_6
+    assert discriminant.is_cyclic()
+           ^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+sage/cpython/getattr.pyx:362: in sage.cpython.getattr.getattr_from_other_class
+    ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_PresentedModule].ObjectType' object has no attribute 'is_cyclic'
+________ test_a_hyperbolic_isometry_of_x2_minus_2y2_has_infinite_order _________
+tests/lattices/test_definite.sage:258: in test_a_hyperbolic_isometry_of_x2_minus_2y2_has_infinite_order
+    assert isometry.cyclic_subgroup().cardinality() == aleph0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:2496: in cardinality
+    construction_cardinality = self._cardinality_decision()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/cyclic_subgroups.py:122: in _cardinality_decision
+    assert False, (
+           ^^^^^
+E   AssertionError: the cardinality of <Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1)> <= Orthogonal group O(Integral lattice of rank 2 and signature (1, 1)) is the order of Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1), but no order algorithm or finite ambient enumeration is supplied
+_ test_positive_cone_character_and_real_spinor_norm_are_independent_computations _
+tests/lattices/test_definite.sage:313: in test_positive_cone_character_and_real_spinor_norm_are_independent_computations
+    assert positive_reflection.preserves_positive_cone() is False
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattice_morphisms.py:2005: in preserves_positive_cone
+    if positive != integers.one() or negative < integers.one():
+                   ^^^^^^^^^^^^
+E   AttributeError: type object 'Cardinalities.parent_class' has no attribute 'one'
+_ test_the_component_character_is_multiplicative_and_cuts_out_the_cone_subgroup _
+tests/lattices/test_definite.sage:341: in test_the_component_character_is_multiplicative_and_cuts_out_the_cone_subgroup
+    character = lattice.component_character()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/lattices.py:4184: in component_character
+    if positive != integers.one() or negative < integers.one():
+                   ^^^^^^^^^^^^
+E   AttributeError: type object 'Cardinalities.parent_class' has no attribute 'one'
+_______ test_definite_complement_extensions_exhaust_the_u_vector_cosets ________
+tests/lattices/test_definite.sage:403: in test_definite_complement_extensions_exhaust_the_u_vector_cosets
+    assert stabilizer.cardinality() == 2
+           ^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'tuple' object has no attribute 'cardinality'
+=========================== short test summary info ============================
+FAILED tests/lattices/test_enriques_anti_invariant_cusps.sage::test_the_enriques_period_lattice_has_two_isotropic_line_orbits_and_five_isotropic_plane_orbits
+FAILED tests/lattices/test_definite.sage::test_square_lattice_minimum_theta_and_packing_radius
+FAILED tests/lattices/test_definite.sage::test_exact_cvp_babai_minima_and_voronoi_geometry_on_square_lattice
+FAILED tests/lattices/test_definite.sage::test_definite_target_embedding_mor_enumerates_all_a1_into_a2_roots
+FAILED tests/lattices/test_definite.sage::test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6
+FAILED tests/lattices/test_definite.sage::test_discriminant_group_of_a1_plus_a2_is_cyclic_of_order_6
+FAILED tests/lattices/test_definite.sage::test_a_hyperbolic_isometry_of_x2_minus_2y2_has_infinite_order
+FAILED tests/lattices/test_definite.sage::test_positive_cone_character_and_real_spinor_norm_are_independent_computations
+FAILED tests/lattices/test_definite.sage::test_the_component_character_is_multiplicative_and_cuts_out_the_cone_subgroup
+FAILED tests/lattices/test_definite.sage::test_definite_complement_extensions_exhaust_the_u_vector_cosets
+10 failed, 19 passed in 239.49s (0:03:59)
+### exit=1
+2026-11-06T17:48:44Z

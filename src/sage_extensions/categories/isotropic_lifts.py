@@ -23,7 +23,14 @@ def _vector_denominator(vector, integral_module):
     r"""The denominator ideal of the map taking 1 to this vector."""
     ring = integral_module.base_ring()
     field_map = ring.fraction_field_map()
-    line = ring.regular_module()
+    # The source model is the rank-one *lattice*, not the bare regular module:
+    # ``denominator_ideal`` requires the rational map to join
+    # ``source.base_change(field_map)`` and ``target.base_change(field_map)``, and
+    # the regular module's base change is a restriction of scalars rather than a
+    # lattice over the fraction field, so a map out of it is semilinear over the
+    # wrong ring.  A rank-one lattice with the unit form is the same free module
+    # with the same single generator, and its base change is of the right shape.
+    line = Lattices(ring)([[1]])
     arrow = Modules(field_map.codomain()).Mor(line.base_change(field_map), vector.parent())(
         lambda label: vector
     )
