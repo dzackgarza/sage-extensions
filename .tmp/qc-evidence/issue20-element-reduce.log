@@ -1,0 +1,18 @@
+parent reduce owner now: _OwnedRingParent
+setstate owner: _OwnedRingParent
+Traceback (most recent call last):
+  File "/probe.py", line 9, in <module>
+    reduced = value.__reduce__()
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/copyreg.py", line 76, in _reduce_ex
+    state = base(self)
+  File "sage/structure/element.pyx", line 398, in sage.structure.element.Element.__init__
+    self._parent = parent
+TypeError: Cannot convert _OwnedRingParent_with_category.element_class to sage.structure.parent.Parent
+[peakrss] issue275: child waited=1 shell_code=1 samples=1
+[peakrss] peak tree RSS      : 2 MiB
+[peakrss] low-water MemAvail : 8593 MiB
+[peakrss] peak single VmHWM  : 2 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       2 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail=  8593 MiB
+launcher exit: 1
