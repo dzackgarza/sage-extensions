@@ -13,12 +13,19 @@ the family element at the same position is
 ``~transversals[position of s.p] * letters[j] * transversals[i]``.  Equal orders
 would not identify the family; this comparison does.
 
-The action is the one this repository's own ``tests/lattices/test_integral_stabilizers.sage``
-builds. Two larger specimens are measured rather than asserted here: the Coble
-element action's 496-point orbit needs about 325 s for the factors alone, and a
-small torsion form's element action reaches ``regular_module_identification``,
-which refuses the restriction of scalars that specimen is read in — a
-pre-existing limitation of that route, so no assertion is made against it.
+Both layers carry the law, and both are asserted here on specimens this
+repository's own tests build: the integral-structure action of
+``tests/lattices/test_integral_stabilizers.sage``, and the natural action of the
+finite group ``tests/groups/test_schreier_generating_morphisms.sage`` builds.
+The second is the same law one owner lower, where the factors are the G-set's
+own datum rather than the action's.
+
+The Coble point stabilizer of
+``tests/lattices/test_coble_point_stabilizer_generators.sage`` is measured rather
+than asserted: its 496-point orbit needs about 325 s for the factors alone, so
+materializing both sides of the comparison is out of reach of this suite's
+per-test bound (``--timeout=60``).  The order certificate for that specimen is
+#273's, and the measurements are recorded in ``TRAPS.md``.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -51,3 +58,31 @@ def test_the_action_factors_compose_to_its_stabilizer_family() -> None:
             image = positions[action.right_cosets().act(letter, point)]
             rebuilt.append((~transversals[image]) * letter * transversals[position])
     assert tuple(rebuilt) == family
+
+
+def test_the_natural_g_set_factors_compose_to_its_stabilizer_family() -> None:
+    r"""``Groups.S(3)`` on its three points: the same law at the G-set owner.
+
+    The factors are the G-set's own datum -- ``orbit_schreier_factors`` returns
+    them there and the action merely passes them up -- so the law is asserted at
+    both layers rather than only where it is consumed.  Two assertions, and both
+    are about the mathematics: every composite fixes the point, and the family
+    the stabilizer presents is the composite family element for element.
+    """
+    group = Groups.S(3)
+    action = group.natural_g_set()
+    points = tuple(action)
+    point = points[0]
+
+    letters, transversals = action.orbit_schreier_factors(point)
+    family = tuple(action.stabilizer(point).group_generators())
+
+    positions = {candidate: position for position, candidate in enumerate(points)}
+    rebuilt = tuple(
+        (~transversals[positions[action.act(letter, candidate)]]) * letter * transversals[position]
+        for position, candidate in enumerate(points)
+        for letter in letters
+    )
+
+    assert all(composite(point) == point for composite in rebuilt)
+    assert rebuilt == family

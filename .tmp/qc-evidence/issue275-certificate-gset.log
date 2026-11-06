@@ -1,0 +1,5 @@
+### pytest (repo configuration) -o addopts= -p sage_extensions.testing.test_lint tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage tests/lattices/test_integral_stabilizers.sage at 2026-11-06T13:51:14Z
+....                                                                     [100%]
+4 passed in 2.60s
+### exit=0
+2026-11-06T13:51:18Z
