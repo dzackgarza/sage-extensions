@@ -127,6 +127,10 @@ class _FiniteIntegralRepresentation(SageObject):
         selected = action.selected_submodule()
         self._submodules = [selected]
         self._positions = {self._submodule_key(selected): 0}
+        self._generator_indices = {
+            generator: index for index, generator in enumerate(action._group_generators())
+        }
+        self._generator_transitions = {}
         self._registering_orbit = True
         zero = _owned_integers().zero()
         self._g_set = FiniteGSets(action.rational_group()).from_finite_orbits(
@@ -174,6 +178,12 @@ class _FiniteIntegralRepresentation(SageObject):
         return self._positions.get(self._submodule_key(submodule))
 
     def _act_on_position(self, group_element, position):
+        generator_index = self._generator_indices.get(group_element)
+        transition = (generator_index, int(position))
+        if generator_index is not None:
+            known = self._generator_transitions.get(transition)
+            if known is not None:
+                return _owned_integers()(known)
         quotient = self.action().finite_module()
         submodule = self._submodules[int(position)]
         automorphism = self.action().quotient_automorphism(group_element)
@@ -191,6 +201,13 @@ class _FiniteIntegralRepresentation(SageObject):
             image_position = len(self._submodules)
             self._submodules.append(quotient.subobject_on(images))
             self._positions[image_key] = image_position
+        # Orbit closure already computes these exact generator edges.
+        # Schreier words and the represented finite action reuse them;
+        # repeated module images and their normal forms add no new data.
+        # Retain only the finite generator-by-orbit table, not arbitrary
+        # words in the possibly infinite rational group.
+        if generator_index is not None:
+            self._generator_transitions[transition] = image_position
         return _owned_integers()(image_position)
 
     def orbit_submodules(self):
