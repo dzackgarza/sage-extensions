@@ -1,0 +1,5 @@
+### pytest (repo configuration) -o addopts= -p sage_extensions.testing.test_lint tests/lattices/test_coble_point_stabilizer_generators.sage at 2026-11-06T06:05:50Z
+..                                                                       [100%]
+2 passed in 64.26s (0:01:04)
+### exit=0
+2026-11-06T06:06:57Z

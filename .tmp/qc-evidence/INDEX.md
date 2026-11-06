@@ -41,3 +41,11 @@ tracked: the #17 and #19 probe logs under `.tmp/` (`enriques_family_cpu.log`,
 `enriques_t1t2.log`, `issue18_sign_witness.log`, `issue18_apex_stabilizer.log`,
 `issue19_order_probe.log`, `issue19_final_probe.log`, `issue19_control.log`,
 `issue19_det.log`), each cited with its own figures in `TRAPS.md`.
+
+## Issue #273 (added 2026-11-06)
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue273-certificates.log` | `stabilizer_generators` | the certificates printed on `A_{T_Co}`, `c = [½ h̃_Co]`: orbit 496, predicted and measured stabilizer order `94 755 225 600`, six generators |
+| `issue273-owner-test.log` | the owner test | **2 passed in 64.26 s** with the test-lint plugin loaded |
+| `issue273-durations.log` | the owner test | per test: **39.86 s** and **8.45 s**, both inside the 60 s gate |
