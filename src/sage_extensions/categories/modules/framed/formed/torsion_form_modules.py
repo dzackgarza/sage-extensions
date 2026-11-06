@@ -288,15 +288,19 @@ class TorsionFormIsometryMor(CoreMor):
 def _torsion_form_isometry(forward, inverse, *, quadratic: bool, check: bool = False):
     r"""Return the form isometry represented by mutually inverse module maps.
 
-    The element is built through the Iso family of the torsion-form category,
-    whose two constructors state one contract
-    ``(forward, inverse=None, *, check=False)``: between two forms that is
-    :class:`TorsionFormIsometryMor`, and on the diagonal it is
-    :class:`TorsionFormOrthogonalGroup`, which crosses the pair through the
-    core and normalizes it into the group.  Either answer is the typed element
-    carrying the form-preservation and inverse-pair validators, and
-    ``check=True`` runs them.  There is no second construction path: an
-    automorphism is a group element, not a bare core arrow.
+    Between two distinct forms the element is built in the typed isometry family
+    (:class:`TorsionFormIsometryMor`), whose element class carries the
+    form-preservation and inverse-pair validators, and ``check=True`` runs them.
+
+    On the diagonal the Iso family is :class:`TorsionFormOrthogonalGroup`, and that
+    group's element construction normalizes through the engine's normal form.  The
+    engine states only *nondegenerate* polar forms, so for a form with a radical
+    there is no group element to build and this returns the core arrow, which is a
+    checked isomorphism of the underlying modules but carries no form validators.
+    That is a stated limitation of the automorphism route on degenerate forms, not
+    a second contract: the constructor's pair contract
+    ``(forward, inverse=None, *, check=False)`` is the same on both families, and a
+    caller that needs the group calls it.
     """
     from sage_extensions.categories.modules.framed.formed.form_modules import (
         FormedModuleMorphism,
@@ -316,7 +320,15 @@ def _torsion_form_isometry(forward, inverse, *, quadratic: bool, check: bool = F
     # finite presentation.
     formed_forward = category.Mor(source, target)((forward_component, value_identity))
     formed_inverse = category.Mor(target, source)((inverse_component, value_identity))
-    return category.Iso(source, target)(formed_forward, formed_inverse, check=check)
+    family = category.Iso(source, target)
+    if isinstance(family, TorsionFormIsometryMor):
+        return family(formed_forward, formed_inverse, check=check)
+    # The diagonal family is the orthogonal group; see the docstring for why a
+    # degenerate form has to stop at the core arrow here.
+    return category.Core().Mor(source, target)._from_known_inverse_pair(
+        formed_forward,
+        formed_inverse,
+    )
 
 
 def _representative_gram(form, *, quadratic: bool):

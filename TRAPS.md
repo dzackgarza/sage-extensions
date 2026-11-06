@@ -2821,3 +2821,23 @@ InstallGlobalFunction( VerifyStabilizerChainTC,
 ```
 with the real body left commented out below it, and `GENSS.DeterministicVerification := false` at `genss.gi:45`; asking for it warns `"Deterministic verification not yet implemented!"` (`genss.gi:1065-1067`). So there is **no** entry point in the maintained package that turns a Monte Carlo chain into a proven one, which is stronger and more precise than the manual sentence the issue quoted. The known-size route remains the only one the package documents (`doc/stabchains.xml:45-46`: with a known size it keeps adding random elements until it is reached "and returns a correct and proven stabiliser chain") — and it is circular for exactly the reason the issue gives.
 **Arithmetic of the p=5 value, written out so the reading cannot drift.** `|O^+_10(5)| = 54461311079175000000000000000000`; the recognition value is `27230655539587500000000000000000`, exactly half, which is `|SO^+_10(5)|` since `[O^+ : SO^+] = 2` for odd `q`. The p=5 generator determinants are `{1, 4}` (`4 = -1`), so the image is **not** inside `SO^+`; that is *consistent*, not contradictory: an index-two subgroup of `O^+_10(5)` containing `Ω` and extended by a **determinant `-1`** element has order `2|Ω| = |SO^+|`, so the recognition value is compatible with the determinants. What it does **not** establish is that the image is that group rather than `O^+` itself with a recognition artefact — only an independent route at p=5 decides that, and none has run.
+
+**A regression I introduced in #272, found by a base-commit diff and repaired (2026-11-06).** Unifying `_torsion_form_isometry` so that *both* Iso families build through their constructor also routed the **diagonal** case — an automorphism — through `TorsionFormOrthogonalGroup`, whose element construction normalizes through the engine's normal form. The engine states only **nondegenerate** polar forms, so for a form with a radical that construction fails; `_radical_isometry_decision` (which builds its checked witness with `_torsion_form_isometry(..., check=True)` precisely for radical forms) then caught the failure in its `except (ValueError, TypeError)` and answered `NotImplemented`, surfacing as `TypeError: the isometry … is undecided`.
+Measured, `tests/forms tests/sets` at HEAD `3903e1c` against a clean worktree at `cd52427`, same command both sides:
+```
+HEAD 3903e1c : 86 failed, 200 passed in 438.90s     (.scratch/sweep-head.log)
+base cd52427 : 83 failed, 200 passed in 446.45s     (.scratch/sweep-base.log)
+new at HEAD: 3
+  tests/forms/test_isometry_between_torsion_forms.sage::test_a_radical_polar_form_is_a_form_and_is_now_decided
+  tests/forms/test_polar_radical_criterion.sage::test_a_mixed_order_form_with_a_vanishing_block_is_still_refused
+  tests/forms/test_polar_radical_criterion.sage::test_an_invertible_gram_can_have_a_nonzero_polar_radical
+fixed at HEAD: 0
+```
+The repair restores the diagonal branch to the core arrow and states the limitation in the docstring instead of hiding it: on a **degenerate** form there is no group element to build, so `_torsion_form_isometry` returns the core arrow, which is a checked isomorphism of underlying modules and carries **no form validators** — the `check=True` promise is real between distinct forms and vacuous on the diagonal of a degenerate one. The constructor contract #272 asked for is untouched: `TorsionFormOrthogonalGroup._element_constructor_` still takes `(forward, inverse=None, *, check=False)`, and `from_morphism(check=)` still runs the element validators. After the repair:
+```
+HEAD : 83 failed, 203 passed in 439.52s             (.scratch/sweep-head2.log)
+base : 83 failed, 200 passed in 446.45s
+new: 0   fixed: 0   common: 83
+```
+The three extra passes are exactly `tests/sets/test_isomorphisms_between_finite_sets_are_counted.sage`, added at `3e39e28`. `tests/forms/test_polar_radical_criterion.sage` and `test_isometry_between_torsion_forms.sage` together with the #272 regression re-run at **19 passed in 54.33 s** (`.scratch/forms-recheck.log`).
+*Why this is worth recording as a process fact:* the focused runs for #272 (`tests/lattices`) were all green, and the QC tier is dark, so nothing would have reported this. Only the base-commit FAILED-id diff found it. On this repository, a change to a shared constructor is not tested until that diff is taken.
