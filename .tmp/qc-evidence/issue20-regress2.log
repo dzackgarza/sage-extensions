@@ -1,0 +1,5 @@
+### pytest tests/sets/test_a_finite_literal_set_reads_as_a_subset.sage tests/sets/test_isomorphisms_between_finite_sets_are_counted.sage tests/lattices/test_integral_stabilizers.sage tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage at 2026-11-06T12:11:19Z
+.........                                                                [100%]
+9 passed in 3.00s
+### exit=0
+2026-11-06T12:11:24Z

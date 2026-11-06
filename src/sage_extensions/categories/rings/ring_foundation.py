@@ -6048,6 +6048,19 @@ class _NativeRingProduct:
 _NATIVE_RING_PRODUCT = _NativeRingProduct()
 
 
+def _rebuild_owned_ring_parent(cls):
+    r"""Allocate an owned ring parent whose state pickle will install.
+
+    The fallback for a parent that states no engine: pickle allocates the class
+    and installs the ``__dict__`` the constructor produced.  A parent built from
+    an engine does not use this -- it rebuilds through :func:`_own_ring`, which
+    returns the same owned parent -- but a parent whose construction this method
+    cannot yet name keeps the state-based route (issue #20).
+    """
+
+    return cls.__new__(cls)
+
+
 class _OwnedRingParent(Parent):
     r"""An owned ring parent with one private computational realization.
 
@@ -6057,6 +6070,29 @@ class _OwnedRingParent(Parent):
     """
 
     _native_module_basis = None
+
+    def __reduce__(self):
+        r"""Persist this parent by its construction, not by its state.
+
+        Restoring ``__dict__`` cannot work for an owned parent: the state graph is
+        cyclic through ``_base``, ``_element_constructor``,
+        ``_preamble_algebra_unit``, ``_selected_data_registry``,
+        ``fraction_field_localization`` and ``nonzero_multiplicative_submonoid``,
+        and unpickling any of those needs a parent whose constructor has already
+        run (issue #20).  So this names the one adapter that builds this parent
+        from its engine, whose single cached entry returns *this* parent when the
+        engine is the one it was built from: the round-tripped object is the same
+        owned parent, which is the acceptance's requirement.
+
+        A parent without an ``_engine`` -- a localization, say -- is built by a
+        constructor this method does not yet name, so it falls back to carrying
+        its own ``__dict__``, which at least round trips the parents whose state
+        is not cyclic.
+        """
+        engine = getattr(self, "_engine", None)
+        if engine is None:
+            return (_rebuild_owned_ring_parent, (type(self),), dict(self.__dict__))
+        return (_own_ring, (engine,))
 
     def __hash__(self):
         # Owned parents are identity-bearing objects: equal engine values in
