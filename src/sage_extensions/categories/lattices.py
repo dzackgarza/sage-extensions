@@ -7452,6 +7452,191 @@ class Lattices(OwnedCategoryOverBaseRing):
             )
             return subobject
 
+        def vectors_of_square_with_complement(self, square, complement):
+            r"""Yield one primitive ``delta`` per ``O(T)``-orbit with ``delta^2 = square`` and ``delta^perp`` isometric to ``complement``.
+
+            The infinite fibre is replaced by a finite gluing computation.  By
+            Nikulin (*Integral symmetric bilinear forms and some of their
+            applications*, Prop. 1.15.1 and 1.5.1) a primitive ``delta`` of
+            square ``d`` with ``delta^perp`` isometric to ``C`` is the same
+            object as a primitive embedding ``<d> perp C -> T`` of finite index:
+            ``T`` is an overlattice of ``<d> perp C`` glued along an
+            anti-isometry ``gamma`` between a subgroup ``H_d`` of
+            ``A_<d>`` and a subgroup ``H_C`` of ``A_C``, and two such ``delta``
+            are ``O(T)``-equivalent exactly when the glue data are equivalent
+            under ``O(<d>) x O(C)``.  ``O(<d>) = {+-1}`` fixes every class of
+            ``A_<d>``, and ``O(C)`` reaches ``A_C`` only through
+            ``rho_C: O(C) -> O(q_C)``, so the collapse is the orbit
+            decomposition of a finite set under a finite group acting on
+            ``A_C``.  ``O(T)`` is never enumerated and no vector of ``T`` is
+            ever searched for.
+
+            ``A_<d>`` is cyclic, so ``H_d`` is the subgroup of order
+            ``[T : <d> perp C]`` and one class carries it; this is the case
+            implemented here.  Each yielded entry is the pair ``(delta,
+            isometry)`` -- ``isometry`` maps the overlattice ``L`` onto ``T``
+            and carries ``L``'s generator of the ``<d>`` summand to ``delta``,
+            which is the certificate the operation is asked for.
+
+            ``rho_C`` is known to be onto for an even, 2-elementary, indefinite
+            ``C`` of rank at least three (Nikulin, Thm. 3.6.3) and for a rank-one
+            ``C``, whose ``O(C) = {+-1}`` is the whole automorphism group of its
+            cyclic form.  Outside those cases collapsing by ``O(q_C)`` would
+            merge orbits that are not ``O(T)``-equivalent, so this raises with
+            the named gap instead of answering with too few vectors.
+            """
+            from math import isqrt
+
+            from sage_extensions.categories.lattices import Lattices
+
+            lattice = self
+            ring = lattice.base_ring()
+            assert _engine_ring(ring) is SageZZ, (
+                f"cannot list vectors of a prescribed square and complement in {lattice!r}: this operation "
+                f"is implemented for lattices over ZZ, and this one is over {ring}"
+            )
+            summand = complement
+            value = ring(square)
+            assert lattice.is_nondegenerate() is True and summand.is_nondegenerate() is True, (
+                f"cannot list vectors of square {value} with complement {summand!r} in {lattice!r}: both "
+                "lattices must be nondegenerate"
+            )
+            assert lattice.is_even() is True and summand.is_even() is True, (
+                f"cannot list vectors of square {value} with complement {summand!r} in {lattice!r}: the "
+                "discriminant forms used here are quadratic, so both lattices must be even"
+            )
+            assert int(lattice.module_rank()) == int(summand.module_rank()) + 1, (
+                f"cannot list vectors of square {value} with complement {summand!r} in {lattice!r}: a "
+                f"vector has a complement of rank one less, so {summand!r} must have rank "
+                f"{int(lattice.module_rank()) - 1}, not {int(summand.module_rank())}"
+            )
+
+            pair = Lattices(ring)([[value]]) + summand
+            assert pair.signature() == lattice.signature(), (
+                f"cannot list vectors of square {value} with complement {summand!r} in {lattice!r}: the "
+                f"orthogonal sum <{value}> perp {summand!r} has signature {pair.signature()} and "
+                f"{lattice!r} has {lattice.signature()}"
+            )
+            pair_order = int(pair.discriminant_group().cardinality())
+            lattice_order = int(lattice.discriminant_group().cardinality())
+            index_squared, remainder = divmod(pair_order, lattice_order)
+            assert remainder == 0 and isqrt(index_squared) ** 2 == index_squared, (
+                f"cannot list vectors of square {value} with complement {summand!r} in {lattice!r}: the "
+                f"index of <{value}> perp {summand!r} in {lattice!r} would satisfy "
+                f"index^2 = {pair_order}/{lattice_order}, which is not a square integer"
+            )
+            index = isqrt(index_squared)
+
+            line = Lattices(ring)([[value]])
+            line_form = line.discriminant_quadratic_form()
+            line_order = int(line_form.cardinality())
+            assert line_order % index == 0, (
+                f"cannot list vectors of square {value} with complement {summand!r} in {lattice!r}: the "
+                f"glue would have order {index}, but A_<{value}> has order {line_order}, so no subgroup "
+                f"of it has that order"
+            )
+            subgroup_generator = (line_order // index) * line_form.module_generators()[0]
+
+            complement_form = summand.discriminant_quadratic_form()
+            complement_values = complement_form.quadratic_value_module()
+            zero_value = complement_values.zero()
+            # The glue is isotropic in A_M = A_<d> perp A_C, so the C-component
+            # of a glue class carries exactly the negated value of the <d> one.
+            line_value = complement_values(line_form.q(subgroup_generator))
+            if int(summand.module_rank()) == 1:
+                automorphisms = complement_form.orthogonal_group()
+                assert int(automorphisms.order()) == 2, (
+                    f"cannot collapse the gluing classes of {summand!r} by its automorphism group: a "
+                    f"rank-one lattice's orthogonal group is {{+-1}}, but the automorphisms of "
+                    f"{complement_form} have order {automorphisms.order()}"
+                )
+            else:
+                elementary = summand.is_p_elementary(ring(2))
+                real, imaginary = summand.signature()
+                assert (
+                    elementary is True and int(real) > 0 and int(imaginary) > 0 and int(summand.module_rank()) >= 3
+                ), (
+                    f"cannot collapse the gluing classes of {summand!r} by O(q_C): that needs rho_C: "
+                    f"O(C) -> O(q_C) to be onto, which is known for an even 2-elementary indefinite C of "
+                    f"rank at least three (Nikulin, Thm. 3.6.3) and for rank one, but {summand!r} has "
+                    f"rank {int(summand.module_rank())}, signature {summand.signature()} and "
+                    f"2-elementary {elementary}; the non-cyclic and non-elementary cases are the gap this "
+                    f"operation does not cover"
+                )
+
+            candidates = tuple(
+                element
+                for element in complement_form.elements()
+                if complement_form.q(element) + line_value == zero_value
+                and int(element.additive_order()) == index
+            )
+            if not candidates:
+                return
+
+            automorphisms = complement_form.orthogonal_group()
+            generators = tuple(automorphisms.group_generators())
+
+            def orbit_of(seed):
+                found = {seed}
+                frontier = [seed]
+                while frontier:
+                    current = frontier.pop()
+                    for generator in generators:
+                        image = generator(current)
+                        if image not in found:
+                            found.add(image)
+                            frontier.append(image)
+                return found
+
+            remaining = set(candidates)
+            representatives = []
+            while remaining:
+                seed = next(iter(remaining))
+                orbit = orbit_of(seed)
+                representatives.append(seed)
+                remaining -= orbit
+
+            pair_dual = pair.dual_lattice()
+            pair_labels = tuple(pair_dual.module_generating_set())
+            complement_labels = tuple(summand.dual_lattice().module_generating_set())
+            for representative in representatives:
+                lifted = complement_form.dual_lattice_lift(representative)
+                coordinates = lifted.to_vector()
+                glue_class = pair.discriminant_class(
+                    (line_order // index) * pair_dual.module_generator(pair_labels[0])
+                    + pair_dual.linear_combination(
+                        {
+                            pair_labels[1 + position]: coordinates(label)
+                            for position, label in enumerate(complement_labels)
+                            if coordinates(label)
+                        }
+                    )
+                )
+                inclusion = pair.overlattice(glue_class)
+                enlarged = inclusion.codomain()
+                assert inclusion.index() == index, (
+                    f"the glue class {representative} of {complement_form} presents an overlattice of index "
+                    f"{inclusion.index()}, not the {index} that <{value}> perp {summand!r} needs"
+                )
+                if enlarged.is_isometric_to(lattice) is not True:
+                    continue
+                isometry = enlarged.isometry_to(lattice)
+                # the overlattice's selected basis is its own, recomputed from
+                # the glue; the vector to follow is the image of the <d>
+                # summand's generator under this embedding, not a basis vector
+                # of the enlarged lattice that happens to come first.
+                delta = isometry(
+                    inclusion(pair.module_generator(tuple(pair.module_generating_set())[0]))
+                )
+                assert delta.q() == value, (
+                    f"the isometry {isometry} carries the <{value}> generator to {delta}, whose square is "
+                    f"{delta.q()}"
+                )
+                assert delta.is_primitive() is True, (
+                    f"the vector {delta} obtained from the gluing is not primitive in {lattice!r}"
+                )
+                yield delta, isometry
+
         def covering_discriminant_classes(self, square):
             r"""Return discriminant classes covering primitive vectors of ``square``.
 
