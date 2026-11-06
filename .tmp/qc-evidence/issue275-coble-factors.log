@@ -1,0 +1,38 @@
+[    17.3s] g-set built
+[    17.3s] point with q(c)=1 found
+[   299.5s] |letters|=4 |orbit|=496
+[   299.5s] orbit order read: 496 points, product 1984
+[   521.3s] composites rebuilt: 1984
+[   522.2s] every composite fixes the point: True
+CERT_POINT True
+CERT_FORM first 64: True
+[   679.8s] schreier morphism built
+[   681.5s] family words: 1984
+  sample 0: equal True (0.1s)
+  sample 248: equal True (0.1s)
+  sample 496: equal True (1.0s)
+  sample 744: equal True (1.1s)
+  sample 992: equal True (1.1s)
+  sample 1240: equal True (0.1s)
+  sample 1488: equal True (1.3s)
+  sample 1736: equal True (1.3s)
+[   687.5s] sample agreement: [(0, True), (248, True), (496, True), (744, True), (992, True), (1240, True), (1488, True), (1736, True)]
+CERT_SAMPLE True over 8 positions
+[   692.6s] subgroup order 94755225600 (expected 94755225600) in 2.1s
+CERT_ORDER True
+PROBE_DONE
+[peakrss] issue275: child waited=0 shell_code=0 samples=348
+[peakrss] peak tree RSS      : 2891 MiB
+[peakrss] low-water MemAvail : 9988 MiB
+[peakrss] peak single VmHWM  : 3030 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2510 MiB peak
+[peakrss]   python                      509 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   692.4s procs=  4 rss=  2891 MiB hwm=  3030 MiB avail= 11294 MiB
+[peakrss]   t=   684.4s procs=  4 rss=  2890 MiB hwm=  3029 MiB avail= 11510 MiB
+[peakrss]   t=   686.4s procs=  4 rss=  2890 MiB hwm=  3029 MiB avail= 11511 MiB
+[peakrss]   t=   688.4s procs=  4 rss=  2890 MiB hwm=  3029 MiB avail= 11511 MiB
+[peakrss]   t=   690.4s procs=  4 rss=  2890 MiB hwm=  3029 MiB avail= 11277 MiB
+launcher exit: 0

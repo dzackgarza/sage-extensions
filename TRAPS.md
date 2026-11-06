@@ -3025,3 +3025,28 @@ The same run pins that the two routes agree: `orbit_schreier_factors` + composit
 ```
 i.e. **4 passed in 2.60 s**, one more test than the `3 passed in 2.94 s` of `475a816`, and the added assertion is free at that size. Log `.tmp/qc-evidence/issue275-certificate-gset.log`.
 *The Coble specimen is not asserted, and the reason is a bound, not a doubt:* the repo's declared `addopts` carries `--timeout=60` per test, and that specimen's 496-point orbit needs **299.5 s** for the factors alone (measured again here, `.tmp/issue275_coble_cert.log`, against 325.3 s in the earlier run). Its certificate is #273's order certificate; the composite route on it is measured separately in the entry below.
+
+**#275's Coble specimen: the factor route reaches the certificate in 692.6 s where the word-by-word realization did not finish in 1800 s (2026-11-06).** Probe `.tmp/qc-evidence/issue275-coble-factors-probe.py`, log `.tmp/qc-evidence/issue275-coble-factors.log`, adopted runtime (rootfs `281da26ffd`, image `sha256:220293469c53…`), exit 0, peak process-tree RSS **2891 MiB** of 6144, total **692.6 s**:
+```
+[    17.3s] g-set built
+[    17.3s] point with q(c)=1 found
+[   299.5s] |letters|=4 |orbit|=496
+[   299.5s] orbit order read: 496 points, product 1984
+[   521.3s] composites rebuilt: 1984
+[   522.2s] every composite fixes the point: True
+CERT_FORM first 64: True
+[   679.8s] schreier morphism built
+[   681.5s] family words: 1984
+  sample 0: equal True (0.1s)
+  sample 248: equal True (0.1s)
+  sample 496: equal True (1.0s)
+  ...
+  sample 1736: equal True (1.3s)
+[   687.5s] sample agreement: [(0, True), (248, True), (496, True), (744, True), (992, True), (1240, True), (1488, True), (1736, True)]
+CERT_SAMPLE True over 8 positions
+[   692.6s] subgroup order 94755225600 (expected 94755225600) in 2.1s
+CERT_ORDER True
+```
+*Where the 692.6 s goes, and what each part is worth:* the factors **299.5 s** for `4 + 496` elements; the 1984 composites **221.8 s** (each is `~t_(s.p) · s · t_p`, so 3968 products and 1984 inversions on owned group elements — not free, about 56 ms per product); the morphism build **158.3 s**; the eight sampled family words 0.1–1.3 s each; the order certificate **2.1 s**. So on this specimen the factor route buys a *finishing* certificate, not a fast one: against #273's `stabilizer_generators` (the same stabilizer, 6 deduplicated generators, ~45 s) it is the expensive route. Both are right for what they certify — #273 certifies the subgroup by order, this certifies the family element by element.
+*Not asserted in the suite:* 692.6 s against the repo's declared `--timeout=60`. The same law is asserted at the integral action and at the G-set owner (`6e12b2e`, 4 passed in 2.60 s).
+*Not claimed here:* the elementwise comparison is a **sample** of 8 positions out of 1984 plus an order certificate; it is not equality with the family on all 1984 positions, and this entry stands on what its own log prints.
