@@ -1,0 +1,114 @@
+[     0.0s] port: /work/src/sage_indefinite_port/__init__.py
+[   366.1s] O(T_Co).group_generators(): 353 in 366.1s
+[   366.1s] snapshot 1 taken
+[   366.1s] orbit search started in a worker thread
+[   456.1s] snapshot 2 taken, 90 s later
+=== top ten allocation sites by size difference ===
+--- 1: 0.0 MiB, 5 blocks, traceback:
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 673
+        return linearize(category)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 662
+        sorted(node.super_categories(), key=provider_order_key, reverse=True)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 655
+        provider_order_key = lambda node: _category_provider_order_key(node, provider_order_cache)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 433
+        repr(_category_graph_signature(category)),
+--- 2: 0.0 MiB, 5 blocks, traceback:
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 673
+        return linearize(category)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 662
+        sorted(node.super_categories(), key=provider_order_key, reverse=True)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 655
+        provider_order_key = lambda node: _category_provider_order_key(node, provider_order_cache)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 433
+        repr(_category_graph_signature(category)),
+--- 3: 0.0 MiB, 7 blocks, traceback:
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 664
+        sequences = [list(linearize(parent)) for parent in parents]
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 662
+        sorted(node.super_categories(), key=provider_order_key, reverse=True)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 655
+        provider_order_key = lambda node: _category_provider_order_key(node, provider_order_cache)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 433
+        repr(_category_graph_signature(category)),
+--- 4: 0.0 MiB, 6 blocks, traceback:
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 664
+        sequences = [list(linearize(parent)) for parent in parents]
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 662
+        sorted(node.super_categories(), key=provider_order_key, reverse=True)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 655
+        provider_order_key = lambda node: _category_provider_order_key(node, provider_order_cache)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 433
+        repr(_category_graph_signature(category)),
+--- 5: 0.0 MiB, 39 blocks, traceback:
+      File "/repos/sage-extensions/src/sage_extensions/categories/lattice_engines.py", line 494
+        from sage.quadratic_forms.qfsolve import qfsolve
+      File "<frozen importlib._bootstrap>", line 1371
+      File "<frozen importlib._bootstrap>", line 1342
+      File "<frozen importlib._bootstrap>", line 938
+      File "<frozen importlib._bootstrap_external>", line 759
+      File "<frozen importlib._bootstrap_external>", line 892
+      File "<frozen importlib._bootstrap_external>", line 511
+--- 6: 0.0 MiB, 4 blocks, traceback:
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 664
+        sequences = [list(linearize(parent)) for parent in parents]
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 662
+        sorted(node.super_categories(), key=provider_order_key, reverse=True)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 655
+        provider_order_key = lambda node: _category_provider_order_key(node, provider_order_cache)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 433
+        repr(_category_graph_signature(category)),
+--- 7: 0.0 MiB, 4 blocks, traceback:
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 664
+        sequences = [list(linearize(parent)) for parent in parents]
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 662
+        sorted(node.super_categories(), key=provider_order_key, reverse=True)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 655
+        provider_order_key = lambda node: _category_provider_order_key(node, provider_order_cache)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 433
+        repr(_category_graph_signature(category)),
+--- 8: 0.0 MiB, 20 blocks, traceback:
+      File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1766
+        if square == 0 and not lattice.is_isotropic():
+      File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 3776
+        return lattice_engines._isotropic_vector_witness(self) is not None
+      File "/repos/sage-extensions/src/sage_extensions/categories/lattice_engines.py", line 496
+        solution = qfsolve(_engine_component_matrix(lattice.gram_tensor()).change_ring(SageQQ))
+      File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/qfsolve.py", line 85
+        ret = G.__pari__().qfsolve()
+--- 9: 0.0 MiB, 3 blocks, traceback:
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 664
+        sequences = [list(linearize(parent)) for parent in parents]
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 662
+        sorted(node.super_categories(), key=provider_order_key, reverse=True)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 655
+        provider_order_key = lambda node: _category_provider_order_key(node, provider_order_cache)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 433
+        repr(_category_graph_signature(category)),
+--- 10: 0.0 MiB, 3 blocks, traceback:
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 664
+        sequences = [list(linearize(parent)) for parent in parents]
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 662
+        sorted(node.super_categories(), key=provider_order_key, reverse=True)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 655
+        provider_order_key = lambda node: _category_provider_order_key(node, provider_order_cache)
+      File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 433
+        repr(_category_graph_signature(category)),
+orbit search finished during the sample: True
+error: SignalError('Segmentation fault')
+DONE
+[peakrss] issue286: child waited=0 shell_code=0 samples=230
+[peakrss] peak tree RSS      : 4044 MiB
+[peakrss] low-water MemAvail : 10360 MiB
+[peakrss] peak single VmHWM  : 4056 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      3131 MiB peak
+[peakrss]   python                      913 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   370.2s procs=  4 rss=  4044 MiB hwm=  4056 MiB avail= 10360 MiB
+[peakrss]   t=   372.2s procs=  4 rss=  4044 MiB hwm=  4056 MiB avail= 10414 MiB
+[peakrss]   t=   374.2s procs=  4 rss=  4044 MiB hwm=  4056 MiB avail= 10416 MiB
+[peakrss]   t=   376.2s procs=  4 rss=  4044 MiB hwm=  4056 MiB avail= 10416 MiB
+[peakrss]   t=   378.2s procs=  4 rss=  4044 MiB hwm=  4056 MiB avail= 10416 MiB
+launcher exit: 0
