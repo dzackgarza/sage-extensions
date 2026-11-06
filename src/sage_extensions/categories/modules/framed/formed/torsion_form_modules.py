@@ -2360,6 +2360,22 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
 
     stabilizer_of_subobject = stabilizer_of_subgroup
 
+    def stabilizer(self, subgroup):
+        r"""Return the setwise stabilizer of the submodule ``subgroup`` in ``O(q)``.
+
+        The name a caller writes when the point is a submodule rather than an
+        element; the action's own stabilizer is :meth:`subobject_action`'s.
+        """
+        return self.stabilizer_of_subgroup(subgroup)
+
+    def orbit(self, subgroup):
+        r"""Return the orbit of the submodule ``subgroup`` under ``O(q)``, as a finite set of submodules.
+
+        With :meth:`stabilizer` it satisfies ``|Stab(J)| * |orbit(J)| = |O(q)|``;
+        that product is the caller's check and not a theorem asserted here.
+        """
+        return self.subobject_action().orbit_of(self.subobject_point(subgroup))
+
     def _repr_(self):
         return f"Orthogonal group of {self.domain()}"
 
