@@ -1,14 +1,13 @@
 -- ZZ element: UNPICKLE RAISED AttributeError: '_OwnedRingParent_with_category' object has no attribute '_engine'
 -- QQ element: PICKLE RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
 -- number field order element: construction raised AttributeError: 'Owned_OwnedAlgebraParent_with_category' object has no attribute 'gen'
--- lattice element: PICKLE RAISED PicklingError: Can't pickle local object <function _lattice_object.<locals>.<lambda> at 0x73391bf92820>
+-- lattice element: UNPICKLE RAISED AttributeError: '_OwnedRingParent_with_category' object has no attribute '_engine'
 PROBE_DONE
-[peakrss] issue275: child waited=0 shell_code=0 samples=2
-[peakrss] peak tree RSS      : 7 MiB
-[peakrss] low-water MemAvail : 10250 MiB
-[peakrss] peak single VmHWM  : 7 MiB
+[peakrss] issue275: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 2 MiB
+[peakrss] low-water MemAvail : 12145 MiB
+[peakrss] peak single VmHWM  : 2 MiB
 [peakrss] peak VmHWM by executable (this is the per-process attribution):
-[peakrss]   timeout                       7 MiB peak
-[peakrss]   t=     2.0s procs=  2 rss=     7 MiB hwm=     7 MiB avail= 10250 MiB
-[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     3 MiB avail= 10396 MiB
+[peakrss]   timeout                       3 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 12145 MiB
 launcher exit: 0

@@ -385,6 +385,25 @@ def _gram_axiom_categories(lattices, gram):
     return () if placement is lattices else (placement,)
 
 
+class _DeferredFormOfGram:
+    r"""The bilinear form of a Gram tensor, computed when a lattice first asks for it.
+
+    A lattice parent retains this computation as its defining form datum, and a
+    parent must survive a pickle round trip, so it is a module-level object
+    carrying the module and the Gram rather than a closure over them (issue #20).
+    """
+
+    def __init__(self, module, gram) -> None:
+        self._module = module
+        self._gram = gram
+
+    def __call__(self):
+        return _form_of_gram(self._module, self._gram)
+
+    def __repr__(self) -> str:
+        return "form of the Gram tensor"
+
+
 def _lattice_object(
     category,
     module,
@@ -438,7 +457,7 @@ def _lattice_object(
             }
     return _form_module_from_bilinear_computation(
         module,
-        lambda: _form_of_gram(module, gram),
+        _DeferredFormOfGram(module, gram),
         _extra_categories=(
             lattices,
             *(
