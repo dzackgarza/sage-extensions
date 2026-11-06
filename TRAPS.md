@@ -2943,3 +2943,17 @@ So the four `wip:` commits that turned eight retained closures into module-level
 2. **The element has no reduction, and `copyreg`'s fallback is what raises.** `ZZ(7).__reduce__()` fails in `copyreg.py:76`, `state = base(self)` → `sage/structure/element.pyx:398 Element.__init__ → self._parent = parent` → `TypeError: Cannot convert _OwnedRingParent_with_category.element_class to sage.structure.parent.Parent`. So pickling an owned element never reaches a parent reduction; it dies first, in the generic non-heap-base path. An owned element class needs its own `__reduce__`.
 3. **A parent with an explicit reduction still fails, on its own.** With `__reduce__` returning `(_rebuild_owned_ring_parent, (type(self),), dict(self.__dict__))` and `__setstate__` doing `self.__dict__.update(state)` — both confirmed as the MRO owners — `pickle.loads(pickle.dumps(ZZ(7).parent()))` still raises `AttributeError: '_OwnedRingParent_with_category' object has no attribute '_engine'`. The state dict demonstrably contains `_engine`, so the loss happens **inside** reconstruction, not in the reduction's choice of state.
 4. That third fact is the remaining question, and it is now narrow: something reconstructed *from* the state — a nested parent, the constructing category, or `Parent`'s own post-`__setstate__` work — builds an `_OwnedRingParent_with_category` that never runs the constructor. Reading that path is the next hour's work, not a guess away, and the source is left unchanged: every experiment above was reverted and the tree is clean at `c5c42f2`.
+
+**Issue #20's boundary, final for this round: the hooks are reachable, the state is not a plain data graph (2026-11-06).** One instrumented round trip with `__reduce__` and `__setstate__` patched at runtime on the created parent class, printing the call sequence:
+```
+hooks installed:
+pickled bytes: 3390
+RAISED AttributeError '_OwnedRingParent_with_category' object has no attribute '_engine'
+call sequence: [('new', 'Parent.__new__')]
+```
+So: `__reduce__` **is** consulted; `_rebuild` **runs**; `Parent.__new__(cls)` **succeeds** (it does not need `_engine`); and then `__setstate__` is **never reached** — the `AttributeError` is raised while pickle is unpickling the *state's values*, before any state is installed.
+The source facts that make this the boundary:
+- `CategoryObject.__setstate__` (`sage/structure/category_object.pyx:755`) restores `self.__dict__ = d` wholesale, so installing state is not itself the obstacle;
+- `Parent.__setstate__` (`parent.pyx:779`) then runs `init_coerce` and `_populate_coercion_lists_` only for `_pickle_version == 1`, which our state carries;
+- therefore the loss is in reconstructing one of the *live objects* the state graph embeds — engine parents, the constructing category, the element class/constructor, or the native module presentation — whose own reconstruction consults `_engine` on a parent that has not been state-installed yet.
+*The next step is mechanical, not conceptual:* pickle the state dict alone and unpickle its keys one at a time to name the key whose reconstruction raises. That is a bisect anyone can run; the design question ("what is an owned parent's persisted form") follows from its answer rather than preceding it.
