@@ -1,0 +1,46 @@
+== QQ parent state ==
+  state['_localization_source']: _OwnedRingParent_with_category
+  state['_localization_submonoid']: SubobjectCategory.parent_class[_SubmonoidEngine].ObjectType
+  state['algebra_source']: _OwnedRingParent_with_category
+  state['_localization_engine_source_decoder']: NoneType
+  state['_localization_engine_source_encoder']: NoneType
+  state['_preamble_engine_ring']: RationalField_with_category
+    state['_preamble_algebra_law_decisions']['associativity']: bool
+    state['_preamble_algebra_law_decisions']['unit']: bool
+    state['_preamble_algebra_law_decisions']['commutativity']: bool
+  state['_preamble_base_ring']: _OwnedRingParent_with_category
+    state['_defining_construction'][0]: OwnedJoinCategory_with_category
+    state['_defining_construction'][1]: NoneType
+      state['_defining_construction'][2]['source']: _OwnedRingParent_with_category
+      state['_defining_construction'][2]['submonoid']: SubobjectCategory.parent_class[_SubmonoidEngine].ObjectType
+      state['_defining_construction'][2]['_engine_ring']: RationalField_with_category
+      state['_defining_construction'][2]['algebra_source']: _OwnedRingParent_with_category
+  state['_constructing_category']: OwnedJoinCategory_with_category
+  state['element_class']: class OwnedJoinCategory.element_class | metaclass _OwnedDynamicMetaclass | _reduction (<function _element_class_of at 0x7d9a0d046140>, (Join of Category of local nontrivial localization rings and Category o
+    arg[0]: OwnedJoinCategory_with_category
+  state['_preamble_algebra_unit']: OwnedJoinCategory.element_class
+  state['_preamble_native_module_presentation']: _RingModulePresentation
+  state['_preamble_ring_display']: str
+  state['_category']: OwnedJoinCategory_with_category
+  state['_base']: _OwnedRingParent_with_category
+  state['_names']: NoneType
+  state['_pickle_version']: int
+  state['_embedding']: NoneType
+  state['_element_constructor']: method
+  state['_convert_method_name']: NoneType
+== QQ element class ==
+element class: OwnedJoinCategory.element_class
+element class _reduction: (<function _element_class_of at 0x7d9a0d046140>, (Join of Category of local nontrivial localization rings and Category of number fields and Category of prime fields and Category of commutative algebra
+== pickle of the submonoid alone ==
+submonoid RAISED PicklingError __reduce__ must return a string or tuple, not NoneType
+submonoid class: SubobjectCategory.parent_class[_SubmonoidEngine].ObjectType
+its _reduction: (Cached version of <function _engine_object_type at 0x7d9a0d07a1f0>, (<class 'sage_extensions.categories.abstract_categories.arrow_categories.SubobjectCategory.parent_class'>, <class 'sage_extensions.categories.abstract_categories.arrow_categories.SubobjectCategory.parent_class'>, <class 'sage_exten
+DONE
+[peakrss] issue275: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 0 MiB
+[peakrss] low-water MemAvail : 11568 MiB
+[peakrss] peak single VmHWM  : 0 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       1 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail= 11568 MiB
+launcher exit: 0

@@ -1,0 +1,34 @@
+class: SubobjectCategory.parent_class[_SubmonoidEngine].ObjectType
+metaclass: _OwnedDynamicMetaclass
+reduction function: Cached version of <function _engine_object_type at 0x7536f3016140>
+  arg[0]: _OwnedDynamicMetaclass <class 'sage_extensions.categories.abstract_categories.arrow_categories.Subobjec
+     its _reduction: (<function _parent_class_of at 0x7536f2fe1f30>, (Subobjects of Integer Ring,))
+     its metaclass: _OwnedDynamicMetaclass
+     RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+  arg[1]: _OwnedDynamicMetaclass <class 'sage_extensions.categories.abstract_categories.arrow_categories.Subobjec
+     its _reduction: (<function _parent_class_of at 0x7536f2fe1f30>, (Subobjects of Integer Ring,))
+     its metaclass: _OwnedDynamicMetaclass
+     RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+  arg[2]: type <class 'sage_extensions.categories.group.submonoids._SubmonoidEngine'>
+     its _reduction: <inherited>
+     its metaclass: type
+     pickles
+  arg[3]: _OwnedDynamicMetaclass <class 'sage_extensions.categories.abstract_categories.arrow_categories.Subobjec
+     its _reduction: (<function _element_class_of at 0x7536f2fe2090>, (Subobjects of Integer Ring,))
+     its metaclass: _OwnedDynamicMetaclass
+     RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+  arg[4]: _OwnedDynamicMetaclass <class 'sage_extensions.categories.abstract_categories.arrow_categories.Subobjec
+     its _reduction: (<function _element_class_of at 0x7536f2fe2090>, (Subobjects of Integer Ring,))
+     its metaclass: _OwnedDynamicMetaclass
+     RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+  arg[5]: NoneType None
+     pickles
+DONE
+[peakrss] issue275: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 11563 MiB
+[peakrss] peak single VmHWM  : 2 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       2 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     2 MiB avail= 11563 MiB
+launcher exit: 0

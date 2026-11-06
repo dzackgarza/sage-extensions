@@ -1,0 +1,15 @@
+category: Subobjects of Integer Ring
+-- category instance SubobjectCategory_with_category: RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+-- category class _OwnedDynamicMetaclass: RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+-- parent_class _OwnedDynamicMetaclass: RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+-- element_class _OwnedDynamicMetaclass: RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+-- subcategory_class _OwnedDynamicMetaclass: RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+DONE
+[peakrss] issue275: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 2 MiB
+[peakrss] low-water MemAvail : 11596 MiB
+[peakrss] peak single VmHWM  : 2 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       2 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 11596 MiB
+launcher exit: 0

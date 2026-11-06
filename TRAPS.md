@@ -3050,3 +3050,28 @@ CERT_ORDER True
 *Where the 692.6 s goes, and what each part is worth:* the factors **299.5 s** for `4 + 496` elements; the 1984 composites **221.8 s** (each is `~t_(s.p) · s · t_p`, so 3968 products and 1984 inversions on owned group elements — not free, about 56 ms per product); the morphism build **158.3 s**; the eight sampled family words 0.1–1.3 s each; the order certificate **2.1 s**. So on this specimen the factor route buys a *finishing* certificate, not a fast one: against #273's `stabilizer_generators` (the same stabilizer, 6 deduplicated generators, ~45 s) it is the expensive route. Both are right for what they certify — #273 certifies the subgroup by order, this certifies the family element by element.
 *Not asserted in the suite:* 692.6 s against the repo's declared `--timeout=60`. The same law is asserted at the integral action and at the G-set owner (`6e12b2e`, 4 passed in 2.60 s).
 *Not claimed here:* the elementwise comparison is a **sample** of 8 positions out of 1984 plus an order certificate; it is not equality with the family on all 1984 positions, and this entry stands on what its own log prints.
+
+**Issue #20, measured at the current tree: three of the five specimens round trip, and the two that do not fail on one object — an owned parameterized category that does not pickle at all (2026-11-06).** Probe `.tmp/qc-evidence/issue20-five-specimens-probe.py`, log `.tmp/qc-evidence/issue20-five-specimens.log`, adopted runtime, `pickle.dumps` then `pickle.loads`, equality **and** parent identity:
+```
+-- ZZ element: equal True | same parent True | bytes 825
+-- QQ element: PICKLE RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+-- number field order element: equal True | same parent True | bytes 3946
+-- lattice element: equal True | same parent True | bytes 2134
+-- isometry element: PICKLE RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+-- stabilizer-family element: PICKLE RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+```
+*Two corrections of the record this probe makes:* (1) the number-field order specimen **is constructible and does round trip** — the primitive element is read from the field's own module basis (`field.module_generator(label)` with the label whose generator is not `1`), so the missing `field.gen()` is an API gap, not a serialization blocker (it still raises `AttributeError: 'Owned_OwnedAlgebraParent_with_category' object has no attribute 'gen'`, measured in `.tmp/qc-evidence/issue20-gen.log`); (2) the stabilizer-family element fails exactly as QQ does, so the acceptance's central specimen is not a separate defect from the join parent's.
+*The chain, read hook by hook* (`.tmp/qc-evidence/issue20-chain.log`, `.tmp/qc-evidence/issue20-class.log`, `.tmp/qc-evidence/issue20-category.log`):
+1. `QQ`'s parent reduces memberwise and its state holds `_localization_submonoid`, an object of class `SubobjectCategory.parent_class[_SubmonoidEngine].ObjectType`;
+2. that class reduces by `_engine_object_type(...)`, whose arguments include the owned classes `SubobjectCategory.parent_class` / `element_class`;
+3. those reduce by `(_parent_class_of, (category,))` / `(_element_class_of, (category,))`, i.e. through the **parameterized category instance** `Subobjects of Integer Ring`;
+4. and that category does not pickle — instance, class, `parent_class`, `element_class` and `subcategory_class` all raise the same `PicklingError: __reduce__ must return a string or tuple, not NoneType`:
+```
+-- category instance SubobjectCategory_with_category: RAISED PicklingError: ...
+-- category class _OwnedDynamicMetaclass: RAISED PicklingError: ...
+-- parent_class _OwnedDynamicMetaclass: RAISED PicklingError: ...
+-- element_class _OwnedDynamicMetaclass: RAISED PicklingError: ...
+-- subcategory_class _OwnedDynamicMetaclass: RAISED PicklingError: ...
+```
+So the blocker is **not** the metaclass hook (it is registered: `copyreg.pickle(_owned_metaclass, _owned_metaclass.__reduce__)`, `owned_category.py:209-214`, and every owned class carries a `_reduction` of the form `(builder, (category,))`). It is that the reduction's datum — a parameterized owned category — is itself unpicklable, so every class whose reduction names it is unpicklable in turn. The earliest correct owner is therefore the parameterized category `SubobjectCategory` (`categories/abstract_categories/arrow_categories.py:1653`), at `UniqueRepresentation`'s reduction, not the ring parents and not the join parent.
+*Not claimed:* no fix is attempted here, and nothing about `_NativeModuleBasis` frames or order bases is newly measured — those specimens round trip through the lattice, which is the same parent graph.
