@@ -114,6 +114,40 @@ def _discriminant_points(
     return list(found)
 
 
+def _primitive_isotropic_line_series(lattice):
+    r"""The ``constant`` term for an indefinite lattice: its primitive isotropic line orbits.
+
+    Each subgroup of ``O(L)`` is asked for its orbits of primitive isotropic
+    rank-one subobjects, which is the cusp count a Baily-Borel boundary is made
+    of.  ``Otilde`` is ``ker rho`` and ``Otilde+`` its intersection with
+    ``O^+``; ``SO`` and ``SOtilde`` are the determinant-one pieces.  Nothing
+    positive or negative is bounded on an indefinite lattice, so ``z`` and ``w``
+    are empty.
+    """
+    orthogonal = lattice.Aut()
+    stable = lattice.stable_orthogonal_group()
+    the_plus = lattice.O_plus()
+    special = lattice.SO()
+    subgroups = {
+        "O": orthogonal,
+        "SO": special,
+        "Otilde": stable,
+        "SOtilde": stable.intersection(special),
+        "O+": the_plus,
+        "SO+": the_plus.intersection(special),
+        "Otilde+": stable.intersection(the_plus),
+        "SOtilde+": stable.intersection(special).intersection(the_plus),
+    }
+    return {
+        name: {
+            "constant": subgroup.isotropic_orbit_representatives(1).cardinality(),
+            "z": [],
+            "w": [],
+        }
+        for name, subgroup in subgroups.items()
+    }
+
+
 def primitive_orbit_series(lattice, bound: int = ORBIT_NORM_BOUND):
     r"""Count the orbits of ``O``, ``SO``, ``Otilde`` and ``SOtilde`` on primitive vectors by norm.
 
@@ -125,6 +159,15 @@ def primitive_orbit_series(lattice, bound: int = ORBIT_NORM_BOUND):
     stabilizers by Schreier-Sims and the orbits on ``X`` directly.  An isometry
     preserves primitivity, so one vector of each ``O``-orbit decides it for the
     whole orbit.
+
+    On an **indefinite** lattice the bounded fibre ``X`` is infinite, so only the
+    ``constant`` term is meaningful and it counts *primitive isotropic lines*
+    (rank-one isotropic sublattices), not vectors: a Baily-Borel cusp is a
+    ``Γ``-orbit of lines, which is what Scattone's, Sterk's and the
+    Dutour Sikirić--Hulek cusp counts number.  The two differ on a lattice whose
+    ``Γ`` does not contain ``-id``, where ``v`` and ``-v`` are separate vector
+    orbits inside one line orbit.  ``z`` and ``w`` are empty there, since no
+    positive or negative norm is bounded.
     """
     definiteness = lattice.definiteness()
     match definiteness:
@@ -133,7 +176,7 @@ def primitive_orbit_series(lattice, bound: int = ORBIT_NORM_BOUND):
         case "negative_definite":
             sign = -1
         case _:
-            raise ValueError(f"primitive bounded orbit series requires a definite lattice, not {lattice}")
+            return _primitive_isotropic_line_series(lattice)
     gram = _gram_matrix(lattice)
     generators = _orthogonal_generator_matrices(lattice)
     vectors = []
