@@ -3242,10 +3242,24 @@ class Lattices(OwnedCategoryOverBaseRing):
 
         @cached_method
         def discriminant_representation(self):
-            r"""Return ``rho_L:O(L)->O(A_L)`` by functoriality of discriminants."""
+            r"""Return ``rho_L:O(L)->O(A_L)`` by functoriality of discriminants.
+
+            An element is accepted in any of the forms an isometry of ``L`` is
+            written in: an element of ``Aut(L)`` itself, a matrix whose rows are
+            the images of the selected basis, or a form-preserving morphism from
+            an equal copy of ``L`` onto ``L``.  The last two are read as
+            isometries of ``L`` by the same constructor that builds ``Aut(L)``,
+            so what is returned is the discriminant action of an actual isometry
+            of ``L`` and not of a matrix treated as one by assumption.
+            """
             source = self.Aut()
             target = self.discriminant_group().orthogonal_group()
-            return OwnedGroups().Mor(source, target)(lambda isometry: isometry.discriminant_morphism())
+
+            def image(element):
+                isometry = element if element.parent() is source else source(element)
+                return isometry.discriminant_morphism()
+
+            return OwnedGroups().Mor(source, target)(image)
 
         @cached_method
         def discriminant_image(self):
