@@ -1,25 +1,25 @@
 [wall=     0.0s cpu=     0.0s] imports
-[wall=     1.6s cpu=     1.1s] case_3: order 92897280, L/P/F 5/10/19
-[wall=    22.6s cpu=    21.3s] polarization transported
-[se-stage] _marked_automorphism_generators start t=356246.3
-[se-stage] _marked_automorphism_generators done in 115.3s: 24 gens
-[wall=   206.3s cpu=   124.5s] coinvariant_extension_subgroup()
-[wall=   206.3s cpu=   124.5s] G_h built; N = Integral lattice of rank 12 and signature (2, 10)
+[wall=     1.4s cpu=     1.0s] case_3: order 92897280, L/P/F 5/10/19
+[wall=    12.5s cpu=    12.1s] polarization transported
+[se-stage] _marked_automorphism_generators start t=391994.4
+[se-stage] _marked_automorphism_generators done in 112.6s: 24 gens
+[wall=   184.0s cpu=   114.0s] coinvariant_extension_subgroup()
+[wall=   184.0s cpu=   114.1s] G_h built; N = Integral lattice of rank 12 and signature (2, 10)
 ---- the acceptance obligation: the generating family of G_h, and T1..T4 ----
-[wall=   818.1s cpu=   726.0s] BUDGET: group_generators() exceeded 600 CPU seconds
+[wall=   784.0s cpu=   714.0s] BUDGET: group_generators() exceeded 600 CPU seconds
 FAMILY_OVER_BUDGET
-[peakrss] enriques-family-cpu: child waited=3 shell_code=3 samples=414
-[peakrss] peak tree RSS      : 3709 MiB
-[peakrss] low-water MemAvail : 1125 MiB
-[peakrss] peak single VmHWM  : 3904 MiB
+[peakrss] enriques-family-cpu: child waited=3 shell_code=3 samples=397
+[peakrss] peak tree RSS      : 4373 MiB
+[peakrss] low-water MemAvail : 6655 MiB
+[peakrss] peak single VmHWM  : 4412 MiB
 [peakrss] peak VmHWM by executable (this is the per-process attribution):
-[peakrss]   julia                      2892 MiB peak
-[peakrss]   python                     1006 MiB peak
+[peakrss]   julia                      3299 MiB peak
+[peakrss]   python                     1103 MiB peak
 [peakrss]   timeout                       7 MiB peak
 [peakrss]   proot-x86_64                  3 MiB peak
-[peakrss]   t=   813.5s procs=  4 rss=  3709 MiB hwm=  3901 MiB avail=  3388 MiB
-[peakrss]   t=   815.5s procs=  4 rss=  3709 MiB hwm=  3901 MiB avail=  3393 MiB
-[peakrss]   t=   797.4s procs=  4 rss=  3708 MiB hwm=  3900 MiB avail=  3411 MiB
-[peakrss]   t=   807.5s procs=  4 rss=  3708 MiB hwm=  3901 MiB avail=  3401 MiB
-[peakrss]   t=   809.5s procs=  4 rss=  3708 MiB hwm=  3901 MiB avail=  3391 MiB
+[peakrss]   t=   778.4s procs=  4 rss=  4373 MiB hwm=  4412 MiB avail=  6662 MiB
+[peakrss]   t=   780.4s procs=  4 rss=  4373 MiB hwm=  4412 MiB avail=  6657 MiB
+[peakrss]   t=   782.4s procs=  4 rss=  4373 MiB hwm=  4412 MiB avail=  6657 MiB
+[peakrss]   t=   784.4s procs=  4 rss=  4373 MiB hwm=  4412 MiB avail=  6655 MiB
+[peakrss]   t=   770.4s procs=  4 rss=  4372 MiB hwm=  4411 MiB avail=  6678 MiB
 launcher exit: 3
