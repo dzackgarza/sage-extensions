@@ -596,6 +596,33 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                 transitions=orbit.__dict__.get("_retained_transitions"),
             )
 
+        def orbit_schreier_factors(self, point):
+            r"""Return the letters and transversals whose composites are the Schreier family.
+
+            :meth:`orbit_schreier_morphism` emits ``t_(s.p)^-1 s t_p`` over the
+            orbit points ``p`` and the cover's letters ``s``, in that order.  The
+            letters and the transversals are returned here separately, so a caller
+            can realize the whole family by reading ``|letters| + |orbit|``
+            elements and composing instead of reading ``|letters| * |orbit|`` of
+            them.  Both are group elements of this G-set's group, in the order the
+            family uses: ``letters[j]`` is the ``j``-th letter and
+            ``transversals[i]`` is ``t_p`` for the ``i``-th orbit point.
+
+            The composite law is the caller's to check: for the ``i``-th orbit
+            point ``p`` and the ``j``-th letter ``s``, the family element is
+            ``~transversals[position of s.p] * letters[j] * transversals[i]``.
+            """
+            orbit, words, augmentation = self._orbit_of(point)
+            ranking = orbit.ranking_map()
+            letters = tuple(
+                augmentation(generator)
+                for generator in augmentation.domain().group_generators()
+            )
+            transversals = tuple(
+                augmentation(words[int(ranking(image))]) for image in orbit
+            )
+            return letters, transversals
+
         @cached_method(key=lambda self, point: self.ranking_map()(point))
         def orbit_as_coset_space(self, point):
             r"""The orbit of ``point`` as ``G/G_point``, with the section of ``G -> G/G_point``."""
