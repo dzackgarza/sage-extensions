@@ -7975,10 +7975,10 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
                 if ambient.is_finite() is True:
                     return _engine_subgroup_admits(self, candidate)
                 return AtomicProposition("is_member", candidate, self)
-            if candidate == ambient.one() or any(
-                candidate == generator or candidate == ~generator
-                for generator in self.selected_subgroup_generators()
-            ):
+            if candidate == ambient.one():
+                return True
+            generators = self.selected_subgroup_generators()
+            if candidate in generators or ~candidate in generators:
                 return True
             if self.is_finite() is True:
                 return _engine_subgroup_admits(self, candidate)
