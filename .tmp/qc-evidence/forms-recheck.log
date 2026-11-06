@@ -1,0 +1,5 @@
+### pytest tests/forms/test_polar_radical_criterion.sage tests/forms/test_isometry_between_torsion_forms.sage tests/lattices/test_the_discriminant_action_of_an_isometry.sage at 2026-11-06T04:53:42Z
+...................                                                      [100%]
+19 passed in 54.33s
+### exit=0
+2026-11-06T04:54:40Z

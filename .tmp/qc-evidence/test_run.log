@@ -1,0 +1,5 @@
+### pytest (repo configuration) -o addopts= -p sage_extensions.testing.test_lint tests/lattices/test_the_discriminant_action_of_an_isometry.sage at 2026-11-05T23:03:19Z
+....                                                                     [100%]
+4 passed in 45.24s
+### exit=0
+2026-11-05T23:04:07Z

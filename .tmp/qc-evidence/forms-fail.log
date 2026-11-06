@@ -1,0 +1,40 @@
+### pytest tests/forms/test_polar_radical_criterion.sage tests/forms/test_isometry_between_torsion_forms.sage at 2026-11-06T04:50:02Z
+F.......F.....F                                                          [100%]
+=================================== FAILURES ===================================
+___________ test_an_invertible_gram_can_have_a_nonzero_polar_radical ___________
+tests/forms/test_polar_radical_criterion.sage:87: in test_an_invertible_gram_can_have_a_nonzero_polar_radical
+    assert form.is_isomorphic(form) is True
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:3842: in is_isomorphic
+    return _forms_are_isomorphic(self, other, quadratic=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py:1755: in _forms_are_isomorphic
+    raise TypeError(
+E   TypeError: the isometry of Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 4] and Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 4] is undecided: their polar forms have radicals, so the normal-form engine does not apply, the represented invariants (order, invariant factors, radical structure, order-qualified value profile) agree, and no checked witness was found within the candidate budget of the automorphism-orbit transports through the invariant-factor framings
+_______ test_a_mixed_order_form_with_a_vanishing_block_is_still_refused ________
+tests/forms/test_polar_radical_criterion.sage:185: in test_a_mixed_order_form_with_a_vanishing_block_is_still_refused
+    assert degenerate.is_isomorphic(degenerate) is True
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:2851: in is_isomorphic
+    return _forms_are_isomorphic(self, other, quadratic=quadratic)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py:1755: in _forms_are_isomorphic
+    raise TypeError(
+E   TypeError: the isometry of Finitely presented module on 2 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 4] and Finitely presented module on 2 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 4] is undecided: their polar forms have radicals, so the normal-form engine does not apply, the represented invariants (order, invariant factors, radical structure, order-qualified value profile) agree, and no checked witness was found within the candidate budget of the automorphism-orbit transports through the invariant-factor framings
+____________ test_a_radical_polar_form_is_a_form_and_is_now_decided ____________
+tests/forms/test_isometry_between_torsion_forms.sage:150: in test_a_radical_polar_form_is_a_form_and_is_now_decided
+    assert form.is_isomorphic(form) is True
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:3842: in is_isomorphic
+    return _forms_are_isomorphic(self, other, quadratic=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py:1755: in _forms_are_isomorphic
+    raise TypeError(
+E   TypeError: the isometry of Finitely presented module on 2 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2] and Finitely presented module on 2 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2] is undecided: their polar forms have radicals, so the normal-form engine does not apply, the represented invariants (order, invariant factors, radical structure, order-qualified value profile) agree, and no checked witness was found within the candidate budget of the automorphism-orbit transports through the invariant-factor framings
+=========================== short test summary info ============================
+FAILED tests/forms/test_polar_radical_criterion.sage::test_an_invertible_gram_can_have_a_nonzero_polar_radical
+FAILED tests/forms/test_polar_radical_criterion.sage::test_a_mixed_order_form_with_a_vanishing_block_is_still_refused
+FAILED tests/forms/test_isometry_between_torsion_forms.sage::test_a_radical_polar_form_is_a_form_and_is_now_decided
+3 failed, 12 passed in 13.56s
+### exit=1
+2026-11-06T04:50:19Z

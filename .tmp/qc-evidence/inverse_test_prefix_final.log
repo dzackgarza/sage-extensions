@@ -1,0 +1,24 @@
+### pytest (pre-fix worktree dc2c230) tests/lattices/test_integral_restriction_stores_a_true_inverse.sage at 2026-11-05T22:15:27Z
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+E   assert e_0 - e_1 == e_0
+      
+      Use -v to get more diff
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:720 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+/repos/sage-extensions/tests/lattices/test_integral_restriction_stores_a_true_inverse.sage:46: assert e_0 - e_1 == e_0
+E   assert -e_0 == e_0
+      
+      Use -v to get more diff
+/repos/sage-extensions/tests/lattices/test_integral_restriction_stores_a_true_inverse.sage:77: assert -e_0 == e_0
+E   assert e_1 == e_2
+      
+      Use -v to get more diff
+/repos/sage-extensions/tests/lattices/test_integral_restriction_stores_a_true_inverse.sage:110: assert e_1 == e_2
+=========================== short test summary info ============================
+FAILED tests/lattices/test_integral_restriction_stores_a_true_inverse.sage::test_a_non_symmetric_unimodular_isometry_stores_its_true_inverse
+FAILED tests/lattices/test_integral_restriction_stores_a_true_inverse.sage::test_a_non_symmetric_cycle_of_order_three_stores_its_true_inverse
+FAILED tests/lattices/test_integral_restriction_stores_a_true_inverse.sage::test_a_rank_three_non_symmetric_cycle_stores_its_true_inverse
+3 failed in 12.89s
+### exit=1

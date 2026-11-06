@@ -1,0 +1,10 @@
+### 2026-11-06T05:06:36Z pytest tests/lattices/test_isometry_mor_cardinality_archive.sage tests/lattices/test_isometry_structure_description_archive.sage tests/lattices/test_discriminant_actions_archive.sage tests/lattices/test_rational_definite_orthogonal_groups.sage tests/lattices/test_rational_indefinite_orthogonal_groups.sage tests/lattices/test_isometry_decision.sage tests/groups/test_generated_model_character_quotient.sage
+....FFFF.........F..................                                     [100%]
+=========================== short test summary info ============================
+FAILED tests/lattices/test_isometry_structure_description_archive.sage::test_the_orthogonal_group_of_U_is_the_klein_four_group
+FAILED tests/lattices/test_discriminant_actions_archive.sage::test_a4_discriminant_image_is_negation_on_c5
+FAILED tests/lattices/test_discriminant_actions_archive.sage::test_the_weyl_group_of_D4_acts_trivially_on_its_glue_and_triality_permutes_the_three_nonzero_classes
+FAILED tests/lattices/test_discriminant_actions_archive.sage::test_d4_triality_fuses_the_three_order_two_glue_subgroups
+FAILED tests/lattices/test_rational_definite_orthogonal_groups.sage::test_embeddings_into_the_rational_plane_are_not_enumerated_shell_by_shell
+5 failed, 31 passed in 84.24s (0:01:24)
+### exit=1
