@@ -32,6 +32,24 @@ IndexT = TypeVar("IndexT")
 PointT = TypeVar("PointT")
 
 
+class _PointsAreEqual:
+    r"""The default equivalence of an ordered set: two points are equivalent when they are equal.
+
+    An ordered set retains its equivalence on the parent, and a parent must survive
+    a pickle round trip, so the default is a module-level object rather than a
+    closure (issue #20).  It carries no state.
+    """
+
+    def __call__(self, left, right):
+        return left == right
+
+    def __repr__(self) -> str:
+        return "point equality"
+
+
+_DEFAULT_EQUIVALENCE = _PointsAreEqual()
+
+
 class OrderedEnumeratedSets(OwnedCategory):
     r"""Sets presented by a chosen enumeration from an index set.
 
@@ -116,7 +134,7 @@ class OrderedEnumeratedSets(OwnedCategory):
             self._element_at_function = element_at
             self._index_of_function = index_of
             self._contains_function = contains
-            self._equivalent_function = equivalent or (lambda left, right: left == right)
+            self._equivalent_function = equivalent or _DEFAULT_EQUIVALENCE
             self._name = name
             super().__init__(facade=True, **rest)
 

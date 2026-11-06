@@ -1,0 +1,16 @@
+-- ZZ element: PICKLE RAISED PicklingError: Can't pickle local object <function _RingModulePresentation.construct.<locals>.<lambda> at 0x7c9177555640>
+-- QQ element: PICKLE RAISED PicklingError: Can't pickle local object <function _RingModulePresentation.construct.<locals>.<lambda> at 0x7c9177555640>
+-- number field order element: construction raised AttributeError: 'Owned_OwnedAlgebraParent_with_category' object has no attribute 'gen'
+-- lattice element: PICKLE RAISED PicklingError: Can't pickle local object <function _RingModulePresentation.construct.<locals>.<lambda> at 0x7c9177555640>
+PROBE_DONE
+[peakrss] issue275: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 284 MiB
+[peakrss] low-water MemAvail : 10311 MiB
+[peakrss] peak single VmHWM  : 284 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      274 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   284 MiB hwm=   284 MiB avail= 10311 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 10531 MiB
+launcher exit: 0

@@ -415,6 +415,44 @@ class EnumeratedSets(OwnedCategory):
             return self.fixed_size_selections(size, repetition=True)
 
 
+class _OrdinalPointAtPosition:
+    r"""The point at a position in the finite ordinal ``[n]``.
+
+    ``[n]`` retains its enumeration on the parent, and a parent must survive a
+    pickle round trip, so the map is a module-level object rather than a closure
+    (issue #20).  It carries no state: position ``k`` is the point ``k``.
+    """
+
+    def __call__(self, position):
+        return NN(int(position))
+
+    def __repr__(self) -> str:
+        return "point at position"
+
+
+class _OrdinalIndexOfPoint:
+    r"""The position of a point of the ordinal ``ordinal``, or ``None`` outside it.
+
+    The ordinal is retained so the question "is this point one of mine" is asked
+    of the ordinal itself, exactly as the closure it replaces asked it.  Holding
+    the ordinal is what makes this picklable where a closure was not: a class
+    instance pickles by reference plus its state, and its state is a parent that
+    is being pickled anyway.
+    """
+
+    def __init__(self, ordinal) -> None:
+        self._ordinal = ordinal
+
+    def __call__(self, point):
+        return int(point) if point in self._ordinal else None
+
+    def __repr__(self) -> str:
+        return "index of point"
+
+
+_ORDINAL_POINT_AT_POSITION = _OrdinalPointAtPosition()
+
+
 class AugmentedSimplexCategory(OwnedCategory):
     r"""The standard finite linear orders \([n] = \{0 < \dots < n-1\}\).
 
@@ -456,8 +494,8 @@ class AugmentedSimplexCategory(OwnedCategory):
             # point at position k is k.
             super().__init__(
                 index_set=self,
-                element_at=lambda position: NN(int(position)),
-                index_of=lambda point: int(point) if point in self else None,
+                element_at=_ORDINAL_POINT_AT_POSITION,
+                index_of=_OrdinalIndexOfPoint(self),
                 contains=self.__contains__,
                 **rest,
             )

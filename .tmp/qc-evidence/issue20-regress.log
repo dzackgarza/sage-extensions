@@ -1,0 +1,16 @@
+### pytest tests/sets/test_a_finite_literal_set_reads_as_a_subset.sage tests/sets/test_cardinals_and_ordinals.sage tests/sets/test_isomorphisms_between_finite_sets_are_counted.sage tests/lattices/test_integral_stabilizers.sage tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage at 2026-11-06T11:03:20Z
+....F........                                                            [100%]
+=================================== FAILURES ===================================
+____ test_cardinal_arithmetic_and_order_do_not_assume_continuum_hypothesis _____
+tests/sets/test_cardinals_and_ordinals.sage:35: in test_cardinal_arithmetic_and_order_do_not_assume_continuum_hypothesis
+    assert cardinals.Mor(aleph(1), continuum).cardinality() == 1
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:2497: in cardinality
+    assert construction_cardinality is not None, (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: cannot compute the cardinality of Set of Morphisms from ℵ_1 to (2)^(ℵ_0) in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda: its construction supplies no exact value or decided finite enumeration (it is in Join of Category of homsets of sets and Category of sets)
+=========================== short test summary info ============================
+FAILED tests/sets/test_cardinals_and_ordinals.sage::test_cardinal_arithmetic_and_order_do_not_assume_continuum_hypothesis
+1 failed, 12 passed in 3.73s
+### exit=1
+2026-11-06T11:03:25Z

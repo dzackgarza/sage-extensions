@@ -6028,6 +6028,26 @@ class _OwnedIntegerElement(_OwnedRingElement):
         return integer_ring(self._backend())
 
 
+class _NativeRingProduct:
+    r"""The multiplication of an owned ring read off its native representation.
+
+    A ring parent retains this callable as part of its algebra datum, so it is a
+    module-level object rather than a closure: a parent must survive a pickle
+    round trip, and a local lambda on it cannot (issue #20).  It carries no
+    state, so it pickles by reference and the datum it supplies is the native
+    product ``left * right`` unchanged.
+    """
+
+    def __call__(self, left, right):
+        return left * right
+
+    def __repr__(self) -> str:
+        return "native ring product"
+
+
+_NATIVE_RING_PRODUCT = _NativeRingProduct()
+
+
 class _OwnedRingParent(Parent):
     r"""An owned ring parent with one private computational realization.
 
@@ -6271,7 +6291,7 @@ class _OwnedRingParent(Parent):
 
                 _algebra_from_native_ring(
                     self,
-                    lambda left, right: left * right,
+                    _NATIVE_RING_PRODUCT,
                     self._from_engine_element(engine.one()),
                     self._native_scalar_action,
                     module_basis=self._native_module_basis,
