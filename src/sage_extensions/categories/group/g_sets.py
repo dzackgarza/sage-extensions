@@ -596,19 +596,6 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                 transitions=orbit.__dict__.get("_retained_transitions"),
             )
 
-        def orbit_lattices(self, point):
-            r"""Return the points of the orbit of ``point``, in the order the Schreier factors use.
-
-            For a G-set whose points are the objects a group acts on -- the lattices
-            of an integral-structure action, say -- these are the targets the
-            transversals of :meth:`orbit_schreier_factors` carry the base point to,
-            element for element.  A consumer that must read a letter as a map
-            between two orbit points needs both endpoints, and this is the one that
-            is not the base point.
-            """
-            orbit, _words, _augmentation = self._orbit_of(point)
-            return tuple(orbit)
-
         def orbit_schreier_factors(self, point):
             r"""Return the letters and transversals whose composites are the Schreier family.
 

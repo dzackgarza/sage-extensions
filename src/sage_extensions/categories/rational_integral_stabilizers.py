@@ -255,20 +255,6 @@ class _FiniteIntegralRepresentation(SageObject):
     def _selected_point(self):
         return self.g_set().point_set()(_owned_integers().zero())
 
-    def stabilizer_schreier_orbit_lattices(self):
-        r"""Return ``L_p`` for every orbit point ``p``, aligned with the Schreier transversals.
-
-        ``stabilizer_schreier_factors`` returns ``transversals[i]`` as an element of
-        the rational group carrying the selected lattice ``L`` to the ``i``-th orbit
-        point, and that point *is* the lattice ``L_p = t_p(L)``.  A consumer needs
-        those targets to read a letter as a map between lattices: a letter ``s``
-        carries ``L_p`` onto ``L_(s.p)``, so its restriction to ``L_p`` is a lattice
-        isometry ``L_p -> L_(s.p)``, and only with both endpoints does the composite
-        ``(~t_(s.p)) * s * t_p`` become an element of ``O(L)``.  Converting a letter
-        against ``L`` alone converts a map whose domain is the wrong lattice.
-        """
-        return self.g_set().orbit_lattices(self._selected_point())
-
     def stabilizer_schreier_factors(self):
         r"""Return the letters and transversals of the lattice stabilizer's Schreier family.
 
@@ -510,17 +496,6 @@ class IntegralStructureAction(SageObject):
     @cached_method
     def finite_representation(self):
         return _FiniteIntegralRepresentation(self)
-
-    def stabilizer_schreier_orbit_lattices(self):
-        r"""Return ``L_p`` for every orbit point ``p``, aligned with the Schreier transversals.
-
-        The lattice ``L_p = t_p(L)`` is the target of ``transversals[i]`` and the
-        domain on which a letter acts when it is read as a lattice isometry
-        ``L_p -> L_(s.p)``.  Exposing them is what lets a consumer realize the
-        Schreier factors without converting a letter against ``L``, a map whose
-        domain is not where that letter lives.
-        """
-        return self.finite_representation().stabilizer_schreier_orbit_lattices()
 
     def stabilizer_schreier_factors(self):
         r"""Return ``(letters, transversals)`` for the lattice stabilizer's Schreier family.
