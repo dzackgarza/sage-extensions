@@ -3169,3 +3169,19 @@ U + U + U     rank  6   1 orbit in  0.1 s   calls: 0
 E8(-2) + U    rank 10   2 orbits in 40.5 s  calls: 0
 ```
 **The only call observed to reach the line is `NamedLattices.Tco.Aut().isotropic_orbit_representatives(1)`**, and its cost is the one item 1 measured: 320–375 s for `group_generators()` (438, 444, 372, 360, 442, 353 generators on six runs) plus at least 130 s of a search that does not terminate under any cap tried. So the repair cannot be given a regression test on a lattice that finishes: the smallest lattice that exercises the line is the one that cannot be run to completion, which is why no test was written for it rather than a test that would have to be skipped or weakened. The trigger is not rank but structure — 2-elementary with a large isometry group, where the port's pointed-isometry test reaches the *reversing* lift fibre and asks for its integral members, which is the only caller of `_vector_denominator`.
+
+**#286, the small-indefinite-lattice brief: the derivation is confirmed on the lattice, the O(L) counts match it, and the Õ count disagrees at d = 9 (2026-11-06).** The lattices are `L_d = U + U + <-2d>`, rank 5, signature `(2, 3)`; the derivation in the brief was checked against the lattice itself before any assertion, and it holds: the isotropic classes of `A_{L_d}` by order are
+```
+d = 1   |A| =  2   {1: 1}                    sum 1   orders 1
+d = 2   |A| =  4   {1: 1}                    sum 1   orders 1
+d = 4   |A| =  8   {1: 1, 2: 1}              sum 2   orders 2
+d = 9   |A| = 18   {1: 1, 3: 2}              sum 3   orders 2
+d = 36  |A| = 72   {1: 1, 2: 1, 3: 2, 6: 2}  sum 6   orders 4
+```
+so `sum_{e^2|d} phi(e) = 1, 1, 2, 3, 6` and `#{e : e^2 | d} = 1, 1, 2, 2, 4`, exactly the brief's figures. **No disagreement with the derivation's arithmetic.**
+*Port timings on the five lattices* (image port unless noted): `O(L).group_generators()` returned **28 in 60.5 s** (d = 1), **26 in 6.3 s** (d = 2), **27 in 7.0 s** (d = 4), **33 in 11.1 s** (d = 9), **37 in 16.8 s** (d = 36) — all inside the brief's one-minute bound, with the first at the boundary.
+*The test as drafted* (`.scratch/issue286_ld_test_draft.sage`, not committed: it is red) asserts the class-order derivation — **passes** — and then the O(L), Õ and Õ⁺ counts. Under the **pinned** port the splitting machinery runs: the first attempt, run under the image port, died in exactly the port#71 way (`recursive.py:154 int()` on an owned coordinate), and under `991b88b0` it does not. What it then computes:
+- `O(L)` counts: **1, 1, 2, 2, 4** — equal to `#{e}` for all five, matching the derivation.
+- Õ counts: **1** (d = 1), **1** (d = 2), **2** (d = 4), **2** (d = 9, derived 3).
+**The one disagreement is d = 9: Õ gives 2 orbits where `sum_{e^2|d} phi(e) = 1 + 2 = 3`.** Two readings, and I do not have the measurement that separates them: either the splitting under-counts (the two order-3 classes stay fused inside their single O(L)-orbit, which is a defect in `splitting_isometries`), or one of the two order-3 classes carries no primitive isotropic vector of divisibility 3, in which case Eichler's criterion does not apply to it because there is no vector to apply it to, and the derivation over-counts. The second reading is plausible and would be *attainedness*, the same distinction `covering_discriminant_classes` already states for a different setting. It is not resolved by a larger run: it needs the two order-3 classes of `A_{L_9}` examined one at a time for an attained primitive vector of divisibility three, which is a finite search on a rank-5 lattice and is the next step.
+*Because it is red, the draft is not committed* and items 2 and 3 of the brief are not started: the owner series would be built on the same splitting, and the plane count for d = 1 rests on the same machinery that has just disagreed once.

@@ -1,0 +1,32 @@
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_________ test_the_primitive_isotropic_orbits_of_l_d_are_one_per_class _________
+tests/lattices/test_isotropic_orbits_on_small_indefinite_lattices.sage:78: in test_the_primitive_isotropic_orbits_of_l_d_are_one_per_class
+    assert stable.isotropic_orbit_representatives(1).cardinality() == class_count
+E   assert 2 == 3
+E    +  where 2 = cardinality()
+E    +    where cardinality = {Integral lattice of rank 1 and signature (0, 0), Integral lattice of rank 1 and signature (0, 0)}.cardinality
+E    +      where {Integral lattice of rank 1 and signature (0, 0), Integral lattice of rank 1 and signature (0, 0)} = isotropic_orbit_representatives(1)
+E    +        where isotropic_orbit_representatives = {g in Orthogonal group O(Integral lattice of rank 5 and signature (2, 3)) : rho_L(g) lies in Subgroup of Orthogonal gr...ely presented module on 5 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 18]}.isotropic_orbit_representatives
+E    +        and   1 = Integer(1)
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:720 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+FAILED tests/lattices/test_isotropic_orbits_on_small_indefinite_lattices.sage::test_the_primitive_isotropic_orbits_of_l_d_are_one_per_class
+1 failed, 1 passed in 173.84s (0:02:53)
+[peakrss] issue286: child waited=1 shell_code=1 samples=91
+[peakrss] peak tree RSS      : 4158 MiB
+[peakrss] low-water MemAvail : 9786 MiB
+[peakrss] peak single VmHWM  : 4197 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      3288 MiB peak
+[peakrss]   python                      898 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   176.1s procs=  4 rss=  4158 MiB hwm=  4197 MiB avail= 10106 MiB
+[peakrss]   t=   174.1s procs=  4 rss=  4157 MiB hwm=  4195 MiB avail= 10106 MiB
+[peakrss]   t=   172.1s procs=  4 rss=  4145 MiB hwm=  4183 MiB avail= 10117 MiB
+[peakrss]   t=   170.1s procs=  4 rss=  4135 MiB hwm=  4173 MiB avail= 10125 MiB
+[peakrss]   t=   168.1s procs=  4 rss=  4128 MiB hwm=  4167 MiB avail= 10133 MiB
+### exit=1
