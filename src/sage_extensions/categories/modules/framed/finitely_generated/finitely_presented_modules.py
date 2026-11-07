@@ -1975,9 +1975,14 @@ class _GeneralPresentedModule:
         assert self._relation_submodule is not None, (
             f"{self} has no engine relation module, so its submodules have no engine preimage to compare"
         )
+        from sage.matrix.constructor import matrix
+
         lifts = [self(generator)._representative() for generator in generators]
-        preimage = self._free_module.submodule(lifts + list(self._relation_submodule.basis()))
-        return tuple(tuple(row) for row in preimage.echelonized_basis_matrix().rows())
+        # Sage's integral Hermite form is the canonical echelon basis of the
+        # same preimage row span; the cover admits every lift above and every
+        # retained relation. See matrix_integer_dense.hermite_form.
+        preimage = matrix(SageZZ, lifts + list(self._relation_submodule.basis()))
+        return tuple(tuple(row) for row in preimage.hermite_form(include_zero_rows=False).rows())
 
     def _submodule_generator_images_from_key(self, key):
         r"""Read a submodule's canonical preimage basis as nonzero quotient generators.
