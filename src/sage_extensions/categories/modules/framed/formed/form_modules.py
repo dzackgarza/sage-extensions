@@ -170,13 +170,13 @@ def _relation_morphism(ring, relation_rows):
     )
 
 
-@cached_function(key=lambda formed_module: id(formed_module))
+@cached_function
 def _represented_value_module(formed_module):
     r"""Return the actual module object underlying a form's public value object."""
     return _represented_module(formed_module.value_module(), formed_module.base_ring())
 
 
-@cached_function(key=lambda value, ring: (id(value), id(ring)))
+@cached_function
 def _represented_module(value, ring):
     r"""Return the ``ring``-module underlying the value object ``value`` of a pairing.
 
@@ -184,13 +184,28 @@ def _represented_module(value, ring):
     ``R`` is already carrying its canonical self-module structure it is
     returned directly; otherwise ``R.regular_module()`` supplies the canonical
     rank-one realization over itself.  Genuine module values are unchanged.
+
+    An owned ring that is an ``ring``-algebra has exactly one scalar structure,
+    its ``algebra_structure_morphism``, and the restriction is taken along that
+    map when it starts at ``ring`` and ends at ``value``.  This is not a
+    convenience: ``restriction_of_scalars`` is one functor per ring map, and the
+    restricted module identifies itself with its scalars through
+    ``regular_module_identification``, which asserts that its ``ring_map`` *is*
+    the algebra's structure morphism.  A second map that agrees pointwise
+    produces a module that refuses its own identification, so the owning datum
+    is read here instead of restated.
     """
+    from sage_extensions.categories.algebras.algebras import Algebras
 
     if value is ring:
         return ring.regular_module()
     if value in Modules(ring):
         return value
     if value in OwnedRings():
+        if value in OwnedRings().Commutative() and value in Algebras(ring):
+            structure = value.algebra_structure_morphism()
+            if structure.domain() is ring and structure.codomain() is value:
+                return value.regular_module().restrict_scalars(structure)
         try:
             scalar_map = OwnedRings().Mor(ring, value)(lambda scalar: value(scalar))
             return value.regular_module().restrict_scalars(scalar_map)

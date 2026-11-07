@@ -3271,3 +3271,60 @@ agree with GAP's named Omega, SO and GO orders for dimensions five and six,
 plus and minus type, and the extension field F9, after a change of basis.
 The unchanged complete port comparison, including its computed generators,
 remains a separate required consumer.
+### Restriction of scalars is interned once per scalar structure, whatever copy asked (2026-11-07, #305)
+
+`Lattices(ZZ)("D4").discriminant_quadratic_form()` failed inside
+`regular_module_identification` (`categories/modules/pure/modules.py:5033`) on the
+declared gated entrypoint and passed in a bare session.  The failing conjunct was
+isolated in one process, running the test modules that precede it and then the
+construction:
+
+```
+regular_module is extension      : True
+conjunct (a) scalars in Algebras : True
+conjunct (b) ring_map is structure: False
+ring_map == structure            : True        (equal, distinct objects)
+```
+
+It is not import order: in a fresh process, `sage.all` first or the session first,
+both conjuncts hold and `|A| = 4`.  It is session history, and it is object identity.
+
+The producer was then named by recording every restriction functor built along a
+`ZZ -> QQ` map and matching the failing module's `ring_map`:
+
+```
+restriction functors built along ZZ -> QQ: 1
+  map id=124324425668144 canonical=False
+failing module ring_map id=124324425668144 canonical=False
+  built by: tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage:36
+            Modules(QQ).restriction_of_scalars(ZZ.Mor(QQ)(lambda n: QQ(n)))(lattice_)
+```
+
+One functor for the whole session, built along a copy a *test helper* stated first.
+`Modules.restriction_of_scalars` interns one functor per ring map ("the cache key is the
+ring map itself"), ring maps are equal when they agree pointwise, so every later
+restriction along `QQ` -- including the canonical
+`fraction_field.algebra_structure_morphism()` that `dual_lattice` asks for -- reuses
+that first functor, and the module it builds carries the copy.  The identification then
+refuses the module the algebra's own structure asked for.  That is why the same
+construction answers differently in two session states and why the ad-hoc map was
+invisible in a bare session.
+
+Measured and excluded on the way: that the algebra's cached structure morphism is
+unstable (it is not -- same object across reads, across an ad-hoc `ZZ.Mor(QQ)` and
+across the sibling test module), and that `_represented_module`'s ad-hoc branch is the
+producer (it is not -- by then its `value` is already the restricted module; patching
+that branch and dropping the `id()` keys of the two `cached_function`s changes nothing).
+
+The repair canonicalises at the functor owner: when the codomain is a commutative
+algebra over the source and the given map equals its `algebra_structure_morphism` on the
+right endpoints, the restriction is interned along that structure morphism.  The
+assertion, the module contract and the element constructor are untouched; a map that
+states anything else is unchanged.
+
+Separately measured on the same specimen, because two assertions in the first draft of
+the regression were false: `q` takes values in `Q/2Z` and the polar form `b` in `Q/Z`
+(`quadratic_value_module()` and `bilinear_value_module()` are distinct objects, and
+`q(0) != b(0,0)`).  On `A_{D4}` the polar form is alternating, `b(x,x) = b(0,0)` for
+every class, and its radical is trivial.  Comparing polar values against `q(0)` fails
+for that reason and not because the pairing is degenerate.
