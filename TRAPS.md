@@ -3459,3 +3459,101 @@ therefore on the caller's side (`dzackgarza/lattice-database`, the run at `406b3
 which has no checkout on this host), and this repository's part is to refuse it -- which
 it does, before the coercion the page reported.  The provider-pin request the issue adds
 is still unanswered on this side.
+
+### #304: the caller hands bare QQ entries to a restricted value module (2026-11-07, corrected)
+
+The entry above this one concluded that the page supplied `QQ.regular_module()`.  **That
+conclusion is withdrawn**: read at the pinned published revision `406b357c7f` and at that
+repository's current HEAD in its own checkout
+(`projects/p-f1595a14bfb1401c85c6ee2525d7ac43/repo`, read only), the value object is the
+restriction of the regular module, in all three modules that state it:
+
+```python
+# latticedb/src/latticedb/records.py:55, graphs.py:55, hoehn_mason.py:49
+_QQ_AS_ZZ_MODULE = Modules(QQ).restriction_of_scalars(
+    integer_domain.fraction_field_map()
+)(QQ.regular_module())
+```
+
+What separates the working construction from the failing one is not the value object but
+whether the Gram's entries are wrapped into it.  Measured here through the page's own
+line, `FormModules(ZZ)(module.bilinear_hom_space(_QQ_AS_ZZ_MODULE)(gram))`:
+
+```
+A2 integral,     wrapped entries  -> formed; is_base_ring_valued() True
+A2 integral,     bare QQ entries  -> formed; True
+half-integral,   wrapped entries  -> formed; False   (1/2 is not integral: correct)
+half-integral,   bare QQ entries  -> TypeError: Fraction(1, 2) does not describe an element
+                                     of Free module on {[0]} over Fraction Field of Integer Ring
+thirds (A2 dual), wrapped entries -> formed; False
+thirds (A2 dual), bare QQ entries -> TypeError: Fraction(-2, 3) does not describe an ...
+```
+
+So the published failure is the bare-entry shape: a *non-integral* rational Gram handed as
+`QQ` scalars to a value object whose elements are module elements.  An integral Gram
+survives even bare, which is why the trace needs a card with fractional entries.
+
+In the caller, `derive` wraps its entries (`records.py:311`, and 506-509), while these
+sites pass a card's Gram tensor unwrapped -- current HEAD `39a920b527`, same shape at
+`406b357c7f`:
+
+```
+records.py:560  lattice.gram_tensor
+records.py:572  source_record.gram_tensor
+records.py:596  source.gram_tensor
+records.py:597  target.gram_tensor
+```
+
+The repair is the caller's: wrap each entry as `derive` does,
+`_QQ_AS_ZZ_MODULE.wrap(QQ(n) / QQ(d))`.  Nothing in this repository changes for it, and
+the library's message already names both the entry and the value object, which is what
+the caller needs to see.  The handover text for the issue dependency is
+`results/issue304-caller-handover.md`.
+
+### #304 is not repaired here, and the bare-entry reading is not the page's failure (2026-11-07, correction)
+
+The entry above this one claimed the published failure was "the bare-entry shape".  That is
+**not established** and is withdrawn as a claim: the probe that produced it used a
+half-integral Gram and raised `Fraction(1, 2) does not describe an element of ...`, while
+the page's recorded failure names `Fraction(2, 1)` -- an *integral* entry, which survives
+every shape measured here.  The original workflow is therefore not reproduced, and the
+routing is now `dzackgarza/lattice-database#18`, under that repository's owner chat, with
+`#304` open and blocked by it.
+
+What still stands as measurement: the value object the page states is the restriction of
+`QQ.regular_module()` (read in `records.py`, `graphs.py`, `hoehn_mason.py` at
+`406b357c7f` and at the current HEAD), the wrapped entries of `derive` build and answer
+correctly on integral and fractional Grams alike, and the *unwrapped* call sites at
+`records.py:560`, `:572`, `:596`, `:597` are the ones the owner now holds.  Which of those
+produces `Fraction(2, 1)` is their measurement to make against their own run; nothing here
+is claimed to repair it, and no test in this repository is changed for it.
+
+### A definite lattice's reflective shell asked a Python int for its parent (2026-11-07, #291)
+
+`Lattices(ZZ)(G).reflective_root_system_components()` raised for every definite lattice,
+A2 included:
+
+```
+AttributeError: 'int' object has no attribute 'parent'
+categories/definite_lattices.py:294
+```
+
+`_roots_of_square` coerced the exact integer to `int(sign * square)` and `_square_shell`
+reads `target.parent()` to cross into the engine, while the sibling route to the same
+helper, `_vectors_of_square`, passes `sign * square` unchanged -- the lattice ring's own
+integer.  The coercion is the defect, not the helper's contract, so the repair passes the
+owned integer and the Hecke branch's refusal test reads `entry % engine_target` exactly as
+the small-box branch already did.
+
+Measured through the public call under the declared gate
+(`tests/lattices/test_reflective_root_system_components_of_definite_lattices.sage`):
+
+```
+before: 3 failed in 1.36 s, each at definite_lattices.py:294
+after:  A2 -> ("G2", 1),  <2> -> ("A1", 1),  E8(-1) -> ("E8", -1)
+```
+
+Two facts measured on the way, because the first draft of that module got both wrong: the
+components are objects reading `label()` and `root_scale()` (the owner-contract test's own
+reading), not `(name, multiplicity)` pairs; and `Lattices(ZZ)("E8")` is the *negative*
+definite form, signature `(0, 8)`, so its root scale `q(r)/2` is `-1`.
