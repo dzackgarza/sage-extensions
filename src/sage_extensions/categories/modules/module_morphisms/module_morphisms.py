@@ -1100,9 +1100,25 @@ class ModuleMorphismMethods:
         if self._element_function is not None:
             image = self._element_function(element)
             return image if image.parent() is self.codomain() else self.codomain()(image)
-        return self._linear_combination_of_generator_images(
-            self.domain()._framing_lift(element)
-        )
+        coordinates = self.domain()._framing_lift(element)
+        backend = self._engine_matrix_cache
+        if backend is not None and backend.base_ring().is_exact() is True:
+            from sage.matrix.constructor import matrix as sage_matrix
+
+            # For left modules, row coefficients act by x*A^t. This
+            # retains coefficient order over noncommutative rings too.
+            ring = self.codomain().base_ring()
+            positions = {label: index for index, label in enumerate(self.parent().column_index_set())}
+            coefficients = coordinates.parent()._selected_module_coefficients(coordinates)
+            values = [backend.base_ring().zero()] * backend.ncols()
+            for label, coefficient in coefficients.items():
+                values[positions[label]] = _linear_algebra_element(ring, coefficient)
+            image = sage_matrix(backend.base_ring(), 1, backend.ncols(), values) * backend.transpose()
+            return self.codomain().linear_combination({
+                label: _owned_engine_element(ring, image[0, index])
+                for index, label in enumerate(self.parent().row_index_set())
+            })
+        return self._linear_combination_of_generator_images(coordinates)
 
     def alternating_extension(self):
         r"""Extend this linear map through the exterior-algebra universal property."""

@@ -7653,7 +7653,6 @@ def _morphism_from_engine_matrix(mor, backend):
         return mor.codomain().linear_combination({
             row_label: _owned_engine_element(ring, coefficient)
             for row_label, coefficient in zip(row_labels, column, strict=True)
-            if coefficient
         })
 
     morphism = mor(image)
