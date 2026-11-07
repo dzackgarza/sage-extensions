@@ -463,13 +463,91 @@ def _group_cardinality(group):
                     )
 
 
+@cached_function
+def _gap_orthogonal_order_function():
+    r"""Compose GAP's classical containment and Wall-form computations.
+
+    Private finite-matrix order adapter, called only by ``_finite_order``.
+    ``RecogniseClassical``'s positive ``isOmegaContained`` answer certifies
+    containment (Niemeyer--Praeger, doi:10.1112/S0024611598000422;
+    https://gap-packages.github.io/recog/doc/chap7.html).
+    The joint determinant/spinor kernel is Omega in odd characteristic.
+    Its quotient image therefore gives the order of the supplied subgroup.
+    GAP's Wall form computes the spinor class as in the rational adapter
+    ``lattice_engines._gap_rational_spinor_norm_class`` (Taylor, p. 163).
+    Other matrix groups use GAP's exact Size computation.
+    """
+    libgap.LoadPackage("recog")
+    return libgap.eval(r"""function(G)
+    local F, q, d, B, recognition, generators, characters,
+          g, spinor, character, rank, sign, discriminant;
+    if HasSize(G) then
+        return Size(G);
+    fi;
+    F := FieldOfMatrixGroup(G);
+    q := Size(F);
+    d := Length(One(G));
+    recognition := RecogniseClassical(G);
+    if recognition.isOmegaContained <> true then
+        return Size(G);
+    fi;
+    generators := GeneratorsOfGroup(G);
+    B := MTX.InvariantBilinearForm(GModuleByMats(generators, F));
+    if B = fail or B <> TransposedMat(B) or DeterminantMat(B) = Zero(F) then
+        return Size(G);
+    fi;
+    if not ForAll(generators, g -> g * B * TransposedMat(g) = B) then
+        Error("the invariant bilinear form is not preserved by its group");
+    fi;
+    characters := [];
+    for g in generators do
+        character := [0, 0];
+        if DeterminantMat(g) <> One(F) then
+            character[1] := 1;
+        fi;
+        if not IsOne(g) then
+            spinor := DeterminantMat(WallForm(2 * B, g).form);
+            if spinor = Zero(F) then
+                Error("the Wall form of a nondegenerate isometry is degenerate");
+            fi;
+            if spinor^((q-1)/2) <> One(F) then
+                character[2] := 1;
+            fi;
+        fi;
+        Add(characters, character);
+    od;
+    rank := RankMat(ImmutableMatrix(GF(2), characters));
+    sign := 0;
+    if IsEvenInt(d) then
+        discriminant := (-One(F))^(d/2) * DeterminantMat(B);
+        if discriminant^((q-1)/2) = One(F) then
+            sign := 1;
+        else
+            sign := -1;
+        fi;
+    fi;
+    return Size(Omega(sign, d, q)) * 2^rank;
+end
+""")
+
+
 def _finite_order(group):
     r"""Return the order of a finite group as an owned integer."""
     match group:
         case _ if group in GroupAutomorphismGroups():
             backend_order = _gap_model(group).Size().sage()
         case _:
-            backend_order = _engine_group(group).order()
+            engine = _engine_group(group)
+            if (
+                isinstance(engine, FinitelyGeneratedMatrixGroup_gap)
+                and engine.base_ring().is_finite()
+                and engine.base_ring().is_field()
+                and engine.base_ring().characteristic() != 2
+                and engine.degree() >= 5
+            ):
+                backend_order = _gap_orthogonal_order_function()(engine.gap()).sage()
+            else:
+                backend_order = engine.order()
     return _owned_engine_element(ZZ, ZZ(backend_order))
 
 

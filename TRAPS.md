@@ -3237,3 +3237,37 @@ a permutation of a 2048-element form is worth retaining per automorphism — rea
 of the orbit's points costs 0.12 ms per comparison and 55.8 s is what a 23715-point
 walk of four letters pays when the action is a retained permutation of element ranks
 rather than a re-application of the morphism.
+
+## Odd-characteristic finite orthogonal subgroup orders (#19)
+
+The natural-module `MatrixGroup.order()` route calls GAP `Size`. On the recorded
+rank-ten Lorentzian family 0, it returns the F3 order
+`5158051199765220556800`, but its F5 calculation exceeds the provider's existing
+60-second test limit. The earlier guarded F5 runs and native action alternatives
+are recorded above. The maintained alternative is `recog`'s
+[`RecogniseClassical`](https://gap-packages.github.io/recog/doc/chap7.html),
+whose positive `isOmegaContained` component establishes Omega containment.
+This is the Niemeyer–Praeger containment algorithm, distinct from the generic
+recognition tree and its candidate size. Its random search can fail to establish
+containment; an unestablished containment supplies no order.
+
+For a nondegenerate symmetric invariant form in odd characteristic, the joint
+kernel of determinant and spinor norm is Omega. GAP's
+`MTX.InvariantBilinearForm` supplies the Gram matrix on the absolutely irreducible
+natural module. `DeterminantMat(WallForm(2*B,g).form)` supplies each nonidentity
+isometry's spinor class, as in the existing rational spinor adapter. The rank of
+the two characters on the supplied generators gives the exact quotient image.
+Thus positive containment gives `Size(Omega(sign,d,q))*2^rank` for the actual
+subgroup. The adapter uses native `Size` for the other matrix-group cases.
+
+Public owner tests `test_orthogonal_reduction_image_orders.sage` return the
+recorded F5 family-0 order `27230655539587500000000000000000`, F5 family-1 order
+`54461311079175000000000000000000`, and F7 family-0 order
+`209544577891300558570289055128616960000`. The measured call phases were
+4.70, 5.93 and 3.92 seconds respectively; the whole selected file passed in
+21.66 seconds. Scalar-subgroup specimens also check the actual subgroup order
+in characteristics two, three and five. Separate native adapter comparisons
+agree with GAP's named Omega, SO and GO orders for dimensions five and six,
+plus and minus type, and the extension field F9, after a change of basis.
+The unchanged complete port comparison, including its computed generators,
+remains a separate required consumer.

@@ -270,3 +270,11 @@ def test_the_generated_reduction_has_its_actual_orthogonal_image_order(case_inde
     image = reduction.O().subgroup(group_generators)
 
     assert image.cardinality() == cardinal(expected)
+
+
+@pytest.mark.parametrize("prime,expected", ((2, 1), (3, 2), (5, 2)))
+def test_the_scalar_subgroup_has_the_order_of_sign_reversal(prime, expected):
+    space = Lattices(ZZ)(5).base_change(PrimeFields()(prime).quotient_map())
+    sign_reversal = space.O()(tuple(-vector for vector in space.module_generators()))
+
+    assert space.O().subgroup((sign_reversal,)).cardinality() == cardinal(expected)
