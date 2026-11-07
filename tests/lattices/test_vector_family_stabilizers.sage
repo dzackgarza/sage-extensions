@@ -98,3 +98,25 @@ def test_a_redundant_family_in_an_indefinite_lattice_has_the_swap_of_its_two_pos
 
     assert swap in stabilizer
     assert lattice.O().transporter(family, reversed_family) in stabilizer
+
+
+def test_a_redundant_index_three_family_has_its_integral_hyperbolic_exchange() -> None:
+    r"""The columns (2,1), (1,2) span an index-three subgroup of ZZ^2.
+
+    Their sum and a repeated vector preserve this span. Over QQ the
+    family spans the whole space. Exchanging e and f is the unique
+    integral isometry carrying it to the exchanged family.
+    """
+    lattice = Lattices(ZZ)([[0, 1], [1, 0]])
+    e, f = tuple(lattice.module_generators())
+    indices = Sets.Δ[3]
+    vectors = (2 * e + f, e + 2 * f, 3 * e + 3 * f, e + 2 * f)
+    targets = (e + 2 * f, 2 * e + f, 3 * e + 3 * f, 2 * e + f)
+    family = Sets().Mor(indices, lattice)(lambda index: vectors[int(index)])
+    target = Sets().Mor(indices, lattice)(lambda index: targets[int(index)])
+
+    witness = lattice.O().transporter(family, target)
+
+    assert witness(e) == f and witness(f) == e
+    assert all(witness(value) == image for value, image in zip(vectors, targets, strict=True))
+    assert all((~witness)(witness(value)) == value for value in (e, f))
