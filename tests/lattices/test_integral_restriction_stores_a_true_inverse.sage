@@ -54,10 +54,14 @@ def test_the_a2_coxeter_inverse_has_its_prescribed_basis_action(ring) -> None:
     coxeter = lattice.Isom(lattice)({labels[0]: f, labels[1]: -e - f})
 
     inverse = ~coxeter
+    square = coxeter * coxeter
 
+    assert square(e) == -e - f
+    assert square(f) == e
     assert inverse(e) == -e - f
     assert inverse(f) == e
     for point in (e, f, 2 * e - 3 * f):
+        assert square(point) == inverse(point)
         assert inverse(coxeter(point)) == point
         assert coxeter(inverse(point)) == point
 
