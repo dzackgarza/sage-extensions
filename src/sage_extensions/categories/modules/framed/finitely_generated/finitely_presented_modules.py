@@ -1979,6 +1979,26 @@ class _GeneralPresentedModule:
         preimage = self._free_module.submodule(lifts + list(self._relation_submodule.basis()))
         return tuple(tuple(row) for row in preimage.echelonized_basis_matrix().rows())
 
+    def _submodule_generator_images_from_key(self, key):
+        r"""Read a submodule's canonical preimage basis as nonzero quotient generators.
+
+        ``key`` is the echelonized integral preimage basis returned by
+        ``_submodule_key_from_generators`` for this module. Its classes generate
+        the same submodule by the correspondence theorem. Basis rows lying in
+        the relations have zero class and contribute no generator. A finite
+        orbit can retain these representatives rather than unreduced orbit
+        words in the free cover.
+        """
+        assert self.base_ring() is _owned_integers() and self._relation_submodule is not None, (
+            "integral submodule preimage data require a represented relation module over ZZ"
+        )
+        images = []
+        for row in key:
+            lift = self._free_module(row)
+            if lift not in self._relation_submodule:
+                images.append(self(lift))
+        return tuple(images)
+
     def _cover_coordinates(self, element):
         r"""Coordinates of a representative as an indexed family on the cover basis."""
         lift = self(element)._representative()
