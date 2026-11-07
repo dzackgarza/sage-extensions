@@ -311,7 +311,7 @@ def _square_shell(positive_gram, target, reflective):
     shell = []
     for row in representatives.rows():
         vector = engine_vector(SageZZ, row)
-        if reflective and any(entry % target for entry in 2 * form * vector):
+        if reflective and any(entry % engine_target for entry in 2 * form * vector):
             continue
         shell.extend((vector, -vector))
     return tuple(shell)
@@ -364,7 +364,11 @@ def _roots_of_square(lattice, square):
     if lattice.module_rank() == 0:
         return finite_ordered_set(())
     sign, positive_gram = _positive_gram(lattice)
-    target = int(sign * square)
+    # ``square`` is the lattice ring's element, so its image under the sign is one
+    # too: the shell's target is an exact integer of that ring, and the enumeration
+    # below reads its parent to cross into the engine.  A Python ``int`` here lost
+    # that ring and the crossing raised (#291).
+    target = sign * square
     if target <= 0:
         return finite_ordered_set(())
     return _shell(lattice, square, _square_shell(positive_gram, target, True))

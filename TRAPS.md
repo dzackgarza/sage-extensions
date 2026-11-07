@@ -3509,3 +3509,51 @@ The repair is the caller's: wrap each entry as `derive` does,
 the library's message already names both the entry and the value object, which is what
 the caller needs to see.  The handover text for the issue dependency is
 `results/issue304-caller-handover.md`.
+
+### #304 is not repaired here, and the bare-entry reading is not the page's failure (2026-11-07, correction)
+
+The entry above this one claimed the published failure was "the bare-entry shape".  That is
+**not established** and is withdrawn as a claim: the probe that produced it used a
+half-integral Gram and raised `Fraction(1, 2) does not describe an element of ...`, while
+the page's recorded failure names `Fraction(2, 1)` -- an *integral* entry, which survives
+every shape measured here.  The original workflow is therefore not reproduced, and the
+routing is now `dzackgarza/lattice-database#18`, under that repository's owner chat, with
+`#304` open and blocked by it.
+
+What still stands as measurement: the value object the page states is the restriction of
+`QQ.regular_module()` (read in `records.py`, `graphs.py`, `hoehn_mason.py` at
+`406b357c7f` and at the current HEAD), the wrapped entries of `derive` build and answer
+correctly on integral and fractional Grams alike, and the *unwrapped* call sites at
+`records.py:560`, `:572`, `:596`, `:597` are the ones the owner now holds.  Which of those
+produces `Fraction(2, 1)` is their measurement to make against their own run; nothing here
+is claimed to repair it, and no test in this repository is changed for it.
+
+### A definite lattice's reflective shell asked a Python int for its parent (2026-11-07, #291)
+
+`Lattices(ZZ)(G).reflective_root_system_components()` raised for every definite lattice,
+A2 included:
+
+```
+AttributeError: 'int' object has no attribute 'parent'
+categories/definite_lattices.py:294
+```
+
+`_roots_of_square` coerced the exact integer to `int(sign * square)` and `_square_shell`
+reads `target.parent()` to cross into the engine, while the sibling route to the same
+helper, `_vectors_of_square`, passes `sign * square` unchanged -- the lattice ring's own
+integer.  The coercion is the defect, not the helper's contract, so the repair passes the
+owned integer and the Hecke branch's refusal test reads `entry % engine_target` exactly as
+the small-box branch already did.
+
+Measured through the public call under the declared gate
+(`tests/lattices/test_reflective_root_system_components_of_definite_lattices.sage`):
+
+```
+before: 3 failed in 1.36 s, each at definite_lattices.py:294
+after:  A2 -> ("G2", 1),  <2> -> ("A1", 1),  E8(-1) -> ("E8", -1)
+```
+
+Two facts measured on the way, because the first draft of that module got both wrong: the
+components are objects reading `label()` and `root_scale()` (the owner-contract test's own
+reading), not `(name, multiplicity)` pairs; and `Lattices(ZZ)("E8")` is the *negative*
+definite form, signature `(0, 8)`, so its root scale `q(r)/2` is `-1`.
