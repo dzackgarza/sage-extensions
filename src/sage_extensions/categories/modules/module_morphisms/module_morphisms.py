@@ -1954,8 +1954,9 @@ class ModuleMorphismMethods:
             cover_map,
         )
 
-    def _preimage_through_the_codomain_presentation(self, element):
-        r"""Return a preimage of ``element`` through the codomain's chosen presentation, or ``None``.
+    @cached_method
+    def _codomain_presentation_preimage_maps(self):
+        r"""Retain the fixed cover equation and projection for preimages through this map.
 
         Let ``r : F_1 -> F_0`` be the chosen presentation of the codomain
         ``M``, with ``pi : F_0 ->> M``, and let ``p : F(S) ->> D`` be the
@@ -1966,14 +1967,13 @@ class ModuleMorphismMethods:
         ``h`` has a preimage under the map ``F(S) + F_1 -> F_0`` with legs
         ``g`` and ``r``.  That map is between finite free modules, so its
         preimage is a coordinate solve.  The ``F(S)``-component ``c`` of a
-        solution gives the preimage ``x = p(c)``.  No element of ``D`` is
-        enumerated.
+        solution gives the preimage ``x = p(c)``. These two maps depend on
+        ``f`` and its endpoint presentations, so their Smith data serve all
+        right-hand sides of this same equation.
         """
         from sage_extensions.categories.modules.pure.modules import Modules
 
         domain, codomain = self.domain(), self.codomain()
-        if element.parent() is not codomain:
-            element = codomain(element)
         presentation = codomain.presentation()
         cover = presentation.codomain()
         codomain_framing = codomain.framing_morphism()
@@ -1992,10 +1992,21 @@ class ModuleMorphismMethods:
             }
         )
         cover_sum = Modules(domain.base_ring()).biproduct((generator_cover, presentation.domain()))
-        solution = cover_sum.from_summands(generator_lift, presentation)._preimage_or_none(lift_to_cover(element))
+        equation = cover_sum.from_summands(generator_lift, presentation)
+        projection = domain_framing * cover_sum.projection(0)
+        return equation, projection
+
+    def _preimage_through_the_codomain_presentation(self, element):
+        r"""Solve the retained cover equation for one target, or return ``None``."""
+        codomain = self.codomain()
+        coordinates = codomain.framing_morphism().lift(codomain(element))
+        cover = codomain.presentation().codomain()
+        target = cover.linear_combination(coordinates.parent()._selected_module_coefficients(coordinates))
+        equation, projection = self._codomain_presentation_preimage_maps()
+        solution = equation._preimage_or_none(target)
         if solution is None:
             return None
-        return domain_framing(cover_sum.projection(0)(solution))
+        return projection(solution)
 
     def _preimage_through_the_extension_framing(self, element):
         r"""Return the preimage of ``element`` in a restriction of scalars to ``R``, or ``None``.
