@@ -536,7 +536,16 @@ def _torsion_form_modules(base_ring, *, quadratic: bool):
 
 
 def _torsion_form_subobject_on(form, generators, *, quadratic: bool):
-    r"""Return the finite torsion submodule spanned by ``generators`` with restricted form."""
+    r"""Return the finite torsion submodule spanned by ``generators`` with restricted form.
+
+    Equal generating data returns a single object.  Two calls that span the same
+    submodule build the same embedded element set in the ambient form, and the
+    subobject is cached on the form under that set, so the two are *the same*
+    subobject -- equal and with equal hashes -- rather than two objects that
+    happen to describe one.  Without this a subobject never equals one built the
+    same way, so an orbit closure over subobjects never recognises a point it has
+    already seen and the point stabilizer refuses the point it was built from.
+    """
 
     generators = tuple(form(generator) for generator in generators)
     unformed = form.unformed_module()
@@ -577,7 +586,7 @@ def _torsion_form_subobject_on(form, generators, *, quadratic: bool):
                 )
         return source(lifted)
 
-    return category.from_module(
+    result = category.from_module(
         underlying_subobject,
         gram,
         form.value_module(),
@@ -586,6 +595,13 @@ def _torsion_form_subobject_on(form, generators, *, quadratic: bool):
         _subobject_lift=lift_from_ambient,
         _subobject_inclusion_factory=inclusion_factory,
     )
+    selected_key = (quadratic, frozenset(_embedded_elements(result)))
+    registry = form.__dict__.setdefault("_torsion_form_subobject_registry", {})
+    existing = registry.get(selected_key)
+    if existing is not None:
+        return existing
+    registry[selected_key] = result
+    return result
 
 
 def _torsion_form_primary_part(form, prime, *, quadratic: bool):
@@ -2360,21 +2376,55 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
 
     stabilizer_of_subobject = stabilizer_of_subgroup
 
-    def stabilizer(self, subgroup):
-        r"""Return the setwise stabilizer of the submodule ``subgroup`` in ``O(q)``.
-
-        The name a caller writes when the point is a submodule rather than an
-        element; the action's own stabilizer is :meth:`subobject_action`'s.
-        """
-        return self.stabilizer_of_subgroup(subgroup)
+    def _subobject_image(self, subgroup, generator):
+        r"""The image of a submodule under one automorphism, as a submodule again."""
+        form = self.domain()
+        return form.subobject_generated_by(
+            tuple(generator(element) for element in _embedded_elements(subgroup))
+        )
 
     def orbit(self, subgroup):
         r"""Return the orbit of the submodule ``subgroup`` under ``O(q)``, as a finite set of submodules.
 
-        With :meth:`stabilizer` it satisfies ``|Stab(J)| * |orbit(J)| = |O(q)|``;
-        that product is the caller's check and not a theorem asserted here.
+        The closure of ``{subgroup}`` under the group's generators, each image
+        read back as the submodule spanning the images of the generators.
+        Nothing enumerates the submodules of the ambient form: on a module with
+        ``2^{11}`` elements that family is every subspace, while one submodule's
+        orbit is reached by the generators alone.  The closure terminates because
+        equal submodules are one object, which is what
+        :func:`_torsion_form_subobject_on` guarantees.
+
+        With :meth:`stabilizer` the orbit satisfies
+        ``|Stab(J)| * |orbit(J)| = |O(q)|``; that product is the caller's check
+        and not a theorem asserted here.
         """
-        return self.subobject_action().orbit_of(self.subobject_point(subgroup))
+        generators = tuple(self.group_generators())
+        points = [subgroup]
+        frontier = [subgroup]
+        while frontier:
+            current = frontier.pop()
+            for generator in generators:
+                image = self._subobject_image(current, generator)
+                if not any(image is seen for seen in points):
+                    points.append(image)
+                    frontier.append(image)
+        return finite_ordered_set(tuple(points))
+
+    def _orbit_action(self, subgroup):
+        r"""The action of ``O(q)`` on the orbit of ``subgroup``, over that orbit alone."""
+        orbit = self.orbit(subgroup)
+        return FiniteGSets(self)(
+            orbit,
+            lambda element, point: self._subobject_image(point, element),
+        )
+
+    def stabilizer(self, subgroup):
+        r"""Return the setwise stabilizer of the submodule ``subgroup`` in ``O(q)``.
+
+        The point stabilizer of the induced action on the orbit of ``subgroup``,
+        so again no family of submodules of the ambient form is enumerated.
+        """
+        return self._orbit_action(subgroup).stabilizer(subgroup)
 
     def _repr_(self):
         return f"Orthogonal group of {self.domain()}"
