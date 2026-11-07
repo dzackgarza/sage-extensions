@@ -63,15 +63,22 @@ class SemilinearModuleMorphism:
     ) -> None:
         domain = parent.domain()
         codomain = parent.codomain()
-        if scalar_map.domain() is not domain.base_ring():
+        # The arrow carries ONE module structure: the endpoints read over the rings the
+        # scalar map names, and the restriction, transpose and evaluator below all use
+        # that same structure.  A ring endpoint is therefore admissible exactly when it
+        # is a module over the scalar map's ring -- QQ is a QQ-module and a ZZ-module,
+        # and the identity of QQ selects the first (#307).
+        source_scalars = scalar_map.domain()
+        target_scalars = scalar_map.codomain()
+        if domain not in Modules(source_scalars):
             raise ValueError(
-                f"a semilinear map out of {domain} lies over a ring map out of its base ring "
-                f"{domain.base_ring()}, but {scalar_map} starts at {scalar_map.domain()}"
+                f"a semilinear map out of {domain} lies over {scalar_map}, so its source "
+                f"must be a module over {source_scalars}, and it is not"
             )
-        if scalar_map.codomain() is not codomain.base_ring():
+        if codomain not in Modules(target_scalars):
             raise ValueError(
-                f"a semilinear map into {codomain} lies over a ring map into its base ring "
-                f"{codomain.base_ring()}, but {scalar_map} ends at {scalar_map.codomain()}"
+                f"a semilinear map into {codomain} lies over {scalar_map}, so its target "
+                f"must be a module over {target_scalars}, and it is not"
             )
         self._scalar_map = scalar_map
         self._restricted_codomain = None
@@ -85,11 +92,11 @@ class SemilinearModuleMorphism:
             case None, _:
                 pass
             case _, None:
-                restricted = Modules(domain.base_ring()).base_change_adjunction(
+                restricted = Modules(source_scalars).base_change_adjunction(
                     scalar_map
                 ).right_adjoint()(codomain)
                 self._restricted_codomain = restricted
-                linear_mor = Modules(domain.base_ring()).Mor(domain, restricted)
+                linear_mor = Modules(source_scalars).Mor(domain, restricted)
                 self._restricted_morphism = linear_mor(restricted_morphism)
                 match restricted is codomain:
                     case True:
@@ -117,7 +124,7 @@ class SemilinearModuleMorphism:
     def restricted_codomain(self):
         r"""Return ``Res_sigma(N)``, the target read in the source fibre."""
         if self._restricted_codomain is None:
-            adjunction = Modules(self.domain().base_ring()).base_change_adjunction(
+            adjunction = Modules(self.scalar_map().domain()).base_change_adjunction(
                 self.scalar_map()
             )
             self._restricted_codomain = adjunction.right_adjoint()(self.codomain())

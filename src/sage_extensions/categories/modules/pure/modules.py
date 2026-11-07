@@ -273,17 +273,25 @@ def _action_with_canonical_endomorphism_parent(base_ring, additive_group, action
 
 
 def _regular_module_reading(value_module):
-    r"""Read a ring stated as a value object through its own rank-one module.
+    r"""Read the *restriction of a ring* stated as a value object through that ring's module.
 
-    A ring is its own module over itself, and the restricted-scalars view of a ring
-    keeps the ring as its extension (``test_restricted_scalars_action.sage`` states
-    that contract), so a pairing can be handed a value object whose elements are the
-    ring's scalars rather than module elements.  The form then reads its own Gram
-    through the wrong element structure: on the A2 lattice an integral Gram answers
-    ``is_base_ring_valued()`` False, and the numerical reading raises ``(0, 0) is not
-    an element of {0,...,3}`` (#293, lattice-database #9).  The module such a caller
-    means is the ring's regular module, restricted along the same map when the value
-    object is already a restriction of that ring.
+    The restricted-scalars view of a ring keeps the ring as its extension
+    (``test_restricted_scalars_action.sage`` states that contract), so a pairing can be
+    handed a value object whose elements are the ring's scalars rather than module
+    elements.  The form then reads its own Gram through the wrong element structure: on
+    the A2 lattice an integral Gram answers ``is_base_ring_valued()`` False, and the
+    numerical reading raises ``(0, 0) is not an element of {0,...,3}`` (#293,
+    lattice-database #9).  The module such a caller means is the ring's regular module,
+    restricted along the same map.
+
+    A bare ring is also read this way, through its *own* regular module.  A ring is
+    that module over itself, and its ``rho`` there has the ring as its domain, so a
+    pairing with values in a ring is linear over the whole ring.  Reading the ring
+    object instead left the scalar action over the ring's *base* -- its domain is
+    ``base_ring()``, ``ZZ`` for ``QQ`` -- so a rational scalar had no action at all
+    (#307).  What the readers want is the scalars, and the ring owner supplies them
+    through ``regular_module_isomorphism()``, so the value object is the module and
+    the identification is the ring's, not a second action written here.
     """
     if value_module in OwnedRings():
         return value_module.regular_module()
@@ -292,6 +300,25 @@ def _regular_module_reading(value_module):
         if extension in OwnedRings() and extension is not extension.regular_module():
             return extension.regular_module().restrict_scalars(value_module.ring_map())
     return value_module
+
+
+def _regular_module_scalar_identification(value_module):
+    r"""Return the ring isomorphism reading ``value_module``'s elements as scalars, or ``None``.
+
+    A value object that *is* its base ring's own regular module carries that ring as
+    its scalar ring, so its elements are the ring's scalars read through the ring
+    owner's ``regular_module_isomorphism()`` -- the exact additive construction
+    ``{}_R R -> R``, ``r e_0 |-> r``, not a coordinate projection and not a coercion
+    test.  Every other value object answers ``None`` and keeps its own reading: this
+    recognises a stated construction, so no scalar action is inferred from whether a
+    particular scalar happens to lie in some image.
+    """
+    ring = value_module.base_ring()
+    if ring not in OwnedRings():
+        return None
+    if value_module is not ring.regular_module():
+        return None
+    return ring.regular_module_isomorphism()
 
 
 def _canonical_scalar_structure_map(ring_map):
@@ -2018,10 +2045,12 @@ class Modules(OwnedCategoryOverBaseRing):
 
             The Cat-owned Mor constructor, not a form-specific fallback,
             checks that the tensor product and ``W`` are both R-modules.  A value
-            object that is a ring, or the restriction of one, is read through that
-            ring's regular module (``_regular_module_reading``): the values of a
-            pairing are module elements, and a form built on the ring's own scalar
-            structure reports an integral Gram as not base-ring valued (#293).
+            object that is the *restriction of a ring* is read through that ring's
+            regular module (``_regular_module_reading``): the values of a pairing
+            are module elements, and a form built on the ring's own scalar
+            structure reports an integral Gram as not base-ring valued (#293).  A
+            ring stated bare stays the value object, whose own action on itself is
+            multiplication, so the pairing is linear over the whole ring (#307).
             """
             from sage_extensions.categories.forms.forms import _bilinear_forms
 

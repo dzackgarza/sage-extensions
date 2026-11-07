@@ -30,6 +30,7 @@ from sage_extensions.categories.modules.pure.modules import (
     Modules,
     ModulesWithChosenFinitePresentation,
     TensorProductModules,
+    _regular_module_scalar_identification,
 )
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
@@ -92,7 +93,7 @@ class BilinearFormMors(OwnedCategoryOverBaseRing):
                     f"the Gram tensor of {self} needs a form on one module, but it pairs {self.left_module()} "
                     f"with {self.right_module()}"
                 )
-            if self.codomain() not in OwnedRings():
+            if self.codomain() not in OwnedRings() and _regular_module_scalar_identification(self.codomain()) is None:
                 raise TypeError(
                     f"the Gram tensor of {self} needs values in a ring, but its values lie in {self.codomain()}"
                 )

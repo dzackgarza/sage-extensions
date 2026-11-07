@@ -4917,6 +4917,41 @@ class OwnedOrderedRings(OwnedCategory):
         return [OwnedRings()]
 
     class ElementMethods:
+        def _ordered_comparison(self, other, op):
+            r"""Compare two elements of one ordered ring, through the ring's engine.
+
+            The order is this category's chosen datum, so the comparisons are stated here
+            rather than on one realization's element base: every owned ordered ring's
+            element class inherits them, which is what makes $\mathbb Q$'s fractions
+            comparable at all -- the localization realization does not derive from the
+            integer realization whose element class used to carry them (#307).  The
+            value is decided by the retained engine of the parent, the same crossing the
+            arithmetic uses, never by a second order written here.
+            """
+            parent = self.parent()
+            if parent not in OwnedOrderedRings():
+                return NotImplemented
+            other = _operand_in_ring(parent, other)
+            if other is NotImplemented:
+                return NotImplemented
+            return bool(
+                richcmp(
+                    _engine_element(parent, self), _engine_element(parent, other), op
+                )
+            )
+
+        def __lt__(self, other):
+            return self._ordered_comparison(other, op_LT)
+
+        def __le__(self, other):
+            return self._ordered_comparison(other, op_LE)
+
+        def __gt__(self, other):
+            return self._ordered_comparison(other, op_GT)
+
+        def __ge__(self, other):
+            return self._ordered_comparison(other, op_GE)
+
         def __abs__(self):
             zero = self.parent().zero()
             return self if self >= zero else -self
@@ -5610,26 +5645,6 @@ class _OwnedRingElement(RingElement):
             if other is NotImplemented:
                 return NotImplemented
         return richcmp(self._backend(), other._backend(), op)
-
-    def _ordered_comparison(self, other, op):
-        if self.parent() not in OwnedOrderedRings():
-            return NotImplemented
-        other = self._operator_operand(other)
-        if other is NotImplemented:
-            return NotImplemented
-        return bool(richcmp(self._backend(), other._backend(), op))
-
-    def __lt__(self, other):
-        return self._ordered_comparison(other, op_LT)
-
-    def __le__(self, other):
-        return self._ordered_comparison(other, op_LE)
-
-    def __gt__(self, other):
-        return self._ordered_comparison(other, op_GT)
-
-    def __ge__(self, other):
-        return self._ordered_comparison(other, op_GE)
 
     def __eq__(self, other):
         other = self._operator_operand(other)

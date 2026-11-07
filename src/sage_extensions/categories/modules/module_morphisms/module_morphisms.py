@@ -3428,10 +3428,18 @@ class TensorProductModuleMorphismMethods:
                     morphism = ordinary._from_constructed_element_map(morphism, premises=(morphism,))
                 return original.pullback(morphism)
         if self.codomain() not in OwnedRings():
-            from sage_extensions.categories.modules.pure.modules import RestrictedScalarsModules
+            from sage_extensions.categories.modules.pure.modules import (
+                RestrictedScalarsModules,
+                _regular_module_scalar_identification,
+            )
 
             values = self.codomain()
-            if (
+            # A value object that is its base ring's regular module reads its
+            # elements through that ring's own identification; the scalar action
+            # it was formed with already has the ring as its domain, so this is
+            # the datum, not a second reading (#307).
+            scalar_identification = _regular_module_scalar_identification(values)
+            if scalar_identification is None and (
                 values in RestrictedScalarsModules(left.base_ring())
                 or (
                     hasattr(values, "module_over_extension")
@@ -3445,6 +3453,7 @@ class TensorProductModuleMorphismMethods:
                     # S^n-valued. Do not project it to one coordinate or
                     # pretend it is a scalar tensor.
                     return self.coordinate_values()
+            if scalar_identification is not None:
                 scalar_ring = scalar_identification.codomain()
                 if scalar_ring in OwnedRings():
                     return tensor(
