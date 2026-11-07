@@ -637,7 +637,7 @@ class _ExactCVPEngine:
                 SageQQ, 1, stop - start, [1] * (stop - start)
             )
             # Sage's Matrix.elementwise_product is the Hadamard product.
-            # Column sums of D*(G*D) are the exact quadratic values.
+            # Column sums of this Hadamard product are exact squared distances.
             squares = weights * displacements.elementwise_product(
                 self.engine_gram_q * displacements
             )
