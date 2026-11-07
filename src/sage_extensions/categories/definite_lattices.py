@@ -626,13 +626,24 @@ class _ExactCVPEngine:
             centered.__pari__().Col(),
             positive_bound + SageQQ(1) / 2,
         )
-        for column in engine_matrix(SageQQ, raw_coordinates).columns():
-            displacement = column - centered
-            positive_square = (
-                displacement * self.engine_gram_q * displacement
+        coordinates = engine_matrix(SageQQ, raw_coordinates)
+        center_column = centered.column()
+        weights = engine_vector(SageQQ, [1] * self.rank)
+        block_size = max(1, 4096 // max(1, self.rank))
+        for start in range(0, coordinates.ncols(), block_size):
+            stop = min(start + block_size, coordinates.ncols())
+            block = coordinates.matrix_from_columns(range(start, stop))
+            displacements = block - center_column * engine_matrix(
+                SageQQ, 1, stop - start, [1] * (stop - start)
             )
-            if positive_square <= positive_bound:
-                yield column, positive_square
+            # Sage's Matrix.elementwise_product is the Hadamard product.
+            # Column sums of this Hadamard product are exact squared distances.
+            squares = weights * displacements.elementwise_product(
+                self.engine_gram_q * displacements
+            )
+            for index, positive_square in enumerate(squares):
+                if positive_square <= positive_bound:
+                    yield block.column(index), positive_square
 
     def has_close_vector(self, target, square_bound) -> bool:
         _point, _translation, centered = self._center(target)

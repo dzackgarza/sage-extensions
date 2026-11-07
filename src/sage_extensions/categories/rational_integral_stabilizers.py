@@ -169,9 +169,9 @@ class _FiniteIntegralRepresentation(SageObject):
         assert quotient.cardinality().is_finite() is True, (
             "the residue-action computation requires a represented finite module M/dM"
         )
-        selected = action.selected_submodule()
-        self._selected_submodule = selected
-        selected_key = self._submodule_key(selected)
+        selected_key = action.finite_quotient_action()._intermediate_image_key_or_none(action.lattice_inclusion())
+        if selected_key is None:
+            raise ValueError("the selected lattice is not intermediate between dM and M")
         self._submodule_generators = [quotient._submodule_generator_images_from_key(selected_key)]
         self._positions = {selected_key: 0}
         self._registering_orbit = True
@@ -216,10 +216,6 @@ class _FiniteIntegralRepresentation(SageObject):
     def _submodule_key(self, submodule):
         return self._action.finite_module()._submodule_key(submodule)
 
-    def _position_of(self, submodule):
-        r"""The position of ``submodule`` among the orbit submodules found so far, or ``None``."""
-        return self._positions.get(self._submodule_key(submodule))
-
     def _act_on_position(self, group_element, position):
         quotient = self.action().finite_module()
         generators = self._submodule_generators[int(position)]
@@ -246,7 +242,7 @@ class _FiniteIntegralRepresentation(SageObject):
     def orbit_submodules(self):
         r"""Realize each orbit submodule from its retained exact generator images."""
         quotient = self.action().finite_module()
-        return (self._selected_submodule,) + tuple(
+        return (self.action().selected_submodule(),) + tuple(
             quotient.subobject_on(images) for images in self._submodule_generators[1:]
         )
 
@@ -259,7 +255,10 @@ class _FiniteIntegralRepresentation(SageObject):
         return tuple(section(point) for point in self.g_set())
 
     def transporter_to(self, submodule):
-        position = self._position_of(submodule)
+        return self._transporter_to_key(self._submodule_key(submodule))
+
+    def _transporter_to_key(self, key):
+        position = self._positions.get(key)
         if position is None:
             return None
         return self.orbit_section()(self.g_set().point_set()(_owned_integers()(position)))
@@ -599,10 +598,10 @@ class IntegralStructureAction(SageObject):
             f"a transporter in {rational_group} requires a finite selected generating family "
             "or a represented finite group"
         )
-        target_submodule = self.finite_quotient_action().intermediate_image_or_none(target_inclusion)
-        if target_submodule is None:
+        target_key = self.finite_quotient_action()._intermediate_image_key_or_none(target_inclusion)
+        if target_key is None:
             return None
-        witness = self.finite_representation().transporter_to(target_submodule)
+        witness = self.finite_representation()._transporter_to_key(target_key)
         if witness is None:
             return None
         if not self._carries_lattice(witness, source_inclusion, target_inclusion):
@@ -763,13 +762,8 @@ class FiniteCommensurabilityQuotient(SageObject):
             self.quotient_automorphism,
         )
 
-    def intermediate_image_or_none(self, lattice_inclusion):
-        r"""Return ``S_L=L/dM`` inside ``F_M`` for ``dM <= L <= M``.
-
-        Both containments are verified through the actual inclusions in
-        ``Res(V)``.  The returned object is the image of the composite
-        ``L -> M -> M/dM`` and therefore retains its inclusion in ``F_M``.
-        """
+    def _intermediate_projection_or_none(self, lattice_inclusion):
+        r"""The composite ``L -> M -> M/dM``, after checking both containments."""
         if lattice_inclusion.codomain() is not self.ambient_restricted_space():
             raise ValueError(
                 f"{lattice_inclusion.domain()} cannot lie between dM and M for M = "
@@ -782,7 +776,31 @@ class FiniteCommensurabilityQuotient(SageObject):
         scaled_reference = self.reference_inclusion() * self.scaling_morphism()
         if scaled_reference.factor_through_or_none(lattice_inclusion) is None:
             return None
-        return (self.quotient_projection() * into_reference).image()
+        return self.quotient_projection() * into_reference
+
+    def _intermediate_image_key_or_none(self, lattice_inclusion):
+        r"""Read the canonical module key without presenting its image submodule.
+
+        The finite-module owner computes the Hermite preimage key from the
+        same projected generators that define ``intermediate_image_or_none``.
+        Its correspondence theorem includes the quotient relations.
+        """
+        projection = self._intermediate_projection_or_none(lattice_inclusion)
+        if projection is None:
+            return None
+        return self.quotient_module()._submodule_key_from_generators(
+            tuple(projection(generator) for generator in projection.domain().module_generators())
+        )
+
+    def intermediate_image_or_none(self, lattice_inclusion):
+        r"""Return ``S_L=L/dM`` inside ``F_M`` for ``dM <= L <= M``.
+
+        Both containments are verified through the actual inclusions in
+        ``Res(V)``.  The returned object is the image of the composite
+        ``L -> M -> M/dM`` and therefore retains its inclusion in ``F_M``.
+        """
+        projection = self._intermediate_projection_or_none(lattice_inclusion)
+        return None if projection is None else projection.image()
 
     def intermediate_image(self, lattice_inclusion):
         r"""Return ``L/dM`` for a represented intermediate lattice ``dM <= L <= M``."""

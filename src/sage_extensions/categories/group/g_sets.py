@@ -658,14 +658,28 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             point ``p`` and the ``j``-th letter ``s``, the family element is
             ``~transversals[position of s.p] * letters[j] * transversals[i]``.
             """
-            orbit, section = self.orbit_transversal_words(point)
-            augmentation = self.acting_group().selected_group_resolution().augmentation()
+            orbit, _words, augmentation = self._orbit_of(point)
             letters = tuple(
                 augmentation(generator)
                 for generator in augmentation.domain().group_generators()
             )
-            transversals = tuple(augmentation(section(image)) for image in orbit)
-            return letters, transversals
+            transitions, letter_count = orbit.__dict__["_retained_transitions"]
+            if letter_count != len(letters):
+                raise ArithmeticError("the retained orbit transitions have a different generating cover")
+            transversals = [self.acting_group().one()]
+            # The breadth-first sweep assigns each new point its next rank
+            # and word s*t_p. Its existing transition table therefore gives
+            # the same transversal as the augmentation of that word, using
+            # the already realized parent transversal rather than reading
+            # every word again from the identity.
+            orbit_size = int(orbit.point_set().cardinality())
+            for position in range(orbit_size):
+                for letter_position, letter in enumerate(letters):
+                    if transitions[position, letter_position] == len(transversals):
+                        transversals.append(letter * transversals[position])
+            if len(transversals) != orbit_size:
+                raise ArithmeticError("the retained orbit transitions do not reach every orbit point")
+            return letters, tuple(transversals)
 
         @cached_method(key=lambda self, point: self.ranking_map()(point))
         def orbit_as_coset_space(self, point):

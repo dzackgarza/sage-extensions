@@ -15,7 +15,7 @@ def test_orbit_generator_permutations_equal_the_given_action(union):
 
     seeds = (ZZ(1), ZZ(4)) if union else (ZZ(1),)
     g_set = FiniteGSets(group).from_finite_orbits(seeds, action)
-    for point in seeds:
+    for point in (*seeds, ZZ(2)):
         orbit, section = g_set.orbit_transversal_words(point)
         letters, transversals = g_set.orbit_schreier_factors(point)
         permutations = g_set.orbit_generator_permutations(point)
@@ -25,3 +25,5 @@ def test_orbit_generator_permutations_equal_the_given_action(union):
             tuple(g_set.act(letter, candidate) for candidate in orbit) for letter in letters
         )
         assert all(g_set.act(transversal, point) == candidate for candidate, transversal in zip(orbit, transversals, strict=True))
+        augmentation = group.selected_group_resolution().augmentation()
+        assert all(transversal == augmentation(section(candidate)) for candidate, transversal in zip(orbit, transversals, strict=True))
