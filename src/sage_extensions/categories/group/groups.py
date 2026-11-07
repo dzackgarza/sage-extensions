@@ -8189,9 +8189,16 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
                 if ambient.is_finite() is True:
                     return _engine_subgroup_admits(self, candidate)
                 return AtomicProposition("is_member", candidate, self)
-            if candidate == ambient.one() or any(
+            if candidate == ambient.one():
+                return True
+            generators = self.selected_subgroup_generators()
+            # A supplied generator has a length-one word certificate.
+            # Its owned set already supplies the membership decision.
+            if generators.is_parent_of(candidate) is True:
+                return True
+            if any(
                 candidate == generator or candidate == ~generator
-                for generator in self.selected_subgroup_generators()
+                for generator in generators
             ):
                 return True
             if self.is_finite() is True:
