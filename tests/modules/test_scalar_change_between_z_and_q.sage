@@ -9,6 +9,8 @@ rank $2$; $\operatorname{Res}_\iota \mathbb Q^2$ is a torsion-free, countably in
 flat since $\mathbb Q$ is a localization of $\mathbb Z$.  Values from the definitions.
 """
 
+import pytest
+
 from sage_extensions.all import *  # noqa: F401,F403
 
 
@@ -73,3 +75,19 @@ def test_restriction_to_the_integers_has_a_right_adjoint() -> None:
     adjunction = Modules(QQ).restriction_coextension_adjunction(inclusion())
 
     assert adjunction.left_adjoint()(QQ ^ 2).base_ring() is ZZ
+
+
+def test_restriction_of_scalars_refuses_the_ring_where_it_expects_a_module() -> None:
+    r"""$\operatorname{Res}_\iota$ takes a $\mathbb Q$-module, and $\mathbb Q$ is a ring.
+
+    $\mathbb Q$ is its own rank-one module over itself, so a membership test alone
+    admits it; the restriction then wraps the ring rather than a module, and a form
+    built on that value object answers that an integral Gram is not base-ring valued
+    (the reading lattice-database recorded for every card).  The canonical rank-one
+    module is $\mathbb Q$'s own, and naming it is the caller's statement.
+    """
+    restriction = Modules(QQ).restriction_of_scalars(ZZ.fraction_field_map())
+
+    with pytest.raises(TypeError):
+        restriction(QQ)
+    assert restriction(QQ.regular_module()).base_ring() is ZZ

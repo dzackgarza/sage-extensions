@@ -190,10 +190,23 @@ class _RestrictionOfScalarsFunctor(Functor):
         return self._target_ring in GroupAlgebras(self._source_ring)
 
     def _apply_object(self, module):
+        from sage_extensions.categories.rings.ring_foundation import OwnedRings
+
         if self.ring_map().is_identity() is True:
             return module
         if self._restricts_group_modules():
             return module.unformed_module()
+        if module in OwnedRings():
+            # A ring is its own rank-one module over itself, so membership alone
+            # admits it here.  What Res_f takes is an S-module, and a ring handed
+            # in as one is read as an element structure the caller did not state:
+            # the form built on it then reports an integral Gram as not
+            # base-ring valued (lattice-database #9).  Name the module instead.
+            raise TypeError(
+                f"restriction of scalars along {self.ring_map()} takes a "
+                f"{self._target_ring}-module, but {module} is a ring; its canonical "
+                f"rank-one module over itself is {module}.regular_module()"
+            )
         return RestrictedScalarsModules(self._source_ring)(module, self.ring_map())
 
     def _restricted_element(self, source_module, restricted, element):

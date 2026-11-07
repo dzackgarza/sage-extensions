@@ -3356,3 +3356,34 @@ its candidates from an engine-side construction (a Schreier–Sims chain or the 
 a permutation stabilizer) instead of one GAP product/membership test per orbit point, or
 the repository has to carry a heavy lane whose ceiling is stated rather than assumed.
 Until one of those lands, a gated #296 pass is not reported.
+
+### Restriction of scalars admits a ring where it expects a module (2026-11-07, #293)
+
+Measured on `d5396d6`, exactly as the issue states, with the A2 lattice:
+
+```
+QQ in Modules(ZZ)                    : True
+restriction(QQ) is QQ.regular_module(): False        (it built a second object)
+form.is_base_ring_valued()           : False         (the Gram is integral)
+form()._as_numerical_tensor()[0,0]   : ValueError: (0, 0) is not an element of {0,...,3}
+--- with QQ.regular_module() instead
+form.is_base_ring_valued()           : True
+```
+
+A ring is its own rank-one module over itself, so `Modules(S).restriction_of_scalars(f)`
+admits the ring by membership alone and then wraps it, and the form built on that value
+object answers that an integral Gram is not base-ring valued -- the reading
+lattice-database recorded for every card.  The repair refuses the ring at the functor and
+names what it took and what it wanted:
+
+```
+TypeError: restriction of scalars along <ZZ -> QQ> takes a Fraction Field of Integer
+Ring-module, but Fraction Field of Integer Ring is a ring; its canonical rank-one module
+over itself is its regular_module()
+```
+
+and `restriction(QQ.regular_module())` still builds, with the form answering `True`.
+`tests/modules/test_scalar_change_between_z_and_q.sage` carries the regression; the owner
+files run `10 passed in 1.76 s` under the declared gate.  `tests/modules/test_restricted_scalars_action.sage`
+was in that selection and the gate stopped on a pre-existing lint finding in it
+(`TL01`, a direct category import at line 11), which is not this unit's.
