@@ -278,3 +278,29 @@ def test_the_scalar_subgroup_has_the_order_of_sign_reversal(prime, expected):
     sign_reversal = space.O()(tuple(-vector for vector in space.module_generators()))
 
     assert space.O().subgroup((sign_reversal,)).cardinality() == cardinal(expected)
+
+
+def test_the_five_dimensional_reflection_group_has_the_full_orthogonal_order():
+    r"""``|O(5,3)| = 2 * 3^4 * (3^2-1) * (3^4-1) = 103680``.
+
+    The reflections are the coordinate signs, adjacent transpositions, and
+    the reflection in ``e0+e1+e2+e3``. A fresh native GAP group on these
+    supplied actions independently has order 103680, as does ``GO(0,5,3)``.
+    """
+    space = Lattices(ZZ)(5).base_change(PrimeFields()(3).quotient_map())
+    field = space.base_ring()
+    basis = tuple(space.module_generators())
+    roots = (
+        *basis,
+        *(left - right for left, right in zip(basis[:-1], basis[1:], strict=True)),
+        sum(basis[:4], space.zero()),
+    )
+    group_generators = tuple(
+        space.O()(tuple(
+            point - space.scalar_multiple(field(2) * space.b(point, root) / space.b(root, root), root)
+            for point in basis
+        ))
+        for root in roots
+    )
+
+    assert space.O().subgroup(group_generators).cardinality() == cardinal(103680)
