@@ -577,10 +577,38 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                 orbit = category(finite_ordered_set(retained["points"]), self.act)
                 orbit.__dict__["_retained_transitions"] = (retained["transitions"], retained["letter_count"])
                 return orbit, retained["words"], retained["augmentation"]
-            points, words = category._orbit_words(
+            points, words, transitions = category._orbit_words(
                 (point,), self.act, augmentation, point_key=self.ranking_map(),
+                retain_transitions=True,
             )
-            return category(finite_ordered_set(tuple(points)), self.act), words, augmentation
+            orbit = category(finite_ordered_set(tuple(points)), self.act)
+            orbit.__dict__["_retained_transitions"] = (
+                transitions, len(tuple(augmentation.domain().group_generators())),
+            )
+            return orbit, words, augmentation
+
+        @cached_method(key=lambda self, point: self.ranking_map()(point))
+        def orbit_generator_permutations(self, point):
+            r"""Return the selected cover's generator actions on the orbit of ``point``.
+
+            The order is that of the letters in ``orbit_schreier_factors``.
+            The orbit search already computed every letter's image of every
+            point. Read those exact transitions to construct the permutations;
+            no rational, module or other supplied action is evaluated again.
+            """
+            orbit, _words, _augmentation = self._orbit_of(point)
+            transitions, letter_count = orbit.__dict__["_retained_transitions"]
+            points = tuple(orbit)
+            point_set = orbit.point_set()
+            ranking = point_set.ranking_map()
+            permutations = SymmetricGroups()(point_set)
+            return tuple(
+                _permutation_from_point_map(
+                    permutations, point_set,
+                    lambda image, letter=letter: points[transitions[(int(ranking(image)), letter)]],
+                )
+                for letter in range(letter_count)
+            )
 
         def orbit_schreier_morphism(self, point):
             r"""Schreier's lemma on the orbit of ``point``: ``E -> G`` with image ``G_point``."""
