@@ -17,6 +17,7 @@ from sage.structure.element import parent as element_parent
 
 import sage_extensions.categories.lattice_engines as lattice_engines
 from sage_extensions.categories.abstract_categories.cat import Cat
+from sage_extensions.categories.functors.core import Functor
 from sage.misc.lazy_attribute import lazy_attribute
 
 from sage_extensions.categories.abstract_categories.arrow_categories import (
@@ -3925,7 +3926,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         r"""The category of marked lattices with apex ``L`` of which ``marked`` is an object.
 
         The marking categories over ``Lattices(R)`` are ``Ar(Lattices)``,
-        ``Fun([2], Lattices)`` and the coslices ``X/Lattices``; a coslice
+        ``Fun([n], Lattices)`` and the coslices ``X/Lattices``; a coslice
         object names its ``X`` as the source of its arrow.
         """
         from sage_extensions.categories.abstract_categories.products import (
@@ -3941,11 +3942,16 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                 category = sublattices
             case _ if marked in flags:
                 category = flags
+            case Functor() if (
+                isinstance(marked.domain(), FiniteOrdinalCategory)
+                and marked.codomain() is lattices
+            ):
+                category = Cat().Mor(marked.domain(), lattices)
             case _:
                 category = CosliceCategory(lattices, marked.arrow().domain())
         assert marked in category, (
             f"{marked} is not a marked lattice: it is an object of none of Ar({lattices}), "
-            f"Fun([2], {lattices}) or a coslice X/{lattices}"
+            f"Fun([n], {lattices}) or a coslice X/{lattices}"
         )
         return category
 
