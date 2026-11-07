@@ -160,3 +160,43 @@ selection-size costs are pre-existing and recorded under #306 with their exact c
 (21.95 s here against 20.90 s at base, ceiling 20 s). Neither gate was changed, warmed,
 reordered or suppressed; the directory-sized selection was run with the plugins' own
 documented one-off flags, which still report every call over the call ceiling.
+
+## The repository's check contract for this repair, and what it returned
+
+There is no client-side Git hook in this checkout to invoke: `git rev-parse --git-dir` is
+`.git`, there is no `.git/hooks/` directory, `core.hooksPath` is unset, and there is no
+`.pre-commit-config.yaml`; CI carries `development.yml`, `ambient.yml` and `readme.yml`. The
+gates this repository declares for a change are the `just` recipes, so the checks below were
+run through them on this tree, in this order, after the merge:
+
+```
+just test-push        Push syntax: 86 file(s) checked; no errors.        exit 0
+just test-commit      Staged syntax: <the committed files>; no errors.   exit 0
+just test-lint <the two test files this repair touches>
+                      2 files, 0 findings                               exit 0
+just test <the four-file affected set>              15 passed in 2.29s   exit 0
+just test <the three vinberg modules>
+                      3 failed, 11 passed; the 3 ids are the pre-existing ones below
+just test-lint (whole tree)
+                      770 files, 1261 findings (TL01..TL13)             exit 1
+```
+
+Two of those are failures whose owner is not this repair, and neither is used as acceptance:
+
+- **Tree-wide `test-lint`.** 1261 findings across 770 files, none in a file this repair
+  touches (the scoped run is 0 findings). It is registered pre-existing debt of the same kind
+  `TRAPS.md` already records per file ("registered, not repaired"), it is not on the
+  publication path (`justfile`: *No full-tree scan on the publication path*), and no issue id
+  in this tree owns it. It is not repaired here and it is not evidence about #307 either way.
+- **The two cost ceilings**, both measured identical at the base and recorded under #306:
+  `tests/modules` collection 15.80 s against 15.85 s (ceiling 6 s), and
+  `test_two_copies_of_e8_and_a_norm_minus_two_line_give_e8_e8_a1` 21.95 s against 20.90 s
+  (ceiling 20 s).
+
+What the acceptance rests on is the passing public behaviour, not a failure count: the
+database's own `properties()` on the published card answers
+`("Coxeter", "hyperbolic Coxeter polytope")`, the same call raises the reported `TypeError` on
+the base provider, and the four form/scalar-restriction laws pass with the declared gate. The
+99 pre-existing `tests/modules` failures are recorded only to show this repair added none —
+their ids are identical at the base, which is a statement about scope, not about them being
+acceptable.
