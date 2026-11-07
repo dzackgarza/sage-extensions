@@ -57,9 +57,16 @@ from sage_extensions.categories.modules.framed.formed.form_modules import (
     FormedModuleMorphism,
     _represented_value_module,
 )
-from sage_extensions.categories.modules.pure.modules import Modules, ModulesOverIntegralDomains, _engine_matrix
+from sage_extensions.categories.modules.pure.modules import (
+    MatrixSpaces,
+    Modules,
+    ModulesOverIntegralDomains,
+    _engine_matrix,
+    _morphism_from_engine_matrix,
+)
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedFields,
+    _linear_algebra_ring,
     _own_ring,
     _owned_engine_element,
     _owned_integers,
@@ -4156,6 +4163,21 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         r"""Return ``second ∘ first`` as an isometry."""
         if first.codomain() is not second.domain():
             raise ValueError(f"cannot compose {second} after {first}: the codomain {first.codomain()} of {first} is not the domain {second.domain()} of {second}")
+        domain, middle, codomain = first.domain(), first.codomain(), second.codomain()
+        ring = domain.base_ring()
+        if ring.is_commutative() is True and _linear_algebra_ring(ring) is not ring:
+            modules = domain.module_category()
+            matrices = MatrixSpaces(ring)
+            if modules.Mor(domain, middle) in matrices and modules.Mor(middle, codomain) in matrices:
+                # In the actual endpoint framings, second after first has
+                # column matrix B*A. The module owner's existing adapters
+                # retain those framings and immediately raise the product.
+                product = _engine_matrix(second.module_morphism()) * _engine_matrix(first.module_morphism())
+                linear = _morphism_from_engine_matrix(modules.Mor(domain, codomain), product)
+                return domain.Isom(codomain)(tuple(
+                    linear(domain.module_generator(label))
+                    for label in domain.module_generating_set()
+                ))
         return first.domain().Isom(second.codomain())(lambda label: second(first(first.domain().module_generator(label))))
 
     def _emptiness_decision(self) -> bool | None:

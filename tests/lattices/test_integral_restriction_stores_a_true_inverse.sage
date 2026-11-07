@@ -22,6 +22,29 @@ import pytest
 from sage_extensions.all import *  # noqa: F401,F403
 
 
+@pytest.mark.parametrize("ring", (ZZ, QQ, RR), ids=("integral", "rational", "exact-real"))
+def test_composition_carries_the_actual_basis_through_distinct_isometric_presentations(ring) -> None:
+    r"""The maps e->u, f->-v and u->x+y, v->y compose to e->x+y, f->-y."""
+    source = Lattices(ring)([[2, -1], [-1, 2]], module_generators=("east", "north"))
+    middle = Lattices(ring)([[2, 1], [1, 2]], module_generators=("up", "right"))
+    target = Lattices(ring)([[2, -1], [-1, 2]], module_generators=("west", "south"))
+    e, f = tuple(source.module_generators())
+    u, v = tuple(middle.module_generators())
+    x, y = tuple(target.module_generators())
+    first = source.Isom(middle)(dict(zip(tuple(source.module_generating_set()), (u, -v), strict=True)))
+    second = middle.Isom(target)(dict(zip(tuple(middle.module_generating_set()), (x + y, y), strict=True)))
+
+    composite = second * first
+
+    assert composite.domain() is source
+    assert composite.codomain() is target
+    assert composite(e) == x + y
+    assert composite(f) == -y
+    for point in (e, f, 2 * e - 3 * f):
+        assert composite(point) == second(first(point))
+        assert (~composite)(composite(point)) == point
+
+
 @pytest.mark.parametrize("ring", (ZZ, QQ), ids=("integral", "rational"))
 def test_the_a2_coxeter_inverse_has_its_prescribed_basis_action(ring) -> None:
     r"""For g(e)=f, g(f)=-e-f, the inverse sends e to -e-f and f to e."""
