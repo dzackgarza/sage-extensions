@@ -3328,3 +3328,31 @@ the regression were false: `q` takes values in `Q/2Z` and the polar form `b` in 
 `q(0) != b(0,0)`).  On `A_{D4}` the polar form is alternating, `b(x,x) = b(0,0)` for
 every class, and its radical is trivial.  Comparing polar values against `q(0)` fails
 for that reason and not because the pairing is degenerate.
+
+### The declared gate terminates #296's plane specimen at 60 s (2026-11-07, measured on 50aa04c)
+
+`just test tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage`
+with the repository's own `addopts` (suite_budget, test_lint, `--timeout=60
+--timeout-method=signal`, junit, report log), plugins provisioned, nothing blanked:
+
+```
+test-call performance gate
+  ...::test_the_small_specimen_checks_the_orbit_stabilizer_identity: 37.48 s > 20 s
+!!!!!!!!!!!!!!!!!!!!!!! cysignals.signals.AlarmInterrupt !!!!!!!!!!!!!!!!!!!!!!!
+1 passed in 98.27 s
+```
+
+The small specimen passes and is flagged by the 20 s call ceiling; the plane specimen
+`test_the_tco_plane_gives_an_isotropic_subobject_with_orbit_and_stabilizer` is cut by the
+60 s `--timeout`, and the SIGALRM lands inside Cython (`AlarmInterrupt`), which is the
+hazard the justfile names for per-test timeouts.  So the #296 acceptance as written
+cannot be produced through this gate on this host: the walk is 55.8 s and the Schreier
+stabilizer 149.0 s on `A_{T_Co}` (measured with the gate's ceilings lifted, `2 passed in
+220.32 s`, `.tmp/qc-evidence/issue296-full-run.log`), and no arrangement of the same
+computation fits 60 s.
+
+Two owners follow from this, and neither is a test edit: the stabilizer route has to get
+its candidates from an engine-side construction (a Schreier–Sims chain or the preimage of
+a permutation stabilizer) instead of one GAP product/membership test per orbit point, or
+the repository has to carry a heavy lane whose ceiling is stated rather than assumed.
+Until one of those lands, a gated #296 pass is not reported.
