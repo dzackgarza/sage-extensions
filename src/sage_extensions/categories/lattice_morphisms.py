@@ -3569,12 +3569,11 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             lambda automorphism: all(automorphism(vector) == vector for vector in embedded),
             description=f"g fixes {embedding} pointwise",
         )
-        if int(source.module_rank()) == 1:
-            category = CosliceCategory(lattice.lattice_category(), source)
-            marked = category.object(embedding)
-            stabilizer.select_group_generators(
-                lambda: self._marking_stabilizer_generators(category, marked, stabilizer)
-            )
+        category = CosliceCategory(lattice.lattice_category(), source)
+        marked = category.object(embedding)
+        stabilizer.select_group_generators(
+            lambda: self._marking_stabilizer_generators(category, marked, stabilizer)
+        )
         return stabilizer
 
     def setwise_stabilizer(self, embedding):
