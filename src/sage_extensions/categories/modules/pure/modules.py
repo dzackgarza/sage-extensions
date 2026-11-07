@@ -272,6 +272,28 @@ def _action_with_canonical_endomorphism_parent(base_ring, additive_group, action
     )
 
 
+def _regular_module_reading(value_module):
+    r"""Read a ring stated as a value object through its own rank-one module.
+
+    A ring is its own module over itself, and the restricted-scalars view of a ring
+    keeps the ring as its extension (``test_restricted_scalars_action.sage`` states
+    that contract), so a pairing can be handed a value object whose elements are the
+    ring's scalars rather than module elements.  The form then reads its own Gram
+    through the wrong element structure: on the A2 lattice an integral Gram answers
+    ``is_base_ring_valued()`` False, and the numerical reading raises ``(0, 0) is not
+    an element of {0,...,3}`` (#293, lattice-database #9).  The module such a caller
+    means is the ring's regular module, restricted along the same map when the value
+    object is already a restriction of that ring.
+    """
+    if value_module in OwnedRings():
+        return value_module.regular_module()
+    if value_module in RestrictedScalarsModules(value_module.base_ring()):
+        extension = value_module.module_over_extension()
+        if extension in OwnedRings() and extension is not extension.regular_module():
+            return extension.regular_module().restrict_scalars(value_module.ring_map())
+    return value_module
+
+
 def _canonical_scalar_structure_map(ring_map):
     r"""Return the algebra's own structure morphism when ``ring_map`` states it.
 
@@ -1995,11 +2017,15 @@ class Modules(OwnedCategoryOverBaseRing):
             r"""Return ``Hom_R(self \otimes_R self, W)``, with ``W`` an R-module.
 
             The Cat-owned Mor constructor, not a form-specific fallback,
-            checks that the tensor product and ``W`` are both R-modules.
+            checks that the tensor product and ``W`` are both R-modules.  A value
+            object that is a ring, or the restriction of one, is read through that
+            ring's regular module (``_regular_module_reading``): the values of a
+            pairing are module elements, and a form built on the ring's own scalar
+            structure reports an integral Gram as not base-ring valued (#293).
             """
             from sage_extensions.categories.forms.forms import _bilinear_forms
 
-            return _bilinear_forms(self, value_module)
+            return _bilinear_forms(self, _regular_module_reading(value_module))
 
         def quadratic_forms(self, value_module):
             r"""Return quadratic forms ``self -> value_module`` through ``Gamma^2(self)``."""

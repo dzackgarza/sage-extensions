@@ -77,17 +77,32 @@ def test_restriction_to_the_integers_has_a_right_adjoint() -> None:
     assert adjunction.left_adjoint()(QQ ^ 2).base_ring() is ZZ
 
 
-def test_restriction_of_scalars_refuses_the_ring_where_it_expects_a_module() -> None:
-    r"""$\operatorname{Res}_\iota$ takes a $\mathbb Q$-module, and $\mathbb Q$ is a ring.
+def test_a_form_over_a_restricted_ring_reads_the_ring_s_regular_module() -> None:
+    r"""A pairing's values are module elements, so the A2 form over $\mathbb Q$ is integral.
 
-    $\mathbb Q$ is its own rank-one module over itself, so a membership test alone
-    admits it; the restriction then wraps the ring rather than a module, and a form
-    built on that value object answers that an integral Gram is not base-ring valued
-    (the reading lattice-database recorded for every card).  The canonical rank-one
-    module is $\mathbb Q$'s own, and naming it is the caller's statement.
+    $\operatorname{Res}_\iota \mathbb Q$ keeps the field as its extension, and that
+    view is the contract ``test_restricted_scalars_action.sage`` states.  A pairing
+    whose values are stated by that view has to read them through the field's own
+    rank-one module: restricting the ring object instead gave a form that answered
+    ``is_base_ring_valued()`` False on the integral A2 Gram -- the reading
+    lattice-database recorded for every card (#293) -- and whose numerical entry
+    raised ``(0, 0) is not an element of {0,...,3}``.
     """
     restriction = Modules(QQ).restriction_of_scalars(ZZ.fraction_field_map())
+    view = restriction(QQ)
+    assert view.module_over_extension() is QQ
 
-    with pytest.raises(TypeError):
-        restriction(QQ)
-    assert restriction(QQ.regular_module()).base_ring() is ZZ
+    lattice = Lattices(ZZ)([[2, -1], [-1, 2]])
+    from_the_ring = FormModules(ZZ)(
+        ZZ.free_module(2).bilinear_hom_space(view)(lattice.gram_tensor())
+    )
+    from_the_module = FormModules(ZZ)(
+        ZZ.free_module(2).bilinear_hom_space(restriction(QQ.regular_module()))(
+            lattice.gram_tensor()
+        )
+    )
+    assert int(from_the_ring.base_ring().one()) == int(from_the_module.base_ring().one())
+    assert from_the_ring.is_base_ring_valued() is True
+    assert from_the_module.is_base_ring_valued() is True
+    first = ZZ.free_module(2).module_generator(0)
+    assert from_the_ring.form()(first, first) == from_the_module.form()(first, first)
