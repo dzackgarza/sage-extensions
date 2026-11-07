@@ -1008,22 +1008,15 @@ class LatticeIsometryMethods:
             if domain.module_rank().is_finite() and codomain.module_rank().is_finite():
                 def inverse_computation():
                     inverse_matrix = _engine_matrix(_module_matrix(forward)).inverse()
-                    domain_generators = tuple(domain.module_generators())
+                    domain_labels = tuple(domain.module_generating_set())
                     inverse_ring = domain.base_ring()
                     return codomain.Mor(domain)(
                         tuple(
-                            sum(
-                                (
-                                    domain.scalar_multiple(
-                                        _owned_engine_element(inverse_ring, coefficient),
-                                        generator,
-                                    )
-                                    for coefficient, generator in zip(
-                                        column, domain_generators, strict=True
-                                    )
-                                ),
-                                domain.zero(),
-                            )
+                            domain.linear_combination({
+                                label: _owned_engine_element(inverse_ring, coefficient)
+                                for label, coefficient in zip(domain_labels, column, strict=True)
+                                if coefficient
+                            })
                             for column in inverse_matrix.columns()
                         )
                     )

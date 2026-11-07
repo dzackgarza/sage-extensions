@@ -17,7 +17,26 @@ stored inverse must be its inverse, on both generators and in both
 compositions.
 """
 
+import pytest
+
 from sage_extensions.all import *  # noqa: F401,F403
+
+
+@pytest.mark.parametrize("ring", (ZZ, QQ), ids=("integral", "rational"))
+def test_the_a2_coxeter_inverse_has_its_prescribed_basis_action(ring) -> None:
+    r"""For g(e)=f, g(f)=-e-f, the inverse sends e to -e-f and f to e."""
+    lattice = Lattices(ring)([[2, -1], [-1, 2]], module_generators=("east", "north"))
+    labels = tuple(lattice.module_generating_set())
+    e, f = tuple(lattice.module_generators())
+    coxeter = lattice.Isom(lattice)({labels[0]: f, labels[1]: -e - f})
+
+    inverse = ~coxeter
+
+    assert inverse(e) == -e - f
+    assert inverse(f) == e
+    for point in (e, f, 2 * e - 3 * f):
+        assert inverse(coxeter(point)) == point
+        assert coxeter(inverse(point)) == point
 
 
 def test_a_non_symmetric_unimodular_isometry_stores_its_true_inverse() -> None:
