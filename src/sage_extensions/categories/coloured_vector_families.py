@@ -489,6 +489,25 @@ class _ColouredFamilyRealization:
         r"""The rational isometry induced by a pairing-graph automorphism."""
         graph = self.pairing_graph()
         rational = self.rational_space()
+        if self.spans_rational_space():
+            # Fundamental.g:378-425 FindTransformation uses the selected
+            # independent rows. Reuse that exact coordinate computation
+            # before constructing the owned isometry on its framing.
+            permutation = tuple(
+                graph._vertex(generator(graph._position(vertex)))
+                for vertex in range(graph._size())
+            )
+            transformation = self._coordinate_automorphism(permutation)
+            labels = tuple(rational.module_generating_set())
+            ring = rational.base_ring()
+            return rational.O()({
+                label: rational.linear_combination({
+                    target_label: _owned_engine_element(ring, coefficient)
+                    for target_label, coefficient in zip(labels, row, strict=True)
+                    if coefficient
+                })
+                for label, row in zip(labels, transformation.rows(), strict=True)
+            })
         isometry = self.rational_transformation(self, graph.position_permutation(generator))
         return rational.O()({
             label: isometry(rational.module_generator(label))

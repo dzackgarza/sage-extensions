@@ -120,3 +120,22 @@ def test_a_redundant_index_three_family_has_its_integral_hyperbolic_exchange() -
     assert witness(e) == f and witness(f) == e
     assert all(witness(value) == image for value, image in zip(vectors, targets, strict=True))
     assert all((~witness)(witness(value)) == value for value in (e, f))
+
+
+def test_the_reindexed_index_two_hyperbolic_family_has_the_identity_transporter() -> None:
+    r"""The rational exchange of 2e and f is not integral, but fixes 2e+f.
+
+    Among O(U)={+-1,+-exchange}, only the identity preserves the family
+    {2e,f,2e+f}. Reindexing the family therefore has that transporter.
+    """
+    lattice = Lattices(ZZ)([[0, 1], [1, 0]])
+    e, f = tuple(lattice.module_generators())
+    vectors = (2 * e, f, 2 * e + f)
+    targets = (f, 2 * e, 2 * e + f)
+    family = Sets().Mor(Sets.Δ[2], lattice)(lambda index: vectors[int(index)])
+    target = Sets().Mor(Sets.Δ[2], lattice)(lambda index: targets[int(index)])
+
+    witness = lattice.O().transporter(family, target)
+
+    assert witness(e) == e
+    assert witness(f) == f
