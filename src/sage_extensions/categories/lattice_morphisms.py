@@ -1010,23 +1010,18 @@ class LatticeIsometryMethods:
             super().__init__(parent, forward, inverse_computation)
             return
         self._underlying_module_isomorphism = None
+        if isinstance(images, LatticeMorphismMethods):
+            images = images.module_morphism()
         forward = domain.module_category().Mor(domain, codomain)(images)
         if inverse_computation is None:
             if domain.module_rank().is_finite() and codomain.module_rank().is_finite():
                 def inverse_computation():
                     inverse_matrix = _engine_matrix(_module_matrix(forward)).inverse()
-                    domain_labels = tuple(domain.module_generating_set())
-                    inverse_ring = domain.base_ring()
-                    return codomain.Mor(domain)(
-                        tuple(
-                            domain.linear_combination({
-                                label: _owned_engine_element(inverse_ring, coefficient)
-                                for label, coefficient in zip(domain_labels, column, strict=True)
-                                if coefficient
-                            })
-                            for column in inverse_matrix.columns()
-                        )
+                    linear = _morphism_from_engine_matrix(
+                        codomain.module_category().Mor(codomain, domain), inverse_matrix,
                     )
+                    parent = codomain.Mor(domain)
+                    return parent.element_class(parent, linear)
             else:
                 inverse_computation = lambda: codomain.Mor(domain)(
                     lambda label: forward.lift(codomain.module_generator(label))
@@ -4174,10 +4169,11 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                 # retain those framings and immediately raise the product.
                 product = _engine_matrix(second.module_morphism()) * _engine_matrix(first.module_morphism())
                 linear = _morphism_from_engine_matrix(modules.Mor(domain, codomain), product)
-                return domain.Isom(codomain)(tuple(
-                    linear(domain.module_generator(label))
-                    for label in domain.module_generating_set()
-                ))
+                # The two supplied isometries establish form preservation.
+                # Retain their linear composite as this owner's constructor
+                # datum, including its selected module realization.
+                parent = domain.Isom(codomain)
+                return parent.element_class(parent, linear)
         return first.domain().Isom(second.codomain())(lambda label: second(first(first.domain().module_generator(label))))
 
     def _emptiness_decision(self) -> bool | None:

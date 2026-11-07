@@ -371,7 +371,8 @@ class IntegralStructureAction(SageObject):
         )
 
     @cached_method
-    def _ambient_group_inclusion(self):
+    def ambient_group_inclusion(self):
+        r"""The supplied subgroup inclusion ``G -> Aut(V)`` into the rational ambient space."""
         group = self.rational_group()
         inclusion = OwnedGroups().Mor(group, group).identity()
         current = group
@@ -397,7 +398,7 @@ class IntegralStructureAction(SageObject):
             )
         ambient = space.module_over_extension()
         restrict = Modules(ambient.base_ring()).restriction_of_scalars(space.ring_map())
-        group_inclusion = self._ambient_group_inclusion()
+        group_inclusion = self.ambient_group_inclusion()
         return GroupActionFunctor(
             self.rational_group(),
             Modules(ring),

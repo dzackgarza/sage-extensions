@@ -307,6 +307,7 @@ class ModuleMorphismMethods:
     supply the family; the public constructors take none.
     """
 
+    _engine_matrix_cache = None
     _scalar_extension_of = None
     _scalar_extension_functor = None
     _lift_function = None
