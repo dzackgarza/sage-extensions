@@ -3387,3 +3387,32 @@ and `restriction(QQ.regular_module())` still builds, with the form answering `Tr
 files run `10 passed in 1.76 s` under the declared gate.  `tests/modules/test_restricted_scalars_action.sage`
 was in that selection and the gate stopped on a pre-existing lint finding in it
 (`TL01`, a direct category import at line 11), which is not this unit's.
+
+### The #304 trace does not reproduce through the value objects a caller can state (2026-11-07, a5cf3ce)
+
+The issue's failure is `module_morphisms.py:4138` applying the codomain to a Gram entry,
+`TypeError: Fraction(2, 1) does not describe an element of Free module on {[0]} over
+Fraction Field of Integer Ring`, from a bilinear form built on a lattice card's rational
+Gram.  Measured on `a5cf3ce` with the rational Gram of the A2 dual lattice, whose entries
+are thirds:
+
+```
+dual Gram tensor: [[(-2)/(3), (-1)/(3)], [(-1)/(3), (-2)/(3)]]
+
+value = the restricted ring            -> form built; is_base_ring_valued() = False;
+                                          pairing on the first generator = ((-2)/(3))*[0]
+value = the restricted regular module  -> form built; the same two answers
+value = the plain QQ.regular_module()  -> TypeError: ... is not defined in Category of
+                                          modules over Integer Ring: both endpoints must
+                                          be Integer Ring-modules
+```
+
+None of the three produces the issued `Fraction(2, 1) does not describe an element of ...`
+message: the two restricted value objects accept the rational entries and answer
+correctly (a Gram with thirds is not base-ring valued), and the unrestricted regular
+module fails earlier, on the base-ring mismatch.  Two readings remain open, and no local
+measurement separates them: the #293 repair at `bilinear_hom_space` subsumed the #304
+trace for this shape, or the page states its value object differently.  Deciding it needs
+the page's own call (`dzackgarza/lattice-database`, the run at `406b357c7f`), and no
+checkout of that repository exists on this host, so the issued reproduction is not
+available here and no repair is claimed.
