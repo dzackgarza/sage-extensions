@@ -186,3 +186,54 @@ in items 1a–4 may be taken from a finite discriminant orbit — in particular 
 
 * **No T_Co run.** Nothing above touches `T_Co`, and no count is quoted from it.
 * **#307 is not claimed closed** — it is pushed as `73d2c49` for independent review.
+
+## Measured state of the comparison unit (tree `ee13b30`, port `991b88b0`)
+
+Group objects on `Λ₂`, timed on the port-bound harness, and the card's row keys from
+`6752696:lattices/6JRX.md` (`O` → `planes: 4`; `O+` → `constant: 1`, `planes: 4`;
+`Otilde+` → `constant: 1`):
+
+```
+lattice.Aut()                                   0.01 s    full O(Λ₂)
+lattice.O_plus()                                0.19 s    {g in O(L) : spinor-norm predicate}
+lattice.stable_orthogonal_group()              48.01 s    {g in O(L) : reflective predicate}
+```
+
+Orbit calls, same harness:
+
+```
+Λ₂, O,  rank 1 :  1 orbit,  115.06 s     valid run result; the card has no O line row
+Λ₂, O+, rank 1 :  did not return within 900 s (killed; peak tree 3122 MiB, julia 2707 MiB)
+Λ₂, O,  rank 2 :  did not return within 240 s in the earlier run
+```
+
+**What this does and does not establish.** The card's `O+` → `constant: 1` row is *not* yet
+computed: the subgroup route did not return, so the row is an unavailable result and is
+recorded as a dependency, not as a count. The `O` count of 1 is a real public-call result and
+is deliberately not used as that row — one `O`-orbit is one `O+`-orbit only if some element
+outside `O+` lies in the line's stabilizer, and whether `-id` is in `O+` here is exactly the
+convention that must not be assumed in signature (2,19).
+
+**Reproducing the row requires one of:** the subgroup enumeration returning (currently >900 s),
+or the stabilizer/index statement itself — exhibit an isometry of the line with spinor norm
+`-1` through the public calls, which is the shorter proof and the one to attempt next.
+
+## Public-call failures found on these specimens, with their owners
+
+1. **`discriminant_sequence_data()` raises on any lattice containing `U ⊕ U`.**
+   `TypeError: int() argument must be a string, a bytes-like object or a real number, not
+   'OwnedJoinCategory.element_class'` at
+   `../sage-indefinite-port/src/sage_indefinite_port/indefinite/recursive.py:154`,
+   `source_coordinates = tuple(int(coordinates(label)) for label in source_labels)`.
+   Reproduced on `U+U` (0.76 s), `L_1 = U+U+⟨-2⟩` (0.69 s), `U+U+E8` (7.46 s) and `Λ₂`
+   (129.68 s / 71.24 s).  Owner: **the indefinite port** — it converts an owned coordinate
+   with `int()` instead of crossing the owned boundary.  `A2` and `E8` answer, so the defect
+   is the `U` summand's coordinate labels, not the method's contract.
+
+2. **`discriminant_group()` costs 45.95 s on `Λ₂`** (rank 21, indefinite), and `A2`'s
+   `discriminant_sequence_data()` costs 64.36 s.  Both are over the 20 s call ceiling and are
+   **cost**, owned by #306; neither is a wrong answer.
+
+Neither of these blocks the structural unit above, which passes in 0.65 s using
+`conway_sloane_genus_symbol()` (0.03 s) for the discriminant structure rather than the two
+expensive calls.
