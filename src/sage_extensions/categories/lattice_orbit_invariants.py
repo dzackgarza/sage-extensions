@@ -342,8 +342,21 @@ def discriminant_sequence_data(lattice):
     def coset_of(element: FqfIsometry) -> int:
         return coset_index[frozenset(element * member for member in image_elements)]
 
-    orthogonal_order = int(lattice.orthogonal_group().cardinality())
+    orthogonal_cardinality = lattice.orthogonal_group().cardinality()
     image_order = int(image.order())
+    # ``kernel_order`` is the kernel of ``O(L) -> O(A_L)``, ``|O(L)| / |image|``.  The image
+    # lies in ``O(A_L)``, which is finite because ``A_L`` is, so when ``O(L)`` is infinite it
+    # gives ``|O(L)| = |ker| * |image|`` with ``|image|`` finite, hence ``|ker| = |O(L)|``.
+    # Infinitude is a property of the lattice, not of its indefiniteness: ``U + U`` has
+    # infinite ``O(L)`` while the hyperbolic plane ``U`` is indefinite with ``|O(U)| = 4``.
+    # When ``O(L)`` is infinite the kernel's cardinality is a cardinal, not an integer, and
+    # the conversion to ``int`` refused it (#309).  A finite ``O(L)`` keeps the integer
+    # quotient, so finite discriminant data is unchanged.
+    kernel_order = (
+        int(orthogonal_cardinality) // image_order
+        if orthogonal_cardinality.is_finite()
+        else orthogonal_cardinality
+    )
     return {
         "discriminant_factors": factors,
         "discriminant_basis_lifts": [[str(coordinate) for coordinate in element.lift()] for element in basis],
@@ -352,7 +365,7 @@ def discriminant_sequence_data(lattice):
         "discriminant_generators": [rows(generator.matrix()) for generator in group.gens()],
         "image_generators": [rows(element.matrix()) for element in images],
         "image_order": image_order,
-        "kernel_order": orthogonal_order // image_order,
+        "kernel_order": kernel_order,
         "coset_representatives": [rows(element.matrix()) for element in representatives],
         "mm_trivial": len(representatives) == 1,
         "image_normal": normal,
