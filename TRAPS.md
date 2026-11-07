@@ -3557,3 +3557,29 @@ Two facts measured on the way, because the first draft of that module got both w
 components are objects reading `label()` and `root_scale()` (the owner-contract test's own
 reading), not `(name, multiplicity)` pairs; and `Lattices(ZZ)("E8")` is the *negative*
 definite form, signature `(0, 8)`, so its root scale `q(r)/2` is `-1`.
+
+### The plane image's stabilizer is the engine's setwise computation, not a Schreier loop (2026-11-07, #296)
+
+The delivered `O(q).stabilizer(J)` built one Schreier candidate per (orbit point, letter) and
+tested each for membership: 94 860 candidates, **149 s** on `A_{T_Co}`.  The engine holding
+`O(q)` is GAP's automorphism group of the abelian group `A`, which has its own setwise
+stabilizer, and the crossing `J` needs was already half-owned by the class: `_normalized_map`
+runs engine -> owned, so the reverse reads the normalized element's framing lift and rebuilds
+the cover vector whose smith-form exponents index the engine's abelian group.
+
+Measured through the public call, same process (`issue296_stabilizer_cost.log`):
+
+```
+T_Co: |A| = 2048, |O(q)| = 46998591897600
+  orbit      23715  in 20.6 s
+  stabilizer order 1981808640 in 1.2 s      (was 149 s by the Schreier loop)
+  |Stab| * |orbit| = 46998591897600 == |O(q)|: True
+  every returned generator fixes J: True
+U(2) + U(2): |O(q)| = 72, stabilizer order 8 in 0.6 s
+```
+
+and the heavy module now runs inside the declared 60 s `--timeout`
+(`issue296_tco_gate_new.log`): **2 passed in 68.67 s**, calls 36.33 s (the small specimen,
+carrying the session's cold start) and 31.98 s (the plane image, walk and stabilizer
+together).  The recipe still exits 1 on the 20 s per-call ceiling, which is the cost issue
+being filed, not a wrong answer.
