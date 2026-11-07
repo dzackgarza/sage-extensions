@@ -3643,7 +3643,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         of a definite lattice of finite rank over ``ZZ``
         (``orthogonalGroup_finite``); its matrices act on row vectors, hence
         are transposed when converted to this Mor's column-image convention.
-        In rational rank one, exact roots of the defining isometry equation
+        In integral or rational rank one, exact roots of the defining isometry equation
         supply the finite matrix group. In higher rational rank, clearing
         denominators presents only the integral span of the chosen basis,
         whose finite group is not ``O(V)``.
@@ -3651,12 +3651,16 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         lattice = self.domain()
         if lattice is not self.codomain():
             raise ValueError(f"the isometries {lattice} -> {self.codomain()} are not an orthogonal group O(L): domain and codomain are different lattices")
-        if lattice.base_ring() is _owned_rationals() and lattice.module_rank() == 1 and lattice.is_definite():
+        if (
+            lattice.base_ring() in (_owned_integers(), _owned_rationals())
+            and lattice.module_rank() == 1
+            and lattice.is_definite()
+        ):
             # BilinModuleCat.orthogonalSubgroup in
             # LeanCategories/Modules/Bilinear/Valued/OrthogonalGroup.lean
             # requires b(gx, gy)=b(x,y). In one coordinate its defining
             # equation is a*u^2=a. Sage's exact polynomial roots supply all
-            # rational solutions; GAP retains their generated matrix group.
+            # solutions in the base ring; GAP retains their generated matrix group.
             from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 
             ring = _engine_ring(lattice.base_ring())
