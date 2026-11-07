@@ -113,3 +113,61 @@ for `Otilde+` and for `Λ₄` (`6JRY`, `O` → planes 9, `O+` → constant 1 and
   `O+`-orbit only if some element outside `O+` lies in the orbit's stabilizer, and that is
   not assumed in signature (2,19).
 * No T_Co result appears anywhere in this batch.
+
+## Implementation design (owner: `orthogonal_quotients.py`, `_subgroup_isotropic_orbit_representatives`)
+
+The seam is small, and this reading establishes it: `OrthogonalCharacterQuotient.splitting_isometries`
+(`orthogonal_quotients.py:956`) uses the stabilizer **only through**
+`self.image(generator)` for each generator, then does the double-coset computation in GAP. So
+the operation only ever needs the finite subgroup `rho(Stab(x)) ≤ Q`; the integral stabilizer
+is an implementation detail of how that image was obtained.
+
+So the owner change is: compute `rho(Stab(x))` from the characters, then call the existing
+double-coset machinery with that image (a new entry point that takes image keys rather than
+generator images).
+
+### The criterion, kept exact
+
+For a finite-index `G ≤ O(L) =: G_0` and a point `x` of a `G_0`-set, with `Q = rho(G_0)`:
+
+* `G` is transitive on `G_0.x` **iff** `G_0 = G·Stab_{G_0}(x)`;
+* when `G = rho^{-1}(rho(G))` (the library's subgroups are exactly their character preimages),
+  that is equivalent to `rho(Stab_{G_0}(x)) = Q`;
+* otherwise the `G`-orbits inside `G_0.x` are the double cosets `rho(G) \\ Q / rho(Stab(x))`,
+  which is what `splitting_isometries` already computes.
+
+`Stab(x) ⊄ G` is **not** the criterion in general; it is the criterion only when
+`[G_0 : G] = 2`, where the single nontrivial coset generates `Q ≅ Z/2`.
+
+### The three characters, not one
+
+1. **Discriminant factor, lines only, from the cited theorem.** Sterk 1991, Cor. 3.3 (p. 11),
+   as research is stating it for `N = (H + H(2)) + P` with `P` even nondegenerate: primitive
+   `v, w` of equal norm, equal divisibility `p`, and `v - w ∈ pN` lie in one
+   discriminant-kernel orbit. Then a finite discriminant isometry fixing `c = [v/p]` lifts,
+   and kernel transitivity corrects `g(v)` back to `v`, so the map from the integral line
+   stabilizer onto the finite class stabilizer is **surjective**:
+   `pi_1(rho(Stab(line))) = Stab_{O(A_L)}(c)`. The hypotheses are the theorem's, and they must
+   be checked in code for the lattice at hand, not assumed: the decomposition of `N`, `P` even
+   and nondegenerate, `v` primitive, and `div(v) = p`.
+2. **Sign / spinor factor — separate, not implied by (1).** It is an index-two character and is
+   decided by exhibiting an element of `Stab(x)` with the nontrivial value; a reflection in a
+   vector `u ⊥ x` with `u·u = -2` has spinor class `[-2] ≠ 1`, so it witnesses the nontrivial
+   value. A norm `-2` root reflection acts *trivially* on `A_L`, so it says nothing about (1)
+   and must not be used there.
+3. **Planes — separate, and not implied by the line lemma.** Nothing in Sterk's statement
+   covers a rank-two isotropic subobject, so the plane rows keep the existing route until the
+   corresponding statement is proved.
+
+A witness that generates only part of `rho(Stab(x))` must not be promoted to the whole image;
+the double-coset count would then be too large. The index-two case is safe precisely because
+`Q ≅ Z/2` and one nontrivial value generates it.
+
+### State
+
+Not implemented, not tested, not pushed. Two things are missing and both are mathematical,
+not cost: the hypothesis check for (1) on the cards' lattices (`Λ_k = U + U + E8(-1)^2 +
+<-2k>` is *not* literally `(H + H(2)) + P`; whether it satisfies the theorem's hypotheses, or
+which of its sublattices does, has to be established), and the correct image theorem for
+planes. The index-two spinor branch alone is writable today and is *not* sufficient for the
+`O+` plane rows.
