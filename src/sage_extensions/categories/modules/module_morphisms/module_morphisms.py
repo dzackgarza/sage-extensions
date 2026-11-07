@@ -144,6 +144,7 @@ def _integral_preimage_solver(morphism, ring):
             return morphism.domain().linear_combination({
                 label: _owned_engine_element(ring, coefficient)
                 for label, coefficient in zip(source_labels, solution, strict=True)
+                if coefficient
             })
 
         return solve_field
@@ -237,7 +238,7 @@ def _represented_real_preimage_solver(morphism):
 
 def _integral_preimage_positional_solver(morphism, ring):
     r"""Factor ``f`` once and return its positional integral preimage solver."""
-    element_solver = _integral_preimage_solver(morphism, ring)
+    element_solver = morphism._integral_preimage_element_solver(ring)
 
     def solve(target):
         original_solution = element_solver(target)
@@ -1542,6 +1543,16 @@ class ModuleMorphismMethods:
         return AffineModuleFibres(ring)(linear, target_inclusion, offset)
 
     @cached_method
+    def _integral_preimage_element_solver(self, ring):
+        r"""Retain the exact solver for this fixed finite free arrow and ring.
+
+        Successive right-hand sides share the same backend matrix, rank,
+        selected label order and Smith data. The native solver still decides
+        each target's membership and supplies its original coordinate lift.
+        """
+        return _integral_preimage_solver(self, ring)
+
+    @cached_method
     def _framed_coordinate_morphism(self):
         r"""Realize this linear arrow in the matrix Mor of its selected framings.
 
@@ -1813,13 +1824,7 @@ class ModuleMorphismMethods:
         coordinates = element.to_vector()
         target = [coordinates(label) for label in codomain_labels]
         coordinate_map = self._framed_coordinate_morphism()
-        solution = _solve_preimage_integrally(coordinate_map, target, ring)
-        if solution is None:
-            return None
-        return self.domain().linear_combination({
-            label: coefficient
-            for label, coefficient in zip(self.domain().module_generating_set(), solution, strict=True)
-        })
+        return coordinate_map._integral_preimage_element_solver(ring)(target)
 
     def lift(self, element):
         r"""Return a selected preimage of ``element``; reject an element outside the image with ``ValueError``.
