@@ -41,3 +41,24 @@ def test_the_rational_triangle_is_an_acute_angled_hyperbolic_polytope() -> None:
 
     assert matrix.is_rooted() is True
     assert matrix.is_acute_angled_hyperbolic_polytope_gram() is True
+
+
+def test_the_rational_valued_form_is_linear_over_its_own_scalars() -> None:
+    r"""The defining law: $b(r x, y) = r\,b(x, y) = b(x, r y)$ for $r\in\mathbb Q$.
+
+    This is the adjunction the semilinear arrow carries: the scalar map of the
+    rational-valued form is the identity of $\mathbb Q$, so the arrow is
+    $\mathbb Q$-linear on both sides, not $\mathbb Z$-linear.
+    """
+    gram = tensor(QQ, (), (3, 3), RATIONAL_TRIANGLE_GRAM)
+    module = Modules(QQ)(QQ.free_module(Sets.Δ[2]))
+    assert module.base_ring() is QQ
+    form = module.bilinear_hom_space(QQ)(gram)
+
+    left = module.module_generator(0)
+    right = module.module_generator(1)
+    scalar = QQ(-2) / 3
+    value = form(left, right)
+    assert form(module.scalar_multiple(scalar, left), right) == scalar * value
+    assert form(left, module.scalar_multiple(scalar, right)) == scalar * value
+    assert value != QQ.zero()

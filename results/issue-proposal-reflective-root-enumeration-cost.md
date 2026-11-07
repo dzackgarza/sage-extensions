@@ -59,3 +59,48 @@ not the specimen -- the next engine-touching test is 0.58 s.  So the ceiling is 
 *the first engine call of a session*, on both this module and the reflective one.  If that
 is chosen as the unit rather than a per-operation cost, the acceptance should say what the
 first-call budget is, because no test can both start the bridge and stay under 20 s today.
+
+## Another selection-size cost on the same ceiling, recorded under #306 (#307)
+
+`tests/modules/` — 79 files, 283 tests — aborts in collection before any test runs, on the
+collection ceiling rather than on a test call:
+
+```
+collected 283 items
+============================ no tests ran in 16.14s ============================
+! _pytest.outcomes.Exit: collection took 15.80 s; the measured ceiling is 6 s !!
+```
+
+The same command on the unchanged base `7494af73`, same runtime, same interpreter wrapper,
+same selection (`SAGE_PYTHON_BIND` pointing at a clean `git archive` export of that commit):
+
+```
+collected 283 items
+============================ no tests ran in 16.17s ============================
+! _pytest.outcomes.Exit: collection took 15.85 s; the measured ceiling is 6 s !!
+```
+
+15.80 s against 15.85 s: the cost is the size of the selection, not the tree. `suite_budget`
+calibrated `COLLECTION_CEILING = 6.0` against "the current 26-test default tree" (its own
+docstring, measurements 2.69–3.81 s), so a 283-test directory cannot be collected inside it
+at any commit. No gate was changed, warmed, reordered or suppressed for this; the wider
+affected set was run with the plugin's own `--no-time-gates` one-off *measurement* option,
+which still reports every call over `TEST_CALL_CEILING` in its terminal summary.
+
+The unit, if this is worth one: either a collection ceiling that scales with the selected
+item count, or a written heavy lane for directory-sized selections. It is not evidence of a
+regression in any test file, and a per-file selection collects far below the ceiling.
+
+## A second measured call over the same ceiling (#307's affected set)
+
+`tests/lattices/test_norm_two_root_types.sage::test_two_copies_of_e8_and_a_norm_minus_two_line_give_e8_e8_a1`,
+gate on, same runtime and wrapper:
+
+```
+current tree : 21.95 s > 20 s   (in a six-module run: 3 failed, 29 passed in 35.03 s)
+base 7494af73: 20.90 s > 20 s   (that module alone: 9 passed in 26.50 s, recipe exit 1 on the gate)
+```
+
+Pre-existing and unchanged by #307: the ceiling is exceeded at the base already, and the
+1.05 s difference is cold-cache noise of the same family as the reflective E8 call above, not
+a new unit.

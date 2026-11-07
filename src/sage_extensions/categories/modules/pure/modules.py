@@ -273,20 +273,23 @@ def _action_with_canonical_endomorphism_parent(base_ring, additive_group, action
 
 
 def _regular_module_reading(value_module):
-    r"""Read a ring stated as a value object through its own rank-one module.
+    r"""Read the *restriction of a ring* stated as a value object through that ring's module.
 
-    A ring is its own module over itself, and the restricted-scalars view of a ring
-    keeps the ring as its extension (``test_restricted_scalars_action.sage`` states
-    that contract), so a pairing can be handed a value object whose elements are the
-    ring's scalars rather than module elements.  The form then reads its own Gram
-    through the wrong element structure: on the A2 lattice an integral Gram answers
-    ``is_base_ring_valued()`` False, and the numerical reading raises ``(0, 0) is not
-    an element of {0,...,3}`` (#293, lattice-database #9).  The module such a caller
-    means is the ring's regular module, restricted along the same map when the value
-    object is already a restriction of that ring.
+    The restricted-scalars view of a ring keeps the ring as its extension
+    (``test_restricted_scalars_action.sage`` states that contract), so a pairing can be
+    handed a value object whose elements are the ring's scalars rather than module
+    elements.  The form then reads its own Gram through the wrong element structure: on
+    the A2 lattice an integral Gram answers ``is_base_ring_valued()`` False, and the
+    numerical reading raises ``(0, 0) is not an element of {0,...,3}`` (#293,
+    lattice-database #9).  The module such a caller means is the ring's regular module,
+    restricted along the same map.
+
+    A bare ring is *not* that case and is left unchanged: it is the pairing's scalar
+    ring -- `module.bilinear_hom_space(ring)(gram)` -- and ``signature_pair`` reads its
+    entries as ordered scalars, which a module's elements are not (#307).  Its own
+    action on itself is multiplication, which is what makes such a pairing linear over
+    the whole ring rather than only over the ring's base.
     """
-    if value_module in OwnedRings():
-        return value_module.regular_module()
     if value_module in RestrictedScalarsModules(value_module.base_ring()):
         extension = value_module.module_over_extension()
         if extension in OwnedRings() and extension is not extension.regular_module():
@@ -2018,10 +2021,12 @@ class Modules(OwnedCategoryOverBaseRing):
 
             The Cat-owned Mor constructor, not a form-specific fallback,
             checks that the tensor product and ``W`` are both R-modules.  A value
-            object that is a ring, or the restriction of one, is read through that
-            ring's regular module (``_regular_module_reading``): the values of a
-            pairing are module elements, and a form built on the ring's own scalar
-            structure reports an integral Gram as not base-ring valued (#293).
+            object that is the *restriction of a ring* is read through that ring's
+            regular module (``_regular_module_reading``): the values of a pairing
+            are module elements, and a form built on the ring's own scalar
+            structure reports an integral Gram as not base-ring valued (#293).  A
+            ring stated bare stays the value object, whose own action on itself is
+            multiplication, so the pairing is linear over the whole ring (#307).
             """
             from sage_extensions.categories.forms.forms import _bilinear_forms
 
