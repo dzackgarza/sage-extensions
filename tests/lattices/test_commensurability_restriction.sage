@@ -37,3 +37,28 @@ def test_proper_containment_does_not_define_a_reference_automorphism():
     finite = IntegralStructureAction(group, reference.inclusion()).finite_quotient(2)
     with pytest.raises(ValueError):
         finite.restricted_automorphism(scaling)
+
+
+def test_two_index_two_lattices_have_their_exact_finite_orbit_and_transporter():
+    plane = Lattices(QQ)([[0, 1], [1, 0]])
+    labels = tuple(plane.module_generating_set())
+    first, second = tuple(plane.module_generators())
+    space = Modules(QQ).restriction_of_scalars(ZZ.fraction_field_map())(plane)
+    reference = space.subobject_on([space(first), space(second)])
+    source = space.subobject_on([space(2 * first), space(second)])
+    target = space.subobject_on([space(first), space(2 * second)])
+    swap = plane.Aut()({labels[0]: second, labels[1]: first})
+    group = plane.Aut().subgroup((swap,))
+    action = IntegralStructureAction(group, source.inclusion()).with_stable_containing_bound(reference.inclusion())
+    finite = action.finite_representation()
+    orbit = finite.orbit_submodules()
+    assert finite.g_set().cardinality() == 2
+    assert all(submodule.cardinality() == 2 for submodule in orbit)
+    assert all(submodule.inclusion().codomain() is action.finite_module() for submodule in orbit)
+    witness = action.transporter(target.inclusion())
+    assert witness(first) == second and witness(second) == first
+    assert (~witness)(witness(first)) == first
+    outside = space.subobject_on([space((QQ(1) / QQ(2)) * first), space(second)])
+    too_small = space.subobject_on([space(4 * first), space(second)])
+    assert action.transporter(outside.inclusion()) is None
+    assert action.transporter(too_small.inclusion()) is None
