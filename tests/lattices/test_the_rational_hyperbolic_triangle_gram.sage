@@ -62,3 +62,41 @@ def test_the_rational_valued_form_is_linear_over_its_own_scalars() -> None:
     assert form(module.scalar_multiple(scalar, left), right) == scalar * value
     assert form(left, module.scalar_multiple(scalar, right)) == scalar * value
     assert value != QQ.zero()
+
+
+def test_the_rational_valued_form_carries_the_pairing_s_own_scalar_action() -> None:
+    r"""The value object's selected action is over $\mathbb Q$, the ring the form is over.
+
+    ``module.bilinear_hom_space(QQ)`` records a member of
+    $\operatorname{Hom}_{\mathbb Q}(M\otimes_{\mathbb Q} M, W)$, so ``W``'s
+    selected scalar action $\rho_W$ has $\mathbb Q$ as its domain -- that is what
+    makes evaluating it at a rational coefficient an action of the selected
+    structure rather than a multiplication supplied from outside it.  A pairing
+    read over the ring object instead has $\rho_W$ over $\mathbb Z$, and then a
+    rational coefficient has no image in $\rho_W$'s domain at all: the two agree
+    numerically where the base ring can read the scalar, so no numeric example
+    distinguishes them, but the action the morphism is over is not the action the
+    value object carries.  No second action is needed to repair that: the ring
+    owner already states the reading, $W = {}_R R$ with
+    ``regular_module_isomorphism()`` the exact $r e_0 \mapsto r$.
+    """
+    gram = tensor(QQ, (), (3, 3), RATIONAL_TRIANGLE_GRAM)
+    module = Modules(QQ)(QQ.free_module(Sets.Δ[2]))
+    form = module.bilinear_hom_space(QQ)(gram)
+    value_module = form.codomain()
+
+    assert value_module.base_ring() is QQ
+    assert value_module.scalar_action().domain() is QQ
+    assert value_module is QQ.regular_module()
+
+    # The readers' conversion is the ring owner's own identification, explicit.
+    identification = QQ.regular_module_isomorphism()
+    left = module.module_generator(0)
+    right = module.module_generator(1)
+    assert form.gram_tensor().base_ring() is QQ
+    assert identification(form(left, right)) == QQ(-1) / 2
+
+    # And evaluation at a rational scalar is that selected action.
+    scalar = QQ(-2) / 3
+    assert identification(form(module.scalar_multiple(scalar, left), right)) == scalar * (QQ(-1) / 2)
+    assert identification(form(left, module.scalar_multiple(scalar, right))) == scalar * (QQ(-1) / 2)

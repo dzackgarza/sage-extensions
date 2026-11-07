@@ -284,17 +284,41 @@ def _regular_module_reading(value_module):
     lattice-database #9).  The module such a caller means is the ring's regular module,
     restricted along the same map.
 
-    A bare ring is *not* that case and is left unchanged: it is the pairing's scalar
-    ring -- `module.bilinear_hom_space(ring)(gram)` -- and ``signature_pair`` reads its
-    entries as ordered scalars, which a module's elements are not (#307).  Its own
-    action on itself is multiplication, which is what makes such a pairing linear over
-    the whole ring rather than only over the ring's base.
+    A bare ring is also read this way, through its *own* regular module.  A ring is
+    that module over itself, and its ``rho`` there has the ring as its domain, so a
+    pairing with values in a ring is linear over the whole ring.  Reading the ring
+    object instead left the scalar action over the ring's *base* -- its domain is
+    ``base_ring()``, ``ZZ`` for ``QQ`` -- so a rational scalar had no action at all
+    (#307).  What the readers want is the scalars, and the ring owner supplies them
+    through ``regular_module_isomorphism()``, so the value object is the module and
+    the identification is the ring's, not a second action written here.
     """
+    if value_module in OwnedRings():
+        return value_module.regular_module()
     if value_module in RestrictedScalarsModules(value_module.base_ring()):
         extension = value_module.module_over_extension()
         if extension in OwnedRings() and extension is not extension.regular_module():
             return extension.regular_module().restrict_scalars(value_module.ring_map())
     return value_module
+
+
+def _regular_module_scalar_identification(value_module):
+    r"""Return the ring isomorphism reading ``value_module``'s elements as scalars, or ``None``.
+
+    A value object that *is* its base ring's own regular module carries that ring as
+    its scalar ring, so its elements are the ring's scalars read through the ring
+    owner's ``regular_module_isomorphism()`` -- the exact additive construction
+    ``{}_R R -> R``, ``r e_0 |-> r``, not a coordinate projection and not a coercion
+    test.  Every other value object answers ``None`` and keeps its own reading: this
+    recognises a stated construction, so no scalar action is inferred from whether a
+    particular scalar happens to lie in some image.
+    """
+    ring = value_module.base_ring()
+    if ring not in OwnedRings():
+        return None
+    if value_module is not ring.regular_module():
+        return None
+    return ring.regular_module_isomorphism()
 
 
 def _canonical_scalar_structure_map(ring_map):

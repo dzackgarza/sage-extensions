@@ -32,13 +32,18 @@ Card: `graphs/hyperbolic-triangle-2-3-infinity.md` — three walls of norm 1, bo
    (`categories/rings/ring_foundation.py`), still decided by the parent's retained engine.
    MRO evidence: `.tmp/issue307_mro.log`.
 
-2. **Which value object a pairing reads.** `is_acute_angled_hyperbolic_polytope_gram` builds
-   `FormModules(ring)(module.bilinear_hom_space(ring)(gram))` with `ring = QQ` and then reads
-   `signature_pair()`, which needs a ring-valued form. `bilinear_hom_space` re-read *every*
-   owned ring through its regular module, so the codomain became `Free module on {[0]} over
-   QQ` and `gram_tensor()` refused it —
-   `TypeError: … needs values in a ring`. `_regular_module_reading` now re-reads only the
-   **restriction** of a ring, which is what #293 reported; a bare ring stays the value ring.
+2. **Which action a ring-valued pairing is evaluated with.** `is_acute_angled_hyperbolic_polytope_gram`
+   builds `FormModules(ring)(module.bilinear_hom_space(ring)(gram))` with `ring = QQ` and reads
+   `signature_pair()`, which needs the values as ordered scalars. `bilinear_hom_space` reads a
+   ring value object through the ring's own rank-one module, `Free module on {[0]} over QQ`,
+   and the two readers refused that shape — `gram_tensor()` with
+   `TypeError: … needs values in a ring`. The repair is in the readers, not in which object a
+   bare ring denotes: `_regular_module_scalar_identification` recognises
+   `W = base_ring().regular_module()` and converts values with the ring owner's explicit
+   `regular_module_isomorphism()`, so `gram_tensor()` and `signature_pair()` accept the shape
+   `_as_numerical_tensor` already accepted for a *restriction* of a regular module.
+   #293's own regression is untouched: it pins the restriction's reading, and both forms it
+   builds are still `is_base_ring_valued() is True`.
 
 3. **One module structure per semilinear arrow.** With (2) in place the same construction
    reached `SemilinearModuleMorphism`, whose endpoints were validated against
@@ -49,15 +54,54 @@ Card: `graphs/hyperbolic-triangle-2-3-infinity.md` — three walls of norm 1, bo
    the defining linear morphism and the restricted codomain all use that one structure
    (`categories/modules/fibered_modules.py`).
 
-4. **A ring's own scalar action.** (2) leaves `QQ` itself as the codomain of a `QQ`-valued
-   form, and `Modules`' generic `scalar_multiple` resolves the acting ring through
-   `base_ring()` — `ZZ` for `QQ` — so evaluating that form at `(1/2)e_0` raised
-   `TypeError: no conversion of this rational to integer`. A ring is the regular left module
-   over itself and its own action is multiplication; `OwnedRings.ParentMethods`
-   now supplies it, and the generic base-ring action is used unchanged whenever the base ring
-   can read the scalar, so no existing reading moves (`categories/rings/ring_foundation.py`).
-   Trade avoided: at the base commit the pairing was `QQ`-linear but had no Gram; with only
-   (2) it had a Gram but was not `QQ`-linear. Both now hold.
+4. **No second scalar action on the ring parent.** A first repair for (2) left `QQ` itself as
+   the codomain and added an action to `OwnedRings.ParentMethods` chosen by testing whether
+   the base ring could coerce the particular scalar. That is not an ownership the library
+   records: a module carries one action `rho_M : R -> End_Ab(U(M))` with `R = base_ring()`
+   (`Modules.ParentMethods.scalar_action`, `_ring_morphism_defining_module_action`), and
+   `_RingModulePresentation.construct` asserts `category.base_ring() is self.base_ring()` and
+   `module.base_ring() is self.base_ring()`. An owned ring's `rho` is `_native_scalar_action`,
+   `_lmul_(base_ring()(scalar))` (ring_foundation.py:6418): its domain is the base ring, so it
+   states nothing about a scalar outside that domain, and membership in a coercion image does
+   not select a structure. The action is therefore taken from the datum: the value of a
+   pairing over `R` is read through `R`'s regular module, whose `rho` has domain `R`, and the
+   scalars come back through `regular_module_isomorphism()`. The override is deleted; no
+   fallback and no rational special case remains.
+
+Trade avoided: at the base the pairing was `QQ`-linear but had no Gram; with only the value
+object narrowed it had a Gram but was not `QQ`-linear. Both hold now, through one action.
+
+## The assertion that separates the two implementations
+
+The rational example passes on both trees — the two constructions agree numerically wherever
+the base ring can read the scalar — so it cannot detect the ownership defect. The new test
+asserts the selected structure instead, through the public construction path:
+
+```
+tests/lattices/test_the_rational_hyperbolic_triangle_gram.sage::
+  test_the_rational_valued_form_carries_the_pairing_s_own_scalar_action
+    assert value_module.base_ring() is QQ
+    assert value_module.scalar_action().domain() is QQ
+    assert value_module is QQ.regular_module()
+    assert form.gram_tensor().base_ring() is QQ
+    assert identification(form(left, right)) == QQ(-1) / 2
+    assert identification(form(module.scalar_multiple(scalar, left), right)) == scalar * (QQ(-1) / 2)
+```
+
+Run unchanged against a clean `git archive` export of `cba727ba` and against this tree:
+
+```
+cba727ba : 1 failed, 3 passed in 1.24s
+           assert value_module.base_ring() is QQ
+           E   assert Integer Ring is QQ
+           E    +    where base_ring = Fraction Field of Integer Ring.base_ring
+forward  : 4 passed in 0.44s
+```
+
+On `cba727ba` the value object's action morphism has domain `Integer Ring` while the recorded
+morphism is `Hom_QQ(M ⊗_QQ M, W)`; on this tree it has domain `QQ`. The value object is the
+same element set in both, which is why no number differs — the difference is the action the
+morphism is over.
 
 ## Evidence
 
@@ -88,7 +132,7 @@ tests/lattices/test_the_rational_hyperbolic_triangle_gram.sage
 tests/modules/test_scalar_change_between_z_and_q.sage
 tests/modules/test_restriction_of_scalars_on_morphisms.sage
 tests/modules/test_restricted_scalars_action.sage
-============================== 15 passed in 1.73s ==============================
+============================== 16 passed in 1.70s ==============================
 ```
 
 Green, the database's own public call (this repository's working tree bound at
@@ -126,6 +170,9 @@ diff of the two FAILED-id sets: empty  →  0 new failures
 
 The base is narrower on purpose — only the files that fail here need re-running to prove a
 failure is pre-existing — so its pass count is not comparable; the id sets are.
+
+Re-run after the action-datum repair, same 37 files: `99 failed, 30 passed in 19.11s`, the
+FAILED-id set still identical to the base — the readers changed, no test's verdict did.
 
 Six lattice modules were run with the gate on:
 
@@ -174,7 +221,7 @@ just test-push        Push syntax: 86 file(s) checked; no errors.        exit 0
 just test-commit      Staged syntax: <the committed files>; no errors.   exit 0
 just test-lint <the two test files this repair touches>
                       2 files, 0 findings                               exit 0
-just test <the four-file affected set>              15 passed in 2.29s   exit 0
+just test <the four-file affected set>              16 passed in 1.70s   exit 0
 just test <the three vinberg modules>
                       3 failed, 11 passed; the 3 ids are the pre-existing ones below
 just test-lint (whole tree)

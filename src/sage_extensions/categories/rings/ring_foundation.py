@@ -4626,32 +4626,6 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                         lambda element: self(module.framing_morphism().lift(element)(label))
                     )
 
-        def scalar_multiple(self, scalar, element):
-            r"""Return ``r*m`` for the ring read as its own module.
-
-            A ring is the regular left module over itself, ``{}_R R``, and that
-            action is multiplication, ``r |-> (m |-> r m)``.  The generic module
-            action is stated over the ring's *base* ring -- ``rho_R`` composed
-            with the structure morphism ``S -> R`` -- which is this action
-            restricted to the image of ``S``; it is used unchanged whenever the
-            base ring can read the scalar, so no existing reading moves.  What
-            it cannot express is a scalar of ``R`` that ``S`` does not contain,
-            such as ``1/2`` for ``ZZ -> QQ``: a pairing whose values lie in a
-            ring is linear over that ring, so evaluating it at ``1/2`` is this
-            action's job (#307).  The same reading is what restriction of
-            scalars does when the module *is* the extension ring.
-            """
-            base_ring = self.base_ring()
-            if (
-                base_ring is not self
-                and _operand_in_ring(base_ring, scalar) is NotImplemented
-            ):
-                underlying = self._underlying_additive_element(element)
-                return self(self(scalar) * self(underlying))
-            from sage_extensions.categories.modules.pure.modules import Modules
-
-            return Modules.ParentMethods.scalar_multiple(self, scalar, element)
-
         def _module_basis_along(self, ring_map):
             r"""A basis of ``Res_f(S)`` over ``R`` for ``f = ring_map: R -> S = self``, or ``None``.
 

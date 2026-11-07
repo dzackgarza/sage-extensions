@@ -93,6 +93,7 @@ from sage_extensions.categories.modules.pure.modules import (
     RestrictedScalarsModules,
     TensorProductModules,
     VectorSpaces,
+    _regular_module_scalar_identification,
 )
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
@@ -2229,7 +2230,10 @@ class FormModules(OwnedCategoryOverBaseRing):
         def signature_pair(self):
             r"""Return cardinal inertia of the selected norm in its chosen ordering."""
             value_module = self.value_module()
-            if value_module not in OwnedRings():
+            if (
+                value_module not in OwnedRings()
+                and _regular_module_scalar_identification(value_module) is None
+            ):
                 if not hasattr(value_module, "regular_module_identification"):
                     raise TypeError(
                         f"the signature of {self} needs ordered scalar values, not {value_module}"
