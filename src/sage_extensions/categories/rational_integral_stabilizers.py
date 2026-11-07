@@ -154,7 +154,10 @@ def _deduplicated_generating_morphism(group, morphism):
 class _FiniteIntegralRepresentation(SageObject):
     r"""The finite lattice orbit, retaining its action and free-word maps.
 
-    The module adapter only codes submodules of M/dM by integer positions.
+    The module adapter codes submodules of M/dM by integer positions and
+    retains their exact generating images. Closure needs those images and
+    their canonical preimage keys; full submodule presentations are realized
+    by ``orbit_submodules`` when requested.
     FiniteGSets owns orbit closure and transporters; the selected free-group
     augmentation keeps words in the supplied generators before evaluation
     in the rational group. No word-recovery algorithm for that group is used.
@@ -167,7 +170,11 @@ class _FiniteIntegralRepresentation(SageObject):
             "the residue-action computation requires a represented finite module M/dM"
         )
         selected = action.selected_submodule()
-        self._submodules = [selected]
+        self._selected_submodule = selected
+        inclusion = selected.inclusion()
+        self._submodule_generators = [tuple(
+            inclusion(generator) for generator in selected.module_generators()
+        )]
         self._positions = {self._submodule_key(selected): 0}
         self._registering_orbit = True
         zero = _owned_integers().zero()
@@ -217,12 +224,10 @@ class _FiniteIntegralRepresentation(SageObject):
 
     def _act_on_position(self, group_element, position):
         quotient = self.action().finite_module()
-        submodule = self._submodules[int(position)]
         automorphism = self.action().quotient_automorphism(group_element)
-        inclusion = submodule.inclusion()
         images = tuple(
-            automorphism(inclusion(submodule.module_generator(label)))
-            for label in submodule.module_generating_set()
+            automorphism(generator)
+            for generator in self._submodule_generators[int(position)]
         )
         image_key = quotient._submodule_key_from_generators(images)
         image_position = self._positions.get(image_key)
@@ -230,13 +235,18 @@ class _FiniteIntegralRepresentation(SageObject):
             assert self._registering_orbit, (
                 "the supplied rational action leaves its computed finite lattice orbit"
             )
-            image_position = len(self._submodules)
-            self._submodules.append(quotient.subobject_on(images))
+            image_position = len(self._submodule_generators)
+            self._submodule_generators.append(images)
             self._positions[image_key] = image_position
         return _owned_integers()(image_position)
 
+    @cached_method
     def orbit_submodules(self):
-        return tuple(self._submodules)
+        r"""Realize each orbit submodule from its retained exact generator images."""
+        quotient = self.action().finite_module()
+        return (self._selected_submodule,) + tuple(
+            quotient.subobject_on(images) for images in self._submodule_generators[1:]
+        )
 
     def orbit_section(self):
         r"""The actual section from lattice-orbit points to G: the section of ``G -> G/G_L``."""
