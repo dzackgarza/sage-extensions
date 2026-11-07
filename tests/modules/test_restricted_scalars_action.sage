@@ -8,8 +8,6 @@ composed with the retained scalar map, so the arithmetic is the field's,
 
 from sage_extensions.all import *
 
-from sage_extensions.categories.modules.pure.modules import Modules
-
 
 def test_the_restricted_scalars_action_multiplies_by_the_image_of_the_scalar() -> None:
     view = Modules(QQ).restriction_of_scalars(ZZ.fraction_field_map())(QQ)

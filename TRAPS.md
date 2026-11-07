@@ -3387,3 +3387,75 @@ and `restriction(QQ.regular_module())` still builds, with the form answering `Tr
 files run `10 passed in 1.76 s` under the declared gate.  `tests/modules/test_restricted_scalars_action.sage`
 was in that selection and the gate stopped on a pre-existing lint finding in it
 (`TL01`, a direct category import at line 11), which is not this unit's.
+
+### The #304 trace does not reproduce through the value objects a caller can state (2026-11-07, a5cf3ce)
+
+The issue's failure is `module_morphisms.py:4138` applying the codomain to a Gram entry,
+`TypeError: Fraction(2, 1) does not describe an element of Free module on {[0]} over
+Fraction Field of Integer Ring`, from a bilinear form built on a lattice card's rational
+Gram.  Measured on `a5cf3ce` with the rational Gram of the A2 dual lattice, whose entries
+are thirds:
+
+```
+dual Gram tensor: [[(-2)/(3), (-1)/(3)], [(-1)/(3), (-2)/(3)]]
+
+value = the restricted ring            -> form built; is_base_ring_valued() = False;
+                                          pairing on the first generator = ((-2)/(3))*[0]
+value = the restricted regular module  -> form built; the same two answers
+value = the plain QQ.regular_module()  -> TypeError: ... is not defined in Category of
+                                          modules over Integer Ring: both endpoints must
+                                          be Integer Ring-modules
+```
+
+None of the three produces the issued `Fraction(2, 1) does not describe an element of ...`
+message: the two restricted value objects accept the rational entries and answer
+correctly (a Gram with thirds is not base-ring valued), and the unrestricted regular
+module fails earlier, on the base-ring mismatch.  Two readings remain open, and no local
+measurement separates them: the #293 repair at `bilinear_hom_space` subsumed the #304
+trace for this shape, or the page states its value object differently.  Deciding it needs
+the page's own call (`dzackgarza/lattice-database`, the run at `406b357c7f`), and no
+checkout of that repository exists on this host, so the issued reproduction is not
+available here and no repair is claimed.
+
+### #304's failing codomain is a QQ-module in a ZZ-bilinear form: the caller's object, refused here (2026-11-07)
+
+The issue names `module_morphisms.py:4138`, which in this tree is the line of the module
+Mor's element constructor that applies the codomain to a value out of the defining family:
+
+```python
+defining_values = indexed_family(
+    domain_labels,
+    lambda pair: self.codomain()(raw_family[...]),
+)
+```
+
+and the guard immediately above it special-cases a codomain that *is* a restriction of
+scalars (`codomain in RestrictedScalarsModules(domain.base_ring()) and
+codomain.module_over_extension() is images.base_ring()`), deriving the defining tensor
+instead of coercing entries.  The issue's message names the codomain as
+`Free module on {[0]} over Fraction Field of Integer Ring` -- `QQ.regular_module()`, a
+`QQ`-module -- while the domain is a `ZZ`-module, so that guard does not apply and the
+entry `Fraction(2, 1)` is handed to a module whose elements are not scalars.
+
+On this tree the same statement is refused earlier and more plainly, at the owner that
+adopts the value object:
+
+```
+ZZ.free_module(2).bilinear_hom_space(QQ.regular_module())
+-> TypeError: Mor(... over Integer Ring, Free module on {[0]} over Fraction Field of
+   Integer Ring) is not defined in Category of modules over Integer Ring: both endpoints
+   must be Integer Ring-modules
+```
+
+and the value object the guard above expects is accepted and answers correctly (measured
+with the A2 dual lattice's rational Gram: form built, `is_base_ring_valued()` False,
+pairing `(-2)/(3)*[0]`).
+
+So the #304 shape is not a missing library operation: it is a `QQ`-module stated as the
+codomain of a `ZZ`-bilinear form, which is the case the issue's own acceptance calls "the
+caller supplies the wrong mathematical object".  Accepting it would mean coercing an
+arbitrary scalar into a module element, which the same sentence forbids.  The repair is
+therefore on the caller's side (`dzackgarza/lattice-database`, the run at `406b357c7f`,
+which has no checkout on this host), and this repository's part is to refuse it -- which
+it does, before the coercion the page reported.  The provider-pin request the issue adds
+is still unanswered on this side.
