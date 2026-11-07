@@ -596,6 +596,24 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                 transitions=orbit.__dict__.get("_retained_transitions"),
             )
 
+        def orbit_transversal_words(self, point):
+            r"""Return the orbit of ``point`` and the section ``p |-> t_p`` into the selected free cover.
+
+            The transversal of an orbit point is returned as its *word* in the
+            selected free cover, before it is realized as an element of the acting
+            group.  ``augmentation() * section`` is the transversal map that
+            :meth:`orbit_schreier_factors` materializes; a caller whose group is
+            reached through an engine reads the words and realizes them there, so
+            realizing ``|orbit|`` transversals costs that caller's own products
+            rather than ``|orbit|`` owned word evaluations.
+            """
+            orbit, words, augmentation = self._orbit_of(point)
+            ranking = orbit.ranking_map()
+            section = Sets().Mor(orbit, augmentation.domain())(
+                lambda image: words[int(ranking(image))]
+            )
+            return orbit, section
+
         def orbit_schreier_factors(self, point):
             r"""Return the letters and transversals whose composites are the Schreier family.
 
@@ -612,15 +630,13 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             point ``p`` and the ``j``-th letter ``s``, the family element is
             ``~transversals[position of s.p] * letters[j] * transversals[i]``.
             """
-            orbit, words, augmentation = self._orbit_of(point)
-            ranking = orbit.ranking_map()
+            orbit, section = self.orbit_transversal_words(point)
+            augmentation = self.acting_group().selected_group_resolution().augmentation()
             letters = tuple(
                 augmentation(generator)
                 for generator in augmentation.domain().group_generators()
             )
-            transversals = tuple(
-                augmentation(words[int(ranking(image))]) for image in orbit
-            )
+            transversals = tuple(augmentation(section(image)) for image in orbit)
             return letters, transversals
 
         @cached_method(key=lambda self, point: self.ranking_map()(point))

@@ -1,0 +1,28 @@
+[    44.3s] specimen built: |A| = 2048, letters = 4
+[    58.3s] 2048 elements of A
+[    58.3s] hash(element): 2048 calls in 0.000 s = 0.1 us each
+[    58.4s] element equality: 2048 calls in 0.126 s = 61.8 us each
+[    58.4s] frozenset of 4 elements: 512 calls in 0.000 s = 0.2 us each
+[    58.6s] one letter applied (first 256 elements): 256 calls in 0.166 s = 647.1 us each
+[    58.8s] one letter applied again, memoized by (id, element): 256 calls in 0.166 s = 649.8 us each
+[    58.8s] engine product: 50 calls in 0.006 s = 114.3 us each
+[    58.8s] engine membership test: 50 calls in 0.003 s = 69.5 us each
+[    58.8s] engine element order: 20 calls in 0.000 s = 12.5 us each
+[    58.8s] engine inverse: 50 calls in 0.001 s = 13.4 us each
+[    58.8s] engine equality: 50 calls in 0.000 s = 0.5 us each
+[    58.8s] DONE
+[peakrss] issue296-costs: child waited=0 shell_code=0 samples=31
+[peakrss] peak tree RSS      : 2815 MiB
+[peakrss] low-water MemAvail : 7973 MiB
+[peakrss] peak single VmHWM  : 2942 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2508 MiB peak
+[peakrss]   python                      423 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    42.0s procs=  4 rss=  2815 MiB hwm=  2815 MiB avail= 10304 MiB
+[peakrss]   t=    54.0s procs=  4 rss=  2786 MiB hwm=  2942 MiB avail= 10611 MiB
+[peakrss]   t=    56.0s procs=  4 rss=  2786 MiB hwm=  2942 MiB avail= 10797 MiB
+[peakrss]   t=    58.0s procs=  4 rss=  2786 MiB hwm=  2942 MiB avail= 10797 MiB
+[peakrss]   t=    60.0s procs=  4 rss=  2786 MiB hwm=  2942 MiB avail= 10795 MiB
+launcher exit: 0

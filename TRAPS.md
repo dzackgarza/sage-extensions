@@ -3185,3 +3185,55 @@ so `sum_{e^2|d} phi(e) = 1, 1, 2, 3, 6` and `#{e : e^2 | d} = 1, 1, 2, 2, 4`, ex
 - Õ counts: **1** (d = 1), **1** (d = 2), **2** (d = 4), **2** (d = 9, derived 3).
 **The one disagreement is d = 9: Õ gives 2 orbits where `sum_{e^2|d} phi(e) = 1 + 2 = 3`.** Two readings, and I do not have the measurement that separates them: either the splitting under-counts (the two order-3 classes stay fused inside their single O(L)-orbit, which is a defect in `splitting_isometries`), or one of the two order-3 classes carries no primitive isotropic vector of divisibility 3, in which case Eichler's criterion does not apply to it because there is no vector to apply it to, and the derivation over-counts. The second reading is plausible and would be *attainedness*, the same distinction `covering_discriminant_classes` already states for a different setting. It is not resolved by a larger run: it needs the two order-3 classes of `A_{L_9}` examined one at a time for an attained primitive vector of divisibility three, which is a finite search on a rank-5 lattice and is the next step.
 *Because it is red, the draft is not committed* and items 2 and 3 of the brief are not started: the owner series would be built on the same splitting, and the plane count for d = 1 rests on the same machinery that has just disagreed once.
+
+### Multiplying torsion-form automorphisms: the crossing is quadratic, and `matrix()` reaches GAP's `exponents` (2026-11-07, #296)
+
+Specimen: `A_{T_Co} = A_{B(2)}` with `B = U + U + I_{0,7}`, so `|A| = 2048 = 2^11`,
+`|O(q)| = 46 998 591 897 600`, engine module invariants `(2, ..., 2)` (11 of them),
+engine generators 4. Measured in one process on the adopted runtime, warm, after
+the `_hash_digest` repair of 2026-11-01:
+
+| operation | measured |
+| --- | ---: |
+| owned product `g * h` of two `TorsionFormAutomorphism`s | 52 ms |
+| engine product of two `AbelianGroupAutomorphism`s | 0.114 ms |
+| one application `g(element)` through the owned module morphism | 0.50 ms |
+| `hash(element)` | 0.0001 ms |
+| `element == element` | 0.12 ms |
+| `_from_engine` of one engine element (builds two transported maps) | 51.7 ms |
+| one engine subgroup membership test (`x in H`, trivial `H`) | 0.07 ms |
+
+`TorsionFormAutomorphism.__mul__` crosses to `_from_engine`, which builds *two*
+presented-module maps through the normalization isometry (`_transported_map`), each
+reading 11 images through `engine_module(basis) * engine_automorphism`. That action is
+`fqf_orthogonal._act_`, which calls `AbelianGroupAutomorphism.matrix()`; `matrix()` is
+`[self(a).exponents() for a in domain.gens()]`, so each action makes 11
+`abelian_group_gap.exponents()` calls, each through `EpimorphismFromFreeGroup`,
+`PreImagesRepresentative` and `ExtRepOfObj`. `exponents()`' own docstring says
+"*Crashes for very large groups*", and its warning is not decorative: after 560 s of
+`generator * transversals[position]` on the plane orbit of `A_{T_Co}` the process died
+with SIGSEGV inside `abelian_group_gap.exponents:154`, from `abelian_aut.matrix:203`
+<- `fqf_orthogonal._act_:484` <- `_normalized_map` <- `_transported_map` <-
+`_from_engine` <- `__mul__` <- the orbit walk (`.tmp/issue296_tco_test5.log`, killed at
+the inner 600 s cap with tree RSS 3076 MiB and no pytest line).
+
+Route chosen and delivered in the same unit, so that no owned automorphism is
+multiplied along a walk: the walk runs in the owned finite action
+(`FiniteGSets.from_finite_orbits` on element-rank points), its transversals stay the
+walk's *words* in the free cover (`FiniteGSets.orbit_transversal_words`), those words
+are realized as engine products (0.114 ms each, one per orbit point), and the
+Schreier candidates are multiplied in the engine. Only a candidate that enlarges the
+subgroup is crossed back to an owned automorphism (51.7 ms each). On `A_{T_Co}` with
+`J = <[1], [3]>` this returns `|orbit(J)| = 23715`, `|Stab(J)| = 1981808640` from 8
+generators, and `23715 * 1981808640 = 46 998 591 897 600 = |O(q)|`; the delivered costs
+are 55.8 s for the action and 149.0 s for the stabilizer, in one process, with the
+specimen built first (`2 passed in 283.95 s`, `.tmp/issue296_full_run.log`).
+
+Two engine facts generalized from the same measurements, since they are what the
+numbers above are: the engine acts on the right, so an engine product `a * b` is the
+automorphism the owned product `b * a` names (the crossing `__mul__` states this), and
+a permutation of a 2048-element form is worth retaining per automorphism — reading
+`g(element)` for each element once costs 0.50 ms each, whereas comparing two members
+of the orbit's points costs 0.12 ms per comparison and 55.8 s is what a 23715-point
+walk of four letters pays when the action is a retained permutation of element ranks
+rather than a re-application of the morphism.

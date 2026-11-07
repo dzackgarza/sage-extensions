@@ -122,7 +122,7 @@ def test_u2_bilinear_orthogonal_group_element_orbit() -> None:
     group = form.O()
 
     assert group.order() == 6
-    assert group.orbit(element).cardinality() == 3
+    assert group.orbit_of_element(element).cardinality() == 3
 
 
 def test_the_discriminant_forms_of_a1_are_one_half_mod_one_and_minus_one_half_mod_two() -> None:

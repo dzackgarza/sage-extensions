@@ -2991,7 +2991,7 @@ def _primary_form_component_family(form):
 
 def _finite_form_orbit(form, element, group=None):
     acting = form.automorphism_group() if group is None else group
-    return acting.orbit(form(element))
+    return acting.orbit_of_element(form(element))
 
 
 def _finite_form_orbits(form, group=None):

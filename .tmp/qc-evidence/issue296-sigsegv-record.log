@@ -1,0 +1,102 @@
+Fatal Python error: Segmentation fault
+
+Thread 0x00007a547bdff6c0 (most recent call first):
+  File "/repos/sage-julia-bridge/src/sage_julia_bridge/interface.py", line 279 in _drain_stderr
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Current thread 0x00007a5505eb3780 (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/groups/abelian_gps/abelian_group_gap.py", line 154 in exponents
+  File "/sage/.venv/lib/python3.14/site-packages/sage/groups/abelian_gps/abelian_aut.py", line 203 in matrix
+  File "/sage/.venv/lib/python3.14/site-packages/sage/groups/fqf_orthogonal.py", line 484 in _act_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2021 in _normalized_map
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2048 in _transported_map
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2076 in _from_engine
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 1842 in __mul__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2411 in _orbit_walk
+  File "/repos/sage-extensions/tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage", line 63 in test_the_tco_plane_gives_an_isotropic_subobject_with_orbit_and_stabilizer
+  File "/sage/.venv/lib/python3.14/site-packages/_pytest/python.py", line 167 in pytest_pyfunc_call
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_execution.py", line 147 in _multicall
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_manager.py", line 183 in _hookexec
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_caller.py", line 197 in __call__
+  File "/sage/.venv/lib/python3.14/site-packages/_pytest/python.py", line 1707 in runtest
+  File "/sage/.venv/lib/python3.14/site-packages/_pytest/runner.py", line 184 in pytest_runtest_call
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_execution.py", line 147 in _multicall
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_manager.py", line 183 in _hookexec
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_caller.py", line 197 in __call__
+  File "/sage/.venv/lib/python3.14/site-packages/_pytest/runner.py", line 250 in <lambda>
+  File "/sage/.venv/lib/python3.14/site-packages/_pytest/runner.py", line 361 in from_call
+  File "/sage/.venv/lib/python3.14/site-packages/_pytest/runner.py", line 249 in call_and_report
+  File "/sage/.venv/lib/python3.14/site-packages/_pytest/runner.py", line 139 in runtestprotocol
+  File "/sage/.venv/lib/python3.14/site-packages/_pytest/runner.py", line 118 in pytest_runtest_protocol
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_execution.py", line 147 in _multicall
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_manager.py", line 183 in _hookexec
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_caller.py", line 197 in __call__
+  File "/sage/.venv/lib/python3.14/site-packages/_pytest/main.py", line 408 in pytest_runtestloop
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_execution.py", line 147 in _multicall
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_manager.py", line 183 in _hookexec
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_caller.py", line 197 in __call__
+  File "/sage/.venv/lib/python3.14/site-packages/_pytest/main.py", line 384 in _main
+  File "/sage/.venv/lib/python3.14/site-packages/_pytest/main.py", line 330 in wrap_session
+  File "/sage/.venv/lib/python3.14/site-packages/_pytest/main.py", line 377 in pytest_cmdline_main
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_execution.py", line 147 in _multicall
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_manager.py", line 183 in _hookexec
+  File "/sage/.venv/lib/python3.14/site-packages/pluggy/_caller.py", line 197 in __call__
+  File "/sage/.venv/lib/python3.14/site-packages/_pytest/config/__init__.py", line 229 in _main
+  File "/sage/.venv/lib/python3.14/site-packages/_pytest/config/__init__.py", line 253 in _console_main
+  File "/sage/.venv/lib/python3.14/site-packages/pytest/__main__.py", line 9 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 203 in _run_module_as_main
+
+Current thread's C stack trace (most recent call first):
+  Binary file "/sage/.venv/bin/python", at _Py_DumpStack+0x30 [0x12bcb20]
+  Binary file "/sage/.venv/bin/python" [0x132c21b]
+  Binary file "/sage/.venv/bin/python" [0x132c167]
+  Binary file "/lib/x86_64-linux-gnu/libc.so.6", at +0x3fd70 [0x7a5505ef5d70]
+  Binary file "/lib/x86_64-linux-gnu/libc.so.6", at +0xa06a6 [0x7a5505f566a6]
+  Binary file "/lib/x86_64-linux-gnu/libc.so.6", at +0xa1eeb [0x7a5505f57eeb]
+  Binary file "/lib/x86_64-linux-gnu/libc.so.6", at malloc+0xfe [0x7a5505f589ce]
+  Binary file "/sage/.venv/bin/python" [0x1803a33]
+  Binary file "/sage/.venv/bin/python" [0x1851875]
+  Binary file "/sage/.venv/bin/python", at PyDict_SetItem+0x4af [0x1850347]
+  Binary file "/sage/.venv/lib/python3.14/site-packages/sage/libs/gap/util.cpython-314-x86_64-linux-gnu.so", at +0xd493 [0x7a548f92c493]
+  Binary file "/sage/.venv/lib/python3.14/site-packages/sage/libs/gap/element.cpython-314-x86_64-linux-gnu.so", at +0x2fd32 [0x7a548f970d32]
+  Binary file "/sage/.venv/lib/python3.14/site-packages/sage/libs/gap/element.cpython-314-x86_64-linux-gnu.so", at +0x1ca7b [0x7a548f95da7b]
+  Binary file "/sage/.venv/lib/python3.14/site-packages/sage/libs/gap/element.cpython-314-x86_64-linux-gnu.so", at +0x2d1f1 [0x7a548f96e1f1]
+  Binary file "/sage/.venv/lib/python3.14/site-packages/sage/libs/gap/element.cpython-314-x86_64-linux-gnu.so", at +0x492b8 [0x7a548f98a2b8]
+  Binary file "/sage/.venv/lib/python3.14/site-packages/sage/libs/gap/element.cpython-314-x86_64-linux-gnu.so", at +0x1510a [0x7a548f95610a]
+  Binary file "/sage/.venv/bin/python" [0x18118c2]
+  Binary file "/sage/.venv/lib/python3.14/site-packages/sage/libs/gap/element.cpython-314-x86_64-linux-gnu.so", at +0x50348 [0x7a548f991348]
+  Binary file "/sage/.venv/bin/python" [0x1856ce3]
+  Binary file "/sage/.venv/bin/python" [0x1812dbd]
+  Binary file "/sage/.venv/lib/python3.14/site-packages/sage/categories/action.cpython-314-x86_64-linux-gnu.so", at +0x11a89 [0x7a5503afaa89]
+  Binary file "/sage/.venv/lib/python3.14/site-packages/sage/structure/coerce.cpython-314-x86_64-linux-gnu.so", at +0x29c7f [0x7a5503e7fc7f]
+  Binary file "/sage/.venv/lib/python3.14/site-packages/sage/structure/element.cpython-314-x86_64-linux-gnu.so", at +0x28705 [0x7a5504639705]
+  Binary file "/sage/.venv/bin/python" [0x18c22fd]
+  Binary file "/sage/.venv/bin/python" [0x18c19c2]
+  Binary file "/sage/.venv/bin/python", at PyNumber_Multiply+0x6f [0x1862849]
+  Binary file "/sage/.venv/bin/python" [0x1801270]
+  Binary file "/sage/.venv/bin/python" [0x1812dbd]
+  Binary file "/sage/.venv/bin/python" [0x18c22fd]
+  Binary file "/sage/.venv/bin/python" [0x18c19c2]
+  Binary file "/sage/.venv/bin/python", at PyNumber_Multiply+0x6f [0x1862849]
+  Binary file "/sage/.venv/bin/python" [0x1801270]
+  <truncated rest of calls>
+
+Extension modules: tree_sitter_sage._binding, wcwidth._wcwidth_c, sage.cpython.string, sage.misc.instancedoc, sage.misc.lazy_import, sage.misc.lazy_attribute, sage.misc.persist, sage.structure.sage_object, sage.misc.nested_class, sage.misc.classcall_metaclass, sage.misc.inherit_comparison, sage.cpython.getattr, sage.categories.category_cy_helper, sage.misc.function_mangling, sage.cpython.dict_del_by_value, sage.misc.weak_dict, sage.misc.cachefunc, sage.misc.c3_controlled, sage.misc.fast_methods, sage.cpython.builtin_types, sage.structure.richcmp, sage.structure.category_object, cysignals.signals, sage.structure.coerce_dict, sage.arith.power, sage.categories.morphism, sage.categories.map, sage.structure.debug_options, sage.misc.lazy_string, sage.categories.category_singleton, sage.categories.functor, sage.misc.constant_function, sage.sets.pythonclass, gmpy2.gmpy2, sage.categories.action, sage.structure.coerce, sage.structure.coerce_maps, sage.cpython.type, sage.structure.parent, sage.structure.element, sage.rings.fast_arith, sage.libs.gmp.pylong, sage.misc.randstate, sage.categories.coercion_methods, sage.misc.misc_c, sage.rings.ring, sage.rings.number_field.number_field_base, sage.rings.abc, sage.misc.allocator, sage.arith.functions, cypari2.stack, cypari2.string_utils, cypari2.convert, cypari2.closure, cypari2.gen, cypari2.handle_error, cypari2.pari_instance, cypari2.custom_block, sage.rings.rational, sage.arith.rational_reconstruction, sage.rings.number_field.number_field_element_base, sage.rings.integer_ring, sage.rings.integer, sage.arith.srange, sage.misc.fpickle, sage.symbolic.function, sage.misc.derivative, sage.rings.real_double_element_gsl, sage.rings.real_double, sage.rings.complex_conversion, sage.ext.memory, sage.libs.pari.convert_sage_complex_double, sage.misc.parser, sage.rings.complex_double, sage.rings.complex_mpfr, sage.libs.mpmath.utils, sage.libs.pari.convert_sage_real_mpfr, sage.rings.real_mpfr, sage.structure.parent_gens, sage.structure.mutability, sage.structure.element_wrapper, sage.rings.morphism, sage.symbolic.expression, sage.symbolic.ring, sage.calculus.var, sage.matrix.args, sage.modules.free_module_element, sage.modules.module, sage.rings.finite_rings.element_base, sage.rings.finite_rings.finite_field_base, sage.structure.factory, sage.structure.coerce_actions, sage.matrix.constructor, sage.sets.family, sage.structure.list_clone, sage.cpython.debug, sage.misc.sage_timeit_class, sage.misc.session, sage.misc.reset, sage.libs.ntl.error, sage.libs.ntl.convert, sage.libs.ntl.ntl_ZZ, sage.libs.ntl.ntl_ZZ_pContext, sage.libs.ntl.ntl_ZZ_p, sage.libs.ntl.ntl_ZZX, sage.libs.ntl.ntl_ZZ_pX, sage.libs.ntl.ntl_ZZ_pEContext, sage.libs.ntl.ntl_ZZ_pE, sage.libs.ntl.ntl_ZZ_pEX, sage.libs.ntl.ntl_lzz_pContext, sage.rings.finite_rings.integer_mod, sage.libs.ntl.ntl_lzz_p, sage.libs.ntl.ntl_lzz_pX, sage.libs.ntl.ntl_mat_ZZ, sage.libs.ntl.ntl_GF2, sage.libs.ntl.ntl_GF2X, sage.libs.ntl.ntl_GF2EContext, sage.libs.ntl.ntl_GF2E, sage.libs.ntl.ntl_GF2EX, sage.libs.ntl.ntl_mat_GF2E, sage.libs.ntl.ntl_mat_GF2, sage.libs.symmetrica.symmetrica, memory_allocator.memory_allocator, sage.data_structures.bitset_base, sage.data_structures.bitset, sage.rings.polynomial.commutative_polynomial, sage.misc.binary_tree, sage.rings.polynomial.polynomial_compiled, sage.rings.polynomial.polydict, sage.rings.padics.pow_computer, sage.rings.padics.local_generic_element, sage.rings.padics.padic_generic_element, sage.rings.padics.common_conversion, sage.libs.pari.convert_gmp, sage.rings.padics.padic_capped_relative_element, sage.rings.padics.padic_capped_absolute_element, sage.rings.padics.padic_floating_point_element, sage.rings.padics.padic_fixed_mod_element, sage.rings.polynomial.multi_polynomial, sage.rings.fraction_field_element, sage.rings.function_field.element, sage.rings.function_field.element_rational, sage.rings.power_series_ring_element, sage.rings.polynomial.multi_polynomial_ring_base, sage.rings.polynomial.polynomial_element, sage.rings.finite_rings.element_pari_ffelt, sage.rings.finite_rings.element_givaro, sage.rings.convert.mpfi, sage.rings.real_mpfi, sage.rings.complex_interval, sage.rings.real_lazy, sage.rings.number_field.number_field_morphisms, sage.rings.polynomial.evaluation_ntl, sage.rings.number_field.number_field_element, sage.rings.real_arb, sage.rings.polynomial.polynomial_complex_arb, sage.rings.complex_arb, sage.rings.number_field.number_field_element_quadratic, sage.groups.group, sage.rings.finite_rings.residue_field, sage.rings.padics.padic_printing, sage.rings.padics.padic_ext_element, sage.rings.padics.pow_computer_ext, sage.rings.padics.padic_ZZ_pX_element, sage.rings.padics.padic_ZZ_pX_FM_element, sage.rings.padics.padic_ZZ_pX_CR_element, sage.rings.padics.padic_ZZ_pX_CA_element, sage.libs.flint.fmpz_poly_sage, sage.rings.polynomial.evaluation_flint, sage.rings.polynomial.polynomial_integer_dense_flint, sage.rings.padics.pow_computer_flint, sage.rings.padics.qadic_flint_CR, sage.rings.padics.qadic_flint_CA, sage.rings.padics.qadic_flint_FP, sage.rings.padics.qadic_flint_FM, sage.rings.padics.pow_computer_relative, sage.rings.padics.relative_ramified_CR, sage.rings.padics.relative_ramified_CA, sage.rings.padics.relative_ramified_FP, sage.rings.padics.relative_ramified_FM, sage.rings.semirings.tropical_semiring, sage.rings.polynomial.laurent_polynomial, sage.rings.polynomial.cyclotomic, sage.libs.flint.fmpq_poly_sage, sage.rings.polynomial.polynomial_rational_flint, sage.rings.power_series_poly, sage.rings.power_series_mpoly, sage.rings.laurent_series_ring_element, sage.rings.finite_rings.element_ntl_gf2e, sage.libs.singular.ring, sage.libs.singular.singular, sage.libs.singular.polynomial, sage.rings.noncommutative_ideals, sage.rings.polynomial.plural, sage.rings.polynomial.multi_polynomial_ideal_libsingular, sage.libs.singular.option, sage.libs.singular.function, sage.rings.polynomial.multi_polynomial_libsingular, sage.rings.complex_mpc, sage.rings.tate_algebra_element, sage.rings.puiseux_series_ring_element, sage.rings.bernmm, sage.rings.bernoulli_mod_p, sage.combinat.combinat_cython, sage.monoids.free_abelian_monoid_element, sage.sets.recursively_enumerated_set, sage.combinat.integer_lists.base, sage.combinat.integer_lists.invlex, sage.combinat.permutation_cython, sage.combinat.partitions, sage.libs.flint.arith_sage, sage.matrix.matrix0, sage.matrix.matrix1, sage.matrix.matrix2, sage.matrix.matrix_dense, sage.modules.vector_integer_dense, sage.arith.multi_modular, sage.rings.polynomial.polynomial_zmod_flint, sage.matrix.matrix_modn_dense_flint, sage.modules.vector_modn_dense, sage.matrix.matrix_modn_dense_float, sage.matrix.matrix_modn_dense_double, sage.modules.vector_mod2_dense, sage.matrix.matrix_mod2_dense, sage.libs.pari.convert_flint, sage.libs.linbox.linbox_flint_interface, sage.libs.pari.convert_sage, sage.libs.pari.convert_sage_matrix, sage.matrix.matrix_integer_dense, sage.modules.vector_rational_dense, sage.matrix.matrix_rational_dense, sage.algebras.quatalg.quaternion_algebra_element, sage.algebras.quatalg.quaternion_algebra_cython, sage.combinat.words.word_datatypes, sage.combinat.words.word_char, sage.misc.search, sage.modular.modsym.p1list, sage.quadratic_forms.quadratic_form__evaluate, sage.quadratic_forms.count_local_2, sage.data_structures.blas_dict, sage.modules.with_basis.indexed_element, sage.misc.lazy_list, sage.misc.callable_dict, sage.algebras.finite_dimensional_algebras.finite_dimensional_algebra_element, sage.algebras.clifford_algebra_element, sage.libs.gap.util, sage.libs.gap.libgap, sage.libs.gap.element, sage.groups.libgap_wrapper, sage.groups.matrix_gps.group_element_gap, sage.groups.matrix_gps.group_element, sage.modular.arithgroup.arithgroup_element, sage.modular.arithgroup.congroup, sage.modular.arithgroup.farey_symbol, sage.rings.polynomial.ore_polynomial_element, sage.rings.factorint, sage.data_structures.pairing_heap, sage.graphs.base.c_graph, sage.graphs.base.graph_backends, sage.graphs.base.dense_graph, sage.graphs.base.static_sparse_graph, sage.graphs.base.static_sparse_backend, sage.graphs.generic_graph_pyx, sage.graphs.views, sage.graphs.base.boost_graph, sage.graphs.base.static_dense_graph, sage.groups.perm_gps.partn_ref.data_structures, sage.sets.disjoint_set, sage.graphs.connectivity, sage.graphs.distances_all_pairs, sage.graphs.line_graph, sage.graphs.path_enumeration, sage.graphs.graph_decompositions.slice_decomposition, sage.graphs.traversals, sage.graphs.independent_sets, sage.graphs.weakly_chordal, sage.graphs.asteroidal_triples, sage.graphs.graph_decompositions.tree_decomposition, sage.graphs.graph_decompositions.fast_digraph, sage.graphs.graph_decompositions.vertex_separation, sage.graphs.graph_decompositions.clique_separators, sage.graphs.graph_decompositions.bandwidth, sage.graphs.graph_decompositions.cutwidth, sage.graphs.spanning_tree, sage.graphs.graph_decompositions.graph_products, sage.graphs.comparability, sage.graphs.isoperimetric_inequalities, sage.graphs.graph_coloring, sage.graphs.hyperbolicity, sage.graphs.chrompoly, sage.graphs.graph_decompositions.rankwidth, sage.graphs.matchpoly, sage.graphs.cliquer, sage.numerical.backends.generic_backend, sage.graphs.convexity_properties, sage.groups.perm_gps.permgroup_element, sage.sets.finite_set_map_cy, sage.probability.probability_distribution, sage.functions.prime_pi, sage.ext.fast_callable, interpreters.wrapper_rdf, sage.ext.interpreters.wrapper_rdf, sage.calculus.integration, sage.calculus.interpolation, sage.calculus.ode, sage.crypto.boolean_function, sage.crypto.sbox, sage.ext.fast_eval, sage.plot.plot3d.transform, sage.plot.plot3d.base, sage.plot.plot3d.index_face_set, sage.plot.plot3d.parametric_surface, sage.plot.plot3d.shapes, sage.combinat.expnums, sage.combinat.debruijn_sequence, sage.combinat.set_partition_iterator, sage.combinat.posets.hasse_cython, sage.geometry.toric_lattice_element, sage.geometry.point_collection, sage.geometry.abc, sage.combinat.enumeration_mod_permgroup, sage.geometry.triangulation.base, cysignals.alarm, cysignals.pselect, cysignals.pysignals, sage.interfaces.process, sage.dynamics.arithmetic_dynamics.projective_ds_helper, sage.quadratic_forms.ternary, sage.matrix.matrix_generic_dense, sage.groups.semimonomial_transformations.semimonomial_transformation, sage.matrix.matrix_sparse, sage.data_structures.binary_search, sage.modules.vector_rational_sparse, sage.modules.vector_integer_sparse, sage.matrix.matrix_rational_sparse, sage.modules.vector_modn_sparse, sage.matrix.matrix_modn_sparse, sage.matrix.matrix_integer_sparse, sage.combinat.root_system.reflection_group_c, sage.combinat.root_system.reflection_group_element, sage.arith.numerical_approx, sage.matrix.action, numpy._core._multiarray_umath, numpy.linalg._umath_linalg, sage.libs.flint.ulong_extras_sage (total: 345)
+[peakrss] issue286: child waited=124 shell_code=124 samples=300
+[peakrss] peak tree RSS      : 3076 MiB
+[peakrss] low-water MemAvail : 4405 MiB
+[peakrss] peak single VmHWM  : 3205 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2495 MiB peak
+[peakrss]   python                      699 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   560.3s procs=  4 rss=  3076 MiB hwm=  3205 MiB avail=  6348 MiB
+[peakrss]   t=   550.3s procs=  4 rss=  3074 MiB hwm=  3201 MiB avail=  6350 MiB
+[peakrss]   t=   558.3s procs=  4 rss=  3074 MiB hwm=  3204 MiB avail=  6349 MiB
+[peakrss]   t=   548.3s procs=  4 rss=  3073 MiB hwm=  3200 MiB avail=  6349 MiB
+[peakrss]   t=   554.3s procs=  4 rss=  3073 MiB hwm=  3202 MiB avail=  5907 MiB
+### exit=124

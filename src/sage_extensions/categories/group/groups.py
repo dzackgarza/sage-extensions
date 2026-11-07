@@ -7005,6 +7005,17 @@ class GroupsWithChosenFreeBasis(OwnedCategory):
             r"""Return the reduced word as an owned finite family of signed generators."""
             return _reduced_word(self, element)
 
+        def reduced_word_syllables(self, element):
+            r"""Return the reduced word of ``element`` as ``(basis point, exponent)`` syllables.
+
+            This is the decomposition a caller needs in order to realize a word of
+            this free group in another engine: each syllable names one point of the
+            free basis and a nonzero exponent, and consecutive letters on one basis
+            point are merged, so the same element has the same syllables whichever
+            free-group engine computed it.
+            """
+            return _reduced_word_syllables(self, element)
+
         def _conjugacy_decision(self, source, target) -> bool:
             r"""Conjugacy in a free group is decided by cyclic reduction of reduced words."""
             return _free_group_conjugacy(self, source, target)

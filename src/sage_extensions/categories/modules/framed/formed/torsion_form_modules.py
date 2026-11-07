@@ -623,6 +623,29 @@ def _embedded_elements(subobject):
     return frozenset(inclusion(element) for element in subobject.elements())
 
 
+class _FormElementPermutation(dict):
+    r"""The permutation of a finite form's elements one automorphism induces, read by rank.
+
+    A key that is read for the first time is the one computation: the owned
+    automorphism is applied to the element at that rank and the rank of the image is
+    retained.  This is a memo of the group's own action on the form's elements, not
+    a second description of it: every value is ``automorphism(element)`` and every
+    element image is computed once, however many orbit points contain it.
+    """
+
+    def __init__(self, ranking, representatives, automorphism) -> None:
+        super().__init__()
+        self._ranking = ranking
+        self._representatives = representatives
+        self._automorphism = automorphism
+
+    def __missing__(self, rank):
+        image = self._automorphism(self._representatives[rank])
+        rank_of_image = int(self._ranking(image))
+        self[rank] = rank_of_image
+        return rank_of_image
+
+
 def _torsion_form_isotropic_subobjects(form, *, quadratic: bool):
     r"""Return all form-bearing subobjects on which the selected form vanishes."""
     return finite_ordered_set(
@@ -2231,8 +2254,14 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
         r"""Return the represented action of this group on the finite form."""
         return _torsion_form_element_action(self.domain(), self)
 
-    def orbit(self, element):
-        r"""Return the orbit of ``element`` through the owned G-set action."""
+    def orbit_of_element(self, element):
+        r"""Return the orbit of ``element`` through the owned G-set action.
+
+        The element orbit is spelled apart from :meth:`orbit`, which is the orbit of
+        a *submodule* (``#296``): one spelling for each of the two acted-on sorts, so
+        neither shadows the other.  ``orbit_cardinality`` and
+        ``stabilizer_generators`` are this action's, as ``stabilizer_of_element`` is.
+        """
         element = self.domain()(element)
         action = self.element_action()
         orbits = action.orbits()
@@ -2376,55 +2405,209 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
 
     stabilizer_of_subobject = stabilizer_of_subgroup
 
-    def _subobject_image(self, subgroup, generator):
-        r"""The image of a submodule under one automorphism, as a submodule again."""
-        form = self.domain()
-        return form.subobject_generated_by(
-            tuple(generator(element) for element in _embedded_elements(subgroup))
+    def _element_enumerations(self):
+        r"""The form's element ranking and the element at each rank, built once.
+
+        An orbit point is a set of element *ranks* in the form's own enumeration, so
+        comparing and hashing points costs nothing next to comparing the presented
+        elements themselves.  The ranking is the point set's own enumeration, read
+        as a bijection and used only as a rank key: it is not equivariant and is
+        never read as a coordinate.
+        """
+        retained = self.__dict__.get("_element_enumeration")
+        if retained is None:
+            elements = self.domain().elements()
+            ranking = elements.ranking_map()
+            inverse = ranking.inverse()
+            retained = (
+                ranking,
+                tuple(inverse(index) for index in range(int(elements.cardinality()))),
+            )
+            self.__dict__["_element_enumeration"] = retained
+        return retained
+
+    def _element_permutation(self, automorphism):
+        r"""The permutation of the ambient form's elements induced by one automorphism.
+
+        Rank ``k`` is sent to the rank of ``automorphism(elements[k])``: the action
+        is the owned morphism's own, evaluated when a rank is first read and then
+        retained.  Nothing reads a matrix or a coordinate vector, and no element
+        present in several orbit points is acted on twice.
+        """
+        retained = self.__dict__.setdefault("_element_permutations", {})
+        permutation = retained.get(automorphism)
+        if permutation is None:
+            ranking, elements = self._element_enumerations()
+            permutation = _FormElementPermutation(ranking, elements, automorphism)
+            retained[automorphism] = permutation
+        return permutation
+
+    def _element_point(self, subgroup):
+        r"""The point of a submodule: the ranks of its elements in the form's enumeration."""
+        ranking, _elements = self._element_enumerations()
+        return frozenset(
+            int(ranking(element)) for element in _embedded_elements(subgroup)
+        )
+
+    def _point_of_elements(self, elements):
+        r"""The point named by an embedded element set, for membership in :meth:`orbit_points`."""
+        ranking, _representatives = self._element_enumerations()
+        return frozenset(int(ranking(element)) for element in elements)
+
+    def _point_elements(self, point):
+        r"""The embedded element set a point names."""
+        _ranking, representatives = self._element_enumerations()
+        return frozenset(representatives[rank] for rank in point)
+
+    def _subobject_of_point(self, point):
+        r"""The submodule a point spans, canonical through the form's subobject registry."""
+        _ranking, representatives = self._element_enumerations()
+        return self.domain().subobject_generated_by(
+            tuple(representatives[rank] for rank in point)
+        )
+
+    def _subobject_point_action(self, automorphism, point):
+        r"""The action of ``O(q)`` on element-rank points: one retained element image each."""
+        permutation = self._element_permutation(automorphism)
+        return frozenset(permutation[rank] for rank in point)
+
+    def subobject_orbit_action(self, subgroup):
+        r"""The finite action of ``O(q)`` on the orbit of the submodule ``subgroup``.
+
+        The orbit search is :meth:`FiniteGSets.from_finite_orbits`: the closure of
+        the point of ``subgroup`` under the selected generators, retaining the one
+        walk, its word section and its transition table, so :meth:`orbit`,
+        :meth:`orbit_points` and :meth:`stabilizer` read the same sweep.  The points
+        are sets of element ranks, which is the form's own enumeration read as a
+        rank key.  Nothing enumerates the submodules of the ambient form.
+        """
+        point = self._element_point(subgroup)
+        retained = self.__dict__.setdefault("_subobject_orbit_actions", {})
+        action = retained.get(point)
+        if action is None:
+            action = FiniteGSets(self).from_finite_orbits(
+                (point,), self._subobject_point_action
+            )
+            retained[point] = action
+        return action
+
+    def orbit_points(self, subgroup):
+        r"""Return the orbit of ``subgroup`` as embedded element sets.
+
+        The image of the action's point set under ``p |-> {elements at the ranks of p}``,
+        so the cardinality is the orbit's and the element sets are built only when
+        read.
+        """
+        points = self.subobject_orbit_action(subgroup).point_set()
+        return Sets().image_set(
+            self._point_elements, points, inverse=self._point_of_elements
         )
 
     def orbit(self, subgroup):
-        r"""Return the orbit of the submodule ``subgroup`` under ``O(q)``, as a finite set of submodules.
+        r"""Return the orbit of the submodule ``subgroup`` under ``O(q)``, as submodules.
 
-        The closure of ``{subgroup}`` under the group's generators, each image
-        read back as the submodule spanning the images of the generators.
-        Nothing enumerates the submodules of the ambient form: on a module with
-        ``2^{11}`` elements that family is every subspace, while one submodule's
-        orbit is reached by the generators alone.  The closure terminates because
-        equal submodules are one object, which is what
-        :func:`_torsion_form_subobject_on` guarantees.
-
-        With :meth:`stabilizer` the orbit satisfies
-        ``|Stab(J)| * |orbit(J)| = |O(q)|``; that product is the caller's check
-        and not a theorem asserted here.
+        The image of :meth:`orbit_points` under the submodule map, so the cardinality
+        is the orbit's and one submodule is built per orbit point only when it is
+        read.  The submodules are the form's, from its registry keyed by element set,
+        and the map is injective on the orbit because a submodule is its element set.
         """
-        generators = tuple(self.group_generators())
-        points = [subgroup]
-        frontier = [subgroup]
-        while frontier:
-            current = frontier.pop()
-            for generator in generators:
-                image = self._subobject_image(current, generator)
-                if not any(image is seen for seen in points):
-                    points.append(image)
-                    frontier.append(image)
-        return finite_ordered_set(tuple(points))
-
-    def _orbit_action(self, subgroup):
-        r"""The action of ``O(q)`` on the orbit of ``subgroup``, over that orbit alone."""
-        orbit = self.orbit(subgroup)
-        return FiniteGSets(self)(
-            orbit,
-            lambda element, point: self._subobject_image(point, element),
+        points = self.subobject_orbit_action(subgroup).point_set()
+        return Sets().image_set(
+            self._subobject_of_point, points, inverse=self._element_point
         )
+
+    def _engine_transversals(self, free, orbit, section, engine_letters, engine):
+        r"""Realize the walk's word section in the engine, one product per orbit point.
+
+        The engine acts on the right (:meth:`TorsionFormAutomorphism.__mul__`), so the
+        engine product ``a * b`` is the automorphism that the owned product ``b * a``
+        names.  The syllables ``s_1 ... s_k`` of a word name the owned product
+        ``s_1 * ... * s_k``, whose engine element is ``s_k * ... * s_1``: every
+        realization below multiplies on the left, which is the whole of the crossing.
+
+        The walk records the word of a point as one letter followed by the word of
+        the point it was reached from, so a word's tail is realized by the time the
+        word is read: each transversal costs one engine product, and the tail is
+        found by its syllable tuple.  A word of any other shape is evaluated syllable
+        by syllable, which is the same value.  No owned automorphism is multiplied
+        here -- a product of two of those rebuilds two presented-module maps through
+        the normalization isometry, which is the cost this avoids.
+        """
+        realized = {}
+        transversals = {}
+        identity = engine.one()
+        for point in orbit:
+            syllables = free.reduced_word_syllables(section(point))
+            value = realized.get(syllables)
+            if value is None:
+                carried = realized.get(syllables[1:]) if syllables else None
+                head = syllables[0] if syllables else None
+                if carried is not None and head[1] == 1:
+                    value = carried * engine_letters[head[0]]
+                else:
+                    value = identity
+                    for label, exponent in syllables:
+                        letter = engine_letters[label]
+                        value = (letter if exponent == 1 else letter**exponent) * value
+                realized[syllables] = value
+            transversals[point] = value
+        return transversals
 
     def stabilizer(self, subgroup):
         r"""Return the setwise stabilizer of the submodule ``subgroup`` in ``O(q)``.
 
-        The point stabilizer of the induced action on the orbit of ``subgroup``,
-        so again no family of submodules of the ambient form is enumerated.
+        Schreier's lemma on the action's own transversals: for each orbit point ``p``
+        with transversal ``t_p`` and each selected generator ``g``, the element
+        ``t_p · g · t_{p·g}^-1`` fixes ``subgroup`` -- it carries ``J`` to ``p``, ``p``
+        to ``p·g``, and ``p·g`` back to ``J`` -- and these elements generate its
+        stabilizer.  The transversals are the walk's words, realized in the group's
+        engine (``_engine_transversals``), and the products are the engine's, so the
+        walk's cost does not grow with the length of the words.  Only a candidate
+        that enlarges the subgroup built so far is crossed back to an owned
+        automorphism, so the returned family stays small.
+
+        The result is a subgroup of this group of maps: every returned generator is
+        an element of ``O(q)``, and it fixes ``subgroup``.  Neither the subgroup's
+        order nor the orbit-stabilizer product is asserted here; they are read off
+        the returned subgroup by the caller.
         """
-        return self._orbit_action(subgroup).stabilizer(subgroup)
+        action = self.subobject_orbit_action(subgroup)
+        acting_group = action.acting_group()
+        assert acting_group is self, (
+            f"the orbit of {subgroup} is an action of {acting_group}, not of {self}"
+        )
+        base = action(self._element_point(subgroup))
+        orbit, section = action.orbit_transversal_words(base)
+        augmentation = acting_group.selected_group_resolution().augmentation()
+        free = augmentation.domain()
+        letters = {
+            label: augmentation(free.free_generator(label))
+            for label in free.free_basis()
+        }
+        engine = self._engine_group()
+        engine_letters = {
+            label: self._to_engine(letter) for label, letter in letters.items()
+        }
+        transversals = self._engine_transversals(
+            free, orbit, section, engine_letters, engine
+        )
+        identity = engine.one()
+        accepted = []
+        current = engine.subgroup([identity])
+        for point in orbit:
+            prefix = transversals[point]
+            for label, letter in letters.items():
+                target = action.act(letter, point)
+                candidate = (
+                    prefix * engine_letters[label] * transversals[target].inverse()
+                )
+                if candidate == identity or candidate in current:
+                    continue
+                accepted.append(candidate)
+                current = engine.subgroup(accepted)
+        return self.subgroup_on(
+            tuple(self._from_engine(generator) for generator in accepted)
+        )
 
     def _repr_(self):
         return f"Orthogonal group of {self.domain()}"

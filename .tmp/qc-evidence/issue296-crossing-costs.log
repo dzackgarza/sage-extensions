@@ -1,0 +1,31 @@
+[    45.2s] specimen built
+[    59.1s] elements() is FiniteOrderedSets.parent_class in Join of Category of finite ordered sets and Category of finite sets and Category of facade sets
+[    59.1s] tuple(elements()): 1 calls in 0.011 s = 11105.6 us each
+[    59.1s] |A| = 2048
+[    59.1s] index the materialized tuple: 512 calls in 0.000 s = 0.0 us each
+[    59.1s] index elements() itself: 64 calls in 0.006 s = 97.2 us each
+[    59.1s] ranking_map is CategoricalIsomorphism
+[    59.1s] ranking(element): 512 calls in 0.012 s = 23.0 us each
+[    59.1s] ranking inverse(rank): 32 calls in 0.002 s = 53.5 us each
+[    59.1s] inverse(3) is [9] + [10]
+[    59.1s] one letter applied, same element: 32 calls in 0.016 s = 495.2 us each
+[    59.1s] element equality, equal copies: 32 calls in 0.004 s = 124.3 us each
+[    59.3s] _from_engine (one crossing): 3 calls in 0.155 s = 51658.2 us each
+[    59.3s] engine subgroup order: 46998591897600
+[    59.3s] |O(q)| = 46998591897600
+[    59.3s] DONE
+[peakrss] issue296-enum: child waited=0 shell_code=0 samples=32
+[peakrss] peak tree RSS      : 2800 MiB
+[peakrss] low-water MemAvail : 7712 MiB
+[peakrss] peak single VmHWM  : 2938 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2503 MiB peak
+[peakrss]   python                      425 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    54.0s procs=  4 rss=  2800 MiB hwm=  2937 MiB avail=  7730 MiB
+[peakrss]   t=    56.0s procs=  4 rss=  2800 MiB hwm=  2938 MiB avail=  7728 MiB
+[peakrss]   t=    58.0s procs=  4 rss=  2800 MiB hwm=  2938 MiB avail=  7723 MiB
+[peakrss]   t=    60.0s procs=  4 rss=  2800 MiB hwm=  2938 MiB avail=  7712 MiB
+[peakrss]   t=    48.0s procs=  4 rss=  2799 MiB hwm=  2937 MiB avail=  7758 MiB
+launcher exit: 0
