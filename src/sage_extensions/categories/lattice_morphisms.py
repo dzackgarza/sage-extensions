@@ -1650,6 +1650,7 @@ class LatticeIsometryMethods:
     def __ne__(self, other) -> bool:
         return not self == other
 
+    @cached_method
     def __hash__(self) -> int:
         r"""Hash the selected endpoints and the coordinate tensor's mathematical hash.
 
