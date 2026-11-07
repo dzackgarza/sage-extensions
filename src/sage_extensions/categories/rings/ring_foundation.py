@@ -1214,6 +1214,18 @@ class LocalizationRings(OwnedCategory):
         def __ne__(self, other):
             return self._richcmp_(other, op_NE)
 
+        def __hash__(self):
+            r"""Hash the fraction's value in its selected exact ring model."""
+            ring = self.parent()
+            engine = ring._selected_engine_ring()
+            if engine is None or engine.is_exact() is not True:
+                raise TypeError(
+                    "hashing a localization value requires a selected exact ring model"
+                )
+            # As for _OwnedRingElement, the ring model owns value equality
+            # and hashing. Numerator/denominator presentations are not keys.
+            return hash(_engine_element(ring, self))
+
         def _repr_(self):
             if (self.denominator() == self.parent().localization_source().one()) is True:
                 return repr(self.numerator())
