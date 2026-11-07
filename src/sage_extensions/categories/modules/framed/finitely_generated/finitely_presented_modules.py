@@ -2023,6 +2023,19 @@ class _GeneralPresentedModule:
 
     def _selected_module_coefficients(self, element):
         r"""Return a finite containing coordinate family of the selected cover representative."""
+        if self._relation_submodule is not None:
+            representative = self(element)._representative()
+            labels = self.module_generating_set()
+            ring = self.base_ring()
+            zero = ring.zero()
+            selected = {}
+            # Ranked sets iterate in their selected ordinal order, the same
+            # order used by _cover_generator for the engine cover basis.
+            for label, value in zip(labels, representative, strict=True):
+                coefficient = _owned_engine_element(ring, value)
+                if (coefficient == zero) is not True:
+                    selected[label] = coefficient
+            return selected
         coordinates = self._cover_coordinates(element)
         zero = self.base_ring().zero()
         return {
