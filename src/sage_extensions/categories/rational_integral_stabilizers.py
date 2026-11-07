@@ -155,7 +155,7 @@ class _FiniteIntegralRepresentation(SageObject):
     r"""The finite lattice orbit, retaining its action and free-word maps.
 
     The module adapter codes submodules of M/dM by integer positions and
-    retains their exact generating images. Closure needs those images and
+    retains their canonical nonzero generating images. Closure needs those images and
     their canonical preimage keys; full submodule presentations are realized
     by ``orbit_submodules`` when requested.
     FiniteGSets owns orbit closure and transporters; the selected free-group
@@ -171,11 +171,9 @@ class _FiniteIntegralRepresentation(SageObject):
         )
         selected = action.selected_submodule()
         self._selected_submodule = selected
-        inclusion = selected.inclusion()
-        self._submodule_generators = [tuple(
-            inclusion(generator) for generator in selected.module_generators()
-        )]
-        self._positions = {self._submodule_key(selected): 0}
+        selected_key = self._submodule_key(selected)
+        self._submodule_generators = [quotient._submodule_generator_images_from_key(selected_key)]
+        self._positions = {selected_key: 0}
         self._registering_orbit = True
         zero = _owned_integers().zero()
         self._g_set = FiniteGSets(action.rational_group()).from_finite_orbits(
@@ -224,10 +222,14 @@ class _FiniteIntegralRepresentation(SageObject):
 
     def _act_on_position(self, group_element, position):
         quotient = self.action().finite_module()
+        generators = self._submodule_generators[int(position)]
+        if not generators:
+            # Every module automorphism fixes the zero submodule.
+            return _owned_integers()(position)
         automorphism = self.action().quotient_automorphism(group_element)
         images = tuple(
             automorphism(generator)
-            for generator in self._submodule_generators[int(position)]
+            for generator in generators
         )
         image_key = quotient._submodule_key_from_generators(images)
         image_position = self._positions.get(image_key)
@@ -236,7 +238,7 @@ class _FiniteIntegralRepresentation(SageObject):
                 "the supplied rational action leaves its computed finite lattice orbit"
             )
             image_position = len(self._submodule_generators)
-            self._submodule_generators.append(images)
+            self._submodule_generators.append(quotient._submodule_generator_images_from_key(image_key))
             self._positions[image_key] = image_position
         return _owned_integers()(image_position)
 
@@ -369,7 +371,8 @@ class IntegralStructureAction(SageObject):
         )
 
     @cached_method
-    def _ambient_group_inclusion(self):
+    def ambient_group_inclusion(self):
+        r"""The supplied subgroup inclusion ``G -> Aut(V)`` into the rational ambient space."""
         group = self.rational_group()
         inclusion = OwnedGroups().Mor(group, group).identity()
         current = group
@@ -395,7 +398,7 @@ class IntegralStructureAction(SageObject):
             )
         ambient = space.module_over_extension()
         restrict = Modules(ambient.base_ring()).restriction_of_scalars(space.ring_map())
-        group_inclusion = self._ambient_group_inclusion()
+        group_inclusion = self.ambient_group_inclusion()
         return GroupActionFunctor(
             self.rational_group(),
             Modules(ring),

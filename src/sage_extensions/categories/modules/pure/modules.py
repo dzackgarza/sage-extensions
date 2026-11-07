@@ -7600,10 +7600,11 @@ def _represented_real_rref(coefficients, column_count, ring):
 def _engine_matrix(morphism):
     r"""Privately materialize the selected framed realization in one engine call.
 
-    Column ``s`` is the coordinate vector of the image of ``e_s``, read once
-    in row-label order; the rows of the engine matrix are read off those
-    columns, so no entry is looked up by its pair of labels.
+    Column ``s`` is the coordinate vector of the image of ``e_s``. The
+    selected framings and generator images are fixed construction data.
+    Retain their immutable matrix; each caller receives its own mutable copy.
     """
+    from copy import copy
     from sage.matrix.constructor import matrix as sage_matrix
 
     morphism = morphism._framed_coordinate_morphism()
@@ -7613,12 +7614,14 @@ def _engine_matrix(morphism):
             f"{morphism} has no matrix: it is a map in {parent}, which is not a space of matrices over "
             f"{parent.base_ring()}"
         )
+    if morphism._engine_matrix_cache is not None:
+        return copy(morphism._engine_matrix_cache)
     ring = parent.base_ring()
     columns = tuple(
         tuple(morphism._matrix_column_coordinates(column_label))
         for column_label in parent.column_index_set()
     )
-    return sage_matrix(
+    backend = sage_matrix(
         _linear_algebra_ring(ring),
         parent.nrows(),
         parent.ncols(),
@@ -7628,19 +7631,39 @@ def _engine_matrix(morphism):
             for entry in row
         ],
     )
+    backend.set_immutable()
+    morphism._engine_matrix_cache = backend
+    return copy(backend)
 
 
 def _morphism_from_engine_matrix(mor, backend):
-    r"""Raise one engine matrix into the matrix Mor ``mor``.
+    r"""Raise a selected engine matrix into its actual framed module Mor.
 
-    The raising companion of :func:`_engine_matrix`: entry ``(t, s)`` of
-    ``backend`` is the coefficient of ``e_t`` in the image of ``e_s``.
+    Entry ``(t,s)`` is the coefficient of ``e_t`` in the image of ``e_s``.
+    Retain an immutable snapshot and raise basis images when they are used.
     """
+    from copy import copy
+
     mor = _require_matrix_mor(mor)
     ring = mor.base_ring()
-    return mor.from_rows(
-        (_owned_engine_element(ring, entry) for entry in row) for row in backend.rows()
-    )
+    if backend.nrows() != mor.nrows() or backend.ncols() != mor.ncols():
+        raise ValueError(f"the matrix has shape {backend.dimensions()}, not {mor.matrix_shape()}")
+    snapshot = copy(backend.change_ring(_linear_algebra_ring(ring)))
+    snapshot.set_immutable()
+    row_labels = tuple(mor.row_index_set())
+    column_positions = {label: position for position, label in enumerate(mor.column_index_set())}
+
+    def image(label):
+        column = snapshot.column(column_positions[label])
+        return mor.codomain().linear_combination({
+            row_label: _owned_engine_element(ring, coefficient)
+            for row_label, coefficient in zip(row_labels, column, strict=True)
+            if coefficient
+        })
+
+    morphism = mor(image)
+    morphism._engine_matrix_cache = snapshot
+    return morphism
 
 
 def _matrix_unit(mor, label):

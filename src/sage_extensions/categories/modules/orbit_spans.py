@@ -16,6 +16,76 @@ from sage_extensions.categories.sets.set_categories import Sets
 from sage_extensions.owned_category import _object_of
 
 
+
+def _rational_orbit_span(ambient, span, steps, containing):
+    r"""Compute a full-rank integral orbit span in the retained rational framing.
+
+    GroupAction.g, MatrixIntegral_GetInvariantSpace, in Indefinite.jl
+    374a5ebb closes integral spans under the supplied matrices. This is the
+    same ascending chain as OrbitSpanConstructions: rational coordinates
+    carry each image and integral row modules compute each sum. The bound
+    is checked at every stage, including when it is not itself stable.
+    """
+    from sage.rings.integer_ring import ZZ as SageZZ
+
+    from sage_extensions.categories.modules.pure.modules import (
+        MatrixSpaces,
+        RestrictedScalarsModules,
+        _engine_matrix,
+        _morphism_from_engine_matrix,
+    )
+    from sage_extensions.categories.rings.ring_foundation import (
+        _owned_integers,
+        _owned_rationals,
+    )
+
+    integers, rationals = _owned_integers(), _owned_rationals()
+    if ambient.base_ring() is not integers or ambient not in RestrictedScalarsModules(integers):
+        return None
+    if ambient.extension_ring() is not rationals:
+        return None
+    extension = ambient.module_over_extension()
+    endomorphisms = Modules(rationals).Mor(extension, extension)
+    if endomorphisms not in MatrixSpaces(rationals):
+        return None
+    labels = tuple(extension.module_generating_set())
+    if not labels:
+        return None
+    seed_points = tuple(span.inclusion()(point) for point in span.module_generators())
+    bound_points = tuple(containing(point) for point in containing.domain().module_generators())
+    if len(seed_points) != len(labels) or len(bound_points) != len(labels):
+        return None
+    seed = _engine_matrix(endomorphisms(dict(zip(
+        labels, (point.underlying_element() for point in seed_points), strict=True,
+    ))))
+    bound = _engine_matrix(endomorphisms(dict(zip(
+        labels, (point.underlying_element() for point in bound_points), strict=True,
+    ))))
+    if not seed.is_invertible() or not bound.is_invertible():
+        return None
+    bound_inverse = bound.inverse()
+    matrices = tuple(_engine_matrix(endomorphisms({
+        label: act(ambient.wrap(extension.module_generator(label))).underlying_element()
+        for label in labels
+    })).transpose() for act in steps)
+    integral_span = seed.transpose().row_module(SageZZ)
+    while True:
+        rows = integral_span.basis_matrix()
+        if any(entry.denominator() != 1 for entry in (bound_inverse * rows.transpose()).list()):
+            raise ValueError("the orbit-generated submodule leaves the specified containing bound")
+        enlarged = rows
+        for transformation in matrices:
+            enlarged = enlarged.stack(rows * transformation)
+        following = enlarged.row_module(SageZZ)
+        if following == integral_span:
+            break
+        integral_span = following
+    inclusion = _morphism_from_engine_matrix(endomorphisms, rows.transpose())
+    return ambient.subobject_on(tuple(
+        ambient.wrap(inclusion(extension.module_generator(label))) for label in labels
+    ))
+
+
 class OrbitSpanConstructions(OwnedCategoryOverBaseRing):
     r"""The least stable submodule containing a given module inclusion."""
 
@@ -60,14 +130,18 @@ class OrbitSpanConstructions(OwnedCategoryOverBaseRing):
             steps = tuple(group.group_generators())
             steps = acting_maps(steps + tuple(~g for g in steps))
             span = ambient.subobject_on(generators)
-            while True:
-                current = tuple(span.inclusion()(v) for v in span.module_generators())
-                if any(not containing.is_in_image(v) for v in current):
-                    raise ValueError("the orbit-generated submodule leaves the specified containing bound")
-                images = tuple(act(v) for act in steps for v in current)
-                if all(span.inclusion().is_in_image(v) for v in images):
-                    break
-                span = ambient.subobject_on(current + images)
+            rational_span = _rational_orbit_span(ambient, span, steps, containing)
+            if rational_span is not None:
+                span = rational_span
+            else:
+                while True:
+                    current = tuple(span.inclusion()(v) for v in span.module_generators())
+                    if any(not containing.is_in_image(v) for v in current):
+                        raise ValueError("the orbit-generated submodule leaves the specified containing bound")
+                    images = tuple(act(v) for act in steps for v in current)
+                    if all(span.inclusion().is_in_image(v) for v in images):
+                        break
+                    span = ambient.subobject_on(current + images)
         if containing is not None and any(
             not containing.is_in_image(span.inclusion()(v)) for v in span.module_generators()
         ):

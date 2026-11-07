@@ -17,6 +17,7 @@ from sage.structure.element import parent as element_parent
 
 import sage_extensions.categories.lattice_engines as lattice_engines
 from sage_extensions.categories.abstract_categories.cat import Cat
+from sage_extensions.categories.functors.core import Functor
 from sage.misc.lazy_attribute import lazy_attribute
 
 from sage_extensions.categories.abstract_categories.arrow_categories import (
@@ -56,9 +57,16 @@ from sage_extensions.categories.modules.framed.formed.form_modules import (
     FormedModuleMorphism,
     _represented_value_module,
 )
-from sage_extensions.categories.modules.pure.modules import Modules, ModulesOverIntegralDomains, _engine_matrix
+from sage_extensions.categories.modules.pure.modules import (
+    MatrixSpaces,
+    Modules,
+    ModulesOverIntegralDomains,
+    _engine_matrix,
+    _morphism_from_engine_matrix,
+)
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedFields,
+    _linear_algebra_ring,
     _own_ring,
     _owned_engine_element,
     _owned_integers,
@@ -1002,30 +1010,18 @@ class LatticeIsometryMethods:
             super().__init__(parent, forward, inverse_computation)
             return
         self._underlying_module_isomorphism = None
+        if isinstance(images, LatticeMorphismMethods):
+            images = images.module_morphism()
         forward = domain.module_category().Mor(domain, codomain)(images)
         if inverse_computation is None:
             if domain.module_rank().is_finite() and codomain.module_rank().is_finite():
                 def inverse_computation():
                     inverse_matrix = _engine_matrix(_module_matrix(forward)).inverse()
-                    domain_generators = tuple(domain.module_generators())
-                    inverse_ring = domain.base_ring()
-                    return codomain.Mor(domain)(
-                        tuple(
-                            sum(
-                                (
-                                    domain.scalar_multiple(
-                                        _owned_engine_element(inverse_ring, coefficient),
-                                        generator,
-                                    )
-                                    for coefficient, generator in zip(
-                                        column, domain_generators, strict=True
-                                    )
-                                ),
-                                domain.zero(),
-                            )
-                            for column in inverse_matrix.columns()
-                        )
+                    linear = _morphism_from_engine_matrix(
+                        codomain.module_category().Mor(codomain, domain), inverse_matrix,
                     )
+                    parent = codomain.Mor(domain)
+                    return parent.element_class(parent, linear)
             else:
                 inverse_computation = lambda: codomain.Mor(domain)(
                     lambda label: forward.lift(codomain.module_generator(label))
@@ -3642,7 +3638,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         of a definite lattice of finite rank over ``ZZ``
         (``orthogonalGroup_finite``); its matrices act on row vectors, hence
         are transposed when converted to this Mor's column-image convention.
-        In rational rank one, exact roots of the defining isometry equation
+        In integral or rational rank one, exact roots of the defining isometry equation
         supply the finite matrix group. In higher rational rank, clearing
         denominators presents only the integral span of the chosen basis,
         whose finite group is not ``O(V)``.
@@ -3650,12 +3646,16 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         lattice = self.domain()
         if lattice is not self.codomain():
             raise ValueError(f"the isometries {lattice} -> {self.codomain()} are not an orthogonal group O(L): domain and codomain are different lattices")
-        if lattice.base_ring() is _owned_rationals() and lattice.module_rank() == 1 and lattice.is_definite():
+        if (
+            lattice.base_ring() in (_owned_integers(), _owned_rationals())
+            and lattice.module_rank() == 1
+            and lattice.is_definite()
+        ):
             # BilinModuleCat.orthogonalSubgroup in
             # LeanCategories/Modules/Bilinear/Valued/OrthogonalGroup.lean
             # requires b(gx, gy)=b(x,y). In one coordinate its defining
             # equation is a*u^2=a. Sage's exact polynomial roots supply all
-            # rational solutions; GAP retains their generated matrix group.
+            # solutions in the base ring; GAP retains their generated matrix group.
             from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
 
             ring = _engine_ring(lattice.base_ring())
@@ -3925,7 +3925,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         r"""The category of marked lattices with apex ``L`` of which ``marked`` is an object.
 
         The marking categories over ``Lattices(R)`` are ``Ar(Lattices)``,
-        ``Fun([2], Lattices)`` and the coslices ``X/Lattices``; a coslice
+        ``Fun([n], Lattices)`` and the coslices ``X/Lattices``; a coslice
         object names its ``X`` as the source of its arrow.
         """
         from sage_extensions.categories.abstract_categories.products import (
@@ -3941,11 +3941,16 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                 category = sublattices
             case _ if marked in flags:
                 category = flags
+            case Functor() if (
+                isinstance(marked.domain(), FiniteOrdinalCategory)
+                and marked.codomain() is lattices
+            ):
+                category = Cat().Mor(marked.domain(), lattices)
             case _:
                 category = CosliceCategory(lattices, marked.arrow().domain())
         assert marked in category, (
             f"{marked} is not a marked lattice: it is an object of none of Ar({lattices}), "
-            f"Fun([2], {lattices}) or a coslice X/{lattices}"
+            f"Fun([n], {lattices}) or a coslice X/{lattices}"
         )
         return category
 
@@ -4153,6 +4158,22 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         r"""Return ``second ∘ first`` as an isometry."""
         if first.codomain() is not second.domain():
             raise ValueError(f"cannot compose {second} after {first}: the codomain {first.codomain()} of {first} is not the domain {second.domain()} of {second}")
+        domain, middle, codomain = first.domain(), first.codomain(), second.codomain()
+        ring = domain.base_ring()
+        if ring.is_commutative() is True and _linear_algebra_ring(ring) is not ring:
+            modules = domain.module_category()
+            matrices = MatrixSpaces(ring)
+            if modules.Mor(domain, middle) in matrices and modules.Mor(middle, codomain) in matrices:
+                # In the actual endpoint framings, second after first has
+                # column matrix B*A. The module owner's existing adapters
+                # retain those framings and immediately raise the product.
+                product = _engine_matrix(second.module_morphism()) * _engine_matrix(first.module_morphism())
+                linear = _morphism_from_engine_matrix(modules.Mor(domain, codomain), product)
+                # The two supplied isometries establish form preservation.
+                # Retain their linear composite as this owner's constructor
+                # datum, including its selected module realization.
+                parent = domain.Isom(codomain)
+                return parent.element_class(parent, linear)
         return first.domain().Isom(second.codomain())(lambda label: second(first(first.domain().module_generator(label))))
 
     def _emptiness_decision(self) -> bool | None:
