@@ -4545,8 +4545,11 @@ def _finite_generated_localization(source, submonoid):
                 candidate = "localization_" + candidate
             occupied.add(candidate)
             inverse_names.append(candidate)
+        # An explicit variable count selects Sage's multivariate model even
+        # for one inverse variable; its ideal reduction also works over ZZ.
         extended_cover = _SagePolynomialRing(
             cover.base_ring(),
+            len(cover_names) + len(inverse_names),
             names=(*cover_names, *inverse_names),
         )
         inverse_variables = tuple(

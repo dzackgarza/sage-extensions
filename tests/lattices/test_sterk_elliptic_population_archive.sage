@@ -177,10 +177,8 @@ def test_sterk_connected_elliptic_subdiagrams_have_the_recorded_types() -> None:
         if letter == "C" and rank != 2:
             letter = "B"
         scale = -subdiagram.root_scale()
-        # Localization elements deliberately remain unhashable: equivalent
-        # fractions need not share one numerator/denominator representation.
-        # Normalize only the test's multiset key to a canonical exact rational;
-        # the public root_scale result remains an owned QQ element.
+        # Use a canonical rational for the archive's multiset key. The
+        # public root_scale result remains an owned QQ element.
         scale_key = Fraction(int(scale.numerator()), int(scale.denominator()))
         return (rank, letter, scale_key)
 
