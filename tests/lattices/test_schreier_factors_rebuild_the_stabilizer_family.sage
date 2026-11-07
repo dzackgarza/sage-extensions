@@ -30,6 +30,8 @@ per-test bound (``--timeout=60``).  The order certificate for that specimen is
 
 from sage_extensions.all import *  # noqa: F401,F403
 
+import pytest
+
 
 def _rational_space(lattice_):
     r"""``lattice_`` read in the rational space ``Res_{ZZ}^{QQ}`` of its plane."""
@@ -86,3 +88,59 @@ def test_the_natural_g_set_factors_compose_to_its_stabilizer_family() -> None:
 
     assert all(composite(point) == point for composite in rebuilt)
     assert rebuilt == family
+
+
+@pytest.mark.parametrize("scaled", (False, True), ids=("two_u", "scaled_hyperbolic_line"))
+def test_the_isotropic_lattice_stabilizer_factors_give_the_full_family(scaled):
+    r"""The line stabilizers in 2U and U(4)+<-8> retain every Schreier element.
+
+    The latter has a nonintegral unipotent action and a lattice orbit of
+    order two. Its square is integral. The invariant containing lattice
+    adds ``e/4+w/2`` to the original integral span.
+    """
+    if scaled:
+        plane = Lattices(QQ)([[0, 4, 0], [4, 0, 0], [0, 0, -8]])
+        e, f, w = tuple(plane.module_generators())
+        quarter = QQ(1) / QQ(4)
+        half = QQ(1) / QQ(2)
+        extra = plane.scalar_multiple(quarter, e) + plane.scalar_multiple(half, w)
+        images = ((e, f, -w), (-e, -f, w), (e, f + extra, e + w))
+        expected = 6
+    else:
+        plane = Lattices(QQ)("U") + Lattices(QQ)("U")
+        e, f, u, v = tuple(plane.module_generators())
+        images = (
+            (e, f, u, v), (e, f, -u, -v),
+            (e, f, v, u), (e, f, -v, -u),
+            (-e, -f, u, v), (e, f - v, u + e, v), (e, f - u, u, v + e),
+        )
+        expected = 7
+    space = _rational_space(plane)
+    basis = tuple(plane.module_generators())
+    lattice = space.subobject_on(tuple(space(point) for point in basis))
+    bound = (
+        space.subobject_on((*tuple(space(point) for point in basis), space(extra)))
+        if scaled else lattice
+    )
+    group_generators = tuple(plane.O()(family) for family in images)
+    assert all(
+        plane.b(generator(left), generator(right)) == plane.b(left, right)
+        for generator in group_generators for left in basis for right in basis
+    )
+    group = plane.O().subgroup(group_generators)
+    action = IntegralStructureAction(group, lattice.inclusion()).with_stable_containing_bound(bound.inclusion())
+    action.validate_stable_containing_bound(check=True)
+
+    letters, transversals = action.stabilizer_schreier_factors()
+    family = action.stabilizer().group_generators()
+    cosets = action.right_cosets()
+    points = tuple(cosets)
+    positions = {point: position for position, point in enumerate(points)}
+    rebuilt = tuple(
+        (~transversals[positions[cosets.act(letter, point)]]) * letter * transversals[position]
+        for position, point in enumerate(points)
+        for letter in letters
+    )
+
+    assert family.cardinality() == cardinal(expected)
+    assert rebuilt == tuple(family)
