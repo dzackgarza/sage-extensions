@@ -184,8 +184,8 @@ def _represented_module(value, ring):
     ``R`` is already carrying its canonical self-module structure it is
     returned directly; otherwise ``R.regular_module()`` supplies the canonical
     rank-one realization over itself.  Genuine module values are unchanged.
-    """
 
+    """
     if value is ring:
         return ring.regular_module()
     if value in Modules(ring):

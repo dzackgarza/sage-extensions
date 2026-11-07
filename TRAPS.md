@@ -3271,3 +3271,119 @@ agree with GAP's named Omega, SO and GO orders for dimensions five and six,
 plus and minus type, and the extension field F9, after a change of basis.
 The unchanged complete port comparison, including its computed generators,
 remains a separate required consumer.
+### Restriction of scalars is interned once per scalar structure, whatever copy asked (2026-11-07, #305)
+
+`Lattices(ZZ)("D4").discriminant_quadratic_form()` failed inside
+`regular_module_identification` (`categories/modules/pure/modules.py:5033`) on the
+declared gated entrypoint and passed in a bare session.  The failing conjunct was
+isolated in one process, running the test modules that precede it and then the
+construction:
+
+```
+regular_module is extension      : True
+conjunct (a) scalars in Algebras : True
+conjunct (b) ring_map is structure: False
+ring_map == structure            : True        (equal, distinct objects)
+```
+
+It is not import order: in a fresh process, `sage.all` first or the session first,
+both conjuncts hold and `|A| = 4`.  It is session history, and it is object identity.
+
+The producer was then named by recording every restriction functor built along a
+`ZZ -> QQ` map and matching the failing module's `ring_map`:
+
+```
+restriction functors built along ZZ -> QQ: 1
+  map id=124324425668144 canonical=False
+failing module ring_map id=124324425668144 canonical=False
+  built by: tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage:36
+            Modules(QQ).restriction_of_scalars(ZZ.Mor(QQ)(lambda n: QQ(n)))(lattice_)
+```
+
+One functor for the whole session, built along a copy a *test helper* stated first.
+`Modules.restriction_of_scalars` interns one functor per ring map ("the cache key is the
+ring map itself"), ring maps are equal when they agree pointwise, so every later
+restriction along `QQ` -- including the canonical
+`fraction_field.algebra_structure_morphism()` that `dual_lattice` asks for -- reuses
+that first functor, and the module it builds carries the copy.  The identification then
+refuses the module the algebra's own structure asked for.  That is why the same
+construction answers differently in two session states and why the ad-hoc map was
+invisible in a bare session.
+
+Measured and excluded on the way: that the algebra's cached structure morphism is
+unstable (it is not -- same object across reads, across an ad-hoc `ZZ.Mor(QQ)` and
+across the sibling test module), and that `_represented_module`'s ad-hoc branch is the
+producer (it is not -- by then its `value` is already the restricted module; patching
+that branch and dropping the `id()` keys of the two `cached_function`s changes nothing).
+
+The repair canonicalises at the functor owner: when the codomain is a commutative
+algebra over the source and the given map equals its `algebra_structure_morphism` on the
+right endpoints, the restriction is interned along that structure morphism.  The
+assertion, the module contract and the element constructor are untouched; a map that
+states anything else is unchanged.
+
+Separately measured on the same specimen, because two assertions in the first draft of
+the regression were false: `q` takes values in `Q/2Z` and the polar form `b` in `Q/Z`
+(`quadratic_value_module()` and `bilinear_value_module()` are distinct objects, and
+`q(0) != b(0,0)`).  On `A_{D4}` the polar form is alternating, `b(x,x) = b(0,0)` for
+every class, and its radical is trivial.  Comparing polar values against `q(0)` fails
+for that reason and not because the pairing is degenerate.
+
+### The declared gate terminates #296's plane specimen at 60 s (2026-11-07, measured on 50aa04c)
+
+`just test tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage`
+with the repository's own `addopts` (suite_budget, test_lint, `--timeout=60
+--timeout-method=signal`, junit, report log), plugins provisioned, nothing blanked:
+
+```
+test-call performance gate
+  ...::test_the_small_specimen_checks_the_orbit_stabilizer_identity: 37.48 s > 20 s
+!!!!!!!!!!!!!!!!!!!!!!! cysignals.signals.AlarmInterrupt !!!!!!!!!!!!!!!!!!!!!!!
+1 passed in 98.27 s
+```
+
+The small specimen passes and is flagged by the 20 s call ceiling; the plane specimen
+`test_the_tco_plane_gives_an_isotropic_subobject_with_orbit_and_stabilizer` is cut by the
+60 s `--timeout`, and the SIGALRM lands inside Cython (`AlarmInterrupt`), which is the
+hazard the justfile names for per-test timeouts.  So the #296 acceptance as written
+cannot be produced through this gate on this host: the walk is 55.8 s and the Schreier
+stabilizer 149.0 s on `A_{T_Co}` (measured with the gate's ceilings lifted, `2 passed in
+220.32 s`, `.tmp/qc-evidence/issue296-full-run.log`), and no arrangement of the same
+computation fits 60 s.
+
+Two owners follow from this, and neither is a test edit: the stabilizer route has to get
+its candidates from an engine-side construction (a Schreier–Sims chain or the preimage of
+a permutation stabilizer) instead of one GAP product/membership test per orbit point, or
+the repository has to carry a heavy lane whose ceiling is stated rather than assumed.
+Until one of those lands, a gated #296 pass is not reported.
+
+### Restriction of scalars admits a ring where it expects a module (2026-11-07, #293)
+
+Measured on `d5396d6`, exactly as the issue states, with the A2 lattice:
+
+```
+QQ in Modules(ZZ)                    : True
+restriction(QQ) is QQ.regular_module(): False        (it built a second object)
+form.is_base_ring_valued()           : False         (the Gram is integral)
+form()._as_numerical_tensor()[0,0]   : ValueError: (0, 0) is not an element of {0,...,3}
+--- with QQ.regular_module() instead
+form.is_base_ring_valued()           : True
+```
+
+A ring is its own rank-one module over itself, so `Modules(S).restriction_of_scalars(f)`
+admits the ring by membership alone and then wraps it, and the form built on that value
+object answers that an integral Gram is not base-ring valued -- the reading
+lattice-database recorded for every card.  The repair refuses the ring at the functor and
+names what it took and what it wanted:
+
+```
+TypeError: restriction of scalars along <ZZ -> QQ> takes a Fraction Field of Integer
+Ring-module, but Fraction Field of Integer Ring is a ring; its canonical rank-one module
+over itself is its regular_module()
+```
+
+and `restriction(QQ.regular_module())` still builds, with the form answering `True`.
+`tests/modules/test_scalar_change_between_z_and_q.sage` carries the regression; the owner
+files run `10 passed in 1.76 s` under the declared gate.  `tests/modules/test_restricted_scalars_action.sage`
+was in that selection and the gate stopped on a pre-existing lint finding in it
+(`TL01`, a direct category import at line 11), which is not this unit's.

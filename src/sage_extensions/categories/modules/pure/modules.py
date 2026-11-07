@@ -272,6 +272,37 @@ def _action_with_canonical_endomorphism_parent(base_ring, additive_group, action
     )
 
 
+def _canonical_scalar_structure_map(ring_map):
+    r"""Return the algebra's own structure morphism when ``ring_map`` states it.
+
+    ``restriction_of_scalars`` interns one functor per ring map, and ring maps that
+    agree pointwise are equal, so the first restriction along *any* copy of a scalar
+    structure answers every later restriction along that structure.  The module such
+    a functor builds identifies itself with its scalars through
+    ``regular_module_identification``, which asserts that its ``ring_map`` is
+    ``S.algebra_structure_morphism()``: interning along a copy therefore makes that
+    identification refuse the very module the algebra's structure asked for, and the
+    answer depends on which copy a session saw first.
+
+    Answering with the algebra's own map keeps the asserted identity true for every
+    consumer without weakening it.  A map that states anything else -- a different
+    source, a non-algebra codomain, or a value the structure morphism does not have --
+    is returned unchanged.
+    """
+    from sage_extensions.categories.algebras.algebras import Algebras
+
+    codomain = _owned_ring(ring_map.codomain())
+    if codomain not in OwnedRings().Commutative():
+        return ring_map
+    domain = _owned_ring(ring_map.domain())
+    if codomain not in Algebras(domain):
+        return ring_map
+    structure = codomain.algebra_structure_morphism()
+    if structure.domain() is not domain or structure.codomain() is not codomain:
+        return ring_map
+    return structure if ring_map == structure else ring_map
+
+
 class Modules(OwnedCategoryOverBaseRing):
     r"""Modules over a ring, on the owned additive and scalar spines."""
 
@@ -431,7 +462,10 @@ class Modules(OwnedCategoryOverBaseRing):
         Along the augmentation ``R[G] -> R`` this is the trivial action.
         One functor per ring map (the cache key is the ring map itself), so
         the forward image ``Res_f(M)`` of a module is one object, cached by
-        that functor.
+        that functor.  Two maps that agree pointwise are one map, so the functor
+        of any copy of a scalar structure is the functor of that structure; see
+        :func:`_canonical_scalar_structure_map` for why the copy is answered with
+        the algebra's own map.
         """
         from sage_extensions.categories.functors.group_actions import (
             _TrivialActionFunctor,
@@ -441,6 +475,7 @@ class Modules(OwnedCategoryOverBaseRing):
         )
 
         assert _owned_ring(ring_map.codomain()) is self.base_ring()
+        ring_map = _canonical_scalar_structure_map(ring_map)
         match ring_map:
             case _ if (
                 ring_map.is_group_algebra_augmentation()
