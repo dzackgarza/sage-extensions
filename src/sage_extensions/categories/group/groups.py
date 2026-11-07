@@ -8192,9 +8192,11 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
             if candidate == ambient.one():
                 return True
             generators = self.selected_subgroup_generators()
-            # A supplied generator has a length-one word certificate.
-            # Its owned set already supplies the membership decision.
+            # A selected generator or its inverse has a one-letter word
+            # certificate, decided by the supplied set's membership operation.
             if generators.is_parent_of(candidate) is True:
+                return True
+            if generators.is_parent_of(~candidate) is True:
                 return True
             if any(
                 candidate == generator or candidate == ~generator

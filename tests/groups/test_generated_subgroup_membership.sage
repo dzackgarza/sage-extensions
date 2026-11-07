@@ -44,3 +44,19 @@ def test_lattice_group_unit_and_free_word_images_have_their_exact_actions():
     fourth = augmentation((s * t)**4)
     assert all(square(point) == -point for point in (e, f, x, y))
     assert all(fourth(point) == point for point in (e, f, x, y))
+
+
+def test_an_inverse_unipotent_generator_is_an_arrow_of_its_classifying_category():
+    space = Lattices(QQ)([[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]])
+    labels = tuple(space.module_generating_set())
+    e, f, x, y = tuple(space.module_generators())
+    shear = space.O()({labels[0]: e, labels[1]: f + x, labels[2]: x, labels[3]: y - e})
+    group = space.O().subgroup((shear,))
+    inverse = ~shear
+    assert group.membership_decision(inverse) is True
+    category = group.classifying_category()
+    point = category.an_object()
+    arrow = category.Mor(point, point)(inverse)
+    assert arrow.group_element()(f) == f - x
+    assert arrow.group_element()(y) == y + e
+    assert all((~arrow).group_element()(arrow.group_element()(vector)) == vector for vector in (e, f, x, y))
