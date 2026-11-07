@@ -3083,6 +3083,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         return _distinct_supercategories(supers)
 
     @object_level
+    @cached_method
     def identity(self) -> LatticeIsometryMethods:
         if self.domain() is not self.codomain():
             raise ValueError(f"there is no identity isometry from {self.domain()} to {self.codomain()}: they are different lattices")
