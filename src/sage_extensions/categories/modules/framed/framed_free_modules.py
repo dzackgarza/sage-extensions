@@ -1438,8 +1438,18 @@ def _restricted_fraction_field_subobject_on(module, module_generators):
     def lift(source, element):
         underlying_element = module(element).underlying_element()
         coordinates = underlying_element.to_vector()
-        if any(label not in support for label in coordinates.support().domain()):
+        # As in lift_from_finite_support, read the finite coefficient family:
+        # its keys contain the support, and omitted coefficients are zero.
+        retained = coordinates.parent()._selected_module_coefficients(coordinates)
+        outside_zero = conjunction(
+            coefficient == fractions.zero()
+            for label, coefficient in retained.items()
+            if label not in support
+        )
+        if outside_zero is False:
             return None
+        if outside_zero is not True:
+            raise ValueError("cannot decide whether coordinates outside the finite span window vanish")
         candidate = engine_ambient(engine_coordinates(underlying_element))
         if candidate not in engine_span:
             return None
