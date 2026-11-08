@@ -3721,9 +3721,8 @@ class GroupMorphism:
     def image_factorization(self):
         r"""Return ``G ->> im(f) -> H`` with the literal image inclusion.
 
-        The first arrow is induced by ``f`` and the existing inclusion's
-        inverse on its image; it is not an inclusion and need not be
-        injective. Its codomain is the actual represented subgroup, not a
+        The first arrow is the corestriction of ``f`` to its image; it
+        need not be injective. Its codomain is the actual represented subgroup, not a
         fresh group with an isomorphic underlying presentation.
 
         For the quotient ``C4 -> C2``, the first arrow is noninjective,
@@ -3731,7 +3730,9 @@ class GroupMorphism:
         """
         image = self.image()
         inclusion = image.inclusion()
-        return self.factor_through(inclusion), inclusion
+        if self._subgroup_premise:
+            return image.Mor(image).identity(), inclusion
+        return self._corestrict_to_subgroup(image), inclusion
 
     @cached_method
     def image_section(self):
@@ -3838,8 +3839,8 @@ class GroupMorphism:
         Protected image-factorization construction: the input map lands in
         ``subgroup`` by its defining construction, rather than a membership
         algorithm. Subgroup elements keep their ambient representation.
-        Used for a supplied generating map of a predicate subgroup and for
-        restriction to a preimage. This does not admit a foreign whole map
+        Used for the canonical image factorization, a supplied generating
+        map of a predicate subgroup and restriction to a preimage. This does not admit a foreign whole map
         at a public Mor constructor.
         """
         assert subgroup.supergroup() is self.codomain()
