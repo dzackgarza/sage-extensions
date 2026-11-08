@@ -10193,11 +10193,12 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             image = automorphisms.condition_set(self._levi_image_contains)
             levi.select_section(Sets().Mor(image, levi.domain())(self._levi_section))
             kernel = levi.kernel()
-            kernel.select_group_generators(
-                lambda: finite_ordered_set(
-                    tuple(kernel(generator) for generator in self._levi_kernel_generators())
+            if not kernel.has_selected_group_resolution():
+                kernel.select_group_generators(
+                    lambda: finite_ordered_set(
+                        tuple(kernel(generator) for generator in self._levi_kernel_generators())
+                    )
                 )
-            )
             return levi
 
         @cached_method
