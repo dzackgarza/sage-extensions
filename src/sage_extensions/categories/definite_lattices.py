@@ -626,7 +626,10 @@ class _ExactCVPEngine:
             centered.__pari__().Col(),
             positive_bound + SageQQ(1) / 2,
         )
-        coordinates = engine_matrix(SageQQ, raw_coordinates)
+        # PARI qfcvp returns lattice vectors in ZZ^rank. Keep that complete
+        # candidate matrix integral; the bounded distance blocks use QQ.
+        # https://pari.math.u-bordeaux.fr/dochtml/html-stable/Vectors__matrices__linear_algebra_and_sets.html#qfcvp
+        coordinates = engine_matrix(SageZZ, raw_coordinates)
         center_column = centered.column()
         weights = engine_vector(SageQQ, [1] * self.rank)
         block_size = max(1, 4096 // max(1, self.rank))
