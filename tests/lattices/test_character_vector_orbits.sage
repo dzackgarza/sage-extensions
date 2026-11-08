@@ -80,9 +80,29 @@ def test_nonnormal_joint_conditions_split_a_based_pair_into_exactly_three_orbits
         return frozenset(a * image * b for a in left for b in right)
 
     group_elements = []
-    for order in Permutations(3):
+    for order in Permutations(int(3)):
         images = tuple(basis[int(position) - 1] for position in order)
         group_elements.extend((group(images), group((-images[0], images[1], images[2]))))
     assert {double_coset(lift) for lift in lifts} == {double_coset(element) for element in group_elements}
+    transversal = quotient.right_coset_transversal()
+    assert transversal.cardinality() == cardinal(6)
+
+    def right_coset(element):
+        image = character(element)
+        return frozenset(a * image for a in left)
+
+    assert {right_coset(lift) for lift in transversal} == {right_coset(element) for element in group_elements}
     assert all((~lift)(lift(point)) == point for lift in lifts for point in basis)
     assert all(lattice.b(lift(x), lift(y)) == lattice.b(x, y) for lift in lifts for x in basis for y in basis)
+
+
+def test_discriminant_kernel_norm_minus_two_orbits_retain_every_axis_class():
+    root = Lattices(ZZ)("A1")
+    lattice = root + root + root
+    basis = tuple(lattice.module_generators())
+    representatives = lattice.stable_orthogonal_group().vector_orbit_representatives(ZZ(-2))
+    assert representatives.cardinality() == cardinal(3)
+    assert all(point.q() == ZZ(-2) and point.is_primitive() for point in representatives)
+    assert {lattice.divided_discriminant_class(point) for point in representatives} == {
+        lattice.divided_discriminant_class(point) for point in basis
+    }

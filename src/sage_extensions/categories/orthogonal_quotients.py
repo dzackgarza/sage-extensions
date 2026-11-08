@@ -888,6 +888,19 @@ class OrthogonalCharacterQuotient:
             )
         return keys, permutations, group
 
+    def _owned_coset_representative(self, point):
+        r"""Transport a native coset representative to the owned product law.
+
+        A reversed model takes an owned H*g*K coset to K*a*H.
+        Inverting a representative of H*a*K gives the required K*a^-1*H.
+        The same inversion transports native right cosets to owned right
+        cosets. The later sign factors are abelian, so the first factor
+        determines the joint convention, as for factorization words.
+        """
+        from sage_extensions.categories.group.groups import _law_reversed
+
+        return point ** -1 if _law_reversed(self._model_factors()[0][1]) else point
+
     def right_coset_transversal(self):
         r"""Return one live lift for every right coset ``H r`` in the image.
 
@@ -917,6 +930,7 @@ class OrthogonalCharacterQuotient:
             )
         lifts = []
         for point in transversal:
+            point = self._owned_coset_representative(point)
             letters = section.letters_of_permutation(point)
             key = self._key_of_gap(
                 libgap.PreImagesRepresentative(to_permutation, point)
@@ -1224,7 +1238,9 @@ class OrthogonalCharacterQuotient:
         not abelian: a transversal of ``rho(Stab) \ Q / rho(Gamma)`` need not
         be one of ``rho(Gamma) \ Q / rho(Stab)``.
         """
-        if self._has_discriminant and not (self.determinant_kernel and self.spinor_kernel):
+        # A stabilizer can correlate its signs with its discriminant image.
+        # Joint conditions use the full joint image of every supplied generator.
+        if self._has_discriminant and not (self.determinant_kernel or self.spinor_kernel):
             return self._splitting_isometries_in_im_rho(stabilizer_generators)
         generators, _images, section = self._image_section()
         to_permutation = section._to_permutation
@@ -1243,7 +1259,7 @@ class OrthogonalCharacterQuotient:
         right = libgap.Image(to_permutation, stabilizer_gap)
         representatives = []
         for double_coset in libgap.AsList(libgap.DoubleCosets(permutation_image, left, right)):
-            point = libgap.Representative(double_coset)
+            point = self._owned_coset_representative(libgap.Representative(double_coset))
             letters = section.letters_of_permutation(point)
             key = self._key_of_gap(
                 libgap.PreImagesRepresentative(to_permutation, point)
@@ -1360,7 +1376,7 @@ class OrthogonalCharacterQuotient:
         if _dbg:
             print(f"[se-stage] DoubleCosets done in {_time.monotonic()-_t0:.1f}s: {len(_dcs)} cosets", flush=True)
         for _n, double_coset in enumerate(_dcs):
-            point = libgap.Representative(double_coset)
+            point = self._owned_coset_representative(libgap.Representative(double_coset))
             _t1 = _time.monotonic()
             element = libgap.PreImagesRepresentative(to_perm, point)
             word = libgap.PreImagesRepresentative(epi, element)
