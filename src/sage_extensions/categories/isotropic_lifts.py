@@ -385,14 +385,13 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             return quotient.codomain().elements().condition_set(integral)
 
         @cached_method
-        def _integral_base_point_or_none(self):
+        def integral_base_point_or_none(self):
             r"""Decide existence and retain one integral lift, or ``None``.
 
-            Private witness contract used by the selected Levi section and
-            its image predicate. An integral rational base point proves
-            nonemptiness immediately. A nonintegral base point proves
-            nothing; only exhaustion of the complete residue locus proves
-            emptiness.
+            An integral rational base point proves nonemptiness immediately.
+            Otherwise test the complete parameter quotient incrementally and
+            retain the first integral lift. A nonintegral base point proves
+            nothing; only exhaustion of that quotient proves emptiness.
             """
             source = self.source_reduction().isotropic_embedding().codomain()
             target = self.target_reduction().isotropic_embedding().codomain()
@@ -400,15 +399,17 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             if base.integral_restriction(source, target) is not None:
                 return base
             quotient = self.integral_parameter_quotient()
-            for residue in self.integral_parameter_classes():
+            for residue in quotient.codomain():
                 parameter = quotient.domain().inclusion()(quotient.preimage(residue)).underlying_element()
-                return self.parameterization()(parameter)
+                lift = self.parameterization()(parameter)
+                if lift.integral_restriction(source, target) is not None:
+                    return lift
             return None
 
         @cached_method
         def integral_base_point(self):
             r"""Select an integral lift, or raise when the integral lift locus is empty."""
-            point = self._integral_base_point_or_none()
+            point = self.integral_base_point_or_none()
             if point is not None:
                 return point
             raise ValueError("the integral reduction-lift locus is empty")
