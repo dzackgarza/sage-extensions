@@ -7822,6 +7822,22 @@ class Lattices(OwnedCategoryOverBaseRing):
             r"""Return nested represented isotropic sublattices with the stated ranks."""
             return _isotropic_flag_locus(self, ranks)
 
+        def indefinite_reduction(self):
+            r"""Return the source's isometric indefinite pre-reduction of this lattice."""
+            from sage_indefinite_port.indefinite.indefinite_reduction import indefinite_reduced_presentation
+
+            return indefinite_reduced_presentation(self)
+
+        def approximate_canonical_presentation(self):
+            r"""Return the source's approximate canonical form as an isometric presentation.
+
+            The source reduction is randomized, so two different results do
+            not certify that two lattices are nonisometric.
+            """
+            from sage_indefinite_port.indefinite.indefinite_reduction import approximate_canonical_presentation
+
+            return approximate_canonical_presentation(self)
+
         def isotropic_flag(self, *basis, flag_type=None):
             r"""Return the null flag of the given type in an adapted basis."""
             return IsotropicFlag(self, basis, flag_type=flag_type)

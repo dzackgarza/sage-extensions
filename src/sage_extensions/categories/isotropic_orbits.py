@@ -432,6 +432,12 @@ class IsotropicFlag:
         r"""Return the ranks of the nested primitive isotropic terms."""
         return FlagType(tuple(int(term.module_rank()) for term in self._terms))
 
+    def invariant(self):
+        r"""Return the source's invariant of this flag under the orthogonal group."""
+        from sage_indefinite_port.indefinite.marked_lattices import INDUCTION
+
+        return INDUCTION.flag_invariant(self._lattice, self._basis, self.flag_type().dimensions)
+
     def graded_quotient_action(self):
         r"""Return the action ``Stab(F) -> GL(gr F + I_t^perp/I_t)`` on successive quotients.
 
