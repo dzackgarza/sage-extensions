@@ -57,7 +57,12 @@ def _integral_covector(lattice, coordinates):
     rescaling of ``a``, so a rational covector is stated by the primitive
     integral covector on its ray.
     """
-    return _owned_vector(lattice.dual_module(), _primitive_integral_coordinates(tuple(coordinates)))
+    coefficients = _primitive_integral_coordinates(tuple(coordinates))
+    ring = lattice.base_ring()
+    return lattice.dual_module()({
+        label: ring(int(coefficient))
+        for label, coefficient in zip(lattice.module_generating_set(), coefficients, strict=True)
+    })
 
 
 def _engine_rational_coordinates(coordinates):
@@ -467,9 +472,7 @@ class RationalPolyhedralCones(OwnedParameterizedCategory):
                     f"has a nonzero constant term; a face of a cone is cut out by "
                     f"homogeneous inequalities"
                 )
-            dual = self.ambient_lattice().dual_module()
-            coordinates = _primitive_integral_coordinates(inequality.A())
-            return _owned_vector(dual, coordinates)
+            return _integral_covector(self.ambient_lattice(), inequality.A())
 
         def _face_from_engine_face(self, face):
             r"""Cross one nonempty engine face using its ambient active inequalities."""
