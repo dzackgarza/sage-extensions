@@ -33,3 +33,23 @@ def test_the_orbit_cosets_have_their_exact_actions_and_double_cosets(union):
     image = tuple(schreier(letter) for letter in schreier.domain().group_generators())
     assert group.subgroup(image).cardinality() == cardinal(2)
     assert all(element(ZZ(1)) == ZZ(1) for element in image)
+
+
+@pytest.mark.parametrize("reverse", (False, True), ids=("cycle_first", "transposition_first"))
+def test_pointed_cosets_generate_the_full_stabilizer_with_the_supplied_cover(reverse):
+    group = Groups.S(3)
+    subgroup = group.subgroup((group((2, 3)),))
+    group_generators = (group((1, 2, 3)), group((1, 2)))
+    if reverse:
+        group_generators = tuple(reversed(group_generators))
+    cover = group.free_cover(group_generators)
+    cosets = FiniteGSets(group).pointed_orbit(
+        subgroup, ZZ(1), lambda element, point: element(point), cover,
+    )
+    schreier = cosets.schreier_generating_morphism()
+    image = tuple(schreier(letter) for letter in schreier.domain().group_generators())
+    assert group.subgroup(image).cardinality() == cardinal(2)
+    assert all(element(ZZ(1)) == ZZ(1) for element in image)
+    section = cosets.representative_map()
+    assert all(section(point)(ZZ(1)) == point for point in cosets)
+

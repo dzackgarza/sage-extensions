@@ -279,12 +279,15 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             )
 
         representation = self.group().Mor(permutations).elementwise(permutation)
-        return _object_of(
+        g_set = _object_of(
             self,
             point_set=point_set,
             permutation_representation=representation,
             point_action=action,
         )
+        g_set.__dict__["_retained_transitions"] = (transitions, len(letters))
+        g_set.__dict__["_retained_transition_augmentation"] = augmentation
+        return g_set
 
     def pointed_orbit(self, subgroup, base, action, augmentation=None):
         r"""``G/H`` realized as the orbit of ``base``, for ``H`` the stabilizer of ``base``.
@@ -894,7 +897,16 @@ class LeftCosetGSets(OwnedParameterizedCategory):
                 f"with a word section through a free cover, which {self} was not built with"
             )
             schreier = _orbit_schreier_morphism(
-                self, self._coset_word_section, self._coset_augmentation
+                self, self._coset_word_section, self._coset_augmentation,
+                # The coset realization retains the action's literal point
+                # set. Its sweep table therefore has the same point order;
+                # its letters must also belong to this exact free cover.
+                transitions=(
+                    self._coset_action.__dict__.get("_retained_transitions")
+                    if self._coset_action.__dict__.get("_retained_transition_augmentation")
+                    is self._coset_augmentation
+                    else None
+                ),
             )
             return schreier._corestrict_to_subgroup(self.subgroup())
 
