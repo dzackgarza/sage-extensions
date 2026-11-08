@@ -25,10 +25,10 @@ def test_special_orthogonal_null_line_has_its_proper_quotient_image(pointwise):
     swapped = full(exchange)
     subgroup = ambient.SO()
     action = reduction.pointwise_levi_action(subgroup=subgroup) if pointwise else reduction.levi_action(subgroup=subgroup)
-    image = action.image()
+    image = reduction.pointwise_levi_image(subgroup=subgroup) if pointwise else reduction.levi_image(subgroup=subgroup)
     assert minus in image
     assert swapped not in image
-    lift = action.lift(minus)
+    lift = reduction.pointwise_levi_lift(minus, subgroup=subgroup) if pointwise else reduction.levi_lift(minus, subgroup=subgroup)
     assert lift in subgroup and lift in space.parabolic_subgroup()
     assert full(lift) == minus
     if pointwise:
@@ -36,6 +36,8 @@ def test_special_orthogonal_null_line_has_its_proper_quotient_image(pointwise):
     assert all((~lift)(lift(point)) == point for point in (e, f, u, v))
     assert image.cardinality() == cardinal(2)
     assert all(generator in image for generator in image.group_generators())
+    if not pointwise:
+        assert any(generator == minus for generator in reduction.levi_image_generators(subgroup=subgroup))
 
 
 def test_spinor_subgroup_lift_adjusts_the_null_action_and_preserves_the_quotient():
@@ -67,7 +69,7 @@ def test_spinor_subgroup_lift_adjusts_the_null_action_and_preserves_the_quotient
     inclusion = reduction.isotropic_embedding()
     null_label = next(iter(inclusion.domain().module_generating_set()))
     shifts = []
-    for generator in action.kernel().group_generators():
+    for generator in reduction.unipotent_kernel(subgroup=subgroup).group_generators():
         assert generator in subgroup and generator(e) == e
         assert reduction.levi_action()(generator) == reduction.O().one()
         values = tuple(inclusion.lift(generator(point)-point).to_vector()(null_label) for point in (u, v))
