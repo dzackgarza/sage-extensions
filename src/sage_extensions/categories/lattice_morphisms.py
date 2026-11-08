@@ -3992,11 +3992,36 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                 and subgroup.supergroup() is self
                 and subgroup.contains_character_kernel()
             ):
+                from sage_extensions.categories.abstract_categories.products import (
+                    FiniteOrdinalCategory,
+                )
+
+                quotient = subgroup.finite_character_quotient()
+                lattice = self.lattice()
+                arrows = Cat().Mor(FiniteOrdinalCategory(2), lattice.lattice_category())
+                if category is arrows:
+                    arrow = marked.arrow()
+                    if arrow.domain().module_rank() == 1:
+                        images = tuple(arrow(point) for point in arrow.domain().module_generators())
+                        if len(images) == 1 and images[0].is_primitive() and images[0].q() == lattice.base_ring().zero():
+                            # The existing Eichler certificate computes the image of
+                            # the setwise line stabilizer, including its sign factor.
+                            # A coslice fixes its source generator and cannot use it.
+                            line_image = quotient.isotropic_line_stabilizer_image(lattice.subobject_on(images))
+                            if line_image == "NOSPLIT":
+                                return finite_ordered_set((marked,))
+                            if line_image is not None:
+                                return finite_ordered_set(
+                                    tuple(
+                                        category.apex_action(splitting, marked)
+                                        for splitting in quotient.splitting_isometries_from_line_class(*line_image)
+                                    )
+                                )
                 stabilizer_generators = self._marking_stabilizer_generators(category, marked, stabilizer)
                 return finite_ordered_set(
                     tuple(
                         category.apex_action(splitting, marked)
-                        for splitting in subgroup.finite_character_quotient().splitting_isometries(
+                        for splitting in quotient.splitting_isometries(
                             stabilizer_generators
                         )
                     )
