@@ -3429,18 +3429,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             """
             changed = self.base_change(ring_map)
             target = changed.Aut()
-
-            def extend(isometry):
-                return target(
-                    lambda label: _base_change_element(
-                        self,
-                        changed,
-                        ring_map,
-                        isometry(self.module_generator(label)),
-                    )
-                )
-
-            return self.Aut().Mor(target)(extend)
+            return self.Aut().Mor(target)(lambda isometry: isometry.base_change(ring_map))
 
         @cached_method
         def witt_index(self):
