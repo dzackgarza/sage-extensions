@@ -8177,6 +8177,12 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
             ambient = self.supergroup()
             if candidate not in ambient:
                 return False
+            generators = self.selected_subgroup_generators()
+            if word is None and generators.is_empty() is True:
+                # The empty family generates {1}; its membership question is
+                # exactly equality with the ambient identity, including when
+                # that equality is an owned proposition.
+                return candidate == ambient.one()
             if word is not None:
                 free = self.selected_group_resolution().level(0)
                 labels = self.selected_subgroup_generators()
@@ -8191,7 +8197,6 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
                 return AtomicProposition("is_member", candidate, self)
             if candidate == ambient.one():
                 return True
-            generators = self.selected_subgroup_generators()
             # A selected generator or its inverse has a one-letter word
             # certificate, decided by the supplied set's membership operation.
             if generators.is_parent_of(candidate) is True:
