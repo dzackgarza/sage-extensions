@@ -4506,21 +4506,14 @@ class Lattices(OwnedCategoryOverBaseRing):
             return self._preamble_gram_tensor
 
         def _evaluate_gram(self, left, right):
-            r"""Contract the retained finite Gram with two lattice vectors."""
+            r"""Contract the retained finite Gram in its selected lattice framing."""
             labels = tuple(self.module_generating_set())
             left_coordinates = left.to_vector()
             right_coordinates = right.to_vector()
-            gram = self.gram_tensor()
             ring = self.base_ring()
-            return sum(
-                (
-                    left_coordinates(left_label)
-                    * gram[left_position, right_position]
-                    * right_coordinates(right_label)
-                    for left_position, left_label in enumerate(labels)
-                    for right_position, right_label in enumerate(labels)
-                ),
-                ring.zero(),
+            return self.gram_tensor().contract(
+                tensor.vector(ring, tuple(left_coordinates(label) for label in labels)),
+                tensor.vector(ring, tuple(right_coordinates(label) for label in labels)),
             )
 
         def b(self, left, right):
