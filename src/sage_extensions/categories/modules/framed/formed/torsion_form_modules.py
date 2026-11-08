@@ -2797,13 +2797,10 @@ def _engine_orthogonal_group(T):
     of diagonalized forms. An integer-valued elementary two-primary part
     with nonsingular polar form is a quadratic space over GF(2); GAP Forms
     supplies the exact base change from its full classical orthogonal group.
-    The other primary parts use OSCAR's normal-form
-    orthogonal-group algorithm on the same presented quotient, retaining
-    both value moduli and the Smith generator basis. The odd-primary route
+    The other primary parts use Sage's full finite-form orthogonal group,
+    retaining both value moduli and the Smith generator basis. The odd-primary route
     retains its explicit isometry of diagonalized forms.
     """
-    from sage_extensions.categories.lattice_engines import _oscar_lattices
-
     exponent = SageZZ(T.annihilator().gen())
     generators = []
     order = SageZZ.one()
@@ -2835,13 +2832,13 @@ def _engine_orthogonal_group(T):
         elif binary_quadratic is not None:
             matrices, part_order = _engine_elementary_two_orthogonal_generators(binary_quadratic)
         else:
-            gram = _engine_matrix(SageQQ, n, n, [
-                gens[i].q().lift() if i == j else gens[i].b(gens[j]).lift()
-                for i in range(n) for j in range(n)
-            ])
-            part_order, matrices = _oscar_lattices.finite_form_isometry_group(
-                gram, part.invariants(), part._modulus, part._modulus_qf
-            )
+            # Sage's TorsionQuadraticModule.orthogonal_group() computes
+            # the complete group when gens is omitted. Its matrices give
+            # row images of the same Smith generators used above.
+            # https://doc.sagemath.org/html/en/reference/modules/sage/modules/torsion_quadratic_module.html#sage.modules.torsion_quadratic_module.TorsionQuadraticModule.orthogonal_group
+            primary_group = part.orthogonal_group()
+            part_order = primary_group.order()
+            matrices = tuple(generator.matrix() for generator in primary_group.gens())
         order *= part_order
         for m in matrices:
             images = [sum((SageZZ(m[i, j]) * gens[j] for j in range(n)), part.zero()) for i in range(n)]
