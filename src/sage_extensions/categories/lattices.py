@@ -9979,11 +9979,8 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
                 })
 
             action = self.parabolic_subgroup().Mor(target)(restrict)
-            kernel = action.kernel()
-            kernel.select_group_generators(
-                lambda: finite_ordered_set(tuple(
-                    kernel(generator) for generator in self.pointwise_parabolic_subgroup().group_generators()
-                ))
+            action.select_kernel_generators(
+                lambda: self.pointwise_parabolic_subgroup().group_generators()
             )
             return action
 
@@ -10192,13 +10189,7 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             levi = self.parabolic_subgroup().Mor(automorphisms)(descend)
             image = automorphisms.condition_set(self._levi_image_contains)
             levi.select_section(Sets().Mor(image, levi.domain())(self._levi_section))
-            kernel = levi.kernel()
-            if not kernel.has_selected_group_resolution():
-                kernel.select_group_generators(
-                    lambda: finite_ordered_set(
-                        tuple(kernel(generator) for generator in self._levi_kernel_generators())
-                    )
-                )
+            levi.select_kernel_generators(lambda: finite_ordered_set(tuple(self._levi_kernel_generators())))
             return levi
 
         @cached_method

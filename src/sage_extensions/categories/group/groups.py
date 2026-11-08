@@ -3529,6 +3529,7 @@ class GroupMorphism:
         )
 
     _SECTION_ON_IMAGE = "set section on the image"
+    _KERNEL_GENERATORS = "kernel generators"
 
     @cached_method
     def _selected_data_registry(self):
@@ -3569,6 +3570,23 @@ class GroupMorphism:
         self._selected_data_registry()[self._SECTION_ON_IMAGE] = section
         return self
 
+    def select_kernel_generators(self, generators):
+        r"""Choose a lazy generating family of the kernel before constructing it.
+
+        ``generators()`` supplies elements of the source generating the
+        kernel. The kernel constructor retains their free augmentation as
+        its defining generating datum, before choosing generic computations.
+        """
+        assert not self.kernel.is_in_cache(), (
+            "kernel generators must be chosen before constructing the kernel"
+        )
+        registry = self._selected_data_registry()
+        assert self._KERNEL_GENERATORS not in registry, (
+            "kernel generators have already been selected on this morphism"
+        )
+        registry[self._KERNEL_GENERATORS] = generators
+        return self
+
     @cached_method
     def kernel(self):
         r"""``ker(f)``, one subgroup per morphism, so its selected generators persist."""
@@ -3576,7 +3594,9 @@ class GroupMorphism:
             KernelSubgroups,
         )
 
-        return KernelSubgroups(self.domain())(self)
+        generators = self._selected_data_registry().get(self._KERNEL_GENERATORS)
+        augmentation = None if generators is None else lambda kernel: kernel.free_cover(generators())
+        return KernelSubgroups(self.domain())(self, generating_morphism_factory=augmentation)
 
     @cached_method
     def image(self):
