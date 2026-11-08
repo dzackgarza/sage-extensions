@@ -13,6 +13,7 @@ def test_nonnormal_character_transporter_has_the_exact_positive_and_negative_dec
     lattice = root + root + root
     group = lattice.O()
     e, f, h = tuple(lattice.module_generators())
+    assert all(point.q() == ZZ(-2) for point in (e, f, h))
     cycle = group((f, h, e))
     exchange = group((e, h, f))
     rho = lattice.discriminant_representation()

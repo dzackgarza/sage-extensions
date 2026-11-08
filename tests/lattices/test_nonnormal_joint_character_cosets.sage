@@ -1,7 +1,7 @@
 r"""A nonnormal discriminant preimage with determinant one in O(A1 cubed).
 
 The integral orthogonal group is the signed permutation group. The
-classes e_i/2 are exactly the three discriminant elements of square 1/2,
+classes e_i/2 are exactly the three discriminant elements of square -1/2,
 so the discriminant orthogonal group is S3. Independent sign changes
 supply both determinants above every permutation. Thus the joint image
 is C2 times S3. Requiring determinant one and fixing e_0/2 gives a

@@ -492,6 +492,32 @@ class OrthogonalCharacterQuotient:
         return self._image_section()[2].gap_group
 
     @cached_method
+    def _gap_character_target(self):
+        r"""The retained condition subgroup S of the full character product.
+
+        Each selected sign factor is required to be the identity. The
+        discriminant factor is the intersection of the supplied targets.
+        Its embedding therefore already satisfies all the sign conditions.
+        """
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        factors, product, embeddings, _projections = self._gap_product()
+        if not self._has_discriminant:
+            return libgap.TrivialSubgroup(product)
+        position = next(index for index, (label, _group) in enumerate(factors) if label == "discriminant")
+        pieces = tuple(
+            libgap.Subgroup(product, [
+                libgap.Image(embeddings[position], _element_to_engine(self._discriminant_group, generator))
+                for generator in target.group_generators()
+            ])
+            for target in self.discriminant_preimages
+        )
+        condition = pieces[0]
+        for piece in pieces[1:]:
+            condition = libgap.Intersection(condition, piece)
+        return condition
+
+    @cached_method
     def _gap_subgroup(self):
         r"""``chi(self.subgroup)`` as a generated subgroup of the character image.
 
@@ -502,8 +528,6 @@ class OrthogonalCharacterQuotient:
         generating families and one projection kernel per sign factor.
         """
         factors, _product, embeddings, projections = self._gap_product()
-        from sage_extensions.categories.group.groups import _element_to_engine
-
         image = self._gap_image()
         if self._has_discriminant and not (self.determinant_kernel and self.spinor_kernel):
             # Injectivity of pi_1 on Q cap S (proof at
@@ -520,40 +544,7 @@ class OrthogonalCharacterQuotient:
                 for generator in libgap.GeneratorsOfGroup(joint)
             ]
             return libgap.Subgroup(image, embedded)
-        pieces = []
-        for target in self.discriminant_preimages:
-            position = next(
-                index for index, (label, _group) in enumerate(factors) if label == "discriminant"
-            )
-            generators = tuple(target.group_generators())
-            targets_gap = [
-                _element_to_engine(self._discriminant_group, generator)
-                for generator in generators
-            ]
-            # The constraint piece is bound to the direct product, not to the
-            # character image: freedom of the embedded target to lie outside
-            # Q is exactly the nonsurjective-rho case, and the meet below
-            # takes place in D between Q and the full constraint subgroup.
-            pieces.append(
-                libgap.Subgroup(
-                    _product,
-                    [libgap.Image(embeddings[position], generator) for generator in targets_gap],
-                )
-            )
-        for position, (label, group) in enumerate(factors):
-            if label == "discriminant":
-                continue
-            projection = projections[position]
-            restricted = libgap.GroupHomomorphismByImages(
-                image,
-                libgap.Range(projection),
-                list(libgap.GeneratorsOfGroup(image)),
-                [libgap.Image(projection, element) for element in libgap.GeneratorsOfGroup(image)],
-            )
-            pieces.append(libgap.Kernel(restricted))
-        if not pieces:
-            return image
-        return libgap.Intersection(image, *pieces)
+        return libgap.Intersection(image, self._gap_character_target())
 
     def image_order(self) -> int:
         r"""``|chi(O(L))|`` without any group built inside the direct product.
@@ -1402,14 +1393,13 @@ class OrthogonalCharacterQuotient:
 
         If ``witness(x)=y`` and ``t`` stabilizes ``y``, then ``t*witness`` still
         carries ``x`` to ``y``.  Thus the relevant finite-character condition
-        is ``rho(t) rho(witness) in rho(Gamma)``.  Right multiplication by a
-        target stabilizer would instead act on the source and is not the same
-        transporter problem.
+        is ``chi(t) chi(witness) in S``, where ``Gamma = chi^-1(S)``.
 
         A stabilizer element ``t`` meets that condition exactly when it lies
-        in ``H g^-1``, for ``H = rho(Gamma)`` and ``g = rho(witness)``: GAP
-        intersects the generated stabilizer image with that right coset
-        directly, instead of listing the stabilizer's image.  The chosen
+        in ``S chi(witness)^-1`` in the owned composition law. The finite
+        character product retains S from its discriminant targets and sign
+        kernels. GAP intersects the target stabilizer image with the coset
+        in its own product convention. The chosen
         element is carried back to a word in the stabilizer generators by
         their own word section, and the composed candidate is then admitted by
         the subgroup's defining predicate; a characters-only candidate the
@@ -1418,31 +1408,40 @@ class OrthogonalCharacterQuotient:
         """
         if witness in self.subgroup:
             return witness
-        generators, _images, section = self._image_section()
-        to_permutation = section._to_permutation
+        from sage_extensions.categories.group.groups import _law_reversed
+
+        product = self._gap_product()[1]
+        to_permutation = libgap.IsomorphismPermGroup(product)
+        permutation_product = libgap.Range(to_permutation)
         point = libgap.Image(to_permutation, self._gap_of_key(self.image(witness)))
+        stabilizer_generators = tuple(target_stabilizer_generators)
         stabilizer_gaps = [
-            self._gap_of_key(self.image(generator)) for generator in target_stabilizer_generators
+            self._gap_of_key(self.image(generator)) for generator in stabilizer_generators
         ]
-        stabilizer_gap = libgap.Subgroup(self._gap_image(), stabilizer_gaps)
+        stabilizer_gap = libgap.Subgroup(product, stabilizer_gaps)
         stabilizer_permutation = libgap.Image(to_permutation, stabilizer_gap)
-        subgroup_permutation = libgap.Image(to_permutation, self._gap_subgroup())
+        subgroup_permutation = libgap.Image(to_permutation, self._gap_character_target())
+        reversed_product = _law_reversed(self._model_factors()[0][1])
+        # For a reversed model, chi(t*g) is a*w. Choose u in S*a
+        # intersect W and set w=u^-1, so a*w lies in S. For a model
+        # preserving products, choose w directly from S*a^-1 intersect W.
         candidates = libgap.Intersection(
             stabilizer_permutation,
-            libgap.RightCoset(subgroup_permutation, point ** -1),
+            libgap.RightCoset(subgroup_permutation, point if reversed_product else point ** -1),
         )
         if bool(libgap.IsEmpty(candidates)):
             return None
         chosen = libgap.Representative(candidates)
+        if reversed_product:
+            chosen = chosen ** -1
         # Factor the chosen stabilizer image over the stabilizer's own
         # generators, so the adjustment is a live element of the stabilizer.
         stabilizer_section = _GapWordSection(
             [libgap.Image(to_permutation, element) for element in stabilizer_gaps],
-            parent=section.permutation_group,
+            parent=permutation_product,
         )
         letters = stabilizer_section.letters_of_permutation(chosen)
         letters = _letters_in_owned_order(self._model_factors(), letters)
-        stabilizer_generators = tuple(target_stabilizer_generators)
         adjustment = self.supergroup.one()
         for index in letters:
             adjustment = adjustment * (

@@ -1,16 +1,20 @@
 r"""Stable-component Eichler transvections give exact null-line transporters.
 
-In 2U(2)+A2(-1), the transvection along the first null basis vector
-and an A2 root carries the opposite null line into the same arithmetic
-orbit. The subgroup transporter must supply its full integral witness.
+In 2U(2)+A2 and its A2 sign variant, the transvection along the first
+null basis vector and an A2 root carries the opposite null line into
+the same arithmetic orbit. Each transporter supplies an integral witness.
 """
+
+import pytest
 
 from sage_extensions.all import *
 
 
-def test_stable_component_line_transporter_matches_an_eichler_transvection():
+@pytest.mark.parametrize("root_twist, signature", ((1, (2, 4)), (-1, (4, 2))), ids=("A2", "A2_twist_minus_one"))
+def test_stable_component_line_transporter_matches_an_eichler_transvection(root_twist, signature):
     hyperbolic = Lattices(ZZ)("U").twist(2)
-    lattice = hyperbolic + hyperbolic + Lattices(ZZ)("A2").twist(-1)
+    lattice = hyperbolic + hyperbolic + Lattices(ZZ)("A2").twist(root_twist)
+    assert tuple(map(int, lattice.signature_pair())) == tuple(map(int, signature))
     basis = tuple(lattice.module_generators())
     e, f, a, b, c, d = basis
     group = lattice.stable_orthogonal_group().intersection(lattice.O_plus())
