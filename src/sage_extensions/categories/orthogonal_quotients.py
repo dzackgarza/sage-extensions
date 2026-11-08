@@ -953,6 +953,181 @@ class OrthogonalCharacterQuotient:
         rank = _f2_rank(descended_vectors, m)
         return m - rank, sign_labels
 
+    def isotropic_line_stabilizer_image(self, representative):
+        r"""Return ``(discriminant image, whether a sign factor is covered)`` for an isotropic line.
+
+        Let ``x = <v>`` be a primitive isotropic line, ``p = div(v)`` and ``c = [v/p]`` in
+        ``A_L``.  The claim is ``rho(Stab_{O(L)}(x)) = Stab_{O(A_L)}(c)`` in the
+        discriminant factor, and no integral stabilizer is needed for it.
+        Eichler's criterion (Gritsenko--Hulek--Sankaran, Lemma 7.8, p. 503) says that, in a
+        lattice with two orthogonal hyperbolic planes, the ``\widetilde{SO}(L)``-orbit of a
+        primitive vector is decided by its length and its normalized discriminant class.
+        Let ``gamma`` belong to ``Stab_{O(A_L)}(c)`` and choose ``g`` in ``O(L)`` above it
+        (the character representation is computed by this quotient, so such a lift exists).
+        Then ``g(v)`` has the same length and the same normalized class ``c`` as ``v``, so by
+        the criterion some ``k`` in ``\widetilde{SO}(L)`` takes ``g(v)`` to ``v``; then
+        ``kg`` fixes ``v``, and ``kg`` has the same discriminant image ``gamma``.  That is
+        surjectivity of the line stabilizer onto the finite class stabilizer.
+
+        A norm ``-2`` root reflection is *not* used for the sign factor: its discriminant
+        image is trivial, so it would be declared a stabilizer member for the wrong reason.
+        The sign factor is a separate character and is decided by the subgroup's own
+        membership test on a reflection in ``u perpendicular to v`` with ``u.u = 2``; if no
+        such witness is exhibited there is no claim about that factor and the caller keeps
+        its integral route.  Nothing below returns a partial discriminant image.
+        """
+        if not _two_hyperbolic_planes(self.lattice):
+            return None
+        lattice = self.lattice
+        inclusion = representative.inclusion()
+        label = next(iter(representative.module_generating_set()))
+        vector = inclusion(representative.module_generator(label))
+        discriminant_class = lattice.divided_discriminant_class(vector)
+        if discriminant_class == lattice.discriminant_group().zero():
+            # Double cosets Gamma \\ im rho / im rho are one coset, *provided* no sign
+            # factor remains to be lifted: Stab_{im rho}(0) = im rho, and
+            # Eichler's lifting argument takes place inside that image.  The remaining
+            # factor is independent: it is met only when no sign label remains or a
+            # kernel-sign witness is exhibited.  A full discriminant stabilizer alone
+            # would not supply this, so the joint condition below is kept explicit.
+            # The factor labels are retained data; do not evaluate _sign_descent_rank
+            # here, because that builds im rho through ambient generators again.  Two
+            # nontrivial sign factors are beyond the single witness this shortcut proves:
+            # one flip covers one sign coset, not a joint two-character image.
+            sign_labels = [
+                label
+                for label, present in (
+                    ("determinant", self.determinant_kernel),
+                    ("spinor", self.spinor_kernel),
+                )
+                if present
+            ]
+            if not sign_labels:
+                return "NOSPLIT"
+            if len(sign_labels) > 1:
+                return None
+            # A norm +2 integral root reflection needs no rho evaluation to certify its
+            # kernel membership: on a dual class x -> x - b(x,u)u the correction b(x,u)u
+            # is a lattice vector, so the class is unchanged.  lattice.reflection has
+            # already checked the integral-reflection-vector condition; the remaining
+            # sign factor is the only character left to test.
+            basis = tuple(lattice.module_generators())
+            for index, first in enumerate(basis):
+                for second in basis[index + 1 :]:
+                    candidate = first + second
+                    if candidate.q() != lattice.base_ring()(2):
+                        continue
+                    if lattice.b(candidate, vector) != lattice.base_ring().zero():
+                        continue
+                    if lattice.reflection(candidate) not in self.subgroup:
+                        return "NOSPLIT"
+            for root in lattice.vectors_of_square_and_divisibility(
+                lattice.base_ring()(2), lattice.base_ring().one()
+            ):
+                if lattice.b(root, vector) != lattice.base_ring().zero():
+                    continue
+                if lattice.reflection(root) not in self.subgroup:
+                    return "NOSPLIT"
+            return None
+        # A joint determinant *and* spinor sign quotient is not certified by one
+        # nontrivial reflection: that witness covers one sign coset only, and the
+        # remaining coset need not be generated.  Keep the integral joint-character
+        # splitting there, with its double cosets in the full joint image, rather than
+        # promoting the single flip to a complete stabilizer image.  This is checked
+        # before _sign_descent_rank can ask for the ambient engine.
+        if self.determinant_kernel and self.spinor_kernel:
+            return None
+        if not self._has_discriminant:
+            # A sign-only character quotient has no im rho at all. This case cannot
+            # use the discriminant-stabilizer image, but the same index-two principle
+            # applies: one kernel-sign witness certifies that the orbit does not split,
+            # so the integral stabilizer is not needed either.
+            _rank, sign_labels = self._sign_descent_rank()
+            if not sign_labels:
+                return "NOSPLIT"
+            for root in lattice.vectors_of_square_and_divisibility(
+                lattice.base_ring()(2), lattice.base_ring().one()
+            ):
+                if lattice.b(root, vector) != lattice.base_ring().zero():
+                    continue
+                if lattice.reflection(root) not in self.subgroup:
+                    return "NOSPLIT"
+            return None
+        discriminant_class = lattice.divided_discriminant_class(vector)
+        finite_orthogonal = self._discriminant_group
+        # An unoriented line is a *set*: its stabilizer may interchange v and -v, so
+        # the discriminant image is the stabilizer of the class set {c, -c}, not of c
+        # alone.  -1 is orthogonal to every form and negates both, so this is the set
+        # stabilizer, and it is computed inside im rho -- the actual image of the
+        # discriminant representation, which is exactly where the lifting argument is
+        # allowed to work.  The set is stabilised by GAP's own elementwise action.
+        from sage.libs.gap.libgap import libgap
+
+        negative_class = -discriminant_class
+        # The setwise stabilizer lives in im(rho), computed by GAP on the class set.
+        # An unoriented line is a *set*: its stabilizer may interchange v and -v, so the
+        # discriminant image is Stab({c, -c}) and -1 belongs to it whenever c != -c.
+        # Computing inside im rho is what the lifting argument means: no element of
+        # O(A_L) outside the retained image is promoted to a complete image.
+        from sage.libs.gap.libgap import libgap
+
+        class_points = libgap.Set(
+            [
+                finite_orthogonal._engine_abelian_element(discriminant_class),
+                finite_orthogonal._engine_abelian_element(-discriminant_class),
+            ]
+        )
+        engine, im_rho, _section, ambient = self._im_rho_engine_and_section()
+        setwise_action = libgap.function_factory(
+            "function(x, g) return Set(List(x, y -> ImageElm(g, y))); end"
+        )
+        right = libgap.Stabilizer(im_rho, class_points, setwise_action)
+        _rank, sign_labels = self._sign_descent_rank()
+        if not sign_labels:
+            return right, False
+        # A kernel-sign witness is what certifies splitting here: a reflection in a norm
+        # ``+2`` vector orthogonal to the line fixes it, acts trivially on ``A_L``, and has
+        # spinor class ``[2] * [-1/2] = [-1]``, outside ``O+``.  That is exactly the missing
+        # piece of the sign character when it is *not* lifted; a generator with nontrivial
+        # sign and nontrivial discriminant image would only supply a graph, not this witness.
+        flip = False
+        rho = lattice.discriminant_representation()
+        square_two = lattice.base_ring()(2)
+        trivial_discriminant = self._discriminant_group.one()
+        zero_scalar = lattice.base_ring().zero()
+        for root in lattice.vectors_of_square_and_divisibility(square_two, lattice.base_ring().one()):
+            if lattice.b(root, vector) != zero_scalar:
+                continue
+            reflection = lattice.reflection(root)
+            if (
+                rho(reflection) == trivial_discriminant
+                and reflection not in self.subgroup
+            ):
+                flip = True
+                break
+        if not flip:
+            # No kernel-sign witness is exhibited, so this cannot certify that the sign
+            # factor is included in the stabilizer's image: the double-coset machinery
+            # needs the integral stabilizer instead of a partial character image.
+            return None
+        return right, flip
+
+    def splitting_isometries_from_line_class(self, stabilizer, stab_sign_flip):
+        r"""Double cosets from the discriminant image of a line stabilizer.
+
+        ``stabilizer`` is the setwise stabilizer of ``{c, -c}`` inside ``im rho`` built by
+        :meth:`isotropic_line_stabilizer_image`, used as the right-hand group of the double
+        cosets ``rho(Gamma) \\ im_rho / Stab`` in place of any integral stabilizer.
+
+        This is the entry point of :meth:`isotropic_line_stabilizer_image`'s argument: it
+        transports by representatives of ``rho(Gamma) \ O(A_L) / Stab(c)`` instead of
+        asking for the integral stabilizer's generators.  Every lift is still checked
+        against the character map.
+        """
+        return self._splitting_isometries_in_im_rho_from_image(
+            (), stab_sign_flip, right=stabilizer
+        )
+
     def splitting_isometries(self, stabilizer_generators):
         r"""Return one lift ``g`` per double coset ``Gamma g Stab`` of ``O(L)``.
 
@@ -998,6 +1173,42 @@ class OrthogonalCharacterQuotient:
         return finite_ordered_set(tuple(representatives))
 
     def _splitting_isometries_in_im_rho(self, stabilizer_generators):
+        r"""Double cosets computed inside ``im rho``: from retained integral generators."""
+        rho = self.lattice.discriminant_representation()
+        discriminant_image_generators = tuple(
+            _element_to_engine(self._discriminant_group, rho(s))
+            for s in stabilizer_generators
+        )
+        return self._splitting_isometries_in_im_rho_from_image(
+            discriminant_image_generators, self._stabilizer_sign_flips(stabilizer_generators)
+        )
+
+    def _stabilizer_sign_flips(self, stabilizer_generators):
+        r"""Whether the integral stabilizer takes a nontrivial value on a sign character.
+
+        Only an element *inside ker rho* proves that a sign factor is already present in
+        the stabilizer: a nontrivial sign with a nontrivial discriminant image can just
+        be a graph character and must never stand for this boolean.
+        """
+        j, sign_labels = self._sign_descent_rank()
+        ring = self.lattice.base_ring()
+        rho = self.lattice.discriminant_representation()
+        trivial_discriminant = self._discriminant_group.one()
+
+        def sign_of(element, label):
+            if label == "spinor":
+                return self.lattice.O_plus().preimage_morphism()(element).is_one()
+            return ring(element.determinant()) == ring.one()
+
+        return any(
+            rho(s) == trivial_discriminant and not sign_of(s, label)
+            for s in stabilizer_generators
+            for label in sign_labels
+        )
+
+    def _splitting_isometries_in_im_rho_from_image(
+        self, discriminant_image_generators, stab_sign_flip, *, right=None,
+    ):
         r"""Double cosets computed inside ``im rho`` (the ``O(A_L)`` engine); see
         :meth:`splitting_isometries` for the exact sign bookkeeping."""
         from sage_extensions.categories.group.groups import _element_to_engine
@@ -1008,9 +1219,16 @@ class OrthogonalCharacterQuotient:
         im_rho_perm = libgap.Range(to_perm)
         left = libgap.Image(to_perm, self._joint_discriminant_image_gap())
         rho = self.lattice.discriminant_representation()
-        right = libgap.Subgroup(
-            im_rho,
-            [_element_to_engine(self._discriminant_group, rho(s)) for s in stabilizer_generators],
+        right = (
+            libgap.Subgroup(
+                im_rho,
+                [
+                    _element_to_engine(self._discriminant_group, rho(s))
+                    for s in discriminant_image_generators
+                ],
+            )
+            if right is None
+            else right
         )
         right_perm = libgap.Image(to_perm, right)
         ring = self.lattice.base_ring()
@@ -1020,18 +1238,19 @@ class OrthogonalCharacterQuotient:
                 return self.lattice.O_plus().preimage_morphism()(element).is_one()
             return ring(element.determinant()) == ring.one()
 
-        stab_sign_flip = any(
-            not sign_of(s, label) for s in stabilizer_generators for label in sign_labels
-        )
         flip_element = None
         if j >= 1 and sign_labels:
-            for label in sign_labels:
-                for g in ambient:
-                    if not sign_of(g, label):
-                        flip_element = g
-                        break
-                if flip_element is not None:
+            stable = self.lattice.stable_orthogonal_group()
+            for candidate in stable.group_generators():
+                if any(not sign_of(candidate, label) for label in sign_labels):
+                    flip_element = candidate
                     break
+            if len(sign_labels) == 1 and not stab_sign_flip and flip_element is None:
+                raise ValueError(
+                    f"the stabilizer's discriminant image leaves a sign coset to lift, and no "
+                    f"kernel element with nontrivial {sign_labels[0]} is available to lift it: "
+                    "a plain sign predicate is not a substitute for a ker(rho) witness"
+                )
         representatives = []
         # Words in the rho-images of the ambient generators, via the
         # epimorphism F(S) ->> im rho: PreImagesRepresentative reuses the
@@ -1362,14 +1581,177 @@ def _assert_isotropic_splitting_has_character_data(subgroup) -> None:
     )
 
 
+def _isotropic_line_representatives(lattice, quotient):
+    r"""Representatives of primitive isotropic *line* classes, from ``A_L`` first.
+
+    Eichler's criterion (Gritsenko--Hulek--Sankaran, Lemma 7.8, p. 503) classifies
+    primitive vectors of fixed length by norm and normalized discriminant class in a
+    lattice with two orthogonal hyperbolic planes.  For norm zero those are exactly the
+    *line* orbits, once ``v`` and ``-v`` are identified by the class set ``{c, -c}``:
+    their normalized class is the whole invariant.  This function constructs one
+    integral representative for *every* candidate class, before any integral orbit
+    enumeration is attempted.  If a candidate class cannot be exhibited physically the
+    construction returns ``None`` and the caller falls back to its integral route --
+    a partial finite family is never returned as if it were the line set.
+    """
+    if not _two_hyperbolic_planes(lattice):
+        return None
+    from sage.libs.gap.libgap import libgap
+    from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+
+    quadratic_module = lattice.discriminant_group()
+    zero_class = quadratic_module.zero()
+    # Ambient line orbits are orbits of the *unordered* pairs {c, -c} under im rho,
+    # the actual integral discriminant image.  Eichler gives vector classes, and two
+    # candidates lying in one im-rho orbit realise one line orbit, so they must never
+    # be split by how many candidates cover it.  Compute those orbits by the faithful
+    # owned action of ambient rho-images on the module elements, not by string labels
+    # or a join of discriminant targets.
+    candidates = tuple(lattice.covering_discriminant_classes(lattice.base_ring().zero()))
+    if all(candidate == zero_class for candidate in candidates):
+        # Every normalized class is zero, so there is exactly one ambient line class.
+        # No partition under rho(O(L)), no joint character intersection, and above all
+        # no ambient integral generating family is required: any primitive isotropic
+        # vector with div one gives that class, checked here rather than asserted.
+        for label in lattice.module_generating_set():
+            vector = lattice.module_generator(label)
+            if vector.q() != lattice.base_ring().zero():
+                continue
+            if not vector.is_primitive():
+                continue
+            if lattice.divided_discriminant_class(vector) != zero_class:
+                continue
+            return finite_ordered_set((lattice.primitive_isotropic_subobject(vector),))
+        return None
+    def key(element):
+        return element
+
+    pairs = {}
+    for candidate in candidates:
+        pair = frozenset({key(candidate), key(-candidate)})
+        pairs.setdefault(pair, candidate)
+
+    ambient = quotient._ambient_generators()
+    rho = lattice.discriminant_representation()
+    images = [rho(generator) for generator in ambient]
+    orbits = []
+    unseen = set(pairs)
+    while unseen:
+        pair_repr = min(unseen)
+        orbit = {pair_repr}
+        frontier = [pair_repr]
+        while frontier:
+            following = []
+            for point in frontier:
+                class_of_point = next(
+                    class_value for candidate_key, class_value in pairs.items()
+                    if candidate_key == point
+                )
+                for gamma in images:
+                    image_point = frozenset({key(gamma(class_of_point)), key(-gamma(class_of_point))})
+                    if image_point not in orbit:
+                        orbit.add(image_point)
+                        following.append(image_point)
+            frontier = following
+        unseen.difference_update(orbit)
+        orbits.append(orbit)
+
+    representatives = []
+    for orbit in orbits:
+        isotropic_vector = None
+        for pair_key in orbit:
+            candidate = next(
+                class_value for candidate_key, class_value in pairs.items()
+                if candidate_key == pair_key
+            )
+            if candidate == zero_class:
+                for label in lattice.module_generating_set():
+                    vector = lattice.module_generator(label)
+                    if vector.q() != lattice.base_ring().zero():
+                        continue
+                    if not vector.is_primitive():
+                        continue
+                    if lattice.divided_discriminant_class(vector) != zero_class:
+                        continue
+                    isotropic_vector = vector
+                    break
+            else:
+                for candidate_vector in lattice.vectors_of_square_and_divisibility(
+                    lattice.base_ring().zero(), candidate.additive_order()
+                ):
+                    if not candidate_vector.is_primitive():
+                        continue
+                    if candidate_vector.q() != lattice.base_ring().zero():
+                        continue
+                    if lattice.divided_discriminant_class(candidate_vector) != candidate:
+                        continue
+                    isotropic_vector = candidate_vector
+                    break
+            if isotropic_vector is not None:
+                break
+        if isotropic_vector is None:
+            return None
+        representatives.append(lattice.primitive_isotropic_subobject(isotropic_vector))
+    return finite_ordered_set(tuple(representatives))
+
+
+def _two_hyperbolic_planes(lattice):
+    r"""Whether two orthogonal unimodular hyperbolic planes are exhibited in the chosen basis.
+
+    Eichler's criterion (Gritsenko--Hulek--Sankaran, *Moduli of K3 Surfaces and Irreducible
+    Symplectic Manifolds*, Lemma 7.8, p. 503) needs that hypothesis; where the retained basis
+    does not exhibit it the caller keeps the exact integral route, so the hypothesis is only
+    ever entered on a detectable basis, never assumed.
+    """
+    generators = tuple(lattice.module_generators())
+    isotropic = [v for v in generators if v.q() == lattice.base_ring().zero()]
+    planes = []
+    zero = lattice.base_ring().zero()
+    for e in isotropic:
+        for f in isotropic:
+            pairing = lattice.b(e, f)
+            if pairing not in (1, -1):
+                continue
+            if all(
+                lattice.b(e, other) == zero and lattice.b(f, other) == zero
+                for predecessor in planes
+                for other in predecessor
+            ):
+                planes.append((e, f))
+                break
+    return len(planes) >= 2
+
+
 def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
     _assert_isotropic_splitting_has_character_data(subgroup)
     quotient = OrthogonalCharacterQuotient(subgroup)
     orthogonal_group = subgroup.supergroup()
     representatives = []
-    for representative in orthogonal_group.isotropic_orbit_representatives(
-        rank, flag=flag
-    ):
+    sourced = (
+        _isotropic_line_representatives(orthogonal_group.domain(), quotient)
+        if not flag and rank == 1
+        else None
+    )
+    if sourced is None:
+        # Every rank other than lines, or a class whose integral representative could
+        # not be exhibited here, uses the port's classification unchanged.
+        sourced = orthogonal_group.isotropic_orbit_representatives(rank, flag=flag)
+    for representative in sourced:
+        line_image = (
+            quotient.isotropic_line_stabilizer_image(representative)
+            if not flag and rank == 1
+            else None
+        )
+        if line_image == "NOSPLIT":
+            # The sign witness (or trivial quotient) proves G_0 = G Stab(x) for its index.
+            representatives.append(representative)
+            continue
+        if line_image is not None:
+            representatives.extend(
+                splitting.transport_isotropic_object(representative)
+                for splitting in quotient.splitting_isometries_from_line_class(*line_image)
+            )
+            continue
         stabilizer = orthogonal_group.isotropic_stabilizer_generators(
             representative, flag=flag
         )
