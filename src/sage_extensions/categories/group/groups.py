@@ -788,6 +788,8 @@ def _engine_basis_label(basis, label):
     match basis:
         case _ if basis in FiniteSets():
             assert label in basis, f"{label!r} is not a free generator: it is not an element of the free basis {basis}"
+            if basis in EnumeratedSets():
+                return int(basis.ranking_map()(label))
             return next(position for position, candidate in enumerate(basis) if candidate == label)
         case _ if basis in OwnedRings():
             return _engine_element(basis, label)
@@ -799,6 +801,8 @@ def _owned_basis_label(basis, engine_label):
     r"""Return the point of an owned free basis indexed by the engine label."""
     match basis:
         case _ if basis in FiniteSets():
+            if basis in EnumeratedSets():
+                return basis.ranking_map().inverse()(int(engine_label))
             return next(candidate for position, candidate in enumerate(basis) if position == int(engine_label))
         case _ if basis in OwnedRings():
             return _owned_engine_element(basis, engine_label)
