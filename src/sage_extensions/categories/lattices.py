@@ -10411,13 +10411,16 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
         @cached_method
         def unipotent_kernel(self):
             r"""Return \(U_I=\ker(P_I\to GL(I)\times O(K_I))\), the unipotent radical."""
-            self.isotropic_embedding()
             levi = self.levi_action()
-            identity = self.Aut().one()
-            return self.pointwise_parabolic_subgroup().predicate_subgroup(
-                lambda isometry: levi(isometry) == identity,
-                "g fixes I pointwise and acts trivially on I^perp/I",
-            )
+            restricted = self.pointwise_parabolic_subgroup().Mor(self.Aut())(lambda isometry: levi(isometry))
+
+            def generators():
+                from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+
+                return finite_ordered_set(tuple(RECURSION.isotropic_quotient_kernel_generators(self, radical_images=())))
+
+            restricted.select_kernel_generators(generators)
+            return restricted.kernel()
 
         def lift_isometry(self, isometry):
             r"""Return \(g\in P_I\) with \(\bar g=\) ``isometry``, when \(L\) splits along the lifts.
