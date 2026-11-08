@@ -1639,12 +1639,9 @@ class LatticeIsometryMethods:
             and other.codomain() is self.codomain()
         ):
             return False
-        domain = self.domain()
-        if domain.module_rank().is_finite():
-            return all(
-                self(generator) == other(generator)
-                for generator in domain.module_generators()
-            )
+        # The complete type-(1,1) coordinate tensor determines this linear
+        # map in the selected endpoint framings. Retain that same value used
+        # by hashing instead of reevaluating each generator image per query.
         return other._coordinate_tensor() == self._coordinate_tensor()
 
     def __ne__(self, other) -> bool:
