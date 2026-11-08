@@ -4103,8 +4103,11 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         selected = representation.codomain().subgroup(()) if target is None else target
         return representation.preimage_subgroup(selected)
 
-    def vector_orbit_representatives(self, square):
+    def vector_orbit_representatives(self, square, *, content=None):
         r"""Return one representative of each ``O(L)``-orbit of square ``square``.
+
+        ``content`` selects the stratum ``c * (primitive of square n/c^2)``.
+        Every isometry preserves content, so the strata do not interact.
 
         For a definite lattice over ``ZZ`` the represented shell is finite, and
         ``O(L)`` is finite, so this is an exact finite quotient with no search
@@ -4113,6 +4116,17 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         """
         lattice = self.domain()
         square = lattice.base_ring()(int(square))
+        if content is not None:
+            selected = lattice.base_ring()(int(content))
+            if selected <= lattice.base_ring().zero():
+                raise ValueError(f"the content of a nonzero vector is positive, but it is {content}")
+            if square % (selected * selected) != lattice.base_ring().zero():
+                return finite_ordered_set(())
+            primitive_square = square // (selected * selected)
+            return finite_ordered_set(tuple(
+                lattice.scalar_multiple(selected, representative)
+                for representative in _primitive_pointed_classes(lattice, primitive_square)
+            ))
         if not lattice.is_definite():
             if square == lattice.base_ring().zero():
                 primitive = tuple(_primitive_pointed_classes(lattice, square))

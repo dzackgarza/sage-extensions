@@ -7822,6 +7822,16 @@ class Lattices(OwnedCategoryOverBaseRing):
             r"""Return nested represented isotropic sublattices with the stated ranks."""
             return _isotropic_flag_locus(self, ranks)
 
+        def doubled_form(self):
+            r"""Return ``(L, 2b)`` and the isometry transport ``O(L, b) -> O(L, 2b)``.
+
+            ``O(L, b) = O(L, 2b)`` on the same module, so full-group and
+            orbit operations transfer. The discriminant group of ``(L, 2b)``
+            is different: stable and congruence conditions stay on ``L``.
+            """
+            functor = Lattices(self.base_ring()).twist_functor(2)
+            return functor(self), functor
+
         def indefinite_reduction(self):
             r"""Return the source's isometric indefinite pre-reduction of this lattice."""
             from sage_indefinite_port.indefinite.indefinite_reduction import indefinite_reduced_presentation
