@@ -58,3 +58,12 @@ def test_doubling_keeps_the_group_but_not_the_discriminant():
     swap = ambient.Aut()(dict(zip(labels, (b, a, c), strict=True)))
     doubled_swap = functor(swap)
     assert doubled_swap.discriminant_isometry() != doubled.O().one().discriminant_isometry()
+
+
+def test_index_two_sublattices_of_a_hyperbolic_summand():
+    r"""U in U+U has three index-two sublattices; O(U) exchanges <e,2f>, <2e,f> and fixes <e+f,2f>."""
+    hyperbolic = Lattices(ZZ)("U")
+    ambient = hyperbolic + hyperbolic
+    e, f, _u, _v = tuple(ambient.module_generators())
+    saturated = ambient.subobject_on((e, f)).inclusion()
+    assert ambient.O().nonprimitive_sublattice_classes(saturated, (1, 2)).cardinality() == cardinal(2)

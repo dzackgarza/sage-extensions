@@ -4103,6 +4103,12 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         selected = representation.codomain().subgroup(()) if target is None else target
         return representation.preimage_subgroup(selected)
 
+    def nonprimitive_sublattice_classes(self, saturated, divisors):
+        r"""Return one inclusion per ``Stab(S)``-class of ``J <= S`` with the given elementary divisors."""
+        from sage_indefinite_port.indefinite.marked_lattices import nonprimitive_sublattice_classes
+
+        return finite_ordered_set(nonprimitive_sublattice_classes(saturated, tuple(int(divisor) for divisor in divisors)))
+
     def isotropic_are_equivalent(self, left, right, *, flag=False):
         r"""Return whether one element of ``O(L)`` carries ``left`` to ``right``."""
         return self.isotropic_equivalence_witness(left, right, flag=flag) is not None
