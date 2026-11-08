@@ -430,6 +430,14 @@ class IsotropicFlag:
         r"""Return the ranks of the nested primitive isotropic terms."""
         return FlagType(tuple(int(term.module_rank()) for term in self._terms))
 
+    def rational_stabilizer_right_cosets(self):
+        r"""Return a transversal of ``G/H`` for the rational stabilizer ``G`` of this flag's perpendicular."""
+        from sage_indefinite_port.indefinite.marked_lattices import isotropic_stabilizer_right_cosets
+
+        return isotropic_stabilizer_right_cosets(
+            _marked_isotropic_category(self._lattice, len(self._terms)), _marked_isotropic_object(self, flag=True)
+        )
+
     def __repr__(self) -> str:
         return f"Primitive totally isotropic flag of length {self.flag_length()} in {self.lattice()}"
 

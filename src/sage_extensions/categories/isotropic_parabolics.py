@@ -163,6 +163,20 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             )
             return action.finite_representation().stabilizer_discriminant_image()
 
+        def rational_stabilizer_right_cosets(self):
+            r"""Return a transversal of ``G/H`` for the rational stabilizer ``G`` of ``I^perp``.
+
+            ``G`` extends the integral stabilizer of ``I^perp`` to the
+            rational space, and ``H`` is its intersection with ``O(L)``.
+            Elements of the transversal are isometries of ``L tensor QQ``.
+            """
+            from sage_extensions.categories.isotropic_orbits import _marked_isotropic_category, _marked_isotropic_object
+            from sage_indefinite_port.indefinite.marked_lattices import isotropic_stabilizer_right_cosets
+
+            return isotropic_stabilizer_right_cosets(
+                _marked_isotropic_category(self.ambient_lattice(), 1), _marked_isotropic_object(self, flag=False)
+            )
+
         def parabolic_subgroup(self):
             r"""Return ``P_I = Stab_{O(L)}(I)``, the one parabolic of the isotropic reduction of ``I``."""
             return self.isotropic_reduction().parabolic_subgroup()
