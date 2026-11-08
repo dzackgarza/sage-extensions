@@ -844,7 +844,13 @@ class LeftCosetGSets(OwnedParameterizedCategory):
             super().__init__(**rest)
 
         def schreier_generating_morphism(self):
-            r"""Schreier's lemma: ``E ->> H`` from the section of ``G -> G/H``, corestricted to ``H``."""
+            r"""Schreier's lemma: ``E ->> H`` from the section of ``G -> G/H``.
+
+            The transversal sends the base point to its selected coset.
+            Thus ``t_(s.p)^-1 s t_p`` fixes the base point, whose stabilizer
+            is the supplied H. This defining range law gives the
+            corestriction of the complete Schreier generating map.
+            """
             assert self._coset_word_section is not None, (
                 f"Schreier generators of {self.subgroup()} are read from a pointed coset space "
                 f"with a word section through a free cover, which {self} was not built with"
@@ -852,7 +858,7 @@ class LeftCosetGSets(OwnedParameterizedCategory):
             schreier = _orbit_schreier_morphism(
                 self, self._coset_word_section, self._coset_augmentation
             )
-            return schreier.factor_through(self.subgroup().inclusion())
+            return schreier._corestrict_to_subgroup(self.subgroup())
 
         @cached_method
         def right_coset_projection(self):
