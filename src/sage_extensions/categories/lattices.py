@@ -10153,7 +10153,7 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             return ambient.O().subgroup(generators)
 
         @cached_method
-        def levi_action(self):
+        def levi_action(self, *, subgroup=None):
             r"""Return \(\rho:P_I\to O(K_I)\), \(g\mapsto\bar g\), the action on \(I^\perp/I\).
 
             An isometry stabilizing \(I\) stabilizes \(I^\perp\), so it
@@ -10169,8 +10169,11 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             prescribed-quotient extension and integral correction decide the
             image and supply the section through the same owned morphism;
             its quotient-trivial triangular action supplies kernel generators.
+            A supplied subgroup restricts the source to its intersection
+            with the parabolic and retains the actual quotient image.
             """
-
+            if subgroup is not None:
+                return self._levi_action_in_subgroup(subgroup, pointwise=False)
             perpendicular = self.orthogonal_complement()
             perpendicular_inclusion = perpendicular.inclusion()
             lifts = self.reduction_lifts()
@@ -10191,6 +10194,49 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             levi.select_section(Sets().Mor(image, levi.domain())(self._levi_section))
             levi.select_kernel_generators(lambda: finite_ordered_set(tuple(self._levi_kernel_generators())))
             return levi
+
+        @cached_method
+        def _levi_action_in_subgroup(self, subgroup, *, pointwise):
+            r"""Restrict the quotient action to a supplied arithmetic subgroup.
+
+            A quotient fibre is a coset of the full quotient kernel.
+            The existing finite-character coset adjustment decides whether
+            that fibre meets the requested subgroup and retains a lift.
+            """
+            ambient = self.isotropic_embedding().codomain().O()
+            full = self.pointwise_levi_action() if pointwise else self.levi_action()
+            if subgroup is ambient:
+                return full
+            if subgroup.supergroup() is not ambient:
+                raise ValueError(f"{subgroup} must be a subgroup of {ambient}")
+            domain = subgroup.intersection(full.domain())
+            action = domain.Mor(self.Aut())(lambda isometry: full(isometry))
+            image = self.Aut().condition_set(
+                lambda isometry: self._levi_lift_in_subgroup(subgroup, isometry, pointwise=pointwise) is not None
+            )
+            action.select_section(Sets().Mor(image, domain)(
+                lambda isometry: domain(self._levi_lift_in_subgroup(subgroup, isometry, pointwise=pointwise))
+            ))
+
+            def kernel_generators():
+                kernel = ambient.subgroup(tuple(full.kernel().group_generators()))
+                return subgroup.intersection(kernel).group_generators()
+
+            action.select_kernel_generators(kernel_generators)
+            return action
+
+        @cached_method
+        def _levi_lift_in_subgroup(self, subgroup, isometry, *, pointwise):
+            r"""An integral quotient lift in the requested subgroup, or None."""
+            full = self.pointwise_levi_action() if pointwise else self.levi_action()
+            if isometry not in full.image():
+                return None
+            lift = full.lift(isometry)
+            if lift in subgroup:
+                return lift
+            return subgroup.finite_character_quotient().adjust_witness_into_subgroup(
+                lift, full.kernel().group_generators()
+            )
 
         @cached_method
         def _levi_fibres(self, isometry):
@@ -10344,8 +10390,10 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             return self.levi_action().lift(isometry)
 
         @cached_method
-        def pointwise_levi_action(self):
+        def pointwise_levi_action(self, *, subgroup=None):
             r"""Return the quotient action P_I^1 -> O(K_I), with its actual image section."""
+            if subgroup is not None:
+                return self._levi_action_in_subgroup(subgroup, pointwise=True)
             levi = self.levi_action()
             restricted = self.pointwise_parabolic_subgroup().Mor(self.Aut())(lambda isometry: levi(isometry))
             image = self.Aut().condition_set(lambda isometry: self._pointwise_levi_integral_lift_or_none(isometry) is not None)
