@@ -5560,6 +5560,8 @@ def _operand_in_ring(ring, value):
     """
     value = _sage_numeral(value)
     other_parent = element_parent(value)
+    if isinstance(other_parent, type):
+        return NotImplemented
     if (
         other_parent is not ring
         and other_parent in OwnedRings()

@@ -51,6 +51,115 @@ def _embedding_glue_data(embedding):
     )
 
 
+def _complement_block_extension(embedding):
+    r"""``M = S + K -> L`` for a primitive nondegenerate ``S``, with both summand inclusions."""
+    source = embedding.domain()
+    complement = embedding.orthogonal_complement()
+    total, source_inclusion, complement_inclusion = _orthogonal_sum_embeddings(source, complement)
+    combined = total.from_summands(embedding, complement.inclusion())
+    extension = total.Emb(embedding.codomain())(lambda label: combined(total.module_generator(label)))
+    return complement, total, source_inclusion, complement_inclusion, extension
+
+
+def _block_isometry(total, source_inclusion, complement_inclusion, source_part, complement_part):
+    r"""The orthogonal sum of two isometries as an element of ``O(M)``."""
+    images = [source_inclusion(source_part(point)) for point in source_part.domain().module_generators()]
+    images += [complement_inclusion(complement_part(point)) for point in complement_part.domain().module_generators()]
+    by_label = dict(zip(total.module_generating_set(), images, strict=True))
+    return total.O()(lambda label: by_label[label])
+
+
+def _nondegenerate_marking_stabilizer_generators(embedding, *, pointwise):
+    r"""Generators of the setwise or pointwise stabilizer of a primitive nondegenerate sublattice.
+
+    #47: an element of ``O(L)`` preserving ``S`` is a pair in ``O(S) x O(K)``
+    preserving the glue ``L/(S+K)``. The extended subgroup of ``O(M)`` is the
+    stabilizer of that glue in the actual image on ``A_M``.
+    """
+    complement, total, source_inclusion, complement_inclusion, extension = _complement_block_extension(embedding)
+    source = embedding.domain()
+    complement_lattice = complement
+    source_identity = source.O().one()
+    complement_identity = complement_lattice.O().one()
+    blocks = [
+        _block_isometry(total, source_inclusion, complement_inclusion, source_identity, generator)
+        for generator in complement_lattice.O().group_generators()
+    ]
+    if not pointwise:
+        blocks += [
+            _block_isometry(total, source_inclusion, complement_inclusion, generator, complement_identity)
+            for generator in source.O().group_generators()
+        ]
+    return tuple(extension.extended_subgroup(total.O().subgroup(tuple(blocks))).group_generators())
+
+
+def _nondegenerate_marking_transporter(left, right, *, pointwise):
+    r"""An isometry of the common ambient carrying the marking ``left`` to ``right``, or ``None``.
+
+    With ``pointwise`` the source correspondence is fixed. Otherwise it may
+    vary by ``O(S)``. A breadth-first search of the finite glue orbit finds
+    the pair carrying ``L/(S_1+K_1)`` to ``L/(S_2+K_2)``.
+    """
+    source = left.domain()
+    left_complement, left_glue = _embedding_glue_data(left)
+    right_complement, right_glue = _embedding_glue_data(right)
+    if len(left_glue) != len(right_glue):
+        return None
+    complement_isometries = left_complement.Isom(right_complement)
+    if complement_isometries.is_empty() is True:
+        return None
+    first_identification = source.Isom(right.domain()).an_element() if right.domain() is not source else source.O().one()
+    complement_start = complement_isometries.an_element()
+    target_glue = frozenset(right_glue)
+
+    def carried(source_part, complement_part):
+        source_action = source_part.discriminant_isometry()
+        complement_action = complement_part.discriminant_isometry()
+        return frozenset((source_action(first), complement_action(second)) for first, second in left_glue)
+
+    moves = [(right.domain().O().one(), generator) for generator in right_complement.O().group_generators()]
+    if not pointwise:
+        moves += [(generator, right_complement.O().one()) for generator in right.domain().O().group_generators()]
+    start = (first_identification, complement_start)
+    seen = {carried(*start): start}
+    frontier = [start]
+    while frontier and target_glue not in seen:
+        current_source, current_complement = frontier.pop()
+        for source_move, complement_move in moves:
+            candidate = (source_move * current_source, complement_move * current_complement)
+            key = carried(*candidate)
+            if key not in seen:
+                seen[key] = candidate
+                frontier.append(candidate)
+    if target_glue not in seen:
+        return None
+    source_part, complement_part = seen[target_glue]
+    ambient = left.codomain()
+    source_images = {point: right(source_part(point)) for point in source.module_generators()}
+    complement_images = {
+        point: right_complement.inclusion()(complement_part(point)) for point in left_complement.module_generators()
+    }
+    split_points = [
+        *(left(point) for point in source.module_generators()),
+        *(left_complement.inclusion()(point) for point in left_complement.module_generators()),
+    ]
+    split_images = [*(source_images[point] for point in source.module_generators()), *(complement_images[point] for point in left_complement.module_generators())]
+    from sage.matrix.constructor import matrix
+    from sage.rings.rational_field import QQ as SageQQ
+
+    labels = tuple(ambient.module_generating_set())
+    def rows(points):
+        return matrix(SageQQ, [[int(point.to_vector()(label)) for label in labels] for point in points])
+
+    change = ~rows(split_points)
+    images = change * rows(split_images)
+    return ambient.O()(lambda label: ambient.linear_combination({
+        other: ambient.base_ring()(int(images[labels.index(label), position]))
+        for position, other in enumerate(labels)
+        if images[labels.index(label), position]
+    }))
+
+
 def _primitive_embeddings_equivalent(left, right, classification):
     r"""Decide equality of primitive-embedding classes by their finite glue.
 
