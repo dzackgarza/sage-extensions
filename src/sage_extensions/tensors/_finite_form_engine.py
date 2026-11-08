@@ -1,10 +1,10 @@
-r"""Private engine (OWN-06): orthogonal groups of nondegenerate symmetric forms over GF(p), p odd.
+r"""Private engine (OWN-06): finite-field orthogonal groups.
 
 Consumer: ``torsion_form_modules._engine_orthogonal_group`` for an elementary
 odd primary part of a finite quadratic module.  GAP's ``GO(epsilon, n, p)``
 is conjugated onto the given Gram matrix by an explicit isometry of
-diagonalized forms; GAP's ``forms`` package, which would supply that base
-change, is absent in the engine (TRAPS.md).
+diagonalized forms. Integer-valued elementary two-primary quadratic forms
+use GAP Forms to transport the full classical group onto their actual basis.
 """
 
 from sage.libs.gap.libgap import libgap as _engine_libgap
@@ -94,3 +94,42 @@ def _engine_odd_orthogonal_generators(gram, p):
 
 def _nonsquare(field):
     return next(x for x in field if x != 0 and not x.is_square())
+
+
+def _engine_elementary_two_orthogonal_generators(quadratic):
+    r"""Return the full group of a nonsingular quadratic form over GF(2).
+
+    GAP Forms 1.3.0, chapter 5.3.1, supplies ``b`` taking each form to its
+    canonical representative. Comparing the supplied form with GAP's GO
+    form gives an exact conjugacy, hence the full group with the same order.
+    https://gap-packages.github.io/forms/doc/chap5.html
+    Quadratic matrices are compared through their quadratic polynomials,
+    since congruent matrices in characteristic two need not be identical.
+    """
+    field = quadratic.base_ring()
+    n = quadratic.nrows()
+    assert field.cardinality() == 2 and n > 0 and n % 2 == 0
+    assert (quadratic + quadratic.transpose()).rank() == n
+    assert _engine_libgap.LoadPackage("forms"), "finite quadratic groups over GF(2) require GAP Forms"
+    gap_field = _engine_libgap.GF(2)
+    form = _engine_libgap.QuadraticFormByMatrix(quadratic, gap_field)
+    witt_index = int(_engine_libgap.WittIndex(form))
+    assert witt_index in (n // 2, n // 2 - 1)
+    group = _engine_libgap.GO(1 if 2 * witt_index == n else -1, n, 2)
+    standard = _engine_libgap.QuadraticFormByMatrix(
+        _engine_libgap.InvariantQuadraticForm(group)["matrix"], gap_field,
+    )
+    assert _engine_libgap.GramMatrix(_engine_libgap.IsometricCanonicalForm(form)) == _engine_libgap.GramMatrix(_engine_libgap.IsometricCanonicalForm(standard))
+    source_basis = _engine_matrix(field, _engine_libgap.BaseChangeToCanonical(form))
+    standard_basis = _engine_matrix(field, _engine_libgap.BaseChangeToCanonical(standard))
+    # Q_source = C Q_standard C^t as quadratic polynomials, so C g C^-1
+    # transports the full standard group to the supplied generator basis.
+    comparison = source_basis.inverse() * standard_basis
+    inverse = comparison.inverse()
+    generators = [comparison * _engine_matrix(field, generator) * inverse for generator in group.GeneratorsOfGroup()]
+    for generator in generators:
+        moved = _engine_libgap.QuadraticFormByMatrix(
+            generator * quadratic * generator.transpose(), gap_field,
+        )
+        assert _engine_libgap.GramMatrix(moved) == _engine_libgap.GramMatrix(form)
+    return generators, SageZZ(group.Size())
