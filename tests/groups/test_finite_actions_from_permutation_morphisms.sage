@@ -56,6 +56,25 @@ def test_the_transposition_double_cosets_partition_s3_modulo_c2() -> None:
     assert set().union(*(set(orbit.points()) for orbit in classes)) == set(cosets)
 
 
+def test_the_pointed_natural_action_realizes_s3_modulo_its_point_stabilizer() -> None:
+    group = Groups.S(3)
+    subgroup = group.subgroup((group((2, 3)),))
+    cosets = FiniteGSets(group).pointed_orbit(
+        subgroup, ZZ(1), lambda element, point: element(point),
+    )
+    representation = cosets.permutation_representation()
+
+    assert cosets.cardinality() == cardinal(3)
+    assert all(
+        representation(element)(point) == element(point)
+        for element in group for point in cosets
+    )
+    classes = cosets.double_cosets(subgroup)
+    assert classes.cardinality() == cardinal(2)
+    assert {int(orbit.points().cardinality()) for orbit in classes} == {1, 2}
+    assert set().union(*(set(orbit.points()) for orbit in classes)) == set(cosets)
+
+
 def test_a_permutation_morphism_requires_its_actual_acting_group() -> None:
     group = Groups.S(3)
     other = Groups.C(2)
