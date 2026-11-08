@@ -3432,7 +3432,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         )
 
     def stabilizer(self, target, action="setwise"):
-        r"""Return a vector, sublattice or family stabilizer in ``O(L)``.
+        r"""Return a vector, sublattice, flag or family stabilizer in ``O(L)``.
 
         A lattice vector is fixed pointwise.  A represented lattice subobject
         accepts ``action='setwise'`` or ``action='pointwise'`` and delegates to
@@ -3448,7 +3448,21 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         from sage_extensions.categories.modules.pure.modules import (
             ModuleSubobjects,
         )
+        from sage_extensions.categories.isotropic_orbits import (
+            IsotropicFlag,
+            _marked_isotropic_category,
+            _marked_isotropic_object,
+        )
 
+        if isinstance(target, IsotropicFlag):
+            if target.lattice() is not lattice:
+                raise ValueError(f"{target} is a flag in {target.lattice()}, not in {lattice}")
+            if action == "pointwise":
+                return self.pointwise_stabilizer(target.top().inclusion())
+            if action == "setwise":
+                category = _marked_isotropic_category(lattice, int(target.flag_length()))
+                return category.apex_stabilizer(_marked_isotropic_object(target, flag=True))
+            raise ValueError(f"action={action!r} must be 'setwise' or 'pointwise' for the flag {target}")
         if target in ModuleSubobjects(lattice.base_ring()):
             embedding = target.inclusion()
             if embedding.codomain() is not lattice:

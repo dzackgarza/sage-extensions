@@ -31,3 +31,19 @@ def test_null_flag_stabilizers_retain_the_terms_and_the_requested_subgroup():
     assert ambient.O().one() in special_pointwise
     for stabilizer in (setwise, pointwise, special, special_pointwise):
         assert ambient.O().one() in stabilizer
+
+
+def test_null_line_flag_stabilizer_in_u_generates_both_scalar_isometries():
+    r"""Fixing the line Ze in U forces (e,f) -> (a*e,a*f), a in {1,-1}."""
+    ambient = Lattices(ZZ)("U")
+    e, f = tuple(ambient.module_generators())
+    flag = ambient.isotropic_flag(e)
+    setwise = ambient.O().stabilizer(flag)
+    family = tuple(setwise.group_generators())
+    assert any(generator(e) == -e for generator in family)
+    for generator in family:
+        assert (generator(e), generator(f)) in ((e, f), (-e, -f))
+        assert (~generator)(generator(e)) == e
+        assert (~generator)(generator(f)) == f
+    pointwise = ambient.O().stabilizer(flag, action="pointwise")
+    assert all(generator(e) == e and generator(f) == f for generator in pointwise.group_generators())
