@@ -17,8 +17,8 @@ from sage_extensions.categories.sets.set_categories import NN, Set, Sets
 def _letters_in_owned_order(factor_groups, letters):
     r"""Read a GAP factorization word in the owned multiplication order.
 
-    ``letters`` are the signed generator indices GAP's ``Factorization``
-    returns, a product in the GAP group's own law.  An engine that
+    ``letters`` are signed generator indices from a GAP word preimage,
+    a product in the GAP group's own law.  An engine that
     multiplies by the reversed law (permutation, word and automorphism
     engines act on the right, ``groups._law_reversed``) reverses the same
     letters when they are evaluated by the owned product.  The discriminant
@@ -65,11 +65,10 @@ class _GapWordSection:
     A5), while parent reuse is the documented GAP mechanism for subgroups of a
     chained group.  Without a parent the fresh ``Group(gens)`` is used.
 
-    ``Factorization`` then returns, for any element of the generated group, a
-    word in the free group on the generator positions; ``letters_of`` reads that
-    word as a tuple of signed 1-based generator indices.  No element of the
-    generated group is ever listed: the cost is that of stabilizer-chain
-    machinery, which scales in the acting degree, not in the group order.  This
+    An explicit free-group epimorphism returns a word in the supplied
+    generator positions; ``letters_of`` reads that word as signed 1-based
+    generator indices. Word preimages use GAP's homomorphism machinery
+    rather than the shortest-word enumeration of ``Factorization``. This
     is the engine behind the generated-model reads of
     ``OrthogonalCharacterQuotient`` and behind
     ``LatticeIsometryMor.discriminant_lift``; the owning layers evaluate the
@@ -85,7 +84,19 @@ class _GapWordSection:
     >>> square_rotation = matrix(QQ, [[0, 1], [-1, 0]])
     >>> identity = identity_matrix(QQ, 2)
     >>> coupled = block_diagonal_matrix(reflection, rotation)
-    >>> family = (-identity_matrix(QQ, 4), coupled, block_diagonal_matrix(-square_rotation, identity), block_diagonal_matrix(reflection, identity), block_diagonal_matrix(reflection, reflection), identity_matrix(QQ, 4), -identity_matrix(QQ, 4), block_diagonal_matrix(identity, -reflection), diagonal_matrix(QQ, [-1, 1, -1, -1]), diagonal_matrix(QQ, [1, 1, -1, -1]), diagonal_matrix(QQ, [1, -1, -1, -1]), block_diagonal_matrix(-reflection, identity), coupled, block_diagonal_matrix(reflection, rotation.inverse()))
+    >>> family = (
+    ...     -identity_matrix(QQ, 4), coupled,
+    ...     block_diagonal_matrix(-square_rotation, identity),
+    ...     block_diagonal_matrix(reflection, identity),
+    ...     block_diagonal_matrix(reflection, reflection),
+    ...     identity_matrix(QQ, 4), -identity_matrix(QQ, 4),
+    ...     block_diagonal_matrix(identity, -reflection),
+    ...     diagonal_matrix(QQ, [-1, 1, -1, -1]),
+    ...     diagonal_matrix(QQ, [1, 1, -1, -1]),
+    ...     diagonal_matrix(QQ, [1, -1, -1, -1]),
+    ...     block_diagonal_matrix(-reflection, identity), coupled,
+    ...     block_diagonal_matrix(reflection, rotation.inverse()),
+    ... )
     >>> section = _GapWordSection(tuple(libgap(g) for g in family))
     >>> section.order()
     96
@@ -100,12 +111,11 @@ class _GapWordSection:
     True
     """
 
-
-
     def __init__(self, gap_generators, parent=None) -> None:
         self._generators = list(gap_generators)
         self._parent = parent
         self._permutation_model = None
+        self._word_epimorphism = None
 
     @property
     def gap_group(self):
@@ -118,15 +128,11 @@ class _GapWordSection:
 
     @property
     def permutation_group(self):
-        r"""The fresh permutation model, built only when letters are requested.
+        r"""The faithful permutation model, built when letters are requested.
 
-        Orders never need it (they reuse the parent chain via
-        :attr:`gap_group`); the fresh model is built lazily because its
-        construction is the measured memory wall at the Enriques image sizes
-        (`.tmp/enriques_staged2b.log`, A5) while letter factorization through a
-        parent-bound subgroup chain follows a different convention and is not
-        interchangeable (caught by the `_checked_lift` guard in
-        `splitting_isometries`).
+        Group orders use the parent-bound native group. Word preimages use
+        this model together with the explicit epimorphism from the original
+        ordered generator family, independently of the model's generators.
         """
         if self._permutation_model is None:
             to_permutation = libgap.IsomorphismPermGroup(libgap.Group(self._generators))
@@ -145,12 +151,23 @@ class _GapWordSection:
     def letters_of(self, gap_element) -> tuple:
         r"""Signed generator indices whose word maps to ``gap_element``."""
         point = libgap.Image(self._to_permutation, gap_element)
-        word = libgap.Factorization(self.permutation_group, point)
-        return tuple(int(index) for index in libgap.LetterRepAssocWord(word))
+        return self.letters_of_permutation(point)
 
     def letters_of_permutation(self, point) -> tuple:
-        r"""Signed generator indices for an element of the permutation model."""
-        word = libgap.Factorization(self.permutation_group, point)
+        r"""Signed indices in the supplied family for a permutation image.
+
+        GAP reference 39.5-1 constructs word preimages through an explicit
+        free-group epimorphism. The permutation model can choose different
+        generators, so its own factorization indices cannot name our family.
+        https://gap-system.github.io/gap/doc/ref/chap39.html#X7E19F92284F6684E
+        """
+        if self._word_epimorphism is None:
+            free = libgap.FreeGroup(len(self._generators))
+            images = [libgap.Image(self._to_permutation, generator) for generator in self._generators]
+            self._word_epimorphism = libgap.GroupHomomorphismByImages(
+                free, self.permutation_group, libgap.GeneratorsOfGroup(free), images
+            )
+        word = libgap.PreImagesRepresentative(self._word_epimorphism, point)
         return tuple(int(index) for index in libgap.LetterRepAssocWord(word))
 
 
