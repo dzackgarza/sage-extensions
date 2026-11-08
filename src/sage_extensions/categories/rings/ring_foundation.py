@@ -1107,6 +1107,33 @@ class LocalizationRings(OwnedCategory):
         def denominator(self):
             return self._denominator
 
+        def _squareness_decision(self):
+            r"""Decide squares in a localization of the integers through rational roots.
+
+            Sage's exact rational square test supplies the only possible roots,
+            up to sign. A reduced root belongs to this localization exactly when
+            its denominator is admitted by the selected multiplicative set.
+            This tests the actual localization rather than its private model,
+            which may invert additional elements. An undecided denominator
+            condition remains a proposition.
+            """
+            ring = self.parent()
+            source = ring.localization_source()
+            if source is not _owned_integers():
+                return super()._squareness_decision()
+            zero_inverted = ring._valid_denominator(source.zero())
+            if zero_inverted is True:
+                return True
+            if zero_inverted is not False:
+                return super()._squareness_decision()
+            value = SageQQ(_engine_element(source, self.numerator())) / SageQQ(
+                _engine_element(source, self.denominator())
+            )
+            if not value.is_square():
+                return False
+            denominator = _owned_engine_element(source, value.sqrt().denominator())
+            return ring._valid_denominator(denominator)
+
         def _add_(self, other):
             # Both denominators were admitted at construction; their product
             # remains admitted by closure of the selected multiplicative set.
