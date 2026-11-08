@@ -1,4 +1,6 @@
 r"""Finite character quotients controlling arithmetic-subgroup orbit splitting."""
+from operator import index
+
 from sage.libs.gap.libgap import libgap
 from sage.misc.cachefunc import cached_method
 from sage.structure.element import parent as element_parent
@@ -1875,6 +1877,8 @@ def _two_hyperbolic_planes(lattice):
 
 
 def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
+    if not flag and index(rank) == 0:
+        return subgroup.supergroup().isotropic_orbit_representatives(0)
     _assert_isotropic_splitting_has_character_data(subgroup)
     quotient = subgroup.finite_character_quotient()
     orthogonal_group = subgroup.supergroup()

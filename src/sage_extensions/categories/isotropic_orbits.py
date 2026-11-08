@@ -167,9 +167,9 @@ class _IsotropicSublatticeLocusEngine:
     r"""Private set realization of isotropic sublattices of one fixed rank."""
 
     def __init__(self, lattice, rank, *, primitive=False, **rest) -> None:
-        rank = int(rank)
-        if rank <= 0:
-            raise ValueError(f"there are no isotropic sublattices of rank {rank} in {lattice}: the rank must be positive")
+        rank = index(rank)
+        if rank < 0:
+            raise ValueError(f"the isotropic sublattice rank must be nonnegative, got {rank} in {lattice}")
         self._lattice = lattice
         self._rank = NN(rank)
         self._primitive = bool(primitive)
@@ -945,9 +945,11 @@ def _isotropic_orbit_representatives(orthogonal_group, rank, *, flag=False):
         dimensions = flag_type.dimensions
     else:
         rank = index(rank)
+        if rank == 0:
+            return finite_ordered_set((lattice.primitive_isotropic_subobject(),))
         dimensions = (rank,)
-    if dimensions[-1] <= 0:
-        raise ValueError(f"there are no isotropic sublattices of rank {rank} in {lattice}: the rank must be positive")
+    if dimensions[-1] < 0:
+        raise ValueError(f"the isotropic sublattice rank must be nonnegative, got {rank} in {lattice}")
     from sage_indefinite_port.indefinite.marked_lattices import (
         primitive_marking_classes,
     )

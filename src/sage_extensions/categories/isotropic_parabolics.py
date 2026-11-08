@@ -150,11 +150,14 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             integral orbit lattices, so no individual rational transporter is
             applied to A_L. The radical action is the full general linear
             group of the isotropic sublattice at every positive rank.
+            The zero sublattice has the full ambient orthogonal stabilizer.
             """
             from sage_indefinite_port.indefinite.marked_lattices import INDUCTION
 
             embedded = self.embedded_module_generators()
             vectors = tuple(embedded[label] for label in self.module_generating_set())
+            if not vectors:
+                return self.ambient_lattice().O().discriminant_image()
             action = INDUCTION.recursion.isotropic_stabilizer_action(
                 vectors, INDUCTION.sublattice_action_images(self)
             )

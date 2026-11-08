@@ -7407,8 +7407,9 @@ class Lattices(OwnedCategoryOverBaseRing):
 
             Admission checks saturation and vanishing of the restricted form
             before refining the represented subobject, so a refused span leaves
-            no wrongly placed object behind.  The stated family must also be
-            nonempty and independent.  One subobject per spanning family, so
+            no wrongly placed object behind. The stated family must be
+            independent; the empty family spans the zero sublattice.
+            One subobject per spanning family, so
             its cached isotropic reduction (and parabolic) is shared.
             """
             from sage_extensions.categories.isotropic_parabolics import (
@@ -7418,9 +7419,6 @@ class Lattices(OwnedCategoryOverBaseRing):
             elements = tuple(
                 element if element_parent(element) is self else self(element)
                 for element in basis
-            )
-            assert elements, (
-                f"cannot form a primitive isotropic sublattice of {self!r} from the empty family: a primitive isotropic sublattice is spanned by a nonempty family of vectors"
             )
             subobject = self.subobject_on(elements)
             assert subobject.is_primitive(), (
