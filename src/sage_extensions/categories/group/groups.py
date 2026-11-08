@@ -8246,6 +8246,8 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
                 return AtomicProposition("is_member", candidate, self)
             if candidate == ambient.one():
                 return True
+            if self in OwnedFiniteGroups():
+                return _engine_subgroup_admits(self, candidate)
             # A selected generator or its inverse has a one-letter word
             # certificate, decided by the supplied set's membership operation.
             if generators.is_parent_of(candidate) is True:
