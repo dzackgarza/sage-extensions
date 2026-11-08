@@ -956,6 +956,11 @@ class OrthogonalCharacterQuotient:
     def isotropic_line_stabilizer_image(self, representative):
         r"""Return ``(discriminant image, whether a sign factor is covered)`` for an isotropic line.
 
+        For a single determinant or component character, an integral reflection
+        fixing the line and changing that character proves ``G = Gamma Stab(line)``.
+        Such a witness returns ``"NOSPLIT"`` for the whole ambient line orbit,
+        independently of the number of integral hyperbolic planes.
+
         Let ``x = <v>`` be a primitive isotropic line, ``p = div(v)`` and ``c = [v/p]`` in
         ``A_L``.  The claim is ``rho(Stab_{O(L)}(x)) = Stab_{O(A_L)}(c)`` in the
         discriminant factor, and no integral stabilizer is needed for it.
@@ -976,12 +981,35 @@ class OrthogonalCharacterQuotient:
         such witness is exhibited there is no claim about that factor and the caller keeps
         its integral route.  Nothing below returns a partial discriminant image.
         """
-        if not _two_hyperbolic_planes(self.lattice):
-            return None
         lattice = self.lattice
         inclusion = representative.inclusion()
         label = next(iter(representative.module_generating_set()))
         vector = inclusion(representative.module_generator(label))
+        if not self._has_discriminant and self.determinant_kernel != self.spinor_kernel:
+            # For one sign character chi, a stabilizer element with chi=-1
+            # proves G = ker(chi) Stab(line), hence one double coset. This
+            # certificate uses no Eichler transitivity hypothesis. The
+            # reflection constructor verifies integrality; orthogonality
+            # makes it fix the line pointwise. A missing witness supplies
+            # no conclusion about the full stabilizer.
+            from itertools import chain, combinations
+
+            basis = tuple(lattice.module_generators())
+            candidates = chain(
+                basis,
+                (first + sign * second for first, second in combinations(basis, 2) for sign in (1, -1)),
+            )
+            zero = lattice.base_ring().zero()
+            for root in candidates:
+                norm = root.q()
+                if norm == zero or (self.spinor_kernel and norm < zero):
+                    continue
+                if lattice.b(root, vector) != zero or not root.is_integral_reflection_vector():
+                    continue
+                if lattice.reflection(root) not in self.subgroup:
+                    return "NOSPLIT"
+        if not _two_hyperbolic_planes(lattice):
+            return None
         discriminant_class = lattice.divided_discriminant_class(vector)
         if discriminant_class == lattice.discriminant_group().zero():
             # Double cosets Gamma \\ im rho / im rho are one coset, *provided* no sign
