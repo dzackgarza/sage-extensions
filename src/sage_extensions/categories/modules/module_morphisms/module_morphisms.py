@@ -4059,6 +4059,9 @@ class ModuleAutomorphismGroup(CoreMor):
         """
         match self.module().is_finite():
             case True:
+                from sage_extensions.categories.group.groups import _place_decided_finiteness
+
+                _place_decided_finiteness(self, True)
                 return True
             case _:
                 return AtomicProposition("is_finite", self)
