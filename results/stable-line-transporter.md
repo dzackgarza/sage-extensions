@@ -21,3 +21,9 @@ The public red assertion is tests/lattices/test_stable_isotropic_line_transporte
 ## Committed baseline obligation
 
 Provider baseline: 03649cc9b0fd9c3371c46588f98d0450111185e1. The public assertion reaches the existing 60-second test timeout and fails the unchanged 20-second call gate. The selected session ends red after 66.27 seconds. Its explicit transvection establishes the positive mathematical orbit relation; no search witness is returned at this bound. Optional local log: port `.tmp/stable-line-transporter-red.log`.
+
+## Nonnormal correction defect
+
+The public A1^3 assertion supplies a three-cycle g with g(f)=h and the full signed-permutation stabilizer of h. Gamma has determinant one and fixes [e/2] in the discriminant. The explicit signed exchange (-e,h,f) lies in Gamma and takes f to h. At the baseline the correction returns None, so the positive assertion fails. The separate e->h request must remain negative because Gamma fixes [e/2].
+
+Owned group elements compose as maps. The discriminant GAP model composes in the reversed order. If a and w are the native images of g and its target correction, the native condition is a*w in S, rather than w*a in S. For a reversed model compute u in W intersect S*a and use w=u^-1. Then a*w belongs to S since u=s*a implies a*u^-1=s^-1. For a model preserving the product, retain W intersect S*a^-1. Every later sign factor is abelian, as the existing word-order guard requires, so the first factor determines the joint convention.
