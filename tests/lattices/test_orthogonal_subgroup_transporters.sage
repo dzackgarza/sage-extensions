@@ -31,3 +31,20 @@ def test_two_basis_vectors_of_the_cubic_lattice_are_equivalent_under_so() -> Non
     assert witness in special
     assert witness.determinant() == 1
     assert witness(first) == second
+
+
+def test_discriminant_kernel_splits_the_u_three_line_orbit_into_its_two_axes():
+    r"""O(U(3))={+/-I,+/-swap}; reduction modulo three is faithful."""
+    lattice = Lattices(ZZ)([[0, 3], [3, 0]])
+    labels = tuple(lattice.module_generating_set())
+    e, f = tuple(lattice.module_generators())
+    negation = lattice.Aut()({labels[0]: -e, labels[1]: -f})
+    quotient = lattice.stable_orthogonal_group().finite_character_quotient()
+    representatives = quotient.splitting_isometries((negation,))
+    assert representatives.cardinality() == 2
+    axes = set()
+    for representative in representatives:
+        image = representative(e)
+        assert image in (e, -e, f, -f)
+        axes.add("e" if image in (e, -e) else "f")
+    assert axes == {"e", "f"}
