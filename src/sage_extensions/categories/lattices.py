@@ -9962,6 +9962,32 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             return embedding.codomain().O().pointwise_stabilizer(embedding)
 
         @cached_method
+        def isotropic_action(self):
+            r"""Return ``P_I -> GL(I)`` by restriction along the null inclusion.
+
+            The kernel fixes I pointwise, so its selected generators are
+            those of the existing pointwise parabolic subgroup.
+            """
+            embedding = self.isotropic_embedding()
+            isotropic = embedding.domain()
+            target = isotropic.general_linear_group()
+
+            def restrict(isometry):
+                return target({
+                    label: embedding.lift(isometry(embedding(isotropic.module_generator(label))))
+                    for label in isotropic.module_generating_set()
+                })
+
+            action = self.parabolic_subgroup().Mor(target)(restrict)
+            kernel = action.kernel()
+            kernel.select_group_generators(
+                lambda: finite_ordered_set(tuple(
+                    kernel(generator) for generator in self.pointwise_parabolic_subgroup().group_generators()
+                ))
+            )
+            return action
+
+        @cached_method
         def perpendicular_restriction(self):
             r"""Return ``r:P_I -> O(I^perp)``, restriction to the full perpendicular.
 
