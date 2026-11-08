@@ -19,7 +19,12 @@ def test_normalization_preserves_triality_and_its_inverse() -> None:
         if (left * right)**2 != group.one()
     )
     normalization = group.normalization_homomorphism()
-    arrow = normalization.domain()(triality.forward(), triality.inverse_morphism())
+    values = form.value_module()
+    value_identity = values.module_category().Mor(values, values).identity()
+    formed = form.category().Mor(form, form)
+    forward = formed((triality.forward(), value_identity))
+    inverse = formed((triality.inverse_morphism(), value_identity))
+    arrow = normalization.domain()(forward, inverse)
     image = normalization(arrow)
 
     assert image**3 == group.one()
