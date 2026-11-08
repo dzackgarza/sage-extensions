@@ -10,10 +10,12 @@ import pytest
 from sage_extensions.all import *
 
 
-@pytest.mark.parametrize("rank", (1, 3), ids=("rank_one", "rank_three"))
+@pytest.mark.parametrize("rank", (1, 2, 3), ids=("rank_one", "rank_two", "rank_three"))
 def test_complete_null_flag_orbits_and_transporters_in_split_unimodular_lattices(rank):
     hyperbolic = Lattices(ZZ)("U")
-    ambient = hyperbolic if rank == 1 else hyperbolic + hyperbolic + hyperbolic
+    ambient = hyperbolic
+    for _ in range(1, rank):
+        ambient = ambient + hyperbolic
     basis = tuple(ambient.module_generators())
     labels = tuple(ambient.module_generating_set())
     group = ambient.O()
@@ -24,9 +26,8 @@ def test_complete_null_flag_orbits_and_transporters_in_split_unimodular_lattices
     terms = tuple(flag.terms())
     assert tuple(int(term.module_rank()) for term in terms) == tuple(range(1, rank + 1))
     assert all(term.is_primitive() for term in terms)
-    swap = ambient.Aut()({
-        label: basis[position ^ 1] for position, label in enumerate(labels)
-    })
+    swapped = tuple(point for left, right in zip(basis[::2], basis[1::2], strict=True) for point in (right, left))
+    swap = ambient.Aut()(dict(zip(labels, swapped, strict=True)))
     moved = IsotropicFlag(ambient, tuple(swap(point) for point in flag.basis()))
     witness = group.isotropic_equivalence_witness(flag, moved, flag=True)
     assert witness.domain() is ambient and witness.codomain() is ambient
