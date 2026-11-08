@@ -26,7 +26,10 @@ from sage_extensions.categories.abstract_categories.mor_categories import (
 )
 from sage_extensions.categories.functors.core import Functor
 from sage_extensions.categories.group.g_sets import FiniteGSets
-from sage_extensions.tensors._finite_form_engine import _engine_odd_orthogonal_generators
+from sage_extensions.tensors._finite_form_engine import (
+    _engine_elementary_two_orthogonal_generators,
+    _engine_odd_orthogonal_generators,
+)
 from sage_extensions.categories.group.groups import (
     OwnedFiniteGroups,
     OwnedGroups,
@@ -2794,11 +2797,13 @@ def _engine_orthogonal_group(T):
     ``p`` odd has ``q`` determined by ``b``, and ``O(T_p)`` is the orthogonal
     group of the Gram matrix of ``p b`` over ``GF(p)``: GAP's
     ``GO(epsilon, n, p)`` conjugated onto that matrix by an explicit isometry
-    of diagonalized forms. The other primary parts use OSCAR's normal-form
+    of diagonalized forms. An integer-valued elementary two-primary part
+    with nonsingular polar form is a quadratic space over GF(2); GAP Forms
+    supplies the exact base change from its full classical orthogonal group.
+    The other primary parts use OSCAR's normal-form
     orthogonal-group algorithm on the same presented quotient, retaining
-    both value moduli and the Smith generator basis. The isometry of diagonalized
-    forms is computed here because GAP's ``forms`` package, which provides
-    ``BaseChangeToCanonical``, is not installed in the engine (TRAPS.md).
+    both value moduli and the Smith generator basis. The odd-primary route
+    retains its explicit isometry of diagonalized forms.
     """
     from sage_extensions.categories.lattice_engines import _oscar_lattices
 
@@ -2809,10 +2814,29 @@ def _engine_orthogonal_group(T):
         part = T.primary_part(p)
         gens = part.smith_form_gens()
         n = len(gens)
+        binary_quadratic = None
+        if (
+            p == 2
+            and all(value == 2 for value in part.invariants())
+            and part._modulus == 1
+            and part._modulus_qf == 2
+            and all(generator.q().lift().denominator() == 1 for generator in gens)
+        ):
+            field = _engine_GF(2)
+            quadratic = _engine_matrix(field, n, n, [
+                field(gens[i].q().lift()) if i == j
+                else field(2 * gens[i].b(gens[j]).lift()) if i < j
+                else field.zero()
+                for i in range(n) for j in range(n)
+            ])
+            if (quadratic + quadratic.transpose()).rank() == n:
+                binary_quadratic = quadratic
         if p != 2 and all(x == p for x in part.invariants()):
             field = _engine_GF(p)
             gram = _engine_matrix(field, n, n, [field(p * gens[i].b(gens[j]).lift()) for i in range(n) for j in range(n)])
             matrices, part_order = _engine_odd_orthogonal_generators(gram, p)
+        elif binary_quadratic is not None:
+            matrices, part_order = _engine_elementary_two_orthogonal_generators(binary_quadratic)
         else:
             gram = _engine_matrix(SageQQ, n, n, [
                 gens[i].q().lift() if i == j else gens[i].b(gens[j]).lift()

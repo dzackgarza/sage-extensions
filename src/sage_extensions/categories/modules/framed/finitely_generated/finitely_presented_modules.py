@@ -3265,17 +3265,19 @@ def _presented_module_from_morphism(
         case True:
             # The cokernel is torsion exactly when the relation morphism
             # becomes surjective over the fraction field.
-            fraction_field_map = base_ring.fraction_field_map()
-            field = fraction_field_map.codomain()
-            from sage_extensions.categories.modules.framed.framed_free_modules import (
-                _fresh_free_module_on,
-            )
+            from sage.matrix.constructor import matrix
 
-            generic_relations = _morphism_on_images(
-                _fresh_free_module_on(_owned_ring(field), Sets.Δ[width - 1]),
-                tuple(tuple(fraction_field_map(coefficient) for coefficient in image) for image in relation_images),
+            field = base_ring.fraction_field_map().codomain()
+            # Scalar extension preserves the rank of this exact relation
+            # matrix. The selected presentation below still owns all labels
+            # and relations; only its rank is computed in the field engine.
+            relations = matrix(
+                engine,
+                len(relation_images),
+                width,
+                [_engine_element(base_ring, coefficient) for image in relation_images for coefficient in image],
             )
-            torsion_decision = int(_engine_matrix(generic_relations).rank()) == width
+            torsion_decision = int(relations.change_ring(_engine_ring(field)).rank()) == width
         case False:
             pass
     match (_require_torsion, torsion_decision):
