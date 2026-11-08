@@ -50,3 +50,10 @@ def test_complete_rank_three_flag_stabilizer_preserves_every_term():
             assert all(term.inclusion().is_in_image((~generator)(term.inclusion()(point))) for point in term.module_generators())
         assert all(ambient.b(generator(x), generator(y)) == ambient.b(x, y) for x in basis for y in basis)
 
+
+
+def test_two_hyperbolic_planes_have_no_rank_three_isotropic_flag():
+    r"""Signature (2,2) bounds the dimension of a null subspace by two."""
+    hyperbolic = Lattices(ZZ)("U")
+    ambient = hyperbolic + hyperbolic
+    assert ambient.O().isotropic_orbit_representatives(3, flag=True).cardinality() == cardinal(0)
