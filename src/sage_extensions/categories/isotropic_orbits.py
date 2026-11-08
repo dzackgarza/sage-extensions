@@ -430,6 +430,59 @@ class IsotropicFlag:
         r"""Return the ranks of the nested primitive isotropic terms."""
         return FlagType(tuple(int(term.module_rank()) for term in self._terms))
 
+    def graded_quotient_action(self):
+        r"""Return the action ``Stab(F) -> GL(gr F + I_t^perp/I_t)`` on successive quotients.
+
+        The codomain is the general linear group of a free module with one
+        coordinate block for each ``I_j/I_{j-1}``, in the adapted basis, and a
+        final block for ``I_t^perp/I_t``. The morphism is block diagonal, so
+        its image is the actual image in the product of the block groups.
+        """
+        ring = self._lattice.base_ring()
+        group = self._lattice.O()
+        stabilizer = group.subgroup(tuple(group.isotropic_stabilizer_generators(self, flag=True)))
+        rank = len(self._basis)
+        adapted_module = ring.free_module(rank)
+        top_inclusion = self.top().inclusion()
+        adapted = adapted_module.Mor(top_inclusion.domain())(
+            dict(zip(adapted_module.module_generating_set(), (top_inclusion.lift(point) for point in self._basis), strict=True))
+        )
+        adapted_labels = tuple(adapted_module.module_generating_set())
+        previous = (0, *self.flag_type().dimensions[:-1])
+        block_of = tuple(
+            index for index, (left, right) in enumerate(zip(previous, self.flag_type().dimensions, strict=True))
+            for _ in range(left, right)
+        )
+        reduction = self.top().isotropic_reduction()
+        quotient = reduction.quotient_lattice()
+        quotient_labels = tuple(quotient.module_generating_set())
+        graded = ring.free_module(rank + len(quotient_labels))
+        graded_labels = tuple(graded.module_generating_set())
+        general_linear = graded.general_linear_group()
+        levi = reduction.levi_action()
+
+        def graded_image(isometry):
+            def isotropic_row(position):
+                coordinates = adapted.lift(top_inclusion.lift(isometry(self._basis[position]))).to_vector()
+                return tuple(
+                    coordinates(label) if block_of[index] == block_of[position] else ring.zero()
+                    for index, label in enumerate(adapted_labels)
+                ) + (ring.zero(),) * len(quotient_labels)
+
+            quotient_isometry = levi(isometry)
+
+            def quotient_row(label):
+                coordinates = quotient_isometry(quotient.module_generator(label)).to_vector()
+                return (ring.zero(),) * rank + tuple(coordinates(other) for other in quotient_labels)
+
+            rows = (*(isotropic_row(position) for position in range(rank)), *(quotient_row(label) for label in quotient_labels))
+            return general_linear({
+                label: graded.linear_combination(dict(zip(graded_labels, row, strict=True)))
+                for label, row in zip(graded_labels, rows, strict=True)
+            })
+
+        return stabilizer.Mor(general_linear)(graded_image)
+
     def rational_stabilizer_right_cosets(self):
         r"""Return a transversal of ``G/H`` for the rational stabilizer ``G`` of this flag's perpendicular."""
         from sage_indefinite_port.indefinite.marked_lattices import isotropic_stabilizer_right_cosets
