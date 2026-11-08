@@ -562,6 +562,19 @@ class RationalIsotropicFlagComplex:
         )
 
 
+def _isotropic_orbit_iterator(group, lattice, rank, height_bound):
+    r"""Duplicate-free first members of the ``group``-orbits (#62); an unbounded walk certifies no completion."""
+    from sage_indefinite_port.indefinite.orbit_iterators import (
+        canonical_orbit_representatives,
+        primitive_isotropic_hermite_subobjects,
+    )
+
+    return canonical_orbit_representatives(
+        primitive_isotropic_hermite_subobjects(lattice, rank, height_bound),
+        group.isotropic_are_equivalent,
+    )
+
+
 class OrientedIsotropicFlag:
     r"""A primitive isotropic flag with an orientation of each ``I_j/I_{j-1}``.
 

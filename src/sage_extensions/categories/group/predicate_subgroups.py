@@ -507,6 +507,12 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 self, rank, flag=flag
             )
 
+        def isotropic_orbit_iterator(self, rank, *, height_bound=None):
+            r"""Yield the first primitive isotropic subobject of each orbit of this subgroup (#62)."""
+            from sage_extensions.categories.isotropic_orbits import _isotropic_orbit_iterator
+
+            return _isotropic_orbit_iterator(self, self.supergroup().domain(), rank, height_bound)
+
         def isotropic_are_equivalent(self, left, right, *, flag=False) -> bool:
 
             return self.isotropic_equivalence_witness(left, right, flag=flag) is not None

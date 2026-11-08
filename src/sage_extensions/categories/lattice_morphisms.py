@@ -4103,6 +4103,16 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         selected = representation.codomain().subgroup(()) if target is None else target
         return representation.preimage_subgroup(selected)
 
+    def isotropic_are_equivalent(self, left, right, *, flag=False):
+        r"""Return whether one element of ``O(L)`` carries ``left`` to ``right``."""
+        return self.isotropic_equivalence_witness(left, right, flag=flag) is not None
+
+    def isotropic_orbit_iterator(self, rank, *, height_bound=None):
+        r"""Yield the first primitive isotropic subobject of each ``O(L)``-orbit in Hermite-form order (#62)."""
+        from sage_extensions.categories.isotropic_orbits import _isotropic_orbit_iterator
+
+        return _isotropic_orbit_iterator(self, self.domain(), rank, height_bound)
+
     def joint_eigensublattices(self, involutions):
         r"""Return the nonzero primitive sublattices ``L_chi`` of pairwise commuting involutions.
 
