@@ -4054,6 +4054,36 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             f"neither {self} itself nor a subgroup of {self} known to contain one"
         )
 
+    @cached_method
+    def congruence_representation(self, modulus):
+        r"""Return ``O(L) ->> im`` in the automorphism group of ``L/mL``, onto the actual finite image.
+
+        The modulus may be composite: the target acts on the finite module
+        ``L/mL`` itself.
+        """
+        lattice = self.domain()
+        ring = lattice.base_ring()
+        residues = ring.quotient_ring(ring.ideal([ring(modulus)]))
+        scalar_change = lattice.orthogonal_group_base_change(residues.quotient_map())
+        changed = scalar_change.codomain().domain()
+        general_linear = changed.general_linear_group()
+
+        def reduce(isometry):
+            reduced = scalar_change(isometry)
+            return general_linear({label: reduced(changed.module_generator(label)) for label in changed.module_generating_set()})
+
+        return self.Mor(general_linear)(reduce).image_factorization()[0]
+
+    def congruence_preimage(self, modulus, target=None):
+        r"""Return the preimage in ``O(L)`` of a subgroup of the actual image in ``Aut(L/mL)``.
+
+        Without ``target`` this is the principal congruence subgroup
+        ``Gamma(m)``, the kernel of the reduction.
+        """
+        representation = self.congruence_representation(modulus)
+        selected = representation.codomain().subgroup(()) if target is None else target
+        return representation.preimage_subgroup(selected)
+
     def vector_orbit_representatives(self, square):
         r"""Return one representative of each ``O(L)``-orbit of square ``square``.
 

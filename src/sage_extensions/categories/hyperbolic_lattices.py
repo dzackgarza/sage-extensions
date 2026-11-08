@@ -399,18 +399,24 @@ class AllcockEdgewalkReport(SageObject):
         simple_roots,
         vertices,
         isometry_generators,
+        reason_non_reflective=None,
     ) -> None:
         self._lattice = lattice
         self._reflective = bool(reflective)
         self._simple_roots = finite_ordered_set(tuple(simple_roots))
         self._vertices = finite_ordered_set(tuple(vertices))
         self._isometry_generators = finite_ordered_set(tuple(isometry_generators))
+        self._reason_non_reflective = reason_non_reflective
 
     def lattice(self):
         return self._lattice
 
     def is_reflective(self) -> bool:
         return self._reflective
+
+    def reason_non_reflective(self):
+        r"""The source's reason when the walk stopped by proving non-reflectivity, else ``None``."""
+        return self._reason_non_reflective
 
     def simple_roots(self):
         return self._simple_roots
@@ -813,7 +819,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             return finite_ordered_set(tuple(isotropic))
 
         @cached_method
-        def _edgewalk(self):
+        def _edgewalk(self, option_norms="all", early_termination=True, initial_vertex=None):
             r"""Walk the reflection chamber through the port's owned lattice API.
 
             The selected ``edgewalk_fundamental_domain`` entry uses signature
@@ -833,12 +839,23 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             )
 
             if (self.signature_pair().second() == cardinal(1)) is True:
-                return edgewalk_fundamental_domain(self)
+                return edgewalk_fundamental_domain(
+                    self, option_norms=option_norms, early_termination=early_termination, initial_vertex=initial_vertex,
+                )
             twist = Lattices(self.base_ring()).twist_functor(-1)
             working = HyperbolicLattices(self.base_ring())(twist(self))
-            report = edgewalk_fundamental_domain(working)
             identification = self.module_category().Mor(working, self)(
                 self.module_generator
+            )
+            match initial_vertex:
+                case None:
+                    working_vertex = None
+                case (generator, roots):
+                    working_vertex = (identification.lift(generator), tuple(-identification.lift(root) for root in roots))
+                case generator:
+                    working_vertex = identification.lift(generator)
+            report = edgewalk_fundamental_domain(
+                working, option_norms=option_norms, early_termination=early_termination, initial_vertex=working_vertex,
             )
             cones = RationalPolyhedralCones(self)
             return AllcockEdgewalkReport(
@@ -860,11 +877,23 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                     twist(isometry)
                     for isometry in report.polyhedron_isometry_generators()
                 ),
+                reason_non_reflective=report.reason_non_reflective(),
             )
 
-        def allcock_edgewalk(self):
-            r"""Return Allcock's full owned fundamental-domain report."""
-            return self._edgewalk()
+        def allcock_edgewalk(self, *, option_norms="all", early_termination=True, initial_vertex=None):
+            r"""Return Allcock's owned fundamental-domain report.
+
+            ``option_norms="K3"`` walks the norm-two reflection subgroup.
+            ``early_termination=False`` lists every vertex orbit of a
+            non-reflective lattice. ``initial_vertex`` prescribes the start.
+            """
+            return self._edgewalk(option_norms, early_termination, initial_vertex)
+
+        def edgewalk_isometry(self, other):
+            r"""Return an isometry to ``other`` found by the edgewalk route, or ``None``."""
+            from sage_indefinite_port.indefinite.edgewalk import edgewalk_isometry
+
+            return edgewalk_isometry(self, other)
 
         def edgewalk_is_reflective(self) -> bool:
             r"""Return whether \(W(L)\) has finite index in \(O(L)\).
