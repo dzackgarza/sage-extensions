@@ -62,3 +62,11 @@ def test_a_permutation_morphism_requires_its_actual_acting_group() -> None:
 
     with pytest.raises(ValueError):
         FiniteGSets(other).from_permutation_representation(group.Mor(group).identity())
+
+
+def test_a_finite_action_requires_a_group_morphism() -> None:
+    group = Groups.S(3)
+    constant_transposition = Sets().Mor(group, group)(lambda _g: group((1, 2)))
+
+    with pytest.raises(TypeError):
+        FiniteGSets(group).from_permutation_representation(constant_transposition)
