@@ -223,11 +223,7 @@ class _FiniteIntegralRepresentation(SageObject):
             # Every module automorphism fixes the zero submodule.
             return _owned_integers()(position)
         automorphism = self.action().quotient_automorphism(group_element)
-        images = tuple(
-            automorphism(generator)
-            for generator in generators
-        )
-        image_key = quotient._submodule_key_from_generators(images)
+        image_key = quotient._submodule_image_key(automorphism.forward(), generators)
         image_position = self._positions.get(image_key)
         if image_position is None:
             assert self._registering_orbit, (

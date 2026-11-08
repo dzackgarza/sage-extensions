@@ -1984,6 +1984,40 @@ class _GeneralPresentedModule:
         preimage = matrix(SageZZ, lifts + list(self._relation_submodule.basis()))
         return tuple(tuple(row) for row in preimage.hermite_form(include_zero_rows=False).rows())
 
+    def _submodule_image_key(self, morphism, generators):
+        r"""The canonical preimage key of the image under an admitted endomorphism.
+
+        If A lifts the selected generator images, a cover row v maps to vA
+        modulo the retained relations. Adjoining those relations and taking
+        Sage's integral Hermite form gives exactly the image preimage span.
+        The selected presentation and actual arrow fix A; no freeness of
+        this quotient or enumeration of its elements is used.
+        """
+        assert self.base_ring() is _owned_integers() and self._relation_submodule is not None, (
+            "integral submodule image data require a represented relation module over ZZ"
+        )
+        assert morphism.domain() is self and morphism.codomain() is self, (
+            "a submodule image in this presentation requires its actual endomorphism"
+        )
+        morphism._require_established_linearity("submodule image")
+        from sage.matrix.constructor import matrix
+
+        cache = self.__dict__.setdefault("_submodule_image_lifts", {})
+        cached = cache.get(id(morphism))
+        if cached is None:
+            action = matrix(SageZZ, [
+                morphism(self.module_generator(label))._representative()
+                for label in self.module_generating_set()
+            ])
+            action.set_immutable()
+            cache[id(morphism)] = (morphism, action)
+        else:
+            action = cached[1]
+        lifts = [self(generator)._representative() for generator in generators]
+        rows = matrix(SageZZ, len(lifts), self._free_module.rank(), [entry for row in lifts for entry in row])
+        preimage = (rows * action).stack(self._relation_submodule.basis_matrix())
+        return tuple(tuple(row) for row in preimage.hermite_form(include_zero_rows=False).rows())
+
     def _submodule_generator_images_from_key(self, key):
         r"""Read a submodule's canonical preimage basis as nonzero quotient generators.
 
