@@ -4415,7 +4415,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
     def _witness_matrix(self):
         r"""The equivalence matrix the deciding search produces, or ``False`` when it finds none.
 
-        Private engine data, for a definite pair (OSCAR's exact equivalence
+        Private engine data, for a definite pair (the exact equivalence
         search) or an indefinite binary pair (the cycle
         walk of :func:`_binary_indefinite_isometry_matrix`).  Its columns
         are the coordinates of the images of the domain generators.
@@ -4424,6 +4424,20 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         signature = self.domain().signature_pair()
         positive, negative = signature.first(), signature.second()
         if positive == 0 or negative == 0:
+            if self.domain().base_ring() is _owned_integers() and self.codomain().base_ring() is _owned_integers():
+                from sage.quadratic_forms.quadratic_form import QuadraticForm
+
+                sign = -1 if positive == 0 else 1
+                source = QuadraticForm(SageZZ, 2 * sign * domain_gram)
+                target = QuadraticForm(SageZZ, 2 * sign * codomain_gram)
+                # Sage's PARI qfisom returns M with self(M) == other:
+                # target(M) == source gives the required column action.
+                transformation = target.is_globally_equivalent_to(source, return_matrix=True)
+                if transformation is False:
+                    return False
+                if abs(transformation.det()) != 1 or transformation.transpose() * codomain_gram * transformation != domain_gram:
+                    raise ArithmeticError("the definite-isometry witness fails the integral form equation")
+                return transformation
             from sage_extensions.categories.lattice_engines import _oscar_lattices
 
             return _oscar_lattices.definite_isometry(
