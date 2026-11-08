@@ -1919,7 +1919,6 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
 
 
 def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False):
-    _assert_isotropic_splitting_has_character_data(subgroup)
     orthogonal_group = subgroup.supergroup()
     witness = orthogonal_group.isotropic_equivalence_witness(
         left, right, flag=flag
@@ -1928,6 +1927,7 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
         return None
     if witness in subgroup:
         return witness
+    _assert_isotropic_splitting_has_character_data(subgroup)
     stabilizer = orthogonal_group.isotropic_stabilizer_generators(
         right, flag=flag
     )
