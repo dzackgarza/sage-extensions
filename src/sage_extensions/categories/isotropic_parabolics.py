@@ -216,28 +216,8 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
         @cached_method
         def unipotent_radical(self):
-            r"""Return ``U_I``, the kernel of ``P_I -> GL(I) x O(I^perp/I)``."""
-
-            inclusion = self.inclusion()
-            embedded = self.embedded_module_generators()
-            labels = self.module_generating_set()
-
-            def is_unipotent(automorphism) -> bool:
-                if not self.stabilizes(automorphism):
-                    return False
-                if any(
-                    automorphism(embedded[label]) != embedded[label]
-                    for label in labels
-                ):
-                    return False
-                return self.acts_trivially_on_isotropic_reduction(automorphism)
-
-            assert inclusion.codomain() is self.ambient_lattice(), (
-                f"cannot form the unipotent radical of {self}: its inclusion has codomain "
-                f"{inclusion.codomain()}, which is not the lattice {self.ambient_lattice()} "
-                f"whose orthogonal group contains the radical"
-            )
-            return self.ambient_lattice().Aut().predicate_subgroup(is_unipotent, f"g acts as the identity on {self} and on its isotropic reduction")
+            r"""Return the generated kernel on I and on its perpendicular quotient."""
+            return self.isotropic_reduction().unipotent_kernel()
 
         def eichler_transvection(self, orthogonal_vector):
             r"""Return the Eichler transvection ``E_{f,x}`` of this isotropic line.
@@ -303,26 +283,15 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             )
 
         def unipotent_group_generators(self):
-            r"""Return the Eichler transvections on a framing of ``f^perp``.
+            r"""Return a finite indexed family generating the full integral unipotent radical.
 
-            For a rank-one isotropic subobject these generate ``U_I``: the
-            unipotent radical is the image of the morphism ``f^perp/f ->
-            O(L)``, and the selected generators of ``f^perp`` generate that
-            quotient.
+            These are the integral generators of the common kernel on I and
+            I-perp/I. In higher null rank this includes the full Hom parameters
+            and the central pointwise-perpendicular shears.
             """
-            from sage_extensions.categories.sets.indexed_families import (
-                finite_indexed_family,
-            )
+            from sage_extensions.categories.sets.indexed_families import finite_indexed_family_from_values
 
-            perpendicular = self.isotropic_perpendicular()
-            perpendicular_inclusion = perpendicular.inclusion()
-            return finite_indexed_family(
-                perpendicular.module_generating_set(),
-                lambda label: self.eichler_transvection(
-                    perpendicular_inclusion(perpendicular.module_generator(label))
-                ),
-                name=f"Eichler transvections of {self}",
-            )
+            return finite_indexed_family_from_values(None, tuple(self.unipotent_radical().group_generators()))
 
         def is_equivalent_to(self, other) -> bool:
             r"""Return whether ``O(L)`` carries this isotropic subobject to ``other``.

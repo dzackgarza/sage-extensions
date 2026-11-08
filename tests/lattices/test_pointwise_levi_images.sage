@@ -49,3 +49,6 @@ def test_zero_null_pointwise_levi_lift_and_joint_kernel():
     lift = reduction.pointwise_levi_lift(minus)
     assert all(lift(point) == -point for point in ambient.module_generators())
     assert reduction.unipotent_kernel().cardinality() == cardinal(1)
+    zero = ambient.primitive_isotropic_subobject()
+    assert zero.unipotent_radical().cardinality() == cardinal(1)
+    assert tuple(zero.unipotent_group_generators()) == ()
