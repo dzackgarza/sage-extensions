@@ -1212,7 +1212,14 @@ class OrthogonalCharacterQuotient:
         self, discriminant_image_generators, stab_sign_flip, *, right=None,
     ):
         r"""Double cosets computed inside ``im rho`` (the ``O(A_L)`` engine); see
-        :meth:`splitting_isometries` for the exact sign bookkeeping."""
+        :meth:`splitting_isometries` for the exact sign bookkeeping.
+
+        ``discriminant_image_generators`` are *already lowered* to the engine by the
+        caller (``_splitting_isometries_in_im_rho`` applies ``rho`` and the crossing
+        once); applying ``rho`` here again would evaluate a group morphism on a raw
+        engine element, which is exactly the boundary the owner never crosses.  A
+        caller with a ready subgroup of ``im rho`` (the line-class stabilizer) passes
+        it as ``right`` instead."""
         from sage_extensions.categories.group.groups import _element_to_engine
 
         j, sign_labels = self._sign_descent_rank()
@@ -1222,13 +1229,7 @@ class OrthogonalCharacterQuotient:
         left = libgap.Image(to_perm, self._joint_discriminant_image_gap())
         rho = self.lattice.discriminant_representation()
         right = (
-            libgap.Subgroup(
-                im_rho,
-                [
-                    _element_to_engine(self._discriminant_group, rho(s))
-                    for s in discriminant_image_generators
-                ],
-            )
+            libgap.Subgroup(im_rho, list(discriminant_image_generators))
             if right is None
             else right
         )
