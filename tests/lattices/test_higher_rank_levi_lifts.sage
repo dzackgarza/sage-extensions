@@ -114,3 +114,29 @@ def test_null_plane_levi_image_generators_realize_both_signs_on_a_line():
     family = tuple(reduction.levi_image_generators())
     assert all(generator in image for generator in family)
     assert reduction.O().subgroup(family).cardinality() == cardinal(2)
+
+
+def test_null_plane_levi_image_is_proper_in_a_split_binary_quotient():
+    r"""The U(2) quotient has four isometries; only its two scalar maps lift.
+
+    The coordinate pairing of f with x is odd. Divisibilities of e and u
+    force the v coefficient of g(f) to be even. Exchanging x,y modulo I
+    would make b(g(f),g(x)) even, so the exchange cannot lift.
+    """
+    glued = Lattices(ZZ)([[0, 2, 0, 0], [2, 0, 1, 0], [0, 1, 0, 2], [0, 0, 2, 0]])
+    ambient = glued + Lattices(ZZ)("U")
+    e, f, x, y, u, v = tuple(ambient.module_generators())
+    reduction = ambient.primitive_isotropic_subobject(e, u).isotropic_reduction()
+    perpendicular = reduction.orthogonal_complement().inclusion()
+    projection = reduction.projection()
+    first, second = (projection(perpendicular.lift(point)) for point in (x, y))
+    labels = tuple(reduction.module_generating_set())
+    general_linear = reduction.general_linear_group()
+    chart = general_linear(dict(zip(labels, (first, second), strict=True)))
+    swapped = general_linear(dict(zip(labels, (second, first), strict=True)))
+    permutation = swapped * ~chart
+    exchange = reduction.O()({label: permutation(reduction.module_generator(label)) for label in labels})
+    minus = reduction.O()({label: -reduction.module_generator(label) for label in labels})
+    image = reduction.levi_image()
+    assert minus in image
+    assert exchange not in image
