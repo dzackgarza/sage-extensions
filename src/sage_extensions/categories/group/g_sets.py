@@ -178,7 +178,7 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         r"""Equip ``point_set`` with the trivial action of this category's group."""
         return self(point_set, lambda _group_element, point: point)
 
-    def _orbit_words(self, seeds, action, augmentation, *, point_key=None, retain_transitions=False):
+    def _orbit_words(self, seeds, action, augmentation, *, point_key=None, retain_transitions=False, targets=()):
         r"""The one orbit search: the union of the orbits of ``seeds``, each point with a word.
 
         ``augmentation`` is a free cover ``pi: F ->> G``.  Breadth-first search
@@ -192,14 +192,22 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         exactly once, and callers of the Schreier construction read each
         ``s.p`` from that table instead of paying the action evaluations
         again.  The table's letter positions index
-        ``free.group_generators()``.
+        ``free.group_generators()``. With ``targets``, return the visited
+        prefix on first reaching a target. Transition tables require the
+        complete sweep and cannot be requested with a target.
         """
+        targets = tuple(targets)
+        if targets and retain_transitions:
+            raise ValueError("a complete transition table requires the full finite orbit")
         free = augmentation.domain()
         steps = tuple((word, augmentation(word)) for word in free.group_generators())
         points = list(finite_ordered_set(tuple(seeds)))
         key = (lambda point: point) if point_key is None else point_key
         rank = {key(point): position for position, point in enumerate(points)}
         words = [free.one() for _point in points]
+        target_keys = {key(point) for point in targets}
+        if target_keys.intersection(rank):
+            return points, words
         transitions = {} if retain_transitions else None
         position = 0
         while position < len(points):
@@ -212,10 +220,26 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                     words.append(word * words[position])
                 if transitions is not None:
                     transitions[(position, letter_position)] = rank[image_key]
+                if image_key in target_keys:
+                    return points, words
             position += 1
         if retain_transitions:
             return points, words, transitions
         return points, words
+
+    def transporter_from_finite_orbit(self, source, target, action):
+        r"""Return one element carrying ``source`` to ``target`` in a finite orbit.
+
+        The supplied effective action has hashable points and a finite
+        source orbit. The existing orbit-word search stops on a witness;
+        exhausting the orbit proves that the transporter is empty.
+        """
+        group = self.group()
+        if source == target:
+            return group.one()
+        augmentation = group.selected_group_resolution().augmentation()
+        points, words = self._orbit_words((source,), action, augmentation, targets=(target,))
+        return next((augmentation(word) for point, word in zip(points, words, strict=True) if point == target), None)
 
     def from_finite_orbits(self, seeds, action):
         r"""The union of the finite orbits of supplied points under a given action.

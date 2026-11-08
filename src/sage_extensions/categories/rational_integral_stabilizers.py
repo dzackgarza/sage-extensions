@@ -85,6 +85,8 @@ What *is* owned, so a caller does not come here for it:
   commensurability class.
 """
 
+from functools import cache
+
 from sage.misc.cachefunc import cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.sage_object import SageObject
@@ -737,10 +739,30 @@ class IntegralStructureAction(SageObject):
             f"a transporter in {rational_group} requires a finite selected generating family "
             "or a represented finite group"
         )
-        target_key = self.finite_quotient_action()._intermediate_image_key_or_none(target_inclusion)
+        quotient_action = self.finite_quotient_action()
+        target_key = quotient_action._intermediate_image_key_or_none(target_inclusion)
         if target_key is None:
             return None
-        witness = self.finite_representation()._transporter_to_key(target_key)
+        source_key = quotient_action._intermediate_image_key_or_none(source_inclusion)
+        if source_key is None:
+            raise ValueError("the selected lattice is not intermediate between dM and M")
+        quotient = self.finite_module()
+        assert quotient.cardinality().is_finite() is True, (
+            "the residue-action computation requires a represented finite module M/dM"
+        )
+
+        @cache
+        def generators(key):
+            return quotient._submodule_generator_images_from_key(key)
+
+        def action(element, key):
+            images = generators(key)
+            if not images:
+                return key
+            automorphism = self.quotient_automorphism(element)
+            return quotient._submodule_image_key(automorphism.forward(), images)
+
+        witness = FiniteGSets(rational_group).transporter_from_finite_orbit(source_key, target_key, action)
         if witness is None:
             return None
         if not self._carries_lattice(witness, source_inclusion, target_inclusion):
