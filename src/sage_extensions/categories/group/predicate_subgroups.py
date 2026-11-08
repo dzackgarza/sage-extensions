@@ -532,8 +532,9 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 self, left, right, flag=flag
             )
 
+        @cached_method
         def cusps(self, rank=1):
-            r"""Return this arithmetic subgroup's primitive-isotropic cusp orbits."""
+            r"""Return the retained primitive-isotropic cusp orbits of this subgroup and rank."""
             from sage_extensions.categories.isotropic_orbits import _arithmetic_cusp
             from sage_extensions.categories.sets.finite_ordered_sets import (
                 finite_ordered_set,
@@ -564,21 +565,30 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             lattice = self.supergroup().domain()
             line_cusps = self.cusps(1)
             plane_cusps = self.cusps(2)
+
+            def matching_cusps(term, cusps):
+                matches = []
+                for cusp in cusps:
+                    if term not in cusp.universe():
+                        continue
+                    witness = cusp.transporter_witness(term)
+                    if witness is not None:
+                        matches.append((cusp, witness))
+                return matches
+
             incidences = []
             for flag in self.isotropic_orbit_representatives(2, flag=True):
                 line, plane = flag.terms()
-                line_vertices = tuple(cusp for cusp in line_cusps if line in cusp)
-                plane_vertices = tuple(cusp for cusp in plane_cusps if plane in cusp)
+                line_vertices = matching_cusps(line, line_cusps)
+                plane_vertices = matching_cusps(plane, plane_cusps)
                 if len(line_vertices) != 1 or len(plane_vertices) != 1:
                     raise ArithmeticError(
                         f"the isotropic flag {flag} of {lattice} lies in {len(line_vertices)} "
                         f"line cusps and {len(plane_vertices)} plane cusps of {self}; each "
                         f"term of a flag must lie in exactly one cusp"
                     )
-                line_cusp = line_vertices[0]
-                plane_cusp = plane_vertices[0]
-                line_transporter = line_cusp.transporter_witness(line)
-                plane_transporter = plane_cusp.transporter_witness(plane)
+                line_cusp, line_transporter = line_vertices[0]
+                plane_cusp, plane_transporter = plane_vertices[0]
                 if line_transporter is None or plane_transporter is None:
                     raise ArithmeticError(
                         f"the isotropic flag {flag} of {lattice} lies in the cusps "
