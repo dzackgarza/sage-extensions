@@ -9,6 +9,7 @@ provider arrives.
 """
 
 from dataclasses import dataclass
+from operator import index
 
 from sage.structure.element import parent as element_parent
 from sage.structure.sage_object import SageObject
@@ -933,8 +934,8 @@ def _isotropic_object_from_marked(marked, *, flag):
 def _isotropic_orbit_representatives(orthogonal_group, rank, *, flag=False):
     r"""Return full-``O(L)`` orbit representatives of primitive isotropic subobjects/flags."""
     lattice = orthogonal_group.domain()
-    rank = lattice.base_ring()(rank)
-    if rank <= lattice.base_ring().zero():
+    rank = index(rank)
+    if rank <= 0:
         raise ValueError(f"there are no isotropic sublattices of rank {rank} in {lattice}: the rank must be positive")
     from sage_indefinite_port.indefinite.marked_lattices import (
         primitive_marking_classes,
