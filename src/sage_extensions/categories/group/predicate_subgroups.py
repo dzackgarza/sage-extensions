@@ -672,9 +672,9 @@ class KernelSubgroups(_PredicateSubgroupConstruction):
             return self._kernel_morphism
 
         def schreier_generators(self, *, generators=None):
-            r"""The images of the generators of the retained Schreier generating morphism, as group elements of this subgroup."""
+            r"""The Schreier generating family, indexed by the retained free basis."""
             morphism = self.schreier_generating_morphism(generators=generators)
-            return tuple(morphism(letter) for letter in morphism.domain().group_generators())
+            return morphism.domain().group_generators().map(morphism, name="Schreier generators")
 
         def index(self, *, generators=None):
             r"""The index of a kernel with a represented finite image.
@@ -688,9 +688,9 @@ class KernelSubgroups(_PredicateSubgroupConstruction):
             return self.coset_space(generators=generators).cardinality()
 
         def schreier_generators(self, *, generators=None):
-            r"""The images of the generators of the retained Schreier generating morphism, as group elements of this subgroup."""
+            r"""The Schreier generating family, indexed by the retained free basis."""
             morphism = self.schreier_generating_morphism(generators=generators)
-            return tuple(morphism(letter) for letter in morphism.domain().group_generators())
+            return morphism.domain().group_generators().map(morphism, name="Schreier generators")
 
         def has_finite_coset_space(self) -> bool:
             r"""Whether ``G/ker(f)`` is realized through ``f`` into a finite group with selected generators of ``G``."""
@@ -709,15 +709,9 @@ class KernelSubgroups(_PredicateSubgroupConstruction):
             return self.coset_space(generators=generators).schreier_generating_morphism()
 
         def schreier_generators(self, *, generators=None):
-            r"""The images of the generators of :meth:`schreier_generating_morphism`: the kernel elements of the Schreier family.
-
-            The generating morphism answers images of its free group's
-            letters; this assertion-only presentation names its values
-            as group elements of the kernel, since a ``G/ker(f)`` that
-            is not realized cannot be asked for them.
-            """
+            r"""The kernel's Schreier generating family on the retained free basis."""
             morphism = self.schreier_generating_morphism(generators=generators)
-            return tuple(morphism(letter) for letter in morphism.domain().group_generators())
+            return morphism.domain().group_generators().map(morphism, name="Schreier generators")
 
         def _cardinality_decision(self):
             r"""Return the exact kernel order when the ambient group is finite."""
@@ -846,9 +840,9 @@ class PreimageSubgroups(_PredicateSubgroupConstruction):
             return self.coset_space(generators=generators).schreier_generating_morphism()
 
         def schreier_generators(self, *, generators=None):
-            r"""The images of the generators of the retained Schreier generating morphism, as group elements of this subgroup."""
+            r"""The Schreier generating family, indexed by the retained free basis."""
             morphism = self.schreier_generating_morphism(generators=generators)
-            return tuple(morphism(letter) for letter in morphism.domain().group_generators())
+            return morphism.domain().group_generators().map(morphism, name="Schreier generators")
 
         def selected_group_resolution(self):
             r"""The selected generating epimorphism onto ``f^-1(K)``, assembled when ``f: G -> Q`` has infinite codomain.
