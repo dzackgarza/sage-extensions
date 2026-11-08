@@ -127,6 +127,12 @@ def _card_lattice(k):
     )
 
 
+# Card objects are deliberately shared: their discriminant module and class data are
+# expensive to build once at this rank, so the separate O-, stable- and spinor-positive
+# comparisons must read that same retained lattice rather than authenticating by repetition.
+_CARD_BY_TAG = {1: _card_lattice(1), 2: _card_lattice(2)}
+
+
 def test_the_scattone_card_input_is_the_published_lattice() -> None:
     r"""The input is $\Lambda_2$ and $\Lambda_4$ (rank 21, signature $(2,19)$), not a proxy.
 
@@ -138,7 +144,7 @@ def test_the_scattone_card_input_is_the_published_lattice() -> None:
         ("6JRX", 1, ZZ(-2), "II_{2,19} (2: 1^20 [2^1]_7)"),
         ("6JRY", 2, ZZ(-4), "II_{2,19} (2: 1^20:[4^1]_7)"),
     ):
-        lattice = _card_lattice(k)
+        lattice = _CARD_BY_TAG[k]
         assert lattice.module_rank() == cardinal(21)
         signature = lattice.signature_pair()
         assert signature.first() == cardinal(2)
@@ -155,7 +161,7 @@ def test_6jrx_has_one_line_orbit_under_o_plus() -> None:
     hyperbolic planes are present, so Eichler's criterion applies and the discriminant
     image of the line stabilizer stabilizes the class set $\{c,-c\}$ inside $\im\rho$.
     """
-    lattice = _card_lattice(1)
+    lattice = _CARD_BY_TAG[1]
     plus = lattice.O_plus()
     assert plus.isotropic_orbit_representatives(1).cardinality() == cardinal(1)
     for representative in plus.isotropic_orbit_representatives(1):
@@ -166,7 +172,7 @@ def test_6jrx_has_one_line_orbit_under_o_plus() -> None:
 
 def test_6jry_has_one_line_orbit_under_o_plus() -> None:
     r"""``6JRY`` (rank $21$, signature $(2,19)$, $\det -4$): the same row under $O^+(L)$."""
-    lattice = _card_lattice(2)
+    lattice = _CARD_BY_TAG[2]
     plus = lattice.O_plus()
     assert plus.isotropic_orbit_representatives(1).cardinality() == cardinal(1)
     for representative in plus.isotropic_orbit_representatives(1):
@@ -182,7 +188,7 @@ def test_6jrx_has_one_line_orbit_under_otilde_plus() -> None:
     not a derivation.  The joint discriminant/sign kernel asks for the ambient selected
     finite generating family of this rank-21 group's Eichler construction.
     """
-    lattice = _card_lattice(1)
+    lattice = _CARD_BY_TAG[1]
     stable_plus = lattice.stable_orthogonal_group().intersection(lattice.O_plus())
     assert stable_plus.isotropic_orbit_representatives(1).cardinality() == cardinal(1)
 
@@ -190,9 +196,9 @@ def test_6jrx_has_one_line_orbit_under_otilde_plus() -> None:
 def test_6jry_has_one_line_orbit_under_otilde_plus() -> None:
     r"""``6JRY``'s other line row: ``Otilde+ -> constant: 1`` (Theorem 4.0.1, p. 55).
     """
-    lattice = _card_lattice(2)
+    lattice = _CARD_BY_TAG[2]
     stable_plus = lattice.stable_orthogonal_group().intersection(lattice.O_plus())
     assert stable_plus.isotropic_orbit_representatives(1).cardinality() == cardinal(1)
-    lattice = _card_lattice(2)
+    lattice = _CARD_BY_TAG[2]
     stable_plus = lattice.stable_orthogonal_group().intersection(lattice.O_plus())
     assert stable_plus.isotropic_orbit_representatives(1).cardinality() == cardinal(1)

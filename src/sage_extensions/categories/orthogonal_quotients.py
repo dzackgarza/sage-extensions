@@ -1599,6 +1599,21 @@ def _isotropic_line_representatives(lattice, quotient):
     # owned action of ambient rho-images on the module elements, not by string labels
     # or a join of discriminant targets.
     candidates = tuple(lattice.covering_discriminant_classes(lattice.base_ring().zero()))
+    if all(candidate == zero_class for candidate in candidates):
+        # Every normalized class is zero, so there is exactly one ambient line class.
+        # No partition under rho(O(L)), no joint character intersection, and above all
+        # no ambient integral generating family is required: any primitive isotropic
+        # vector with div one gives that class, checked here rather than asserted.
+        for label in lattice.module_generating_set():
+            vector = lattice.module_generator(label)
+            if vector.q() != lattice.base_ring().zero():
+                continue
+            if not vector.is_primitive():
+                continue
+            if lattice.divided_discriminant_class(vector) != zero_class:
+                continue
+            return finite_ordered_set((lattice.primitive_isotropic_subobject(vector),))
+        return None
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
 
     def key(element):
