@@ -9,9 +9,11 @@ provider arrives.
 """
 
 from dataclasses import dataclass
-from itertools import pairwise
+from itertools import pairwise, product
 from operator import index
 
+from sage.matrix.constructor import matrix
+from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import parent as element_parent
 from sage.structure.sage_object import SageObject
 
@@ -493,6 +495,108 @@ class IsotropicFlag:
 
     def __repr__(self) -> str:
         return f"Primitive totally isotropic flag of length {self.flag_length()} in {self.lattice()}"
+
+
+class OrientedIsotropicFlag:
+    r"""A primitive isotropic flag with an orientation of each ``I_j/I_{j-1}``.
+
+    The orientation is the one of the adapted basis. An oriented primitive
+    isotropic sublattice is the case of one block.
+    """
+
+    def __init__(self, lattice, basis, *, flag_type=None) -> None:
+        self._flag = IsotropicFlag(lattice, basis, flag_type=flag_type or FlagType((len(tuple(basis)),)))
+
+    def flag(self):
+        return self._flag
+
+    def lattice(self):
+        return self._flag.lattice()
+
+    def basis(self):
+        return self._flag.basis()
+
+    def __repr__(self) -> str:
+        return f"Oriented {self._flag}"
+
+
+def _graded_orientation_signs(isometry, source, target):
+    r"""The determinant sign of ``isometry`` on each block, from the source to the target adapted basis."""
+    ring = source.lattice().base_ring()
+    target_inclusion = target.top().inclusion()
+    module = ring.free_module(len(target.basis()))
+    adapted = module.Mor(target_inclusion.domain())(
+        dict(zip(module.module_generating_set(), (target_inclusion.lift(point) for point in target.basis()), strict=True))
+    )
+    labels = tuple(module.module_generating_set())
+    rows = tuple(
+        tuple(adapted.lift(target_inclusion.lift(isometry(point))).to_vector()(label) for label in labels)
+        for point in source.basis()
+    )
+    dimensions = source.flag_type().dimensions
+    return tuple(
+        int(matrix(SageZZ, [[int(entry) for entry in row[left:right]] for row in rows[left:right]]).determinant())
+        for left, right in zip((0, *dimensions[:-1]), dimensions, strict=True)
+    )
+
+
+def _orientation_group_elements(group, flag):
+    r"""Map each attained sign tuple of ``Stab(flag)`` to a stabilizer element, and return the generators."""
+    generators = tuple(group.isotropic_stabilizer_generators(flag, flag=True))
+    signs = {generator: _graded_orientation_signs(generator, flag, flag) for generator in generators}
+    identity = tuple(1 for _ in flag.flag_type().dimensions)
+    transversal = {identity: group.one()}
+    frontier = [identity]
+    while frontier:
+        current = frontier.pop()
+        for generator in generators:
+            moved = tuple(left * right for left, right in zip(signs[generator], current, strict=True))
+            if moved not in transversal:
+                transversal[moved] = generator * transversal[current]
+                frontier.append(moved)
+    return generators, signs, transversal
+
+
+def _oriented_isotropic_orbit_representatives(group, flag_type):
+    r"""One oriented flag per class: each flag class splits by the sign cosets of its stabilizer image."""
+    lattice = group.domain()
+    representatives = []
+    for flag in group.isotropic_orbit_representatives(flag_type, flag=True):
+        _generators, _signs, transversal = _orientation_group_elements(group, flag)
+        seen = set()
+        for orientation in product((1, -1), repeat=len(flag_type.dimensions)):
+            if orientation in seen:
+                continue
+            seen.update(tuple(left * right for left, right in zip(orientation, attained, strict=True)) for attained in transversal)
+            basis = list(flag.basis())
+            for sign, stop in zip(orientation, flag_type.dimensions, strict=True):
+                if sign == -1:
+                    basis[stop - 1] = -basis[stop - 1]
+            representatives.append(OrientedIsotropicFlag(lattice, basis, flag_type=flag_type))
+    return finite_ordered_set(tuple(representatives))
+
+
+def _oriented_isotropic_equivalence_witness(group, left, right):
+    r"""An isometry carrying one oriented flag to another with both orientations, or ``None``."""
+    witness = group.isotropic_equivalence_witness(left.flag(), right.flag(), flag=True)
+    if witness is None:
+        return None
+    _generators, _signs, transversal = _orientation_group_elements(group, left.flag())
+    correction = transversal.get(_graded_orientation_signs(witness, left.flag(), right.flag()))
+    return None if correction is None else witness * correction
+
+
+def _oriented_isotropic_stabilizer_generators(group, oriented):
+    r"""Schreier generators of the kernel of ``Stab(F) -> {+-1}^blocks``."""
+    generators, signs, transversal = _orientation_group_elements(group, oriented.flag())
+    schreier = []
+    for attained, representative in transversal.items():
+        for generator in generators:
+            moved = tuple(left * right for left, right in zip(signs[generator], attained, strict=True))
+            element = ~transversal[moved] * generator * representative
+            if element != group.one():
+                schreier.append(element)
+    return finite_ordered_set(tuple(schreier))
 
 
 class _CuspEngine:
@@ -1082,4 +1186,5 @@ __all__ = [
     "CuspIncidence",
     "FlagType",
     "IsotropicFlag",
+    "OrientedIsotropicFlag",
 ]

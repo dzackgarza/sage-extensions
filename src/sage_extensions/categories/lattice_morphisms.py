@@ -4198,6 +4198,24 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
 
         return _isotropic_equivalence_witness(self, left, right, flag=flag)
 
+    def oriented_isotropic_orbit_representatives(self, flag_type):
+        r"""Return the classes of primitive isotropic flags of ``flag_type`` with oriented graded pieces."""
+        from sage_extensions.categories.isotropic_orbits import _oriented_isotropic_orbit_representatives
+
+        return _oriented_isotropic_orbit_representatives(self, flag_type)
+
+    def oriented_isotropic_equivalence_witness(self, left, right):
+        r"""Return an isometry carrying one oriented isotropic flag to another, or ``None``."""
+        from sage_extensions.categories.isotropic_orbits import _oriented_isotropic_equivalence_witness
+
+        return _oriented_isotropic_equivalence_witness(self, left, right)
+
+    def oriented_isotropic_stabilizer_generators(self, oriented):
+        r"""Return generators of the stabilizer of an oriented isotropic flag."""
+        from sage_extensions.categories.isotropic_orbits import _oriented_isotropic_stabilizer_generators
+
+        return _oriented_isotropic_stabilizer_generators(self, oriented)
+
     def isotropic_stabilizer_generators(self, obj, *, flag=False):
 
         return _isotropic_stabilizer_generators(self, obj, flag=flag)
