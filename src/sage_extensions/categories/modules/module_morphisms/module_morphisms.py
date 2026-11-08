@@ -1083,6 +1083,11 @@ class ModuleMorphismMethods:
         codomain = self.codomain()
         ring = codomain.base_ring()
         coefficients = coordinates.parent()._selected_module_coefficients(coordinates)
+        if len(coefficients) == 1:
+            ((source_label, coefficient),) = coefficients.items()
+            if (ring(coefficient) == ring.one()) is True:
+                # The defining equation of linear extension is f(e_s)=y_s.
+                return codomain(self._generator_image(source_label))
         return sum(
             (
                 codomain.scalar_multiple(
