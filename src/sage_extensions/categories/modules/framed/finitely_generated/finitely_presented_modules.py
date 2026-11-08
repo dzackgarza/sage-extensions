@@ -1975,9 +1975,14 @@ class _GeneralPresentedModule:
         assert self._relation_submodule is not None, (
             f"{self} has no engine relation module, so its submodules have no engine preimage to compare"
         )
+        from sage.matrix.constructor import matrix
+
         lifts = [self(generator)._representative() for generator in generators]
-        preimage = self._free_module.submodule(lifts + list(self._relation_submodule.basis()))
-        return tuple(tuple(row) for row in preimage.echelonized_basis_matrix().rows())
+        # Sage's integral Hermite form is the canonical echelon basis of the
+        # same preimage row span; the cover admits every lift above and every
+        # retained relation. See matrix_integer_dense.hermite_form.
+        preimage = matrix(SageZZ, lifts + list(self._relation_submodule.basis()))
+        return tuple(tuple(row) for row in preimage.hermite_form(include_zero_rows=False).rows())
 
     def _submodule_generator_images_from_key(self, key):
         r"""Read a submodule's canonical preimage basis as nonzero quotient generators.
@@ -2023,6 +2028,19 @@ class _GeneralPresentedModule:
 
     def _selected_module_coefficients(self, element):
         r"""Return a finite containing coordinate family of the selected cover representative."""
+        if self._relation_submodule is not None:
+            representative = self(element)._representative()
+            labels = self.module_generating_set()
+            ring = self.base_ring()
+            zero = ring.zero()
+            selected = {}
+            # Ranked sets iterate in their selected ordinal order, the same
+            # order used by _cover_generator for the engine cover basis.
+            for label, value in zip(labels, representative, strict=True):
+                coefficient = _owned_engine_element(ring, value)
+                if (coefficient == zero) is not True:
+                    selected[label] = coefficient
+            return selected
         coordinates = self._cover_coordinates(element)
         zero = self.base_ring().zero()
         return {
