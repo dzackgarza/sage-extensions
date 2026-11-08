@@ -1174,6 +1174,8 @@ class OrthogonalCharacterQuotient:
 
     def _splitting_isometries_in_im_rho(self, stabilizer_generators):
         r"""Double cosets computed inside ``im rho``: from retained integral generators."""
+        from sage_extensions.categories.group.groups import _element_to_engine
+
         rho = self.lattice.discriminant_representation()
         discriminant_image_generators = tuple(
             _element_to_engine(self._discriminant_group, rho(s))
