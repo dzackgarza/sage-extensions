@@ -659,18 +659,17 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             The orbit search already computed every letter's image of every
             point. Read those exact transitions to construct the permutations;
             no rational, module or other supplied action is evaluated again.
+            Their positions are already in the orbit's selected point order.
             """
             orbit, _words, _augmentation = self._orbit_of(point)
             transitions, letter_count = orbit.__dict__["_retained_transitions"]
-            points = tuple(orbit)
             point_set = orbit.point_set()
-            ranking = point_set.ranking_map()
             permutations = SymmetricGroups()(point_set)
             return tuple(
-                _permutation_from_point_map(
-                    permutations, point_set,
-                    lambda image, letter=letter: points[transitions[(int(ranking(image)), letter)]],
-                )
+                permutations([
+                    transitions[(position, letter)] + 1
+                    for position in range(int(point_set.cardinality()))
+                ])
                 for letter in range(letter_count)
             )
 
