@@ -2831,12 +2831,22 @@ class Modules(OwnedCategoryOverBaseRing):
                 source._element_of_unformed_module(element)
             )
 
+        @cached_method(
+            name="_scalar_action_from_module_multiplication",
+            key=lambda self, endomorphisms, additive_group, scalar_multiple: (
+                id(endomorphisms), id(additive_group), scalar_multiple
+            ),
+        )
         def _ring_morphism_defining_module_action(
-            self, endomorphisms, additive_group, scalar_multiple=None
+            self, endomorphisms, additive_group, scalar_multiple
         ):
             r"""Return ``rho_M : R -> End_Ab(U(M))``, ``r |-> (m |-> r m)``, from the scalar multiplication.
 
             A module whose datum is ``rho`` itself states it at its own level.
+            Reuse this construction only for the literal current endpoints
+            and the same supplied multiplication. Category refinement can
+            replace an endomorphism parent, and native module installation
+            can supply a different selected coefficient action.
             """
             ring = self.base_ring()
             assert (
@@ -2846,9 +2856,6 @@ class Modules(OwnedCategoryOverBaseRing):
                 f"the scalar action of {self} can only be represented in "
                 f"End({additive_group}), not {endomorphisms}"
             )
-            if scalar_multiple is None:
-                scalar_multiple = self._owned_scalar_multiple
-
             return ring.Mor(endomorphisms, category=OwnedRings())(
                 lambda scalar: endomorphisms.elementwise(
                     lambda element: scalar_multiple(scalar, element),
@@ -2888,7 +2895,7 @@ class Modules(OwnedCategoryOverBaseRing):
                 self,
                 endomorphisms,
                 additive_group,
-                None if native is None else native.scalar_multiple,
+                self._owned_scalar_multiple if native is None else native.scalar_multiple,
             )
 
         def annihilator(self):
