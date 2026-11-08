@@ -1866,6 +1866,8 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
     )
     if witness is None:
         return None
+    if witness in subgroup:
+        return witness
     stabilizer = orthogonal_group.isotropic_stabilizer_generators(
         right, flag=flag
     )
