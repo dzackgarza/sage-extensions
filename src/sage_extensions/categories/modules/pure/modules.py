@@ -7684,7 +7684,9 @@ def _morphism_from_engine_matrix(mor, backend):
             for row_label, coefficient in zip(row_labels, column, strict=True)
         })
 
-    morphism = mor(image)
+    # Construct from the framed matrix datum and check its module relations.
+    morphism = mor.element_class(mor, image)
+    morphism.validate_linearity()
     morphism._engine_matrix_cache = snapshot
     return morphism
 
