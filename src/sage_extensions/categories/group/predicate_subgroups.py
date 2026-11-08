@@ -490,21 +490,12 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             Schreier morphism, including when several character conditions
             were intersected and no single preimage presentation remains.
             """
-            from sage_extensions.categories.group.g_sets import (
-                FiniteGSets,
-                _LeftCosetPointSet,
-            )
-
             assert self.contains_character_kernel(), (
                 f"{self} has no complete finite-character condition realizing its coset space"
             )
-            group = self.supergroup()
-            points = _LeftCosetPointSet(group, self)
-            return FiniteGSets(group).pointed_orbit(
-                self,
-                points(group.one()),
-                lambda element, coset: points(element * coset.representative()),
-                _free_cover(group, generators),
+            quotient = self.finite_character_quotient()
+            return _preimage_coset_space(
+                self, quotient.character_representation(), quotient._character_target(), generators,
             )
 
         def vector_orbit_representatives(self, square):

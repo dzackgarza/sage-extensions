@@ -4945,7 +4945,7 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             if labels and not (
                 all(factor in GroupsWithChosenFinitePresentation() for factor in family)
                 or all(
-                    factor in OwnedFiniteGroups() and _encodes_as_permutations(_engine_group(factor))
+                    factor in OwnedFiniteGroups() and _encodes_elements_in_gap(_engine_group(factor))
                     for factor in family
                 )
             ):
@@ -4964,17 +4964,20 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 # preserving the comparison maps used below.
                 presentation_isomorphisms = (
                     ()
-                    if all_finite
+                    if all_finite and all(_encodes_as_permutations(_engine_group(family[label])) for label in labels)
                     else tuple(
-                        _gap_model(family[label]).IsomorphismFpGroup()
-                        if family[label] in OwnedFiniteGroups()
-                        else libgap.IdentityMapping(_gap_model(family[label]))
+                        _gap_model(family[label]).IsomorphismPermGroup()
+                        if all_finite else (
+                            _gap_model(family[label]).IsomorphismFpGroup()
+                            if family[label] in OwnedFiniteGroups()
+                            else libgap.IdentityMapping(_gap_model(family[label]))
+                        )
                         for label in labels
                     )
                 )
                 engines = (
                     tuple(_gap_model(family[label]) for label in labels)
-                    if all_finite
+                    if not presentation_isomorphisms
                     else tuple(isomorphism.Image() for isomorphism in presentation_isomorphisms)
                 )
                 product_engine = libgap.DirectProduct(*engines)

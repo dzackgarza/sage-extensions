@@ -229,6 +229,66 @@ class OrthogonalCharacterQuotient:
         r"""Return the owned product in which all character images live."""
         return self._image_space
 
+    @cached_method
+    def _character_product_construction(self):
+        r"""The product in groups of the retained finite character codomains."""
+        from sage_extensions.categories.group.groups import OwnedGroups
+
+        factors = dict(self._model_factors())
+        return OwnedGroups().product_construction(finite_indexed_family(
+            self._image_labels, factors.__getitem__, name="Orthogonal character groups",
+        ))
+
+    @cached_method
+    def character_representation(self):
+        r"""The joint homomorphism from ``O(L)`` to its finite character product.
+
+        Its actual image can be a proper subgroup of the product. Sign
+        factors use the order-two group; the discriminant factor retains
+        its owned orthogonal group.
+        """
+        construction = self._character_product_construction()
+        diagram = construction.diagram()
+
+        def leg(index):
+            label = index.value()
+            target = diagram(index)
+            if label == "discriminant":
+                return self.lattice.discriminant_representation()
+            if label == "determinant":
+                return self.supergroup.Mor(target).elementwise(
+                    lambda isometry: self._c2_of_sign(self.lattice.base_ring()(isometry.determinant()))
+                )
+            return self.supergroup.Mor(target).elementwise(
+                lambda isometry: target.one() if self._real_spinor_norm(isometry).is_one()
+                else target.group_generators()[0]
+            )
+
+        cone = diagram.Cones().cone(self.supergroup, leg)
+        return construction.factor(cone).apex_map()
+
+    @cached_method
+    def _character_target(self):
+        r"""The subgroup of the character product whose preimage is Gamma."""
+        construction = self._character_product_construction()
+        product = construction.object()
+        shape = construction.diagram().domain()
+        projections = {
+            label: construction.structure_morphism(shape(label)) for label in self._image_labels
+        }
+
+        def allowed(point):
+            for label in self._image_labels:
+                component = projections[label](point)
+                if label == "discriminant":
+                    if any(component not in target for target in self.discriminant_preimages):
+                        return False
+                elif component.is_one() is not True:
+                    return False
+            return True
+
+        return product.predicate_subgroup(allowed, "the specified finite character conditions")
+
     def image(self, isometry):
         components = {}
         if self._has_discriminant:
