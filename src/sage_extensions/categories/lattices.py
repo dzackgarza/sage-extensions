@@ -10200,8 +10200,8 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             r"""Restrict the quotient action to a supplied arithmetic subgroup.
 
             A quotient fibre is a coset of the full quotient kernel.
-            The existing finite-character coset adjustment decides whether
-            that fibre meets the requested subgroup and retains a lift.
+            The existing finite coset action decides whether that fibre
+            meets the requested subgroup and retains a lift.
             """
             ambient = self.isotropic_embedding().codomain().O()
             full = self.pointwise_levi_action() if pointwise else self.levi_action()
@@ -10227,16 +10227,29 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
 
         @cached_method
         def _levi_lift_in_subgroup(self, subgroup, isometry, *, pointwise):
-            r"""An integral quotient lift in the requested subgroup, or None."""
+            r"""An integral quotient lift in a supplied finite-index subgroup, or None."""
             full = self.pointwise_levi_action() if pointwise else self.levi_action()
             if isometry not in full.image():
                 return None
             lift = full.lift(isometry)
             if lift in subgroup:
                 return lift
-            return subgroup.finite_character_quotient().adjust_witness_into_subgroup(
-                lift, full.kernel().group_generators()
+            from sage_extensions.categories.group.g_sets import FiniteGSets
+
+            ambient = self.isotropic_embedding().codomain().O()
+            cosets = ambient.left_cosets(subgroup)
+            if cosets not in FiniteGSets(ambient):
+                raise ValueError(f"the quotient lift requires a finite coset action for {subgroup}")
+            kernel = ambient.subgroup(tuple(full.kernel().group_generators()))
+            inclusion = kernel.inclusion()
+            # The right fibre lift*ker(rho) meets Gamma exactly when ker(rho)
+            # transports lift^-1*Gamma to Gamma; compare the marked-diagram
+            # construction in cat._apex_isomorphism_in_subgroup.
+            transporter = FiniteGSets(kernel).transporter_from_finite_orbit(
+                cosets.coset_of(~lift), cosets.base_point(),
+                lambda element, point: cosets.act(inclusion(element), point),
             )
+            return None if transporter is None else lift * ~inclusion(transporter)
 
         @cached_method
         def _levi_fibres(self, isometry):
