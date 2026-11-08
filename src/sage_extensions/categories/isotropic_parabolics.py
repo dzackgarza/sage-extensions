@@ -142,6 +142,38 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 for label in self.module_generating_set()
             )
 
+        def stabilizer_discriminant_image(self):
+            r"""Return rho(P_I) as a subgroup of O(A_L) by the action-groupoid construction (#310).
+
+            The stabilizer is presented by the action's own orbit data, and each
+            Schreier factor is converted through discriminant transports between
+            integral orbit lattices, so no individual rational transporter is
+            applied to A_L.  A line and a plane are supported: their radical
+            action is the one the isotropic reduction of that subobject allows.
+            """
+            from sage_indefinite_port.indefinite.marked_lattices import INDUCTION
+
+            embedded = self.embedded_module_generators()
+            vectors = tuple(embedded[label] for label in self.module_generating_set())
+            match vectors:
+                case (line,):
+                    radical_images = ((-line,),)
+                case (first, second):
+                    radical_images = (
+                        (second, first),
+                        (first + second, second),
+                        (-first, second),
+                    )
+                case _:
+                    raise ValueError(
+                        f"the discriminant image of the stabilizer of {self} is realized here "
+                        f"for a line or a plane, not for {vectors!r}"
+                    )
+            action = INDUCTION.recursion.isotropic_stabilizer_action(
+                vectors, radical_images
+            )
+            return action.finite_representation().stabilizer_discriminant_image()
+
         def parabolic_subgroup(self):
             r"""Return ``P_I = Stab_{O(L)}(I)``, the one parabolic of the isotropic reduction of ``I``."""
             return self.isotropic_reduction().parabolic_subgroup()
