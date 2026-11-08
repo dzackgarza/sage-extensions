@@ -21,5 +21,6 @@ def test_complete_iteration_agrees_with_the_selected_finite_residue_set() -> Non
         points = tuple(module)
 
         assert set(points) == set(module.elements())
-        assert sum(1 for _ in points) == module.cardinality()
+        assert int(sum(1 for _ in points)) == int(module.cardinality())
         assert all(point != other for i, point in enumerate(points) for other in points[:i])
+
