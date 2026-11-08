@@ -35,8 +35,17 @@ def test_glued_line_pointwise_image_excludes_quotient_negation():
     e, f, x, y = tuple(ambient.module_generators())
     reduction = ambient.primitive_isotropic_subobject(e).isotropic_reduction()
     minus = reduction.O()({label: -reduction.module_generator(label) for label in reduction.module_generating_set()})
-    setwise = reduction.levi_lift(minus)
+    setwise = reduction.parabolic_subgroup()(ambient.Aut()({label: -ambient.module_generator(label) for label in ambient.module_generating_set()}))
     assert reduction.levi_action()(setwise) == minus
     assert setwise(e) == -e
     assert reduction.pointwise_levi_lift(minus) is None
     assert minus not in reduction.pointwise_levi_image()
+
+
+def test_zero_null_pointwise_levi_lift_and_joint_kernel():
+    ambient = Lattices(ZZ)([[6]])
+    reduction = ambient.primitive_isotropic_subobject().isotropic_reduction()
+    minus = reduction.O()({label: -reduction.module_generator(label) for label in reduction.module_generating_set()})
+    lift = reduction.pointwise_levi_lift(minus)
+    assert all(lift(point) == -point for point in ambient.module_generators())
+    assert reduction.unipotent_kernel().cardinality() == cardinal(1)

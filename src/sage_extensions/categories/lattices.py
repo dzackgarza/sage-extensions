@@ -10344,64 +10344,49 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             return self.levi_action().lift(isometry)
 
         @cached_method
-        def _rank_one_combined_levi_lift_table(self):
-            r"""Lifts in \(P_I\) indexed by the joint image in \(GL(I)\times O(K_I)\), for rank one.
-
-            Computed from the generators selected on ``parabolic_subgroup()``
-            by the finite-image traversal of \(g\mapsto(\rho_I(g),\bar g)\);
-            \(GL(I)=\{\pm1\}\) for a line, so the image has at most
-            \(2|O(K_I)|\) elements.
-            """
-            line = self.isotropic_sublattice()
-            if int(line.module_rank()) != 1:
-                raise ValueError(
-                    f"cannot tabulate the lifts to P_I for K_I = {self!r}: this is implemented for an isotropic sublattice I of rank 1, and I = {line!r} has rank {line.module_rank()}"
-                )
-            action = self.isotropic_action()
+        def pointwise_levi_action(self):
+            r"""Return the quotient action P_I^1 -> O(K_I), with its actual image section."""
             levi = self.levi_action()
+            restricted = self.pointwise_parabolic_subgroup().Mor(self.Aut())(lambda isometry: levi(isometry))
+            image = self.Aut().condition_set(lambda isometry: self._pointwise_levi_integral_lift_or_none(isometry) is not None)
+            restricted.select_section(Sets().Mor(image, restricted.domain())(self._pointwise_levi_section))
 
-            def joint_image(isometry):
-                return (action(isometry), levi(isometry))
+            def generators():
+                from sage_indefinite_port.indefinite.marked_lattices import RECURSION
 
-            def multiply(left, right):
-                return (left[0] * right[0], left[1] * right[1])
+                return finite_ordered_set(tuple(RECURSION.isotropic_quotient_kernel_generators(self, radical_images=())))
 
-            return self.parabolic_subgroup().finite_image_lifts(
-                joint_image,
-                multiply=multiply,
-                image_bound=2 * int(self.Aut().cardinality()),
-            )
+            restricted.select_kernel_generators(generators)
+            return restricted
+
+        @cached_method
+        def _pointwise_levi_integral_lift_or_none(self, isometry):
+            r"""An integral quotient lift fixing the null sublattice pointwise, or None."""
+            from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+
+            return RECURSION.isotropic_quotient_lift(self, isometry, radical_images=())
+
+        def _pointwise_levi_section(self, isometry):
+            r"""An element of the pointwise parabolic realizing an isometry in its image."""
+            lift = self._pointwise_levi_integral_lift_or_none(isometry)
+            if lift is None:
+                raise ValueError(f"{isometry} has no integral pointwise Levi lift in {self}")
+            return self.pointwise_parabolic_subgroup()(lift)
 
         @cached_method
         def pointwise_levi_image(self):
-            r"""Return the image of ``P_I^1`` in ``O(K_I)`` for a rank-one reduction.
-
-            ``P_I^1`` is the kernel of :meth:`isotropic_action`, so its image
-            is the second component of the joint image over the identity of
-            \(GL(I)\).  The image in a trivial \(O(K_I)\) is trivial.
-            """
-            automorphisms = self.Aut()
-            if automorphisms.is_trivial() is True:
-                return automorphisms.trivial_subgroup()
-            identity_on_line = self.isotropic_action().codomain().one()
-            return automorphisms.subgroup(
-                target
-                for (on_line, target) in self._rank_one_combined_levi_lift_table()
-                if (on_line == identity_on_line) is True
-            )
+            r"""Return the actual image of the pointwise null stabilizer on its quotient."""
+            return self.pointwise_levi_action().image()
 
         def pointwise_levi_lift(self, isometry):
-            r"""Return a lift in ``P_I^1`` exactly when ``isometry`` lies in its Levi image."""
+            r"""Return an integral pointwise-parabolic lift, or None outside its image."""
             if isometry.parent() is not self.Aut():
-                raise ValueError(
-                    f"cannot lift {isometry!r} to P_I^1: it lies in {isometry.parent()!r}, not in O(K_I) for K_I = {self!r}"
-                )
+                raise ValueError(f"{isometry} does not lie in the quotient orthogonal group of {self}")
             if (isometry == self.Aut().one()) is True:
                 return self.pointwise_parabolic_subgroup().one()
             if isometry not in self.pointwise_levi_image():
                 return None
-            identity_on_line = self.isotropic_action().codomain().one()
-            return self._rank_one_combined_levi_lift_table()[identity_on_line, isometry]
+            return self.pointwise_levi_action().lift(isometry)
 
         @cached_method
         def parabolic_levi_exact_sequence(self):
@@ -10410,17 +10395,8 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
 
         @cached_method
         def unipotent_kernel(self):
-            r"""Return \(U_I=\ker(P_I\to GL(I)\times O(K_I))\), the unipotent radical."""
-            levi = self.levi_action()
-            restricted = self.pointwise_parabolic_subgroup().Mor(self.Aut())(lambda isometry: levi(isometry))
-
-            def generators():
-                from sage_indefinite_port.indefinite.marked_lattices import RECURSION
-
-                return finite_ordered_set(tuple(RECURSION.isotropic_quotient_kernel_generators(self, radical_images=())))
-
-            restricted.select_kernel_generators(generators)
-            return restricted.kernel()
+            r"""Return the joint kernel on I and I-perp/I, with its integral generators."""
+            return self.pointwise_levi_action().kernel()
 
         def lift_isometry(self, isometry):
             r"""Return \(g\in P_I\) with \(\bar g=\) ``isometry``, when \(L\) splits along the lifts.
