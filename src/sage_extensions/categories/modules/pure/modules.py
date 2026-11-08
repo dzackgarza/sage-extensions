@@ -3380,7 +3380,19 @@ class Modules(OwnedCategoryOverBaseRing):
                     )
 
                 def __iter__(self):
-                    return iter(self.elements())
+                    r"""Yield finite Smith residues through Sage FGP_Module_class.__iter__."""
+                    assert _engine_ring(self.base_ring()) is SageZZ, (
+                        f"the torsion module {self} is enumerated only over ZZ"
+                    )
+                    if self.is_zero():
+                        yield self.zero()
+                        return
+                    engine = self._smith_engine()
+                    assert engine is not None, (
+                        f"the Smith normal form of the finite torsion module {self} is unavailable"
+                    )
+                    for residue in engine:
+                        yield self._from_smith_engine_element(residue)
 
             def direct_sum_of_cyclics(self, orders):
                 r"""Return ``\bigoplus_i R/(a_i)`` for the selected nonzero scalars.

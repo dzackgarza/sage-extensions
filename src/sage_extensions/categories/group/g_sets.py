@@ -25,6 +25,7 @@ from sage_extensions.categories.group.g_objects import GObjectMor, GObjects
 from sage_extensions.categories.group.groups import (
     OwnedFiniteGroups,
     OwnedGroups,
+    PermutationGroups,
     SymmetricGroups,
     _GroupMorRealizationMixin,
     _engine_group,
@@ -149,6 +150,28 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             point_set,
             action,
             injectivity_decision=injectivity_decision,
+        )
+
+    def from_permutation_representation(self, representation):
+        r"""The finite action defined by the supplied ``G -> Perm(X)``.
+
+        The permutation group retains its actual point set. The supplied
+        group morphism is the action datum, including when it has a kernel.
+        """
+        if representation.domain() is not self.group():
+            raise ValueError("the permutation representation must start at the acting group")
+        permutations = representation.codomain()
+        if permutations not in PermutationGroups():
+            raise TypeError("the action morphism must land in a permutation group")
+        if representation not in self.group().Mor(permutations):
+            raise TypeError("a finite action requires a group morphism")
+        points = permutations.natural_points()
+        if points not in FiniteSets():
+            raise ValueError("a finite action requires a finite permutation domain")
+        return _object_of(
+            self,
+            point_set=points,
+            permutation_representation=representation,
         )
 
     def trivial(self, point_set):
@@ -860,8 +883,8 @@ class LeftCosetGSets(OwnedParameterizedCategory):
                 if left_subgroup is group
                 else left_subgroup.inclusion()
             )
-            acted = FiniteGSets(left_subgroup)(
-                self, lambda element, point: self.act(inclusion(element), point)
+            acted = FiniteGSets(left_subgroup).from_permutation_representation(
+                self.permutation_representation() * inclusion,
             )
             return _double_coset_set(acted, self, _DoubleCosetSet)
 

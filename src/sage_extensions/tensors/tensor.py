@@ -58,6 +58,8 @@ from sage_extensions.categories.rings.ring_foundation import (
     _linear_algebra_ring,
     _linear_algebra_element,
     _own_ring,
+    _owned_integers,
+    _owned_rationals,
 )
 from sage_extensions.categories.sets.cardinals import Cardinalities, cardinal
 from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
@@ -632,9 +634,7 @@ class Tensor:
                     f"covariant tensor contraction takes, in a slot of rank {rank}, "
                     f"a vector of {slot_module}"
                 )
-        # The ubiquitous pairing G(x, y) = x^t G y is evaluated here, at the
-        # tensor owner.  Reading its exact components directly avoids loading
-        # a numerical array stack merely to contract a small exact tensor.
+        # The pairing G(x, y) = x^t G y is evaluated at the tensor owner.
         if len(vectors) == 2:
             left, right = vectors
             left_rank, right_rank = self._lower_index_ranks()
@@ -642,6 +642,13 @@ class Tensor:
                 raise ValueError(
                     f"cannot contract a type-{self.tensor_valence()} tensor with an infinite-rank index by finite component enumeration"
                 )
+            ring = self.base_ring()
+            if ring is _owned_integers() or ring is _owned_rationals():
+                # Sage's exact matrix product and Vector.dot_product retain
+                # arbitrary-size coefficients in both tensor slots.
+                image = _engine_component_matrix(self) * _engine_component_vector(right)
+                value = _engine_component_vector(left).dot_product(image)
+                return _owned_engine_element(ring, value)
             return sum(
                 (
                     left[left_index]
