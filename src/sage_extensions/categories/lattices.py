@@ -7824,8 +7824,9 @@ class Lattices(OwnedCategoryOverBaseRing):
             r"""Return nested represented isotropic sublattices with the stated ranks."""
             return _isotropic_flag_locus(self, ranks)
 
-        def isotropic_flag(self, *basis):
-            return IsotropicFlag(self, basis)
+        def isotropic_flag(self, *basis, flag_type=None):
+            r"""Return the null flag of the given type in an adapted basis."""
+            return IsotropicFlag(self, basis, flag_type=flag_type)
 
         def isotropic_line_orbit_representatives(self):
             return self.O().isotropic_orbit_representatives(1)
@@ -7834,6 +7835,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             return self.O().isotropic_orbit_representatives(2)
 
         def isotropic_flag_orbit_representatives(self, rank=2):
+            r"""Return null-flag orbits of a ``FlagType`` or complete-flag rank."""
             return self.O().isotropic_orbit_representatives(rank, flag=True)
 
         @cached_method

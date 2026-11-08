@@ -514,7 +514,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             return _subgroup_vector_equivalence_witness(self, left, right)
 
         def isotropic_orbit_representatives(self, rank, *, flag=False):
-
+            r"""Return subgroup null orbits; ``flag=True`` accepts a ``FlagType`` or complete-flag rank."""
             return _subgroup_isotropic_orbit_representatives(
                 self, rank, flag=flag
             )

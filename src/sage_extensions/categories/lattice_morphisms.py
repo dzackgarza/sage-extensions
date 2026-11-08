@@ -1702,6 +1702,7 @@ class LatticeIsometryMethods:
                 return IsotropicFlag(
                     self.codomain(),
                     tuple(self(element) for element in obj.isotropic_basis()),
+                    flag_type=obj.flag_type(),
                 )
 
     @cached_method
@@ -4116,7 +4117,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         return finite_ordered_set(representatives)
 
     def isotropic_orbit_representatives(self, rank, *, flag=False):
-
+        r"""Return null-subobject orbits; with ``flag=True``, accept a ``FlagType`` or complete-flag rank."""
         return _isotropic_orbit_representatives(self, rank, flag=flag)
 
     def cusps(self, rank=1):

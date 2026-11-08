@@ -386,12 +386,16 @@ class FlagType:
 class IsotropicFlag:
     r"""A primitive totally isotropic flag, recorded by its nested lattice subobjects."""
 
-    def __init__(self, lattice, basis) -> None:
+    def __init__(self, lattice, basis, *, flag_type=None) -> None:
         self._lattice = lattice
         self._basis = tuple(_held(lattice, element) for element in basis)
         if not self._basis:
             raise ValueError(f"cannot form an isotropic flag in {lattice} from an empty basis")
-        self._terms = tuple(lattice.primitive_isotropic_subobject(*self._basis[: rank + 1]) for rank in range(len(self._basis)))
+        if flag_type is None:
+            flag_type = FlagType.complete(len(self._basis))
+        if flag_type.dimensions[-1] != len(self._basis):
+            raise ValueError(f"the flag type {flag_type} must end at the basis rank {len(self._basis)}")
+        self._terms = tuple(lattice.primitive_isotropic_subobject(*self._basis[:rank]) for rank in flag_type.dimensions)
 
     def lattice(self):
         return self._lattice
@@ -910,52 +914,58 @@ def _isotropic_object_from_marked(marked, *, flag):
                 for left, right in pairwise(diagram.domain().objects())
             )
             basis = tuple(arrows[0].domain().module_generators())
-            if len(basis) != 1:
-                raise ArithmeticError(f"the complete marked flag {marked} must start with a line")
-            # Each successive primitive rank-one quotient supplies one new
-            # basis vector. This retains an adapted integral basis at every
-            # step of the finite-ordinal diagram, including its final inclusion.
+            dimensions = tuple(int(arrow.domain().module_rank()) for arrow in arrows)
+            # Lift a basis of each primitive quotient to extend the adapted
+            # integral basis. CombinedAlgorithms.h:659-717 retains precisely
+            # these cumulative spaces and their block source actions.
             for arrow in arrows[:-1]:
                 quotient = arrow.cokernel()
-                if quotient.is_torsion_free() is not True or int(quotient.module_rank()) != 1:
+                if quotient.is_torsion_free() is not True:
                     raise ArithmeticError(
-                        f"the complete marked flag {marked} needs primitive rank-one successive quotients"
+                        f"the marked flag {marked} needs primitive successive inclusions"
                     )
                 trivialization = quotient.finite_free_trivialization()
                 normalized = trivialization.codomain()
-                label = next(iter(normalized.module_generating_set()))
-                generator = trivialization.inverse()(normalized.module_generator(label))
-                complement = arrow.cokernel_projection().preimage(generator)
-                basis = (*(arrow(point) for point in basis), complement)
+                complements = tuple(
+                    arrow.cokernel_projection().preimage(trivialization.inverse()(point))
+                    for point in normalized.module_generators()
+                )
+                basis = (*(arrow(point) for point in basis), *complements)
             return IsotropicFlag(
-                arrows[-1].codomain(), tuple(arrows[-1](point) for point in basis)
+                arrows[-1].codomain(), tuple(arrows[-1](point) for point in basis),
+                flag_type=FlagType(dimensions),
             )
 
 
 def _isotropic_orbit_representatives(orthogonal_group, rank, *, flag=False):
     r"""Return full-``O(L)`` orbit representatives of primitive isotropic subobjects/flags."""
     lattice = orthogonal_group.domain()
-    rank = index(rank)
-    if rank <= 0:
+    if flag:
+        flag_type = rank if isinstance(rank, FlagType) else FlagType.complete(index(rank))
+        dimensions = flag_type.dimensions
+    else:
+        rank = index(rank)
+        dimensions = (rank,)
+    if dimensions[-1] <= 0:
         raise ValueError(f"there are no isotropic sublattices of rank {rank} in {lattice}: the rank must be positive")
     from sage_indefinite_port.indefinite.marked_lattices import (
         primitive_marking_classes,
     )
 
-    category = _marked_isotropic_category(lattice, int(rank) if flag else 1)
+    category = _marked_isotropic_category(lattice, len(dimensions))
     if flag:
         from sage_extensions.categories.abstract_categories.products import FiniteSequenceDiagram
 
-        # CombinedAlgorithms.h:2424-2479 uses seq_dims_flag(rank) for
-        # complete flags of every attainable rank.
-        shapes = tuple(_zero_isotropic_shape(lattice, size) for size in range(1, int(rank) + 1))
+        # CombinedAlgorithms.h:590-717 retains arbitrary block dimensions;
+        # seq_dims_flag(rank) is its complete-flag specialization.
+        shapes = tuple(_zero_isotropic_shape(lattice, size) for size in dimensions)
         arrows = tuple(
             left.Mor(right)(dict(zip(left.module_generating_set(), right.module_generators())))
             for left, right in pairwise(shapes)
         )
         shape = (
-            shapes[0] if rank == 1
-            else _marked_isotropic_category(lattice, int(rank) - 1)(
+            shapes[0] if len(dimensions) == 1
+            else _marked_isotropic_category(lattice, len(dimensions) - 1)(
                 FiniteSequenceDiagram(shapes, arrows, category.codomain_category())
             )
         )
