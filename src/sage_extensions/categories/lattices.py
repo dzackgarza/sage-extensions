@@ -10142,11 +10142,10 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             :meth:`_levi_section` on the image (``select_section``; the image is
             the subset of \(O(K_I)\) cut out by :meth:`_levi_image_contains`),
             and generators of ``kernel()`` from :meth:`_levi_kernel_generators`
-            (its selected generating resolution).  For a higher-rank \(I\) with
-            \(O(K_I)\) not placed finite, the selected section is the one that
-            asserts (port #18 owns those extension equations).
+            (its selected generating resolution). At other ranks, the port's
+            prescribed-quotient extension and integral correction decide the
+            image and supply the section through the same owned morphism.
             """
-            from sage_extensions.categories.group.groups import OwnedFiniteGroups
 
             perpendicular = self.orthogonal_complement()
             perpendicular_inclusion = perpendicular.inclusion()
@@ -10165,12 +10164,8 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
 
             levi = self.parabolic_subgroup().Mor(automorphisms)(descend)
             reduces_a_line = self.isotropic_sublattice().module_rank() == NN(1)
-            finite_reduction_group = automorphisms in OwnedFiniteGroups()
-            # When I has rank >= 2 and O(K_I) is placed finite, ``lift``'s own
-            # finite-image word section applies and nothing is selected.
-            if reduces_a_line or not finite_reduction_group:
-                image = automorphisms.condition_set(self._levi_image_contains)
-                levi.select_section(Sets().Mor(image, levi.domain())(self._levi_section))
+            image = automorphisms.condition_set(self._levi_image_contains)
+            levi.select_section(Sets().Mor(image, levi.domain())(self._levi_section))
             if reduces_a_line:
                 kernel = levi.kernel()
                 kernel.select_group_generators(
@@ -10193,17 +10188,10 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             ``isotropic_lifts.py``).  Each integral locus is empty exactly when
             its finite residue locus is.
 
-            For \(I\) of rank at least 2, a lift must also choose the action on
-            \(I\) and solve the extension equations \(B = XA + A^tX^t\); those
-            are the specialized extension equations of port #18, and research
-            has no route here.
             """
             rank = self.isotropic_sublattice().module_rank()
             assert rank == NN(1), (
-                f"cannot lift {isometry!r} from O(K_I) to P_I for K_I = {self!r}: I has rank {rank}, "
-                f"and O(K_I) is not placed finite, so a lift solves the extension equations of an "
-                f"isotropic sublattice of rank at least 2, which are sage-indefinite-port #18's "
-                f"computation"
+                f"the two signed line-lift torsors require rank one, got rank {rank} in {self!r}"
             )
             opposite, identification = self._opposite_marking()
             return (
@@ -10211,22 +10199,37 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
                 self.rational_lifts(opposite, identification * isometry),
             )
 
+        @cached_method
+        def _levi_integral_lift_or_none(self, isometry):
+            r"""An integral lift at a rank other than one, with the quotient map prescribed."""
+            from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+
+            return RECURSION.isotropic_quotient_lift(self, isometry)
+
         def _levi_image_contains(self, isometry):
-            r"""Whether ``isometry`` lies in the image of :meth:`levi_action`: some fibre of :meth:`_levi_fibres` has an integral member."""
+            r"""Whether the prescribed quotient isometry has an integral parabolic lift."""
+            if self.isotropic_sublattice().module_rank() != NN(1):
+                return self._levi_integral_lift_or_none(isometry) is not None
             return any(
                 fibre.integral_base_point_or_none() is not None
                 for fibre in self._levi_fibres(isometry)
             )
 
         def _levi_section(self, isometry):
-            r"""One point of \(\rho^{-1}(\gamma)\): the integral base point of the first nonempty fibre of :meth:`_levi_fibres`.
+            r"""One integral point of \(\rho^{-1}(\gamma)\) for an isometry in the image.
 
             A set-theoretic section of \(\rho\) on its image, not a
             homomorphic splitting.  Its domain, the subset of \(O(K_I)\) cut
-            out by :meth:`_levi_image_contains`, has already decided that a
-            fibre is nonempty.
+            out by :meth:`_levi_image_contains`, has already decided that the
+            fibre is nonempty. Lines use the signed lift torsors; other ranks
+            use the prescribed-quotient integral correction.
             """
             lattice = self.isotropic_embedding().codomain()
+            if self.isotropic_sublattice().module_rank() != NN(1):
+                lift = self._levi_integral_lift_or_none(isometry)
+                if lift is None:
+                    raise ValueError(f"{isometry} has no integral Levi lift in {lattice}")
+                return self.parabolic_subgroup()(lift)
             fibre = next(
                 fibre
                 for fibre in self._levi_fibres(isometry)

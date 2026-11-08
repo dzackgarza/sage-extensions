@@ -28,3 +28,64 @@ def test_null_plane_levi_section_lifts_a_quotient_transvection():
         assert isotropic.inclusion().is_in_image((~lift)(source))
     assert all((~lift)(lift(point)) == point for point in ambient.module_generators())
     assert all(ambient.b(lift(x), lift(y)) == ambient.b(x, y) for x in ambient.module_generators() for y in ambient.module_generators())
+
+
+def _glued_plane_reduction():
+    glued = Lattices(ZZ)([[0, 3, 0, 0], [3, 0, 1, 0], [0, 1, 0, 3], [0, 0, 3, 0]])
+    ambient = glued + Lattices(ZZ)("U") + Lattices(ZZ)([[2]])
+    e, f, x, y, u, v, w = tuple(ambient.module_generators())
+    isotropic = ambient.primitive_isotropic_subobject(e, u)
+    return ambient, isotropic, (e, f, x, y, u, v, w)
+
+
+def test_glued_null_plane_levi_lift_can_move_the_null_basis():
+    r"""Global negation lifts -1 on K, but no lift fixes I pointwise.
+
+    If g fixes e,u, preservation of their pairings forces the f and v
+    coefficients of g(f) to be 1 and 0. Since g(x)=-x modulo I,
+    b(g(f),g(x))=-1 modulo 3, whereas b(f,x)=1.
+    """
+    ambient, isotropic, basis = _glued_plane_reduction()
+    reduction = isotropic.isotropic_reduction()
+    levi = reduction.levi_action()
+    minus = reduction.O()({label: -reduction.module_generator(label) for label in reduction.module_generating_set()})
+    lift = levi.lift(minus)
+    assert levi(lift) == minus
+    assert lift in isotropic.parabolic_subgroup()
+    assert lift(basis[0]) != basis[0] or lift(basis[4]) != basis[4]
+    assert all((~lift)(lift(point)) == point for point in basis)
+    assert all(ambient.b(lift(x), lift(y)) == ambient.b(x, y) for x in basis for y in basis)
+
+
+def test_glued_null_plane_quotient_exchange_has_no_levi_lift():
+    r"""The exchange x <-> y on K fails the retained gluing condition.
+
+    Divisibilities force g(e)=a*e+3*b*u and g(u)=c*e+d*u, with a,d
+    units modulo 3. Pairing with g(u) forces the v coefficient of g(f)
+    to vanish modulo 3. Then g(x)=y modulo I gives b(g(f),g(x))=0
+    modulo 3, contrary to b(f,x)=1.
+    """
+    ambient, isotropic, basis = _glued_plane_reduction()
+    reduction = isotropic.isotropic_reduction()
+    perpendicular = reduction.orthogonal_complement().inclusion()
+    projection = reduction.projection()
+    x, y, w = (projection(perpendicular.lift(basis[position])) for position in (2, 3, 6))
+    labels = tuple(reduction.module_generating_set())
+    general_linear = reduction.general_linear_group()
+    chart = general_linear(dict(zip(labels, (x, y, w), strict=True)))
+    swapped = general_linear(dict(zip(labels, (y, x, w), strict=True)))
+    permutation = swapped * ~chart
+    exchange = reduction.O()({label: permutation(reduction.module_generator(label)) for label in labels})
+    image_locus = reduction.levi_action().selected_section().domain()
+    assert exchange not in image_locus
+
+
+def test_zero_null_levi_section_lifts_negation_of_the_whole_lattice():
+    ambient = Lattices(ZZ)([[6]])
+    isotropic = ambient.primitive_isotropic_subobject()
+    reduction = isotropic.isotropic_reduction()
+    levi = reduction.levi_action()
+    minus = reduction.O()({label: -reduction.module_generator(label) for label in reduction.module_generating_set()})
+    lift = levi.lift(minus)
+    assert levi(lift) == minus
+    assert all(lift(point) == -point for point in ambient.module_generators())
