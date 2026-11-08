@@ -436,29 +436,8 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             return self.intersection(self.supergroup().stabilizer(target, action=action))
 
         def intersection(self, other):
-            if other.supergroup() is not self.supergroup():
-                raise ValueError(
-                    f"cannot intersect {self} and {other}: they are subgroups of different "
-                    f"groups, {self.supergroup()} and {other.supergroup()}"
-                )
-            left = self._character_data_snapshot()
-            right = other._character_data_snapshot()
-            data = {
-                "determinant_kernel": bool(left.get("determinant_kernel", False))
-                or bool(right.get("determinant_kernel", False)),
-                "spinor_kernel": bool(left.get("spinor_kernel", False))
-                or bool(right.get("spinor_kernel", False)),
-                "discriminant_preimages": tuple(left.get("discriminant_preimages", ()))
-                + tuple(right.get("discriminant_preimages", ())),
-            }
-            return IntersectionSubgroups(self.supergroup())(
-                (self, other),
-                character_data=data,
-                character_data_complete=(
-                    self.character_data_is_complete()
-                    and other.character_data_is_complete()
-                ),
-            )
+            r"""Intersect subgroups through their common owning construction."""
+            return IntersectionSubgroups(self.supergroup())((self, other))
 
         def finite_character_quotient(self):
             if not self.character_data_is_complete():
@@ -1212,11 +1191,16 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
             return self._intersected_subgroups
 
         def _restricted_preimage_generating_morphism(self, morphism, target, generated):
-            r"""``E ->> f^-1(K) cap B`` through the Schreier morphism onto ``(f i)^-1(K)``."""
+            r"""``E ->> f^-1(K) cap B`` through the Schreier morphism onto ``(f i)^-1(K)``.
+
+            The restricted inclusion lands in B and its composite with f
+            lands in K. These two range laws give the intersection
+            corestriction at its constructing owner.
+            """
             inclusion = generated.inclusion()
             restricted = (morphism * inclusion).preimage_subgroup(target)
             augmentation = restricted.schreier_generating_morphism()
-            return (inclusion * restricted.inclusion() * augmentation).factor_through(self.inclusion())
+            return (inclusion * restricted.inclusion() * augmentation)._corestrict_to_subgroup(self)
 
         def _restricted_character_generating_morphism(self, character_subgroup, generated):
             r"""Generate ``Gamma cap B`` by restricting a finite character condition to ``B``.
@@ -1226,6 +1210,9 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
             supplies the existing predicate-subgroup Schreier computation;
             no membership or word algorithm for an arbitrary generated
             subgroup of ``G`` is assumed.
+
+            The restricted predicate and its inclusion supply both
+            intersection range laws for the resulting corestriction.
             """
             quotient = character_subgroup.finite_character_quotient()
             index_bound = quotient.index()
@@ -1238,7 +1225,7 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
                 index_bound=index_bound,
                 generators=generated.group_generators(),
             )
-            return (inclusion * restricted.inclusion() * augmentation).factor_through(self.inclusion())
+            return (inclusion * restricted.inclusion() * augmentation)._corestrict_to_subgroup(self)
 
         def _character_intersection_generating_morphism(self, intersected_subgroups):
             # Lazy: finite-family prerequisite is checked at realization, not construction
