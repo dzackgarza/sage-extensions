@@ -76,7 +76,31 @@ class _GapWordSection:
     letters in their own generators and verify the result against the requested
     image element, so an engine inconsistency surfaces as an ``ArithmeticError``,
     never as a wrong element.
+    The words retain the supplied ordered family, including redundant
+    generators, through the change of finite representation:
+
+    >>> from sage.all import QQ, block_diagonal_matrix, diagonal_matrix, identity_matrix, matrix
+    >>> rotation = matrix(QQ, [[0, 1], [-1, 1]])
+    >>> reflection = matrix(QQ, [[0, 1], [1, 0]])
+    >>> square_rotation = matrix(QQ, [[0, 1], [-1, 0]])
+    >>> identity = identity_matrix(QQ, 2)
+    >>> coupled = block_diagonal_matrix(reflection, rotation)
+    >>> family = (-identity_matrix(QQ, 4), coupled, block_diagonal_matrix(-square_rotation, identity), block_diagonal_matrix(reflection, identity), block_diagonal_matrix(reflection, reflection), identity_matrix(QQ, 4), -identity_matrix(QQ, 4), block_diagonal_matrix(identity, -reflection), diagonal_matrix(QQ, [-1, 1, -1, -1]), diagonal_matrix(QQ, [1, 1, -1, -1]), diagonal_matrix(QQ, [1, -1, -1, -1]), block_diagonal_matrix(-reflection, identity), coupled, block_diagonal_matrix(reflection, rotation.inverse()))
+    >>> section = _GapWordSection(tuple(libgap(g) for g in family))
+    >>> section.order()
+    96
+    >>> evaluations = []
+    >>> for point in libgap.AsList(section.permutation_group):
+    ...     evaluated = identity_matrix(QQ, 4)
+    ...     for letter in section.letters_of_permutation(point):
+    ...         generator = family[abs(letter) - 1]
+    ...         evaluated = evaluated * (generator if letter > 0 else generator.inverse())
+    ...     evaluations.append(libgap.Image(section._to_permutation, libgap(evaluated)) == point)
+    >>> all(evaluations)
+    True
     """
+
+
 
     def __init__(self, gap_generators, parent=None) -> None:
         self._generators = list(gap_generators)
