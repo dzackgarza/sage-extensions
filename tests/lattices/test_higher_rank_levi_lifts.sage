@@ -89,3 +89,16 @@ def test_zero_null_levi_section_lifts_negation_of_the_whole_lattice():
     lift = levi.lift(minus)
     assert levi(lift) == minus
     assert all(lift(point) == -point for point in ambient.module_generators())
+
+
+def test_null_plane_public_levi_lift_uses_the_exact_image_section():
+    hyperbolic = Lattices(ZZ)("U")
+    ambient = hyperbolic + hyperbolic + hyperbolic + Lattices(ZZ)([[2]])
+    e, f, a, b, u, v, w = tuple(ambient.module_generators())
+    labels = tuple(ambient.module_generating_set())
+    reduction = ambient.primitive_isotropic_subobject(e, a).isotropic_reduction()
+    known = ambient.Aut()(dict(zip(labels, (e, f, a, b, u, v+w-u, w-2*u), strict=True)))
+    quotient_map = reduction.levi_action()(known)
+    lift = reduction.levi_lift(quotient_map)
+    assert reduction.levi_action()(lift) == quotient_map
+    assert all((~lift)(lift(point)) == point for point in ambient.module_generators())
