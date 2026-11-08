@@ -1459,8 +1459,8 @@ def _permutation_from_point_map(permutation_group, point_set, mapping):
     # A permutation is a bijection of the backend point domain. Let the
     # permutation engine check that property instead of searching all pairs
     # of points for preimage counts at this owned/engine boundary.
-    ranking = point_set.ranking_map()
-    images = [int(ranking(mapping(point))) + 1 for point in point_set]
+    ranking, _inverse = permutation_group._natural_point_ranking_and_inverse()
+    images = [int(ranking(mapping(point))) + 1 for point in ranking.domain()]
     try:
         return permutation_group(images)
     except (TypeError, ValueError) as error:

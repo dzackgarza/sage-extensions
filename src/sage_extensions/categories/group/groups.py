@@ -7332,7 +7332,7 @@ class SymmetricGroups(OwnedCategory):
         @cached_method
         def _natural_point_ranking_and_inverse(self):
             r"""The ranking and inverse fixed by this group's selected point set."""
-            ranking = self.natural_points().ranking_map()
+            ranking = finite_ordered_set(self.natural_points()).ranking_map()
             return ranking, ranking.inverse()
 
         def _permutation_point_action(self, backend_element, point):

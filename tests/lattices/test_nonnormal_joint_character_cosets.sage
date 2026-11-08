@@ -78,7 +78,7 @@ def test_nonnormal_joint_subgroup_generators_retain_the_discriminant_kernel():
     family = tuple(subgroup.group_generators())
     assert all(inclusion(generator).determinant() == ZZ.one() for generator in family)
     assert all(rho(inclusion(generator)) in target for generator in family)
-    roots = Set((f, -f, h, -h))
+    roots = Sets()((f, -f, h, -h))
     action = FiniteGSets(subgroup)(roots, lambda generator, point: inclusion(generator)(point))
     assert action.permutation_representation().image().cardinality() == cardinal(8)
     assert (rho * inclusion).image().cardinality() == cardinal(2)
