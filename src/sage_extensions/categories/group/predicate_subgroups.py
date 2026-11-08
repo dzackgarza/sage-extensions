@@ -439,6 +439,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             r"""Intersect subgroups through their common owning construction."""
             return IntersectionSubgroups(self.supergroup())((self, other))
 
+        @cached_method
         def finite_character_quotient(self):
             if not self.character_data_is_complete():
                 raise ValueError(

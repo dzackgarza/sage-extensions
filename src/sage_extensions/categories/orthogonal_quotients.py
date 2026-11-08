@@ -1507,7 +1507,7 @@ def _finite_subgroup_vector_orbit_representatives(subgroup, square):
 def _subgroup_vector_orbit_representatives(subgroup, square):
     if not subgroup.contains_character_kernel():
         return _finite_subgroup_vector_orbit_representatives(subgroup, square)
-    quotient = OrthogonalCharacterQuotient(subgroup)
+    quotient = subgroup.finite_character_quotient()
     orthogonal_group = subgroup.supergroup()
     lattice = orthogonal_group.domain()
     square = lattice.base_ring()(square)
@@ -1593,7 +1593,7 @@ def _subgroup_vector_equivalence_witness(subgroup, left, right):
     if witness is None:
         return None
     stabilizer = orthogonal_group.vector_stabilizer_generators(right)
-    return OrthogonalCharacterQuotient(subgroup).adjust_witness_into_subgroup(
+    return subgroup.finite_character_quotient().adjust_witness_into_subgroup(
         witness, stabilizer
     )
 
@@ -1760,7 +1760,7 @@ def _two_hyperbolic_planes(lattice):
 
 def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
     _assert_isotropic_splitting_has_character_data(subgroup)
-    quotient = OrthogonalCharacterQuotient(subgroup)
+    quotient = subgroup.finite_character_quotient()
     orthogonal_group = subgroup.supergroup()
     representatives = []
     sourced = (
@@ -1809,7 +1809,7 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
     stabilizer = orthogonal_group.isotropic_stabilizer_generators(
         right, flag=flag
     )
-    return OrthogonalCharacterQuotient(subgroup).adjust_witness_into_subgroup(
+    return subgroup.finite_character_quotient().adjust_witness_into_subgroup(
         witness, stabilizer
     )
 
