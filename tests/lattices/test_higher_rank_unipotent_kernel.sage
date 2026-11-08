@@ -6,10 +6,13 @@ Surjectivity onto that Hom module and a unit central parameter generate
 the full integral two-step unipotent group.
 """
 
+import pytest
+
 from sage_extensions.all import *
 
 
-def test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices():
+@pytest.mark.parametrize("public_operation", ("reduction", "radical", "generators"))
+def test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices(public_operation):
     hyperbolic = Lattices(ZZ)("U")
     ambient = hyperbolic + hyperbolic + hyperbolic
     e, f, a, b, u, v = tuple(ambient.module_generators())
@@ -18,13 +21,18 @@ def test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices():
     inclusion = space.inclusion()
     null_labels = tuple(inclusion.domain().module_generating_set())
     reduction = space.isotropic_reduction()
-    kernel = reduction.unipotent_kernel()
+    if public_operation == "reduction":
+        group_generators = reduction.unipotent_kernel().group_generators()
+    elif public_operation == "radical":
+        group_generators = space.unipotent_radical().group_generators()
+    else:
+        group_generators = space.unipotent_group_generators()
     levi = reduction.levi_action()
     parameters = ZZ.free_module(4)
     parameter_labels = tuple(parameters.module_generating_set())
     images = []
     central_parameters = []
-    for generator in kernel.group_generators():
+    for generator in group_generators:
         assert generator(e) == e and generator(a) == a
         assert levi(generator) == levi.codomain().one()
         first = inclusion.lift(generator(u)-u).to_vector()
