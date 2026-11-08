@@ -42,9 +42,7 @@ def test_discriminant_kernel_splits_the_u_three_line_orbit_into_its_two_axes():
     quotient = lattice.stable_orthogonal_group().finite_character_quotient()
     representatives = quotient.splitting_isometries((negation,))
     assert representatives.cardinality() == 2
-    axes = set()
-    for representative in representatives:
-        image = representative(e)
-        assert image in (e, -e, f, -f)
-        axes.add("e" if image in (e, -e) else "f")
-    assert axes == {"e", "f"}
+    images = tuple(representative(e) for representative in representatives)
+    assert all(image in (e, -e, f, -f) for image in images)
+    assert any(image in (e, -e) for image in images)
+    assert any(image in (f, -f) for image in images)

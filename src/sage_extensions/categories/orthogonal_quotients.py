@@ -1174,6 +1174,8 @@ class OrthogonalCharacterQuotient:
 
     def _splitting_isometries_in_im_rho(self, stabilizer_generators):
         r"""Double cosets computed inside ``im rho``: from retained integral generators."""
+        from sage_extensions.categories.group.groups import _element_to_engine
+
         rho = self.lattice.discriminant_representation()
         discriminant_image_generators = tuple(
             _element_to_engine(self._discriminant_group, rho(s))
@@ -1210,7 +1212,11 @@ class OrthogonalCharacterQuotient:
         self, discriminant_image_generators, stab_sign_flip, *, right=None,
     ):
         r"""Double cosets computed inside ``im rho`` (the ``O(A_L)`` engine); see
-        :meth:`splitting_isometries` for the exact sign bookkeeping."""
+        :meth:`splitting_isometries` for the exact sign bookkeeping.
+
+        The supplied generators are elements of the retained GAP image.
+        This method forms their subgroup directly.
+        """
         from sage_extensions.categories.group.groups import _element_to_engine
 
         j, sign_labels = self._sign_descent_rank()
@@ -1222,10 +1228,7 @@ class OrthogonalCharacterQuotient:
         right = (
             libgap.Subgroup(
                 im_rho,
-                [
-                    _element_to_engine(self._discriminant_group, rho(s))
-                    for s in discriminant_image_generators
-                ],
+                list(discriminant_image_generators),
             )
             if right is None
             else right
