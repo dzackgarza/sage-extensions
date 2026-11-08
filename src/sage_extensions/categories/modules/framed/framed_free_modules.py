@@ -1265,11 +1265,11 @@ def _finite_support_labels(module, elements):
 
     This is a private finite-coordinate boundary.  The ambient framing may be
     infinite and need not admit a ranking map; only labels that actually occur
-    in the supplied finite family are retained.  A finite framing is its own
-    finite window, so its labels are taken whole and no two labels are compared.
+    in the supplied finite family are retained. A finite ranked framing
+    supplies its whole finite window.
     """
     framing = module.module_generating_set()
-    if cardinal(framing.cardinality()).is_finite():
+    if cardinal(framing.cardinality()).is_finite() and framing in EnumeratedSets():
         return finite_ordered_set(framing)
     support = []
     for candidate in elements:

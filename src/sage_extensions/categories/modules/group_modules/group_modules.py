@@ -668,7 +668,7 @@ class ModulesOverGroupAlgebra(Modules):
             return Modules(self.group_algebra()).Mor(self, codomain)
 
         def _finite_action_endomorphism_family(self):
-            r"""Return ``{id_M} union {rho(s) : s in S}`` for a chosen finite ``S``.
+            r"""Return the identity and ``rho(s_i)`` on the chosen finite index set.
 
             Choosing a finite group generating set is a represented backend for
             the wide equalizer/coequalizer of the full action; callers retain
@@ -683,14 +683,14 @@ class ModulesOverGroupAlgebra(Modules):
             indices = Sets().coproduct(
                 indexed_family(
                     Sets.Δ[1],
-                    lambda side: Sets.Δ[0] if int(side) == 0 else generators,
+                    lambda side: Sets.Δ[0] if int(side) == 0 else generators.index_set(),
                 )
             )
             coefficient_module = self.unformed_module()
             identity = coefficient_module.module_category().Mor(coefficient_module, coefficient_module).identity()
             return finite_indexed_family(
                 indices,
-                lambda tagged: identity if int(tagged.summand_index()) == 0 else self.action_of(tagged.summand_element()),
+                lambda tagged: identity if int(tagged.summand_index()) == 0 else self.action_of(generators.value(tagged.summand_element())),
                 name=f"Identity and chosen action generators on {self}",
             )
 

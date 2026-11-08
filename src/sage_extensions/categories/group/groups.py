@@ -7325,18 +7325,24 @@ class SymmetricGroups(OwnedCategory):
             self._symmetric_points = symmetric_points
             super().__init__(**rest)
 
+        @cached_method
+        def _natural_point_ranking_and_inverse(self):
+            r"""The ranking and inverse fixed by this group's selected point set."""
+            ranking = self.natural_points().ranking_map()
+            return ranking, ranking.inverse()
+
         def _permutation_point_action(self, backend_element, point):
             points = self.natural_points()
             if point not in points:
                 raise ValueError(
                     f"{point} is outside the selected permutation domain {points}"
                 )
-            ranking = points.ranking_map()
+            ranking, point_at_position = self._natural_point_ranking_and_inverse()
             position = int(ranking(points(point))) + 1
             # The inverse of the selected ranking map is the mathematical
             # unranking operation, even when the enumeration is not stored
             # as a Python tuple or has a nontrivial selected order.
-            return ranking.inverse()(int(backend_element(position)) - 1)
+            return point_at_position(int(backend_element(position)) - 1)
 
         def natural_points(self):
             return self._symmetric_points

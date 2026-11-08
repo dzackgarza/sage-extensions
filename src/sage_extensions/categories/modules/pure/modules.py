@@ -7660,9 +7660,14 @@ def _engine_matrix(morphism):
     if morphism._engine_matrix_cache is not None:
         return copy(morphism._engine_matrix_cache)
     ring = parent.base_ring()
-    columns = tuple(
-        tuple(morphism._matrix_column_coordinates(column_label))
+    row_labels = tuple(parent.row_index_set())
+    coordinate_columns = tuple(
+        morphism._matrix_column_coordinates(column_label)
         for column_label in parent.column_index_set()
+    )
+    columns = tuple(
+        tuple(column(row_label) for row_label in row_labels)
+        for column in coordinate_columns
     )
     backend = sage_matrix(
         _linear_algebra_ring(ring),
