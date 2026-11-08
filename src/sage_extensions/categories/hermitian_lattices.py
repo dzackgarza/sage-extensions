@@ -118,6 +118,54 @@ class HermitianLattice(SageObject):
             raise ValueError(f"{self} has an indefinite trace lattice, so U(h) is infinite in general and is not enumerated")
         return tuple(element for element in lattice.O() if self.is_order_linear(element))
 
+    def definite_scaling(self):
+        r"""Return a real ``alpha`` in the order with ``Tr(alpha h)`` positive definite.
+
+        ``h`` must be definite at every complex place. Then ``alpha`` must
+        have the sign of ``h`` at each place, and such an element exists by
+        weak approximation; small coordinates are searched in growing boxes.
+        """
+        from itertools import count, product
+
+        from sage.rings.qqbar import QQbar
+
+        embeddings = self._field.embeddings(QQbar)
+        signs = []
+        for embedding in embeddings:
+            image = self._gram.apply_map(embedding)
+            minors = [image[:size, :size].det() for size in range(1, self.rank() + 1)]
+            if all(minor.real() > 0 for minor in minors):
+                signs.append(1)
+            elif all((minor.real() > 0) == (size % 2 == 0) for size, minor in zip(range(1, self.rank() + 1), minors, strict=True)):
+                signs.append(-1)
+            else:
+                raise ValueError(f"{self} is indefinite at the place {embedding}: U(h) is not finite")
+        for radius in count(0):
+            for coefficients in product(range(-radius, radius + 1), repeat=len(self._order_basis)):
+                alpha = sum((int(c) * element for c, element in zip(coefficients, self._order_basis, strict=True)), self._field.zero())
+                if alpha != 0 and alpha == alpha.conjugate() and all(
+                    (embedding(alpha).real() > 0) == (sign > 0) for embedding, sign in zip(embeddings, signs, strict=True)
+                ):
+                    return alpha
+        raise AssertionError("count() does not terminate")
+
+    def definite_unitary_group_generators(self):
+        r"""Return generators of the finite ``U(h)``, through ``O(Tr(alpha h))`` commuting with the order.
+
+        Uses the ``GAP`` centralizer of the root of unity generating the
+        order when the order is ``ZZ[zeta]``, and filters ``O`` otherwise.
+        """
+        scaled = HermitianLattice(self._order_basis, self.definite_scaling() * self._gram)
+        lattice = scaled.trace_lattice()
+        zeta = self._field.zeta(self._field.zeta_order())
+        if scaled._generates_order(zeta):
+            return tuple(lattice.O().centralizer(scaled.unit_isometry(zeta)).group_generators())
+        return tuple(element for element in lattice.O() if scaled.is_order_linear(element))
+
+    def _generates_order(self, zeta):
+        powers = matrix(SageQQ, [list((zeta**k).vector()) for k in range(self._field.degree())])
+        return powers.det() != 0 and all(entry in SageZZ for entry in (self._basis_matrix * ~powers).list())
+
     def isometry_to(self, other):
         r"""Return an order-linear isometry of definite trace lattices to ``other``, or ``None``."""
         source, target = self.trace_lattice(), other.trace_lattice()

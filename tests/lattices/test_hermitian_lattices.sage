@@ -46,3 +46,18 @@ def test_unit_scaled_basis_is_isometric():
     second = HermitianLattice((field.one(), w), _diagonal(field, 2, 1))
     witness = first.isometry_to(second)
     assert witness is not None
+
+
+def test_mixed_sign_rank_two_form_over_zeta_five_has_unitary_order_200():
+    r"""h=sqrt5*I is definite of opposite signs at the two places. U(h)=U(I) is mu_10 wr S_2, order 200."""
+    field = SageCyclotomicField(5)
+    z = field.gen()
+    two = field(int(2))
+    root = two*z*z + two*z*z*z + field.one()
+    assert root*root == field(int(5))
+    basis = (field.one(), z, z*z, z*z*z)
+    zero = field.zero()
+    lattice = HermitianLattice(basis, sage_matrix(field, 2, 2, [root, zero, zero, root]))
+    generators = lattice.definite_unitary_group_generators()
+    scaled = generators[0].domain()
+    assert scaled.O().subgroup(generators).cardinality() == cardinal(200)
