@@ -114,7 +114,10 @@ class _SparseFreeModuleElement(ModuleElement):
         assert label in labels, (
             f"{label!r} is not a basis label of {self.parent()}; the basis is indexed by {labels}"
         )
-        return self._coefficients.get(labels(label), self.parent().base_ring().zero())
+        selected_label = labels(label)
+        if selected_label in self._coefficients:
+            return self._coefficients[selected_label]
+        return self.parent().base_ring().zero()
 
     @cached_method
     def support(self):
