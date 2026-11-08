@@ -432,6 +432,14 @@ class IsotropicFlag:
         r"""Return the ranks of the nested primitive isotropic terms."""
         return FlagType(tuple(int(term.module_rank()) for term in self._terms))
 
+    def face(self, index):
+        r"""Return the flag with the term of position ``index`` removed (the face map ``d_index``)."""
+        dimensions = self.flag_type().dimensions
+        if not 0 <= index < len(dimensions) or len(dimensions) == 1:
+            raise ValueError(f"{self} has no face of index {index}")
+        remaining = dimensions[:index] + dimensions[index + 1:]
+        return IsotropicFlag(self._lattice, self._basis[: remaining[-1]], flag_type=FlagType(remaining))
+
     def invariant(self):
         r"""Return the source's invariant of this flag under the orthogonal group."""
         from sage_indefinite_port.indefinite.marked_lattices import INDUCTION
@@ -501,6 +509,57 @@ class IsotropicFlag:
 
     def __repr__(self) -> str:
         return f"Primitive totally isotropic flag of length {self.flag_length()} in {self.lattice()}"
+
+
+class RationalIsotropicFlagComplex:
+    r"""The quotient by a group ``G <= O(L)`` of the flags of rational isotropic subspaces (#45).
+
+    A simplex orbit is a flag orbit of a :class:`FlagType`. Faces forget a
+    term of the chosen representative and are transported, with an actual
+    isometry, to the chosen representative of the face orbit.
+    """
+
+    def __init__(self, group) -> None:
+        self._group = group
+
+    def group(self):
+        return self._group
+
+    def simplex_orbits(self, flag_type):
+        r"""Return the chosen representatives of the orbits of flags of ``flag_type``."""
+        return self._group.isotropic_orbit_representatives(flag_type, flag=True)
+
+    def face_map(self, flag, index):
+        r"""Return the representative of the orbit of ``d_index(flag)`` and an isometry carrying the face to it."""
+        face = flag.face(index)
+        for representative in self.simplex_orbits(face.flag_type()):
+            witness = self._group.isotropic_equivalence_witness(face, representative, flag=True)
+            if witness is not None:
+                return representative, witness
+        raise ArithmeticError(f"the face {face} lies in no listed orbit of {self._group}")
+
+    def stabilizer_generators(self, flag):
+        r"""Return generators of the setwise stabilizer of a simplex."""
+        return self._group.isotropic_stabilizer_generators(flag, flag=True)
+
+    def face_stabilizer_image(self, flag, index):
+        r"""Return the image of the stabilizer of ``flag`` in the stabilizer of its face.
+
+        Stabilizing a chain stabilizes each term, so the map is the
+        restriction of the same isometries.
+        """
+        return self.stabilizer_generators(flag)
+
+    def incidence_multiplicity(self, flag_type, index, face_representative):
+        r"""Return the number of orbits of ``flag_type`` whose ``index`` face lies in the given orbit.
+
+        This counts flag orbits. It is neither an orbifold weight nor a
+        number of flags in an infinite orbit.
+        """
+        return sum(
+            1 for flag in self.simplex_orbits(flag_type)
+            if self._group.isotropic_equivalence_witness(flag.face(index), face_representative, flag=True) is not None
+        )
 
 
 class OrientedIsotropicFlag:
@@ -1193,4 +1252,5 @@ __all__ = [
     "FlagType",
     "IsotropicFlag",
     "OrientedIsotropicFlag",
+    "RationalIsotropicFlagComplex",
 ]

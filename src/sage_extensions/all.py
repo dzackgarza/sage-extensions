@@ -184,6 +184,7 @@ from sage_extensions.categories.isotropic_orbits import (  # noqa: F401
     FlagType,
     IsotropicFlag,
     OrientedIsotropicFlag,
+    RationalIsotropicFlagComplex,
 )
 from sage_extensions.categories.isotropic_parabolics import (  # noqa: F401
     PrimitiveIsotropicSubobjects,
