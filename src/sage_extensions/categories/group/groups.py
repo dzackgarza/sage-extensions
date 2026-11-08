@@ -4079,7 +4079,7 @@ class IndexedFreeGroupMorphism(GroupMorphism):
             tuple(self._admitted_generator_image(label) for label in basis),
         )
 
-    @cached_method
+    @cached_method(key=lambda self, index, sign: (id(index), index, sign))
     def _signed_generator_image(self, index, sign):
         r"""The image of one letter of a reduced word, a basis element to the power ``sign``."""
         return self._admitted_generator_image(index) ** sign
