@@ -395,6 +395,9 @@ class FiniteOrderedSets(OwnedCategory):
         if index_of is None:
             indices = tuple(index_set)
             points = tuple(element_at(index) for index in indices)
+            # These retained objects already satisfy the chosen enumeration.
+            # Their admission does not need equality with other points.
+            identity_indices = {id(point): index for point, index in zip(points, indices, strict=True)}
             # The finite presentation has already selected its points. Keep
             # these exact objects as the forward enumeration instead of
             # re-running an arbitrary defining callback during membership,
@@ -415,6 +418,9 @@ class FiniteOrderedSets(OwnedCategory):
                         if equal is not False:
                             raise ValueError("distinctness of the enumerated points is undecided")
                 def index_of(point):
+                    retained = identity_indices.get(id(point))
+                    if retained is not None:
+                        return retained
                     for index, present in zip(indices, points, strict=True):
                         equal = True if point is present else point == present
                         if equal is True:
@@ -428,6 +434,8 @@ class FiniteOrderedSets(OwnedCategory):
                     def contains(point):
                         from sage_extensions.logic import conjunction, negation
 
+                        if id(point) in identity_indices:
+                            return True
                         return negation(conjunction(
                             negation(True if point is present else point == present)
                             for present in points
@@ -436,6 +444,9 @@ class FiniteOrderedSets(OwnedCategory):
                 if len(lookup) != len(points):
                     raise ValueError("an enumeration must select distinct points at distinct indices")
                 def index_of(point):
+                    retained = identity_indices.get(id(point))
+                    if retained is not None:
+                        return retained
                     try:
                         return lookup.get(point)
                     except (TypeError, ValueError):
@@ -449,6 +460,8 @@ class FiniteOrderedSets(OwnedCategory):
                     def contains(point):
                         from sage_extensions.logic import conjunction, negation
 
+                        if id(point) in identity_indices:
+                            return True
                         try:
                             position = lookup.get(point)
                         except (TypeError, ValueError):
