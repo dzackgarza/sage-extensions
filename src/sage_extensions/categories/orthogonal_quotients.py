@@ -1029,6 +1029,14 @@ class OrthogonalCharacterQuotient:
                 if lattice.reflection(root) not in self.subgroup:
                     return "NOSPLIT"
             return None
+        # A joint determinant *and* spinor sign quotient is not certified by one
+        # nontrivial reflection: that witness covers one sign coset only, and the
+        # remaining coset need not be generated.  Keep the integral joint-character
+        # splitting there, with its double cosets in the full joint image, rather than
+        # promoting the single flip to a complete stabilizer image.  This is checked
+        # before _sign_descent_rank can ask for the ambient engine.
+        if self.determinant_kernel and self.spinor_kernel:
+            return None
         if not self._has_discriminant:
             # A sign-only character quotient has no im rho at all. This case cannot
             # use the discriminant-stabilizer image, but the same index-two principle
@@ -1588,7 +1596,8 @@ def _isotropic_line_representatives(lattice, quotient):
     """
     if not _two_hyperbolic_planes(lattice):
         return None
-    from sage.libs.gap.libgap import libgap  # keep the caller's libgap available upward
+    from sage.libs.gap.libgap import libgap
+    from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
 
     quadratic_module = lattice.discriminant_group()
     zero_class = quadratic_module.zero()
@@ -1614,8 +1623,6 @@ def _isotropic_line_representatives(lattice, quotient):
                 continue
             return finite_ordered_set((lattice.primitive_isotropic_subobject(vector),))
         return None
-    from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
-
     def key(element):
         return element
 
