@@ -4939,8 +4939,8 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 raise TypeError(f"the product of {family} cannot be formed in {self}: some factor is not an object of {self}")
             labels = tuple(family.index_set())
             # GAP's DirectProduct serves families of finitely presented
-            # groups, and of finite groups realized as permutation groups,
-            # whose product it returns as a permutation group; every other
+            # groups, and finite groups with native GAP elements, transported
+            # through their permutation isomorphisms; every other
             # family is realized on families of components.
             if labels and not (
                 all(factor in GroupsWithChosenFinitePresentation() for factor in family)
@@ -4960,8 +4960,9 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 # factors even when the caller selected Grp rather than Ab.
                 all_abelian = all(family[label] in OwnedAbelianGroups() for label in labels)
                 # GAP's FP direct product is an FP group for FP inputs (49.1-1).
-                # Convert mixed finite factors through their FP isomorphisms,
-                # preserving the comparison maps used below.
+                # Finite native factors use permutation isomorphisms; mixed
+                # FP factors use FP isomorphisms. The comparison maps remain
+                # in every projection and mediating homomorphism below.
                 presentation_isomorphisms = (
                     ()
                     if all_finite and all(_encodes_as_permutations(_engine_group(family[label])) for label in labels)
