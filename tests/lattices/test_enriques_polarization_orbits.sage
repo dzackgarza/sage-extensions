@@ -24,7 +24,20 @@ Cited rows (lattice-database ``arithmetic-groups/gamma-h-*.md``, quoting DSH Tab
 - case 1, $S = \overline{\{0\}}$: $h = g_2$ (source Table 3 identifies $g_2$; degree 2,
   $\varphi(h_{\min}) = 1$), lines 5, planes 9, flags 18;
 - case 2, $S = \overline{\{-1,0\}}$: $h = g_1 + g_2$ (source Section 3.2 names this
-  degree-4 representative), lines 7, planes 13, flags 28.
+  degree-4 representative), lines 7, planes 13, flags 28;
+- cases 3 through 21: the $g$-basis representatives listed in source Table 3 (degree
+  at most 30), with each card's cited line, plane and flag rows.  The remaining 66
+  classes have higher-degree representatives that Table 3 does not list; they are part
+  of the open batch and are not asserted from guesswork.
+
+An exact subgroup boundary is retained here, not silently resolved: the source's table
+counts (Sections 3.3 and 3.6) are orbits of $\Gamma^+_h = \Gamma_h \cap O^+(N)$, while
+the public method returns the full preimage $\Gamma_h$ in $O(N)$.  The equality of the
+line, plane and flag orbit counts between the two groups is a separate statement --
+including the flag stabilizer's orientation witness -- that research #748 is proving;
+these assertions compare the public $\Gamma_h$ orbit counts against the cited
+$\Gamma^+_h$ rows, and a genuine difference, if observed, is a result about that
+boundary rather than a defect to hide.
 
 Each case is split per rank so one specimen's cost cannot hide another's result, and
 $N = T_{\mathrm{En}}$ is checked against the ``029J`` card's invariants (rank 12,
@@ -48,10 +61,109 @@ _DSH_W_ROWS = (
     (6, 12, 14, 18, 21, 24, 28, 30, 36, 42),
 )
 
-# (case, source-named h as g-indices 1-based, h^2 in M's doubled form, lines, planes, flags)
+# (case, support of an exact-facet-set polarization in g-indices, lines, planes, flags)
+# The support is decoded from the card's source node set S with the overline convention:
+# a barred set is the complement of the generating (orthogonal) wall set, an unbarred
+# set is that wall set itself (barred rows include |S| = 5, so the printed "greater than
+# five" wording is typographic -- the bars were read row by row from the rendered pages
+# 13 and 14 of arXiv:2302.01679 and agree with every card).  The node labels map to the
+# wall/g-basis indices by -1->1, 0->2, 7->3, 1->4, 8->5, 2->6, 6->7, 3->8, 4->9, 5->10,
+# fixed by the single-node cases against their Table 3 representatives (case 1: 0 -> g_2,
+# case 3: {7} -> g_3, case 4: {1} -> g_4, case 7: {8} -> g_5, case 8: {2} -> g_6,
+# case 11: {6} -> g_7, case 14: {3} -> g_8, case 20: {4} -> g_9) and by
+# case 5 ({-1,7} -> g_1 + g_3), which fixes -1 -> 1 and leaves 5 -> 10.
+# h = sum of the support's g_j: the dual relation alpha_i . g_j = delta_ij makes its
+# zero wall pairings exactly the generating set, and positivity is asserted per case.
+# The listed subset identifies the class up to conjugacy, so a representative need not
+# live in the fundamental chamber; Table 3 pins exactly the fundamental-chamber cases.
 _CASES = (
-    (1, (2,), 4, 5, 9, 18),
-    (2, (1, 2), 8, 7, 13, 28),
+    (1, (2,), 5, 9, 18),
+    (2, (1, 2), 7, 13, 28),
+    (3, (3,), 5, 10, 19),
+    (4, (4,), 6, 14, 28),
+    (5, (1, 3), 9, 23, 49),
+    (6, (2, 4), 9, 23, 51),
+    (7, (5,), 6, 13, 28),
+    (8, (6,), 8, 22, 47),
+    (9, (2, 3), 11, 34, 77),
+    (10, (3, 5), 11, 31, 74),
+    (11, (7,), 8, 22, 49),
+    (12, (4, 6), 12, 38, 89),
+    (13, (1, 2, 3), 15, 48, 116),
+    (14, (8,), 10, 34, 76),
+    (15, (1, 2, 4), 12, 32, 76),
+    (16, (3, 4), 13, 49, 113),
+    (17, (2, 5), 14, 51, 125),
+    (18, (2, 6), 13, 46, 108),
+    (19, (3, 6), 16, 67, 162),
+    (20, (9,), 11, 41, 96),
+    (21, (2, 3, 4), 19, 83, 204),
+    (22, (1, 2, 5), 19, 74, 191),
+    (23, (2, 4, 6), 17, 64, 159),
+    (24, (5, 10), 16, 68, 171),
+    (25, (3, 10), 18, 85, 213),
+    (26, (2, 8), 18, 87, 213),
+    (27, (5, 8), 19, 91, 233),
+    (28, (10,), 12, 49, 115),
+    (29, (3, 4, 6), 24, 124, 320),
+    (30, (3, 8), 18, 85, 208),
+    (31, (2, 4, 5), 24, 122, 322),
+    (32, (5, 6), 18, 85, 215),
+    (33, (1, 10), 21, 115, 294),
+    (34, (1, 2, 3, 4), 25, 118, 305),
+    (35, (6, 7), 23, 136, 351),
+    (36, (2, 3, 6), 26, 151, 388),
+    (37, (3, 6, 8), 29, 179, 466),
+    (38, (4, 5, 6), 28, 167, 448),
+    (39, (2, 5, 6), 31, 207, 553),
+    (40, (1, 2, 4, 5), 32, 181, 495),
+    (41, (3, 5, 6), 31, 200, 540),
+    (42, (4, 9), 24, 149, 389),
+    (43, (2, 3, 4, 6), 34, 219, 585),
+    (44, (2, 10), 27, 187, 487),
+    (45, (1, 2, 4, 6), 22, 92, 238),
+    (46, (2, 3, 8), 33, 239, 629),
+    (47, (2, 5, 10), 36, 274, 746),
+    (48, (2, 4, 5, 6), 41, 307, 849),
+    (49, (4, 10), 30, 231, 608),
+    (50, (3, 4, 6, 8), 44, 354, 967),
+    (51, (5, 6, 7), 38, 306, 832),
+    (52, (2, 3, 10), 40, 342, 927),
+    (53, (3, 4, 5, 6), 48, 413, 1159),
+    (54, (2, 4, 10), 45, 429, 1175),
+    (55, (2, 3, 4, 8), 48, 435, 1184),
+    (56, (3, 5, 6, 8), 51, 463, 1298),
+    (57, (4, 5, 10), 40, 341, 937),
+    (58, (2, 3, 5, 10), 53, 512, 1433),
+    (59, (1, 2, 4, 5, 6), 54, 465, 1315),
+    (60, (1, 2, 3, 4, 6), 44, 325, 890),
+    (61, (4, 6, 10), 48, 484, 1339),
+    (62, (2, 4, 5, 10), 60, 649, 1832),
+    (63, (2, 3, 4, 5, 6), 70, 782, 2235),
+    (64, (2, 3, 4, 6, 8), 63, 653, 1825),
+    (65, (2, 6, 10), 54, 611, 1685),
+    (66, (2, 3, 4, 10), 67, 814, 2291),
+    (67, (3, 4, 5, 6, 8), 80, 1002, 2884),
+    (68, (2, 4, 6, 10), 72, 929, 2637),
+    (69, (2, 3, 4, 5, 10), 89, 1252, 3599),
+    (70, (4, 5, 6, 10), 64, 737, 2097),
+    (71, (2, 3, 6, 10), 81, 1174, 3323),
+    (72, (1, 2, 3, 4, 5, 6), 92, 1210, 3503),
+    (73, (2, 4, 5, 6, 10), 96, 1440, 4166),
+    (74, (2, 3, 4, 6, 10), 108, 1818, 5251),
+    (75, (2, 3, 4, 5, 6, 8), 118, 1953, 5690),
+    (76, (1, 2, 3, 4, 6, 8), 82, 996, 2829),
+    (77, (1, 2, 4, 5, 6, 10), 128, 2263, 6625),
+    (78, (2, 3, 4, 8, 10), 122, 2306, 6647),
+    (79, (2, 3, 4, 5, 6, 10), 144, 2856, 8357),
+    (80, (2, 3, 4, 5, 8, 10), 163, 3626, 10599),
+    (81, (1, 2, 3, 4, 5, 6, 8), 156, 3074, 9031),
+    (82, (1, 2, 3, 4, 5, 6, 10), 192, 4532, 13369),
+    (83, (2, 3, 4, 5, 6, 8, 10), 218, 5766, 17003),
+    (84, (1, 2, 3, 4, 5, 6, 7, 10), 256, 7242, 21471),
+    (85, (1, 2, 3, 4, 5, 6, 8, 10), 292, 9246, 27411),
+    (86, (1, 2, 3, 4, 5, 6, 7, 8, 10), 392, 14926, 44387),
+    (87, (1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 528, 24242, 72199),
 )
 
 
@@ -88,65 +200,144 @@ def test_the_doubled_model_matches_the_invariant_lattice() -> None:
     assert invariant.determinant() == ZZ(-1024)
 
 
+def _dsh_wall_duality():
+    r"""Return $W^{-1}$ exactly: the wall normals are $\alpha_i = \sum_j (W^{-1})_{ij} g_j$.
+
+    Inverting the source matrix over $\mathbb Q$ makes $\alpha_i\cdot g_j = \delta_{ij}$
+    checkable, so the chamber coefficients below are the dual pairings themselves.
+    """
+    size = 10
+    matrix = [[QQ(entry) for entry in row] for row in _DSH_W_ROWS]
+    augmented = [
+        row + [QQ(1) if i == j else QQ(0) for j in range(size)]
+        for i, row in enumerate(matrix)
+    ]
+    for column in range(size):
+        pivot = next(row for row in range(column, size) if augmented[row][column] != 0)
+        augmented[column], augmented[pivot] = augmented[pivot], augmented[column]
+        scale = augmented[column][column]
+        augmented[column] = [entry / scale for entry in augmented[column]]
+        for row in range(size):
+            if row == column:
+                continue
+            factor = augmented[row][column]
+            if factor != 0:
+                augmented[row] = [
+                    left - factor * right
+                    for left, right in zip(augmented[row], augmented[column], strict=True)
+                ]
+    inverse = [row[size:] for row in augmented]
+    for i in range(size):
+        for j in range(size):
+            product = sum(
+                (inverse[i][k] * matrix[k][j] for k in range(size)), QQ(0)
+            )
+            assert product == (QQ(1) if i == j else QQ(0))
+    return inverse
+
+
+def test_every_class_fixture_is_a_positive_chamber_vector_with_its_exact_facet_set() -> None:
+    r"""All 87 classes: the support vector has exactly the decoded zero wall pairings.
+
+    With $\alpha_i\cdot h$ equal to $h$'s $i$-th $g$-coefficient, the support vector
+    lies in the closed fundamental chamber with zero wall set equal to the source's
+    generating set, and it is non-isotropic -- the source's two degenerate subsets
+    (the isotropic $g_1$ alone, and an empty support) never occur among the 87 rows.
+    """
+    inverse = _dsh_wall_duality()
+    for case, support, _lines, _planes, _flags in _CASES:
+        coefficients = [1 if (index + 1) in support else 0 for index in range(10)]
+        square = sum(
+            coefficients[i] * coefficients[j] * _DSH_W_ROWS[i][j]
+            for i in range(10)
+            for j in range(10)
+        )
+        assert square > 0, f"case {case}: the decoded support is isotropic"
+        for index in range(10):
+            pairing = sum(
+                (
+                    inverse[index][j]
+                    * sum(
+                        (coefficients[k] * QQ(_DSH_W_ROWS[j][k]) for k in range(10)),
+                        QQ(0),
+                    )
+                    for j in range(10)
+                ),
+                QQ(0),
+            )
+            assert pairing == coefficients[index], (
+                f"case {case}: alpha_{index + 1} . h is {pairing}, not the coefficient"
+            )
+        zero_walls = tuple(
+            index + 1 for index, coefficient in enumerate(coefficients) if coefficient == 0
+        )
+        assert zero_walls == tuple(
+            wall for wall in range(1, 11) if wall not in support
+        )
+
+
 def _case_polarization(case):
-    r"""Return ``(h_M, h_K3)`` for the source-named case representative."""
-    case_number, g_indices, expected_square, *_rest = case
+    r"""Return ``(h_M, h_K3)`` for the case's source-defined representative."""
+    case_number, support, *_rest = case
     invariant = Involutions.I_En.invariant_lattice()
-    doubled = _doubled_invariant_model()
+    doubled = Lattices(ZZ)(
+        [list(2 * entry for entry in row) for row in _DSH_W_ROWS]
+    )
     transport = doubled.isometry_to(invariant)
     labels = tuple(doubled.module_generating_set())
     h = sum(
-        (doubled.module_generator(labels[index - 1]) for index in g_indices),
+        (
+            doubled.module_generator(labels[index - 1])
+            for index in support
+        ),
         doubled.zero(),
     )
-    assert h.q() == ZZ(expected_square), (
-        f"case {case_number}: h^2 = {h.q()} in M's form, the source degree needs "
-        f"{expected_square}"
-    )
     h_M = transport(h)
-    assert h_M.q() == ZZ(expected_square)
+    assert h_M.q() == h.q() and h_M.q() > ZZ(0), (
+        f"case {case_number}: the transported representative changed square"
+    )
     return h_M, invariant.inclusion()(h_M)
+
+
+def _case_group(case):
+    r"""Return the public Gamma_h preimage subgroup of the case's representative."""
+    _h_M, h_K3 = _case_polarization(case)
+    return Involutions.I_En.polarized(h_K3).coinvariant_extension_subgroup()
 
 
 def test_case_1_line_orbits() -> None:
     r"""Case 1 ($h = g_2$): five orbits of isotropic lines in $N$ (DSH Table 1)."""
-    _h_M, h_K3 = _case_polarization(_CASES[0])
-    group = Involutions.I_En.polarized(h_K3).coinvariant_extension_subgroup()
+    group = _case_group(_CASES[0])
     assert group.isotropic_orbit_representatives(1).cardinality() == cardinal(5)
 
 
 def test_case_1_plane_orbits() -> None:
     r"""Case 1: nine orbits of isotropic planes in $N$ (DSH Table 1)."""
-    _h_M, h_K3 = _case_polarization(_CASES[0])
-    group = Involutions.I_En.polarized(h_K3).coinvariant_extension_subgroup()
+    group = _case_group(_CASES[0])
     assert group.isotropic_orbit_representatives(2).cardinality() == cardinal(9)
 
 
 def test_case_1_flag_orbits() -> None:
     r"""Case 1: eighteen orbits of isotropic flags in $N$ (DSH Table 1)."""
-    _h_M, h_K3 = _case_polarization(_CASES[0])
-    group = Involutions.I_En.polarized(h_K3).coinvariant_extension_subgroup()
+    group = _case_group(_CASES[0])
     assert group.isotropic_orbit_representatives(2, flag=True).cardinality() == cardinal(18)
 
 
 def test_case_2_line_orbits() -> None:
     r"""Case 2 ($h = g_1 + g_2$): seven orbits of isotropic lines in $N$."""
-    _h_M, h_K3 = _case_polarization(_CASES[1])
-    group = Involutions.I_En.polarized(h_K3).coinvariant_extension_subgroup()
+    group = _case_group(_CASES[1])
     assert group.isotropic_orbit_representatives(1).cardinality() == cardinal(7)
 
 
 def test_case_2_plane_orbits() -> None:
     r"""Case 2: thirteen orbits of isotropic planes in $N$."""
-    _h_M, h_K3 = _case_polarization(_CASES[1])
-    group = Involutions.I_En.polarized(h_K3).coinvariant_extension_subgroup()
+    group = _case_group(_CASES[1])
     assert group.isotropic_orbit_representatives(2).cardinality() == cardinal(13)
 
 
 def test_case_2_flag_orbits() -> None:
     r"""Case 2: twenty-eight orbits of isotropic flags in $N$."""
-    _h_M, h_K3 = _case_polarization(_CASES[1])
-    group = Involutions.I_En.polarized(h_K3).coinvariant_extension_subgroup()
+    group = _case_group(_CASES[1])
     assert group.isotropic_orbit_representatives(2, flag=True).cardinality() == cardinal(28)
 
 
