@@ -4103,6 +4103,89 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         selected = representation.codomain().subgroup(()) if target is None else target
         return representation.preimage_subgroup(selected)
 
+    def joint_eigensublattices(self, involutions):
+        r"""Return the nonzero primitive sublattices ``L_chi`` of pairwise commuting involutions.
+
+        The key of each is its sign tuple ``chi``. Eigenspaces of distinct
+        characters are orthogonal, so their sum has finite index in ``L``.
+        """
+        from itertools import product
+
+        from sage.matrix.constructor import matrix
+        from sage.rings.integer_ring import ZZ as SageZZ
+
+        lattice = self.lattice()
+        involutions = tuple(involutions)
+        points = tuple(lattice.module_generators())
+        labels = tuple(lattice.module_generating_set())
+        for involution in involutions:
+            if any(involution(involution(point)) != point for point in points):
+                raise ValueError(f"{involution} is not an involution")
+        for left in involutions:
+            for right in involutions:
+                if any(left(right(point)) != right(left(point)) for point in points):
+                    raise ValueError(f"the involutions {left} and {right} do not commute")
+
+        def row(point):
+            return [int(point.to_vector()(label)) for label in labels]
+
+        size = len(labels)
+        result = {}
+        for chi in product((1, -1), repeat=len(involutions)):
+            system = matrix(SageZZ, 0, size)
+            for sign, involution in zip(chi, involutions, strict=True):
+                system = system.stack((matrix(SageZZ, [row(involution(point)) for point in points]) - sign * matrix.identity(SageZZ, size)).transpose())
+            kernel = system.right_kernel().basis_matrix()
+            if kernel.nrows() == 0:
+                continue
+            result[chi] = lattice.subobject_on(tuple(
+                lattice.linear_combination({label: lattice.base_ring()(int(entry)) for label, entry in zip(labels, vector_, strict=True) if entry})
+                for vector_ in kernel.rows()
+            ))
+        return result
+
+    def commuting_involutions_centralizer_generators(self, involutions):
+        r"""Return generators of ``C_{O(L)}(f_1,...,f_s)`` for pairwise commuting involutions (#49).
+
+        A centralizing isometry preserves each ``L_chi``, and a tuple in
+        the product of their orthogonal groups extends to ``L`` exactly when
+        it preserves the glue ``L/M``, for ``M`` the sum of the ``L_chi``.
+        """
+        lattice = self.lattice()
+        pieces = self.joint_eigensublattices(involutions)
+        inclusions = tuple(piece.inclusion() for piece in pieces.values())
+        adapted_points = tuple(
+            inclusion(generator) for inclusion in inclusions for generator in inclusion.domain().module_generators()
+        )
+        sum_inclusion = lattice.subobject_on(adapted_points).inclusion()
+        total = sum_inclusion.domain()
+        ring = lattice.base_ring()
+        adapted = ring.free_module(len(adapted_points))
+        adapted_labels = tuple(adapted.module_generating_set())
+        coordinates = adapted.Mor(total)(dict(zip(adapted_labels, (sum_inclusion.lift(point) for point in adapted_points), strict=True)))
+
+        def block(position, factor_generator):
+            images = [
+                inclusion(factor_generator(generator) if index == position else generator)
+                for index, inclusion in enumerate(inclusions)
+                for generator in inclusion.domain().module_generators()
+            ]
+            def image(label):
+                vector_ = coordinates.lift(total.module_generator(label)).to_vector()
+                return sum(
+                    (total.scalar_multiple(vector_(name), sum_inclusion.lift(point)) for name, point in zip(adapted_labels, images, strict=True)),
+                    total.zero(),
+                )
+            return total.O()(image)
+
+        generators = tuple(
+            block(position, generator)
+            for position, inclusion in enumerate(inclusions)
+            for generator in inclusion.domain().O().group_generators()
+        )
+        extension = total.Emb(lattice)(lambda label: sum_inclusion(total.module_generator(label)))
+        return tuple(extension.extended_subgroup(total.O().subgroup(generators)).group_generators())
+
     def vector_orbit_representatives(self, square, *, content=None):
         r"""Return one representative of each ``O(L)``-orbit of square ``square``.
 
