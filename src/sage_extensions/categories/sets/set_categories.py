@@ -349,7 +349,7 @@ class EnumeratedSets(OwnedCategory):
                         int(cardinal(counting_order.cardinality()).finite_value())
                     )
                 case False:
-                    assert counting_order in CountablyInfiniteSets(), (
+                    assert counting_order.cardinality().is_countably_infinite() is True, (
                         f"the ranking map of {self} has codomain {counting_order}, not a finite or countably infinite "
                         "standard well-order"
                     )
@@ -5058,6 +5058,18 @@ class CartesianProductsOfSets(OwnedCategory):
         def has_finite_index_set(self) -> bool:
             index = self.index_set()
             return Sets().is_provably_finite(index)
+
+        def __iter__(self):
+            r"""Enumerate the selected ranking or the finite factor iterators."""
+            if self in EnumeratedSets():
+                return EnumeratedSets.ParentMethods.__iter__(self)
+            if not self.has_finite_index_set() or self.index_set() not in EnumeratedSets():
+                raise TypeError("product iteration requires a finite enumerated index set")
+            factors = tuple(self.factor(index) for index in self.index_set())
+            if not all(Sets().is_provably_finite(factor) for factor in factors):
+                raise TypeError("unranked product iteration requires finite factors")
+            # itertools.product uses the supplied complete finite iterators.
+            return (self(values) for values in product(*factors))
 
         def factor(self, index: IndexT) -> Sets().ObjectType:
             normalized = self.index_set()(index)

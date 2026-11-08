@@ -12,7 +12,7 @@ def test_s3_times_a_singleton_has_every_group_element_once() -> None:
 
     assert product.cardinality() == cardinal(6)
     assert sum(1 for _ in points) == ZZ(6)
-    assert {first(point) for point in points} == set(group)
+    assert all(sum(1 for point in points if first(point) == element) == ZZ(1) for element in group)
     assert all(second(point) == singleton(0) for point in points)
     assert product not in EnumeratedSets()
 
@@ -32,6 +32,3 @@ def test_the_empty_product_has_its_unique_empty_section() -> None:
     assert product.cardinality() == cardinal(1)
     assert sum(1 for _ in points) == ZZ(1)
     assert points[0] == product(())
-
-
-
