@@ -238,7 +238,7 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         points, words, transitions = self._orbit_words(
             seeds, action, augmentation, retain_transitions=True,
         )
-        g_set = self(finite_ordered_set(tuple(points)), action)
+        g_set = self._from_orbit_sweep(points, action, augmentation, transitions)
         g_set.__dict__["_retained_orbit_bfs"] = {
             "seeds": seeds,
             "augmentation": augmentation,
@@ -248,6 +248,43 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             "letter_count": len(tuple(augmentation.domain().group_generators())),
         }
         return g_set
+
+    def _from_orbit_sweep(self, points, action, augmentation, transitions):
+        r"""Realize the finite action from its complete generator transition table.
+
+        The orbit sweep has evaluated every selected letter on every point.
+        Its columns are the images of those letters under ``G -> Sym(X)``.
+        Retain these finite permutations when admitting the elementwise
+        morphism; other group elements use the supplied defining action.
+        This is the same transition-table realization used by
+        ``orbit_generator_permutations``, with the actual points retained.
+        """
+        point_set = finite_ordered_set(tuple(points))
+        permutations = SymmetricGroups()(point_set)
+        letters = tuple(augmentation.domain().group_generators())
+        assert len(transitions) == len(points) * len(letters)
+        generator_images = {
+            augmentation(letter): permutations([
+                transitions[(position, letter_position)] + 1
+                for position in range(len(points))
+            ])
+            for letter_position, letter in enumerate(letters)
+        }
+
+        def permutation(element):
+            if element in generator_images:
+                return generator_images[element]
+            return _permutation_from_point_map(
+                permutations, point_set, lambda point: action(element, point),
+            )
+
+        representation = self.group().Mor(permutations).elementwise(permutation)
+        return _object_of(
+            self,
+            point_set=point_set,
+            permutation_representation=representation,
+            point_action=action,
+        )
 
     def pointed_orbit(self, subgroup, base, action, augmentation=None):
         r"""``G/H`` realized as the orbit of ``base``, for ``H`` the stabilizer of ``base``.
@@ -262,8 +299,10 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         """
         if augmentation is None:
             augmentation = self.group().selected_group_resolution().augmentation()
-        points, words = self._orbit_words((base,), action, augmentation)
-        orbit = self(finite_ordered_set(tuple(points)), action)
+        points, words, transitions = self._orbit_words(
+            (base,), action, augmentation, retain_transitions=True,
+        )
+        orbit = self._from_orbit_sweep(points, action, augmentation, transitions)
         return orbit._pointed_coset_space(subgroup, base, words, augmentation)
 
     def underlying_category(self):
