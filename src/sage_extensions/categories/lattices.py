@@ -10328,16 +10328,15 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
 
         def levi_image_generators(self):
             r"""Return the generators of :meth:`levi_image`: the images of the selected generators of \(P_I\)."""
-            return self.levi_image().selected_subgroup_generators()
+            return self.levi_image().group_generators()
 
         def levi_lift(self, isometry):
             r"""Return a lift of ``isometry`` to \(P_I\) when it lies in :meth:`levi_image`, else ``None``.
 
             The lift is ``levi_action().lift``, a set-theoretic section, not
-            a homomorphic splitting: for a line \(I\) the torsor section
-            :meth:`_levi_section`, otherwise the word section of the finite
-            image computed from the selected generators of \(P_I\), which
-            needs \(O(K_I)\) finite, as when \(K_I\) is definite.
+            a homomorphic splitting. The selected image section uses signed
+            lift torsors for a line and prescribed-quotient integral
+            correction at other ranks.
             """
             if isometry.parent() is not self.Aut():
                 raise ValueError(

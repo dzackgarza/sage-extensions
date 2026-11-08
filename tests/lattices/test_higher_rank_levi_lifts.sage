@@ -102,3 +102,15 @@ def test_null_plane_public_levi_lift_uses_the_exact_image_section():
     lift = reduction.levi_lift(quotient_map)
     assert reduction.levi_action()(lift) == quotient_map
     assert all((~lift)(lift(point)) == point for point in ambient.module_generators())
+
+
+def test_null_plane_levi_image_generators_realize_both_signs_on_a_line():
+    r"""In 2U + <2>, negating the last summand lifts the nontrivial O(<2>) element."""
+    hyperbolic = Lattices(ZZ)("U")
+    ambient = hyperbolic + hyperbolic + Lattices(ZZ)([[2]])
+    basis = tuple(ambient.module_generators())
+    reduction = ambient.primitive_isotropic_subobject(basis[0], basis[2]).isotropic_reduction()
+    image = reduction.levi_image()
+    family = tuple(reduction.levi_image_generators())
+    assert all(generator in image for generator in family)
+    assert reduction.O().subgroup(family).cardinality() == cardinal(2)
