@@ -679,7 +679,7 @@ class _TransversalCosets(Parent):
         r"""The transversal's ``position``-th entry (zero-based) at full GAP index width."""
         return _gap_list_entry(self._transversal, position)
 
-    @cached_method
+    @cached_method(key=lambda self, element: (id(element), element))
     def _multiplier(self, element):
         encoded = self._permutations.Image(_element_to_engine(self.group, element))
         return encoded if self._reversed else encoded.Inverse()
