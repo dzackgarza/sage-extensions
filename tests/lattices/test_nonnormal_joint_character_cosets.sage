@@ -55,3 +55,30 @@ def test_nonnormal_joint_character_cosets_have_the_exact_left_action_and_lifts()
             assert cosets.act(~generator, cosets.act(generator, point)) == point
     for generator in (cycle, exchange, sign):
         assert (cosets.act(generator, base) == base) == (generator in subgroup)
+
+
+def test_nonnormal_joint_subgroup_generators_retain_the_discriminant_kernel():
+    r"""The signed action on the other two axes identifies the subgroup with D8.
+
+    Fixing the first axis modulo the discriminant leaves signed permutations
+    on the other axes. Determinant one then fixes the sign on the first
+    axis. This is a faithful action of order eight; its discriminant image
+    has order two and its full integral kernel has order four.
+    """
+    root = Lattices(ZZ)("A1")
+    lattice = root + root + root
+    group = lattice.O()
+    labels = tuple(lattice.module_generating_set())
+    e, f, h = tuple(lattice.module_generators())
+    exchange = group(dict(zip(labels, (e, h, f), strict=True)))
+    rho = lattice.discriminant_representation()
+    target = rho.codomain().subgroup((rho(exchange),))
+    subgroup = lattice.SO().intersection(group.discriminant_preimage(target))
+    inclusion = subgroup.inclusion()
+    family = tuple(subgroup.group_generators())
+    assert all(inclusion(generator).determinant() == ZZ.one() for generator in family)
+    assert all(rho(inclusion(generator)) in target for generator in family)
+    roots = Set((f, -f, h, -h))
+    action = FiniteGSets(subgroup)(roots, lambda generator, point: inclusion(generator)(point))
+    assert action.permutation_representation().image().cardinality() == cardinal(8)
+    assert (rho * inclusion).image().cardinality() == cardinal(2)
