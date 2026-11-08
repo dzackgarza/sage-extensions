@@ -4047,11 +4047,30 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                         )
                     )
                 )
+        from sage_extensions.categories.group.predicate_subgroups import PreimageSubgroups
+
+        if (
+            subgroup in PreimageSubgroups(self)
+            and subgroup.supergroup() is self
+            and subgroup.preimage_morphism().codomain().is_finite() is True
+        ):
+            # H \\ G / P = K \\ F / rho(P): #43, using the finite image F of rho.
+            representation = subgroup.preimage_morphism()
+            image = representation.codomain()
+            stabilizer_image = image.subgroup(tuple(
+                representation(generator) for generator in self._marking_stabilizer_generators(category, marked, stabilizer)
+            ))
+            double_cosets = image.left_cosets(stabilizer_image).double_cosets(subgroup.target_subgroup())
+            representative = double_cosets.double_coset_section()
+            section = representation.image_section()
+            return finite_ordered_set(tuple(
+                category.apex_action(section(representative(orbit)), marked)
+                for orbit in double_cosets
+            ))
         assert False, (
             f"cannot split the orbit of {marked} under {self} along {subgroup}: the splitting is "
             f"computed through a finite quotient of {self} by characters (discriminant, determinant, "
-            f"spinor norm), so {subgroup} must contain the kernel of such a character map; it is "
-            f"neither {self} itself nor a subgroup of {self} known to contain one"
+            f"spinor norm) or a finite-codomain preimage, and {subgroup} is neither"
         )
 
     @cached_method

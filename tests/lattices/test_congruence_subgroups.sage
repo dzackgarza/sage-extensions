@@ -25,3 +25,20 @@ def test_gamma_three_of_two_hyperbolic_planes_has_index_1152():
     gamma = group.congruence_preimage(3)
     assert ambient.Aut().one() in gamma
     assert ambient.Aut()(dict(zip(labels, (-e, -f, -u, -v), strict=True))) not in gamma
+
+
+def test_gamma_three_splits_null_lines_of_two_hyperbolic_planes_into_sixteen_orbits():
+    r"""Gamma(3)-orbits are the 16 isotropic lines of the split form on F3^4."""
+    hyperbolic = Lattices(ZZ)("U")
+    ambient = hyperbolic + hyperbolic
+    group = ambient.O()
+    gamma = group.congruence_preimage(3)
+    e, _f, _u, _v = tuple(ambient.module_generators())
+    arrows = Cat().Mor(FiniteOrdinalCategory(2), Lattices(ZZ))
+    marked = arrows.object(ambient.primitive_isotropic_subobject(e).inclusion())
+    orbits = tuple(group.split_orbit(marked, gamma))
+    assert len(orbits) == 16
+    first, second = orbits[0], orbits[1]
+    assert arrows.Iso(first, second).an_element_in(gamma) is None
+    assert arrows.Iso(first, first).an_element_in(gamma) is not None
+    assert all(ambient.q(arrow.arrow()(next(iter(arrow.arrow().domain().module_generators())))) == 0 for arrow in orbits)
