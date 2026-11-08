@@ -43,3 +43,15 @@ def test_zero_null_stabilizer_has_the_full_discriminant_image():
     generator = next(iter(ambient.module_generators()))
     minus = ambient.Aut()({label: -generator for label in ambient.module_generating_set()})
     assert ambient.discriminant_representation()(minus) in image
+
+
+def test_zero_orbit_transporter_in_the_constructive_stabilizer_subgroup():
+    ambient = Lattices(ZZ)([[6]])
+    zero = ambient.primitive_isotropic_subobject()
+    group = ambient.O().stabilizer(zero)
+    orbits = group.isotropic_orbit_representatives(0)
+    assert orbits.cardinality() == cardinal(1)
+    representative = next(iter(orbits))
+    witness = group.isotropic_equivalence_witness(zero, representative)
+    assert witness in group
+    assert witness == group.one()
