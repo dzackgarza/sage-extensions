@@ -8,7 +8,7 @@ standard finite free/cofree constructions.
 """
 
 from sage.categories.category import Category
-from sage.misc.cachefunc import cached_method
+from sage.misc.cachefunc import cached_function, cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import Element, parent as element_parent
 from sage.structure.parent import Parent
@@ -240,6 +240,55 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         augmentation = group.selected_group_resolution().augmentation()
         points, words = self._orbit_words((source,), action, augmentation, targets=(target,))
         return next((augmentation(word) for point, word in zip(points, words, strict=True) if point == target), None)
+
+    def transporter_on_left_cosets(self, subgroup, source, target, inclusion):
+        r"""Transport source*H to target*H under the supplied group inclusion.
+
+        The finite-index hypothesis comes from a finite ambient group, a
+        selected finite coset action, or the subgroup's finite quotient
+        data. Enumerate only the acting group's source orbit, retaining
+        the actual coset equality and inverse witness.
+        """
+        from sage_extensions.categories.group.predicate_subgroups import PredicateSubgroups
+
+        ambient = subgroup.supergroup()
+        if inclusion.domain() is not self.group() or inclusion.codomain() is not ambient:
+            raise ValueError("the coset action needs an inclusion into the subgroup's ambient group")
+        finite = ambient in OwnedFiniteGroups()
+        if not finite and ambient.has_selected_left_cosets(subgroup):
+            finite = ambient.left_cosets(subgroup) in FiniteGSets(ambient)
+        if not finite and subgroup in PredicateSubgroups(ambient):
+            finite = subgroup.has_finite_coset_space()
+        if not finite:
+            raise ValueError(f"no finite left-coset action is supplied for {subgroup}")
+        points = _LeftCosetPointSet(ambient, subgroup)
+        return self.transporter_from_finite_orbit(
+            points(source), points(target),
+            lambda element, point: points(inclusion(element) * point.representative()),
+        )
+
+    def preimage_coset_space(self, subgroup, morphism, target, augmentation):
+        r"""Return G/f^-1(H) from its orbit in the finite target's cosets.
+
+        Only f(G)'s orbit of H is needed; the ambient target need not be
+        the image of f. The supplied free cover retains the section and
+        the full Schreier generating morphism of the preimage.
+        """
+        if subgroup.supergroup() is not self.group() or morphism.domain() is not self.group():
+            raise ValueError("the finite preimage and its morphism must have this acting group as source")
+        if morphism.codomain() not in OwnedFiniteGroups() or target.supergroup() is not morphism.codomain():
+            raise ValueError("the preimage coset action requires a subgroup of the finite target")
+        points = _LeftCosetPointSet(morphism.codomain(), target)
+
+        @cached_function(key=lambda element: (id(element), element))
+        def image(element):
+            return morphism(element)
+
+        return self.pointed_orbit(
+            subgroup, points(morphism.codomain().one()),
+            lambda element, point: points(image(element) * point.representative()),
+            augmentation,
+        )
 
     def from_finite_orbits(self, seeds, action):
         r"""The union of the finite orbits of supplied points under a given action.

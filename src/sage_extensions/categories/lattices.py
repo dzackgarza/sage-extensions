@@ -10237,17 +10237,10 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             from sage_extensions.categories.group.g_sets import FiniteGSets
 
             ambient = self.isotropic_embedding().codomain().O()
-            cosets = ambient.left_cosets(subgroup)
-            if cosets not in FiniteGSets(ambient):
-                raise ValueError(f"the quotient lift requires a finite coset action for {subgroup}")
             kernel = ambient.subgroup(tuple(full.kernel().group_generators()))
             inclusion = kernel.inclusion()
-            # The right fibre lift*ker(rho) meets Gamma exactly when ker(rho)
-            # transports lift^-1*Gamma to Gamma; compare the marked-diagram
-            # construction in cat._apex_isomorphism_in_subgroup.
-            transporter = FiniteGSets(kernel).transporter_from_finite_orbit(
-                cosets.coset_of(~lift), cosets.base_point(),
-                lambda element, point: cosets.act(inclusion(element), point),
+            transporter = FiniteGSets(kernel).transporter_on_left_cosets(
+                subgroup, ~lift, ambient.one(), inclusion,
             )
             return None if transporter is None else lift * ~inclusion(transporter)
 

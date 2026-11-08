@@ -64,23 +64,11 @@ def _free_cover(ambient, generators):
 
 
 def _preimage_coset_space(subgroup, morphism, target, generators):
-    r"""``G/P`` for ``P = f^-1(K)``, ``f: G -> Q`` finite: the orbit of ``K`` in ``Q/K``.
-
-    ``G`` acts on ``Q/K`` through ``f``; the stabilizer of the base point
-    ``K`` is ``f^-1(K) = P``.  The finiteness used is that of ``Q``.
-    """
+    r"""G/f^-1(H) as the image's orbit of H in the finite target's cosets."""
     from sage_extensions.categories.group.g_sets import FiniteGSets
 
-    assert morphism.codomain() in OwnedFiniteGroups(), (
-        f"the cosets of {subgroup} are realized through the finite group {morphism.codomain()}, "
-        f"but it is not known to be finite"
-    )
-    image_cosets = morphism.codomain().left_cosets(target)
-    return FiniteGSets(subgroup.supergroup()).pointed_orbit(
-        subgroup,
-        image_cosets.base_point(),
-        lambda element, point: image_cosets.act(morphism(element), point),
-        _free_cover(subgroup.supergroup(), generators),
+    return FiniteGSets(subgroup.supergroup()).preimage_coset_space(
+        subgroup, morphism, target, _free_cover(subgroup.supergroup(), generators),
     )
 
 

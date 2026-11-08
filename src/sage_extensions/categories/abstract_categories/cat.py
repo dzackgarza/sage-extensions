@@ -1516,13 +1516,10 @@ class _EvaluationFunctor(Functor):
 
 
 def _apex_isomorphism_in_subgroup(witness, subgroup, stabilizer_generators):
-    r"""An element of ``w S`` in ``H``, using the finite coset action on ``G/H``.
+    r"""An element of witness*S in H through the finite action on G/H.
 
-    Here ``w = witness`` lies in ``G = subgroup.supergroup()``, ``H`` is
-    ``subgroup``, and the supplied generators generate ``S``, the apex
-    image of the source marking's automorphisms.  The functor and coslice
-    categories own those markings and reconstruct the resulting marked
-    isomorphism.  They share this finite-action computation.
+    S is the apex image of the source marking's automorphisms. The
+    marking owner reconstructs the natural isomorphism from its apex.
     """
     from sage_extensions.categories.group.g_sets import FiniteGSets
 
@@ -1531,18 +1528,10 @@ def _apex_isomorphism_in_subgroup(witness, subgroup, stabilizer_generators):
         f"{subgroup} is a subgroup of {group}, but the apex isomorphism "
         f"{witness.domain()} -> {witness.codomain()} does not lie in it"
     )
-    cosets = group.left_cosets(subgroup)
-    assert cosets in FiniteGSets(group), (
-        f"an apex isomorphism in {subgroup} is found in the finite coset space "
-        f"{group}/{subgroup}, which is not realized as a finite {group}-set"
-    )
     stabilizer = group.subgroup(stabilizer_generators)
     inclusion = stabilizer.inclusion()
-    action = FiniteGSets(stabilizer)(
-        cosets, lambda element, point: cosets.act(inclusion(element), point)
-    )
-    transporter = action.transporter_witness(
-        cosets.coset_of(~witness), cosets.base_point()
+    transporter = FiniteGSets(stabilizer).transporter_on_left_cosets(
+        subgroup, ~witness, group.one(), inclusion,
     )
     return None if transporter is None else witness * ~inclusion(transporter)
 
