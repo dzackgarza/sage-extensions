@@ -1242,8 +1242,13 @@ class OrthogonalCharacterQuotient:
         r"""Double cosets computed inside ``im rho`` (the ``O(A_L)`` engine); see
         :meth:`splitting_isometries` for the exact sign bookkeeping.
 
-        The supplied generators are elements of the retained GAP image.
-        This method forms their subgroup directly.
+        ``discriminant_image_generators`` are *already lowered* to the engine by the
+        caller (``_splitting_isometries_in_im_rho`` applies ``rho`` and the crossing
+        once); applying ``rho`` here again would evaluate a group morphism on a raw
+        engine element, which is exactly the boundary the owner never crosses.  A
+        caller with a ready subgroup of ``im rho`` (the line-class stabilizer) passes
+        it as ``right`` instead.  The supplied generators are elements of the retained
+        GAP image; this method forms their subgroup directly.
         """
         from sage_extensions.categories.group.groups import _element_to_engine
 
