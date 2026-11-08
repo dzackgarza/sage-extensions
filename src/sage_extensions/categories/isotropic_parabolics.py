@@ -148,29 +148,15 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             The stabilizer is presented by the action's own orbit data, and each
             Schreier factor is converted through discriminant transports between
             integral orbit lattices, so no individual rational transporter is
-            applied to A_L.  A line and a plane are supported: their radical
-            action is the one the isotropic reduction of that subobject allows.
+            applied to A_L. The radical action is the full general linear
+            group of the isotropic sublattice at every positive rank.
             """
             from sage_indefinite_port.indefinite.marked_lattices import INDUCTION
 
             embedded = self.embedded_module_generators()
             vectors = tuple(embedded[label] for label in self.module_generating_set())
-            match vectors:
-                case (line,):
-                    radical_images = ((-line,),)
-                case (first, second):
-                    radical_images = (
-                        (second, first),
-                        (first + second, second),
-                        (-first, second),
-                    )
-                case _:
-                    raise ValueError(
-                        f"the discriminant image of the stabilizer of {self} is realized here "
-                        f"for a line or a plane, not for {vectors!r}"
-                    )
             action = INDUCTION.recursion.isotropic_stabilizer_action(
-                vectors, radical_images
+                vectors, INDUCTION.sublattice_action_images(self)
             )
             return action.finite_representation().stabilizer_discriminant_image()
 
