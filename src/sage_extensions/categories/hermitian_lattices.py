@@ -107,6 +107,23 @@ class HermitianLattice(SageObject):
         action = self.order_action(unit)
         return lattice.Aut()(lambda label: action(lattice.module_generator(label)))
 
+    def isometry_from_matrix(self, g):
+        r"""Return the isometry of the trace lattice given by a unitary matrix acting on column coordinates."""
+        trace = self.trace_lattice()
+        positions = dict(zip(self._labels(), trace.module_generating_set(), strict=True))
+        basis = self._order_basis
+
+        def image(name):
+            i, a = next(key for key, value in positions.items() if value == name)
+            terms = {}
+            for row in range(self.rank()):
+                for b, value in enumerate(self._coordinates_in_order(g[row, i] * basis[a])):
+                    if value:
+                        terms[positions[(row, b)]] = trace.base_ring()(value)
+            return trace.linear_combination(terms)
+
+        return trace.Aut()(image)
+
     def is_order_linear(self, isometry):
         r"""Return whether an isometry of the trace lattice commutes with the order."""
         lattice = self.trace_lattice()
