@@ -23,6 +23,32 @@ from sage.rings.integer_ring import ZZ
 from sage.rings.rational_field import QQ
 
 
+def symplectic_generators(gram):
+    r"""Return generators of `Sp(M, b)` for an alternating `b` of constant elementary divisor.
+
+    In a symplectic basis `a_i, b_i`, the transvections along `a_i`, `b_i` and
+    `a_i - a_{i+1}` are the homology images of Humphries' generators of the mapping class
+    group, which surjects onto `Sp_{2g}(Z)`. A scalar multiple of a unimodular form has the same group.
+    """
+    gram = matrix(ZZ, gram)
+    size = gram.nrows()
+    form, change = gram.symplectic_form()
+    divisors = set(form[i, size // 2 + i] for i in range(size // 2))
+    assert len(divisors) == 1, f"{gram} is not a multiple of a unimodular form"
+    basis = change.inverse().change_ring(QQ)
+    half = size // 2
+    unit = lambda i: identity_matrix(QQ, size).row(i)
+    vectors = [unit(i) for i in range(size)]
+    vectors += [unit(i) - unit(i + 1) for i in range(half - 1)]
+    scale = next(iter(divisors))
+    result = []
+    for v in vectors:
+        along = v * basis
+        pairing = gram.change_ring(QQ) * along / scale
+        result.append(matrix(ZZ, identity_matrix(QQ, size) + along.column() * pairing.row()))
+    return tuple(result)
+
+
 class IsometryCommutant:
     r"""The commutant algebra and integral order of a set of isometries."""
 
@@ -229,10 +255,8 @@ class IsometryCommutant:
                 for g in lattice.O().group_generators()
             )
         else:
-            assert gram == -gram.transpose() and degree == 2, (
-                f"the symplectic form {gram} has degree above two, which needs Hua-Reiner generators"
-            )
-            isometries = (matrix(ZZ, 2, 2, [0, -1, 1, 0]), matrix(ZZ, 2, 2, [1, 1, 0, 1]))
+            assert gram == -gram.transpose(), f"the form {gram} is neither symmetric nor alternating"
+            isometries = symplectic_generators(gram)
         inverse = action_rows.inverse()
         result = []
         for isometry in isometries:

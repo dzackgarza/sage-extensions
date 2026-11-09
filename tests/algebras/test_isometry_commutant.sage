@@ -18,7 +18,8 @@ from sage.matrix.special import diagonal_matrix, identity_matrix
 from sage.rings.infinity import Infinity
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.rational_field import QQ as SageQQ
-from sage_extensions.algebras.isometry_commutant import IsometryCommutant
+from sage_extensions.algebras.isometry_commutant import IsometryCommutant, symplectic_generators
+from sage.rings.finite_rings.finite_field_constructor import GF as SageGF
 
 U2 = sage_matrix(SageZZ, 4, 4, [0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0])
 EICHLER = sage_matrix(SageZZ, 4, 4, [1, 0, 0, -1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1])
@@ -127,10 +128,22 @@ def test_centralizer_of_left_multiplications_is_right_sl2():
     assert int(commutant.dimension()) == int(4)
     generators = commutant.simple_centralizer_generators()
     assert len(generators) == int(2)
-    orders = sorted(g.multiplicative_order() for g in generators)
-    assert orders[0] == int(4) and orders[1] == +Infinity
+    assert all(g.multiplicative_order() == +Infinity for g in generators)
+    field = SageGF(int(3))
+    blocks = [g[[int(0), int(1)], [int(0), int(1)]].change_ring(field) for g in generators]
+    assert len(_closure(blocks, identity_matrix(field, int(2)))) == int(24)
     # Right multiplication by g sends the basis E_11, E_12, E_21, E_22 by blocks equal to g transposed.
     for g in generators:
         block = g[[int(0), int(1)], [int(0), int(1)]]
         assert g[[int(2), int(3)], [int(2), int(3)]] == block and int(block.det()) == int(1)
         assert g[[int(0), int(1)], [int(2), int(3)]].is_zero() and g[[int(2), int(3)], [int(0), int(1)]].is_zero()
+
+
+def test_symplectic_generators_reduce_onto_sp4_of_two():
+    r"""|Sp_4(F_2)| = 720, and the generators preserve the form."""
+    gram = sage_matrix(SageZZ, 4, 4, [0, 0, 1, 0, 0, 0, 0, 1, -1, 0, 0, 0, 0, -1, 0, 0])
+    generators = symplectic_generators(gram)
+    assert all(g.transpose() * gram * g == gram for g in generators)
+    field = SageGF(int(2))
+    reduced = [g.change_ring(field) for g in generators]
+    assert len(_closure(reduced, identity_matrix(field, int(4)))) == int(720)
