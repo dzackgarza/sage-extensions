@@ -142,6 +142,81 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 for label in self.module_generating_set()
             )
 
+        @cached_method
+        def _stabilizer_action(self):
+            r"""The integral-structure action whose stabilizer is ``Stab_{O(L)}(I)``.
+
+            ``None`` for the zero isotropic sublattice, whose stabilizer is the
+            whole ambient orthogonal group and so has no orbit to split.
+            """
+            from sage_indefinite_port.indefinite.marked_lattices import INDUCTION
+
+            embedded = self.embedded_module_generators()
+            vectors = tuple(embedded[label] for label in self.module_generating_set())
+            if not vectors:
+                return None
+            # The radical action is what the port's stabilizer problem takes as
+            # its "allowed action on J" (IndefiniteForms.g:1710-1723): the
+            # sign change on a line, and the generating set of GL(J) on a
+            # plane.  No owner supplies those images for higher rank, so above a
+            # plane this raises rather than guessing an action.
+            match vectors:
+                case (line,):
+                    radical_images = ((-line,),)
+                case (first, second):
+                    radical_images = (
+                        (second, first),
+                        (first + second, second),
+                        (-first, second),
+                    )
+                case _:
+                    raise ValueError(
+                        f"the stabilizer action of {self} is realized here for a line or a "
+                        f"plane, not for {vectors!r}: no owner supplies the radical images "
+                        "of a higher-rank isotropic sublattice"
+                    )
+            return INDUCTION.recursion.isotropic_stabilizer_action(
+                vectors, radical_images
+            )
+
+        def _stabilizer_representation(self):
+            r"""The finite lattice-orbit representation of the stabilizer action."""
+            action = self._stabilizer_action()
+            if action is None:
+                raise ValueError(
+                    f"the stabilizer of {self} has no lattice orbit to represent: it is the "
+                    "zero isotropic sublattice, whose stabilizer is the ambient orthogonal group"
+                )
+            return action.finite_representation()
+
+        def stabilizer_schreier_factors(self):
+            r"""Return ``(letters, transversals)`` of the stabilizer's Schreier family.
+
+            ``letters`` are the action groupoid's generators and ``transversals[i]``
+            is the transporter of the ``i``-th lattice-orbit point, so the family is
+            ``t_(s.p)^-1 s t_p`` over the two.
+            """
+            return self._stabilizer_representation().stabilizer_schreier_factors()
+
+        def orbit_lattice_records(self):
+            r"""Return one record per lattice-orbit point, with its maps (#286).
+
+            See ``_FiniteIntegralRepresentation.orbit_lattice_records``: each record
+            states the orbit lattice, the module image and its own generating
+            labels, the inclusion into the rational ambient, the images of the
+            ambient lattice's generators, and the transport ``t_p: L -> L_p``.
+            """
+            return self._stabilizer_representation().orbit_lattice_records()
+
+        def middle_transport(self, position, letter):
+            r"""Return ``letter`` as an isometry between two orbit lattices (#286).
+
+            The domain is the orbit lattice at ``position``, whose generators are
+            the image module's own canonical basis; the transported source basis is
+            read once, by the transport, and not again here.
+            """
+            return self._stabilizer_representation().middle_transport(position, letter)
+
         def stabilizer_discriminant_image(self):
             r"""Return rho(P_I) as a subgroup of O(A_L) by the action-groupoid construction (#310).
 
@@ -152,15 +227,9 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             group of the isotropic sublattice at every positive rank.
             The zero sublattice has the full ambient orthogonal stabilizer.
             """
-            from sage_indefinite_port.indefinite.marked_lattices import INDUCTION
-
-            embedded = self.embedded_module_generators()
-            vectors = tuple(embedded[label] for label in self.module_generating_set())
-            if not vectors:
+            action = self._stabilizer_action()
+            if action is None:
                 return self.ambient_lattice().O().discriminant_image()
-            action = INDUCTION.recursion.isotropic_stabilizer_action(
-                vectors, INDUCTION.sublattice_action_images(self)
-            )
             return action.finite_representation().stabilizer_discriminant_image()
 
         def rational_stabilizer_right_cosets(self):
