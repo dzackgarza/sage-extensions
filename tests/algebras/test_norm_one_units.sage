@@ -43,3 +43,23 @@ def test_a_quaternion_order_with_a_unit_of_norm_minus_one():
     assert int(3) + int(2) * i + int(2) * j in generators
     assert other in generators
     assert tuple(kernel) == (SageQQ(int(-1)),)
+
+
+def test_gl4_over_a_real_quadratic_order_has_degree_four_extractions():
+    r"""d = 4, C = <-1, e>, C^4 = <e^4>. det(diag(e^4, 1, 1, 1)) = e^4 extracts c = e, leaving
+    k = diag(e^3, 1/e, 1/e, 1/e) of determinant one; c^4 = 1 in C means c = +-1."""
+    field = QuadraticField(int(2), "a")
+    e = int(1) + field.gen()
+    zero, one = field.zero(), field.one()
+
+    def diag(*entries):
+        return sage_matrix(field, int(4), int(4), lambda i, j: entries[i] if i == j else zero)
+
+    elementary = sage_matrix(field, int(4), int(4), lambda i, j: one if i == j or (i, j) == (int(0), int(1)) else zero)
+    cycle = sage_matrix(field, int(4), int(4), lambda i, j: one if j == (i + int(1)) % int(4) else zero)
+    units = [diag(e, one, one, one), diag(-one, one, one, one), elementary, cycle]
+    generators, kernel = norm_one_generators(units, [-one, e], int(4), lambda m: m.det(), field)
+    assert all(g.det() == one for g in generators)
+    assert elementary in generators
+    assert diag(e**int(3), ~e, ~e, ~e) in generators
+    assert tuple(kernel) == (-one,)
