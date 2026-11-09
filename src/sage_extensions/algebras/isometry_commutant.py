@@ -498,11 +498,13 @@ class IsometryCommutant:
         return [sum(idempotents[i] for i in range(size) if atom >> i & 1) for atom in atoms]
 
     def _product_centralizer_generators(self):
-        r"""Return centralizer generators through a splitting of `L` by integral central idempotents, or ``None``.
+        r"""Return centralizer generators through a splitting by central idempotents, or ``None``.
 
-        Central idempotents `e_j` of `A` are orthogonal under the form, so an integral family
-        splits `L` orthogonally. Every element of `A` preserves each `e_j L`, so the centralizer
-        is the product of the centralizers of the factors.
+        The sums `e_j` of adjoint orbits of primitive central idempotents of `A` are orthogonal
+        under the form, so an integral family splits `L` orthogonally. Every element of `A`
+        preserves each `e_j L`, so the centralizer is the product of the centralizers of the
+        factors. A family with no integral partition goes to
+        :meth:`_glued_centralizer_generators`.
         """
         if self.radical_basis():
             return None
@@ -523,9 +525,17 @@ class IsometryCommutant:
             cofactor = minimal // factor
             _d, inverse, _other = cofactor.xgcd(factor)
             idempotents.append((inverse * cofactor)(generic))
-        idempotents = self._integral_idempotent_atoms(idempotents)
-        if len(idempotents) < 2:
+        family = []
+        for idempotent in idempotents:
+            adjoint = self.adjoint(idempotent)
+            merged = idempotent if adjoint == idempotent else idempotent + adjoint
+            if merged not in family:
+                family.append(merged)
+        if len(family) < 2:
             return None
+        idempotents = self._integral_idempotent_atoms(family)
+        if len(idempotents) < 2:
+            return self._glued_centralizer_generators(family)
         results = []
         for index, idempotent in enumerate(idempotents):
             image = matrix(ZZ, idempotent).transpose().row_module().basis_matrix()
@@ -547,6 +557,60 @@ class IsometryCommutant:
                 block[:size, :size] = generator.transpose()
                 results.append(matrix(ZZ, basis.transpose().change_ring(QQ) * block.transpose().change_ring(QQ) * basis.transpose().change_ring(QQ).inverse()))
         return tuple(results)
+
+    def _glued_centralizer_generators(self, idempotents):
+        r"""Return centralizer generators through adjoint-fixed central idempotents that are not integral.
+
+        A centralizer element lies in `A`, so it commutes with each `e_j` and preserves
+        `e_j L`. Hence `M = \bigoplus_j e_j L` contains `L` with finite index, and the centralizer
+        is the stabilizer of `L` in `\prod_j C(e_j L)`, each factor carrying the restricted
+        form scaled to be integral. The orbit of `L` lies in the finite set of lattices between
+        `M` and `d M`, for `d` the exponent of `M / L`. Schreier's lemma gives the generators.
+        """
+        blocks = []
+        for idempotent in idempotents:
+            denominator = idempotent.denominator()
+            span = matrix(ZZ, denominator * idempotent).transpose().hermite_form(include_zero_rows=False)
+            blocks.append(matrix(QQ, span).transpose() / denominator)
+        frame = block_matrix(QQ, [blocks], subdivide=False)
+        assert frame.is_square() and frame.det() != 0, f"the projections {blocks} do not span the ambient space"
+        to_frame = frame.inverse()
+        lattice = matrix(ZZ, to_frame)
+        one = identity_matrix(ZZ, self.rank)
+        generators = []
+        offset = 0
+        for basis in blocks:
+            form = basis.transpose() * self.gram * basis
+            scaled = matrix(ZZ, form.denominator() * form)
+            restricted = [matrix(ZZ, basis.solve_right(F * basis)) for F in self.isometries]
+            size = basis.ncols()
+            for generator in IsometryCommutant(scaled, restricted).centralizer_generators():
+                move = identity_matrix(ZZ, self.rank)
+                move[offset : offset + size, offset : offset + size] = generator
+                generators.append(move)
+            offset += size
+
+        def key(element):
+            return (element * lattice).transpose().hermite_form(include_zero_rows=False).str()
+
+        transversal = {key(one): one}
+        frontier = [one]
+        schreier = {}
+        while frontier:
+            current = frontier.pop()
+            for generator in generators:
+                image = generator * current
+                label = key(image)
+                if label not in transversal:
+                    transversal[label] = image
+                    frontier.append(image)
+                    continue
+                element = transversal[label].inverse().change_ring(ZZ) * image
+                if element != one:
+                    schreier[element.str()] = element
+        result = tuple(frame * element * to_frame for element in schreier.values())
+        assert all(self.is_centralizer_element(g) for g in result)
+        return tuple(matrix(ZZ, g) for g in result)
 
     def centralizer_generators(self):
         r"""Return generators of the simultaneous centralizer, by the structure of `A`."""

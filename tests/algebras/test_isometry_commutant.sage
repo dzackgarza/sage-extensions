@@ -326,3 +326,32 @@ def test_inversion_witness_on_the_unipotent_fixture():
     assert t is not None
     assert t.transpose() * gram * t == gram and t * left_t == left_t.inverse() * t
     assert t * left_t != left_t * t
+
+
+def test_glued_centralizer_is_the_stabilizer_of_the_gluing_in_the_product():
+    r"""Issue 54: L = {(x, y, z) in Z^3 : x = z mod 2}, form x^2 + y^2 + z^2, F = diag(1, 1, -1).
+
+    In the basis (1, 0, 1), (0, 1, 0), (0, 0, 2), F is the matrix below. A = M_2(Q) x Q, the
+    idempotents diag(1, 1, 0) and diag(0, 0, 1) are not integral on L, and M = Z^2 + Z contains L
+    with index 2. The centralizer on M is D_4 x {+-1}, of order 16, and L is the kernel of
+    x + z mod 2 on M. A signed permutation of (x, y) fixes the functional x mod 2 exactly when it
+    does not swap x and y, so the stabilizer is the eight sign matrices, of index 2.
+    """
+    gram = sage_matrix(SageZZ, 3, 3, [2, 0, 2, 0, 1, 0, 2, 0, 4])
+    F = sage_matrix(SageZZ, 3, 3, [1, 0, 0, 0, 1, 0, -1, 0, -1])
+    P = sage_matrix(SageZZ, 3, 3, [1, 0, 0, 0, 1, 0, 1, 0, 2]).change_ring(SageQQ)
+    assert P.transpose() * P == gram.change_ring(SageQQ)
+    commutant = IsometryCommutant(gram, [F])
+    assert int(commutant.dimension()) == int(5)
+    generators = commutant.centralizer_generators()
+    assert all(commutant.is_centralizer_element(g) for g in generators)
+    signs = [(a, b, c) for a in (int(1), int(-1)) for b in (int(1), int(-1)) for c in (int(1), int(-1))]
+    expected = [
+        sage_matrix(SageZZ, P.inverse() * diagonal_matrix(SageQQ, [SageQQ(a), SageQQ(b), SageQQ(c)]) * P)
+        for a, b, c in signs
+    ]
+    group = _closure(generators, identity_matrix(SageZZ, int(3)))
+    assert set(group) == set(m.str() for m in expected)
+    assert len(group) == int(8)
+    swap = sage_matrix(SageZZ, 3, 3, [0, 1, 0, 1, 0, 0, 0, 0, 1]).change_ring(SageQQ)
+    assert not commutant.is_centralizer_element(P.inverse() * swap * P)
