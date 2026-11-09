@@ -357,6 +357,68 @@ def _equivariant_finite_orbit_decomposition(isometry, candidates, action, equali
     )
 
 
+def finite_preimage_generators(generators, image, in_subgroup):
+    r"""Return Schreier generators of ``G cap rho^-1(S)`` for ``G = <generators>``.
+
+    ``image`` is a homomorphism to a finite group and ``in_subgroup`` decides
+    membership in ``S``. Right cosets ``S rho(x)`` are compared by ``rho(x y^-1) in S``.
+    """
+    generators = tuple(generators)
+    one = generators[0] * ~generators[0]
+    transversal = [one]
+    schreier = []
+    position = 0
+
+    def representative(element):
+        for known in transversal:
+            if in_subgroup(image(element * ~known)):
+                return known
+        return None
+
+    while position < len(transversal):
+        current = transversal[position]
+        position += 1
+        for generator in generators:
+            product = current * generator
+            known = representative(product)
+            if known is None:
+                transversal.append(product)
+                continue
+            element = product * ~known
+            if element != one and all(element != seen for seen in schreier):
+                schreier.append(element)
+    return tuple(schreier), len(transversal)
+
+
+def finite_subgroup_normalizer(lattice, generators):
+    r"""Return all elements of ``N_{O(L)}(H)`` and ``C_{O(L)}(H)`` for definite ``L``."""
+    assert lattice.is_definite(), (
+        f"{lattice} is indefinite: its normalizers need the full centralizer of a "
+        f"noncyclic finite subgroup (port #50, #54)"
+    )
+    generators = tuple(generators)
+    one = lattice.O().one()
+    elements = [one]
+    frontier = [one]
+    while frontier:
+        current = frontier.pop()
+        for generator in generators:
+            image = current * generator
+            if all(image != known for known in elements):
+                elements.append(image)
+                frontier.append(image)
+    normalizer = []
+    centralizer = []
+    for candidate in lattice.O():
+        inverse = ~candidate
+        conjugates = tuple(candidate * generator * inverse for generator in generators)
+        if all(any(c == element for element in elements) for c in conjugates):
+            normalizer.append(candidate)
+            if all(c == g for c, g in zip(conjugates, generators, strict=True)):
+                centralizer.append(candidate)
+    return tuple(normalizer), tuple(centralizer)
+
+
 def _isometry_power(isometry, exponent):
     r"""Return an exact nonnegative power of one lattice automorphism."""
     exponent = int(exponent)
@@ -619,6 +681,99 @@ class CyclotomicDecomposition(SageObject):
         if not self._components_commute(components):
             return False
         return self.orthogonal_sum_inclusion().isometry_extends(self._block_sum(components))
+
+    def _twisted_component_transporter(self, divisor, exponent):
+        r"""Return one ``t`` in ``O(L_d)`` with ``t f_d t^-1 = f_d^a``, or ``None``."""
+        summand = self.summand(divisor)
+        restriction = self.component_isometries()[divisor]
+        target = _isometry_power(restriction, exponent)
+        if int(divisor) in (1, 2):
+            return summand.O().one()
+        assert summand.is_definite(), (
+            f"the twisted transporter on the summand of {divisor} needs the semilinear "
+            f"unitary isometries of an indefinite Hermitian lattice (port #51)"
+        )
+        for candidate in summand.O():
+            if candidate * restriction == target * candidate:
+                return candidate
+        return None
+
+    def _centralizer_discriminant_representatives(self, divisor):
+        r"""Return one element of ``Z_{O(L_d)}(f_d)`` for each action on ``A_{L_d}``."""
+        centralizer = self.component_centralizers()[divisor]
+        generators = tuple(centralizer.group_generators())
+        one = self.summand(divisor).O().one()
+        found = [(one.discriminant_morphism(), one)]
+        frontier = [one]
+        while frontier:
+            current = frontier.pop()
+            for generator in generators:
+                image = current * generator
+                action = image.discriminant_morphism()
+                if all(action != known for known, _element in found):
+                    found.append((action, image))
+                    frontier.append(image)
+        return tuple(element for _action, element in found)
+
+    def twisted_transporter(self, exponent):
+        r"""Return ``g`` in ``O(L)`` with ``g f g^-1 = f^a``, or ``None`` if none exists.
+
+        For ``a`` prime to the order, ``ker Phi_d(f^a) = ker Phi_d(f)``, so ``g``
+        restricts to each ``L_d`` with ``g_d f_d g_d^-1 = f_d^a``. Each such ``g_d``
+        is ``t_d c_d`` with ``c_d`` in ``Z_{O(L_d)}(f_d)``. Whether a tuple preserves
+        ``L`` depends only on its action on ``A_M``, so one centralizer element per
+        discriminant action decides existence.
+        """
+        from itertools import product
+
+        from sage.arith.misc import gcd
+
+        exponent = int(exponent)
+        if int(gcd(exponent, self._order)) != 1:
+            raise ValueError(
+                f"{exponent} is not prime to the order {self._order} of {self.isometry()}"
+            )
+        divisors_ = tuple(self.nonzero_divisors())
+        transporters = {}
+        for divisor in divisors_:
+            transporter = self._twisted_component_transporter(divisor, exponent)
+            if transporter is None:
+                return None
+            transporters[divisor] = transporter
+        choices = tuple(
+            tuple(
+                transporters[divisor] * element
+                for element in self._centralizer_discriminant_representatives(divisor)
+            )
+            for divisor in divisors_
+        )
+        inclusion = self.orthogonal_sum_inclusion()
+        for tuple_ in product(*choices):
+            sum_ = self._block_sum(dict(zip(divisors_, tuple_, strict=True)))
+            if inclusion.isometry_extends(sum_):
+                result = inclusion.isometry_extension(sum_)
+                assert result * self.isometry() == _isometry_power(self.isometry(), exponent) * result
+                return result
+        return None
+
+    def cyclic_normalizer(self):
+        r"""Return ``(generators, realized)`` for ``N_{O(L)}(<f>)``.
+
+        ``realized`` maps each ``a`` in the image in ``(Z/n)^x`` to a transporter.
+        The centralizer is the kernel of the map to ``(Z/n)^x``, so its generators
+        and one lift of every realized unit generate the normalizer.
+        """
+        from sage.arith.misc import gcd
+
+        realized = {}
+        for exponent in range(1, max(self._order, 2)):
+            if int(gcd(exponent, self._order)) != 1:
+                continue
+            transporter = self.twisted_transporter(exponent)
+            if transporter is not None:
+                realized[exponent] = transporter
+        generators = tuple(self.centralizer_group().group_generators()) + tuple(realized.values())
+        return generators, realized
 
     def _orthogonal_sum_image(self, divisor, element):
         r"""Return the image of ``element`` of ``L_d`` under ``L_d -> M = sum_e L_e``.
@@ -1529,6 +1684,8 @@ def _arithmetic_centralizer_group_generators(centralizer):
 
 __all__ = [
     "CyclotomicDecomposition",
+    "finite_preimage_generators",
+    "finite_subgroup_normalizer",
     "IsometryPrimitiveExtension",
     "PolarizedEquivariantLattice",
 ]
