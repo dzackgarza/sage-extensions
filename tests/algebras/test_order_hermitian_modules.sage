@@ -19,6 +19,8 @@ from sage.matrix.constructor import block_matrix, matrix as sage_matrix
 from sage.matrix.special import diagonal_matrix, identity_matrix
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.rational_field import QQ as SageQQ
+from sage.rings.finite_rings.integer_mod_ring import Zmod
+from sage_extensions.algebras.isometry_commutant import IsometryCommutant
 from sage_extensions.algebras.order_hermitian_modules import OrderHermitianModule
 
 Z2 = SageZZ(int(2))
@@ -95,3 +97,51 @@ def test_nonfree_ideal():
     assert int(module.conductor_exponent) == int(1)
     one = identity_matrix(SageZZ, int(2))
     assert set(g.str() for g in module.definite_unitary_elements()) == set([one.str(), (-one).str()])
+
+
+def _gaussian_plane():
+    i = sage_matrix(SageZZ, int(2), int(2), [SageZZ(int(0)), SageZZ(int(-1)), SageZZ(int(1)), SageZZ(int(0))])
+    action = block_matrix(SageZZ, [[i, sage_matrix(SageZZ, int(2), int(2))], [sage_matrix(SageZZ, int(2), int(2)), i]], subdivide=False)
+    one = identity_matrix(SageZZ, int(4))
+    module = OrderHermitianModule(diagonal_matrix(SageZZ, [Z2, Z2, Z2, Z2]), [action], [one, action])
+    return module, action
+
+
+def test_congruence_intersection_recovers_the_diagonal_subgroup():
+    r"""U(Z[i]^2) = mu_4 wr S_2 acts faithfully mod 3, so allowing the 16 diagonal reductions gives index 2."""
+    module, _action = _gaussian_plane()
+    group = module.definite_unitary_elements()
+    assert len(group) == int(32)
+    diagonal = [g for g in group if all(g[i, j] == 0 for i in (int(0), int(1)) for j in (int(2), int(3)))]
+    assert len(diagonal) == int(16)
+    allowed = [g.change_ring(Zmod(int(3))) for g in diagonal]
+    index, generators = module.congruence_intersection(group, int(3), allowed)
+    assert int(index) == int(2)
+    assert all(g in diagonal for g in generators)
+    assert len(_generated(generators, identity_matrix(SageZZ, int(4)))) == int(16)
+
+
+def test_tensor_and_adjoint_descriptions_give_the_same_group():
+    r"""Elements of U are the units of the commutant satisfying u^dagger u = 1, and conversely."""
+    module, action = _gaussian_plane()
+    commutant = IsometryCommutant(module.gram, [action])
+    group = module.definite_unitary_elements()
+    assert all(commutant.is_centralizer_element(g) for g in group)
+    negation = -identity_matrix(SageZZ, int(4))
+    assert commutant.is_centralizer_element(negation) and module.is_unitary(negation)
+    swap_conjugate = sage_matrix(SageZZ, int(4), int(4), [1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1])
+    assert not commutant.is_centralizer_element(swap_conjugate) and not module.is_unitary(swap_conjugate)
+
+
+def test_definite_transporter_and_its_negative():
+    r"""diag(1, 2) and its swap are unitarily equivalent; diag(1, 3) has a different determinant."""
+    i = sage_matrix(SageZZ, int(2), int(2), [SageZZ(int(0)), SageZZ(int(-1)), SageZZ(int(1)), SageZZ(int(0))])
+    zero = sage_matrix(SageZZ, int(2), int(2))
+    action = block_matrix(SageZZ, [[i, zero], [zero, i]], subdivide=False)
+    one = identity_matrix(SageZZ, int(4))
+    make = lambda a, b: OrderHermitianModule(diagonal_matrix(SageZZ, [SageZZ(int(2 * a)), SageZZ(int(2 * a)), SageZZ(int(2 * b)), SageZZ(int(2 * b))]), [action], [one, action])
+    source, target = make(1, 2), make(2, 1)
+    witness = source.definite_transporter(target)
+    assert witness.transpose() * target.gram * witness == source.gram
+    assert witness * action == action * witness
+    assert source.definite_transporter(make(1, 3)) is None

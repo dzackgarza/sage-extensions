@@ -20,6 +20,7 @@ from sage.arith.functions import lcm
 from sage.matrix.constructor import matrix
 from sage.matrix.special import identity_matrix
 from sage.quadratic_forms.quadratic_form import QuadraticForm
+from sage.rings.finite_rings.integer_mod_ring import Zmod
 from sage.rings.integer_ring import ZZ
 from sage.rings.rational_field import QQ
 
@@ -128,3 +129,53 @@ class OrderHermitianModule:
         return tuple(
             matrix(ZZ, g) for g in automorphisms if self.is_unitary(matrix(ZZ, g))
         )
+
+    def congruence_intersection(self, generators, modulus, allowed):
+        r"""Return `(index, generators)` of the elements whose reduction lies in ``allowed``.
+
+        ``generators`` generate a subgroup of `U(\Lambda, h)`. ``allowed`` is a set of
+        reductions modulo ``modulus``, forming a subgroup. Right cosets of the preimage are
+        compared in the finite image, and Schreier's lemma gives generators.
+        """
+        ring = Zmod(modulus)
+        generators = tuple(matrix(ZZ, g) for g in generators)
+        one = identity_matrix(ZZ, self.rank)
+
+        def reduce(element):
+            return element.change_ring(ring)
+
+        allowed = tuple(matrix(ring, a) for a in allowed)
+        transversal = [one]
+        schreier = {}
+        position = 0
+        while position < len(transversal):
+            current = transversal[position]
+            position += 1
+            for generator in generators:
+                image = generator * current
+                for known in transversal:
+                    quotient = image * known.inverse().change_ring(ZZ)
+                    if reduce(quotient) in allowed:
+                        if quotient != one:
+                            schreier[quotient.str()] = quotient
+                        break
+                else:
+                    transversal.append(image)
+        return len(transversal), tuple(schreier.values())
+
+    def definite_transporter(self, other):
+        r"""Return `g` with `g^t B' g = B` and `g F_i = F'_i g` for definite forms, or ``None``."""
+        assert self.rank == other.rank and len(self.coefficient_actions) == len(other.coefficient_actions)
+        form, target = (self.gram, other.gram) if self.gram[0, 0] > 0 else (-self.gram, -other.gram)
+        witness = QuadraticForm(ZZ, 2 * target).is_globally_equivalent_to(QuadraticForm(ZZ, 2 * form), return_matrix=True)
+        if witness is False:
+            return None
+        base = matrix(ZZ, witness)
+        for automorphism in QuadraticForm(ZZ, 2 * form).automorphisms():
+            candidate = base * matrix(ZZ, automorphism)
+            if candidate.transpose() * other.gram * candidate == self.gram and all(
+                candidate * a == b * candidate
+                for a, b in zip(self.coefficient_actions, other.coefficient_actions, strict=True)
+            ):
+                return candidate
+        return None
