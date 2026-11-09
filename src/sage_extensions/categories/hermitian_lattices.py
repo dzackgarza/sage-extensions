@@ -123,6 +123,24 @@ class HermitianLattice(SageObject):
             raise ValueError(f"{self} has an indefinite trace lattice, so U(h) is infinite in general and is not enumerated")
         return tuple(element for element in lattice.O() if self.is_order_linear(element))
 
+    def witt_frame(self, isotropic):
+        r"""Return a Witt frame whose first columns are the given isotropic vectors of ``O^n``.
+
+        Dual vectors solve ``B(v_i, w_j) = delta_ij`` for ``B(x, y) = x^* G^T y``;
+        with ``c = B(w_i, w_j)``, replacing ``w_j`` by ``w_j - (1/2) sum c_ij v_i``
+        makes them isotropic. The middle block is the orthogonal complement.
+        """
+        V = matrix(self._field, isotropic).transpose()
+        k = V.ncols()
+        form = self._gram.transpose()
+        if _star(V) * form * V != matrix(self._field, k, k):
+            raise ValueError("the given vectors do not span a totally isotropic subspace")
+        W = (_star(V) * form).solve_right(matrix.identity(self._field, k))
+        W = W - V * (_star(W) * form * W) / 2
+        M = (_star(V.augment(W)) * form).right_kernel().basis_matrix().transpose()
+        frame = V.augment(M).augment(W)
+        return HermitianWittFrame(self, frame, _star(M) * form * M, k)
+
     def definite_scaling(self):
         r"""Return a real ``alpha`` in the order with ``Tr(alpha h)`` positive definite.
 

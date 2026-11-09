@@ -93,3 +93,35 @@ def test_levi_image_of_the_standard_frame_is_all_sixteen_pairs():
     units = [i**k for k in range(4)]
     pairs = [(sage_matrix(field, 1, 1, [a]), sage_matrix(field, 1, 1, [b])) for a in units for b in units]
     assert len(frame.liftable_levi_image(pairs)) == int(16)
+
+
+def test_witt_frame_of_a_null_vector_in_the_odd_lattice_has_centre_zi():
+    r"""On diag(1,1,-1) with v = (1,0,1), n(0,T) is y -> y + T B(v,y) v with B(v,y) = y_1 - y_3, integral iff T lies in Z[i]; T is skew, so T in Zi."""
+    field = SageCyclotomicField(4)
+    i = field.gen()
+    one, zero = field.one(), field.zero()
+    lattice = HermitianLattice((one, i), sage_matrix(field, 3, 3, [one, zero, zero, zero, one, zero, zero, zero, -one]))
+    frame = lattice.witt_frame([[one, zero, one]])
+    generators, centre = frame.integral_unipotent_kernel()
+    assert len(centre) == int(1)
+    assert centre[0][1][0, 0] in (i, -i)
+    assert all(frame.preserves_lattice(frame.unipotent(*pair)) for pair in generators + centre)
+
+
+def test_rank_two_isotropic_frame_has_rank_four_centre():
+    r"""Skew T in M_2(Z[i]): diagonal in Zi, off-diagonal b in Z[i]. The frame has no middle."""
+    field = SageCyclotomicField(4)
+    i = field.gen()
+    one, zero = field.one(), field.zero()
+    gram = sage_matrix(field, 4, 4, [zero, zero, one, zero, zero, zero, zero, one, one, zero, zero, zero, zero, one, zero, zero])
+    lattice = HermitianLattice((one, i), gram)
+    frame = lattice.witt_frame([[one, zero, zero, zero], [zero, one, zero, zero]])
+    generators, centre = frame.integral_unipotent_kernel()
+    assert len(centre) == int(4)
+    assert all(frame.preserves_lattice(frame.unipotent(*pair)) for pair in centre)
+    half = _skew(field, i / field(int(2)))
+    assert not frame.preserves_lattice(frame.unipotent(sage_matrix(field, 0, 2), half))
+
+
+def _skew(field, value):
+    return sage_matrix(field, 2, 2, [value, field.zero(), field.zero(), field.zero()])
