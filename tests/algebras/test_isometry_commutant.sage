@@ -147,3 +147,15 @@ def test_symplectic_generators_reduce_onto_sp4_of_two():
     field = SageGF(int(2))
     reduced = [g.change_ring(field) for g in generators]
     assert len(_closure(reduced, identity_matrix(field, int(4)))) == int(720)
+
+
+def test_eichler_centralizer_is_the_kernel_times_sl2():
+    r"""U + U = M_2(Z) with F = left multiplication by T up to a change of basis, so C(Z) is
+    {X -> A^n X g^-1 : g in SL_2(Z)}, faithful modulo 3 with image <T> x SL_2(F_3) of order 72."""
+    commutant = IsometryCommutant(U2, [EICHLER])
+    generators = commutant.square_zero_centralizer_generators()
+    assert all(commutant.is_centralizer_element(g) for g in generators)
+    assert any(g in (EICHLER, EICHLER.inverse()) for g in generators)
+    field = SageGF(int(3))
+    reduced = [g.change_ring(field) for g in generators]
+    assert len(_closure(reduced, identity_matrix(field, int(4)))) == int(72)

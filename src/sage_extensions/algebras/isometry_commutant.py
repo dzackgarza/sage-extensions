@@ -49,6 +49,42 @@ def symplectic_generators(gram):
     return tuple(result)
 
 
+def _form_generators(gram):
+    r"""Return generators of the isometry group of a symmetric or alternating integral form."""
+    if gram == gram.transpose():
+        from sage_extensions.categories.lattices import Lattices
+
+        lattice = Lattices(ZZ)([[int(c) for c in row] for row in gram.rows()])
+        frame = tuple(lattice.module_generators())
+        return tuple(
+            matrix(ZZ, [[int(c) for c in g(v)] for v in frame]).transpose()
+            for g in lattice.O().group_generators()
+        )
+    assert gram == -gram.transpose(), f"the form {gram} is neither symmetric nor alternating"
+    return symplectic_generators(gram)
+
+
+def _integer_solution(equations, target):
+    r"""Return an integer solution of `equations x = target`, or ``None``."""
+    diagonal, left, right = equations.smith_form()
+    moved = left * target
+    solution = []
+    for i in range(diagonal.ncols()):
+        entry = diagonal[i, i] if i < diagonal.nrows() else 0
+        value = moved[i] if i < len(moved) else 0
+        if entry == 0:
+            if value != 0:
+                return None
+            solution.append(0)
+        elif value % entry != 0:
+            return None
+        else:
+            solution.append(value // entry)
+    if any(moved[i] != 0 for i in range(diagonal.ncols(), len(moved))):
+        return None
+    return right * vector(ZZ, solution)
+
+
 class IsometryCommutant:
     r"""The commutant algebra and integral order of a set of isometries."""
 
@@ -245,18 +281,7 @@ class IsometryCommutant:
                 for x in module
             ],
         )
-        if gram == gram.transpose():
-            from sage_extensions.categories.lattices import Lattices
-
-            lattice = Lattices(ZZ)([[int(c) for c in row] for row in gram.rows()])
-            frame = tuple(lattice.module_generators())
-            isometries = tuple(
-                matrix(ZZ, [[int(c) for c in g(v)] for v in frame]).transpose()
-                for g in lattice.O().group_generators()
-            )
-        else:
-            assert gram == -gram.transpose(), f"the form {gram} is neither symmetric nor alternating"
-            isometries = symplectic_generators(gram)
+        isometries = _form_generators(gram)
         inverse = action_rows.inverse()
         result = []
         for isometry in isometries:
@@ -265,6 +290,86 @@ class IsometryCommutant:
             assert self.is_centralizer_element(element)
             result.append(matrix(ZZ, element))
         return tuple(result)
+
+    def square_zero_centralizer_generators(self):
+        r"""Return generators of the centralizer when `rad^2 = 0` and `O / rad` is `M_n(Z)`.
+
+        `O / (O \cap rad)` acts on `\bar M = O e / (rad e)`, carrying the form defined by
+        `x^\dagger y = b(x, y) t` modulo the radical. For an isometry of `\bar M` with a
+        preimage `\bar u` in `O`, a lift is `\bar u + x` with `x` integral in the radical,
+        and since `rad^2 = 0` the unitary equation
+        `\bar u^\dagger x + x^\dagger \bar u = 1 - \bar u^\dagger \bar u` is linear.
+        Lifting a generating set proves the image is the whole isometry group; the
+        kernel is :meth:`unipotent_kernel_generators`.
+        """
+        radical = self.radical_basis()
+        assert radical and all((x * y).is_zero() for x in radical for y in radical), (
+            f"the commutant of {self.isometries} does not have a nonzero radical of square zero"
+        )
+        size = self.dimension()
+        radical_rows = matrix(QQ, [self.coordinates(x) for x in radical])
+        scale = radical_rows.denominator()
+        radical_lattice = matrix(ZZ, scale * radical_rows).saturation()
+        _diagonal, _left, change = radical_lattice.smith_form()
+        kernel_rank = radical_lattice.nrows()
+        project = lambda element: (self.coordinates(element) * change.change_ring(QQ))[kernel_rank:]
+        inverse_change = change.inverse().change_ring(QQ)
+        section = tuple(
+            sum(c * m.change_ring(QQ) for c, m in zip(inverse_change.row(kernel_rank + i), self.order_basis))
+            for i in range(size - kernel_rank)
+        )
+        quotient_dimension = size - kernel_rank
+        degree = ZZ(quotient_dimension).isqrt()
+        assert degree**2 == quotient_dimension, f"the semisimple quotient of the commutant is not M_n(Q)"
+        e = self._primitive_idempotent(degree)
+        images = matrix(QQ, [project(m * e) for m in self.order_basis])
+        denominator = images.denominator()
+        hermite = matrix(ZZ, denominator * images).hermite_form(include_zero_rows=False)
+        assert hermite.nrows() == degree
+        basis = matrix(QQ, hermite) / denominator
+        lifts = [
+            sum(c * m for c, m in zip(combination, self.order_basis)) * e
+            for combination in (images.solve_left(row) for row in basis.rows())
+        ]
+
+        def on_module(element):
+            return matrix(QQ, [basis.solve_left(project(element * m)) for m in lifts]).transpose()
+
+        action_rows = matrix(QQ, [on_module(m).list() for m in section])
+        assert action_rows.denominator() == 1 and abs(action_rows.det()) == 1, (
+            f"the semisimple quotient of the order of the commutant of {self.isometries} is not End(M)"
+        )
+        adjoint_e = self.adjoint(e)
+        line = matrix(QQ, [project(adjoint_e * m.change_ring(QQ) * e) for m in self.order_basis])
+        line_scale = line.denominator()
+        generator = matrix(QQ, matrix(ZZ, line_scale * line).hermite_form(include_zero_rows=False)) / line_scale
+        assert generator.nrows() == 1
+        gram = matrix(
+            ZZ,
+            [[generator.solve_left(project(self.adjoint(x) * y))[0] for y in lifts] for x in lifts],
+        )
+        identity = identity_matrix(QQ, self.rank)
+        radical_integral = tuple(
+            sum(c * m.change_ring(QQ) for c, m in zip(row, self.order_basis)) for row in radical_lattice.rows()
+        )
+        action_inverse = action_rows.inverse()
+        generators = list(self.unipotent_kernel_generators())
+        for isometry in _form_generators(gram):
+            combination = vector(QQ, isometry.list()) * action_inverse
+            preimage = sum(c * m for c, m in zip(combination, section))
+            preimage_adjoint = self.adjoint(preimage)
+            columns = [(preimage_adjoint * x + self.adjoint(x) * preimage).list() for x in radical_integral]
+            equations = matrix(QQ, columns).transpose()
+            target = vector(QQ, (identity - preimage_adjoint * preimage).list())
+            common = lcm([equations.denominator(), target.denominator()])
+            solution = _integer_solution(matrix(ZZ, common * equations), vector(ZZ, common * target))
+            assert solution is not None, (
+                f"the isometry {isometry} of the semisimple quotient has no integral unitary lift"
+            )
+            element = preimage + sum(c * x for c, x in zip(solution, radical_integral))
+            assert self.is_centralizer_element(element)
+            generators.append(matrix(ZZ, element))
+        return tuple(generators)
 
     def is_semisimple(self):
         return not self.radical_basis()
