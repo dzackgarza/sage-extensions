@@ -122,6 +122,73 @@ def _primitive_pointed_classes(lattice, square):
     return tuple(marked.arrow()(source.module_generator(label)) for marked in classes)
 
 
+def _degenerate_null_orbits(lattice, content):
+    r"""Return the square-zero orbits of a degenerate lattice, indexed lazily (#41).
+
+    Without ``content`` the zero vector comes first, followed by the pairs
+    ``(c, p)`` of a content and a primitive class on successive antidiagonals.
+    """
+    from itertools import islice
+
+    from sage_indefinite_port.indefinite.marked_lattices import DegenerateNullClasses
+
+    classes = DegenerateNullClasses(lattice)
+    ring = lattice.base_ring()
+
+    def primitive(position):
+        return next(islice(iter(classes), position, None))
+
+    if classes.is_finite():
+        primitive_vector = primitive(0)
+        if content is not None:
+            return finite_ordered_set((lattice.scalar_multiple(ring(int(content)), primitive_vector),))
+        return OrderedEnumeratedSets()(
+            NN,
+            lambda index: lattice.scalar_multiple(ring(int(index)), primitive_vector),
+            index_of=lambda vector: (
+                NN(int(vector.content())) if vector != lattice.zero() and vector.primitive_part() == primitive_vector
+                else NN(0) if vector == lattice.zero() else None
+            ),
+            name=f"Square-zero orbit representatives of {lattice}",
+        )
+    if content is not None:
+        selected = ring(int(content))
+        return OrderedEnumeratedSets()(
+            NN,
+            lambda index: lattice.scalar_multiple(selected, primitive(int(index))),
+            index_of=lambda vector: (
+                None if vector == lattice.zero() or vector.content() != selected
+                else (lambda position: None if position is None else NN(position))(classes.index_of(vector.primitive_part()))
+            ),
+            name=f"Square-zero orbit representatives of content {content} of {lattice}",
+        )
+
+    def element_at(index):
+        position = int(index)
+        if position == 0:
+            return lattice.zero()
+        diagonal = 0
+        remaining = position - 1
+        while remaining > diagonal:
+            remaining -= diagonal + 1
+            diagonal += 1
+        return lattice.scalar_multiple(ring(remaining + 1), primitive(diagonal - remaining))
+
+    def index_of(vector):
+        if element_parent(vector) is not lattice or vector.q() != ring.zero():
+            return None
+        if vector == lattice.zero():
+            return NN(0)
+        scale = int(vector.content())
+        position = classes.index_of(vector.primitive_part())
+        if position is None:
+            return None
+        diagonal = scale - 1 + position
+        return NN(diagonal * (diagonal + 1) // 2 + scale)
+
+    return OrderedEnumeratedSets()(NN, element_at, index_of=index_of, name=f"Square-zero orbit representatives of {lattice}")
+
+
 def _framing_tuple(element):
     r"""Return ordered framing coefficients only at a private engine boundary."""
     parent = element.parent()
@@ -4217,6 +4284,8 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         """
         lattice = self.domain()
         square = lattice.base_ring()(int(square))
+        if square == lattice.base_ring().zero() and not lattice.is_definite() and not lattice.is_nondegenerate():
+            return _degenerate_null_orbits(lattice, content)
         if content is not None:
             selected = lattice.base_ring()(int(content))
             if selected <= lattice.base_ring().zero():
