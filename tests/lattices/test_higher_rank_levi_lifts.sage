@@ -140,3 +140,30 @@ def test_null_plane_levi_image_is_proper_in_a_split_binary_quotient():
     image = reduction.levi_image()
     assert minus in image
     assert exchange not in image
+
+
+def test_odd_glued_exchange_has_no_lift_over_an_infinite_quotient():
+    r"""K = U(2) + U has infinite O(K); exchanging the U(2) basis does not lift.
+
+    Divisibilities give g(e) = a*e + b*u with b even, so d is odd in
+    g(u) = c*e + d*u. Pairing g(f) with g(e) and g(u) makes its v coefficient
+    even. The added U pairs with none of y, e, u. If g(x) = y modulo I then
+    b(g(f), g(x)) is even, contrary to b(f, x) = 1. Ambient negation lifts -1.
+    """
+    glued = Lattices(ZZ)([[0, 2, 0, 0], [2, 0, 1, 0], [0, 1, 0, 2], [0, 0, 2, 0]])
+    ambient = glued + Lattices(ZZ)("U") + Lattices(ZZ)("U")
+    e, f, x, y, u, v, p, q = tuple(ambient.module_generators())
+    reduction = ambient.primitive_isotropic_subobject(e, u).isotropic_reduction()
+    perpendicular = reduction.orthogonal_complement().inclusion()
+    projection = reduction.projection()
+    images = tuple(projection(perpendicular.lift(point)) for point in (x, y, p, q))
+    labels = tuple(reduction.module_generating_set())
+    general_linear = reduction.general_linear_group()
+    chart = general_linear(dict(zip(labels, images, strict=True)))
+    swapped = general_linear(dict(zip(labels, (images[1], images[0], images[2], images[3]), strict=True)))
+    permutation = swapped * ~chart
+    exchange = reduction.O()({label: permutation(reduction.module_generator(label)) for label in labels})
+    minus = reduction.O()({label: -reduction.module_generator(label) for label in labels})
+    image = reduction.levi_image()
+    assert minus in image
+    assert exchange not in image
