@@ -1190,6 +1190,12 @@ def _isotropic_orbit_representatives(orthogonal_group, rank, *, flag=False):
         rank = index(rank)
         if rank == 0:
             return finite_ordered_set((lattice.primitive_isotropic_subobject(),))
+        if rank == 1 and int(lattice.module_rank()) == 4 and int(lattice.witt_index()) == 1:
+            from sage_indefinite_port.indefinite.witt_one_hilbert import isotropic_line_representative
+
+            representative = isotropic_line_representative(lattice)
+            if representative is not None:
+                return finite_ordered_set((lattice.primitive_isotropic_subobject(representative),))
         dimensions = (rank,)
     if dimensions[-1] < 0:
         raise ValueError(f"the isotropic sublattice rank must be nonnegative, got {rank} in {lattice}")
