@@ -373,6 +373,14 @@ class IsometryCommutant:
             generators.append(matrix(ZZ, element))
         return tuple(generators)
 
+    def centralizer_generators(self):
+        r"""Return generators of the simultaneous centralizer, by the structure of `A`."""
+        if self.radical_basis():
+            return self.square_zero_centralizer_generators()
+        if all(x * y == y * x for x in self.order_basis for y in self.order_basis):
+            return self.commutative_centralizer_generators()
+        return self.simple_centralizer_generators()
+
     def _primitive_element(self):
         r"""Return an integral generator of a commutative semisimple `A`, by increasing height.
 
