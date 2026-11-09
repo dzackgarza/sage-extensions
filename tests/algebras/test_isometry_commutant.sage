@@ -159,3 +159,35 @@ def test_eichler_centralizer_is_the_kernel_times_sl2():
     field = SageGF(int(3))
     reduced = [g.change_ring(field) for g in generators]
     assert len(_closure(reduced, identity_matrix(field, int(4)))) == int(72)
+
+
+def _reduced(generators, modulus):
+    field = SageGF(int(modulus))
+    return len(_closure([g.change_ring(field) for g in generators], identity_matrix(field, int(2))))
+
+
+def test_norm_one_units_of_z_sqrt_two():
+    r"""b = Tr(x conj y) on 1, sqrt 2. e = 1 + sqrt 2 has norm -1, so the norm-one units are +-e^(2Z)."""
+    gram = diagonal_matrix(SageZZ, [SageZZ(int(2)), SageZZ(int(-4))])
+    F = sage_matrix(SageZZ, 2, 2, [3, 4, 2, 3])
+    commutant = IsometryCommutant(gram, [F])
+    generators = commutant.field_centralizer_generators()
+    minus = -identity_matrix(SageZZ, int(2))
+    candidates = [g for g in generators if g != minus]
+    assert all(g in (F, F.inverse(), -F, -F.inverse()) for g in candidates) and candidates
+    expected = [F, minus]
+    assert _reduced(generators, 7) == _reduced(expected, 7)
+    assert _reduced(generators, 17) == _reduced(expected, 17)
+
+
+def test_nonmaximal_order_keeps_only_the_units_inside_it():
+    r"""On 1, 4 sqrt 2: e^2 = 3 + 2 sqrt 2 is not in Z[4 sqrt 2] and e^4 = 17 + 12 sqrt 2 is."""
+    gram = diagonal_matrix(SageZZ, [SageZZ(int(2)), SageZZ(int(-64))])
+    F = sage_matrix(SageZZ, 2, 2, [17, 96, 3, 17])
+    assert F.transpose() * gram * F == gram
+    commutant = IsometryCommutant(gram, [F])
+    generators = commutant.field_centralizer_generators()
+    assert all(commutant.is_centralizer_element(g) for g in generators)
+    minus = -identity_matrix(SageZZ, int(2))
+    assert _reduced(generators, 7) == _reduced([F, minus], 7)
+    assert _reduced(generators, 17) == _reduced([F, minus], 17)

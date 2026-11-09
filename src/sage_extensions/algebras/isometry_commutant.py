@@ -19,6 +19,7 @@ from sage.arith.misc import factorial
 from sage.matrix.constructor import matrix
 from sage.matrix.special import identity_matrix
 from sage.modules.free_module_element import vector
+from sage.rings.number_field.number_field import NumberField
 from sage.rings.integer_ring import ZZ
 from sage.rings.rational_field import QQ
 
@@ -370,6 +371,75 @@ class IsometryCommutant:
             assert self.is_centralizer_element(element)
             generators.append(matrix(ZZ, element))
         return tuple(generators)
+
+    def field_centralizer_generators(self):
+        r"""Return generators of the centralizer when the commutant `A` is a number field.
+
+        `C(Z)` is the group of `u` in `O^\times` with `u \sigma(u) = 1`, for the adjoint
+        `\sigma`. Norm-one units of `O_K` form the kernel of `u \mapsto u \sigma(u)` on the
+        Dirichlet unit group, and `O` has finite index in `O_K`, so Schreier's lemma on
+        membership in `O` gives the subgroup.
+        """
+        size = self.dimension()
+        generator = next(
+            (
+                m
+                for m in (*self.order_basis, *(x + y for x in self.order_basis for y in self.order_basis))
+                if m.minimal_polynomial().is_irreducible() and m.minimal_polynomial().degree() == size
+            ),
+            None,
+        )
+        assert generator is not None, f"the commutant of {self.isometries} is not a number field"
+        field = NumberField(generator.minimal_polynomial(), "a")
+        powers = matrix(QQ, [(generator.change_ring(QQ) ** k).list() for k in range(size)])
+
+        def to_field(element):
+            return field(list(powers.solve_left(vector(QQ, matrix(QQ, element).list()))))
+
+        def to_matrix(element):
+            return sum(
+                c * generator.change_ring(QQ) ** k for k, c in enumerate(element.polynomial().padded_list(size))
+            )
+
+        image = to_field(self.adjoint(generator))
+        conjugate = field.hom([image])
+        assert conjugate(image) == field.gen(), "the adjoint is not an involution of the field"
+        units = field.unit_group()
+        values = tuple(field(u) for u in units.gens())
+        exponents = [list(units.log(v * conjugate(v))) for v in values]
+        torsion = units.torsion_generator().order()
+        relation = matrix(ZZ, exponents)
+        columns = relation.ncols()
+        extended = relation.stack(matrix(ZZ, [[torsion if j == 0 else 0 for j in range(columns)]]))
+        kernel = extended.left_kernel().basis()
+        norm_one = []
+        for row in kernel:
+            element = field.one()
+            for value, exponent in zip(values, row[: len(values)]):
+                element = element * value ** int(exponent)
+            norm_one.append(element)
+        moves = [to_matrix(u) for u in norm_one if u != 1]
+        if not moves:
+            return ()
+        one = identity_matrix(QQ, self.rank)
+        transversal = [one]
+        result = {}
+        position = 0
+        while position < len(transversal):
+            current = transversal[position]
+            position += 1
+            for move in moves:
+                product_element = current * move
+                for known in transversal:
+                    quotient = product_element * known.inverse()
+                    if self.in_order(quotient):
+                        if quotient != one:
+                            result[quotient.str()] = matrix(ZZ, quotient)
+                        break
+                else:
+                    transversal.append(product_element)
+        assert all(self.is_centralizer_element(g) for g in result.values())
+        return tuple(result.values())
 
     def is_semisimple(self):
         return not self.radical_basis()
