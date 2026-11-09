@@ -8,6 +8,7 @@ gives Z in 2(1+i)Z[i] and centre 4Zi, and n(1+i,i) is rejected.
 
 from sage_extensions.all import *
 from sage.matrix.constructor import matrix as sage_matrix
+from sage.matrix.special import identity_matrix as _sage_identity
 from sage.rings.number_field.number_field import CyclotomicField as SageCyclotomicField
 from sage_extensions.categories.hermitian_lattices import HermitianLattice, HermitianWittFrame
 from sage.rings.integer_ring import ZZ as SZZ
@@ -235,3 +236,19 @@ def test_a_split_rank_two_isotropic_sublattice_lifts_all_of_the_levi():
     assert index == int(1)
     assert len(generators) == int(12)
 
+
+
+def test_flag_levi_on_a_split_rank_two_frame():
+    r"""Z[i]^5 with J standard: every pair lifts, so the Borel subgroup of GL_2(Z[i]) x U(K) has index 1.
+    Each returned A is upper triangular with unit diagonal entries."""
+    field = SageCyclotomicField(int(4))
+    zero, one = field.zero(), field.one()
+    J = sage_matrix(field, int(5), int(5), [zero, zero, zero, one, zero, zero, zero, zero, zero, one, zero, zero, one, zero, zero, one, zero, zero, zero, zero, zero, one, zero, zero, zero])
+    lattice = HermitianLattice((one, field.gen()), J)
+    frame = HermitianWittFrame(lattice, _sage_identity(field, int(5)), sage_matrix(field, int(1), int(1), [one]), int(2))
+    index, generators = frame.levi_image_schreier((int(1), int(1)))
+    assert int(index) == int(1)
+    assert all(a[int(1), int(0)] == zero for a, _u in generators)
+    assert any(a[int(0), int(1)] != zero for a, _u in generators)
+    units = set(field.roots_of_unity())
+    assert all(a[int(0), int(0)] in units and a[int(1), int(1)] in units for a, _u in generators)
