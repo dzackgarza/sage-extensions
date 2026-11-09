@@ -4091,7 +4091,9 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             reduced = scalar_change(isometry)
             return general_linear({label: reduced(changed.module_generator(label)) for label in changed.module_generating_set()})
 
-        return self.Mor(general_linear)(reduce).image_factorization()[0]
+        representation = self.Mor(general_linear)(reduce).image_factorization()[0]
+        assert representation.codomain().is_finite() is True, f"the image of {self} in Aut(L/{modulus}L) is finite"
+        return representation
 
     def congruence_preimage(self, modulus, target=None):
         r"""Return the preimage in ``O(L)`` of a subgroup of the actual image in ``Aut(L/mL)``.
