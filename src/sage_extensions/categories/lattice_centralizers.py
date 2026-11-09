@@ -1610,6 +1610,53 @@ def arithmetic_centralizer(orthogonal_group, isometry):
     return centralizer
 
 
+def _hyperbolic_unitary_generators(group, isometry, divisor):
+    r"""Return ``U(1,1)`` generators when ``(L, f)`` is the trace of the hyperbolic plane over ``Z[zeta_d]``, or ``None``."""
+    from sage.matrix.constructor import matrix
+    from sage.rings.integer_ring import ZZ as SageZZ
+    from sage.rings.number_field.number_field import CyclotomicField
+
+    from sage_extensions.categories.hermitian_lattices import HermitianLattice
+    from sage_indefinite_port.indefinite.binary_hyperbolic_unitary import generators, theta
+
+    d = {4: 1, 3: 3}[divisor]
+    field = CyclotomicField(divisor)
+    zeta = field.gen()
+    hermitian = HermitianLattice((field.one(), zeta), matrix(field, 2, 2, [0, 1, 1, 0]))
+    trace = hermitian.trace_lattice()
+    lattice = group.lattice()
+    frame = tuple(lattice.module_generators())
+    trace_frame = tuple(trace.module_generators())
+    gram = matrix(SageZZ, [[int(lattice.b(x, y)) for y in frame] for x in frame])
+    target = matrix(SageZZ, [[int(trace.b(x, y)) for y in trace_frame] for x in trace_frame])
+    omega = hermitian.unit_isometry(zeta)
+    if gram != target or any(
+        [int(c) for c in isometry(v)] != [int(c) for c in omega(w)] for v, w in zip(frame, trace_frame, strict=True)
+    ):
+        return None
+    source = theta(d).parent()
+    if d == 1:
+        embed = source.hom([zeta])
+    else:
+        embed = source.hom([2 * zeta + 1])
+    labels = tuple(lattice.module_generating_set())
+    result = []
+    for g in generators(d).values():
+        image = hermitian.isometry_from_matrix(matrix(field, 2, 2, [embed(entry) for entry in g.list()]))
+        result.append(
+            group(
+                {
+                    label: sum(
+                        (lattice.scalar_multiple(int(c), f) for c, f in zip(image(w), frame, strict=True)),
+                        lattice.zero(),
+                    )
+                    for label, w in zip(labels, trace_frame, strict=True)
+                }
+            )
+        )
+    return tuple(result)
+
+
 def _eisenstein_act_generators(group, isometry):
     r"""Return ``Aut E^{4,1}`` generators when ``(L, f)`` is the source trace lattice, or ``None``."""
     from sage.matrix.constructor import matrix
@@ -1768,6 +1815,10 @@ def _arithmetic_centralizer_group_generators(centralizer):
             eisenstein := _eisenstein_act_generators(group, isometry)
         ) is not None:
             generators = eisenstein
+        case (divisor,) if divisor in (3, 4) and int(lattice.module_rank()) == 4 and (
+            hyperbolic := _hyperbolic_unitary_generators(group, isometry, divisor)
+        ) is not None:
+            generators = hyperbolic
         case (divisor,):
             assert False, (
                 f"the centralizer of {isometry} in {group} is the unitary group of {lattice} "
