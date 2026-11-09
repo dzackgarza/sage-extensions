@@ -12,7 +12,10 @@ The integer kernel of the commutation equations is saturated, so its basis is a
 in characteristic zero (Curtis-Reiner, *Methods of Representation Theory I*, 5.26).
 """
 
+from itertools import product
+
 from sage.arith.functions import lcm
+from sage.arith.misc import factorial
 from sage.matrix.constructor import matrix
 from sage.matrix.special import identity_matrix
 from sage.modules.free_module_element import vector
@@ -101,31 +104,63 @@ class IsometryCommutant:
             for v in form.right_kernel().basis()
         )
 
-    def unipotent_kernel_generators(self):
-        r"""Return generators of the kernel of `C(Z) \to (A / rad A)^\times` when `rad^2 = 0`.
-
-        An element of the kernel is `1 + x` with `x` integral in the radical. Since
-        `x^\dagger x` lies in `rad^2`, the unitary equation is `x + x^\dagger = 0`.
-        The kernel is therefore the free abelian group of the integer points of a
-        rational subspace, written multiplicatively by `(1 + x)(1 + y) = 1 + x + y`.
-        """
+    def _skew_radical(self):
+        r"""Return a `Z`-basis of `\{x \in rad A : x^\dagger = -x\} \cap M_r(Z)`."""
         radical = self.radical_basis()
-        assert all((x * y).is_zero() for x in radical for y in radical), (
-            f"the radical of the commutant of {self.isometries} has nonzero square"
-        )
         if not radical:
             return ()
-        r = self.rank
-        rows = [list(x + self.adjoint(x)) for x in radical]
-        equations = matrix(QQ, [[entry for row in m.rows() for entry in row] for m in map(matrix, rows)])
+        equations = matrix(QQ, [(x + self.adjoint(x)).list() for x in radical])
         relations = equations.left_kernel().basis()
         if not relations:
             return ()
         skew = [sum(c * x for c, x in zip(v, radical)) for v in relations]
         denominator = lcm([m.denominator() for m in skew])
         scaled = matrix(ZZ, [(denominator * m).list() for m in skew]).saturation()
-        identity = identity_matrix(ZZ, r)
-        return tuple(identity + matrix(ZZ, r, r, list(row)) for row in scaled.rows())
+        return tuple(matrix(ZZ, self.rank, self.rank, list(row)) for row in scaled.rows())
+
+    def unipotent_kernel_generators(self):
+        r"""Return generators of the kernel of `C(Z) \to (A / rad A)^\times` for abelian skew radical.
+
+        The logarithm is a bijection from the kernel over `Q` onto the skew radical
+        `n`. On abelian `n` it is a homomorphism, so the kernel is a lattice in `n`.
+        With `x^{c+1} = 0`, a logarithm of an integral element lies in
+        `\Lambda = M^{-1}(n \cap M_r(Z))` for `M = lcm(1, ..., c)`, and `\exp` is
+        integral on `c! (n \cap M_r(Z)) = D \Lambda` for `D = M c!`. Testing each
+        residue of `\Lambda / D \Lambda` therefore determines the lattice.
+        """
+        basis = self._skew_radical()
+        if not basis:
+            return ()
+        assert all(x * y == y * x for x in basis for y in basis), (
+            f"the skew radical of the commutant of {self.isometries} is not abelian"
+        )
+        identity = identity_matrix(QQ, self.rank)
+        nilpotency = 1
+        probes = list(basis)
+        power = list(basis)
+        while True:
+            power = [x * y for x in power for y in probes if not (x * y).is_zero()]
+            if not power:
+                break
+            nilpotency += 1
+        modulus = lcm(range(1, nilpotency + 1))
+        depth = modulus * factorial(nilpotency)
+
+        def exponential(coordinates):
+            x = sum((c * m.change_ring(QQ) for c, m in zip(coordinates, basis)), 0 * identity) / modulus
+            term = identity
+            total = identity
+            for k in range(1, nilpotency + 1):
+                term = term * x / k
+                total = total + term
+            return total
+
+        rows = [[depth if i == j else 0 for j in range(len(basis))] for i in range(len(basis))]
+        for residue in product(range(depth), repeat=len(basis)):
+            if any(residue) and exponential(residue).denominator() == 1:
+                rows.append(list(residue))
+        lattice = matrix(ZZ, rows).hermite_form(include_zero_rows=False)
+        return tuple(matrix(ZZ, exponential(list(row))) for row in lattice.rows())
 
     def is_semisimple(self):
         return not self.radical_basis()
