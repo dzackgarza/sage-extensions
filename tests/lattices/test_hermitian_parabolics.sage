@@ -148,7 +148,20 @@ def test_glued_eisenstein_line_has_a_proper_liftable_levi_image():
     frame = HermitianWittFrame(lattice, ~basis, sage_matrix(field, int(1), int(1), [middle]), int(1))
     units = [(-omega) ** int(k) for k in range(int(6))]
     pairs = [(sage_matrix(field, int(1), int(1), [a]), sage_matrix(field, int(1), int(1), [u])) for a in units for u in units]
+    assert len(frame.levi_candidates()) == int(36)
+    assert len(frame.levi_image()) == int(18)
     image = frame.liftable_levi_image(pairs)
     expected = [pair for pair in pairs if ((pair[0][int(0), int(0)] - pair[1][int(0), int(0)]) / theta).is_integral()]
     assert len(expected) == int(18)
     assert list(image) == expected
+
+
+def test_split_gaussian_line_lifts_every_candidate():
+    r"""Z[i]^3 with J = antidiag(1,1,1) splits as a hyperbolic plane and <1>, so all 4 x 4 unit pairs lift."""
+    field = SageCyclotomicField(int(4))
+    zero, one = field.zero(), field.one()
+    witt = sage_matrix(field, int(3), int(3), [zero, zero, one, zero, one, zero, one, zero, zero])
+    lattice = HermitianLattice((one, field.gen()), witt)
+    frame = HermitianWittFrame(lattice, witt.parent().identity_matrix(), sage_matrix(field, int(1), int(1), [one]), int(1))
+    assert len(frame.levi_candidates()) == int(16)
+    assert len(frame.levi_image()) == int(16)

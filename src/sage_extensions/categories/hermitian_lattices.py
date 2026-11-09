@@ -484,6 +484,61 @@ class HermitianWittFrame(SageObject):
             generators.append(multiple)
         return tuple(generators), centre_generators
 
+    def quotient_lattice_basis(self):
+        r"""Return a ``ZZ``-basis of ``I^perp / I`` in the middle Witt coordinates."""
+        degree = self._field.degree()
+        inverse = ~self._frame
+        images = []
+        for position in range(self._n):
+            for scalar in self._lattice.order_basis():
+                point = vector(self._field, self._n)
+                point[position] = scalar
+                images.append(inverse * point)
+        flatten = lambda entries: [value for entry in entries for value in entry.vector()]
+        last = matrix(SageQQ, [flatten(image[self._k + self._m :]) for image in images])
+        kernel = (last.denominator() * last).change_ring(SageZZ).left_kernel().basis_matrix()
+        projected = kernel.change_ring(SageQQ) * matrix(SageQQ, [flatten(image[self._k : self._k + self._m]) for image in images])
+        common = projected.denominator()
+        echelon = (common * projected).change_ring(SageZZ).echelon_form()
+        return tuple(
+            vector(self._field, [self._field(list(row[degree * j : degree * (j + 1)])) / common for j in range(self._m)])
+            for row in echelon[: echelon.rank()].rows()
+        )
+
+    def quotient_unitary_elements(self):
+        r"""Return every element of ``U(I^perp / I)`` for a definite trace form on the quotient."""
+        from sage.quadratic_forms.quadratic_form import QuadraticForm
+
+        basis = self.quotient_lattice_basis()
+        gram = matrix(SageQQ, [[(left.conjugate() * self._middle * right).trace() for right in basis] for left in basis])
+        if gram[0, 0] < 0:
+            gram = -gram
+        if not gram.is_positive_definite():
+            raise ValueError("the trace form of the quotient is indefinite, so its unitary group is infinite in general")
+        columns = matrix(self._field, basis).transpose()
+        pivots = list(columns.pivots())
+        chart_inverse = ~columns[:, pivots]
+        elements = []
+        for automorphism in QuadraticForm((2 * gram.denominator() * gram).change_ring(SageZZ)).automorphisms():
+            image = columns * automorphism.change_ring(self._field)
+            candidate = image[:, pivots] * chart_inverse
+            if candidate * columns == image:
+                elements.append(candidate)
+        return tuple(elements)
+
+    def levi_candidates(self):
+        r"""Return all ``(A, U)`` with ``A`` a root of unity of the order, for an isotropic line."""
+        if self._k != 1:
+            raise ValueError("levi_candidates requires an isotropic line: GL_k of the order is infinite for k > 1")
+        if self._field.unit_group().rank() != 0:
+            raise ValueError("levi_candidates requires a finite unit group of the order")
+        units = [unit for unit in self._field.roots_of_unity() if self._integral(matrix(self._field, 1, 1, [unit]))]
+        return tuple((matrix(self._field, 1, 1, [unit]), element) for unit in units for element in self.quotient_unitary_elements())
+
+    def levi_image(self):
+        r"""Return the pairs of :meth:`levi_candidates` that lift to integral isometries."""
+        return self.liftable_levi_image(self.levi_candidates())
+
     def levi_lift(self, A, U):
         r"""Return parameters ``(Z,T)`` with ``l(A,U) n(Z,T)`` integral on ``O^n``, or ``None``."""
         left = self.in_lattice(self.levi(A, U))
