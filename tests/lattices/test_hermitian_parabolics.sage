@@ -140,8 +140,9 @@ def test_glued_eisenstein_line_has_a_proper_liftable_levi_image():
     omega = field.gen()
     theta = omega - omega.conjugate()
     middle = field(int(9))
-    witt = sage_matrix(field, int(3), int(3), [0, 0, 1, 0, middle, 0, 1, 0, 0])
-    basis = sage_matrix(field, int(3), int(3), [1, theta**int(-1), 0, 0, theta**int(-1), 0, 0, 0, theta])
+    zero, one = field.zero(), field.one()
+    witt = sage_matrix(field, int(3), int(3), [zero, zero, one, zero, middle, zero, one, zero, zero])
+    basis = sage_matrix(field, int(3), int(3), [one, theta**int(-1), zero, zero, theta**int(-1), zero, zero, zero, theta])
     gram = basis.conjugate_transpose() * witt * basis
     lattice = HermitianLattice((field.one(), omega), gram.transpose())
     frame = HermitianWittFrame(lattice, ~basis, sage_matrix(field, int(1), int(1), [middle]), int(1))
