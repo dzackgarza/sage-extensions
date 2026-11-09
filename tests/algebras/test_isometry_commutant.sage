@@ -14,6 +14,7 @@ and the centralizer in O(L) is the four matrices diag(+-1, +-1, -+1) with equal 
 
 from sage_extensions.all import *
 from sage.matrix.constructor import matrix as sage_matrix
+from sage.matrix.constructor import block_matrix
 from sage.matrix.special import diagonal_matrix, identity_matrix
 from sage.rings.infinity import Infinity
 from sage.rings.integer_ring import ZZ as SageZZ
@@ -171,7 +172,7 @@ def test_norm_one_units_of_z_sqrt_two():
     gram = diagonal_matrix(SageZZ, [SageZZ(int(2)), SageZZ(int(-4))])
     F = sage_matrix(SageZZ, 2, 2, [3, 4, 2, 3])
     commutant = IsometryCommutant(gram, [F])
-    generators = commutant.field_centralizer_generators()
+    generators = commutant.commutative_centralizer_generators()
     minus = -identity_matrix(SageZZ, int(2))
     candidates = [g for g in generators if g != minus]
     assert all(g in (F, F.inverse(), -F, -F.inverse()) for g in candidates) and candidates
@@ -186,8 +187,44 @@ def test_nonmaximal_order_keeps_only_the_units_inside_it():
     F = sage_matrix(SageZZ, 2, 2, [17, 96, 3, 17])
     assert F.transpose() * gram * F == gram
     commutant = IsometryCommutant(gram, [F])
-    generators = commutant.field_centralizer_generators()
+    generators = commutant.commutative_centralizer_generators()
     assert all(commutant.is_centralizer_element(g) for g in generators)
     minus = -identity_matrix(SageZZ, int(2))
     assert _reduced(generators, 7) == _reduced([F, minus], 7)
     assert _reduced(generators, 17) == _reduced([F, minus], 17)
+
+
+def test_swap_on_the_hyperbolic_plane_has_order_four_centralizer():
+    r"""Issue 54: on U with F the swap, the centralizer is all of O(U) = {+-1, +-F}."""
+    gram = sage_matrix(SageZZ, 2, 2, [0, 1, 1, 0])
+    F = sage_matrix(SageZZ, 2, 2, [0, 1, 1, 0])
+    generators = IsometryCommutant(gram, [F]).commutative_centralizer_generators()
+    group = _closure(generators, identity_matrix(SageZZ, int(2)))
+    one = identity_matrix(SageZZ, int(2))
+    assert set(group) == set(m.str() for m in (one, -one, F, -F))
+
+
+def test_adjoint_swapping_two_fields():
+    r"""W + W* of rank 6, F = (A, A^-T) with A the companion matrix of x^3 - x - 1.
+
+    A^-T has the reciprocal polynomial x^3 + x^2 - 1, which differs, so the commutant is
+    Z[A] x Z[A^-T] with the factors swapped by the adjoint. K has discriminant -23, Z[x]
+    is its maximal order and x is a fundamental unit, so C(Z) = +-F^Z.
+    """
+    A = sage_matrix(SageZZ, 3, 3, [0, 0, 1, 1, 0, 1, 0, 1, 0])
+    assert A.charpoly().list() == [SageZZ(int(-1)), SageZZ(int(-1)), SageZZ(int(0)), SageZZ(int(1))]
+    zero = sage_matrix(SageZZ, int(3), int(3))
+    one = identity_matrix(SageZZ, int(3))
+    B = block_matrix(SageZZ, [[zero, one], [one, zero]], subdivide=False)
+    F = block_matrix(SageZZ, [[A, zero], [zero, A.inverse().transpose()]], subdivide=False)
+    commutant = IsometryCommutant(B, [F])
+    assert int(commutant.dimension()) == int(6)
+    generators = commutant.commutative_centralizer_generators()
+    assert all(commutant.is_centralizer_element(g) for g in generators)
+    expected = [F, -identity_matrix(SageZZ, int(6))]
+    for modulus in (int(5), int(7)):
+        field = SageGF(modulus)
+        identity = identity_matrix(field, int(6))
+        assert len(_closure([g.change_ring(field) for g in generators], identity)) == len(
+            _closure([g.change_ring(field) for g in expected], identity)
+        )

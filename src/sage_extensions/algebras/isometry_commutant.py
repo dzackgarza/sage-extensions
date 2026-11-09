@@ -12,9 +12,10 @@ The integer kernel of the commutation equations is saturated, so its basis is a
 in characteristic zero (Curtis-Reiner, *Methods of Representation Theory I*, 5.26).
 """
 
-from itertools import combinations, product
+from itertools import combinations, count, product
 
 from sage.arith.functions import lcm
+from sage.arith.misc import CRT_list as crt
 from sage.arith.misc import factorial
 from sage.matrix.constructor import matrix
 from sage.matrix.special import identity_matrix
@@ -372,56 +373,87 @@ class IsometryCommutant:
             generators.append(matrix(ZZ, element))
         return tuple(generators)
 
-    def field_centralizer_generators(self):
-        r"""Return generators of the centralizer when the commutant `A` is a number field.
+    def _primitive_element(self):
+        r"""Return an integral generator of a commutative semisimple `A`, by increasing height.
 
-        `C(Z)` is the group of `u` in `O^\times` with `u \sigma(u) = 1`, for the adjoint
-        `\sigma`. Norm-one units of `O_K` form the kernel of `u \mapsto u \sigma(u)` on the
-        Dirichlet unit group, and `O` has finite index in `O_K`, so Schreier's lemma on
-        membership in `O` gives the subgroup.
+        Over `Q` the elements failing to generate lie in finitely many proper subspaces, so
+        the search ends.
         """
         size = self.dimension()
-        generator = next(
-            (
-                m
-                for m in (*self.order_basis, *(x + y for x in self.order_basis for y in self.order_basis))
-                if m.minimal_polynomial().is_irreducible() and m.minimal_polynomial().degree() == size
-            ),
-            None,
-        )
-        assert generator is not None, f"the commutant of {self.isometries} is not a number field"
-        field = NumberField(generator.minimal_polynomial(), "a")
+        for height in count(1):
+            for values in product(range(-height, height + 1), repeat=size):
+                element = sum(c * m for c, m in zip(values, self.order_basis))
+                polynomial = element.minimal_polynomial()
+                if polynomial.degree() == size and polynomial.is_squarefree():
+                    return element
+
+    def commutative_centralizer_generators(self):
+        r"""Return generators of the centralizer when the commutant `A` is a product of fields.
+
+        Let `a` generate `A`, with squarefree minimal polynomial `\prod p_j` and
+        `K_j = Q[x]/p_j`. The adjoint permutes the factors. On a fixed factor the unitary
+        equation is `u \sigma(u) = 1`, solved on the Dirichlet unit group. On a swapped
+        pair, `u` is any unit of one factor and determines the other. These generate the
+        norm-one units of the maximal order, and `O` has finite index in it, so Schreier's
+        lemma on membership in `O` gives the subgroup.
+        """
+        size = self.dimension()
+        assert not self.radical_basis() and all(
+            x * y == y * x for x in self.order_basis for y in self.order_basis
+        ), f"the commutant of {self.isometries} is not commutative semisimple"
+        generator = self._primitive_element()
+        minimal = generator.minimal_polynomial().change_ring(QQ)
+        factors = tuple(factor for factor, _multiplicity in minimal.factor())
+        fields = tuple(NumberField(factor, "a") if factor.degree() > 1 else QQ for factor in factors)
+        element_of = lambda j, polynomial: fields[j](polynomial) if factors[j].degree() > 1 else polynomial(-factors[j][0] / factors[j][1])
         powers = matrix(QQ, [(generator.change_ring(QQ) ** k).list() for k in range(size)])
+        ring = minimal.parent()
+        adjoint_polynomial = ring(list(powers.solve_left(vector(QQ, self.adjoint(generator).list()))))
+        thetas = tuple(element_of(j, adjoint_polynomial) for j in range(len(factors)))
+        partner = tuple(
+            next(i for i, factor in enumerate(factors) if factor(thetas[j]) == 0) for j in range(len(factors))
+        )
 
-        def to_field(element):
-            return field(list(powers.solve_left(vector(QQ, matrix(QQ, element).list()))))
-
-        def to_matrix(element):
+        def to_matrix(values):
+            residues = [ring(v.polynomial()) if factors[j].degree() > 1 else ring(v) for j, v in enumerate(values)]
+            combined = crt(residues, list(factors)) if len(factors) > 1 else residues[0]
             return sum(
-                c * generator.change_ring(QQ) ** k for k, c in enumerate(element.polynomial().padded_list(size))
+                c * generator.change_ring(QQ) ** k for k, c in enumerate(combined.padded_list(size))
             )
 
-        image = to_field(self.adjoint(generator))
-        conjugate = field.hom([image])
-        assert conjugate(image) == field.gen(), "the adjoint is not an involution of the field"
-        units = field.unit_group()
-        values = tuple(field(u) for u in units.gens())
-        exponents = [list(units.log(v * conjugate(v))) for v in values]
-        torsion = units.torsion_generator().order()
-        relation = matrix(ZZ, exponents)
-        columns = relation.ncols()
-        extended = relation.stack(matrix(ZZ, [[torsion if j == 0 else 0 for j in range(columns)]]))
-        kernel = extended.left_kernel().basis()
-        norm_one = []
-        for row in kernel:
-            element = field.one()
-            for value, exponent in zip(values, row[: len(values)]):
-                element = element * value ** int(exponent)
-            norm_one.append(element)
-        moves = [to_matrix(u) for u in norm_one if u != 1]
+        def unit_generators(j):
+            if factors[j].degree() == 1:
+                return (QQ(-1),)
+            return tuple(fields[j](u) for u in fields[j].unit_group().gens())
+
+        moves = []
+        done = set()
+        for j, field in enumerate(fields):
+            if j in done:
+                continue
+            ones = [fields[i](1) for i in range(len(fields))]
+            if partner[j] == j:
+                done.add(j)
+                for u in self._norm_one_generators(field, thetas[j], factors[j]):
+                    entry = list(ones)
+                    entry[j] = u
+                    moves.append(to_matrix(entry))
+            else:
+                other = partner[j]
+                done |= set((j, other))
+                for u in unit_generators(j):
+                    entry = list(ones)
+                    entry[j] = u
+                    inverse = ~u
+                    if factors[j].degree() > 1:
+                        entry[other] = field.hom([thetas[other]])(inverse)
+                    else:
+                        entry[other] = inverse
+                    moves.append(to_matrix(entry))
+        one = identity_matrix(QQ, self.rank)
+        moves = [m for m in moves if m != one]
         if not moves:
             return ()
-        one = identity_matrix(QQ, self.rank)
         transversal = [one]
         result = {}
         position = 0
@@ -440,6 +472,26 @@ class IsometryCommutant:
                     transversal.append(product_element)
         assert all(self.is_centralizer_element(g) for g in result.values())
         return tuple(result.values())
+
+    @staticmethod
+    def _norm_one_generators(field, theta, factor):
+        r"""Return generators of the units `u` of `field` with `u \sigma(u) = 1`, `\sigma(a) = \theta`."""
+        if factor.degree() == 1:
+            return (QQ(-1),)
+        conjugate = field.hom([theta])
+        units = field.unit_group()
+        values = tuple(field(u) for u in units.gens())
+        relation = matrix(ZZ, [list(units.log(v * conjugate(v))) for v in values])
+        torsion = units.torsion_generator().order()
+        columns = relation.ncols()
+        extended = relation.stack(matrix(ZZ, [[torsion if j == 0 else 0 for j in range(columns)]]))
+        generators = []
+        for row in extended.left_kernel().basis():
+            element = field.one()
+            for value, exponent in zip(values, row[: len(values)]):
+                element = element * value ** int(exponent)
+            generators.append(element)
+        return tuple(u for u in generators if u != 1)
 
     def is_semisimple(self):
         return not self.radical_basis()
