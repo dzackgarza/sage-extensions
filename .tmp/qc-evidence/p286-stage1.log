@@ -1,0 +1,16 @@
+[17:06:34] setup
+[17:07:15] lines: 2 in 41.1 s
+[17:07:16] line 0: v = -e_f, K rank 10 signature (1, 9) det -1024
+[17:07:18] line 0: 1 O(K)-orbits of isotropic vectors in 2.3 s
+[17:07:18] line 0: plane rank 2 primitive True K_P rank 10 det 0 (0.1 s)
+[17:07:18] line 1: v = -e_fp, K rank 10 signature (1, 9) det -256
+[17:07:23] line 1: 2 O(K)-orbits of isotropic vectors in 4.7 s
+[17:07:23] line 1: plane rank 2 primitive True K_P rank 10 det 0 (0.1 s)
+[17:07:23] line 1: plane rank 2 primitive True K_P rank 10 det 0 (0.1 s)
+[17:07:23] candidates: 3
+[17:07:23] plane of line 0: new orbit  (cumulative 0.0 s)
+[17:07:39] plane of line 1: equivalent to a kept plane  (cumulative 16.6 s)
+[17:07:40] plane of line 1: new orbit  (cumulative 16.8 s)
+[17:07:40] O(T_En)-orbits of primitive isotropic planes: 2 in 16.8 s
+[17:07:40]   line 0: ['e_f', 'e_ep + 2*e_fp - 4*e_a1 - 5*e_a2 - 7*e_a3 - 10*e_a4 - 8*e_a5 - 6*e_a6 - 4*e_a7 - 2*e_a8']
+[17:07:40]   line 1: ['2*e_e + 2*e_f - 2*e_a1 - 4*e_a2 - 5*e_a3 - 8*e_a4 - 7*e_a5 - 6*e_a6 - 4*e_a7 - 2*e_a8', 'e_fp']

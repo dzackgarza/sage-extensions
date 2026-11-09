@@ -3583,3 +3583,59 @@ and the heavy module now runs inside the declared 60 s `--timeout`
 carrying the session's cold start) and 31.98 s (the plane image, walk and stabilizer
 together).  The recipe still exits 1 on the 20 s per-call ceiling, which is the cost issue
 being filed, not a wrong answer.
+
+### Primitive isotropic planes come from the reduction's lines, not from a plane enumeration (2026-11-09, #286)
+
+`O(L)`-orbits of primitive isotropic planes were read from the port's
+`plane_classes` (`isotropic_induction.py:259`), which enumerates plane classes directly
+through `flags_through`'s double cosets.  On `Lambda_2 = U^2 + E8(-1)^2 + <-2>`
+(`lattice-database` card `6JRX`) that route did not return in 2700 s at 3.4 GiB, and on
+`T_En` the rank-2 call had not returned in 158 s.  Scattone (*On the compactification of
+moduli spaces for algebraic K3 surfaces*, Mem. AMS 374, Prop. 5.4.7 with Cor. 5.4.8(2),
+p. 78, summarised at the port's `tests/fixtures/DATA_SOURCES.md:172`) reads them from the
+lines of `K_v = v^perp/Zv` over the representatives `v` of the line classes, and the in-repo
+branch in `categories/isotropic_orbits.py` now does that, identifying the pairs
+`(v, line of K_v)` by exact plane equivalence.
+
+Three facts measured on the way:
+
+- **`<v, f>` with `b(v, f) != 0` is not a totally isotropic span**, so
+  `primitive_isotropic_subobject(v, f)` refuses it with `AssertionError: ... is not totally
+  isotropic`.  The direct-summand test the branch needs is `lattice.subobject_on((v, f))`
+  with `det(L) = det(<v, f>) det(<v, f>^perp)`; on `T_En` the two line representatives give
+  `v = -e_e, f = e_f` (`b = -1`, dets `-1` and `-1024` against `det T_En = 1024`) and
+  `v = e_fp, f = e_ep` (`b = 2`, dets `-4` and `-256`).
+- **An isotropic plane need not be `U` or `U(2)`**: `Z e_1 + Z e_3` in `T_En` carries the
+  zero form, so it contains infinitely many primitive isotropic lines.  "One plane contains
+  two vector orbits" is false; the parametrisation is still injective because it goes
+  through `E/Zv` in the reduction, and the identification step is unavoidable.
+- **`T_En`'s two line reductions have different invariants**: rank 10, signature `(1,9)`,
+  `det -1024` and `det -256`, with 1 and 2 `O(K)`-classes of isotropic vectors, at 2.3 s
+  and 4.7 s.
+
+Cost of the full call, `T_En` under `O`, cold process: **62.8 s** =
+41.1 s line classes (the port's rank-1 route, unchanged) + 7.0 s the two reductions +
+16.6 s the one exact plane isometry that identifies the second candidate with the first.
+The repository's per-call ceiling is 20 s, so the card-reading module reports as cost even
+though the count agrees.
+
+### The rank-19 Lorentzian reduction is where the Scattone specimens stop (2026-11-09, #286)
+
+For `Lambda_2` and `Lambda_4` the single line class (`1` orbit, 20.5 s on `Lambda_2`) has
+`K_v = U + E8(-1)^2 + <-2>`, rank 19, signature `(1,18)`, so the next step is the
+`O(K_v)`-classification of the isotropic vectors of a rank-19 Lorentzian lattice.
+`INDUCTION.isotropic_vector_classes` on it did not return within the probe's 2400 s inner
+cap (`launcher exit: 124`, peak tree RSS 1086 MiB), so cards `6JRX` (four plane classes) and
+`6JRY` (nine) are not reproduced yet.  One plane class of `Lambda_{2k}` is *not* the
+hyperbolic summand's: a primitive isotropic plane of `Lambda_2` may carry `E8(-1)`
+components, which is why `E^perp/E` varies and Scattone's four classes exist at all —
+`E^perp/E` for a plane inside `U^2` alone would be `E8(-1)^2 + <-2>` for every plane.
+
+### A plane's stabilizer is the expensive half of every subgroup row (2026-11-09, #286)
+
+Splitting an `O(L)`-plane class into `Gamma`-orbits goes through
+`isotropic_stabilizer_generators`, i.e. the port's `automorphism_group_generators` on the
+marked plane.  On a plane of `T_En` (rank 12) it had not returned after 7 min and was
+killed with its probe.  That, not the plane enumeration, is what blocks card `029J`'s
+`gamma-en-2` and `Otilde+` rows; `Otilde+` additionally needs 24 242 representatives
+realised one at a time.

@@ -1180,6 +1180,120 @@ def _isotropic_object_from_marked(marked, *, flag):
             )
 
 
+def _hyperbolic_completion(lattice, line):
+    r"""Return ``(v, <v, f>)`` when ``v`` splits off a hyperbolic plane at index one.
+
+    ``v`` is the selected generator of the isotropic line ``line`` and ``f`` is an
+    isotropic vector of ``lattice`` with ``b(v, f) != 0`` for which
+    ``L = <v, f> + <v, f>^\perp`` is an orthogonal direct sum of index one, decided
+    by ``det(L) = det(<v, f>) det(<v, f>^\perp)``.  ``None`` when no such ``f`` is
+    exhibited among the chosen generators of ``L``.
+
+    The split is what makes the plane branch complete.  With it, every ``x`` in
+    ``v^\perp`` has ``x = a v + b f + k`` and ``b(x, v) = b m``, so ``b = 0`` and
+    ``v^\perp = <v> + <v, f>^\perp``: the reduction ``K_v = v^\perp/<v>`` *is* the
+    complement ``<v, f>^\perp``, and every isometry of that complement extends to
+    ``L`` by the identity on ``<v, f>``, hence lies in ``Stab_{O(L)}(v)``.  The
+    stabilizer therefore acts on ``K_v`` through all of ``O(K_v)``, and one
+    representative per ``O(K_v)``-orbit of isotropic vectors is one representative
+    per ``Stab_{O(L)}(v)``-orbit of planes through that line.  Without it the
+    argument fails at that step and the caller keeps the marking-class route.
+    """
+    ring = lattice.base_ring()
+    zero = ring.zero()
+    selected = line.module_generating_set()[0]
+    v = line.inclusion()(line.module_generator(selected))
+    for label in lattice.module_generating_set():
+        candidate = lattice.module_generator(label)
+        if candidate.q() != zero or lattice.b(v, candidate) == zero:
+            continue
+        # <v, f> is a hyperbolic plane only when it is a direct summand.  Its Gram
+        # determinant is -b(v, f)^2 and the index of <v, f> + <v, f>^\perp in L has
+        # square equal to the determinant quotient, so index one is exactly the
+        # equality below.  The span is built with the restricted form and not as a
+        # primitive isotropic subobject: b(v, f) != 0 makes <v, f> not isotropic.
+        span = lattice.subobject_on((v, candidate))
+        if lattice.determinant() != span.determinant() * span.inclusion().orthogonal_complement().determinant():
+            continue
+        return v, span
+    return None
+
+
+def _planes_through_line(orthogonal_group, line):
+    r"""One primitive isotropic plane per ``Stab_{O(L)}(v)``-orbit through ``line``.
+
+    Scattone, *On the compactification of moduli spaces for algebraic K3
+    surfaces*, Mem. AMS 374 (1987), Proposition 5.4.7 with Corollary 5.4.8(2),
+    p. 78, as ``tests/fixtures/DATA_SOURCES.md`` records it: a primitive isotropic
+    plane ``E`` containing a primitive isotropic vector ``v`` corresponds to the
+    primitive isotropic line ``E/<v>`` of the reduction ``K_v = v^\perp/<v>``.
+    The vectors of ``K_v`` are the selected quotient's, and the frame of the
+    reduction lifts them into ``v^\perp <= L``, so each returned plane is
+    ``<v, lift>`` in the lattice itself.
+
+    ``isotropic_vector_classes(K_v)`` is the port's classification of the
+    primitive isotropic vectors of ``K_v`` modulo ``O(K_v)``, which is the class
+    set wanted here exactly when :func:`_hyperbolic_completion` has certified the
+    split; the caller checks that first.
+    """
+    from sage_indefinite_port.indefinite.marked_lattices import INDUCTION
+
+    lattice = orthogonal_group.domain()
+    reduction = line.isotropic_reduction()
+    quotient = reduction.quotient_lattice()
+    labels = tuple(quotient.module_generating_set())
+    perpendicular = reduction.orthogonal_complement().inclusion()
+    frame = reduction.coordinate_frame()
+    lifts = {label: perpendicular(frame(label)) for label in labels}
+
+    def lift(element):
+        coordinates = element.to_vector()
+        return sum(
+            (
+                lattice.scalar_multiple(coordinates(label), lifts[label])
+                for label in labels
+                if coordinates(label)
+            ),
+            lattice.zero(),
+        )
+
+    v = line.inclusion()(line.module_generator(line.module_generating_set()[0]))
+    return tuple(
+        lattice.primitive_isotropic_subobject(v, lift(isotropic))
+        for isotropic in INDUCTION.isotropic_vector_classes(quotient)
+    )
+
+
+def _isotropic_plane_orbit_representatives(orthogonal_group):
+    r"""One representative per ``O(L)``-orbit of primitive isotropic planes, or ``None``.
+
+    The pairs ``(v, line of K_v)`` do not index the plane classes: a plane
+    contains as many primitive isotropic vector orbits as the line orbits of
+    ``O(L)`` meet it, and the same plane is reached from each of them.
+    The candidates are therefore collected over the line representatives ``v`` and
+    then *identified*: two candidates are the same class exactly when an isometry
+    of ``L`` carries one plane onto the other, which is the exact plane
+    equivalence and not a count or an invariant comparison.  Scattone's Corollary
+    5.4.8(2) is the statement that this identification collapses the candidates
+    to the plane classes.
+    """
+    lattice = orthogonal_group.domain()
+    candidates = []
+    for line in _isotropic_orbit_representatives(orthogonal_group, 1):
+        if _hyperbolic_completion(lattice, line) is None:
+            return None
+        candidates.extend(_planes_through_line(orthogonal_group, line))
+    kept = []
+    for plane in candidates:
+        if any(
+            _isotropic_equivalence_witness(orthogonal_group, other, plane) is not None
+            for other in kept
+        ):
+            continue
+        kept.append(plane)
+    return finite_ordered_set(tuple(kept))
+
+
 def _isotropic_orbit_representatives(orthogonal_group, rank, *, flag=False):
     r"""Return full-``O(L)`` orbit representatives of primitive isotropic subobjects/flags."""
     lattice = orthogonal_group.domain()
@@ -1199,6 +1313,15 @@ def _isotropic_orbit_representatives(orthogonal_group, rank, *, flag=False):
         dimensions = (rank,)
     if dimensions[-1] < 0:
         raise ValueError(f"the isotropic sublattice rank must be nonnegative, got {rank} in {lattice}")
+    if not flag and dimensions == (2,):
+        # Scattone 5.4.7: planes are read from the lines of v^perp/Zv over the line
+        # classes, not enumerated as plane classes directly.  The fast branch is
+        # taken only when it is certified complete; a lattice whose line
+        # representatives do not split off a hyperbolic plane keeps the port's
+        # marking-class classification, which never returns a partial family.
+        planes = _isotropic_plane_orbit_representatives(orthogonal_group)
+        if planes is not None:
+            return planes
     from sage_indefinite_port.indefinite.marked_lattices import (
         primitive_marking_classes,
     )

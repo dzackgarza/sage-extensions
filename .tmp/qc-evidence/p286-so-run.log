@@ -1,0 +1,23 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.29 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: reportlog-1.0.0, timeout-2.4.0, platformdirs-4.13.5, anyio-4.15.1
+timeout: 1800.0s
+timeout method: signal
+timeout func_only: False
+collected 1 item
+
+tests/lattices/test_special_orthogonal_split_building.sage .             [100%]
+
+------ generated xml file: /repos/sage-extensions/tests/.report/junit.xml ------
+-------------- generated report log file: tests/.report/run.jsonl --------------
+========================== test-call performance gate ==========================
+tests/lattices/test_special_orthogonal_split_building.sage::test_special_orthogonal_split_building_retains_exact_flag_incidence_and_transporters: 32.06 s > 20 s
+============================== slowest durations ===============================
+32.06s call     tests/lattices/test_special_orthogonal_split_building.sage::test_special_orthogonal_split_building_retains_exact_flag_incidence_and_transporters
+0.00s teardown tests/lattices/test_special_orthogonal_split_building.sage::test_special_orthogonal_split_building_retains_exact_flag_incidence_and_transporters
+0.00s setup    tests/lattices/test_special_orthogonal_split_building.sage::test_special_orthogonal_split_building_retains_exact_flag_incidence_and_transporters
+============================== 1 passed in 33.31s ==============================
+exit 0
