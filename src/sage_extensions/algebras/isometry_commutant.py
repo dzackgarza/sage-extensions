@@ -374,36 +374,46 @@ class IsometryCommutant:
         return tuple(generators)
 
     def inversion_transporter(self):
-        r"""Return `t \in O(L)` with `t F t^{-1} = F^{-1}`, or ``None``, for `A` a real quadratic field.
+        r"""Return `t \in O(L)` with `t F t^{-1} = F^{-1}`, or ``None``, for `A` a real quadratic field."""
+        F = self.isometries[0]
+        return self.equivariant_transporter(self.gram, F.inverse())
 
-        Rationally, `t = t_0 a` with `t_0` one invertible solution and `a \in A`. Then
-        `c = t_0^\dagger t_0` lies in `Q`, so `a \sigma(a) = 1 / c`. The solutions form cosets
-        of the centralizer, generated up to sign by a norm-one unit `\eta > 1`, so each coset
-        has a member with `|a_1 / a_2|` in `[1, \eta^2)`. Then `|a_1| \le \sqrt{n} \eta` and
-        `|a_2| \le \sqrt{n}`, which bounds the integer coordinates of `a` in the lattice of
-        `a` with `t_0 a` integral. Exhausting that box decides the question.
+    def equivariant_transporter(self, target_gram, target_isometry):
+        r"""Return `t` in `GL_r(Z)` with `t^t B' t = B` and `t F = F' t`, or ``None``, for `A` a real quadratic field.
+
+        Rationally, `t = t_0 a` with `t_0` an invertible solution of the linear equation and
+        `a \in A`. Then `B_0 = t_0^t B' t_0` is the form `B` scaled by an element of `A`, and
+        `\sigma(a) c a = 1` for a rational `c`. The solutions form cosets of the centralizer,
+        generated up to sign by a norm-one unit `\eta > 1`, so each coset has a member with
+        `|a_1 / a_2|` in `[1, \eta^2)`. Then `|a_1| \le \sqrt{n} \eta` and `|a_2| \le \sqrt{n}`,
+        which bounds the integer coordinates of `a` on the lattice of `a` with `t_0 a` integral.
+        Exhausting that box decides the question. ``None`` is returned at once when the
+        linear system has no invertible solution, since the modules are then not isomorphic.
         """
         assert len(self.isometries) == 1 and self.dimension() == 2 and not self.radical_basis()
         F = self.isometries[0]
+        target_gram = matrix(QQ, target_gram)
+        target_isometry = matrix(QQ, target_isometry)
         r = self.rank
         rows = []
-        inverse = F.inverse()
         for i in range(r):
             for j in range(r):
                 row = [0] * r**2
                 for k in range(r):
                     row[i * r + k] += F[k, j]
-                    row[k * r + j] -= inverse[i, k]
+                    row[k * r + j] -= target_isometry[i, k]
                 rows.append(row)
-        solutions = matrix(QQ, rows).right_kernel().basis()
-        start = next(
-            matrix(QQ, r, r, list(v))
-            for v in (*solutions, *(x + y for x in solutions for y in solutions))
-            if matrix(QQ, r, r, list(v)).det() != 0
-        )
-        square = self.adjoint(start) * start
+        solutions = [matrix(QQ, r, r, list(v)) for v in matrix(QQ, rows).right_kernel().basis()]
+        candidates = (*solutions, *(x + y for x in solutions for y in solutions))
+        start = next((m for m in candidates if m.det() != 0), None)
+        if start is None:
+            return None
+        source_gram = self.gram.change_ring(QQ)
+        square = source_gram.inverse() * start.transpose() * target_gram * start
         scalar = square[0, 0]
-        assert square == scalar * identity_matrix(QQ, r), "t_0^dagger t_0 is not rational"
+        if square != scalar * identity_matrix(QQ, r):
+            square_coordinates = self.coordinates(square)
+            raise ArithmeticError(f"t_0^dagger t_0 is not rational: {square_coordinates}")
         generator = self._primitive_element()
         field = NumberField(generator.minimal_polynomial(), "a")
         assert field.signature() == (2, 0), "the commutant is not a real quadratic field"
@@ -425,12 +435,12 @@ class IsometryCommutant:
         first_radius, second_radius = radius * eta, radius
         x_bound = int(((first_radius * abs(values[1][1]) + second_radius * abs(values[1][0])) / determinant).ceil()) + 1
         y_bound = int(((first_radius * abs(values[0][1]) + second_radius * abs(values[0][0])) / determinant).ceil()) + 1
-        identity = identity_matrix(QQ, r)
         for x in range(-x_bound, x_bound + 1):
             for y in range(-y_bound, y_bound + 1):
                 candidate = start * (x * elements[0] + y * elements[1])
-                if candidate.denominator() == 1 and self.adjoint(candidate) * candidate == identity:
-                    assert candidate * F == inverse * candidate
+                if candidate.denominator() != 1 or candidate.det() not in (1, -1):
+                    continue
+                if candidate.transpose() * target_gram * candidate == source_gram and candidate * F == target_isometry * candidate:
                     return matrix(ZZ, candidate)
         return None
 

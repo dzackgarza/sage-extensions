@@ -266,3 +266,32 @@ def test_inversion_fails_on_an_ideal_of_order_three():
     assert F.transpose() * gram * F == gram
     commutant = IsometryCommutant(gram, [F])
     assert commutant.inversion_transporter() is None
+
+
+def _ideal_data(K, ideal):
+    a, b = ideal.basis()
+    conj = K.automorphisms()[int(1)]
+    norm = ideal.norm()
+    pair = lambda x, y: (x * conj(y)).trace() / norm
+    gram = sage_matrix(SageZZ, 2, 2, [pair(a, a), pair(a, b), pair(a, b), pair(b, b)])
+    unit = K(K.unit_group().fundamental_units()[int(0)])
+    unit = unit if unit.norm() == 1 else unit**int(2)
+    basis = sage_matrix(SageQQ, [list(a), list(b)])
+    columns = [basis.solve_left(vector(SageQQ, list(unit * x))) for x in (a, b)]
+    return gram, sage_matrix(SageZZ, columns).transpose()
+
+
+def test_equivariant_transporter_across_a_basis_change_and_ideal_classes():
+    r"""Q(sqrt 229), class number 3. A unimodular change of basis of the same ideal is a transporter.
+    The ideals I and O have rationally equivalent data but differ in class, so no integral one exists."""
+    K = SageNumberField(SagePolynomialRing(SageQQ, "x")([SageQQ(int(-57)), SageQQ(int(-1)), SageQQ(int(1))]), "w")
+    ideal = next(p for p in K.primes_above(int(3)) if not p.is_principal())
+    gram, F = _ideal_data(K, ideal)
+    change = sage_matrix(SageZZ, 2, 2, [2, 1, 1, 1])
+    target_gram = change.inverse().transpose() * gram * change.inverse()
+    target_F = change * F * change.inverse()
+    commutant = IsometryCommutant(gram, [F])
+    t = commutant.equivariant_transporter(target_gram, target_F)
+    assert t.transpose() * target_gram * t == gram and t * F == target_F * t
+    other_gram, other_F = _ideal_data(K, K.ideal(K.one()))
+    assert IsometryCommutant(gram, [F]).equivariant_transporter(other_gram, other_F) is None
