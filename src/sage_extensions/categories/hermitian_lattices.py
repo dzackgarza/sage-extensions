@@ -553,6 +553,54 @@ class HermitianWittFrame(SageObject):
             lifts.append(self.in_lattice(self.levi(A, U) * self.unipotent(*self.levi_lift(A, U))))
         return (*kernel, *lifts)
 
+    def general_linear_generators(self):
+        r"""Return generators of ``GL_k(O)`` for a Euclidean imaginary quadratic order ``O``.
+
+        Elementary matrices and diagonal units generate ``GL_k`` of a Euclidean ring.
+        """
+        if self._field.degree() != 2 or self._field.discriminant() not in (-3, -4, -7, -8, -11):
+            raise ValueError("general_linear_generators requires a norm-Euclidean imaginary quadratic field")
+        identity = matrix.identity(self._field, self._k)
+        generators = []
+        for row in range(self._k):
+            for column in range(self._k):
+                if row != column:
+                    for scalar in self._lattice.order_basis():
+                        elementary = copy(identity)
+                        elementary[row, column] = scalar
+                        generators.append(elementary)
+        for unit in self._field.roots_of_unity():
+            diagonal = copy(identity)
+            diagonal[0, 0] = unit
+            generators.append(diagonal)
+        return tuple(generators)
+
+    def levi_image_schreier(self):
+        r"""Return ``(index, generators)`` of the liftable subgroup of ``GL_k(O) x U(K)``.
+
+        The liftable pairs form a subgroup of finite index, since a congruence subgroup lifts.
+        Right cosets are enumerated by the lifting decision and generators are Schreier elements.
+        """
+        identity_a, identity_u = matrix.identity(self._field, self._k), matrix.identity(self._field, self._m)
+        moves = [(a, identity_u) for a in self.general_linear_generators()]
+        moves += [(identity_a, u) for u in self.quotient_unitary_elements()]
+        representatives = [(identity_a, identity_u)]
+        generators = []
+        position = 0
+        while position < len(representatives):
+            a, u = representatives[position]
+            position += 1
+            for move_a, move_u in moves:
+                product_a, product_u = a * move_a, u * move_u
+                for known_a, known_u in representatives:
+                    quotient = (product_a * ~known_a, product_u * ~known_u)
+                    if self.levi_lift(*quotient) is not None:
+                        generators.append(quotient)
+                        break
+                else:
+                    representatives.append((product_a, product_u))
+        return len(representatives), tuple(generators)
+
     def levi_lift(self, A, U):
         r"""Return parameters ``(Z,T)`` with ``l(A,U) n(Z,T)`` integral on ``O^n``, or ``None``."""
         left = self.in_lattice(self.levi(A, U))

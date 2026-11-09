@@ -189,3 +189,21 @@ def test_glued_eisenstein_line_stabilizers_have_the_hand_levi_counts():
         assert all(entry.is_integral() for entry in generator.list())
         assert all(entry.is_integral() for entry in (~generator).list())
 
+
+def test_a_split_rank_two_isotropic_sublattice_lifts_all_of_the_levi():
+    r"""Z[i]^5 splits as two hyperbolic planes and <1>, so the image is all of GL_2 x U(1).
+
+    The moves are 4 elementary matrices, 4 diagonal units and the 4 elements of U(1).
+    """
+    field = SageCyclotomicField(int(4))
+    zero, one = field.zero(), field.one()
+    rows = [[zero] * int(5) for _ in range(int(5))]
+    for row, column in ((int(0), int(3)), (int(1), int(4)), (int(2), int(2)), (int(3), int(0)), (int(4), int(1))):
+        rows[row][column] = one
+    witt = sage_matrix(field, rows)
+    lattice = HermitianLattice((one, field.gen()), witt)
+    frame = HermitianWittFrame(lattice, witt.parent().identity_matrix(), sage_matrix(field, int(1), int(1), [one]), int(2))
+    index, generators = frame.levi_image_schreier()
+    assert index == int(1)
+    assert len(generators) == int(12)
+
