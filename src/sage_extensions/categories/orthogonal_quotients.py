@@ -48,7 +48,8 @@ def _letters_in_owned_order(factor_groups, letters):
 
 def _f2_rank(vectors, width):
     r"""F2-rank of a list of 0/1 vectors: Sage's maintained ``GF(2)`` matrix rank."""
-    from sage.all import GF, matrix
+    from sage.all import GF
+    from sage.matrix.constructor import matrix
 
     if not vectors:
         return 0
@@ -80,7 +81,8 @@ class _GapWordSection:
     The words retain the supplied ordered family, including redundant
     generators, through the change of finite representation:
 
-    >>> from sage.all import QQ, block_diagonal_matrix, diagonal_matrix, identity_matrix, matrix
+    >>> from sage.all import QQ, block_diagonal_matrix, diagonal_matrix, identity_matrix
+    >>> from sage.matrix.constructor import matrix
     >>> rotation = matrix(QQ, [[0, 1], [-1, 1]])
     >>> reflection = matrix(QQ, [[0, 1], [1, 0]])
     >>> square_rotation = matrix(QQ, [[0, 1], [-1, 0]])
