@@ -415,13 +415,45 @@ class HermitianWittFrame(SageObject):
                 vector(SageQQ, residue) * inverse * fibre_lattice
                 for residue in product(*(range(size) for size in sizes))
             ]
+        size = len(basis)
+        unit = lambda *indices: [sum(1 for index in indices if index == position) for position in range(size)]
+        negative = lambda index: [-entry for entry in unit(index)]
+        def value(point):
+            parameters = self._combine(basis, point)
+            return vector(SageQQ, self._order_coordinates(left * self.in_lattice(matrix.identity(self._field, self._n) + self._unipotent_part(parameters) + self._quadratic_part(parameters[0]))))
+        # The entries have degree two in the coordinates, so these samples determine them exactly.
+        constant = value([0] * size)
+        plus = [value(unit(i)) for i in range(size)]
+        minus = [value(negative(i)) for i in range(size)]
+        linear = [(p - m) / 2 for p, m in zip(plus, minus, strict=True)]
+        square = [(p + m) / 2 - constant for p, m in zip(plus, minus, strict=True)]
+        cross = {(i, j): value(unit(i, j)) - plus[i] - plus[j] + constant for i in range(size) for j in range(i + 1, size)}
+        rows = [constant, *linear, *square, *cross.values()]
+        scale = int(lcm([SageZZ(1), *(entry.denominator() for row in rows for entry in row)]))
+        as_integers = lambda row: [int(entry * scale) for entry in row]
+        constant_integers, linear_integers, square_integers = as_integers(constant), [as_integers(r) for r in linear], [as_integers(r) for r in square]
+        cross_integers = [(i, j, as_integers(r)) for (i, j), r in cross.items()]
+        points_denominator = int(lcm([SageZZ(1), *(entry.denominator() for row in section for entry in row), *(entry.denominator() for extra in fibre_representatives for entry in extra)]))
+        section_integers = [[int(entry * points_denominator) for entry in row] for row in section]
+        extra_integers = [[0] * z_rank + [int(entry * points_denominator) for entry in extra] for extra in fibre_representatives]
+        target = scale * points_denominator * points_denominator
         for coordinates in product(range(modulus), repeat=len(section)):
-            base = sum((int(c) * row for c, row in zip(coordinates, section, strict=True)), vector(SageQQ, len(basis)))
-            for extra in fibre_representatives:
-                total = base + vector(SageQQ, [0] * z_rank + list(extra))
-                parameters = self._combine(basis, list(total))
-                if self._integral(left * self.in_lattice(matrix.identity(self._field, self._n) + self._unipotent_part(parameters) + self._quadratic_part(parameters[0]))):
-                    yield coordinates, parameters
+            base = [sum(c * row[position] for c, row in zip(coordinates, section_integers, strict=True)) for position in range(size)]
+            for extra, extra_point in zip(fibre_representatives, extra_integers, strict=True):
+                t = [b + e for b, e in zip(base, extra_point, strict=True)]
+                integral = True
+                for k, c0 in enumerate(constant_integers):
+                    total = c0 * points_denominator * points_denominator
+                    for i in range(size):
+                        total += t[i] * linear_integers[i][k] * points_denominator + t[i] * t[i] * square_integers[i][k]
+                    for i, j, row in cross_integers:
+                        total += t[i] * t[j] * row[k]
+                    if total % target:
+                        integral = False
+                        break
+                if integral:
+                    point = vector(SageQQ, t) / points_denominator
+                    yield coordinates, self._combine(basis, list(point))
                     break
 
     def integral_unipotent_kernel(self):

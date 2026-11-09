@@ -125,3 +125,29 @@ def test_rank_two_isotropic_frame_has_rank_four_centre():
 
 def _skew(field, value):
     return sage_matrix(field, 2, 2, [value, field.zero(), field.zero(), field.zero()])
+
+
+def test_glued_eisenstein_line_has_a_proper_liftable_levi_image():
+    r"""L = <e, theta f, w, (e+w)/theta> with h(w,w) = 9: a unit pair lifts iff a = u mod theta.
+
+    A lift l(a,u) n(Z,T) preserves w, so w + Z e lies in L and Z is integral.
+    Integrality of the image of theta f makes theta Z^bar / 9 lie in
+    theta^{-1} O, so Z is divisible by theta. The image of the glue vector
+    is then in L exactly when a = u modulo theta. For such pairs l(a,u)
+    preserves L. Units map onto {1,-1} modulo theta, so 18 of 36 pairs lift.
+    """
+    field = SageCyclotomicField(int(3))
+    omega = field.gen()
+    theta = omega - omega.conjugate()
+    middle = field(int(9))
+    witt = sage_matrix(field, int(3), int(3), [0, 0, 1, 0, middle, 0, 1, 0, 0])
+    basis = sage_matrix(field, int(3), int(3), [1, theta**int(-1), 0, 0, theta**int(-1), 0, 0, 0, theta])
+    gram = basis.conjugate_transpose() * witt * basis
+    lattice = HermitianLattice((field.one(), omega), gram.transpose())
+    frame = HermitianWittFrame(lattice, ~basis, sage_matrix(field, int(1), int(1), [middle]), int(1))
+    units = [(-omega) ** int(k) for k in range(int(6))]
+    pairs = [(sage_matrix(field, int(1), int(1), [a]), sage_matrix(field, int(1), int(1), [u])) for a in units for u in units]
+    image = frame.liftable_levi_image(pairs)
+    expected = [pair for pair in pairs if ((pair[0][int(0), int(0)] - pair[1][int(0), int(0)]) / theta).is_integral()]
+    assert len(expected) == int(18)
+    assert list(image) == expected
