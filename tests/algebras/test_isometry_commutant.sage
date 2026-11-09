@@ -16,7 +16,11 @@ from sage_extensions.all import *
 from sage.matrix.constructor import matrix as sage_matrix
 from sage.matrix.constructor import block_matrix
 from sage.matrix.special import diagonal_matrix, identity_matrix
+from sage.modules.free_module_element import vector
 from sage.rings.infinity import Infinity
+from sage.rings.number_field.number_field import NumberField as SageNumberField
+from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing as SagePolynomialRing
+from sage.rings.rational_field import QQ as SageQQ
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.rational_field import QQ as SageQQ
 from sage_extensions.algebras.isometry_commutant import IsometryCommutant, symplectic_generators
@@ -228,3 +232,37 @@ def test_adjoint_swapping_two_fields():
         assert len(_closure([g.change_ring(field) for g in generators], identity)) == len(
             _closure([g.change_ring(field) for g in expected], identity)
         )
+
+
+def test_inversion_transporter_is_the_conjugation_on_z_sqrt_two():
+    gram = diagonal_matrix(SageZZ, [SageZZ(int(2)), SageZZ(int(-4))])
+    F = sage_matrix(SageZZ, 2, 2, [3, 4, 2, 3])
+    commutant = IsometryCommutant(gram, [F])
+    t = commutant.inversion_transporter()
+    assert t.transpose() * gram * t == gram
+    assert t * F == F.inverse() * t
+
+
+def test_inversion_fails_on_an_ideal_of_order_three():
+    r"""K = Q(sqrt 229) has class number 3, and I is a nonprincipal prime above 3. A transporter inverting
+    multiplication by a norm-one unit is sigma-linear on K, so it sends I to a multiple of sigma(I),
+    which forces [I] = [sigma I] = [I]^-1 and so [I]^2 = 1, impossible in a group of order 3."""
+    K = SageNumberField(SagePolynomialRing(SageQQ, "x")([SageQQ(int(-57)), SageQQ(int(-1)), SageQQ(int(1))]), "w")
+    assert int(K.class_number()) == int(3) and int(K.disc()) == int(229)
+    ideal = next(p for p in K.primes_above(int(3)) if not p.is_principal())
+    a, b = ideal.basis()
+    conj = K.automorphisms()[int(1)]
+    norm = ideal.norm()
+    pair = lambda x, y: (x * conj(y)).trace()
+    # The trace form of x conj(y) has this Gram divided by the norm.
+    gram_q = sage_matrix(SageQQ, 2, 2, [pair(a, a), pair(a, b), pair(a, b), pair(b, b)]) / norm
+    gram = sage_matrix(SageZZ, gram_q)
+    unit = K.unit_group().fundamental_units()[int(0)]
+    unit = K(unit)
+    unit = unit if unit.norm() == 1 else unit**int(2)
+    basis = sage_matrix(SageQQ, [list(a), list(b)])
+    columns = [basis.solve_left(vector(SageQQ, list(unit * x))) for x in (a, b)]
+    F = sage_matrix(SageZZ, columns).transpose()
+    assert F.transpose() * gram * F == gram
+    commutant = IsometryCommutant(gram, [F])
+    assert commutant.inversion_transporter() is None
