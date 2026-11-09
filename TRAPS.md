@@ -3639,3 +3639,95 @@ marked plane.  On a plane of `T_En` (rank 12) it had not returned after 7 min an
 killed with its probe.  That, not the plane enumeration, is what blocks card `029J`'s
 `gamma-en-2` and `Otilde+` rows; `Otilde+` additionally needs 24 242 representatives
 realised one at a time.
+
+### PARI cannot decide or mirror a rank-17 definite lattice class on this host (2026-11-09, #286)
+
+Both lattice-class operations the definite route of #286 needs fail at rank 17, and the
+failure is inside PARI, not in the caller.
+
+`Lattices(ZZ)("E8") + Lattices(ZZ)("E8") + Lattices(ZZ)([[-2]])` is the genus member the
+degree-2 and degree-4 cards point at (`<-2k> + 2E8(-1)`, rank 17, `|det| = 2k`, negative
+definite).  Measured:
+
+```
+genus mass (Smith--Minkowski--Siegel)     2499347/9440684171518279680000  in 1.1 s
+genus_class_number()                     > 6 GiB in 38 s, killed at 6324 MiB
+  (Genus._genus_classes -> neighbor_iteration(algorithm="orbits")
+   -> p_divisible_vectors -> automorphism_group -> PARI qfauto
+   -> "the PARI stack overflows (current size: 1073741824)")
+is_globally_equivalent_to on two such forms   qfisom overflow at 1 GiB
+is_globally_equivalent_to after pari.allocatemem(3 GiB)  overflow at 3 GiB
+```
+
+So the genus class enumeration is available in principle (`_genus_classes` reaches
+`neighbor_iteration` and the mass is cheap) and blocked in practice by `qfauto` at rank 17
+on this host.  The mass is the only part of the route that runs.
+
+### `is_isometric` is not a lattice-class test (2026-11-09, #286)
+
+`Lattices.ParentMethods.is_isometric` is `negation(self.Isom(other).is_empty())`, and for
+two rank-17 *definite* even lattices of the same determinant the isometry Mor is undecided,
+so the negation is truthy.  Measured: 17 pairwise different plane quotients of
+`Lambda_2 = U^2 + E8(-1)^2 + <-2>` (all of determinant -2, built from different vector
+shapes `(t, q1, q2)`) were all reported isometric to the first, one after another, in 0.0 s
+each.  A class dedupe must use an exact decision (`is_isometric_to` raises instead of
+answering) or PARI's `is_globally_equivalent_to`, which at rank 17 does not run here.
+
+### A primitive isotropic plane's quotient is not free of `E8` gluing (2026-11-09, #286)
+
+For `Lambda_{2k} = U^2 + E8(-1)^2 + <-2k>` and a primitive isotropic plane `E`, the
+quotient `K_E = E^perp/E` has rank 17 and determinant `+-2k` (measured on 17 shapes for
+`k = 1`), so every candidate lies in the genus of `<-2k> + 2E8(-1)` -- which is Scattone's
+`G(k)` (`port tests/fixtures/DATA_SOURCES.md:172`,
+`k3_modular_strata.json::type_ii_correspondence`: "E -> E^perp/E is a bijection from the
+O(Lambda_{2k})-orbits of primitive isotropic planes onto the genus G(k) of
+<-2k> + 2E8(-1), so there are h(k) orbits").  `E8(-1)^2` is a unimodular summand of
+`Lambda`, so `E^perp = E8(-1)^2 perp W` with `W` of rank 3 inside `U^2 + <-2k>`; the plane
+classes are the different *diagonal* images of `E` in `E8(-1)^2 + W`, not the different
+`W`'s, and `E ∩ E8(-1)^2 = 0` always because that summand is negative definite.
+
+Cost of the quotient, on the same host: 25-35 s cold and about 1 s warm per plane, with the
+Julia bridge peaking at 5.1 GiB (tree 6.5 GiB) on the second lattice.
+
+### `Gamma_{En,2}` is the stabilizer of the degree-2 polarization, and its discriminant image is the missing operation (2026-11-09, #286)
+
+Alexeev--Engel--Garza--Schaffler, *Compact moduli of Enriques surfaces of degree 2*,
+Nagoya Math. J. 259 (2025), Definition 2.6 (arXiv:2312.03638): `Gamma_{En,2}` is the image
+in `O(T_En)` of `{g in O(L) | g o I_En = I_En o g and g(h) = h}` with
+`h = e + f in U(2) = S_dP` (`e^2 = f^2 = 0`, `e.f = 2`), and `Gamma_{En,2} = Gamma_En ∩
+Gamma_dP` with `Gamma_En = O(T_En)`, `Gamma_dP = O(T_dP)`.
+
+In this repository that is `T_En.Aut().stabilizer(h)` for `h = e_ep + e_fp`, whose pairing
+is `q(h) = 4` in the bilinear convention (`h^2 = 2` geometrically, so the polarization is
+degree 2 as the paper says) and `div(h) = 2`.  Measured: the stabilizer object builds in
+0.0 s, `contains_character_kernel()` and `character_data_is_complete()` are both `False`,
+`finite_character_quotient()` raises `ValueError: ... has no finite character quotient`,
+and `isotropic_orbit_representatives(1)` raises
+
+```
+... is cut out by a predicate that is not a character kernel, so no finite character
+quotient describes it, and the subgroup itself cannot be listed instead ... The missing
+operation is a generating set for an arithmetic subgroup of O(L), which belongs in
+lattice_engines.py
+```
+
+So the missing operation is the discriminant image of a *vector* stabilizer (or, for a
+plane row, of a plane stabilizer) in `O(A_L)`: not a determinant/spinor/discriminant
+preimage, so the character machinery refuses it by design and the orbit splitting cannot
+start.
+
+### Sequential isotropic reductions on one rank-19 lattice grow the Julia bridge past 6 GiB (2026-11-09, #286)
+
+Nineteen `primitive_isotropic_subobject(e).isotropic_reduction().quotient_lattice()` calls
+on `U + E8(-1)^2 + <-2>` in one process (one per candidate isotropic vector, rank 19 -> 17)
+were killed at a tree RSS of 6681 MiB by the probe's guard: the Julia bridge's own high
+water mark reached 4907 MiB and the Python process 2418 MiB, on a lattice of rank 19 whose
+Gram is 19x19.  The same run on a *single* candidate peaks around 500 MiB, and the
+per-call cost falls to about 1 s once warm, so the growth is per call and not per lattice.
+A batch of reductions has to be spread over processes, or the reduction has to avoid the
+bridge.
+
+Sage's `neighbor_iteration` in this image accepts only `algorithm="orbits"`; the
+`algorithm="fast"` spelling that would skip `automorphism_group` raises
+`ValueError: unknown algorithm` in 0.0 s, so there is no qfauto-free neighbour traversal
+to fall back on.

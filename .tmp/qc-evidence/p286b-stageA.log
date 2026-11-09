@@ -1,0 +1,18 @@
+[18:35:41] 6JRX: M = E8^2 + <-2> rank 17 signature (0, 17) det -2 (0.1 s)
+[18:35:41] 6JRX: genus built in 0.0 s: Genus of even integral lattices of signature (0, 17) and determinant -2
+[18:35:42] 6JRX: mass (2499347)/(9440684171518279680000) in 1.1 s
+[peakrss] STOPPED_AT_MEMORY_LIMIT: tree RSS 6324 MiB exceeded 6144 MiB
+[peakrss] issue275: child waited=143 shell_code=143 samples=20
+[peakrss] peak tree RSS      : 6324 MiB
+[peakrss] low-water MemAvail : 5190 MiB
+[peakrss] peak single VmHWM  : 6330 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     6319 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    38.0s procs=  3 rss=  6324 MiB hwm=  6330 MiB avail=  5190 MiB
+[peakrss]   t=    36.0s procs=  3 rss=  5714 MiB hwm=  5714 MiB avail=  5934 MiB
+[peakrss]   t=    34.0s procs=  3 rss=  5630 MiB hwm=  5630 MiB avail=  6643 MiB
+[peakrss]   t=    32.0s procs=  3 rss=  5120 MiB hwm=  5120 MiB avail=  7109 MiB
+[peakrss]   t=    26.0s procs=  3 rss=  4824 MiB hwm=  4824 MiB avail=  7389 MiB
+launcher exit: 143

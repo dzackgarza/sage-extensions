@@ -1,0 +1,16 @@
+[peakrss] STOPPED_AT_MEMORY_LIMIT: tree RSS 6544 MiB exceeded 6144 MiB
+[peakrss] issue275: child waited=143 shell_code=143 samples=33
+[peakrss] peak tree RSS      : 6544 MiB
+[peakrss] low-water MemAvail : 5261 MiB
+[peakrss] peak single VmHWM  : 8217 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      5112 MiB peak
+[peakrss]   python                     3094 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    64.0s procs=  4 rss=  6544 MiB hwm=  8217 MiB avail=  5261 MiB
+[peakrss]   t=    60.0s procs=  4 rss=  5742 MiB hwm=  5744 MiB avail=  6121 MiB
+[peakrss]   t=    58.0s procs=  4 rss=  4875 MiB hwm=  5047 MiB avail=  6568 MiB
+[peakrss]   t=    56.0s procs=  4 rss=  4774 MiB hwm=  5047 MiB avail=  6891 MiB
+[peakrss]   t=    54.0s procs=  4 rss=  4535 MiB hwm=  5048 MiB avail=  7045 MiB
+launcher exit: 143

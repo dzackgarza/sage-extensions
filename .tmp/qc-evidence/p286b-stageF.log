@@ -1,0 +1,19 @@
+[18:53:23] T_En labels ('e', 'f', 'ep', 'fp', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8')
+[18:53:24] h = e_ep + e_fp: q(h) 4 primitive True
+[18:53:24] b(h, L) = gcd of pairings [0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0]
+[18:53:24] O.stabilizer(h) built in 0.0 s: {g in Orthogonal group O(Integral lattice of rank 12 and signature (2, 10)) : g fixes e_ep + e_fp}
+[18:53:24]   contains_character_kernel: False
+[18:53:24]   character_data_is_complete: False
+[18:53:24]   finite_character_quotient raised ValueError: {g in Orthogonal group O(Integral lattice of rank 12 and signature (2, 10)) : g fixes e_ep + e_fp} has no finite character quotient: it is not known to be the full preimage of a subgroup of a finite quotient of Orthogonal group O(Integral lattice of rank 12 and signature (2, 10)) by determinant, spinor norm and discriminant characters
+[18:53:24]   isotropic_orbit_representatives(1) raised AssertionError after 0.0 s: {g in Orthogonal group O(Integral lattice of rank 12 and signature (2, 10)) : g fixes e_ep + e_fp} is cut out by a predicate that is not a character kernel, so no finite character quotient describes it, and the subgroup itself cannot be listed instead: that listing is finite only for a definite lattice, which has no isotropic vector.  Over an indefinite lattice L, O(L) is an infinite arithmetic group and no generating set of this subgroup is known.  The missing operation is a generating set for an arithmetic subgroup of O(L), which belongs in lattice_engines.py
+[peakrss] issue275: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 257 MiB
+[peakrss] low-water MemAvail : 7195 MiB
+[peakrss] peak single VmHWM  : 257 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      246 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   257 MiB hwm=   257 MiB avail=  7195 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail=  7372 MiB
+launcher exit: 0
