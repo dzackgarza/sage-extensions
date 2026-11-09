@@ -47,3 +47,15 @@ def test_norm_form_centralizer_through_the_public_group():
     generators = tuple(L.O().centralizer(F).group_generators())
     assert all(g * F == F * g for g in generators)
     assert _closure_mod(L, generators, 7) == _closure_mod(L, (F, L.O()(lambda label: -L.module_generator(label))), 7)
+
+
+def test_jordan_block_centralizer_recovers_a_root_with_sign():
+    r"""U + <2>, F = E(e, v): A = Q[N] with A / rad = Q, and C(Z) = +-F^Z contains the root F of F^2."""
+    L = Lattices(ZZ)("U") + Lattices(ZZ)([[2]])
+    labels = L.module_generating_set()
+    e, f, v = tuple(L.module_generators())
+    F = L.O()({labels[0]: e, labels[1]: f + v - e, labels[2]: v - L.scalar_multiple(2, e)})
+    generators = tuple(L.O().centralizer(F * F).group_generators())
+    assert F in generators or ~F in generators
+    assert L.O()(lambda label: -L.module_generator(label)) in generators
+    assert len(generators) == int(2)

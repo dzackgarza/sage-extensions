@@ -375,7 +375,11 @@ class IsometryCommutant:
 
     def centralizer_generators(self):
         r"""Return generators of the simultaneous centralizer, by the structure of `A`."""
-        if self.radical_basis():
+        radical = self.radical_basis()
+        if radical and self.dimension() - len(radical) == 1:
+            # A / rad = Q: a unit is +-(1 + x) with x in the radical, and -1 is central.
+            return (-identity_matrix(ZZ, self.rank), *self.unipotent_kernel_generators())
+        if radical:
             return self.square_zero_centralizer_generators()
         if all(x * y == y * x for x in self.order_basis for y in self.order_basis):
             return self.commutative_centralizer_generators()
