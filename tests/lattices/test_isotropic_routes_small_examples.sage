@@ -34,6 +34,20 @@ def test_spacelike_lorentzian_vector_orbits():
 
 
 def test_rank_three_null_planes_with_proper_levi_image():
+    r"""L = 2U + U(3) has one orbit of primitive isotropic rank-three sublattices.
+
+    Let I be one. Since I = I^perp, the cokernel C of L/I -> I^dual has
+    |C|^2 = |A_L| = 9, so H = (I_Q meet L^dual)/I is an isotropic line in A_L.
+    A_L has two isotropic lines, and the U(3) exchange swaps them. Fix H and
+    let M = L + H, so M = 3U and L = {x in M : b(x, t) = 0 mod 3} for a t in
+    M isotropic modulo 3. The saturation I' of I in M is a Lagrangian with
+    I = I' meet L of index three, so b(I', t) is nonzero modulo 3. O(M) is
+    transitive on Lagrangians. Write t = (a, phi) in I' + I'^dual with phi
+    nonzero and phi(a) = 0 modulo 3. GL(I') moves phi to a fixed covector up
+    to scalar, and a skew shear s has s(phi) ranging over ker(phi), which
+    clears a. So the stabilizer of I' is transitive on such lines t, and the
+    stabilizer of L in O(M) is transitive on the I'.
+    """
     ambient = _hyperbolic(2) + Lattices(ZZ)("U").twist(3)
     assert ambient.O().isotropic_orbit_representatives(3).cardinality() == cardinal(1)
 
