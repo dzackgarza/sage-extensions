@@ -295,3 +295,23 @@ def test_equivariant_transporter_across_a_basis_change_and_ideal_classes():
     assert t.transpose() * target_gram * t == gram and t * F == target_F * t
     other_gram, other_F = _ideal_data(K, K.ideal(K.one()))
     assert IsometryCommutant(gram, [F]).equivariant_transporter(other_gram, other_F) is None
+
+
+def test_product_commutant_splits_into_factors():
+    r"""U + M_2(Z), q = -2 det on the second. F1 = J + left T, F2 = 1 + left S. The commutant is
+    Z[J] x M_2(Z), and C(Z) = {+-1, +-J} x SL_2(Z), whose image modulo 3 has order 4 * 24 = 96."""
+    zero = sage_matrix(SageZZ, int(2), int(4))
+    J = sage_matrix(SageZZ, 2, 2, [0, 1, 1, 0])
+    gram4 = sage_matrix(SageZZ, 4, 4, [0, 0, 0, -1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, 0])
+    left_t = sage_matrix(SageZZ, 4, 4, [1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1])
+    left_s = sage_matrix(SageZZ, 4, 4, [0, 0, -1, 0, 0, 0, 0, -1, 1, 0, 0, 0, 0, 1, 0, 0])
+    block = lambda x, y: block_matrix(SageZZ, [[x, zero], [zero.transpose(), y]], subdivide=False)
+    B = block(J, gram4)
+    F1 = block(J, left_t)
+    F2 = block(identity_matrix(SageZZ, int(2)), left_s)
+    commutant = IsometryCommutant(B, [F1, F2])
+    generators = commutant.centralizer_generators()
+    assert all(commutant.is_centralizer_element(g) for g in generators)
+    field = SageGF(int(3))
+    reduced = [g.change_ring(field) for g in generators]
+    assert len(_closure(reduced, identity_matrix(field, int(6)))) == int(96)

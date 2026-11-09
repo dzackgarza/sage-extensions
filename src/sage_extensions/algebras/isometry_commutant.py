@@ -17,7 +17,7 @@ from itertools import combinations, count, product
 from sage.arith.functions import lcm
 from sage.arith.misc import CRT_list as crt
 from sage.arith.misc import factorial
-from sage.matrix.constructor import matrix
+from sage.matrix.constructor import block_matrix, matrix
 from sage.matrix.special import identity_matrix
 from sage.modules.free_module_element import vector
 from sage.rings.number_field.number_field import NumberField
@@ -444,8 +444,89 @@ class IsometryCommutant:
                     return matrix(ZZ, candidate)
         return None
 
+    def _center_basis(self):
+        r"""Return a `Q`-basis of the center of `A`."""
+        size = self.dimension()
+        rows = []
+        for x in self.order_basis:
+            rows.append(matrix(QQ, [(m * x - x * m).list() for m in self.order_basis]).transpose())
+        equations = block_matrix(QQ, [[r] for r in rows], subdivide=False)
+        return tuple(
+            sum(c * m.change_ring(QQ) for c, m in zip(v, self.order_basis))
+            for v in equations.right_kernel().basis()
+        )
+
+    @staticmethod
+    def _integral_idempotent_atoms(idempotents):
+        r"""Return the finest partition of the family whose block sums are integral."""
+        size = len(idempotents)
+        masks = [mask for mask in range(1, 2**size) if sum(idempotents[i] for i in range(size) if mask >> i & 1).denominator() == 1]
+        atoms = []
+        for i in range(size):
+            atom = (2**size - 1)
+            for mask in masks:
+                if mask >> i & 1:
+                    atom &= mask
+            if atom not in atoms:
+                atoms.append(atom)
+        return [sum(idempotents[i] for i in range(size) if atom >> i & 1) for atom in atoms]
+
+    def _product_centralizer_generators(self):
+        r"""Return centralizer generators through a splitting of `L` by integral central idempotents, or ``None``.
+
+        Central idempotents `e_j` of `A` are orthogonal under the form, so an integral family
+        splits `L` orthogonally. Every element of `A` preserves each `e_j L`, so the centralizer
+        is the product of the centralizers of the factors.
+        """
+        if self.radical_basis():
+            return None
+        center = self._center_basis()
+        if len(center) < 2 or len(center) == self.dimension():
+            return None
+        generic = None
+        for values in product(range(-3, 4), repeat=len(center)):
+            element = sum(c * m for c, m in zip(values, center))
+            if element.minimal_polynomial().degree() == len(center):
+                generic = element
+                break
+        assert generic is not None, "no generator of the center in the height box"
+        minimal = generic.minimal_polynomial()
+        factors = [factor for factor, _ in minimal.factor()]
+        idempotents = []
+        for factor in factors:
+            cofactor = minimal // factor
+            _d, inverse, _other = cofactor.xgcd(factor)
+            idempotents.append((inverse * cofactor)(generic))
+        idempotents = self._integral_idempotent_atoms(idempotents)
+        if len(idempotents) < 2:
+            return None
+        results = []
+        for index, idempotent in enumerate(idempotents):
+            image = matrix(ZZ, idempotent).transpose().row_module().basis_matrix()
+            coordinates = image.change_ring(QQ)
+            gram_block = matrix(ZZ, image * self.gram * image.transpose())
+            pieces = [
+                coordinates.solve_left(vector(QQ, (F * row).list()))
+                for F in self.isometries
+                for row in image.rows()
+            ]
+            size = image.nrows()
+            restricted = [
+                matrix(ZZ, [pieces[k * size + i] for i in range(size)]).transpose()
+                for k in range(len(self.isometries))
+            ]
+            for generator in IsometryCommutant(gram_block, restricted).centralizer_generators():
+                basis = image.stack(matrix(ZZ, sum((matrix(ZZ, e).transpose().row_module().basis_matrix().rows() for j, e in enumerate(idempotents) if j != index), [])))
+                block = identity_matrix(ZZ, self.rank)
+                block[:size, :size] = generator.transpose()
+                results.append(matrix(ZZ, basis.transpose().change_ring(QQ) * block.transpose().change_ring(QQ) * basis.transpose().change_ring(QQ).inverse()))
+        return tuple(results)
+
     def centralizer_generators(self):
         r"""Return generators of the simultaneous centralizer, by the structure of `A`."""
+        split = self._product_centralizer_generators()
+        if split is not None:
+            return split
         radical = self.radical_basis()
         if radical and self.dimension() - len(radical) == 1:
             # A / rad = Q: a unit is +-(1 + x) with x in the radical, and -1 is central.
