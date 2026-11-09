@@ -46,3 +46,13 @@ def test_orbit_representatives_of_square_fifty():
     classes = tuple(group.vector_orbit_representatives(50))
     assert len(classes) == int(3)
     assert all(lattice.q(point) == 50 for point in classes)
+
+
+def test_congruence_subgroup_witnesses_on_a_degenerate_lattice():
+    r"""Gamma(3) on <2> + 0: e = d = 1, b = 3k. (x, t) -> (x, t + 3kx) carries (1, 1) to (1, 4),
+    and no element of Gamma(3) sends (1, 1) to (1, 2), since b must be 1 modulo 3."""
+    _lattice, group, _x, _r, vector = _setup()
+    gamma = group.congruence_preimage(3)
+    witness = gamma.vector_equivalence_witness(vector(1, 1), vector(1, 4))
+    assert witness is not None and witness(vector(1, 1)) == vector(1, 4) and witness in gamma
+    assert gamma.vector_equivalence_witness(vector(1, 1), vector(1, 2)) is None

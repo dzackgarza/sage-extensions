@@ -1694,11 +1694,41 @@ def _subgroup_vector_orbit_representatives(subgroup, square):
     return finite_ordered_set(split_representatives())
 
 
+def _preimage_vector_witness(subgroup, source, target):
+    r"""Return an element of the preimage subgroup carrying ``source`` to ``target``, or ``None``.
+
+    Any ``O(L)``-witness ``w`` gives all others as ``t w`` with ``t`` in ``Stab(target)``.
+    The images of ``t w`` in the finite quotient form a finite set, explored by the stabilizer
+    generators; an element lies in the subgroup according to its image alone.
+    """
+    orthogonal_group = subgroup.supergroup()
+    witness = orthogonal_group.vector_equivalence_witness(source, target)
+    if witness is None:
+        return None
+    morphism = subgroup.preimage_morphism()
+    generators = tuple(orthogonal_group.vector_stabilizer_generators(target))
+    seen = [morphism(witness)]
+    frontier = [witness]
+    while frontier:
+        current = frontier.pop()
+        if current in subgroup:
+            return current
+        for generator in generators:
+            candidate = generator * current
+            image = morphism(candidate)
+            if all(image != known for known in seen):
+                seen.append(image)
+                frontier.append(candidate)
+    return None
+
+
 def _subgroup_vector_equivalence_witness(subgroup, left, right):
     orthogonal_group = subgroup.supergroup()
     if not subgroup.contains_character_kernel():
         lattice = orthogonal_group.domain()
         source, target = lattice(left), lattice(right)
+        if hasattr(subgroup, "preimage_morphism") and not lattice.is_definite():
+            return _preimage_vector_witness(subgroup, source, target)
         return next(
             (
                 automorphism
