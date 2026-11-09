@@ -378,6 +378,32 @@ class IsometryCommutant:
         F = self.isometries[0]
         return self.equivariant_transporter(self.gram, F.inverse())
 
+    def find_inversion_transporter(self, height):
+        r"""Return a verified `t` with `t F t^{-1} = F^{-1}` among small intertwiners, or ``None``.
+
+        The intertwiners are a saturated integer lattice, searched to coefficient ``height``.
+        A result is a proof of existence. ``None`` says only that the box holds no isometry.
+        """
+        assert len(self.isometries) == 1
+        F = self.isometries[0]
+        inverse = F.inverse()
+        r = self.rank
+        rows = []
+        for i in range(r):
+            for j in range(r):
+                row = [0] * r**2
+                for k in range(r):
+                    row[i * r + k] += F[k, j]
+                    row[k * r + j] -= inverse[i, k]
+                rows.append(row)
+        basis = [matrix(ZZ, r, r, list(v)) for v in matrix(ZZ, rows).right_kernel().basis()]
+        for values in product(range(-height, height + 1), repeat=len(basis)):
+            candidate = sum(c * m for c, m in zip(values, basis))
+            if candidate.det() in (1, -1) and candidate.transpose() * self.gram * candidate == self.gram:
+                assert candidate * F == inverse * candidate
+                return candidate
+        return None
+
     def equivariant_transporter(self, target_gram, target_isometry):
         r"""Return `t` in `GL_r(Z)` with `t^t B' t = B` and `t F = F' t`, or ``None``, for `A` a real quadratic field.
 

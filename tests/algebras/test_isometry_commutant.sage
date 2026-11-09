@@ -315,3 +315,14 @@ def test_product_commutant_splits_into_factors():
     field = SageGF(int(3))
     reduced = [g.change_ring(field) for g in generators]
     assert len(_closure(reduced, identity_matrix(field, int(6)))) == int(96)
+
+
+def test_inversion_witness_on_the_unipotent_fixture():
+    r"""Issue 50: L = M_2(Z), q = -2 det, f(X) = T X. t(X) = D X D with D = diag(-1, 1) inverts f, and it does not centralize f."""
+    gram = sage_matrix(SageZZ, 4, 4, [0, 0, 0, -1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, 0])
+    left_t = sage_matrix(SageZZ, 4, 4, [1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1])
+    commutant = IsometryCommutant(gram, [left_t])
+    t = commutant.find_inversion_transporter(int(1))
+    assert t is not None
+    assert t.transpose() * gram * t == gram and t * left_t == left_t.inverse() * t
+    assert t * left_t != left_t * t
