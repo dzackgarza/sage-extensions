@@ -28,3 +28,21 @@ def test_pointwise_stabilizer_has_order_two():
     images = set(str(g(r)) for g in generators) | set([str(r)])
     assert images == set([str(r), str(-r)])
     assert all(g(x) == x for g in generators)
+
+
+def test_equivalence_witnesses_are_exact_isometries():
+    lattice, group, x, r, vector = _setup()
+    for source, target in (((1, 0), (1, 1)), ((5, 1), (5, 6))):
+        witness = group.vector_equivalence_witness(vector(*source), vector(*target))
+        assert witness(vector(*source)) == vector(*target)
+        assert lattice.q(witness(x)) == lattice.q(x)
+        assert witness(r) in (r, -r)
+    assert group.vector_equivalence_witness(vector(5, 1), vector(5, 2)) is None
+
+
+def test_orbit_representatives_of_square_fifty():
+    r"""q = 50 forces x = +-5, and t is a class of Z/5 up to sign: t = 0, 1, 2."""
+    lattice, group, _x, r, _vector = _setup()
+    classes = tuple(group.vector_orbit_representatives(50))
+    assert len(classes) == int(3)
+    assert all(lattice.q(point) == 50 for point in classes)
