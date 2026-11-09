@@ -295,6 +295,7 @@ class _FiniteIntegralRepresentation(SageObject):
             }
         )
 
+    @cached_method
     def _orbit_lattice_data(self):
         r"""Return the orbit lattices ``L_p = t_p L`` with their transporters ``t_p: L -> L_p``.
 
@@ -328,27 +329,83 @@ class _FiniteIntegralRepresentation(SageObject):
                 }
             )
             epimorphism, image_inclusion = composite.image_factorization()
+            image_module = epimorphism.codomain()
             image_form = lattice.pullback_form(epimorphism.inverse())
             image_lattice = Lattices(lattice.base_ring())(image_form.gram_tensor())
-            image_labels = tuple(image_lattice.module_generating_set())
             module_images = tuple(
                 epimorphism(lattice.module_generator(label)) for label in labels
             )
+            # The transport's domain is the source lattice ``L``, so its images
+            # are keyed by ``L``'s own generator labels.  The value of the
+            # ``i``-th source generator is the transported point read in the
+            # image module's *canonical* basis, which ``image_factorization``
+            # takes from the span's basis and which need not be the image of the
+            # source basis; ``_lattice_element_of_module_image`` performs exactly
+            # that basis change.
             transport = lattice.Isom(image_lattice)(
                 {
                     label: self._lattice_element_of_module_image(
                         image_lattice, module_images[index]
                     )
-                    for index, label in enumerate(image_labels)
+                    for index, label in enumerate(labels)
                 }
             )
             data[int(position)] = {
+                "space_inclusion": inclusion,
+                # The Schreier transversals act on the underlying rational vector
+                # space, so the source generators are recorded there.
+                "space_images": tuple(
+                    inclusion(lattice.module_generator(label)).underlying_element()
+                    for label in labels
+                ),
+                "source_labels": labels,
                 "lattice": image_lattice,
+                "module": image_module,
+                "module_labels": tuple(image_module.module_generating_set()),
+                "lattice_labels": tuple(image_lattice.module_generating_set()),
                 "inclusion": image_inclusion,
                 "images": module_images,
                 "transport": transport,
             }
         return data
+
+    def orbit_lattice_records(self):
+        r"""Return one record per lattice-orbit point, with its maps (#286).
+
+        Each record states the orbit lattice ``L_p = t_p L``, the module image it
+        was built from together with that module's own generating labels, the
+        inclusion of the module image into the rational ambient, the images of
+        ``L``'s generators, and the transport ``t_p: L -> L_p``.  The module image
+        and the lattice are the same underlying module with different structure,
+        so their label identifications are stated separately rather than assumed
+        equal: ``image_factorization`` presents the image in the span's canonical
+        basis, which is the module's own basis, and the transported source basis
+        is a different tuple of elements that is read once, by the transport.
+        """
+        data = self._orbit_lattice_data()
+        return tuple(data[position] for position in sorted(data))
+
+    def middle_transport(self, position, letter):
+        r"""Return the letter as an isometry ``L_p -> L_(s.p)`` between orbit lattices.
+
+        Its domain is the orbit lattice at ``position``, so its images are read on
+        that lattice's *own* generators -- the module image's canonical basis --
+        and not on the transported source basis, which the transport already
+        carries.
+        """
+        orbit = self._orbit_lattice_data()
+        source = orbit[int(position)]
+        target = orbit[int(self._act_on_position(letter, int(position)))]
+        ambient = self.action().lattice_inclusion().codomain()
+        images = {}
+        for index, label in enumerate(source["lattice_labels"]):
+            basis_element = source["module"].module_generator(source["module_labels"][index])
+            embedded = source["inclusion"](basis_element).underlying_element()
+            moved = ambient.wrap(letter(embedded))
+            images[label] = self._lattice_element_of_module_image(
+                target["lattice"], target["inclusion"].lift(moved)
+            )
+        return source["lattice"].Isom(target["lattice"])(images)
 
     def stabilizer_discriminant_image(self):
         r"""Return ``rho(G_L) <= O(A_L)`` by the action-groupoid construction.
@@ -376,29 +433,13 @@ class _FiniteIntegralRepresentation(SageObject):
         orbit = self._orbit_lattice_data()
         orthogonal = lattice.discriminant_group().orthogonal_group()
 
-        def middle_map(source, target, letter):
-            r"""Return ``letter`` as an isometry between two orbit lattice objects."""
-
-            source_lattice = source["lattice"]
-            target_lattice = target["lattice"]
-            images = {}
-            for index, label in enumerate(tuple(source_lattice.module_generating_set())):
-                embedded = source["inclusion"](
-                    source["images"][index]
-                ).underlying_element()
-                moved = space.wrap(letter(embedded))
-                images[label] = self._lattice_element_of_module_image(
-                    target_lattice, target["inclusion"].lift(moved)
-                )
-            return source_lattice.Isom(target_lattice)(images)
-
         generators = []
         for position in tuple(orbit):
             source = orbit[position]
             for letter in letters:
                 target_position = int(self._act_on_position(letter, position))
                 target = orbit[target_position]
-                middle = middle_map(source, target, letter)
+                middle = self.middle_transport(position, letter)
                 # Compose by evaluation: Disc(t_(s.p)^-1) after Disc(s) after
                 # Disc(t_p), read on A_L, and raised as one automorphism of A_L.
                 outer = target["transport"].inverse()
