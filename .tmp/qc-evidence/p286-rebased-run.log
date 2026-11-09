@@ -1,0 +1,47 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.47 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: reportlog-1.0.0, timeout-2.4.0, platformdirs-4.13.5, anyio-4.15.1
+timeout: 1800.0s
+timeout method: signal
+timeout func_only: False
+collected 8 items
+
+tests/lattices/test_orbit_milestones.sage ..                             [ 25%]
+tests/lattices/test_unpolarized_enriques_strata.sage ..                  [ 50%]
+tests/lattices/test_special_orthogonal_split_building.sage .             [ 62%]
+tests/lattices/test_stable_isotropic_plane_orbits.sage ...               [100%]
+
+------ generated xml file: /repos/sage-extensions/tests/.report/junit.xml ------
+-------------- generated report log file: tests/.report/run.jsonl --------------
+========================== test-call performance gate ==========================
+tests/lattices/test_orbit_milestones.sage::test_the_enriques_lattice_has_two_line_cusps_and_two_plane_cusps: 68.58 s > 20 s
+============================== slowest durations ===============================
+68.58s call     tests/lattices/test_orbit_milestones.sage::test_the_enriques_lattice_has_two_line_cusps_and_two_plane_cusps
+12.62s call     tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_planes
+9.82s call     tests/lattices/test_special_orthogonal_split_building.sage::test_special_orthogonal_split_building_retains_exact_flag_incidence_and_transporters
+8.68s call     tests/lattices/test_stable_isotropic_plane_orbits.sage::test_the_stable_plane_orbit_of_l_1
+8.43s call     tests/lattices/test_orbit_milestones.sage::test_milestone_one_the_E10_cusp_acts_on_its_reduction_lattice
+5.15s call     tests/lattices/test_stable_isotropic_plane_orbits.sage::test_stable_plus_has_the_same_l_1_plane_orbit
+0.04s call     tests/lattices/test_stable_isotropic_plane_orbits.sage::test_the_standard_u_plane_is_primitive_and_totally_isotropic
+0.00s call     tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_lines
+0.00s setup    tests/lattices/test_orbit_milestones.sage::test_milestone_one_the_E10_cusp_acts_on_its_reduction_lattice
+0.00s teardown tests/lattices/test_orbit_milestones.sage::test_milestone_one_the_E10_cusp_acts_on_its_reduction_lattice
+0.00s teardown tests/lattices/test_stable_isotropic_plane_orbits.sage::test_the_stable_plane_orbit_of_l_1
+0.00s teardown tests/lattices/test_special_orthogonal_split_building.sage::test_special_orthogonal_split_building_retains_exact_flag_incidence_and_transporters
+0.00s teardown tests/lattices/test_stable_isotropic_plane_orbits.sage::test_the_standard_u_plane_is_primitive_and_totally_isotropic
+0.00s teardown tests/lattices/test_stable_isotropic_plane_orbits.sage::test_stable_plus_has_the_same_l_1_plane_orbit
+0.00s teardown tests/lattices/test_orbit_milestones.sage::test_the_enriques_lattice_has_two_line_cusps_and_two_plane_cusps
+0.00s teardown tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_planes
+0.00s setup    tests/lattices/test_orbit_milestones.sage::test_the_enriques_lattice_has_two_line_cusps_and_two_plane_cusps
+0.00s setup    tests/lattices/test_special_orthogonal_split_building.sage::test_special_orthogonal_split_building_retains_exact_flag_incidence_and_transporters
+0.00s setup    tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_lines
+0.00s setup    tests/lattices/test_stable_isotropic_plane_orbits.sage::test_the_standard_u_plane_is_primitive_and_totally_isotropic
+0.00s setup    tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_planes
+0.00s setup    tests/lattices/test_stable_isotropic_plane_orbits.sage::test_stable_plus_has_the_same_l_1_plane_orbit
+0.00s setup    tests/lattices/test_stable_isotropic_plane_orbits.sage::test_the_stable_plane_orbit_of_l_1
+0.00s teardown tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_lines
+======================== 8 passed in 114.43s (0:01:54) =========================
+exit 0
