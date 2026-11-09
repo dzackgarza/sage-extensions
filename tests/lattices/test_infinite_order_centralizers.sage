@@ -59,3 +59,17 @@ def test_jordan_block_centralizer_recovers_a_root_with_sign():
     assert F in generators or ~F in generators
     assert L.O()(lambda label: -L.module_generator(label)) in generators
     assert len(generators) == int(2)
+
+
+def test_infinite_cyclic_normalizer_has_an_inversion_coset():
+    r"""On the norm form of Z[sqrt 2], conjugation inverts F, and it does not centralize F."""
+    from sage_extensions.categories.lattice_centralizers import infinite_cyclic_normalizer
+
+    L = Lattices(ZZ)([[2, 0], [0, -4]])
+    labels = L.module_generating_set()
+    one, root = tuple(L.module_generators())
+    F = L.O()({labels[0]: L.scalar_multiple(3, one) + L.scalar_multiple(2, root), labels[1]: L.scalar_multiple(4, one) + L.scalar_multiple(3, root)})
+    centralizer, inversion = infinite_cyclic_normalizer(L.O(), F)
+    assert inversion is not None
+    assert inversion * F == ~F * inversion and inversion * F != F * inversion
+    assert all(g * F == F * g for g in centralizer)

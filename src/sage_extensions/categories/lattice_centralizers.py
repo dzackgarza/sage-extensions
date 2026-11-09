@@ -1636,6 +1636,38 @@ def _infinite_order_centralizer_generators(group, isometry):
     return tuple(as_isometry(g) for g in IsometryCommutant(gram, [columns]).centralizer_generators())
 
 
+def infinite_cyclic_normalizer(group, isometry):
+    r"""Return ``(centralizer_generators, inversion)`` for ``N_{O(L)}(<f>)``, ``f`` of infinite order.
+
+    ``Aut(Z) = {+-1}``, so the normalizer is the centralizer, extended by ``inversion`` when
+    some element inverts ``f``. ``inversion`` is ``None`` when none exists.
+    """
+    from sage.matrix.constructor import matrix
+    from sage.rings.integer_ring import ZZ as SageZZ
+
+    from sage_extensions.algebras.isometry_commutant import IsometryCommutant
+
+    lattice = group.lattice()
+    frame = tuple(lattice.module_generators())
+    gram = matrix(SageZZ, [[int(lattice.b(x, y)) for y in frame] for x in frame])
+    columns = matrix(SageZZ, [[int(c) for c in isometry(v)] for v in frame]).transpose()
+    labels = tuple(lattice.module_generating_set())
+    witness = IsometryCommutant(gram, [columns]).inversion_transporter()
+    inversion = None
+    if witness is not None:
+        inversion = group(
+            {
+                label: sum(
+                    (lattice.scalar_multiple(int(c), g) for c, g in zip(witness.column(j), frame, strict=True)),
+                    lattice.zero(),
+                )
+                for j, label in enumerate(labels)
+            }
+        )
+        assert inversion * isometry == ~isometry * inversion
+    return _infinite_order_centralizer_generators(group, isometry), inversion
+
+
 def _arithmetic_centralizer_group_generators(centralizer):
     r"""Compute a generating set of ``Z = Z_{O(L)}(f)`` for ``f`` of finite order.
 
@@ -1712,6 +1744,7 @@ def _arithmetic_centralizer_group_generators(centralizer):
 __all__ = [
     "CyclotomicDecomposition",
     "finite_preimage_generators",
+    "infinite_cyclic_normalizer",
     "finite_subgroup_normalizer",
     "IsometryPrimitiveExtension",
     "PolarizedEquivariantLattice",

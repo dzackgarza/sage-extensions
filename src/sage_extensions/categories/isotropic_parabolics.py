@@ -42,6 +42,23 @@ from sage_extensions.categories.rings.ring_foundation import (
 )
 
 
+def general_linear_images(vectors):
+    r"""Return images of ``vectors`` under generators of ``GL_k(Z)``, for ``k = len(vectors)``.
+
+    Adjacent transpositions, one shear and one sign change generate ``GL_k(Z)``
+    (Newman, *Integral Matrices*, VII.1).
+    """
+    images = []
+    for i in range(len(vectors) - 1):
+        swapped = list(vectors)
+        swapped[i], swapped[i + 1] = swapped[i + 1], swapped[i]
+        images.append(tuple(swapped))
+    if len(vectors) > 1:
+        images.append((vectors[0] + vectors[1], *vectors[1:]))
+    images.append((-vectors[0], *vectors[1:]))
+    return tuple(images)
+
+
 class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
     r"""Primitive totally isotropic subobjects of a lattice over ``R``.
 
@@ -159,16 +176,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             # its "allowed action on J" (IndefiniteForms.g:1710-1723): generators
             # of GL(J). Adjacent transpositions, one shear and one sign change
             # generate GL_k(Z) for every k (Newman, Integral Matrices, VII.1).
-            k = len(vectors)
-            radical_images = []
-            for i in range(k - 1):
-                images = list(vectors)
-                images[i], images[i + 1] = images[i + 1], images[i]
-                radical_images.append(tuple(images))
-            if k > 1:
-                radical_images.append((vectors[0] + vectors[1], *vectors[1:]))
-            radical_images.append((-vectors[0], *vectors[1:]))
-            radical_images = tuple(radical_images)
+            radical_images = general_linear_images(vectors)
             return INDUCTION.recursion.isotropic_stabilizer_action(
                 vectors, radical_images
             )
