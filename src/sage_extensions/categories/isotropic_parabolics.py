@@ -156,25 +156,19 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             if not vectors:
                 return None
             # The radical action is what the port's stabilizer problem takes as
-            # its "allowed action on J" (IndefiniteForms.g:1710-1723): the
-            # sign change on a line, and the generating set of GL(J) on a
-            # plane.  No owner supplies those images for higher rank, so above a
-            # plane this raises rather than guessing an action.
-            match vectors:
-                case (line,):
-                    radical_images = ((-line,),)
-                case (first, second):
-                    radical_images = (
-                        (second, first),
-                        (first + second, second),
-                        (-first, second),
-                    )
-                case _:
-                    raise ValueError(
-                        f"the stabilizer action of {self} is realized here for a line or a "
-                        f"plane, not for {vectors!r}: no owner supplies the radical images "
-                        "of a higher-rank isotropic sublattice"
-                    )
+            # its "allowed action on J" (IndefiniteForms.g:1710-1723): generators
+            # of GL(J). Adjacent transpositions, one shear and one sign change
+            # generate GL_k(Z) for every k (Newman, Integral Matrices, VII.1).
+            k = len(vectors)
+            radical_images = []
+            for i in range(k - 1):
+                images = list(vectors)
+                images[i], images[i + 1] = images[i + 1], images[i]
+                radical_images.append(tuple(images))
+            if k > 1:
+                radical_images.append((vectors[0] + vectors[1], *vectors[1:]))
+            radical_images.append((-vectors[0], *vectors[1:]))
+            radical_images = tuple(radical_images)
             return INDUCTION.recursion.isotropic_stabilizer_action(
                 vectors, radical_images
             )
