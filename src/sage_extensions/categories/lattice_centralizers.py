@@ -1610,6 +1610,39 @@ def arithmetic_centralizer(orthogonal_group, isometry):
     return centralizer
 
 
+def _eisenstein_act_generators(group, isometry):
+    r"""Return ``Aut E^{4,1}`` generators when ``(L, f)`` is the source trace lattice, or ``None``."""
+    from sage.matrix.constructor import matrix
+    from sage.rings.integer_ring import ZZ as SageZZ
+
+    from sage_indefinite_port.indefinite.act_eisenstein import OMEGA, lattice as act_lattice, trace_generators
+
+    lattice = group.lattice()
+    hermitian = act_lattice()
+    trace = hermitian.trace_lattice()
+    frame = tuple(lattice.module_generators())
+    trace_frame = tuple(trace.module_generators())
+    gram = matrix(SageZZ, [[int(lattice.b(x, y)) for y in frame] for x in frame])
+    target = matrix(SageZZ, [[int(trace.b(x, y)) for y in trace_frame] for x in trace_frame])
+    if gram != target:
+        return None
+    omega = hermitian.unit_isometry(OMEGA)
+    if any([int(c) for c in isometry(v)] != [int(c) for c in omega(w)] for v, w in zip(frame, trace_frame, strict=True)):
+        return None
+    labels = tuple(lattice.module_generating_set())
+    result = []
+    for generator in trace_generators():
+        images = {
+            label: sum(
+                (lattice.scalar_multiple(int(c), g) for c, g in zip(generator(w), frame, strict=True)),
+                lattice.zero(),
+            )
+            for label, w in zip(labels, trace_frame, strict=True)
+        }
+        result.append(group(images))
+    return tuple(result)
+
+
 def _infinite_order_centralizer_generators(group, isometry):
     r"""Return generators of the centralizer of an infinite-order isometry through its commutant."""
     from sage.matrix.constructor import matrix
@@ -1731,6 +1764,10 @@ def _arithmetic_centralizer_group_generators(centralizer):
             # and both act integrally as -id and f on this very lattice.
             negation = group(lambda label: -lattice.module_generator(label))
             generators = (isometry, negation)
+        case (3,) if int(lattice.module_rank()) == 10 and (
+            eisenstein := _eisenstein_act_generators(group, isometry)
+        ) is not None:
+            generators = eisenstein
         case (divisor,):
             assert False, (
                 f"the centralizer of {isometry} in {group} is the unitary group of {lattice} "
