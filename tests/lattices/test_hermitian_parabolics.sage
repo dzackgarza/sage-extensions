@@ -165,3 +165,27 @@ def test_split_gaussian_line_lifts_every_candidate():
     frame = HermitianWittFrame(lattice, witt.parent().identity_matrix(), sage_matrix(field, int(1), int(1), [one]), int(1))
     assert len(frame.levi_candidates()) == int(16)
     assert len(frame.levi_image()) == int(16)
+
+
+def test_glued_eisenstein_line_stabilizers_have_the_hand_levi_counts():
+    r"""A = 1 forces u = 1 modulo theta, which three of the six units satisfy."""
+    field = SageCyclotomicField(int(3))
+    omega = field.gen()
+    theta = omega - omega.conjugate()
+    zero, one = field.zero(), field.one()
+    middle = field(int(9))
+    witt = sage_matrix(field, int(3), int(3), [zero, zero, one, zero, middle, zero, one, zero, zero])
+    basis = sage_matrix(field, int(3), int(3), [one, theta**int(-1), zero, zero, theta**int(-1), zero, zero, zero, theta])
+    gram = basis.conjugate_transpose() * witt * basis
+    lattice = HermitianLattice((field.one(), omega), gram.transpose())
+    inverse = ~basis
+    frame = HermitianWittFrame(lattice, inverse, sage_matrix(field, int(1), int(1), [middle]), int(1))
+    assert len(frame.pointwise_levi_image()) == int(3)
+    isotropic = inverse.column(int(0))
+    form = gram
+    for generator in frame.stabilizer_generators(True):
+        assert generator * isotropic == isotropic
+        assert generator.conjugate_transpose() * form * generator == form
+        assert all(entry.is_integral() for entry in generator.list())
+        assert all(entry.is_integral() for entry in (~generator).list())
+

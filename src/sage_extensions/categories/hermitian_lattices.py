@@ -539,6 +539,20 @@ class HermitianWittFrame(SageObject):
         r"""Return the pairs of :meth:`levi_candidates` that lift to integral isometries."""
         return self.liftable_levi_image(self.levi_candidates())
 
+    def pointwise_levi_image(self):
+        r"""Return the pairs of :meth:`levi_image` with ``A`` the identity."""
+        identity = matrix.identity(self._field, self._k)
+        return tuple(pair for pair in self.levi_image() if pair[0] == identity)
+
+    def stabilizer_generators(self, pointwise):
+        r"""Return matrices on ``O^n`` generating the line stabilizer, as a kernel plus exact Levi lifts."""
+        generators, centre = self.integral_unipotent_kernel()
+        kernel = [self.in_lattice(self.unipotent(*parameters)) for parameters in (*generators, *centre)]
+        lifts = []
+        for A, U in self.pointwise_levi_image() if pointwise else self.levi_image():
+            lifts.append(self.in_lattice(self.levi(A, U) * self.unipotent(*self.levi_lift(A, U))))
+        return (*kernel, *lifts)
+
     def levi_lift(self, A, U):
         r"""Return parameters ``(Z,T)`` with ``l(A,U) n(Z,T)`` integral on ``O^n``, or ``None``."""
         left = self.in_lattice(self.levi(A, U))
