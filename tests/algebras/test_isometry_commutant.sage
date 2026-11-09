@@ -48,6 +48,15 @@ def test_nonsemisimple_commutant_of_eichler_transvection():
             assert sum(c * m for c, m in zip(table[i][j], commutant.order_basis)) == left * right
 
 
+def test_unipotent_kernel_of_eichler_transvection_is_generated_by_it():
+    r"""rad = N M_2(Z), and N m is skew exactly for m symmetric under the symplectic involution of M_2, the scalars."""
+    commutant = IsometryCommutant(U2, [EICHLER])
+    generators = commutant.unipotent_kernel_generators()
+    assert len(generators) == int(1)
+    assert generators[0] in (EICHLER, EICHLER.inverse())
+    assert commutant.is_centralizer_element(generators[0])
+
+
 def test_noncommuting_isometries_have_simultaneous_commutant():
     swap = sage_matrix(SageZZ, 3, 3, [0, 1, 0, 1, 0, 0, 0, 0, 1])
     negate = diagonal_matrix(SageZZ, [SageZZ(-1), SageZZ(1), SageZZ(1)])

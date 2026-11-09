@@ -12,6 +12,7 @@ The integer kernel of the commutation equations is saturated, so its basis is a
 in characteristic zero (Curtis-Reiner, *Methods of Representation Theory I*, 5.26).
 """
 
+from sage.arith.functions import lcm
 from sage.matrix.constructor import matrix
 from sage.matrix.special import identity_matrix
 from sage.modules.free_module_element import vector
@@ -99,6 +100,32 @@ class IsometryCommutant:
             sum(c * m.change_ring(QQ) for c, m in zip(v, self.order_basis))
             for v in form.right_kernel().basis()
         )
+
+    def unipotent_kernel_generators(self):
+        r"""Return generators of the kernel of `C(Z) \to (A / rad A)^\times` when `rad^2 = 0`.
+
+        An element of the kernel is `1 + x` with `x` integral in the radical. Since
+        `x^\dagger x` lies in `rad^2`, the unitary equation is `x + x^\dagger = 0`.
+        The kernel is therefore the free abelian group of the integer points of a
+        rational subspace, written multiplicatively by `(1 + x)(1 + y) = 1 + x + y`.
+        """
+        radical = self.radical_basis()
+        assert all((x * y).is_zero() for x in radical for y in radical), (
+            f"the radical of the commutant of {self.isometries} has nonzero square"
+        )
+        if not radical:
+            return ()
+        r = self.rank
+        rows = [list(x + self.adjoint(x)) for x in radical]
+        equations = matrix(QQ, [[entry for row in m.rows() for entry in row] for m in map(matrix, rows)])
+        relations = equations.left_kernel().basis()
+        if not relations:
+            return ()
+        skew = [sum(c * x for c, x in zip(v, radical)) for v in relations]
+        denominator = lcm([m.denominator() for m in skew])
+        scaled = matrix(ZZ, [(denominator * m).list() for m in skew]).saturation()
+        identity = identity_matrix(ZZ, r)
+        return tuple(identity + matrix(ZZ, r, r, list(row)) for row in scaled.rows())
 
     def is_semisimple(self):
         return not self.radical_basis()
