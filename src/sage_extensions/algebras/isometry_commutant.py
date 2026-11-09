@@ -12,7 +12,7 @@ The integer kernel of the commutation equations is saturated, so its basis is a
 in characteristic zero (Curtis-Reiner, *Methods of Representation Theory I*, 5.26).
 """
 
-from itertools import product
+from itertools import combinations, product
 
 from sage.arith.functions import lcm
 from sage.arith.misc import factorial
@@ -161,6 +161,86 @@ class IsometryCommutant:
                 rows.append(list(residue))
         lattice = matrix(ZZ, rows).hermite_form(include_zero_rows=False)
         return tuple(matrix(ZZ, exponential(list(row))) for row in lattice.rows())
+
+    def _primitive_idempotent(self, degree):
+        r"""Return an idempotent of `O` of rank `r / degree`, found among sparse elements."""
+        target = self.rank / degree
+        size = len(self.order_basis)
+        for support in range(1, min(size, 3) + 1):
+            for positions in combinations(range(size), support):
+                for values in product((-2, -1, 1, 2), repeat=support):
+                    element = sum(c * self.order_basis[i] for c, i in zip(values, positions))
+                    if element * element == element and element.rank() == target:
+                        return element
+        raise ArithmeticError(
+            f"no idempotent of rank {target} among sparse elements of the order of {self.isometries}"
+        )
+
+    def simple_centralizer_generators(self):
+        r"""Return generators of the centralizer when `O` is a maximal order `M_n(Z)`.
+
+        For a rank-`r/n` idempotent `e`, `M = O e` is free of rank `n` and `O = End(M)`.
+        The space `e^\dagger O e` has rank one, so `x^\dagger y = b(x, y) t` defines an
+        integral form on `M`. A unit `u` satisfies `u^\dagger u = 1` exactly when it
+        preserves `b`, so the centralizer is the isometry group of `(M, b)`: orthogonal
+        when `b` is symmetric, symplectic when alternating.
+        """
+        assert not self.radical_basis(), f"the commutant of {self.isometries} is not semisimple"
+        degree = ZZ(self.dimension()).isqrt()
+        assert degree**2 == self.dimension(), f"the commutant of {self.isometries} is not M_n(Q)"
+        e = self._primitive_idempotent(degree)
+        span = matrix(ZZ, [(m * e).list() for m in self.order_basis]).hermite_form(include_zero_rows=False)
+        assert span.nrows() == degree
+        module = tuple(matrix(ZZ, self.rank, self.rank, list(row)) for row in span.rows())
+        coordinates = matrix(QQ, span)
+
+        def on_module(element):
+            return matrix(
+                QQ, [coordinates.solve_left(vector(QQ, (element * m).list())) for m in module]
+            ).transpose()
+
+        action_rows = matrix(QQ, [on_module(m).list() for m in self.order_basis])
+        assert action_rows.denominator() == 1 and abs(action_rows.det()) == 1, (
+            f"the order of the commutant of {self.isometries} is not End(O e)"
+        )
+        adjoint_e = self.adjoint(e)
+        line = matrix(QQ, [(adjoint_e * m * e).list() for m in self.order_basis])
+        scale = line.denominator()
+        generator = matrix(ZZ, scale * line).hermite_form(include_zero_rows=False)
+        assert generator.nrows() == 1
+        generator = matrix(QQ, generator) / scale
+        gram = matrix(
+            ZZ,
+            [
+                [
+                    generator.solve_left(vector(QQ, (self.adjoint(x) * y).list()))[0]
+                    for y in module
+                ]
+                for x in module
+            ],
+        )
+        if gram == gram.transpose():
+            from sage_extensions.categories.lattices import Lattices
+
+            lattice = Lattices(ZZ)([[int(c) for c in row] for row in gram.rows()])
+            frame = tuple(lattice.module_generators())
+            isometries = tuple(
+                matrix(ZZ, [[int(c) for c in g(v)] for v in frame]).transpose()
+                for g in lattice.O().group_generators()
+            )
+        else:
+            assert gram == -gram.transpose() and degree == 2, (
+                f"the symplectic form {gram} has degree above two, which needs Hua-Reiner generators"
+            )
+            isometries = (matrix(ZZ, 2, 2, [0, -1, 1, 0]), matrix(ZZ, 2, 2, [1, 1, 0, 1]))
+        inverse = action_rows.inverse()
+        result = []
+        for isometry in isometries:
+            combination = vector(QQ, isometry.list()) * inverse
+            element = sum(c * m.change_ring(QQ) for c, m in zip(combination, self.order_basis))
+            assert self.is_centralizer_element(element)
+            result.append(matrix(ZZ, element))
+        return tuple(result)
 
     def is_semisimple(self):
         return not self.radical_basis()

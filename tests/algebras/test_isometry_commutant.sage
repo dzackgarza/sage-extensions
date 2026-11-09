@@ -15,6 +15,7 @@ and the centralizer in O(L) is the four matrices diag(+-1, +-1, -+1) with equal 
 from sage_extensions.all import *
 from sage.matrix.constructor import matrix as sage_matrix
 from sage.matrix.special import diagonal_matrix, identity_matrix
+from sage.rings.infinity import Infinity
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.rational_field import QQ as SageQQ
 from sage_extensions.algebras.isometry_commutant import IsometryCommutant
@@ -84,3 +85,52 @@ def test_noncommuting_isometries_have_simultaneous_commutant():
     assert all(commutant.is_centralizer_element(u) for u in expected)
     assert not commutant.is_centralizer_element(diagonal_matrix(SageZZ, [SageZZ(1), SageZZ(-1), SageZZ(1)]))
     assert not commutant.is_centralizer_element(diagonal_matrix(SageZZ, [SageZZ(2), SageZZ(2), SageZZ(1)]))
+
+
+def _closure(generators, one):
+    known = {one.str(): one}
+    frontier = [one]
+    while frontier:
+        current = frontier.pop()
+        for g in generators:
+            image = g * current
+            if image.str() not in known:
+                known[image.str()] = image
+                frontier.append(image)
+    return known
+
+
+def test_noncommuting_oracle_on_two_planes_has_order_four():
+    r"""Issue 54: F1 = diag(-1, 1), F2 the block swap. The centralizer is {diag(P, P) : P in O(U)}."""
+    F1 = diagonal_matrix(SageZZ, [SageZZ(int(-1)), SageZZ(int(-1)), SageZZ(int(1)), SageZZ(int(1))])
+    F2 = sage_matrix(SageZZ, 4, 4, [0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0])
+    assert F1 * F2 != F2 * F1
+    commutant = IsometryCommutant(U2, [F1, F2])
+    generators = commutant.simple_centralizer_generators()
+    group = _closure(generators, identity_matrix(SageZZ, int(4)))
+    assert len(group) == int(4)
+    swap = sage_matrix(SageZZ, 2, 2, [0, 1, 1, 0])
+    expected = [
+        sage_matrix(SageZZ, 4, 4, [p[0, 0], p[0, 1], 0, 0, p[1, 0], p[1, 1], 0, 0, 0, 0, p[0, 0], p[0, 1], 0, 0, p[1, 0], p[1, 1]])
+        for p in (identity_matrix(SageZZ, int(2)), -identity_matrix(SageZZ, int(2)), swap, -swap)
+    ]
+    assert set(group) == set(m.str() for m in expected)
+
+
+def test_centralizer_of_left_multiplications_is_right_sl2():
+    r"""M_2(Z) with q = -2 det, F1, F2 left multiplication by T, S. The commutant is right
+    multiplication, of symplectic type since det(Xg) = det X det g, so C(Z) = SL_2(Z)."""
+    gram = sage_matrix(SageZZ, 4, 4, [0, 0, 0, -1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, 0])
+    left_t = sage_matrix(SageZZ, 4, 4, [1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1])
+    left_s = sage_matrix(SageZZ, 4, 4, [0, 0, -1, 0, 0, 0, 0, -1, 1, 0, 0, 0, 0, 1, 0, 0])
+    commutant = IsometryCommutant(gram, [left_t, left_s])
+    assert int(commutant.dimension()) == int(4)
+    generators = commutant.simple_centralizer_generators()
+    assert len(generators) == int(2)
+    orders = sorted(g.multiplicative_order() for g in generators)
+    assert orders[0] == int(4) and orders[1] == +Infinity
+    # Right multiplication by g sends the basis E_11, E_12, E_21, E_22 by blocks equal to g transposed.
+    for g in generators:
+        block = g[[int(0), int(1)], [int(0), int(1)]]
+        assert g[[int(2), int(3)], [int(2), int(3)]] == block and int(block.det()) == int(1)
+        assert g[[int(0), int(1)], [int(2), int(3)]].is_zero() and g[[int(2), int(3)], [int(0), int(1)]].is_zero()
