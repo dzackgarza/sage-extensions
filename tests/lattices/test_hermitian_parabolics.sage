@@ -156,6 +156,34 @@ def test_glued_eisenstein_line_has_a_proper_liftable_levi_image():
     assert list(image) == expected
 
 
+def test_glued_eisenstein_line_schreier_index_matches_the_hand_count():
+    r"""The glued line above: pairs with a = u mod theta have index 2 in mu_6 x mu_6."""
+    field = SageCyclotomicField(int(3))
+    omega = field.gen()
+    theta = omega - omega.conjugate()
+    middle = field(int(9))
+    zero, one = field.zero(), field.one()
+    witt = sage_matrix(field, int(3), int(3), [zero, zero, one, zero, middle, zero, one, zero, zero])
+    basis = sage_matrix(field, int(3), int(3), [one, theta**int(-1), zero, zero, theta**int(-1), zero, zero, zero, theta])
+    gram = basis.conjugate_transpose() * witt * basis
+    lattice = HermitianLattice((field.one(), omega), gram.transpose())
+    frame = HermitianWittFrame(lattice, ~basis, sage_matrix(field, int(1), int(1), [middle]), int(1))
+    index, generators = frame.levi_image_schreier()
+    assert int(index) == int(2)
+    assert all(((a[int(0), int(0)] - u[int(0), int(0)]) / theta).is_integral() for a, u in generators)
+    identity = (sage_matrix(field, int(1), int(1), [one]), sage_matrix(field, int(1), int(1), [one]))
+    known = [identity]
+    frontier = [identity]
+    while frontier:
+        a, u = frontier.pop()
+        for g, h in generators:
+            image = (a * g, u * h)
+            if image not in known:
+                known.append(image)
+                frontier.append(image)
+    assert len(known) == int(18)
+
+
 def test_split_gaussian_line_lifts_every_candidate():
     r"""Z[i]^3 with J = antidiag(1,1,1) splits as a hyperbolic plane and <1>, so all 4 x 4 unit pairs lift."""
     field = SageCyclotomicField(int(4))
