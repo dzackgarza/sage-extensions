@@ -1216,13 +1216,9 @@ class OrthogonalCharacterQuotient:
             ]
         )
         engine, im_rho, _section, ambient = self._im_rho_engine_and_section()
-        setwise_action = libgap.function_factory(
-            "function(x, g) return Set(List(x, y -> ImageElm(g, y))); end"
-        )
-        right = libgap.Stabilizer(im_rho, class_points, setwise_action)
         _rank, sign_labels = self._sign_descent_rank()
         if not sign_labels:
-            return right, False
+            return class_points, False
         # A kernel-sign witness is what certifies splitting here: a reflection in a norm
         # ``+2`` vector orthogonal to the line fixes it, acts trivially on ``A_L``, and has
         # spinor class ``[2] * [-1/2] = [-1]``, outside ``O+``.  That is exactly the missing
@@ -1248,22 +1244,27 @@ class OrthogonalCharacterQuotient:
             # factor is included in the stabilizer's image: the double-coset machinery
             # needs the integral stabilizer instead of a partial character image.
             return None
-        return right, flip
+        return class_points, flip
 
-    def splitting_isometries_from_line_class(self, stabilizer, stab_sign_flip):
-        r"""Double cosets from the discriminant image of a line stabilizer.
+    def splitting_isometries_from_line_class(self, class_points, stab_sign_flip):
+        r"""Splitting lifts from the rho(Gamma)-orbits on the isotropic class pairs.
 
-        ``stabilizer`` is the setwise stabilizer of ``{c, -c}`` inside ``im rho`` built by
-        :meth:`isotropic_line_stabilizer_image`, used as the right-hand group of the double
-        cosets ``rho(Gamma) \\ im_rho / Stab`` in place of any integral stabilizer.
+        ``class_points`` is the engine set of the normalized discriminant classes
+        ``{c, -c}`` of the line's generator, built by
+        :meth:`isotropic_line_stabilizer_image`.  Its setwise stabilizer inside
+        ``im rho`` is the right-hand group of the double cosets that split the ambient
+        line orbit, and those double cosets are computed as the ``rho(Gamma)``-orbits
+        on the ``im rho``-orbit of the class set -- the orbit--double-coset bijection
+        stated in :meth:`_splitting_isometries_in_im_rho_from_image` -- so the
+        stabilizer itself is never formed.
 
-        This is the entry point of :meth:`isotropic_line_stabilizer_image`'s argument: it
-        transports by representatives of ``rho(Gamma) \ O(A_L) / Stab(c)`` instead of
-        asking for the integral stabilizer's generators.  Every lift is still checked
-        against the character map.
+        This is the entry point of :meth:`isotropic_line_stabilizer_image`'s argument:
+        it transports by representatives of the cosets of the class stabilizer instead
+        of asking for the integral stabilizer's generators.  Every lift is still
+        checked against the character map.
         """
         return self._splitting_isometries_in_im_rho_from_image(
-            (), stab_sign_flip, right=stabilizer
+            (), stab_sign_flip, point=class_points
         )
 
     def splitting_isometries(self, stabilizer_generators):
@@ -1349,36 +1350,46 @@ class OrthogonalCharacterQuotient:
         )
 
     def _splitting_isometries_in_im_rho_from_image(
-        self, discriminant_image_generators, stab_sign_flip, *, right=None,
+        self, discriminant_image_generators, stab_sign_flip, *, right=None, point=None,
     ):
-        r"""Double cosets computed inside ``im rho`` (the ``O(A_L)`` engine); see
+        r"""Splitting lifts computed inside ``im rho`` (the ``O(A_L)`` engine); see
         :meth:`splitting_isometries` for the exact sign bookkeeping.
 
         ``discriminant_image_generators`` are *already lowered* to the engine by the
         caller (``_splitting_isometries_in_im_rho`` applies ``rho`` and the crossing
         once); applying ``rho`` here again would evaluate a group morphism on a raw
         engine element, which is exactly the boundary the owner never crosses.  A
-        caller with a ready subgroup of ``im rho`` (the line-class stabilizer) passes
-        it as ``right`` instead.  The supplied generators are elements of the retained
-        GAP image; this method forms their subgroup directly.
+        caller that retains a point of the finite ``im rho``-set whose stabilizer is
+        the right-hand group of the double cosets passes it as ``point`` instead, and
+        the double cosets are then computed as the ``rho(Gamma)``-orbits on the
+        ``im rho``-orbit of that point.
+
+        **The bijection, and its source.**  Let ``Q = im rho`` act transitively on the
+        set ``X = Q . point``, let ``V = Stab_Q(point)`` be the setwise stabilizer of
+        the point, and let ``U = rho(Gamma) <= Q``.  The orbit--coset bijection
+        ``gV |-> g . point`` identifies the ``U``-orbits on the coset space ``Q / V``
+        -- which are exactly the double cosets ``U \ Q / V`` -- with the ``U``-orbits
+        on ``X`` (Betten--Fripertinger--Kerber, *Algebraic Combinatorics Via Finite
+        Group Actions*, chapter "Double Cosets",
+        ``mathe2.uni-bayreuth.de/frib/html/book/hyl00_14.html``: if ``G X`` is
+        transitive and ``U <= G`` then, for each ``x`` in ``X``, the map
+        ``U(gx) |-> UgG_x`` is a bijection from the orbits of ``U`` on ``X`` onto the
+        double cosets ``U \ G / G_x``, so a transversal of the double cosets yields a
+        transversal of the orbits of ``U``).  Computing the orbits on a few hundred
+        points -- the isotropic classes of ``A_L``, or the images of the isotropic
+        planes -- is what keeps this route inside its budget: the double-coset
+        enumeration in a group of order ``|im rho|`` does not return at the Enriques
+        size, while the orbit walk of the class set under the ``im rho``-generators
+        terminates.  The walk doubles as a transversal of ``Q / V``: every reached
+        point carries the engine element that carries the start to it, so the
+        representative of each ``rho(Gamma)``-orbit is read off the walk itself.
         """
         from sage_extensions.categories.group.groups import _element_to_engine
 
         j, sign_labels = self._sign_descent_rank()
         engine, im_rho, _section, ambient = self._im_rho_engine_and_section()
-        to_perm = libgap.IsomorphismPermGroup(im_rho)
-        im_rho_perm = libgap.Range(to_perm)
-        left = libgap.Image(to_perm, self._joint_discriminant_image_gap())
         rho = self.lattice.discriminant_representation()
-        right = (
-            libgap.Subgroup(
-                im_rho,
-                list(discriminant_image_generators),
-            )
-            if right is None
-            else right
-        )
-        right_perm = libgap.Image(to_perm, right)
+        rho_images = [_element_to_engine(self._discriminant_group, rho(g)) for g in ambient]
         ring = self.lattice.base_ring()
 
         def sign_of(element, label):
@@ -1405,28 +1416,110 @@ class OrthogonalCharacterQuotient:
         # parent chain, and the letters index the ambient O(L) generators.
         from sage_extensions.categories.group.groups import _law_reversed
 
-        rho_images = [_element_to_engine(self._discriminant_group, rho(g)) for g in ambient]
         free = libgap.FreeGroup(len(rho_images))
         epi = libgap.GroupHomomorphismByImagesNC(
             free, im_rho, list(free.GeneratorsOfGroup()), rho_images
         )
-        import os as _os
-        import time as _time
-
-        _dbg = bool(_os.environ.get("SE_DEBUG_STAGES"))
-        _t0 = _time.monotonic()
-        if _dbg:
-            print(f"[se-stage] before DoubleCosets: left={int(libgap.Order(left))} right={int(libgap.Order(right))} image={int(libgap.Order(im_rho))}", flush=True)
+        if point is not None:
+            # The orbit route: the double cosets as the rho(Gamma)-orbits on the
+            # im rho-orbit of the point, walked breadth-first with the im
+            # rho-generators.  Every reached point carries the engine element that
+            # carries the start to it, which is the transversal of Q / Stab(point)
+            # the bijection above reads the double-coset representatives from.
+            setwise_action = libgap.function_factory(
+                "function(x, g) return Set(List(x, y -> ImageElm(g, y))); end"
+            )
+            identity = libgap.One(engine)
+            orbit_points = [point]
+            orbit_elements = [identity]
+            keys = {str(point): 0}
+            frontier = [(point, identity)]
+            while frontier:
+                following = []
+                for reached_point, reached_element in frontier:
+                    for generator in rho_images:
+                        image = setwise_action(reached_point, generator)
+                        marker = str(image)
+                        if marker in keys:
+                            continue
+                        reached = generator * reached_element
+                        if setwise_action(point, reached) != image:
+                            # The engine product must compose as (g*h)(x) = g(h(x));
+                            # the other order carries the start to a different point.
+                            reached = reached_element * generator
+                            assert setwise_action(point, reached) == image, (
+                                "the orbit walk's transversal element does not carry the "
+                                "start to the reached point"
+                            )
+                        keys[marker] = len(orbit_points)
+                        orbit_points.append(image)
+                        orbit_elements.append(reached)
+                        following.append((image, reached))
+                frontier = following
+            # The rho(Gamma)-orbits on the orbit points: the double cosets.  One
+            # representative element per orbit, read off the walk's own transversal:
+            # the element that carries the start to the orbit's first-reached point.
+            left_generators = list(
+                libgap.GeneratorsOfGroup(self._joint_discriminant_image_gap())
+            )
+            representative_elements = []
+            unvisited = list(range(len(orbit_points)))
+            while unvisited:
+                current = unvisited[0]
+                representative_elements.append(orbit_elements[current])
+                component = {current}
+                walk = [current]
+                while walk:
+                    following = []
+                    for position in walk:
+                        for generator in left_generators:
+                            marker = str(setwise_action(orbit_points[position], generator))
+                            target = keys.get(marker)
+                            if target is None or target in component:
+                                continue
+                            component.add(target)
+                            following.append(target)
+                    walk = following
+                unvisited = [index for index in unvisited if index not in component]
+            for element in representative_elements:
+                word = libgap.PreImagesRepresentative(epi, element)
+                letters = tuple(int(x) for x in libgap.LetterRepAssocWord(word))
+                if _law_reversed(self._discriminant_group):
+                    letters = letters[::-1]
+                key_disc = self._discriminant_group._from_engine(element)
+                value = self.supergroup.one()
+                for index in letters:
+                    value = value * (ambient[index - 1] if index > 0 else ~ambient[-index - 1])
+                lifts = [value]
+                if j >= 1 and len(sign_labels) == 1 and not stab_sign_flip and flip_element is not None:
+                    lifts.append(flip_element * value)
+                for lift in lifts:
+                    image_of_lift = self.image(lift)
+                    if image_of_lift["discriminant"] != key_disc:
+                        raise ArithmeticError(
+                            "splitting lift's discriminant image disagrees with the word section"
+                        )
+                    representatives.append(lift)
+            return finite_ordered_set(tuple(representatives))
+        # The double-coset route: retained for callers that hold the integral
+        # stabilizer generators and no point of the finite set.
+        to_perm = libgap.IsomorphismPermGroup(im_rho)
+        im_rho_perm = libgap.Range(to_perm)
+        left = libgap.Image(to_perm, self._joint_discriminant_image_gap())
+        right = (
+            libgap.Subgroup(
+                im_rho,
+                list(discriminant_image_generators),
+            )
+            if right is None
+            else right
+        )
+        right_perm = libgap.Image(to_perm, right)
         _dcs = libgap.AsList(libgap.DoubleCosets(im_rho_perm, left, right_perm))
-        if _dbg:
-            print(f"[se-stage] DoubleCosets done in {_time.monotonic()-_t0:.1f}s: {len(_dcs)} cosets", flush=True)
         for _n, double_coset in enumerate(_dcs):
-            point = self._owned_coset_representative(libgap.Representative(double_coset))
-            _t1 = _time.monotonic()
-            element = libgap.PreImagesRepresentative(to_perm, point)
+            owned = self._owned_coset_representative(libgap.Representative(double_coset))
+            element = libgap.PreImagesRepresentative(to_perm, owned)
             word = libgap.PreImagesRepresentative(epi, element)
-            if _dbg and (_n < 5 or _n % 50 == 0):
-                print(f"[se-stage] rep {_n}: extract {_time.monotonic()-_t1:.2f}s", flush=True)
             letters = tuple(int(x) for x in libgap.LetterRepAssocWord(word))
             if _law_reversed(self._discriminant_group):
                 letters = letters[::-1]
@@ -1915,15 +2008,12 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
     quotient = subgroup.finite_character_quotient()
     orthogonal_group = subgroup.supergroup()
     representatives = []
-    sourced = (
-        _isotropic_line_representatives(orthogonal_group.domain(), quotient)
-        if not flag and rank == 1
-        else None
-    )
-    if sourced is None:
-        # Every rank other than lines, or a class whose integral representative could
-        # not be exhibited here, uses the port's classification unchanged.
-        sourced = orthogonal_group.isotropic_orbit_representatives(rank, flag=flag)
+    # The ambient classes always come from the port's classification: the
+    # in-repo discriminant-class route exhibits its representatives by an
+    # integral-point enumeration that does not return on the Enriques lattice
+    # (its Normaliz walk is measured at over twenty minutes before failing),
+    # while the port's line route answers the same classes in tens of seconds.
+    sourced = orthogonal_group.isotropic_orbit_representatives(rank, flag=flag)
     for representative in sourced:
         line_image = (
             quotient.isotropic_line_stabilizer_image(representative)
