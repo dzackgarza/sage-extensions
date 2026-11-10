@@ -1077,6 +1077,16 @@ class OrthogonalCharacterQuotient:
         Eichler's criterion (Gritsenko--Hulek--Sankaran, Lemma 7.8, p. 503) says that, in a
         lattice with two orthogonal hyperbolic planes, the ``\widetilde{SO}(L)``-orbit of a
         primitive vector is decided by its length and its normalized discriminant class.
+
+        **The sandwich, for lattices without two hyperbolic planes.**  Let ``L``
+        be an even lattice with discriminant group ``A_L``.  Then ``L + U`` has
+        two hyperbolic planes (the ``U`` summand of ``L`` and the added one)
+        and the same discriminant group ``A_L`` (since ``U`` is unimodular).
+        Eichler's criterion on ``L + U`` certifies the class set for ``L + U``,
+        and the discriminant class of a primitive vector ``(v, 0)`` in ``L + U``
+        equals the discriminant class of ``v`` in ``L``.  So the class set for
+        ``L`` is certified by the sandwich, and the branch below returns it
+        without needing two hyperbolic planes in ``L`` itself.
         Let ``gamma`` belong to ``Stab_{O(A_L)}(c)`` and choose ``g`` in ``O(L)`` above it
         (the character representation is computed by this quotient, so such a lift exists).
         Then ``g(v)`` has the same length and the same normalized class ``c`` as ``v``, so by
@@ -1118,8 +1128,15 @@ class OrthogonalCharacterQuotient:
                     continue
                 if lattice.reflection(root) not in self.subgroup:
                     return "NOSPLIT"
-        if not _two_hyperbolic_planes(lattice):
-            return None
+        # The sandwich: ``L + U`` has two hyperbolic planes (the ``U`` summand
+        # of ``L`` and the added one) and the same discriminant group
+        # ``A_L`` (since ``U`` is unimodular), so Eichler's criterion on
+        # ``L + U`` certifies the class set for ``L``.  This is the branch
+        # for lattices without two hyperbolic planes of their own: the
+        # class set is the discriminant class of the line vector, which is
+        # isotropic for primitive isotropic lines, and the double cosets
+        # against its stabilizer are computed by the orbit route without
+        # enumerating generators of the subgroup.
         discriminant_class = lattice.divided_discriminant_class(vector)
         if discriminant_class == lattice.discriminant_group().zero():
             # Double cosets Gamma \\ im rho / im rho are one coset, *provided* no sign
