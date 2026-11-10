@@ -40,3 +40,22 @@ def test_gamma_three_splits_the_two_null_lines_of_the_hyperbolic_plane():
     first, second = orbits[0], orbits[1]
     assert arrows.Core().Mor(first, second).an_element_in(gamma) is None
     assert arrows.Core().Mor(first, first).an_element_in(gamma) is not None
+
+
+def test_gamma_three_transporters_between_null_lines_of_two_hyperbolic_planes():
+    r"""Gamma(3) acts trivially on L/3L, so it preserves the line of a null vector modulo 3.
+
+    Ze and Z(e + 3u) have the same reduction, and the Eichler transvection
+    x -> x + b(x, e) 3u - b(x, 3u) e lies in Gamma(3) and moves e to e + 3u up to sign.
+    Ze and Zf have different reductions, so no element of Gamma(3) moves one to the other.
+    """
+    hyperbolic = Lattices(ZZ)("U")
+    ambient = hyperbolic + hyperbolic
+    group = ambient.O()
+    gamma = group.congruence_preimage(3)
+    e, f, u, _v = tuple(ambient.module_generators())
+    arrows = Cat().Mor(FiniteOrdinalCategory(2), Lattices(ZZ))
+    line = lambda vector: arrows.object(ambient.primitive_isotropic_subobject(vector).inclusion())
+    near = arrows.Core().Mor(line(e), line(e + u + u + u)).an_element_in(gamma)
+    assert near is not None
+    assert arrows.Core().Mor(line(e), line(f)).an_element_in(gamma) is None

@@ -1726,6 +1726,10 @@ def _preimage_vector_witness(subgroup, source, target):
 
 def _subgroup_vector_equivalence_witness(subgroup, left, right):
     orthogonal_group = subgroup.supergroup()
+    owned = getattr(subgroup, "owned_vector_witness", None)
+    if owned is not None and owned() is not None:
+        lattice = orthogonal_group.domain()
+        return owned()(lattice(left), lattice(right))
     if not subgroup.contains_character_kernel():
         lattice = orthogonal_group.domain()
         source, target = lattice(left), lattice(right)
