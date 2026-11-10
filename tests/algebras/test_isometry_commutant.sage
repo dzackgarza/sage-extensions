@@ -158,7 +158,7 @@ def test_eichler_centralizer_is_the_kernel_times_sl2():
     r"""U + U = M_2(Z) with F = left multiplication by T up to a change of basis, so C(Z) is
     {X -> A^n X g^-1 : g in SL_2(Z)}, faithful modulo 3 with image <T> x SL_2(F_3) of order 72."""
     commutant = IsometryCommutant(U2, [EICHLER])
-    generators = commutant.square_zero_centralizer_generators()
+    generators = commutant.radical_centralizer_generators()
     assert all(commutant.is_centralizer_element(g) for g in generators)
     assert any(g in (EICHLER, EICHLER.inverse()) for g in generators)
     field = SageGF(int(3))
@@ -441,3 +441,69 @@ def test_nonmaximal_split_commutant_is_gamma_upper_zero_of_two():
     assert len(_closure([h.change_ring(three) for h in blocks], identity_matrix(three, int(2)))) == int(24)
     swap = sage_matrix(SageQQ, int(2), int(2), [int(0), -int(1), int(1), int(0)])
     assert not commutant.is_centralizer_element(acting(lambda X: X * swap))
+
+
+JORDAN_GRAM = sage_matrix(SageZZ, int(3), int(3), [int(0), int(1), int(0), int(1), int(0), int(0), int(0), int(0), int(2)])
+# Eichler transvection of U + <2> along e, g: x -> x + (x.e) g - (x.g) e - (x.e) e, columns E e, E f, E g.
+JORDAN = sage_matrix(SageZZ, int(3), int(3), [int(1), -int(1), -int(2), int(0), int(1), int(0), int(0), int(1), int(1)])
+
+
+def test_single_jordan_block_commutant_has_radical_square_nonzero():
+    r"""N = E - 1 has N^3 = 0 \ne N^2, so A = Q[N] with rad = (N), rad^2 = Q N^2 and A / rad = Q.
+    With l = log E = N - N^2 / 2 skew, E^t = 1 + t N + (t^2 - t) N^2 / 2 has entry t at (2, 1)
+    and -t^2 at (0, 1); it is integral exactly for t in Z. So C(Z) = {+-E^t : t in Z}."""
+    commutant = IsometryCommutant(JORDAN_GRAM, [JORDAN])
+    assert int(commutant.dimension()) == int(3)
+    assert int(len(commutant.radical_basis())) == int(2)
+    generators = commutant.centralizer_generators()
+    assert -identity_matrix(SageZZ, int(3)) in generators
+    exponents = []
+    for g in generators:
+        sign = g[int(1), int(1)]
+        t = sign * g[int(2), int(1)]
+        assert g == sign * JORDAN.change_ring(SageQQ) ** int(t)
+        exponents.append(SageZZ(t))
+    from sage.arith.misc import gcd as sage_gcd
+    assert sage_gcd(exponents) == int(1)
+
+
+def _block_log(g):
+    shifted = g.change_ring(SageQQ) - identity_matrix(SageQQ, int(6))
+    return shifted - shifted * shifted / int(2)
+
+
+def test_doubled_jordan_block_has_nonabelian_skew_radical():
+    r"""L + L with E + E: A = M_2(Q[l]/(l^3)), O / rad = M_2(Z), and the quotient form is the
+    identity form, so the image of C(Z) is the signed permutations, of order 8, each lifting as a
+    block matrix. The skew radical n has n_1 / n_2 = {[[a l, c l], [c l, b l]]} and
+    n_2 = Q mu, mu = l^2 (E_12 - E_21) / 2, and [l E_11, mu] \ne 0, so n is not abelian.
+    The l-coefficients of an integral element are integral (l^2 vanishes at (2, 1)), and
+    exp(l E_11), exp(l E_22), exp(l (E_12 + E_21)) = 1 + l (E_12 + E_21) + l^2 / 2 are integral:
+    Lambda_1 = Z^3. 1 + t mu is integral exactly for t in Z, since l^2 = N^2 has entry -2 at (0, 1):
+    Lambda_2 = Z mu."""
+    zero = sage_matrix(SageZZ, int(3), int(3))
+    gram = block_matrix(SageZZ, [[JORDAN_GRAM, zero], [zero, JORDAN_GRAM]], subdivide=False)
+    doubled = block_matrix(SageZZ, [[JORDAN, zero], [zero, JORDAN]], subdivide=False)
+    commutant = IsometryCommutant(gram, [doubled])
+    assert int(commutant.dimension()) == int(12)
+    assert int(len(commutant.radical_basis())) == int(8)
+    generators = commutant.centralizer_generators()
+    assert all(commutant.is_centralizer_element(g) for g in generators)
+    image = lambda g: sage_matrix(SageZZ, int(2), int(2), [g[int(0), int(0)], g[int(0), int(3)], g[int(3), int(0)], g[int(3), int(3)]])
+    assert len(_closure([image(g) for g in generators], identity_matrix(SageZZ, int(2)))) == int(8)
+    one = identity_matrix(SageZZ, int(2))
+    kernel = [_block_log(g) for g in generators if image(g) == one]
+    coefficient = lambda x, i, j: x[int(3) * i + int(2), int(3) * j + int(1)]
+    level_one = []
+    level_two = []
+    for x in kernel:
+        assert coefficient(x, int(0), int(1)) == coefficient(x, int(1), int(0))
+        row = [coefficient(x, int(0), int(0)), coefficient(x, int(1), int(1)), coefficient(x, int(0), int(1))]
+        if any(c != int(0) for c in row):
+            level_one.append(row)
+        else:
+            level_two.append(-x[int(0), int(4)])
+    span = sage_matrix(SageZZ, level_one).hermite_form(include_zero_rows=False)
+    assert span == identity_matrix(SageZZ, int(3))
+    from sage.arith.misc import gcd as sage_gcd
+    assert sage_gcd([SageZZ(c) for c in level_two]) == int(1)

@@ -16,7 +16,7 @@ from itertools import combinations, count, product
 
 from sage.arith.functions import lcm
 from sage.arith.misc import CRT_list as crt
-from sage.arith.misc import factorial
+from sage.arith.misc import binomial, factorial
 from sage.matrix.constructor import block_matrix, matrix
 from sage.matrix.special import identity_matrix
 from sage.modules.free_module_element import vector
@@ -184,63 +184,126 @@ class IsometryCommutant:
             for v in form.right_kernel().basis()
         )
 
-    def _skew_radical(self):
-        r"""Return a `Z`-basis of `\{x \in rad A : x^\dagger = -x\} \cap M_r(Z)`."""
+    def _radical_nilpotency(self):
+        r"""Return the least `p` with `rad^{p+1} = 0` and `Q`-bases of `rad^1, ..., rad^p`."""
+        r = self.rank
         radical = self.radical_basis()
         if not radical:
-            return ()
-        equations = matrix(QQ, [(x + self.adjoint(x)).list() for x in radical])
-        relations = equations.left_kernel().basis()
-        if not relations:
-            return ()
-        skew = [sum(c * x for c, x in zip(v, radical)) for v in relations]
-        denominator = lcm([m.denominator() for m in skew])
-        scaled = matrix(ZZ, [(denominator * m).list() for m in skew]).saturation()
-        return tuple(matrix(ZZ, self.rank, self.rank, list(row)) for row in scaled.rows())
+            return 0, ()
+        powers = [matrix(QQ, [x.list() for x in radical])]
+        while True:
+            products = [(matrix(QQ, r, r, list(row)) * y).list() for row in powers[-1].rows() for y in radical]
+            span = matrix(QQ, products).row_space().basis_matrix()
+            if span.nrows() == 0:
+                return len(powers), tuple(powers)
+            powers.append(span)
+
+    def _unipotent_frame(self):
+        r"""Return a `Z`-basis of `n \cap M_r(Z)` adapted to `n_k = n \cap rad^k`, with the level of each vector.
+
+        `n` is the skew radical `\{x \in rad A : x^\dagger = -x\}`, a nilpotent Lie algebra with
+        `[n_i, n_j] \subseteq n_{i+j}`. Each `n_k \cap M_r(Z)` is saturated in the next, so a basis of
+        the deeper lattice extends by the rows of a unimodular completion.
+        """
+        if hasattr(self, "_frame"):
+            return self._frame
+        r = self.rank
+        nilpotency, powers = self._radical_nilpotency()
+        lattices = []
+        for rows in powers:
+            elements = [matrix(QQ, r, r, list(row)) for row in rows.rows()]
+            equations = matrix(QQ, [(x + self.adjoint(x)).list() for x in elements])
+            skew = [sum(c * x for c, x in zip(v, elements)) for v in equations.left_kernel().basis()]
+            if not skew:
+                lattices.append(matrix(ZZ, 0, r**2))
+                continue
+            denominator = lcm([m.denominator() for m in skew])
+            lattices.append(matrix(ZZ, [(denominator * m).list() for m in skew]).saturation())
+        basis_rows, levels = [], []
+        for level in range(nilpotency, 0, -1):
+            lattice = lattices[level - 1]
+            if lattice.nrows() == len(basis_rows):
+                continue
+            if not basis_rows:
+                new_rows = list(lattice.rows())
+            else:
+                inside = matrix(ZZ, [lattice.change_ring(QQ).solve_left(vector(QQ, row)) for row in basis_rows])
+                _diagonal, _left, right = inside.smith_form()
+                completion = right.inverse()
+                new_rows = [completion.row(i) * lattice for i in range(inside.nrows(), lattice.nrows())]
+            basis_rows += new_rows
+            levels += [level] * len(new_rows)
+        basis = tuple(matrix(QQ, r, r, list(row)) for row in basis_rows)
+        self._frame = (basis, tuple(levels), nilpotency)
+        return self._frame
+
+    def _exp(self, x):
+        nilpotency = self._radical_nilpotency()[0]
+        term = total = identity_matrix(QQ, self.rank)
+        for k in range(1, nilpotency + 1):
+            term = term * x / k
+            total = total + term
+        return total
+
+    def _integral_point(self, element, level):
+        r"""Return an integral element of ``element`` `\cdot N_{level}(Q)`, or ``None``.
+
+        Here `N_k = \exp(n_k)` and ``element`` is a rational unitary element of `A`. A member
+        `\gamma` of the coset is `g \exp(s) w` with `s` in the level-``level`` span of the frame
+        and `w \in N_{level+1}`, since `N_k / N_{k+1}` is the vector group `n_k / n_{k+1}`. For
+        `\gamma` integral, `g^{-1}\gamma \in E^{-1} M_r(Z)` with `E` the denominator of `g^{-1}`, and
+        `(g^{-1}\gamma - 1)^{p+1} = 0`, so its logarithm lies in `(E^p \mathrm{lcm}(1..p))^{-1}(n \cap M_r(Z))`.
+        Right multiplication by `\exp(p!\,\mu)` for `\mu` in the frame keeps `\gamma` integral and
+        moves `s` by `p!\,\mu`, so `s` is decided modulo `p!` on that finite residue set
+        (Mal'cev coordinates of the second kind: Segal, *Polycyclic Groups*, Ch. 6).
+        """
+        basis, levels, nilpotency = self._unipotent_frame()
+        if level > nilpotency:
+            return matrix(ZZ, element) if element.denominator() == 1 else None
+        indices = [i for i, value in enumerate(levels) if value == level]
+        if not indices:
+            return self._integral_point(element, level + 1)
+        scale = element.inverse().denominator() ** nilpotency * lcm(range(1, nilpotency + 1))
+        period = scale * factorial(nilpotency)
+        for residue in product(range(period), repeat=len(indices)):
+            step = sum((QQ((c, scale)) * basis[i] for c, i in zip(residue, indices)), 0 * element)
+            found = self._integral_point(element * self._exp(step), level + 1)
+            if found is not None:
+                return found
+        return None
 
     def unipotent_kernel_generators(self):
-        r"""Return generators of the kernel of `C(Z) \to (A / rad A)^\times` for abelian skew radical.
+        r"""Return generators of the kernel `N(Z)` of `C(Z) \to (A / rad A)^\times`.
 
-        The logarithm is a bijection from the kernel over `Q` onto the skew radical
-        `n`. On abelian `n` it is a homomorphism, so the kernel is a lattice in `n`.
-        With `x^{c+1} = 0`, a logarithm of an integral element lies in
-        `\Lambda = M^{-1}(n \cap M_r(Z))` for `M = lcm(1, ..., c)`, and `\exp` is
-        integral on `c! (n \cap M_r(Z)) = D \Lambda` for `D = M c!`. Testing each
-        residue of `\Lambda / D \Lambda` therefore determines the lattice.
+        Over `Q` the kernel is `\exp(n)` for the skew radical `n` (the logarithm of a unitary
+        unipotent element is skew). With `N_k = \exp(n_k)`, each `N_k(Z) / N_{k+1}(Z)` embeds in
+        `n_k / n_{k+1}` by the logarithm. Its image `\Lambda_k` contains `p!` times the level-`k`
+        frame lattice, since `\exp(p!\,\mu)` is integral, and lies in `\mathrm{lcm}(1..p)^{-1}` times
+        it, since the logarithm of an integral unipotent has those denominators. Each residue
+        between is decided by :meth:`_integral_point`, and lifts of `\Lambda_k` for every `k`
+        generate `N(Z)` (Segal, *Polycyclic Groups*, Ch. 6, Thm. 2).
         """
-        basis = self._skew_radical()
+        basis, levels, nilpotency = self._unipotent_frame()
         if not basis:
             return ()
-        assert all(x * y == y * x for x in basis for y in basis), (
-            f"the skew radical of the commutant of {self.isometries} is not abelian"
-        )
-        identity = identity_matrix(QQ, self.rank)
-        nilpotency = 1
-        probes = list(basis)
-        power = list(basis)
-        while True:
-            power = [x * y for x in power for y in probes if not (x * y).is_zero()]
-            if not power:
-                break
-            nilpotency += 1
+        one = identity_matrix(QQ, self.rank)
         modulus = lcm(range(1, nilpotency + 1))
-        depth = modulus * factorial(nilpotency)
-
-        def exponential(coordinates):
-            x = sum((c * m.change_ring(QQ) for c, m in zip(coordinates, basis)), 0 * identity) / modulus
-            term = identity
-            total = identity
-            for k in range(1, nilpotency + 1):
-                term = term * x / k
-                total = total + term
-            return total
-
-        rows = [[depth if i == j else 0 for j in range(len(basis))] for i in range(len(basis))]
-        for residue in product(range(depth), repeat=len(basis)):
-            if any(residue) and exponential(residue).denominator() == 1:
-                rows.append(list(residue))
-        lattice = matrix(ZZ, rows).hermite_form(include_zero_rows=False)
-        return tuple(matrix(ZZ, exponential(list(row))) for row in lattice.rows())
+        depth = factorial(nilpotency)
+        result = {}
+        for level in range(nilpotency, 0, -1):
+            indices = [i for i, value in enumerate(levels) if value == level]
+            for i in indices:
+                element = self._exp(depth * basis[i])
+                result[element.str()] = matrix(ZZ, element)
+            for residue in product(range(modulus * depth), repeat=len(indices)):
+                if all(c % (modulus * depth) == 0 for c in residue):
+                    continue
+                step = sum((QQ((c, modulus)) * basis[i] for c, i in zip(residue, indices)), 0 * one)
+                found = self._integral_point(self._exp(step), level + 1)
+                if found is not None and found != one:
+                    result[found.str()] = found
+        assert all(self.is_centralizer_element(g) for g in result.values())
+        return tuple(result.values())
 
     def _primitive_idempotent(self, degree, coefficients=(-2, -1, 1, 2)):
         r"""Return an idempotent of `A` of rank `r / degree`, a sparse combination of the order basis."""
@@ -351,21 +414,18 @@ class IsometryCommutant:
         assert all(self.is_centralizer_element(g) for g in result.values())
         return tuple(result.values())
 
-    def square_zero_centralizer_generators(self):
-        r"""Return generators of the centralizer when `rad^2 = 0` and `O / rad` is `M_n(Z)`.
+    def radical_centralizer_generators(self):
+        r"""Return generators of the centralizer when `rad \ne 0` and `O / (O \cap rad)` is `M_n(Z)`.
 
         `O / (O \cap rad)` acts on `\bar M = O e / (rad e)`, carrying the form defined by
-        `x^\dagger y = b(x, y) t` modulo the radical. For an isometry of `\bar M` with a
-        preimage `\bar u` in `O`, a lift is `\bar u + x` with `x` integral in the radical,
-        and since `rad^2 = 0` the unitary equation
-        `\bar u^\dagger x + x^\dagger \bar u = 1 - \bar u^\dagger \bar u` is linear.
-        Lifting a generating set proves the image is the whole isometry group; the
-        kernel is :meth:`unipotent_kernel_generators`.
+        `x^\dagger y = b(x, y) t` modulo the radical. An isometry of `\bar M` has a preimage `p`
+        in `A` with `r = p^\dagger p - 1` in the radical and self-adjoint, so
+        `u = p (1 + r)^{-1/2}`, a polynomial in `r`, is a rational unitary lift. The unitary lifts
+        are `u N(Q)`, and :meth:`_integral_point` decides whether that coset meets `M_r(Z)`.
+        The kernel is :meth:`unipotent_kernel_generators`. No condition on `rad^2` is needed.
         """
         radical = self.radical_basis()
-        assert radical and all((x * y).is_zero() for x in radical for y in radical), (
-            f"the commutant of {self.isometries} does not have a nonzero radical of square zero"
-        )
+        assert radical, f"the commutant of {self.isometries} is semisimple"
         size = self.dimension()
         radical_rows = matrix(QQ, [self.coordinates(x) for x in radical])
         scale = radical_rows.denominator()
@@ -409,25 +469,20 @@ class IsometryCommutant:
             [[generator.solve_left(project(self.adjoint(x) * y))[0] for y in lifts] for x in lifts],
         )
         identity = identity_matrix(QQ, self.rank)
-        radical_integral = tuple(
-            sum(c * m.change_ring(QQ) for c, m in zip(row, self.order_basis)) for row in radical_lattice.rows()
-        )
         action_inverse = action_rows.inverse()
+        nilpotency = self._radical_nilpotency()[0]
 
         def lift(isometry):
             combination = vector(QQ, isometry.list()) * action_inverse
             preimage = sum(c * m for c, m in zip(combination, section))
-            preimage_adjoint = self.adjoint(preimage)
-            columns = [(preimage_adjoint * x + self.adjoint(x) * preimage).list() for x in radical_integral]
-            equations = matrix(QQ, columns).transpose()
-            target = vector(QQ, (identity - preimage_adjoint * preimage).list())
-            common = lcm([equations.denominator(), target.denominator()])
-            solution = _integer_solution(matrix(ZZ, common * equations), vector(ZZ, common * target))
-            if solution is None:
+            defect = self.adjoint(preimage) * preimage - identity
+            assert (defect**(nilpotency + 1)).is_zero() and self.adjoint(defect) == defect
+            root = sum(binomial(QQ((-1, 2)), k) * defect**k for k in range(nilpotency + 1))
+            element = self._integral_point(preimage * root, 1)
+            if element is None:
                 return None
-            element = preimage + sum(c * x for c, x in zip(solution, radical_integral))
             assert self.is_centralizer_element(element)
-            return matrix(ZZ, element)
+            return element
 
         # The image of C(Z) in the isometry group of the quotient form is arithmetic, hence of
         # finite index (Platonov-Rapinchuk, Thm. 4.1); its elements are those with a lift, and
@@ -762,7 +817,7 @@ class IsometryCommutant:
             # A / rad = Q: a unit is +-(1 + x) with x in the radical, and -1 is central.
             return (-identity_matrix(ZZ, self.rank), *self.unipotent_kernel_generators())
         if radical:
-            return self.square_zero_centralizer_generators()
+            return self.radical_centralizer_generators()
         if all(x * y == y * x for x in self.order_basis for y in self.order_basis):
             return self.commutative_centralizer_generators()
         return self.simple_centralizer_generators()
