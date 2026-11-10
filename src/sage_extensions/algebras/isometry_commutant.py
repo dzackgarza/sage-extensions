@@ -20,6 +20,7 @@ from sage.arith.misc import factorial
 from sage.matrix.constructor import block_matrix, matrix
 from sage.matrix.special import identity_matrix
 from sage.modules.free_module_element import vector
+from sage.libs.pari import pari
 from sage.rings.number_field.number_field import NumberField
 from sage.rings.integer_ring import ZZ
 from sage.rings.rational_field import QQ
@@ -64,6 +65,21 @@ def _form_generators(gram):
         )
     assert gram == -gram.transpose(), f"the form {gram} is neither symmetric nor alternating"
     return symplectic_generators(gram)
+
+
+_RATIONAL_COEFFICIENTS = (-2, -1, 1, 2, QQ((-1, 2)), QQ((1, 2)), QQ((-1, 3)), QQ((1, 3)), QQ((-1, 4)), QQ((1, 4)))
+
+
+def _short_vectors(gram, bound):
+    r"""Return every integer vector `x \ne 0` with `x^t G x \le` ``bound``, for `G` rational positive definite.
+
+    Fincke-Pohst enumeration (Fincke, Pohst, Math. Comp. 44 (1985), 463-471), as PARI's
+    ``qfminim``, which lists one vector of each pair `\pm x`.
+    """
+    denominator = gram.denominator()
+    found = pari(matrix(ZZ, denominator * gram)).qfminim(denominator * bound)[2].sage()
+    vectors = [vector(ZZ, column) for column in found.columns()]
+    return vectors + [-v for v in vectors]
 
 
 def _integer_solution(equations, target):
@@ -226,13 +242,13 @@ class IsometryCommutant:
         lattice = matrix(ZZ, rows).hermite_form(include_zero_rows=False)
         return tuple(matrix(ZZ, exponential(list(row))) for row in lattice.rows())
 
-    def _primitive_idempotent(self, degree):
-        r"""Return an idempotent of `O` of rank `r / degree`, found among sparse elements."""
+    def _primitive_idempotent(self, degree, coefficients=(-2, -1, 1, 2)):
+        r"""Return an idempotent of `A` of rank `r / degree`, a sparse combination of the order basis."""
         target = self.rank / degree
         size = len(self.order_basis)
         for support in range(1, min(size, 3) + 1):
             for positions in combinations(range(size), support):
-                for values in product((-2, -1, 1, 2), repeat=support):
+                for values in product(coefficients, repeat=support):
                     element = sum(c * self.order_basis[i] for c, i in zip(values, positions))
                     if element * element == element and element.rank() == target:
                         return element
@@ -241,57 +257,99 @@ class IsometryCommutant:
         )
 
     def simple_centralizer_generators(self):
-        r"""Return generators of the centralizer when `O` is a maximal order `M_n(Z)`.
+        r"""Return generators of the centralizer when `A \cong M_n(Q)`, for any order `O`.
 
-        For a rank-`r/n` idempotent `e`, `M = O e` is free of rank `n` and `O = End(M)`.
-        The space `e^\dagger O e` has rank one, so `x^\dagger y = b(x, y) t` defines an
-        integral form on `M`. A unit `u` satisfies `u^\dagger u = 1` exactly when it
-        preserves `b`, so the centralizer is the isometry group of `(M, b)`: orthogonal
-        when `b` is symmetric, symplectic when alternating.
+        A rational idempotent `e` of rank `r/n` gives the simple module `A e`, and `X = O e`
+        is an `O`-stable lattice in it. `A` acts faithfully on `A e`, so `A = End_Q(A e)`
+        and `O' = End_Z(X)` is a maximal order containing `O`, with matrix units `E_{ij}`.
+        For `e' = E_{11}`, the space `e'^\dagger A e'` is a line, so `x^\dagger y = b(x, y) t`
+        defines a form on `O' e'`. A unit `u` of `O'` satisfies `u^\dagger u = 1` exactly when
+        it preserves `b`, so the unitary units of `O'` are the isometry group of `b`:
+        orthogonal when `b` is symmetric, symplectic when alternating. A unit of `O` is a
+        unit of `O'`, and the unitary units of `O` are an arithmetic subgroup of finite index
+        (Platonov-Rapinchuk, *Algebraic Groups and Number Theory*, Prop. 4.1), so Schreier's
+        lemma on membership in `O` gives them when `O \ne O'`.
         """
         assert not self.radical_basis(), f"the commutant of {self.isometries} is not semisimple"
         degree = ZZ(self.dimension()).isqrt()
-        assert degree**2 == self.dimension(), f"the commutant of {self.isometries} is not M_n(Q)"
-        e = self._primitive_idempotent(degree)
-        span = matrix(ZZ, [(m * e).list() for m in self.order_basis]).hermite_form(include_zero_rows=False)
+        assert degree**2 == self.dimension() and len(self._center_basis()) == 1, (
+            f"the commutant of {self.isometries} is not central simple of square dimension"
+        )
+        r = self.rank
+        e = self._primitive_idempotent(degree, _RATIONAL_COEFFICIENTS)
+        images = matrix(QQ, [(m.change_ring(QQ) * e).list() for m in self.order_basis])
+        denominator = images.denominator()
+        span = matrix(QQ, matrix(ZZ, denominator * images).hermite_form(include_zero_rows=False)) / denominator
         assert span.nrows() == degree
-        module = tuple(matrix(ZZ, self.rank, self.rank, list(row)) for row in span.rows())
-        coordinates = matrix(QQ, span)
+        module = tuple(matrix(QQ, r, r, list(row)) for row in span.rows())
 
         def on_module(element):
             return matrix(
-                QQ, [coordinates.solve_left(vector(QQ, (element * m).list())) for m in module]
+                QQ, [span.solve_left(vector(QQ, (element * m).list())) for m in module]
             ).transpose()
 
-        action_rows = matrix(QQ, [on_module(m).list() for m in self.order_basis])
-        assert action_rows.denominator() == 1 and abs(action_rows.det()) == 1, (
-            f"the order of the commutant of {self.isometries} is not End(O e)"
-        )
-        adjoint_e = self.adjoint(e)
-        line = matrix(QQ, [(adjoint_e * m * e).list() for m in self.order_basis])
-        scale = line.denominator()
-        generator = matrix(ZZ, scale * line).hermite_form(include_zero_rows=False)
-        assert generator.nrows() == 1
-        generator = matrix(QQ, generator) / scale
-        gram = matrix(
-            ZZ,
-            [
-                [
-                    generator.solve_left(vector(QQ, (self.adjoint(x) * y).list()))[0]
-                    for y in module
-                ]
-                for x in module
-            ],
-        )
-        isometries = _form_generators(gram)
+        action_rows = matrix(QQ, [on_module(m.change_ring(QQ)).list() for m in self.order_basis])
+        assert action_rows.denominator() == 1, f"the order of {self.isometries} does not preserve O e"
         inverse = action_rows.inverse()
-        result = []
-        for isometry in isometries:
-            combination = vector(QQ, isometry.list()) * inverse
-            element = sum(c * m.change_ring(QQ) for c, m in zip(combination, self.order_basis))
-            assert self.is_centralizer_element(element)
-            result.append(matrix(ZZ, element))
-        return tuple(result)
+
+        def element_of(block):
+            combination = vector(QQ, matrix(QQ, block).list()) * inverse
+            return sum(c * m.change_ring(QQ) for c, m in zip(combination, self.order_basis))
+
+        def unit(i, j):
+            block = matrix(QQ, degree, degree)
+            block[i, j] = 1
+            return element_of(block)
+
+        corner = unit(0, 0)
+        column = tuple(unit(i, 0) for i in range(degree))
+        adjoint_corner = self.adjoint(corner)
+        line = next(
+            value
+            for value in (adjoint_corner * unit(i, j) * corner for i in range(degree) for j in range(degree))
+            if not value.is_zero()
+        )
+        generator = matrix(QQ, [line.list()])
+        form = matrix(
+            QQ,
+            [[generator.solve_left(vector(QQ, (self.adjoint(x) * y).list()))[0] for y in column] for x in column],
+        )
+        gram = matrix(ZZ, form.denominator() * form)
+        group = tuple(element_of(isometry) for isometry in _form_generators(gram))
+        if abs(action_rows.det()) == 1:
+            assert all(self.is_centralizer_element(g) for g in group)
+            return tuple(matrix(ZZ, g) for g in group)
+        return self._order_subgroup_generators(group)
+
+    def _order_subgroup_generators(self, moves):
+        r"""Return Schreier generators of the elements of `\langle` ``moves`` `\rangle` lying in `O`.
+
+        The moves are unitary units of an order containing `O`, and the subgroup has finite
+        index. A unitary `w \in O` has `\det w = \pm 1`, so `w^{-1}` is integral and lies in
+        `O`: right cosets are compared by membership of `x y^{-1}` in `O`.
+        """
+        one = identity_matrix(QQ, self.rank)
+        moves = [matrix(QQ, m) for m in moves if m != one]
+        if not moves:
+            return ()
+        transversal = [one]
+        result = {}
+        position = 0
+        while position < len(transversal):
+            current = transversal[position]
+            position += 1
+            for move in moves:
+                product_element = current * move
+                for known in transversal:
+                    quotient = product_element * known.inverse()
+                    if self.in_order(quotient):
+                        if quotient != one:
+                            result[quotient.str()] = matrix(ZZ, quotient)
+                        break
+                else:
+                    transversal.append(product_element)
+        assert all(self.is_centralizer_element(g) for g in result.values())
+        return tuple(result.values())
 
     def square_zero_centralizer_generators(self):
         r"""Return generators of the centralizer when `rad^2 = 0` and `O / rad` is `M_n(Z)`.
@@ -355,8 +413,8 @@ class IsometryCommutant:
             sum(c * m.change_ring(QQ) for c, m in zip(row, self.order_basis)) for row in radical_lattice.rows()
         )
         action_inverse = action_rows.inverse()
-        generators = list(self.unipotent_kernel_generators())
-        for isometry in _form_generators(gram):
+
+        def lift(isometry):
             combination = vector(QQ, isometry.list()) * action_inverse
             preimage = sum(c * m for c, m in zip(combination, section))
             preimage_adjoint = self.adjoint(preimage)
@@ -365,13 +423,26 @@ class IsometryCommutant:
             target = vector(QQ, (identity - preimage_adjoint * preimage).list())
             common = lcm([equations.denominator(), target.denominator()])
             solution = _integer_solution(matrix(ZZ, common * equations), vector(ZZ, common * target))
-            assert solution is not None, (
-                f"the isometry {isometry} of the semisimple quotient has no integral unitary lift"
-            )
+            if solution is None:
+                return None
             element = preimage + sum(c * x for c, x in zip(solution, radical_integral))
             assert self.is_centralizer_element(element)
-            generators.append(matrix(ZZ, element))
-        return tuple(generators)
+            return matrix(ZZ, element)
+
+        # The image of C(Z) in the isometry group of the quotient form is arithmetic, hence of
+        # finite index (Platonov-Rapinchuk, Thm. 4.1); its elements are those with a lift, and
+        # lifting is a coset invariant because the kernel is contained in C(Z). Schreier's
+        # lemma on liftability gives the image when a generator does not lift.
+        from sage_extensions.categories.lattice_centralizers import finite_preimage_generators
+
+        quotient_generators = tuple(matrix(ZZ, g) for g in _form_generators(gram))
+        lifts_ = [lift(g) for g in quotient_generators]
+        if any(value is None for value in lifts_):
+            image, _index = finite_preimage_generators(
+                quotient_generators, lambda element: element, lambda element: lift(element) is not None
+            )
+            lifts_ = [lift(g) for g in image]
+        return (*self.unipotent_kernel_generators(), *lifts_)
 
     def inversion_transporter(self):
         r"""Return `t \in O(L)` with `t F t^{-1} = F^{-1}`, or ``None``, for `A` a real quadratic field."""
@@ -416,6 +487,8 @@ class IsometryCommutant:
         Exhausting that box decides the question. ``None`` is returned at once when the
         linear system has no invertible solution, since the modules are then not isomorphic.
         """
+        if self.is_compact():
+            return self.compact_equivariant_transporter(target_gram, (target_isometry,))
         assert len(self.isometries) == 1 and self.dimension() == 2 and not self.radical_basis()
         F = self.isometries[0]
         target_gram = matrix(QQ, target_gram)
@@ -612,8 +685,75 @@ class IsometryCommutant:
         assert all(self.is_centralizer_element(g) for g in result)
         return tuple(matrix(ZZ, g) for g in result)
 
+    def trace_form(self):
+        r"""Return the Gram matrix of `(x, y) \mapsto \mathrm{Tr}(x^\dagger y)` on the order basis."""
+        return matrix(QQ, [[(self.adjoint(x) * y).trace() for y in self.order_basis] for x in self.order_basis])
+
+    def is_compact(self):
+        r"""Decide whether the real unitary group `\{u \in A_R : u^\dagger u = 1\}` is compact.
+
+        It is compact exactly when the trace form is positive definite: then
+        `\mathrm{Tr}(u^\dagger u) = r` bounds the group, and otherwise an `x` with
+        `\mathrm{Tr}(x^\dagger x) \le 0` gives a noncompact one-parameter subgroup
+        (Weil, *Algebras with involutions and the classical groups*, J. Indian Math. Soc. 24 (1960), \S 2).
+        """
+        return self.trace_form().is_positive_definite()
+
+    def compact_centralizer_elements(self):
+        r"""Return every element of the centralizer when it is finite.
+
+        A centralizer element `u` lies in `O` with `\mathrm{Tr}(u^\dagger u) = \mathrm{Tr}(1) = r`,
+        so it is among the vectors of the positive definite trace form of norm at most `r`.
+        This covers every compact commutant: nonsplit (for example definite quaternion), nonmaximal and glued.
+        """
+        assert self.is_compact(), f"the unitary group of the commutant of {self.isometries} is not compact"
+        result = []
+        for coordinates in _short_vectors(self.trace_form(), self.rank):
+            element = sum(c * m for c, m in zip(coordinates, self.order_basis))
+            if self.is_centralizer_element(element):
+                result.append(matrix(ZZ, element))
+        return tuple(result)
+
+    def compact_equivariant_transporter(self, target_gram, target_isometries):
+        r"""Return `t \in GL_r(Z)` with `t^t B' t = B` and every `t F_i = F'_i t`, or ``None``, for compact `A`.
+
+        On the integral intertwiners `I`, `Q(x) = \mathrm{Tr}(B^{-1} x^t B' x)`. For a solution
+        `t_1`, `x = t_1 a` identifies `I_Q` with `A` and `Q(t_1 a) = \mathrm{Tr}(a^\dagger a)`, so `Q`
+        is positive definite and every solution has `Q(t) = r`. ``None`` is therefore a proof
+        when `Q` is not positive definite or no vector of norm at most `r` is a solution.
+        """
+        assert self.is_compact()
+        target_gram = matrix(ZZ, target_gram)
+        targets = tuple(matrix(ZZ, self.rank, self.rank, T) for T in target_isometries)
+        assert len(targets) == len(self.isometries)
+        r = self.rank
+        rows = []
+        for F, T in zip(self.isometries, targets):
+            for i in range(r):
+                for j in range(r):
+                    row = [0] * r**2
+                    for k in range(r):
+                        row[i * r + k] += F[k, j]
+                        row[k * r + j] -= T[i, k]
+                    rows.append(row)
+        basis = [matrix(ZZ, r, r, list(v)) for v in matrix(ZZ, rows).right_kernel().basis()]
+        if len(basis) != self.dimension():
+            return None
+        inverse = self.gram.change_ring(QQ).inverse()
+        form = matrix(QQ, [[(inverse * x.transpose() * target_gram * y).trace() for y in basis] for x in basis])
+        if not form.is_positive_definite():
+            return None
+        for coordinates in _short_vectors(form, r):
+            candidate = sum(c * m for c, m in zip(coordinates, basis))
+            if candidate.det() in (1, -1) and candidate.transpose() * target_gram * candidate == self.gram:
+                assert all(candidate * F == T * candidate for F, T in zip(self.isometries, targets))
+                return candidate
+        return None
+
     def centralizer_generators(self):
         r"""Return generators of the simultaneous centralizer, by the structure of `A`."""
+        if self.is_compact():
+            return self.compact_centralizer_elements()
         split = self._product_centralizer_generators()
         if split is not None:
             return split
@@ -704,28 +844,7 @@ class IsometryCommutant:
                     else:
                         entry[other] = inverse
                     moves.append(to_matrix(entry))
-        one = identity_matrix(QQ, self.rank)
-        moves = [m for m in moves if m != one]
-        if not moves:
-            return ()
-        transversal = [one]
-        result = {}
-        position = 0
-        while position < len(transversal):
-            current = transversal[position]
-            position += 1
-            for move in moves:
-                product_element = current * move
-                for known in transversal:
-                    quotient = product_element * known.inverse()
-                    if self.in_order(quotient):
-                        if quotient != one:
-                            result[quotient.str()] = matrix(ZZ, quotient)
-                        break
-                else:
-                    transversal.append(product_element)
-        assert all(self.is_centralizer_element(g) for g in result.values())
-        return tuple(result.values())
+        return self._order_subgroup_generators(moves)
 
     @staticmethod
     def _norm_one_generators(field, theta, factor):

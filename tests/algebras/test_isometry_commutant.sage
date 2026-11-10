@@ -355,3 +355,89 @@ def test_glued_centralizer_is_the_stabilizer_of_the_gluing_in_the_product():
     assert len(group) == int(8)
     swap = sage_matrix(SageZZ, 3, 3, [0, 1, 0, 1, 0, 0, 0, 0, 1]).change_ring(SageQQ)
     assert not commutant.is_centralizer_element(P.inverse() * swap * P)
+
+
+def _quaternion_multiplications():
+    r"""Left and right multiplication matrices on the Lipschitz order Z<1, i, j, k> of (-1, -1 / Q)."""
+    from sage.algebras.quatalg.quaternion_algebra import QuaternionAlgebra
+
+    algebra = QuaternionAlgebra(SageQQ, int(-1), int(-1))
+    basis = (algebra.one(), *algebra.gens())
+    coordinates = lambda x: [SageZZ(c) for c in x.coefficient_tuple()]
+    left = lambda q: sage_matrix(SageZZ, [coordinates(q * b) for b in basis]).transpose()
+    right = lambda q: sage_matrix(SageZZ, [coordinates(b * q) for b in basis]).transpose()
+    return basis, left, right
+
+
+def test_definite_quaternion_commutant_has_the_lipschitz_units():
+    r"""B = I_4 on the Lipschitz order, F1, F2 left multiplication by i, j.
+
+    The commutant is right multiplication by the quaternions, a nonsplit algebra. R_q is
+    integral exactly for q Lipschitz, and R_q^t R_q = N(q), so C(Z) = {R_u : N(u) = 1},
+    the eight units +-1, +-i, +-j, +-k.
+    """
+    basis, left, right = _quaternion_multiplications()
+    one = identity_matrix(SageZZ, int(4))
+    commutant = IsometryCommutant(one, [left(basis[int(1)]), left(basis[int(2)])])
+    assert int(commutant.dimension()) == int(4)
+    assert commutant.is_compact()
+    elements = commutant.centralizer_generators()
+    expected = set(right(sign * u).str() for u in basis for sign in (int(1), int(-1)))
+    assert set(g.str() for g in elements) == expected
+
+
+def test_compact_transporter_decides_both_ways():
+    r"""Conjugating by a signed permutation P of I_4 has transporter P. For B' = 2 I_4 and the same
+    F, R_{(1+i)/2} is a rational transporter, but t^t (2 I) t = I has no integral solution
+    since det(2 I) = 16 det(t)^2 != 1."""
+    basis, left, right = _quaternion_multiplications()
+    one = identity_matrix(SageZZ, int(4))
+    sources = [left(basis[int(1)]), left(basis[int(2)])]
+    commutant = IsometryCommutant(one, sources)
+    P = sage_matrix(SageZZ, 4, 4, [0, 1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0, 0, 0, 1])
+    targets = [P * F * P.inverse() for F in sources]
+    witness = commutant.compact_equivariant_transporter(one, targets)
+    assert witness is not None
+    assert witness.transpose() * witness == one
+    assert all(witness * F == T * witness for F, T in zip(sources, targets))
+    half = (basis[int(0)] + basis[int(1)]) / int(2)
+    rational = sage_matrix(SageQQ, [list((b * half).coefficient_tuple()) for b in basis]).transpose()
+    assert rational.transpose() * (2 * one) * rational == one
+    assert all(rational * F == F * rational for F in sources)
+    assert commutant.compact_equivariant_transporter(2 * one, sources) is None
+
+
+def _eichler_level_two_lattice():
+    r"""L = {X in M_2(Z) : X_22 even}, basis E11, E21, E12, 2 E22, with q = -2 det."""
+    frame = [sage_matrix(SageQQ, 2, 2, v) for v in ([1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 2])]
+    coordinates = lambda X: [X[0, 0], X[1, 0], X[0, 1], X[1, 1] / 2]
+    pairing = lambda X, Y: -((X + Y).det() - X.det() - Y.det())
+    gram = sage_matrix(SageZZ, [[pairing(x, y) for y in frame] for x in frame])
+    acting = lambda f: sage_matrix(SageZZ, [coordinates(f(x)) for x in frame]).transpose()
+    return gram, acting
+
+
+def test_nonmaximal_split_commutant_is_gamma_upper_zero_of_two():
+    r"""F1, F2 left multiplication by T = [[1, 1], [0, 1]] and [[1, 0], [2, 1]]. They generate the
+    Eichler order {[[a, b], [2c, d]]}, and L is its module Z^2 + (Z + 2Z). The commutant is right
+    multiplication X -> X h, which preserves L exactly for h = [[a, 2b], [c, d]] integral, and
+    preserves q exactly for det h = 1. So C(Z) is Gamma^0(2), of index 3 in SL_2(Z): its image
+    mod 2 has order 2 and its image mod 3 is all of SL_2(F_3), of order 24. The order of the
+    commutant has index 2 in the maximal order of right multiplications by M_2(Z)."""
+    gram, acting = _eichler_level_two_lattice()
+    upper = sage_matrix(SageQQ, 2, 2, [1, 1, 0, 1])
+    lower = sage_matrix(SageQQ, 2, 2, [1, 0, 2, 1])
+    commutant = IsometryCommutant(gram, [acting(lambda X: upper * X), acting(lambda X: lower * X)])
+    assert int(commutant.dimension()) == int(4)
+    assert not commutant.is_compact()
+    generators = commutant.centralizer_generators()
+    assert all(commutant.is_centralizer_element(g) for g in generators)
+    blocks = [sage_matrix(SageZZ, 2, 2, [g[0, 0], g[2, 0], g[0, 2], g[2, 2]]) for g in generators]
+    assert all(h.det() == 1 and h[0, 1] % 2 == 0 for h in blocks)
+    for g, h in zip(generators, blocks):
+        assert g == acting(lambda X: X * h.change_ring(SageQQ))
+    two, three = SageGF(int(2)), SageGF(int(3))
+    assert len(_closure([h.change_ring(two) for h in blocks], identity_matrix(two, int(2)))) == int(2)
+    assert len(_closure([h.change_ring(three) for h in blocks], identity_matrix(three, int(2)))) == int(24)
+    swap = sage_matrix(SageQQ, 2, 2, [0, -1, 1, 0])
+    assert not commutant.is_centralizer_element(acting(lambda X: X * swap))
