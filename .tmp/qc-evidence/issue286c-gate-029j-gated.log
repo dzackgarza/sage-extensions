@@ -1,0 +1,34 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 0.39 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collected 2 items
+
+tests/lattices/test_unpolarized_enriques_strata.sage ..                  [100%]
+
+========================== test-call performance gate ==========================
+tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_lines: 38.75 s > 20 s
+tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_planes: 22.54 s > 20 s
+============================== slowest durations ===============================
+38.75s call     tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_lines
+22.54s call     tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_planes
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+========================= 2 passed in 61.61s (0:01:01) =========================
+[peakrss] issue286gate: child waited=1 shell_code=1 samples=34
+[peakrss] peak tree RSS      : 693 MiB
+[peakrss] low-water MemAvail : 10007 MiB
+[peakrss] peak single VmHWM  : 693 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      682 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=    64.0s procs=  3 rss=   693 MiB hwm=   693 MiB avail= 10255 MiB
+[peakrss]   t=    62.0s procs=  3 rss=   690 MiB hwm=   690 MiB avail= 10239 MiB
+[peakrss]   t=    60.0s procs=  3 rss=   688 MiB hwm=   688 MiB avail= 10009 MiB
+[peakrss]   t=    58.0s procs=  3 rss=   685 MiB hwm=   685 MiB avail= 10338 MiB
+[peakrss]   t=    56.0s procs=  3 rss=   683 MiB hwm=   684 MiB avail= 10345 MiB
+launcher exit: 1

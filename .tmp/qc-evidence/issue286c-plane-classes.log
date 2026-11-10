@@ -1,0 +1,40 @@
+[12:43:33] E8 shells (positive block norms): {2: 240, 4: 2160, 6: 6720} in 0.4 s
+[12:43:33] === k = 1
+[12:43:35]   quotient genus of E8(-2)^2 + <-2>: mass 2499347/9440684171518279680000
+[12:43:35]   (t=0, n1=0, n2=0, alpha=1, beta=0): NEW class det -2 |Aut| 1941728542064640000; mass 1/1941728542064640000 of 2499347/9440684171518279680000 [0.36 s]
+[12:43:54]   (t=1, n1=2, n2=4, alpha=-2, beta=-2): NEW class det -2 |Aut| 5393690394624000; mass 361/1941728542064640000 of 2499347/9440684171518279680000 [0.92 s]
+[12:44:07]   (t=0, n1=4, n2=4, alpha=-2, beta=-2): NEW class det -2 |Aut| 1371195958099968000; mass 103651/555334363030487040000 of 2499347/9440684171518279680000 [1.03 s]
+[12:44:48]   k = 1: 3 classes; 1132 isotropic candidates of 1132 shapes, 103 distinct reduced grams
+[12:44:48]   mass found 103651/555334363030487040000 against 2499347/9440684171518279680000; equal False
+[12:44:48]    class |Aut| 1941728542064640000 det -2 shape (0, 0, 0, 1, 0)
+[12:44:48]    class |Aut| 5393690394624000 det -2 shape (1, 2, 4, -2, -2)
+[12:44:48]    class |Aut| 1371195958099968000 det -2 shape (0, 4, 4, -2, -2)
+[12:44:48] === k = 2
+[12:44:48]   quotient genus of E8(-2)^2 + <-4>: mass 642332179/18881368343036559360000
+[12:44:51]   (t=0, n1=0, n2=0, alpha=1, beta=0): NEW class det -4 |Aut| 1941728542064640000; mass 1/1941728542064640000 of 642332179/18881368343036559360000 [3.32 s]
+[12:45:25]   (t=1, n1=0, n2=4, alpha=-2, beta=-2): NEW class det -4 |Aut| 129448569470976000; mass 1/121358033879040000 of 642332179/18881368343036559360000 [0.06 s]
+[12:46:21]   (t=1, n1=2, n2=2, alpha=-2, beta=-2): NEW class det -4 |Aut| 809053559193600; mass 151/121358033879040000 of 642332179/18881368343036559360000 [0.41 s]
+[12:48:31]   (t=0, n1=4, n2=4, alpha=-2, beta=-2): NEW class det -4 |Aut| 1371195958099968000; mass 691381/555334363030487040000 of 642332179/18881368343036559360000 [1.38 s]
+[12:48:37]   (t=1, n1=4, n2=4, alpha=-3, beta=-2): NEW class det -4 |Aut| 106542032486400; mass 5903731/555334363030487040000 of 642332179/18881368343036559360000 [0.25 s]
+[12:49:48]   k = 2: 5 classes; 1200 isotropic candidates of 1201 shapes, 121 distinct reduced grams
+[12:49:48]   mass found 5903731/555334363030487040000 against 642332179/18881368343036559360000; equal False
+[12:49:48]    class |Aut| 1941728542064640000 det -4 shape (0, 0, 0, 1, 0)
+[12:49:48]    class |Aut| 129448569470976000 det -4 shape (1, 0, 4, -2, -2)
+[12:49:48]    class |Aut| 809053559193600 det -4 shape (1, 2, 2, -2, -2)
+[12:49:48]    class |Aut| 1371195958099968000 det -4 shape (0, 4, 4, -2, -2)
+[12:49:48]    class |Aut| 106542032486400 det -4 shape (1, 4, 4, -3, -2)
+[12:49:48] total 376.0 s
+[peakrss] issue286planes: child waited=0 shell_code=0 samples=189
+[peakrss] peak tree RSS      : 809 MiB
+[peakrss] low-water MemAvail : 7116 MiB
+[peakrss] peak single VmHWM  : 809 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      798 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   298.2s procs=  3 rss=   809 MiB hwm=   809 MiB avail=  7553 MiB
+[peakrss]   t=   300.2s procs=  3 rss=   809 MiB hwm=   809 MiB avail=  7411 MiB
+[peakrss]   t=   302.2s procs=  3 rss=   809 MiB hwm=   809 MiB avail=  8800 MiB
+[peakrss]   t=   304.2s procs=  3 rss=   809 MiB hwm=   809 MiB avail=  8840 MiB
+[peakrss]   t=   306.2s procs=  3 rss=   809 MiB hwm=   809 MiB avail=  8887 MiB
+launcher exit: 0
