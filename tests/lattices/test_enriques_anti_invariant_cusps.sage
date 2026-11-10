@@ -22,8 +22,9 @@ def test_the_enriques_period_lattice_has_two_isotropic_line_orbits_and_two_isotr
     modulo O(T_En) (H. Sterk, *Compactifications of the period space of
     Enriques surfaces, Part I*, Math. Z. 207 (1991), Propositions 4.5 (p. 28)
     and 4.6 (p. 29); D. Dutour Sikiri'c and K. Hulek, arXiv:2302.01679,
-    Section 3.6, p. 22).  The count is read from the card by tag and compared
-    with the same public call the ``029J`` test of #286 uses."""
+    Section 3.6, p. 22).  The test names the tag and pins its value, comparing
+    the pinned counts with the ambient public call ``Aut()`` of #286's 029J
+    test (the rank-2 branch ``v^\perp/Zv``)."""
     lattice = NamedLattices.TEn
     lines = lattice.Aut().isotropic_orbit_representatives(1)
     assert lines.cardinality() == cardinal(2)
