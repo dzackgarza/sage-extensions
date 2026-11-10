@@ -23,3 +23,4 @@ def test_rank_three_null_stabilizer_realizes_both_discriminant_automorphisms():
     image = space.stabilizer_discriminant_image()
     assert image.cardinality() == cardinal(2)
     assert rho(witness) in image
+

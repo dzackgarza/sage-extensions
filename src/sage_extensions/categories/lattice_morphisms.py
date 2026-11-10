@@ -3472,6 +3472,53 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
 
         return arithmetic_centralizer(self, isometry)
 
+    def _normalizer_construction(self, subgroup):
+        r"""Realization of the groups' normalizer hook for a finite subgroup of ``O(L)``, ``L`` indefinite.
+
+        Implementer side of ``OwnedGroups.ParentMethods._normalizer_construction``
+        (``OWN-05``).  Reduction modulo 3 is injective on finite subgroups of
+        ``GL_n(ZZ)`` (Minkowski), so a subgroup whose closure exceeds
+        ``|GL_n(F_3)|`` elements is infinite and selects the general route.
+        The generators of ``N(H)`` come from the twisted transporters of
+        ``sage-indefinite-port`` (#50).
+        """
+        lattice = self.lattice()
+        if lattice.is_definite() or subgroup is self or not subgroup.has_selected_finite_group_generating_set():
+            return None
+        from sage.groups.matrix_gps.linear import GL
+        from sage.rings.finite_rings.finite_field_constructor import GF
+        from sage_indefinite_port.indefinite.finite_normalizers import FiniteSubgroupNormalizer
+
+        generators = tuple(subgroup.group_generators())
+        framing = tuple(lattice.module_generators())
+        bound = int(GL(len(framing), GF(3)).order())
+        key = lambda g: tuple(str(g(x)) for x in framing)
+        elements = {key(self.one()): self.one()}
+        frontier = [self.one()]
+        while frontier:
+            current = frontier.pop()
+            for generator in generators:
+                following = current * generator
+                if key(following) not in elements:
+                    elements[key(following)] = following
+                    frontier.append(following)
+            if len(elements) > bound:
+                return None
+
+        def normalizes(automorphism):
+            inverse = automorphism.inverse()
+            return all(key(automorphism * generator * inverse) in elements for generator in generators)
+
+        normalizer = StabilizerSubgroups(self)(
+            subgroup,
+            self.subgroup_conjugation_g_set().action_functor(),
+            normalizes,
+            description=f"normalizer of {subgroup} in {self}",
+        )
+        return normalizer.select_group_generators(
+            lambda: finite_ordered_set(FiniteSubgroupNormalizer(lattice, generators).normalizer_generators())
+        )
+
     def intersection(self, *subgroups):
         r"""Return the intersection of represented subgroups of this orthogonal group."""
         return IntersectionSubgroups(self)(subgroups)
@@ -3638,6 +3685,8 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         assert embedding.codomain() is lattice, (
             f"{embedding} does not embed into {lattice}, so its image has no stabilizer in O({lattice}); its codomain is {embedding.codomain()}"
         )
+        from sage_indefinite_port.indefinite.pairing_slices import pointwise_transporter
+
         source = embedding.domain()
         embedded = tuple(embedding(generator) for generator in source.module_generators())
         stabilizer = StabilizerSubgroups(self)(
@@ -3645,6 +3694,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             self.natural_module_action_functor(),
             lambda automorphism: all(automorphism(vector) == vector for vector in embedded),
             description=f"g fixes {embedding} pointwise",
+            vector_witness=lambda left, right: pointwise_transporter(lattice, embedded, left, right),
         )
         category = CosliceCategory(lattice.lattice_category(), source)
         marked = category.object(embedding)
@@ -3670,6 +3720,8 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         assert embedding.codomain() is lattice, (
             f"{embedding} does not embed into {lattice}, so its image has no stabilizer in O({lattice}); its codomain is {embedding.codomain()}"
         )
+        from sage_indefinite_port.indefinite.pairing_slices import setwise_transporter
+
         source = embedding.domain()
         embedded = tuple(embedding(generator) for generator in source.module_generators())
 
@@ -3682,6 +3734,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             self.natural_module_action_functor(),
             preserves_image,
             description=f"g(im({embedding}))=im({embedding})",
+            vector_witness=lambda left, right: setwise_transporter(lattice, embedded, left, right),
         )
         from sage_extensions.categories.abstract_categories.products import (
             FiniteOrdinalCategory,

@@ -944,8 +944,12 @@ class StabilizerSubgroups(_PredicateSubgroupConstruction):
         description=None,
         generating_morphism=None,
         basis_change=None,
+        vector_witness=None,
     ):
         r"""Construct the stabilizer retaining the stabilized object and action.
+
+        ``vector_witness(left, right)`` is the action owner's exact decision of
+        vector equivalence under this stabilizer, when it supplies one.
 
         ``generating_morphism`` is the action owner's free generating
         morphism onto the stabilizer, when its action supplies one.
@@ -973,6 +977,7 @@ class StabilizerSubgroups(_PredicateSubgroupConstruction):
             stabilizer_action=action,
             generating_morphism=generating_morphism,
             basis_change=basis_change,
+            vector_witness=vector_witness,
         )
 
     @classmethod
@@ -980,11 +985,16 @@ class StabilizerSubgroups(_PredicateSubgroupConstruction):
         return "stabilizer subgroups"
 
     class ParentMethods:
-        def __init__(self, stabilized_object, stabilizer_action, basis_change=None, **rest) -> None:
+        def __init__(self, stabilized_object, stabilizer_action, basis_change=None, vector_witness=None, **rest) -> None:
             self._stabilized_object = stabilized_object
             self._stabilizer_action = stabilizer_action
             self._basis_change = basis_change
+            self._vector_witness = vector_witness
             super().__init__(**rest)
+
+        def owned_vector_witness(self):
+            r"""The action owner's exact vector decision for this stabilizer, or ``None``."""
+            return self._vector_witness
 
         def basis_change(self):
             r"""The automorphism ``P`` the generators were computed through: ``P(e_j) = b_j``, ``b`` adapted to the stabilized flag."""
