@@ -40,3 +40,17 @@ def test_gamma_three_splits_the_two_null_lines_of_the_hyperbolic_plane():
     first, second = orbits[0], orbits[1]
     assert arrows.Core().Mor(first, second).an_element_in(gamma) is None
     assert arrows.Core().Mor(first, first).an_element_in(gamma) is not None
+
+def test_gamma_two_splits_null_lines_of_two_hyperbolic_planes_into_nine_orbits():
+    r"""O(2U) maps onto O+(4, 2) modulo two, and -1 is trivial there, so the Gamma(2)-orbits of primitive
+    null lines are the (2 + 1)^2 = 9 singular points of the hyperbolic quadric over F_2."""
+    hyperbolic = Lattices(ZZ)("U")
+    ambient = hyperbolic + hyperbolic
+    group = ambient.O()
+    gamma = group.congruence_preimage(2)
+    e, _f, _u, _v = tuple(ambient.module_generators())
+    arrows = Cat().Mor(FiniteOrdinalCategory(2), Lattices(ZZ))
+    marked = arrows.object(ambient.primitive_isotropic_subobject(e).inclusion())
+    orbits = tuple(group.split_orbit(marked, gamma))
+    assert len(orbits) == 9
+    assert arrows.Core().Mor(orbits[0], orbits[1]).an_element_in(gamma) is None
