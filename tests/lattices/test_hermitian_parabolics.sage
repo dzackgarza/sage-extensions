@@ -252,3 +252,172 @@ def test_flag_levi_on_a_split_rank_two_frame():
     assert any(a[int(0), int(1)] != zero for a, _u in generators)
     units = set(field.roots_of_unity())
     assert all(a[int(0), int(0)] in units and a[int(1), int(1)] in units for a, _u in generators)
+
+
+def _assert_unitary_integral(lattice, g):
+    form = lattice.gram_matrix().transpose()
+    assert g.conjugate_transpose() * form * g == form
+    assert all(entry.is_integral() for entry in g.list())
+    assert all(entry.is_integral() for entry in (~g).list())
+
+
+def _vector(field, *entries):
+    return sage_matrix(field, len(entries), int(1), [field(int(x)) if isinstance(x, int) else x for x in entries])
+
+
+def test_transporter_carries_the_standard_line_to_the_opposite_line():
+    r"""On Z[i]^3 with J = antidiag(1,1,1), the permutation e1 <-> e3 is integral unitary, so a transporter exists."""
+    field, i, lattice, middle = _gaussian()
+    one, zero = field.one(), field.zero()
+    g = lattice.isotropic_transporter([[one, zero, zero]], [[zero, zero, one]])
+    _assert_unitary_integral(lattice, g)
+    image = g * _vector(field, one, zero, zero)
+    assert image[0, 0] == zero and image[1, 0] == zero and image[2, 0] in [i**int(k) for k in range(int(4))]
+
+
+def test_transporter_to_a_translated_null_vector():
+    r"""n(1+i, 0) sends e3 to (-1, 1+i, 1), integral since N(1+i)/2 = 1, so the based transporter exists."""
+    field, i, lattice, middle = _gaussian()
+    one, zero = field.one(), field.zero()
+    target = [-one, one + i, one]
+    based = lattice.isotropic_transporter([[zero, zero, one]], [target], based=True)
+    _assert_unitary_integral(lattice, based)
+    assert based * _vector(field, zero, zero, one) == _vector(field, *target)
+    setwise = lattice.isotropic_transporter([[zero, zero, one]], [target])
+    _assert_unitary_integral(lattice, setwise)
+    assert setwise * _vector(field, zero, zero, one) in [i**int(k) * _vector(field, *target) for k in range(int(4))]
+
+
+def test_transporter_on_the_eisenstein_antidiagonal_lattice():
+    r"""On Z[omega]^3 with J = antidiag(1,1,1), the permutation e1 <-> e3 is integral unitary."""
+    field = SageCyclotomicField(int(3))
+    one, zero = field.one(), field.zero()
+    lattice = HermitianLattice((one, field.gen()), sage_matrix(field, int(3), int(3), [zero, zero, one, zero, one, zero, one, zero, zero]))
+    g = lattice.isotropic_transporter([[one, zero, zero]], [[zero, zero, one]])
+    _assert_unitary_integral(lattice, g)
+    assert g * _vector(field, one, zero, zero) in [unit * _vector(field, zero, zero, one) for unit in field.roots_of_unity()]
+
+
+def test_no_transporter_between_lines_of_different_pairing_ideals():
+    r"""Basis b1, b2, b3 with h(b1,b2) = p = 1+i, h(b1,b3) = 1, h(b2,b3) = p, h(b3,b3) = 1, det = -2.
+
+    b1 and b2 are primitive and null. The ideal h(b, L) is an isometry invariant of the line of a
+    primitive b: h(b1, L) = (1) contains h(b1,b3) = 1, and h(b2, L) = (p). So no isometry
+    carries one line to the other, while the identity carries b1 to itself.
+    """
+    field = SageCyclotomicField(int(4))
+    i = field.gen()
+    one, zero = field.one(), field.zero()
+    p = one + i
+    gram = sage_matrix(field, int(3), int(3), [zero, p, one, p.conjugate(), zero, p, one, p.conjugate(), one])
+    lattice = HermitianLattice((one, i), gram)
+    first, second = [one, zero, zero], [zero, one, zero]
+    assert lattice.isotropic_transporter([first], [second]) is None
+    assert lattice.isotropic_transporter([first], [second], based=True) is None
+    _assert_unitary_integral(lattice, lattice.isotropic_transporter([first], [first]))
+
+
+def _split_rank_two():
+    field = SageCyclotomicField(int(4))
+    zero, one = field.zero(), field.one()
+    J = sage_matrix(field, int(5), int(5), [zero, zero, zero, one, zero, zero, zero, zero, zero, one, zero, zero, one, zero, zero, one, zero, zero, zero, zero, zero, one, zero, zero, zero])
+    lattice = HermitianLattice((one, field.gen()), J)
+    return field, lattice, HermitianWittFrame(lattice, J.parent().identity_matrix(), sage_matrix(field, int(1), int(1), [one]), int(2))
+
+
+def test_transporter_of_rank_two_sublattices_and_flags():
+    r"""On the split Z[i]^5, swapping e1 <-> e4 fixes e2 and carries <e1, e2> to <e4, e2> and the flag e1 < <e1, e2> to e4 < <e4, e2>."""
+    field, lattice, _ = _split_rank_two()
+    one, zero = field.one(), field.zero()
+    e = lambda k: [one if j == int(k) else zero for j in range(int(5))]
+    source, target = [e(0), e(1)], [e(3), e(1)]
+    g = lattice.isotropic_transporter(source, target)
+    _assert_unitary_integral(lattice, g)
+    image = g * sage_matrix(field, source).transpose()
+    assert all(image[row, column] == zero for row in (int(0), int(2), int(4)) for column in range(int(2)))
+    assert image[[int(3), int(1)], :].det() in [field.gen()**int(k) for k in range(int(4))]
+    flag = lattice.isotropic_transporter(source, target, blocks=(int(1), int(1)))
+    _assert_unitary_integral(lattice, flag)
+    first = flag * _vector(field, *source[0])
+    assert all(first[row, 0] == zero for row in range(int(5)) if row != int(3))
+    assert first[int(3), 0].norm() == one
+
+
+def test_induced_action_on_the_diagonal_lattice():
+    r"""On diag(1,1,-1) with v = (1,0,1): diag(-1,1,-1) sends v to -v and fixes e2, so (A,U) = (-1, 1); diag(1,-1,1) gives (1, -1)."""
+    field = SageCyclotomicField(int(4))
+    i = field.gen()
+    one, zero = field.one(), field.zero()
+    lattice = HermitianLattice((one, i), sage_matrix(field, int(3), int(3), [one, zero, zero, zero, one, zero, zero, zero, -one]))
+    frame = lattice.witt_frame([[one, zero, one]])
+    negate_line = sage_matrix(field, int(3), int(3), [-one, zero, zero, zero, one, zero, zero, zero, -one])
+    negate_middle = sage_matrix(field, int(3), int(3), [one, zero, zero, zero, -one, zero, zero, zero, one])
+    singleton = lambda value: sage_matrix(field, int(1), int(1), [value])
+    assert frame.induced_action(negate_line) == (singleton(-one), singleton(one))
+    assert frame.induced_action(negate_middle) == (singleton(one), singleton(-one))
+    assert frame.induced_action(negate_line * negate_middle) == (singleton(-one), singleton(-one))
+
+
+def test_induced_action_of_witt_coordinates_on_the_gaussian_frame():
+    r"""On Z[i]^3 with J: diag(1,i,1) acts by i on I^perp/I and 1 on I; n(1+i,i) acts trivially on both."""
+    field, i, lattice, middle = _gaussian()
+    frame = _frame(field, lattice, middle, field.one(), field.one())
+    one, zero = field.one(), field.zero()
+    twist = sage_matrix(field, int(3), int(3), [one, zero, zero, zero, i, zero, zero, zero, one])
+    singleton = lambda value: sage_matrix(field, int(1), int(1), [value])
+    assert frame.induced_action(twist) == (singleton(one), singleton(i))
+    assert frame.induced_action(frame.unipotent(*_parameters(field, one + i, i))) == (singleton(one), singleton(one))
+
+
+def test_flag_stabilizers_based_and_setwise_on_the_split_frame():
+    r"""Split Z[i]^5, flag <e1> < <e1,e2>. Pointwise: A = 1, and all four of U(1) lift.
+
+    Setwise: A is upper triangular with unit diagonal and some A has a nonzero (1,2) entry.
+    Every unipotent n(Z,T) fixes e1 and e2, so it lies in both.
+    """
+    field, lattice, frame = _split_rank_two()
+    one, zero = field.one(), field.zero()
+    e1, e2 = _vector(field, one, zero, zero, zero, zero), _vector(field, zero, one, zero, zero, zero)
+    assert len(frame.pointwise_levi_image()) == int(4)
+    pointwise = frame.stabilizer_generators(True, (int(1), int(1)))
+    for g in pointwise:
+        _assert_unitary_integral(lattice, g)
+        assert g * e1 == e1 and g * e2 == e2
+    assert {frame.induced_action(g)[1][0, 0] for g in pointwise} == {field.gen()**int(k) for k in range(int(4))}
+    units = [field.gen()**int(k) for k in range(int(4))]
+    setwise = frame.stabilizer_generators(False, (int(1), int(1)))
+    actions = [frame.induced_action(g)[0] for g in setwise]
+    assert all(A[1, 0] == zero and A[0, 0] in units and A[1, 1] in units for A in actions)
+    assert any(A[0, 1] != zero for A in actions)
+    for g in setwise:
+        _assert_unitary_integral(lattice, g)
+
+
+def _glued_eisenstein():
+    field = SageCyclotomicField(int(3))
+    omega = field.gen()
+    theta = omega - omega.conjugate()
+    middle = field(int(9))
+    zero, one = field.zero(), field.one()
+    witt = sage_matrix(field, int(3), int(3), [zero, zero, one, zero, middle, zero, one, zero, zero])
+    basis = sage_matrix(field, int(3), int(3), [one, theta**int(-1), zero, zero, theta**int(-1), zero, zero, zero, theta])
+    gram = basis.conjugate_transpose() * witt * basis
+    lattice = HermitianLattice((one, omega), gram.transpose())
+    return field, theta, lattice, HermitianWittFrame(lattice, ~basis, sage_matrix(field, int(1), int(1), [middle]), int(1))
+
+
+def test_setwise_line_stabilizer_of_the_glued_lattice_induces_the_hand_levi_image():
+    r"""A pair lifts iff a = u mod theta, so the generators induce exactly 18 of the 36 unit pairs."""
+    field, theta, lattice, frame = _glued_eisenstein()
+    generators = frame.stabilizer_generators(False, (int(1),))
+    pairs = {tuple(a[0, 0] for a in frame.induced_action(g)) for g in generators}
+    assert all(((a - u) / theta).is_integral() for a, u in pairs)
+    known, frontier = {(field.one(), field.one())}, [(field.one(), field.one())]
+    while frontier:
+        a, u = frontier.pop()
+        for g, h in pairs:
+            image = (a * g, u * h)
+            if image not in known:
+                known.add(image)
+                frontier.append(image)
+    assert len(known) == int(18)

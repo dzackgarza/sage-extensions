@@ -158,6 +158,13 @@ class HermitianLattice(SageObject):
         frame = V.augment(M).augment(W)
         return HermitianWittFrame(self, frame, _star(M) * form * M, k)
 
+    def isotropic_transporter(self, source, target, blocks=None, based=False):
+        r"""Return ``g`` in ``U(O^n, h)`` carrying one primitive isotropic sublattice to another, or ``None``.
+
+        ``source`` and ``target`` list ``O``-bases, see :meth:`HermitianWittFrame.transporter_to`.
+        """
+        return self.witt_frame(source).transporter_to(self.witt_frame(target), blocks, based)
+
     def definite_scaling(self):
         r"""Return a real ``alpha`` in the order with ``Tr(alpha h)`` positive definite.
 
@@ -505,22 +512,47 @@ class HermitianWittFrame(SageObject):
             for row in echelon[: echelon.rank()].rows()
         )
 
-    def quotient_unitary_elements(self):
-        r"""Return every element of ``U(I^perp / I)`` for a definite trace form on the quotient."""
-        from sage.quadratic_forms.quadratic_form import QuadraticForm
-
+    def _quotient_trace_gram(self):
         basis = self.quotient_lattice_basis()
         gram = matrix(SageQQ, [[(left.conjugate() * self._middle * right).trace() for right in basis] for left in basis])
+        return matrix(self._field, basis).transpose(), gram
+
+    def quotient_unitary_elements(self):
+        r"""Return every element of ``U(I^perp / I)`` for a definite trace form on the quotient."""
+        return self.quotient_isometries_to(self)
+
+    def quotient_isometries_to(self, other):
+        r"""Return every ``O``-linear isometry ``I^perp / I -> I'^perp / I'`` in middle coordinates.
+
+        The trace forms must be definite. Trace isometries are a coset of the finite orthogonal
+        group of the source; ``O``-linear ones preserve ``h`` because ``Tr(alpha h) = 0`` for
+        all ``alpha`` forces ``h = 0``.
+        """
+        from sage.quadratic_forms.quadratic_form import QuadraticForm
+
+        if self._m == 0:
+            return (matrix(self._field, 0, 0),)
+        columns, gram = self._quotient_trace_gram()
+        target_columns, target_gram = other._quotient_trace_gram()
+        if gram[0, 0] * target_gram[0, 0] < 0:
+            return ()
         if gram[0, 0] < 0:
-            gram = -gram
-        if not gram.is_positive_definite():
+            gram, target_gram = -gram, -target_gram
+        if not gram.is_positive_definite() or not target_gram.is_positive_definite():
             raise ValueError("the trace form of the quotient is indefinite, so its unitary group is infinite in general")
-        columns = matrix(self._field, basis).transpose()
+        scale = 2 * lcm([gram.denominator(), target_gram.denominator()])
+        form = QuadraticForm((scale * gram).change_ring(SageZZ))
+        target_form = QuadraticForm((scale * target_gram).change_ring(SageZZ))
+        witness = target_form.is_globally_equivalent_to(form, return_matrix=True)
+        if witness is False:
+            return ()
+        if witness.transpose() * target_gram * witness != gram:
+            raise ArithmeticError("the equivalence of quadratic forms does not carry the target form to the source form")
         pivots = list(columns.pivots())
         chart_inverse = ~columns[:, pivots]
         elements = []
-        for automorphism in QuadraticForm((2 * gram.denominator() * gram).change_ring(SageZZ)).automorphisms():
-            image = columns * automorphism.change_ring(self._field)
+        for automorphism in form.automorphisms():
+            image = target_columns * (witness * automorphism).change_ring(self._field)
             candidate = image[:, pivots] * chart_inverse
             if candidate * columns == image:
                 elements.append(candidate)
@@ -540,18 +572,54 @@ class HermitianWittFrame(SageObject):
         return self.liftable_levi_image(self.levi_candidates())
 
     def pointwise_levi_image(self):
-        r"""Return the pairs of :meth:`levi_image` with ``A`` the identity."""
+        r"""Return the liftable pairs with ``A`` the identity, which fix ``I`` pointwise."""
         identity = matrix.identity(self._field, self._k)
-        return tuple(pair for pair in self.levi_image() if pair[0] == identity)
+        return tuple((identity, U) for U in self.quotient_unitary_elements() if self.levi_lift(identity, U) is not None)
 
-    def stabilizer_generators(self, pointwise):
-        r"""Return matrices on ``O^n`` generating the line stabilizer, as a kernel plus exact Levi lifts."""
+    def _require_isotropic_basis(self):
+        r"""Require the first ``k`` columns to be an ``O``-basis of a primitive sublattice.
+
+        Only then is the group induced on ``I`` equal to ``GL_k(O)`` in the frame coordinates.
+        """
+        rows = [
+            [value for entry in scalar * self._frame.column(column) for value in self._order_coordinates(matrix(self._field, [[entry]]))]
+            for column in range(self._k) for scalar in self._lattice.order_basis()
+        ]
+        if any(value not in SageZZ for row in rows for value in row):
+            raise ValueError("the isotropic columns of the frame do not lie in the lattice")
+        if any(divisor != 1 for divisor in matrix(SageZZ, rows).elementary_divisors()):
+            raise ValueError("the isotropic columns of the frame are not a basis of a primitive sublattice")
+
+    def stabilizer_generators(self, pointwise, blocks=None):
+        r"""Return matrices on ``O^n`` generating the stabilizer of ``I`` or of a flag ending in ``I``.
+
+        Every ``n(Z,T)`` is the identity on ``I``, so the integral unipotent kernel lies in the
+        stabilizer of each flag in ``I``. The stabilizer is therefore generated by this kernel
+        and exact lifts of generators of its Levi image.
+
+        With ``pointwise``, the frame columns of ``I`` are fixed and ``A`` is the identity.
+        Otherwise the flag is preserved setwise: ``A`` lies in the block upper triangular
+        subgroup of ``GL_k(O)`` for ``blocks``, which is all of ``GL_k(O)`` when ``blocks`` is ``None``.
+        """
+        self._require_isotropic_basis()
         generators, centre = self.integral_unipotent_kernel()
         kernel = [self.in_lattice(self.unipotent(*parameters)) for parameters in (*generators, *centre)]
-        lifts = []
-        for A, U in self.pointwise_levi_image() if pointwise else self.levi_image():
-            lifts.append(self.in_lattice(self.levi(A, U) * self.unipotent(*self.levi_lift(A, U))))
+        pairs = self.pointwise_levi_image() if pointwise else self.levi_image_schreier(blocks)[1]
+        lifts = [self.in_lattice(self.levi(A, U) * self.unipotent(*self.levi_lift(A, U))) for A, U in pairs]
         return (*kernel, *lifts)
+
+    def induced_action(self, g):
+        r"""Return ``(A, U)``, the action of ``g`` on ``I`` and on ``I^perp / I``, in frame coordinates.
+
+        ``g`` is a matrix on ``O^n`` acting on column coordinates; it must be integral, unitary and stabilize ``I``.
+        """
+        form = self._lattice.gram_matrix().transpose()
+        if not self._integral(g) or not self._integral(~g) or _star(g) * form * g != form:
+            raise ValueError("the matrix is not an integral unitary automorphism of the lattice")
+        witt = ~self._frame * g * self._frame
+        if witt[self._k :, : self._k] != 0:
+            raise ValueError("the matrix does not stabilize the isotropic sublattice of the frame")
+        return witt[: self._k, : self._k], witt[self._k : self._k + self._m, self._k : self._k + self._m]
 
     def general_linear_generators(self, blocks=None):
         r"""Return generators of ``GL_k(O)``, or of its block upper triangular subgroup.
@@ -563,6 +631,9 @@ class HermitianWittFrame(SageObject):
         """
         if self._field.degree() != 2 or self._field.discriminant() not in (-3, -4, -7, -8, -11):
             raise ValueError("general_linear_generators requires a norm-Euclidean imaginary quadratic field")
+        maximal = matrix(SageQQ, [list(element.vector()) for element in self._field.maximal_order().basis()])
+        if self._lattice._basis_matrix.det().abs() != maximal.det().abs():
+            raise ValueError("general_linear_generators requires the maximal order")
         identity = matrix.identity(self._field, self._k)
         generators = []
         blocks = (self._k,) if blocks is None else tuple(blocks)
@@ -583,10 +654,8 @@ class HermitianWittFrame(SageObject):
                 generators.append(diagonal)
         return tuple(generators)
 
-    def levi_image_schreier(self, blocks=None):
-        r"""Return ``(index, generators)`` of the liftable subgroup of ``GL_k(O) x U(K)``.
-
-        With ``blocks``, the source group is the block upper triangular subgroup of a flag.
+    def _levi_cosets(self, blocks):
+        r"""Return right coset representatives of the liftable subgroup, and its Schreier generators.
 
         The liftable pairs form a subgroup of finite index, since a congruence subgroup lifts.
         Right cosets are enumerated by the lifting decision and generators are Schreier elements.
@@ -609,14 +678,71 @@ class HermitianWittFrame(SageObject):
                         break
                 else:
                     representatives.append((product_a, product_u))
-        return len(representatives), tuple(generators)
+        return tuple(representatives), tuple(generators)
+
+    def levi_image_schreier(self, blocks=None):
+        r"""Return ``(index, generators)`` of the liftable subgroup of ``GL_k(O) x U(K)``.
+
+        With ``blocks``, the source group is the block upper triangular subgroup of a flag.
+        """
+        representatives, generators = self._levi_cosets(blocks)
+        return len(representatives), generators
 
     def levi_lift(self, A, U):
         r"""Return parameters ``(Z,T)`` with ``l(A,U) n(Z,T)`` integral on ``O^n``, or ``None``."""
-        left = self.in_lattice(self.levi(A, U))
+        return self._lift_to(self, A, U)
+
+    def _lift_to(self, other, A, U):
+        r"""Return ``(Z,T)`` with ``F' diag(A, U, A^{-*}) n(Z,T) F^{-1}`` integral, or ``None``."""
+        left = other._frame * self._blocks(((0, 0), A), ((1, 1), U), ((2, 2), ~_star(A))) * ~self._frame
         for _, parameters in self._admissible(left):
             return parameters
         return None
+
+    def transporter_to(self, other, blocks=None, based=False):
+        r"""Return ``g`` in ``U(O^n, h)`` carrying this frame's sublattice ``I`` to that of ``other``, or ``None``.
+
+        Both frames lie on one lattice and their first ``k`` columns are ``O``-bases of
+        primitive sublattices. Each isometry has the form ``F' l(A,U) n(Z,T) F^{-1}`` with
+        ``A`` in ``GL_k(O)``, or block upper triangular for a flag, and ``U`` an isometry of the quotients.
+        With ``based``, ``A`` is the identity, so ``g`` matches the two bases.
+
+        ``None`` is a proof: pairs that lift form one coset of the liftable subgroup ``S``.
+        Each candidate is ``(1, U_0) r^{-1}`` for a representative ``r`` of the right cosets
+        of ``S``, and these meet every coset of ``S``, so an empty result means no pair lifts.
+        Unequal ranks admit no isometry.
+        """
+        lattice = self._lattice
+        if lattice.gram_matrix() != other._lattice.gram_matrix() or lattice.order_basis() != other._lattice.order_basis():
+            raise ValueError("the frames must lie on one Hermitian lattice")
+        if self._k != other._k:
+            return None
+        self._require_isotropic_basis()
+        other._require_isotropic_basis()
+        isometries = self.quotient_isometries_to(other)
+        if not isometries:
+            return None
+        if based:
+            identity = matrix.identity(self._field, self._k)
+            candidates = [(identity, U) for U in isometries]
+        else:
+            representatives, _ = self._levi_cosets(blocks)
+            candidates = [(~a, isometries[0] * ~u) for a, u in representatives]
+        for A, U in candidates:
+            parameters = self._lift_to(other, A, U)
+            if parameters is not None:
+                return self._verified_transporter(other, A, U, parameters)
+        return None
+
+    def _verified_transporter(self, other, A, U, parameters):
+        witt = self._blocks(((0, 0), A), ((1, 1), U), ((2, 2), ~_star(A))) * self.unipotent(*parameters)
+        g = other._frame * witt * ~self._frame
+        form = self._lattice.gram_matrix().transpose()
+        if not self._integral(g) or not self._integral(~g) or _star(g) * form * g != form:
+            raise ArithmeticError("the transporter is not an integral unitary automorphism")
+        if (~other._frame * g * self._frame)[self._k :, : self._k] != 0:
+            raise ArithmeticError("the transporter does not carry the isotropic sublattice to its target")
+        return g
 
     def liftable_levi_image(self, pairs):
         r"""Return those ``(A, U)`` in ``pairs`` with an integral lift."""
