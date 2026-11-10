@@ -3956,6 +3956,16 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                 return automorphism
         return None
 
+    def vector_orbit_set(self, square, subgroup=None):
+        r"""Return the orbit set of ``subgroup`` (default ``O(L)``) on primitive vectors of ``square``.
+
+        The set may be infinite. It iterates one vector per orbit by height, with exact
+        equivalence and transporters, and makes no finiteness claim (#53).
+        """
+        from sage_indefinite_port.indefinite.pairing_slices import SubgroupVectorOrbits
+
+        return SubgroupVectorOrbits(self.domain(), self if subgroup is None else subgroup, square)
+
     def vectors_are_equivalent(self, left, right) -> bool:
         r"""Return whether two vectors lie in the same ``O(L)``-orbit."""
         return self.vector_equivalence_witness(left, right) is not None
