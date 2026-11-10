@@ -3812,3 +3812,64 @@ the same mathematics: that method's own hypothesis
 makes `rho(Gamma) \ O(q) / Stab(c)` the `rho(Gamma)`-orbits on the isotropic classes of
 `A_{T_En}` up to sign — 265 pairs, enumerated by `covering_discriminant_classes(0)` and
 acted on by `discriminant_generator_lifts()`.
+
+### Eichler's criterion does not transfer to an enlargement, and the line-stabilizer image refuses without its hypothesis (2026-11-10, #315)
+
+`OrthogonalCharacterQuotient.isotropic_line_stabilizer_image` may return a class set only
+where Eichler's criterion applies to `L` itself: two orthogonal hyperbolic planes in `L`
+(Gritsenko--Hulek--Sankaran, Lemma 7.8, p. 503).  Commit `82715b7c94` deleted that refusal
+with a "sandwich" -- apply the criterion on `L + U`, which has the same discriminant group
+-- and the argument is false: the criterion classifies `\widetilde{SO}(L + U)`-orbits on
+`L + U`, and the element it produces need not preserve `L`.  The refusal is restored.
+
+Specimen `L = U + E8(-1)^2 = II_{1,17}`, rank 18, determinant -1, one hyperbolic plane
+(`NamedLattices.U + NamedLattices.E8 ** 2`), primitive isotropic line `<e_0>`:
+
+```
+_two_hyperbolic_planes(L)                                     False
+L.eichler_criterion_applies()                                 False
+_two_hyperbolic_planes(L + U) / (L+U).eichler_criterion_applies()   True / True
+L.O_plus().finite_character_quotient()
+  .isotropic_line_stabilizer_image(<e_0>)
+    at 82715b7c94                no return at 900 s; faulthandler at 180 s puts the
+                                 frame in orthogonal_quotients.py:1179, the
+                                 `for root in lattice.vectors_of_square_and_divisibility(2, 1)`
+                                 walk of the zero-class branch (set_categories.py:4468
+                                 `_points_satisfying` below it)
+    with the refusal restored    None in 0.77 s (the pytest call)
+L.Aut().isotropic_orbit_representatives(1)   no return at 1800 s
+```
+
+`L` is unimodular, so `A_L` is trivial and the call reaches the *zero*-class branch first:
+the sandwich branch is what the `T_En` rows used, and the specimen the issue names is
+refused before it.  A positive control, the same call through `L.O_plus()` on lattices that
+do split two hyperbolic planes, returns a claim rather than refusing: `U + U + E8(-2)`
+(rank 12, determinant 256) `NOSPLIT` in 15.6 s, and `U + U + E8(-1)` (rank 12, determinant
+1) `NOSPLIT` in 25.0 s.
+
+The `O(L)`-orbit count of `II_{1,17}` is **not** decided by these probes.  Five constructed
+primitive isotropic vectors (`e_0`, `e_0+e_1+r`, `2e_0+e_1+r_1+r_2`, `e_0+2e_1+r_1+r_2`,
+`2e_0+2e_1+(r_1+..+r_4)` with the roots pairwise orthogonal) have reductions
+`v^\perp/\mathbb{Z} v` of rank 16, determinant 1, signature (0,16), and `is_isometric`
+reported every pair equal -- which decides nothing, because that predicate is
+`not Isom(other).is_empty()` and a definite isometry Mor of equal determinant is undecided
+(see *`is_isometric` is not a lattice-class test*, above).  The count belongs to the
+`integral.primitive_orbits` row of `dzackgarza/lattice-database` card `0236`
+(`U + E8(-1)^2`, alias `II_{1,17}`); that card exists and carries **no** orbit row at all,
+so there is nothing to compare against yet.
+
+Reproduce: `bash .scratch/issue315_launch.sh` with `PROBE=issue315_probe9.py` against the
+tree at `82715b7` for the stack, and `.scratch/p315_gate.sh` for the pytest figures; both
+run under `peakrss.py` with `PEAKRSS_LIMIT_MIB=6144`.  The gate is
+`tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage`,
+**2 passed in 2.03 s**, exit 0 (0.77 s and 0.02 s per `--durations=0`).
+
+Cost of the refusal on the `Gamma_h` rows, measured on
+`tests/lattices/test_enriques_polarization_orbits.sage::test_the_source_line_row_is_the_public_line_orbit_count[case-3]`:
+at `82715b7` it **passes in 128.61 s** (test call 126.92 s); with the refusal it
+prints `F` and is then killed at the 1800 s inner cap, pytest never flushing the
+failure summary because its teardown (`sage.misc.temporary_file` cleanup under proot)
+does not return, and a `--tb=long` attempt segfaulted in CPython while formatting the
+traceback (`inspect.getmodule`).  The fallback route's exception is therefore not
+identified; logs `.tmp/p315-enriques-case3-base.log` and
+`.tmp/p315-enriques-case3-after-native.log`.

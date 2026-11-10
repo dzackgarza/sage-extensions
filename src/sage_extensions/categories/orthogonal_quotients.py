@@ -1078,15 +1078,18 @@ class OrthogonalCharacterQuotient:
         lattice with two orthogonal hyperbolic planes, the ``\widetilde{SO}(L)``-orbit of a
         primitive vector is decided by its length and its normalized discriminant class.
 
-        **The sandwich, for lattices without two hyperbolic planes.**  Let ``L``
-        be an even lattice with discriminant group ``A_L``.  Then ``L + U`` has
-        two hyperbolic planes (the ``U`` summand of ``L`` and the added one)
-        and the same discriminant group ``A_L`` (since ``U`` is unimodular).
-        Eichler's criterion on ``L + U`` certifies the class set for ``L + U``,
-        and the discriminant class of a primitive vector ``(v, 0)`` in ``L + U``
-        equals the discriminant class of ``v`` in ``L``.  So the class set for
-        ``L`` is certified by the sandwich, and the branch below returns it
-        without needing two hyperbolic planes in ``L`` itself.
+        **A lattice without two hyperbolic planes is refused.**  The criterion is a
+        statement about the lattice it is applied to: the two orthogonal hyperbolic
+        planes are its hypothesis *in* ``L`` (Gritsenko--Hulek--Sankaran, Lemma 7.8,
+        p. 503).  It is not inherited from an enlargement: on ``L + U`` it classifies
+        the ``\widetilde{SO}(L + U)``-orbits of ``L + U``, and the element it
+        produces need not preserve ``L``, so the two invariants it compares say
+        nothing about the ``O(L)``-orbits of ``L``.  What decides the ``O(L)``-orbit
+        of a primitive isotropic ``v`` is the isometry class of
+        ``v^\perp/\mathbb{Z} v`` (Conway--Sloane, *Sphere Packings, Lattices and
+        Groups*, ch. 16), which the discriminant group of a unimodular ``L`` cannot
+        see.  Where the hypothesis is not exhibited the call below returns ``None``
+        and the caller keeps its exact integral route.
         Let ``gamma`` belong to ``Stab_{O(A_L)}(c)`` and choose ``g`` in ``O(L)`` above it
         (the character representation is computed by this quotient, so such a lift exists).
         Then ``g(v)`` has the same length and the same normalized class ``c`` as ``v``, so by
@@ -1128,15 +1131,14 @@ class OrthogonalCharacterQuotient:
                     continue
                 if lattice.reflection(root) not in self.subgroup:
                     return "NOSPLIT"
-        # The sandwich: ``L + U`` has two hyperbolic planes (the ``U`` summand
-        # of ``L`` and the added one) and the same discriminant group
-        # ``A_L`` (since ``U`` is unimodular), so Eichler's criterion on
-        # ``L + U`` certifies the class set for ``L``.  This is the branch
-        # for lattices without two hyperbolic planes of their own: the
-        # class set is the discriminant class of the line vector, which is
-        # isotropic for primitive isotropic lines, and the double cosets
-        # against its stabilizer are computed by the orbit route without
-        # enumerating generators of the subgroup.
+        # The criterion's hypothesis is read on ``L`` itself (Gritsenko--Hulek--Sankaran,
+        # Lemma 7.8, p. 503): two orthogonal hyperbolic planes in ``L``.  It is not
+        # transferred from the enlargement ``L + U``, whose classification is of
+        # ``\widetilde{SO}(L + U)``-orbits and whose moving element need not preserve
+        # ``L``.  Without the hypothesis the class set below is uncertified, so the
+        # call refuses and the caller keeps its exact integral route.
+        if not _two_hyperbolic_planes(lattice):
+            return None
         discriminant_class = lattice.divided_discriminant_class(vector)
         if discriminant_class == lattice.discriminant_group().zero():
             # Double cosets Gamma \\ im rho / im rho are one coset, *provided* no sign
