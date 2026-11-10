@@ -42,20 +42,23 @@ def test_gamma_three_splits_the_two_null_lines_of_the_hyperbolic_plane():
     assert arrows.Core().Mor(first, first).an_element_in(gamma) is not None
 
 
-def test_gamma_three_transporters_between_null_lines_of_two_hyperbolic_planes():
-    r"""Gamma(3) acts trivially on L/3L, so it preserves the line of a null vector modulo 3.
-
-    Ze and Z(e + 3u) have the same reduction, and the Eichler transvection
-    x -> x + b(x, e) 3u - b(x, 3u) e lies in Gamma(3) and moves e to e + 3u up to sign.
-    Ze and Zf have different reductions, so no element of Gamma(3) moves one to the other.
+def test_gamma_three_line_stabilizer_has_schreier_generators_of_index_72():
+    r"""P = Stab(Ze) in O(2U) maps onto the stabilizer of the point <e> among the 16 isotropic
+    points of F_3^4: an element fixing <e> modulo 3 moves Ze inside its Gamma(3)-orbit, and a
+    Gamma(3) element brings it back. The image of O(2U) has order 1152 and is transitive on the
+    16 points, so [P : Gamma(3) meet P] = 1152 / 16 = 72.
     """
+    from sage_extensions.categories.lattice_centralizers import finite_preimage_generators
+
     hyperbolic = Lattices(ZZ)("U")
     ambient = hyperbolic + hyperbolic
     group = ambient.O()
     gamma = group.congruence_preimage(3)
-    e, f, u, _v = tuple(ambient.module_generators())
-    arrows = Cat().Mor(FiniteOrdinalCategory(2), Lattices(ZZ))
-    line = lambda vector: arrows.object(ambient.primitive_isotropic_subobject(vector).inclusion())
-    near = arrows.Core().Mor(line(e), line(e + u + u + u)).an_element_in(gamma)
-    assert near is not None
-    assert arrows.Core().Mor(line(e), line(f)).an_element_in(gamma) is None
+    e, _f, _u, _v = tuple(ambient.module_generators())
+    line = ambient.primitive_isotropic_subobject(e)
+    stabilizer = gamma.stabilizer(line, action="setwise")
+    generators = tuple(stabilizer.group_generators())
+    assert all(g in gamma and line.stabilizes(g) for g in generators)
+    ambient_generators = tuple(group.stabilizer(line, action="setwise").group_generators())
+    _schreier, index = finite_preimage_generators(ambient_generators, lambda g: g, lambda g: g in gamma)
+    assert index == 72
