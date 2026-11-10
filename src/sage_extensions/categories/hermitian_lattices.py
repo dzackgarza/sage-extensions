@@ -607,19 +607,32 @@ class HermitianWittFrame(SageObject):
         lifts = [self.in_lattice(self.levi(A, U) * self.unipotent(*self.levi_lift(A, U))) for A, U in pairs]
         return (*kernel, *lifts)
 
-    def congruence_stabilizer_generators(self, modulus, pointwise, blocks=None):
-        r"""Return ``(generators, index)`` for the stabilizer of :meth:`stabilizer_generators` meet ``Gamma(m)``.
+    def preimage_stabilizer_generators(self, image, in_subgroup, pointwise, blocks=None):
+        r"""Return ``(generators, index)`` for ``P cap rho^{-1}(S)``, ``P`` the stabilizer of :meth:`stabilizer_generators`.
 
-        ``Gamma(m)`` is the kernel of ``U(O^n, h) -> GL_n(O/mO)``. Membership depends only on
-        the residue matrix, so right cosets of ``P cap Gamma(m)`` in ``P`` are decided by
-        ``g h^{-1} in Gamma(m)``; their Schreier generators generate ``P cap Gamma(m)``
-        (Schreier's lemma), and ``index`` is ``[P : P cap Gamma(m)]``.
+        ``image`` is a homomorphism ``rho`` from ``U(O^n, h)``, on matrices acting on ``O^n``,
+        to a finite group, for instance the joint residue and determinant map of several
+        characters, and ``in_subgroup`` decides membership in a subgroup ``S`` of its image.
+        Right cosets of ``P cap rho^{-1}(S)`` in ``P`` are decided by ``rho(g h^{-1}) in S``;
+        their Schreier generators generate the intersection (Schreier's lemma), and ``index``
+        is ``[P : P cap rho^{-1}(S)]``.
         """
         from sage_extensions.categories.lattice_centralizers import finite_preimage_generators
 
-        identity = matrix.identity(self._field, self._lattice.rank())
-        level = lambda g: all(SageZZ(value) % modulus == 0 for value in self._order_coordinates(g - identity))
-        return finite_preimage_generators(self.stabilizer_generators(pointwise, blocks), lambda g: g, level)
+        return finite_preimage_generators(self.stabilizer_generators(pointwise, blocks), image, in_subgroup)
+
+    def residue_coordinates(self, g, modulus):
+        r"""Return the ``ZZ``-coordinates of the entries of an integral matrix in the order basis, modulo ``modulus``."""
+        return tuple(int(SageZZ(value) % modulus) for value in self._order_coordinates(g))
+
+    def congruence_stabilizer_generators(self, modulus, pointwise, blocks=None):
+        r"""Return ``(generators, index)`` for the stabilizer of :meth:`stabilizer_generators` meet ``Gamma(m)``.
+
+        ``Gamma(m)`` is the kernel of ``U(O^n, h) -> GL_n(O/mO)``, the preimage of the trivial
+        subgroup under the residue map (:meth:`preimage_stabilizer_generators`).
+        """
+        identity = self.residue_coordinates(matrix.identity(self._field, self._lattice.rank()), modulus)
+        return self.preimage_stabilizer_generators(lambda g: self.residue_coordinates(g, modulus), lambda r: r == identity, pointwise, blocks)
 
     def induced_action(self, g):
         r"""Return ``(A, U)``, the action of ``g`` on ``I`` and on ``I^perp / I``, in frame coordinates.
