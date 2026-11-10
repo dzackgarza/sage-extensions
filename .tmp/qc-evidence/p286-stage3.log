@@ -1,0 +1,33 @@
+U + U(2): rank 4 det 4
+  line 0: v = -e_1
+    label 0: b -1 span det -1 complement det -4 product 4 lattice det 4
+  completion: found
+  line 1: v = -e_2
+    label 3: b -2 span det -4 complement det -1 product 4 lattice det 4
+  completion: found
+U + E8: rank 10 det -1
+  line 0: v = e_0 + 2*e_1 - 4*e_2 - 7*e_3 - 10*e_4 - 8*e_5 - 6*e_6 - 4*e_7 - 2*e_8 - 5*e_9
+    label 0: b 2 span det -4 complement det 4 product -16 lattice det -1
+    label 1: b 1 span det -1 complement det 1 product -1 lattice det -1
+  completion: found
+T_En: rank 12 det 1024
+  line 0: v = -e_e
+    label f: b -1 span det -1 complement det -1024 product 1024 lattice det 1024
+  completion: found
+  line 1: v = e_fp
+    label ep: b 2 span det -4 complement det -256 product 1024 lattice det 1024
+  completion: found
+[peakrss] issue275: child waited=0 shell_code=0 samples=27
+[peakrss] peak tree RSS      : 580 MiB
+[peakrss] low-water MemAvail : 8757 MiB
+[peakrss] peak single VmHWM  : 580 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      570 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    52.0s procs=  3 rss=   580 MiB hwm=   580 MiB avail=  8768 MiB
+[peakrss]   t=    50.0s procs=  3 rss=   578 MiB hwm=   578 MiB avail=  8862 MiB
+[peakrss]   t=    48.0s procs=  3 rss=   571 MiB hwm=   571 MiB avail=  9261 MiB
+[peakrss]   t=    46.0s procs=  3 rss=   567 MiB hwm=   567 MiB avail=  9350 MiB
+[peakrss]   t=    44.0s procs=  3 rss=   564 MiB hwm=   564 MiB avail=  9350 MiB
+launcher exit: 0

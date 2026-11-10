@@ -1,0 +1,30 @@
+PARI stack size set to 3221225472 bytes, maximum size set to 3221225472
+[18:48:11] 6JRX: K rank 19 det 2
+[18:48:37]   (t=0, q1=0, q2=-2, ab=1): det -2 build 25.4 s decide 0.1 s -> NEW
+[18:48:37]     NEW class with 482 roots
+Traceback (most recent call last):
+  File "/probe.py", line 90, in <module>
+    if kept_entry[1].is_globally_equivalent_to(candidate_form):
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__equivalence_testing.py", line 109, in is_globally_equivalent_to
+    mat = other.__pari__().qfisom(self)
+  File "cypari2/auto_gen.pxi", line 30327, in cypari2.gen.Gen_base.qfisom
+    sig_on()
+  File "cypari2/handle_error.pyx", line 211, in cypari2.handle_error._pari_err_handle
+cypari2.handle_error.PariError: the PARI stack overflows (current size: 3221225472; maximum size: 3221225472)
+You can use pari.allocatemem() to change the stack size and try again
+[peakrss] issue275: child waited=1 shell_code=1 samples=16
+[peakrss] peak tree RSS      : 3216 MiB
+[peakrss] low-water MemAvail : 6530 MiB
+[peakrss] peak single VmHWM  : 3288 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2057 MiB peak
+[peakrss]   python                     1220 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    30.0s procs=  4 rss=  3216 MiB hwm=  3288 MiB avail=  8307 MiB
+[peakrss]   t=    28.0s procs=  4 rss=  2279 MiB hwm=  2279 MiB avail=  9286 MiB
+[peakrss]   t=    26.0s procs=  4 rss=  2234 MiB hwm=  2235 MiB avail=  9172 MiB
+[peakrss]   t=    24.0s procs=  4 rss=  2196 MiB hwm=  2197 MiB avail=  9260 MiB
+[peakrss]   t=    22.0s procs=  4 rss=  2085 MiB hwm=  2086 MiB avail=  9325 MiB
+launcher exit: 1

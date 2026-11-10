@@ -1,0 +1,29 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.07 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: reportlog-1.0.0, timeout-2.4.0, platformdirs-4.13.5, anyio-4.15.1
+timeout: 1800.0s
+timeout method: signal
+timeout func_only: False
+collected 3 items
+
+tests/lattices/test_stable_isotropic_plane_orbits.sage ...               [100%]
+
+------ generated xml file: /repos/sage-extensions/tests/.report/junit.xml ------
+-------------- generated report log file: tests/.report/run.jsonl --------------
+========================== test-call performance gate ==========================
+tests/lattices/test_stable_isotropic_plane_orbits.sage::test_the_stable_plane_orbit_of_l_1: 31.69 s > 20 s
+============================== slowest durations ===============================
+31.69s call     tests/lattices/test_stable_isotropic_plane_orbits.sage::test_the_stable_plane_orbit_of_l_1
+15.61s call     tests/lattices/test_stable_isotropic_plane_orbits.sage::test_stable_plus_has_the_same_l_1_plane_orbit
+1.18s call     tests/lattices/test_stable_isotropic_plane_orbits.sage::test_the_standard_u_plane_is_primitive_and_totally_isotropic
+0.00s setup    tests/lattices/test_stable_isotropic_plane_orbits.sage::test_the_standard_u_plane_is_primitive_and_totally_isotropic
+0.00s teardown tests/lattices/test_stable_isotropic_plane_orbits.sage::test_the_standard_u_plane_is_primitive_and_totally_isotropic
+0.00s teardown tests/lattices/test_stable_isotropic_plane_orbits.sage::test_the_stable_plane_orbit_of_l_1
+0.00s setup    tests/lattices/test_stable_isotropic_plane_orbits.sage::test_the_stable_plane_orbit_of_l_1
+0.00s teardown tests/lattices/test_stable_isotropic_plane_orbits.sage::test_stable_plus_has_the_same_l_1_plane_orbit
+0.00s setup    tests/lattices/test_stable_isotropic_plane_orbits.sage::test_stable_plus_has_the_same_l_1_plane_orbit
+============================== 3 passed in 50.57s ==============================
+exit 0

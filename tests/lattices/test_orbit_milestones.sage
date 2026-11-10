@@ -57,17 +57,30 @@ def test_milestone_one_the_E10_cusp_acts_on_its_reduction_lattice() -> None:
     )
 
 
-def test_the_enriques_lattice_has_two_line_cusps_and_nine_plane_cusps() -> None:
+def test_the_enriques_lattice_has_two_line_cusps_and_two_plane_cusps() -> None:
     r"""For \(N=U\oplus U(2)\oplus E_8(-2)\), \(O(N)\) has 2 orbits of primitive
-    isotropic lines and 9 of primitive isotropic planes (Sterk, *Compactifications of
-    the period space of Enriques surfaces I*, Math. Z. 207 (1991), 1--36).  The
-    reductions \(I^\perp/I\) have rank \(12-2\cdot 1=10\) and \(12-2\cdot 2=8\).
+    isotropic lines and 2 of primitive isotropic planes.
+
+    The value is the ``O`` row of ``lattice-database`` card ``029J``
+    (``constant: 2``, ``planes: 2``), which cites H. Sterk,
+    *Compactifications of the period space of Enriques surfaces, Part I*,
+    Math. Z. 207 (1991), 1--36, Propositions 4.5 (p. 28) and 4.6 (p. 29): two
+    orbits of primitive isotropic lines, realised on \(L_1 = \mathbb{Z} e_1\)
+    and \(L_2 = \mathbb{Z} e_3\), and two of primitive isotropic planes, on
+    \(P_1 = \mathbb{Z} e_1 + \mathbb{Z} e_3\) and
+    \(P_2 = \mathbb{Z}(2 e_1 + 2 e_2 + w) + \mathbb{Z} e_3\) with \(w\) of norm
+    \(4\) in \(E_8\).  The plane classes come from the lines of the reduction
+    \(v^\perp/\mathbb{Z} v\) over the two line orbits, identified by plane
+    equivalence.  Nine is the count modulo the smaller arithmetic groups of
+    the same card (its ``gamma-en-2`` row states nine), not modulo \(O(N)\).
+    The reductions \(I^\perp/I\) have rank
+    \(12-2\cdot 1=10\) and \(12-2\cdot 2=8\).
     """
     lattice = NamedLattices.TEn
     line_cusps = lattice.cusps(1)
     plane_cusps = lattice.cusps(2)
 
     assert line_cusps.cardinality() == 2
-    assert plane_cusps.cardinality() == 9
+    assert plane_cusps.cardinality() == 2
     assert all(cusp.reduction_lattice().module_rank() == 10 for cusp in line_cusps)
     assert all(cusp.reduction_lattice().module_rank() == 8 for cusp in plane_cusps)
