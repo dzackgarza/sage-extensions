@@ -409,8 +409,8 @@ def test_compact_transporter_decides_both_ways():
 
 def _eichler_level_two_lattice():
     r"""L = {X in M_2(Z) : X_22 even}, basis E11, E21, E12, 2 E22, with q = -2 det."""
-    frame = [sage_matrix(SageQQ, 2, 2, v) for v in ([1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 2])]
-    coordinates = lambda X: [X[0, 0], X[1, 0], X[0, 1], X[1, 1] / 2]
+    frame = [sage_matrix(SageQQ, int(2), int(2), v) for v in ([int(1), int(0), int(0), int(0)], [int(0), int(0), int(1), int(0)], [int(0), int(1), int(0), int(0)], [int(0), int(0), int(0), int(2)])]
+    coordinates = lambda X: [X[int(0), int(0)], X[int(1), int(0)], X[int(0), int(1)], X[int(1), int(1)] / int(2)]
     pairing = lambda X, Y: -((X + Y).det() - X.det() - Y.det())
     gram = sage_matrix(SageZZ, [[pairing(x, y) for y in frame] for x in frame])
     acting = lambda f: sage_matrix(SageZZ, [coordinates(f(x)) for x in frame]).transpose()
@@ -425,19 +425,19 @@ def test_nonmaximal_split_commutant_is_gamma_upper_zero_of_two():
     mod 2 has order 2 and its image mod 3 is all of SL_2(F_3), of order 24. The order of the
     commutant has index 2 in the maximal order of right multiplications by M_2(Z)."""
     gram, acting = _eichler_level_two_lattice()
-    upper = sage_matrix(SageQQ, 2, 2, [1, 1, 0, 1])
-    lower = sage_matrix(SageQQ, 2, 2, [1, 0, 2, 1])
+    upper = sage_matrix(SageQQ, int(2), int(2), [int(1), int(1), int(0), int(1)])
+    lower = sage_matrix(SageQQ, int(2), int(2), [int(1), int(0), int(2), int(1)])
     commutant = IsometryCommutant(gram, [acting(lambda X: upper * X), acting(lambda X: lower * X)])
     assert int(commutant.dimension()) == int(4)
     assert not commutant.is_compact()
     generators = commutant.centralizer_generators()
     assert all(commutant.is_centralizer_element(g) for g in generators)
-    blocks = [sage_matrix(SageZZ, 2, 2, [g[0, 0], g[2, 0], g[0, 2], g[2, 2]]) for g in generators]
-    assert all(h.det() == 1 and h[0, 1] % 2 == 0 for h in blocks)
+    blocks = [sage_matrix(SageZZ, int(2), int(2), [g[int(0), int(0)], g[int(2), int(0)], g[int(0), int(2)], g[int(2), int(2)]]) for g in generators]
+    assert all(h.det() == int(1) and h[int(0), int(1)] % int(2) == int(0) for h in blocks)
     for g, h in zip(generators, blocks):
         assert g == acting(lambda X: X * h.change_ring(SageQQ))
     two, three = SageGF(int(2)), SageGF(int(3))
     assert len(_closure([h.change_ring(two) for h in blocks], identity_matrix(two, int(2)))) == int(2)
     assert len(_closure([h.change_ring(three) for h in blocks], identity_matrix(three, int(2)))) == int(24)
-    swap = sage_matrix(SageQQ, 2, 2, [0, -1, 1, 0])
+    swap = sage_matrix(SageQQ, int(2), int(2), [int(0), -int(1), int(1), int(0)])
     assert not commutant.is_centralizer_element(acting(lambda X: X * swap))
