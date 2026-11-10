@@ -1,0 +1,76 @@
+[12:07:09] imported
+[12:07:10] invariant lattice of I_En: rank 10 det -1024 signature (1, 9) in 0.2 s
+[12:07:10]   labels (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+[12:07:10]   isotropic generator pairs with nonzero pairing: [(0, 1, 2)]
+[12:07:10]   U(2) pairs: [(0, 1, 2)]
+[12:07:10] h = 0 + 1: q(h) = 4, primitive True
+[12:07:10] polarized object built in 0.0 s
+[12:07:10] invariant polarization 4 in 0.2 s
+[12:07:34] Gamma_En,2 = coinvariant_extension_subgroup built in 24.0 s
+[12:07:34]   supergroup is T_En.O(): Integral lattice of rank 12 and signature (2, 10)
+[12:07:34]   contains_character_kernel True
+[12:07:34]   character_data_is_complete True
+[12:07:34]   finite_character_quotient in 0.0 s
+[12:08:54]   image_order 46998591897600 in 80.3 s
+[12:08:54]   subgroup_image_order 696729600 in 0.1 s
+[12:08:54]   [O(A) : rho(Gamma)] 67456 in 0.0 s
+[12:32:08]   line orbits raised TypeError after 1393.5 s: <class 'object'> is a built-in class
+------------------------------------------------------------------------
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x86e5) [0x7119989416e5]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8786) [0x711998941786]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8b54) [0x711998941b54]
+/lib/x86_64-linux-gnu/libc.so.6(+0x3fd70) [0x71199a64cd70]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa06a6) [0x71199a6ad6a6]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa1eeb) [0x71199a6aeeeb]
+/lib/x86_64-linux-gnu/libc.so.6(malloc+0xfe) [0x71199a6af9ce]
+/lib/x86_64-linux-gnu/libstdc++.so.6(_Znwm+0x1c) [0x711990ab3bac]
+/sage/.venv/lib/python3.14/site-packages/pynormaliz.libs/libnormaliz-b105b60c.so.3.11.0(_ZN11libnormaliz9Full_ConeIxE15find_new_facetsERKm+0xa6e) [0x7118fd98d9ae]
+/sage/.venv/lib/python3.14/site-packages/pynormaliz.libs/libnormaliz-b105b60c.so.3.11.0(_ZN11libnormaliz9Full_ConeIxE10build_coneEv+0x7c9) [0x7118fda092c9]
+/sage/.venv/lib/python3.14/site-packages/pynormaliz.libs/libnormaliz-b105b60c.so.3.11.0(_ZN11libnormaliz9Full_ConeIxE14build_top_coneEv+0x56) [0x7118fda0cba6]
+/sage/.venv/lib/python3.14/site-packages/pynormaliz.libs/libnormaliz-b105b60c.so.3.11.0(_ZN11libnormaliz9Full_ConeIxE19support_hyperplanesEv+0x72) [0x7118fda0ffe2]
+/sage/.venv/lib/python3.14/site-packages/pynormaliz.libs/libnormaliz-b105b60c.so.3.11.0(_ZN11libnormaliz9Full_ConeIxE7computeEv+0x340) [0x7118fda04e70]
+/sage/.venv/lib/python3.14/site-packages/pynormaliz.libs/libnormaliz-b105b60c.so.3.11.0(_ZN11libnormaliz4ConeI10__gmp_exprIA1_12__mpz_structS3_EE23compute_full_cone_innerIxEEvRNS_14ConePropertiesE+0x580) [0x7118fd8f5710]
+/sage/.venv/lib/python3.14/site-packages/pynormaliz.libs/libnormaliz-b105b60c.so.3.11.0(_ZN11libnormaliz4ConeI10__gmp_exprIA1_12__mpz_structS3_EE17compute_full_coneERNS_14ConePropertiesE+0x7b) [0x7118fd8f7d1b]
+/sage/.venv/lib/python3.14/site-packages/pynormaliz.libs/libnormaliz-b105b60c.so.3.11.0(_ZN11libnormaliz4ConeI10__gmp_exprIA1_12__mpz_structS3_EE7computeENS_14ConePropertiesE+0x1668) [0x7118fd8daa98]
+/sage/.venv/lib/python3.14/site-packages/PyNormaliz_cpp.cpython-314-x86_64-linux-gnu.so(+0x2b227) [0x711900a73227]
+/sage/.venv/lib/python3.14/site-packages/PyNormaliz_cpp.cpython-314-x86_64-linux-gnu.so(+0x2cef7) [0x711900a74ef7]
+/sage/.venv/bin/python() [0x182e141]
+/sage/.venv/bin/python() [0x1807764]
+/sage/.venv/bin/python() [0x181664d]
+/sage/.venv/bin/python() [0x192484b]
+/sage/.venv/bin/python(PySequence_Tuple+0x28d) [0x1831b4d]
+/sage/.venv/bin/python() [0x183184c]
+/sage/.venv/bin/python() [0x1812dbd]
+/sage/.venv/bin/python(PyObject_Vectorcall+0x70) [0x1818a70]
+/sage/.venv/bin/python() [0x192786d]
+/sage/.venv/bin/python(PyObject_GenericGetAttr+0x2ad) [0x181af87]
+/sage/.venv/bin/python() [0x18025e2]
+/sage/.venv/bin/python() [0x1855b91]
+/sage/.venv/bin/python(PyEval_EvalCode+0xa6) [0x189b67c]
+/sage/.venv/bin/python() [0x18e2351]
+/sage/.venv/bin/python() [0x1a7048d]
+/sage/.venv/bin/python() [0x1a702c1]
+/sage/.venv/bin/python() [0x1984486]
+/sage/.venv/bin/python() [0x19843d4]
+/sage/.venv/bin/python() [0x19842e3]
+/sage/.venv/bin/python(Py_RunMain+0x40c) [0x1984f0c]
+/sage/.venv/bin/python() [0x1984ad6]
+/sage/.venv/bin/python() [0x198492c]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29ca8) [0x71199a636ca8]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x85) [0x71199a636d65]
+/sage/.venv/bin/python(_start+0x29) [0x19fab29]
+------------------------------------------------------------------------
+[peakrss] issue286c: child waited=124 shell_code=124 samples=748
+[peakrss] peak tree RSS      : 2685 MiB
+[peakrss] low-water MemAvail : 996 MiB
+[peakrss] peak single VmHWM  : 2691 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     2680 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  1499.7s procs=  3 rss=  2685 MiB hwm=  2691 MiB avail=  7640 MiB
+[peakrss]   t=  1497.7s procs=  3 rss=  2681 MiB hwm=  2687 MiB avail=  7612 MiB
+[peakrss]   t=  1495.7s procs=  3 rss=  2678 MiB hwm=  2683 MiB avail=  7594 MiB
+[peakrss]   t=  1493.7s procs=  3 rss=  2674 MiB hwm=  2680 MiB avail=  6075 MiB
+[peakrss]   t=  1491.7s procs=  3 rss=  2671 MiB hwm=  2677 MiB avail=  6088 MiB
+launcher exit: 124

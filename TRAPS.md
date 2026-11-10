@@ -3731,3 +3731,84 @@ Sage's `neighbor_iteration` in this image accepts only `algorithm="orbits"`; the
 `algorithm="fast"` spelling that would skip `automorphism_group` raises
 `ValueError: unknown algorithm` in 0.0 s, so there is no qfauto-free neighbour traversal
 to fall back on.
+
+### The rank-17 genus class number comes from reduced neighbours and the mass, not from `automorphism_group()` (2026-11-10, #286)
+
+The genus enumeration of `E8(-1)^2 + <-2k>` (rank 17, negative definite) stops because
+Sage's `algorithm="orbits"` neighbour route needs `QuadraticForm.automorphism_group()`,
+and that call does not return on this host at rank 17 (>90 s, killed), even though
+`number_of_automorphisms()` — the same PARI `qfauto` — answers in **0.3 s**.  Rank 17 is
+far past the `p**n <= 2**18` threshold where Sage would itself choose `"random"`, so the
+`"orbits"` spelling forced by the in-repo `_genus_classes` is the wrong one here.
+
+What runs, on the reduced seed:
+
+```
+.lll()                                          0.0 s
+number_of_automorphisms()                       0.3 s   (1941728542064640000 for <-2>)
+conway_mass()                                   1.1 s
+theta_series(8)                                18.8 s   per form: too slow to separate candidates
+short_vector_list_up_to_length(6)              PARI stack overflow (1 GiB stack)
+qfisom, two LLL-reduced rank-17 forms           0.0-3.1 s, but occasionally minutes
+```
+
+Random `p`-neighbours at `p=3`, each neighbour LLL-reduced, candidates bucketed by
+`|Aut|` (needed for the mass anyway) and `qfisom` called only inside a bucket, with the
+mass equality as the stopping rule: **4 classes in 19 s for `k = 1`**, the sum
+`1/|Aut|` equal to the mass `2499347/9440684171518279680000` exactly.  The class
+`|Aut|`s are 1941728542064640000, 12804747411456000, 5393690394624000 and
+1371195958099968000.  For `k = 2` (mass `642332179/18881368343036559360000`) the
+traversal reached three classes and then entered a `qfisom` between two candidates with
+equal `|Aut|` that ran past six minutes: an exact, cheap rank-17 class test is the
+missing capability, not a faster search.
+
+### A plane's quotient by integer linear algebra, and the card lattice's unimodular `E8` summands (2026-11-10, #286)
+
+For a primitive isotropic plane `E` of `Lambda_{2k}`, `Q = E^perp/E` needs no bridge: the
+kernel of the two covectors `b(.,v)`, `b(.,e)` in `Lambda`, its saturation, the Smith
+normal form of the plane's two coordinate rows, and the Gram of the remaining rows give
+`Q`'s Gram matrix in 0.15 s (against 25-35 s cold and multi-GiB bridge growth through
+`isotropic_reduction().quotient_lattice()`).  Checked on
+`E = <e_a, x_b>` of `Lambda_2`, whose perpendicular is
+`<e_a, x_b> perp E8(-1)^2 perp <-2>`: the routine returns that Gram exactly, det `-2`.
+
+The card's lattice has **unimodular** `E8` summands (`Lattices(ZZ)("E8")`, det 1), so
+`det(E^perp/E) = +-2k` and every quotient lies in the one genus of
+`E8(-1)^2 + <-2k>`.  A probe that used the scaled block `2E8` gives quotients of
+determinant `-131072` and a rank-21 lattice of signature `(18,3)`, which is not
+`Lambda_{2k}`; nothing measured on it is a statement about the card.
+
+A bounded shape family `e = alpha x + beta y + w_1 + w_2 + t z` with
+`2 alpha beta = n_1 + n_2 + 2k t^2`, E8 block norms `0,2,4,6` and `t <= 3` (1200 shapes,
+0.15 s per candidate) reaches **3 of the 4** classes for `k = 1` and **5 of the 9** for
+`k = 2`; the mass shortfall reports the incompleteness, so no partial family is ever
+returned as complete.  The `k = 1` class missing from the plane search,
+`|Aut| = 12804747411456000`, is reached by the genus traversal at `p = 3`, which names
+it as the shape the search has to find.
+
+### `Gamma_{En,2}` is a discriminant preimage that builds in 24 s; its double-coset split does not return (2026-11-10, #286)
+
+`Involutions.I_En.polarized(h).coinvariant_extension_subgroup()` **is** the construction
+the issue needs, at the polarization the source names: the invariant lattice
+`S_En` (rank 10, det -1024, signature (1,9)) has exactly one isotropic generator pair
+with nonzero pairing, its first two generators, with `b = 2` — the `U(2) = S_dP`
+summand — and `h = g_0 + g_1` has `q(h) = 4` (bilinear convention: degree 2) and is
+primitive.  The group is a complete character kernel:
+
+```
+build                                             24.0 s
+contains_character_kernel() / character_data_is_complete()   True / True
+image_order()                                     46998591897600   80.3 s  (= |O(q)| of the issue)
+subgroup_image_order()                            696729600        0.1 s   (= |W(E8)|)
+[O(q) : rho(Gamma)]                               67456            0.0 s
+isotropic_orbit_representatives(1)                did not return in 1500 s (exit 124)
+```
+
+The stop is `splitting_isometries_from_line_class` ->
+`_splitting_isometries_in_im_rho_from_image`, i.e. `libgap.IsomorphismPermGroup` and
+`libgap.DoubleCosets` on a group of order 46998591897600.  The reformulation that keeps
+the same mathematics: that method's own hypothesis
+(`isotropic_line_stabilizer_image` certifies `rho(Stab_{O(L)}(v)) = Stab_{O(q)}(c)`)
+makes `rho(Gamma) \ O(q) / Stab(c)` the `rho(Gamma)`-orbits on the isotropic classes of
+`A_{T_En}` up to sign — 265 pairs, enumerated by `covering_discriminant_classes(0)` and
+acted on by `discriminant_generator_lifts()`.
