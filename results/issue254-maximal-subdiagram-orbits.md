@@ -58,15 +58,18 @@ vertices and the card's `diagram` bonds as the Coxeter entries (order `inf` on t
 `null` in the digest).  The digest is **regenerated, not edited**:
 
 ```
-python3 tests/cards/refresh_lattice_database_enriques.py --ref e8a7f880dd21931d54da1e99217e924db9c88e33
-wrote …/lattice-database-enriques.json at database ref e8a7f88…: 87 group cards,
+python3 tests/cards/refresh_lattice_database_enriques.py --ref dbc9fc6add622459d60dba3dc62d3e4be6b903d7
+wrote …/lattice-database-enriques.json at database ref dbc9fc6…: 87 group cards,
 36 polarization-count degrees, 1 discriminant forms, 5 cusp chambers 5 cusp diagrams
 ```
 
-The pin is the one `main` already carried: `#312` reads the same card block for the wall
-counts, and this issue's push leaves that section and its pin alone.  Against `main` the
-digest's diff is the new section and its `_provenance` line; `cusp_chambers`, and every other
-section, compare equal field for field.
+The pin is the one `main` carried when this unit was rebased (`#285`'s evidence commit moved
+it to `dbc9fc6`): `#312` reads the same card block for the wall counts, and this push leaves
+that section and its pin alone.  Against `main` the digest's diff is the new section and its
+`_provenance` line; `cusp_chambers`, and every other section, compare equal field for field.
+An earlier revision of this branch was generated at `e8a7f88`, where that card stated Sterk's
+fifth 0-cusp chamber as 13 walls; the rebase onto `dbc9fc6` made the whole digest one pin
+again, and the fifth diagram now carries its 14 walls and 17 bonds.
 
 ## Red
 
@@ -95,15 +98,19 @@ $ pytest tests/lattices/test_the_maximal_subdiagram_orbits.sage \
 tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_orbits_partition_the_maximal_elliptic_subdiagrams: 75.00 s > 20 s
 tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_rank_of_a_subdiagram_is_its_rank_in_the_induced_enumeration: 69.05 s > 20 s
 tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_a_vertex_relabelling_leaves_the_orbit_counts_unchanged: 146.16 s > 20 s
-12 passed in 299.31s (0:04:59)
-[peakrss] peak tree RSS      : 781 MiB
+12 passed in 1307.44s (0:21:47)
+[peakrss] peak tree RSS      : 795 MiB
 ```
+
+That run was taken while the shared VM carried other chats' jobs at a load average of about
+fourteen on four cores; the same selection took 299.31 s an hour earlier on an idle VM.
 
 Seven of the twelve are the new module and five are `test_coxeter_subdiagrams.sage`, the
 existing module on this owner, which passes unchanged — the refactor keeps the points and the
-order of the queries it re-routed.  An earlier run of the same two modules at the pre-rebase
-base gave `12 passed in 370.11s`; the tree then differed by `#286`'s commits and by the two
-adapters this unit drops afterwards, neither of which this module touches.
+order of the queries it re-routed.  An earlier run of the same two modules on the pre-rebase base
+gave `12 passed in 370.11s`; the tree then differed by `#286`'s commits, by the two adapters
+this unit drops afterwards, and by the fifth diagram's pin, none of which this module's
+assertions depend on.
 
 `just test-lint tests/lattices/test_the_maximal_subdiagram_orbits.sage` on the adopted
 runtime: `1 files, 0 findings`, exit 0.
@@ -117,7 +124,7 @@ commit's message records.
 
 No lattice-database card states how many `Aut`-orbits a cusp diagram's maximal subdiagrams
 fall into, so the test asserts the partition, the orbit identity and the order, never a
-number.  What it meets, at digest pin `e8a7f880`:
+number.  What it meets, at digest pin `dbc9fc6`:
 
 | specimen | vertices | \|Aut\| | elliptic, `connected=False` | elliptic, `connected=True` | parabolic, `connected=False` | parabolic, `connected=True` |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -126,15 +133,17 @@ number.  What it meets, at digest pin `e8a7f880`:
 | cusp 4.3.6 | 10 | 1 | 9 / 9 | 4 / 4 | 2 / 2 | 2 / 2 |
 | cusp 4.3.7 | 12 | 2 | 34 / 18 | 8 / 4 | 31 / 17 | 7 / 5 |
 | cusp 4.3.8 | 11 | 2 | 29 / 17 | 10 / 5 | 14 / 8 | 6 / 4 |
-| cusp 4.3.9 | 13 | 2 | 57 / 35 | 11 / 7 | 54 / 32 | 12 / 9 |
+| cusp 4.3.9 | 14 | 8 | 132 / 24 | 16 / 3 | 154 / 28 | 24 / 8 |
 
 `E6` is elliptic, so its parabolic family is empty: the test states that (`== 0`) instead of
 skipping the row, and guards the parabolic partition on the cusp specimens being nonempty.
 
-The five specimens are the card's diagrams.  The fifth is 13 walls at this pin;
-`a36d86a` (`#312`) records that the library's computed chamber at that cusp has 13 walls
-where a later revision of the card states 14 — that discrepancy is `#312`'s, and this test
-follows the card the digest carries.
+The five specimens are the card's diagrams, and the fifth is the 14-wall, 17-bond diagram the
+card states at `dbc9fc6`.  `a36d86a` (`#312`) records that the library's computed chamber at
+that cusp has 13 walls where the card states 14 — that discrepancy is `#312`'s, and this test
+follows the card the digest carries.  The counts for that row were measured on the identical
+row at the earlier pin `5c66bb3` (the walls and bonds of the two rows compare equal) and are
+recorded here for that reason.
 
 ## What is not done here
 
