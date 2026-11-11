@@ -1124,6 +1124,7 @@ def _genus_classes(gram):
     from sage.quadratic_forms.genera.genus import Genus as SageGenus
     from sage.quadratic_forms.quadratic_form import QuadraticForm
     from sage.rings.rational_field import QQ as SageQQ
+    from sage.sets.primes import Primes
 
     # Every class the enumeration discovers costs one PARI ``qfauto`` call, and at
     # rank 17 the 1 GiB default stack overflows inside it (#317).  PARI's own
@@ -1255,18 +1256,101 @@ def _genus_classes(gram):
     # The exhaustive ``orbits`` traversal is unusable at these ranks: it asks
     # PARI for ``automorphism_group()``, which does not return, while
     # ``number_of_automorphisms()`` answers from the same ``qfauto`` call.
-    # ``-entry`` is the positive definite form whose automorphism order is the
-    # class's, since ``qfauto`` requires a positive definite matrix.
+    # ``scale`` makes the form even and positive definite -- a ``qfauto``
+    # precondition -- and is the normalization the spinor-genus seeds and
+    # ``form.conway_mass()`` are stated in, so the automorphism orders below are
+    # those of the very forms the mass counts.
     total = form.conway_mass()
     representative_grams = tuple(genus.representatives(backend="sage"))
-    found_forms = tuple(QuadraticForm(SageZZ, -entry) for entry in representative_grams)
+    found_forms = tuple(
+        QuadraticForm(SageZZ, (scale * entry).change_ring(SageZZ))
+        for entry in representative_grams
+    )
     found_mass = sum(
         SageQQ.one() / found.number_of_automorphisms() for found in found_forms
     )
     assert found_mass == total, (
         f"the classes found in the genus of {gram} have mass {found_mass}, but the genus has mass {total}"
     )
-    return (representative_grams,)
+    if not spinor_primes:
+        # One improper spinor genus: the whole class set is that spinor genus,
+        # so a single group *is* the split, with the representative first.
+        return (representative_grams,)
+    # Several improper spinor genera.  ``seeds`` holds one class per spinor
+    # genus, the representative's first, which the assertions above prove are
+    # distinct.  A ``p``-neighbour moves the spinor genus by the class of ``p``
+    # [CS10, Ch. 15, §9.2, Thm. 15], so a walk at a prime whose operator lies in
+    # the improper spinor kernel never leaves the spinor genus it started in:
+    # walking from each seed labels every class it reaches with that seed's
+    # spinor genus.  The labelling is *reported*, never guessed -- a class no
+    # walk reaches, or one reached from two seeds, is a refusal, because the
+    # mass certificate above covers the class set and not its partition.
+    prime = SageZZ(3)
+    while prime.divides(genus.determinant()) or not spinor_classes(
+        spinor_operators.delta(prime)
+    ).is_one():
+        prime = Primes().next(prime)
+    inits = tuple(found.__pari__().qfisominit() for found in found_forms)
+    roots = tuple(len(found.short_vector_list_up_to_length(2)[1]) for found in found_forms)
+
+    def located_index(candidate, candidate_roots):
+        for index, (known_init, known_roots) in enumerate(zip(inits, roots, strict=True)):
+            if known_roots == candidate_roots and known_init.qfisom(candidate.__pari__()):
+                return index
+        return None
+
+    def roots_of(candidate):
+        return len(candidate.short_vector_list_up_to_length(2)[1])
+
+    labels: dict[int, int] = {}
+    for seed_index, seed in enumerate(seeds):
+        representative = QuadraticForm(SageZZ, seed.Hessian_matrix().change_ring(SageZZ))
+        start = located_index(representative, roots_of(representative))
+        if start is None:
+            raise AssertionError(
+                f"the spinor-genus seed {seed_index} of {gram} is not among the enumerated classes, so the spinor-genus split cannot be reported"
+            )
+        queue = [representative]
+        labels.setdefault(start, seed_index)
+        if labels[start] != seed_index:
+            raise AssertionError(
+                f"the class of the spinor-genus seed {seed_index} of {gram} is also reached from seed {labels[start]}, so the spinor-genus split is inconsistent"
+            )
+        while queue:
+            current = queue.pop()
+            vector = None
+            for _ in range(200):
+                vector = current.find_primitive_p_divisible_vector__next(prime, vector)
+                if vector is None:
+                    break
+                neighbour = current.find_p_neighbor_from_vec(prime, vector).lll()
+                neighbour_roots = roots_of(neighbour)
+                index = located_index(neighbour, neighbour_roots)
+                if index is None:
+                    raise AssertionError(
+                        f"the {prime}-neighbour {neighbour} of a class of the genus of {gram} is not among the enumerated classes, so the enumeration is incomplete"
+                    )
+                if index in labels:
+                    if labels[index] != seed_index:
+                        raise AssertionError(
+                            f"the class {index} of the genus of {gram} is reached from both spinor-genus seeds {labels[index]} and {seed_index}, so the spinor-genus split is inconsistent"
+                        )
+                    continue
+                labels[index] = seed_index
+                queue.append(neighbour)
+    unlabelled = tuple(index for index in range(len(representative_grams)) if index not in labels)
+    if unlabelled:
+        raise AssertionError(
+            f"the classes {unlabelled} of the genus of {gram} were reached by no spinor-genus seed at p = {prime}, so the spinor-genus split is not reported rather than guessed"
+        )
+    return tuple(
+        tuple(
+            representative_grams[index]
+            for index in range(len(representative_grams))
+            if labels[index] == seed_index
+        )
+        for seed_index in range(len(seeds))
+    )
 
 
 def _local_density(form, prime, value):

@@ -29,6 +29,9 @@ RAW = "https://raw.githubusercontent.com/dzackgarza/lattice-database/{ref}/{path
 
 # The two card paths, as the database lays them out.
 ARITHMETIC_GROUP_PATH = "arithmetic-groups/{slug}.md"
+
+# The two Scattone rank-21 cards whose primitive-isotropic-plane rows are read.
+SCATTONE_TAGS = ("6JRX", "6JRY")
 LATTICE_PATH = "lattices/{tag}.md"
 
 
@@ -91,6 +94,32 @@ def lattice_table4(ref: str, tag: str) -> dict:
     }
 
 
+def plane_orbits(ref: str, tag: str) -> dict:
+    """The primitive-isotropic-plane rows of one Scattone lattice card."""
+    path = LATTICE_PATH.format(tag=tag)
+    card = front_matter(fetch(ref, path), path)
+    orbits = card["integral"]["primitive_orbits"]
+    return {
+        "tag": card["tag"],
+        "path": path,
+        "name": card["name"],
+        "latex": card["latex"],
+        "aliases": card.get("aliases"),
+        "signature": card.get("signature"),
+        "determinant": card.get("determinant"),
+        "rows": {
+            group: {
+                "planes": row["planes"],
+                "citation": row["reference"]["citation"],
+            }
+            # A group row without a ``planes`` count states its class number as
+            # a constant elsewhere and is not a plane row.
+            for group, row in orbits.items()
+            if "planes" in row
+        },
+    }
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ref", required=True, help="full lattice-database commit SHA")
@@ -125,11 +154,13 @@ def main(argv: list[str]) -> int:
                     "parent_group",
                 ],
                 "lattice": "integral.polarization_counts.{degree}.{#h,#Γ̄_h,reference.citation}",
+                "plane_orbits": "integral.primitive_orbits.{group}.planes,reference.citation",
             },
             "generated_by": "tests/cards/refresh_lattice_database_enriques.py",
         },
         "arithmetic_groups": groups,
         "polarization_counts": lattice_table4(ref, "0128"),
+        "plane_orbits": {tag: plane_orbits(ref, tag) for tag in SCATTONE_TAGS},
     }
     DIGEST.write_text(json.dumps(digest, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
     print(

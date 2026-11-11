@@ -19,7 +19,8 @@
     "lattice",
     "parent_group"
    ],
-   "lattice": "integral.polarization_counts.{degree}.{#h,#Γ̄_h,reference.citation}"
+   "lattice": "integral.polarization_counts.{degree}.{#h,#Γ̄_h,reference.citation}",
+   "plane_orbits": "integral.primitive_orbits.{group}.planes,reference.citation"
   }
  },
  "arithmetic_groups": {
@@ -1240,6 +1241,56 @@
    "path": "arithmetic-groups/gamma-h-9.md",
    "plane_orbits": 34,
    "tag": "gamma-h-9"
+  }
+ },
+ "plane_orbits": {
+  "6JRX": {
+   "aliases": [
+    "U + U + E8(-1) + E8(-1) + <-2>"
+   ],
+   "determinant": -2,
+   "latex": "\\Lambda_{2}",
+   "name": "Lambda_2",
+   "path": "lattices/6JRX.md",
+   "rows": {
+    "O": {
+     "citation": "J. Scattone, \"On the compactification of moduli spaces for algebraic K3 surfaces\", Mem. Amer. Math. Soc. 374 (1987): Proposition 5.4.7 with Corollary 5.4.8(2), p. 78 — E -> E^perp/E is a bijection from the O(L_k)-orbits of primitive isotropic planes onto G(k), so there are h(k) of them — with Section 6.2 (Degree two), p. 97, (6.2.1): G(1) consists of four isomorphism classes; hence 4 orbits of primitive isotropic planes of O(Lambda_2), those of the 1-cusps of the Baily-Borel compactification.",
+     "planes": 4
+    },
+    "O+": {
+     "citation": "J. Scattone, \"On the compactification of moduli spaces for algebraic K3 surfaces\", Mem. Amer. Math. Soc. 374 (1987), Section 6, p. 94 — the Baily–Borel compactification of D_k/O_-(L_k) is obtained from D_k/O_-(L_k) by adding one point p and h(k) curves, so one zero-dimensional boundary component and h(1) = 4 one-dimensional ones (Section 6.2, p. 97). Section 3.6, p. 50, defines O_-(L) as the group of isometries of L with spinor norm 1, and Section 1, p. 3, as the index-two subgroup of O(L) that preserves the component D_k of the period domain; that is this card's O+.",
+     "planes": 4
+    }
+   },
+   "signature": [
+    2,
+    19
+   ],
+   "tag": "6JRX"
+  },
+  "6JRY": {
+   "aliases": [
+    "U + U + E8(-1) + E8(-1) + <-4>"
+   ],
+   "determinant": -4,
+   "latex": "\\Lambda_{4}",
+   "name": "Lambda_4",
+   "path": "lattices/6JRY.md",
+   "rows": {
+    "O": {
+     "citation": "J. Scattone, \"On the compactification of moduli spaces for algebraic K3 surfaces\", Mem. Amer. Math. Soc. 374 (1987): Proposition 5.4.7 with Corollary 5.4.8(2), p. 78 — E -> E^perp/E is a bijection from the O(L_k)-orbits of primitive isotropic planes onto G(k), so there are h(k) of them — with Section 6.3 (Degree four), p. 100: G(2) consists of nine isomorphism classes; hence 9 orbits of primitive isotropic planes of O(Lambda_4), those of the 1-cusps of the Baily-Borel compactification.",
+     "planes": 9
+    },
+    "O+": {
+     "citation": "J. Scattone, \"On the compactification of moduli spaces for algebraic K3 surfaces\", Mem. Amer. Math. Soc. 374 (1987), Section 6, p. 94 — the Baily–Borel compactification of D_k/O_-(L_k) is obtained from D_k/O_-(L_k) by adding one point p and h(k) curves, so one zero-dimensional boundary component and h(2) = 9 one-dimensional ones (Section 6.3, p. 100). Section 3.6, p. 50, defines O_-(L) as the group of isometries of L with spinor norm 1, and Section 1, p. 3, as the index-two subgroup of O(L) that preserves the component D_k of the period domain; that is this card's O+.",
+     "planes": 9
+    }
+   },
+   "signature": [
+    2,
+    19
+   ],
+   "tag": "6JRY"
   }
  },
  "polarization_counts": {

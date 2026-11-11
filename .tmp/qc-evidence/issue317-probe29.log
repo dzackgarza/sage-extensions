@@ -1,0 +1,13 @@
+k = 1: det -2, spinor_genus_count 1, spinor_generators(proper=False) []
+        Sage's Genus.representatives would use p = 3 (it starts at 2 for an even genus and skips primes dividing the determinant)
+k = 2: det -4, spinor_genus_count 1, spinor_generators(proper=False) []
+        Sage's Genus.representatives would use p = 3 (it starts at 2 for an even genus and skips primes dividing the determinant)
+DONE
+[peakrss] issue286: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 3 MiB
+[peakrss] low-water MemAvail : 11628 MiB
+[peakrss] peak single VmHWM  : 3 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       3 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail= 11628 MiB
+launcher exit: 0

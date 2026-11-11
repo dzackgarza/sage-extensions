@@ -301,3 +301,13 @@ are byte-for-byte the launcher's redirected output.
 | `issue295-O-q-B2-engine-wall.log` | `#295` | `A.orthogonal_group()` for `A = (Z/2)^11`: `fqf_orthogonal._isom_fqf` → `orbits`, no return at 180 s |
 | `issue295-image-order-in-O-q-B2.log` | `#295` | `order of the image in O(q_B(2)): 247726080` from the faithful action on the 2048 classes, 92 stabilizer generators, 220 s |
 | `issue295-gate-setA.log` | `#295` | the new module plus four neighbours: **16 passed in 311.70 s**, exit 0 |
+
+Second batch on issue 317 (cards by tag, spinor split, k = 2 diagnosis):
+`issue317-summand-genus-from-card.log` — `tests/lattices/test_genus_of_the_scattone_summands.sage`
+with the expected count read from card 6JRX plus the two-spinor-genus split test:
+**4 passed in 83.24 s**, exit 0 (the enumeration call 82.52 s, gate red on cost);
+`issue317-probe27.log` and `issue317-probe28.log` — the split on `diag(3,4,9)`,
+`diag(1,16,17)` (4, 4) and `diag(1,16,20)` (3, 3); `issue317-probe29.log` — both
+summand genera have one improper spinor genus and Sage uses p = 3;
+`issue317-probe25d.log` — the repaired walk at p = 2, 3, 5, 7 reaches seven of the
+nine k = 2 classes.

@@ -1,0 +1,33 @@
+
+=== diag(3,4,9) ===
+  spinor_genus_count: 2
+  class number: 2
+  mass: (1)/(4)
+  spinor_genus_class_numbers: (1, 1)
+
+=== diag(3,9,4) ===
+  spinor_genus_count: 2
+  class number: 2
+  mass: (1)/(4)
+  spinor_genus_class_numbers: (1, 1)
+
+=== diag(4,9,3) ===
+  spinor_genus_count: 2
+  class number: 2
+  mass: (1)/(4)
+  spinor_genus_class_numbers: (1, 1)
+DONE
+[peakrss] issue286: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 351 MiB
+[peakrss] low-water MemAvail : 1436 MiB
+[peakrss] peak single VmHWM  : 357 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      347 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   351 MiB hwm=   357 MiB avail=  1436 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   338 MiB hwm=   344 MiB avail=  1477 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   175 MiB hwm=   181 MiB avail=  1652 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   114 MiB hwm=   122 MiB avail=  1778 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  1885 MiB
+launcher exit: 0
