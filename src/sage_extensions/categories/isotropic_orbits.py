@@ -2228,6 +2228,64 @@ class IsotropicVectorReductionImage(SageObject):
             return False
         return self._coset_meets_the_subgroup(self._discriminant_representation()(lift))
 
+    def class_lift(self, vector_of_the_reduction):
+        r"""Return a vector of ``v^\perp`` whose class in ``N`` is ``vector_of_the_reduction``.
+
+        The reduction's coordinate frame is a section of
+        ``v^\perp -> v^\perp/\mathbf Z v`` on its generating set, so the class is
+        lifted by the same coordinates.  The lift is checked against the
+        projection rather than assumed.
+        """
+        coordinates = vector_of_the_reduction.to_vector()
+        frame = self._reduction.coordinate_frame()
+        lift = None
+        for label in self._reduction.module_generating_set():
+            coefficient = int(coordinates(label))
+            if coefficient:
+                piece = coefficient * frame[label]
+                lift = piece if lift is None else lift + piece
+        assert lift is not None and self._reduction.projection()(lift) == vector_of_the_reduction, (
+            f"the coordinate frame of {self._reduction} does not lift the class "
+            f"{vector_of_the_reduction} to a vector of v^perp"
+        )
+        return self._line.isotropic_perpendicular().inclusion()(lift)
+
+    def admits_root(self, root) -> bool:
+        r"""Whether the reflection of ``N`` in ``root`` lies in ``G_v``.
+
+        The lift is :meth:`class_lift` and the lift of the reflection is the
+        reflection of the ambient lattice in that vector, which fixes ``v``, so
+        the criterion of :meth:`contains` applies with an explicit lift and no
+        Levi section is needed.  This is the root filter that
+        :meth:`cusp_chamber` hands to Vinberg's algorithm (#285).
+        """
+        lift = self.class_lift(root)
+        reflection = self._lattice.reflection(lift)
+        return self.contains(self.reduction_image(reflection), lift=reflection)
+
+    def cusp_chamber(self, *, max_roots=None, max_decompositions=None):
+        r"""Return the chamber of the reflection part of ``G_v`` on ``N`` (#285).
+
+        Vinberg's algorithm on the hyperbolic reduction ``N``, with the root
+        filter :meth:`admits_root`: a root of ``N`` is a wall only when its
+        reflection lies in ``G_v``.  The result is the chamber anchored at the
+        cusp that the class of ``v`` defines, whose walls and inner products are
+        the Coxeter diagram of the polarized cusp
+        (Sterk, *Compactifications of the period space of Enriques surfaces,
+        Part I*, Math. Z. 207 (1991), §4.3.1, p. 17, with the diagrams
+        4.3.5--4.3.9).  ``max_roots`` and ``max_decompositions`` bound the
+        search; an unbounded search on a chamber that is not of finite volume
+        does not return.
+        """
+        from sage_extensions.categories.hyperbolic_lattices import HyperbolicLattices
+
+        reduction = HyperbolicLattices(self._lattice.base_ring())(self._reduction)
+        return reduction.fundamental_chamber(
+            admits_root=self.admits_root,
+            max_roots=max_roots,
+            max_decompositions=max_decompositions,
+        )
+
     def root_reflection(self, root):
         r"""Return the reflection of ``L`` in ``root``, which must lie in ``v^\perp``.
 
