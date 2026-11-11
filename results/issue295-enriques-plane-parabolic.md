@@ -133,8 +133,17 @@ T_En.Aut().stabilizer(P1, action="setwise").group_generators()
 
 The 120 reflections come from the single shell of $K = E_8(-4)$ (the catalogue's
 doubling of $E_8(-2)$): 240 vectors, $w$ and $-w$ giving one reflection each.
-Their images in $O(K)$ generate $W(E_8) = O(E_8)/\{\pm 1\}$, which is the whole
-Levi factor there.
+Their images in $O(K)$ generate $W(E_8) = O(E_8)$, the whole Levi factor
+there: the reflection group *is* the orthogonal group of $E_8$, because $-1$
+is its longest element, so no sign class is divided out.
+
+Measured against the discriminant image, these families are not the whole
+parabolic: the reflections' images generate a subgroup of index
+$134912 = 527 \cdot 256$ in $Q = \rho(O(T_{\mathrm{En}}))$ (order
+$46998591897600$), while the radical and the Levi-on-$P$ lifts have trivial
+image and the divided class set of $P_1$ has a $Q$-orbit of $527$ points.
+The plane index therefore does not close from these generators;
+`results/issue325-plane-index.md` records the measurements.
 
 ## 4. Evidence
 

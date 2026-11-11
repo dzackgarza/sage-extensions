@@ -1363,7 +1363,9 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             running count stays below 128: for \(T_{\mathrm{En}}\) at \(P_1\),
             \(K = E_8(-4)\) (the catalogue's doubling of \(E_8(-2)\)) has one
             shell of 240 vectors, whose reflections generate
-            \(W(E_8) = O(E_8)/(\pm 1)\) and so the whole Levi factor; for the
+            \(W(E_8) = O(E_8)\) and so the whole Levi factor -- the reflection
+            group *is* the orthogonal group of \(E_8\), because \(-1\) is its
+            longest element, so no sign class is divided out; for the
             odd \(I_{0,7}(2)\) of the Coble ambient the first shell alone gives
             only the sign changes and the second is needed for the permutations.
             """
