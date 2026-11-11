@@ -161,12 +161,14 @@ other projects' probes).
 
 Measured on the public call:
 
-    k = 1: 4 classes, mass exact, 95.83 s (the chamber is 77 s of it)
-    k = 2: 9 classes, mass exact, 35.08 s (the chamber is ~69 s of it)
+    k = 1: 4 classes, mass exact, 96.51 s (the chamber is ~77 s of it)
+    k = 2: 9 classes, mass exact, 27.11 s (the chamber is ~69 s of it)
 
 and `_genus_classes` alone, with the chamber already built, at `k = 2`:
 **25.6 s** (`issue334-probe6.log`), against the probe's 30 s and against no
-return in 1080 s on `main`.
+return in 1080 s on `main`. The run quoted below is at the pushed commit, which
+is the same branch rebased onto `main` at `6db8551` (the two commits that
+landed after `7519715` touch `lattices.py` at lines 2298–6544, not this route).
 
 ## 5. The tests
 
@@ -179,7 +181,7 @@ taken through the public `genus().representatives()`.
     $ /sage/.venv/bin/python -m pytest tests/lattices/test_genus_of_the_scattone_summands.sage \
         -o addopts='' -p qc_sage_session -p sage_extensions.testing.suite_budget \
         -p sage_extensions.testing.test_lint --tb=short -rf --no-time-gates
-    8 passed in 135.66s (0:02:15)
+    8 passed in 127.63s (0:02:07)
 
 The same file was red on `test-lint` on `main` — four findings, `TL01` on
 `import json` and `from pathlib import Path`, `TL13` on `__file__`, `TL10` on
