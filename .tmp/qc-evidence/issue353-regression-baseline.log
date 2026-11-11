@@ -1,0 +1,513 @@
+FFFFFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+_ test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[reduction] _
+
+public_operation = 'reduction'
+
+    @pytest.mark.parametrize("public_operation", ("reduction", "radical", "generators"))
+    def test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices(public_operation):
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic + hyperbolic + hyperbolic
+        e, f, a, b, u, v = tuple(ambient.module_generators())
+        labels = tuple(ambient.module_generating_set())
+        space = ambient.primitive_isotropic_subobject(e, a)
+        inclusion = space.inclusion()
+        null_labels = tuple(inclusion.domain().module_generating_set())
+        reduction = space.isotropic_reduction()
+        if public_operation == "reduction":
+>           group_generators = reduction.unipotent_kernel().group_generators()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_higher_rank_unipotent_kernel.sage:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/groups.py:5763: in group_generators
+    self.selected_group_resolution().generators(name="Group generators"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5726: in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:383: in selected_resolution
+    resolution = selected.realize()
+                 ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:116: in realize
+    return self._resolution_factory()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:47: in resolution
+    augmentation = generating_morphism(subgroup)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3670: in <lambda>
+    augmentation = None if generators is None else lambda kernel: kernel.free_cover(generators())
+                                                                                    ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def generators():
+        from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+    
+>       return finite_ordered_set(tuple(RECURSION.isotropic_quotient_kernel_generators(self, radical_images=())))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+
+src/sage_extensions/categories/lattices.py:11939: AttributeError
+_ test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[radical] _
+
+public_operation = 'radical'
+
+    @pytest.mark.parametrize("public_operation", ("reduction", "radical", "generators"))
+    def test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices(public_operation):
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic + hyperbolic + hyperbolic
+        e, f, a, b, u, v = tuple(ambient.module_generators())
+        labels = tuple(ambient.module_generating_set())
+        space = ambient.primitive_isotropic_subobject(e, a)
+        inclusion = space.inclusion()
+        null_labels = tuple(inclusion.domain().module_generating_set())
+        reduction = space.isotropic_reduction()
+        if public_operation == "reduction":
+            group_generators = reduction.unipotent_kernel().group_generators()
+        elif public_operation == "radical":
+>           group_generators = space.unipotent_radical().group_generators()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_higher_rank_unipotent_kernel.sage:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/groups.py:5763: in group_generators
+    self.selected_group_resolution().generators(name="Group generators"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5726: in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:383: in selected_resolution
+    resolution = selected.realize()
+                 ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:116: in realize
+    return self._resolution_factory()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:47: in resolution
+    augmentation = generating_morphism(subgroup)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3670: in <lambda>
+    augmentation = None if generators is None else lambda kernel: kernel.free_cover(generators())
+                                                                                    ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def generators():
+        from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+    
+>       return finite_ordered_set(tuple(RECURSION.isotropic_quotient_kernel_generators(self, radical_images=())))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+
+src/sage_extensions/categories/lattices.py:11939: AttributeError
+_ test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[generators] _
+
+public_operation = 'generators'
+
+    @pytest.mark.parametrize("public_operation", ("reduction", "radical", "generators"))
+    def test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices(public_operation):
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic + hyperbolic + hyperbolic
+        e, f, a, b, u, v = tuple(ambient.module_generators())
+        labels = tuple(ambient.module_generating_set())
+        space = ambient.primitive_isotropic_subobject(e, a)
+        inclusion = space.inclusion()
+        null_labels = tuple(inclusion.domain().module_generating_set())
+        reduction = space.isotropic_reduction()
+        if public_operation == "reduction":
+            group_generators = reduction.unipotent_kernel().group_generators()
+        elif public_operation == "radical":
+            group_generators = space.unipotent_radical().group_generators()
+        else:
+>           group_generators = space.unipotent_group_generators()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_higher_rank_unipotent_kernel.sage:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/isotropic_parabolics.py:573: in unipotent_group_generators
+    return finite_indexed_family_from_values(None, tuple(self.unipotent_radical().group_generators()))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5763: in group_generators
+    self.selected_group_resolution().generators(name="Group generators"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5726: in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:383: in selected_resolution
+    resolution = selected.realize()
+                 ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:116: in realize
+    return self._resolution_factory()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:47: in resolution
+    augmentation = generating_morphism(subgroup)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3670: in <lambda>
+    augmentation = None if generators is None else lambda kernel: kernel.free_cover(generators())
+                                                                                    ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def generators():
+        from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+    
+>       return finite_ordered_set(tuple(RECURSION.isotropic_quotient_kernel_generators(self, radical_images=())))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+
+src/sage_extensions/categories/lattices.py:11939: AttributeError
+________ test_split_pointwise_levi_lift_over_an_infinite_quotient[line] ________
+
+>   return cache[k]
+E   KeyError: ((Morphism from Integral lattice of rank 3 and signature (2, 1) to Integral lattice of rank 3 and signature (2, 1),), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+null_rank = 1
+
+    @pytest.mark.parametrize("null_rank", (1, 2), ids=("line", "plane"))
+    def test_split_pointwise_levi_lift_over_an_infinite_quotient(null_rank):
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic
+        for _ in range(null_rank):
+            ambient = ambient + hyperbolic
+        ambient = ambient + Lattices(ZZ)([[2]])
+        basis = tuple(ambient.module_generators())
+        labels = tuple(ambient.module_generating_set())
+        null_basis = basis[:2*null_rank:2]
+        u, v, w = basis[-3:]
+        known = ambient.Aut()(dict(zip(labels, (*basis[:-3], u, v+w-u, w-2*u), strict=True)))
+        reduction = ambient.primitive_isotropic_subobject(*null_basis).isotropic_reduction()
+        quotient_map = reduction.levi_action()(known)
+>       lift = reduction.pointwise_levi_lift(quotient_map)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_pointwise_levi_images.sage:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattices.py:11969: in pointwise_levi_lift
+    if isometry not in self.pointwise_levi_image(subgroup=subgroup):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:4437: in __contains__
+    member = self.predicate()(point)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3696: in <lambda>
+    lambda element: element in image_locus,
+                    ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:4437: in __contains__
+    member = self.predicate()(point)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:11933: in <lambda>
+    image = self.Aut().condition_set(lambda isometry: self._pointwise_levi_integral_lift_or_none(isometry) is not None)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    ???
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Integral lattice of rank 3 and signature (2, 1)
+isometry = Morphism from Integral lattice of rank 3 and signature (2, 1) to Integral lattice of rank 3 and signature (2, 1)
+
+    @cached_method
+    def _pointwise_levi_integral_lift_or_none(self, isometry):
+        r"""An integral quotient lift fixing the null sublattice pointwise, or None."""
+        from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+    
+>       return RECURSION.isotropic_quotient_lift(self, isometry, radical_images=())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+
+src/sage_extensions/categories/lattices.py:11949: AttributeError
+_______ test_split_pointwise_levi_lift_over_an_infinite_quotient[plane] ________
+
+>   return cache[k]
+E   KeyError: ((Morphism from Integral lattice of rank 3 and signature (2, 1) to Integral lattice of rank 3 and signature (2, 1),), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+null_rank = 2
+
+    @pytest.mark.parametrize("null_rank", (1, 2), ids=("line", "plane"))
+    def test_split_pointwise_levi_lift_over_an_infinite_quotient(null_rank):
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic
+        for _ in range(null_rank):
+            ambient = ambient + hyperbolic
+        ambient = ambient + Lattices(ZZ)([[2]])
+        basis = tuple(ambient.module_generators())
+        labels = tuple(ambient.module_generating_set())
+        null_basis = basis[:2*null_rank:2]
+        u, v, w = basis[-3:]
+        known = ambient.Aut()(dict(zip(labels, (*basis[:-3], u, v+w-u, w-2*u), strict=True)))
+        reduction = ambient.primitive_isotropic_subobject(*null_basis).isotropic_reduction()
+        quotient_map = reduction.levi_action()(known)
+>       lift = reduction.pointwise_levi_lift(quotient_map)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_pointwise_levi_images.sage:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattices.py:11969: in pointwise_levi_lift
+    if isometry not in self.pointwise_levi_image(subgroup=subgroup):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:4437: in __contains__
+    member = self.predicate()(point)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3696: in <lambda>
+    lambda element: element in image_locus,
+                    ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:4437: in __contains__
+    member = self.predicate()(point)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:11933: in <lambda>
+    image = self.Aut().condition_set(lambda isometry: self._pointwise_levi_integral_lift_or_none(isometry) is not None)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Integral lattice of rank 3 and signature (2, 1)
+isometry = Morphism from Integral lattice of rank 3 and signature (2, 1) to Integral lattice of rank 3 and signature (2, 1)
+
+    @cached_method
+    def _pointwise_levi_integral_lift_or_none(self, isometry):
+        r"""An integral quotient lift fixing the null sublattice pointwise, or None."""
+        from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+    
+>       return RECURSION.isotropic_quotient_lift(self, isometry, radical_images=())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+
+src/sage_extensions/categories/lattices.py:11949: AttributeError
+__________ test_glued_line_pointwise_image_excludes_quotient_negation __________
+
+>   return cache[k]
+E   KeyError: ((Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1),), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_glued_line_pointwise_image_excludes_quotient_negation():
+        ambient = Lattices(ZZ)([[0, 3, 0, 0], [3, 0, 1, 0], [0, 1, 0, 3], [0, 0, 3, 0]])
+        e, f, x, y = tuple(ambient.module_generators())
+        reduction = ambient.primitive_isotropic_subobject(e).isotropic_reduction()
+        minus = reduction.O()({label: -reduction.module_generator(label) for label in reduction.module_generating_set()})
+        setwise = reduction.parabolic_subgroup()(ambient.Aut()({label: -ambient.module_generator(label) for label in ambient.module_generating_set()}))
+        assert reduction.levi_action()(setwise) == minus
+        assert setwise(e) == -e
+>       assert reduction.pointwise_levi_lift(minus) is None
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_pointwise_levi_images.sage:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattices.py:11969: in pointwise_levi_lift
+    if isometry not in self.pointwise_levi_image(subgroup=subgroup):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:4437: in __contains__
+    member = self.predicate()(point)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3696: in <lambda>
+    lambda element: element in image_locus,
+                    ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:4437: in __contains__
+    member = self.predicate()(point)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:11933: in <lambda>
+    image = self.Aut().condition_set(lambda isometry: self._pointwise_levi_integral_lift_or_none(isometry) is not None)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Integral lattice of rank 2 and signature (1, 1)
+isometry = Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1)
+
+    @cached_method
+    def _pointwise_levi_integral_lift_or_none(self, isometry):
+        r"""An integral quotient lift fixing the null sublattice pointwise, or None."""
+        from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+    
+>       return RECURSION.isotropic_quotient_lift(self, isometry, radical_images=())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+
+src/sage_extensions/categories/lattices.py:11949: AttributeError
+_____________ test_zero_null_pointwise_levi_lift_and_joint_kernel ______________
+
+>   return cache[k]
+E   KeyError: ((Morphism from Integral lattice of rank 1 and signature (1, 0) to Integral lattice of rank 1 and signature (1, 0),), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_zero_null_pointwise_levi_lift_and_joint_kernel():
+        ambient = Lattices(ZZ)([[6]])
+        reduction = ambient.primitive_isotropic_subobject().isotropic_reduction()
+        minus = reduction.O()({label: -reduction.module_generator(label) for label in reduction.module_generating_set()})
+>       lift = reduction.pointwise_levi_lift(minus)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_pointwise_levi_images.sage:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattices.py:11969: in pointwise_levi_lift
+    if isometry not in self.pointwise_levi_image(subgroup=subgroup):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:4437: in __contains__
+    member = self.predicate()(point)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3696: in <lambda>
+    lambda element: element in image_locus,
+                    ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:4437: in __contains__
+    member = self.predicate()(point)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:11933: in <lambda>
+    image = self.Aut().condition_set(lambda isometry: self._pointwise_levi_integral_lift_or_none(isometry) is not None)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Integral lattice of rank 1 and signature (1, 0)
+isometry = Morphism from Integral lattice of rank 1 and signature (1, 0) to Integral lattice of rank 1 and signature (1, 0)
+
+    @cached_method
+    def _pointwise_levi_integral_lift_or_none(self, isometry):
+        r"""An integral quotient lift fixing the null sublattice pointwise, or None."""
+        from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+    
+>       return RECURSION.isotropic_quotient_lift(self, isometry, radical_images=())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+
+src/sage_extensions/categories/lattices.py:11949: AttributeError
+____ test_primitive_isotropic_refinement_selects_the_line_eichler_operation ____
+
+    def test_primitive_isotropic_refinement_selects_the_line_eichler_operation() -> None:
+        lattice, line = _lorentzian_line()
+        module_generators = tuple(lattice.module_generators())
+        isotropic = module_generators[0]
+        root = module_generators[2]
+    
+        transvection = line.eichler_transvection(root)
+>       family = line.unipotent_group_generators()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_parabolic_induction.sage:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/isotropic_parabolics.py:573: in unipotent_group_generators
+    return finite_indexed_family_from_values(None, tuple(self.unipotent_radical().group_generators()))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5763: in group_generators
+    self.selected_group_resolution().generators(name="Group generators"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5726: in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:383: in selected_resolution
+    resolution = selected.realize()
+                 ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:116: in realize
+    return self._resolution_factory()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:47: in resolution
+    augmentation = generating_morphism(subgroup)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3670: in <lambda>
+    augmentation = None if generators is None else lambda kernel: kernel.free_cover(generators())
+                                                                                    ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def generators():
+        from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+    
+>       return finite_ordered_set(tuple(RECURSION.isotropic_quotient_kernel_generators(self, radical_images=())))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+
+src/sage_extensions/categories/lattices.py:11939: AttributeError
+________ test_the_eichler_transvections_of_a_line_form_an_abelian_group ________
+
+    def test_the_eichler_transvections_of_a_line_form_an_abelian_group() -> None:
+        lattice, line = _lorentzian_line()
+        module_generators = tuple(lattice.module_generators())
+        isotropic = module_generators[0]
+        first, second = module_generators[2:4]
+    
+        left = line.eichler_transvection(first)
+        right = line.eichler_transvection(second)
+        assert left * right == line.eichler_transvection(first + second)
+        assert left * right == right * left
+        assert ~left == line.eichler_transvection(-first)
+        assert line.eichler_transvection(isotropic) == lattice.Aut().identity()
+        assert line.eichler_transvection(lattice.zero()) == lattice.Aut().identity()
+    
+>       family = line.unipotent_group_generators()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_parabolic_induction.sage:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/isotropic_parabolics.py:573: in unipotent_group_generators
+    return finite_indexed_family_from_values(None, tuple(self.unipotent_radical().group_generators()))
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5763: in group_generators
+    self.selected_group_resolution().generators(name="Group generators"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5726: in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:383: in selected_resolution
+    resolution = selected.realize()
+                 ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:116: in realize
+    return self._resolution_factory()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:47: in resolution
+    augmentation = generating_morphism(subgroup)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3670: in <lambda>
+    augmentation = None if generators is None else lambda kernel: kernel.free_cover(generators())
+                                                                                    ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def generators():
+        from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+    
+>       return finite_ordered_set(tuple(RECURSION.isotropic_quotient_kernel_generators(self, radical_images=())))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+
+src/sage_extensions/categories/lattices.py:11939: AttributeError
+=========================== short test summary info ============================
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[reduction]
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[radical]
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[generators]
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[line]
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[plane]
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_glued_line_pointwise_image_excludes_quotient_negation
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_zero_null_pointwise_levi_lift_and_joint_kernel
+FAILED tests/lattices/test_parabolic_induction.sage::test_primitive_isotropic_refinement_selects_the_line_eichler_operation
+FAILED tests/lattices/test_parabolic_induction.sage::test_the_eichler_transvections_of_a_line_form_an_abelian_group
+9 failed in 44.88s
+[peakrss] issue353: child waited=1 shell_code=1 samples=28
+[peakrss] peak tree RSS      : 311 MiB
+[peakrss] low-water MemAvail : 2717 MiB
+[peakrss] peak single VmHWM  : 323 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      313 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    38.1s procs=  3 rss=   311 MiB hwm=   318 MiB avail=  4224 MiB
+[peakrss]   t=    54.2s procs=  3 rss=   310 MiB hwm=   323 MiB avail=  4273 MiB
+[peakrss]   t=    52.1s procs=  3 rss=   309 MiB hwm=   323 MiB avail=  3557 MiB
+[peakrss]   t=    44.1s procs=  3 rss=   308 MiB hwm=   323 MiB avail=  4168 MiB
+[peakrss]   t=    46.1s procs=  3 rss=   308 MiB hwm=   323 MiB avail=  4006 MiB
+launcher exit: 1

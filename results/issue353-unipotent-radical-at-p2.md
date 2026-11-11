@@ -157,6 +157,25 @@ the block matrix agrees with the direct image of a `K` vector.
 2. The structure is **not** "missing a citation" and the rank is **not** unverified: both
    are now derived from the cited block form and computed, and `2 rank(K) + 1` holds.
 
+## Regression check on the neighbouring modules
+
+The modules that touch the same machinery were run as well.  Ten of their tests fail, and
+the same ten fail on a clean worktree at the base commit (`6907349`, `.scratch/wt353base`),
+so the set is pre-existing and unrelated to this change:
+
+```
+tests/lattices/test_higher_rank_unipotent_kernel.sage       3 failed  (also on the base)
+tests/lattices/test_pointwise_levi_images.sage              4 failed  (also on the base)
+tests/lattices/test_parabolic_induction.sage                2 failed  (also on the base)
+                                                     9 failed in 44.88s on the clean base
+tests/lattices/test_the_plane_stabilizer_reaches_the_whole_quotient_group.sage   passed
+```
+
+The last line is the module nearest this change -- it drives the plane stabilizer's
+quotient image through the same block basis -- and it passes.  `test_isotropic_reduction.sage`
+passes in full (7 of 7), and `test_the_enriques_plane_discriminant_image_bound.sage` was not
+reached before the run was stopped.
+
 ## What this does not claim
 
 `#331` is not reached: the parabolic at P₂ is not shown to be the whole setwise
