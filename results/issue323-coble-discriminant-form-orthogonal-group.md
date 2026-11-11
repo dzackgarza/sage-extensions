@@ -216,7 +216,7 @@ the two orbits carrying `q = 0` have 1 and 527 classes — the card's
 
 ### 4.3 The acceptance test
 
-`tests/lattices/test_discriminant_form_of_the_coble_lattice.sage`, six tests,
+`tests/lattices/test_discriminant_form_of_the_coble_lattice.sage`, seven tests,
 each number card `6JRR`'s, read from `tests/cards/lattice-database-enriques.json`
 by tag through `card("discriminant_forms", "6JRR")`:
 
@@ -224,17 +224,23 @@ by tag through `card("discriminant_forms", "6JRR")`:
 $ /sage/.venv/bin/python -m pytest -p qc_sage_session -p sage_extensions.testing.test_lint \
     -o addopts= -q --tb=short --durations=0 \
     tests/lattices/test_discriminant_form_of_the_coble_lattice.sage
-......                                                                   [100%]
-7.75s call  ...::test_the_generating_set_of_the_orthogonal_group_states_isometries
-5.33s call  ...::test_the_lattice_is_the_published_formula_and_its_discriminant_form_is_the_cards
-0.24s call  ...::test_discriminant_representation_of_the_coble_lattice_returns_on_an_isometry
-0.14s call  ...::test_the_rank_one_half_integral_form_has_the_trivial_orthogonal_group
+.......                                                                  [100%]
+6.07s call  ...::test_the_generating_set_of_the_orthogonal_group_states_isometries
+3.59s call  ...::test_the_lattice_is_the_published_formula_and_its_discriminant_form_is_the_cards
+0.29s call  ...::test_a_half_integral_two_part_with_isotropic_dual_keeps_the_general_route
+0.13s call  ...::test_discriminant_representation_of_the_coble_lattice_returns_on_an_isometry
+0.12s call  ...::test_the_rank_one_half_integral_form_has_the_trivial_orthogonal_group
 0.08s call  ...::test_the_form_is_the_half_integral_odd_rank_case_the_owner_serves
-6 passed in 15.19s
+7 passed in 11.74s
 ```
 
-`just test-lint tests/lattices/test_discriminant_form_of_the_coble_lattice.sage`:
-`1 files, 0 findings`.
+That is the run in the pushed tree, with the test-lint plugin loaded. On its own,
+`just test-lint tests/lattices/test_discriminant_form_of_the_coble_lattice.sage`
+prints `1 files, 0 findings`.
+
+The commits these numbers belong to are `984e7e6` (the test) and `4df29b8` (the
+owner branch, the trap entry and this report) on `main`, whose push was verified
+with `git ls-remote main` at `4df29b83b9e4d9bc12545089f3ed2394987e41b6`.
 
 The card read is in `tests/lattices/conftest.py`, which binds `card(section, tag)`
 as a builtin — the mechanism the lint documents — because the lint rejects a file
