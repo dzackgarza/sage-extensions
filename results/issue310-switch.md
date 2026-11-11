@@ -79,3 +79,34 @@ class.
   `[rho(O(L)) : rho(Stab(line))]` computed from the two exact images, with the stabilizer's
   image asserted inside the group's image.  Green: **1 passed in 10.74 s**
   (`.tmp/p310-red-row.log`).
+
+## The class index on `T_Co`: 1, computed
+
+The decided design (a finite family of lines, the class bijection when the index per class is
+1) was measured on `T_Co` before any code moved (`.tmp/p310-probe10.log`):
+
+| quantity | value | cost |
+| --- | ---: | ---: |
+| `|rho(O(T_Co))|` | 46998591897600 | 98.2 s |
+| generators of `rho(O(T_Co))` | 77 | — |
+| `|rho(Stab(<e_1>))|` | 89181388800 | 20.8 s |
+| `|rho(O(T_Co)) . c|` for `c = [v/div v]` | **527** | 48.5 s (class walk on `A`, 2048 points) |
+| index per class `(|rho(G)|/|orbit|) / |rho(Stab)|` | **1** | — |
+
+So the hypothesis of the class bijection holds on `T_Co`, and it holds as a *computation*
+(`46998591897600 / 527 / 89181388800 = 1`), not as the citation #315 struck down.
+
+What did not land is the second half, the construction of one primitive isotropic line per
+class. The prescribed search is over `div(v) * (c~' + L)`, and the direct box scan of `L` in
+the chosen coordinates measures at:
+
+* `|x_i| <= 1`: 177147 vectors in 3.3 s, **46 of the 527 classes** hit.
+
+The lattice is `[2] + U(2) + E8(-2)`, so its isotropic vectors have first coordinate zero and
+solve `2 x_1 x_2 = -q_(E8(-2))(x)`; a plain coordinate box therefore fills the class set
+slowly, and a box large enough to reach all 527 (`|x_i| <= 2` is 48.8M coordinate vectors)
+was not established as sufficient within this unit. The construction needs either that
+measurement or the substitution `x_1 = 1, x_2 = -q(x)/2` over a box in the `E8(-2)` part only,
+which turns the isotropic condition into a solved coordinate and leaves 8 free coordinates.
+Until one of them is measured, the call has no bound it can name, and a bound it cannot name
+is exactly what the refusal must not invent.
