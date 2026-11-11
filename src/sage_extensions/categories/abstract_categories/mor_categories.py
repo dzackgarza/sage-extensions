@@ -128,7 +128,15 @@ def _category_mor(
         from sage_extensions.categories.abstract_categories.cat import _FunctorCategory
 
         if isinstance(category, _FunctorCategory):
-            return _FunctorCategory.Mor(category, domain, codomain)
+            # The Mor of the most specific functor-category realization that
+            # states one: a subcategory of [C, D] such as the oriented
+            # isotropic flags cuts its Mor out of [C, D](F, G) (CON-17), and
+            # that subobject is what admits its arrows.
+            owner = next(
+                klass for klass in type(category).__mro__
+                if issubclass(klass, _FunctorCategory) and "Mor" in vars(klass)
+            )
+            return owner.Mor(category, domain, codomain)
         # Admission follows the category's public Mor selector.  Most owned
         # categories inherit the packet implementation, while constructions
         # such as G-objects and functor categories legitimately specialize
