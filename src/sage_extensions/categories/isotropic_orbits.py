@@ -1388,11 +1388,258 @@ def _isotropic_stabilizer_generators(orthogonal_group, obj, *, flag=False):
     )
 
 
+def _divided_discriminant_classes(lattice, plane):
+    r"""Return the divided discriminant classes ``[u/div(u)]`` of a primitive isotropic plane.
+
+    For a primitive ``u`` of ``L`` with divisibility ``d = div(u)`` the vector
+    ``u/d`` lies in ``L^\#`` and its class ``[u/d]`` in ``A_L = L^\#/L`` depends
+    only on the line ``\mathbb{Z} u``: ``div(mu) = m div(u)``, so
+    ``mu/div(mu) = u/div(u)``.  The class set of a primitive isotropic
+    subobject is therefore the set of these classes over its primitive
+    directions, which is finite because ``2 u/div(u) \in L`` on a lattice whose
+    discriminant group has exponent two: for such an ``L`` a class in ``A_L`` is
+    fixed by the coset of ``u`` in ``P/2P``, so the three nonzero cosets carry
+    every class and the third term below contributes nothing new.
+
+    ``P1 = \mathbb{Z} e_1 + \mathbb{Z} e_3`` and
+    ``P2 = \mathbb{Z}(2 e_1 + 2 e_2 + w) + \mathbb{Z} e_3`` of the Enriques
+    period lattice (D. Dutour Sikirić and K. Hulek, *Moduli of polarised
+    Enriques surfaces -- computational aspects*, J. London Math. Soc. 110
+    (2024), arXiv:2302.01679, §3.6 (the Tits building), p. 22, and H. Sterk,
+    *Compactifications of the period space of Enriques surfaces, Part I*,
+    Math. Z. 207 (1991), Propositions 4.5 (p. 28) and 4.6 (p. 29)) have
+    different class sets here, which is the whole reason the two planes are in
+    different ``O(L)``-orbits.
+    """
+    inclusion = plane.inclusion()
+    domain = inclusion.domain()
+    labels = tuple(domain.module_generating_set())
+    basis = tuple(inclusion(domain.module_generator(label)) for label in labels)
+    if len(basis) != 2:
+        raise ValueError(
+            f"a primitive isotropic plane needs two generators, but {plane} has {len(basis)}; "
+            f"the divided class set is stated only for rank two"
+        )
+    discriminant = lattice.discriminant_group()
+    classes = [discriminant.zero()]
+    for vector in (basis[0], basis[1], basis[0] + basis[1]):
+        classes.append(lattice.divided_discriminant_class(vector))
+    return tuple(classes)
+
+
+class IsotropicPlaneOrbit:
+    r"""One orbit of primitive isotropic planes of a lattice under an arithmetic subgroup.
+
+    The orbit is recorded by the point of the finite divided-class set that
+    indexes it, and realized as an actual plane on demand.  See
+    :meth:`sage_extensions.categories.group.predicate_subgroups.PredicateSubgroups.ParentMethods.isotropic_plane_orbits`
+    for the reduction that makes one point stand for one orbit.
+    """
+
+    def __init__(self, decomposition, start, point) -> None:
+        self._decomposition = decomposition
+        self._start = start
+        self._point = point
+
+    def lattice(self):
+        r"""Return the lattice whose planes are being classified."""
+        return self._decomposition.lattice()
+
+    def group(self):
+        r"""Return the subgroup acting."""
+        return self._decomposition.group()
+
+    def divided_classes(self):
+        r"""Return the divided discriminant classes of the realized representative."""
+        plane = self.representative()
+        return _divided_discriminant_classes(self.lattice(), plane)
+
+    def representative(self):
+        r"""Return a primitive isotropic plane in this orbit.
+
+        The plane is the image of the ``O(L)``-orbit representative under an
+        isometry whose discriminant image carries the representative's class
+        set to this orbit's point.  The isometry is read as a word in the
+        ambient generators (the section of the finite character image), and
+        the transported plane is checked against the point it is supposed to
+        reach before it is returned.
+        """
+        return self._decomposition.plane_of(self._start, self._point)
+
+    def __repr__(self):
+        return f"An orbit of primitive isotropic planes of {self.lattice()} under {self.group()}"
+
+
+class _DividedClassPlaneOrbitDecomposition:
+    r"""The finite divided-class decomposition behind :class:`IsotropicPlaneOrbit`.
+
+    The reduction is Dutour Sikirić--Hulek, arXiv:2302.01679, Lemma 3.6
+    (printed p. 22, in §3.6 "The Tits building"): for ``G = O(L)``, its
+    discriminant kernel ``U = \widetilde{O}(L)`` contained in ``K = \Gamma`` and
+    a stabilizer ``H = G_x``, the quotient map ``G -> G/U`` carries the double
+    cosets ``K \backslash G / H`` onto those of ``K/U \backslash G/U /
+    \overline{H}``, and the double cosets ``\Gamma \backslash O(L) / G_x`` are
+    the ``\Gamma``-orbits on the ``O(L)``-orbit ``xG`` of the plane ``x``.  The
+    ambient quotient is the discriminant image ``Q = \rho(O(L)) \subset O(A_L)``,
+    of order ``46998591897600`` on ``T_{\mathrm{En}}``, and ``\Gamma`` is a
+    character kernel, so everything below is a finite permutation-group
+    computation on the divided classes.
+    """
+
+    def __init__(self, subgroup, representatives) -> None:
+        from sage.libs.gap.libgap import libgap
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        self._group = subgroup
+        lattice = representatives[0].inclusion().codomain()
+        if any(plane.inclusion().codomain() is not lattice for plane in representatives):
+            raise ValueError(
+                f"the divided-class plane orbits of {subgroup} need every ambient representative to "
+                f"be a plane of one lattice: the first is a plane of {lattice} and another is not"
+            )
+        self._lattice = lattice
+        self._discriminant = lattice.discriminant_group()
+        quotient = subgroup.finite_character_quotient()
+        # The engine is the character quotient's own discriminant image, so the
+        # classes cross into it through ITS orthogonal group; the classes
+        # themselves are read on the representatives' lattice above.
+        orthogonal = quotient.lattice.discriminant_group().O()
+        engine, image, section, ambient = quotient._im_rho_engine_and_section()
+        self._engine = engine
+        self._image = libgap.Subgroup(engine, libgap.SmallGeneratingSet(image))
+        self._section = section
+        self._ambient = ambient
+        self._orthogonal = orthogonal
+        self._setwise_action = libgap.function_factory(
+            "function(x, g) return Set(List(x, y -> ImageElm(g, y))); end"
+        )
+        self._starts = []
+        for plane in representatives:
+            classes = _divided_discriminant_classes(lattice, plane)
+            self._starts.append((plane, classes, self._point_of_classes(classes)))
+        subgroup_generators = tuple(subgroup.discriminant_image().group_generators())
+        images = [_element_to_engine(orthogonal, generator) for generator in subgroup_generators]
+        self._subgroup_image = libgap.Subgroup(engine, images)
+        self._subgroup_image_generators = libgap.SmallGeneratingSet(self._subgroup_image)
+
+    def lattice(self):
+        return self._lattice
+
+    def group(self):
+        return self._group
+
+    def _point_of_classes(self, classes):
+        return _libgap().Set([self._orthogonal._engine_abelian_element(c) for c in classes])
+
+    def _point_of(self, plane):
+        return self._point_of_classes(_divided_discriminant_classes(self._lattice, plane))
+
+    def orbits(self):
+        r"""Return one :class:`IsotropicPlaneOrbit` per orbit of the subgroup."""
+        from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+
+        action = self._setwise_action
+        ambient_orbits = [
+            _libgap().AsList(_libgap().Orbit(self._image, point, action))
+            for _plane, _classes, point in self._starts
+        ]
+        points = []
+        owners = []
+        for start, orbit in enumerate(ambient_orbits):
+            for point in orbit:
+                points.append(point)
+                owners.append(start)
+        markers = [str(point) for point in points]
+        position = {marker: index for index, marker in enumerate(markers)}
+        graphs = [
+            [position[str(action(point, generator))] for point in points]
+            for generator in self._subgroup_image_generators
+        ]
+        seen = [False] * len(points)
+        orbits = []
+        for start in range(len(points)):
+            if seen[start]:
+                continue
+            seen[start] = True
+            stack = [start]
+            while stack:
+                current = stack.pop()
+                for graph in graphs:
+                    following = graph[current]
+                    if not seen[following]:
+                        seen[following] = True
+                        stack.append(following)
+            orbits.append(IsotropicPlaneOrbit(self, owners[start], points[start]))
+        return finite_ordered_set(tuple(orbits))
+
+    def plane_of(self, start, point):
+        r"""Return the plane at ``point`` as the image of the ``start`` representative."""
+        from sage.libs.gap.libgap import libgap
+
+        plane, _classes, start_point = self._starts[start]
+        if str(point) == str(start_point):
+            return plane
+        element = libgap.RepresentativeAction(self._image, start_point, point, self._setwise_action)
+        if element is None:
+            raise ArithmeticError(
+                f"the divided class point {point} is not reached from the {start}-th representative "
+                f"of {self._lattice} by the discriminant image, which contradicts the orbit it was found in"
+            )
+        letters = self._section.letters_of(element)
+        for word in (letters, tuple(reversed(letters))):
+            transported = self._transported(plane, word)
+            if transported is not None and str(self._point_of(transported)) == str(point):
+                return transported
+        raise ArithmeticError(
+            f"no word in the ambient generators carries the class set of the {start}-th representative "
+            f"of {self._lattice} to {point} as a plane, although the discriminant image carries the "
+            f"class set there: the lift and the class set disagree"
+        )
+
+    def _transported(self, plane, word):
+        r"""The image of ``plane`` under the word of ambient-generator letters, or ``None``."""
+        inclusion = plane.inclusion()
+        domain = inclusion.domain()
+        vectors = [inclusion(domain.module_generator(label)) for label in domain.module_generating_set()]
+        for label, exponent in word:
+            isometry = self._ambient[label - 1]
+            if exponent != 1:
+                isometry = isometry.inverse()
+            vectors = [isometry(vector) for vector in vectors]
+        try:
+            return self._lattice.primitive_isotropic_subobject(*vectors)
+        except (ValueError, ArithmeticError):
+            return None
+
+
+def _libgap():
+    from sage.libs.gap.libgap import libgap
+
+    return libgap
+
+
+def _divided_class_isotropic_plane_orbits(subgroup, representatives):
+    r"""Return the subgroup's orbits of primitive isotropic planes, by divided classes."""
+    if representatives is None:
+        raise ValueError(
+            f"the divided-class plane orbits of {subgroup} need the O(L)-orbit representatives of "
+            f"primitive isotropic planes as an argument: the classification below classifies the "
+            f"subgroup's orbits inside each named ambient orbit, and the ambient plane orbit of an "
+            f"indefinite lattice is not enumerated by the port's marking-class route without a "
+            f"stabilizer computation"
+        )
+    representatives = tuple(representatives)
+    if not representatives:
+        raise ValueError(f"the divided-class plane orbits of {subgroup} need at least one ambient representative")
+    return _DividedClassPlaneOrbitDecomposition(subgroup, representatives).orbits()
+
+
 __all__ = [
     "ArithmeticCuspIncidence",
     "CuspIncidence",
     "FlagType",
     "IsotropicFlag",
+    "IsotropicPlaneOrbit",
     "OrientedIsotropicFlag",
     "RationalIsotropicFlagComplex",
 ]

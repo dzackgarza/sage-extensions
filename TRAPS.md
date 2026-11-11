@@ -3873,3 +3873,82 @@ does not return, and a `--tb=long` attempt segfaulted in CPython while formattin
 traceback (`inspect.getmodule`).  The fallback route's exception is therefore not
 identified; logs `.tmp/p315-enriques-case3-base.log` and
 `.tmp/p315-enriques-case3-after-native.log`.
+
+### The Enriques plane rows by divided classes, and the eager apex stabilizer that blocked them (2026-11-11, #316)
+
+**Delivered: a plane-orbit call that returns.** `IsotropicPlaneOrbits` are computed
+as the subgroup's orbits on the *divided discriminant classes* of the two
+`O(T_En)`-orbit representatives, in the finite discriminant image
+`Q = rho(O(T_En))`, `|Q| = 46998591897600`.  Reduced from the double cosets by
+Dutour Sikirić--Hulek, arXiv:2302.01679, Lemma 3.6 (printed p. 22, §3.6 "The Tits
+building"): with `U = ker rho ⊂ K = Γ` the map `O(L) -> O(L)/U` carries
+`Γ \backslash O(L) / G_x` bijectively onto the double cosets of the finite image,
+and those are the `Γ`-orbits on the `O(L)`-orbit of the plane.  Measured, one
+process, `PEAKRSS_LIMIT_MIB=6144`:
+
+```
+class point of P1 = Z e_1 + Z e_3              Q-orbit 527     in 0.0 s
+class point of P2 = Z(2e_1+2e_2+w) + Z e_3     Q-orbit 23715   in 0.3 s
+                                                     total   24242   = 029J `Otilde+` planes
+rho(Gamma_En,2)-orbits on the union (24242 pts)      9            = 029J `gamma-en-2` planes
+   orbit lengths 2, 120, 135, 270, 270, 1575, 3780, 8640, 9450
+|rho(Gamma_En,2)| = 696729600 (= |W(E8)|), [Q : rho(Gamma)] = 67456, |rho(Otilde+)| = 1
+```
+
+The two orbit sizes `527` and `23715` are exactly the stabilizer-image indices
+Dutour Sikirić--Hulek print (p. 22), so the class-point orbit and the coset space
+`Q/rho(Stab)` have equal size and the identification is certified by the published
+indices rather than assumed.  Module
+`tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage`; evidence
+`.tmp/p316-evidence/` (`INDEX.md`).
+
+**The rows are over the call gate, and the module is run with the gates off.**
+`224.95 s` for the `Γ_En,2` row and `100.31 s` for the `Õ⁺` row.  Under the
+repository's default `addopts` the second exceeds the 20 s call gate and the first
+is killed by `pytest-timeout` at 60 s, which ends the whole session rather than
+reporting a red gate — so a module with a row at this cost cannot even produce a
+verdict under the default flags.  This is the same intrinsic cost the `029J` `O`
+row already reports (64.19 s and 39.75 s in the same run), not a separate defect.
+Run with the repo's own documented flag set, the module and three neighbours are
+**10 passed in 468.06 s**, exit 0.
+
+**The prerequisite defect: `vector_stabilizer_generators` built an apex stabilizer it
+never uses.** `Γ_{En,2}` is built by the coinvariant route
+(`Involutions.I_En.polarized(h).coinvariant_extension_subgroup()`), which reaches
+`image_under` -> `group_generators()` on the invariant lattice's vector stabilizer ->
+`vector_stabilizer_generators` -> `_marking_stabilizer_generators(category, marked,
+category.apex_stabilizer(marked))`.  The third argument is evaluated **eagerly**, and
+for indefinite `L` `_marking_stabilizer_generators` ignores it: the generators come
+from the lattice category's marked-diagram decision.  `apex_stabilizer` calls
+`pointwise_stabilizer`, whose first statement is
+`from sage_indefinite_port.indefinite.pairing_slices import pointwise_transporter`, and
+the pinned port has **no** module `pairing_slices` (its indefinite modules are
+`pointwise_shell`, `exact_isotropic`, `marked_lattices`, `recursive`, ...; the names
+`pointwise_transporter`, `setwise_transporter` and `SubgroupVectorOrbits` appear
+nowhere in the port).  So `Γ_{En,2}` failed inside 46 s with `ModuleNotFoundError` in
+**most** fresh processes and built in one; the difference is whether something earlier
+in the session had given the invariant lattice's stabilizer complete character data, in
+which case `image_under` answers through `discriminant_image()` and no vector
+stabilizer is formed.  Repair at the caller that evaluates an argument it cannot need:
+`vector_stabilizer_generators` now asks the category for the apex stabilizer only when
+`lattice.is_definite()`, where `_marking_stabilizer_generators` actually reduces it;
+the indefinite branch passes `None`.  Behaviour on definite lattices is unchanged.
+`Γ_{En,2}` then builds in 30-45 s in every run measured.
+
+Still stale, not repaired here (outside #316): `lattice_morphisms.py:3723`
+(`setwise_transporter`) and `:4018` (`SubgroupVectorOrbits`) import the same absent
+module, so `pointwise_stabilizer`, the setwise stabilizer of a sublattice and
+`vector_orbit_set` raise `ModuleNotFoundError` on any indefinite lattice that reaches
+them.
+
+**The gate entrypoint does not bind the port, and that is a setup artefact.** The
+repository's declared `.scratch/sage-python` binds `$RUNWORK` (an empty directory) at
+`/work` and does **not** bind the pinned indefinite port.  A run through it therefore
+imports the image's port copy and dies in the recorded way, here as
+`../sage-indefinite-port/src/sage_indefinite_port/indefinite/recursive.py:154`
+(`recursive.py:154 int()` on an owned coordinate) inside
+`O(T_En).group_generators()`, which reads as six failures in modules that are green.
+The exact fix, measured: `SAGE_PYTHON_RUNWORK=<port repo>` plus
+`PYTHONPATH=/work/src:/work:<pytest_plugins>` so that the port is at `/work` and its
+`src` is ahead.  With that, the four-module gate run passes; without it, it fails on
+setup alone.

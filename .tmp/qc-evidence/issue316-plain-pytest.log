@@ -1,0 +1,24 @@
+....                                                                     [100%]
+============================== slowest durations ===============================
+282.93s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_gamma_en_2_plane_row_is_nine
+159.51s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_otilde_plus_plane_row_is_24242
+20.04s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_two_representatives_are_primitive_isotropic_planes_with_different_classes
+2.60s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_a_split_orbit_realizes_its_plane
+
+(8 durations < 0.005s hidden.  Use -vv to show these durations.)
+4 passed in 471.33s (0:07:51)
+[peakrss] issue316: child waited=0 shell_code=0 samples=241
+[peakrss] peak tree RSS      : 747 MiB
+[peakrss] low-water MemAvail : 5584 MiB
+[peakrss] peak single VmHWM  : 750 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      739 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        0 MiB peak
+[peakrss]   t=   472.9s procs=  3 rss=   747 MiB hwm=   750 MiB avail=  6503 MiB
+[peakrss]   t=   477.0s procs=  3 rss=   747 MiB hwm=   750 MiB avail=  6472 MiB
+[peakrss]   t=   479.0s procs=  3 rss=   747 MiB hwm=   750 MiB avail=  6463 MiB
+[peakrss]   t=   481.0s procs=  3 rss=   747 MiB hwm=   750 MiB avail=  6453 MiB
+[peakrss]   t=   475.0s procs=  3 rss=   746 MiB hwm=   750 MiB avail=  6507 MiB
+launcher exit: 0
