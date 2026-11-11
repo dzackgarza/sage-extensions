@@ -202,6 +202,20 @@ class NamedLattices:
 
     @lazy_class_attribute
     def Tco(cls):
+        r"""``T_Co = <2> + E(2)`` with ``E = E8 + U``: the Coble lattice of the source.
+
+        D. Dolgachev and S. Kondo, *Enriques surfaces and Borel--Weil--Bott type
+        duality*, Izv. Math. 77:3 (2013), section 3, equation (3.6), printed
+        p. 513: the lattice is ``N = <2> + E(2)`` with ``E = E8 + U``.  ``E8`` is
+        the negative definite one, ``E8(-1)``, and that is forced by the source's
+        own signature ``(2, 9)``: ``<2>`` contributes one positive square, while
+        ``(E8(-1) + U)(2)`` has signature ``(1, 9)`` -- with a positive definite
+        ``E8`` the sum would be ``(10, 1)``.  The blocks stand here in the
+        source's order, ``<2>``, ``U(2)``, ``E8(-2)``, with the ``E8`` block in
+        this catalogue's Sage basis order, so the named module generators are
+        ``h`` for the ``<2>`` line, ``ep`` and ``fp`` for ``U(2)``, and ``a1`` to
+        ``a8`` for ``E8(-2)``.
+        """
         return _C(
             _block_gram(_rank_one_2, 2 * _Ug(), 2 * _E8g_sage_basis_order()),
             names="h,ep,fp,a1,a2,a3,a4,a5,a6,a7,a8",

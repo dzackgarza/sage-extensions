@@ -3984,3 +3984,50 @@ The 13 generators come from `lattice.Aut().isotropic_stabilizer_generators(plane
 which is what the port's plane branch answers on `U + U(2)` — so the escape hatch
 that supplies `ρ(G_x)` is usable on small lattices even where the ambient orbit is
 not enumerable.
+
+### The `T_Co` line classes of #286 stop in the owned lift locus, and `O(A_{T_Co})` stops in `_isom_fqf` (2026-11-11, #286)
+
+Specimen `T_Co = <2> + E(2)`, `E = E8 + U` (Dolgachev--Kondo, Izv. Math. 77:3 (2013),
+(3.6), p. 513), built as `Lattices(ZZ)([[2]]) + (NamedLattices.U +
+NamedLattices.E8).twist(2)`: rank 11, signature (2, 9), determinant -2048, even,
+2-elementary, `A = (Z/2)^11`, **528 isotropic classes, 527 of them nonzero** (61 s for the
+single pass over the 2048 classes), `q(h) = 2`, `div(h) = 2`, `q([h/2]) = 1/2`.
+
+Two stages do not return, each measured once:
+
+```
+L.Aut().isotropic_orbit_representatives(1)                    no return at 600 s
+  stack: isotropic_lifts.py:385 integral_parameter_classes
+         <- :234 _integral_lift_locus <- :278 integral_members
+         <- port recursive.py:1720 _isotropic_pointed_isometry
+         <- :1597 pointed_isometry <- :1771 primitive_vector_classes
+         <- isotropic_induction.py:109 <- marked_lattices.py:195
+         <- isotropic_orbits.py:1348 <- lattice_morphisms.py:4441
+  the enumeration is modules/pure/modules.py:3374 elements() ->
+  finite_ordered_sets.from_indexed -> fgp_module.list
+
+Tco.stable_orthogonal_group().intersection(Tco.O_plus())
+  .isotropic_orbit_representatives(1)                          no return at 600 s
+  same ambient stage, entered at orthogonal_quotients.py:2039
+
+Tco.discriminant_group().O().cardinality()                     no return at 1500 s
+  stack: groups.py:540 _finite_order <- torsion_form_modules.py:2004 _engine_group
+         <- :2839 _engine_orthogonal_group
+         <- Sage TorsionQuadraticModule.orthogonal_group -> fqf_orthogonal._isom_fqf
+```
+
+The second row is the curve of *`TorsionQuadraticModule.orthogonal_group()` enumerates
+isometries by brute force*, above, at `|A| = 2048` -- past that table's largest measured
+specimen (`n = 6`, 4.90 s). It blocks every character-quotient row of `#286`, including
+`R_{Gamma_En,2} = rho^-1(P)`, whose `P` is a stabilizer inside `O(A_{T_Co})`.
+
+`DiscriminantClass.is_characteristic` cannot decide on this form either: it compares
+`q(x).lift() - b(x,v).lift()` against `ZZ`, and both lifts are `OwnedJoinCategory`
+value elements, for which `in ZZ` is `False` even at `0`, so all 2048 classes answer
+`False` -- see `results/issue-to-file-discriminant-characteristic-undecided.md`.
+
+The gate `tests/lattices/test_the_coble_lattice_from_the_cited_formula.sage` (the
+construction, the invariants and the 528/527 pair) is **3 passed in 31.25 s**, exit 0
+(calls 26.13 s, 3.23 s, 0.59 s).  Reproduce the stages with
+`bash .scratch/issue315_launch.sh` and `PROBE=issue286_probe4.py` (row `O`),
+`issue286_probe5.py` (row `Otilde+`) or `issue286_probe3.py` (`O(A).cardinality()`).
