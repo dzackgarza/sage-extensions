@@ -83,6 +83,18 @@ ceiling and the first is close to the 60 s `--timeout`; the run above is the gat
 configuration's computation with the ceilings lifted, which is how the #296 and #321
 evidence was taken.
 
+`main` moved while the unit was measured and `src/sage_extensions/categories/lattices.py`
+moved with it, so the test was re-run at the rebased tip before the push
+(`a6627c7` -> `9eb7245`):
+
+```
+37.13s call     ...::test_the_tco_plane_has_a_returning_orbit_and_setwise_stabilizer
+17.46s call     ...::test_the_composed_automorphisms_of_the_torsion_form_are_isometries
+2 passed in 56.04s
+```
+
+and the test lint again `1 files, 0 findings`.
+
 Test lint:
 
 ```
