@@ -161,7 +161,7 @@ orbit_point=point)` does the same when `P` is already in hand.  The test
 values only: `2 * 348364800 * 67456 = 46998591897600` (`|P| * |orbit| = |O(q)|`, `|P|` read from
 the two summands), `|rho_L(O(L))| = |O(q)|`, the family's cardinality `= 15 * 67456 - 67455`,
 and that five sampled members lie in the preimage and preserve the point under the preimage's own
-`preimage_morphism()`.  `1 passed in 52.65 s` at commit `15a3d13` (log:
+`preimage_morphism()`.  `1 passed in 52.65 s` at commit `f0003cd` (log:
 `.tmp/qc-evidence/issue354-preimage-test.log`).
 
 **What is not claimed.**  The order of the image of the whole family in `O(q)` was not computed:
