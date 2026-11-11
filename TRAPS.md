@@ -4368,3 +4368,41 @@ site stating "signature (1,n) with n >= 1" now calls: the three above and the tw
 correct and is now the only spelling. `cardinal(1).parent()` itself is left alone:
 the observable wrongness was the comparison, and the element class's `parent()` is
 not this unit's to change.
+
+### Sage's `spinor_generators` returns at most one prime, and half the classes with it (2026-11-11, #330)
+
+Measured 2026-11-11 in the adopted runtime (SageMath 11.0.beta5, release date
+2026-10-28, Python 3.14), source read at
+`sage/quadratic_forms/genera/genus.py` in the pinned image.
+
+`GenusSymbol_global_ring.spinor_generators` (`genus.py:2624-2663`) ends each round
+with `U = Q.subgroup((g,) + Q.gens())`. `Q.gens()` generate the quotient, so `U` is
+the whole quotient after the first accepted prime and `while U.order() < q` stops:
+the call returns at most one prime for **every** genus, and the containment test
+`g.gap() in U.gap()` is only ever asked of the trivial subgroup. On
+`diag(1, 20, 400)`, whose quotient has order 4 and exponent 2:
+
+```
+G.spinor_generators(False) = [3]
+G.spinor_generators(True)  = [3]
+G.representatives(backend='sage')  ->  6 matrices,
+    "Warning: not all classes in the genus were found"
+```
+
+against twelve classes and mass `3/2`. `representatives` seeds its mass-stopped
+traversal from the same call (`genus.py:3071-3074`), so every definite genus with more
+than two spinor genera enumerates half its classes and fails its own mass test. With
+the loop repaired at runtime (`U = Q.subgroup(tuple(U.gens()) + (g,))`) the list
+becomes `[3, 11]` and the same call returns twelve matrices with the warning gone.
+
+Repaired locally in #330: `_spinor_generating_primes` runs the walk the call intends,
+`_genus_classes` hands those seeds to Sage's own `neighbor_iteration`, and the count is
+read as the order of the quotient `A/K = \prod_{p|2d} Z_p^\times/Z_p^{\times2} / K`
+rather than as `2 ** len(spinor_generators)`. Upstream text:
+`results/sage-upstream-spinor-generators.md`.
+
+Second, smaller observation from the same function: `_improper_spinor_kernel`
+(`genus.py:2586`) falls through to `_proper_is_improper` (`genus.py:2688`) whenever `K`
+is a proper subgroup of `A`, and that routine draws `V.random_element()`, so the route
+is randomized; four fresh evaluations on each of `diag(1, 20, ±400)` gave the same
+order every time, so the answer looked invariant.

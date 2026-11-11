@@ -662,18 +662,36 @@ class _Genus(Sets().ObjectType):
         return _owned_engine_element(_owned_rationals(), SageQQ(self._engine().mass()))
 
     @cached_method
-    def spinor_genus_count(self):
-        r"""Return the number of improper spinor genera in this genus, a power of 2 [CS99, Ch. 15, §9.1].
+    def spinor_genus_count(self, proper=False):
+        r"""Return the number of spinor genera in this genus, the index of the spinor-norm image.
 
-        Defined here for rank at least 3 [CS99, Ch. 15, §3.5, l.11778]; Sage's
-        ``spinor_generators(proper=False)`` on the genus symbol computes it.
+        The count is the order of the spinor-kernel quotient
+        \(A/K = \prod_{p \mid 2d} \mathbf Z_p^\times/\mathbf Z_p^{\times 2} / K\)
+        of :func:`_spinor_kernel_quotient`, which is the index of the spinor
+        norms of the local isometry groups in the idèle group,
+        \([J_{\mathbf Q} : \mathbf Q^\times \prod_p \theta(O^+(L_p))]\)
+        (Cassels, *Rational Quadratic Forms*, Ch. 11; Conway--Sloane,
+        *Sphere Packings, Lattices and Groups*, Ch. 15, §9).  It is a power of
+        two [CS99, Ch. 15, §9.1], and it is defined here for rank at least
+        three [CS99, Ch. 15, §3.5].
+
+        ``proper=False`` counts the improper spinor genera — the convention of
+        the genus enumeration in :func:`_genus_classes`, and the one this
+        method has always reported — and ``proper=True`` the proper ones.
+
+        The quotient's order is read directly, because it *is* the index.  It
+        is not the length of Sage's ``spinor_generators`` list: that call
+        adjoins each new prime to the quotient's own generators rather than to
+        the accumulated subgroup and so returns at most one prime, which made
+        ``2 ** len(...)`` report two spinor genera on a genus with four
+        (``results/sage-upstream-spinor-generators.md``).
         """
         integers = _owned_integers()
         rank = int(self._lattice.module_rank())
         assert rank >= 3, (
             f"the spinor-genus count of {self!r} is taken here in rank at least three, and the rank is {rank}"
         )
-        return integers(2 ** len(self._engine().spinor_generators(proper=False)))
+        return integers(int(_spinor_kernel_quotient(self._engine(), proper=proper).order()))
 
     def theta_series(self, precision=20, variable="q"):
         r"""Return the theta series of this definite genus.
@@ -1088,6 +1106,88 @@ def _integral_lattice_genera():
     return _IntegralLatticeGenera()
 
 
+def _spinor_kernel_quotient(genus, *, proper):
+    r"""Return the spinor-kernel quotient of a genus symbol, whose order is the number of spinor genera.
+
+    ``genus`` is Sage's ``GenusSymbol_global_ring``.  Its
+    ``_proper_spinor_kernel`` and ``_improper_spinor_kernel`` retain a pair
+    \((A, K)\) with
+
+    \[
+    A = \prod_{p \mid 2d} \mathbf Z_p^\times / \mathbf Z_p^{\times 2},
+    \]
+
+    \(d\) the determinant of the genus, and \(K\) the subgroup cut out by the
+    spinor norms of the local isometries; the quotient \(A/K\) is the
+    spinor-norm image, and its order is the number of spinor genera
+    [CS99, Ch. 15, §9].  Read in the pinned runtime at
+    ``sage/quadratic_forms/genera/genus.py:2547-2612``.
+
+    ``proper=True`` counts the proper spinor genera and ``proper=False`` the
+    improper ones — the convention of the genus enumeration below.  The two
+    agree whenever the improper class of the genus is the proper one; on
+    ``diag(1, 20, 400)`` both are of order four and on ``diag(1, 20, -400)``
+    both are of order two, measured repeatedly and independent of the random
+    vector ``_proper_is_improper`` draws.
+    """
+    operators, kernel = (
+        genus._proper_spinor_kernel() if proper else genus._improper_spinor_kernel()
+    )
+    return operators.quotient(kernel)
+
+
+def _spinor_generating_primes(genus, *, proper):
+    r"""Return primes coprime to the determinant whose spinor classes generate the spinor-kernel quotient.
+
+    The spinor genera of the genus are indexed by the quotient \(A/K\) of
+    :func:`_spinor_kernel_quotient`, and the p-neighbour construction reaches
+    one spinor genus per subset of a generating set of primes: the class of
+    the prime \(q\) is \(\delta(q)\) in \(A\), and the odd primes coprime to
+    the determinant generate.  This walks those primes in increasing order,
+    keeps the ones that enlarge the subgroup the accepted ones generate, and
+    stops when that subgroup has the quotient's order.  Every accepted prime
+    doubles the order, because \(A\) is a product of copies of
+    \(\mathbf Z/2\) and so its quotient is elementary two.
+
+    Sage's own ``GenusSymbol_global_ring.spinor_generators``
+    (``sage/quadratic_forms/genera/genus.py:2624-2663``) means to run the same
+    walk but ends each round with ``U = Q.subgroup((g,) + Q.gens())``: the new
+    prime is adjoined to the quotient's own generators rather than to the
+    accumulated subgroup, so after the first accepted prime the subgroup is
+    the whole quotient and the call returns at most one prime for every genus.
+    Counting that list reports two spinor genera for every genus with four.
+    Reported upstream in ``results/sage-upstream-spinor-generators.md``; the
+    loop here is the one that call intends, and it is what the genus
+    enumeration and :meth:`_Genus.spinor_genus_count` consult.
+    """
+    from sage.sets.primes import Primes
+
+    operators, kernel = (
+        genus._proper_spinor_kernel() if proper else genus._improper_spinor_kernel()
+    )
+    quotient = operators.quotient(kernel)
+    target = quotient.order()
+    accumulated = quotient.subgroup([])
+    accepted = []
+    candidate_prime = SageZZ(2)
+    while accumulated.order() < target:
+        candidate_prime = Primes().next(candidate_prime)
+        if candidate_prime.divides(genus.determinant()):
+            continue
+        candidate = quotient(operators.delta(candidate_prime))
+        enlarged = quotient.subgroup(tuple(accumulated.gens()) + (candidate,))
+        if enlarged.order() == accumulated.order():
+            continue
+        assert enlarged.order() == 2 * accumulated.order(), (
+            f"the spinor-kernel class of the prime {candidate_prime} does not double the "
+            f"accumulated subgroup of order {accumulated.order()}, so that quotient is not "
+            f"elementary two"
+        )
+        accepted.append(candidate_prime)
+        accumulated = enlarged
+    return tuple(accepted)
+
+
 @cached_function
 def _genus_classes(gram):
     r"""Private computation of the isometry classes of the genus of ``gram``.
@@ -1111,11 +1211,15 @@ def _genus_classes(gram):
     strongest available theorem used here.
     A definite
     spinor genus is enumerated by Sage's own mass-stopped ``p``-neighbour
-    traversal at a prime coprime to the determinant, which seeds from the
-    genus symbol's spinor generators and stops when the class masses reach the
-    Siegel mass.  The masses of all classes found -- including explicitly
-    inserted seeds on the indefinite route -- must add up exactly to the mass
-    of the genus; this is the completeness check after enumeration.
+    traversal at a prime coprime to the determinant, ``neighbor_iteration``,
+    seeded from one class per spinor genus (:func:`_spinor_generating_primes`);
+    it stops when the class masses reach the Siegel mass.  The masses of all
+    classes found -- including explicitly inserted seeds on the indefinite
+    route -- must add up exactly to the mass of the genus; this is the
+    completeness check after enumeration.  The seeds are ours rather than
+    Sage's ``spinor_generators`` because that call returns at most one prime
+    (``results/sage-upstream-spinor-generators.md``), which would start this
+    traversal in half the spinor genera and stop it at half the mass.
     """
     from itertools import combinations
 
@@ -1123,6 +1227,7 @@ def _genus_classes(gram):
     from sage.quadratic_forms.binary_qf import BinaryQF
     from sage.quadratic_forms.genera.genus import Genus as SageGenus
     from sage.quadratic_forms.quadratic_form import QuadraticForm
+    from sage.quadratic_forms.quadratic_form__neighbors import neighbor_iteration
     from sage.rings.rational_field import QQ as SageQQ
     from sage.sets.primes import Primes
 
@@ -1156,7 +1261,7 @@ def _genus_classes(gram):
         -SageZZ.one() if positive == 0 else SageZZ.one()
     )
     form = QuadraticForm(SageZZ, scale * gram)
-    spinor_primes = genus.spinor_generators(proper=False)
+    spinor_primes = _spinor_generating_primes(genus, proper=False)
     spinor_operators, kernel = genus._improper_spinor_kernel()
     spinor_classes = spinor_operators.quotient(kernel)
     assert spinor_classes.is_abelian(), (
@@ -1179,10 +1284,11 @@ def _genus_classes(gram):
     assert generated.order() == spinor_classes.order(), (
         f"the improper spinor generators {spinor_primes} do not span the quotient of order {spinor_classes.order()}"
     )
-    # Sage's maintained spinor_generators starts at 3. Its documented
-    # Chebotarev argument guarantees that omitting the prime 2 does not lose
-    # any quotient class, and every returned generator satisfies the
-    # p-neighbour theorem's coprimality hypothesis with 2*det(gram).
+    # The selection starts at 3, as Sage's does: the class of a prime q in
+    # A = prod_{p | 2d} Z_p^x / Z_p^{x2} depends only on q modulo 8d, and by
+    # Dirichlet's theorem every odd unit class modulo 8d contains infinitely
+    # many primes, so starting at 3 loses nothing.  Each generator satisfies
+    # the p-neighbour theorem's coprimality hypothesis with 2*det(gram).
     for spinor_prime in spinor_primes:
         assert spinor_prime > 2 and not spinor_prime.divides(genus.determinant())
     # Build the Boolean-lattice orbit recursively. Every nonempty subset has
@@ -1261,10 +1367,22 @@ def _genus_classes(gram):
     # ``form.conway_mass()`` are stated in, so the automorphism orders below are
     # those of the very forms the mass counts.
     total = form.conway_mass()
-    representative_grams = tuple(genus.representatives(backend="sage"))
+    # The mass-stopped neighbour traversal is Sage's own -- the one
+    # ``GenusSymbol_global_ring.representatives`` runs -- but its seed list is
+    # ours: Sage seeds it from ``self.spinor_generators(proper=False)``
+    # (``genus.py:3071-3074``), and that call returns at most one prime for
+    # every genus, so its traversal starts in half the spinor genera and stops
+    # with "not all classes in the genus were found" at half the mass.  The
+    # neighbour prime is the one Sage picks: the form here is even, so two
+    # unless two divides the determinant.
+    neighbor_prime = SageZZ(2) if form.is_even() else SageZZ(3)
+    while neighbor_prime.divides(genus.determinant()):
+        neighbor_prime = Primes().next(neighbor_prime)
     found_forms = tuple(
-        QuadraticForm(SageZZ, (scale * entry).change_ring(SageZZ))
-        for entry in representative_grams
+        neighbor_iteration(seeds, neighbor_prime, mass=total)
+    )
+    representative_grams = tuple(
+        (found.Hessian_matrix() / scale).change_ring(SageZZ) for found in found_forms
     )
     found_mass = sum(
         SageQQ.one() / found.number_of_automorphisms() for found in found_forms
