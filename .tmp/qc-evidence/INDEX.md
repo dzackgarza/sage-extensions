@@ -342,3 +342,11 @@ for k = 1 and 1 of 9 for k = 2, with the right genus masses;
 `issue317-probe35-walls-negative.log` — the same run with the wall sign reversed,
 returning the same candidates, which is the diagnostic that the wall roots are
 carried in a framing other than the coordinate basis.
+
+Sixth batch on issue 317 (the frame, the bound, the classes):
+`issue317-nikulin-chamber.md` — the frame resolved (wall roots are lattice
+elements of square −2; model Gram = U ⊕ E8 ⊕ E8), the bound, and the class sets;
+`issue317-probe37.log` — **k = 1: 4 classes, mass equal; k = 2: 9 classes
+including the 544-root D₁₇(−1), mass equal**;
+`issue317-chamber-test.log` — `tests/lattices/test_genus_of_the_scattone_summands.sage`:
+**5 passed in 112.46 s**, exit 0 (the class enumeration 110.39 s).

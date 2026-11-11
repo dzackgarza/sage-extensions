@@ -74,3 +74,47 @@ hand-written family of candidates (the `[:3]`, `[:8]`, `[:8]` slices) rather tha
 
 Not reached: they follow the class set through `E ↦ E^⊥/E` (Scattone, Mem. AMS
 374, Prop. 5.4.7 with Cor. 5.4.8(2), p. 78) once the classes are complete.
+
+## The frame, resolved
+
+`fundamental_chamber()` stores the cone as `correlation(root) = b(root, .)` for the
+roots `wall_roots()` returns, so a wall root's vector is a **lattice element**, and
+membership of the closed chamber is `b(r, x) >= 0` in the lattice's own form.  Read
+through `model.framing_morphism().lift(root)`, every one of the 19 wall roots has
+`q(r) = -2` in the model's Gram, and the model's Gram is `U` at `[0:2]`
+orthogonal to two `E8` Cartans at `[2:10]` and `[10:18]`.  So the earlier "different
+framing" reading was wrong: my hand-built Gram agreed, and the reason both wall
+signs gave the same candidates was that the candidate family then in use had
+`x = y = 0` for almost every member, which no wall can discriminate.
+
+## The bound
+
+Every wall of square `-2` inside an `E8` block is that block's simple root, so
+`b(r, x) >= 0` puts each `E8` part in the dominant chamber.  `E8` is unimodular, so
+its dominant vectors are the nonnegative integral combinations of the fundamental
+weights (the columns of the inverse Cartan matrix), with `q(x) = c^T M c`; those of
+norm at least `-40` are collected, and the hyperbolic coordinates are bounded by
+`|a|, |b| <= 10`.  Both are truncations of a definite region, and the mass
+assertion is what decides: a class they hide leaves the mass short and the route
+declines (`_genus_classes_through_the_chamber` returns `None`).
+
+## The classes (`issue317-probe37.log`)
+
+    k = 1: 6 chamber vectors, 4 classes, mass 2499347/9440684171518279680000   EQUAL
+    k = 2: 14 chamber vectors, 9 classes, mass 642332179/18881368343036559360000 EQUAL
+
+The k = 2 nine include the 544-root class with |Aut| = 46620662575398912000, i.e.
+`D_17(-1)` -- the class the four turns of neighbour walking never reached.  The
+eight others are the 204/224/244/264/304/384/480/480-root classes found before.
+
+## What is shipped
+
+`src/sage_extensions/categories/lattices.py`: `_unimodular_complement_frame`
+(cached: model, walls, dominant pool) and `_genus_classes_through_the_chamber`,
+called first from `_genus_classes`'s definite branch.  Through it,
+`(E8(-1)^2 + <-2>).genus().representatives()` returns the card's 4 classes in
+116.8 s.  For k = 2 the shipped route does not return inside 1080 s, although the
+same algorithm in the probe closes in 30 s: the shipped path admits far more
+chamber candidates for `order = 4` than the probe did, so the per-candidate exact
+test dominates.  That is the next unit; the k = 2 class set is measured, not yet
+shipped.

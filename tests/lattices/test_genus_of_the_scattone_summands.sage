@@ -68,6 +68,29 @@ def test_the_degree_two_summand_genus_has_the_cards_class_count() -> None:
     assert all(member.is_even() is True for member in representatives)
 
 
+def test_the_degree_two_summand_genus_through_the_unimodular_complement() -> None:
+    r"""The same four classes, from the chamber of II_{1,17} rather than the neighbour walk.
+
+    Nikulin, Math. USSR Izv. 14 (1980), Proposition 1.15.1 with its proof,
+    pp. 128--129, and Theorem 1.14.2, p. 125: the classes are the ``v^perp`` for
+    the primitive ``v`` of square ``2`` in ``II_{1,17}``, one per ``O(II_{1,17})``-
+    orbit, and the orbits are read from the fundamental chamber of the Vinberg
+    reflection group (Vinberg 1975; SPLAG ch. 27).  The chamber has 19 walls, every
+    one of square ``-2`` in the model's own form, and the class masses close on the
+    genus mass.
+    """
+    card = _card("6JRX")
+    genus = _summand_lattice(1).genus()
+    representatives = genus.representatives()
+
+    assert representatives.cardinality() == cardinal(card["rows"]["O"]["planes"])
+    assert all(member.genus() == genus for member in representatives)
+    chamber_walls = HyperbolicLattices(ZZ)(
+        Lattices(ZZ)("U") + Lattices(ZZ)("E8") + Lattices(ZZ)("E8")
+    ).fundamental_chamber().wall_roots()
+    assert cardinal(len(tuple(chamber_walls))) == cardinal(19)
+
+
 def test_the_degree_two_summand_genus_mass_is_the_siegel_mass() -> None:
     r"""``2499347/9440684171518279680000``: the mass the card's classes add up to."""
     genus = _summand_lattice(1).genus()
