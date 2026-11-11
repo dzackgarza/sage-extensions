@@ -138,8 +138,41 @@ Levi factor there.
 
 ## 4. Evidence
 
-* red, before the construction (`d2cb8bd` in a worktree at that commit):
-  `.tmp/issue295-red-enriques-plane.log` — no result inside the cap;
-* green, this tree: `.tmp/issue295-green-enriques-plane.log`;
-* the stack: `.tmp/issue295e-stack.log`;
-* the construction probe: `.tmp/issue295k-closure.log`.
+Committed and pushed as `58a6d50`, `c20a05d`, `093a106` on `main`
+(`git ls-remote` → `refs/heads/main = 093a1063cabcf5d594f2bb2bc8cb88e6e1344c09`).
+
+* red, before the construction: the test module at `d2cb8bd` (test, digest and
+  reader only, in a worktree at that commit) — `pytest exit: 124`, no result
+  inside a 240 s cap (`.tmp/issue295-red-enriques-plane.log`).
+* green: the module as pushed, `1 passed` in 76 s
+  (`.tmp/issue295-gate-pushed2.log`).
+* the stack: `.tmp/issue295e-stack.log`.
+* the construction probe (generator counts, isometry and plane checks, `rho`):
+  `.tmp/issue295k-closure.log`.
+
+### The index certificate is not in this unit
+
+Feeding the generators to `O(T_En).isotropic_plane_orbits(...,
+stabilizer_generators={0: ...})` never reaches the sandwich: the call realizes
+each orbit through the port's right-coset transversal and raises
+`TypeError: int() argument must be a string, a bytes-like object or a real
+number, not 'OwnedJoinCategory.element_class'` at
+`sage_indefinite_port/indefinite/recursive.py:154`, via
+`eichler.py:488 right_coset_transversal -> eichler.py:464
+stabilizer_of_lattice`.  That is port code and the port is paused, so the test
+asserts the generators' own properties and records the obstruction in its
+docstring; the index it would have compared is card `029J`'s Otilde+ row, read
+by tag through `sage_extensions.lattice_database.card_plane_orbit_row`, whose
+citation gives `527` and `23715` in `rho(O(T_En))` (Dutour Sikirić--Hulek,
+§3.6, p. 22).
+
+### The module gate's other failures are pre-existing
+
+Five modules, 14 tests: `10 failed, 4 passed in 143 s`.  Every failure is that
+same port `TypeError`, in the orbit-realisation path.  Baselined at the fetched
+remote head without these commits: `test_unpolarized_enriques_strata` (both
+tests) and
+`test_setwise_stabilizer_discriminant_images::test_the_divided_class_plane_call_...`
+fail there identically, and the Coble discriminant-image test passes both there
+and here (`.tmp/issue295-baseline.log`).  The other seven failures lie in modules
+that were not baselined, so that part rests on the error being the same one.
