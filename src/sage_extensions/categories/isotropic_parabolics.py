@@ -1440,39 +1440,44 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             return tuple(self.vector_from_coordinates(row) for row in basis)
 
         @cached_method
-        def unipotent_radical_generators(self):
-            r"""Return the Eichler transvections that generate the unipotent radical of the parabolic.
+        def parabolic_transvection_generators(self):
+            r"""Return the plane's Eichler transvections: elements of the parabolic at the plane.
 
-            For an isotropic \\(p \\in P\\) and \\(x \\in p^\\perp\\) the Eichler
+            For an isotropic p in the plane and x in p^\perp the Eichler
             transvection
 
-            \\[ t(p, x)(y) = y - b(x, y)\\, p + b(p, y)\\, x - \\tfrac12 q(x)\\, b(p, y)\\, p \\]
+            \[ t(p, x)(y) = y - b(x, y)\, p + b(p, y)\, x - \tfrac12 q(x)\, b(p, y)\, p \]
 
             (Gritsenko--Hulek--Sankaran, arXiv:0810.1614, section 3.1, equations
             (4)--(5), transcribed in
             :meth:`sage_extensions.categories.lattices.Lattices.ParentMethods.eichler_transvection`,
             after Dawes, section 2 equation (7)) is an integral isometry on an even
-            lattice, fixes `p`, and for `x\\perp p` it acts on \\(P^\\perp/P\\) as the
-            identity: for \\(k \\in P^\\perp\\) it sends `k` to
-            \\(k - b(x,k)p \\in k + P\\).  So every one of them lies in the
-            unipotent radical \\(U_I\\) of the parabolic at the plane, and
+            lattice, fixes `p`, and for `x\perp p` it acts on \(P^\perp/P\) as the
+            identity: for \(k \in P^\perp\) it sends `k` to
+            \(k - b(x,k)p \in k + P\).  It carries the plane onto itself, because
+            for \(p' \in P\) it sends `p'` to \(p' + b(p',x)\,p \in P\), so it is an
+            element of the parabolic at the plane -- and on the plane it is
+            unipotent, fixing `p`.
+
+            That is the whole of what it is: it is in the *unipotent radical* only
+            when \(b(p',x) = 0\) for both generators of the plane, so that it fixes
+            the plane pointwise.  :meth:`unipotent_radical_generators` returns that
+            subfamily and this method returns all of them.  At Sterk's `P_2` of
+            \(T_{\mathrm{En}}\) the difference is measured: 21 transvections are
+            returned here and 14 of them lie in the radical (#337).
+
             Eichler's criterion takes exactly this family, one parameter per basis
-            vector of \\(p^\\perp\\): Dutour Sikirić--Hulek, arXiv:2302.01679v2,
-            subsection "Approximate models and the case of signature \\(p,q\\geq 2\\)"
+            vector of \(p^\perp\): Dutour Sikirić--Hulek, arXiv:2302.01679v2,
+            subsection "Approximate models and the case of signature \(p,q\geq 2\)"
             (Lemma `sublattice_approx_model`, which cites Eichler's criterion and
             Scattone, Ph.D. thesis, section 3.7, Proposition 3.7.3: generators of
-            \\(SL_2(ZZ)^2\\) together with the transvections \\(E_{e_i, v_{i,j}}\\)
-            over a `ZZ`-basis \\((v_{i,j})\\) of \\(e_i^\\perp\\)).
-
-            On \\(L = U \\oplus U(2) \\oplus E_8(-2)\\) at \\(P_1\\) this family has
-            2 x 11 members, and the radical they generate has the rank 17 that the
-            root count of the parabolic gives: \\(2 \\cdot 8\\) from
-            \\(\\mathrm{Hom}(K, P)\\) and one from the skew part of
-            \\(\\mathrm{End}(P^*)\\).
+            \(SL_2(ZZ)^2\) together with the transvections \(E_{e_i, v_{i,j}}\)
+            over a `ZZ`-basis \((v_{i,j})\) of \(e_i^\perp\)).  On
+            \(L = U \oplus U(2) \oplus E_8(-2)\) at \(P_1\) it has 2 x 11 members.
             """
             lattice = self.ambient_lattice()
             assert lattice.is_even() is True, (
-                f"the Eichler transvections of the radical at {self} need the half-integral "
+                f"the Eichler transvections at {self} need the half-integral "
                 f"coefficient q(x)/2 of an even lattice, and {lattice} is odd"
             )
             generators = []
@@ -1494,6 +1499,31 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                     generators.append(transvection)
             return tuple(generators)
 
+        @cached_method
+        def unipotent_radical_generators(self):
+            r"""Return the plane's Eichler transvections that lie in the unipotent radical.
+
+            The unipotent radical is the common kernel
+            \(U_I = \ker(P_I \to \GL(I) \times O(I^\perp/I))\), and an element lies
+            in it exactly when it fixes every vector of the plane and carries
+            \(I^\perp\) into `I` modulo `I`.  Each element of
+            :meth:`parabolic_transvection_generators` is checked against both
+            conditions here, and only the ones that pass are returned, so the family
+            is a subfamily of the radical and not of the parabolic.
+            :meth:`parabolic_transvection_generators` keeps the ones that move the
+            plane, which the parabolic needs.
+
+            What is *not* claimed: that these elements generate \(U_I\).  The
+            radical is a lattice of rank \(2\operatorname{rank}(K) + 1\) by the
+            block form, and a rank statement about it is not made here (#331).
+            """
+            return tuple(
+                transvection
+                for transvection in self.parabolic_transvection_generators()
+                if self._fixes_isotropic_pointwise(transvection)
+                and self.acts_trivially_on_isotropic_reduction(transvection)
+            )
+
         def half_vector_transvection_generators(self):
             r"""Return the Eichler transvections of the plane along its half lattice vectors.
 
@@ -1512,7 +1542,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             parabolic at `P` and acts trivially on `P^\\perp/P`; on `P` it is
             unipotent.  Because `\\(w \\notin L\\)` it acts nontrivially on the
             discriminant classes of `L`, where every transvection of
-            :meth:`unipotent_radical_generators` acts trivially: measured on
+            :meth:`parabolic_transvection_generators` acts trivially: measured on
             `T_{\\mathrm{En}}` at `P_1`, those 20 generate a subgroup of
             `\\rho(O(L))` of order 1, while these generate one of order
             `\\(2^8\\)`.
@@ -2349,9 +2379,12 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             The construction is the published block decomposition of the
             parabolic, and its three factors are constructed separately:
 
-            * the **unipotent radical**, as `1 + n` over a `ZZ`-basis of the
-              nilpotent endomorphisms that kill `I` and carry \(I^\perp\) into
-              `I` (:meth:`unipotent_radical_generators`);
+            * the **Eichler transvections** of the plane, over a `ZZ`-basis of
+              \(p^\perp\) for each \(p\) in the plane's basis
+              (:meth:`parabolic_transvection_generators`); they lie in the parabolic,
+              and the ones that also fix the plane pointwise are the part of the
+              unipotent radical this family sees
+              (:meth:`unipotent_radical_generators`);
             * the **Levi factor on \(I^\perp/I\)**, as the reflections in the
               root shells of the definite quotient lifted into \(I^\perp\)
               (:meth:`quotient_reflection_generators`);
@@ -2381,7 +2414,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             Scattone, *Ph.D. thesis*, §3.7 Proposition 3.7.3).
             """
             return (
-                self.unipotent_radical_generators()
+                self.parabolic_transvection_generators()
                 + self.half_vector_transvection_generators()
                 + self.quotient_reflection_generators()
                 + self.levi_lift_generators()
