@@ -1733,8 +1733,10 @@ class _FunctorCategory(CategoricalMor):
             )
             for obj in shape.objects()
         }
-        return NaturalTransformation(
-            first, second, lambda obj: components[obj.position()]
+        # The element of Fun(J, D)(F, G) on this construction datum, as every
+        # Mor of the functor category constructs its arrows from one.
+        return first.natural_transformations_to(second)(
+            NaturalTransformation(first, second, lambda obj: components[obj.position()])
         )
 
     def _core_isomorphism_from_apex(self, core_mor, apex):
