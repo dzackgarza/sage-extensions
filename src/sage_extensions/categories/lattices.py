@@ -1950,9 +1950,12 @@ class Lattices(OwnedCategoryOverBaseRing):
             PrimitiveIsotropicSubobjects,
         )
 
-        arrow = getattr(marked, "arrow", None)
-        if arrow is None:
+        arrow_member = getattr(marked, "arrow", None)
+        if arrow_member is None:
             return None
+        # The marking category exposes the arrow as a method, and a category that
+        # stores it as data exposes it as the arrow itself.
+        arrow = arrow_member() if callable(arrow_member) else arrow_member
         codomain = arrow.codomain()
         if not hasattr(codomain, "lattice_category") or codomain.base_ring() is not _owned_integers():
             return None
