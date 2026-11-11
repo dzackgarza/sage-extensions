@@ -1,21 +1,21 @@
 index [O(L) : Gamma] = 1
-[23:07:04] T_Co isotropic_plane_orbits: 73.7 s
+[23:43:50] T_Co isotropic_plane_orbits: 82.6 s
 T_Co PLANE ROW: 1
   representative: Integral lattice of rank 2 and signature (0, 0) | primitive True | rank 2
   divided classes: ['0', '2*[h] + [a3] - [a4] + 2*[a7] - 2*[a8]', '[ep] + [fp] + [a1] + [a2] - [a4] + [a8]', '2*[h] + [ep] + [fp] + [a1] + [a2] + [a3] - 2*[a4] + 2*[a7] - [a8]']
-[23:07:04] whole probe: 321.8 s
-[peakrss] p360probe6: child waited=0 shell_code=0 samples=167
-[peakrss] peak tree RSS      : 2584 MiB
-[peakrss] low-water MemAvail : 762 MiB
-[peakrss] peak single VmHWM  : 2590 MiB
+[23:43:50] whole probe: 228.8 s
+[peakrss] p360probe6b: child waited=0 shell_code=0 samples=119
+[peakrss] peak tree RSS      : 2646 MiB
+[peakrss] low-water MemAvail : 7620 MiB
+[peakrss] peak single VmHWM  : 2734 MiB
 [peakrss] peak VmHWM by executable (this is the per-process attribution):
-[peakrss]   julia                      1988 MiB peak
-[peakrss]   python                      606 MiB peak
+[peakrss]   julia                      2037 MiB peak
+[peakrss]   python                      686 MiB peak
 [peakrss]   timeout                       7 MiB peak
 [peakrss]   proot-x86_64                  3 MiB peak
-[peakrss]   t=   325.5s procs=  4 rss=  2584 MiB hwm=  2589 MiB avail=  6431 MiB
-[peakrss]   t=   327.5s procs=  4 rss=  2584 MiB hwm=  2590 MiB avail=  6426 MiB
-[peakrss]   t=   321.5s procs=  4 rss=  2583 MiB hwm=  2588 MiB avail=  6435 MiB
-[peakrss]   t=   323.5s procs=  4 rss=  2583 MiB hwm=  2588 MiB avail=  6432 MiB
-[peakrss]   t=   319.5s procs=  4 rss=  2581 MiB hwm=  2586 MiB avail=  6437 MiB
+[peakrss]   t=   224.2s procs=  4 rss=  2646 MiB hwm=  2646 MiB avail=  7849 MiB
+[peakrss]   t=   228.2s procs=  4 rss=  2646 MiB hwm=  2647 MiB avail=  7724 MiB
+[peakrss]   t=   230.2s procs=  4 rss=  2646 MiB hwm=  2647 MiB avail=  7714 MiB
+[peakrss]   t=   222.2s procs=  4 rss=  2645 MiB hwm=  2646 MiB avail=  7853 MiB
+[peakrss]   t=   226.2s procs=  4 rss=  2645 MiB hwm=  2646 MiB avail=  7740 MiB
 launcher exit: 0

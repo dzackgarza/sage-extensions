@@ -69,12 +69,15 @@ while they raised the rank.  That is not a completion: at the `T_Co` plane above
 it returned `11` rows of determinant `2`, so the block form — and with it the
 whole parabolic — refused (`unipotent_radical_index` raised
 `AssertionError: ... the ranks came out as 7 and 2 with determinant 2`).
-Both completions are now the cokernels': `P` is saturated in `P^⊥` and `P^⊥` in
-`L`, a finitely generated torsion-free module over `ZZ` is free
-(`finite_free_trivialization`), and lifting that trivialization's basis points
-back along the cokernel projection completes the basis.  On `T_En` at Sterk's
-`P₁` and `P₂` the same method returns determinant `±1` as before; on `T_Co` it
-returns determinant `1`.
+Both completions now fall back on the cokernels' where the standard rows are not
+a basis: `P` is saturated in `P^⊥` and `P^⊥` in `L`, a finitely generated
+torsion-free module over `ZZ` is free (`finite_free_trivialization`), and
+lifting that trivialization's basis points back along the cokernel projection
+completes the basis.  The standard rows are kept where they do give a basis, so
+the block coordinates of the planes the repository already measures do not move:
+on `T_En` at Sterk's `P₁` and `P₂` the determinant is `±1` as before, and on
+`T_Co` the cokernel completion returns determinant `1` where the standard rows
+returned `2`.
 
 ## The rows
 
@@ -114,7 +117,7 @@ What does return, by the route this issue's change installs
 
 ```
 index [O(L) : Gamma] = 1
-[23:07:04] T_Co isotropic_plane_orbits: 73.7 s
+[23:43:50] T_Co isotropic_plane_orbits: 82.6 s
 T_Co PLANE ROW: 1
   representative: Integral lattice of rank 2 and signature (0, 0) | primitive True | rank 2
   divided classes: ['0', '2*[h] + [a3] - [a4] + 2*[a7] - 2*[a8]',
@@ -131,7 +134,7 @@ names.
 
 | row | page value (research #645) | computed |
 | --- | --- | --- |
-| `O(T_Co)` plane orbits | **1** — `thm:coble-plane-stabilizer-image` item 5, "a single double coset over the whole 23715, the one `Orth(B)`-orbit of planes" | **1**, on the plane's own stabilizer route (73.7 s); the ambient route does not return (the stop above) |
+| `O(T_Co)` plane orbits | **1** — `thm:coble-plane-stabilizer-image` item 5, "a single double coset over the whole 23715, the one `Orth(B)`-orbit of planes" | **1**, on the plane's own stabilizer route (82.6 s); the ambient route does not return (the stop above) |
 | index per finite class, `[Stab_{O(q)}(J) : ρ(Stab_{O(T_Co)}(P))]` | **8** — `thm:plane-fibre` item 1, `1981808640 / 247726080` | **8**, with both orders computed (`stabilizer_discriminant_image_orders() = (1981808640, 247726080)`) |
 | `O(T_Co)` line orbits | **1** — `thm:plane-half-index` item 4 has `Γ_Co` read 527 orbits from `|O(q)| / |ρ(S)|`, so `O(T_Co)` itself is transitive (`thm:unpolarized-cusps`) | 1, recorded in `results/issue286-tco-rows.md`; this turn's run reaches the line orbit before the stop and does not print its count |
 | the incidence | each liftable `J` carries three nonzero classes, one per `0`-cusp (`thm:plane-fibre`, *the incidence*), so a plane class contains three line classes | not computed: `tits_building_incidence()` stops at the same line |

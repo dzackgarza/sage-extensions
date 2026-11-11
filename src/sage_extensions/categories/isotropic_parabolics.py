@@ -2986,23 +2986,70 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             isomorphism with the free module on the quotient's own generators.
             Lifting those basis points back along the cokernel projection gives
             the completing vectors.  Keeping standard basis vectors in order
-            while they raise the rank does **not** compute this: on
+            while they raise the rank does **not** compute this, and on
             \(T_{\mathrm{Co}}\) at a plane whose generators are congruent modulo
-            `2`, the first such vector to raise the rank of \(P^\perp\)'s
-            chosen basis to `9` leaves a sublattice of index `2`, and the
-            assembled rows were then not a `ZZ`-basis of `L` at all.
+            `2` the first such vector to raise the rank of \(P^\perp\)'s chosen
+            basis to `9` leaves a sublattice of index `2`, so the assembled rows
+            were not a `ZZ`-basis of `L` at all.  The standard rows are kept
+            where they do give a basis -- the block coordinates of the planes
+            this repository measures do not move -- and the cokernel completion
+            is what this method falls back on otherwise.
             """
             lattice = self.ambient_lattice()
             labels = tuple(lattice.module_generating_set())
             rank = len(labels)
+            plane_rows = [self.coordinates(vector) for vector in self.plane_basis()]
+            perpendicular_rows = _rank_completed_rows(
+                plane_rows,
+                [self.coordinates(vector) for vector in self.vector_perpendicular_basis(self.plane_basis())],
+                rank - 4,
+            )
+            complement_rows = _rank_completed_rows(
+                plane_rows + perpendicular_rows,
+                [tuple(1 if other == position else 0 for other in range(rank)) for position in range(rank)],
+                2,
+            )
+            rows = plane_rows + perpendicular_rows + complement_rows
+            if len(rows) != rank or abs(int(matrix(SageZZ, rows).determinant())) != 1:
+                rows, plane_rows, perpendicular_rows, complement_rows = self._cokernel_block_rows()
+            current = matrix(SageZZ, rows)
+            assert (
+                len(complement_rows) == 2
+                and len(perpendicular_rows) == rank - 4
+                and abs(int(current.determinant())) == 1
+            ), (
+                f"the plane's basis, its completion to P^perp and that to L must give a "
+                f"ZZ-basis of L, but the ranks came out as {len(perpendicular_rows)} and "
+                f"{len(complement_rows)} with determinant {int(current.determinant())}"
+            )
+            return tuple(
+                self.vector_from_coordinates(row)
+                for row in complement_rows + plane_rows + perpendicular_rows
+            )
+
+        def _cokernel_block_rows(self):
+            r"""Return the block rows `(U \mid P \mid K)`, completed through the cokernels.
+
+            The fallback of :meth:`plane_block_basis`, for a plane at which keeping
+            standard basis vectors in order while they raise the rank does not give
+            a `ZZ`-basis of `L` — measured at a `T_Co` plane, where it left a
+            sublattice of index `2`.  Both completions are then the cokernels': `P`
+            is saturated in \(P^\perp\) (`P` is saturated in `L`, and if `n v` lies
+            in `P` for a `v` of \(P^\perp\) then `v` lies in `L` and `n v` in `P`),
+            and \(P^\perp\) is saturated in `L` by its own definition, so both
+            quotients are torsion-free and free over `ZZ`
+            (:meth:`...finite_free_trivialization`); lifting that trivialization's
+            basis points back along the cokernel projection completes the basis.
+            """
+            lattice = self.ambient_lattice()
+            rank = len(tuple(lattice.module_generating_set()))
             perpendicular = lattice.subobject_on(tuple(self.perpendicular_basis()))
             into_perpendicular = self.inclusion().factor_through(perpendicular.inclusion())
-            plane_labels = tuple(into_perpendicular.domain().module_generating_set())
             perpendicular_basis = _completed_basis(
                 into_perpendicular,
                 tuple(
                     into_perpendicular(into_perpendicular.domain().module_generator(label))
-                    for label in plane_labels
+                    for label in into_perpendicular.domain().module_generating_set()
                 ),
             )
             into_lattice = perpendicular.inclusion()
@@ -3017,19 +3064,11 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             plane_rows = [self.coordinates(vector) for vector in self.plane_basis()]
             perpendicular_rows = [self.coordinates(vector) for vector in from_perpendicular[2:]]
             complement_rows = [self.coordinates(vector) for vector in completing]
-            current = matrix(SageZZ, plane_rows + perpendicular_rows + complement_rows)
-            assert (
-                len(complement_rows) == 2
-                and len(perpendicular_rows) == rank - 4
-                and abs(int(current.determinant())) == 1
-            ), (
-                f"the plane's basis, its completion to P^perp and that to L must give a "
-                f"ZZ-basis of L, but the ranks came out as {len(perpendicular_rows)} and "
-                f"{len(complement_rows)} with determinant {int(current.determinant())}"
-            )
-            return tuple(
-                self.vector_from_coordinates(row)
-                for row in complement_rows + plane_rows + perpendicular_rows
+            return (
+                complement_rows + plane_rows + perpendicular_rows,
+                plane_rows,
+                perpendicular_rows,
+                complement_rows,
             )
 
         @cached_method
@@ -3761,6 +3800,28 @@ __all__ = ["PrimitiveIsotropicSubobjects"]
 # ---------------------------------------------------------------------------
 # The parabolic subgroup of an isotropic plane, by its published block form.
 # ---------------------------------------------------------------------------
+
+
+def _rank_completed_rows(rows, candidates, count):
+    r"""Return up to ``count`` of ``candidates`` that raise the rank of ``rows``, in order.
+
+    This is the cheap completion: the standard basis rows are taken in order while
+    they raise the rank.  It is a completion only when the rows it returns span a
+    *saturated* extension, which is not automatic -- at a `T_Co` plane the rows so
+    chosen span a sublattice of index `2` -- so its caller checks that the rows
+    assembled from it are a `ZZ`-basis and falls back on
+    :func:`_completed_basis` when they are not.
+    """
+    current = matrix(SageZZ, tuple(rows))
+    kept = []
+    for row in candidates:
+        augmented = matrix(SageZZ, tuple(current.rows()) + (row,))
+        if augmented.rank() > current.rank():
+            current = augmented
+            kept.append(row)
+        if len(kept) == count:
+            break
+    return kept
 
 
 def _completed_basis(arrow, basis):

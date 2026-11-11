@@ -29,7 +29,7 @@ one orbit it is.
 under `.tmp/qc-evidence/`:
 
 * the $T_{\mathrm{En}}$ row: **2**, the card's value, in 156 s under load;
-* the $T_{\mathrm{Co}}$ plane row by its own stabilizer: **1** orbit, in 73.7 s,
+* the $T_{\mathrm{Co}}$ plane row by its own stabilizer: **1** orbit, in 82.6 s,
   with $[O(T_{\mathrm{Co}}) : \Gamma] = 1$ and the parabolic decided complete on
   its three factors (radical `1` in 6.4 s, plane actions `1` in 41.0 s,
   quotient images `1` in 4.9 s), `105` stabilizer generators, and
@@ -144,10 +144,21 @@ def test_the_coble_plane_row_of_the_planes_own_stabilizer_returns() -> None:
 
 
 def _divided_classes(lattice, plane):
-    r"""The divided discriminant classes of the plane's own basis vectors."""
+    r"""The divided discriminant class set of a primitive isotropic plane.
+
+    For a plane with basis $(p_1, p_2)$ the set is $\{0\} \cup
+    \{[p_1/\mathrm{div}(p_1)], [p_2/\mathrm{div}(p_2)],
+    [(p_1+p_2)/\mathrm{div}(p_1+p_2)]\}$: every primitive direction of a rank-two
+    totally isotropic $P$ is one of $p_1, p_2, p_1+p_2$ up to a unit, and
+    $[\lambda u/\mathrm{div}(\lambda u)] = [u/\mathrm{div}(u)]$, so the three
+    classes are the whole set, which is what the plane's class set is.
+    """
     inclusion = plane.inclusion()
     domain = inclusion.domain()
-    return tuple(
-        lattice.divided_discriminant_class(inclusion(domain.module_generator(label)))
-        for label in domain.module_generating_set()
+    points = tuple(
+        inclusion(domain.module_generator(label)) for label in domain.module_generating_set()
+    )
+    return (lattice.discriminant_group().zero(),) + tuple(
+        lattice.divided_discriminant_class(point)
+        for point in (points[0], points[1], points[0] + points[1])
     )
