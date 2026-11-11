@@ -4059,20 +4059,15 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         return None
 
     def vector_orbit_set(self, square, subgroup=None):
-        r"""Return one representative per orbit of ``subgroup`` (default ``O(L)``) on the vectors of ``square``.
+        r"""Return the orbit set of ``subgroup`` (default ``O(L)``) on primitive vectors of ``square``.
 
-        The representatives come from the acting group's own orbit
-        computation: ``O(L)``'s representatives of the square-``square`` shell,
-        split by the subgroup's finite character quotient where it has one
-        (``_subgroup_vector_orbit_representatives``), and the finite listing of
-        a definite lattice's subgroup where that listing exists.  A subgroup
-        whose orbits are neither split by a finite character quotient nor
-        listable -- a predicate subgroup over an indefinite lattice, for
-        instance -- refuses there, and that refusal is what this call raises:
-        no orbit of an infinite group is enumerated here.
+        The set may be infinite. It iterates one vector per orbit by height, with exact
+        equivalence and transporters, and makes no finiteness claim. The orbit set is
+        the port's :class:`sage_indefinite_port.indefinite.pairing_slices.SubgroupVectorOrbits` (#53).
         """
-        group = self if subgroup is None else subgroup
-        return group.vector_orbit_representatives(square)
+        from sage_indefinite_port.indefinite.pairing_slices import SubgroupVectorOrbits
+
+        return SubgroupVectorOrbits(self.domain(), self if subgroup is None else subgroup, square)
 
     def vectors_are_equivalent(self, left, right) -> bool:
         r"""Return whether two vectors lie in the same ``O(L)``-orbit."""

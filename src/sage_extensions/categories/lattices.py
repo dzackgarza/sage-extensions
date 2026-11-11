@@ -1928,8 +1928,15 @@ class Lattices(OwnedCategoryOverBaseRing):
         rank-two branch answers the same question by converting each rational
         generator of its integral-structure action to an integral isometry, and
         on \(T_{\mathrm{En}}\) that conversion does not return (#295, `TRAPS.md`).
+
+        A coslice marking asks for the pointwise stabilizer of the plane, a
+        proper subgroup of the parabolic, so it keeps the port's route.
         """
-        parabolic = self._isotropic_plane_parabolic_generators(marked)
+        parabolic = (
+            None
+            if isinstance(diagram_category, CosliceCategory)
+            else self._isotropic_plane_parabolic_generators(marked)
+        )
         if parabolic is not None:
             return parabolic
         from sage_indefinite_port.indefinite.marked_lattices import (
