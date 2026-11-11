@@ -203,6 +203,7 @@ from sage_extensions.categories.sets.indexed_families import (
     indexed_family,
 )
 from sage_extensions.categories.sets.set_categories import (
+    _ConditionSetEngine,
     NN,
     FiniteSets,
     Sets,
@@ -2306,6 +2307,16 @@ class OrientedFlagDiagram(FiniteSequenceDiagram):
         return f"Diagram of {self._oriented}"
 
 
+class _OrientedFlagEndomorphismsEngine(_ConditionSetEngine):
+    r"""The orientation-preserving natural transformations ``F => F``, with the identity of ``F``."""
+
+    def identity(self):
+        r"""The identity of the universe Mor ``Fun([t], Lattices)(F, F)``, admitted into this subset."""
+        return self(self.universe().identity())
+
+    one = identity
+
+
 class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCategory):
     r"""Lattices marked by an oriented primitive isotropic flag with ``t`` terms.
 
@@ -2395,7 +2406,21 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
         # underlying diagrams, Fun([t], Lattices)(F, G): the transformations
         # built on an apex component are its elements, and a Mor of this
         # category's own packet would be a second parent that admits none of them.
-        subset = source.natural_transformations_to(target).condition_set(preserves_orientations)
+        universe = source.natural_transformations_to(target)
+        if source is target:
+            # Mor(F, F) has the identity of the universe, whose graded
+            # determinants are all 1; no condition set of a Mor in the
+            # provider carries one, so this subset's engine adds it.
+            from sage_extensions.owned_category import _object_of
+
+            subset = _object_of(
+                Sets(),
+                _engine=(Sets(), _OrientedFlagEndomorphismsEngine, None),
+                universe=universe,
+                predicate=preserves_orientations,
+            )
+        else:
+            subset = universe.condition_set(preserves_orientations)
         subset._retain_point_computation(lambda: self._oriented_transformation(source, target))
         return subset
 

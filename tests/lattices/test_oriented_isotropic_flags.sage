@@ -177,7 +177,11 @@ def test_oriented_mor_is_the_orientation_preserving_natural_transformations():
     assert identity in endomorphisms
     chosen = category.Mor(positive, negative).an_element()
     assert chosen in category.Mor(positive, negative)
-    assert determinant(chosen.component(tuple(category.domain_category().objects())[-1])) == -1
+    top = tuple(category.domain_category().objects())[-1]
+    assert determinant(chosen.component(top)) == -1
+    unit = endomorphisms.identity()
+    assert unit in endomorphisms
+    assert all((chosen * unit).component(top)(point) == chosen.component(top)(point) for point in (e1, f1, e2, f2))
 
 
 def test_oriented_isometry_between_two_presentations_of_three_u():
