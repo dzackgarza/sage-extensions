@@ -1,5 +1,4 @@
 name: Enriques polarization rows (#319)
-
 # The 87 numerical polarizations of Dutour Sikirić–Hulek and card 0128's
 # Table 4 rows, each compared with the public isotropic-orbit call of #286.
 # Every row builds an arithmetic subgroup of O(U + U(2) + E8(-2)) and calls the
@@ -33,14 +32,11 @@ on:
         type: string
   schedule:
     - cron: '17 3 * * *'
-
 permissions:
   contents: read
-
 concurrency:
   group: enriques-polarization-rows
   cancel-in-progress: false
-
 jobs:
   card-rows:
     name: Each card row against the public orbit call
@@ -52,6 +48,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+      - name: Mark the checkout as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Run the card rows
         env:
           PYTHONPATH: src
@@ -68,3 +66,4 @@ jobs:
           if [ "$DEGREES" != "all" ]; then arguments+=(--degrees "$DEGREES"); fi
           "$SAGE_BIN" tests/enriques_polarization_rows_by_card.py "${arguments[@]}" \
             --cap "$ENRIQUES_CALL_CAP" --budget "$ENRIQUES_ROW_BUDGET"
+        shell: bash
