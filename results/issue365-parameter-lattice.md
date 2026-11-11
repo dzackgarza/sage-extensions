@@ -199,6 +199,34 @@ generator rather than the skew scalar.
 | `.tmp/qc-evidence/issue365-tests.log` | the acceptance run of the three test files |
 | `.tmp/qc-evidence/issue365-lint.log` | `test_lint` on the new test file |
 
+## Regression check on the neighbouring modules
+
+The eight files that drive `parabolic_stabilizer_generators`, `unipotent_radical*` or
+`parabolic_obstruction` were run with this commit and, for the three that fail, without it
+at the fetched main `7ef38d5`:
+
+```
+9 failed, 19 passed in 349.11s      # with this commit, .tmp/qc-evidence/issue365-regression.log
+  test_higher_rank_unipotent_kernel                  3 failed
+  test_parabolic_induction                           2 failed
+  test_pointwise_levi_images                         4 failed
+9 failed, 4 passed in 4.96s         # the same three files on the base, .tmp/qc-evidence/issue365-base.log
+```
+
+The nine ids are the same on both sides, so the pre-existing set is unchanged; on the base
+they are `AttributeError: 'EichlerRecursion' object has no attribute
+'isotropic_quotient_kernel_generators'`, a port module this runtime does not ship, and not
+something this commit touches.
+
+One failure in that selection was this commit's to fix. The first run of it — with
+`test_the_unipotent_radical_of_a_plane.sage` as it stood — was `10 failed, 18 passed`
+(`.tmp/qc-evidence/issue365-regression-earlier-test.log`), the tenth being that file's
+assertion that every member of `unipotent_radical_generators()` is one of the plane's
+Eichler transvections. The family carries the block generators of `#365`'s lattice now, so
+that assertion is false and the test asserts the three memberships that are true instead —
+some transvections are in the family, some are not, and some members of the family are not
+transvections — and it is green in the acceptance run.
+
 ## What this does not claim
 
 `is_parabolic_complete()` is still `False` at `P_2`, and the radical is no longer the

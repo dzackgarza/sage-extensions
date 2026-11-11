@@ -1,0 +1,67 @@
+FFF.......F..F..FFFF.......F                                             [100%]
+=================================== FAILURES ===================================
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   KeyError: ((Morphism from Integral lattice of rank 3 and signature (2, 1) to Integral lattice of rank 3 and signature (2, 1),), ())
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11949: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+E   KeyError: ((Morphism from Integral lattice of rank 3 and signature (2, 1) to Integral lattice of rank 3 and signature (2, 1),), ())
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11949: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+E   KeyError: ((Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1),), ())
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11949: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+E   KeyError: ((Morphism from Integral lattice of rank 1 and signature (1, 0) to Integral lattice of rank 1 and signature (1, 0),), ())
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11949: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+E   assert Morphism from Integral lattice of rank 12 and signature (2, 10) to Integral lattice of rank 12 and signature (2, 10) in (Morphism from Integral lattice of rank 12 and signature (2, 10) to Integral lattice of rank 12 and signature (2, 10),...phism from Integral lattice of rank 12 and signature (2, 10) to Integral lattice of rank 12 and signature (2, 10), ...)
+/repos/sage-extensions/tests/lattices/test_the_unipotent_radical_of_a_plane.sage:75: assert Morphism from Integral lattice of rank 12 and signature (2, 10) to Integral lattice of rank 12 and signature (2, 10) in (Morphism from Integral lattice of rank 12 and signature (2, 10) to Integral lattice of rank 12 and signature (2, 10),...phism from Integral lattice of rank 12 and signature (2, 10) to Integral lattice of rank 12 and signature (2, 10), ...)
+========================== test-call performance gate ==========================
+tests/lattices/test_the_enriques_plane_discriminant_image_bound.sage::test_the_plane_classes_and_their_cusp_count_are_card_029J_s_rows: 33.55 s > 20 s
+tests/lattices/test_the_enriques_plane_discriminant_image_bound.sage::test_the_plane_that_does_not_split_has_an_exact_discriminant_image: 87.25 s > 20 s
+tests/lattices/test_the_enriques_plane_index_returns.sage::test_the_o_row_of_the_plane_index_returns_on_the_enriques_lattice: 118.66 s > 20 s
+tests/lattices/test_the_enriques_plane_index_returns.sage::test_the_supplied_setwise_stabilizer_generators_close_the_plane_index: 58.82 s > 20 s
+tests/lattices/test_the_plane_stabilizer_reaches_the_whole_quotient_group.sage::test_the_plane_stabilizer_reaches_the_whole_quotient_orthogonal_group: 32.86 s > 20 s
+=========================== short test summary info ============================
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[reduction]
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[radical]
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[generators]
+FAILED tests/lattices/test_parabolic_induction.sage::test_primitive_isotropic_refinement_selects_the_line_eichler_operation
+FAILED tests/lattices/test_parabolic_induction.sage::test_the_eichler_transvections_of_a_line_form_an_abelian_group
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[line]
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[plane]
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_glued_line_pointwise_image_excludes_quotient_negation
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_zero_null_pointwise_levi_lift_and_joint_kernel
+FAILED tests/lattices/test_the_unipotent_radical_of_a_plane.sage::test_the_transvections_that_move_the_plane_are_returned_elsewhere
+10 failed, 18 passed in 340.58s (0:05:40)
+[peakrss] issue353: child waited=1 shell_code=1 samples=176
+[peakrss] peak tree RSS      : 2716 MiB
+[peakrss] low-water MemAvail : 4917 MiB
+[peakrss] peak single VmHWM  : 2797 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2050 MiB peak
+[peakrss]   python                      737 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   342.3s procs=  4 rss=  2716 MiB hwm=  2716 MiB avail=  7517 MiB
+[peakrss]   t=   344.3s procs=  4 rss=  2716 MiB hwm=  2716 MiB avail=  7516 MiB
+[peakrss]   t=   338.3s procs=  4 rss=  2715 MiB hwm=  2715 MiB avail=  7521 MiB
+[peakrss]   t=   340.3s procs=  4 rss=  2715 MiB hwm=  2715 MiB avail=  7520 MiB
+[peakrss]   t=   334.3s procs=  4 rss=  2714 MiB hwm=  2714 MiB avail=  7533 MiB
+launcher exit: 1

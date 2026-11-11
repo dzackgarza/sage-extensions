@@ -1,0 +1,80 @@
+[    0.4s] 
+[    0.9s] ==== P_2: splits = False
+[    0.9s]   J = [2, 0, 0, 2] | K = b(U,K) has 1 nonzero entries
+[    1.0s]   unipotent_parameter_modulus() = 2
+[    1.9s]   unipotent_parameter_class_counts() = (2, 65536, 4096)
+[    1.9s]   |unipotent_parameter_lattice| = 16 | rank = 16 | index = 16
+[    1.9s]      [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    1.9s]      [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    1.9s]      [0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    1.9s]      [0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    1.9s]      [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    1.9s]      [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    1.9s]      [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    1.9s]      [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+[    1.9s]      [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
+[    1.9s]      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
+[    1.9s]      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+[    1.9s]      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+[    1.9s]      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]
+[    1.9s]      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]
+[    1.9s]      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+[    1.9s]      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+[    6.7s]   |unipotent_translation_basis| = 16 | rank = 16 | covolume in the coordinate lattice of Hom(K, P) = 1
+[   11.3s]   unipotent_translation_rank() = (16, 16)
+[   11.5s]   unipotent_radical_rank() = 17 | unipotent_translation_kernel_rank() = 1
+[   11.7s]   central generator: c = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] | tau = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] | a = [0, -1, 1, 0] | coordinate on the centre's lattice = 1
+[   11.8s]     fixes the plane pointwise: True | trivial on I^perp/I: True | not the identity: True
+[   11.8s]   |unipotent_radical_block_generators| = 17 | |unipotent_radical_generators| = 31
+[   14.8s]   unipotent_radical_index() = 1
+[   14.9s]   is_parabolic_complete() = False
+[   16.9s]   the plane's transvections in U_I: 14 | outside the parameter lattice: 0 | their translation rank: (12, 16)
+[   16.9s]   the sixteen unit parameters lift: [False, False, False, False, True, True, True, True, True, True, True, True, True, True, True, True]
+[   17.0s] 
+[   17.5s] ==== P_1: splits = True
+[   17.5s]   J = [1, 0, 0, 2] | K = b(U,K) has 0 nonzero entries
+[   17.5s]   unipotent_parameter_modulus() = 1
+[   17.5s]   unipotent_parameter_class_counts() = (1, 1, 1)
+[   17.5s]   |unipotent_parameter_lattice| = 16 | rank = 16 | index = 1
+[   17.5s]      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[   17.5s]      [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[   17.5s]      [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[   17.5s]      [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[   17.5s]      [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[   17.5s]      [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[   17.5s]      [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[   17.5s]      [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+[   17.5s]      [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
+[   17.5s]      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
+[   17.5s]      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+[   17.5s]      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]
+[   17.5s]      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]
+[   17.5s]      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]
+[   17.5s]      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+[   17.5s]      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+[   22.2s]   |unipotent_translation_basis| = 16 | rank = 16 | covolume in the coordinate lattice of Hom(K, P) = 256
+[   26.7s]   unipotent_translation_rank() = (16, 16)
+[   26.9s]   unipotent_radical_rank() = 17 | unipotent_translation_kernel_rank() = 1
+[   27.1s]   central generator: c = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] | tau = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] | a = [0, -2, 1, 0] | coordinate on the centre's lattice = 1
+[   27.1s]     fixes the plane pointwise: True | trivial on I^perp/I: True | not the identity: True
+[   27.1s]   |unipotent_radical_block_generators| = 17 | |unipotent_radical_generators| = 35
+[   30.7s]   unipotent_radical_index() = 1
+[   30.7s]   is_parabolic_complete() = True
+[   33.1s]   the plane's transvections in U_I: 18 | outside the parameter lattice: 0 | their translation rank: (16, 16)
+[   33.1s]   the sixteen unit parameters lift: [True, True, True, True, True, True, True, True, True, True, True, True, True, True, True, True]
+[   33.1s] 
+[   33.1s] done
+[peakrss] issue353: child waited=0 shell_code=0 samples=18
+[peakrss] peak tree RSS      : 329 MiB
+[peakrss] low-water MemAvail : 10357 MiB
+[peakrss] peak single VmHWM  : 329 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      319 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    30.0s procs=  3 rss=   329 MiB hwm=   329 MiB avail= 10402 MiB
+[peakrss]   t=    32.0s procs=  3 rss=   329 MiB hwm=   329 MiB avail= 10404 MiB
+[peakrss]   t=    34.0s procs=  3 rss=   329 MiB hwm=   329 MiB avail= 10403 MiB
+[peakrss]   t=    26.0s procs=  3 rss=   328 MiB hwm=   328 MiB avail= 10403 MiB
+[peakrss]   t=    28.0s procs=  3 rss=   328 MiB hwm=   328 MiB avail= 10404 MiB
+launcher exit: 0
