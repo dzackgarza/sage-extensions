@@ -727,7 +727,7 @@ def _engine_left_coset_positions(group, subgroup):
     requested: the engine of an infinite group such as an indefinite
     ``O(L)`` is not a finite group.
     """
-    if not group.category().is_subcategory(OwnedFiniteGroups()):
+    if not group.category().is_subcategory(OwnedFiniteGroups()) or not group._supplies_engine():
         return None
     if _encodes_elements_in_gap(_engine_group(group)):
         return _TransversalCosets(group, subgroup)
@@ -5724,6 +5724,14 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             return None
 
     class ParentMethods:
+        @RealizationHook
+        def _supplies_engine(self) -> bool:
+            r"""Whether :meth:`_engine_group` realizes this group, so engine-backed operations may be asked of it.
+
+            A realization whose engine exists only under a hypothesis overrides this with that hypothesis.
+            """
+            return True
+
         @RealizationHook
         def _engine_group(self):
             r"""The selected group engine, when a realization supplies one (``OWN-05``)."""

@@ -390,6 +390,10 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             )
             return cardinal(sum(1 for _element in self))
 
+        def _supplies_engine(self) -> bool:
+            r"""A predicate subgroup is realized inside its supergroup's engine, so it has one exactly when the supergroup does."""
+            return self.supergroup()._supplies_engine()
+
         @cached_method
         def _engine_group(self):
             r"""The engine subgroup on this subgroup's selected determining family.

@@ -3827,6 +3827,15 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             f"{lattice.module_rank()}"
         )
 
+    def _supplies_engine(self) -> bool:
+        r"""Whether :meth:`_engine_group` is exact here: rank one over ``ZZ`` or ``QQ``, or definite of finite rank over ``ZZ``."""
+        lattice = self.domain()
+        if lattice is not self.codomain():
+            return False
+        rank_one = lattice.base_ring() in (_owned_integers(), _owned_rationals()) and lattice.module_rank() == 1 and lattice.is_definite()
+        definite = lattice.base_ring() is _owned_integers() and lattice.module_rank().is_finite() and lattice.is_definite()
+        return rank_one or definite
+
     @cached_method
     def _engine_group(self):
         r"""Return Sage's private orthogonal-group engine when it is exact.
