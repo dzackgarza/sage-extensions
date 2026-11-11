@@ -40,7 +40,8 @@ Full file: `tests/groups/test_a_double_coset_section_returns_its_group_elements.
   `double_coset_section()`.
 
 Before the fix: `2 failed, 1 passed in 7.67 s`, both failures that `TypeError`. After:
-`3 passed in 2.84 s`.
+`3 passed in 2.84 s`; with the mark on the element, this file and its seven neighbours:
+`41 passed in 17.94 s`.
 
 ## The repair, at the owner
 
@@ -52,10 +53,11 @@ Before the fix: `2 failed, 1 passed in 7.67 s`, both failures that `TypeError`. 
   map*; inverting a word reverses it, so the inverse is supplied too.
 - `membership_decision` reads the record before the general question, so a consumer that
   coerces the value back — a coset or double-coset section — gets a certificate.
-- The record is keyed by **element identity** and holds the element. This library's group
-  elements are not reliably equatable: on this specimen an owned lattice isometry
-  satisfies `value == ~value`, and `hash` is the parent's, so a value key or a hash key
-  would admit the wrong elements. Measured, `.scratch/issue292/run287hash.log`:
+- The mark lives on **the element**, as a tuple of the groups whose construction supplied
+  it, compared by identity (`element._admitted_subgroups`). Not a value key and not a hash
+  key: this library's group elements are not reliably equatable — on this specimen an
+  owned lattice isometry satisfies `value == ~value` and `hash` is the parent's, measured
+  in `.scratch/issue292/run287hash.log`:
 
   ```
   type: OwnedLatticeIsometryMor_with_category_with_category.ArrowType
@@ -63,6 +65,12 @@ Before the fix: `2 failed, 1 passed in 7.67 s`, both failures that `TypeError`. 
   inverse hash: 4843919552574235634
   value == inverse: True
   ```
+
+  Not a record on the subgroup either: `fd60fe9` first kept an id-keyed dict on the
+  subgroup, one entry per value of the cover's word evaluation. That is one entry per
+  word, so the subgroup would grow without bound on exactly the long walks this admission
+  serves — the shape sage-extensions#292 is about one call away. `d7b4b08` moves the mark
+  onto the element, where it lives exactly as long as the element does.
 
 - Nothing is reparented. An element parented by the subgroup breaks the *ambient's*
   ingress (`_to_engine` asserts membership in the supergroup), which is why group
