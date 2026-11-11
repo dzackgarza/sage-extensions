@@ -7,7 +7,7 @@ def test_the_divided_class_of_a_basis_vector_of_u2_is_not_characteristic() -> No
     For ``x = (a e + b f)/2`` one has ``b(x, x) = ab`` in ``QQ/ZZ``, which is
     zero; a characteristic ``c`` must then pair trivially with every class,
     hence ``c = 0``, and ``e/2`` is a nonzero class.  The definition is
-    Ito--Ohashi's (Michigan Math. J. 63 (2014), 159-188, Section 2, p. 162):
+    Ito--Ohashi's (arXiv:1302.2316v3, Section 2, p. 4):
     an element ``x`` of a finite quadratic form ``(A, b, q)`` with
     ``q : A -> QQ/2ZZ`` and ``b : A x A -> QQ/ZZ`` is characteristic when
     ``b(x, a) = q(a) (mod 1)`` for every ``a`` in ``A``.
@@ -23,7 +23,7 @@ def test_diagonal_two_minus_two_has_a_characteristic_divided_class() -> None:
     r"""The divided class of ``e + f`` on ``diag(2, -2)`` answers characteristic.
 
     By the definition the module's other docstring cites (Ito--Ohashi,
-    Michigan Math. J. 63 (2014), Section 2, p. 162): the class
+    arXiv:1302.2316v3, Section 2, p. 4): the class
     ``(e + f)/2`` pairs with each class ``x`` as ``q(x)`` does, the four
     differences ``q(x) - b(x, (e+f)/2)`` being ``0``, ``1``, ``0`` and ``0``.
     """

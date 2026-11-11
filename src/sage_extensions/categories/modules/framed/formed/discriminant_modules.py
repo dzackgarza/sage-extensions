@@ -507,8 +507,8 @@ class DiscriminantQuadraticModules(OwnedCategoryOverBaseRing):
 
             ``q(x) - b(x, v)`` lies in ``ZZ`` for every ``x`` in the
             discriminant group: H. Ito and H. Ohashi, *Classification of
-            involutions on Enriques surfaces*, Michigan Math. J. **63**
-            (2014), 159-188, Section 2, p. 162, state, for a finite
+            involutions on Enriques surfaces*, arXiv:1302.2316v3, Section 2,
+            p. 4, state, for a finite
             quadratic form ``(A, b, q)`` with ``q : A -> Q/2Z`` and
             ``b : A x A -> Q/Z`` (the sign convention of this module's
             quotient value modules), that ``an element x of A is called
