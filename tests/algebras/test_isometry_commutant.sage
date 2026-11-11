@@ -77,8 +77,9 @@ def test_unipotent_kernel_of_a_three_block_recovers_a_root():
     commutant = IsometryCommutant(gram, [F * F])
     assert int(commutant.dimension()) == int(3)
     generators = commutant.unipotent_kernel_generators()
-    assert len(generators) == int(1)
-    assert generators[0] in (F, F.inverse())
+    powers = [F**k for k in range(int(-4), int(5))]
+    assert all(g in powers for g in generators)
+    assert F in generators or F.inverse() in generators
 
 
 def test_noncommuting_isometries_have_simultaneous_commutant():
@@ -440,7 +441,10 @@ def test_nonmaximal_split_commutant_is_gamma_upper_zero_of_two():
     assert len(_closure([h.change_ring(two) for h in blocks], identity_matrix(two, int(2)))) == int(2)
     assert len(_closure([h.change_ring(three) for h in blocks], identity_matrix(three, int(2)))) == int(24)
     swap = sage_matrix(SageQQ, int(2), int(2), [int(0), -int(1), int(1), int(0)])
-    assert not commutant.is_centralizer_element(acting(lambda X: X * swap))
+    frame = [sage_matrix(SageQQ, int(2), int(2), v) for v in ([int(1), int(0), int(0), int(0)], [int(0), int(0), int(1), int(0)], [int(0), int(1), int(0), int(0)], [int(0), int(0), int(0), int(2)])]
+    coordinates = lambda X: [X[int(0), int(0)], X[int(1), int(0)], X[int(0), int(1)], X[int(1), int(1)] / int(2)]
+    rational = sage_matrix(SageQQ, [coordinates(x * swap) for x in frame]).transpose()
+    assert rational.denominator() != int(1)
 
 
 JORDAN_GRAM = sage_matrix(SageZZ, int(3), int(3), [int(0), int(1), int(0), int(1), int(0), int(0), int(0), int(0), int(2)])

@@ -32,65 +32,65 @@ def _assert_unitary_integral(lattice, g):
 
 
 def _column(field, entries):
-    return sage_matrix(field, len(entries), 1, [field(x) for x in entries])
+    return sage_matrix(field, len(entries), int(1), [field(x) for x in entries])
 
 
 def _two_i_order(size, pairs):
-    field = SageCyclotomicField(4)
+    field = SageCyclotomicField(int(4))
     i = field.gen()
-    gram = sage_matrix(field, size, size, 0)
+    gram = sage_matrix(field, int(size), int(size), int((0)))
     for row, column in pairs:
         gram[row, column] = field.one()
-    return field, HermitianLattice((field.one(), 2 * i), gram), gram
+    return field, HermitianLattice((field.one(), int((2)) * i), gram), gram
 
 
 def test_based_transporter_over_two_i_order_to_a_translated_null_vector():
-    field, lattice, _gram = _two_i_order(3, ((0, 2), (1, 1), (2, 0)))
-    target = [-2, 2, 1]
-    g = lattice.isotropic_transporter([[0, 0, 1]], [target], based=True)
+    field, lattice, _gram = _two_i_order(int(3), ((int(0), int(2)), (int(1), int(1)), (int(2), int(0))))
+    target = [int(-int(2)), int((2)), int((1))]
+    g = lattice.isotropic_transporter([[int((0)), int((0)), int((1))]], [target], based=True)
     _assert_unitary_integral(lattice, g)
-    assert g * _column(field, [0, 0, 1]) == _column(field, target)
+    assert g * _column(field, [int(0), int(0), int(1)]) == _column(field, target)
 
 
 def test_flag_transporter_over_two_i_order():
-    field, lattice, gram = _two_i_order(5, ((0, 3), (1, 4), (2, 2), (3, 0), (4, 1)))
-    e = lambda k: [1 if j == k else 0 for j in range(5)]
-    source, target = [e(0), e(1)], [e(3), e(1)]
-    flag = lattice.isotropic_transporter(source, target, blocks=(1, 1))
+    field, lattice, gram = _two_i_order(int(5), ((int(0), int(3)), (int(1), int(4)), (int(2), int(2)), (int(3), int(0)), (int(4), int(1))))
+    e = lambda k: [int((1)) if j == k else int((0)) for j in range(int((5)))]
+    source, target = [e(int(0)), e(int(1))], [e(int(3)), e(int(1))]
+    flag = lattice.isotropic_transporter(source, target, blocks=(int(1), int(1)))
     _assert_unitary_integral(lattice, flag)
-    first = flag * _column(field, source[0])
-    assert all(first[row, 0] == 0 for row in range(5) if row != 3)
-    assert first[3, 0] in (field.one(), -field.one())
-    second = flag * _column(field, source[1])
-    assert second[0, 0] == second[2, 0] == second[4, 0] == 0
+    first = flag * _column(field, source[int(0)])
+    assert all(first[row, int(0)] == int(0) for row in range(int(5)) if row != int(3))
+    assert first[int(3), int(0)] in (field.one(), -field.one())
+    second = flag * _column(field, source[int(1)])
+    assert second[int(0), int(0)] == second[int(2), int(0)] == second[int(4), int(0)] == int(0)
 
 
 def test_two_i_order_refuses_unproved_generators_of_gl_two():
-    field, lattice, gram = _two_i_order(5, ((0, 3), (1, 4), (2, 2), (3, 0), (4, 1)))
-    frame = HermitianWittFrame(lattice, gram.parent().identity_matrix(), sage_matrix(field, 1, 1, [1]), 2)
+    field, lattice, gram = _two_i_order(int(5), ((int(0), int(3)), (int(1), int(4)), (int(2), int(2)), (int(3), int(0)), (int(4), int(1))))
+    frame = HermitianWittFrame(lattice, gram.parent().identity_matrix(), sage_matrix(field, int(1), int(1), [int(1)]), int(2))
     with pytest.raises(ValueError):
         frame.general_linear_generators()
-    assert len(frame.general_linear_generators((1, 1))) == 2 + 2 * 2
+    assert len(frame.general_linear_generators((int(1), int(1)))) == int(2) + int(2) * int(2)
 
 
 def _gaussian_line_frame():
-    field = SageCyclotomicField(4)
-    gram = sage_matrix(field, 3, 3, [0, 0, 1, 0, 1, 0, 1, 0, 0])
+    field = SageCyclotomicField(int(4))
+    gram = sage_matrix(field, int(3), int(3), [int(0), int(0), int(1), int(0), int(1), int(0), int(1), int(0), int(0)])
     lattice = HermitianLattice((field.one(), field.gen()), gram)
-    return field, lattice, HermitianWittFrame(lattice, gram.parent().identity_matrix(), sage_matrix(field, 1, 1, [1]), 1)
+    return field, lattice, HermitianWittFrame(lattice, gram.parent().identity_matrix(), sage_matrix(field, int(1), int(1), [int(1)]), int(1))
 
 
-@pytest.mark.parametrize("pointwise, index", ((False, 16), (True, 8)), ids=("setwise", "pointwise"))
+@pytest.mark.parametrize("pointwise, index", ((False, int(16)), (True, int(8))), ids=("setwise", "pointwise"))
 def test_gaussian_line_stabilizer_meets_gamma_two_with_the_hand_index(pointwise, index):
     field, lattice, frame = _gaussian_line_frame()
-    generators, found = frame.congruence_stabilizer_generators(2, pointwise)
+    generators, found = frame.congruence_stabilizer_generators(int(2), pointwise)
     assert found == index
-    e1 = _column(field, [1, 0, 0])
-    identity = sage_matrix.identity(field, 3)
+    e1 = _column(field, [int(1), int(0), int(0)])
+    identity = sage_matrix.identity(field, int(3))
     for g in generators:
         _assert_unitary_integral(lattice, g)
-        assert all(value % 2 == 0 for entry in (g - identity).list() for value in lattice._coordinates_in_order(entry))
+        assert all(value % int(2) == int(0) for entry in (g - identity).list() for value in lattice._coordinates_in_order(entry))
         image = g * e1
-        assert image[1, 0] == image[2, 0] == 0
+        assert image[int(1), int(0)] == image[int(2), int(0)] == int(0)
         if pointwise:
             assert image == e1
