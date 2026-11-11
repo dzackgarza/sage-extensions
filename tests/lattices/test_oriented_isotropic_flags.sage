@@ -190,7 +190,7 @@ def test_oriented_isometry_between_two_presentations_of_three_u():
     graded sign attained, so the oriented flags (e0, e2, e4) and (f0 - f1, f2, -f4) are isomorphic.
     """
     lattices = Lattices(ZZ)
-    gram = [[int(i // 2 == j // 2 and i != j) for j in range(6)] for i in range(6)]
+    gram = [[int(i // int(2) == j // int(2) and i != j) for j in range(int(6))] for i in range(int(6))]
     source = lattices(gram)
     target_gram = [row[:] for row in gram]
     target_gram[0][0] = 2
