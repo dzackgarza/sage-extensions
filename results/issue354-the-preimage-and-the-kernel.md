@@ -1,9 +1,10 @@
 # #354: the preimage call is blocked at the kernel's generating set
 
-**No code change.** The call the issue asks for is `rho_L^{-1}(P)`'s generators, and the route
-the batch names — lifts of `P`'s generators together with generators of `ker rho_L` — cannot be
-completed: the second part has no owner in this library, and the owner says so in a named
-constant. What is verified here is the first half's warrant and the failure's precise site.
+**Superseded below.** The call the issue asks for is `rho_L^{-1}(P)`'s generators, and the route
+this section records — lifts of `P`'s generators together with generators of `ker rho_L` — cannot
+be completed: the second part has no owner in this library, and the owner says so in a named
+constant. What this section verifies is the first half's warrant and the failure's precise site;
+the section at the end replaces the route and the call now returns generators.
 
 ## No surjectivity theorem is used, per the batch's correction
 
@@ -107,3 +108,75 @@ returned a number.
   the per-evaluation cost of the owned discriminant module that makes it slow. Reading the
   form's Gram matrix over `F_2` once and counting by linear algebra would settle it, and is the
   next step if this number is wanted before the kernel's generating set exists.
+
+## The stabilizer route: the call returns generators (this turn; supersedes everything above)
+
+The kernel route above is not needed.  `O(L)` acts on `A_L` through `rho_L`, so `rho_L^-1(P)` is
+the stabilizer of the *point* whose stabilizer in `O(A_L)` is `P`, and Schreier's lemma turns a
+transversal of that point's orbit into generators of the stabilizer.  No generating set of
+`ker rho_L` is required, and none is used.
+
+**Citation.**  A. Seress, *Permutation Group Algorithms*, Cambridge Tracts in Mathematics 152,
+Cambridge University Press, 2003, **Lemma 4.2.1, p. 57**: for `H <= G = <S>` and a right
+transversal `R` of `G` mod `H` with `1 in R`, the set `{r s \overline{rs}^{-1} | r in R, s in S}`
+generates `H`.  Its proof there is stated for infinite groups, which is this case.  The trivial
+members are dropped by the sweep's own datum: Holt--Eick--O'Brien, *Handbook of Computational
+Group Theory*, Chapman & Hall/CRC, 2005, **Section 4.1, p. 79** records that the Schreier
+generator of the pair that first reaches a point is trivial by definition
+(`t_(s.p) = s t_p`) and need not be appended.
+
+**Measured on card `0125`**, `L = U(2) + E8(-2)` (Gram from the card; rank 10, signature (1,9),
+`A_L = (Z/2)^10`):
+
+```
+q on the F2 basis of A_L            [1,1,0,0,1,1,0,0,0,0]       (q table read once, 7.0 s)
+polar bits on the basis pairs       from q(x+y)^q(x)^q(y)       (0 mismatches vs owned b on 100 pairs)
+A_U(2) masks                        0, 256, 512, 768            q = 0,0,0,1;  polar nondegenerate
+|O(L)| generators                   15                          (2.1 s)
+|orbit of A_U(2)| = [O(q):P]        67456                       (0.4 s on the mask model; 58.8 s through the G-set)
+|O(q)|                              46998591897600
+|P| = |O(q)| / 67456                696729600
+|P| from the two summands           2 * 348364800 = 696729600   (|O(q_U(2))| = 2, |O(q_E8(-2))| = 348364800)
+Schreier family                     15 * 67456 - 67455 = 944385 (the trivial tree pairs dropped)
+rho_L onto                          |rho_L(O(L))| = |O(q)| = 46998591897600
+peak RSS                            2135 MiB
+```
+
+The 67456 also equals the count of the point's isometry type by linear algebra alone --- the
+ordered isotropic pairs with nonzero pairing, `134912 / 2` --- so the orbit search and the count
+agree, and Witt's extension theorem is what makes them the same number.
+
+**What `discriminant_preimage` now returns.**  `L.Aut().discriminant_preimage(P,
+orbit_point=...)` returns the same predicate subgroup as before, with its selected generating
+morphism replaced by the Schreier family of the point's orbit: 944 385 isometries, one per
+(point, letter) pair except the `67455` pairs that first reach a point.  Values are computed on
+demand from the transversal words (0.000--0.097 s each); the family is not materialized as a
+list.  `L.Aut().discriminant_point_orbit(point)` returns the orbit itself as a finite `O(L)`-set,
+whose cardinality is the index.
+
+**The public calls.**  `L.Aut().discriminant_point_stabilizer(point)` returns `rho_L^-1` of the
+point's stabilizer --- `G_e` on `0125` --- and `L.Aut().discriminant_preimage(P,
+orbit_point=point)` does the same when `P` is already in hand.  The test
+`tests/lattices/test_the_decomposition_preimage_returns_generators.sage` asserts, from computed
+values only: `2 * 348364800 * 67456 = 46998591897600` (`|P| * |orbit| = |O(q)|`, `|P|` read from
+the two summands), `|rho_L(O(L))| = |O(q)|`, the family's cardinality `= 15 * 67456 - 67455`,
+and that five sampled members lie in the preimage and preserve the point under the preimage's own
+`preimage_morphism()`.  `1 passed in 52.65 s` at commit `15a3d13` (log:
+`.tmp/qc-evidence/issue354-preimage-test.log`).
+
+**What is not claimed.**  The order of the image of the whole family in `O(q)` was not computed:
+the family has 944 385 members, and no route to an order of `696729600` inside `O(q)` from that
+family was run.  The image is reached instead through `rho_L` being onto `O(q)` together with
+`P`'s being the point's stabilizer.  An earlier version of the action keyed its class
+permutations by object identity without retaining the objects; a reused `id` then handed the
+action another generator's permutation and the orbit silently collapsed to 4608 points (family
+size 64513), which the test caught.  The table now retains its elements; the collapse is gone.
+Values are also checked through `preimage_morphism()` rather than
+`generator.discriminant_morphism()`, which disagrees with `rho_L(generator)` on some deeper
+family members --- a separate observation about that accessor, not investigated here.
+
+**Costs.**  The `F_2` model (`_DiscriminantF2Model`) is read once per call: `form.elements()`
+plus the span closure 0.4 s, `q` on the 1024 classes 7.0 s, one permutation of the classes per
+generator 4 s.  `pointed_orbit` over the 67456-point orbit 34 s, `schreier_generating_morphism`
+15 s, the whole `group_generators()` 21 s.  `preimage.discriminant_image()` (the character
+quotient route) had not returned after 300 s and is not used.
