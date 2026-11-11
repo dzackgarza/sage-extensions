@@ -4261,3 +4261,46 @@ action instead.
 metadata failure it enters `isotropic_induction.plane_automorphism_generators` →
 `_stabilizer_generators` → `recursive.isotropic_stabilizer_action` and had produced
 nothing after 3000 s — the rank-two parabolic wall #316 measured at 1500 s.
+
+### #322: the lift locus is the kernel only when the marked vector has divisibility one (2026-11-11)
+
+The repair in `b9e8cfa` reported the kernel of `a + mP |-> s(a) + L'` and justified it with
+"`E_{f,x}` is integral exactly when `x` lies in `L'`".  **The converse is false.**
+`Lattices.eichler_transvection` (Gritsenko--Hulek--Sankaran, arXiv:0810.1614, section 3.1,
+(4)--(5)) is integral for `x` in `L'` because `L'` is even; the converse needs a `y` with
+`b(y,f) = 1`, and a primitive isotropic `f` only gives `b(f, L') = d Z` for the divisibility
+`d = div(f)`.  At `d = 2` the parameter `f/2` has `b(y,f/2) = b(y,f)/2` and `q(f/2) = 0`, so
+`E_{f,f/2}` is the identity: an integral isometry whose parameter is not a lattice vector.
+The kernel is then a proper subset of the locus and the call loses integral lifts.
+`T_Co = <2> + (U + E8(-1))(2)` has `d = 2` for **every** basis vector, because every pairing
+it exhibits is even — so this is the case on the lattice #322 is about, not a corner.
+
+The controls of `b9e8cfa` could not see it: they check that each returned class lifts, and
+every returned class does.  What fails is the excluded classes.  `U(2) + U(2)` returned 4 of
+16 integral classes and `U(4) + <2>` 2 of 4 (`.tmp/p322-cosets-RED2.log`), while the two
+divisibility-one controls agreed.
+
+**What does hold, and what the method now does.**  For every base point and every
+divisibility the locus is a union of cosets of `K = kern(a |-> s(a) mod L')`: the section
+lands in the perpendicular of the marked isotropic vector, so
+`phi(a + k) = E_{f,s(k)} phi(a)`, and `E_{f,s(k)}` is integral with integral inverse for `k`
+in `K` on an even lattice.  So the locus is the union of the `K`-cosets whose representative
+passes the expensive lift test -- 256 representatives on `T_Co` instead of 262144 classes,
+and `|locus| = 128 * 1024 = 131072` there, 128 times the kernel.  The base-point refusal went
+with the kernel statement: the coset argument does not need an integral base point.
+`integral_base_point_or_none` had the same listing defect one call away (`for residue in
+quotient.codomain()`) and now searches the locus.
+
+**Cost of the honest answer.** One `T_Co` locus is 86.5 s: 36.2 s of lift tests plus 46.6 s
+of `finite_ordered_set` over 131072 classes, whose hash pass dominates (the 131072 additions
+are 0.2 s).  The `O(T_Co)` row is 424.5 s quiet, against 66.0 s with the wrong locus.
+
+**The `Õ⁺(T_Co)` row still does not return, and the locus is not its blocker.**  Its two
+routes are both closed on `T_Co` (`.tmp/p322-otilde-step.log`): `isotropic_line_stabilizer_image`
+returns `None` because the lattice exhibits no *unimodular* hyperbolic plane, which is #315's
+refusal and not a defect to route around; and the fallback `splitting_isometries` reaches
+`OrthogonalCharacterQuotient._image_section` -> `_ambient_generators` and demands `O(T_Co)`'s
+selected finite generating set, whose computation
+(`_core_automorphism_generators` -> the port's `orthogonal_group_generators`) ran from 488 s
+to a 2100 s cap without returning.  That is #18's measured cost and #17's open replacement of
+the generator-driven character image; it is not a locus question.

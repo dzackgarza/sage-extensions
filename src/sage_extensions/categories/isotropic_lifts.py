@@ -410,38 +410,55 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
 
         @cached_method
         def integral_parameter_classes(self):
-            r"""The integral residue locus, as the kernel of one map of finite groups.
+            r"""The integral residue locus, as a union of cosets of the transvection kernel.
 
             Write ``f`` for the target's marked isotropic vector, ``phi: P -> T`` for the
             parameterization (:meth:`parameterization`), ``s`` for the target section and
             ``L'`` for the target lattice.  Eichler's transvection formula
             (Gritsenko--Hulek--Sankaran, arXiv:0810.1614, section 3.1, (4)--(5), cited in
-            this module's docstring)
+            this module's docstring; the owner of the formula here is
+            ``Lattices.ParentMethods.eichler_transvection``)
 
                 ``E_{f,x}(y) = y + b(y,x) f - (q(x)/2) b(y,f) f - b(y,f) x``
 
-            gives, for ``L'`` even, that ``E_{f,x}`` is an isometry of ``L'`` **exactly when
-            ``x`` lies in ``L'``**: if ``x`` is in ``L'`` each term is integral, ``q(x)/2``
-            by evenness; conversely a ``y`` with ``b(y,f) = 1``, which a primitive isotropic
-            ``f`` supplies, gives ``x = [b(y,x) - q(x)/2] f - (E(y) - y)``, which lies in
-            ``L'`` because ``f`` does.
+            is integral for ``x`` in ``L'``: each term is then integral, ``q(x)/2`` because
+            ``L'`` is even.  A primitive isotropic ``f`` does **not** make that an exact
+            criterion, because the converse needs a ``y`` with ``b(y,f) = 1`` and a primitive
+            isotropic vector only gives ``b(f, L') = d Z`` for the divisibility ``d = div(f)``,
+            which may exceed one.  On a lattice of divisibility ``d = 2`` the parameter
+            ``x = f/2`` has ``b(y,x) = b(y,f)/2`` and ``q(x) = 0``, so ``E_{f,f/2}`` is the
+            identity: an integral isometry whose parameter is not a lattice vector.  The
+            integral parameters are therefore not the parameters that lie in ``L'``, and a
+            locus computed as ``{a : s(a) in L'}`` loses exactly those lifts.
 
-            Since ``phi(a) = E_{f,s(a)} phi(0)`` and ``phi(x+y) = E(y) phi(x)``, an
-            **integral base point** ``phi(0)`` makes the integral residue locus the kernel of
+            What holds for every base point and every divisibility is that the locus is a
+            union of cosets of
 
-                ``a + mP |-> s(a) + L'`` in ``L'^vee/L' = A_{L'}``,
+                ``K = {a in P/mP : s(a) in L'}``,
 
-            a subgroup of ``P/mP``.  So the locus is computed here from the parameter
-            module's structure -- the images ``s(a_i)`` of its generators ``a_i`` in
-            ``A_{L'}``, then an integer Smith form of the rational coordinate matrix of
-            those images in a basis of ``L'`` -- and never by listing the elements of
-            ``P/mP``.
+            the kernel of ``a + mP |-> s(a) + L'`` in ``L'^vee/L' = A_{L'}``.  The
+            section lands in the perpendicular of the marked isotropic vector, so the
+            transvections ``E_{f,s(a)}`` and ``E_{f,s(k)}`` commute and compose to the
+            transvection of the sum, and ``phi(a) = E_{f,s(a)} phi(0)`` is how
+            :meth:`parameterization` defines these coordinates.  Hence
 
-            With a base point that is not integral the statement above does not hold: the
-            transvection must then also cancel the fractional part of ``phi(0)``, so the
-            locus is not a kernel.  That case is refused rather than decided here; the
-            reason, and the sizes that make a per-class search unusable, are in
-            ``TRAPS.md``.
+                ``phi(a + k) = E_{f,s(k)} phi(a)``
+
+            for every ``k`` in ``K``.  Both ``E_{f,s(k)}`` and its inverse
+            ``E_{f,-s(k)}`` are integral, because ``s(k)`` and ``-s(k)`` lie in ``L'`` and
+            ``L'`` is even.  Multiplying by an integral isometry whose inverse is integral
+            preserves integrality, so ``phi(a + k)`` is integral exactly when ``phi(a)`` is:
+            the locus is a union of ``K``-cosets, integral base point or not.
+
+            The locus is computed here from the parameter module's structure, never by
+            listing its elements: ``K`` from one integer Smith form of the coordinates of
+            ``s`` on a basis of ``P`` (:meth:`integral_parameter_quotient`,
+            ``Modules.ParentMethods.rational_coordinates``); one representative of each
+            coset of ``P/mP`` modulo ``K``, which is ``|P/mP| / |K| = prod_i step_i`` of
+            them; the lift ``phi`` of that parameter, asked for its integral restriction --
+            the lift test itself, not a criterion for it; and the union of the cosets that
+            pass.  A coset whose representative fails contributes nothing, and its
+            representative's lift is the only lift built for it.
             """
             from sage.all import QQ, ZZ, gcd, lcm
             from sage.matrix.constructor import matrix
@@ -450,17 +467,12 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
 
             source = self.source_reduction().isotropic_embedding().codomain()
             target = self.target_reduction().isotropic_embedding().codomain()
-            base = self.base_point()
-            if base.integral_restriction(source, target) is None:
-                raise ValueError(
-                    f"the integral lift locus of {self.reduction_isometry()!r} is not computed "
-                    f"from its parameter module: the base point is not an integral isometry "
-                    f"{source} -> {target}, and with a nonintegral base point integrality is not "
-                    f"constant on the cosets of the transvection period, so the locus is not the "
-                    f"kernel of the class map (see TRAPS.md, '#322'). Ask "
-                    f"integral_base_point_or_none for existence, or supply a torsor whose base "
-                    f"point is integral."
-                )
+            assert target.is_even() is True, (
+                f"the integral lift locus of {self.reduction_isometry()!r} is computed as a "
+                f"union of cosets of the transvection kernel only on an even lattice: on "
+                f"{target!r} the transvection of a kernel class need not be integral, so "
+                f"integrality is not constant on those cosets"
+            )
             quotient = self.integral_parameter_quotient()
             parameter_lattice = quotient.domain()
             classes_module = quotient.codomain()
@@ -504,7 +516,12 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
                 denominator // gcd(abs(smith[index, index]), denominator)
                 for index in range(parameter_rank)
             )
-            counts = tuple(period_scalar // gcd(step, period_scalar) for step in steps)
+            # In the coordinates w = V a of P/mP = (Z/m)^r the kernel condition
+            # (V a)_i in step_i Z is the condition w_i in gcd(step_i, m) Z, so
+            # gcd(step_i, m) indexes the cosets in that coordinate and
+            # m / gcd(step_i, m) counts the kernel's classes there.
+            coset_steps = tuple(gcd(step, period_scalar) for step in steps)
+            counts = tuple(period_scalar // step for step in coset_steps)
             images = tuple(
                 classes_module(quotient(parameter_lattice.module_generator(label)))
                 for label in labels
@@ -523,37 +540,72 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
                     zero,
                 )
 
-            # w ranges over the multiples of the steps; a = V^-1 w is its parameter.
+            def parameters(moduli):
+                r"""The index vectors ``indices`` with ``0 <= indices[i] < moduli[i]``."""
+                indices = [0] * parameter_rank
+                while True:
+                    yield tuple(indices)
+                    position = 0
+                    while position < parameter_rank:
+                        indices[position] += 1
+                        if ZZ(indices[position]) < ZZ(moduli[position]):
+                            break
+                        indices[position] = 0
+                        position += 1
+                    if position == parameter_rank:
+                        return
+
             inverse_right = right.inverse()
-            residues = []
-            indices = [0] * parameter_rank
-            while True:
-                multiples = [
-                    ZZ(indices[position]) * step for position, step in enumerate(steps)
-                ]
-                column = inverse_right * matrix(ZZ, parameter_rank, 1, multiples)
-                residues.append(
-                    class_of(tuple(int(entry) % int(period_scalar) for entry in column.list()))
+
+            def parameter_class(indices):
+                r"""The class of the parameter ``V^-1 indices`` in ``P/mP``."""
+                column = inverse_right * matrix(
+                    ZZ, parameter_rank, 1, [ZZ(index) for index in indices]
                 )
-                position = 0
-                while position < parameter_rank:
-                    indices[position] += 1
-                    if ZZ(indices[position]) < counts[position]:
-                        break
-                    indices[position] = 0
-                    position += 1
-                if position == parameter_rank:
-                    break
-            return finite_ordered_set(tuple(residues))
+                return class_of(
+                    tuple(int(entry) % int(period_scalar) for entry in column.list())
+                )
+
+            # K itself, as the classes of P/mP with w = V a a multiple of the steps.
+            transvection_kernel = tuple(
+                parameter_class(
+                    tuple(ZZ(index) * step for index, step in zip(indices, coset_steps))
+                )
+                for indices in parameters(counts)
+            )
+            parameterization = self.parameterization()
+
+            def lifts_integrally(residue):
+                r"""Whether the lift of this parameter class restricts to an isometry of ``L'``."""
+                parameter = inclusion(quotient.preimage(residue)).underlying_element()
+                return parameterization(parameter).integral_restriction(source, target) is not None
+
+            passing = tuple(
+                residue
+                for residue in (
+                    parameter_class(indices) for indices in parameters(coset_steps)
+                )
+                if lifts_integrally(residue)
+            )
+            # The locus is the union of the cosets that pass, each translated from its
+            # own tested representative by the transvection kernel.
+            return finite_ordered_set(tuple(
+                residue + element
+                for residue in passing
+                for element in transvection_kernel
+            ))
 
         @cached_method
         def integral_base_point_or_none(self):
             r"""Decide existence and retain one integral lift, or ``None``.
 
             An integral rational base point proves nonemptiness immediately.
-            Otherwise test the complete parameter quotient incrementally and
-            retain the first integral lift. A nonintegral base point proves
-            nothing; only exhaustion of that quotient proves emptiness.
+            Otherwise the integral residue locus decides it: its classes are the
+            cosets of the transvection kernel whose representative lifts
+            integrally (:meth:`integral_parameter_classes`), so the first of
+            them supplies a lift and an empty locus proves emptiness without
+            listing ``P/mP``.  The lift is asked for its integral restriction
+            once more, on that class alone, rather than assumed.
             """
             source = self.source_reduction().isotropic_embedding().codomain()
             target = self.target_reduction().isotropic_embedding().codomain()
@@ -561,8 +613,9 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             if base.integral_restriction(source, target) is not None:
                 return base
             quotient = self.integral_parameter_quotient()
-            for residue in quotient.codomain():
-                parameter = quotient.domain().inclusion()(quotient.preimage(residue)).underlying_element()
+            inclusion = quotient.domain().inclusion()
+            for residue in self.integral_parameter_classes():
+                parameter = inclusion(quotient.preimage(residue)).underlying_element()
                 lift = self.parameterization()(parameter)
                 if lift.integral_restriction(source, target) is not None:
                     return lift
