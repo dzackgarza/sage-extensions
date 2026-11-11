@@ -10,6 +10,13 @@ B = diag(1, 1, -1), F1 swaps the first two coordinates, F2 negates the first. Th
 do not commute and generate the dihedral group of order 8, absolutely irreducible on
 the first two coordinates and trivial on the third, so A = {diag(a, a, b)}, O = Z x Z,
 and the centralizer in O(L) is the four matrices diag(+-1, +-1, -+1) with equal first two.
+
+Product Levi quotient. L = M + <1>, M = U + <2> with basis e, f, g, h (e.f = 1, g.g = 2, h.h = 1), and F = E + 1 for
+the Eichler transvection E e = e, E f = f + g - e, E g = g - 2e, so N = F - 1 has N f = g - e, N g = -2e, N h = 0: one
+Jordan block of length three on M. A map commuting with F sends f to l_1 f modulo span(e, g, h) and h to l_2 h modulo e,
+and the maps with l_1 = l_2 = 0 are nilpotent, so A / rad = Q x Q, both factors fixed by the adjoint. -1_M + 1 and 1_M + -1
+are integral isometries commuting with F, so the image of C(Z) in {+-1}^2 is the whole group, and the sign pairs
+(g_ff, g_hh) of any generating set generate it.
 """
 
 from sage_extensions.all import *
@@ -511,3 +518,15 @@ def test_doubled_jordan_block_has_nonabelian_skew_radical():
     assert span == identity_matrix(SageZZ, int(3))
     from sage.arith.misc import gcd as sage_gcd
     assert sage_gcd([SageZZ(c) for c in level_two]) == int(1)
+
+
+def test_product_levi_quotient_centralizer_reaches_both_signs():
+    gram = sage_matrix(SageZZ, 4, 4, [0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1])
+    F = sage_matrix(SageZZ, 4, 4, [1, -1, -2, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1])
+    commutant = IsometryCommutant(gram, [F])
+    assert commutant.dimension() - len(commutant.radical_basis()) == 2
+    generators = commutant.centralizer_generators()
+    assert all(g * F == F * g and g.transpose() * gram * g == gram for g in generators)
+    signs = sage_matrix(SageGF(2), [[0 if g[1, 1] == 1 else 1, 0 if g[3, 3] == 1 else 1] for g in generators])
+    assert all(g[1, 1] in (1, -1) and g[3, 3] in (1, -1) for g in generators)
+    assert signs.rank() == 2
