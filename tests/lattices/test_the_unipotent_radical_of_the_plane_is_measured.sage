@@ -14,15 +14,17 @@ there, by comparing computed values:
   translations.  That is the block form of #353 written down and computed rather than
   quoted: Dutour Sikirić--Hulek, arXiv:2302.01679v2, Theorem 4.9
   (`theorem_isotropic_k_planes`), printed p. 22, gives the basis $(U \\mid P \\mid K)$;
-* the returned family's translations fall short of that target, so
-  `unipotent_radical_index()` returns `aleph0`: the returned unipotent generators do
-  **not** generate the radical at $P_2$, and neither do the generators of
-  `parabolic_stabilizer_generators()` that lie in it.
+* the returned family's translations do reach that target, because the family includes
+  the block generators of #365 (`unipotent_radical_block_generators()`, one over each
+  vector of the parameter lattice `unipotent_parameter_lattice()` and one over the
+  centre), so `unipotent_radical_index()` is $1$ and the returned family generates the
+  radical.  The fourteen transvections alone do **not**: their translations span $12$ of
+  $16$, which is the measurement #353 reported and this file's third test still pins.
 
-So `is_parabolic_complete()` stays `False` at $P_2$, now on the radical factor itself and
-not only on the absence of a citation.  The plane-action factor (index $1$ by the
-$\\Gamma(2)$ certificate) and the quotient factor (index $1$ by computed orders) are
-decided; the radical is the factor that fails.
+So `is_parabolic_complete()` stays `False` at $P_2$, but no longer on the radical
+factor: the reason is the Levi pairing, which `parabolic_obstruction()` names.  The
+plane-action factor (index $1$ by the $\\Gamma(2)$ certificate) and the quotient factor
+(index $1$ by computed orders) are decided, and the radical is now decided too.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -88,20 +90,33 @@ def test_the_radical_has_rank_two_rank_k_plus_one() -> None:
     assert cardinal(kernel_rank) > cardinal(1)
 
 
-def test_the_returned_family_has_infinite_index_in_the_radical() -> None:
-    r"""The translations fall short of the target, so no finite index exists at $P_2$.
+def test_the_returned_family_reaches_the_radical_translation_rank() -> None:
+    r"""The family's translations reach the target, so the radical is generated, and the index is one.
 
-    The index is not refused for want of a citation any more: it is infinite.  The
-    obstruction the parabolic reports is a sentence, so what is asserted here is the
-    object behind it --- the family's translation rank, the radical's rank, the
-    infinite index, and that the parabolic is not complete --- and the sentence is
-    only required to exist.
+    Two facts are asserted, and they are different: the family's translations span the
+    rank the radical's own translation image has
+    (`unipotent_translation_rank`, whose target is computed from $I^\perp/I$), and
+    `unipotent_radical_index()` is one, which additionally requires the family to meet
+    the centre in a generator.  What #353 measured is still true of the transvections
+    alone and is asserted as well: their translations fall short, so they alone would
+    generate a subgroup of infinite index.
     """
     plane = _second_representative(NamedLattices.TEn)
     translation, target = plane.unipotent_translation_rank()
+    basis = tuple(
+        plane.inclusion()(plane.module_generator(label))
+        for label in plane.module_generating_set()
+    )
+    transvections = tuple(
+        transvection
+        for transvection in plane.parabolic_transvection_generators()
+        if all(transvection(vector) == vector for vector in basis)
+        and plane.acts_trivially_on_isotropic_reduction(transvection)
+    )
 
-    assert cardinal(translation) < cardinal(target)
+    assert cardinal(translation) == cardinal(target)
     assert cardinal(target) == cardinal(plane.unipotent_radical_rank() - plane.unipotent_translation_kernel_rank())
-    assert plane.unipotent_radical_index() == aleph0
+    assert cardinal(plane.unipotent_translation_rank(transvections)[0]) < cardinal(target)
+    assert plane.unipotent_radical_index() == cardinal(1)
     assert plane.is_parabolic_complete() is False
     assert bool(plane.parabolic_obstruction()) is True
