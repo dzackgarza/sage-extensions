@@ -1,4 +1,17 @@
-# #341: a stabilizer's generator family generates a subgroup, and where the membership question was coming from
+# #341: a stabilizer's generator family generates a subgroup, from the datum of the construction
+
+## The result
+
+`G.subgroup(tuple(S.group_generators()))` returns, for `S = G.stabilizer(x)`, and the
+membership of each generator in `G` is never put as a question.  The datum read is the
+stabilizer's own: `S` is a subgroup of `G` by its construction, its selected resolution
+states a family generating `S`, and reading that family
+(`OwnedGroups.ParentMethods.group_generators`) records each generator on the element as a
+member of the group `S` acts by — the same element-side mark a free cover's word values
+get (`GeneratedSubgroups._mark_admitted`, `0c6ea4e7df`).  A family that carries no such
+mark is read through `group(element)` exactly as before: on a finite group that is the
+membership decision, and on an infinite generated group it is the present undecided
+`TypeError`.
 
 ## The cause, measured
 
@@ -21,71 +34,143 @@ What the family actually is, per specimen, printed element by element:
 | --- | --- | --- | --- |
 | `U + U` over `QQ`, `G = <τ₁, τ₂, swap>`, `S` = lattice stabilizer of `2ZZ e₁ + ZZ f₁ + ZZ e₂ + ZZ f₂` | the **generated subgroup** `G` | 12 | `O(U + U)` — the **ambient**, not `G` |
 | `T_En`, `G = O(T_En)`, `S` = setwise stabilizer of `ZZ e` | the **ambient** `O(T_En)` | 6260 | `O(T_En)` — i.e. `G` itself |
+| `U` over `ZZ`, `G = <-1> <= O(U)`, the refusal specimen | the **generated subgroup** `G` | — | `O(U)` |
 
-So the two rows fail differently, and only the first one fails:
+Only the first row fails, and it fails with the `TypeError` above.  The second needs no
+datum: `_element_constructor_` of the ambient takes the parent-identity branch
+(`__contains__`: `value.parent() is self`), so no question is asked and the call already
+returned (2208.3 s on the pre-repair tree, `.scratch/issue292/run341ten.log`).  The third
+row is where the two candidate repairs are *distinguishable*: `O(U)` is finite, `G` has
+order 2, and the swap is not in `G`, so a construction that admits a family on a premise
+about the family answers wrongly, and a construction that reads the family's own datum
+refuses.
 
-- **Ambient case (`T_En`).** `_element_constructor_` of the ambient takes the parent-identity
-  branch (`__contains__`: `value.parent() is self`), so no membership question is asked and
-  the construction already succeeded: `group.subgroup(tuple(S.group_generators()))` returned
-  a `Subgroup of Orthogonal group O(T_En)` in 2208.3 s on the **pre-repair** tree
-  (`.scratch/issue292/run341ten.log`; the run's process loaded the library before the repair
-  was written to disk — file mtimes 10:12:48 against a process start at ~10:12:00, and the
-  generator count 6260 with `parent is group: True` on every one of the first four).
-  `T_En` therefore does *not* reproduce the issue as reported; the test keeps it as a
-  regression guard, and it is not red before the repair.
-- **Generated-subgroup case (`U + U`).** The generators are parented by `O(U + U)` while
-  `group` is a proper subgroup of it, so parent identity does not decide, and the
-  membership question is asked — that is the `TypeError` #287's results file recorded, and
-  `#341`'s acceptance is about. This is the red.
+## The repair that was refused (`803179745e`)
+
+`803179745e` put a helper in front of the coercion that admitted every element whose parent
+was `group`'s ambient group, whenever `group` was a generated subgroup — with no check and
+no datum from the element's construction.  It is refused, and the third row is why: at that
+commit `G.subgroup((swap,))` **returns** a subgroup of `G` whose generator `G` does not
+contain, and `G._admits_member(swap)` goes from `False` to `True` on the way through.  A
+premise the caller states about arbitrary elements is not the stabilizer's datum.  The
+blanket admission is deleted; nothing in this repair reads a family's parent.
 
 ## The repair
 
-At `GeneratedSubgroups._engine_subgroup`, through one helper
-(`src/sage_extensions/categories/group/groups.py`): `_supplied_generator(group, element)`
-reads one supplied generator as an element of `group` without deciding membership.
+Two owners, and the direction of the datum is the point: the subgroup that *supplies* a
+generator family writes the record, and the group that is asked to *generate* from it reads
+one.
 
-- An element whose parent **is** `group` is that element.
-- An element whose parent is `group`'s **ambient group** is a member of `group` by the
-  caller's supplied premise (`OWN-05`, `OWN-22`), and it is recorded through the same
-  element-side admission a free cover's word values get
-  (`_retain_admitted_member`, `0c6ea4e7df`), so no later question about it is put to
-  `group` either.
-- An element whose parent is **neither** is coerced through `group` exactly as before, so a
-  foreign element is still refused and nothing is admitted that was not supplied.
+- **Written** — `OwnedGroups.ParentMethods.group_generators`
+  (`src/sage_extensions/categories/group/groups.py`) returns the family through
+  `_record_generators_in_supergroup(self, generators)`, which marks each generator with
+  `self.supergroup()._mark_admitted`.  That is the element-side admission of
+  `0c6ea4e7df`: `element._admitted_subgroups`, a tuple of the groups whose construction
+  supplied the element, compared by identity.  `S = G.stabilizer(x)` builds its generator
+  family in its own selected resolution, so the family `S.group_generators()` hands out
+  names `S.supergroup() = G`, and what is written is exactly "generated by a family of `S`,
+  therefore a member of `G`".
+- **Read** — `_supplied_generator(group, element)` accepts the element when
+  `group._admits_member(element)` is true.  Otherwise it calls `group(element)`, unchanged.
 
-The admission is written only for a **generated** subgroup (`group in
-GeneratedSubgroups(ambient)`): that record is the family the subgroup was handed. A
-predicate subgroup's membership is its predicate, and recording a supplied element there
-would answer a question its predicate has not decided, so that branch is left to the
-predicate.
+Consequences, each one intended:
 
-The stabilizer's datum is the first two bullets: its generator family is built through its
-own selected free cover into the ambient group, and this library does not reparent subgroup
-elements, so "element of `L.Aut()`" is written in the element's parent rather than decided.
+- A family with the mark is admitted without a question — `G.subgroup(S.group_generators())`
+  on the `U + U` specimen.
+- A family with no mark goes through `group(element)`: finite group → the membership
+  decision, so `<-1>.subgroup((swap,))` in `O(U)` raises `ValueError`; infinite generated
+  group → the present `TypeError`.
+- Nothing is written for an ambient group (`supergroup() is group`), nor for a supergroup
+  that keeps no such admission (a predicate subgroup's membership is its predicate), so
+  those routes behave as before.
+- The mark is on the elements and the returned family is the resolution's own object, so
+  two reads of one group's generators remain the same objects.
+
+## Is the record load-bearing?
+
+`.scratch/issue341_record_probe.py`, on the `U + U` specimen, at the tree this file ships
+with:
+
+```
+S.supergroup() is G: True
+|family|: 12
+generator parents are the ambient: True
+generators marked for G: (True, True, True, True, True, True, True, True, True, True, True, True)
+marks each generator carries: (1, 1, 1)   (each mark names G)
+with the mark: group.subgroup(family) -> Subgroup of Subgroup of Orthogonal group O(...) | supergroup is G: True
+after stripping, marked for G: (False, False, ...)
+without the mark: group.subgroup(family) raised TypeError : membership of Morphism from Lattice of rank 4 and signature (2, 2) to Lattice of rank 4 and signature (2, 2) in Subgroup of Orthogonal group O(...) is undecided; supply a word witness to membership_decision
+```
+
+So the construction succeeds because of the record, and the same family without it is the
+error the issue was opened with.
 
 ## Runs, on the tree this file ships with
 
-```
-tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage   (the U + U half, pre-repair)   1 failed in 2.62 s
-tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage   (the U + U half, post-repair)  1 passed in 2.13 s
-eleven group/lattice files at the narrowed repair, the #341 U + U half and #287's file
-  among them                                                                                        55 passed in 19.88 s
-```
-
-The full run at the tip this file ships with: the #341 file's two halves, #287's file,
-seven neighbours and `tests/lattices/test_the_orthogonal_group_of_ten_has_a_discriminant_image.sage`
+Red, at `803179745e`, the new test alone:
 
 ```
-44 passed in 4577.49s (1:16:17)
+tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage -k outside_the_group
+1 failed, 2 deselected in 11.17s   (Failed: DID NOT RAISE ValueError)
 ```
 
-with the two `sha256` values of the edited library file and the new test pinned before the
-run and re-checked after it (`.scratch/issue292/issue341-pre-run.sha`), so the run is of the
-bytes that were committed.
+Green, that file's two light halves with #287's file and the generator-family file:
+
+```
+tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage
+tests/groups/test_a_double_coset_section_returns_its_group_elements.sage
+tests/groups/test_group_generators_use_the_supplied_family.sage
+9 passed, 1 deselected in 75.52s (0:01:15)
+```
+
+Regression sweep — every file of `tests/groups` in one session, against the clean worktree at
+`803179745e`:
+
+```
+this tree   100 failed, 200 passed, 1 deselected in 325.90s (0:05:25)
+803179745e  100 failed, 199 passed, 1 deselected in 293.48s (0:04:53)
+```
+
+`diff` of the two FAILED-id sets is empty, and the single extra pass here is the new test.  The
+hundred are effects of running the whole directory in one session (algebraic closures,
+`_from_engine_morphism`, `character`) that are present at the base commit and independent of
+this change; they are not this repair's, and the same file-by-file runs above are green.
+
+The `T_En` half is the row that builds `O(T_En)` and 6260 stabilizer generators (2208.3 s when
+it was last measured), so it runs as its own background job rather than inside this turn:
+
+```
+tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage -k enriques
+```
+
+and its result is reported when it returns.
+
+Test lint on the #341 file (`sage_extensions.testing.test_lint`):
+
+```
+1 files, 6 findings (TL01, TL11)
+```
+
+— identical, at the same six sites, on the file as committed at `803179745e`: the imported
+name and the local variable called `generators`.  This commit adds no finding; the debt is the
+file's own and is left as it stands rather than mixed into a repair of the construction.
+
 
 ## What is not claimed
 
 No order, index or finiteness of the constructed subgroup is asserted: an infinite generated
 subgroup has no decided order here, and asking would be the question this construction
-declines to ask. The premise is the caller's — a family that does not lie in `group` but is
-parented by its ambient is admitted on that statement, not verified.
+declines to ask.
+
+The `T_En` row needs no record at all: its generators are parented by the group itself.  The
+mark is what makes the two rows one construction rather than two.
+
+A mark is written for the generators of a subgroup whose supergroup keeps that admission,
+and that family is then materialised when `group_generators()` is read.  That cost is
+stated here rather than hidden, and it is paid only where a subgroup of a *generated*
+subgroup is asked for its generators: an ambient group and a predicate supergroup both
+return the family untouched.
+
+`tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage::test_normalizer_retains_its_conjugation_action_functor`
+fails on `main` before this issue's commits (`7052fc3`) and after them; it is not this
+repair's and is not touched by it.
