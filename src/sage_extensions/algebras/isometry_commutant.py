@@ -117,15 +117,26 @@ def _factor_centralizer_generators(factor):
 
 
 class IsometryCommutant:
-    r"""The commutant algebra and integral order of a set of isometries."""
+    r"""The commutant algebra and integral order of a set of isometries and self-adjoint maps.
+
+    Each source `F` is an isometry (`F^t B F = B`, adjoint `F^{-1}`) or `B`-self-adjoint
+    (`F^t B = B F`, adjoint `F`). In both cases the adjoint of `F` is a polynomial in `F`,
+    so the commutant `A` is stable under the adjoint and its unit group meets `O(L)` in the
+    centralizer of the sources. A self-adjoint source is, for example, multiplication by a
+    generator of `O_K` on the trace form of an `O_K`-lattice, whose commutant gives the
+    `O_K`-linear isometries.
+    """
 
     def __init__(self, gram, isometries):
         self.gram = matrix(ZZ, gram)
         self.rank = self.gram.nrows()
         self.isometries = tuple(matrix(ZZ, self.rank, self.rank, F) for F in isometries)
         assert self.gram == self.gram.transpose() and self.gram.det() != 0
-        assert all(F.transpose() * self.gram * F == self.gram for F in self.isometries)
-        assert all(F.det() in (1, -1) for F in self.isometries)
+        assert all(
+            (F.transpose() * self.gram * F == self.gram and F.det() in (1, -1))
+            or F.transpose() * self.gram == self.gram * F
+            for F in self.isometries
+        ), f"every source must be an isometry or self-adjoint for the Gram matrix {self.gram}"
         self._adjoint_factor = self.gram.change_ring(QQ).inverse()
         self.order_basis = self._integral_basis()
         self._coordinates = matrix(QQ, [m.list() for m in self.order_basis])
