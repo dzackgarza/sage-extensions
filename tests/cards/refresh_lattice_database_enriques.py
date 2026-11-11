@@ -39,6 +39,10 @@ LATTICE_PATH = "lattices/{tag}.md"
 # The Coble lattice card, whose discriminant-form rows #323 reads.
 DISCRIMINANT_FORM_TAGS = ("6JRR",)
 
+# The Enriques period lattice card, whose 0-cusp chamber rows #312 and #285
+# read: the wall count of the restricted chamber at each of Sterk's five cusps.
+CUSP_CHAMBER_TAGS = ("029J",)
+
 
 def fetch(ref: str, path: str) -> str:
     return subprocess.run(
@@ -171,6 +175,43 @@ def discriminant_form(ref: str, tag: str) -> dict:
     }
 
 
+def cusp_chambers(ref: str, tag: str) -> dict:
+    """The 0-cusp chamber rows of one lattice card (#312, #285).
+
+    ``integral.cusp_chambers.<subgroup>`` is a list of chambers: the cusp (the
+    primitive isotropic vector, in the card's Gram coordinates), the paper's
+    statement number for that diagram, the printed page and figure, and the
+    walls as named root vectors with their number.  The row is what a chamber
+    computation is compared with (#297), by tag and by cusp vector, so the
+    number is never transcribed into a test.
+    """
+    path = LATTICE_PATH.format(tag=tag)
+    card = front_matter(fetch(ref, path), path)
+    block = card["integral"]["cusp_chambers"]
+    return {
+        "tag": card["tag"],
+        "path": path,
+        "name": card["name"],
+        "latex": card["latex"],
+        "rank": card["rank"],
+        "signature": card.get("signature"),
+        "certification": card["certifications"]["integral.cusp_chambers"],
+        "rows": {
+            subgroup: [
+                {
+                    "statement": row["statement"],
+                    "cusp": row["cusp"],
+                    "walls": row["wall_count"],
+                    "printed_page": row.get("printed_page"),
+                    "figure": row.get("figure"),
+                }
+                for row in rows
+            ]
+            for subgroup, rows in block.items()
+        },
+    }
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ref", required=True, help="full lattice-database commit SHA")
@@ -206,6 +247,7 @@ def main(argv: list[str]) -> int:
                 ],
                 "lattice": "integral.polarization_counts.{degree}.{#h,#Γ̄_h,reference.citation}",
                 "plane_orbits": "integral.primitive_orbits.{group}.planes and .orbit_lengths(per-orbit sizes) and .constant(the line count),reference.citation",
+                "cusp_chambers": "integral.cusp_chambers.{subgroup}.{cusp,statement,wall_count,printed_page,figure},certifications.integral.cusp_chambers",
                 "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
             },
             "generated_by": "tests/cards/refresh_lattice_database_enriques.py",
@@ -214,12 +256,14 @@ def main(argv: list[str]) -> int:
         "polarization_counts": lattice_table4(ref, "0128"),
         "plane_orbits": {tag: plane_orbits(ref, tag) for tag in PLANE_ORBIT_TAGS},
         "discriminant_forms": {tag: discriminant_form(ref, tag) for tag in DISCRIMINANT_FORM_TAGS},
+        "cusp_chambers": {tag: cusp_chambers(ref, tag) for tag in CUSP_CHAMBER_TAGS},
     }
     DIGEST.write_text(json.dumps(digest, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
     print(
         f"wrote {DIGEST} at database ref {ref}: {len(groups)} group cards, "
         f"{len(digest['polarization_counts']['rows'])} polarization-count degrees, "
-        f"{len(digest['discriminant_forms'])} discriminant forms"
+        f"{len(digest['discriminant_forms'])} discriminant forms, "
+        f"{sum(len(rows) for card in digest['cusp_chambers'].values() for rows in card['rows'].values())} cusp chambers"
     )
     return 0
 

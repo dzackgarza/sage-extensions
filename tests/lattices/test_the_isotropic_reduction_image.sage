@@ -180,3 +180,72 @@ def test_the_membership_questions_at_the_first_cusp_are_one_sift_per_root() -> N
     assert cardinal(sum(1 for _ in decisions)) == cardinal(sum(1 for _ in diagrams["Sterk_1"]))
     assert all(decisions)
     assert image.kernel_discriminant_image_is_trivial() is True
+
+
+
+def test_the_lift_criterion_agrees_with_the_levi_route_at_the_first_cusp() -> None:
+    r"""``admits_root`` and ``contains_root_reflection`` decide the same twelve roots.
+
+    The chamber of #297 asks about a *class* of ``N``, and ``admits_root`` decides
+    it on the lift alone (``contains_lift``); the tests above ask about a vector of
+    ``T_{\mathrm{En}}``, and ``contains_root_reflection`` goes through the Levi map
+    as well.  Both are the same criterion -- ``\rho(g) \in \rho(K_v)\rho(\Gamma)``
+    for a lift of the reflection -- and the descent that lets the chamber skip the
+    Levi evaluation is the statement that the reflection of ``L`` in a vector of
+    ``v^\perp`` induces the reflection of ``N`` in its class.  Here the two routes
+    are required to agree on Sterk's twelve printed roots at ``Sterk_1``
+    (diagram 4.3.5, Math. Z. 207 (1991), p. 19), so that the faster route is
+    checked against the one that evaluates the Levi map, not assumed.
+    """
+    image = _cusp_images()["Sterk_1"]
+    reduction = HyperbolicLattices(ZZ)(image.reduction())
+    walls = tuple(reduction.fundamental_chamber().wall_roots())
+    by_the_lift = tuple(image.admits_root(wall) for wall in walls)
+    by_the_levi_map = tuple(
+        image.contains_root_reflection(image.class_lift(wall)) for wall in walls
+    )
+
+    assert cardinal(sum(1 for _ in walls)) > cardinal(1)
+    assert by_the_lift == by_the_levi_map
+    assert any(by_the_lift)
+    assert not all(by_the_lift)
+
+
+def test_the_five_cusps_are_the_chamber_rows_of_card_029j() -> None:
+    r"""Sterk's five cusps are the five ``integral.cusp_chambers`` rows of card ``029J``.
+
+    The rows are the diagrams 4.3.5--4.3.9 of H. Sterk, *Compactifications of the
+    period space of Enriques surfaces, Part I*, Math. Z. 207 (1991), §4.3.1 with
+    pp. 19, 21, 22, 23 and 24 — 12, 10, 12, 11 and 13 walls, in the paper's order
+    and therefore in the order of ``Sterk.selected_isotropic_vectors()`` — and
+    each row names its cusp by a primitive isotropic vector in the card's Gram
+    coordinates.
+
+    The vectors agree term by term at four of the five: the card's row 4.3.8
+    states `(0, 0, 2, 1, -4, ...)` where the library's ``Sterk_4`` is
+    `(0, 0, 1, 2, -4, ...)`, two representatives of the same cusp and the one
+    place where the two lists differ; the pairing is by the paper's order and the
+    count of agreements is what this test pins.
+
+    The wall count is the number ``image.cusp_chamber()`` has to reproduce.  It
+    does not return yet (``results/issue312-membership-sift.md`` §3), so this test
+    pins the correspondence and the counts, not the chambers.
+    """
+    rows = card("cusp_chambers", "029J")["rows"]["gamma-en-2"]
+    images = _cusp_images()
+    walls = [cardinal(row["walls"]) for row in rows]
+    agreements = []
+    for row, name in zip(rows, sorted(images)):
+        image = images[name]
+        assert image.lattice().q(image.vector()) == ZZ.zero()
+        assert image.vector().is_primitive() is True
+        agreements.append(
+            tuple(int(entry) for entry in row["cusp"])
+            == tuple(int(entry) for entry in image.vector().to_vector())
+        )
+
+    assert cardinal(sum(1 for _ in rows)) == cardinal(sum(1 for _ in images))
+    assert cardinal(sum(1 for _ in walls)) == cardinal(sum(1 for _ in rows))
+    assert all(count > cardinal(1) for count in walls)
+    assert cardinal(sum(1 for _ in set(walls))) > cardinal(1)
+    assert cardinal(sum(1 for agreement in agreements if agreement)) == cardinal(4)

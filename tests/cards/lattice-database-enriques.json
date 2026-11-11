@@ -5,7 +5,7 @@
    "lattice": "lattices/{tag}.md"
   },
   "generated_by": "tests/cards/refresh_lattice_database_enriques.py",
-  "ref": "d6a539339bac5ea0ee8d8bde5dc19564955eb152",
+  "ref": "e8a7f880dd21931d54da1e99217e924db9c88e33",
   "repository": "dzackgarza/lattice-database",
   "rows": {
    "arithmetic_group": [
@@ -19,6 +19,7 @@
     "lattice",
     "parent_group"
    ],
+   "cusp_chambers": "integral.cusp_chambers.{subgroup}.{cusp,statement,wall_count,printed_page,figure},certifications.integral.cusp_chambers",
    "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
    "lattice": "integral.polarization_counts.{degree}.{#h,#Γ̄_h,reference.citation}",
    "plane_orbits": "integral.primitive_orbits.{group}.planes and .orbit_lengths(per-orbit sizes) and .constant(the line count),reference.citation"
@@ -1242,6 +1243,124 @@
    "path": "arithmetic-groups/gamma-h-9.md",
    "plane_orbits": 34,
    "tag": "gamma-h-9"
+  }
+ },
+ "cusp_chambers": {
+  "029J": {
+   "certification": "3d07d82fc2fb4bc5f2171e4d73ef7c6e534354d0d9e7ad2e55910f0a7ce25022",
+   "latex": "U \\oplus U(2) \\oplus E_{8}(-2)",
+   "name": "U + U(2) + E8(-2)",
+   "path": "lattices/029J.md",
+   "rank": 12,
+   "rows": {
+    "gamma-en-2": [
+     {
+      "cusp": [
+       1,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "figure": 4,
+      "printed_page": 19,
+      "statement": "4.3.5",
+      "walls": 12
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       1,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "figure": 6,
+      "printed_page": 21,
+      "statement": "4.3.6",
+      "walls": 10
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       1,
+       1,
+       -2,
+       -3,
+       -4,
+       -6,
+       -5,
+       -4,
+       -3,
+       -2
+      ],
+      "figure": 8,
+      "printed_page": 22,
+      "statement": "4.3.7",
+      "walls": 12
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       2,
+       1,
+       -4,
+       -5,
+       -7,
+       -10,
+       -8,
+       -6,
+       -4,
+       -2
+      ],
+      "figure": 10,
+      "printed_page": 23,
+      "statement": "4.3.8",
+      "walls": 11
+     },
+     {
+      "cusp": [
+       2,
+       2,
+       0,
+       0,
+       -4,
+       -5,
+       -7,
+       -10,
+       -8,
+       -6,
+       -4,
+       -2
+      ],
+      "figure": 12,
+      "printed_page": 24,
+      "statement": "4.3.9",
+      "walls": 13
+     }
+    ]
+   },
+   "signature": [
+    2,
+    10
+   ],
+   "tag": "029J"
   }
  },
  "discriminant_forms": {

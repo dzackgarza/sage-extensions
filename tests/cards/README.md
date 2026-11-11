@@ -9,7 +9,7 @@ python3 tests/cards/refresh_lattice_database_enriques.py --ref <40-character dat
 ```
 
 `_provenance.ref` names the database commit the digest was read at; the digest
-was last refreshed at `587d56febe5856d54c6bc9fc023fa5a425f76bfb`. The script
+was last refreshed at `e8a7f880dd21931d54da1e99217e924db9c88e33`. The script
 fetches only the front matter of the named cards and keeps only the rows the
 tests read, so a refresh is one HTTP request per card and the diff is the
 database's change, not a transcription.
@@ -28,6 +28,8 @@ What is read, and from where:
 | `plane_orbits[tag].rows[group].planes`, `.orbit_lengths`, `.lines`, `.citation` | `lattices/6JRX.md`, `lattices/6JRY.md`, `lattices/029J.md` | `integral.primitive_orbits.{group}.planes`, `.orbit_lengths`, `.constant` (the line count), `reference.citation` |
 | `discriminant_forms[tag].orthogonal_group_order`, `.isotropic_classes`, `.isotropic_orbits` | `lattices/6JRR.md` | `integral.discriminant_form` |
 | `discriminant_forms[tag].certification` | same | `certifications.integral.discriminant_form` — the stamp the database computed the block under |
+| `cusp_chambers[tag].rows[subgroup][i].walls`, `.statement`, `.cusp`, `.printed_page`, `.figure` | `lattices/029J.md` | `integral.cusp_chambers.{subgroup}.{wall_count,statement,cusp,printed_page,figure}` |
+| `cusp_chambers[tag].certification` | same | `certifications.integral.cusp_chambers` — the stamp the database computed the block under |
 
 A test reads these by tag through `card(section, tag)`, bound as a builtin by
 `tests/lattices/conftest.py`: `test_lint` rejects a file read inside a test file

@@ -2,10 +2,13 @@
 
 **Result.** Membership in `G_v` is decided by sifting one stabilizer chain of
 `ρ(Γ_{En,2})`, built once and shared by every cusp, and the per-root question at
-Sterk's first cusp costs **0.106 s of CPU instead of 0.65 s** — the sift itself
-is 0.3 ms of that, and the 0.5 s that went away is the Levi evaluation the
-question never needed.  The restricted chamber at the five cusps still does not
-return: what remains is Vinberg's own enumeration, not the membership question.
+Sterk's first cusp costs **0.106 s of CPU**, of which the sift is 0.3 ms and the
+discriminant image of the lift 0.086 s.  What the question used to cost and no
+longer does is the Levi evaluation — `λ(reflection) ∈ O(N)`, built per candidate
+and read by nothing: two `contains_root_reflection` calls (which still build it)
+took 5.78 s of wall time in the loaded run below.  The restricted chamber at the
+five cusps still does not return: what remains is Vinberg's own enumeration, not
+the membership question.
 
 Measured on the adopted runtime (Sage 11.0.beta5 on the `ghcr.io/dzackgarza/sage`
 image pinned in the repository's notes, the indefinite port bound at `/work`).
@@ -94,3 +97,21 @@ on the class of the lift in `A_L`).  The card rows this would be compared with
 are read and matched already (`tests/cards`
 `integral.cusp_chambers` of `029J`, five rows: 4.3.5 with 12 walls, 4.3.6 with
 10, 4.3.7 with 12, 4.3.8 with 11, 4.3.9 with 13).
+
+
+## 4. Two measurements the comparison will need
+
+`Sterk.selected_isotropic_vectors()` and the card's `integral.cusp_chambers` rows
+name the same five cusps, and **four of the five vectors agree term by term**.
+The exception is 4.3.8: the card states the cusp as `(0, 0, 2, 1, -4, -5, -7,
+-10, -8, -6, -4, -2)` and the library's `Sterk_4`, built as
+`c(b["ep"] + 2 b["fp"]) + α`, is `(0, 0, 1, 2, -4, …)`.  They are two
+representatives of one cusp — both primitive and isotropic, and the card's row is
+the authority — so a wall-count comparison must pair the rows with the cusps by
+the paper's order, not by exact vector equality.  The test
+`test_the_five_cusps_are_the_chamber_rows_of_card_029j` pins the count of
+agreements (four) rather than pretending to five.
+
+Card 029J's five rows, as read by tag at `e8a7f88`:
+4.3.5 with 12 walls (printed p. 19), 4.3.6 with 10 (p. 21), 4.3.7 with 12
+(p. 22), 4.3.8 with 11 (p. 23), 4.3.9 with 13 (p. 24).
