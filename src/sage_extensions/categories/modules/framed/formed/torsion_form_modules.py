@@ -2797,6 +2797,11 @@ def _engine_orthogonal_group(T):
     of diagonalized forms. An integer-valued elementary two-primary part
     with nonsingular polar form is a quadratic space over GF(2); GAP Forms
     supplies the exact base change from its full classical orthogonal group.
+    An elementary two-primary part with a half-integral value has an odd
+    number of generators, so its polar form is not alternating and no GF(2)
+    quadratic form carries it; ``_engine_two_primary_odd_orthogonal_generators``
+    splits off the half-integral direction and hands the integral remainder to
+    the same GAP route.
     The other primary parts use Sage's full finite-form orthogonal group,
     retaining both value moduli and the Smith generator basis. The odd-primary route
     retains its explicit isometry of diagonalized forms.
@@ -2809,6 +2814,32 @@ def _engine_orthogonal_group(T):
         gens = part.smith_form_gens()
         n = len(gens)
         binary_quadratic = None
+        half_integral = (
+            p == 2
+            and all(value == 2 for value in part.invariants())
+            and part._modulus == 1
+            and part._modulus_qf == 2
+            and any(generator.q().lift().denominator() == 2 for generator in gens)
+        )
+        if half_integral:
+            # Two preconditions, both measured on the part: the polar form must
+            # be nondegenerate, and delta = q mod ZZ must satisfy
+            # delta(B^1 delta) = 1, i.e. the B-dual of delta must not be
+            # isotropic.  Without the second one the B-dual lies in ker delta,
+            # the restriction of B to ker delta has a one-dimensional radical,
+            # and the split below does not apply (the two-primary part of
+            # `Lattices(ZZ)([[6, 0], [0, 6]])` is such a part, with q = 3/2 on
+            # both generators); such a part keeps Sage's general route.
+            field = _engine_GF(2)
+            polar = _engine_matrix(field, n, n, [
+                field(SageZZ(2 * gens[i].b(gens[j]).lift())) for i in range(n) for j in range(n)
+            ])
+            delta = _engine_matrix(field, n, 1, [
+                0 if generator.q().lift().denominator() == 1 else 1 for generator in gens
+            ])
+            half_integral = polar.rank() == n and bool(
+                (polar.solve_right(delta).transpose() * delta)[0, 0]
+            )
         if (
             p == 2
             and all(value == 2 for value in part.invariants())
@@ -2831,6 +2862,8 @@ def _engine_orthogonal_group(T):
             matrices, part_order = _engine_odd_orthogonal_generators(gram, p)
         elif binary_quadratic is not None:
             matrices, part_order = _engine_elementary_two_orthogonal_generators(binary_quadratic)
+        elif half_integral:
+            matrices, part_order = _engine_two_primary_odd_orthogonal_generators(part, gens)
         else:
             # Sage's TorsionQuadraticModule.orthogonal_group() computes
             # the complete group when gens is omitted. Its matrices give
@@ -2846,6 +2879,155 @@ def _engine_orthogonal_group(T):
     group = T.orthogonal_group(gens=generators)
     group.gap().SetSize(order)
     return group
+
+
+def _engine_two_primary_odd_orthogonal_generators(part, gens):
+    r"""Generators of ``O(q)``, and its order, for an odd-rank elementary two-primary part.
+
+    ``part`` is a finite quadratic module over `\ZZ` whose invariants are all
+    `2`, with `b` valued in `\QQ/\ZZ` and `q` in `\QQ/2\ZZ`, and ``gens`` are its
+    Smith generators, so that ``A = part`` has `n` rows in that basis.  This is
+    the case no integral GF(2) quadratic matrix expresses: some `q(g_i)` is a
+    half-integer, hence the reduction `\delta` of `q` modulo `\ZZ` is a nonzero
+    functional on `A`, and the polar form `B(x,y) = 2b(x,y)` is a *symmetric*
+    `\FF_2`-form with `B(x,x) = \delta(x)`, which is not alternating.  This is
+    the odd-rank situation of P. J. Cameron, *Classical Groups*, Chapter 6, §6.2,
+    Theorem 6.1, printed p. 69: an odd rank forces the polar form away from the
+    alternating case, and the isometry group is read off a symplectic group.  The
+    split below is that theorem's, one step over -- Cameron's own odd-rank form is
+    `\FF_2`-valued with a rank-one radical, so all of `Sp(n-1,F)` survives, while
+    here the half-integral direction stands in for the radical and the group that
+    survives on `A_0` is the orthogonal group of its alternating restriction.
+    `GO(\epsilon,n,2)`, which the integral branch of
+    ``_engine_orthogonal_group`` uses, requires an alternating polar form of even
+    rank and cannot be handed this data.
+
+    Reduction, in five steps; every identity below is a two-line consequence of
+    `q(x+y) = q(x)+q(y)+2b(x,y)`, which holds in the module itself:
+
+    * `\delta` is additive: `q(x+y)-q(x)-q(y)` lies in `\ZZ`.  So `\delta` is a
+      linear functional, and `B(x,x) = 2(q(x) \bmod \ZZ) = \delta(x)`.
+    * `B` is nondegenerate and `\delta(B^{-1}\delta) = 1` -- both are the
+      caller's preconditions, checked there before the branch is taken.  So
+      there is one `c` with `B(c,.) = \delta`, `B(c,c) = 1`, and `B(c,w) =
+      \delta(w) = 0` for `w \in \ker\delta`: `A = \langle c\rangle \perp A_0`
+      with `A_0 = \ker\delta` of rank `n-1`, and `n` is odd (an alternating form
+      has even rank, and `B|_{A_0}` is alternating).  With `\delta(B^{-1}\delta)
+      = 0` instead, `c` is isotropic and lies in `A_0`, `B|_{A_0}` has the
+      one-dimensional radical `\langle c\rangle`, and this split does not apply;
+      that part keeps Sage's general route.
+    * `q(x+w) = q(x)+q(w)+B(x,w)` makes `q_0 = q|_{A_0}` integer-valued, with
+      polar form `B|_{A_0}`, nondegenerate.  So `q_0` is an ordinary quadratic
+      form over `\FF_2` in `n-1` even dimensions, which is exactly what the
+      integral branch's GAP route takes.
+    * Every `g \in O(q)` preserves `B`, hence preserves `\delta = B(c,.)`, hence
+      fixes `c` and preserves `A_0`.  Conversely, for `g_0 \in O(q_0)` the map
+      fixing `c` and acting as `g_0` on `A_0` preserves `q`, because
+      `q(\alpha c + w) = \alpha q(c) + q_0(w)` for `w \in A_0`.  So
+      `g \mapsto g|_{A_0}` is a bijection `O(q) \to O(q_0)` and
+      `|O(q)| = |O(q_0)|`.
+    * Cameron, *Classical Groups*, pp. 70-71, for the shape of the data: the
+      quadratic forms polarising to a fixed symplectic form are its translates
+      by the linear functionals, and over `\FF_2` each functional is
+      `x \mapsto B(x,a)`.  Here the functional the extension would have to
+      preserve is `B(c,.)|_{A_0}`, which is zero by the choice of `c`, so the
+      extension is the identity on `\langle c\rangle` and nothing else moves.
+
+    Two boundary cases.  For `n = 1` -- `A = \langle c\rangle` with
+    `q(c) = 1/2 \neq 0` -- the only class of value zero is zero, so the only
+    `q`-preserving linear map is the identity: the empty generating set and order
+    one are returned.  A part whose polar form is degenerate, or whose
+    `\delta(B^{-1}\delta)` is zero, never reaches here: the caller checks both
+    before taking the branch, and such a part keeps Sage's general route.
+
+    The generators are returned in the caller's row convention: the `i`-th one
+    sends `g_i` to `\sum_j m_{ij} g_j`.  Each is checked on the whole of `A`
+    before it is returned.  The check is exact rather than a sample: with `M`
+    the integer matrix `M_{ii} = 2q(g_i)`, `M_{ij} = 2b(g_i,g_j)`, the quadratic
+    polynomial of `A` is `x \mapsto (x M x^t)/2` on `x \in \{0,1\}^n`, so
+    `x \mapsto xG` preserves it exactly when `G M G^t - M` has entries divisible
+    by `4` on the diagonal and by `2` off it -- those entries are the
+    coefficients of the difference polynomial, so the condition is the vanishing
+    of that polynomial on all of `A`, not a check at finitely many points.
+    """
+    n = len(gens)
+    field = _engine_GF(2)
+    values = [generator.q().lift() for generator in gens]
+    assert all(value.denominator() in (1, 2) for value in values), (
+        f"an elementary two-primary part's quadratic values lie in (1/2)Z/2Z, not in {values}"
+    )
+    delta = _engine_matrix(field, 1, n, [0 if value.denominator() == 1 else 1 for value in values])
+    assert delta != 0, "the integral case is the GF(2) quadratic-form branch, not this one"
+    bilinear = _engine_matrix(field, n, n, [
+        field(SageZZ(2 * gens[i].b(gens[j]).lift())) for i in range(n) for j in range(n)
+    ])
+    assert bilinear == bilinear.transpose()
+    assert bilinear.rank() == n, "the polar form of a nondegenerate finite form must be nondegenerate"
+    assert [bilinear[i, i] for i in range(n)] == [delta[0, i] for i in range(n)], (
+        "B(x,x) must be the linear functional q mod ZZ"
+    )
+    solution = bilinear.solve_right(delta.transpose())
+    c = _engine_matrix(field, 1, n, [solution[i, 0] for i in range(n)])
+    assert c * bilinear == delta
+    assert (c * delta.transpose())[0, 0] == 1, (
+        "the caller's second precondition is delta(B^-1 delta) = 1; without it c is isotropic, c lies "
+        "in ker delta, and the restriction of B to ker delta has the one-dimensional radical <c>"
+    )
+    if n == 1:
+        # `A = <c>` with `q(c) = 1/2 \neq 0`: the only class of `q`-value zero is
+        # zero, so the only `q`-preserving linear map is the identity.
+        return [], SageZZ.one()
+    kernel = delta.right_kernel().basis_matrix()
+    assert kernel.nrows() == n - 1 and c * kernel.transpose() == 0, (
+        "the complement of the half-integral direction must be its orthogonal complement"
+    )
+    basis = []
+    for row in kernel.rows():
+        element = part.zero()
+        for index in range(n):
+            if row[index]:
+                element = element + gens[index]
+        basis.append(element)
+    diagonal = []
+    for index, element in enumerate(basis):
+        value = element.q().lift()
+        assert value.denominator() == 1, f"q must be integer-valued off the half-integral direction, not {value}"
+        diagonal.append(field(SageZZ(value)))
+    quadratic = _engine_matrix(field, n - 1, n - 1, [
+        diagonal[i] if i == j
+        else field(SageZZ(2 * basis[i].b(basis[j]).lift())) if i < j
+        else field.zero()
+        for i in range(n - 1) for j in range(n - 1)
+    ])
+    assert (quadratic + quadratic.transpose()).rank() == n - 1
+    integral = _engine_matrix(SageZZ, n, n, [
+        SageZZ(2 * values[i]) if i == j else SageZZ(2 * gens[i].b(gens[j]).lift())
+        for i in range(n) for j in range(n)
+    ])
+    subgenerators, part_order = _engine_elementary_two_orthogonal_generators(quadratic)
+    frame = _engine_matrix(field, n, n, [
+        c[0, j] if i == 0 else kernel[i - 1, j]
+        for i in range(n) for j in range(n)
+    ])
+    assert frame.rank() == n, "the half-integral direction and the integral complement must span A"
+    inverse = frame.inverse()
+    matrices = []
+    for subgenerator in subgenerators:
+        inner = _engine_matrix(field, n, n, [
+            field.one() if i == 0 and j == 0 else subgenerator[i - 1, j - 1] if i > 0 and j > 0 else field.zero()
+            for i in range(n) for j in range(n)
+        ])
+        matrix = inverse * inner * frame
+        moved = _engine_matrix(SageZZ, n, n, [SageZZ(matrix[i, j]) for i in range(n) for j in range(n)])
+        moved = moved * integral * moved.transpose()
+        for i in range(n):
+            for j in range(n):
+                modulus = 4 if i == j else 2
+                assert (moved[i, j] - integral[i, j]) % modulus == 0, (
+                    f"{matrix} does not preserve the quadratic form of {part}"
+                )
+        matrices.append(matrix)
+    return matrices, part_order
 
 
 def _extend(T, part, gens, p, exponent, images):

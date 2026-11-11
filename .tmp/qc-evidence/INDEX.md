@@ -296,3 +296,23 @@ Follow-up on issue 317's ninth class, on the same tree: `issue317-probe24.log`
 roots 204/224/264/480 against `D_17`'s 544), `issue317-probe22.log` (1400 splits,
 17778 planes, 1 class), `issue317-probe23.log` (0 splits in 56 s).  All three logs
 are byte-for-byte the launcher's redirected output.
+| `issue295-red-module-not-found.log` | `#295` | the red failure at `7858c09d97`: `B.Aut().stabilizer(P, action="setwise")` raises `ModuleNotFoundError: No module named 'sage_indefinite_port.indefinite.pairing_slices'` at `lattice_morphisms.py:3723` |
+| `issue295-t-en-identity-metadata.log` | `#295` | the second failure: the routing wrapper's `update_wrapper` doc copy runs `sageinspect` on a generated class → `TypeError`, reached from the port's `plane_automorphism_generators` via `one()` |
+| `issue295-O-q-B2-engine-wall.log` | `#295` | `A.orthogonal_group()` for `A = (Z/2)^11`: `fqf_orthogonal._isom_fqf` → `orbits`, no return at 180 s |
+| `issue295-image-order-in-O-q-B2.log` | `#295` | `order of the image in O(q_B(2)): 247726080` from the faithful action on the 2048 classes, 92 stabilizer generators, 220 s |
+| `issue295-gate-setA.log` | `#295` | the new module plus four neighbours: **16 passed in 311.70 s**, exit 0 |
+
+Second batch on issue 317 (cards by tag, spinor split, k = 2 diagnosis):
+`issue317-summand-genus-from-card.log` — `tests/lattices/test_genus_of_the_scattone_summands.sage`
+with the expected count read from card 6JRX plus the two-spinor-genus split test:
+**4 passed in 83.24 s**, exit 0 (the enumeration call 82.52 s, gate red on cost);
+`issue317-probe27.log` and `issue317-probe28.log` — the split on `diag(3,4,9)`,
+`diag(1,16,17)` (4, 4) and `diag(1,16,20)` (3, 3); `issue317-probe29.log` — both
+summand genera have one improper spinor genus and Sage uses p = 3;
+`issue317-probe25d.log` — the repaired walk at p = 2, 3, 5, 7 reaches seven of the
+nine k = 2 classes.
+
+Re-run on the rebased tree (main at `d35c72c`): `issue317-rebased2.log`,
+`test_genus_of_the_scattone_summands.sage` plus `test_genus.sage` — 13 passed,
+1 failed in 30.92 s, and the failure is the pre-existing
+`spinor_genus_count() == 2` on `diag(1,20,400)`.

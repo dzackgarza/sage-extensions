@@ -1,0 +1,25 @@
+B: Integral lattice of rank 11 and signature (2, 9) rank 11 signature (2, 9) det -1
+[     0.1] B built
+generators: ['e_0', 'e_1', 'e_2', 'e_3', 'e_4', 'e_5', 'e_6', 'e_7', 'e_8', 'e_9', 'e_10']
+P: ['e_0', 'e_2'] rank 2 isotropic True
+[     0.3] P built
+Traceback (most recent call last):
+  File "/probe.py", line 30, in <module>
+    stabilizer = B.Aut().stabilizer(P, action="setwise")
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3585, in stabilizer
+    return self.setwise_stabilizer(embedding)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3723, in setwise_stabilizer
+    from sage_indefinite_port.indefinite.pairing_slices import setwise_transporter
+ModuleNotFoundError: No module named 'sage_indefinite_port.indefinite.pairing_slices'
+[peakrss] issue275: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 273 MiB
+[peakrss] low-water MemAvail : 10632 MiB
+[peakrss] peak single VmHWM  : 273 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      262 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   273 MiB hwm=   273 MiB avail= 10632 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail= 10829 MiB
+launcher exit: 1

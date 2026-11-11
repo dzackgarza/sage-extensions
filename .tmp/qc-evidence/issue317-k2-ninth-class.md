@@ -110,3 +110,65 @@ reduction of the complement first and is not usable as written.
   executable, and the only Sage is inside the adopted PRoot runtime, whose
   interpreter the probe reports as "not executable".  The same `pytest`
   invocation was run through the runtime launcher instead.
+
+## Where Sage's mass-stopped traversal stops, and what is not the cause
+
+Measured on the k = 2 summand genus (`issue317-probe29.log`):
+
+    k = 1: det -2, spinor_genus_count 1, spinor_generators(proper=False) []
+           Sage's Genus.representatives uses p = 3
+    k = 2: det -4, spinor_genus_count 1, spinor_generators(proper=False) []
+           Sage's Genus.representatives uses p = 3
+
+- **Seeds are not the cause.** Both genera have one improper spinor genus, so
+  `spinor_generators(proper=False)` is empty and Sage seeds the traversal with
+  the representative alone (`seeds = [Q]`).
+- **The prime is not the cause.** Sage skips p = 2 because 2 divides the
+  determinant, and runs at p = 3.  A repaired walk run at p = 2, 3, 5, 7
+  (`issue317-probe25d.log`) reaches the same seven classes as at 3, 5, 7
+  (`issue317-probe25c.log`): 328 attempts, 7 classes, mass ratio 0.99977 against
+  the genus mass, stopping for the budget rather than for the mass.
+- **The stop condition is a defect, and it is not sufficient on its own.**
+  `neighbor_iteration` starts `mass_count` at zero and adds only *discovered
+  neighbours*: the traversal seeds are never counted, so `mass == mass_count`
+  cannot fire unless the seed class is rediscovered as one of its own
+  neighbours, and the loop then ends when its waiting list empties and returns
+  whatever it sampled.  `issue317-probe25.log` shows the shape of that: with
+  per-candidate `qfisominit` cost it made 36 attempts in 123 s and returned one
+  class.  Accumulating the mass over *all* classes including the seed
+  (`issue317-probe25b/c/d`) repairs the accounting, and after that repair the
+  walk still stops at seven.
+- **What binds is the neighbour sampling.** The two classes it never reaches are
+  the ones with 384 roots and 544 roots (`D_17(-1)`); the seven it does reach
+  carry 204, 224, 244, 264, 304 and 480.  `find_primitive_p_divisible_vector__random`
+  gives a bounded sample per class, and the class-valued neighbour set needs the
+  mod-p line orbits — `orbits_lines_mod_p`, hence `automorphism_group()`, which
+  does not return at rank 17 (the same stop that was diagnosed for k = 1).
+
+So the k = 2 genus still returns seven of nine with the mass short, and the
+assertion keeps refusing the family.  The plane rows and the card comparison
+remain undelivered for that reason.
+
+## The spinor-genus split, restored and demonstrated
+
+`_genus_classes` returns one group per improper spinor genus again.  A genus with
+one spinor genus returns its single group (the split *is* one group); a genus
+with several labels each class by a walk from its seeds at a prime in the
+improper spinor kernel, and refuses rather than guesses if a class is reached
+from no seed or from two.  `issue317-probe27b.log` and `issue317-probe28.log`:
+
+    diag(3,4,9)   spinor_genus_count 2, class number 2, spinor_genus_class_numbers (1, 1)
+    diag(1,16,17) spinor_genus_count 2, class number 8, spinor_genus_class_numbers (4, 4)
+    diag(1,16,20) spinor_genus_count 2, class number 6, spinor_genus_class_numbers (3, 3)
+
+The caller that reads the split is `IntegralLatticeMethods.spinor_genus_class_numbers`
+(`lattices.py:5087`), which takes `classes[0]` as the representative's spinor
+genus and sorts the rest by size.  `spinor_genus_count` does **not** read it: it
+is `2 ** len(genus.spinor_generators(proper=False))` (`lattices.py:665`).  The
+lattice of the failing `test_published_four_spinor_genus_is_counted_from_all_generators`
+is `diag(1, 20, 400)`, positive definite of rank 3, written down by Benham--Hsia,
+*On spinor exceptional representations*, Nagoya Math. J. 87 (1982), §2.3, p. 252
+as a genus with four spinor genera; Sage's symbol yields two generators, so the
+count is 2, and the same `2 == 4` failure reproduces on a `git archive` copy of
+the base commit.  It is untouched by this change because it never reaches
+`_genus_classes`.

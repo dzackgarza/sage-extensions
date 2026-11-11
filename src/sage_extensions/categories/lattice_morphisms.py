@@ -3680,13 +3680,22 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
 
         A linear map that fixes a generating set of \(I\) fixes \(I\)
         pointwise, so the condition is decided on the framing of \(I\).
+
+        The stabilizer is constructed without a ``vector_witness``: the
+        capability that supplied one (the port's ``pairing_slices`` module) is
+        not part of the pinned port, and the witness is not part of this
+        stabilizer's construction at all.  It is an optional decision retained
+        for vector equivalence, and where it is absent
+        ``_subgroup_vector_equivalence_witness`` uses the ambient group's own
+        vector-equivalence decision, which is the same decision.  Requiring the
+        module to construct the stabilizer made every indefinite pointwise
+        stabilizer fail with ``ModuleNotFoundError`` before producing a
+        generator.
         """
         lattice = self.lattice()
         assert embedding.codomain() is lattice, (
             f"{embedding} does not embed into {lattice}, so its image has no stabilizer in O({lattice}); its codomain is {embedding.codomain()}"
         )
-        from sage_indefinite_port.indefinite.pairing_slices import pointwise_transporter
-
         source = embedding.domain()
         embedded = tuple(embedding(generator) for generator in source.module_generators())
         stabilizer = StabilizerSubgroups(self)(
@@ -3694,7 +3703,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             self.natural_module_action_functor(),
             lambda automorphism: all(automorphism(vector) == vector for vector in embedded),
             description=f"g fixes {embedding} pointwise",
-            vector_witness=lambda left, right: pointwise_transporter(lattice, embedded, left, right),
         )
         category = CosliceCategory(lattice.lattice_category(), source)
         marked = category.object(embedding)
@@ -3715,13 +3723,20 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         For a totally isotropic \(I\) this is the parabolic subgroup
         \(P_I\), whose Levi action on \(I^\perp/I\) and unipotent radical are
         read off the isotropic reduction of \(\iota\).
+
+        The stabilizer is constructed without a ``vector_witness``, for the
+        reason :meth:`pointwise_stabilizer` states: the port's
+        ``pairing_slices`` module is not part of the pinned port, and the
+        witness is an optional retained decision, not part of the generator
+        computation.  With the import in place every indefinite setwise
+        stabilizer -- the setwise stabilizer of an isotropic plane in
+        particular -- failed with ``ModuleNotFoundError`` before producing a
+        generator.
         """
         lattice = self.lattice()
         assert embedding.codomain() is lattice, (
             f"{embedding} does not embed into {lattice}, so its image has no stabilizer in O({lattice}); its codomain is {embedding.codomain()}"
         )
-        from sage_indefinite_port.indefinite.pairing_slices import setwise_transporter
-
         source = embedding.domain()
         embedded = tuple(embedding(generator) for generator in source.module_generators())
 
@@ -3734,7 +3749,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             self.natural_module_action_functor(),
             preserves_image,
             description=f"g(im({embedding}))=im({embedding})",
-            vector_witness=lambda left, right: setwise_transporter(lattice, embedded, left, right),
         )
         from sage_extensions.categories.abstract_categories.products import (
             FiniteOrdinalCategory,

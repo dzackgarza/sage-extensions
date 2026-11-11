@@ -10,6 +10,58 @@ Write to it in the turn the measurement is made.
 
 ## Sage
 
+### The brute-force orthogonal group does not return for a half-integral elementary two-primary form
+
+Measured 2026-11-11 in the adopted runtime (SageMath 11.0.beta5, Python 3.14):
+`TorsionQuadraticModule.orthogonal_group()` with no generators -- the route
+`_engine_orthogonal_group` takes for a two-primary part that is not an integral
+GF(2) quadratic space -- was still enumerating candidate isometries in
+`sage/groups/fqf_orthogonal.py:569` (`_isom_fqf`, the `b_cand` list, through
+`_mul_`) after 210 s, on the discriminant form of the Coble lattice
+`T_Co = <2> + E8(-2) + U(2)`, 2048 classes, 11 Smith generators. The stack is
+`faulthandler.dump_traceback_later` output, not a signal handler's, so every
+frame is a Python frame:
+`.tmp/qc-evidence/issue323-O-q-TCo-generators-wall.log`. One data point in the
+class count, not a curve.
+
+What the specimen is, measured: the 11 q-values are
+`[1/2, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1]`, and `B(x,y) = 2b(x,y)` is a symmetric
+`F_2` form of **rank 11** -- nondegenerate -- with `B(x,x) = q mod Z = e_1^*`.
+So the polar form is not alternating, and the bilinear form is *not* degenerate:
+the obstruction is the half-integral value alone. An alternating form has even
+rank, so no GF(2) quadratic matrix carries this part (the neighbouring branch
+needs `q(e_i) in Z`), and `GO(eps,n,2)` needs an alternating polar form; that
+leaves `_isom_fqf`, which is written for neither. Any statement that this form's
+bilinear form is degenerate is refuted by the rank.
+
+Route chosen: `_engine_two_primary_odd_orthogonal_generators`
+(`categories/modules/framed/formed/torsion_form_modules.py`) takes the case in
+which `c` with `B(c,.) = delta` satisfies `delta(B^-1 delta) = 1` (so `B(c,c) = 1`
+and `<c>` is not isotropic); then `q` restricted to `ker delta` is an ordinary
+quadratic space over `F_2` in `n-1` dimensions with alternating polar form, which
+`_engine_elementary_two_orthogonal_generators` (GAP Forms: `WittIndex`,
+`BaseChangeToCanonical`, `GO`) hands back generators of; they are transported to
+`A` by fixing `c`, and each is checked against the whole form by the exact
+coefficient criterion. The mathematics is the odd-rank situation of Cameron,
+*Classical Groups*, ch. 6, §6.2, Theorem 6.1 (printed p. 69), with pp. 70-71 for
+the quadratic refinements of a symplectic form.
+
+The second condition is not decoration, and it is where a first version of this
+route was wrong: the two-primary part of `Lattices(ZZ)([[6, 0], [0, 6]])` is
+elementary, has `q = 3/2` on both Smith generators and `B = 2b` the identity, so
+`delta = (1,1)`, `c = (1,1)` is isotropic, `ker delta = <c>` is its own
+orthogonal complement and `B` restricted to it is degenerate. Splitting there
+raises inside the GAP route (`(Q + Q^t).rank() == n - 1` fails) and caught by
+`tests/groups/test_generated_model_character_quotient.sage`, eleven tests of
+which failed on the 2026-11-11 run before the condition was added. Such a part
+keeps Sage's general route, which answers for it, and
+`tests/lattices/test_discriminant_form_of_the_coble_lattice.sage` pins it.
+
+Cost after the change, same runtime and specimen: `orthogonal_group()` 0.01 s,
+4 generators, order 46998591897600 (card `6JRR`) in 0.00 s; the whole lattice
+build plus group 7.0 s, of which 4.1 s is the discriminant form.
+`n = 1` (`<2>`'s discriminant form, `q(1/2) = 1/2`) returns the trivial group.
+
 ### PARI overflows on groups and isometry witnesses for a line plus E8
 
 On SageMath 11.0.beta1 with Python 3.14, the orthogonal group of the positive
@@ -4154,3 +4206,58 @@ of this locus: the ambient `O(T_Co)` row it starts from now completes.
 A base point that is not integral is refused by `integral_parameter_classes` with the
 reason in the error, because with a nonintegral `phi(0)` the locus is not the kernel
 (the transvection must also cancel the base point's fractional part).
+
+## The setwise stabilizer's generators, and the two failures in front of them (2026-11-11, #295)
+
+**A stabilizer constructor may not require a module for data it does not use.**
+`setwise_stabilizer` and `pointwise_stabilizer` built a `vector_witness` from
+`sage_indefinite_port.indefinite.pairing_slices`, which the pinned port does not ship
+(its `indefinite/` modules are `marked_lattices`, `isotropic_induction`, `eichler`,
+`pointwise_shell`, `exact_isotropic`, `recursive`, `edgewalk*`, `lorentzian_cells`,
+`scaled_shells`, `indefinite_reduction`, `groupoid_cache`, `facet_*`). The witness is
+optional retained data read only by `_subgroup_vector_equivalence_witness`, which
+falls back to the ambient vector-equivalence decision; requiring it made every
+indefinite setwise or pointwise stabilizer raise `ModuleNotFoundError` before
+producing a generator. Both now construct without it. `vector_orbit_set`
+(`lattice_morphisms.py:4032`) still imports `SubgroupVectorOrbits` from the same
+absent module and is **not** repaired: it is a different operation, needs a real
+orbit-enumeration replacement from the port, and is recorded here so it is not
+mistaken for working.
+
+**`functools.update_wrapper` cannot wrap a dynamically generated class's method.**
+`ObjectLevelOperation.__get__` copied the routed operation's metadata with
+`update_wrapper`, whose `__doc__` copy reads Sage's `InstanceDocDescriptor`, which
+runs `sageinspect.sage_getsourcelines` and fails with `TypeError: <class 'object'> is
+a built-in class` on any class created by `_generated_arrow_type`
+(`OwnedJoinCategory.parent_class`). The operation is fine; only the doc copy fails.
+Observed on `O(T_En).one()`, reached from the port's `plane_automorphism_generators`
+through `predicate_subgroups.one()`, so `T_En.Aut().stabilizer(P)` died with a
+traceback about `inspect` and nothing about lattices. `mor_foundation.py` now copies
+name, module and annotations and copies `__doc__` only when it is a `str`.
+
+**Measured, from these two repairs (`B = U + U + I_{0,7}`, `P = <e_1, e_2>`):**
+
+| call | result |
+| --- | --- |
+| `B.Aut().stabilizer(P, action="setwise").group_generators()` | 92 generators in 16.8 s, all with `domain() is B` |
+| `B.discriminant_representation()` on each | 0 failures; `B` unimodular, so the images generate the trivial group (order 1) |
+| `U + U(2)`, same call | 13 generators in 3.7 s, all images in 0.9 s; #321's plane call fed with them returns 2 orbits |
+| `B(2) = T_Co`, images in `O(q)` | blocked: `O(A_{T_Co})` does not build (below) |
+| order of `<rho(Stab_{O(B)}(P))>` in `O(q_{B(2)})` | **247726080 = 2^18·3^3·5·7**, index `189720` in `O(q) = 46998591897600`, from the faithful action on the 2048 classes (220 s) |
+
+**`O(A)` for `A = (Z/2)^11` does not build.** `A.orthogonal_group()` →
+`_finite_order` → `_engine_group` → `_engine_orthogonal_group` →
+`torsion_quadratic_module.orthogonal_group` → `fqf_orthogonal._isom_fqf` → `orbits`,
+no return at 180 s. The elementary-two fast path
+(`_engine_elementary_two_orthogonal_generators`) is not taken because its rank test on
+the associated bilinear form fails: on `(Z/2)^11` an alternating form is degenerate,
+so `rank(q + q^T) = n = 11` cannot hold. Everything that routes through
+`O(q_{B(2)})` — `discriminant_representation` on `T_Co` included, since
+`discriminant_morphism` normalizes through `O(A).from_morphism` — is therefore
+unavailable at this size, and the image order above is read through the permutation
+action instead.
+
+**`T_En.Aut().stabilizer(P, action="setwise")` still does not return.** Past the
+metadata failure it enters `isotropic_induction.plane_automorphism_generators` →
+`_stabilizer_generators` → `recursive.isotropic_stabilizer_action` and had produced
+nothing after 3000 s — the rank-two parabolic wall #316 measured at 1500 s.

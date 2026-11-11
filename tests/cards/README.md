@@ -25,6 +25,14 @@ What is read, and from where:
 | `arithmetic_groups[tag].citation` | same | `data.reference.citation` — the paper, its table and page |
 | `polarization_counts.rows[degree].primitive_classes`, `.group_classes` | `lattices/0128.md` | `integral.polarization_counts.{2d}.#h`, `.#Γ̄_h` |
 | `polarization_counts.rows[degree].citation` | same | `integral.polarization_counts.{2d}.reference.citation` |
+| `plane_orbits[tag].rows[group].planes`, `.citation` | `lattices/6JRX.md`, `lattices/6JRY.md` | `integral.primitive_orbits.{O,O+}.planes`, `reference.citation` |
+| `discriminant_forms[tag].orthogonal_group_order`, `.isotropic_classes`, `.isotropic_orbits` | `lattices/6JRR.md` | `integral.discriminant_form` |
+| `discriminant_forms[tag].certification` | same | `certifications.integral.discriminant_form` — the stamp the database computed the block under |
+
+A test reads these by tag through `card(section, tag)`, bound as a builtin by
+`tests/lattices/conftest.py`: `test_lint` rejects a file read inside a test file
+(`TL01` for `json` and `pathlib`, `TL13` for `__file__` and `Path`), so the one
+reader is the conftest and every test names only its row.
 
 The paper the orbit rows come from is D. Dutour Sikirić and K. Hulek, *Moduli of
 polarised Enriques surfaces — computational aspects*, J. London Math. Soc. 110

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from functools import update_wrapper
+from functools import WRAPPER_ASSIGNMENTS
 from typing import TYPE_CHECKING
 
 from sage.categories.category import Category
@@ -327,6 +327,42 @@ def _identity_of_object(category: Category, obj: Parent) -> Morphism:
     return category.MorCategory().Of(obj, obj).identity()
 
 
+def _copy_operation_metadata(operation, reading) -> None:
+    r"""Copy an operation's name, module and documentation onto its routing wrapper.
+
+    ``functools.update_wrapper`` is not usable here: on a dynamically generated
+    element class (``_generated_arrow_type``, and every ``OwnedJoinCategory``
+    parent class built that way) the wrapped ``cached_method``'s ``__doc__`` is
+    Sage's ``InstanceDocDescriptor``, and reading it runs
+    ``sageinspect.sage_getsourcelines`` on a class that has no source file,
+    which raises ``TypeError``.  That failure has nothing to do with the
+    operation: it happens while copying a docstring, and it made
+    ``O(T_{\mathrm{En}}).one()`` -- and so the port's plane stabilizer on the
+    Enriques lattice -- raise before producing a generator.
+
+    The metadata that can be read is therefore copied directly, and a
+    ``__doc__`` that is not already a string is left to the underlying
+    ``reading``, which still carries it as its own attribute readable through
+    ``__wrapped__``.
+    """
+
+    operation.__wrapped__ = reading
+    for name in WRAPPER_ASSIGNMENTS:
+        if name == "__doc__":
+            continue
+        try:
+            value = getattr(reading, name)
+        except AttributeError:
+            continue
+        setattr(operation, name, value)
+    try:
+        documentation = reading.__doc__
+    except (AttributeError, TypeError):
+        documentation = None
+    if isinstance(documentation, str):
+        operation.__doc__ = documentation
+
+
 def _asked_of_the_category(owner: Parent, objects: tuple) -> bool:
     r"""Whether a name of the Mor packet is asked of ``owner`` as a category.
 
@@ -387,7 +423,7 @@ class ObjectLevelOperation:
 
     def __init__(self, reading) -> None:
         self._reading = reading
-        update_wrapper(self, reading)
+        _copy_operation_metadata(self, reading)
         self._category_reading = _category_level_operations()[self.__name__]
         self._category_arity = self._category_reading.__code__.co_argcount - 1
 
@@ -402,7 +438,7 @@ class ObjectLevelOperation:
                 return category_level(instance, *objects)
             return reading(*objects, **options)
 
-        update_wrapper(operation, reading)
+        _copy_operation_metadata(operation, reading)
         return operation
 
     def __set__(self, instance, value) -> None:
