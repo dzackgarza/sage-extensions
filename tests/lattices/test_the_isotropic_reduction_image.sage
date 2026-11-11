@@ -216,7 +216,7 @@ def test_the_five_cusps_are_the_chamber_rows_of_card_029j() -> None:
 
     The rows are the diagrams 4.3.5--4.3.9 of H. Sterk, *Compactifications of the
     period space of Enriques surfaces, Part I*, Math. Z. 207 (1991), §4.3.1 with
-    pp. 19, 21, 22, 23 and 24 — 12, 10, 12, 11 and 13 walls, in the paper's order
+    pp. 19, 21, 22, 23 and 24 — 12, 10, 12, 11 and 14 walls, in the paper's order
     and therefore in the order of ``Sterk.selected_isotropic_vectors()`` — and
     each row names its cusp by a primitive isotropic vector in the card's Gram
     coordinates.
@@ -249,3 +249,44 @@ def test_the_five_cusps_are_the_chamber_rows_of_card_029j() -> None:
     assert all(count > cardinal(1) for count in walls)
     assert cardinal(sum(1 for _ in set(walls))) > cardinal(1)
     assert cardinal(sum(1 for agreement in agreements if agreement)) == cardinal(4)
+
+
+def test_every_cusp_chamber_has_the_wall_count_of_its_card_row() -> None:
+    r"""The chamber of ``G_v`` at each of Sterk's five cusps, against card ``029J``.
+
+    ``cusp_chamber`` is the fundamental chamber of the reflection subgroup
+    ``W' = <s_r : r a root of N, s_r in G_v>`` of ``W = W(N)``.  It is Vinberg's
+    algorithm run on the roots whose reflections ``G_v`` admits, and it stops on
+    his finite-volume criterion: E. B. Vinberg, *On the groups of unit elements of
+    certain quadratic forms*, Math. USSR Sb. 16 (1972), §3.2, Proposition 4
+    (p. 28) says the polyhedron cut by the normals the algorithm lists is the
+    chamber, and Proposition 5 (p. 29) says the list breaks off once that
+    polyhedron has finite volume.  So ``is_complete_wall_set()`` is not an extra
+    certificate here: it is the statement that the algorithm reached its own stop,
+    and the walls returned are then all of them.
+
+    Sterk computed the five chambers by that algorithm and published the five
+    diagrams 4.3.5--4.3.9 (*Compactifications of the period space of Enriques
+    surfaces, Part I*, Math. Z. 207 (1991), pp. 19, 21, 22, 23 and 24); their wall
+    counts are the ``integral.cusp_chambers`` rows of card ``029J``, which are
+    read here by tag and paired with the cusps in the paper's order.  Card row
+    4.3.8 states its cusp as ``(0, 0, 2, 1, -4, ...)`` where the library's
+    ``Sterk_4`` is ``(0, 0, 1, 2, -4, ...)``: two representatives of one cusp, so
+    the pairing is by the paper's order and not by the vectors.
+
+    ``cusp_chamber`` takes no bound here: a bound is not part of the route.
+    """
+    rows = card("cusp_chambers", "029J")["rows"]["gamma-en-2"]
+    images = _cusp_images()
+    counted = []
+    for row, name in zip(rows, sorted(images)):
+        image = images[name]
+        chamber = image.cusp_chamber()
+        walls = tuple(chamber.wall_roots())
+        assert chamber.is_complete_wall_set() is True
+        assert all(image.admits_root(root) for root in walls)
+        assert all(root.q() in (ZZ(-2), ZZ(-4)) for root in walls)
+        counted.append((cardinal(sum(1 for _ in walls)), cardinal(row["walls"])))
+
+    assert cardinal(sum(1 for _ in counted)) == cardinal(sum(1 for _ in rows))
+    assert all(measured == expected for measured, expected in counted)
