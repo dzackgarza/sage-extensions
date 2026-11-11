@@ -1,0 +1,16 @@
+.....                                                                    [100%]
+5 passed in 2.36s
+[peakrss] issue351pytest: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 241 MiB
+[peakrss] low-water MemAvail : 2448 MiB
+[peakrss] peak single VmHWM  : 255 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      245 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   241 MiB hwm=   247 MiB avail=  2674 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   240 MiB hwm=   255 MiB avail=  2648 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   235 MiB hwm=   244 MiB avail=  2638 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   184 MiB hwm=   186 MiB avail=  2448 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   107 MiB hwm=   109 MiB avail=  2547 MiB
+launcher exit: 0
