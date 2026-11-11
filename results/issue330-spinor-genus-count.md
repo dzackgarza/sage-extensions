@@ -80,7 +80,8 @@ mass-stopped traversal from (`genus.py:3071-3074`), so the defect has a second s
 in the tree: a definite genus with more than two spinor genera enumerates half its
 classes. On this specimen, with the walk repaired at runtime, `representatives` returns
 twelve matrices instead of six and stops printing `Warning: not all classes in the genus
-were found`. That is the upstream report: `results/sage-upstream-spinor-generators.md`.
+were found`. No upstream report is drafted for it: this repository presents the Sage API
+through its own owners and #330 owns the count (`bfc9bcb`), so the defect is recorded here.
 
 ## The repair
 

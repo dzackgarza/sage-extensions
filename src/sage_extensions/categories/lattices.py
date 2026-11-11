@@ -714,8 +714,7 @@ class _Genus(Sets().ObjectType):
         is not the length of Sage's ``spinor_generators`` list: that call
         adjoins each new prime to the quotient's own generators rather than to
         the accumulated subgroup and so returns at most one prime, which made
-        ``2 ** len(...)`` report two spinor genera on a genus with four
-        (``results/sage-upstream-spinor-generators.md``).
+        ``2 ** len(...)`` report two spinor genera on a genus with four.
         """
         integers = _owned_integers()
         rank = int(self._lattice.module_rank())
@@ -1191,8 +1190,9 @@ def _spinor_generating_primes(genus, *, proper):
     accumulated subgroup, so after the first accepted prime the subgroup is
     the whole quotient and the call returns at most one prime for every genus.
     Counting that list reports two spinor genera for every genus with four.
-    Reported upstream in ``results/sage-upstream-spinor-generators.md``; the
-    loop here is the one that call intends, and it is what the genus
+    No upstream report is drafted for it: this repository presents the Sage API
+    through its own owners and #330 owns the count, so the defect is recorded
+    here.  The loop below is the one that call intends; it is what the genus
     enumeration and :meth:`_Genus.spinor_genus_count` consult.
     """
     from sage.sets.primes import Primes
@@ -1256,9 +1256,9 @@ def _genus_classes(gram):
     classes found -- including explicitly inserted seeds on the indefinite
     route -- must add up exactly to the mass of the genus; this is the
     completeness check after enumeration.  The seeds are ours rather than
-    Sage's ``spinor_generators`` because that call returns at most one prime
-    (``results/sage-upstream-spinor-generators.md``), which would start this
-    traversal in half the spinor genera and stop it at half the mass.
+    Sage's ``spinor_generators`` because that call returns at most one prime,
+    which would start this traversal in half the spinor genera and stop it at
+    half the mass.
     """
     from itertools import combinations
 
