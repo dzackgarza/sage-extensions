@@ -190,6 +190,7 @@ from sage_extensions.categories.isotropic_parabolics import (  # noqa: F401
     PrimitiveIsotropicSubobjects,
 )
 from sage_extensions.lattice_database import (  # noqa: F401
+    card_plane_orbit_lengths,
     card_plane_orbit_row,
 )
 from sage_extensions.categories.lattice_centralizers import (  # noqa: F401

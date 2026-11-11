@@ -4406,3 +4406,41 @@ Second, smaller observation from the same function: `_improper_spinor_kernel`
 is a proper subgroup of `A`, and that routine draws `V.random_element()`, so the route
 is randomized; four fresh evaluations on each of `diag(1, 20, ±400)` gave the same
 order every time, so the answer looked invariant.
+
+## #331 · the parabolic at a non-splitting plane: two open factors and two defects seen
+
+Measured on `T_En = U ⊕ U(2) ⊕ E8(-2)` at Sterk's `P_2` (`t(x)`, 122 generators:
+21 radical + 19 half-vector + 64 quotient reflections + 18 plane lifts):
+
+* **The plane factor is closed.**  `levi_plane_action_index()` gives 1 at `P_2` and 3 at
+  `P_1` (14 plane actions there) from the `Γ(2)` certificate: the Sanov shears `A`, `B`
+  and `-1` are exhibited among the returned plane actions and `|GL_2(F_2)|/|image|` is
+  computed.  `J = 2·1_2` at `P_2` is why no congruence condition survives there; at `P_1`
+  `J = diag(1,2)` forces `Γ^0(2)`.
+* **Open: the quotient factor.**  `H_0 = {N ∈ O(I^⊥/I) : (1,N) admits an integral lift}`
+  is not computed here, and neither is `|O(I^⊥/I)|` for `K = P_2^⊥/P_2` (rank 8, negative
+  definite, Gram with Smith normal form `(1,1,2,2,2,2,2,2)`).  The 64 quotient reflections
+  give `(1, s_w)` for roots `w` of `K`, i.e. a subgroup of `H_0`, and that is all.
+* **Open: the radical.**  `U_I` has rank `2·8 + 1 = 17` by the block form
+  (`Hom(K,I)` plus the skew part of `End(I)`), and the returned kernel elements are not
+  shown to generate it.
+
+Two defects seen in the same code, not repaired in this unit:
+
+1. `unipotent_radical_generators` is named for the radical but *is not* contained in it.
+   An Eichler transvection `E_{p,x}` with `p ∈ I` and `x ∈ p^⊥` acts on `I` by the
+   unipotent matrix fixing `p` (`E(p_2) = p_2 + b(p_2,x)p_1`), so it lies in the parabolic
+   and not in `ker(P_I → GL(I) × O(I^⊥/I))`.  Measured at `P_2`: 92 of the 122 returned
+   generators fix `I` pointwise, and 58 act trivially on `I^⊥/I`; the members of the family
+   that lie in the radical are the ones satisfying both, and which of the 21 named
+   transvections do is not recorded by the method.  Any caller that reads it as "the
+   radical" gets a subgroup of the parabolic that is not the kernel.
+2. `plane_block_lift` searches the free parameter of the `P_2` equation over
+   `range(-bound, bound + 1)` with `bound = 2|det J| + 2` (10 at `P_2`) instead of over a
+   complete residue system of the denominators of the linear part.  The integral solutions
+   of `P_2 J^t P_1^t + P_1 J P_2^t = remainder` are a coset `c + Z·S`, and the parameter
+   realising an integral `P_2` can fall outside that range, in which case a lift that
+   exists is reported as `None`.  `levi_lift_generators` inherits it: it returns the lifts
+   of its own candidate list only, and a candidate whose admissible parameter is large is
+   silently dropped.  All 18 candidates found a lift at `P_2`, so no measurement above is
+   affected; the defect is in the completeness of the search, not in what it returned.

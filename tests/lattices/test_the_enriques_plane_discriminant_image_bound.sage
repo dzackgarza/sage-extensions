@@ -16,9 +16,13 @@ Math. Z. 207 (1991), Proposition 4.6, p. 29).  Dutour Sikirić--Hulek,
 arXiv:2302.01679v2, section 3.6 (the Tits building), p. 22, state the indices of
 their stabilizer images in the discriminant group: $527$ for $P_1$ and
 $23715 = 3^2\cdot5\cdot17\cdot31$ for $P_2$.  Those two numbers are card `029J`'s
-cited values and are read here by tag, together with the two plane rows the card
-states: two $O$-orbits of planes and $24242 = 527 + 23715$ one-dimensional cusps
-under $\widetilde{O}^+$.
+cited values, and they are read here by tag: the digest keeps the row *total*
+($24242$ one-dimensional cusps under $\widetilde{O}^+$, two $O$-orbits of planes)
+as a structured field, and the per-orbit lengths come from the card's own sentence
+in that row, through `card_plane_orbit_lengths`.  Filing the split as a structured
+row on `dzackgarza/lattice-database` would be the better place for it and is not
+done here: this project's GitHub connection is scoped to one repository.  Nothing
+in this module types either number.
 
 The orbit sizes are computed from the permutation action of $O(q)$ on its own
 discriminant group, not taken from the page; the test compares them with the
@@ -51,18 +55,19 @@ def test_the_plane_classes_and_their_cusp_count_are_card_029J_s_rows() -> None:
     r"""Two $O$-orbits of planes, and $527 + 23715$ one-dimensional cusps.
 
     $527$ and $23715$ are the indices Dutour Sikirić--Hulek, section 3.6, p. 22,
-    give for the stabilizer images of $P_1$ and $P_2$ in the discriminant group;
-    $24242$ is card `029J`'s $\widetilde{O}^+$ plane row, read by tag, and it is
-    their sum.
+    give for the stabilizer images of $P_1$ and $P_2$ in the discriminant group.
+    Card `029J` states them in its $\widetilde{O}^+$ row as the lengths of the two
+    orbits of its $24242$ planes; the two computed indices are compared with that
+    stated pair by tag, and their sum with the card's row total.
     """
     lattice = NamedLattices.TEn
     first, second = _representatives(lattice)
 
     index_first = first.stabilizer_discriminant_index()
     index_second = second.stabilizer_discriminant_index()
+    stated = card_plane_orbit_lengths("029J", "Otilde+")
 
-    assert index_first == 527
-    assert index_second == 23715
+    assert sorted([int(index_first), int(index_second)]) == sorted(stated)
     assert index_first + index_second == card_plane_orbit_row("029J", "Otilde+")
     assert card_plane_orbit_row("029J", "O") == cardinal(2)
 
@@ -77,14 +82,19 @@ def test_the_plane_that_does_not_split_has_an_exact_discriminant_image() -> None
     Equal orders decide the image without any claim that those generators
     generate $G_{P_2}$ itself, which stays open
     (`parabolic_obstruction`).  The index $23715$ is card `029J`'s cited value for
-    $P_2$ (Dutour Sikirić--Hulek, section 3.6, p. 22).
+    $P_2$ (Dutour Sikirić--Hulek, section 3.6, p. 22), read here by tag as the
+    larger of the two lengths the card states for its $\widetilde{O}^+$ plane
+    orbits: the card's $O$ row names $P_1$ before $P_2$ and gives the images'
+    indices in that order, and $P_2$'s is the larger of the pair.
     """
     lattice = NamedLattices.TEn
     _first, second = _representatives(lattice)
 
     upper, lower = second.stabilizer_discriminant_image_orders()
 
-    assert second.stabilizer_discriminant_index() == 23715
+    assert second.stabilizer_discriminant_index() == max(
+        card_plane_orbit_lengths("029J", "Otilde+")
+    )
     assert upper == lower
     assert second.stabilizer_discriminant_image_is_exact() is True
     assert second.stabilizer_discriminant_image_index() == 1
