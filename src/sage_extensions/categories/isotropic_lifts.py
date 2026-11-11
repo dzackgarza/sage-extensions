@@ -457,8 +457,11 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             coset of ``P/mP`` modulo ``K``, which is ``|P/mP| / |K| = prod_i step_i`` of
             them; the lift ``phi`` of that parameter, asked for its integral restriction --
             the lift test itself, not a criterion for it; and the union of the cosets that
-            pass.  A coset whose representative fails contributes nothing, and its
-            representative's lift is the only lift built for it.
+            pass, presented as the image of the passing representatives and the kernel
+            under the coset addition, with the inverse naming both components of the pair,
+            so the union itself is never listed as one set.  A coset whose representative
+            fails contributes nothing, and its representative's lift is the only lift
+            built for it.
             """
             from sage.all import QQ, ZZ, gcd, lcm
             from sage.matrix.constructor import matrix
@@ -587,13 +590,35 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
                 )
                 if lifts_integrally(residue)
             )
-            # The locus is the union of the cosets that pass, each translated from its
-            # own tested representative by the transvection kernel.
-            return finite_ordered_set(tuple(
-                residue + element
-                for residue in passing
-                for element in transvection_kernel
-            ))
+            # The locus is the union of the cosets that pass, each translated
+            # from its own tested representative by the transvection kernel.
+            # That union is presented as the image of the passing
+            # representatives and the kernel under the coset addition, with the
+            # inverse naming both components of the pair, so the union itself
+            # is never listed as one set: on ``T_Co`` it has 131072 classes
+            # and it is built once per candidate the port tests, so its
+            # listing was the row's own cost.
+            passing_residues = finite_ordered_set(passing)
+            kernel = finite_ordered_set(transvection_kernel)
+            cosets = passing_residues.product_with(kernel)
+            residue_projection, kernel_projection = (
+                cosets.projection(index) for index in cosets.index_set()
+            )
+
+            def sum_of(pair):
+                return residue_projection(pair) + kernel_projection(pair)
+
+            def pair_of(value):
+                r"""The unique representative and kernel class summing to this class, or ``None``."""
+                for residue in passing:
+                    shift = value - residue
+                    if shift in kernel:
+                        return cosets((residue, shift))
+                return None
+
+            return Sets().image_set(
+                Sets().Mor(cosets, classes_module)(sum_of), cosets, inverse=pair_of
+            )
 
         @cached_method
         def integral_base_point_or_none(self):
