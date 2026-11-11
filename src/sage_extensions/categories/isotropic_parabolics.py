@@ -1816,6 +1816,149 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                     found.append(lift)
             return tuple(found)
 
+        @cached_method
+        def _discriminant_orthogonal_action(self):
+            r"""Return `(|O(q)|, action, ranking, elements)` for the permutation action on the discriminant group.
+
+            `O(q) = O(A_L, q)` is a finite group; its elements are module
+            automorphisms of the discriminant module, and a permutation of the
+            group's own element enumeration is built from its generators'
+            images.  The GAP group they generate is returned as ``action``, so a
+            setwise stabilizer or an orbit asks the engine and not this module.
+            The group order is checked against the group's own `order()`.
+            """
+            from sage.libs.gap.libgap import libgap
+
+            lattice = self.ambient_lattice()
+            discriminant = lattice.discriminant_group()
+            orthogonal = discriminant.orthogonal_group()
+            elements = tuple(discriminant.elements())
+            ranking = discriminant.elements().ranking_map()
+            permutations = [
+                libgap.PermList([int(ranking(generator(element))) + 1 for element in elements])
+                for generator in orthogonal.group_generators()
+            ]
+            action = libgap.Group(*permutations)
+            order = orthogonal.order()
+            assert int(action.Size()) == int(order), (
+                f"the generators of O(q) for {lattice} generate a group of order {int(action.Size())}, "
+                f"not the group's own {int(order)}"
+            )
+            return order, action, ranking, elements
+
+        def stabilizer_discriminant_index(self) -> int:
+            r"""Return `[O(q) : \mathrm{Stab}_{O(q)}(D(P))]` for this plane's divided class set `D(P)`.
+
+            This is the number of points in the `O(q)`-orbit of `D(P)`: every
+            `g \in \mathrm{Stab}_{O(L)}(P)` permutes the divided discriminant
+            classes `[u/\mathrm{div}(u)]` of the plane's primitive directions, so
+            the orbit is the index of the largest subgroup of `O(q)` that
+            `\rho(G_P)` can fill.  Computed from the orbit, not read from a page;
+            see :meth:`stabilizer_discriminant_image_orders` for the bound and
+            the lower side.
+            """
+            from sage.libs.gap.libgap import libgap
+
+            from sage_extensions.categories.isotropic_orbits import (
+                _divided_discriminant_classes,
+            )
+
+            lattice = self.ambient_lattice()
+            _order, action, ranking, _elements = self._discriminant_orthogonal_action()
+            classes = _divided_discriminant_classes(lattice, self)
+            points = sorted(
+                {
+                    int(ranking(classes[0])) + 1,
+                    int(ranking(classes[1])) + 1,
+                    int(ranking(classes[2])) + 1,
+                    int(ranking(classes[3])) + 1,
+                }
+            )
+            point_set = libgap.eval("Set([" + ",".join(str(point) for point in points) + "])")
+            return int(libgap.Length(libgap.Orbit(action, point_set, libgap.eval("OnSets"))))
+
+        def stabilizer_discriminant_image_orders(self):
+            r"""Return `(upper, lower)`: the bound on `\rho(G_P)` and the order of the returned images.
+
+            **Upper bound.**  For a primitive isotropic plane `P` and
+            `g \in \mathrm{Stab}_{O(L)}(P)`, the divided discriminant classes
+            `[u/div(u)]` of `P`'s primitive directions are permuted by `\rho(g)`:
+            `g u` is again isotropic and primitive with the same divisibility, so
+            `\rho(g)` preserves the class set `D(P)`.  Hence
+
+            \[ \rho(G_P) \subseteq \mathrm{Stab}_{O(q)}(D(P)), \qquad
+               |\mathrm{Stab}_{O(q)}(D(P))| = |O(q)| / |O(q)\cdot D(P)| . \]
+
+            `D(P)` is the `\mathbb{F}_2`-span of the classes of the plane's two
+            generators together with their sum, and on an even lattice whose
+            discriminant group has exponent two that is the whole class set
+            (``_divided_discriminant_classes``); it is a two-dimensional totally
+            singular subspace of `A_L`.
+
+            **Lower bound.**  `\rho` of :meth:`parabolic_stabilizer_generators`,
+            every one of which is an isometry of `L` carrying `P` onto itself,
+            so the order of the subgroup they generate is a lower bound without
+            any generation claim for `G_P` itself -- the point of this pair.
+
+            Both orders are computed, not read from a page.  Building the
+            permutation action costs about ten seconds and the images of the
+            returned family about five minutes for a hundred generators, all of
+            it cached.
+            """
+            from sage.libs.gap.libgap import libgap
+
+            from sage_extensions.categories.isotropic_orbits import (
+                _divided_discriminant_classes,
+            )
+
+            lattice = self.ambient_lattice()
+            order, _action, ranking, _elements = self._discriminant_orthogonal_action()
+            orbit_size = self.stabilizer_discriminant_index()
+            if int(order) % orbit_size:
+                raise ValueError(
+                    f"the orbit of the divided classes of {self} has {orbit_size} points, "
+                    f"which does not divide |O(q)| = {int(order)}"
+                )
+            upper = int(order) // orbit_size
+            rho = lattice.discriminant_representation()
+            elements = tuple(lattice.discriminant_group().elements())
+            images = [
+                libgap.PermList(
+                    [int(ranking(rho(generator)(element))) + 1 for element in elements]
+                )
+                for generator in self.parabolic_stabilizer_generators()
+            ]
+            lower = int(libgap.Group(*images).Size()) if images else 1
+            return upper, lower
+
+        def stabilizer_discriminant_image_is_exact(self) -> bool:
+            r"""Return whether the returned generators' discriminant image is the whole of `\rho(G_P)`.
+
+            The bound is the one :meth:`stabilizer_discriminant_image_orders`
+            states: `\rho(G_P)` preserves the plane's divided discriminant
+            classes, so it lies in `\mathrm{Stab}_{O(q)}(D(P))`, and the images
+            of the returned generators lie in `\rho(G_P)`.  Equal orders decide
+            the image *whatever* the generation of `G_P` itself, which is why
+            this predicate and :meth:`is_parabolic_complete` answer different
+            questions: the second is about `G_P`, the first about `\rho(G_P)`.
+
+            `\rho(G_P)` is the object the plane-orbit call of #286 consumes, so
+            a caller that needs only the image can accept an incomplete family
+            of `G_P` exactly when this returns ``True``.
+            """
+            upper, lower = self.stabilizer_discriminant_image_orders()
+            return upper == lower
+
+        def stabilizer_discriminant_image_index(self) -> int:
+            r"""Return `[\mathrm{Stab}_{O(q)}(D(P)) : \rho(\text{returned generators})]`.
+
+            One exactly when :meth:`stabilizer_discriminant_image_is_exact`
+            holds; otherwise it is the missing factor in the returned family's
+            image, which a caller can name instead of guessing.
+            """
+            upper, lower = self.stabilizer_discriminant_image_orders()
+            return upper // lower
+
         def is_parabolic_complete(self) -> bool:
             r"""Return whether the generators of :meth:`parabolic_stabilizer_generators` are the whole parabolic.
 
@@ -1864,17 +2007,18 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             * Scattone's criterion, cited there, generates the *radical*: the
               transvections `E_{e,x}` over a `ZZ`-basis of `e^\perp`.
 
-            What is known here instead: the admissible subgroup is cut out by
-            three block equations whose denominators are `det J` (4 for Sterk's
-            `P_2` of `T_{\mathrm{En}}`) and `det A = 64` (the `P_3` block, since
-            `P_3 = (K - P_1 K) A^{-1}`), so it is determined modulo at most
-            `2^15`; admissibility is *not* determined by the plane action modulo
-            16 (measured: shifting an entry by 16 changes the answer), and the
-            returned lifts' reductions do not match the admissible classes
-            computed modulo 4, so neither the subgroup nor its index is settled
-            yet.  The comparison the issue asks for -- `\rho(G_{P_2})` against
-            card `029J`'s `Otilde+` and `gamma-en-2` plane rows -- needs that
-            subgroup first.
+            What is known here instead: the discriminant image is decided
+            without that statement.  Every `g` in the stabilizer permutes the
+            plane's divided discriminant classes, so
+            `\rho(G_P) \subseteq \mathrm{Stab}_{O(q)}(D(P))`, and the images of
+            the returned generators lie in `\rho(G_P)`; when the two orders
+            agree, `\rho(G_P)` is exact whatever the generation of `G_P`
+            (:meth:`stabilizer_discriminant_image_orders`,
+            :meth:`stabilizer_discriminant_image_is_exact`).  At Sterk's `P_2`
+            of `T_{\mathrm{En}}` the bound is `|O(q)|/23715` and the family of
+            :meth:`parabolic_stabilizer_generators` reaches it only once the
+            half-vector Eichler transvections of #325 are among the generators:
+            with the plane lifts alone the image is short by `2^12`.
             """
             if self.is_parabolic_complete():
                 return None
