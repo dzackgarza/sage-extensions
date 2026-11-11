@@ -36,3 +36,62 @@ evidence on the repaired tree.  The page's `thm:unpolarized-cusps` via
 The plane row and the incidence do not return on this tree:
 `isotropic_plane_orbits` raises on `T_Co` (its docstring names `T_Co` as the motivating
 refusal), so the incidence stops at its first plane cusp.
+
+## `Õ(T_Co)` (the kernel row, `ker rho`)
+
+The call `Tco.stable_orthogonal_group().isotropic_orbit_representatives(1)`, the row #310's
+`96d8373` wires through `_line_orbit_from_divided_classes`.  **It does not return within
+the adopted runtime's 6144 MiB memory guard.**  Two probes, one load window each:
+
+1. `.tmp/p286-row-otilde.log` (14:47-16:15, load 5-19): the machine's own free memory was
+   the killer — the process peaked at 4911 MiB RSS while the VM's available memory fell
+   to 903 MiB, and the probe died silently inside the residue loop.  Its stacks show the
+   row had already passed the ambient `O(T_Co)` stage and the character-image sweep.
+2. `.tmp/p286-row-otilde2.log` (16:17-17:28, load 1-7): the peakrss guard itself fired at
+   **6155 MiB peak single VmHWM** (`launcher exit: 143`), the stop line being
+
+```
+  lattices.py:9988 in is_primitive
+  lattices.py:6730 in isotropic_lines_by_divided_class
+  orthogonal_quotients.py:2159 in _line_orbit_from_divided_classes
+  orthogonal_quotients.py:2205 in _subgroup_isotropic_orbit_representatives
+```
+
+after passing the ambient stage and the character-image sweep, so the residue loop's
+own per-candidate primitive check (`is_primitive` -> `is_injective`) drives the row past
+the guard.  No count, representative or index is therefore stated for this row: the page
+states 527 line orbits, index 1 over every class (`sec-cusp-lifting`, research
+`3077f6789c`, page proof only), and nothing this turn computed can be compared with it.
+The row's stop is the memory ceiling, not the mathematics: the same construction on
+`T_En` measured 5 lines in 113.7 s (`.tmp/p286f-gamma-line2.log`) and the `T_Co` case of
+the divided-class construction ran at 59.86 s at `6db8551ae9`
+(`.tmp/p310-construction.log`).
+
+## `Õ⁺(T_Co)` and the restricted stabilizers `R_Γ`
+
+These rows were **not run this turn**; their blockers are named from the recorded state,
+and each is the next unit's work:
+
+- `Õ⁺(T_Co)` (`R_{Γ_En}`, page (1)): the class route is refused on `T_Co` —
+  `isotropic_line_stabilizer_image` returns `None` in 0.1 s because its criterion
+  (Eichler's, Gritsenko--Hulek--Sankaran Lemma 7.8, p. 503) needs two orthogonal
+  *unimodular* hyperbolic planes in the lattice itself and `T_Co` exhibits none
+  (`_two_hyperbolic_planes(T_Co)` is `False`, #315's ruling) — so the caller keeps the
+  generator route, which demands `O(T_Co)`'s selected finite generating set through
+  `OrthogonalCharacterQuotient._ambient_generators` -> the port's
+  `orthogonal_group_generators`; that computation ran from 488 s to a 2100 s cap without
+  returning at `9fa28c1f51`'s measurement (`results/issue322-locus.md`), and the row's
+  own stabilizer-generator cost is #18's record (1643 s + ~3668 s port conversion).
+- `R_{Γ_{En,2}} = ρ̄^{-1}(P)`: `P` is a stabilizer inside `O(A_{T_Co})`, whose own order
+  does not return (`groups.py:540` -> `fqf_orthogonal._isom_fqf`,
+  `results/issue286-tco-run.md`'s row 3), so this row stops before the call is reached.
+- `R_{Γ^K_En} = O(T_Co)` and `R_{Γ_En} = Õ⁺(T_Co)`: the restricted-stabilizer construction
+  itself (`Stab_Γ(δ)` restricted to `δ^⊥`, δ the `(-2)`-vector of `T_En` with
+  `δ^⊥ ≅ T_Co`) is measured at 252 s for the stabilizer's 339 generators plus 277 s for
+  the restriction (`p286e-coble-groups.log`), and the page's containment
+  (`R_{Γ^K_En} = O(T_Co)`) checked `True` on all 339 — but no row through the public
+  call was run this turn.
+
+The machine's memory ceiling (the `Õ` row's 6155 MiB against the 6144 MiB guard) and the
+time budget are what stopped this turn at two rows of six; the remaining four are each a
+next unit's run, not a mathematical obstruction.
