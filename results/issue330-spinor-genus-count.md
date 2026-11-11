@@ -8,17 +8,53 @@ uses that count as a completeness check.
 
 | source | state |
 |---|---|
-| Benham–Hsia, *On spinor exceptional representations*, Nagoya Math. J. **87** (1982), §2.3, p. 252 | **not on this machine; not read here.** The value four is the issue's and the named test's. |
-| Conway–Sloane, *Sphere Packings, Lattices and Groups*, Ch. 15 §9 (index of the spinor-norm image); Cassels, *Rational Quadratic Forms*, Ch. 11 | **not on this machine; not read here.** Cited in the docstring for the formula; the page-level statement still needs a reader. |
-| Sage's implementation of the spinor-norm quotient, `sage/quadratic_forms/genera/genus.py:2547-2663`, read in the pinned image | read |
+| Benham–Hsia, *On spinor exceptional representations*, Nagoya Math. J. **87** (1982), §2.3, p. 252 | **not on this machine; not read here, and no copy exists in the project.** The value four is the issue's and the named test's, corroborated below by computation. |
+| Cassels, *Rational Quadratic Forms*, Ch. 11 §3 and §1 | **read** (§1 p. 200, §3 pp. 207–211) |
+| Conway–Sloane, *Sphere Packings, Lattices and Groups*, Ch. 15 §9 | **read** (pp. 388–391) |
+| Sage's implementation of the spinor-norm quotient, `sage/quadratic_forms/genera/genus.py:2547-2663`, pinned image | read |
 
-Both missing sources are requested from the orchestrator: the paper is
-Nagoya Math. J. 87 (1982) 247–260, DOI `10.1017/S0027763000020031` (Project Euclid serves
-the volume, but its page answered this machine with a bot challenge, and Cambridge Core
-holds the article behind its own front end — neither was worked around), and SPLAG
-Ch. 15 §9 or Cassels Ch. 11 for the index formula. Everything below that is *computed* was
-computed here; the one thing the sources would add is the page on which the formula and
-the specimen's four-way split are printed.
+Benham–Hsia is the one source still missing; it is Nagoya Math. J. 87 (1982) 247–260,
+DOI `10.1017/S0027763000020031`. Project Euclid serves the volume but answered this
+machine with a bot challenge, and Cambridge Core holds the article behind its own front
+end; neither was worked around.
+
+## The two sources that were read, and the convention they fix
+
+**Cassels, Ch. 11, §3, "Number of spinor genera".** The section opens on **p. 207**: "In
+this section we show that the number of spinor genera in a genus is equal to the order of
+a certain group which depends, of course, on the genus and which is readily computable",
+for dimension at least three ((3.1), p. 207). That group is (3.15) on **p. 209**,
+$G_P = R_P/S_PT_P$, with $R_P = \prod_{p\in P}\theta(V_p) = \prod_{p\in P}\mathbf Q_p^\times$
+by Lemma 3.1, (3.2), on p. 207; $S_P = \prod_{p\in P}\theta(\Lambda_p)$, the product of
+the local spinor-norm images ((3.10), p. 209); and $T_P$ the rationals that are units away
+from $P$ ((3.12)–(3.14), p. 209). **Theorem 3.1 with Note 2, p. 211**, says the set of
+spinor genera is a principal homogeneous space over $G_P$: the number of them is
+$|G_P|$, the index of $\prod_p\theta(\Lambda_p)\cdot T$ in $\prod_p\mathbf Q_p^\times$.
+Equation (3.16) on p. 209, $g^2 = 1$ for every $g \in G_P$, is why that order is a power
+of two.
+
+**Conway–Sloane, Ch. 15, §9.** **p. 389**: "Each genus is partitioned into a number of
+spinor genera (the number is always a power of 2). There is a group of spinor operators
+acting transitively on the spinor genera". **p. 388**: "The current use of the term
+differs slightly from Eichler's (by replacing the orthogonal group by the special
+orthogonal group in some places)". **p. 390**, §9.3: "We call $r \in \mathbf Q$
+automorphous if it is the spinor norm of a **proper** integral automorphism of $f$",
+with the same word for the $p$-adic version; Theorems 16 and 17 on the same page name the
+spinor kernel by those numbers, and Theorem 15(b) on p. 389 is the rank-$\geq 3$ hypothesis.
+
+**Their convention is the proper one, and the code now follows it.** Cassels defines
+$\theta$ on $O^+(V)$ (Ch. 10, §3, p. 178) and takes $\theta(\Lambda_p)$ to be its image on
+$O^+(\Lambda_p)$ (Ch. 11, §1, p. 200); Conway–Sloane say the same in the two passages
+above. The method's default was `proper=False`, the improper count, which admits improper
+isometries and partitions more coarsely; `_Genus.spinor_genus_count` now defaults to
+`proper=True` and its docstring carries the statements, the pages and the convention.
+`proper=False` remains for `_genus_classes`, whose enumeration partitions by the improper
+spinor genus and says so. Measured after the change: four under both conventions on
+`diag(1, 20, 400)`, two under both on `diag(1, 20, -400)`, and two under both on the genus
+of `[[-9,1,0],[1,7,0],[0,0,2]]`, the specimen of the `lattices.py` doctest, so that
+doctest's `> 1` is unaffected. On a genus where the two differ the public count reports the
+source's proper one; the three genera measured here are not such a genus, and no other
+genus of this library was measured for the question.
 
 ## Which of the two was the defect
 

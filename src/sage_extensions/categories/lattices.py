@@ -662,22 +662,53 @@ class _Genus(Sets().ObjectType):
         return _owned_engine_element(_owned_rationals(), SageQQ(self._engine().mass()))
 
     @cached_method
-    def spinor_genus_count(self, proper=False):
+    def spinor_genus_count(self, proper=True):
         r"""Return the number of spinor genera in this genus, the index of the spinor-norm image.
 
         The count is the order of the spinor-kernel quotient
         \(A/K = \prod_{p \mid 2d} \mathbf Z_p^\times/\mathbf Z_p^{\times 2} / K\)
-        of :func:`_spinor_kernel_quotient`, which is the index of the spinor
-        norms of the local isometry groups in the idèle group,
-        \([J_{\mathbf Q} : \mathbf Q^\times \prod_p \theta(O^+(L_p))]\)
-        (Cassels, *Rational Quadratic Forms*, Ch. 11; Conway--Sloane,
-        *Sphere Packings, Lattices and Groups*, Ch. 15, §9).  It is a power of
-        two [CS99, Ch. 15, §9.1], and it is defined here for rank at least
-        three [CS99, Ch. 15, §3.5].
+        of :func:`_spinor_kernel_quotient`, and that order is the index of the
+        spinor-norm image.
 
-        ``proper=False`` counts the improper spinor genera — the convention of
-        the genus enumeration in :func:`_genus_classes`, and the one this
-        method has always reported — and ``proper=True`` the proper ones.
+        Cassels, *Rational Quadratic Forms*, Ch. 11, §3, "Number of spinor
+        genera", states it on **p. 207**: "the number of spinor genera in a
+        genus is equal to the order of a certain group which depends, of
+        course, on the genus and which is readily computable", for dimension at
+        least three ((3.1), p. 207).  That group is (3.15) on **p. 209**,
+        \\(G_P = R_P/S_PT_P\\), with \\(R_P = \\prod_{p \\in P}\\theta(V_p) =
+        \\prod_{p \\in P}\\mathbf Q_p^\\times\\) by Lemma 3.1, (3.2), on p. 207,
+        and \\(S_P = \\prod_{p \\in P}\\theta(\\Lambda_p)\\) the product of the
+        local spinor-norm images ((3.10), p. 209), \\(T_P\\) the rationals that
+        are units away from \\(P\\) ((3.12)--(3.14), p. 209).  **Theorem 3.1
+        with Note 2, p. 211**, says the set of spinor genera is a principal
+        homogeneous space over \\(G_P\\); so there are \\(|G_P|\\) of them, the
+        index of \\(\\prod_p \\theta(\\Lambda_p) \\cdot T\\) in \\(\\prod_p
+        \\mathbf Q_p^\\times\\).  Equation (3.16) on p. 209, \\(g^2 = 1\\), is why
+        that order is a power of two.
+
+        **The convention, which both sources fix and this method follows: the
+        spinor norm is that of proper isometries.**  Cassels defines \\(\\theta\\)
+        on \\(O^+(V)\\) (Ch. 10, §3, p. 178) and takes
+        \\(\\theta(\\Lambda_p)\\) to be its image on the proper \\(p\\)-adic
+        integral isometries (Ch. 11, §1, p. 200).  Conway--Sloane say the same:
+        §9.1 on **p. 388** notes that their use of the term "differs slightly
+        from Eichler's (by replacing the orthogonal group by the special
+        orthogonal group in some places)", and §9.3 on **p. 390** defines \\(r\\)
+        to be automorphous "if it is the spinor norm of a **proper** integral
+        automorphism", with the same word in the \\(p\\)-adic version; Theorems
+        16 and 17 on p. 390 name the spinor kernel by those numbers, and §9.1
+        on **p. 389** records that "each genus is partitioned into a number of
+        spinor genera (the number is always a power of 2)", with a group of
+        spinor operators acting transitively on them.  The count here is
+        therefore the **proper** one, ``proper=True``, and that is the default;
+        the rank hypothesis is Theorem 15(b) on p. 389.
+
+        ``proper=False`` counts the improper spinor genera, the partition that
+        admits improper isometries; it is coarser or equal, it is the
+        convention of the genus enumeration in :func:`_genus_classes`, and it
+        is what this method reported before the sources were read.  Measured:
+        the two agree on ``diag(1, 20, 400)`` (four each) and on
+        ``diag(1, 20, -400)`` (two each), and they differ in general.
 
         The quotient's order is read directly, because it *is* the index.  It
         is not the length of Sage's ``spinor_generators`` list: that call
@@ -1123,12 +1154,16 @@ def _spinor_kernel_quotient(genus, *, proper):
     [CS99, Ch. 15, §9].  Read in the pinned runtime at
     ``sage/quadratic_forms/genera/genus.py:2547-2612``.
 
-    ``proper=True`` counts the proper spinor genera and ``proper=False`` the
-    improper ones — the convention of the genus enumeration below.  The two
-    agree whenever the improper class of the genus is the proper one; on
-    ``diag(1, 20, 400)`` both are of order four and on ``diag(1, 20, -400)``
-    both are of order two, measured repeatedly and independent of the random
-    vector ``_proper_is_improper`` draws.
+    ``proper=True`` keeps the kernel cut out by the spinor norms of the proper
+    local isometries, which is the convention both cited sources use (Cassels,
+    *Rational Quadratic Forms*, Ch. 11, §1, p. 200 and §3, Theorem 3.1, p. 211;
+    Conway--Sloane, Ch. 15, §9.3, p. 390), and is the convention of
+    :meth:`_Genus.spinor_genus_count`; ``proper=False`` is the coarser improper
+    kernel, which is what the genus enumeration below partitions by.  The two
+    agree whenever the improper class of the genus is the proper one: measured
+    of order four on both on ``diag(1, 20, 400)`` and of order two on both on
+    ``diag(1, 20, -400)``, repeatedly and independently of the random vector
+    ``_proper_is_improper`` draws.
     """
     operators, kernel = (
         genus._proper_spinor_kernel() if proper else genus._improper_spinor_kernel()
@@ -1194,8 +1229,12 @@ def _genus_classes(gram):
 
     ``gram`` is an immutable Gram matrix over Sage's ``ZZ`` of a
     nondegenerate integral lattice of finite rank.  Returns the Gram matrices
-    of one lattice from each isometry class of its genus, grouped by improper
-    spinor genus, the spinor genus of ``gram`` first.
+    of one lattice from each isometry class of its genus, grouped by
+    **improper** spinor genus, the spinor genus of ``gram`` first.  The
+    improper partition is the one that admits improper isometries; it is
+    coarser than or equal to the proper one that
+    :meth:`_Genus.spinor_genus_count` reports by default, and the two agree on
+    the specimens measured here, ``diag(1, 20, 400)`` and ``diag(1, 20, -400)``.
 
     In rank at most ``1`` the genus is one class.  In rank ``2`` the classes
     are the reduced binary forms of discriminant ``-4 det`` in the genus;
@@ -5351,7 +5390,15 @@ class Lattices(OwnedCategoryOverBaseRing):
             return self.genus().class_number()
 
         def spinor_genus_count(self):
-            r"""Return the number of improper spinor genera in the integral genus."""
+            r"""Return the number of spinor genera in the integral genus.
+
+            This is :meth:`_Genus.spinor_genus_count` in the convention both
+            cited sources use, the spinor norm of the **proper** local
+            isometries: Cassels, *Rational Quadratic Forms*, Ch. 11, §1, p. 200
+            (where \\(\theta(\\Lambda_p)\\) is the image on \\(O^+(\\Lambda_p)\\))
+            and §3, Theorem 3.1, p. 211; Conway--Sloane, *Sphere Packings,
+            Lattices and Groups*, Ch. 15, §9.3, p. 390.
+            """
             ring = self.base_ring()
             assert _engine_ring(ring) is SageZZ, (
                 f"the spinor-genus count here is implemented for ZZ-lattices, but {self} is over {ring}"
