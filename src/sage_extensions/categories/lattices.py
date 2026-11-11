@@ -2307,12 +2307,20 @@ class OrientedFlagDiagram(FiniteSequenceDiagram):
         return f"Diagram of {self._oriented}"
 
 
-class _OrientedFlagEndomorphismsEngine(_ConditionSetEngine):
-    r"""The orientation-preserving natural transformations ``F => F``, with the identity of ``F``."""
+class _OrientedFlagMorEngine(_ConditionSetEngine):
+    r"""The orientation-preserving natural transformations ``F => G``: a condition subset of the diagram Mor.
+
+    Its points are the elements of the universe Mor itself (``CON-17``).
+    ``Mor(F, F)`` has the identity of the universe, whose graded
+    determinants are all 1; no condition set of a Mor in the provider
+    carries one, so this engine adds it.
+    """
 
     def identity(self):
         r"""The identity of the universe Mor ``Fun([t], Lattices)(F, F)``, admitted into this subset."""
-        return self(self.universe().identity())
+        universe = self.universe()
+        assert universe.domain() is universe.codomain(), f"{self} has distinct endpoints, so it has no identity"
+        return self(universe.identity())
 
     one = identity
 
@@ -2391,8 +2399,14 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
 
     two_mor = Mor
 
+    @cached_method(key=lambda self, source, target: (id(source), id(target)))
     def _diagram_mor(self, source, target):
-        r"""The Mor ``Fun([t], Lattices)(F, G)`` of the underlying diagrams, of which ``Mor(F, G)`` is a subobject."""
+        r"""The Mor ``Fun([t], Lattices)(F, G)`` of the underlying diagrams, of which ``Mor(F, G)`` is a subobject.
+
+        It is cached on the oriented diagrams, so the subset and the
+        transporter built for it read one Mor parent: the subset admits only
+        points whose parent is its universe.
+        """
         from sage_extensions.categories.abstract_categories.cat import Cat, _FunctorCategory
 
         return _FunctorCategory.Mor(Cat().Mor(self.domain_category(), self.codomain_category()), source, target)
@@ -2411,21 +2425,17 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
         # The universe is the one Mor of the underlying diagrams that
         # Fun([t], Lattices) admits its arrows by; the transformations built on
         # an apex component are its elements.
-        universe = self._diagram_mor(source, target)
-        if source is target:
-            # Mor(F, F) has the identity of the universe, whose graded
-            # determinants are all 1; no condition set of a Mor in the
-            # provider carries one, so this subset's engine adds it.
-            from sage_extensions.owned_category import _object_of
+        # One engine for every pair: a Mor's own condition_set selector is not
+        # the set owner's condition subset, and the subset must admit the
+        # universe's elements, including its chosen transporter.
+        from sage_extensions.owned_category import _object_of
 
-            subset = _object_of(
-                Sets(),
-                _engine=(Sets(), _OrientedFlagEndomorphismsEngine, None),
-                universe=universe,
-                predicate=preserves_orientations,
-            )
-        else:
-            subset = universe.condition_set(preserves_orientations)
+        subset = _object_of(
+            Sets(),
+            _engine=(Sets(), _OrientedFlagMorEngine, None),
+            universe=self._diagram_mor(source, target),
+            predicate=preserves_orientations,
+        )
         subset._retain_point_computation(lambda: self._oriented_transformation(source, target))
         return subset
 
