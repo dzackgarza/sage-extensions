@@ -115,3 +115,14 @@ agreements (four) rather than pretending to five.
 Card 029J's five rows, as read by tag at `e8a7f88`:
 4.3.5 with 12 walls (printed p. 19), 4.3.6 with 10 (p. 21), 4.3.7 with 12
 (p. 22), 4.3.8 with 11 (p. 23), 4.3.9 with 13 (p. 24).
+
+## 5. The one count that differs, and it differs before any chamber runs
+
+`Sterk.sterk_roots()["Sterk_5"]` — `Sterk.sterk5_in_U_E8_2()`, "Sterk 5's
+fourteen roots in `U + E8(2)` coordinates" in `sterk.py` — holds **14** roots,
+and card `029J`'s `integral.cusp_chambers` row for that cusp, statement **4.3.9**,
+states `wall_count: 13` with thirteen wall vectors.  Both values are recorded
+here and neither is typed into the test.  Which is right is not decided by
+anything measured in this work: the chamber that would decide it does not return
+(§3), so this is a discrepancy between the library's transcription of Sterk's
+figure and the database's row for it, filed for whoever owns the transcription.
