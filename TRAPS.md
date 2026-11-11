@@ -4304,3 +4304,31 @@ selected finite generating set, whose computation
 (`_core_automorphism_generators` -> the port's `orthogonal_group_generators`) ran from 488 s
 to a 2100 s cap without returning.  That is #18's measured cost and #17's open replacement of
 the generator-driven character image; it is not a locus question.
+
+### The pointwise stabilizer's perpendicular carried a plane requirement, and its decision an `I = I^perp` assertion (2026-11-11, #328)
+
+Measured 2026-11-11 in the adopted runtime (SageMath 11.0.beta5, Python 3.14) on
+`9fa28c1`: `PrimitiveIsotropicSubobjects.perpendicular_basis` computed
+`self.plane_basis()`, which raises unless the subobject has rank two, and
+`splitting_complement` ended its search at two vectors. On a primitive isotropic
+*line* — the case #328 is about — the perpendicular had no `ZZ`-basis at all:
+`ValueError: the parabolic construction here is stated for a primitive isotropic
+plane, but Integral lattice of rank 1 and signature (0, 0) has rank 1`, raised from
+`perpendicular_basis` through `plane_basis`. The plane requirement belongs to the
+Levi-block construction (`_levi_block_isometry`, `levi_lift_generators`, written for
+a `2 x 2` block), not to the perpendicular.
+
+Both helpers now read the new `isotropic_basis()` and take the subobject's rank; at
+rank two the returned values are unchanged. Measured after the repair, on
+`U + (A_2(-1) + <-2>)` at `<e>`: the reduction and its rank-3 quotient build in
+0.3 s, `O(K_I)` has order 24, answered in 0.15 s, and its 24 elements list in a
+further 0.08 s; one witness search through them costs 0.07--2.1 s, the low figure a
+warm cache inside one process and the high one the module's first call.
+
+The same method asserted its maximal-isotropic hypothesis
+(`AssertionError: the pointwise stabilizer of ... is not its pointwise kernel: that
+identification needs I = I^perp`), so the general case answered nothing at all
+although the class of the vectors modulo `I` is an invariant the call never read.
+Both are repaired in the #328 commit; the decision is now
+`None`-or-witness on the invariants plus a construction, and a refusal naming the
+datum where the construction is not exhaustive.

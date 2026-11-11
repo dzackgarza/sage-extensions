@@ -35,6 +35,8 @@ in this module's calls is that call's own output, not a lattice-database card
 value.
 """
 
+import pytest
+
 from sage_extensions.all import *  # noqa: F401,F403
 
 
@@ -85,3 +87,58 @@ def test_the_pointwise_stabilizer_leaves_the_isotropic_line_pointwise_fixed() ->
     ambient, line, (e, f, r, s) = _specimen()
     stabilizer = ambient.O().pointwise_stabilizer(line.inclusion())
     assert stabilizer.vector_equivalence_witness(e, -e) is None
+
+
+def _plane_specimen():
+    r"""$L = U \oplus U \oplus (A_2(-1) \oplus \langle -2\rangle)$ and its isotropic plane $\langle e_1, e_2\rangle$."""
+
+    lattices = Lattices(ZZ)
+    negative = lattices([[-2, 1], [1, -2]]) + lattices([[-2]])
+    ambient = lattices("U") + lattices("U") + negative
+    e1, f1, e2, f2, r, _second_root, s = tuple(ambient.module_generators())
+    plane = ambient.primitive_isotropic_subobject(e1, e2)
+    return ambient, plane, (e1, f1, e2, f2, r, s)
+
+
+def test_the_pointwise_stabilizer_of_a_plane_transports_a_vector_of_the_perpendicular() -> None:
+    r"""$r$ is carried to $-r$ by an element fixing the plane $\langle e_1, e_2\rangle$ pointwise."""
+
+    ambient, plane, (e1, f1, e2, f2, r, s) = _plane_specimen()
+    stabilizer = ambient.Aut().stabilizer(plane, action="pointwise")
+    witness = stabilizer.vector_equivalence_witness(r, -r)
+    assert witness in stabilizer
+    assert witness(r) == -r
+    assert witness(e1) == e1
+    assert witness(e2) == e2
+
+
+def test_the_pointwise_stabilizer_of_a_plane_transports_between_two_cosets_of_the_plane() -> None:
+    r"""$e_1 + r$ is carried to $e_2 + r$: the plane is fixed pointwise and the displacement $e_2 - e_1$ is a shear."""
+
+    ambient, plane, (e1, f1, e2, f2, r, s) = _plane_specimen()
+    stabilizer = ambient.Aut().stabilizer(plane, action="pointwise")
+    witness = stabilizer.vector_equivalence_witness(e1 + r, e2 + r)
+    assert witness in stabilizer
+    assert witness(e1 + r) == e2 + r
+    assert witness(e1) == e1
+    assert witness(e2) == e2
+
+
+def test_the_pointwise_stabilizer_of_a_plane_separates_the_two_summands_of_the_quotient() -> None:
+    r"""$r$ and $s$ lie in different summands of $K_I$, so the pointwise stabilizer separates them."""
+
+    ambient, plane, (e1, f1, e2, f2, r, s) = _plane_specimen()
+    stabilizer = ambient.Aut().stabilizer(plane, action="pointwise")
+    assert stabilizer.vector_equivalence_witness(r, s) is None
+
+
+def test_the_pointwise_stabilizer_refuses_where_the_reduction_is_indefinite() -> None:
+    r"""On $U \oplus U \oplus K$ at a line, $I^\perp/I$ keeps a hyperbolic plane, so the quotient orbits are not a finite computation."""
+
+    lattices = Lattices(ZZ)
+    negative = lattices([[-2, 1], [1, -2]]) + lattices([[-2]])
+    ambient = lattices("U") + lattices("U") + negative
+    e1, f1, e2, f2, r, _second_root, s = tuple(ambient.module_generators())
+    line = ambient.primitive_isotropic_subobject(e1)
+    with pytest.raises(ArithmeticError):
+        line.pointwise_vector_equivalence_witness(r, -r)
