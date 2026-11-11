@@ -1,0 +1,70 @@
+name: Enriques polarization rows (#319)
+
+# The 87 numerical polarizations of Dutour Sikirić–Hulek and card 0128's
+# Table 4 rows, each compared with the public isotropic-orbit call of #286.
+# Every row builds an arithmetic subgroup of O(U + U(2) + E8(-2)) and calls the
+# orbit classifier on it, so the rows are minutes each and they live in this one
+# job that reports later rather than in the per-test gate.
+#
+# The job reports every row it decided and names every row that did not return
+# inside its per-call cap or inside the job's budget; it is red in both cases.
+on:
+  workflow_dispatch:
+    inputs:
+      cards:
+        description: "gamma-h-N cards to run, comma separated, or 'all'"
+        required: false
+        default: "all"
+        type: string
+      degrees:
+        description: "card 0128 degrees 2d to run, comma separated, or 'all'"
+        required: false
+        default: "all"
+        type: string
+      call_cap:
+        description: "seconds one public call may take before its row is undecided"
+        required: false
+        default: "1800"
+        type: string
+      budget:
+        description: "seconds for the whole run, 0 for no budget"
+        required: false
+        default: "18000"
+        type: string
+  schedule:
+    - cron: '17 3 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: enriques-polarization-rows
+  cancel-in-progress: false
+
+jobs:
+  card-rows:
+    name: Each card row against the public orbit call
+    runs-on: ubuntu-latest
+    container: ghcr.io/dzackgarza/sage:develop
+    timeout-minutes: 350
+    steps:
+      - name: Check out the commit under test
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Run the card rows
+        env:
+          PYTHONPATH: src
+          ENRIQUES_CALL_CAP: ${{ inputs.call_cap || '1800' }}
+          ENRIQUES_ROW_BUDGET: ${{ inputs.budget || '18000' }}
+          CARDS: ${{ inputs.cards || 'all' }}
+          DEGREES: ${{ inputs.degrees || 'all' }}
+        run: |
+          set -o pipefail
+          "$SAGE_BIN" --version
+          git rev-parse HEAD
+          arguments=()
+          if [ "$CARDS" != "all" ]; then arguments+=(--tags "$CARDS"); fi
+          if [ "$DEGREES" != "all" ]; then arguments+=(--degrees "$DEGREES"); fi
+          "$SAGE_BIN" tests/enriques_polarization_rows_by_card.py "${arguments[@]}" \
+            --cap "$ENRIQUES_CALL_CAP" --budget "$ENRIQUES_ROW_BUDGET"
