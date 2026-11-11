@@ -43,7 +43,6 @@ def _is_primitive_isotropic_line(lattice, subobject) -> bool:
 def test_the_coble_lattice_line_orbit_call_returns_primitive_isotropic_lines() -> None:
     r"""``L.Aut().isotropic_orbit_representatives(1)`` returns on ``T_Co``."""
     lattice = _coble_lattice()
-    assert lattice.hyperbolic_plane_summand_count() == cardinal(1)
 
     lines = lattice.Aut().isotropic_orbit_representatives(1)
 

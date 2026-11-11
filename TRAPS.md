@@ -4119,3 +4119,38 @@ formula to get around it: that is a second implementation of `eichler_transvecti
 The criterion is conditional on `phi(0)` being integral; with a non-integral base point the
 transvection must also cancel the base point's fractional part, so the kernel statement
 does not apply.  Do not drop that test to make the cheap route look general.
+
+### #322 after the repair: the lift locus on `T_Co` is 1024 classes, computed in 0.9 s (2026-11-11)
+
+`integral_parameter_classes` now takes its locus from the parameter module's structure: the
+images `s(a_i)` of the generators of `P` in `A_{L'}` (through the owned coordinate map
+`Modules.ParentMethods.rational_coordinates`), then the integer Smith form of the
+coordinate matrix, then the classes of the kernel.  Measured on `T_Co = <2> + E(2)`,
+`E = U + E8(-1)`, marked `U(2)` line `<e_1>`, identity reduction
+(`.tmp/p322-locus-size.log`, `.tmp/p322-probe11.log`):
+
+```
+|P/mP|               262144 = 4^9      (period m = 4)
+|integral locus|     1024 = 2^10       computed in 0.9 s  (index 2^18 / 2^10 = 256)
+before               262144 classes x (0.353 + 0.039) s ~ 28 h
+U + <2>              |P/mP| = 2,   locus 2
+U(2) + <2>           |P/mP| = 4,   locus 2      (proper subgroup: 4 -> 2)
+U + U + <2>          |P/mP| = 8,   locus 8
+```
+
+Every class the new method returns on those three controls was confirmed to give an
+integral lift by the expensive per-class test, so the criterion and its indexing agree with
+the lift where both are affordable.
+
+The public call now returns.  `L.Aut().isotropic_orbit_representatives(1)` on `T_Co` gives
+**1 orbit**, representative `e_2` with `[v/2] = [1]` and `div = 2`, in 56.9 s
+(`.tmp/p322-reps.log`) -- agreeing with the page's `thm:unpolarized-cusps` transitivity.
+`Tco.stable_orthogonal_group().intersection(Tco.O_plus())` (the `Otilde+(T_Co)` row) still
+does not return: 2400 s cap, and a 600 s `faulthandler` dump shows only
+`matrix_space._element_constructor_` above an invalid (Cython) frame
+(`.tmp/p322-otilde-stack.log`).  That row is a separate defect of the subgroup split, not
+of this locus: the ambient `O(T_Co)` row it starts from now completes.
+
+A base point that is not integral is refused by `integral_parameter_classes` with the
+reason in the error, because with a nonintegral `phi(0)` the locus is not the kernel
+(the transvection must also cancel the base point's fractional part).

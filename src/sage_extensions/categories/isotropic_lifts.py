@@ -363,26 +363,188 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             )
             (section_denominator,) = tuple(section.denominator_ideal(parameter_lattice, target).ideal_generators())
             isotropic_denominator = _vector_denominator(witt.isotropic_vector(), target)
-            period = ring(2) * isotropic_denominator * section_denominator
+            period = self.integral_parameter_period()
             multiplication = Modules(ring).Mor(parameter_lattice, parameter_lattice)(
                 lambda label: parameter_lattice.scalar_multiple(period, parameter_lattice.module_generator(label))
             )
             return multiplication.cokernel_projection()
 
         @cached_method
-        def integral_parameter_classes(self):
-            r"""The complete finite residue locus for integral isometry lifts."""
-            quotient = self.integral_parameter_quotient()
-            lattice = quotient.domain()
+        def integral_parameter_period(self):
+            r"""Return ``m``, the period of the integral parameter quotient.
+
+            Write ``x = base^-1(f_target)`` and choose ``D`` with ``Dx`` integral.  Every
+            integral lift has its parameter in ``P = projection(E)/D``.  If ``e`` has
+            denominator ``A`` and the section of ``P`` has denominator ``B``, then
+            ``m = 2AB`` makes the section of ``mP`` lie in ``2A*E``, and the Eichler
+            formula and its inverse are integral for those parameters
+            (:meth:`integral_parameter_quotient`).
+            """
             source = self.source_reduction().isotropic_embedding().codomain()
             target = self.target_reduction().isotropic_embedding().codomain()
+            ring = source.base_ring()
+            field_map = ring.fraction_field_map()
+            field = field_map.codomain()
+            parameters = self.parameter_space()
+            restricted_parameters = parameters.restrict_scalars(field_map)
+            witt = self._target_witt
+            rational_target = witt.rational_lattice()
+            source_vector = self.base_point().inverse()(witt.dual_isotropic_vector())
+            denominator = _vector_denominator(source_vector, source)
+            projection = self.target_splitting().codomain().projection(1) * self.target_splitting()
+            rationalize = ModulesOverIntegralDomains(target.base_ring())(target).generic_fibre_map()
+            parameter_lattice = restricted_parameters.subobject_on(tuple(
+                restricted_parameters(parameters.scalar_multiple(
+                    field.one() / field_map(denominator),
+                    projection(rationalize(vector).underlying_element()),
+                )) for vector in target.module_generators()
+            ))
+            section = Modules(field).Mor(parameter_lattice.base_change(field_map), rational_target)(
+                lambda label: self._target_section(
+                    parameter_lattice.inclusion()(parameter_lattice.module_generator(label)).underlying_element()
+                )
+            )
+            (section_denominator,) = tuple(section.denominator_ideal(parameter_lattice, target).ideal_generators())
+            isotropic_denominator = _vector_denominator(witt.isotropic_vector(), target)
+            return ring(2) * isotropic_denominator * section_denominator
 
-            def integral(residue):
-                parameter = lattice.inclusion()(quotient.preimage(residue)).underlying_element()
-                lift = self.parameterization()(parameter)
-                return lift.integral_restriction(source, target) is not None
+        @cached_method
+        def integral_parameter_classes(self):
+            r"""The integral residue locus, as the kernel of one map of finite groups.
 
-            return quotient.codomain().elements().condition_set(integral)
+            Write ``f`` for the target's marked isotropic vector, ``phi: P -> T`` for the
+            parameterization (:meth:`parameterization`), ``s`` for the target section and
+            ``L'`` for the target lattice.  Eichler's transvection formula
+            (Gritsenko--Hulek--Sankaran, arXiv:0810.1614, section 3.1, (4)--(5), cited in
+            this module's docstring)
+
+                ``E_{f,x}(y) = y + b(y,x) f - (q(x)/2) b(y,f) f - b(y,f) x``
+
+            gives, for ``L'`` even, that ``E_{f,x}`` is an isometry of ``L'`` **exactly when
+            ``x`` lies in ``L'``**: if ``x`` is in ``L'`` each term is integral, ``q(x)/2``
+            by evenness; conversely a ``y`` with ``b(y,f) = 1``, which a primitive isotropic
+            ``f`` supplies, gives ``x = [b(y,x) - q(x)/2] f - (E(y) - y)``, which lies in
+            ``L'`` because ``f`` does.
+
+            Since ``phi(a) = E_{f,s(a)} phi(0)`` and ``phi(x+y) = E(y) phi(x)``, an
+            **integral base point** ``phi(0)`` makes the integral residue locus the kernel of
+
+                ``a + mP |-> s(a) + L'`` in ``L'^vee/L' = A_{L'}``,
+
+            a subgroup of ``P/mP``.  So the locus is computed here from the parameter
+            module's structure -- the images ``s(a_i)`` of its generators ``a_i`` in
+            ``A_{L'}``, then an integer Smith form of the rational coordinate matrix of
+            those images in a basis of ``L'`` -- and never by listing the elements of
+            ``P/mP``.
+
+            With a base point that is not integral the statement above does not hold: the
+            transvection must then also cancel the fractional part of ``phi(0)``, so the
+            locus is not a kernel.  That case is refused rather than decided here; the
+            reason, and the sizes that make a per-class search unusable, are in
+            ``TRAPS.md``.
+            """
+            from sage.all import QQ, ZZ, gcd, lcm
+            from sage.matrix.constructor import matrix
+
+            from sage_extensions.categories.rings.ring_foundation import _engine_element
+
+            source = self.source_reduction().isotropic_embedding().codomain()
+            target = self.target_reduction().isotropic_embedding().codomain()
+            base = self.base_point()
+            if base.integral_restriction(source, target) is None:
+                raise ValueError(
+                    f"the integral lift locus of {self.reduction_isometry()!r} is not computed "
+                    f"from its parameter module: the base point is not an integral isometry "
+                    f"{source} -> {target}, and with a nonintegral base point integrality is not "
+                    f"constant on the cosets of the transvection period, so the locus is not the "
+                    f"kernel of the class map (see TRAPS.md, '#322'). Ask "
+                    f"integral_base_point_or_none for existence, or supply a torsor whose base "
+                    f"point is integral."
+                )
+            quotient = self.integral_parameter_quotient()
+            parameter_lattice = quotient.domain()
+            classes_module = quotient.codomain()
+            period = self.integral_parameter_period()
+            period_scalar = ZZ(_engine_element(period.parent(), period))
+            labels = tuple(parameter_lattice.module_generating_set())
+            parameter_rank = int(parameter_lattice.module_rank())
+            assert len(labels) == parameter_rank, (
+                f"the parameter lattice {parameter_lattice} must be free on its selected "
+                f"generators for the class map to be read off them, but it has rank "
+                f"{parameter_rank} and {len(labels)} generators"
+            )
+            rational_target = self._target_witt.rational_lattice()
+            inclusion = parameter_lattice.inclusion()
+            # s(a_i) in a basis of L', as one rational column per parameter generator.
+            columns = [
+                rational_target.rational_coordinates(
+                    self._target_section(
+                        inclusion(parameter_lattice.module_generator(label)).underlying_element()
+                    )
+                )
+                for label in labels
+            ]
+            ambient_rank = int(target.module_rank())
+            coordinates = matrix(QQ, ambient_rank, parameter_rank, [
+                entry for column in columns for entry in column.list()
+            ])
+            denominator = ZZ(1)
+            for entry in coordinates.list():
+                denominator = lcm(denominator, ZZ(entry.denominator()))
+            integral_coordinates = matrix(ZZ, ambient_rank, parameter_rank, [
+                ZZ((entry * denominator).numerator()) for entry in coordinates.list()
+            ])
+            # B = U D V with U, V unimodular: B a = U D V a, and U and V preserve the
+            # integrality of a vector up to unimodular change, so B a is in
+            # denominator * Z^ambient_rank exactly when (D V a)_i is in denominator * Z
+            # for every i, that is when (V a)_i is a multiple of
+            # denominator / gcd(D_ii, denominator).
+            smith, _left, right = integral_coordinates.smith_form()
+            steps = tuple(
+                denominator // gcd(abs(smith[index, index]), denominator)
+                for index in range(parameter_rank)
+            )
+            counts = tuple(period_scalar // gcd(step, period_scalar) for step in steps)
+            images = tuple(
+                classes_module(quotient(parameter_lattice.module_generator(label)))
+                for label in labels
+            )
+            zero = classes_module.zero()
+
+            def class_of(coefficients):
+                return sum(
+                    (
+                        classes_module.scalar_multiple(
+                            classes_module.base_ring()(coefficient), image
+                        )
+                        for coefficient, image in zip(coefficients, images)
+                        if coefficient % period_scalar != 0
+                    ),
+                    zero,
+                )
+
+            # w ranges over the multiples of the steps; a = V^-1 w is its parameter.
+            inverse_right = right.inverse()
+            residues = []
+            indices = [0] * parameter_rank
+            while True:
+                multiples = [
+                    ZZ(indices[position]) * step for position, step in enumerate(steps)
+                ]
+                column = inverse_right * matrix(ZZ, parameter_rank, 1, multiples)
+                residues.append(
+                    class_of(tuple(int(entry) % int(period_scalar) for entry in column.list()))
+                )
+                position = 0
+                while position < parameter_rank:
+                    indices[position] += 1
+                    if ZZ(indices[position]) < counts[position]:
+                        break
+                    indices[position] = 0
+                    position += 1
+                if position == parameter_rank:
+                    break
+            return finite_ordered_set(tuple(residues))
 
         @cached_method
         def integral_base_point_or_none(self):

@@ -1921,6 +1921,36 @@ class Modules(OwnedCategoryOverBaseRing):
             r"""Return the selected degree-zero augmentation."""
             return self.selected_module_resolution().augmentation()
 
+        def rational_coordinates(self, element):
+            r"""Return the exact rational coordinates of ``element`` in the selected framing.
+
+            ``element`` is an element of ``self`` over the fraction field of the base ring --
+            for a lattice, a vector of ``L tensor QQ`` -- and this returns its coordinates in
+            the basis ``module_generating_set()``, as a Sage column matrix over ``QQ``.
+
+            The coefficients are the lift of ``element`` through the selected degree-zero
+            augmentation, ``framing_morphism()``, which is an isomorphism from the free
+            module on the framing onto ``self``; they are therefore unique, and the expansion
+            is exact.  The entries are read off the owned ring through its own lowering
+            ``_engine_element`` and converted to the exact rational field, because the callers
+            of this map compare them with the integers: a vector of an integral framed module
+            has integer coordinates, and a vector of its dual lattings outside it has a
+            non-integer coordinate.  The public object of this module stays in the owned
+            modules; only this private crossing exposes the numbers, and it is the one place
+            that conversion is written.
+            """
+            from sage.all import QQ
+            from sage.matrix.constructor import matrix
+
+            from sage_extensions.categories.rings.ring_foundation import _engine_element
+
+            coordinates = tuple(self.framing_morphism().lift(self(element)))
+            scalars = [
+                QQ(_engine_element(coefficient.parent(), coefficient))
+                for coefficient in coordinates
+            ]
+            return matrix(QQ, len(scalars), 1, scalars)
+
         def framing_object(self):
             r"""Return the selected module augmentation as an arrow object."""
             return self.module_category().ArrowCategory()(self.framing_morphism())
