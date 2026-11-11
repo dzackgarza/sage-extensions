@@ -107,6 +107,31 @@ def _pointed_marking(lattice, vector):
     return category, category.object(arrow)
 
 
+def _primitive_isotropic_subobject_or_none(lattice, embedded):
+    r"""Return the primitive totally isotropic subobject spanned by ``embedded``, or ``None``.
+
+    An embedding whose image is neither primitive nor totally isotropic spans
+    no such subobject, and the parabolic's own vector decisions are stated for
+    one; the stabilizer then retains no vector decision instead of receiving
+    one about a different object.
+    """
+    if not embedded:
+        return None
+    subobject = lattice.subobject_on(embedded)
+    if subobject.is_primitive() is not True:
+        return None
+    zero = lattice.base_ring().zero()
+    image = subobject.embedded_module_generators()
+    labels = tuple(subobject.module_generating_set())
+    if any(
+        lattice.b(image[left], image[right]) != zero
+        for left in labels
+        for right in labels
+    ):
+        return None
+    return lattice.primitive_isotropic_subobject(*embedded)
+
+
 def _primitive_pointed_classes(lattice, square):
     r"""Return primitive vector classes of square ``square`` through the frozen marked API."""
     from sage_extensions.categories.lattices import Lattices
@@ -3681,16 +3706,16 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         A linear map that fixes a generating set of \(I\) fixes \(I\)
         pointwise, so the condition is decided on the framing of \(I\).
 
-        The stabilizer is constructed without a ``vector_witness``: the
-        capability that supplied one (the port's ``pairing_slices`` module) is
-        not part of the pinned port, and the witness is not part of this
-        stabilizer's construction at all.  It is an optional decision retained
-        for vector equivalence, and where it is absent
-        ``_subgroup_vector_equivalence_witness`` uses the ambient group's own
-        vector-equivalence decision, which is the same decision.  Requiring the
-        module to construct the stabilizer made every indefinite pointwise
-        stabilizer fail with ``ModuleNotFoundError`` before producing a
-        generator.
+        The stabilizer retains the action owner's own vector decision as its
+        ``vector_witness`` when the image of \(\iota\) is a primitive totally
+        isotropic sublattice: that decision is
+        :meth:`sage_extensions.categories.isotropic_parabolics.PrimitiveIsotropicSubobjects.ParentMethods.pointwise_vector_equivalence_witness`,
+        and it identifies this stabilizer with the pointwise kernel of the
+        parabolic at that subobject, which needs \(I=I^\perp\).  Otherwise no
+        witness is retained, and the stabilizer's vector-equivalence call is then
+        decided by whichever route its supergroup supplies; with none, that call
+        refuses rather than answering from the ambient group, whose orbit is a
+        different relation.
         """
         lattice = self.lattice()
         assert embedding.codomain() is lattice, (
@@ -3698,11 +3723,17 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         )
         source = embedding.domain()
         embedded = tuple(embedding(generator) for generator in source.module_generators())
+        isotropic = _primitive_isotropic_subobject_or_none(lattice, embedded)
         stabilizer = StabilizerSubgroups(self)(
             embedding,
             self.natural_module_action_functor(),
             lambda automorphism: all(automorphism(vector) == vector for vector in embedded),
             description=f"g fixes {embedding} pointwise",
+            vector_witness=(
+                None
+                if isotropic is None
+                else isotropic.pointwise_vector_equivalence_witness
+            ),
         )
         category = CosliceCategory(lattice.lattice_category(), source)
         marked = category.object(embedding)
@@ -3724,14 +3755,14 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         \(P_I\), whose Levi action on \(I^\perp/I\) and unipotent radical are
         read off the isotropic reduction of \(\iota\).
 
-        The stabilizer is constructed without a ``vector_witness``, for the
-        reason :meth:`pointwise_stabilizer` states: the port's
-        ``pairing_slices`` module is not part of the pinned port, and the
-        witness is an optional retained decision, not part of the generator
-        computation.  With the import in place every indefinite setwise
-        stabilizer -- the setwise stabilizer of an isotropic plane in
-        particular -- failed with ``ModuleNotFoundError`` before producing a
-        generator.
+        When the image of \(\iota\) is a primitive totally isotropic sublattice
+        the stabilizer retains that subobject's own vector decision,
+        :meth:`sage_extensions.categories.isotropic_parabolics.PrimitiveIsotropicSubobjects.ParentMethods.vector_equivalence_witness`,
+        which answers with a witness when the pointwise kernel supplies one and
+        otherwise refuses, naming the image of the parabolic in \(O(I^\perp)\) as
+        the undecided part.  Without such an image no witness is retained, and
+        the stabilizer's vector-equivalence call then refuses rather than
+        answering from the ambient group, whose orbit is a different relation.
         """
         lattice = self.lattice()
         assert embedding.codomain() is lattice, (
@@ -3744,11 +3775,15 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             inverse = automorphism.inverse()
             return all(embedding.is_in_image(automorphism(vector)) and embedding.is_in_image(inverse(vector)) for vector in embedded)
 
+        isotropic = _primitive_isotropic_subobject_or_none(lattice, embedded)
         stabilizer = StabilizerSubgroups(self)(
             embedding,
             self.natural_module_action_functor(),
             preserves_image,
             description=f"g(im({embedding}))=im({embedding})",
+            vector_witness=(
+                None if isotropic is None else isotropic.vector_equivalence_witness
+            ),
         )
         from sage_extensions.categories.abstract_categories.products import (
             FiniteOrdinalCategory,
@@ -4024,14 +4059,20 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         return None
 
     def vector_orbit_set(self, square, subgroup=None):
-        r"""Return the orbit set of ``subgroup`` (default ``O(L)``) on primitive vectors of ``square``.
+        r"""Return one representative per orbit of ``subgroup`` (default ``O(L)``) on the vectors of ``square``.
 
-        The set may be infinite. It iterates one vector per orbit by height, with exact
-        equivalence and transporters, and makes no finiteness claim (#53).
+        The representatives come from the acting group's own orbit
+        computation: ``O(L)``'s representatives of the square-``square`` shell,
+        split by the subgroup's finite character quotient where it has one
+        (``_subgroup_vector_orbit_representatives``), and the finite listing of
+        a definite lattice's subgroup where that listing exists.  A subgroup
+        whose orbits are neither split by a finite character quotient nor
+        listable -- a predicate subgroup over an indefinite lattice, for
+        instance -- refuses there, and that refusal is what this call raises:
+        no orbit of an infinite group is enumerated here.
         """
-        from sage_indefinite_port.indefinite.pairing_slices import SubgroupVectorOrbits
-
-        return SubgroupVectorOrbits(self.domain(), self if subgroup is None else subgroup, square)
+        group = self if subgroup is None else subgroup
+        return group.vector_orbit_representatives(square)
 
     def vectors_are_equivalent(self, left, right) -> bool:
         r"""Return whether two vectors lie in the same ``O(L)``-orbit."""

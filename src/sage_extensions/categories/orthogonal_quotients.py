@@ -1725,8 +1725,21 @@ def _finite_supergroup_elements(subgroup):
 
 
 def _finite_subgroup_vector_orbit_representatives(subgroup, square):
-    r"""Return one representative of each orbit of a listable subgroup."""
+    r"""Return one representative of each orbit of a listable subgroup.
+
+    The listing runs through the subgroup's action on the vectors of
+    ``square``, which is finite only when the lattice is definite: for an
+    indefinite lattice the vector set of a square is infinite whenever it is
+    nonempty, and the orbits of an infinite group on it are not enumerated here.
+    """
     lattice = subgroup.supergroup().domain()
+    assert lattice.is_definite(), (
+        f"cannot list the orbits of {subgroup}: it is cut out by a predicate that "
+        f"is not a character kernel, so its orbits are read by listing the subgroup "
+        f"inside O(L) acting on the vectors of square {square}, and {lattice} is not "
+        f"definite.  "
+        + _MISSING_ARITHMETIC_GENERATING_SET
+    )
     action = FiniteGSets(subgroup)(
         lattice.vectors_of_square(square),
         lambda automorphism, vector: automorphism(vector),
@@ -1837,6 +1850,23 @@ def _preimage_vector_witness(subgroup, source, target):
 
 
 def _subgroup_vector_equivalence_witness(subgroup, left, right):
+    r"""Return an element of ``subgroup`` carrying ``left`` onto ``right``, or ``None``.
+
+    Four routes, in order:
+
+    * the subgroup's action owner retained its own exact decision
+      (``owned_vector_witness``), which is used as it stands;
+    * the subgroup is the preimage of a finite-image subgroup along a morphism
+      on an indefinite lattice: the witnesses of ``left |-> right`` inside the
+      supergroup form the coset of the supergroup's stabilizer of ``right``, and
+      that coset is walked through the images in the finite quotient;
+    * the subgroup is a character kernel: a supergroup witness is adjusted into
+      the subgroup inside the finite character quotient;
+    * otherwise the subgroup is listed inside a finite ``O(L)``, which exists
+      only for a definite lattice; for an indefinite one that listing refuses
+      rather than answering, because the supergroup's orbit is a strictly larger
+      relation than the subgroup's.
+    """
     orthogonal_group = subgroup.supergroup()
     owned = getattr(subgroup, "owned_vector_witness", None)
     if owned is not None and owned() is not None:

@@ -37,11 +37,55 @@ return; see ``isotropic_quotient_projection`` below.
 from sage.matrix.constructor import matrix
 from sage.misc.cachefunc import cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
+from sage.structure.element import parent as element_parent
 
 from sage_extensions.categories.modules.pure.modules import ModuleSubobjects
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
 )
+
+
+def _integral_solution(system, target):
+    r"""Return one integral solution of ``system * x = target``, or ``None`` when there is none.
+
+    ``system`` is a matrix over `ZZ` and ``target`` a column of its height.
+    Smith normal form writes ``U * system * V = S`` with ``S`` diagonal, so
+    ``system * x = target`` has an integral solution exactly when
+    ``U * target`` is divisible entry by entry by the diagonal of ``S`` and
+    vanishes past its rank; then ``x = V * (S^-1 * U * target)``.  Both answers
+    are exact: a solution is never missed and a non-solution is never returned.
+    """
+    diagonal, left, right = system.smith_form()
+    transformed = left * target
+    rows, columns = system.nrows(), system.ncols()
+    coordinates = [SageZZ.zero() for _ in range(columns)]
+    for position in range(rows):
+        entry = transformed[position, 0]
+        pivot = (
+            diagonal[position, position]
+            if position < min(rows, columns)
+            else SageZZ.zero()
+        )
+        if pivot:
+            if entry % pivot:
+                return None
+            coordinates[position] = entry // pivot
+        elif entry:
+            return None
+    solution = right * matrix(SageZZ, [[entry] for entry in coordinates])
+    values = tuple(solution[position, 0] for position in range(columns))
+    assert system * matrix(SageZZ, [[entry] for entry in values]) == target, (
+        f"the Smith-normal-form solution of {system} * x = {target} does not satisfy it"
+    )
+    return values
+
+
+def _content(values):
+    r"""Return the content of an integer vector: the gcd of its entries, and zero for the zero vector."""
+    content = SageZZ.zero()
+    for value in values:
+        content = content.gcd(SageZZ(value))
+    return abs(content)
 
 
 def general_linear_images(vectors):
@@ -402,6 +446,179 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             )
             return self.ambient_lattice().Aut().isotropic_equivalence_witness(
                 self, other
+            )
+
+        def _kernel_parameter_witness(self, source, target):
+            r"""Solve ``k(source) = target`` for one element ``k`` of the pointwise kernel, or ``None``.
+
+            The kernel is ``K = ker(P_I -> O(I^perp))`` and its elements act on
+            the ambient lattice by ``x |-> x + N(pi(x))`` with
+            ``N: L/I^perp -> rad(I^perp)`` linear, which is the parametrization
+            :meth:`IsotropicReductions._pointwise_perpendicular_kernel_data`
+            retains: there ``N`` runs over the complete integral solution module
+            of the homogeneous isometry equations
+            ``b(N f_a, f_b) + b(f_a, N f_b) = 0``, so the assignment
+            ``parameter |-> 1 + N`` is a homomorphism from an additive lattice to
+            ``K`` and every element of ``K`` is one of its values.  On a vector
+            ``x`` the displacement is therefore linear in the parameter, and
+            ``k(source) = target`` is one integer linear system, solved exactly
+            by Smith normal form.  ``None`` is the exact statement that ``K``
+            carries ``source`` onto ``target``; the returned isometry is checked
+            against the two endpoints before it leaves this method.
+            """
+            lattice = self.ambient_lattice()
+            reduction = self.isotropic_reduction()
+            parameters = reduction.pointwise_perpendicular_parameter_module()
+            labels = tuple(parameters.module_generating_set())
+            ring = parameters.base_ring()
+            source_coordinates = self.coordinates(source)
+            target_coordinates = self.coordinates(target)
+            if not labels:
+                return lattice.Aut().one() if source_coordinates == target_coordinates else None
+            columns = []
+            for label in labels:
+                isometry = reduction.pointwise_perpendicular_isometry(
+                    parameters.module_generator(label)
+                )
+                image = self.coordinates(isometry(source))
+                columns.append(
+                    [
+                        reached - start
+                        for reached, start in zip(image, source_coordinates, strict=True)
+                    ]
+                )
+            rows = [
+                [column[position] for column in columns]
+                for position in range(len(source_coordinates))
+            ]
+            displacement = [
+                reached - start
+                for reached, start in zip(target_coordinates, source_coordinates, strict=True)
+            ]
+            values = _integral_solution(
+                matrix(SageZZ, rows),
+                matrix(SageZZ, [[entry] for entry in displacement]),
+            )
+            if values is None:
+                return None
+            parameter = parameters.zero()
+            for entry, label in zip(values, labels, strict=True):
+                parameter = parameter + ring(int(entry)) * parameters.module_generator(label)
+            isometry = reduction.pointwise_perpendicular_isometry(parameter)
+            assert isometry(source) == target, (
+                f"the pointwise-kernel parameter solving {source} |-> {target} does not carry "
+                f"{source} onto {target}: it carries it onto {isometry(source)}"
+            )
+            return isometry
+
+        def pointwise_vector_equivalence_witness(self, left, right):
+            r"""Return one element of the pointwise stabilizer of ``I`` carrying ``left`` onto ``right``, or ``None``.
+
+            ``left`` and ``right`` are vectors of the ambient lattice, and the
+            pointwise stabilizer is ``{g in O(L) : g(iota(I)) = iota(I) pointwise}``.
+
+            When ``I`` is maximal isotropic, i.e. ``I = I^perp``, that group is
+            exactly ``K = ker(P_I -> O(I^perp))``: an element fixing ``I``
+            pointwise stabilizes ``I^perp`` and acts trivially on the whole of
+            ``I = I^perp``, and conversely an element fixing ``I^perp``
+            pointwise fixes ``I``.  That hypothesis is asserted here, and the
+            kernel is the one
+            :meth:`IsotropicReductions._pointwise_perpendicular_kernel_data`
+            retains as a complete integral parameter module, so
+            :meth:`_kernel_parameter_witness` decides ``k(left) = right`` for
+            ``k`` in the whole pointwise stabilizer and not merely for some
+            selected generators of it.
+
+            The answer is therefore a decision: ``None`` says that no element of
+            the pointwise stabilizer carries ``left`` onto ``right``.  No element
+            of the infinite group is listed and no generating family of it is
+            selected.
+            """
+            assert self.isotropic_perpendicular().module_rank() == self.module_rank(), (
+                f"the pointwise stabilizer of {self} is not its pointwise kernel: "
+                f"that identification needs I = I^perp, and {self} has rank "
+                f"{int(self.module_rank())} in a perpendicular of rank "
+                f"{int(self.isotropic_perpendicular().module_rank())}"
+            )
+            lattice = self.ambient_lattice()
+            source = left if element_parent(left) is lattice else lattice(left)
+            target = right if element_parent(right) is lattice else lattice(right)
+            return self._kernel_parameter_witness(source, target)
+
+        def vector_equivalence_witness(self, left, right):
+            r"""Return one element of ``P_I = Stab_{O(L)}(I)`` carrying ``left`` onto ``right``, or ``None``, or refuse.
+
+            ``left`` and ``right`` are vectors of the ambient lattice.  The
+            parabolic is the semidirect-like product of its Levi factor and its
+            unipotent radical, ``1 -> U_I -> P_I -> M_I -> 1`` with
+            ``M_I <= GL(I) x O(I^perp/I)`` (this module's own statement at the
+            top of the file), so a witness in ``P_I`` is a unipotent element
+            composed with a Levi element and the decision below is exact on the
+            unipotent part:
+
+            * ``q(left) != q(right)``: ``None``, because every element of ``P_I``
+              is an isometry of ``L`` and preserves the quadratic form.
+            * the content of ``b(left, -)|_I`` differs from the content of
+              ``b(right, -)|_I``, or the content of ``b(-, left)`` differs from
+              the content of ``b(-, right)``: ``None``, because an element of
+              ``P_I`` carries ``I`` onto ``I`` bijectively and hence acts on
+              ``Hom(I, ZZ)`` and on ``Hom(L, ZZ)`` by unimodular changes of
+              coordinates, which preserve the content, the gcd of the values on
+              a basis.
+            * the pointwise kernel ``K = ker(P_I -> O(I^perp))`` carries ``left``
+              onto ``right``: that element is returned, solved for exactly as
+              :meth:`_kernel_parameter_witness` does, and ``K`` is a subgroup of
+              ``P_I``.  ``K`` lies in the unipotent radical ``U_I``, and equals it
+              when ``I = I^perp``, so this decides the unipotent part of the
+              parabolic on a maximal isotropic subobject.
+            * otherwise the call refuses.  What remains undecided is the image of
+              ``P_I`` in ``O(I^perp)``, whose orbits on the reduction are not
+              computed here: the closed-form Levi lifts are
+              :meth:`levi_lift_generators`, and turning those generators into an
+              orbit decision on ``I^perp/I`` is the missing step.
+
+            ``None`` is therefore a decision, and this call never answers
+            ``None`` because it failed to find a witness.  No element of the
+            infinite group is listed and no generating family of it is selected.
+            """
+            lattice = self.ambient_lattice()
+            source = left if element_parent(left) is lattice else lattice(left)
+            target = right if element_parent(right) is lattice else lattice(right)
+            if lattice.q(source) != lattice.q(target):
+                return None
+            if _content(self._reduction_values(source)) != _content(
+                self._reduction_values(target)
+            ):
+                return None
+            if _content(self._dual_values(source)) != _content(self._dual_values(target)):
+                return None
+            witness = self._kernel_parameter_witness(source, target)
+            if witness is not None:
+                return witness
+            raise ArithmeticError(
+                f"cannot decide whether {source} and {target} are equivalent under "
+                f"{self.parabolic_subgroup()}: they have the same square "
+                f"{lattice.q(source)} and the same reduction contents, and no element of the "
+                f"pointwise kernel ker(P_I -> O(I^perp)) carries one onto the other.  The "
+                f"remainder of the parabolic is its image in O(I^perp); its orbits on the "
+                f"reduction I^perp/I are not computed here, so neither answer is claimed"
+            )
+
+        def _reduction_values(self, vector):
+            r"""Return the values of ``b(vector, -)`` on the generators of ``I``."""
+            lattice = self.ambient_lattice()
+            embedded = self.embedded_module_generators()
+            return tuple(
+                int(lattice.b(vector, embedded[label]))
+                for label in self.module_generating_set()
+            )
+
+        def _dual_values(self, vector):
+            r"""Return the values of ``b(-, vector)`` on the generators of the ambient lattice."""
+            lattice = self.ambient_lattice()
+            return tuple(
+                int(lattice.b(generator, vector))
+                for generator in lattice.module_generators()
             )
 
 
