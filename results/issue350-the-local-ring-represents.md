@@ -104,3 +104,42 @@ library does not have (the local \(p\)-adic decision it does have is
 `_Genus.local_representations`, used inside `represents` for the `ZZ` case), and the second
 would change the meaning of an inherited module method that other callers use. The local
 half of the paper's argument is therefore stated, not asserted.
+
+## Adjustment: no typed value survives, and the verdicts come from card 0026
+
+Every assertion the module makes is now either read by tag or computed from the lattice.
+
+| assertion at `9cbc5fa` | disposition |
+| --- | --- |
+| `lattice.determinant() == -2401` | **deleted** — an invariant of the test's own Gram matrix, not a value |
+| `signature_pair().first() == 1`, `.second() == 2` | **deleted**, same reason |
+| `lengths.cardinality() == 6`, the six listed divisors | **deleted** — a derivation in the docstring, not a card |
+| `lengths.cardinality() == 10`, the ten listed divisors, `4 not in lengths`, `21 not in lengths` | **deleted** |
+| the same test, replaced by the property | **kept, changed**: `bound = 2 * lattice.discriminant_module().exponent()` per lattice, and every returned length is checked to divide it — no length and no divisor typed |
+| `is_reflective(max_decompositions=200) is True` (twice) | **kept, changed** to `is bool(card 0026's hyperbolic.reflective)` |
+| `edgewalk_is_reflective() is True` | **kept, changed** to `is bool(card 0026's hyperbolic.reflective)` |
+| `is_cocompact(max_decompositions=200) is False` | **deleted** — no card field holds cocompactness |
+| `not lattice.represents(1)` on the Bogachev--Kolpakov form | **deleted** — no card holds it; the test that held it is deleted, since nothing else remained in it |
+| `roots.cardinality() >= 3`, `walls.cardinality() >= 3`, the per-root involution/negation checks | **kept** — structural claims about what the walk returns, not lattice values |
+
+The reflective verdict is read once from the digest's `hyperbolic_reflectivity` row for card
+`0026` (`U + A1(-1)`, Gram `[[0,1,0],[1,0,0],[0,0,-2]]`, `reflective: true`, certified), and the
+lattice the module builds is checked against that card's Gram, so the comparison is about the
+card's lattice and not a lookalike. The test whose subject was the Bogachev--Kolpakov form is
+gone with its assertion, and the docstring sentences that stated what the library does not do
+or what the test does not ask went with it.
+
+Runs on the adjusted module:
+
+```
+$ pytest tests/lattices/test_reflection_hyperbolic.sage --durations=0
+....                                                                     [100%]
+1.51s  test_the_edgewalk_and_vinbergs_algorithm_agree_that_u_plus_a1_is_reflective
+0.71s  test_vinberg_enumeration_closes_the_polyhedron_of_u_plus_a1
+0.47s  test_vinbergs_criterion_bounds_the_root_lengths_of_the_bogachev_kolpakov_lattices
+4 passed in 3.09s
+
+$ just test-push
+Push syntax: 29 file(s) checked; no errors.
+exit 0
+```

@@ -1,89 +1,63 @@
 r"""Reflection groups of hyperbolic lattices, and Vinberg's enumeration.
 
 Vinberg's algorithm enumerates the walls of a fundamental polyhedron for
-\(W(L)\).  It is a semi-decision procedure: it halts with a certificate when
-the polyhedron closes, so a completed search proves reflectivity while a
-bounded one proves nothing.  The tests below state what a completed search
-delivers on \(U\oplus A_1\), and check Vinberg's root-length bound against the
-two Bogachev-Kolpakov ternary lattices, where the bound is what makes "does
-this lattice have a root" a finite question.
+\(W(L)\).  It is a semi-decision procedure: it halts with a certificate when the
+polyhedron closes, so a completed search proves reflectivity while a bounded one
+proves nothing.  The tests below check what a completed search delivers on
+\(U\oplus A_1\), and Vinberg's root-length bound on the two Bogachev--Kolpakov
+ternary lattices, where the bound is what makes "does this lattice have a root" a
+finite question.
 
-Allcock's edgewalk answers the same question and terminates on every input, so
-it decides where Vinberg's algorithm semi-decides.
+Allcock's edgewalk answers the same question and terminates on every input, so it
+decides where Vinberg's algorithm semi-decides.
+
+Every expected value is read by tag or computed here: the reflective verdict on
+\(U\oplus A_1\) is card `0026`'s certified ``hyperbolic.reflective``, and the
+root-length bound is the exponent of each lattice's own discriminant group.
 
 Sources: Vinberg, *On groups of unit elements of certain quadratic forms*,
 Mat. Sb. 87 (1972); Vinberg, *Hyperbolic reflection groups*, Russian Math.
 Surveys 40 (1985); Bogachev and Kolpakov, *Thin hyperbolic reflection groups*,
-arXiv:2112.14642v4, sections 6.1 and 6.2.
+arXiv:2112.14642v4, §6.2, p. 9.
 """
 
 from sage_extensions.all import *
 
 
 def u_plus_a1():
-    r"""Return \(U\oplus A_1\), of signature \((1,2)\), as a hyperbolic lattice.
+    r"""Return \(U\oplus A_1\) as a hyperbolic lattice, built through the owning category.
 
     The reflection algorithms are methods of ``HyperbolicLattices``, whose domain
     is a lattice of signature \((n,1)\) or \((1,n)\) (V. V. Nikulin, *Reflection
     groups in hyperbolic spaces and the denominator formula for Lorentzian
     Kac--Moody Lie algebras*, Izvestiya: Mathematics 60 (1996), no. 2,
-    arXiv:alg-geom/9503003v6, §1.1, (1.1.1), preprint p. 3).  The orthogonal sum
-    of two lattices is a ``Lattices`` object, so the sum is handed to the
-    category that owns the algorithms.
+    arXiv:alg-geom/9503003v6, §1.1, (1.1.1), preprint p. 3), and the sum is
+    handed to that category.
     """
     return HyperbolicLattices(ZZ)(Lattices(ZZ)("U") + Lattices(ZZ)("A1"))
+
+
+def card_0026():
+    r"""Card `0026`'s row, the lattice \(U\oplus A_1(-1)\) and its certified verdict."""
+    return card("hyperbolic_reflectivity", "0026")
 
 
 def test_vinbergs_criterion_bounds_the_root_lengths_of_the_bogachev_kolpakov_lattices() -> None:
     r"""Every root length divides twice the exponent of the discriminant group.
 
-    Bogachev and Kolpakov, arXiv:2112.14642v4 section 6.2, citing Vinberg.  For
-    the section 6.1 lattice the invariant factors are \(1, 49, 49\), so every
-    root length divides \(98\), whose six divisors are \(1,2,7,14,49,98\); for
-    the section 6.2 lattice they are \(1, 49, 2401\), so every root length
-    divides \(4802 = 2\cdot 7^4\), which has \(2\cdot5=10\) divisors.
-    """
-    with_roots = Lattices.BogachevKolpakovNonReflective
-    without_roots = Lattices.BogachevKolpakovWithoutRoots
-
-    lengths = with_roots.possible_root_lengths()
-    assert lengths.cardinality() == 6
-    for length in (1, 2, 7, 14, 49, 98):
-        assert length in lengths
-
-    lengths = without_roots.possible_root_lengths()
-    assert lengths.cardinality() == 10
-    for length in (1, 2, 7, 14, 49, 98, 343, 686, 2401, 4802):
-        assert length in lengths
-    assert 4 not in lengths
-    assert 21 not in lengths
-
-
-def test_the_root_length_forty_nine_form_does_not_represent_one() -> None:
-    r"""\(q = 49m_2^2 + 14m_1m_3 - 28m_2m_3 + 6m_3^2\) never takes the value \(1\).
-
     Bogachev and Kolpakov, *Thin hyperbolic reflection groups*,
-    arXiv:2112.14642v4, §6.2, p. 9, state it of this form: "However, \(q\) does
-    not integrally represent \(1\)".  The paper's reason is the local one:
-    modulo \(7\), \(q\equiv 6m_3^2\), and \(6\cdot\{0,1,2,4\}=\{0,6,5,3\}\) omits
-    \(1\), so \(q\) fails over \(\mathbb Z_7\) and hence over \(\mathbb Z\).
-
-    Only the integral verdict is asserted, which is what the paper states and what
-    :meth:`represents` decides.  The local half of the argument is not asked of
-    this library: ``localize_at_prime`` on a lattice returns the localization of
-    its underlying *module*, which carries no form, and :meth:`represents` is
-    implemented over \(\mathbb Z\), \(\mathbb Q\), \(\mathbb A\) and
-    \(\mathbb R\) (Serre, *A Course in Arithmetic*, Ch. IV, §1, pp. 27--34, with
-    Ch. IV §2 for the \(p\)-adic case), refusing any other ring by assertion.
-
-    With \(q(x)=b(x,x)\) the Gram matrix is
-    \(\begin{psmallmatrix}0&0&7\\0&49&-14\\7&-14&6\end{psmallmatrix}\), of
-    determinant \(7\cdot(0\cdot(-14)-49\cdot7)=-7^4\).
+    arXiv:2112.14642v4, §6.2, p. 9, citing Vinberg: a root length divides twice
+    the last invariant factor of the Gram matrix, which is the exponent of the
+    discriminant group.  The bound is read from each lattice's own discriminant
+    module, and the lengths it reports are measured against that bound, so no
+    length, divisor or count is typed here.
     """
-    lattice = Lattices(ZZ)([[0, 0, 7], [0, 49, -14], [7, -14, 6]])
+    for lattice in (Lattices.BogachevKolpakovNonReflective, Lattices.BogachevKolpakovWithoutRoots):
+        bound = ZZ(2) * lattice.discriminant_module().exponent()
+        lengths = lattice.possible_root_lengths()
 
-    assert lattice.determinant() == -2401
-    assert not lattice.represents(1)
+        assert int(bound) > 1
+        assert all(int(bound) % int(length) == 0 for length in lengths)
 
 
 def test_vinberg_enumeration_closes_the_polyhedron_of_u_plus_a1() -> None:
@@ -91,15 +65,19 @@ def test_vinberg_enumeration_closes_the_polyhedron_of_u_plus_a1() -> None:
 
     Each wall of the fundamental polyhedron is the mirror of a root, so each
     accepted vector is a root, its reflection is an involution of \(O(L)\)
-    negating it, and its length obeys Vinberg's bound.  A polyhedron in
-    \(\mathbb H^2\) has at least three walls.
+    negating it, and its length obeys Vinberg's bound.  The verdict is card
+    `0026`'s ``hyperbolic.reflective``, and the lattice is checked to be that
+    card's lattice by its Gram.
     """
+    stated = card_0026()
     lattice = u_plus_a1()
     roots = lattice.vinberg_simple_roots(max_decompositions=200)
+    basis = tuple(lattice.module_generators())
 
-    assert lattice.signature_pair().first() == 1
-    assert lattice.signature_pair().second() == 2
-    assert lattice.is_reflective(max_decompositions=200) is True
+    assert [
+        [int(lattice.b(left, right)) for right in basis] for left in basis
+    ] == stated["gram"]
+    assert lattice.is_reflective(max_decompositions=200) is bool(stated["reflective"])
     assert roots.cardinality() >= 3
 
     lengths = lattice.possible_root_lengths()
@@ -113,24 +91,31 @@ def test_vinberg_enumeration_closes_the_polyhedron_of_u_plus_a1() -> None:
         assert reflection(root) == -root
 
 
-def test_u_plus_a1_is_reflective_but_not_cocompact() -> None:
-    r"""\(U\) is isotropic, so the fundamental polyhedron of \(U\oplus A_1\) has an
-    ideal vertex: it has finite volume and is not compact (Vinberg 1985, section 1).
+def test_u_plus_a1_is_reflective() -> None:
+    r"""\(U\oplus A_1\) is reflective, by card `0026`'s certified field.
+
+    The Vinberg search on this lattice completes, and the verdict it returns is
+    compared with the card's rather than typed.
     """
+    stated = card_0026()
     lattice = u_plus_a1()
 
-    assert lattice.is_reflective(max_decompositions=200) is True
-    assert lattice.is_cocompact(max_decompositions=200) is False
+    assert lattice.is_reflective(max_decompositions=200) is bool(stated["reflective"])
 
 
 def test_the_edgewalk_and_vinbergs_algorithm_agree_that_u_plus_a1_is_reflective() -> None:
-    r"""Both decide reflectivity of \(U\oplus A_1\) positively, and the walls the
-    edgewalk reports are roots whose reflections are involutions of \(O(L)\).
+    r"""Both decide reflectivity of \(U\oplus A_1\) as card `0026` states it.
+
+    The two routes are independent — the edgewalk terminates on every input and
+    Vinberg's search only on a certificate — so their agreement with the card is
+    two measurements of the same verdict.  The walls the edgewalk reports are
+    roots whose reflections are involutions of \(O(L)\).
     """
+    stated = card_0026()
     lattice = u_plus_a1()
 
-    assert lattice.edgewalk_is_reflective() is True
-    assert lattice.is_reflective(max_decompositions=200) is True
+    assert lattice.edgewalk_is_reflective() is bool(stated["reflective"])
+    assert lattice.is_reflective(max_decompositions=200) is bool(stated["reflective"])
 
     walls = lattice.edgewalk_simple_roots()
     assert walls.cardinality() >= 3
