@@ -25,7 +25,7 @@ What is read, and from where:
 | `arithmetic_groups[tag].citation` | same | `data.reference.citation` — the paper, its table and page |
 | `polarization_counts.rows[degree].primitive_classes`, `.group_classes` | `lattices/0128.md` | `integral.polarization_counts.{2d}.#h`, `.#Γ̄_h` |
 | `polarization_counts.rows[degree].citation` | same | `integral.polarization_counts.{2d}.reference.citation` |
-| `plane_orbits[tag].rows[group].planes`, `.citation` | `lattices/6JRX.md`, `lattices/6JRY.md` | `integral.primitive_orbits.{O,O+}.planes`, `reference.citation` |
+| `plane_orbits[tag].rows[group].planes`, `.orbit_lengths`, `.lines`, `.citation` | `lattices/6JRX.md`, `lattices/6JRY.md`, `lattices/029J.md` | `integral.primitive_orbits.{group}.planes`, `.orbit_lengths`, `.constant` (the line count), `reference.citation` |
 | `discriminant_forms[tag].orthogonal_group_order`, `.isotropic_classes`, `.isotropic_orbits` | `lattices/6JRR.md` | `integral.discriminant_form` |
 | `discriminant_forms[tag].certification` | same | `certifications.integral.discriminant_form` — the stamp the database computed the block under |
 

@@ -102,14 +102,17 @@ def lattice_table4(ref: str, tag: str) -> dict:
 def plane_orbits(ref: str, tag: str) -> dict:
     """The primitive-isotropic rows of one lattice card: its planes, and its lines.
 
-    A card's group row carries ``planes`` (the 1-dimensional cusps) and, where it
-    states them, ``constant``: the number of its 0-dimensional cusps, which are the
-    primitive isotropic *lines*.  ``029J``'s ``Otilde+`` row states both -- 528 lines
-    and 24242 planes -- and names ``Otilde^+(N)`` acting on ``N = U + U(2) + E8(-2)``
+    A card's group row carries ``planes`` (the 1-dimensional cusps), ``constant``
+    where it states it (the number of its 0-dimensional cusps, which are the
+    primitive isotropic *lines*), and ``orbit_lengths`` where its source states the
+    sizes of the plane orbits and not only how many there are.  ``029J``'s
+    ``Otilde+`` row states all three -- 528 lines, 24242 planes and their split
+    527 + 23715 -- and names ``Otilde^+(N)`` acting on ``N = U + U(2) + E8(-2)``
     for them (Dutour Sikirić--Hulek, arXiv:2302.01679v2, section 3.6, p. 22), so a
-    line count is read from the card by tag here and the ``constant`` key is renamed
-    to the ``lines`` it states.  A row keeping only one of the two is kept with the
-    one it has.
+    line count is read from the card by tag here and the ``constant`` key is
+    renamed to the ``lines`` it states, and the per-orbit lengths are kept as the
+    list the card states, in its citation's order.  A row keeping only some of them
+    is kept with the ones it has.
     """
     path = LATTICE_PATH.format(tag=tag)
     card = front_matter(fetch(ref, path), path)
@@ -125,6 +128,11 @@ def plane_orbits(ref: str, tag: str) -> dict:
         "rows": {
             group: {
                 **({"planes": row["planes"]} if "planes" in row else {}),
+                **(
+                    {"orbit_lengths": [int(length) for length in row["orbit_lengths"]]}
+                    if row.get("orbit_lengths") is not None
+                    else {}
+                ),
                 **({"lines": row["constant"]} if "constant" in row else {}),
                 "citation": row["reference"]["citation"],
             }
@@ -197,7 +205,7 @@ def main(argv: list[str]) -> int:
                     "parent_group",
                 ],
                 "lattice": "integral.polarization_counts.{degree}.{#h,#Γ̄_h,reference.citation}",
-                "plane_orbits": "integral.primitive_orbits.{group}.planes and .constant(the line count),reference.citation",
+                "plane_orbits": "integral.primitive_orbits.{group}.planes and .orbit_lengths(per-orbit sizes) and .constant(the line count),reference.citation",
                 "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
             },
             "generated_by": "tests/cards/refresh_lattice_database_enriques.py",

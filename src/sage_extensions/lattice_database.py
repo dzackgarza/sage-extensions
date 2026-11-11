@@ -109,37 +109,32 @@ def card_line_orbit_row(tag: str, group: str) -> int:
     return rows[group]["lines"]
 
 
-# The card's own words for a split of a plane row into orbit lengths: lattice
-# card 029J states its two Otilde^+ plane orbits as "the 24242 planes in two
-# orbits, of lengths 527 and 23715".  The digest keeps only the totals as
-# structured fields, so this phrasing is what a per-orbit length is read from.
-_ORBIT_LENGTH_PHRASE = re.compile(
-    r"(\d+)\s+planes in two orbits, of lengths (\d+) and (\d+)"
-)
-
+# Card 029J used to state its two Otilde^+ plane orbits as "the 24242 planes in
+# two orbits, of lengths 527 and 23715" inside the row's citation, and this module
+# read the split out of that sentence.  `dzackgarza/lattice-database` d6a5393
+# states it as the row's own `orbit_lengths` field instead and the digest carries
+# the field, so no sentence is parsed for a plane row any more.
 
 def card_plane_orbit_lengths(tag: str, group: str):
     r"""Return card ``tag``'s per-orbit numbers for the primitive isotropic planes under ``group``.
 
-    The digest's structured rows hold only the *total* number of primitive
-    isotropic planes of a row (`card_plane_orbit_row`), because
-    ``integral.primitive_orbits.{group}.planes`` is the only per-group number
-    the lattice cards state as a field.  The split of that total into the
-    lengths of the individual orbits is stated in the row's own citation, which
-    the digest keeps verbatim; this function reads the split there, and returns
-    it sorted.
+    The row's ``orbit_lengths`` field is the card's own record of the sizes of
+    those orbits, in the order its citation names them
+    (``integral.primitive_orbits.{group}.orbit_lengths`` on the card, which
+    ``tests/cards/refresh_lattice_database_enriques.py`` emits as the row's
+    ``orbit_lengths``): ``dzackgarza/lattice-database`` d6a5393 states it for
+    ``029J``'s ``O`` and ``Otilde+`` rows, 527 and 23715, beside the row total and
+    the row's count of orbits.  Nothing here parses a sentence.
 
-    Filing the split as a structured row on ``dzackgarza/lattice-database``
-    would be the better place for it, and is not done here: this project's
-    GitHub connection is scoped to the one connected repository and cannot
-    write to another one.  The card's recorded statement is therefore the
-    authority used, with the two checks below.
-
-    The reading is checked against the row itself before it is returned: the
-    lengths must add up to the card's total for that row, and their number must
-    be the card's own count of orbits (the ``O`` row states that count for
-    ``029J``).  Either check failing raises instead of returning numbers that
-    the card does not support.
+    The reading is checked against the row before it is returned: the lengths
+    must agree with the card's ``planes`` for that row under one of the two
+    readings the card's own schema allows — a source that counts orbits states
+    the count (``029J``'s ``O`` row states 2), and a source that counts planes
+    states the total (its ``Otilde+`` row states 24242) — and their number must
+    be the card's own count of orbits where the card states one.  Either check
+    failing raises instead of returning numbers the card does not support, and a
+    row that states the total without the split raises rather than falling back
+    to its citation.
     """
     digest = _digest()
     card = digest.get("plane_orbits", {}).get(tag)
@@ -154,27 +149,21 @@ def card_plane_orbit_lengths(tag: str, group: str):
             f"lattice card {tag} states no primitive-isotropic-plane row for {group!r}: "
             f"it states {sorted(rows)}"
         )
-    citation = rows[group]["citation"]
-    match = _ORBIT_LENGTH_PHRASE.search(citation)
-    if match is None:
+    if "orbit_lengths" not in rows[group]:
         raise KeyError(
             f"lattice card {tag} states the total of its {group!r} plane row but not the "
-            f"lengths of the orbits it splits into: the phrase "
-            f"{_ORBIT_LENGTH_PHRASE.pattern!r} does not occur in its citation, which reads "
-            f"{citation!r}"
+            f"lengths of the orbits it splits into: the row states {sorted(rows[group])}, "
+            f"and a per-orbit length is read from the row's own `orbit_lengths` field "
+            f"(dzackgarza/lattice-database d6a5393), not from its citation"
         )
-    stated_total = int(match.group(1))
-    found = sorted(int(entry) for entry in match.groups()[1:])
-    total = rows[group]["planes"]
-    if stated_total != total:
-        raise ValueError(
-            f"lattice card {tag} states {stated_total} planes in its per-orbit sentence for "
-            f"{group!r}, against its own row total {total}"
-        )
-    if sum(found) != total:
+    found = sorted(int(length) for length in rows[group]["orbit_lengths"])
+    total = rows[group].get("planes")
+    if total is not None and sum(found) != total and len(found) != total:
         raise ValueError(
             f"lattice card {tag} states per-orbit lengths {found} for {group!r}, whose sum is "
-            f"{sum(found)}, against the card's own total {total}"
+            f"{sum(found)} and whose number is {len(found)}, against the card's own planes = "
+            f"{total}: a row states the number of orbits or the number of planes, and this "
+            f"pair agrees with neither"
         )
     orbit_count = rows["O"]["planes"] if "O" in rows else None
     if orbit_count is not None and len(found) != orbit_count:
