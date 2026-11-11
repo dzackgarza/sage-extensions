@@ -321,6 +321,39 @@ def _regular_module_scalar_identification(value_module):
     return ring.regular_module_isomorphism()
 
 
+def _scalar_value_identification(value_module, base_ring=None):
+    r"""Return the ring isomorphism reading ``value_module``'s elements as scalars, or ``None``.
+
+    Two stated constructions supply that reading, and both are the same datum: a
+    value object that *is* a ring's own regular module
+    (``_regular_module_scalar_identification``), and a restriction of scalars
+    whose extension is one -- the module structure such a restriction was formed
+    with already has the extension ring as its domain, so its
+    ``regular_module_identification`` reads the scalars rather than adding a
+    second action (#307).
+
+    ``base_ring`` is the ring the pairing is taken over, when the caller has it;
+    it defaults to the value object's own base ring.
+
+    A restriction of ``S^n`` for ``n > 1`` is genuinely ``S^n``-valued and
+    asserts when asked for a scalar reading; it answers ``None`` here rather than
+    projecting to one coordinate or pretending to be a scalar tensor.
+    """
+    identification = _regular_module_scalar_identification(value_module)
+    if identification is not None:
+        return identification
+    ring = value_module.base_ring() if base_ring is None else base_ring
+    if value_module in RestrictedScalarsModules(ring) or (
+        hasattr(value_module, "module_over_extension")
+        and value_module.base_ring() is ring
+    ):
+        try:
+            return value_module.regular_module_identification()
+        except AssertionError:
+            return None
+    return None
+
+
 def _canonical_scalar_structure_map(ring_map):
     r"""Return the algebra's own structure morphism when ``ring_map`` states it.
 

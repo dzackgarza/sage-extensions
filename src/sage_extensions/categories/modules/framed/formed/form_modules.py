@@ -90,10 +90,10 @@ from sage_extensions.categories.modules.pure.modules import (
     MatrixSpaces,
     Modules,
     ModulesWithChosenFinitePresentation,
-    RestrictedScalarsModules,
     TensorProductModules,
     VectorSpaces,
     _regular_module_scalar_identification,
+    _scalar_value_identification,
 )
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
@@ -261,14 +261,21 @@ def _form_square_commutes(
     ``f`` is a map of framed free modules of finite rank, the square is the
     tensor equation ``f^* G_N = G_M``: the Gram tensor of ``N`` pulled back
     along ``f`` is the Gram tensor of ``M``, and :meth:`Tensor.pullback` owns
-    that contraction (``OWN-24``).  Otherwise no Gram tensor states the
-    square, and a selected finite spanning family supplies the equations:
-    a bilinear form is determined by its values on pairs of generators,
-    and a quadratic form ``q`` by ``q(s)`` and ``q(s + t)``.  These finite
-    equations prove the universal equation when both maps are known linear.
-    A failed equation refutes it without that premise.  Missing finite data
-    or unestablished linearity retains the form-square proposition; no
-    infinite generating family or undecided equality is Boolean-coerced.
+    that contraction (``OWN-24``).  That is one comparison of the two Gram
+    tensors, so the decision costs a Gram-matrix read, not one ``b`` evaluation
+    per pair of generators (#320).  The scalars are read by
+    ``_scalar_value_identification``: the value object is a ring or a
+    restriction of scalars from one, and in the second case the Gram tensor's
+    entries are the scalars that restriction reads, not the value object's own
+    elements.
+    Otherwise no Gram tensor states the square, and a selected finite spanning
+    family supplies the equations: a bilinear form is determined by its values
+    on pairs of generators, and a quadratic form ``q`` by ``q(s)`` and
+    ``q(s + t)``.  These finite equations prove the universal equation when
+    both maps are known linear.  A failed equation refutes it without that
+    premise.  Missing finite data or unestablished linearity retains the
+    form-square proposition; no infinite generating family or undecided
+    equality is Boolean-coerced.
     """
     source_form = domain.form()
     target_form = codomain.form()
@@ -319,9 +326,19 @@ def _form_square_commutes(
         and module_morphism.linearity_decision() is True
         and value_morphism.linearity_decision() is True
     )
-    algebra_values = source_form.codomain() in OwnedRings() or (
-        source_form.codomain() in RestrictedScalarsModules(domain.base_ring())
-        and source_form.codomain().module_over_extension() in OwnedRings()
+    # The tensor branch is available exactly when both value objects read their
+    # elements as scalars of one ring: the two Gram tensors are then numerical
+    # over that ring and the square is one comparison of them.  Reading the
+    # extension itself as the ring asked the value object to be that ring, which
+    # a restriction of scalars is not, so a formed submodule over restricted
+    # scalars fell through to one :meth:`b` evaluation per pair of generators
+    # (#320).
+    source_scalars = _scalar_value_identification(source_form.codomain())
+    target_scalars = _scalar_value_identification(target_form.codomain())
+    algebra_values = (
+        source_scalars is not None
+        and target_scalars is not None
+        and source_scalars.codomain() is target_scalars.codomain()
     )
     match kind:
         case True, _ if (
@@ -4089,22 +4106,43 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                 return FormBaseChanges(ring_map.codomain())(self, ring_map)
 
             def gram_matrix(self, basis=None):
-                r"""Return the coordinate matrix of the selected finite free form."""
-                if (
-                    basis is None
-                    and _is_bilinear_form(self.form())
-                    and self.value_module() in OwnedRings()
-                ):
-                    size = int(self.module_rank())
+                r"""Return the coordinate matrix of the selected finite free form.
+
+                The entries are the form's values read as scalars of one ring, and
+                that ring supplies the matrix space: either the value object *is* a
+                ring, or it is a restriction of scalars from one, and then its
+                ``_scalar_value_identification`` is the reading of its elements as
+                that ring's scalars.  A restriction of scalars is not a ring and
+                has no ``matrix_space``, so "a matrix over the values" is not a
+                construction; the scalar reading is the same coordinate datum
+                (``#320``).
+
+                On a framed module the form's coordinate Gram tensor already holds
+                every entry, and for a pulled-back form that tensor is the ambient
+                Gram tensor transported along the basis, ``B G B^t``, taken once.
+                Building the matrix from it costs one tensor contraction instead of
+                one :meth:`b` evaluation per entry.
+                """
+                values = self.value_module()
+                if basis is None and _is_bilinear_form(self.form()):
+                    from sage_extensions.tensors.tensor import Tensor
+
                     gram = self.gram_tensor()
-                    return (
-                        self.value_module()
-                        .matrix_space(size, size)
-                        .from_rows(
-                            (gram[row, column] for column in range(size))
-                            for row in range(size)
+                    if isinstance(gram, Tensor):
+                        rows, columns = map(int, gram.tensor_shape())
+                        return (
+                            gram.base_ring()
+                            .matrix_space(rows, columns)
+                            .from_rows(
+                                tuple(
+                                    tuple(
+                                        gram[row, column]
+                                        for column in range(columns)
+                                    )
+                                    for row in range(rows)
+                                )
+                            )
                         )
-                    )
                 selected = (
                     tuple(self.module_generators()) if basis is None else tuple(basis)
                 )
@@ -4113,13 +4151,24 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                         f"a Gram matrix of {self} is taken on elements of {self}, but {basis} contains "
                         "an element of another module"
                     )
+                scalars = _scalar_value_identification(values)
+                if scalars is None:
+                    raise TypeError(
+                        f"a Gram matrix of {self} needs its values read as scalars of one ring, "
+                        f"but {values} is neither a ring nor a restriction of scalars from one"
+                    )
                 size = len(selected)
                 return (
-                    self.value_module()
+                    scalars.codomain()
                     .matrix_space(size, size)
                     .from_rows(
                         tuple(
-                            tuple(self.b(left, right) for right in selected)
+                            tuple(
+                                self.b(left, right)
+                                if values is scalars.codomain()
+                                else scalars(self.b(left, right))
+                                for right in selected
+                            )
                             for left in selected
                         )
                     )

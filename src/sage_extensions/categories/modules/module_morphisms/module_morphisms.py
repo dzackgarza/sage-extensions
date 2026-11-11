@@ -3453,30 +3453,17 @@ class TensorProductModuleMorphismMethods:
                 return original.pullback(morphism)
         if self.codomain() not in OwnedRings():
             from sage_extensions.categories.modules.pure.modules import (
-                RestrictedScalarsModules,
-                _regular_module_scalar_identification,
+                _scalar_value_identification,
             )
 
             values = self.codomain()
-            # A value object that is its base ring's regular module reads its
-            # elements through that ring's own identification; the scalar action
-            # it was formed with already has the ring as its domain, so this is
-            # the datum, not a second reading (#307).
-            scalar_identification = _regular_module_scalar_identification(values)
-            if scalar_identification is None and (
-                values in RestrictedScalarsModules(left.base_ring())
-                or (
-                    hasattr(values, "module_over_extension")
-                    and values.base_ring() is left.base_ring()
-                )
-            ):
-                try:
-                    scalar_identification = values.regular_module_identification()
-                except AssertionError:
-                    # A restriction of S^n for n>1 remains genuinely
-                    # S^n-valued. Do not project it to one coordinate or
-                    # pretend it is a scalar tensor.
-                    return self.coordinate_values()
+            # One reading of the values as scalars, taken at its owner: a value
+            # object that is a ring's regular module, or a restriction of
+            # scalars from one, has the ring as its scalar ring, and its
+            # identification is that datum, not a second reading (#307, #320).
+            scalar_identification = _scalar_value_identification(
+                values, left.base_ring()
+            )
             if scalar_identification is not None:
                 scalar_ring = scalar_identification.codomain()
                 if scalar_ring in OwnedRings():
