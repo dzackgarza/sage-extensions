@@ -1190,10 +1190,9 @@ def _spinor_generating_primes(genus, *, proper):
     accumulated subgroup, so after the first accepted prime the subgroup is
     the whole quotient and the call returns at most one prime for every genus.
     Counting that list reports two spinor genera for every genus with four.
-    No upstream report is drafted for it: this repository presents the Sage API
-    through its own owners and #330 owns the count, so the defect is recorded
-    here.  The loop below is the one that call intends; it is what the genus
-    enumeration and :meth:`_Genus.spinor_genus_count` consult.
+    #330 (`bfc9bcb871`) owns the count.  The loop below is the one that call
+    intends; it is what the genus enumeration and
+    :meth:`_Genus.spinor_genus_count` consult.
     """
     from sage.sets.primes import Primes
 
