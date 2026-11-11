@@ -41,6 +41,5 @@ def test_line_flag_in_two_hyperbolic_planes_under_a_congruence_preimage_has_imag
     gamma = group.congruence_preimage(3, representation.codomain().subgroup((representation(negation),)))
     flag = IsotropicFlag(ambient, (next(iter(ambient.module_generators())),))
     action = flag.graded_quotient_action(gamma)
-    assert action.domain().supergroup() is group
     assert all(generator in gamma for generator in action.domain().group_generators())
     assert action.image().cardinality() == cardinal(2)

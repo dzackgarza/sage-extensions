@@ -447,8 +447,11 @@ class IsotropicFlag:
 
         return INDUCTION.flag_invariant(self._lattice, self._basis, self.flag_type().dimensions)
 
-    def graded_quotient_action(self):
-        r"""Return the action ``Stab(F) -> GL(gr F + I_t^perp/I_t)`` on successive quotients.
+    def graded_quotient_action(self, group):
+        r"""Return the action ``Stab_G(F) -> GL(gr F + I_t^perp/I_t)`` on successive quotients.
+
+        ``group`` is ``G <= O(L)``: ``O(L)`` itself, or a finite-index subgroup
+        of it, whose stabilizer is ``G cap Stab_{O(L)}(F)``.
 
         The codomain is the general linear group of a free module with one
         coordinate block for each ``I_j/I_{j-1}``, in the adapted basis, and a
@@ -456,8 +459,14 @@ class IsotropicFlag:
         its image is the actual image in the product of the block groups.
         """
         ring = self._lattice.base_ring()
-        group = self._lattice.O()
-        stabilizer = group.subgroup(tuple(group.isotropic_stabilizer_generators(self, flag=True)))
+        ambient = self._lattice.O()
+        full = ambient.subgroup(tuple(ambient.isotropic_stabilizer_generators(self, flag=True)))
+        if group is ambient:
+            stabilizer = full
+        else:
+            if group.supergroup() is not ambient:
+                raise ValueError(f"{group} is not a subgroup of {ambient}")
+            stabilizer = group.intersection(full)
         rank = len(self._basis)
         adapted_module = ring.free_module(rank)
         top_inclusion = self.top().inclusion()
