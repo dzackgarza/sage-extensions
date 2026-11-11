@@ -16,7 +16,7 @@ These numbers are **not** restated here.  They are the cards' own rows, read by 
 through ``card_plane_orbit_row`` from ``tests/cards/lattice-database-enriques.json``,
 which ``tests/cards/refresh_lattice_database_enriques.py`` generates from
 ``dzackgarza/lattice-database`` at database commit
-``587d56febe5856d54c6bc9fc023fa5a425f76bfb``.  The cards certify the rows
+``d6a539339bac5ea0ee8d8bde5dc19564955eb152``.  The cards certify the rows
 (``integral.primitive_orbits``: ``6JRX``
 ``10326525e21ed937f866e6f77476a56decd775a91f1670b4eca32c2df47cf546``, ``6JRY``
 ``eba45974e533209118987f193c471e877519717395fa1bdb2076d70e25f9b5e1``), so a

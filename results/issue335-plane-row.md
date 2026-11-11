@@ -8,7 +8,9 @@ this tree, the nine classes the row is made of, and why the count cannot be retu
 ## 1. What the cards say, and which group each row counts
 
 Read at the pin the card digest uses, `dzackgarza/lattice-database` commit
-`587d56febe5856d54c6bc9fc023fa5a425f76bfb`, `lattices/6JRX.md` and `lattices/6JRY.md`:
+`d6a539339bac5ea0ee8d8bde5dc19564955eb152`, `lattices/6JRX.md` and `lattices/6JRY.md`
+— byte-for-byte the same two cards as at `587d56febe5856d54c6bc9fc023fa5a425f76bfb`, the pin the digest carried when this
+turn began, so the rows and their citations are unchanged:
 
 | card | lattice | rank | signature | det | `A_L` | `O` | `O+` | `Otilde+` |
 |---|---|---|---|---|---|---|---|---|
