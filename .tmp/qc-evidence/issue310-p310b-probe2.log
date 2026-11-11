@@ -1,0 +1,65 @@
+group_generators: 94.99s
+Timeout (0:01:40)!
+Thread 0x00007cd3c4ede780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 169 in __contains__
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 7539 in _own_ring
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 7808 in _engine_element
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py", line 3312 in _presented_module_from_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4387 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 4348 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/powers.py", line 847 in _presented_degree_power
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/powers.py", line 857 in _divided_square
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 2229 in divided_square
+  File "/repos/sage-extensions/src/sage_extensions/categories/forms/forms.py", line 924 in _quadratic_forms
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 2126 in quadratic_forms
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/form_modules.py", line 3638 in from_module
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2709 in _invariant_factor_form_isomorphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/form_modules.py", line 3860 in invariant_factor_form
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 1988 in normalization_isometry
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2146 in _normalized_form_automorphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 3164 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2133 in from_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2059 in discriminant_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 3742 in image
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 3164 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 8133 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 8133 in image_under
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3275 in discriminant_image
+  File "/probe.py", line 6 in step
+  File "/probe.py", line 15 in <module>
+G.discriminant_image: 24.97s
+div(vector) = 2 class = [2]
+stabilizer_discriminant_image #1: 22.41s
+stabilizer_discriminant_image #2: 4.01s
+orders 1 89181388800 index 0
+class orbit: 1 elements, 0 moves, 0.04s
+index per class: 0
+isotropic_stabilizer_generators: 12.03s
+stabilizer generator count: 30
+Timeout (0:01:40)!
+Thread 0x00007cd3c4ede780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 6613 in __int__
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 533 in __contains__
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 547 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 810 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1631 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 116 in _value_at_normalized_index
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 90 in value
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1095 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1091 in _linear_combination_of_generator_images
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1126 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 810 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2159 in _normalized_form_automorphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 3164 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2133 in from_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2059 in discriminant_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 341 in image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1554 in _splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1345 in _splitting_isometries_in_im_rho
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1310 in splitting_isometries
+  File "/probe.py", line 47 in <lambda>
+  File "/probe.py", line 6 in step
+  File "/probe.py", line 47 in <module>
+splitting_isometries: 97.16s
+done
+launcher exit: 0

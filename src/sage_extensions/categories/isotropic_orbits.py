@@ -1294,6 +1294,152 @@ def _isotropic_plane_orbit_representatives(orthogonal_group):
     return finite_ordered_set(tuple(kept))
 
 
+def _hilbert_model_gram(field_discriminant):
+    r"""Return the Gram matrix of ``U + (O_F, Tr)`` for a real quadratic discriminant.
+
+    ``field_discriminant`` is the discriminant of ``F = QQ(sqrt(d))``, so
+    ``omega = (1 + sqrt(d))/2`` for odd ``d`` and ``omega = sqrt(d)`` for
+    ``d = 4 * field_discriminant``, and the basis is ``(E_11, E_22, 1, omega)``.
+    The entries are ``Tr(x conj(y))`` of the ring of integers: ``Tr(1) = 2``,
+    ``Tr(omega) = 1`` and ``Tr(omega conj(omega)) = 2 N(omega) = (1 - d)/2``
+    for odd ``d``, and ``Tr(omega) = 0`` with
+    ``Tr(omega conj(omega)) = -d/2`` for even ``d``.
+
+    This is the lattice ``L = ZZ + ZZ + O_F`` of Bruinier, *Hilbert modular forms
+    and their applications*, in *The 1-2-3 of Modular Forms* (Universitext,
+    Springer, 2008), pp. 105-179, §2.7, printed pp. 143-144, for the form printed there,
+    ``Q(a, b, nu) = nu conj(nu) - a b``.  This library's quadratic form is
+    ``q(x) = b(x, x)``, so the matrix below is twice the source's, i.e.
+    ``q = 2Q = -2 det`` on the Hermitian matrices ``X = [[a, beta],
+    [conj(beta), d]]``: the even normalization.  Isotropy and the orthogonal
+    group are the same for ``q`` and for ``2Q``.
+    """
+    if field_discriminant % 4 == 1:
+        trace_of_omega, trace_of_norm = 1, (1 - field_discriminant) // 2
+    else:
+        trace_of_omega, trace_of_norm = 0, -field_discriminant // 2
+    return matrix(
+        SageZZ,
+        [
+            [0, -1, 0, 0],
+            [-1, 0, 0, 0],
+            [0, 0, 2, trace_of_omega],
+            [0, 0, trace_of_omega, trace_of_norm],
+        ],
+    )
+
+
+def _witt_one_hilbert_line_representatives(lattice):
+    r"""One representative per ``O(L)``-orbit of primitive isotropic lines at Witt index one.
+
+    A rank-four lattice of Witt index one has no second hyperbolic plane, so the
+    Eichler envelope that classifies isotropic orbits on ``U + U + K`` does not
+    apply to it, and the classification is the cusp count of the Hilbert modular
+    group instead:
+
+    * Bruinier, *Hilbert modular forms and their applications*, in *The 1-2-3 of
+      Modular Forms* (Universitext, Springer, 2008), pp. 105-179, §2.7, printed pp. 143-144:
+      the Hilbert lattice is ``L = ZZ + ZZ + O_F`` inside ``V = QQ + QQ + F`` with
+      ``Q(a, b, nu) = nu conj(nu) - a b``, and ``Gamma_F = SL_2(O_F) =
+      Spin_L``; the same section identifies ``H^2`` with ``K^+`` and states that
+      the identification commutes with the action of ``SL_2(F)``.  Since
+      ``Spin_L <= O(L)``, the group ``O(L)`` has no more orbits than
+      ``Gamma_F``.
+    * Bruinier, ibid., Corollary 1.4 (§1.1, printed pp. 106-109): the number of
+      cusps of ``Gamma_F`` equals the class number ``h(F)``.  A cusp is a
+      ``Gamma_F``-orbit of ``P^1(F)`` (§1.1, printed p. 106), the rational
+      boundary points of ``K^+`` are ``P^1(F)`` (ibid. (1.9)), and the projective
+      model matches those with the rational isotropic lines (ibid. Lemma 2.20
+      and §2.7).  A rational isotropic line meets the lattice ``L`` in a
+      rank-one primitive sublattice, and every primitive isotropic vector spans
+      such a line, so the ``Gamma_F``-orbits of primitive isotropic lines of
+      ``L`` number ``h(F)``.
+
+    The printed pages above are the publisher's table-of-contents pages for the
+    two sections: §1.1 begins on p. 106 and §1.2 on p. 109, and Corollary 1.4 is
+    the last numbered statement of §1.1, so it stands on one of pp. 106-109;
+    §2.7 begins on p. 143 and carries the lattice and ``Gamma_F = Spin_L`` over
+    to p. 144.  The same count is stated with an exact printed page, without a
+    statement number, in Hirzebruch-Van de Ven, *Hilbert modular surfaces and the
+    classification of algebraic surfaces*, Invent. Math. 23 (1974), 1-29,
+    pp. 12-13: the cusps "are in one-to-one correspondence with the ideal
+    classes", and the compactified space has ``h(p)`` of them, in the case
+    ``K = QQ(sqrt p)`` for a prime ``p = 1 mod 4`` that covers the ``F = 5``
+    lattice.
+
+    Hence ``h(F) = 1`` forces exactly one ``O(L)``-orbit of primitive isotropic
+    lines, and *any* primitive isotropic vector of ``L`` represents it: the
+    representative below is the one the exact isotropic-vector construction
+    finds, not a chosen coordinate vector, and it is checked to be isotropic,
+    primitive, and a primitive isotropic line of this lattice.
+
+    The lattice is accepted only when it is the model: even, rank four,
+    determinant the field discriminant ``F`` of a real quadratic field, and
+    isometric to :func:`_hilbert_model_gram` of that discriminant under the
+    library's own exact isometry decision (which rests on one genus with one
+    spinor genus, Conway-Sloane, *Low-dimensional lattices IV*, Ch. 15,
+    Theorem 14).  ``None`` when that is not established, which leaves the
+    caller's marking-class route in charge.  A class number above one refuses by
+    name: the count there is only bounded by ``h(F)``, and the exact quotient of
+    the class set is not owned yet.
+    """
+    ring = lattice.base_ring()
+    frame = tuple(lattice.module_generators())
+    gram = matrix(SageZZ, [[int(lattice.b(left, right)) for right in frame] for left in frame])
+    if gram != gram.transpose():
+        return None
+    determinant = int(gram.det())
+    field_discriminant = abs(determinant)
+    radicand = int(SageZZ(field_discriminant).squarefree_part())
+    if radicand == 1 or determinant != field_discriminant:
+        return None
+    from sage_extensions.categories.rings.number_fields import QuadraticField
+
+    field = QuadraticField(radicand, "s")
+    if int(field.discriminant()) != field_discriminant:
+        return None
+    from sage_extensions.categories.lattices import Lattices
+
+    model = Lattices(ring)([list(row) for row in _hilbert_model_gram(field_discriminant).rows()])
+    if lattice.is_isometric(model) is not True:
+        return None
+    class_number = int(field.class_number())
+    if class_number != 1:
+        raise NotImplementedError(
+            f"the O(L)-orbits of primitive isotropic lines of {lattice} are not enumerated: it is "
+            f"the Hilbert model U + (O_F, Tr) of discriminant {field_discriminant}, where "
+            f"F = QQ(sqrt({radicand})) has class number {class_number}, so the cusp count only bounds "
+            "the number of orbits by h(F) and the class set of the model is not owned yet"
+        )
+    from sage.arith.functions import lcm
+    from sage.arith.misc import gcd
+    from sage.rings.rational_field import QQ
+    from sage_indefinite_port.indefinite.exact_isotropic import find_isotropic_exact
+
+    rational = find_isotropic_exact(matrix(QQ, gram))
+    if rational is None:
+        raise ArithmeticError(
+            f"the exact isotropic-vector construction found no isotropic vector for {lattice}, "
+            "whose Witt index is one"
+        )
+    common = int(lcm(tuple(QQ(entry).denominator() for entry in rational)))
+    integral = tuple(int(QQ(entry) * common) for entry in rational)
+    content = int(gcd(integral))
+    zero = ring.zero()
+    representative = lattice.zero()
+    for generator, coordinate in zip(frame, integral, strict=True):
+        if coordinate:
+            representative = representative + lattice.scalar_multiple(ring(coordinate // content), generator)
+    if representative.q() != zero:
+        raise ArithmeticError(f"the isotropic-vector construction returned {representative} of square {representative.q()} in {lattice}")
+    if representative.is_primitive() is not True:
+        raise ArithmeticError(f"the isotropic-vector construction returned the imprimitive {representative} in {lattice}")
+    line = lattice.primitive_isotropic_subobject(representative)
+    if line.is_primitive() is not True:
+        raise ArithmeticError(f"the line of {representative} is not primitive in {lattice}")
+    return finite_ordered_set((line,))
+
+
 def _isotropic_orbit_representatives(orthogonal_group, rank, *, flag=False):
     r"""Return full-``O(L)`` orbit representatives of primitive isotropic subobjects/flags."""
     lattice = orthogonal_group.domain()
@@ -1305,11 +1451,12 @@ def _isotropic_orbit_representatives(orthogonal_group, rank, *, flag=False):
         if rank == 0:
             return finite_ordered_set((lattice.primitive_isotropic_subobject(),))
         if rank == 1 and int(lattice.module_rank()) == 4 and int(lattice.witt_index()) == 1:
-            from sage_indefinite_port.indefinite.witt_one_hilbert import isotropic_line_representative
-
-            representative = isotropic_line_representative(lattice)
-            if representative is not None:
-                return finite_ordered_set((lattice.primitive_isotropic_subobject(representative),))
+            # Witt index one has no second hyperbolic plane, so the Eichler
+            # envelope below does not reach it; the Hilbert model answers by cusp
+            # count instead, and only where that count is proved to be one.
+            representatives = _witt_one_hilbert_line_representatives(lattice)
+            if representatives is not None:
+                return representatives
         dimensions = (rank,)
     if dimensions[-1] < 0:
         raise ValueError(f"the isotropic sublattice rank must be nonnegative, got {rank} in {lattice}")

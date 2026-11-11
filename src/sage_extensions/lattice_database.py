@@ -15,6 +15,7 @@ printed page the row comes from.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 DIGEST = (
@@ -60,4 +61,80 @@ def card_plane_orbit_row(tag: str, group: str) -> int:
     return rows[group]["planes"]
 
 
-__all__ = ["card_plane_orbit_row", "DIGEST"]
+# The card's own words for a split of a plane row into orbit lengths: lattice
+# card 029J states its two Otilde^+ plane orbits as "the 24242 planes in two
+# orbits, of lengths 527 and 23715".  The digest keeps only the totals as
+# structured fields, so this phrasing is what a per-orbit length is read from.
+_ORBIT_LENGTH_PHRASE = re.compile(
+    r"(\d+)\s+planes in two orbits, of lengths (\d+) and (\d+)"
+)
+
+
+def card_plane_orbit_lengths(tag: str, group: str):
+    r"""Return card ``tag``'s per-orbit numbers for the primitive isotropic planes under ``group``.
+
+    The digest's structured rows hold only the *total* number of primitive
+    isotropic planes of a row (`card_plane_orbit_row`), because
+    ``integral.primitive_orbits.{group}.planes`` is the only per-group number
+    the lattice cards state as a field.  The split of that total into the
+    lengths of the individual orbits is stated in the row's own citation, which
+    the digest keeps verbatim; this function reads the split there, and returns
+    it sorted.
+
+    Filing the split as a structured row on ``dzackgarza/lattice-database``
+    would be the better place for it, and is not done here: this project's
+    GitHub connection is scoped to the one connected repository and cannot
+    write to another one.  The card's recorded statement is therefore the
+    authority used, with the two checks below.
+
+    The reading is checked against the row itself before it is returned: the
+    lengths must add up to the card's total for that row, and their number must
+    be the card's own count of orbits (the ``O`` row states that count for
+    ``029J``).  Either check failing raises instead of returning numbers that
+    the card does not support.
+    """
+    digest = _digest()
+    card = digest.get("plane_orbits", {}).get(tag)
+    if card is None:
+        raise KeyError(
+            f"the digest keeps no plane rows for lattice card {tag!r}: it keeps "
+            f"{sorted(digest.get('plane_orbits', {}))}"
+        )
+    rows = card["rows"]
+    if group not in rows:
+        raise KeyError(
+            f"lattice card {tag} states no primitive-isotropic-plane row for {group!r}: "
+            f"it states {sorted(rows)}"
+        )
+    citation = rows[group]["citation"]
+    match = _ORBIT_LENGTH_PHRASE.search(citation)
+    if match is None:
+        raise KeyError(
+            f"lattice card {tag} states the total of its {group!r} plane row but not the "
+            f"lengths of the orbits it splits into: the phrase "
+            f"{_ORBIT_LENGTH_PHRASE.pattern!r} does not occur in its citation, which reads "
+            f"{citation!r}"
+        )
+    stated_total = int(match.group(1))
+    found = sorted(int(entry) for entry in match.groups()[1:])
+    total = rows[group]["planes"]
+    if stated_total != total:
+        raise ValueError(
+            f"lattice card {tag} states {stated_total} planes in its per-orbit sentence for "
+            f"{group!r}, against its own row total {total}"
+        )
+    if sum(found) != total:
+        raise ValueError(
+            f"lattice card {tag} states per-orbit lengths {found} for {group!r}, whose sum is "
+            f"{sum(found)}, against the card's own total {total}"
+        )
+    orbit_count = rows["O"]["planes"] if "O" in rows else None
+    if orbit_count is not None and len(found) != orbit_count:
+        raise ValueError(
+            f"lattice card {tag} states {len(found)} per-orbit lengths {found} for {group!r}, "
+            f"against the card's own count of {orbit_count} O-orbits of primitive isotropic planes"
+        )
+    return tuple(found)
+
+
+__all__ = ["card_plane_orbit_lengths", "card_plane_orbit_row", "DIGEST"]

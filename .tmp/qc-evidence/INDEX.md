@@ -332,3 +332,29 @@ seed in **155.6 s** (repeat 186.8 s), and `orbits_lines_mod_p(3)` is killed at t
 (corrected: the 2-neighbour lattice is not built this way);
 `issue317-probe34.log` — k = 1 has 0 elements of order two in N^#/N and k = 2 has
 exactly 1, so p = 2 cannot walk either genus.
+
+Fifth batch on issue 317 (Nikulin's correspondence and the Vinberg chamber):
+`issue317-nikulin-chamber.md` — the citation (Nikulin, Thm 1.14.2 p. 125, Prop.
+1.15.1 with its proof p. 128-129), the chamber call, and the stop;
+`issue317-probe35.log` — `fundamental_chamber()` on `U + E8(-1)^2` returns **19
+wall roots in 76.9 s**, and the chamber vectors of square 2k reach 1 of 4 classes
+for k = 1 and 1 of 9 for k = 2, with the right genus masses;
+`issue317-probe35-walls-negative.log` — the same run with the wall sign reversed,
+returning the same candidates, which is the diagnostic that the wall roots are
+carried in a framing other than the coordinate basis.
+
+Sixth batch on issue 317 (the frame, the bound, the classes):
+`issue317-nikulin-chamber.md` — the frame resolved (wall roots are lattice
+elements of square −2; model Gram = U ⊕ E8 ⊕ E8), the bound, and the class sets;
+`issue317-probe37.log` — **k = 1: 4 classes, mass equal; k = 2: 9 classes
+including the 544-root D₁₇(−1), mass equal**;
+`issue317-chamber-test.log` — `tests/lattices/test_genus_of_the_scattone_summands.sage`:
+**5 passed in 112.46 s**, exit 0 (the class enumeration 110.39 s).
+
+Seventh batch on issue 317 (the truncations): `issue317-bound-full-buckets.log` —
+the per-bucket `[:40]` slice removed, so every vector of both norm buckets is
+tried and the nineteen wall tests run before the exact isometry test:
+`tests/lattices/test_genus_of_the_scattone_summands.sage` **5 passed in 108.48 s**,
+exit 0, the class enumeration 106.08 s against 110.39 s with the slice.
+`coordinate_bound = 10` and the norm floor −40 remain; the note in
+`issue317-nikulin-chamber.md` states exactly what the proof of them needs.

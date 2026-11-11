@@ -119,16 +119,126 @@ $A_{U(2)}$.  The missing $2^8$ therefore lives in elements of $P_{P_1}$ that mix
 the $E_8(-2)$ and $U(2)$ components of $A_L$; constructing them integrally is
 the open step, and it is not a repair inside this call.
 
+## 2b. The exact index, and the missing $2^8$ named
+
+`stabilizer_discriminant_image()` was the candidate for computing
+$\rho(G_{P_1})$ outright, on the strength of research#750
+`thm:schreier-discriminant-image` (`writing/coble/computations/discriminant-form-descent.md`).
+That theorem's hypotheses, read at the page and at
+`def:stabilizer-congruence-data`:
+
+1. $V$ finite dimensional over $\mathbb{Q}$ with a nondegenerate symmetric form $\beta$;
+2. $L \subseteq V$ an integral nondegenerate lattice;
+3. $M \subseteq V$ finitely generated and full with $L \subseteq M$, and $G \leq O(V)$ with $GM = M$;
+4. $m \geq 1$ with $mM \subseteq L$ (or $mM \subseteq e_2L$, by `cor:stabilizer-modulus`);
+5. $S \subseteq G$ finite and symmetric with $G = \langle S \rangle$;
+
+and its conclusion is $\rho_L(\operatorname{Stab}_G(L)) = \langle \rho_L(k_{s,p}) \rangle$
+over the Schreier elements $k_{s,p} = t_{sp}^{-1} s t_p$.
+
+**It does not cover a rank-2 isotropic sublattice as stated, and the rank is not
+what fails.**  The theorem's data contain no isotropic subspace: it computes the
+stabilizer of a *lattice*.  Applying it to $P_1$ requires $G$ = the rational
+stabilizer of $P_1$ in $O(V)$ and $L = T_{\mathrm{En}}$, so that
+$\operatorname{Stab}_G(L) = \operatorname{Stab}_{O(T_{\mathrm{En}})}(P_1)$; then
+(1)–(4) hold, and the hypothesis that fails is (5): a finite symmetric $S$ with
+$G = \langle S \rangle$ **exactly**.  `isotropic_stabilizer_action` supplies the
+approximate family $A_E$ together with the $GL(I)$-radical images, and nothing in
+this tree exhibits that family as a generating set of the whole rational plane
+stabilizer; a subgroup where the theorem needs $G$ returns a subgroup of the
+wanted image.  Measured: the call had not returned on $T_{\mathrm{En}}$ after
+11.3 min even for the rank-one line $\langle e_1 \rangle$
+(`.tmp/issue325-exact-image.log`), against 30.4 s on $T_{\mathrm{Co}}$, so it is
+not the closure for this issue either.
+
+**What settles the index is a theorem, and it is on the page.**
+`thm:enriques-integral-plane-stabilizers`
+(`writing/coble/lattices-and-moduli/lattices.md:454`), proved, states
+$$\rho\bigl(\operatorname{Stab}_{O(T_{\mathrm{En}})}(\varPi)\bigr) =
+\operatorname{Stab}_{O(A,q)}\bigl(D(\varPi)\bigr)$$
+for **every** primitive totally isotropic plane $\varPi$.  For $P_1$ it is
+`lem:ten-base-stabilizers`, which computes $|F_1| = 89\,181\,388\,800$; for
+$P_2$ the proof of the plane theorem computes $|F| = 1\,981\,808\,640 =
+6 \cdot 40\,320 \cdot 2^{13}$, and $|Q|/23\,715 = 1\,981\,808\,640$.  So the
+index per class is $527$ and $23\,715$ — card `029J`'s two plane indices — and
+their sum is the card's `Otilde+` row, $24\,242$.
+
+**The missing factor has a name.**  `lem:half-vector-eichler` gives, for a
+primitive isotropic $\eta$ of divisibility two and $w \in T_{\mathrm{En}}^\#$,
+the Eichler transvection $E_{\eta,w}$: it is integral, fixes $\eta$, preserves
+every primitive isotropic plane through $\eta$, and its discriminant image is
+$T_{d,[w]}$; these form a subgroup $U_d$ of order $2^8$
+(`lem:half-vector-eichler`(3)).  The proof of `lem:ten-base-stabilizers` gets
+$\rho(\operatorname{Stab}(P_1)) = L \cdot U_{d_1}$ with
+$|L| = 348\,364\,800$ and $|U_{d_1}| = 2^8$, product $89\,181\,388\,800$.  The
+family this repository builds is exactly $L$: its reflection image has order
+$348\,364\,800$, and the $2^8$ it misses is $U_{d_1}$ — the images of the
+transvections along a *half* lattice vector, $w \in T_{\mathrm{En}}^\#$, which no
+integral-parameter transvection and no plane-preserving lift produces.
+
+## 2c. The repair: the half-vector transvections
+
+The obstruction of §2b is the transvection along a vector of the metric dual
+that is not a lattice vector, and it is now in the family.
+
+*Construction.*  For a primitive isotropic `e` of divisibility two and
+`w ∈ L^#` with `b(e,w) = 0`, `2w ∈ L` and `q(w) ∈ Z`,
+
+$$E_{e,w}(x) = x - b(w,x)e + b(e,x)w - \tfrac12 q(w)b(e,x)e,$$
+
+the Eichler transvection formula — Dawes, section 2 equation (7), the
+transcription `Lattices.ParentMethods.eichler_transvection` already carries for
+`w ∈ L`; Gritsenko–Hulek–Sankaran, *The desingularization of the moduli space of
+Enriques surfaces*, arXiv:0810.1614, section 3.1, equations (4)–(5); and
+Scattone, *On the compactification of moduli spaces for algebraic K3 surfaces*,
+Mem. Amer. Math. Soc. 374 (1987), section 3.7, Proposition 3.7.3, whose criterion
+generates the radical of the parabolic at an isotropic sublattice by the
+transvections over a basis of `e^⊥`.  With those hypotheses every coefficient is
+an integer: `b(w,x) ∈ Z` because `2w ∈ L` and `L` is even, `q(w)/2 · b(e,x) ∈ Z`
+because `q(w) ∈ Z` and `b(e,x) ∈ 2Z`, and `b(e,x)w ∈ L` because `b(e,x)` is even
+and `2w ∈ L`.
+
+*Owner.*  `Lattices.ParentMethods.half_vector_transvection_parameters` decides
+the hypotheses on the dual basis and
+`…eichler_transvection_half_vector` builds the isometry, asserting integrality of
+every image before it constructs it;
+`PrimitiveIsotropicSubobjects.half_vector_transvection_generators` collects them
+for the plane, and `parabolic_stabilizer_generators` includes them beside the
+radical, the reflected Levi factor and the plane lifts.  The plane-lift code
+(`plane_block_lift`, `levi_lift_generators`) is untouched.
+
+*The checks, on `T_En` at `P_1`.*  The metric dual's 12 basis vectors give 10
+generators: one is excluded because `b(e,w) ≠ 0`, one gives the identity.  Each
+is integral (constructed in `Aut(L)`), an isometry of `T_En` on the full Gram
+matrix, and carries `P_1` onto itself —
+`True / True / True` in `.tmp/issue325-halfvector.log`.
+
+*Exactness by computation.*  In `O(A_L)`:
+
+| family | order of the image | index in `Q` |
+| --- | --- | --- |
+| radical + reflections + plane lifts | 348 364 800 | 134 912 |
+| half-vector transvections alone | 256 | 183 588 249 600 |
+| all four | **89 181 388 800** | **527** |
+| `Stab_Q(D(P_1))` (finite-group stabilizer) | **89 181 388 800** | **527** |
+
+The last two orders are equal, and that equality — `ρ(G_{P_1})` against the
+finite stabilizer both computed here — is the exactness, with no page used as
+evidence.  The half-vector family alone is the `2^8` of §2b.
+
 ## 3. What returns today
 
 * `O(T_En).isotropic_plane_orbits((P1, P2))` — the published-index route —
   returns `2` orbits, and `2` is card `029J`'s `O` row read by tag through
   `card_plane_orbit_row`.
 * `O(T_En).isotropic_plane_orbits((P1,), stabilizer_generators={0: family})` —
-  the #325 acceptance — refuses with the index above.
+  the #325 acceptance — **returns** since the half-vector transvections joined
+  the family: the call closes the sandwich at `[Q : ρ(G_{P_1})] = 527 =
+  |Q · J_{P_1}|`, and it raises rather than returning if the two indices differ.
 
-`tests/lattices/test_the_enriques_plane_index_returns.sage` pins both: the first
-green against the card, the second red, with the measured index in its docstring.
+`tests/lattices/test_the_enriques_plane_index_returns.sage`: `2 passed in
+186.52 s` (`.tmp/issue325-green.log`); before the repair, the same module was
+`1 failed, 1 passed` with the index `134912` of §2.
 
 ## 4. The five plane-orbit modules
 

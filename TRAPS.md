@@ -4332,3 +4332,115 @@ although the class of the vectors modulo `I` is an invariant the call never read
 Both are repaired in the #328 commit; the decision is now
 `None`-or-witness on the invariants plus a construction, and a refusal naming the
 datum where the construction is not exhaustive.
+
+### A cardinal's `parent()` is the element class, so `.parent().one()` is not a unit (2026-11-11, #288)
+
+Measured 2026-11-11 in the adopted runtime (SageMath 11.0.beta5, Python 3.14) on
+`a0d9ad37`: `cardinal(1).parent()` returns the element *class*
+`sage_extensions.categories.sets.cardinals.Cardinalities.parent_class`, not the
+category instance, and that class has no `one`:
+
+```
+first:      1    <class '...categories.sets.cardinals.Cardinalities.parent_class'>
+first.parent():  <class '...categories.sets.cardinals.Cardinalities.parent_class'>
+isinstance(first.parent(), type): True
+Cardinalities() has one: True
+first.is_finite(): True        first.finite_value(): 1
+int(cardinal(Infinity)): TypeError: cannot convert infinite cardinal ℵ_0 to integer
+```
+
+So every site that wrote "the signature count is one" as `positive.parent().one()`
+raised `AttributeError: type object 'Cardinalities.parent_class' has no attribute
+'one'`; on `a0d9ad37` three sites did
+(`Lattices.component_character`, `Lattices.positive_cone_subgroup`,
+`LatticeIsometryMethods.preserves_positive_cone`), and both consumers named by #288
+were among them. The count was available the whole time as `int` of the cardinal.
+
+The signature owner (`_lattice.signature_pairs()`) returns elements of
+`Card × Card`, so an entry is a cardinal and the comparison is an **integer**
+comparison; `is_finite()` has to be asked first, since `int` of an infinite cardinal
+raises `TypeError` and the owner's own docstring admits infinite inertia
+(`Z^{(N)}` has `(p,q) = (ℵ_0, 0)`).
+
+Repaired at one owner — `Lattices.has_two_component_positive_cone()` — which every
+site stating "signature (1,n) with n >= 1" now calls: the three above and the two in
+`hyperbolic_geometry.PositiveConeComponents`, whose `int(...)` spelling was already
+correct and is now the only spelling. `cardinal(1).parent()` itself is left alone:
+the observable wrongness was the comparison, and the element class's `parent()` is
+not this unit's to change.
+
+### Sage's `spinor_generators` returns at most one prime, and half the classes with it (2026-11-11, #330)
+
+Measured 2026-11-11 in the adopted runtime (SageMath 11.0.beta5, release date
+2026-10-28, Python 3.14), source read at
+`sage/quadratic_forms/genera/genus.py` in the pinned image.
+
+`GenusSymbol_global_ring.spinor_generators` (`genus.py:2624-2663`) ends each round
+with `U = Q.subgroup((g,) + Q.gens())`. `Q.gens()` generate the quotient, so `U` is
+the whole quotient after the first accepted prime and `while U.order() < q` stops:
+the call returns at most one prime for **every** genus, and the containment test
+`g.gap() in U.gap()` is only ever asked of the trivial subgroup. On
+`diag(1, 20, 400)`, whose quotient has order 4 and exponent 2:
+
+```
+G.spinor_generators(False) = [3]
+G.spinor_generators(True)  = [3]
+G.representatives(backend='sage')  ->  6 matrices,
+    "Warning: not all classes in the genus were found"
+```
+
+against twelve classes and mass `3/2`. `representatives` seeds its mass-stopped
+traversal from the same call (`genus.py:3071-3074`), so every definite genus with more
+than two spinor genera enumerates half its classes and fails its own mass test. With
+the loop repaired at runtime (`U = Q.subgroup(tuple(U.gens()) + (g,))`) the list
+becomes `[3, 11]` and the same call returns twelve matrices with the warning gone.
+
+Repaired locally in #330: `_spinor_generating_primes` runs the walk the call intends,
+`_genus_classes` hands those seeds to Sage's own `neighbor_iteration`, and the count is
+read as the order of the quotient `A/K = \prod_{p|2d} Z_p^\times/Z_p^{\times2} / K`
+rather than as `2 ** len(spinor_generators)`. Upstream text:
+`results/sage-upstream-spinor-generators.md`.
+
+Second, smaller observation from the same function: `_improper_spinor_kernel`
+(`genus.py:2586`) falls through to `_proper_is_improper` (`genus.py:2688`) whenever `K`
+is a proper subgroup of `A`, and that routine draws `V.random_element()`, so the route
+is randomized; four fresh evaluations on each of `diag(1, 20, ±400)` gave the same
+order every time, so the answer looked invariant.
+
+## #331 · the parabolic at a non-splitting plane: two open factors and two defects seen
+
+Measured on `T_En = U ⊕ U(2) ⊕ E8(-2)` at Sterk's `P_2` (`t(x)`, 122 generators:
+21 radical + 19 half-vector + 64 quotient reflections + 18 plane lifts):
+
+* **The plane factor is closed.**  `levi_plane_action_index()` gives 1 at `P_2` and 3 at
+  `P_1` (14 plane actions there) from the `Γ(2)` certificate: the Sanov shears `A`, `B`
+  and `-1` are exhibited among the returned plane actions and `|GL_2(F_2)|/|image|` is
+  computed.  `J = 2·1_2` at `P_2` is why no congruence condition survives there; at `P_1`
+  `J = diag(1,2)` forces `Γ^0(2)`.
+* **Open: the quotient factor.**  `H_0 = {N ∈ O(I^⊥/I) : (1,N) admits an integral lift}`
+  is not computed here, and neither is `|O(I^⊥/I)|` for `K = P_2^⊥/P_2` (rank 8, negative
+  definite, Gram with Smith normal form `(1,1,2,2,2,2,2,2)`).  The 64 quotient reflections
+  give `(1, s_w)` for roots `w` of `K`, i.e. a subgroup of `H_0`, and that is all.
+* **Open: the radical.**  `U_I` has rank `2·8 + 1 = 17` by the block form
+  (`Hom(K,I)` plus the skew part of `End(I)`), and the returned kernel elements are not
+  shown to generate it.
+
+Two defects seen in the same code, not repaired in this unit:
+
+1. `unipotent_radical_generators` is named for the radical but *is not* contained in it.
+   An Eichler transvection `E_{p,x}` with `p ∈ I` and `x ∈ p^⊥` acts on `I` by the
+   unipotent matrix fixing `p` (`E(p_2) = p_2 + b(p_2,x)p_1`), so it lies in the parabolic
+   and not in `ker(P_I → GL(I) × O(I^⊥/I))`.  Measured at `P_2`: 92 of the 122 returned
+   generators fix `I` pointwise, and 58 act trivially on `I^⊥/I`; the members of the family
+   that lie in the radical are the ones satisfying both, and which of the 21 named
+   transvections do is not recorded by the method.  Any caller that reads it as "the
+   radical" gets a subgroup of the parabolic that is not the kernel.
+2. `plane_block_lift` searches the free parameter of the `P_2` equation over
+   `range(-bound, bound + 1)` with `bound = 2|det J| + 2` (10 at `P_2`) instead of over a
+   complete residue system of the denominators of the linear part.  The integral solutions
+   of `P_2 J^t P_1^t + P_1 J P_2^t = remainder` are a coset `c + Z·S`, and the parameter
+   realising an integral `P_2` can fall outside that range, in which case a lift that
+   exists is reported as `None`.  `levi_lift_generators` inherits it: it returns the lifts
+   of its own candidate list only, and a candidate whose admissible parameter is large is
+   silently dropped.  All 18 candidates found a lift at `P_2`, so no measurement above is
+   affected; the defect is in the completeness of the search, not in what it returned.

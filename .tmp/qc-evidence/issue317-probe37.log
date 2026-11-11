@@ -1,0 +1,41 @@
+PARI stack size set to 2147483648 bytes, maximum size set to 8589934592
+[    70.7s] chamber: 19 walls
+[    70.7s] every wall root has square -2 in the model's form
+[    70.7s] the Gram is U at [0:2] orthogonal to two E8 blocks at [2:10] and [10:18]
+[    70.7s] dominant E8 vectors with norm >= -40: 44 over norms [-40, -38, -36, -34, -32, -30, -28, -26, -24, -22, -20, -18, -16, -14, -12, -10, -8, -6, -4, -2, 0]
+
+===== k = 1 =====
+    genus mass 2499347/9440684171518279680000
+    class 1: v=[-4, -4, -8, -14, -20, -16, -12, -8, -4, -10, -7, -14, -20, -16, -12, -8, -4, -10] |Aut| 1371195958099968000 roots 482 ratio 0.00275472 equal False
+    class 2: v=[-3, -3, -5, -10, -15, -12, -9, -6, -3, -8, -5, -10, -15, -12, -9, -6, -3, -8] |Aut| 12804747411456000 roots 306 ratio 0.29774377 equal False
+    class 3: v=[-2, -2, -4, -7, -10, -8, -6, -4, -2, -5, -2, -4, -6, -5, -4, -3, -2, -3] |Aut| 5393690394624000 roots 306 ratio 0.99805469 equal False
+    class 4: v=[-1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] |Aut| 1941728542064640000 roots 482 ratio 1.00000000 equal True
+[    99.2s] k = 1: 6 chamber vectors, 4 classes, mass 2499347/9440684171518279680000 vs 2499347/9440684171518279680000: equal True
+
+===== k = 2 =====
+    genus mass 642332179/18881368343036559360000
+    class 1: v=[-6, -6, -12, -21, -30, -24, -18, -12, -6, -15, -10, -20, -30, -24, -18, -12, -6, -16] |Aut| 46620662575398912000 roots 544 ratio 0.00000063 equal False
+    class 2: v=[-6, -6, -12, -21, -30, -24, -18, -12, -6, -15, -11, -21, -30, -24, -18, -12, -6, -15] |Aut| 1371195958099968000 roots 480 ratio 0.00002207 equal False
+    class 3: v=[-4, -4, -8, -14, -20, -16, -12, -8, -4, -10, -6, -12, -18, -15, -12, -8, -4, -9] |Aut| 3767021862912000 roots 304 ratio 0.00782532 equal False
+    class 4: v=[-4, -4, -7, -14, -20, -16, -12, -8, -4, -10, -7, -14, -20, -16, -12, -8, -4, -10] |Aut| 334764638208000 roots 244 ratio 0.09563335 equal False
+    class 5: v=[-3, -3, -5, -10, -15, -12, -9, -6, -3, -8, -4, -8, -12, -10, -8, -6, -3, -6] |Aut| 49662885888000 roots 204 ratio 0.68752448 equal False
+    class 6: v=[-2, -3, -4, -7, -10, -8, -6, -4, -2, -5, -4, -7, -10, -8, -6, -4, -2, -5] |Aut| 106542032486400 roots 224 ratio 0.96342518 equal False
+    class 7: v=[-2, -2, -4, -7, -10, -8, -6, -4, -2, -5, 0, 0, 0, 0, 0, 0, 0, 0] |Aut| 129448569470976000 roots 384 ratio 0.96365226 equal False
+    class 8: v=[-2, -2, -2, -4, -6, -5, -4, -3, -2, -3, -2, -4, -6, -5, -4, -3, -2, -3] |Aut| 809053559193600 roots 264 ratio 0.99998486 equal False
+    class 9: v=[-1, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] |Aut| 1941728542064640000 roots 480 ratio 1.00000000 equal True
+[   129.7s] k = 2: 14 chamber vectors, 9 classes, mass 642332179/18881368343036559360000 vs 642332179/18881368343036559360000: equal True
+DONE
+[peakrss] issue286: child waited=0 shell_code=0 samples=66
+[peakrss] peak tree RSS      : 695 MiB
+[peakrss] low-water MemAvail : 4889 MiB
+[peakrss] peak single VmHWM  : 695 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      684 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   128.1s procs=  3 rss=   695 MiB hwm=   695 MiB avail=  5379 MiB
+[peakrss]   t=   130.1s procs=  3 rss=   695 MiB hwm=   695 MiB avail=  5202 MiB
+[peakrss]   t=   126.1s procs=  3 rss=   578 MiB hwm=   578 MiB avail=  5490 MiB
+[peakrss]   t=   106.1s procs=  3 rss=   565 MiB hwm=   565 MiB avail=  5722 MiB
+[peakrss]   t=   108.1s procs=  3 rss=   565 MiB hwm=   576 MiB avail=  5680 MiB
+launcher exit: 0

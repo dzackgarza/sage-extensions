@@ -1,0 +1,26 @@
+.....                                                                    [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_the_cards_class_count: 110.39 s > 20 s
+============================== slowest durations ===============================
+110.39s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_the_cards_class_count
+1.41s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_through_the_unimodular_complement
+0.16s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_a_definite_genus_with_two_spinor_genera_keeps_its_split
+0.12s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_is_the_rank_seventeen_lattice
+0.01s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_mass_is_the_siegel_mass
+
+(10 durations < 0.005s hidden.  Use -vv to show these durations.)
+5 passed in 112.46s (0:01:52)
+[peakrss] issue317: child waited=0 shell_code=0 samples=58
+[peakrss] peak tree RSS      : 631 MiB
+[peakrss] low-water MemAvail : 10979 MiB
+[peakrss] peak single VmHWM  : 631 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      620 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   112.1s procs=  3 rss=   631 MiB hwm=   631 MiB avail= 11338 MiB
+[peakrss]   t=   114.1s procs=  3 rss=   631 MiB hwm=   631 MiB avail= 11336 MiB
+[peakrss]   t=    92.1s procs=  3 rss=   630 MiB hwm=   630 MiB avail= 11369 MiB
+[peakrss]   t=    94.1s procs=  3 rss=   630 MiB hwm=   630 MiB avail= 11363 MiB
+[peakrss]   t=    96.1s procs=  3 rss=   630 MiB hwm=   630 MiB avail= 11363 MiB
+launcher exit: 0

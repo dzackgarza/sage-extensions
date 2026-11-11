@@ -105,38 +105,38 @@ def test_the_o_row_of_the_plane_index_returns_on_the_enriques_lattice() -> None:
 
 
 def test_the_supplied_setwise_stabilizer_generators_close_the_plane_index() -> None:
-    r"""The setwise stabilizer's own generators make the index return (#325's acceptance).
+    r"""The setwise stabilizer's own generators make the plane index return (#325's acceptance).
 
-    **Red on main at this commit.** The call raises
+    The generators are the four factors of
+    :meth:`parabolic_stabilizer_generators`: the Eichler transvections of the
+    unipotent radical, the *half-vector* transvections along vectors of the
+    metric dual that are not lattice vectors, the reflections lifted from the
+    shells of $P_1^\perp/P_1$, and the integral Levi lifts on $P_1$.  The call
+    closes the sandwich exactly when
+    $[Q : \langle\rho(h)\rangle] = |Q \cdot J_{P_1}|$, i.e. when the supplied
+    family's discriminant image is $\rho(G_{P_1})$ itself, and it raises
+    otherwise.
 
-    ```
-    ValueError: the discriminant image of the stabilizer of <the plane of rank 2> is not
-    established: the supplied generators generate a subgroup of index 134912 in
-    rho(O(T_En)), while the orbit of the plane's divided classes has 527 points.
-    ```
+    Exactness is asserted by computation, not by a citation: computed in the
+    finite group $O(A_L)$ on this tree, the image of the four families has order
+    $89181388800$ and so does $\mathrm{Stab}_Q(D(P_1))$, both of index $527$ in
+    $Q = \rho(O(T_{\mathrm{En}}))$ — the two orders are equal, and that equality
+    is what the call checks before it returns.  The half-vector family alone
+    contributes $2^8$; without it the same computation gave $134912 = 527 \cdot
+    256$, and that is the shortfall this test was red on.
 
-    The generators supplied are the ones
-    :meth:`parabolic_stabilizer_generators` returns: 20 Eichler transvections of
-    the unipotent radical, 120 reflections lifted from the shells of
-    $P_1^\perp/P_1$, and 12 integral Levi lifts of elementary matrices of
-    $GL(P_1)$.  Measured one family at a time against $Q = \rho(O(T_{\mathrm{En}}))$
-    (order $46998591897600$): the transvections generate a subgroup of order 1,
-    the Levi lifts a subgroup of order 1, and the reflections a subgroup of
-    order $348364800 = |\rho(O(E_8(-2)))|$, of index
-    $134912 = 527 \cdot 256$.  An independent computation of the same images
-    (dual basis $G^{-1}$, a class read off the fractional coordinates of
-    $L^\#/L$) agrees on all 152 generators: the 32 radical and Levi-on-$P$
-    generators move no class, the 120 reflections move classes.
-
-    So the obstruction is not the port and not the call: the three families are
-    not a generating set of the parabolic, and the missing factor
-    $256 = 2^8$ is exactly $|A_{E_8(-2)}|$, the part of $A_L$ the transvections
-    and the Levi-on-$P$ lifts leave alone.  Until that family is completed, the
-    honest answer of the call is this refusal.
-
-    The same numbers come out on `1756b91`: the setwise stabilizer returns
-    150 generators in 493 s and the call raises the index `134912` against
-    the class orbit's `527`.
+    The research statements behind the construction
+    (`lem:half-vector-eichler`, `lem:ten-base-stabilizers`,
+    `thm:enriques-integral-plane-stabilizers` in
+    `writing/coble/lattices-and-moduli/lattices.md`, and
+    `thm:schreier-discriminant-image` in
+    `writing/coble/computations/discriminant-form-descent.md`) are page proofs:
+    they are cited as the source of the construction and certify nothing here.
+    The expected values this module asserts are card `029J`'s rows, read by tag
+    through `card_plane_orbit_row` — the `O` row for the ambient orbit count and
+    the `Otilde+` row for the sum of the per-class indices, which the two calls
+    in this module and in
+    `test_enriques_plane_orbits_by_divided_classes.sage` reproduce.
     """
     lattice = NamedLattices.TEn
     plane = _enriques_plane_representatives(lattice)[0]
@@ -150,4 +150,7 @@ def test_the_supplied_setwise_stabilizer_generators_close_the_plane_index() -> N
 
     assert orbits.cardinality() != cardinal(0)
     for orbit in orbits:
-        assert orbit.representative().is_primitive() is True
+        representative = orbit.representative()
+        assert representative.inclusion().codomain() is lattice
+        assert representative.is_primitive() is True
+        assert representative.module_rank() == cardinal(2)

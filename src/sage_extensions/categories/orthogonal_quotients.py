@@ -13,6 +13,7 @@ from sage_extensions.categories.sets.finite_ordered_sets import (
 )
 from sage_extensions.categories.sets.indexed_families import finite_indexed_family
 from sage_extensions.categories.rings.ring_foundation import _owned_integers
+from sage_extensions.categories.sets.cardinals import cardinal
 from sage_extensions.categories.sets.set_categories import NN, Set, Sets
 
 
@@ -644,10 +645,7 @@ class OrthogonalCharacterQuotient:
             return int(libgap.Order(libgap.Group(tuples)))
         og = self._discriminant_group
         engine = _gap_model(og)
-        rho = self.lattice.discriminant_representation()
-        rho_images = [
-            _element_to_engine(og, rho(generator)) for generator in ambient
-        ]
+        rho_images = list(self.ambient_discriminant_images())
         im_rho = libgap.Subgroup(engine, rho_images)
         ambient_order = int(libgap.Order(im_rho))
         if not sign_labels:
@@ -721,21 +719,21 @@ class OrthogonalCharacterQuotient:
         elif self.determinant_kernel:
             kernel_selection = lattice.SO()
         else:
+            kernel_selection = None
+        if kernel_selection is None:
             # No sign factor: K_0 is the whole ambient group, and its
             # rho-image piece is exactly what carries rho(O(L)) into the meet
             # (dropping it reintroduces the refuted target-alone answer on
-            # nonsurjective rho).
-            kernel_selection = self.supergroup
-        rho = lattice.discriminant_representation()
-        pieces.append(
-            libgap.Subgroup(
-                og_engine,
-                [
-                    _element_to_engine(self._discriminant_group, rho(g))
-                    for g in kernel_selection.group_generators()
-                ],
-            )
-        )
+            # nonsurjective rho).  The images of that same generating family are
+            # the quotient's cached sweep, so K_0 contributes no second one.
+            kernel_images = list(self.ambient_discriminant_images())
+        else:
+            rho = lattice.discriminant_representation()
+            kernel_images = [
+                _element_to_engine(self._discriminant_group, rho(g))
+                for g in kernel_selection.group_generators()
+            ]
+        pieces.append(libgap.Subgroup(og_engine, kernel_images))
         if not pieces:
             raise ValueError(
                 f"{self.subgroup} retains no discriminant preimage: its joint "
@@ -990,6 +988,15 @@ class OrthogonalCharacterQuotient:
         The subgroup is bound to the FQF engine of ``O(A_L)`` (whose chains are
         measured instant at the Enriques size, `.tmp/measure_pathB.log`), and
         letters index the ambient ``O(L)`` generators through ``rho``.
+
+        ``rho`` is evaluated on *every* ambient generator, so this is the one
+        computation of ``rho(O(L))`` the quotient schedules: the returned tuple
+        is cached per subgroup (hence per lattice), and the callers that need the
+        ambient generator images read them from here rather than sweeping the
+        generating family again.  On ``T_Co`` one sweep is 26 s of
+        ``discriminant_morphism`` constructions
+        over 340 generators (`.tmp/p310b-probe1.log`), and the row used to
+        schedule four of them before its first lift.
         """
         from sage_extensions.categories.group.groups import (
             _element_to_engine,
@@ -999,12 +1006,36 @@ class OrthogonalCharacterQuotient:
         og = self._discriminant_group
         engine = _gap_model(og)
         ambient = self._ambient_generators()
-        rho = self.lattice.discriminant_representation()
-        images = [_element_to_engine(og, rho(g)) for g in ambient]
+        images = list(self.ambient_discriminant_images())
         subgroup = libgap.Subgroup(engine, images)
         section = _GapWordSection(images, parent=engine)
         return engine, subgroup, section, ambient
 
+    @cached_method
+    def ambient_discriminant_images(self):
+        r"""``rho`` on the selected generating family of ``O(L)``, once per lattice.
+
+        ``rho`` is the lattice's discriminant representation and the family is
+        the ambient group's selected generating set; both are fixed objects of
+        the lattice's own construction, so the images are a datum of the lattice,
+        not of a row, a class or a call.  They are engine elements of the
+        ``O(A_L)`` model, the form every caller here wants: the word section of
+        :meth:`_im_rho_engine_and_section`, the sign-descent test, and the
+        double-coset walk all consume them.
+
+        Computing them is a ``discriminant_morphism`` construction per generator
+        (340 generators on ``T_Co``; 26 s in one sweep, `.tmp/p310b-probe1.log`),
+        which is why this is memoized rather than recomputed where it is needed.
+        """
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        og = self._discriminant_group
+        rho = self.lattice.discriminant_representation()
+        return tuple(
+            _element_to_engine(og, rho(g)) for g in self._ambient_generators()
+        )
+
+    @cached_method
     def _sign_descent_rank(self):
         r"""``(j, sign_labels)``: F2-dimension of sign patterns realized on ``ker rho``.
 
@@ -1012,12 +1043,16 @@ class OrthogonalCharacterQuotient:
         homomorphism on ``im rho``; each of the ``2^m`` products is tested by
         ``GroupHomomorphismByImages`` on the rho-images of the ambient
         generators, inside the ``O(A_L)`` engine only.
+
+        The rho-images are read from :meth:`_im_rho_engine_and_section`, which is
+        the quotient's single evaluation of ``rho`` on the ambient family; the
+        rank itself is a property of the lattice and its characters, not of a
+        row, so the pair is cached as well.
         """
         from itertools import product as _product_tuples
 
         from sage_extensions.categories.group.groups import (
             OwnedGroups,
-            _element_to_engine,
             _gap_model,
         )
 
@@ -1028,8 +1063,7 @@ class OrthogonalCharacterQuotient:
         if not self._has_discriminant or m == 0:
             return m, sign_labels
         _engine, im_rho, _section, ambient = self._im_rho_engine_and_section()
-        rho = self.lattice.discriminant_representation()
-        rho_images = [_element_to_engine(self._discriminant_group, rho(g)) for g in ambient]
+        rho_images = self.ambient_discriminant_images()
         ring = self.lattice.base_ring()
         # F2 encoding of signs: 0 = +1 (trivial), 1 = -1, so the sign of a
         # product is the F2 sum of the selected values.
@@ -1407,8 +1441,7 @@ class OrthogonalCharacterQuotient:
 
         j, sign_labels = self._sign_descent_rank()
         engine, im_rho, _section, ambient = self._im_rho_engine_and_section()
-        rho = self.lattice.discriminant_representation()
-        rho_images = [_element_to_engine(self._discriminant_group, rho(g)) for g in ambient]
+        rho_images = self.ambient_discriminant_images()
         ring = self.lattice.base_ring()
 
         def sign_of(element, label):
@@ -2054,6 +2087,74 @@ def _two_hyperbolic_planes(lattice):
     return len(planes) >= 2
 
 
+def _line_orbit_from_divided_classes(subgroup, representative):
+    r"""The ``ker rho`` line orbits as divided classes, or ``None`` when the split is not one.
+
+    Let ``G = O(L)``, ``H = Stab_G(x)`` for the line ``x``, ``Gamma = ker rho`` and
+    ``c = [v/div v]`` for a generator ``v`` of ``x``.  Because ``Gamma`` is normal in ``G``
+    and equal to the kernel of ``rho``, the double cosets ``Gamma \\ G / H`` correspond
+    bijectively to the cosets ``rho(G)/rho(H)`` -- orbit--stabilizer for the action of the
+    quotient ``G/ker rho``, which acts through ``rho`` -- and the map ``Gamma g x |-> rho(g) c``
+    sends an orbit to its class, with fibre over ``c`` of size
+    ``[Stab_(rho(G))(c) : rho(H)]``.
+
+    When that index is 1 -- computed here from the two exact images, not assumed -- the
+    ``Gamma``-orbits in ``G x`` are in bijection with the classes of ``rho(G) c``, and a
+    representative of each orbit is *any* primitive isotropic line with that divided class, so
+    no isometry is needed: the lines come from
+    ``Lattices.ParentMethods.primitive_isotropic_vector_of_divided_class``.  An index greater
+    than one is a case of the mathematics, not a fallback: the caller keeps the explicit
+    isometry route, which is how the case of several isometries per class is handled.
+
+    Only the stable orthogonal group itself is served here: ``Otilde^+`` is the kernel of the
+    joint character ``rho x (real spinor norm)``, whose index is not this one, so its orbits are
+    not these cosets and the caller keeps its own route.
+    """
+    lattice = subgroup.supergroup().domain()
+    if subgroup != lattice.stable_orthogonal_group():
+        return None
+    labels = tuple(representative.module_generating_set())
+    if len(labels) != 1:
+        return None
+    vector = representative.inclusion()(representative.module_generator(labels[0]))
+    divisor = lattice.div(vector)
+    if divisor <= lattice.base_ring().zero():
+        return None
+    image_of_group = subgroup.supergroup().discriminant_image()
+    image_of_stabilizer = representative.stabilizer_discriminant_image()
+    order = image_of_group.cardinality().finite_value()
+    stabilizer_order = image_of_stabilizer.cardinality().finite_value()
+    if order % stabilizer_order:
+        raise ArithmeticError(
+            f"the discriminant image of the stabilizer of {representative!r} has order "
+            f"{stabilizer_order}, which does not divide the order {order} of the image of "
+            f"{subgroup.supergroup()}; the stabilizer's image must lie in the group's image"
+        )
+    class_orbit = {lattice.divided_discriminant_class(vector)}
+    frontier = [lattice.divided_discriminant_class(vector)]
+    while frontier:
+        current = frontier.pop()
+        for generator in image_of_group.group_generators():
+            moved = generator(current)
+            if moved not in class_orbit:
+                class_orbit.add(moved)
+                frontier.append(moved)
+    if order % len(class_orbit):
+        raise ArithmeticError(
+            f"the class orbit of {representative!r} has {len(class_orbit)} elements, which does "
+            f"not divide the order {order} of the discriminant image of {subgroup.supergroup()}"
+        )
+    index_per_class = (order // len(class_orbit)) // stabilizer_order
+    if index_per_class != 1:
+        return None
+    return tuple(
+        lattice.primitive_isotropic_subobject(
+            lattice.primitive_isotropic_vector_of_divided_class(component, divisor)
+        )
+        for component in class_orbit
+    )
+
+
 def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
     if not flag and index(rank) == 0:
         return subgroup.supergroup().isotropic_orbit_representatives(0)
@@ -2083,6 +2184,11 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
                 for splitting in quotient.splitting_isometries_from_line_class(*line_image)
             )
             continue
+        if not flag and index(rank) == 1:
+            from_divided_classes = _line_orbit_from_divided_classes(subgroup, representative)
+            if from_divided_classes is not None:
+                representatives.extend(from_divided_classes)
+                continue
         stabilizer = orthogonal_group.isotropic_stabilizer_generators(
             representative, flag=flag
         )
