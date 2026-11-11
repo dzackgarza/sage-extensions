@@ -446,3 +446,28 @@ solves.
 | `issue366-lint.log` | `8430450` (#366) | `test_lint` on the new and changed test files |
 | `issue366-regression.log` | `8430450` (#366) | the neighbouring files with the change |
 | `issue366-base.log` | `75b048f` (main without #366) | the same neighbouring file set without it |
+
+### #360: the plane row of `T_Co` for `O(T_Co)`, and the parabolic at a `T_Co` plane (2026-11-11, base `2a43ce4`)
+
+The plane-orbit call no longer reads its count off the finite divided-class set
+where that set is not the orbit set: at a representative whose parabolic
+`is_parabolic_complete()` establishes, it computes the double cosets
+`ρ(Γ) \ ρ(O(L)) / ρ(G_x)` themselves and realizes each orbit by the splitting
+isometry's transport (`_orbits_from_stabilizer`).  On `T_Co` that is what the
+row needs, because the plane's stabilizer maps onto a subgroup of index **8** in
+the stabilizer of its order-four isotropic subgroup — `1981808640 / 247726080`,
+both orders computed — while its class set is one `ρ(O(L))`-orbit of `23715`
+points, so the class-set count is short by exactly that factor.  The plane's
+block basis was also repaired at its owner: completing it by keeping standard
+basis vectors while they raise the rank leaves a sublattice of index `2` at that
+plane, and the two completions are now the cokernels'
+(`finite_free_trivialization`), which is the statement that a saturated
+sublattice of a free `ZZ`-module is a direct summand.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue360-parabolic-at-a-tco-plane.py`, `issue360-parabolic-at-a-tco-plane.log` | the tree of this push | at the `T_Co` plane of `test_the_tco_plane_orbit_and_its_composed_automorphisms.sage`: `is_parabolic_complete() = True` from its three factors (radical `1` in 6.4 s, plane actions `1` in 41.0 s, quotient images `1` in 4.9 s), `105` generators, `stabilizer_discriminant_image_orders() = (1981808640, 247726080)` and index `8` in 79.7 s; the block basis is `11` rows of determinant `1` (it was `2` before the repair); `T_En` at Sterk's `P₁`, `P₂` returns `±1` as before |
+| `issue360-plane-orbit-by-stabilizer.py`, `issue360-plane-orbit-by-stabilizer.log` | the tree of this push | `ρ̄⁻¹(ρ(O(T_Co)))` has `[O(L) : Γ] = 1`, and `isotropic_plane_orbits([P])` returns **1** orbit in 73.7 s, its representative primitive and its divided class set the one handed in |
+| `issue360-coble-plane-row.py`, `issue360-coble-plane-row.log` | the tree of this push | `Tco.Aut().isotropic_orbit_representatives(2)` stops after 9 min 6 s at `PariError: sorry, qfsolve, dim >= 10 is not yet implemented` (`lattice_engines.py:496` ← `lattices.py:4687` ← `isotropic_induction.py:84` ← `isotropic_orbits.py:1393`); the incidence stops with it |
+| `issue360-regression.log` | the tree of this push | the neighbouring parabolic, plane-block, radical and divided-class rows with the change |
+| `issue360-lint.log` | the tree of this push | `test_lint` on the new test module: **1 file, 0 findings** |
