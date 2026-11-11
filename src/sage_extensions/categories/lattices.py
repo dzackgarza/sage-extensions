@@ -2316,6 +2316,10 @@ class _OrientedFlagMorEngine(_ConditionSetEngine):
     carries one, so this engine adds it.
     """
 
+    def an_element(self):
+        r"""The retained transporter, a point of the universe admitted into this subset (``_ConditionSetEngine._an_element_``)."""
+        return self._an_element_()
+
     def identity(self):
         r"""The identity of the universe Mor ``Fun([t], Lattices)(F, F)``, admitted into this subset."""
         universe = self.universe()
@@ -2354,6 +2358,18 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
                 return cls.__base__(lattices, length)
         assert int(length) >= 1, f"an oriented isotropic flag has at least one term, not {length}"
         return typecall(cls, Cat(), FiniteOrdinalCategory(int(length) + 1), lattices)
+
+    def __init__(self, category_of_categories, domain, codomain) -> None:
+        from types import MethodType
+
+        super().__init__(category_of_categories, domain, codomain)
+        # The realized class of a functor category can place Sets.ParentMethods,
+        # whose Mor is the plain Mor of the diagrams, before this class (the
+        # hazard _category_mor names). The oriented Mor is the definition of
+        # this category's arrows, so it is bound on the instance, where the
+        # public attribute lookup reads it first.
+        self.Mor = MethodType(OrientedIsotropicFlags.Mor, self)
+        self.two_mor = self.Mor
 
     def _make_named_class_key(self, name):
         return OrientedIsotropicFlags, self.category_of_categories(), self.domain_category(), self.codomain_category()
