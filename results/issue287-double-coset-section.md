@@ -69,7 +69,7 @@ Before the fix: `2 failed, 1 passed in 7.67 s`, both failures that `TypeError`. 
   Not a record on the subgroup either: `fd60fe9` first kept an id-keyed dict on the
   subgroup, one entry per value of the cover's word evaluation. That is one entry per
   word, so the subgroup would grow without bound on exactly the long walks this admission
-  serves — the shape sage-extensions#292 is about one call away. `d7b4b08` moves the mark
+  serves — the shape sage-extensions#292 is about one call away. `c694cb9` moves the mark
   onto the element, where it lives exactly as long as the element does.
 
 - Nothing is reparented. An element parented by the subgroup breaks the *ambient's*
