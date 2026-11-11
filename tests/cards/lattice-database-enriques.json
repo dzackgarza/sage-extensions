@@ -1366,7 +1366,7 @@
  },
  "cusp_diagrams": {
   "029J": {
-   "certification": "3d07d82fc2fb4bc5f2171e4d73ef7c6e534354d0d9e7ad2e55910f0a7ce25022",
+   "certification": "c67663ee2cb0aade7b4069583e0e73b87f8f86970ddec9f6835e4dfc65c19b34",
    "latex": "U \\oplus U(2) \\oplus E_{8}(-2)",
    "name": "U + U(2) + E8(-2)",
    "path": "lattices/029J.md",
@@ -1801,6 +1801,21 @@
         "right": "\\alpha_12"
        },
        {
+        "left": "\\alpha_7",
+        "order": 3,
+        "right": "\\alpha_8"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 3,
+        "right": "\\overline{\\widetilde\\alpha}_8"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 4,
+        "right": "\\alpha_13"
+       },
+       {
         "left": "\\overline{\\widetilde\\alpha}_8",
         "order": 3,
         "right": "\\alpha_10"
@@ -1831,6 +1846,7 @@
        "\\alpha_5",
        "\\alpha_6",
        "\\alpha_7",
+       "\\alpha_8",
        "\\overline{\\widetilde\\alpha}_8",
        "\\alpha_9",
        "\\alpha_10",
@@ -1839,7 +1855,7 @@
        "\\alpha_13",
        "\\alpha_14"
       ],
-      "wall_count": 13
+      "wall_count": 14
      }
     ]
    },
