@@ -21,8 +21,17 @@ from sage_extensions.all import *
 
 
 def u_plus_a1():
-    r"""Return \(U\oplus A_1\), of signature \((1,2)\)."""
-    return Lattices(ZZ)("U") + Lattices(ZZ)("A1")
+    r"""Return \(U\oplus A_1\), of signature \((1,2)\), as a hyperbolic lattice.
+
+    The reflection algorithms are methods of ``HyperbolicLattices``, whose domain
+    is a lattice of signature \((n,1)\) or \((1,n)\) (V. V. Nikulin, *Reflection
+    groups in hyperbolic spaces and the denominator formula for Lorentzian
+    Kac--Moody Lie algebras*, Izvestiya: Mathematics 60 (1996), no. 2,
+    arXiv:alg-geom/9503003v6, §1.1, (1.1.1), preprint p. 3).  The orthogonal sum
+    of two lattices is a ``Lattices`` object, so the sum is handed to the
+    category that owns the algorithms.
+    """
+    return HyperbolicLattices(ZZ)(Lattices(ZZ)("U") + Lattices(ZZ)("A1"))
 
 
 def test_vinbergs_criterion_bounds_the_root_lengths_of_the_bogachev_kolpakov_lattices() -> None:
@@ -53,10 +62,21 @@ def test_vinbergs_criterion_bounds_the_root_lengths_of_the_bogachev_kolpakov_lat
 def test_the_root_length_forty_nine_form_does_not_represent_one() -> None:
     r"""\(q = 49m_2^2 + 14m_1m_3 - 28m_2m_3 + 6m_3^2\) never takes the value \(1\).
 
-    Bogachev and Kolpakov, arXiv:2112.14642v4 section 6.2.  Modulo \(7\),
-    \(q\equiv 6m_3^2\), and \(6\cdot\{0,1,2,4\}=\{0,6,5,3\}\) omits \(1\), so
-    \(q\) fails to represent \(1\) over \(\mathbb Z_7\), hence over \(\mathbb Z\).
-    With \(q(x)=b(x,x)\) its Gram matrix is
+    Bogachev and Kolpakov, *Thin hyperbolic reflection groups*,
+    arXiv:2112.14642v4, §6.2, p. 9, state it of this form: "However, \(q\) does
+    not integrally represent \(1\)".  The paper's reason is the local one:
+    modulo \(7\), \(q\equiv 6m_3^2\), and \(6\cdot\{0,1,2,4\}=\{0,6,5,3\}\) omits
+    \(1\), so \(q\) fails over \(\mathbb Z_7\) and hence over \(\mathbb Z\).
+
+    Only the integral verdict is asserted, which is what the paper states and what
+    :meth:`represents` decides.  The local half of the argument is not asked of
+    this library: ``localize_at_prime`` on a lattice returns the localization of
+    its underlying *module*, which carries no form, and :meth:`represents` is
+    implemented over \(\mathbb Z\), \(\mathbb Q\), \(\mathbb A\) and
+    \(\mathbb R\) (Serre, *A Course in Arithmetic*, Ch. IV, §1, pp. 27--34, with
+    Ch. IV §2 for the \(p\)-adic case), refusing any other ring by assertion.
+
+    With \(q(x)=b(x,x)\) the Gram matrix is
     \(\begin{psmallmatrix}0&0&7\\0&49&-14\\7&-14&6\end{psmallmatrix}\), of
     determinant \(7\cdot(0\cdot(-14)-49\cdot7)=-7^4\).
     """
@@ -64,7 +84,6 @@ def test_the_root_length_forty_nine_form_does_not_represent_one() -> None:
 
     assert lattice.determinant() == -2401
     assert not lattice.represents(1)
-    assert not lattice.localize_at_prime(7).represents(1)
 
 
 def test_vinberg_enumeration_closes_the_polyhedron_of_u_plus_a1() -> None:
