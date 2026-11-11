@@ -100,7 +100,17 @@ def lattice_table4(ref: str, tag: str) -> dict:
 
 
 def plane_orbits(ref: str, tag: str) -> dict:
-    """The primitive-isotropic-plane rows of one Scattone lattice card."""
+    """The primitive-isotropic rows of one lattice card: its planes, and its lines.
+
+    A card's group row carries ``planes`` (the 1-dimensional cusps) and, where it
+    states them, ``constant``: the number of its 0-dimensional cusps, which are the
+    primitive isotropic *lines*.  ``029J``'s ``Otilde+`` row states both -- 528 lines
+    and 24242 planes -- and names ``Otilde^+(N)`` acting on ``N = U + U(2) + E8(-2)``
+    for them (Dutour Sikirić--Hulek, arXiv:2302.01679v2, section 3.6, p. 22), so a
+    line count is read from the card by tag here and the ``constant`` key is renamed
+    to the ``lines`` it states.  A row keeping only one of the two is kept with the
+    one it has.
+    """
     path = LATTICE_PATH.format(tag=tag)
     card = front_matter(fetch(ref, path), path)
     orbits = card["integral"]["primitive_orbits"]
@@ -114,13 +124,14 @@ def plane_orbits(ref: str, tag: str) -> dict:
         "determinant": card.get("determinant"),
         "rows": {
             group: {
-                "planes": row["planes"],
+                **({"planes": row["planes"]} if "planes" in row else {}),
+                **({"lines": row["constant"]} if "constant" in row else {}),
                 "citation": row["reference"]["citation"],
             }
-            # A group row without a ``planes`` count states its class number as
-            # a constant elsewhere and is not a plane row.
+            # A group row that states neither count is a class number stated
+            # elsewhere, not an orbit row.
             for group, row in orbits.items()
-            if "planes" in row
+            if "planes" in row or "constant" in row
         },
     }
 
@@ -186,7 +197,7 @@ def main(argv: list[str]) -> int:
                     "parent_group",
                 ],
                 "lattice": "integral.polarization_counts.{degree}.{#h,#Γ̄_h,reference.citation}",
-                "plane_orbits": "integral.primitive_orbits.{group}.planes,reference.citation",
+                "plane_orbits": "integral.primitive_orbits.{group}.planes and .constant(the line count),reference.citation",
                 "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
             },
             "generated_by": "tests/cards/refresh_lattice_database_enriques.py",

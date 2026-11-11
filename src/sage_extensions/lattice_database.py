@@ -33,6 +33,27 @@ def _digest():
     return json.loads(DIGEST.read_text())
 
 
+def _orbit_rows(tag: str):
+    r"""Return ``(rows, source)``: the orbit rows card ``tag`` states, and who states them.
+
+    A lattice card keeps them under ``integral.primitive_orbits`` and the digest
+    stores them per group; an arithmetic-group card states the singular rows
+    ``data.line_orbits``, ``data.plane_orbits`` and ``data.flag_orbits``, which the
+    digest stores under the card's tag.  One resolution serves the readers below,
+    so two rows of the same card cannot be read from different cards.
+    """
+    digest = _digest()
+    lattice_rows = digest.get("plane_orbits", {})
+    if tag in lattice_rows:
+        return lattice_rows[tag]["rows"], f"lattice card {tag}"
+    rows = {
+        name: {"planes": card["plane_orbits"], "lines": card["line_orbits"]}
+        for name, card in digest.get("arithmetic_groups", {}).items()
+        if card.get("tag") == tag
+    }
+    return rows, f"arithmetic-group card {tag}"
+
+
 def card_plane_orbit_row(tag: str, group: str) -> int:
     r"""Return card ``tag``'s number of primitive isotropic plane orbits under ``group``.
 
@@ -41,24 +62,51 @@ def card_plane_orbit_row(tag: str, group: str) -> int:
     digest keeps.  A card that states no such row raises, rather than returning
     a number of another group's.
     """
-    digest = _digest()
-    lattice_rows = digest.get("plane_orbits", {})
-    if tag in lattice_rows:
-        rows = lattice_rows[tag]["rows"]
-        source = f"lattice card {tag}"
-    else:
-        rows = {
-            name: {"planes": card["plane_orbits"]}
-            for name, card in digest.get("arithmetic_groups", {}).items()
-            if card.get("tag") == tag
-        }
-        source = f"arithmetic-group card {tag}"
+    rows, source = _orbit_rows(tag)
     if group not in rows:
         raise KeyError(
             f"{source} states no primitive-isotropic-plane row for {group!r}: "
             f"it states {sorted(rows)}"
         )
+    if "planes" not in rows[group]:
+        raise KeyError(
+            f"{source} states a row for {group!r} without a plane count: it states "
+            f"{sorted(rows[group])}"
+        )
     return rows[group]["planes"]
+
+
+def card_line_orbit_row(tag: str, group: str) -> int:
+    r"""Return card ``tag``'s number of primitive isotropic line orbits under ``group``.
+
+    The row is the card's ``integral.primitive_orbits.{group}.constant``, stored by
+    the digest as ``lines``: a card's ``constant`` is the number of its
+    0-dimensional cusps, and those cusps are the primitive isotropic *lines*.  On
+    ``029J`` the ``Otilde+`` row states **528** lines beside 24242 planes for
+    ``Otilde^+(N)`` on ``N = U + U(2) + E8(-2)`` -- "the space M~_En =
+    Otilde^+(N)\D_N ... has 528 0-dimensional cusps (isotropic lines) and 24242
+    1-dimensional cusps (isotropic planes); under O^+_10(F_2) the 528 lines fall in
+    two orbits, of lengths 527 and 1" (D. Dutour Sikirić, K. Hulek, *Moduli of
+    polarised Enriques surfaces -- computational aspects*, arXiv:2302.01679v2,
+    section 3.6, p. 22).  Its ``O`` row states 2: Sterk's two orbits of primitive
+    isotropic lines (*Compactifications of the period space of Enriques surfaces,
+    Part I*, Math. Z. 207 (1991), Proposition 4.5, p. 28).
+
+    A card that states no such row raises, rather than returning another group's
+    count.
+    """
+    rows, source = _orbit_rows(tag)
+    if group not in rows:
+        raise KeyError(
+            f"{source} states no primitive-isotropic-line row for {group!r}: "
+            f"it states {sorted(rows)}"
+        )
+    if "lines" not in rows[group]:
+        raise KeyError(
+            f"{source} states a row for {group!r} without a line count: it states "
+            f"{sorted(rows[group])}"
+        )
+    return rows[group]["lines"]
 
 
 # The card's own words for a split of a plane row into orbit lengths: lattice
@@ -137,4 +185,85 @@ def card_plane_orbit_lengths(tag: str, group: str):
     return tuple(found)
 
 
-__all__ = ["card_plane_orbit_lengths", "card_plane_orbit_row", "DIGEST"]
+# The card's own words for a split of a *line* row into orbit lengths: 029J's
+# Otilde^+ citation states "the 528 lines fall in two orbits, of lengths 527 and
+# 1".  As with the plane rows, the digest keeps the total as a field and the split
+# in the citation, so this phrasing is what a per-orbit length is read from.
+_LINE_ORBIT_LENGTH_PHRASE = re.compile(
+    r"(\d+)\s+lines fall in two orbits, of lengths (\d+) and (\d+)"
+)
+
+
+def card_line_orbit_lengths(tag: str, group: str):
+    r"""Return card ``tag``'s per-orbit numbers for the primitive isotropic lines under ``group``.
+
+    The digest's structured ``lines`` row holds the *total* number of primitive
+    isotropic lines of a row (:func:`card_line_orbit_row`); the split of that total
+    into the lengths of the individual orbits is stated in the row's own citation,
+    which the digest keeps verbatim.  This function reads the split there and
+    returns it sorted.
+
+    The reading is checked against the row before it is returned: the lengths must
+    add up to the card's total for that row, and their number must be the card's own
+    count of orbits -- the ``O`` row states that count, because ``029J``'s
+    ``Otilde+`` sentence says "under O^+_10(F_2) the 528 lines fall in two orbits",
+    and those two orbits are the card's two ``O``-orbits of primitive isotropic
+    lines.  Either check failing raises instead of returning numbers the card does
+    not support.
+    """
+    digest = _digest()
+    card = digest.get("plane_orbits", {}).get(tag)
+    if card is None:
+        raise KeyError(
+            f"the digest keeps no line rows for lattice card {tag!r}: it keeps "
+            f"{sorted(digest.get('plane_orbits', {}))}"
+        )
+    rows = card["rows"]
+    if group not in rows:
+        raise KeyError(
+            f"lattice card {tag} states no primitive-isotropic-line row for {group!r}: "
+            f"it states {sorted(rows)}"
+        )
+    if "lines" not in rows[group]:
+        raise KeyError(
+            f"lattice card {tag} states a row for {group!r} without a line count: it "
+            f"states {sorted(rows[group])}"
+        )
+    citation = rows[group]["citation"]
+    match = _LINE_ORBIT_LENGTH_PHRASE.search(citation)
+    if match is None:
+        raise KeyError(
+            f"lattice card {tag} states the total of its {group!r} line row but not the "
+            f"lengths of the orbits it splits into: the phrase "
+            f"{_LINE_ORBIT_LENGTH_PHRASE.pattern!r} does not occur in its citation, which "
+            f"reads {citation!r}"
+        )
+    stated_total = int(match.group(1))
+    found = sorted(int(entry) for entry in match.groups()[1:])
+    total = rows[group]["lines"]
+    if stated_total != total:
+        raise ValueError(
+            f"lattice card {tag} states {stated_total} lines in its per-orbit sentence for "
+            f"{group!r}, against its own row total {total}"
+        )
+    if sum(found) != total:
+        raise ValueError(
+            f"lattice card {tag} states per-orbit lengths {found} for {group!r}, whose sum is "
+            f"{sum(found)}, against the card's own total {total}"
+        )
+    orbit_count = rows["O"]["lines"] if "O" in rows else None
+    if orbit_count is not None and len(found) != orbit_count:
+        raise ValueError(
+            f"lattice card {tag} states {len(found)} per-orbit lengths {found} for {group!r}, "
+            f"against the card's own count of {orbit_count} O-orbits of primitive isotropic lines"
+        )
+    return tuple(found)
+
+
+__all__ = [
+    "card_line_orbit_lengths",
+    "card_line_orbit_row",
+    "card_plane_orbit_lengths",
+    "card_plane_orbit_row",
+    "DIGEST",
+]
