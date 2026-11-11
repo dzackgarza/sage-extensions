@@ -21,10 +21,12 @@ there, by comparing computed values:
   radical.  The fourteen transvections alone do **not**: their translations span $12$ of
   $16$, which is the measurement #353 reported and this file's third test still pins.
 
-So `is_parabolic_complete()` stays `False` at $P_2$, but no longer on the radical
-factor: the reason is the Levi pairing, which `parabolic_obstruction()` names.  The
-plane-action factor (index $1$ by the $\\Gamma(2)$ certificate) and the quotient factor
-(index $1$ by computed orders) are decided, and the radical is now decided too.
+So every factor of the parabolic at $P_2$ is decided: the radical by the parameter
+lattice, the plane-action factor by the $\\Gamma(2)$ certificate, and the quotient factor
+by computed orders — `is_parabolic_complete()` is `True` there and
+`parabolic_obstruction()` is `None` (#366).  What this file keeps from #353 is the
+measurement behind the radical's own answer: the fourteen transvections alone fall short,
+and the block generators are what closes the gap.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -118,5 +120,5 @@ def test_the_returned_family_reaches_the_radical_translation_rank() -> None:
     assert cardinal(target) == cardinal(plane.unipotent_radical_rank() - plane.unipotent_translation_kernel_rank())
     assert cardinal(plane.unipotent_translation_rank(transvections)[0]) < cardinal(target)
     assert plane.unipotent_radical_index() == cardinal(1)
-    assert plane.is_parabolic_complete() is False
-    assert bool(plane.parabolic_obstruction()) is True
+    assert plane.is_parabolic_complete() is True
+    assert plane.parabolic_obstruction() is None

@@ -1,24 +1,26 @@
-r"""The parabolic at a plane that does not split: what is claimed, and what the obstruction is (#331).
+r"""The parabolic at a plane that does not split: the three factors, and their decision (#331, #366).
 
-At a primitive isotropic plane that does not split off the lattice, the block
-equations of D. Dutour Sikirić and K. Hulek, *Moduli of polarised Enriques
-surfaces — computational aspects*, J. London Math. Soc. 110 (2024),
-arXiv:2302.01679v2, **Theorem 4.9** (`theorem_isotropic_k_planes`), proof,
-printed **p. 22**, give integral lifts of plane actions — #326 builds them for
-Sterk's $P_2$ of $T_{\mathrm{En}}$ — but they do not show that the lifts returned
-*generate* the subgroup of plane actions admitting one.  The paper's own
-statement is an algorithm: an integral extension exists only on a finite-index
-subgroup ("we could not find a universal construction of such a lattice"), and
-their **Alg 1**, section "Integral group algorithms", computes the integral points
-of the rational group by a set-stabilizer computation in $GL_n(\mathbb{Z}/d\mathbb{Z})$
-plus Schreier's lemma.  No cited statement names a generating set of the
-parabolic.
+At a primitive isotropic plane $P$ the parabolic is
+$P_I = \mathrm{Stab}_{O(L)}(P)$, and it maps onto a subgroup
+$M \subseteq \GL(P) \times O(P^\perp/P)$ with kernel the unipotent radical $U_I$.  A
+generating family is the whole parabolic exactly when it contains $U_I$ and its image is
+$M$, by the correspondence between the subgroups containing a normal subgroup and the
+subgroups of the quotient (Milne, *Group Theory*, v4.01, Theorem 1.47 printed p. 22, with
+Corollary 1.48 printed p. 23).  `parabolic_completeness_decision()` computes the three
+factors of that statement — the radical by its parameter lattice (#365), the plane actions
+of the members trivial on $P^\perp/P$, and the quotient images of the members that fix $P$
+pointwise — and `is_parabolic_complete()` is `True` exactly when all three are one.
 
-So at $P_2$ the repository reports the two facts it can: the family generated is
-a subgroup of the setwise stabilizer, and `is_parabolic_complete()` is False with
-`parabolic_obstruction()` naming the missing statement.  This module pins that,
-so that a later unit that settles the congruence subgroup has to change the
-answer rather than the record.  It asserts no count and no index.
+At Sterk's $P_2$ of $T_{\mathrm{En}}$, which does *not* split off the lattice, all three
+hold, so the parabolic there is generated and `parabolic_obstruction()` is `None`; at
+$P_1$, which does split, the block equations force the answer directly.  What the block
+equations of Dutour Sikirić–Hulek, Theorem 4.9 (arXiv:2302.01679v2, printed p. 22), give
+on their own is the *lifts* of plane actions — their **Alg 1** computes the integral points
+of the rational group by a set-stabilizer computation in $GL_n(\mathbb{Z}/d\mathbb{Z})$ plus
+Schreier's lemma, which is the whole of $M$ and not a generating set of it — so the
+generation here rests on the three computed factors and not on that algorithm.
+
+This module pins the decision at both representatives, and no count or index is typed.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -39,20 +41,24 @@ def _second_representative(lattice):
     return lattice.primitive_isotropic_subobject(2 * first + 2 * second + w, third)
 
 
-def test_the_plane_that_does_not_split_is_not_claimed_to_be_complete() -> None:
-    r"""$P_2$ does not split, and the parabolic there is a subgroup, not the stabilizer.
+def test_the_plane_that_does_not_split_is_complete_by_its_three_factors() -> None:
+    r"""$P_2$ does not split, and its parabolic is generated anyway — decided, not assumed.
 
-    The published statement that is missing is a generation one; Dutour
-    Sikirić--Hulek, Theorem 4.9 (arXiv:2302.01679v2, printed p. 22), is an
-    algorithm for the stabilizer as the integral points of a rational group, so
-    `is_parabolic_complete()` stays False at $P_2$ and the obstruction is stated.
+    The three factors of `parabolic_completeness_decision()` are compared with the answer
+    the predicate gives: the radical's own index, the plane actions of the members trivial
+    on $P_2^\perp/P_2$, and the quotient images of the members that fix the plane
+    pointwise.  All three being one *is* the statement that the family generates the
+    parabolic, so the predicate is `True` and there is no obstruction left to state.
     """
     lattice = NamedLattices.TEn
     plane = _second_representative(lattice)
 
     assert plane.splitting_complement() is None
-    assert plane.is_parabolic_complete() is False
-    assert bool(plane.parabolic_obstruction()) is True
+    assert plane.unipotent_radical_index() == cardinal(1)
+    assert plane.levi_plane_action_index(trivial_on_quotient=True) == cardinal(1)
+    assert plane.levi_quotient_image_index(trivial_on_plane=True) == cardinal(1)
+    assert plane.is_parabolic_complete() is True
+    assert plane.parabolic_obstruction() is None
     assert plane.levi_lift_generators() != ()
 
 

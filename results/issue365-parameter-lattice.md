@@ -234,8 +234,12 @@ reason: what is missing is the Levi pairing — a subdirect product of `GL_2(ℤ
 `O(P_2^⊥/P_2)` need not be the product, and for the returned generators the plane action
 determines the quotient action.  That is #331's factor.  The generation of `U_I` itself is
 here: the block generators cover a `ℤ`-basis of `τ(U_I)` and contain a generator of `Z`,
-and `U_I` is a central extension of `τ(U_I)` by `Z` (Robinson, *A Course in the Theory of
-Groups*, 2nd ed., GTM 80, **1.4.6**, printed p. 20, and **1.3.3**, p. 9, cited in
-`unipotent_radical_block_generators`), so the family generates the radical.
+and `U_I` is a central extension of `τ(U_I)` by `Z`, so the family generates the radical by
+the correspondence between the subgroups of a group containing a normal subgroup and the
+subgroups of the quotient — Milne, *Group Theory*, v4.01 (6 November 2025), **Theorem 1.47
+(Correspondence Theorem)**, printed **p. 22**, with **Corollary 1.48** on **p. 23**, cited
+in `unipotent_radical_block_generators`.  (That citation replaced Robinson's 1.4.6/1.3.3
+in #366, where Milne's notes were read on this machine; the earlier one named a statement
+this workspace has no copy of.)
 `unipotent_radical_index()` returns `1` and the #353 test's assertion of an infinite index
 is replaced by that measurement.

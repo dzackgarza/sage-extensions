@@ -28,13 +28,17 @@ surfaces — computational aspects*, JLMS 110 (2024), arXiv:2302.01679v2, **Theo
 and checked by `plane_block_gram()` — an element of the radical has
 
 ```
-g = ( 1  a  τ )        A = 1,   τ + cᵗ A_K = 0,   a + aᵗ + cᵗ A_K c = 0,
-    ( 0  A  0 )   ⟺    A_K = b(K, K),
-    ( 0  c  1 )
+g = ( 1  0  0 )        A = 1,   τ = -J⁻¹ cᵗ A_K,   J a + aᵗ Jᵗ = -(Kc + cᵗ Kᵗ + cᵗ A_K c),
+    ( a  1  τ )   ⟺    J = b(U, P),  K = b(U, K),  A_K = b(K, K),
+    ( c  0  1 )
 ```
 
 because it fixes `P` pointwise and carries `P^⊥` into `P^⊥`, and `P^⊥` into `P` modulo
-`P`.  So:
+`P`.  This is the form #366 corrected: the two relations written here first,
+`τ + cᵗ A_K = 0` and `a + aᵗ + cᵗ A_K c = 0`, are the equations of a *split* basis with
+`J = 1₂`, which is not `P₂`'s (`J = 2·1₂` there, and `K` has a nonzero entry), and the
+block matrix is written in the ordering of `unipotent_block_solution`, with `a` in the
+`(P, U)`-block and `c` in the `(K, U)`-block.  So:
 
 * the Levi torus `GL(U) × O(K)` is **not** in the radical (`A = 1`), which is why `U_I` is
   unipotent with a well-defined rank;
