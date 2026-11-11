@@ -66,3 +66,25 @@ def test_the_plane_classes_and_their_cusp_count_are_card_029J_s_rows() -> None:
     assert index_first + index_second == card_plane_orbit_row("029J", "Otilde+")
     assert card_plane_orbit_row("029J", "O") == cardinal(2)
 
+
+
+def test_the_plane_that_does_not_split_has_an_exact_discriminant_image() -> None:
+    r"""At $P_2$ the image of the returned generators is the whole bound.
+
+    $\rho(G_{P_2}) \subseteq \mathrm{Stab}_{O(q)}(D(P_2))$ of order
+    $|O(q)|/23715 = 1981808640$, and the images of the generators
+    `parabolic_stabilizer_generators` returns generate a subgroup of that order.
+    Equal orders decide the image without any claim that those generators
+    generate $G_{P_2}$ itself, which stays open
+    (`parabolic_obstruction`).  The index $23715$ is card `029J`'s cited value for
+    $P_2$ (Dutour Sikirić--Hulek, section 3.6, p. 22).
+    """
+    lattice = NamedLattices.TEn
+    _first, second = _representatives(lattice)
+
+    upper, lower = second.stabilizer_discriminant_image_orders()
+
+    assert second.stabilizer_discriminant_index() == 23715
+    assert upper == lower
+    assert second.stabilizer_discriminant_image_is_exact() is True
+    assert second.stabilizer_discriminant_image_index() == 1

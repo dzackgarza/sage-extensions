@@ -1900,19 +1900,15 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             so the order of the subgroup they generate is a lower bound without
             any generation claim for `G_P` itself -- the point of this pair.
 
-            Both orders are computed, not read from a page.  Building the
-            permutation action costs about ten seconds and the images of the
-            returned family about five minutes for a hundred generators, all of
-            it cached.
+            Both orders are computed, not read from a page: the upper from the
+            orbit of `D(P)` in the permutation action of `O(q)` on its
+            discriminant group, the lower from the order of the subgroup the
+            images generate in `O(q)` itself.  Neither is a count of this
+            module's own search, and both are cached.
             """
-            from sage.libs.gap.libgap import libgap
-
-            from sage_extensions.categories.isotropic_orbits import (
-                _divided_discriminant_classes,
-            )
-
             lattice = self.ambient_lattice()
-            order, _action, ranking, _elements = self._discriminant_orthogonal_action()
+            group = lattice.discriminant_group().orthogonal_group()
+            order = group.order()
             orbit_size = self.stabilizer_discriminant_index()
             if int(order) % orbit_size:
                 raise ValueError(
@@ -1921,14 +1917,10 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 )
             upper = int(order) // orbit_size
             rho = lattice.discriminant_representation()
-            elements = tuple(lattice.discriminant_group().elements())
-            images = [
-                libgap.PermList(
-                    [int(ranking(rho(generator)(element))) + 1 for element in elements]
-                )
-                for generator in self.parabolic_stabilizer_generators()
-            ]
-            lower = int(libgap.Group(*images).Size()) if images else 1
+            images = tuple(
+                rho(generator) for generator in self.parabolic_stabilizer_generators()
+            )
+            lower = int(group.subgroup(images).order()) if images else 1
             return upper, lower
 
         def stabilizer_discriminant_image_is_exact(self) -> bool:
@@ -1980,7 +1972,12 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
               builds them -- but nothing cited shows that the ones returned
               *generate* the subgroup of plane actions that admits an integral
               lift, so the family is a subgroup of the parabolic and not the
-              parabolic.  :meth:`parabolic_obstruction` says why.
+              parabolic.  :meth:`parabolic_obstruction` says why, and
+              :meth:`stabilizer_discriminant_image_is_exact` says whether the
+              *discriminant image* -- what the plane-orbit call of #286
+              consumes -- is nevertheless the whole of `\\rho(G_P)`.  At Sterk's
+              `P_2` of `T_{\\mathrm{En}}` it is: the image has order 1981808640,
+              the bound `|O(q)|/23715`.
             """
             return self.splitting_complement() is not None
 
@@ -2015,10 +2012,14 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             agree, `\rho(G_P)` is exact whatever the generation of `G_P`
             (:meth:`stabilizer_discriminant_image_orders`,
             :meth:`stabilizer_discriminant_image_is_exact`).  At Sterk's `P_2`
-            of `T_{\mathrm{En}}` the bound is `|O(q)|/23715` and the family of
-            :meth:`parabolic_stabilizer_generators` reaches it only once the
-            half-vector Eichler transvections of #325 are among the generators:
-            with the plane lifts alone the image is short by `2^12`.
+            of `T_{\mathrm{En}}` the bound is `|O(q)|/23715 = 1981808640` and the
+            family of :meth:`parabolic_stabilizer_generators` reaches it --
+            measured, because the half-vector Eichler transvections of #325
+            (:meth:`half_vector_transvection_generators`, the transvections
+            `E_{e,w}` for `w` in the metric dual with `2w \\in L` and
+            `b(e,w) = 0`) are among them.  With the plane lifts of
+            :meth:`levi_lift_generators` alone the image was short by `2^12`,
+            which is what those transvections supply.
             """
             if self.is_parabolic_complete():
                 return None
