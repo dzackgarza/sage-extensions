@@ -367,17 +367,49 @@ class NumberFieldVinbergLattice(SageObject):
         return f"Number-field Vinberg lattice ({self.lattice()}, {self.real_embedding()})"
 
 
-def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions):
+def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions, admits_root=None):
     r"""Run Vinberg's algorithm on a Gram matrix of signature \((n,1)\).
 
     Returns the completeness flag of the search and the coordinate rows of the
     accepted roots.  ``vinal`` is Bogachev and Perepechko's implementation of
     the algorithm; ``FindRoots`` reports whether the fundamental polyhedron was
     established, which is the algorithm's own termination criterion.
+
+    ``admits_root`` restricts the algorithm to a reflection subgroup: a candidate
+    root is accepted only when its coordinate row is admitted, and the same test
+    filters the roots of the initial cone at the controlling vector.  A finite
+    index reflection subgroup of \(O(L)\) has its own polyhedron and not the
+    full group's, so the restriction is part of the algorithm and not a filter
+    of its output (#297).
     """
     from vinal import VinAl
 
-    algorithm = VinAl(gram, controlling_vector, False, None)
+    if admits_root is None:
+        algorithm = VinAl(gram, controlling_vector, False, None)
+    else:
+        class _FilteredVinAl(VinAl):
+            r"""Vinberg's algorithm over one lattice, restricted to a reflection subgroup.
+
+            ``VinAl`` enumerates the roots of the whole lattice and accepts a
+            candidate when it is a root and lies beyond the walls already found
+            (its ``IsRoot`` and ``IsNewRoot``).  A reflection subgroup of
+            finite index has a different polyhedron -- the intersection of the
+            half-spaces of its own root system -- so a candidate must also have
+            its reflection in the subgroup.  This class adds exactly that test,
+            by ``IsRoot``, which both the initial cusp cone and the candidate
+            enumeration go through.
+            """
+
+            def __init__(self, *arguments, **keywords) -> None:
+                self._admits_root = admits_root
+                super().__init__(*arguments, **keywords)
+
+            def IsRoot(self, vector):
+                return super().IsRoot(vector) and bool(
+                    self._admits_root(tuple(int(entry) for entry in vector))
+                )
+
+        algorithm = _FilteredVinAl(gram, controlling_vector, False, None)
     complete = algorithm.FindRoots(max_roots=max_roots, max_decompositions=max_decompositions)
     return bool(complete), tuple(tuple(root) for root in algorithm.roots)
 
@@ -491,8 +523,15 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             )
 
         @cached_method
-        def _vinberg_search(self, controlling_vector, max_roots, max_decompositions):
+        def _vinberg_search(self, controlling_vector, max_roots, max_decompositions, admits_root=None):
             r"""Run Vinberg's algorithm and return completeness with the roots.
+
+            ``admits_root`` is the reflection-subgroup restriction of #297: a
+            callable taking a root of this lattice and answering whether its
+            reflection is in the subgroup.  It is applied to the candidate roots
+            and to the roots of the initial cusp cone, inside the algorithm, and
+            the rows are converted to lattice elements here so the caller speaks
+            in elements and not in engine coordinates.
 
             The algorithm is stated for a lattice over any totally real ring of
             integers, where a root row is a vector over that ring and the
@@ -509,16 +548,22 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             )
             gram, negated = self._engine_gram_of_signature_n_1()
             coordinates = None if controlling_vector is None else list(_framing_coordinates(controlling_vector))
+            row_filter = None
+            if admits_root is not None:
+                def row_filter(row):
+                    element = self(tuple(int(entry) for entry in row))
+                    return bool(admits_root(-element if negated else element))
             complete, rows = _vinal_vinberg_roots(
                 gram,
                 coordinates,
                 max_roots,
                 max_decompositions,
+                admits_root=row_filter,
             )
             roots = tuple(self(tuple(int(entry) for entry in row)) for row in rows)
             return complete, tuple(-root for root in roots) if negated else roots
 
-        def vinberg_simple_roots(self, controlling_vector=None, *, max_roots=None, max_decompositions=None):
+        def vinberg_simple_roots(self, controlling_vector=None, *, max_roots=None, max_decompositions=None, admits_root=None):
             r"""Return the roots Vinberg's algorithm accepted.
 
             The accepted roots are the outward normals of the walls of a
@@ -533,7 +578,9 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             enumeration measures height from.  Omitted, the engine picks one of
             negative square for itself.
             """
-            _complete, roots = self._vinberg_search(controlling_vector, max_roots, max_decompositions)
+            _complete, roots = self._vinberg_search(
+                controlling_vector, max_roots, max_decompositions, admits_root=admits_root
+            )
             return finite_ordered_set(roots)
 
         def vinberg_algorithm(self, controlling_vector=None, *, max_roots=None, max_decompositions=None):
@@ -700,20 +747,83 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             r"""Return the projectivization of the positive-cone component containing ``timelike``."""
             return self.positive_cone_component(timelike).projectivization()
 
-        def fundamental_chamber(self, controlling_vector=None, *, max_roots=None, max_decompositions=None):
+        def fundamental_chamber(self, controlling_vector=None, *, max_roots=None, max_decompositions=None, admits_root=None):
             r"""Return the exact root-half-space cone cut out by Vinberg's walls.
 
             The chamber is ``{x : b(r,x) >= 0 for every accepted wall r}``.
             It retains those roots and their actual correlation covectors; the
             completion flag records whether the Vinberg search established the
             full wall set or only a bounded exploration prefix.
+
+            ``admits_root`` restricts the algorithm to a reflection subgroup: a
+            root is a wall only when ``admits_root(root)`` holds, which for a
+            subgroup is the statement that the reflection in it lies there
+            (:meth:`subgroup_fundamental_chamber` builds the callable for a
+            subgroup given by generators, #297).  Without it the chamber is the
+            full group's, and for a finite-index reflection subgroup that is a
+            different polyhedron.
             """
-            complete, roots = self._vinberg_search(controlling_vector, max_roots, max_decompositions)
+            complete, roots = self._vinberg_search(
+                controlling_vector, max_roots, max_decompositions, admits_root=admits_root
+            )
             correlation = self.algebraic_correlation_morphism()
             return self.rational_polyhedral_cone(
                 tuple(correlation(root) for root in roots),
                 wall_roots=roots,
                 complete=complete,
+            )
+
+        def subgroup_fundamental_chamber(self, controlling_vector=None, *, generators, max_roots=None, max_decompositions=None):
+            r"""Return the chamber of the reflection subgroup generated by ``generators``.
+
+            ``generators`` are isometries of this lattice; the reflection subgroup
+            they generate is a subgroup of \(O(L)\), and its fundamental
+            polyhedron is the intersection of the half-spaces of *its* roots, not
+            of the lattice's.  Vinberg's algorithm is run with the root filter
+            "the reflection in this root lies in the subgroup", which is applied
+            inside the search and not to its output: a wall of the full group
+            that the subgroup does not contain is not a wall of the subgroup's
+            chamber, and filtering afterwards would return a smaller cone that is
+            not a fundamental domain of anything.
+
+            Membership of a reflection in the subgroup is the subgroup's own
+            test (:meth:`sage_extensions.categories.group.groups.*.subgroup`), and
+            an undecided membership propagates from it rather than being guessed:
+            where the group machinery cannot decide membership of an integral
+            reflection, this call does not return a chamber.
+
+            Where it is needed (#285, research#654).  Sterk, *Compactifications
+            of the period space of Enriques surfaces, Part I*, Math. Z. 207
+            (1991), §4.3.1, p. 17 takes the chamber of \(G_v\), the image of the
+            integral stabilizer \(\Gamma_v\) in \(O(v^\perp/\mathbf Z v)\); the
+            five cusp diagrams of §4.3.5--4.3.9 have 12, 10, 12, 11 and 14 walls,
+            while the full group's chamber of the cusp lattice \(U + E_8(-2)\)
+            has ten, so four of the five are chambers of proper reflection
+            subgroups and only this call produces them.  Vinberg's algorithm is
+            E. B. Vinberg, *Some arithmetical discrete groups in Lobacevskii
+            spaces* (1975), and Conway--Sloane, *SPLAG*, Ch. 27, §2.
+            """
+            subgroup = self.O().subgroup(tuple(generators))
+            # The algorithm asks about the same root repeatedly, once per
+            # decomposition it belongs to, and membership in a subgroup of
+            # infinite index is not cheap; the answers are memoised for the one
+            # call.  A caller whose subgroup has its own decidable criterion
+            # should pass it to `fundamental_chamber(admits_root=...)` instead:
+            # that is the path #285 takes, with the discriminant criterion of
+            # the stabilizer's image (#312).
+            decided = {}
+
+            def admits_root(root):
+                key = tuple(int(entry) for entry in root.to_vector())
+                if key not in decided:
+                    decided[key] = bool(self.reflection(root) in subgroup)
+                return decided[key]
+
+            return self.fundamental_chamber(
+                controlling_vector,
+                max_roots=max_roots,
+                max_decompositions=max_decompositions,
+                admits_root=admits_root,
             )
 
         def coxeter_polyhedron(

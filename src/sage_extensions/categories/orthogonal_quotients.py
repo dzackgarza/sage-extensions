@@ -2130,14 +2130,19 @@ def _line_orbit_from_divided_classes(subgroup, representative):
             f"{stabilizer_order}, which does not divide the order {order} of the image of "
             f"{subgroup.supergroup()}; the stabilizer's image must lie in the group's image"
         )
-    class_orbit = {lattice.divided_discriminant_class(vector)}
+    # The class orbit in the order the walk reaches it, so the representatives this
+    # function returns are the same tuple on every call: a set's iteration order is
+    # not a datum a comparison against a recorded list can be made against.
+    seen = {lattice.divided_discriminant_class(vector)}
+    class_orbit = [lattice.divided_discriminant_class(vector)]
     frontier = [lattice.divided_discriminant_class(vector)]
     while frontier:
         current = frontier.pop()
         for generator in image_of_group.group_generators():
             moved = generator(current)
-            if moved not in class_orbit:
-                class_orbit.add(moved)
+            if moved not in seen:
+                seen.add(moved)
+                class_orbit.append(moved)
                 frontier.append(moved)
     if order % len(class_orbit):
         raise ArithmeticError(
@@ -2147,10 +2152,22 @@ def _line_orbit_from_divided_classes(subgroup, representative):
     index_per_class = (order // len(class_orbit)) // stabilizer_order
     if index_per_class != 1:
         return None
-    return tuple(
-        lattice.primitive_isotropic_subobject(
-            lattice.primitive_isotropic_vector_of_divided_class(component, divisor)
+    # One construction for the whole orbit: the residue loop asks for the orbit's
+    # classes together, so it fixes their residues in one pass over the translations
+    # instead of one search per class (which would rebuild the search 527 times on
+    # ``T_Co``, where the class orbit is the 527 nonzero isotropic classes).
+    vectors = lattice.isotropic_lines_by_divided_class(divisor, classes=tuple(class_orbit))
+    missing = tuple(component for component in class_orbit if component not in vectors)
+    if missing:
+        raise ValueError(
+            f"the divided classes of the line orbit of {representative!r} in {lattice!r} are not "
+            f"all realized at divisor {divisor}: {len(missing)} of the {len(class_orbit)} classes "
+            f"have no primitive isotropic vector there, the first being {missing[0]}.  The "
+            f"divided-class route supplies one representative per class or none, so this refuses "
+            f"rather than returning a short family"
         )
+    return tuple(
+        lattice.primitive_isotropic_subobject(vectors[component])
         for component in class_orbit
     )
 

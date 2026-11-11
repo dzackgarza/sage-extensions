@@ -5,7 +5,7 @@
    "lattice": "lattices/{tag}.md"
   },
   "generated_by": "tests/cards/refresh_lattice_database_enriques.py",
-  "ref": "587d56febe5856d54c6bc9fc023fa5a425f76bfb",
+  "ref": "d6a539339bac5ea0ee8d8bde5dc19564955eb152",
   "repository": "dzackgarza/lattice-database",
   "rows": {
    "arithmetic_group": [
@@ -21,7 +21,7 @@
    ],
    "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
    "lattice": "integral.polarization_counts.{degree}.{#h,#Γ̄_h,reference.citation}",
-   "plane_orbits": "integral.primitive_orbits.{group}.planes,reference.citation"
+   "plane_orbits": "integral.primitive_orbits.{group}.planes and .orbit_lengths(per-orbit sizes) and .constant(the line count),reference.citation"
   }
  },
  "arithmetic_groups": {
@@ -1273,15 +1273,26 @@
    "path": "lattices/029J.md",
    "rows": {
     "O": {
-     "citation": "V. Alexeev, P. Engel, D. Z. Garza, L. Schaffler, \"Compact moduli of Enriques surfaces of degree 2\", Nagoya Math. J. (2025). Section 2: the unique (-2)-vector and the two (-4)-vectors modulo Gamma_En (from V. V. Nikulin, J. Soviet Math. 22 (1983), Theorems 2.13 and 2.15); the two 0-cusps of F_{(10,10,0)} are the primitive isotropic lines modulo Gamma_En (Section 3.2, p. 589); the two orbits of primitive isotropic lines and the two of primitive isotropic planes modulo O(T_En) are H. Sterk, \"Compactifications of the period space of Enriques surfaces, Part I\", Math. Z. 207 (1991), 1-36, Propositions 4.5 (p. 28) and 4.6 (p. 29). The two O(N)-orbits of isotropic lines are spanned by L_1 = Ze_1 and L_2 = Ze_3, with images of their stabilizers in the discriminant group of index 1 and 527 = 17*31, and the two orbits of isotropic planes are P_1 = Ze_1 + Ze_3 and P_2 = Z(2e_1 + 2e_2 + w) + Ze_3, w a vector of norm 4 in E_8, with images of index 527 and 23715 = 3^2*5*17*31: D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Section 3.6 (The Tits building), p. 22.",
+     "citation": "V. Alexeev, P. Engel, D. Z. Garza, L. Schaffler, \"Compact moduli of Enriques surfaces of degree 2\", Nagoya Math. J. 259 (2025), 581–624. Section 2: the unique (-2)-vector and the two (-4)-vectors modulo Gamma_En (from V. V. Nikulin, J. Soviet Math. 22 (1983), Theorems 2.13 and 2.15); the two 0-cusps of F_{(10,10,0)} are the primitive isotropic lines modulo Gamma_En (Section 3.2, p. 589); the two orbits of primitive isotropic lines and the two of primitive isotropic planes modulo O(T_En) are H. Sterk, \"Compactifications of the period space of Enriques surfaces, Part I\", Math. Z. 207 (1991), 1-36, Propositions 4.5 (p. 28) and 4.6 (p. 29). The two O(N)-orbits of isotropic lines are spanned by L_1 = Ze_1 and L_2 = Ze_3, with images of their stabilizers in the discriminant group of index 1 and 527 = 17*31, and the two orbits of isotropic planes are P_1 = Ze_1 + Ze_3 and P_2 = Z(2e_1 + 2e_2 + w) + Ze_3, w a vector of norm 4 in E_8, with images of index 527 and 23715 = 3^2*5*17*31: D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Section 3.6 (The Tits building), p. 22. D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Section 3.6 (The Tits building), p. 22: \"The set of 24242 isotropic planes also has 2 orbits, and these are of length 527 and 23715 respectively.\"",
+     "lines": 2,
+     "orbit_lengths": [
+      527,
+      23715
+     ],
      "planes": 2
     },
     "Otilde+": {
-     "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Section 3.6 (The Tits building), p. 22: the space M~_En = Otilde^+(N)\\D_N, for N = U + U(2) + E_8(-2), has 528 0-dimensional cusps (isotropic lines) and 24242 1-dimensional cusps (isotropic planes); under O^+_10(F_2) the 528 lines fall in two orbits, of lengths 527 and 1, and the 24242 planes in two orbits, of lengths 527 and 23715.",
+     "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Section 3.6 (The Tits building), p. 22: the space M~_En = Otilde^+(N)\\D_N, for N = U + U(2) + E_8(-2), has 528 0-dimensional cusps (isotropic lines) and 24242 1-dimensional cusps (isotropic planes); under O^+_10(F_2) the 528 lines fall in two orbits, of lengths 527 and 1, and the 24242 planes in two orbits, of lengths 527 and 23715. D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Section 3.6 (The Tits building), p. 22: \"The set of 24242 isotropic planes also has 2 orbits, and these are of length 527 and 23715 respectively.\"",
+     "lines": 528,
+     "orbit_lengths": [
+      527,
+      23715
+     ],
      "planes": 24242
     },
     "gamma-en-2": {
-     "citation": "H. Sterk, \"Compactifications of the period space of Enriques surfaces, Part I\", Math. Z. 207 (1991), 1-36, Proposition 4.2.3 with Remark 4.2.4, p. 16: the five orbits of primitive isotropic lines of Gamma_En,2, the zero-dimensional boundary components of the Satake-Baily-Borel compactification; V. Alexeev, P. Engel, D. Z. Garza, L. Schaffler, \"Compact moduli of Enriques surfaces of degree 2\", Nagoya Math. J. 249 (2025), Section 3.3, p. 590: \"There are five 0-cusps for which we use Sterk's numbering 1, 2, 3, 4, 5. There are also 9 distinct 1-cusps.\"",
+     "citation": "H. Sterk, \"Compactifications of the period space of Enriques surfaces, Part I\", Math. Z. 207 (1991), 1-36, Proposition 4.2.3 with Remark 4.2.4, p. 16: the five orbits of primitive isotropic lines of Gamma_En,2, the zero-dimensional boundary components of the Satake-Baily-Borel compactification; V. Alexeev, P. Engel, D. Z. Garza, L. Schaffler, \"Compact moduli of Enriques surfaces of degree 2\", Nagoya Math. J. 259 (2025), 581–624, Section 3.3, p. 590: \"There are five 0-cusps for which we use Sterk's numbering 1, 2, 3, 4, 5. There are also 9 distinct 1-cusps.\"",
+     "lines": 5,
      "planes": 9
     }
    },
@@ -1306,7 +1317,12 @@
     },
     "O+": {
      "citation": "J. Scattone, \"On the compactification of moduli spaces for algebraic K3 surfaces\", Mem. Amer. Math. Soc. 374 (1987), Section 6, p. 94 — the Baily–Borel compactification of D_k/O_-(L_k) is obtained from D_k/O_-(L_k) by adding one point p and h(k) curves, so one zero-dimensional boundary component and h(1) = 4 one-dimensional ones (Section 6.2, p. 97). Section 3.6, p. 50, defines O_-(L) as the group of isometries of L with spinor norm 1, and Section 1, p. 3, as the index-two subgroup of O(L) that preserves the component D_k of the period domain; that is this card's O+.",
+     "lines": 1,
      "planes": 4
+    },
+    "Otilde+": {
+     "citation": "J. Scattone, \"On the compactification of moduli spaces for algebraic K3 surfaces\", Mem. Amer. Math. Soc. 374 (1987), Theorem 4.0.1, p. 55 — the Baily–Borel compactification of D_k/Gamma_k has exactly floor((N+2)/2) boundary components of Type III, for k = k~ N^2 with k~ squarefree, which is one in degree 2k = 2 because N = 1. Section 1, p. 4, sets Gamma_k = O~(L_k) intersect O_-(L_k) and notes that it is also written O*(L_k) in Section 3.6, whose p. 51 has O*(L) = O_-(L) intersect O~(L); that is this card's Otilde+.",
+     "lines": 1
     }
    },
    "signature": [
@@ -1330,7 +1346,12 @@
     },
     "O+": {
      "citation": "J. Scattone, \"On the compactification of moduli spaces for algebraic K3 surfaces\", Mem. Amer. Math. Soc. 374 (1987), Section 6, p. 94 — the Baily–Borel compactification of D_k/O_-(L_k) is obtained from D_k/O_-(L_k) by adding one point p and h(k) curves, so one zero-dimensional boundary component and h(2) = 9 one-dimensional ones (Section 6.3, p. 100). Section 3.6, p. 50, defines O_-(L) as the group of isometries of L with spinor norm 1, and Section 1, p. 3, as the index-two subgroup of O(L) that preserves the component D_k of the period domain; that is this card's O+.",
+     "lines": 1,
      "planes": 9
+    },
+    "Otilde+": {
+     "citation": "J. Scattone, \"On the compactification of moduli spaces for algebraic K3 surfaces\", Mem. Amer. Math. Soc. 374 (1987), Theorem 4.0.1, p. 55 — the Baily–Borel compactification of D_k/Gamma_k has exactly floor((N+2)/2) boundary components of Type III, for k = k~ N^2 with k~ squarefree, which is one in degree 2k = 4 because N = 1. Section 1, p. 4, sets Gamma_k = O~(L_k) intersect O_-(L_k) and notes that it is also written O*(L_k) in Section 3.6, whose p. 51 has O*(L) = O_-(L) intersect O~(L); that is this card's Otilde+.",
+     "lines": 1
     }
    },
    "signature": [

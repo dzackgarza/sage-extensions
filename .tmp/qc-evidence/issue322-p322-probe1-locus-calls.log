@@ -1,0 +1,62 @@
+T_Co rank 11
+CALL 1 begins at 34.7s from isotropic_lifts.py:234:_integral_lift_locus <- isotropic_lifts.py:278:integral_members <- recursive.py:1720:_isotropic_pointed_isometry <- recursive.py:1597:pointed_isometry
+CALL 2 begins at 232.7s from isotropic_lifts.py:234:_integral_lift_locus <- isotropic_lifts.py:278:integral_members <- recursive.py:1720:_isotropic_pointed_isometry <- recursive.py:1597:pointed_isometry
+CALL 3 begins at 386.1s from isotropic_lifts.py:234:_integral_lift_locus <- isotropic_lifts.py:278:integral_members <- recursive.py:1720:_isotropic_pointed_isometry <- recursive.py:1597:pointed_isometry
+CALL 4 begins at 548.7s from isotropic_lifts.py:234:_integral_lift_locus <- isotropic_lifts.py:278:integral_members <- recursive.py:1720:_isotropic_pointed_isometry <- recursive.py:1597:pointed_isometry
+Timeout (0:10:00)!
+Thread 0x000077807cbe0780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 5586 in _backend
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 5625 in _mul_
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 5672 in __mul__
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 2159 in _fraction_equality_status
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 1222 in equality_status
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 1227 in _richcmp_
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 1239 in __eq__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 103 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 413 in _raw_scalar_multiple
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 212 in _lmul_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 2728 in _owned_scalar_multiple
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 2924 in <lambda>
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 810 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 3014 in scalar_multiple
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1093 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1091 in _linear_combination_of_generator_images
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1126 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 810 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/form_modules.py", line 449 in <lambda>
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1106 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 810 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 133 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 130 in <lambda>
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 4423 in __contains__
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 4444 in _element_constructor_
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 417 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/g_sets.py", line 1938 in _element_constructor_
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 417 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 193 in <lambda>
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 810 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1631 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 581 in lifts_integrally
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 588 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 583 in integral_parameter_classes
+  File "/probe.py", line 19 in counted
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 234 in _integral_lift_locus
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 278 in integral_members
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1720 in _isotropic_pointed_isometry
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1597 in pointed_isometry
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1771 in <genexpr>
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1771 in primitive_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 109 in _computed_isotropic_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 75 in isotropic_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 195 in primitive_marking_classes
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 1495 in _isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 4488 in isotropic_orbit_representatives
+  File "/probe.py", line 27 in <module>
+CALL 5 begins at 856.5s from isotropic_lifts.py:234:_integral_lift_locus <- isotropic_lifts.py:278:integral_members <- recursive.py:1720:_isotropic_pointed_isometry <- recursive.py:1597:pointed_isometry
+CALL 6 begins at 1042.4s from isotropic_lifts.py:234:_integral_lift_locus <- isotropic_lifts.py:278:integral_members <- recursive.py:1720:_isotropic_pointed_isometry <- recursive.py:1597:pointed_isometry
+Timeout (0:10:00)!
+Thread 0x000077807cbe0780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line ??? in __init__
+  <invalid frame>
+CALL 7 begins at 1237.6s from isotropic_lifts.py:234:_integral_lift_locus <- isotropic_lifts.py:278:integral_members <- recursive.py:1720:_isotropic_pointed_isometry <- recursive.py:1597:pointed_isometry
+CALL 8 begins at 1557.6s from isotropic_lifts.py:234:_integral_lift_locus <- isotropic_lifts.py:278:integral_members <- recursive.py:1720:_isotropic_pointed_isometry <- recursive.py:1597:pointed_isometry

@@ -1,0 +1,71 @@
+card 029J Otilde+ lines (constant): 24242
+build Otilde+(T_En): 5.43s
+character data complete: True
+finite_character_quotient: 0.00s
+has_discriminant True det_kernel False spinor_kernel True
+ambient O(T_En) line orbits: 45.37s
+Traceback (most recent call last):
+  File "/probe.py", line 22, in <module>
+    lines = plus.isotropic_orbit_representatives(1)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 507, in isotropic_orbit_representatives
+    return _subgroup_isotropic_orbit_representatives(
+        self, rank, flag=flag
+    )
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2192, in _subgroup_isotropic_orbit_representatives
+    stabilizer = orthogonal_group.isotropic_stabilizer_generators(
+        representative, flag=flag
+    )
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 4579, in isotropic_stabilizer_generators
+    return _isotropic_stabilizer_generators(self, obj, flag=flag)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 1532, in _isotropic_stabilizer_generators
+    return automorphism_group_generators(
+        category,
+        _marked_isotropic_object(obj, flag=flag),
+    )
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 116, in automorphism_group_generators
+    generators = INDUCTION.line_automorphism_generators(marked.arrow().codomain(), INDUCTION.plane_vectors(sublattice)[0])
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 310, in line_automorphism_generators
+    return self._stabilizer_generators((line,), ((-line,),))
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 304, in _stabilizer_generators
+    return tuple(lattice.integral_isometry(generator) for generator in action.stabilizer().group_generators())
+           ^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 304, in <genexpr>
+    return tuple(lattice.integral_isometry(generator) for generator in action.stabilizer().group_generators())
+                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 215, in <genexpr>
+    self._value_at_normalized_index(index)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 118, in _value_at_normalized_index
+    self._rank_value_cache[rank] = self._value_function(normalized)
+                                   ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/resolutions.py", line 951, in generator
+    return self.generator_morphism()(labels(label))
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 795, in __call__
+    return function(element, *args, **kwargs)
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 758, in <lambda>
+    function = lambda point, *args, **kwargs: left(
+                                              ~~~~^
+        right(point), *args, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 3164, in __call__
+    return normalize(self.codomain(), self._owned_function(point, *args, **kwargs))
+                                      ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 4111, in _evaluate_reduced_word
+    retain(value)
+    ~~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 4296, in _retain_admitted_member
+    point = self.universe()(element)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 1559, in __call__
+    return self._element_constructor_(value)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 1571, in _element_constructor_
+    if element not in self:
+       ^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 1594, in __contains__
+    raise TypeError(f"membership of {value} in {self} is undecided; supply a word witness to membership_decision")
+TypeError: membership of Morphism from Lattice of rank 12 and signature (2, 10) to Lattice of rank 12 and signature (2, 10) in Subgroup of Orthogonal group O(Lattice of rank 12 and signature (2, 10)) is undecided; supply a word witness to membership_decision
+launcher exit: 1

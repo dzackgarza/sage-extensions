@@ -1,0 +1,6 @@
+U(2)+<-6>: RETURNED 2 @ 5.9s
+U(2)U(2): TypeError @ 6.3s: membership of Morphism from Lattice of rank 4 and signature (2, 2) to Lattice of rank 4 and signature (2, 2) in Subgroup of Orthogonal group O(Lattice
+U(2)U(2)+<-6>: TypeError @ 12.5s: membership of Morphism from Lattice of rank 5 and signature (2, 3) to Lattice of rank 5 and signature (2, 3) in Subgroup of Orthogonal group O(Lattice
+U(2)U(2)U(2): TypeError @ 54.8s: membership of Morphism from Lattice of rank 6 and signature (3, 3) to Lattice of rank 6 and signature (3, 3) in Subgroup of Orthogonal group O(Lattice
+done
+launcher exit: 0

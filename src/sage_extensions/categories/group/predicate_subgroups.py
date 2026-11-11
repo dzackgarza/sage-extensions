@@ -508,6 +508,43 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 self, rank, flag=flag
             )
 
+        def isotropic_vector_reduction_image(self, representative):
+            r"""Return the group that ``Stab_Gamma(v)`` induces on ``v^perp/<v>`` (#312).
+
+            ``v`` is a primitive isotropic vector of the ambient lattice and
+            ``Gamma = self`` is a subgroup of its orthogonal group cut out by a
+            condition on the discriminant group, ``Gamma = rho^-1(rho(Gamma))``.
+
+            The returned
+            :class:`sage_extensions.categories.isotropic_orbits.IsotropicVectorReductionImage`
+            is the image ``G_v`` of the stabilizer in ``O(v^perp/<v>)``, the image
+            ``rho(K_v)`` of the kernel of the parabolic's Levi map in ``O(A_L)`` --
+            with whether that image is trivial as an output, because one lift of an
+            isometry decides membership only when it is -- and a membership test
+            for an isometry of ``v^perp/<v>``.  Two lifts differ by an element of
+            ``K_v``, a unipotent group containing the Eichler transvections
+            ``t(v, a)``, ``a`` orthogonal to ``v`` (V. Gritsenko, K. Hulek,
+            G. Sankaran, *Abelianisation of orthogonal groups and the fundamental
+            group of modular varieties*, arXiv:0810.1614, §3.1, equation (4)), so
+            the criterion is ``rho(g)`` in ``rho(K_v) rho(Gamma)``, computed in the
+            finite group ``O(A_L)``; the quotient action is the quotient block of
+            Dutour Sikirić--Hulek, arXiv:2302.01679v2, theorem
+            `theorem_isotropic_k_planes`, printed p. 22.
+
+            Where it is needed: Sterk's five Enriques cusp diagrams (H. Sterk,
+            *Compactifications of the period space of Enriques surfaces, Part I*,
+            Math. Z. 207 (1991), 4.3.5--4.3.9) are diagrams of the reflection
+            subgroup of ``G_v`` for ``Gamma_{En,2}`` on ``T_{En}``
+            (Proposition 2.7, p. 6 for the group; Proposition 4.2.3 with
+            Remark 4.2.4, p. 16 for its five cusps), which is research#654; the
+            output is the subgroup input of #297, the chamber anchored at the cusp.
+            """
+            from sage_extensions.categories.isotropic_orbits import (
+                IsotropicVectorReductionImage,
+            )
+
+            return IsotropicVectorReductionImage(self, representative)
+
         def isotropic_plane_orbits(self, representatives=None, *, stabilizer_generators=None):
             r"""Return this subgroup's orbits of primitive isotropic planes, one per divided-class point.
 

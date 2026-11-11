@@ -4292,9 +4292,23 @@ class _ConditionSetEngine:
         without asking the predicate again (which may be undecided on it).
         It is keyed by the point's identity and holds the point, so the key
         cannot be reused by another object while the record stands.
+
+        The supplied element is recorded before it is coerced into the universe,
+        and it is not coerced at all when it already holds the representation the
+        universe uses: a subgroup's elements keep their ambient representative
+        rather than being reparented, so a point whose parent is the universe's
+        ambient group *is* the point, and coercing it would ask the subgroup's
+        own membership question -- the question this record or the subgroup's
+        mark answers, which for an infinite generated subgroup is otherwise an
+        unevaluated proposition.
         """
-        point = self.universe()(element)
-        self._admitted_members.setdefault(id(point), point)
+        retained = self._admitted_members
+        retained.setdefault(id(element), element)
+        universe = self.universe()
+        ambient = getattr(universe, "supergroup", None)
+        owner = universe if ambient is None or ambient() is universe else ambient()
+        point = element if element.parent() is owner else universe(element)
+        retained.setdefault(id(point), point)
         return point
 
     def _an_element_(self):

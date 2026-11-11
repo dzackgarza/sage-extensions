@@ -358,3 +358,24 @@ tried and the nineteen wall tests run before the exact isometry test:
 exit 0, the class enumeration 106.08 s against 110.39 s with the slice.
 `coordinate_bound = 10` and the norm floor −40 remain; the note in
 `issue317-nikulin-chamber.md` states exactly what the proof of them needs.
+
+### #335: the Scattone plane rows of `6JRX` and `6JRY` (2026-11-11, base `7519715`, port `991b88b0`)
+
+`isotropic_orbit_representatives(2)` on `Λ₂` and `Λ₄` does not return: the rank-2 branch
+reaches `_planes_through_line`, whose candidate classification is the port's
+`INDUCTION.isotropic_vector_classes` on the rank-19 Witt-index-one reduction
+`⟨−2k⟩ ⊕ U ⊕ E8(−1)²`, and that call passes the 6144 MiB tree guard on `Λ₄` and does not
+return on `Λ₁`'s reduction in 2400 s. The nine classes of `6JRY`'s `O` row are #334's,
+mass-closed. The exact plane equivalence is not the defect: ten pairs of five distinct
+classes all answer distinct.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue335-probe2.log` | `7519715` (#335) | `Λ₄` by the public path: 1 line class in 23.1 s, split certified, then **STOPPED_AT_MEMORY_LIMIT tree RSS 6156 MiB** at 84 s in the port's rank-19 classification |
+| `issue335-probe3.log` | `7519715` (#335) | the same in the card's own basis: 1 line class in 125.8 s, split certified, `K_v` rank 19 det 4 (1,18); the library's own line classification of `K_v` had not returned in fifteen minutes and was stopped |
+| `issue335-probe1.log` | `7519715` (#335) | `Λ₂` under the public path: 1 `O(L)` line class in 30.6 s (the 4-plane row rests on the same rank-19 reduction) |
+| `issue335-probe4.log` | `7519715` (#335) | planes built without the port: five of the nine classes in the box `|c|,|d| ≤ 3`, norm ≥ −24, mass short by exactly the four missing shares |
+| `issue335-probe7.log` | `7519715` (#335) | the widened box `|c|,|d| ≤ 10`, norm ≥ −40: roots 244 and 304 added; **stopped at its 3000 s inner cap** (`launcher exit: 124`, peak tree RSS 1307 MiB) with nothing of roots 544 |
+| `issue335-probe8.log` | `7519715` (#335) | `_isotropic_equivalence_witness` on ten pairs of five distinct plane classes: all ten distinct, 0.4–50.0 s per pair |
+| `issue335-lint3.log` | `7519715` (#335) | `test_scattone_plane_orbits.sage -k test_the_card_inputs -p sage_extensions.testing.test_lint`: 1 passed, 4 deselected, no findings |
+| `issue335-lint5.log` | rebased onto `900e866` (#335) | the same, after `#338` moved the card digest to database pin `d6a5393` and rewrote the reader: **1 passed, 4 deselected**, no findings, exit 0 |

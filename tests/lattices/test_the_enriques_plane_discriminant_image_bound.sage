@@ -16,13 +16,11 @@ Math. Z. 207 (1991), Proposition 4.6, p. 29).  Dutour Sikirić--Hulek,
 arXiv:2302.01679v2, section 3.6 (the Tits building), p. 22, state the indices of
 their stabilizer images in the discriminant group: $527$ for $P_1$ and
 $23715 = 3^2\cdot5\cdot17\cdot31$ for $P_2$.  Those two numbers are card `029J`'s
-cited values, and they are read here by tag: the digest keeps the row *total*
-($24242$ one-dimensional cusps under $\widetilde{O}^+$, two $O$-orbits of planes)
-as a structured field, and the per-orbit lengths come from the card's own sentence
-in that row, through `card_plane_orbit_lengths`.  Filing the split as a structured
-row on `dzackgarza/lattice-database` would be the better place for it and is not
-done here: this project's GitHub connection is scoped to one repository.  Nothing
-in this module types either number.
+cited values, and they are read here by tag from the row's own `orbit_lengths`
+field, which `dzackgarza/lattice-database` d6a5393 states for both the `O` and
+the $\widetilde{O}^+$ rows beside the row total ($24242$ one-dimensional cusps
+under $\widetilde{O}^+$, two $O$-orbits of planes).  Nothing in this module types
+either number, and nothing parses a sentence for it.
 
 The orbit sizes are computed from the permutation action of $O(q)$ on its own
 discriminant group, not taken from the page; the test compares them with the
