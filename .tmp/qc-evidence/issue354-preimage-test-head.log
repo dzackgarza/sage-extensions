@@ -1,0 +1,18 @@
+.                                                                        [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_decomposition_preimage_returns_generators.sage::test_the_decomposition_preimage_returns_generators: 53.88 s > 20 s
+1 passed in 54.30s
+[peakrss] p354bpytest5: child waited=0 shell_code=0 samples=33
+[peakrss] peak tree RSS      : 1882 MiB
+[peakrss] low-water MemAvail : 3832 MiB
+[peakrss] peak single VmHWM  : 1946 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1936 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    58.0s procs=  3 rss=  1882 MiB hwm=  1946 MiB avail=  3870 MiB
+[peakrss]   t=    56.0s procs=  3 rss=  1854 MiB hwm=  1860 MiB avail=  3988 MiB
+[peakrss]   t=    62.0s procs=  3 rss=  1846 MiB hwm=  1946 MiB avail=  3844 MiB
+[peakrss]   t=    60.0s procs=  3 rss=  1842 MiB hwm=  1946 MiB avail=  3956 MiB
+[peakrss]   t=    64.0s procs=  3 rss=  1836 MiB hwm=  1946 MiB avail=  3832 MiB
+launcher exit: 0
