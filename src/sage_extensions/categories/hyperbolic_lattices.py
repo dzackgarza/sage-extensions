@@ -417,16 +417,48 @@ def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions
             its reflection in the subgroup.  This class adds exactly that test,
             by ``IsRoot``, which both the initial cusp cone and the candidate
             enumeration go through.
+
+            The candidate enumeration asks the test in
+            :meth:`IsNewRoot` *last*.  ``VinAl.IsNewRoot`` is the conjunction
+            "not a repeat, a root, beyond every accepted wall", and the
+            subgroup test belongs to that conjunction; its position among the
+            conjuncts is free, and it is the only conjunct whose cost is a sift
+            through a stabilizer chain rather than a handful of rank-ten
+            integer inner products.  Asked first, it answers for every root of
+            the lattice the enumeration reaches, most of which point away from
+            the chamber being built and are rejected by the wall condition
+            whatever the subgroup says; asked last, it answers only for the
+            candidates inside that chamber.  The accepted set is the same
+            either way, because the conjunction is.
             """
 
             def __init__(self, *arguments, **keywords) -> None:
                 self._admits_root = admits_root
                 super().__init__(*arguments, **keywords)
 
-            def IsRoot(self, vector):
-                return super().IsRoot(vector) and bool(
+            def _in_the_subgroup(self, vector) -> bool:
+                return bool(
                     self._admits_root(tuple(int(entry) for entry in vector))
                 )
+
+            def IsRoot(self, vector):
+                r"""Vinberg's root test with the subgroup test, for the initial cone.
+
+                The initial cone is cut by the roots orthogonal to the
+                controlling vector, and those are candidates with no wall
+                condition to satisfy first: every one of them is asked.
+                """
+                return super().IsRoot(vector) and self._in_the_subgroup(vector)
+
+            def IsNewRoot(self, vector):
+                r"""``VinAl.IsNewRoot`` with the subgroup test asked after the wall condition."""
+                if self.V.are_linearly_dependent(self.roots[:self.V.degree() - 1] + [vector]):
+                    return False
+                if not super().IsRoot(vector):
+                    return False
+                if not all(vector.inner_product(root) <= 0 for root in self.roots):
+                    return False
+                return self._in_the_subgroup(vector)
 
         algorithm = _FilteredVinAl(gram, controlling_vector, False, None)
     complete = algorithm.FindRoots(max_roots=max_roots, max_decompositions=max_decompositions)

@@ -2447,23 +2447,82 @@ class IsotropicVectorReductionImage(SageObject):
         reflection = self._lattice.reflection(lift)
         return self.contains_lift(reflection)
 
-    def cusp_chamber(self, *, max_roots=None, max_decompositions=None):
+    def cusp_chamber(
+        self,
+        controlling_vector=None,
+        *,
+        max_roots=None,
+        max_decompositions=None,
+    ):
         r"""Return the chamber of the reflection part of ``G_v`` on ``N`` (#285).
 
-        Vinberg's algorithm on the hyperbolic reduction ``N``, with the root
-        filter :meth:`admits_root`: a root of ``N`` is a wall only when its
-        reflection lies in ``G_v``.  The result is the chamber anchored at the
-        cusp that the class of ``v`` defines, whose walls and inner products are
-        the Coxeter diagram of the polarized cusp
-        (Sterk, *Compactifications of the period space of Enriques surfaces,
-        Part I*, Math. Z. 207 (1991), §4.3.1, p. 17, with the diagrams
-        4.3.5--4.3.9).  ``max_roots`` and ``max_decompositions`` bound the
-        search; an unbounded search on a chamber that is not of finite volume
-        does not return.
+        Vinberg's algorithm on the hyperbolic reduction ``N = v^\perp/\mathbf Z v``
+        with the root filter :meth:`admits_root`: a root of ``N`` is a wall of the
+        chamber only when its reflection lies in ``G_v``.  The result is the
+        chamber anchored at the cusp that ``v`` defines, whose walls and inner
+        products are the Coxeter diagram of the polarized cusp (Sterk,
+        *Compactifications of the period space of Enriques surfaces, Part I*,
+        Math. Z. 207 (1991), §4.3.1, p. 17, diagrams 4.3.5--4.3.9).
+
+        **The algorithm is Vinberg's, not an enumeration of the lattice's roots.**
+        E. B. Vinberg, *On the groups of unit elements of certain quadratic forms*,
+        Math. USSR Sb. 16 (1972), §3.2 (pp. 27--29), takes a discrete group
+        \(\Theta\) of motions of Lobachevskii space, a point \(p_0\), and the
+        normals \(e\) with \((e,e)>0\) and \(R_e\in\Theta\) — here the roots of
+        \(N\) whose reflection lies in \(G_v\), which is :meth:`admits_root` — and
+        lists them as \(e_1,e_2,\dots\) by the rule (40), \((e,e_i)\le 0\) for
+        every earlier term, in increasing distance from \(p_0\) (formula (43)).
+        Proposition 4 (p. 28) states that the polyhedron
+        \(P=\bigcap_i \Pi^-_{e_i}\) cut out by the normals listed *is* the cell of
+        the reflection subgroup; Proposition 5 (p. 29) states that if its volume
+        is finite the list breaks off at some \(e_m\), and then \(P^{(m)}\) is
+        that cell.  The algorithm therefore stops on the finite-volume criterion
+        and the polyhedron it has cut out when it stops is the chamber: the
+        wall set needs no separate certificate of completeness, and no bound on
+        the search is part of the route.
+
+        **The criterion on the diagram.**  The stop is the finite-volume test of
+        E. B. Vinberg, *Hyperbolic reflection groups*, Russian Math. Surveys 40
+        (1985): §4.5, Theorem 4.1 (p. 54), gives it for a polyhedron whose
+        dihedral angles are at most a right angle in terms of the critical
+        principal submatrices of its Gram matrix, and §5.3 (pp. 59--60) reads the
+        same statement on the Coxeter scheme — a vertex at infinity is a
+        subscheme of rank \(n-1\) whose connected components are all parabolic
+        (Table 2), and the polyhedron has finite volume exactly when those
+        subschemes generate the whole extended complex.  Computationally the
+        engine tests the geometric form of the criterion
+        (:meth:`sage_extensions.categories.hyperbolic_lattices.HyperbolicLattices.ParentMethods.fundamental_chamber`'s
+        completion flag): every vertex of the polyhedron cut out so far lies in
+        the closure of the light cone, so every vertex is a point at infinity,
+        which for an acute-angled polyhedron cut out by non-redundant walls is
+        finite volume.
+
+        **The controlling vector.**  ``controlling_vector`` is the point \(p_0\)
+        of \(N\otimes\mathbf R\) the candidate normals are measured from; by
+        Propositions 4 and 5 the chamber returned does not depend on it, and it
+        is accepted as a vector of the ambient lattice lying in \(v^\perp\), of
+        the sign that makes it a point of the hyperbolic space.  What the choice
+        does decide is the length of the candidate list: a point lying on many
+        of the walls presents them first, and the point Sterk uses at the first
+        cusp is \(x=e'+f'\) (§4.3.5, p. 19), of square \(4\), orthogonal to nine
+        of his twelve printed roots, with the remaining three at heights
+        \(b(x,a)^2/\lvert q(a)\rvert=4,16,64\).  Omitted, the engine selects a
+        point of its own.
+
+        ``max_roots`` and ``max_decompositions`` bound the search for a caller
+        who wants a prefix of the chamber — a chamber that is not of finite
+        volume never stops — and a bounded search returns
+        ``is_complete_wall_set() == False``; the route of this issue passes no
+        bound.
         """
         from sage_extensions.categories.hyperbolic_lattices import HyperbolicLattices
 
         reduction = HyperbolicLattices(self._lattice.base_ring())(self._reduction)
+        control = (
+            None
+            if controlling_vector is None
+            else self._class_of_the_controlling_vector(controlling_vector)
+        )
         # Vinberg's algorithm asks about the same candidate root once per
         # decomposition it belongs to, while the answer depends only on the root's
         # coordinates: one sift per *distinct* root, not per question.
@@ -2476,10 +2535,47 @@ class IsotropicVectorReductionImage(SageObject):
             return decided[key]
 
         return reduction.fundamental_chamber(
+            control,
             admits_root=admits_root,
             max_roots=max_roots,
             max_decompositions=max_decompositions,
         )
+
+    def _class_of_the_controlling_vector(self, controlling_vector):
+        r"""Return the class in ``N`` of a vector of ``L`` offered as the point \(p_0\).
+
+        The point ``p_0`` of Vinberg's algorithm
+        (:meth:`cusp_chamber`, Vinberg 1972, §3.2, p. 27) is a point of the
+        hyperbolic space of \(N\), so a vector offered for it is a vector of
+        \(v^\perp\) whose class in \(N\) is timelike: of the sign of the
+        one-dimensional definite part of the form on \(N\).  Both conditions
+        are checked here rather than left to the engine, which would accept a
+        vector of the wrong sign as a formula and fail somewhere inside the
+        polyhedral arithmetic.  A vector of an equal copy of the ambient lattice
+        is read coordinate-wise, as :meth:`root_reflection` reads a root.
+        """
+        lattice = self._lattice
+        vector = self._coerced(lattice, controlling_vector)
+        zero = lattice.base_ring().zero()
+        if lattice.b(vector, self._vector) != zero:
+            raise ValueError(
+                f"\nthe controlling vector {vector!r} is not orthogonal to {self._vector!r}, "
+                f"so it spans no class in v^perp/Zv: a point of the hyperbolic space of "
+                f"{self._reduction} is a class of v^perp, not a vector moving v"
+            )
+        signature = self._reduction.signature_pair()
+        positive, negative = int(signature.first()), int(signature.second())
+        positive_is_one = positive == 1
+        square = lattice.q(vector)
+        timelike = (square > zero) if positive_is_one else (square < zero)
+        if timelike is not True:
+            raise ValueError(
+                f"\n{vector!r} is not a point of the hyperbolic space of {self._reduction}: "
+                f"the reduction has signature ({positive}, {negative}), so a point is a class of "
+                f"square {'>' if positive_is_one else '<'} 0, and this one has square {square}"
+            )
+        perpendicular = self._reduction.orthogonal_complement()
+        return self._reduction.projection()(perpendicular.inclusion().lift(vector))
 
     def root_reflection(self, root):
         r"""Return the reflection of ``L`` in ``root``, which must lie in ``v^\perp``.
