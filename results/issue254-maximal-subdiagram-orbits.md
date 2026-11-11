@@ -83,6 +83,8 @@ E   AttributeError: 'CoxeterDiagrams.parent_class[_FiniteDigraphEngine].ObjectTy
 
 ## Green
 
+On the pushed tree (`c32f8c1` plus this unit's three commits), with the port at `/work`:
+
 ```
 $ pytest tests/lattices/test_the_maximal_subdiagram_orbits.sage \
          tests/lattices/test_coxeter_subdiagrams.sage \
@@ -90,12 +92,18 @@ $ pytest tests/lattices/test_the_maximal_subdiagram_orbits.sage \
          -p sage_extensions.testing.test_lint --no-time-gates --tb=short -rf -p no:cacheprovider
 ............                                                             [100%]
 ========================== test-call performance gate ==========================
-tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_orbits_partition_the_maximal_elliptic_subdiagrams: 143.28 s > 20 s
-tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_rank_of_a_subdiagram_is_its_rank_in_the_induced_enumeration: 72.33 s > 20 s
-tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_a_vertex_relabelling_leaves_the_orbit_counts_unchanged: 143.72 s > 20 s
-12 passed in 370.11s (0:06:10)
+tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_orbits_partition_the_maximal_elliptic_subdiagrams: 75.00 s > 20 s
+tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_rank_of_a_subdiagram_is_its_rank_in_the_induced_enumeration: 69.05 s > 20 s
+tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_a_vertex_relabelling_leaves_the_orbit_counts_unchanged: 146.16 s > 20 s
+12 passed in 299.31s (0:04:59)
 [peakrss] peak tree RSS      : 781 MiB
 ```
+
+Seven of the twelve are the new module and five are `test_coxeter_subdiagrams.sage`, the
+existing module on this owner, which passes unchanged — the refactor keeps the points and the
+order of the queries it re-routed.  An earlier run of the same two modules at the pre-rebase
+base gave `12 passed in 370.11s`; the tree then differed by `#286`'s commits and by the two
+adapters this unit drops afterwards, neither of which this module touches.
 
 `just test-lint tests/lattices/test_the_maximal_subdiagram_orbits.sage` on the adopted
 runtime: `1 files, 0 findings`, exit 0.
