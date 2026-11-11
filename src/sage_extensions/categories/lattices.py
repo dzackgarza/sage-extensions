@@ -1681,12 +1681,13 @@ def _genus_classes_through_the_chamber(gram):
                 right_norm = target - left_norm
                 if right_norm not in dominant:
                     continue
-                # Each norm bucket is finite; the mass assertion below is what
-                # certifies that no class is missed, so this bound on the pairs
-                # taken per pair of norms cannot make the returned family wrong --
-                # a short family fails the assertion and this route declines.
-                for left in dominant[left_norm][:40]:
-                    for right in dominant[right_norm][:40]:
+                # Every vector of both norm buckets is tried: a bucket is finite
+                # because the E8 block is definite and the floor of the showered
+                # norm range is where the wall inequalities cut it off, and the
+                # nineteen wall tests below run before the exact isometry test, so
+                # the expensive part sees only the chamber's own vectors.
+                for left in dominant[left_norm]:
+                    for right in dominant[right_norm]:
                         vector = [left_coordinate, right_coordinate] + left + right
                         if len(vector) != model_rank or pairing(vector, vector) != order:
                             continue

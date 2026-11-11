@@ -350,3 +350,11 @@ elements of square −2; model Gram = U ⊕ E8 ⊕ E8), the bound, and the class
 including the 544-root D₁₇(−1), mass equal**;
 `issue317-chamber-test.log` — `tests/lattices/test_genus_of_the_scattone_summands.sage`:
 **5 passed in 112.46 s**, exit 0 (the class enumeration 110.39 s).
+
+Seventh batch on issue 317 (the truncations): `issue317-bound-full-buckets.log` —
+the per-bucket `[:40]` slice removed, so every vector of both norm buckets is
+tried and the nineteen wall tests run before the exact isometry test:
+`tests/lattices/test_genus_of_the_scattone_summands.sage` **5 passed in 108.48 s**,
+exit 0, the class enumeration 106.08 s against 110.39 s with the slice.
+`coordinate_bound = 10` and the norm floor −40 remain; the note in
+`issue317-nikulin-chamber.md` states exactly what the proof of them needs.

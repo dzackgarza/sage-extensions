@@ -118,3 +118,37 @@ same algorithm in the probe closes in 30 s: the shipped path admits far more
 chamber candidates for `order = 4` than the probe did, so the per-candidate exact
 test dominates.  That is the next unit; the k = 2 class set is measured, not yet
 shipped.
+
+## The truncations, after this turn
+
+`sage-extensions` on main at `0721851728` (a #310 commit, which carried these two
+functions in from the shared tree) had three truncations. One is now gone:
+
+- **`[:40]` per norm bucket — removed.** The nineteen wall tests run *before* the
+  exact isometry test, so every vector of both buckets is now tried and the
+  expensive part still sees only the chamber's vectors. Measured cost of removing
+  it: the module's class enumeration is 106.08 s against 110.39 s with the slice,
+  so the slice was buying nothing. `issue317-bound-full-buckets.log`.
+- **`coordinate_bound = 10` and the norm floor `-40` — still there.** They are
+  truncations, not proved bounds. What a proof needs, in the coordinates the code
+  uses (`v = (a, b, x, y)`, `q(v) = 2ab + q(x) + q(y) = 2k`, `x, y` in the two
+  `E8(-1)` blocks):
+  - the sixteen walls inside the blocks are the E8 simple roots, so `b(r, x) >= 0`
+    is `B x >= 0` componentwise — dominance, already used as the enumeration's
+    restriction;
+  - the three remaining walls carry the hyperbolic coordinates. For such a wall
+    `r = (alpha, beta, p, q)` one has `q(r) = -2 = 2 alpha beta + q(p) + q(q)` with
+    `q(p), q(q) <= 0`, so `alpha beta <= -1`: the two signs are opposite, and
+    `b(r, v) >= 0` reads `alpha a + beta b + b(p,x) + b(q,y) >= 0`, where the two
+    last terms are bounded by Cauchy--Schwarz in the definite blocks,
+    `|b(p,x)| <= sqrt(|q(p)| |q(x)|)` and likewise for `y`, with
+    `|q(x)| + |q(y)| = 2ab - 2k`.
+  - Composing one wall with `alpha > 0 > beta` and one with `beta > 0 > alpha`
+    bounds the ratio of `a` and `b`, not their size; closing the argument needs
+    those three walls' actual coordinates and the resulting linear system in
+    `(a, b)`. That is the remaining step, and until it is written the two bounds
+    stay and the mass assertion stays as the guard.
+  - What the closing runs actually needed, for calibration: `|a|, |b| <= 2` with
+    E8 norms down to `-6` for k = 1, and `|a|, |b| <= 6` with E8 norms down to
+    `-36` for k = 2, so the bound to prove is of that shape and much tighter than
+    `10` and `-40`.
