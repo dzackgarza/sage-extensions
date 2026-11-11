@@ -209,3 +209,46 @@ computation that needs `automorphism_group()` and does not return at rank 17.
 Sampling cannot substitute for it: fifteen primes and 1440 sampled lines, or
 33296 exhaustively enumerated lines at p = 2, reach eight classes and not the
 ninth, whose mass is exactly 1/|Aut(D_17(-1))| of the genus.
+
+## Correction: `automorphism_group()` does return at rank 17
+
+The claim that it "does not return" was inherited from the #286 record, which
+says ">90 s, killed" — a 90 s cap, not a non-return.  Measured
+(`issue317-probe32.log`):
+
+    k = 1 seed: number_of_automorphisms() = 1941728542064640000 in 0.3 s
+    k = 1 seed: automorphism_group()      order 1941728542064640000 in 155.6 s
+    (repeat run, issue317-probe33.log: 186.8 s)
+
+`number_of_automorphisms` is PARI's `qfauto` order; `automorphism_group` builds
+the matrix group on top and costs ~3 minutes at rank 17.  It returns.
+
+## What actually blocks the complete neighbour set: memory, not time
+
+`orbits_lines_mod_p(3)` — the routine that turns the group into a complete
+neighbour set — is `OrbitsDomain(G, GF(p)^17, OnLines)`
+(`sage/quadratic_forms/quadratic_form__neighbors.py:416`).  At rank 17 that
+materializes 3^17 = 129 140 163 vectors; the run was killed at the 6144 MiB
+guard (`launcher exit: 143`) 196 s in, right after `automorphism_group()`
+returned and before any orbit was reported (`issue317-probe32.log`).
+
+## p = 2 cannot carry the walk, for a structural reason
+
+A 2-neighbour of an even lattice N is `N + Z(v/2)` for a primitive v with
+`b(v, N) <= 2Z`, i.e. for a nonzero element of order two in `N^#/N`.  Measured
+(`issue317-probe34.log`):
+
+    k = 1: discriminant group [2], |N^#/N| = 2, 2-torsion 1  -> 0 elements of order two
+    k = 2: discriminant group [4], |N^#/N| = 4, 2-torsion 2  -> 1 element of order two
+
+So for k = 1 there is no integral 2-neighbour at all, and for k = 2 there is
+exactly one class reachable that way.  That is why the exhaustive p = 2 sweep
+(33296 lines, probe 31) cannot close the genus however long it runs, and it is
+also why Sage's own `find_p_neighbor_from_vec(2, v)` refuses these forms ("either
+y is not primitive or self is not even, maximal at 2").
+
+The walk therefore has to be at an odd prime, where at p = 3 there are 6.4e7
+isotropic lines of `N/3N`.  Enumerating their orbits needs either the
+`OrbitsDomain` materialization above (memory-blocked) or a chunked orbit
+computation over the 43M-point isotropic cone of `F_3^17` — an engineering unit,
+not a mathematical one.

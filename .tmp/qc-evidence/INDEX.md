@@ -323,3 +323,12 @@ Third batch on issue 317 (the k = 2 prime ladder and an exhaustive p = 2 sweep):
 `issue317-probe31.log` — exhaustive enumeration of the seed's 2-divisible lines
 (33296 of 131071 in 3223 s at 13 lines/s), **5 classes**, no 544-root class.
 Neither reaches `D_17(-1)`.
+
+Fourth batch on issue 317 (the correction and the real blocker):
+`issue317-probe32.log` — `automorphism_group()` **returns** on the rank-17 k = 1
+seed in **155.6 s** (repeat 186.8 s), and `orbits_lines_mod_p(3)` is killed at the
+6144 MiB guard after 196 s building GF(3)^17;
+`issue317-probe33.log` — the same walk with 5 mod-2 line orbits and no 2-neighbour
+(corrected: the 2-neighbour lattice is not built this way);
+`issue317-probe34.log` — k = 1 has 0 elements of order two in N^#/N and k = 2 has
+exactly 1, so p = 2 cannot walk either genus.

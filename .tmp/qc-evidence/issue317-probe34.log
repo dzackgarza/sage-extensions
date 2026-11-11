@@ -1,0 +1,11 @@
+k = 1: discriminant group invariant factors [2], |N^#/N| = 2, 2-torsion order 1 (so 0 nonzero elements of order two)
+k = 2: discriminant group invariant factors [4], |N^#/N| = 4, 2-torsion order 2 (so 1 nonzero elements of order two)
+DONE
+[peakrss] issue286: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 3 MiB
+[peakrss] low-water MemAvail : 10997 MiB
+[peakrss] peak single VmHWM  : 3 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       4 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail= 10997 MiB
+launcher exit: 0

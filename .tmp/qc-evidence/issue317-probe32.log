@@ -1,0 +1,20 @@
+PARI stack size set to 2147483648 bytes, maximum size set to 8589934592
+[     0.1s] k = 1: seed of the genus, beginning number_of_automorphisms()
+[     0.4s] k = 1: number_of_automorphisms() = 1941728542064640000 in 0.3s
+[     0.4s] k = 1: seed of the genus, beginning automorphism_group()
+[   156.0s] k = 1: automorphism_group() RETURNED order 1941728542064640000 in 155.6s
+[peakrss] STOPPED_AT_MEMORY_LIMIT: tree RSS 6440 MiB exceeded 6144 MiB
+[peakrss] issue286: child waited=143 shell_code=143 samples=99
+[peakrss] peak tree RSS      : 6440 MiB
+[peakrss] low-water MemAvail : 5359 MiB
+[peakrss] peak single VmHWM  : 6440 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     6429 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   196.2s procs=  3 rss=  6440 MiB hwm=  6440 MiB avail=  5359 MiB
+[peakrss]   t=   194.2s procs=  3 rss=  5721 MiB hwm=  5721 MiB avail=  6071 MiB
+[peakrss]   t=   192.2s procs=  3 rss=  5202 MiB hwm=  5202 MiB avail=  6649 MiB
+[peakrss]   t=   190.2s procs=  3 rss=  5115 MiB hwm=  5115 MiB avail=  6761 MiB
+[peakrss]   t=   184.2s procs=  3 rss=  4792 MiB hwm=  4792 MiB avail=  7194 MiB
+launcher exit: 143
