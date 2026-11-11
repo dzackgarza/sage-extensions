@@ -4086,8 +4086,19 @@ class IndexedFreeGroupMorphism(GroupMorphism):
         return self._admitted_generator_image(index) ** sign
 
     def _evaluate_reduced_word(self, element):
+        r"""Evaluate a word by its letters, and retain the value as a member of a subgroup.
+
+        The letters are the images of the selected free basis, so the product of a word
+        is an element of the codomain *by this evaluation*, even when the codomain is an
+        infinite generated subgroup for which a general membership question is
+        undecided.  Retaining the value is the range law of this map: a consumer that
+        later coerces the value back into the codomain — a coset or double-coset
+        section, say — reads that admission instead of asking a solver
+        (``GeneratedSubgroups.membership_decision``).  The inverse is retained with it,
+        because inverting a word reverses it and no solver is needed for that either.
+        """
         codomain = self.codomain()
-        return reduce(
+        value = reduce(
             mul,
             (
                 self._signed_generator_image(index, sign)
@@ -4095,6 +4106,10 @@ class IndexedFreeGroupMorphism(GroupMorphism):
             ),
             codomain.one(),
         )
+        retain = getattr(codomain, "_retain_admitted_member", None)
+        if retain is not None and codomain.supergroup() is not codomain:
+            retain(value)
+        return value
 
     def postcompose(self, morphism):
         assert morphism.domain() is self.codomain(), (
@@ -8168,6 +8183,7 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
         ) -> None:
             self._selected_subgroup_generators = selected_subgroup_generators
             self._selected_cardinality_decision = cardinality_decision
+            self._admitted_members = {}
             super().__init__(**rest)
             assert (selected_subgroup_generators is None) != (
                 deferred_subgroup_generators is None
@@ -8190,6 +8206,34 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
             if self._selected_subgroup_generators is None:
                 self._selected_subgroup_generators = self.group_generators()
             return self._selected_subgroup_generators
+
+        def _retain_admitted_member(self, element):
+            r"""Retain an element of this subgroup that a construction of this subgroup supplied.
+
+            Protected ingress contract, the group's form of
+            ``_ConditionSetEngine._retain_admitted_member`` (``OWN-05``): the caller is a
+            realisation whose range is this subgroup *by construction* — here the free
+            cover's word evaluation, whose letters are the selected generators — so the
+            value's membership is supplied, not solved.  A general membership question
+            about an infinite generated subgroup stays undecided
+            (:meth:`membership_decision`); this record is not an answer to it, only the
+            statement that this element arrived through a map into this subgroup.
+
+            The record is keyed by the element's identity and holds the element, so the
+            key cannot be reused by another object while the record stands.  The inverse
+            is recorded with it: ``k^-1`` for a word ``k`` is that word reversed, which
+            needs no solver.  Elements of this library are not reliably equatable —
+            ``hash`` is the parent's for some owned families and an isometry can compare
+            equal to its own inverse — so this is deliberately an identity record.
+            """
+            self._admitted_members.setdefault(id(element), element)
+            inverse = ~element
+            self._admitted_members.setdefault(id(inverse), inverse)
+            return element
+
+        def _admits_member(self, candidate) -> bool:
+            r"""Whether ``candidate`` is an element this subgroup's own constructions supplied."""
+            return id(candidate) in self._admitted_members
 
         def _cardinality_decision(self):
             if self._selected_cardinality_decision is not None:
@@ -8221,11 +8265,17 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
             r"""Membership certified by a word in the selected free generators.
 
             When no word is supplied, a general infinite matrix-subgroup
-            membership question remains an unevaluated proposition.
+            membership question remains an unevaluated proposition — unless this
+            subgroup's own constructions supplied the element: a value of the selected
+            free cover's word evaluation is a member by that map's range law
+            (:meth:`_retain_admitted_member`), and reading that admission is a
+            certificate, not a search.
             """
             ambient = self.supergroup()
             if candidate not in ambient:
                 return False
+            if self._admits_member(candidate):
+                return True
             generators = self.selected_subgroup_generators()
             if word is None and generators.is_empty() is True:
                 # The empty family generates {1}; its membership question is
