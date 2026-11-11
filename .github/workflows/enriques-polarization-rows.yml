@@ -64,6 +64,7 @@ jobs:
           arguments=()
           if [ "$CARDS" != "all" ]; then arguments+=(--tags "$CARDS"); fi
           if [ "$DEGREES" != "all" ]; then arguments+=(--degrees "$DEGREES"); fi
-          "$SAGE_BIN" tests/enriques_polarization_rows_by_card.py "${arguments[@]}" \
+          sage_python="$("$SAGE_BIN" -c "import sys; print(sys.executable)")"
+          "$sage_python" tests/enriques_polarization_rows_by_card.py "${arguments[@]}" \
             --cap "$ENRIQUES_CALL_CAP" --budget "$ENRIQUES_ROW_BUDGET"
         shell: bash
