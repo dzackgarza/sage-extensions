@@ -33,7 +33,7 @@ def _retains_group_resolution(group) -> bool:
     return group.has_selected_resolution(OwnedGroups())
 
 
-def _fix_selected_generating_morphism(subgroup, generating_morphism) -> None:
+def _fix_selected_generating_morphism(subgroup, generating_morphism, *, replace=False) -> None:
     r"""Retain ``E ->> H`` from a free group as ``H``'s selected resolution, realized at first read.
 
     ``generating_morphism`` computes, from the constructed subgroup, a group
@@ -41,6 +41,12 @@ def _fix_selected_generating_morphism(subgroup, generating_morphism) -> None:
     computes nothing (``OWN-22``): the morphism, and the degree-zero
     resolution read off its free basis, are built when the generators are
     first requested and cached by the resolution registry.
+
+    ``replace`` lets the constructing owner supersede a family a coarser rule
+    selected at construction --- the preimage construction selects Schreier's
+    family over the cosets of a finite target group, and an owner that reads
+    the acted-on point itself (``LatticeIsometryMethods.discriminant_preimage``)
+    supplies the same subgroup's family from that point's orbit instead.
     """
 
     def resolution():
@@ -53,7 +59,7 @@ def _fix_selected_generating_morphism(subgroup, generating_morphism) -> None:
             augmentation * free.group_generator_morphism(),
         )
 
-    _fix_selected_resolution(subgroup, OwnedGroups(), resolution)
+    _fix_selected_resolution(subgroup, OwnedGroups(), resolution, replace=replace)
 
 
 def _free_cover(ambient, generators):

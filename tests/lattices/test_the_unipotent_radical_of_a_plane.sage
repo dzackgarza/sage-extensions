@@ -56,11 +56,13 @@ def test_the_transvections_that_move_the_plane_are_returned_elsewhere() -> None:
     r"""The family that is not in the radical is kept, by a method named for what it is.
 
     `parabolic_transvection_generators` returns the plane's Eichler transvections, each
-    of which carries the plane onto itself; the radical's own generators are the
-    subfamily that fixes it.  At $P_2$ the two differ, which is why the parabolic needs
-    the first and not only the second: a family that is not in the kernel of
-    $P_I \to \mathrm{GL}(I) \times O(I^\perp/I)$ is exactly what the transvections
-    that move the plane contribute.
+    of which carries the plane onto itself; the radical's own transvections are the
+    subfamily that fixes it pointwise.  At $P_2$ the two families differ in both
+    directions, which is why the parabolic needs the first and not only the second: the
+    transvections that move the plane are what a family inside the kernel cannot supply,
+    and the radical's family is not made of transvections only --- it carries the block
+    generators of #365 over the parameter lattice as well, which no Eichler transvection
+    is.
     """
     lattice = NamedLattices.TEn
     plane = _second_representative(lattice)
@@ -71,6 +73,6 @@ def test_the_transvections_that_move_the_plane_are_returned_elsewhere() -> None:
     assert radical != ()
     for element in transvections:
         assert plane.stabilizes(element) is True
-    for element in radical:
-        assert element in transvections
+    assert any(element in radical for element in transvections)
     assert any(element not in radical for element in transvections)
+    assert any(element not in transvections for element in radical)

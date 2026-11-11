@@ -379,3 +379,70 @@ classes all answer distinct.
 | `issue335-probe8.log` | `7519715` (#335) | `_isotropic_equivalence_witness` on ten pairs of five distinct plane classes: all ten distinct, 0.4–50.0 s per pair |
 | `issue335-lint3.log` | `7519715` (#335) | `test_scattone_plane_orbits.sage -k test_the_card_inputs -p sage_extensions.testing.test_lint`: 1 passed, 4 deselected, no findings |
 | `issue335-lint5.log` | rebased onto `900e866` (#335) | the same, after `#338` moved the card digest to database pin `d6a5393` and rewrote the reader: **1 passed, 4 deselected**, no findings, exit 0 |
+
+## #354: the preimage's Schreier family (the stabilizer route)
+
+`rho_L^-1(P)` for the decomposition stabilizer `P` of `A_{U(2)}` is the stabilizer of a point of
+`O(L)`'s action on `A_L`, so Schreier's lemma (Seress, *Permutation Group Algorithms*, Cambridge
+Tracts in Mathematics 152, CUP 2003, Lemma 4.2.1, p. 57) generates it from a transversal of that
+orbit, with no generating set of `ker rho_L`.  `discriminant_point_orbit`,
+`discriminant_point_stabilizer` and `discriminant_preimage(..., orbit_point=...)` are that route.
+On card `0125` the orbit has 67456 points, `|O(q)| = 46998591897600`, and the family has
+`15 * 67456 - 67455 = 944385` members; `2 * 348364800 * 67456 = |O(q)|` reads `|P|` from the two
+summands' isometry groups, the other way to the same number.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue354-preimage-test.log` | `f0003cd`, measured at its pre-rebase parent `15a3d13` (#354) | `tests/lattices/test_the_decomposition_preimage_returns_generators.sage`, `-p qc_sage_session -p sage_extensions.testing.suite_budget --no-time-gates`: **1 passed in 52.65 s**, no lint findings; the call takes 52.13 s, over the local 20 s call ceiling, which is reported and not enforced in this run |
+| `issue354-preimage-test-head.log` | `f0003cd` on `f899ebd` (#354) | the same test at the pushed head: **1 passed in 54.30 s** (call 53.88 s), `--no-time-gates`, no lint findings |
+| `issue354-subfamily-test.log` | `e514842` (#354) | the extended test: the nine-member subfamily's image order is `2 * 348364800` through `orthogonal.subgroup(...)`, every member preserves `A_{U(2)}`; **1 passed in 93.81 s** (call 93.35 s), `--no-time-gates`, no lint findings |
+
+### #365: the radical's parameter lattice at `P₂`, decided class by class (2026-11-12, base `7ef38d5`)
+
+Membership of a parameter `c` of the unipotent radical is not tabulated any more. The
+translation `τ = −J⁻¹cᵗA_K` is linear in `c` and the plane block `Ja + aᵗJᵗ = −(Kc + cᵗKᵗ + cᵗA_Kc)`
+is quadratic, so each depends on `c` modulo a modulus that `unipotent_parameter_modulus()`
+derives from the equations and then verifies on their lcm: `2` at Sterk's `P₂` of `T_En`,
+`1` at the splitting plane `P₁`. All `2¹⁶ = 65536` classes at it are decided, `4096` lift,
+the lattice they generate has rank `16` and index `16`, and `4096 · 16 = 65536` is the
+check that the admissible classes are a subgroup. The translations over that basis are a
+`ℤ`-basis of `τ(U_I)` — rank `16`, covolume `1` — so `unipotent_radical_index()` is `1` at
+`P₂`. The centre's generator is the generator of the lattice of integral `a` with `Ja`
+skew: at `P₁`, with `J = diag(1,2)`, it is `((0,−2),(1,0))`, which the skew scalar `1` the
+handed-over code passed cannot reach, so that code raised there and broke the splitting
+plane's own test.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue365-parameters.log` | `5b2c60c` (#365) | the probe, `P₂` then `P₁`: modulus, class counts, lattice rank and index, the translations' rank and covolume, the fourteen transvections' parameters, the centre's matrix `a` and its coordinate, `unipotent_radical_index()`, `is_parabolic_complete()` |
+| `issue365-tests.log` | `5b2c60c` (#365) | the four test files, `test_lint` loaded: **15 passed in 118 s**, no findings |
+| `issue365-lint.log` | `5b2c60c` (#365) | `test_lint` on the new test file and the two updated ones: **3 files, 0 findings** |
+| `issue365-regression.log` | `5b2c60c` (#365) | the eight neighbouring files: **9 failed, 19 passed**, the nine pre-existing ones included |
+| `issue365-base.log` | `7ef38d5` (main without #365) | the same three failing files on the base: **9 failed, 4 passed in 4.96 s**, the same nine ids |
+| `issue365-regression-earlier-test.log` | `5b2c60c`'s code with the previous revision of `test_the_unipotent_radical_of_a_plane.sage` | the same eight files **before** that file was updated for the widened family: **10 failed, 18 passed in 340.58 s**, the tenth being the assertion that every radical generator is a transvection |
+
+### #366: the setwise stabilizer's generators carry the radical, and `P₂`'s parabolic is generated (2026-11-12, base `75b048f`)
+
+`L.Aut().stabilizer(P, action="setwise").group_generators()` at Sterk's `P₂` of `T_En` went
+to the indefinite port and returned 23 elements carrying **one** of the radical's seventeen
+block generators and the centre's generator.  The parabolic's completeness is now a
+computation rather than the splitting hypothesis: `parabolic_completeness_decision()` computes
+the radical's index, the plane actions of the members trivial on `P₂^⊥/P₂`, and the quotient
+images of the members that fix `P₂` pointwise, and the family is the whole parabolic exactly
+when all three are `1` — Milne, *Group Theory*, v4.01 of 6 November 2025, **Theorem 1.47
+(Correspondence Theorem)**, printed **p. 22**, with **Corollary 1.48**, printed **p. 23**.
+At `P₂` all three are `1`, so the predicate is `True`, `parabolic_obstruction()` is `None`,
+and the public call returns the block family of 139 elements, which contains all seventeen
+of the radical's generators and the centre's.  At `P₁`, which splits, the block equations
+give the answer directly.  The radical's own generation is cited from the same theorem, and
+the split-basis relations in `#353`'s docstrings were replaced by the equations the code
+solves.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue366-public-before.log` | `75b048f` (main without #366) | the public call before the change: **23 elements in 16.2 s**, 1 of the radical's 17 block generators and the centre's generator among them |
+| `issue366-completeness.py`, `issue366-completeness.log` | `8430450` (#366) | the three factors at `P₂` (**1, 1, 1**), `parabolic_completeness_decision() = (True, None)`, `parabolic_obstruction() = None`, `|parabolic_stabilizer_generators()| = 139`; the same calls at the splitting plane `P₁`; and the public family at `P₂` |
+| `issue366-tests.log` | `8430450` (#366) | the acceptance run of the five test files |
+| `issue366-lint.log` | `8430450` (#366) | `test_lint` on the new and changed test files |
+| `issue366-regression.log` | `8430450` (#366) | the neighbouring files with the change |
+| `issue366-base.log` | `75b048f` (main without #366) | the same neighbouring file set without it |

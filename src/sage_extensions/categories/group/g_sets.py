@@ -59,7 +59,7 @@ class GSetMorCategoryConstruction(MorCategoryConstruction):
         return GSetMor
 
 
-def _orbit_schreier_morphism(orbit, word_section, augmentation, *, transitions=None):
+def _orbit_schreier_morphism(orbit, word_section, augmentation, *, transitions=None, drop_trivial=False):
     r"""Schreier's lemma on a pointed finite orbit: ``E -> G`` onto the base-point stabilizer.
 
     ``orbit`` is a finite ``G``-set, ``augmentation`` a free cover
@@ -76,6 +76,15 @@ def _orbit_schreier_morphism(orbit, word_section, augmentation, *, transitions=N
     that already evaluated every ``s.p``: ``s.p`` is then read from the table
     instead of recomputed by the action.  The words are the same words -- the
     table selects exactly the images the comprehension would recompute.
+
+    ``drop_trivial`` drops the Schreier generators that are the identity by
+    the sweep's own construction: for the pair whose letter first reached a
+    point, that point's transversal is the pair's word applied to its
+    predecessor's, so the word ``t_(s.p)^-1 s t_p`` is empty
+    (Holt--Eick--O'Brien, *Handbook of Computational Group Theory*,
+    Chapman & Hall/CRC, 2005, Section 4.1, p. 79).  The base point keeps its
+    whole row: its transversal is the identity, so a letter fixing it gives
+    the Schreier generator ``s``, which is not trivial.
     """
     from sage_extensions.categories.sets.set_categories import finite_ordinal_set
 
@@ -89,12 +98,34 @@ def _orbit_schreier_morphism(orbit, word_section, augmentation, *, transitions=N
             f"the retained transition table of {orbit} covers {len(table)} pairs, but the Schreier "
             f"family needs {len(points)} points x {len(letter_words)} letters"
         )
-        words = tuple(
-            (~sections[table[(position, letter_position)]]) * letter * sections[position]
+        pairs = [
+            (position, letter_position)
             for position in range(len(points))
-            for letter_position, letter in enumerate(letter_words)
+            for letter_position in range(len(letter_words))
+        ]
+        if drop_trivial:
+            # Holt--Eick--O'Brien, Handbook of Computational Group Theory,
+            # Chapman & Hall/CRC, 2005, Section 4.1, p. 79: the Schreier
+            # generator of the pair that first reaches a point is trivial by
+            # definition, because that point's transversal is exactly the
+            # pair's word applied to its predecessor's.  The sweep appended a
+            # point at its first reaching pair, so those are the pairs to drop.
+            discovery = {}
+            for pair in pairs:
+                image = table[pair]
+                if image and image not in discovery:
+                    discovery[image] = pair
+            trivial = frozenset(discovery.values())
+            pairs = [pair for pair in pairs if pair not in trivial]
+        words = tuple(
+            (~sections[table[pair]]) * letter_words[pair[1]] * sections[pair[0]]
+            for pair in pairs
         )
     else:
+        assert not drop_trivial, (
+            f"the trivial Schreier generators of {orbit} are identified by the orbit sweep's "
+            "transition table, which this construction was not given"
+        )
         words = tuple(
             (~word_section(orbit.act(augmentation(generator), point))) * generator * word_section(point)
             for point in orbit
@@ -957,13 +988,15 @@ class LeftCosetGSets(OwnedParameterizedCategory):
             self._coset_augmentation = coset_augmentation
             super().__init__(**rest)
 
-        def schreier_generating_morphism(self):
+        def schreier_generating_morphism(self, *, drop_trivial=False):
             r"""Schreier's lemma: ``E ->> H`` from the section of ``G -> G/H``.
 
             The transversal sends the base point to its selected coset.
             Thus ``t_(s.p)^-1 s t_p`` fixes the base point, whose stabilizer
             is the supplied H. This defining range law gives the
             corestriction of the complete Schreier generating map.
+            ``drop_trivial`` omits the generators that are the identity by the
+            sweep's construction (``_orbit_schreier_morphism``).
             """
             assert self._coset_word_section is not None, (
                 f"Schreier generators of {self.subgroup()} are read from a pointed coset space "
@@ -980,6 +1013,7 @@ class LeftCosetGSets(OwnedParameterizedCategory):
                     is self._coset_augmentation
                     else None
                 ),
+                drop_trivial=drop_trivial,
             )
             return schreier._corestrict_to_subgroup(self.subgroup())
 

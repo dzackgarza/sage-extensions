@@ -67,21 +67,35 @@ The row's stop is the memory ceiling, not the mathematics: the same construction
 the divided-class construction ran at 59.86 s at `6db8551ae9`
 (`.tmp/p310-construction.log`).
 
-## `Õ⁺(T_Co)` and the restricted stabilizers `R_Γ`
+## `Õ⁺(T_Co)` (`R_{Γ_En}`, page (1) states this row is `Õ⁺(T_Co)`)
 
-These rows were **not run this turn**; their blockers are named from the recorded state,
-and each is the next unit's work:
+The call `Tco.stable_orthogonal_group().intersection(Tco.O_plus()).isotropic_orbit_representatives(1)`.
+**It does not return within the adopted runtime's 6144 MiB memory guard either.**  The probe
+(`.tmp/p286-row-otildeplus2.log`, run on the current main `9e19dda` with #339's repair
+`6d486c210f` in its history) was killed by the guard at **6150 MiB tree RSS** (`launcher
+exit: 143`, `STOPPED_AT_MEMORY_LIMIT`), after passing the ambient `O(T_Co)` stage and the
+class-route refusal, the stop line being
 
-- `Õ⁺(T_Co)` (`R_{Γ_En}`, page (1)): the class route is refused on `T_Co` —
-  `isotropic_line_stabilizer_image` returns `None` in 0.1 s because its criterion
-  (Eichler's, Gritsenko--Hulek--Sankaran Lemma 7.8, p. 503) needs two orthogonal
-  *unimodular* hyperbolic planes in the lattice itself and `T_Co` exhibits none
-  (`_two_hyperbolic_planes(T_Co)` is `False`, #315's ruling) — so the caller keeps the
-  generator route, which demands `O(T_Co)`'s selected finite generating set through
-  `OrthogonalCharacterQuotient._ambient_generators` -> the port's
-  `orthogonal_group_generators`; that computation ran from 488 s to a 2100 s cap without
-  returning at `9fa28c1f51`'s measurement (`results/issue322-locus.md`), and the row's
-  own stabilizer-generator cost is #18's record (1643 s + ~3668 s port conversion).
+```
+  orthogonal_quotients.py:143 in permutation_group
+  orthogonal_quotients.py:150 in _to_permutation
+  orthogonal_quotients.py:1345 in splitting_isometries
+  orthogonal_quotients.py:2286 in _subgroup_isotropic_orbit_representatives
+```
+
+so the character image's own permutation group is what drives the row past the guard: the
+ambient `O(T_Co)` row peaks at ~530 MiB (`.tmp/p286-row-otildeplus.log`), and the blowup
+happens in the quotient's `permutation_group`.  The page states 527 line orbits, index 1
+over every class (`sec-cusp-lifting`, research `3077f6789c`, page proof only); no count,
+representative or index is stated for this row either.
+
+The row was run twice on this tree with the same outcome: an earlier probe
+(`row_otildeplus_diag.py`, `.tmp/p286-row-otildeplus-diag.log`) was killed at its own
+900 s cap while still inside the ambient stage, confirming the row's ambient stage alone
+exceeds 900 s and the memory stop is the quotient's, not the ambient row's.
+
+## The restricted stabilizers `R_Γ` (not run this turn)
+
 - `R_{Γ_{En,2}} = ρ̄^{-1}(P)`: `P` is a stabilizer inside `O(A_{T_Co})`, whose own order
   does not return (`groups.py:540` -> `fqf_orthogonal._isom_fqf`,
   `results/issue286-tco-run.md`'s row 3), so this row stops before the call is reached.
@@ -92,6 +106,7 @@ and each is the next unit's work:
   (`R_{Γ^K_En} = O(T_Co)`) checked `True` on all 339 — but no row through the public
   call was run this turn.
 
-The machine's memory ceiling (the `Õ` row's 6155 MiB against the 6144 MiB guard) and the
-time budget are what stopped this turn at two rows of six; the remaining four are each a
-next unit's run, not a mathematical obstruction.
+The machine's memory ceiling (the `Õ` and `Õ⁺` rows' 6150-6155 MiB against the 6144 MiB
+guard) and the time budget are what stopped this turn at three rows of six (the `O` row
+returned; the two kernel rows stopped at the guard); the remaining three are each a next
+unit's run, not a mathematical obstruction.

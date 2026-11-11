@@ -506,9 +506,16 @@ class DiscriminantQuadraticModules(OwnedCategoryOverBaseRing):
             A class ``v`` is characteristic when
 
             ``q(x) - b(x, v)`` lies in ``ZZ`` for every ``x`` in the
-            discriminant group.  The quadratic and bilinear values live in
+            discriminant group: H. Ito and H. Ohashi, *Classification of
+            involutions on Enriques surfaces*, arXiv:1302.2316v3, Section 2,
+            p. 4, state, for a finite
+            quadratic form ``(A, b, q)`` with ``q : A -> Q/2Z`` and
+            ``b : A x A -> Q/Z`` (the sign convention of this module's
+            quotient value modules), that ``an element x of A is called
+            characteristic if b(x, a) = q(a) (mod 1) for all a of A``.
+            The quadratic and bilinear values live in
             quotient value modules, so the comparison is made on their
-            selected rational lifts exactly as in the archived contract, and
+            selected rational lifts, and
             the membership is asked of this module's own base ring: the lifts
             are elements of the owned rational field, and the owned integers
             coerce them, where the engine's own integer ring refuses a foreign

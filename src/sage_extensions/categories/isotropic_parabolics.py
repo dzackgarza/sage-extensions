@@ -35,6 +35,7 @@ return; see ``isotropic_quotient_projection`` below.
 """
 
 from sage.matrix.constructor import matrix
+from sage.matrix.special import identity_matrix
 from sage.misc.cachefunc import cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import parent as element_parent
@@ -106,6 +107,11 @@ def general_linear_images(vectors):
 
 
 _PLANE_ACTION_WITNESS_BOUND = 4
+
+# How many classes of the radical's parameter `unipotent_parameter_lattice` decides before
+# it refuses: deciding every class of the residue system is what makes the lattice exact,
+# and a truncation of it would return a lattice that is too small without saying so.
+_UNIPOTENT_PARAMETER_CLASS_LIMIT = 1 << 18
 
 
 def _plane_action_matrix(plane, automorphism):
@@ -1501,28 +1507,1248 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
         @cached_method
         def unipotent_radical_generators(self):
-            r"""Return the plane's Eichler transvections that lie in the unipotent radical.
+            r"""Return the plane's Eichler transvections in the unipotent radical, and its block generators.
 
             The unipotent radical is the common kernel
             \(U_I = \ker(P_I \to \GL(I) \times O(I^\perp/I))\), and an element lies
             in it exactly when it fixes every vector of the plane and carries
             \(I^\perp\) into `I` modulo `I`.  Each element of
             :meth:`parabolic_transvection_generators` is checked against both
-            conditions here, and only the ones that pass are returned, so the family
-            is a subfamily of the radical and not of the parabolic.
+            conditions here, and only the ones that pass are returned, so that part
+            of the family is a subfamily of the radical and not of the parabolic;
             :meth:`parabolic_transvection_generators` keeps the ones that move the
-            plane, which the parabolic needs.
+            plane, which the parabolic needs.  The second part is
+            :meth:`unipotent_radical_block_generators`: one element over each vector
+            of the parameter lattice :meth:`unipotent_parameter_lattice`, which is
+            every parameter of an element of `U_I`, together with a generator of the
+            centre `\ker \tau`.
 
-            What is *not* claimed: that these elements generate \(U_I\).  The
-            radical is a lattice of rank \(2\operatorname{rank}(K) + 1\) by the
-            block form, and a rank statement about it is not made here (#331).
+            What is measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): all fourteen
+            transvections fix the plane pointwise and act trivially on
+            \(I^\perp/I\), so all fourteen lie in \(U_I\) (#337 does not reproduce
+            there) -- but their translations span only \(12\) of the \(16\)
+            dimensions of \(\operatorname{Hom}(I^\perp/I, I)\)
+            (:meth:`unipotent_translation_rank`), so they alone generate a subgroup
+            of infinite index.  The block generators are what closes that: their
+            translations are a `\ZZ`-basis of `\tau(U_I)` and their centre member
+            generates `Z`, so the returned family has index \(1\) in a radical of
+            rank \(17 = 16 + 1\) (:meth:`unipotent_radical_index`).  No transvection
+            generation statement is used, so Scattone's Proposition 3.7.3 and its
+            hypothesis -- two orthogonal hyperbolic planes, which \(T_{\mathrm{En}}\)
+            does not have -- are not needed (#331, #353, #365).
             """
             return tuple(
                 transvection
                 for transvection in self.parabolic_transvection_generators()
                 if self._fixes_isotropic_pointwise(transvection)
                 and self.acts_trivially_on_isotropic_reduction(transvection)
+            ) + tuple(self.unipotent_radical_block_generators())
+
+        def _unipotent_block_basis(self):
+            r"""Return `(change, inverse, A_K, Gram)` of :meth:`plane_block_basis`.
+
+            `change` has the block basis vectors as its rows, `A_K = b(K, K)`, and
+            `Gram = change \cdot G \cdot change^t` is the Gram matrix of the block
+            basis, so `b(x, y) = x^t \mathrm{Gram} y` in block coordinates.
+            """
+            from sage.rings.rational_field import QQ as SageQQ
+
+            change, inverse, _h, _j, _k, A_K = self.plane_block_gram()
+            gram = change * matrix(SageQQ, self.gram_matrix()) * change.transpose()
+            return change, inverse, A_K, gram
+
+        def _unipotent_block_matrix(self, c, a, tau):
+            r"""Return the block matrix of an element of `U_I` with blocks `(c, a, \tau)`.
+
+            In the basis `(U \mid P \mid K)` of :meth:`plane_block_basis` an element of
+            the radical has the shape
+
+            .. math::
+                g = \begin{pmatrix} 1 & 0 & 0 \\ a & 1 & \tau \\ c & 0 & 1 \end{pmatrix},
+
+            with `a` the plane vectors' coefficients of the images of the vectors of `U`,
+            `\tau` the translations of the basis vectors of `K` into `P`, and `c` the
+            coefficients of `U` in the images of the basis vectors of `K`.  That shape is
+            what "fixes `I` pointwise and acts trivially on `I^\perp/I`" says in these
+            coordinates: the `P`-columns and the `K`-columns are the identity outside the
+            `P`-rows, and the `P`-rows of the `K`-columns are the translation.
+            """
+            change = self.plane_block_gram()[0]
+            size = change.nrows()
+            two = 2
+            block = identity_matrix(SageZZ, size)
+            block[two:4, 0:two] = a
+            block[two:4, 4:size] = tau
+            block[4:size, 0:two] = c
+            return block
+
+        def unipotent_block_solution(self, c, skew=None):
+            r"""Return `(a, \tau)` for the parameter `c`, or ``None`` when there is no lift.
+
+            Solving `g^t \mathrm{Gram} g = \mathrm{Gram}` for the block matrix
+
+            .. math::
+                g = \begin{pmatrix} 1 & 0 & 0 \\ a & 1 & \tau \\ c & 0 & 1 \end{pmatrix}
+
+            in the basis `(U \mid P \mid K)` of :meth:`plane_block_basis`, with
+            `\mathrm{Gram} = \begin{pmatrix} H & J & K \\ J^t & 0 & 0 \\ K^t & 0 & A
+            \end{pmatrix}` and `H = 0`, gives exactly
+
+            .. math::
+                \tau = -J^{-1} c^t A, \qquad J a + a^t J^t = -(Kc + c^t K^t + c^t A c),
+
+            the second equation fixing `a` up to the skew part, which ``skew`` fixes as
+            `(a_{12} - a_{21})/2`.  Both were obtained by solving the equations exactly
+            over `\QQ` in the twelve block coordinates of `P_2`, and every element this
+            module builds is checked against the isometry condition itself -- the
+            assertion below.  No lift exists for a `c` whose `\tau` or whose `a` is not
+            integral, and `None` is returned for those rather than rounding; the
+            parameters that do lift are decided class by class by
+            :meth:`unipotent_parameter_lifts` and are the lattice
+            :meth:`unipotent_parameter_lattice` returns.
+            """
+            from sage.rings.rational_field import QQ as SageQQ
+
+            change = self.plane_block_gram()[0]
+            _change, _inverse, A_K, gram = self._unipotent_block_basis()
+            _h, J, K = self.plane_block_gram()[2:5]
+            size = change.nrows()
+            rows = A_K.nrows()
+            two = 2
+            J = matrix(SageQQ, J)
+            if int(J.determinant()) == 0:
+                raise ValueError(f"the plane's block basis at {self} pairs U with P degenerately")
+            tau = -(J.inverse() * (c.transpose() * A_K))
+            if any(entry.denominator() != 1 for entry in tau.list()):
+                return None
+            symmetric = -(K * c + c.transpose() * K.transpose() + c.transpose() * A_K * c)
+            # the four equations: the three of J a + a^t J^t = symmetric, and the skew
+            system = []
+            target = []
+            for first in range(two):
+                for second in range(first, two):
+                    row = []
+                    for i in range(two):
+                        for j in range(two):
+                            unit = matrix(SageZZ, two, two, 0)
+                            unit[i, j] = 1
+                            value = J * unit + unit.transpose() * J.transpose()
+                            row.append(SageQQ(value[first, second]))
+                    system.append(row)
+                    target.append(SageQQ(symmetric[first, second]))
+            # the skew equation, scaled by two so that the system stays integral; it is
+            # imposed only when asked for, because the skew part of a is half-integral for
+            # a parameter whose translation pairs oddly with K, and integral only on the
+            # centre
+            if skew is not None:
+                system.append([SageQQ(0), SageQQ(1), SageQQ(-1), SageQQ(0)])
+                target.append(SageQQ(2 * skew))
+            if any(SageQQ(entry).denominator() != 1 for row in system for entry in row) or any(
+                SageQQ(entry).denominator() != 1 for entry in target
+            ):
+                return None
+            integer_system = matrix(SageZZ, [[SageZZ(int(entry)) for entry in row] for row in system])
+            integer_target = matrix(SageZZ, len(target), 1, [SageZZ(int(entry)) for entry in target])
+            solution = _integral_solution(integer_system, integer_target)
+            if solution is None:
+                return None
+            a = matrix(SageZZ, [[SageZZ(int(solution[two * i + j])) for j in range(two)] for i in range(two)])
+            tau = matrix(SageZZ, [[SageZZ(int(tau[i, k])) for k in range(rows)] for i in range(two)])
+            block = self._unipotent_block_matrix(c, a, tau)
+            assert block.transpose() * gram * block == gram, (
+                f"the block parameters c = {c}, skew = {skew} at {self} do not give an "
+                f"isometry; the solved block equations are wrong"
             )
+            return a, tau
+
+        def unipotent_block_element(self, c, skew=None):
+            r"""Return the element of `U_I` with parameter `c`, or ``None``.
+
+            This is :meth:`unipotent_block_solution` transported to the ambient lattice:
+            the block matrix is conjugated back by the block basis and the resulting
+            integer matrix is the automorphism.
+            """
+            from sage.rings.rational_field import QQ as SageQQ
+
+            solution = self.unipotent_block_solution(c, skew)
+            if solution is None:
+                return None
+            a, tau = solution
+            return self._unipotent_block_automorphism(c, a, tau)
+
+        def _unipotent_block_automorphism(self, c, a, tau):
+            r"""Return the ambient automorphism of the block matrix with blocks `(c, a, \tau)`, or ``None``.
+
+            The block matrix of :meth:`_unipotent_block_matrix` is conjugated back by the
+            block basis, and the result is kept only when it is integral: an element of
+            `U_I` is an automorphism of the ambient lattice, so a block matrix whose
+            conjugate has denominators is not one, and ``None`` says so instead of
+            rounding.  The block equations are *not* rechecked here; the caller has
+            solved them, and :meth:`unipotent_block_solution` asserts the isometry
+            condition for the elements it builds.
+            """
+            from sage.rings.rational_field import QQ as SageQQ
+
+            change, inverse, _A_K, _gram = self._unipotent_block_basis()
+            lattice = self.ambient_lattice()
+            labels = tuple(lattice.module_generating_set())
+            block = self._unipotent_block_matrix(c, a, tau)
+            lifted = change.transpose() * block * inverse.transpose()
+            if any(entry.denominator() != 1 for entry in matrix(SageQQ, lifted).list()):
+                return None
+            ring = lattice.base_ring()
+            images = {}
+            for column, label in enumerate(labels):
+                images[label] = lattice.linear_combination(
+                    {
+                        other: ring(int(lifted[row, column]))
+                        for row, other in enumerate(labels)
+                        if lifted[row, column]
+                    }
+                )
+            return lattice.Aut()(images)
+
+        def _unipotent_symmetric_lattice(self):
+            r"""Return `(adjugate, determinant)` deciding membership in `\Lambda_J`.
+
+            The second block equation of :meth:`unipotent_block_solution` is
+            `J a + a^t J^t = S(c)`, so it has an integral solution `a` exactly when
+            `S(c)` lies in the image of
+
+            .. math::
+                \phi: \operatorname{Mat}_2(\ZZ) \to \operatorname{Sym}_2(\ZZ),
+                \qquad a \mapsto J a + a^t J^t ,
+
+            and that image is the lattice `\Lambda_J` computed here: the Hermite
+            normal form of the four images `\phi(E_{ij})` in the three coordinates
+            `(s_{11}, s_{12}, s_{22})` of a symmetric matrix.  `J` is invertible in
+            the block form of Dutour Sikirić--Hulek, Theorem 4.9
+            (`theorem_isotropic_k_planes`), arXiv:2302.01679v2, printed p. 22, so
+            the image has rank three and that normal form is a `3 \times 3` basis
+            `H`: then `s \in \Lambda_J` exactly when `\operatorname{adj}(H) s` is
+            divisible by `\det H` entrywise, which is what the returned pair decides.
+            At Sterk's `P_2` of \(T_{\mathrm{En}}\) the basis is
+            `\operatorname{diag}(4, 2, 4)`, so `\Lambda_J` has index `32` in
+            `\operatorname{Sym}_2(\ZZ)` (`.tmp/qc-evidence/issue365-parameters.log`).
+            """
+            J = matrix(SageZZ, self.plane_block_gram()[3])
+            images = []
+            for first in range(2):
+                for second in range(2):
+                    unit = matrix(SageZZ, 2, 2, 0)
+                    unit[first, second] = 1
+                    value = J * unit + unit.transpose() * J.transpose()
+                    images.append((int(value[0, 0]), int(value[0, 1]), int(value[1, 1])))
+            reduced = matrix(SageZZ, images).hermite_form()
+            kept = [
+                tuple(int(entry) for entry in row) for row in reduced.rows() if any(row)
+            ]
+            if len(kept) != 3:
+                raise ArithmeticError(
+                    f"the image of a -> J a + a^t J^t at {self} has rank {len(kept)}, "
+                    f"not 3, so the second block equation is not the membership test "
+                    f"this method returns the data for"
+                )
+            basis = matrix(SageZZ, 3, 3, [entry for row in kept for entry in row])
+            determinant = abs(int(basis.determinant()))
+            assert determinant and basis * basis.adjugate() == determinant * identity_matrix(
+                SageZZ, 3
+            ), f"the basis {basis} of the lattice of the second block equation at {self} is not invertible"
+            adjugate = basis.adjugate()
+            return (
+                tuple(
+                    tuple(int(adjugate[first, second]) for second in range(3))
+                    for first in range(3)
+                ),
+                determinant,
+            )
+
+        def _unipotent_symmetric_defect(self, parameter):
+            r"""Return `S(c) = -(Kc + c^t K^t + c^t A_K c)` as the triple `(s_{11}, s_{12}, s_{22})`.
+
+            This is the right side of the second block equation of
+            :meth:`unipotent_block_solution`, in the three coordinates of a symmetric
+            matrix that :meth:`_unipotent_symmetric_lattice` decides membership in.
+            """
+            _change, _inverse, _h, _J, K, A = self.plane_block_gram()
+            product = K * parameter
+            defect = -(
+                product
+                + parameter.transpose() * K.transpose()
+                + parameter.transpose() * A * parameter
+            )
+            return (int(defect[0, 0]), int(defect[0, 1]), int(defect[1, 1]))
+
+        def unipotent_parameter_lifts(self, parameter) -> bool:
+            r"""Return whether `c` is the parameter of an element of `U_I`.
+
+            `c` is the `(K, U)` block of the block matrix of
+            :meth:`_unipotent_block_matrix`, an `\operatorname{rank}(K) \times 2`
+            integer matrix.  By :meth:`unipotent_block_solution` an element of `U_I`
+            over `c` exists exactly when
+
+            .. math::
+                \tau = -J^{-1} c^t A_K, \qquad
+                J a + a^t J^t = -(Kc + c^t K^t + c^t A_K c)
+
+            have an integral solution `(a, \tau)`, and both are decided here rather
+            than searched for:
+
+            * `\tau` is determined by `c`, and it is integral exactly when
+              `\operatorname{adj}(J) c^t A_K` is divisible by `\det J` entrywise;
+            * `a` exists exactly when the right side lies in the lattice
+              `\Lambda_J = \{J a + a^t J^t : a \in \operatorname{Mat}_2(\ZZ)\}` of
+              :meth:`_unipotent_symmetric_lattice`, since that map is onto the
+              symmetric matrices over `\QQ` and its kernel -- the skew part of `a`
+              -- is free.
+
+            Both are integral membership tests, so `False` here means that no element
+            of `U_I` has this parameter, not that none was found.
+            """
+            rows = int(self.plane_block_gram()[5].nrows())
+            if parameter.nrows() != rows or parameter.ncols() != 2:
+                raise ValueError(
+                    f"a parameter of the radical at {self} is a {rows} x 2 matrix, and "
+                    f"{parameter} is {parameter.nrows()} x {parameter.ncols()}"
+                )
+            _change, _inverse, _h, J, _K, A = self.plane_block_gram()
+            scalar = abs(int(J.determinant()))
+            if scalar == 0:
+                raise ValueError(
+                    f"the block basis at {self} pairs U with P degenerately, so the "
+                    f"translation is not determined by the parameter"
+                )
+            translation = J.adjugate() * (parameter.transpose() * A)
+            if any(int(entry) % scalar for entry in translation.list()):
+                return False
+            return self._unipotent_symmetric_lifts(
+                self._unipotent_symmetric_defect(parameter)
+            )
+
+        def _unipotent_symmetric_lifts(self, defect) -> bool:
+            r"""Return whether the symmetric triple lies in `\Lambda_J`."""
+            adjugate, determinant = self._unipotent_symmetric_lattice()
+            image = matrix(SageZZ, 3, 3, [entry for row in adjugate for entry in row]) * matrix(
+                SageZZ, 3, 1, [SageZZ(entry) for entry in defect]
+            )
+            return all(int(entry) % determinant == 0 for entry in image.list())
+
+        def _unipotent_parameter_units(self):
+            r"""Return the unit parameters of the radical, in the order of :meth:`unipotent_parameter_vector`.
+
+            One `\operatorname{rank}(K) \times 2` matrix per coordinate: the `(2 i + j)`-th
+            has a single `1` in row `i`, column `j`.
+            """
+            rows = int(self.plane_block_gram()[5].nrows())
+            units = []
+            for position in range(rows):
+                for column in range(2):
+                    unit = matrix(SageZZ, rows, 2, 0)
+                    unit[position, column] = 1
+                    units.append(unit)
+            return tuple(units)
+
+        def _unipotent_symmetric_uniform(self, modulus) -> bool:
+            r"""Return whether `S(c + m d) - S(c) \in \Lambda_J` for every integral `c, d`.
+
+            Expanding the second block equation along a step `d` of length `m`,
+
+            .. math::
+                S(c + m d) - S(c) = -m(Kd + d^t K^t) - m^2 d^t A_K d
+                    - m(c^t A_K d + d^t A_K c),
+
+            the first two terms are a quadratic function of `d` and the third is
+            bilinear in `(c, d)`.  A quadratic function is determined by its values on
+            the coordinate vectors and on the pairwise sums -- the cross terms -- and a
+            bilinear one by its values on pairs of coordinate vectors, so the three
+            finite families of checks below decide this for all integral `c` and `d`;
+            no range is searched.
+            """
+            _change, _inverse, _h, _J, _K, A = self.plane_block_gram()
+            units = self._unipotent_parameter_units()
+            order = len(units)
+            for unit in units:
+                if not self._unipotent_symmetric_lifts(
+                    self._unipotent_symmetric_defect(modulus * unit)
+                ):
+                    return False
+            for first in range(order):
+                for second in range(first + 1, order):
+                    if not self._unipotent_symmetric_lifts(
+                        self._unipotent_symmetric_defect(modulus * (units[first] + units[second]))
+                    ):
+                        return False
+            for first in range(order):
+                for second in range(order):
+                    step = modulus * units[second]
+                    crossed = -(
+                        units[first].transpose() * A * step
+                        + step.transpose() * A * units[first]
+                    )
+                    if not self._unipotent_symmetric_lifts(
+                        (int(crossed[0, 0]), int(crossed[0, 1]), int(crossed[1, 1]))
+                    ):
+                        return False
+            return True
+
+        @cached_method
+        def unipotent_parameter_modulus(self) -> int:
+            r"""Return the modulus at which the lift condition depends only on the class of `c`.
+
+            Both block equations of :meth:`unipotent_block_solution` are conditions on
+            the parameter `c` alone, and each is a condition on the class of `c` at its
+            own modulus:
+
+            * the translation `\tau = -J^{-1} c^t A_K` is **linear** in `c`, so its
+              integrality depends on `c` modulo the least `m` with
+              `m \operatorname{adj}(J) c^t A_K \equiv 0 \pmod{\det J}` for every `c`,
+              which is `\operatorname{lcm}` over the sixteen coordinates of the
+              quotients `\det J / \gcd(\det J, \text{entry})` -- computed, not assumed;
+            * the second equation's right side is **quadratic** in `c`, so its
+              membership in `\Lambda_J` is decided by
+              :meth:`_unipotent_symmetric_uniform`: `m` such that the difference
+              `S(c + m d) - S(c)` lies in `\Lambda_J` for every integral `c` and `d`,
+              which makes membership depend on `c` modulo `m` and on nothing else.  The
+              differences are quadratic in the step, so finitely many of them decide
+              the whole family.
+
+            The modulus returned is the `\operatorname{lcm}` of the two, and both
+            conditions are recomputed on it before it is returned, so it is verified
+            and not only derived.  At Sterk's `P_2` of \(T_{\mathrm{En}}\) both are `2`
+            -- `\det J = 4` and `A_K` has an odd entry, so the translation needs the
+            class modulo two, and `J = 2 \cdot 1_2` makes the second equation's
+            integrality a parity condition -- and the radical's parameters are then
+            decided on `2^{16} = 65536` classes, of which `4096` lift, an index of `16`
+            (`.tmp/qc-evidence/issue365-parameters.log`).
+            """
+            _change, _inverse, _h, J, _K, A = self.plane_block_gram()
+            scalar = abs(int(J.determinant()))
+            if scalar == 0:
+                raise ValueError(
+                    f"the block basis at {self} pairs U with P degenerately, so the "
+                    f"translation is not determined by the parameter"
+                )
+            adjugate = J.adjugate()
+            translation_modulus = SageZZ.one()
+            for unit in self._unipotent_parameter_units():
+                for entry in (adjugate * (unit.transpose() * A)).list():
+                    translation_modulus = translation_modulus.lcm(
+                        SageZZ(scalar) // SageZZ(scalar).gcd(SageZZ(abs(int(entry))))
+                    )
+            adjugate, determinant = self._unipotent_symmetric_lattice()
+            bound = 2 * int(translation_modulus) * determinant * scalar
+            symmetric_modulus = None
+            for candidate in range(1, bound + 1):
+                if self._unipotent_symmetric_uniform(candidate):
+                    symmetric_modulus = candidate
+                    break
+            if symmetric_modulus is None:
+                raise ArithmeticError(
+                    f"no modulus below {bound} makes the second block equation at {self} "
+                    f"constant on the classes of the parameter, although the difference "
+                    f"of its right side along a step of that length is decided by finitely "
+                    f"many checks; the derivation of the modulus does not hold here"
+                )
+            modulus = int(SageZZ(symmetric_modulus).lcm(translation_modulus))
+            if not self._unipotent_symmetric_uniform(modulus):
+                raise ArithmeticError(
+                    f"the modulus {modulus} of the radical's parameters at {self} was "
+                    f"derived from the two block equations, and the second of them is not "
+                    f"constant on its classes"
+                )
+            return modulus
+
+        @cached_method
+        def _unipotent_parameter_decision(self):
+            r"""Return `(modulus, classes, admissible, basis)` of the parameter lattice.
+
+            Every class of the parameter at :meth:`unipotent_parameter_modulus` is
+            decided by :meth:`unipotent_parameter_lifts`, so the answer is the whole
+            set and not a sample of it.  The admissible classes are checked to be a
+            subgroup: the lattice they generate together with the modulus times the
+            coordinate lattice must have exactly as many classes as there are
+            admissible ones -- `|admissible| \cdot [\ZZ^{16} : L] = \text{modulus}^{16}`
+            -- which holds for a union of classes exactly when that union is a subgroup,
+            and fails otherwise.
+            """
+            rows = int(self.plane_block_gram()[5].nrows())
+            order = 2 * rows
+            modulus = self.unipotent_parameter_modulus()
+            classes = modulus**order
+            if classes > _UNIPOTENT_PARAMETER_CLASS_LIMIT:
+                raise NotImplementedError(
+                    f"the parameters of the radical at {self} are decided on {classes} "
+                    f"classes -- {order} coordinates modulo {modulus} -- and deciding every "
+                    f"one of them is what makes the answer exact; this construction decides "
+                    f"at most {_UNIPOTENT_PARAMETER_CLASS_LIMIT} and refuses rather than "
+                    f"truncating the residue system"
+                )
+            generators = []
+            for position in range(order):
+                row = [0] * order
+                row[position] = modulus
+                generators.append(row)
+            admissible = 0
+            for state in range(classes):
+                values = []
+                remainder = state
+                for _position in range(order):
+                    values.append(remainder % modulus)
+                    remainder //= modulus
+                if not self.unipotent_parameter_lifts(
+                    self.unipotent_parameter_matrix(tuple(values))
+                ):
+                    continue
+                admissible += 1
+                generators.append(values)
+            reduced = matrix(SageZZ, generators).hermite_form()
+            basis = [
+                tuple(int(entry) for entry in row) for row in reduced.rows() if any(row)
+            ]
+            if len(basis) != order:
+                raise ArithmeticError(
+                    f"the parameters of the radical at {self} span rank {len(basis)}, but "
+                    f"the radical's translation lattice has rank {order}"
+                )
+            index = abs(int(matrix(SageZZ, [list(row) for row in basis]).determinant()))
+            if admissible * index != classes:
+                raise ArithmeticError(
+                    f"the admissible parameters of the radical at {self} are not a "
+                    f"subgroup: {admissible} of {classes} classes lift, and the lattice "
+                    f"they generate has index {index}, whose product with the count is "
+                    f"{admissible * index} and not {classes}"
+                )
+            return modulus, classes, admissible, tuple(basis)
+
+        def unipotent_parameter_lattice(self):
+            r"""Return a `ZZ`-basis of the parameters `c` of `U_I`, as sixteen-tuples.
+
+            `c` is the `(K, U)` block of an element of the radical, an
+            `\operatorname{rank}(K) \times 2` integer matrix, listed row by row by
+            :meth:`unipotent_parameter_vector`.  The block equations of
+            :meth:`unipotent_block_solution` -- derived from the block form of Dutour
+            Sikirić--Hulek, Theorem 4.9 (`theorem_isotropic_k_planes`),
+            arXiv:2302.01679v2, printed p. 22 -- determine the rest of the element
+            from `c`:
+
+            .. math::
+                \tau = -J^{-1} c^t A_K, \qquad
+                J a + a^t J^t = -(Kc + c^t K^t + c^t A_K c),
+
+            so `c` is a parameter of an element of `U_I` exactly when those have an
+            integral solution.  Both are congruence conditions: the first is linear in
+            `c`, the second quadratic.  :meth:`unipotent_parameter_modulus` computes
+            the modulus at which each depends only on the class of `c`, and every class
+            at that modulus is decided by :meth:`unipotent_parameter_lifts`, with no
+            residue table and no range: what comes back is the lattice of all the
+            parameters that lift.
+
+            The admissible classes are a subgroup, and not by assumption: the product
+            of their count with the index of the lattice they generate is checked
+            against the number of classes in `\ZZ^{\text{order}}`, which is a subgroup
+            only then.  A parameter outside the returned lattice is therefore not a
+            parameter of any element of `U_I`, and :meth:`unipotent_parameter_lifts`
+            says so on the class.
+
+            Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): modulus `2`, `4096` of
+            `65536` classes admissible, rank `16`, index `16` in `\ZZ^{16}`; the
+            parameters of the plane's Eichler transvections that lie in the radical and
+            of the elements over the parameters supported on the third and fourth
+            basis vectors of `K` all lie in it
+            (`.tmp/qc-evidence/issue365-parameters.log`).
+            """
+            return self._unipotent_parameter_decision()[3]
+
+        @cached_method
+        def unipotent_parameter_class_counts(self):
+            r"""Return how many classes of the parameter are decided, and how many of them lift.
+
+            `(modulus, classes, admissible)`, the numbers behind
+            :meth:`unipotent_parameter_lattice`; they are what makes the returned
+            lattice exact rather than a sample.  At Sterk's `P_2` of
+            \(T_{\mathrm{En}}\): `(2, 65536, 4096)`
+            (`.tmp/qc-evidence/issue365-parameters.log`).
+            """
+            decision = self._unipotent_parameter_decision()
+            return decision[0], decision[1], decision[2]
+
+        def unipotent_parameter_matrix(self, parameters):
+            r"""Return the `\operatorname{rank}(K) \times 2` parameter matrix of a parameter tuple.
+
+            The inverse of :meth:`unipotent_parameter_vector`: entry `(i, j)` of the
+            result is coordinate `2 i + j` of ``parameters``, the coefficient of the
+            `i`-th basis vector of `K = I^\perp/I` in the image of the `j`-th basis
+            vector of the plane.
+            """
+            rows = int(self.plane_block_gram()[5].nrows())
+            if len(tuple(parameters)) != 2 * rows:
+                raise ValueError(
+                    f"a parameter of the radical at {self} has {2 * rows} coordinates, "
+                    f"and {parameters} has {len(tuple(parameters))}"
+                )
+            c = matrix(SageZZ, rows, 2, 0)
+            for column in range(2):
+                for position in range(rows):
+                    c[position, column] = SageZZ(int(parameters[2 * position + column]))
+            return c
+
+        def unipotent_parameter_vector(self, parameter):
+            r"""Return the coordinates of a parameter matrix, as :meth:`unipotent_parameter_lattice` lists them.
+
+            The entry at position `2 i + j` is the coefficient of the `i`-th basis
+            vector of `K = I^\perp/I` in the image of the `j`-th basis vector of the
+            plane: the `(K, U)` block of :meth:`_unipotent_block_matrix`, read row by
+            row.  This is the one flattening the parameter lattice, its coordinates and
+            the radical's block generators are all expressed in.
+            """
+            rows = int(self.plane_block_gram()[5].nrows())
+            if parameter.nrows() != rows or parameter.ncols() != 2:
+                raise ValueError(
+                    f"a parameter of the radical at {self} is a {rows} x 2 matrix, and "
+                    f"{parameter} is {parameter.nrows()} x {parameter.ncols()}"
+                )
+            return tuple(
+                int(parameter[position, column])
+                for position in range(rows)
+                for column in range(2)
+            )
+
+        def unipotent_parameter_coordinates(self, parameters):
+            r"""Return the coordinates of a parameter on :meth:`unipotent_parameter_lattice`.
+
+            Raises ``ValueError`` naming the parameter when it is not in the lattice,
+            which by :meth:`unipotent_parameter_lattice` is the statement that no
+            element of `U_I` has it.  The coordinates are integers exactly then: the
+            lattice is returned as a basis of its own span, so it is saturated in
+            `\ZZ^{\text{order}}` and a parameter in it is an integral combination of the
+            basis.
+            """
+            rows = int(self.plane_block_gram()[5].nrows())
+            order = 2 * rows
+            if len(tuple(parameters)) != order:
+                raise ValueError(
+                    f"a parameter of the radical at {self} has {order} coordinates, and "
+                    f"{parameters} has {len(tuple(parameters))}"
+                )
+            basis = matrix(SageZZ, [list(row) for row in self.unipotent_parameter_lattice()])
+            if int(basis.rank()) != order:
+                raise ArithmeticError(
+                    f"the parameter lattice of the radical at {self} has rank "
+                    f"{int(basis.rank())}, not {order}"
+                )
+            expressed = matrix(
+                SageZZ, 1, order, [int(entry) for entry in parameters]
+            ) * basis.inverse()
+            if any(entry.denominator() != 1 for entry in expressed.list()):
+                raise ValueError(
+                    f"{parameters} is not a parameter of the radical at {self}: it is not "
+                    f"in the lattice unipotent_parameter_lattice() returns, so no element "
+                    f"of the radical has it"
+                )
+            return tuple(int(entry) for entry in expressed.list())
+
+        def unipotent_parameter_from_coordinates(self, coordinates):
+            r"""Return the parameter that a coordinate vector names on :meth:`unipotent_parameter_lattice`.
+
+            The inverse of :meth:`unipotent_parameter_coordinates`: the `\ZZ`-linear
+            combination of the lattice's basis with these coefficients, in the listing
+            order of :meth:`unipotent_parameter_vector`.
+            """
+            basis = self.unipotent_parameter_lattice()
+            rows = int(self.plane_block_gram()[5].nrows())
+            order = 2 * rows
+            if len(tuple(coordinates)) != order:
+                raise ValueError(
+                    f"the parameter lattice of the radical at {self} has {order} basis "
+                    f"vectors, and {len(tuple(coordinates))} coordinates are given"
+                )
+            total = [0] * order
+            for coefficient, row in zip(coordinates, basis, strict=True):
+                for position in range(order):
+                    total[position] += int(coefficient) * row[position]
+            return tuple(total)
+
+        def unipotent_central_coordinate(self, automorphism):
+            r"""Return the power `k` with `g = z^k` for a central element of the radical, or refuse.
+
+            The centre `Z = \ker \tau` of `U_I` is infinite cyclic, generated by
+            :meth:`unipotent_central_generator`, so an element of `Z` is a power of that
+            generator and this returns its integer power: `|k| = 1` says the element is a
+            generator of `Z` as well.  An element of the radical outside `Z` -- one with
+            `c \neq 0` or with a nonzero translation `\tau` -- and an element outside the
+            radical are both named in the error, and so is an element of `Z` whose matrix
+            `a` is not a multiple of the generator's
+            (:meth:`_unipotent_central_coordinate`).
+
+            This is what makes "the returned family meets the centre in a generator" a
+            computation on the family's members rather than a search for one of them.
+            """
+            parameter, translation, matrix_a = self.unipotent_block_coordinates(automorphism)
+            if any(int(entry) for entry in parameter.list()):
+                raise ValueError(
+                    f"{automorphism} is not central in the radical at {self}: its parameter "
+                    f"is {[int(entry) for entry in parameter.list()]} and not zero"
+                )
+            if any(int(entry) for entry in translation.list()):
+                raise ValueError(
+                    f"{automorphism} is not central in the radical at {self}: it translates "
+                    f"by {[int(entry) for entry in translation.list()]} and not by zero"
+                )
+            return self._unipotent_central_coordinate(matrix_a)
+
+        def unipotent_radical_element(self, parameters):
+            r"""Return the element of `U_I` over a parameter, or refuse when there is none.
+
+            ``parameters`` is a coordinate tuple of :meth:`unipotent_parameter_lattice`'s
+            listing (:meth:`unipotent_parameter_vector`).  The element is
+            :meth:`unipotent_block_element` of that parameter's matrix: its block matrix
+            satisfies the two block equations by construction, and every element this
+            builds is checked against `g^t \mathrm{Gram} g = \mathrm{Gram}` there before
+            it is carried back to the ambient lattice.  A parameter outside the lattice
+            names no element of `U_I` -- :meth:`unipotent_parameter_lattice` is every
+            parameter that lifts -- so it is refused here, with that reason, rather than
+            answered with ``None``.
+            """
+            self.unipotent_parameter_coordinates(parameters)
+            element = self.unipotent_block_element(self.unipotent_parameter_matrix(parameters))
+            if element is None:
+                raise ArithmeticError(
+                    f"the parameter {parameters} is in the parameter lattice of the radical "
+                    f"at {self} and has no integral element over it, so the lattice is not "
+                    f"the set of parameters that lift"
+                )
+            return element
+
+        @cached_method
+        def _unipotent_central_matrix(self):
+            r"""Return the least positive generator of the lattice of integral `a` with `J a` skew.
+
+            The centre `Z = \ker \tau` consists of the elements of `U_I` with `c = 0` and
+            `\tau = 0`, whose second block equation of :meth:`unipotent_block_solution` is
+            `Ja + a^t J^t = 0`, i.e. `Ja` skew.  Those `a` form the one-dimensional
+            lattice `J^{-1}\operatorname{so}_2(\ZZ) \cap \operatorname{Mat}_2(\ZZ)`:
+            with `a = s J^{-1} K` for the rotation `K = ((0,-1),(1,0))` and
+            `J^{-1} = \operatorname{adj}(J)/\det J`, `a` is integral exactly when
+            `s \operatorname{adj}(J) K` is divisible by `\det J` entrywise, so the least
+            such `s` is the lcm of `\det J / \gcd(\det J, \text{entry})` over the four
+            entries.  That is `2` at Sterk's `P_2` of \(T_{\mathrm{En}}\), where the
+            generator is `((0,-1),(1,0))`.
+
+            The generator need not be a skew matrix: at a plane with
+            `J = \operatorname{diag}(1,2)` it is `((0,-2),(1,0))`, whose
+            `(a_{12} - a_{21})/2` is not an integer.  That is why the centre's element is
+            built from this matrix and not from the scalar `skew` parameter of
+            :meth:`unipotent_block_solution`, which only reaches the skew matrices.
+            """
+            J = matrix(SageZZ, self.plane_block_gram()[3])
+            scalar = abs(int(J.determinant()))
+            if scalar == 0:
+                raise ValueError(
+                    f"the block basis at {self} pairs U with P degenerately, so the "
+                    f"centre of the radical is not read off the plane block"
+                )
+            rotation = matrix(SageZZ, 2, 2, [0, -1, 1, 0])
+            defect = J.adjugate() * rotation
+            scale = SageZZ.one()
+            for entry in defect.list():
+                scale = scale.lcm(
+                    SageZZ(scalar) // SageZZ(scalar).gcd(SageZZ(abs(int(entry))))
+                )
+            generator = matrix(
+                SageZZ,
+                2,
+                2,
+                [
+                    int(SageZZ(scale) * SageZZ(int(defect[first, second])) // SageZZ(scalar))
+                    for first in range(2)
+                    for second in range(2)
+                ],
+            )
+            assert matrix(SageZZ, J * generator + generator.transpose() * J.transpose()).is_zero(), (
+                f"the lattice generator {generator} of the centre at {self} does not make J a skew"
+            )
+            return generator
+
+        def _unipotent_central_coordinate(self, a):
+            r"""Return `|k|` for `a = k a_0`, with `a_0` the generator of :meth:`_unipotent_central_matrix`.
+
+            An element of the radical with `c = 0` is central exactly when its matrix `a`
+            lies in the lattice that generator spans, because `Z` is that lattice in the
+            block coordinates.  An `a` outside it is named in the error: the index
+            argument of :meth:`unipotent_radical_index` divides by the lattice of the
+            family's central members, and an element counted as central while it is not
+            would make that index wrong.
+            """
+            generator = self._unipotent_central_matrix()
+            pivot = None
+            for first in range(2):
+                for second in range(2):
+                    if pivot is None and int(generator[first, second]):
+                        pivot = (first, second)
+            if pivot is None:
+                raise ArithmeticError(
+                    f"the lattice of the centre at {self} is trivial, so a central element "
+                    f"has no coordinate on it"
+                )
+            first, second = pivot
+            step = SageZZ(int(generator[first, second]))
+            value = SageZZ(int(a[first, second]))
+            if value % step:
+                raise ValueError(
+                    f"the matrix {a} is not in the lattice of the centre at {self}, so the "
+                    f"element over it is not central"
+                )
+            coordinate = value // step
+            if coordinate * generator != a:
+                raise ValueError(
+                    f"the matrix {a} is not a multiple of the centre's generator at {self}"
+                )
+            return int(abs(coordinate))
+
+        def unipotent_central_generator(self):
+            r"""Return a generator of the centre `Z = \ker \tau` of `U_I`.
+
+            `Z` is the part of `U_I` with `c = 0` and `\tau = 0`, whose second block
+            equation is `Ja + a^t J^t = 0`, i.e. `Ja` skew: the one-dimensional lattice
+            of :meth:`_unipotent_central_matrix`, so `Z \cong \ZZ`.  It is the dimension
+            of `U_I` that the translation map fixes
+            (:meth:`unipotent_translation_kernel_rank`), the rest of the radical being
+            `\tau(U_I)` (:meth:`unipotent_translation_basis`).
+
+            The element over that generator is returned after three checks -- it is an
+            integral automorphism of the ambient lattice, it fixes the plane pointwise
+            and acts trivially on `I^\perp/I` so it lies in the radical, and it is not
+            the identity -- so the generator is measured and not assumed.
+
+            Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): one generator, its parameter
+            `c = 0`, its translations zero, all three checks true
+            (`.tmp/qc-evidence/issue365-parameters.log`).
+            """
+            rows = int(self.plane_block_gram()[5].nrows())
+            zero = matrix(SageZZ, rows, 2, 0)
+            matrix_a = self._unipotent_central_matrix()
+            element = self._unipotent_block_automorphism(
+                zero, matrix_a, matrix(SageZZ, 2, rows, 0)
+            )
+            if element is None:
+                raise ArithmeticError(
+                    f"the generator {matrix_a} of the lattice of the centre at {self} does "
+                    f"not give an integral automorphism of the ambient lattice"
+                )
+            if not self._fixes_isotropic_pointwise(
+                element
+            ) or not self.acts_trivially_on_isotropic_reduction(element):
+                raise ArithmeticError(
+                    f"the element over the generator {matrix_a} at {self} does not fix the "
+                    f"plane pointwise and act trivially on I^perp/I, so it is not the centre's "
+                    f"generator"
+                )
+            if element == self.ambient_lattice().Aut().one():
+                raise ArithmeticError(
+                    f"the generator {matrix_a} of the lattice of the centre at {self} gives "
+                    f"the identity, so the centre's generator was not found"
+                )
+            return element
+
+        def unipotent_block_coordinates(self, automorphism):
+            r"""Return `(c, \tau, a)` of an element of `U_I`, and refuse anything else.
+
+            The block matrix of ``automorphism`` in the basis of
+            :meth:`plane_block_basis` must have the shape of
+            :meth:`_unipotent_block_matrix` and satisfy the isometry condition there; an
+            element that does not fix `I` pointwise, does not act trivially on
+            `I^\perp/I`, or is not an isometry of that shape is named in the error rather
+            than silently given coordinates.
+            """
+            change, inverse, A_K, gram = self._unipotent_block_basis()
+            lattice = self.ambient_lattice()
+            labels = tuple(lattice.module_generating_set())
+            size = change.nrows()
+            columns = [self.coordinates(automorphism(lattice.module_generator(label))) for label in labels]
+            standard = matrix(SageZZ, size, size, 0)
+            for index in range(size):
+                for column in range(size):
+                    standard[index, column] = SageZZ(int(columns[column][index]))
+            block = inverse.transpose() * standard * change.transpose()
+            if any(entry.denominator() != 1 for entry in block.list()):
+                raise ValueError(f"{automorphism} does not preserve the block basis of {self} integrally")
+            block = matrix(SageZZ, [[SageZZ(int(block[i, j])) for j in range(size)] for i in range(size)])
+            c = block[4:size, 0:2]
+            a = block[2:4, 0:2]
+            tau = block[2:4, 4:size]
+            if block != self._unipotent_block_matrix(c, a, tau):
+                raise ValueError(
+                    f"{automorphism} is not in the radical of {self}: its block matrix has "
+                    f"entries outside the blocks a, tau and c of an element fixing I "
+                    f"pointwise and acting trivially on I^perp/I"
+                )
+            if block.transpose() * gram * block != gram:
+                raise ValueError(f"{automorphism} is not an isometry of the block form of {self}")
+            return c, tau, a
+
+        @cached_method
+        def unipotent_translation_basis(self):
+            r"""Return the translations of the elements over :meth:`unipotent_parameter_lattice`.
+
+            Each entry is the `2 \times \operatorname{rank}(K)` matrix of the images of
+            the basis vectors of `K` in the plane's basis: the translation `\tau(g)` of
+            :meth:`unipotent_translation_rank`, read off the element's block matrix
+            rather than assumed from a formula.
+
+            Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): sixteen translations whose
+            span has rank sixteen and covolume `1` in the coordinate lattice of
+            `\operatorname{Hom}(K, I)` -- they are a `\ZZ`-basis of the whole of it, as
+            `\tau(U_I)` is of rank `2 \operatorname{rank}(K) = 16` there
+            (`.tmp/qc-evidence/issue365-parameters.log`).
+            """
+            translations = []
+            for parameters in self.unipotent_parameter_lattice():
+                element = self.unipotent_block_element(self.unipotent_parameter_matrix(parameters))
+                if element is None:
+                    raise ArithmeticError(
+                        f"the parameter {parameters} of the radical at {self} has no integral "
+                        f"lift, although the parameter lattice was computed from it"
+                    )
+                translations.append(self.unipotent_block_coordinates(element)[1])
+            return tuple(translations)
+
+        @cached_method
+        def unipotent_radical_block_generators(self):
+            r"""Return a generating family of `U_I` read off the plane's block equations.
+
+            One element over each vector of :meth:`unipotent_parameter_lattice` -- their
+            translations form a `ZZ`-basis of `\tau(U_I)` by
+            :meth:`unipotent_translation_basis` -- together with a generator of the
+            centre (:meth:`unipotent_central_generator`).  The family generates `U_I`,
+            which is a central extension
+
+            .. math:: 1 \to Z \to U_I \to \tau(U_I) \to 1,
+
+            of the lattice `\tau(U_I)` by `Z`.  `Z` is central, hence normal, and
+            `\tau` induces `U_I/Z \cong \tau(U_I)`, so the generated subgroup is
+            identified by the correspondence between subgroups of a group containing a
+            normal subgroup and subgroups of the quotient: J. S. Milne, *Group Theory*,
+            version 4.01 of 6 November 2025, **Theorem 1.47 (Correspondence Theorem)**,
+            printed **p. 22** -- "there is a one-to-one correspondence {subgroups of `G`
+            containing `N`} `\leftrightarrow` {subgroups of `\bar G`}" under
+            `H \mapsto \alpha(H)` and `\bar H \mapsto \alpha^{-1}(\bar H)` -- with
+            **Corollary 1.48**, printed **p. 23**, for the quotient map `g \mapsto gN`.
+            The step used is the one the proof of 1.47 carries on p. 23,
+            `\alpha^{-1}\alpha(H) = HN`, "which equals `H` if and only if `H \supset N`":
+            the subgroup generated by the returned family contains `Z` -- all of it, by
+            :meth:`unipotent_central_generator` -- and its image is all of
+            `\tau(U_I)` -- a `\ZZ`-basis of it, by :meth:`unipotent_translation_basis`
+            -- so `HN = H` and its preimage is itself, which is the whole of `U_I`.
+            (Read in the copy of Milne's notes downloaded on this machine;
+            `results/issue366-radical-generators-in-the-stabilizer.md` records the run.)
+
+            Nothing here uses a transvection generation statement, so Scattone's
+            Proposition 3.7.3 and its hypothesis of two orthogonal hyperbolic planes are
+            not needed: at a plane that does not split they do not apply, and the block
+            equations do.
+            """
+            generators = []
+            for parameters in self.unipotent_parameter_lattice():
+                element = self.unipotent_block_element(self.unipotent_parameter_matrix(parameters))
+                if element is None:
+                    raise ArithmeticError(
+                        f"the parameter {parameters} of the radical at {self} has no integral "
+                        f"lift, although the translation lattice was computed from it"
+                    )
+                generators.append(element)
+            generators.append(self.unipotent_central_generator())
+            return tuple(generators)
+
+        @cached_method
+        def unipotent_radical_rank(self) -> int:
+            r"""Return the rank of `U_I` as a free abelian group, from the plane's block form.
+
+            `U_I` is unipotent, so it is a free abelian group whose rank is its
+            dimension, and the dimension is read off the block form.  In the basis
+            `(U \mid P \mid K)` of :meth:`plane_block_basis`, with `K = P^\perp/P`
+            and the Gram matrix `B` of :meth:`plane_block_gram`, an element of the
+            radical acts as
+
+            .. math::
+                g = \begin{pmatrix} 1 & a & \tau \\ 0 & A & 0 \\ 0 & c & 1
+                \end{pmatrix},
+
+            because it fixes `P` pointwise (no `P`-column outside the first block),
+            carries `P^\perp` into `P^\perp` and `P^\perp` into `P` modulo `P` (no
+            `K`-row above the last block).  The isometry condition `g^t B g = B`
+            then reads, block by block,
+
+            .. math::
+                A = 1, \qquad \tau = -J^{-1} c^t A_K, \qquad
+                J a + a^t J^t = -(Kc + c^t K^t + c^t A_K c),
+
+            with `J = b(U, P)`, `K = b(U, K)` and `A_K = b(K, K)`.  These are the
+            equations :meth:`unipotent_block_solution` solves, in the ordering of
+            :meth:`_unipotent_block_matrix`, where `a` is the `(P, U)`-block, `c` the
+            `(K, U)`-block and `\tau` the `(P, K)`-block.  The translation is
+            `-J^{-1} c^t A_K` and not `-c^t A_K`, and the second equation carries `J` on
+            both sides together with the linear term `Kc + c^t K^t`: the shorter forms
+            `\tau + c^t A_K = 0` and `a + a^t + c^t A_K c = 0` hold only in a basis with
+            `J = 1_2` and `K = b(U, K) = 0`, which is a splitting plane in a unimodular
+            plane basis.  At Sterk's `P_2` of \(T_{\mathrm{En}}\) neither holds -- there
+            `J = 2 \cdot 1_2` and `K` has a nonzero entry, and the two are what the plane
+            not splitting off the lattice means -- so the equations above are the ones
+            this module uses.
+
+            With `A_K = b(K, K)`: the Levi torus of the plane is not in the radical,
+            the translation `\tau` is determined by `c \in \operatorname{Hom}(U, K)`,
+            and only the skew part of `a` is left free.  So `U_I` is nilpotent of
+            class two, `2 \operatorname{rank}(K_I)` of its dimensions are translations
+            (:meth:`unipotent_translation_rank`) and one is fixed by the translation
+            map (:meth:`unipotent_translation_kernel_rank`).
+
+            **The block form is cited; the consequence is derived and computed.**
+            The basis and the Gram matrix are those of Dutour Sikirić--Hulek,
+            arXiv:2302.01679v2, Theorem 4.9 (`theorem_isotropic_k_planes`), proof,
+            printed p. 22, and :meth:`plane_block_basis` and :meth:`plane_block_gram`
+            build and check them.  No published numbered statement gives this
+            structure at a plane of a lattice without two hyperbolic planes --
+            Scattone, *Mem. Amer. Math. Soc.* 374, §3.7, Proposition 3.7.3, which
+            the repository quotes, generates the radical *by transvections*, and its
+            hypothesis of two orthogonal hyperbolic planes is not met here -- so the
+            derivation above is written here and its dimension is computed by
+            `_unipotent_rank` rather than quoted.  The radical's generation does not
+            rest on that statement: :meth:`unipotent_parameter_lattice` decides every
+            parameter that lifts, and :meth:`unipotent_radical_index` is `1` at this
+            plane.
+
+            Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): `17 = 2 \cdot 8 + 1`,
+            against `16` translations and `1` central dimension
+            (`.tmp/qc-evidence/issue365-parameters.log`).
+            """
+            return self._unipotent_rank(zero_on_perpendicular=False)
+
+        @cached_method
+        def unipotent_translation_kernel_rank(self) -> int:
+            r"""Return the rank of the kernel of the radical's translation map.
+
+            This is the part of `U_I` that fixes `I^\perp` pointwise: the centre, in
+            the block form of :meth:`unipotent_radical_rank`, where it is the skew
+            part of `a` with `c = 0` and `\tau = 0`.  It is computed as the dimension
+            of the same linear system with the extra conditions `N(K) = 0`.
+
+            Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): `1`, so `U_I/Z` has rank
+            `17 - 1 = 16 = 2 \operatorname{rank}(K)`, the whole of
+            `\operatorname{Hom}(I^\perp/I, I)` (`.tmp/qc-evidence/issue353-structure2.log`).
+            """
+            return self._unipotent_rank(zero_on_perpendicular=True)
+
+        def _unipotent_rank(self, zero_on_perpendicular: bool) -> int:
+            r"""Return the dimension of the radical's block-form system.
+
+            The unknowns are the `n^2` entries of `N = g - 1` in the block
+            coordinates of :meth:`plane_block_basis`, the conditions are the three
+            of :meth:`unipotent_radical_rank` -- `N` kills the two plane vectors,
+            `N` carries the `n - 4` basis vectors of `K` into the plane, and
+            `N^t B + B N = 0` -- and the dimension of the solution space is the rank
+            of `U_I`, because exp and log are polynomial bijections between a
+            unipotent group in characteristic zero and its Lie algebra.  With
+            ``zero_on_perpendicular`` the conditions `N(K) = 0` are added, which cuts
+            out the kernel of the translation map.
+            """
+            from sage.rings.rational_field import QQ as SageQQ
+
+            change = self.plane_block_gram()[0]
+            gram = change * matrix(SageQQ, self.gram_matrix()) * change.transpose()
+            size = change.nrows()
+            unknowns = size * size
+            plane_positions = (2, 3)
+            kernel_positions = tuple(range(4, size))
+
+            def empty():
+                return [SageQQ(0)] * unknowns
+
+            rows = []
+            for column in plane_positions:
+                for index in range(size):
+                    entry = empty()
+                    entry[size * index + column] = SageQQ(1)
+                    rows.append(entry)
+            for column in kernel_positions:
+                for index in range(size):
+                    if index in plane_positions:
+                        continue
+                    entry = empty()
+                    entry[size * index + column] = SageQQ(1)
+                    rows.append(entry)
+            if zero_on_perpendicular:
+                for column in kernel_positions:
+                    for index in range(size):
+                        entry = empty()
+                        entry[size * index + column] = SageQQ(1)
+                        rows.append(entry)
+            for first in range(size):
+                for second in range(first, size):
+                    entry = empty()
+                    for middle in range(size):
+                        if gram[middle, second]:
+                            entry[size * middle + first] += gram[middle, second]
+                        if gram[first, middle]:
+                            entry[size * middle + second] += gram[first, middle]
+                    rows.append(entry)
+            return unknowns - int(matrix(SageQQ, rows).rank())
+
+        @cached_method
+        def unipotent_translation_rank(self, family=None) -> tuple[int, int]:
+            r"""Return the rank of ``family``'s translations, and the rank of their target.
+
+            An element of the radical fixes `I` pointwise, so its *translation*
+
+            .. math:: \tau(g): I^\perp/I \to I, \qquad \bar x \mapsto g(x) - x
+
+            is a homomorphism of groups -- `\tau(g h) = \tau(g) + \tau(h)`, because
+            `h` fixes `I` pointwise and `g` fixes `I` pointwise -- with values in the
+            free abelian group `\operatorname{Hom}(K_I, I)` of rank
+            `2 \operatorname{rank}(K_I)`.  The subgroup a family generates sits in
+            the preimage of the span of its translations, so its rank is at most
+            `\operatorname{rank} \tau(\text{family})` plus the rank of the translation
+            kernel: a family whose translations fall short of the target therefore
+            generates a subgroup of infinite index in the radical, and a target the
+            translations reach does *not* by itself prove the index finite (the
+            kernel direction can still be missed).
+
+            ``family`` defaults to :meth:`unipotent_radical_generators`, since that
+            is the family whose index :meth:`unipotent_radical_index` reports.  A
+            member that does not act trivially on `I^\perp/I` has no translation and
+            raises, rather than being silently dropped from the rank.
+
+            Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): `(12, 16)` for the
+            fourteen returned unipotent transvections
+            (`.tmp/qc-evidence/issue353-structure2.log`), `(14, 16)` for the
+            twenty-eight generators of :meth:`parabolic_stabilizer_generators` that lie
+            in the radical (`.tmp/qc-evidence/issue353-obstruction.log`), and
+            `(16, 16)` for the family the default returns, which includes the block
+            generators of :meth:`unipotent_radical_block_generators`
+            (`.tmp/qc-evidence/issue365-parameters.log`).  The first two families fall
+            short and generate subgroups of infinite index; the third reaches the target
+            and, meeting the centre in a generator, generates the radical, of rank `17`
+            (:meth:`unipotent_radical_rank`, :meth:`unipotent_radical_index`).
+            """
+            from sage.rings.rational_field import QQ as SageQQ
+
+            if family is None:
+                family = self.unipotent_radical_generators()
+            lattice = self.ambient_lattice()
+            labels = tuple(lattice.module_generating_set())
+            rank = int(lattice.module_rank())
+            plane_vectors = [self.coordinates(vector) for vector in self.plane_basis()]
+            plane = matrix(
+                SageQQ,
+                [[plane_vectors[column][position] for column in range(len(plane_vectors))] for position in range(rank)],
+            )
+            perpendicular = self.isotropic_perpendicular()
+            perpendicular_vectors = [
+                perpendicular.inclusion()(perpendicular.module_generator(label))
+                for label in perpendicular.module_generating_set()
+            ]
+
+            def plane_coordinates(vector):
+                r"""Return the coordinates of ``vector`` on the plane's basis, or ``None``."""
+                image = matrix(SageQQ, rank, 1, [int(vector.to_vector()(label)) for label in labels])
+                try:
+                    solution = plane.solve_right(image)
+                except (ValueError, ArithmeticError):
+                    return None
+                if (plane * solution - image).norm() != 0:
+                    return None
+                if any(entry.denominator() != 1 for entry in solution.list()):
+                    return None
+                return [int(entry) for entry in solution.list()]
+
+            translations = []
+            for generator in family:
+                entry = []
+                for vector in perpendicular_vectors:
+                    written = plane_coordinates(generator(vector) - vector)
+                    if written is None:
+                        raise ValueError(
+                            f"the element {generator} at {self} does not act trivially on "
+                            f"I^perp/I, so it has no translation and is not in the radical"
+                        )
+                    entry.extend(written)
+                translations.append(entry)
+            return (
+                int(matrix(SageQQ, translations).rank()) if translations else 0,
+                2 * (len(perpendicular_vectors) - int(self.module_rank())),
+            )
+
+        @cached_method
+        def unipotent_radical_index(self):
+            r"""Return `[U_I : \langle\text{the returned unipotent generators}\rangle]`.
+
+            The returned family is :meth:`unipotent_radical_generators` -- the plane's
+            Eichler transvections that lie in the radical together with the block
+            generators of :meth:`unipotent_radical_block_generators` -- and the index is
+            the product of the two factors of
+
+            .. math:: [U_I : H] = [\tau(U_I) : \tau(H)] \cdot [Z : H \cap Z],
+
+            `Z` being the centre and `\tau` the translation
+            (:meth:`unipotent_translation_rank`, :meth:`unipotent_translation_kernel_rank`).
+            Both factors are lattice indices:
+
+            * the first is the index of the `ZZ`-span of the family's parameters `c` in
+              :meth:`unipotent_parameter_lattice`, computed by Smith normal form -- the
+              map `c \mapsto \tau` is injective, so it is the index of `\tau(H)` in
+              `\tau(U_I)` as well.  When the rank falls short the index is infinite and
+              this returns `\aleph_0`;
+            * the second is the gcd of the coordinates of the family's central members on
+              the generator of `Z` (:meth:`_unipotent_central_coordinate`), those being
+              the members with `c = 0`.  It is exact as soon as that gcd is `1` -- then
+              the subgroup meets `Z` in all of `Z` -- and when it is not, the products of
+              non-central members that land in `Z` would have to be enumerated, which
+              this method refuses rather than guesses.
+
+            At Sterk's `P_2` of \(T_{\mathrm{En}}\) both factors are `1`: the returned
+            family's parameters span the whole parameter lattice (`16` of `16`, the
+            lattice of #365's exact decision) and the central generator is one of its
+            members, so the returned family generates the radical, of rank
+            `17 = 16 + 1`, and this returns `1`
+            (`.tmp/qc-evidence/issue365-parameters.log`).  What #353 could not show is
+            why the fourteen transvections alone are not enough: their translations
+            reach rank `12` of the `16`.
+            """
+            from sage.arith.misc import gcd
+            from sage_extensions.categories.sets.cardinals import aleph0
+
+            rows = int(self.plane_block_gram()[5].nrows())
+            order = 2 * rows
+            coordinates = []
+            central = []
+            for generator in self.unipotent_radical_generators():
+                c, _tau, a = self.unipotent_block_coordinates(generator)
+                parameter = self.unipotent_parameter_vector(c)
+                if not any(parameter):
+                    central.append(self._unipotent_central_coordinate(a))
+                    coordinates.append([0] * order)
+                    continue
+                coordinates.append(list(self.unipotent_parameter_coordinates(parameter)))
+            images = matrix(SageZZ, coordinates)
+            if int(images.rank()) < order:
+                return aleph0
+            diagonal = images.smith_form()[0]
+            index = 1
+            for position in range(2 * rows):
+                index *= abs(int(diagonal[position, position]))
+            if not central:
+                raise NotImplementedError(
+                    f"no member of the returned family at {self} lies in the centre of the "
+                    f"radical, so [Z : H cap Z] is not read off the family and the index "
+                    f"there is not computed"
+                )
+            central_index = int(gcd(central))
+            if central_index != 1:
+                raise NotImplementedError(
+                    f"the returned family at {self} meets the centre in {central_index} Z; the "
+                    f"products of its non-central members that land in the centre would have to "
+                    f"be enumerated to get [Z : H cap Z], and that case is not implemented"
+                )
+            return index
 
         def half_vector_transvection_generators(self):
             r"""Return the Eichler transvections of the plane along its half lattice vectors.
@@ -2248,129 +3474,206 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 actions.append(action)
             return tuple(actions)
 
+        @cached_method
+        def levi_quotient_image_index(self, trivial_on_plane=False) -> int:
+            r"""Return `[O(I^\perp/I) : H_0]`, the index of the returned generators' quotient image.
+
+            `H_0` is the subgroup of `O(I^\perp/I)` generated by the images of
+            :meth:`parabolic_stabilizer_generators` under the Levi quotient action
+            :meth:`~sage_extensions.categories.lattices.IsotropicReductions.ParentMethods.levi_action`.
+            Those generators are isometries with `g(I) = I`, so their images lie in the image
+            `M` of the whole setwise stabilizer, and `M` lies in `O(I^\perp/I)` by definition:
+
+            .. math:: H_0 \subseteq M \subseteq O(I^\perp/I).
+
+            Equal orders settle both ends at once.  When the index below is `1`,
+            `|H_0| = |O(I^\perp/I)|`, so `M` is all of `O(I^\perp/I)` and `H_0` **is** `M`:
+            the image of the full setwise stabilizer is identified by this computation,
+            with no generation statement about the parabolic used or needed.  At Sterk's
+            `P_2` of `T_{\mathrm{En}}` this is the case — `|H_0| = |O(P_2^\perp/P_2)|` =
+            10 321 920, both computed here.
+
+            An index greater than `1` does **not** identify `M`: the subgroup sits between
+            `H_0` and `O(I^\perp/I)` and nothing here decides where.  The returned number is
+            then the bound `[O(I^\perp/I) : H_0]`, which is what
+            :meth:`parabolic_obstruction` reports it as.
+
+            With ``trivial_on_plane`` the same index is asked of the members of
+            :meth:`parabolic_stabilizer_generators` that fix `I` **pointwise**, i.e. of the
+            elements `(1, N)` of `\GL(I) \times O(I^\perp/I)`
+            (:meth:`quotient_reflection_generators` supplies the reflection part of them).
+            A value of `1` there says every quotient action occurs with a trivial plane
+            action, which together with
+            `\GL(I)` occurring with a trivial quotient action
+            (:meth:`levi_plane_action_index` with ``trivial_on_quotient``) makes the image
+            of the parabolic the whole product -- the computation
+            :meth:`parabolic_completeness_decision` runs.
+
+            The quotient lattice is negative definite at a maximal isotropic plane of a
+            `(2,n)` lattice, so `O(I^\perp/I)` is finite and its order is the engine's
+            (`O(K_I).cardinality()`); the subgroup's order is the engine's too
+            (:meth:`~sage_extensions.categories.group.groups.*.subgroup`).
+            """
+            reduction = self.isotropic_reduction()
+            orthogonal = reduction.quotient_lattice().Aut()
+            levi = reduction.levi_action()
+            images = tuple(
+                levi(generator)
+                for generator in self.parabolic_stabilizer_generators()
+                if not trivial_on_plane or self._fixes_isotropic_pointwise(generator)
+            )
+            if not images:
+                raise ArithmeticError(
+                    f"no generator of the parabolic at {self} fixes the plane pointwise, so "
+                    f"there is no quotient image to compare with O(I^perp/I)"
+                )
+            generated = orthogonal.subgroup(images)
+            total = int(orthogonal.cardinality())
+            part = int(generated.cardinality())
+            if total % part != 0:
+                raise ArithmeticError(
+                    f"the image of the generators of the parabolic at {self} has order "
+                    f"{part}, which does not divide the order {total} of "
+                    f"O(I^perp/I) for I = {self}: a subgroup's order divides its group's "
+                    f"(Lagrange), so one of the two orders is wrong"
+                )
+            return total // part
+
+        @cached_method
+        def parabolic_completeness_decision(self):
+            r"""Return `(complete, reason)` for the parabolic's generators, `reason` ``None`` when complete.
+
+            `P_I = \mathrm{Stab}_{O(L)}(I)` maps onto a subgroup `M` of
+            `\GL(I) \times O(I^\perp/I)` with kernel `U_I`, so a subgroup of `P_I` that
+            contains `U_I` is `P_I` exactly when its image is `M`.  That is the
+            correspondence between the subgroups of a group containing a normal subgroup and
+            the subgroups of the quotient: Milne, *Group Theory*, v4.01 of 6 November 2025,
+            **Theorem 1.47 (Correspondence Theorem)**, printed **p. 22**, with **Corollary
+            1.48**, printed **p. 23**.  The returned family's image is what has to be
+            compared with `M`, and `M` is what the two projections of the family's image
+            have to fill:
+
+            * the image of :meth:`unipotent_radical_block_generators` is `\tau(U_I)` and it
+              contains `Z`, so the radical is generated exactly when
+              :meth:`unipotent_radical_index` is `1` -- the `\ker` half;
+            * `M` contains `\GL(I) \times 1` exactly when every plane action occurs with a
+              trivial quotient action, which is
+              :meth:`levi_plane_action_index` with ``trivial_on_quotient`` equal to `1`;
+            * `M` contains `1 \times O(I^\perp/I)` exactly when every quotient action occurs
+              with a trivial plane action, which is :meth:`levi_quotient_image_index` with
+              ``trivial_on_plane`` equal to `1`.
+
+            With all three the image is the whole product, hence `M`, hence the family
+            generates `P_I`.  At Sterk's `P_2` of \(T_{\mathrm{En}}\) all three hold --
+            measured -- so the parabolic there is generated, and that is what
+            :meth:`is_parabolic_complete` answers.
+
+            A **split** plane needs none of this: there `L = P \perp U \perp K`, the third
+            block equation of Dutour Sikirić--Hulek, Theorem 4.9
+            (`theorem_isotropic_k_planes`), arXiv:2302.01679v2, printed p. 22, reads
+            `0 = P_3 A Q_3^t` and forces `P_3 = 0` for *every* quotient action, so every
+            pair `(Q_1, Q_3)` lifts and the image is the product by the same equations.
+
+            A computation that is not available -- a quotient that is not definite, a
+            parameter lattice the enumeration refuses, a plane action whose `\Gamma(2)`
+            certificate does not settle the congruence level -- is reported as ``False``
+            with that refusal as the reason.  That is what this predicate's `False` has
+            always meant: not established.
+            """
+            if self.splitting_complement() is not None:
+                return True, None
+            rank = int(self.module_rank())
+            if rank != 2:
+                return (
+                    False,
+                    f"no cited statement shows that the generators of the parabolic at {self} "
+                    f"generate it: the block equations of Dutour Sikirić--Hulek, Theorem 4.9 "
+                    f"(arXiv:2302.01679v2, printed p. 22), and the three factors this decides "
+                    f"for a plane, are stated for a primitive isotropic plane, and this "
+                    f"subobject has rank {rank}",
+                )
+            failures = []
+            try:
+                radical = self.unipotent_radical_index()
+            except (ArithmeticError, NotImplementedError, ValueError) as error:
+                return (
+                    False,
+                    f"the radical factor at {self} is not decided: {error}; the family is then "
+                    f"only a subgroup of the parabolic",
+                )
+            if radical != 1:
+                failures.append(
+                    f"the radical is not generated (unipotent_radical_index() = {radical})"
+                )
+            try:
+                plane_index = self.levi_plane_action_index(trivial_on_quotient=True)
+            except (ArithmeticError, NotImplementedError, ValueError) as error:
+                return (
+                    False,
+                    f"the plane-action factor at {self} is not decided: {error}; the family is "
+                    f"then only a subgroup of the parabolic",
+                )
+            if plane_index != 1:
+                failures.append(
+                    f"the plane actions of the members that act trivially on I^perp/I have "
+                    f"index {plane_index} in GL(I)"
+                )
+            try:
+                quotient_index = self.levi_quotient_image_index(trivial_on_plane=True)
+            except (ArithmeticError, NotImplementedError, ValueError) as error:
+                return (
+                    False,
+                    f"the quotient factor at {self} is not decided: {error}; the family is "
+                    f"then only a subgroup of the parabolic",
+                )
+            if quotient_index != 1:
+                failures.append(
+                    f"the quotient images of the members that fix I pointwise have index "
+                    f"{quotient_index} in O(I^perp/I)"
+                )
+            if failures:
+                return (
+                    False,
+                    f"the image of the parabolic's generators at {self} in GL(I) x O(I^perp/I) "
+                    f"is not the whole product: " + "; ".join(failures) + ". The family's image "
+                    f"is then a proper subgroup of M, so the family is a proper subgroup of the "
+                    f"parabolic (Milne, Group Theory, v4.01, Theorem 1.47 printed p. 22 with "
+                    f"Corollary 1.48 printed p. 23, applied to P_I -> M)",
+                )
+            return True, None
+
         def is_parabolic_complete(self) -> bool:
             r"""Return whether the generators of :meth:`parabolic_stabilizer_generators` are the whole parabolic.
 
-            Two hypotheses, and the predicate states which one holds:
+            The answer is :meth:`parabolic_completeness_decision`'s first component, and
+            `False` means *not established* rather than established otherwise --
+            :meth:`parabolic_obstruction` gives the reason.
 
-            * **Split** (`splitting_complement()` is not None, so
-              `L = P \perp U \perp K` with `(P, U)` an orthogonal summand):
-              ``True``.  The block `K = b(U, K)` of the block form vanishes, an
-              isometry differs from the lift of its own `(g|_P, g|_K)` by an
-              element of the unipotent radical, the radical is generated by the
-              Eichler transvections (Scattone, Ph.D. thesis, section 3.7,
-              Proposition 3.7.3, as Dutour Sikirić--Hulek cite it in arXiv:2302.01679v2,
-              Lemma `sublattice_approx_model`), and the plane's image is the
-              congruence subgroup generated by the elementary lifts.  This is
-              the case #295 closed.  The quotient factor needs no separate
-              argument there: with `K = b(U, K) = 0` the third block equation
-              reads `0 = P_3 A Q_3^t`, so `P_3 = 0` for *every* quotient action,
-              and the first two equations do not involve `Q_3` at all -- the
-              admissible pairs are the product `A \times O(I^\perp/I)` with `A`
-              the plane actions admitting a lift, so every `N \in
-              O(I^\perp/I)` lifts with a trivial plane action.  Without the
-              splitting this fails, and the quotient factor is open
-              (:meth:`parabolic_obstruction`).
-            * **Not split**: ``False``.  The block equations of Dutour
-              Sikirić--Hulek, Theorem 4.9 (`theorem_isotropic_k_planes`), printed
-              p. 22, still give integral lifts -- :meth:`levi_lift_generators`
-              builds them -- but nothing cited shows that the ones returned
-              *generate* the parabolic, so the family is a subgroup of it and not
-              the whole: the quotient action on `I^\perp/I` and the radical are
-              the two factors without an argument
-              (:meth:`parabolic_obstruction`).  The plane action is not one of
-              them: :meth:`levi_plane_action_index` decides
-              `[\GL(I) : \langle g|_I \rangle]` by the `\Gamma(2)` certificate,
-              and at Sterk's `P_2` of `T_{\\mathrm{En}}` it is `1`, so every
-              plane action in `\GL_2(ZZ)` already occurs.  And
-              :meth:`stabilizer_discriminant_image_is_exact` says whether the
-              *discriminant image* -- what the plane-orbit call of #286
-              consumes -- is the whole of `\\rho(G_P)`: at `P_2` it is, of order
-              1981808640 = `|O(q)|/23715`.
+            * **Split** (`splitting_complement()` is not None, so `L = P \perp U \perp K`):
+              ``True``, by the block equations themselves: with `K = b(U, K) = 0` the third
+              equation reads `0 = P_3 A Q_3^t`, so `P_3 = 0` for *every* quotient action and
+              the admissible pairs are the whole product `A \times O(I^\perp/I)`.  This is
+              the case #295 closed.
+            * **Not split**: the three factors of the previous paragraph are computed, and
+              the answer is ``True`` exactly when all three are `1` -- the radical generated,
+              the plane actions of the members trivial on `I^\perp/I` filling `\GL(I)`, and
+              the quotient actions of the members fixing `I` pointwise filling
+              `O(I^\perp/I)`.  At Sterk's `P_2` of \(T_{\mathrm{En}}\) all three hold
+              (`.tmp/qc-evidence/issue366-completeness.log`), so the parabolic there is
+              generated: the radical by #365's parameter lattice, the two Levi factors by the
+              `\Gamma(2)` certificate and by computed orders.
             """
-            return self.splitting_complement() is not None
+            return self.parabolic_completeness_decision()[0]
 
         def parabolic_obstruction(self) -> str | None:
-            r"""Return why the parabolic's generators are not known to be all of it, or ``None``.
+            r"""Return why the parabolic's generators are not established to be all of it.
 
-            ``None`` exactly when :meth:`is_parabolic_complete` is ``True``.
-
-            At a plane that does not split the missing statement is a generation
-            claim, and the sources read do not make one:
-
-            * Dutour Sikirić--Hulek, arXiv:2302.01679v2, Theorem 4.9
-              (`theorem_isotropic_k_planes`, printed p. 22) and its proof are an
-              *algorithm*: given an isometry `Q` of `P^\perp` they solve the
-              block equations over `\QQ`, note that an integral extension exists
-              only on a finite-index subgroup -- "we could not find a universal
-              construction of such a lattice.  However, in all the cases we
-              considered, a practical algorithm allowed us to solve this
-              problem" -- and get the stabilizer as the integral points of a
-              rational group, which their **Alg 1** (section "Integral group
-              algorithms", p. 15) computes by a set-stabilizer computation in
-              `GL_n(Z/dZ)` and Schreier's lemma.  They name no generator set of
-              the parabolic.
-            * Scattone's criterion, cited there, generates the *radical*: the
-              transvections `E_{e,x}` over a `ZZ`-basis of `e^\perp`.
-
-            What is known here instead: the discriminant image is decided
-            without that statement.  Every `g` in the stabilizer permutes the
-            plane's divided discriminant classes, so
-            `\rho(G_P) \subseteq \mathrm{Stab}_{O(q)}(D(P))`, and the images of
-            the returned generators lie in `\rho(G_P)`; when the two orders
-            agree, `\rho(G_P)` is exact whatever the generation of `G_P`
-            (:meth:`stabilizer_discriminant_image_orders`,
-            :meth:`stabilizer_discriminant_image_is_exact`).  At Sterk's `P_2`
-            of `T_{\mathrm{En}}` the bound is `|O(q)|/23715 = 1981808640` and the
-            family of :meth:`parabolic_stabilizer_generators` reaches it --
-            measured, because the half-vector Eichler transvections of #325
-            (:meth:`half_vector_transvection_generators`, the transvections
-            `E_{e,w}` for `w` in the metric dual with `2w \\in L` and
-            `b(e,w) = 0`) are among them.  With the plane lifts of
-            :meth:`levi_lift_generators` alone the image was short by `2^12`,
-            which is what those transvections supply.
-
-            What is *decided* here, and not part of the obstruction, is the plane
-            action factor: :meth:`levi_plane_action_index` computes
-            `[\GL(I) : \langle g|_I \rangle]` from a `\Gamma(2)` certificate,
-            and it is `1` at Sterk's `P_2` of `T_{\mathrm{En}}` -- the block
-            equation there is `P_1 = Q_1^{-t}` because `J = 2 \\cdot 1_2`, so no
-            congruence condition on the plane action follows at all.  The two
-            factors that remain are
-
-            * the quotient factor: `H_0 = \\{N \\in O(I^\\perp/I) : (1,N)
-              \\text{ admits an integral lift}\\}`, which the block equations
-              decide and nothing here computes, together with the order of
-              `O(I^\\perp/I)` to compare it with the reflections returned by
-              :meth:`quotient_reflection_generators`;
-            * the radical: `U_I` has rank `2 \\cdot \\operatorname{rank}(K) + 1`
-              by the block form, and the returned transvections are not all of
-              it -- an Eichler transvection `E_{p,x}` moves `p^\\perp` by
-              multiples of `p` and acts on `I` unipotently, so it is in the
-              parabolic and not in the kernel.  That the members of the family
-              that are in the kernel generate `U_I` is a rank statement about a
-              torsion-free nilpotent lattice, and it is not made here.
+            ``None`` exactly when :meth:`is_parabolic_complete` is ``True``; otherwise the
+            reason :meth:`parabolic_completeness_decision` gives -- which factor of
+            `P_I \to M \subseteq \GL(I) \times O(I^\perp/I)` is not `1`, with its computed
+            value, or which of the three computations is not available here.
             """
-            if self.is_parabolic_complete():
-                return None
-            return (
-                f"no cited statement shows that the generators of the parabolic at {self} "
-                f"generate the setwise stabilizer: Dutour Sikirić--Hulek Theorem 4.9 "
-                f"(arXiv:2302.01679v2, printed p. 22) solves the block equations and their "
-                f"Alg 1 (same paper, section 'Integral group algorithms') computes the "
-                f"integral points of a rational group, but neither names a generating set "
-                f"of the parabolic. The plane action is decided: "
-                f"levi_plane_action_index() gives the index of the returned plane actions in "
-                f"GL_2(ZZ) by the Gamma(2) certificate (1 at Sterk's P_2 of T_En, where "
-                f"det J = {int(self.plane_block_gram()[3].determinant())} makes J a scalar "
-                f"and imposes no congruence). Not decided: the quotient factor "
-                f"H_0 = {{N in O(I^perp/I) : (1, N) admits an integral lift}} and the order "
-                f"of O(I^perp/I), against the reflections of "
-                f"quotient_reflection_generators(); and the radical U_I, of rank "
-                f"2 * {int(self.isotropic_reduction().quotient_lattice().module_rank())} + 1 "
-                f"by the block form (det A = {int(self.plane_block_gram()[5].determinant())}), "
-                f"which the family's kernel elements are not shown to generate."
-            )
+            return self.parabolic_completeness_decision()[1]
 
         @cached_method
         def parabolic_stabilizer_generators(self):
@@ -2400,9 +3703,16 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             generating set of the whole parabolic: an isometry `g` preserving
             `I` induces `(g|_I, g|_K)` in `GL(I) \times O(K)`, a lift of that
             pair differs from `g` by an element of the radical, and each of the
-            three factors is generated above.  Without the splitting the last
-            two factors are only a subgroup, and :meth:`is_parabolic_complete`
-            says so; the discriminant image is what the caller compares.
+            three factors is generated above.  Without the splitting the same
+            conclusion is a computation rather than a hypothesis, and
+            :meth:`parabolic_completeness_decision` runs it: the radical is
+            generated when :meth:`unipotent_radical_index` is `1`, the plane
+            actions of the members trivial on `I^\perp/I` fill `GL(I)`, and the
+            quotient images of the members that fix `I` pointwise fill
+            `O(I^\perp/I)`.  At Sterk's `P_2` of \(T_{\mathrm{En}}\) all three
+            hold, so this family is the whole parabolic there and
+            :meth:`parabolic_obstruction` is ``None``
+            (`.tmp/qc-evidence/issue366-completeness.log`).
 
             Sources, all read in the arXiv text of the cited version: Dutour
             Sikirić--Hulek, arXiv:2302.01679v2, §"The Tits building",
@@ -2418,6 +3728,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 + self.half_vector_transvection_generators()
                 + self.quotient_reflection_generators()
                 + self.levi_lift_generators()
+                + self.unipotent_radical_block_generators()
             )
 
 

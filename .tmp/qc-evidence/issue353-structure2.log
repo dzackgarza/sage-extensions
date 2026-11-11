@@ -1,0 +1,13 @@
+[    1.0s] lattice Integral lattice of rank 12 and signature (2, 10) rank 12
+[    1.8s] block Gram diagonal blocks: U [0, 0] | P [0, 0] | K [-4, -4, -20, -12, -4, -4, -4, -4]
+[    1.8s] b(U, P) = [2, 0, 0, 2] | b(P, K) = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] | b(U, K) = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    1.8s] constraint matrix (182, 144) rank 127 | rank U = 17
+[    1.9s] rank Z = 1 | rank(U/Z) = 16 | rank Hom(K, P) = 2*rank(K) = 16
+[    7.2s] 
+[    7.2s] |unipotent_radical_generators| = 14
+[    7.2s] block matrix agrees with the direct image on a K vector: True
+[    7.3s] (g-1) of the plane basis: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    8.7s] returned unipotent generators: 14 elements | in U: 14 | outside U: 0
+[    8.7s]   rank of span(log family) = 13 of rank U = 17 -> infinite index
+[    8.7s]   rank of their translations = 12 of rank(U/Z) = 16
+[    8.7s] building the parabolic family ...
