@@ -45,7 +45,10 @@ way to range over the candidates `α` and over the `β` that must be excluded.
 landed): at `Sterk_1`, 1400 membership questions in 964 s of wall time (360 s of
 CPU) and no closure; at `max_decompositions=400`, no return in 2200 s.  The
 unrestricted chamber of the same `N` closes in 3.3 s of CPU with ten walls, of
-which the filter admits nine.
+which the filter admits nine.  Asking it to stop after twelve *accepted* roots
+(`max_roots=12`, unbounded decompositions) had not reached twelve after 14
+minutes of wall time — so the height order the engine picks for the controlling
+vector does not even present Sterk's twelve walls early.
 
 **Growing the convex region from the closed chamber of `W`.**  Start from `C`,
 the ten-wall chamber of `W`; a wall whose reflection is admitted is a facet of
