@@ -1722,6 +1722,24 @@ class LatticeIsometryMethods:
     def __invert__(self):
         return self.inverse()
 
+    def __pow__(self, exponent):
+        r"""Return the ``exponent``-th power of this automorphism, by repeated squaring.
+
+        The zeroth power is the identity isometry of the endomorphism set, not
+        Sage's generic identity morphism, so powers compose with isometries.
+        """
+        assert self.domain() is self.codomain(), (
+            f"{self} has no powers: its domain {self.domain()} is not its codomain {self.codomain()}"
+        )
+        exponent = int(exponent)
+        base = self if exponent >= 0 else self.inverse()
+        result = self.parent().identity()
+        for bit in bin(abs(exponent))[2:]:
+            result = result * result
+            if bit == "1":
+                result = result * base
+        return result
+
     def __eq__(self, other) -> bool:
         if self is other:
             return True
