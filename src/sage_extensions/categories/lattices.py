@@ -77,6 +77,11 @@ from sage_extensions.categories.abstract_categories.arrow_categories import (
     CosliceCategory,
     _WalkingArrowFunctorCategory,
 )
+from sage_extensions.categories.abstract_categories.cat import (
+    NaturalTransformationMor,
+    NaturalTransformationMorCategoryConstruction,
+    NaturalTransformationMorphism,
+)
 from sage_extensions.categories.abstract_categories.products import FiniteSequenceDiagram, _FiniteSequenceFunctorCategory
 from sage_extensions.categories.definite_lattices import (
     _babai,
@@ -203,7 +208,6 @@ from sage_extensions.categories.sets.indexed_families import (
     indexed_family,
 )
 from sage_extensions.categories.sets.set_categories import (
-    _ConditionSetEngine,
     NN,
     FiniteSets,
     Sets,
@@ -2307,26 +2311,74 @@ class OrientedFlagDiagram(FiniteSequenceDiagram):
         return f"Diagram of {self._oriented}"
 
 
-class _OrientedFlagMorEngine(_ConditionSetEngine):
-    r"""The orientation-preserving natural transformations ``F => G``: a condition subset of the diagram Mor.
+class OrientedFlagMor(NaturalTransformationMor):
+    r"""``Mor(F, G)`` of oriented flag diagrams: the orientation-preserving natural transformations.
 
-    Its points are the elements of the universe Mor itself (``CON-17``).
-    ``Mor(F, F)`` has the identity of the universe, whose graded
-    determinants are all 1; no condition set of a Mor in the provider
-    carries one, so this engine adds it.
+    It is the subobject of ``X = Fun([t], Lattices)(F, G)``, the Mor of the
+    underlying diagrams, cut out by the condition that the flags have one
+    type and every graded determinant of the apex component, from the source
+    to the target adapted basis, is ``+1``; its points are elements of ``X``
+    (``CON-17``).  A natural transformation carries each term into the next,
+    so the matrix of its apex component on the adapted bases is block
+    triangular and its diagonal blocks are the induced maps of graded
+    pieces.  The chosen element is the isomorphism on the oriented
+    transporter, and ``Mor(F, F)`` has the identity of ``X``.
     """
 
+    @cached_method
+    def underlying_mor(self):
+        r"""``X = Fun([t], Lattices)(F, G)``, the Mor of the underlying diagrams."""
+        from sage_extensions.categories.abstract_categories.cat import Cat, _FunctorCategory
+
+        category = self.functor_category()
+        return _FunctorCategory.Mor(
+            Cat().Mor(category.domain_category(), category.codomain_category()), self.source(), self.target()
+        )
+
+    def _preserves_orientations(self, transformation) -> bool:
+        source_flag, target_flag = self.source().oriented_flag().flag(), self.target().oriented_flag().flag()
+        if source_flag.flag_type() != target_flag.flag_type():
+            return False
+        _shape, top = self.functor_category()._marking_shape()
+        return all(sign == 1 for sign in _graded_orientation_signs(transformation.component(top), source_flag, target_flag))
+
+    def __contains__(self, transformation) -> bool:
+        r"""A point of ``X`` (or of this Mor) satisfying the orientation condition."""
+        return (
+            isinstance(transformation, NaturalTransformationMorphism)
+            and transformation.parent() in (self, self.underlying_mor())
+            and self._preserves_orientations(transformation)
+        )
+
+    is_parent_of = __contains__
+
+    def accepts(self, arrow) -> bool:
+        return arrow in self
+
+    def _element_constructor_(self, transformation):
+        r"""The point of ``X`` on this datum, admitted by the orientation condition."""
+        element = self.underlying_mor()(transformation)
+        if not self._preserves_orientations(element):
+            raise ValueError(f"{element} does not carry the orientations of {self.source()} onto those of {self.target()}")
+        return element
+
+    def _an_element_(self):
+        r"""The natural isomorphism on the oriented transporter; it raises when there is none."""
+        return self.functor_category()._oriented_transformation(self.source(), self.target())
+
     def an_element(self):
-        r"""The retained transporter, a point of the universe admitted into this subset (``_ConditionSetEngine._an_element_``)."""
         return self._an_element_()
 
     def identity(self):
-        r"""The identity of the universe Mor ``Fun([t], Lattices)(F, F)``, admitted into this subset."""
-        universe = self.universe()
-        assert universe.domain() is universe.codomain(), f"{self} has distinct endpoints, so it has no identity"
-        return self(universe.identity())
+        r"""The identity of ``X = Fun([t], Lattices)(F, F)``, whose graded determinants are all 1."""
+        assert self.source() is self.target(), f"{self} has distinct endpoints, so it has no identity"
+        return self.underlying_mor().identity()
 
     one = identity
+
+
+class OrientedFlagMorCategoryConstruction(NaturalTransformationMorCategoryConstruction):
+    FixedCategoryClass = OrientedFlagMor
 
 
 class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCategory):
@@ -2344,6 +2396,8 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
     marked-diagram contract of the lattice category.
     """
 
+    _MorCategory = OrientedFlagMorCategoryConstruction
+
     @staticmethod
     @cached_function(key=lambda cls, lattices, length: (cls, id(lattices), int(length)))
     def __classcall__(cls, lattices, length):
@@ -2358,18 +2412,6 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
                 return cls.__base__(lattices, length)
         assert int(length) >= 1, f"an oriented isotropic flag has at least one term, not {length}"
         return typecall(cls, Cat(), FiniteOrdinalCategory(int(length) + 1), lattices)
-
-    def __init__(self, category_of_categories, domain, codomain) -> None:
-        from types import MethodType
-
-        super().__init__(category_of_categories, domain, codomain)
-        # The realized class of a functor category can place Sets.ParentMethods,
-        # whose Mor is the plain Mor of the diagrams, before this class (the
-        # hazard _category_mor names). The oriented Mor is the definition of
-        # this category's arrows, so it is bound on the instance, where the
-        # public attribute lookup reads it first.
-        self.Mor = MethodType(OrientedIsotropicFlags.Mor, self)
-        self.two_mor = self.Mor
 
     def _make_named_class_key(self, name):
         return OrientedIsotropicFlags, self.category_of_categories(), self.domain_category(), self.codomain_category()
@@ -2393,67 +2435,11 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
     def _object_on(self, oriented):
         return OrientedFlagDiagram(oriented)
 
-    def Mor(self, domain, codomain):
-        r"""The orientation-preserving natural transformations ``F => G``.
-
-        The subset of the ``Fun([t], Lattices)`` Mor of the underlying flag
-        diagrams (``_diagram_mor``) cut out by the condition that the flags have one type and
-        every graded determinant of the apex component, from the source to
-        the target adapted basis, is ``+1``.  A natural transformation
-        carries each term into the next, so the matrix of its apex component
-        on the adapted bases is block triangular and its diagonal blocks are
-        the induced maps of graded pieces.  Its chosen element is the
-        isomorphism on the oriented transporter.
-        """
-        from sage_extensions.categories.abstract_categories.cat import _FunctorObject
-
-        source, target = (
-            self(obj.functor() if isinstance(obj, _FunctorObject) else obj)
-            for obj in (domain, codomain)
-        )
-        return self._oriented_mor(source, target)
-
-    two_mor = Mor
-
-    @cached_method(key=lambda self, source, target: (id(source), id(target)))
     def _diagram_mor(self, source, target):
-        r"""The Mor ``Fun([t], Lattices)(F, G)`` of the underlying diagrams, of which ``Mor(F, G)`` is a subobject.
+        r"""``X = Fun([t], Lattices)(F, G)``, of which this category's ``Mor(F, G)`` is the subobject."""
+        from sage_extensions.categories.abstract_categories.cat import _FunctorCategory
 
-        It is cached on the oriented diagrams, so the subset and the
-        transporter built for it read one Mor parent: the subset admits only
-        points whose parent is its universe.
-        """
-        from sage_extensions.categories.abstract_categories.cat import Cat, _FunctorCategory
-
-        return _FunctorCategory.Mor(Cat().Mor(self.domain_category(), self.codomain_category()), source, target)
-
-    @cached_method(key=lambda self, source, target: (id(source), id(target)))
-    def _oriented_mor(self, source, target):
-        _shape, top = self._marking_shape()
-        source_flag, target_flag = source.oriented_flag().flag(), target.oriented_flag().flag()
-
-        def preserves_orientations(transformation):
-            if source_flag.flag_type() != target_flag.flag_type():
-                return False
-            apex = transformation.component(top)
-            return all(sign == 1 for sign in _graded_orientation_signs(apex, source_flag, target_flag))
-
-        # The universe is the one Mor of the underlying diagrams that
-        # Fun([t], Lattices) admits its arrows by; the transformations built on
-        # an apex component are its elements.
-        # One engine for every pair: a Mor's own condition_set selector is not
-        # the set owner's condition subset, and the subset must admit the
-        # universe's elements, including its chosen transporter.
-        from sage_extensions.owned_category import _object_of
-
-        subset = _object_of(
-            Sets(),
-            _engine=(Sets(), _OrientedFlagMorEngine, None),
-            universe=self._diagram_mor(source, target),
-            predicate=preserves_orientations,
-        )
-        subset._retain_point_computation(lambda: self._oriented_transformation(source, target))
-        return subset
+        return _FunctorCategory.Mor(self, source, target).underlying_mor()
 
     def _oriented_transformation(self, source, target):
         r"""The natural isomorphism on the oriented transporter; it raises when there is none."""
