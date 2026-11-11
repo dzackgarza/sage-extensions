@@ -64,8 +64,10 @@ File "sage_extensions/categories/lattice_morphisms.py", line 4441 in isotropic_o
 ```
 
 with `isotropic_lifts.py:385` calling `modules/pure/modules.py:3374 elements()`, which
-runs `finite_ordered_sets.from_indexed` and `fgp_module.list`. Filed as a defect of the
-call: `results/issue-to-file-tco-line-classes-enumerate-a-module.md`.
+runs `finite_ordered_sets.from_indexed` and `fgp_module.list`. The locus is owned by the
+open issues #92 (whose body names `integral_members()` as its own computation) and #57, so
+no new issue is filed: the measurement is written up as a comment for #92 in
+`results/issue92-tco-lift-locus-enumerates-a-module.md`.
 Logs `.tmp/p286-probe4.log` (row 1), `.tmp/p286-probe5.log` (row 2).
 
 ## Row 3: the stage
@@ -94,10 +96,27 @@ group's own cardinality.
 Filed as `results/issue-to-file-discriminant-characteristic-undecided.md`.
 Log `.tmp/p286-probe6.log`.
 
+## Re-measured after #319 landed
+
+The first readings were taken at `5fc4e01`. The other chat's `9fdcabe` (the Enriques
+plane rows from the divided classes of Sterk's representatives) changed
+`isotropic_orbits.py` and `predicate_subgroups.py`, both on this call's path, so the two
+line rows were re-measured on `9fdcabe` (with that chat's further uncommitted edits in
+`isotropic_orbits.py` and `predicate_subgroups.py` present, since the tree is shared):
+
+| row | result on `9fdcabe` | log |
+| --- | --- | --- |
+| `O(T_Co)` line orbits | no return at 700 s, same stack ending `isotropic_lifts.py:385 -> modules.py:3374 elements() -> fgp_module.list` | `.tmp/p286-probe4-post319.log` |
+| `Õ⁺(T_Co)` line orbits | no return at 700 s, same stack, entered at `orthogonal_quotients.py:2039` | `.tmp/p286-probe5-post319.log` |
+
+The isotropic class count reproduced there unchanged: **528** isotropic, **527** nonzero,
+57.7 s.
+
 ## Files
 
 - `tests/lattices/test_the_coble_lattice_from_the_cited_formula.sage` -- construction,
   invariants, 528/527.
-- `results/issue-to-file-tco-line-classes-enumerate-a-module.md` -- the call's blocker.
+- `results/issue92-tco-lift-locus-enumerates-a-module.md` -- the call's blocker, as a
+  report against #92.
 - `results/issue-to-file-discriminant-characteristic-undecided.md` -- `is_characteristic`.
 - `TRAPS.md`, the `T_Co` entry -- the two stages and their stacks.
