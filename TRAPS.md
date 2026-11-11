@@ -4437,10 +4437,14 @@ Two defects seen in the same code, not repaired in this unit:
    radical" gets a subgroup of the parabolic that is not the kernel.
 2. `plane_block_lift` searches the free parameter of the `P_2` equation over
    `range(-bound, bound + 1)` with `bound = 2|det J| + 2` (10 at `P_2`) instead of over a
-   complete residue system of the denominators of the linear part.  The integral solutions
-   of `P_2 J^t P_1^t + P_1 J P_2^t = remainder` are a coset `c + Z·S`, and the parameter
-   realising an integral `P_2` can fall outside that range, in which case a lift that
-   exists is reported as `None`.  `levi_lift_generators` inherits it: it returns the lifts
-   of its own candidate list only, and a candidate whose admissible parameter is large is
-   silently dropped.  All 18 candidates found a lift at `P_2`, so no measurement above is
-   affected; the defect is in the completeness of the search, not in what it returned.
+   complete residue system of the denominators of the linear part.  **Retracted in #336,
+   which measured and then proved the range sufficient**: the linear part is
+   `K (P_1 J)^{-t} = K J^{-t} Q_1` with `Q_1` the integral plane action, so its
+   denominators divide `det J`, its period divides `|det J|`, and `2|det J| + 2` integers
+   on each side is a complete residue system.  Over every integral action with entries in
+   `[-4,4]` at both planes of `T_En` (124 and 360 with `P_1`, `P_3` integral) no admissible
+   parameter falls outside, and none needs a non-integral one.  #336 removes the unstated
+   inequality by computing the period (`plane_block_parameter_period`); the magic constant
+   was redundant, not wrong.  What remains open in `levi_lift_generators` is a different
+   thing: it searches a fixed list of candidate plane actions, so an action outside that
+   list is not tried at all.

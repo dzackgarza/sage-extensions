@@ -8183,7 +8183,6 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
         ) -> None:
             self._selected_subgroup_generators = selected_subgroup_generators
             self._selected_cardinality_decision = cardinality_decision
-            self._admitted_members = {}
             super().__init__(**rest)
             assert (selected_subgroup_generators is None) != (
                 deferred_subgroup_generators is None
@@ -8208,7 +8207,7 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
             return self._selected_subgroup_generators
 
         def _retain_admitted_member(self, element):
-            r"""Retain an element of this subgroup that a construction of this subgroup supplied.
+            r"""Mark an element this subgroup's own construction supplied, on the element.
 
             Protected ingress contract, the group's form of
             ``_ConditionSetEngine._retain_admitted_member`` (``OWN-05``): the caller is a
@@ -8216,24 +8215,38 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
             cover's word evaluation, whose letters are the selected generators — so the
             value's membership is supplied, not solved.  A general membership question
             about an infinite generated subgroup stays undecided
-            (:meth:`membership_decision`); this record is not an answer to it, only the
+            (:meth:`membership_decision`); this mark is not an answer to it, only the
             statement that this element arrived through a map into this subgroup.
 
-            The record is keyed by the element's identity and holds the element, so the
-            key cannot be reused by another object while the record stands.  The inverse
-            is recorded with it: ``k^-1`` for a word ``k`` is that word reversed, which
-            needs no solver.  Elements of this library are not reliably equatable —
-            ``hash`` is the parent's for some owned families and an isometry can compare
-            equal to its own inverse — so this is deliberately an identity record.
+            The mark is a tuple of the groups on the element itself, compared by
+            identity, so it lives exactly as long as the element does.  A record on the
+            subgroup instead would retain one entry per value of the cover's word
+            evaluation, which is one entry per word: that grows without bound in the
+            subgroup for exactly the walks this admission exists to serve
+            (sage-extensions#292 is the same shape one call away).  Elements of this
+            library are not reliably equatable — ``hash`` is the parent's for some owned
+            families, and on the #287 specimen an isometry satisfies
+            ``value == ~value`` — so the marks are compared by identity, not by value.
+
+            The inverse is marked with the value: ``k^-1`` for a word ``k`` is that word
+            reversed, which needs no solver and no further construction.
             """
-            self._admitted_members.setdefault(id(element), element)
-            inverse = ~element
-            self._admitted_members.setdefault(id(inverse), inverse)
+            self._mark_admitted(element)
+            self._mark_admitted(~element)
+            return element
+
+        def _mark_admitted(self, element):
+            r"""Record this subgroup on ``element`` as one of the maps into it that supplied it."""
+            admitted = getattr(element, "_admitted_subgroups", ())
+            if not any(group is self for group in admitted):
+                element._admitted_subgroups = (*admitted, self)
             return element
 
         def _admits_member(self, candidate) -> bool:
             r"""Whether ``candidate`` is an element this subgroup's own constructions supplied."""
-            return id(candidate) in self._admitted_members
+            return any(
+                group is self for group in getattr(candidate, "_admitted_subgroups", ())
+            )
 
         def _cardinality_decision(self):
             if self._selected_cardinality_decision is not None:
