@@ -4154,3 +4154,58 @@ of this locus: the ambient `O(T_Co)` row it starts from now completes.
 A base point that is not integral is refused by `integral_parameter_classes` with the
 reason in the error, because with a nonintegral `phi(0)` the locus is not the kernel
 (the transvection must also cancel the base point's fractional part).
+
+## The setwise stabilizer's generators, and the two failures in front of them (2026-11-11, #295)
+
+**A stabilizer constructor may not require a module for data it does not use.**
+`setwise_stabilizer` and `pointwise_stabilizer` built a `vector_witness` from
+`sage_indefinite_port.indefinite.pairing_slices`, which the pinned port does not ship
+(its `indefinite/` modules are `marked_lattices`, `isotropic_induction`, `eichler`,
+`pointwise_shell`, `exact_isotropic`, `recursive`, `edgewalk*`, `lorentzian_cells`,
+`scaled_shells`, `indefinite_reduction`, `groupoid_cache`, `facet_*`). The witness is
+optional retained data read only by `_subgroup_vector_equivalence_witness`, which
+falls back to the ambient vector-equivalence decision; requiring it made every
+indefinite setwise or pointwise stabilizer raise `ModuleNotFoundError` before
+producing a generator. Both now construct without it. `vector_orbit_set`
+(`lattice_morphisms.py:4032`) still imports `SubgroupVectorOrbits` from the same
+absent module and is **not** repaired: it is a different operation, needs a real
+orbit-enumeration replacement from the port, and is recorded here so it is not
+mistaken for working.
+
+**`functools.update_wrapper` cannot wrap a dynamically generated class's method.**
+`ObjectLevelOperation.__get__` copied the routed operation's metadata with
+`update_wrapper`, whose `__doc__` copy reads Sage's `InstanceDocDescriptor`, which
+runs `sageinspect.sage_getsourcelines` and fails with `TypeError: <class 'object'> is
+a built-in class` on any class created by `_generated_arrow_type`
+(`OwnedJoinCategory.parent_class`). The operation is fine; only the doc copy fails.
+Observed on `O(T_En).one()`, reached from the port's `plane_automorphism_generators`
+through `predicate_subgroups.one()`, so `T_En.Aut().stabilizer(P)` died with a
+traceback about `inspect` and nothing about lattices. `mor_foundation.py` now copies
+name, module and annotations and copies `__doc__` only when it is a `str`.
+
+**Measured, from these two repairs (`B = U + U + I_{0,7}`, `P = <e_1, e_2>`):**
+
+| call | result |
+| --- | --- |
+| `B.Aut().stabilizer(P, action="setwise").group_generators()` | 92 generators in 16.8 s, all with `domain() is B` |
+| `B.discriminant_representation()` on each | 0 failures; `B` unimodular, so the images generate the trivial group (order 1) |
+| `U + U(2)`, same call | 13 generators in 3.7 s, all images in 0.9 s; #321's plane call fed with them returns 2 orbits |
+| `B(2) = T_Co`, images in `O(q)` | blocked: `O(A_{T_Co})` does not build (below) |
+| order of `<rho(Stab_{O(B)}(P))>` in `O(q_{B(2)})` | **247726080 = 2^18·3^3·5·7**, index `189720` in `O(q) = 46998591897600`, from the faithful action on the 2048 classes (220 s) |
+
+**`O(A)` for `A = (Z/2)^11` does not build.** `A.orthogonal_group()` →
+`_finite_order` → `_engine_group` → `_engine_orthogonal_group` →
+`torsion_quadratic_module.orthogonal_group` → `fqf_orthogonal._isom_fqf` → `orbits`,
+no return at 180 s. The elementary-two fast path
+(`_engine_elementary_two_orthogonal_generators`) is not taken because its rank test on
+the associated bilinear form fails: on `(Z/2)^11` an alternating form is degenerate,
+so `rank(q + q^T) = n = 11` cannot hold. Everything that routes through
+`O(q_{B(2)})` — `discriminant_representation` on `T_Co` included, since
+`discriminant_morphism` normalizes through `O(A).from_morphism` — is therefore
+unavailable at this size, and the image order above is read through the permutation
+action instead.
+
+**`T_En.Aut().stabilizer(P, action="setwise")` still does not return.** Past the
+metadata failure it enters `isotropic_induction.plane_automorphism_generators` →
+`_stabilizer_generators` → `recursive.isotropic_stabilizer_action` and had produced
+nothing after 3000 s — the rank-two parabolic wall #316 measured at 1500 s.

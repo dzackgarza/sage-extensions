@@ -1,0 +1,36 @@
+B setwise stabilizer group generators: 92
+[    16.0] family
+A: 2048
+  2048 classes listed in 1.2 s
+[    20.0] elements
+  indexed in 0.7 s
+[    20.7] index
+   0 permutations in 1.7 s
+   10 permutations in 19.7 s
+   20 permutations in 38.2 s
+   30 permutations in 57.3 s
+   40 permutations in 76.2 s
+   50 permutations in 96.3 s
+   60 permutations in 121.1 s
+   70 permutations in 143.5 s
+   80 permutations in 169.5 s
+   90 permutations in 195.8 s
+[   219.2] permutations
+permutations: 92
+order of the image in O(q_B(2)): 247726080
+[   219.3] order
+TOTAL 219.2525505530648
+[peakrss] issue275: child waited=0 shell_code=0 samples=111
+[peakrss] peak tree RSS      : 478 MiB
+[peakrss] low-water MemAvail : 1422 MiB
+[peakrss] peak single VmHWM  : 478 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      468 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   114.1s procs=  3 rss=   478 MiB hwm=   478 MiB avail=  2418 MiB
+[peakrss]   t=   116.1s procs=  3 rss=   478 MiB hwm=   478 MiB avail=  2301 MiB
+[peakrss]   t=   118.1s procs=  3 rss=   478 MiB hwm=   478 MiB avail=  2187 MiB
+[peakrss]   t=   110.1s procs=  3 rss=   477 MiB hwm=   477 MiB avail=  2794 MiB
+[peakrss]   t=   112.1s procs=  3 rss=   477 MiB hwm=   477 MiB avail=  2601 MiB
+launcher exit: 0
