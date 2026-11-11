@@ -1,0 +1,56 @@
+PARI stack size set to 2147483648 bytes, maximum size set to 8589934592
+
+===== k = 2 =====
+[     0.5s] L: rank 21 det -4 signature (2, 19)
+[     0.5s] dominant E8 vectors with norm >= -24: 20 and 20
+[     1.0s]   candidate roots 480 from w = [0, 0, -3, -3, 0, 0, 0, 0, 0, 0, 0, 0, -2, -4, -6, -5, -4, -3, -2, -3, -2]
+[     1.1s]   candidate roots 480 from w = [0, 0, -3, -3, -2, -4, -6, -5, -4, -3, -2, -3, 0, 0, 0, 0, 0, 0, 0, 0, -2]
+[     1.2s]   candidate roots 480 from w = [0, 0, -3, -3, 0, 0, 0, 0, 0, 0, 0, 0, -6, -12, -18, -15, -12, -9, -5, -9, -1]
+[     1.3s]   candidate roots 384 from w = [0, 0, -3, -3, 0, 0, 0, 0, 0, 0, 0, 0, -7, -14, -20, -16, -12, -8, -4, -10, -1]
+[     1.4s]   candidate roots 204 from w = [0, 0, -3, -3, -5, -10, -15, -12, -9, -6, -3, -8, -4, -8, -12, -10, -8, -6, -3, -6, -1]
+[     1.5s]   candidate roots 264 from w = [0, 0, -3, -3, -4, -8, -12, -10, -8, -6, -4, -6, -4, -8, -12, -10, -8, -6, -3, -6, -1]
+[     1.6s]   candidate roots 264 from w = [0, 0, -3, -3, -2, -4, -6, -5, -4, -3, -2, -3, -6, -12, -18, -15, -12, -8, -4, -9, -1]
+[     1.7s]   candidate roots 204 from w = [0, 0, -3, -3, -4, -8, -12, -10, -8, -6, -3, -6, -5, -10, -15, -12, -9, -6, -3, -8, -1]
+[     1.8s]   candidate roots 264 from w = [0, 0, -3, -3, -4, -8, -12, -10, -8, -6, -3, -6, -4, -8, -12, -10, -8, -6, -4, -6, -1]
+[     1.9s]   candidate roots 384 from w = [0, 0, -3, -3, -7, -14, -20, -16, -12, -8, -4, -10, 0, 0, 0, 0, 0, 0, 0, 0, -1]
+[     2.0s]   candidate roots 224 from w = [0, 0, -3, -3, -4, -7, -10, -8, -6, -4, -2, -5, -6, -11, -16, -13, -10, -7, -4, -8, -1]
+[     2.1s]   candidate roots 224 from w = [0, 0, -3, -3, -6, -11, -16, -13, -10, -7, -4, -8, -4, -7, -10, -8, -6, -4, -2, -5, -1]
+[     3.0s]   candidate roots 384 from w = [0, 0, -3, -3, 0, 0, 0, 0, 0, 0, 0, 0, -7, -14, -20, -16, -12, -8, -4, -10, 1]
+[     3.1s]   candidate roots 204 from w = [0, 0, -3, -3, -5, -10, -15, -12, -9, -6, -3, -8, -4, -8, -12, -10, -8, -6, -3, -6, 1]
+[     3.7s]   candidate roots 224 from w = [0, 0, -3, -3, -4, -7, -10, -8, -6, -4, -2, -5, -6, -11, -16, -13, -10, -7, -4, -8, 1]
+[    22.0s] k = 2: 262 candidates; root counts seen [204, 224, 264, 384, 480] of [204, 224, 244, 264, 304, 384, 480, 544]
+[    22.4s]   class roots 204 |Aut| 49662885888000 from w = [0, 0, -3, -3, -5, -10, -15, -12, -9, -6, -3, -8, -4, -8, -12, -10, -8, -6, -3, -6, -1]
+[    23.7s]   class roots 224 |Aut| 106542032486400 from w = [0, 0, -3, -3, -4, -7, -10, -8, -6, -4, -2, -5, -6, -11, -16, -13, -10, -7, -4, -8, -1]
+[    24.6s]   class roots 264 |Aut| 809053559193600 from w = [0, 0, -3, -3, -4, -8, -12, -10, -8, -6, -4, -6, -4, -8, -12, -10, -8, -6, -3, -6, -1]
+[    25.4s]   class roots 384 |Aut| 129448569470976000 from w = [0, 0, -3, -3, 0, 0, 0, 0, 0, 0, 0, 0, -7, -14, -20, -16, -12, -8, -4, -10, -1]
+[    28.5s]   class roots 480 |Aut| 1941728542064640000 from w = [0, 0, -3, -3, 0, 0, 0, 0, 0, 0, 0, 0, -2, -4, -6, -5, -4, -3, -2, -3, -2]
+[    35.8s] k = 2: mass 657131/21359013962711040000 vs 642332179/18881368343036559360000: SHORT
+
+===== k = 1 =====
+[    35.8s] L: rank 21 det -2 signature (2, 19)
+[    35.8s] dominant E8 vectors with norm >= -24: 20 and 20
+[    35.9s]   candidate roots 482 from w = [0, 0, -3, -3, 0, 0, 0, 0, 0, 0, 0, 0, -6, -11, -16, -13, -10, -7, -4, -8, -2]
+[    35.9s]   candidate roots 306 from w = [0, 0, -3, -3, -5, -10, -15, -12, -9, -6, -3, -8, -2, -4, -6, -5, -4, -3, -2, -3, -2]
+[    36.0s]   candidate roots 482 from w = [0, 0, -3, -3, -4, -8, -12, -10, -8, -6, -4, -6, -2, -4, -6, -5, -4, -3, -2, -3, -2]
+[    36.0s]   candidate roots 306 from w = [0, 0, -3, -3, -2, -4, -6, -5, -4, -3, -2, -3, -5, -10, -15, -12, -9, -6, -3, -8, -2]
+[    36.0s]   candidate roots 482 from w = [0, 0, -3, -3, -2, -4, -6, -5, -4, -3, -2, -3, -4, -8, -12, -10, -8, -6, -4, -6, -2]
+[    36.1s]   candidate roots 306 from w = [0, 0, -3, -3, -4, -8, -12, -10, -8, -6, -3, -6, -4, -7, -10, -8, -6, -4, -2, -5, -2]
+[    60.9s] k = 1: 358 candidates; root counts seen [306, 482] of [306, 482]
+[    61.5s]   class roots 306 |Aut| 5393690394624000 from w = [0, 0, -3, -3, -5, -10, -15, -12, -9, -6, -3, -8, -2, -4, -6, -5, -4, -3, -2, -3, -2]
+[    63.3s]   class roots 482 |Aut| 1941728542064640000 from w = [0, 0, -3, -3, 0, 0, 0, 0, 0, 0, 0, 0, -6, -11, -16, -13, -10, -7, -4, -8, -2]
+[    63.7s] k = 1: mass 361/1941728542064640000 vs 2499347/9440684171518279680000: SHORT
+DONE
+[peakrss] issue335: child waited=0 shell_code=0 samples=35
+[peakrss] peak tree RSS      : 796 MiB
+[peakrss] low-water MemAvail : 8172 MiB
+[peakrss] peak single VmHWM  : 796 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      786 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    66.1s procs=  3 rss=   796 MiB hwm=   796 MiB avail= 10401 MiB
+[peakrss]   t=    68.1s procs=  3 rss=   796 MiB hwm=   796 MiB avail= 10243 MiB
+[peakrss]   t=    64.1s procs=  3 rss=   789 MiB hwm=   789 MiB avail= 10408 MiB
+[peakrss]   t=    62.1s procs=  3 rss=   784 MiB hwm=   784 MiB avail= 10414 MiB
+[peakrss]   t=    60.1s procs=  3 rss=   781 MiB hwm=   781 MiB avail= 10415 MiB
+launcher exit: 0
