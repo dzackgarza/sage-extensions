@@ -571,15 +571,17 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
               ``P_I``.  ``K`` lies in the unipotent radical ``U_I``, and equals it
               when ``I = I^perp``, so this decides the unipotent part of the
               parabolic on a maximal isotropic subobject.
-            * otherwise the call refuses.  What remains undecided is the image of
-              ``P_I`` in ``O(I^perp)``, whose orbits on the reduction are not
-              computed here: the closed-form Levi lifts are
-              :meth:`levi_lift_generators`, and turning those generators into an
-              orbit decision on ``I^perp/I`` is the missing step.
+            * otherwise :meth:`_reduction_orbit_witness` decides through the
+              reduction modulo ``I``: its answer is an element of ``P_I``, or
+              ``None`` when the reductions lie in different orbits of the image
+              of ``P_I`` in ``O(I^perp/I)``.  That stage needs ``I^perp/I``
+              definite, where the image is finite, and both vectors in
+              ``I^perp``, where the reduction is defined; outside those
+              hypotheses it refuses and names the missing datum.
 
             ``None`` is therefore a decision, and this call never answers
-            ``None`` because it failed to find a witness.  No element of the
-            infinite group is listed and no generating family of it is selected.
+            ``None`` because it failed to find a witness.  No element of an
+            infinite group is listed and no generating family of one is selected.
             """
             lattice = self.ambient_lattice()
             source = left if element_parent(left) is lattice else lattice(left)
@@ -595,13 +597,279 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             witness = self._kernel_parameter_witness(source, target)
             if witness is not None:
                 return witness
+            return self._reduction_orbit_witness(source, target)
+
+        def _reduction_classes(self, vector):
+            r"""Return the class of ``vector`` in ``I^perp/I`` and its lift on the chosen frame.
+
+            ``vector`` must lie in \(I^\perp\); the lift is the reduction's own
+            coordinate frame, so ``vector`` equals the lift of its class plus an
+            element of \(I\).
+            """
+            lattice = self.ambient_lattice()
+            reduction = self.isotropic_reduction()
+            perpendicular = reduction.orthogonal_complement().inclusion()
+            if not perpendicular.is_in_image(vector):
+                raise ArithmeticError(
+                    f"the reduction of {vector} modulo {self} is not defined: the vector does "
+                    f"not lie in the perpendicular I^perp of {self}, so it has no class in "
+                    f"I^perp/I"
+                )
+            quotient = reduction.quotient_lattice()
+            labels = tuple(quotient.module_generating_set())
+            class_of = reduction.projection()(perpendicular.lift(vector))
+            coordinates = class_of.to_vector()
+            frame = self.quotient_frame_lifts()
+            lifted = sum(
+                (
+                    lattice.scalar_multiple(
+                        lattice.base_ring()(int(coordinates(label))), frame[label]
+                    )
+                    for label in labels
+                    if int(coordinates(label))
+                ),
+                lattice.zero(),
+            )
+            return class_of, lifted, vector - lifted
+
+        def _unimodular_carrying(self, source, target):
+            r"""Return a matrix in ``GL_2(ZZ)`` carrying ``source`` onto ``target``, or ``None``.
+
+            Two vectors of `ZZ^2` are carried onto one another by a unimodular
+            matrix exactly when their contents agree: a unimodular matrix
+            preserves the content, and two vectors of content `c` are `c` times
+            primitive vectors, which the completion of each to a `ZZ`-basis
+            (Bezout) carries onto one another.
+            """
+            if len(source) != 2 or len(target) != 2:
+                return None
+            source_content = _content(source)
+            if source_content != _content(target):
+                return None
+            if source_content == 0:
+                return matrix(SageZZ, [[1, 0], [0, 1]])
+            primitive_source = tuple(SageZZ(entry) // source_content for entry in source)
+            primitive_target = tuple(SageZZ(entry) // source_content for entry in target)
+
+            def completion(primitive):
+                first, second = int(primitive[0]), int(primitive[1])
+                divisor, left, right = SageZZ(first).xgcd(SageZZ(second))
+                assert abs(int(divisor)) == 1, (
+                    f"{primitive} is not primitive: {first} and {second} have gcd {divisor}"
+                )
+                return matrix(SageZZ, [[first, -int(right)], [second, int(left)]])
+
+            action = completion(primitive_target) * completion(primitive_source).inverse()
+            assert action * matrix(SageZZ, [[entry] for entry in source]) == matrix(
+                SageZZ, [[entry] for entry in target]
+            ), (
+                f"the unimodular matrix built for {source} |-> {target} does not carry it there"
+            )
+            return action
+
+        def _preserves_the_form(self, automorphism) -> bool:
+            r"""Whether ``automorphism`` preserves the pairing on a generating set of the lattice."""
+            lattice = self.ambient_lattice()
+            generators = tuple(lattice.module_generators())
+            images = tuple(automorphism(generator) for generator in generators)
+            return all(
+                lattice.b(image, other) == lattice.b(generator, source)
+                for generator, image in zip(generators, images, strict=True)
+                for source, other in zip(generators, images, strict=True)
+            )
+
+        def _frame_matrix(self, automorphism):
+            r"""Return the matrix of an isometry of ``I^perp/I`` on the reduction's frame.
+
+            The frame is a section of \(I^\perp \twoheadrightarrow I^\perp/I\)
+            on a generating set, so an isometry of the quotient is read as the
+            coordinate matrix of its images of the frame's classes.
+            """
+            quotient = self.isotropic_reduction().quotient_lattice()
+            labels = tuple(quotient.module_generating_set())
+            columns = []
+            for label in labels:
+                image = automorphism(quotient.module_generator(label))
+                coordinates = image.to_vector()
+                columns.append([int(coordinates(other)) for other in labels])
+            return matrix(SageZZ, columns).transpose()
+
+        def _levi_block_isometry(self, plane_action, quotient_action=None):
+            r"""Return the isometry of ``L`` with ``plane_action`` on ``I`` and the identity on ``I^perp/I``, or ``None``.
+
+            With the plane basis \((p_1,p_2)\), a frame \((\tilde\kappa_a)\)
+            of \(I^\perp\) over \(I\) and a complement \((u_1,u_2)\) of
+            \(I^\perp\), the isometry asked for is the block matrix
+            \(\mathrm{diag}(A, A^{-t}, 1)\) with
+            \(A^{-t} = {}^{t}(J A^{-1} J^{-1})\) and \(J = (b(p_i,u_j))\),
+            read in that basis and carried to the lattice's own generators.
+            That is the block equation \(J = g|_I J g|_U^t\) of Dutour
+            Sikirić–Hulek, *Moduli of polarised Enriques surfaces —
+            computational aspects*, J. London Math. Soc. 110 (2024),
+            arXiv:2302.01679v2, §"The Tits building", Theorem
+            (`theorem_isotropic_k_planes`, printed p. 22), which determines the
+            \(I\)-block from the \(U\)-block; :meth:`levi_lift_generators`
+            reads the same equation for the elementary matrices of \(GL(I)\).
+            ``quotient_action`` is the isometry of \(I^\perp/I\) the element
+            is to induce, read on the reduction's frame; the default is the
+            identity.  The result is returned only after the pairing is checked
+            on a generating set of ``L``, because the block equations constrain
+            the \(I\)- and \(U\)-blocks against each other and say nothing
+            about a complement that does not pair honestly with the plane.
+            """
+            complement = self.splitting_complement()
+            if complement is None:
+                return None
+            plane = self.plane_basis()
+            lattice = self.ambient_lattice()
+            ring = lattice.base_ring()
+            pairing = matrix(
+                SageZZ,
+                [
+                    [int(lattice.b(left, right)) for right in complement]
+                    for left in plane
+                ],
+            )
+            if int(pairing.determinant()) == 0:
+                return None
+            try:
+                contragredient = (
+                    pairing * plane_action.inverse() * pairing.inverse()
+                ).transpose()
+            except (ZeroDivisionError, ValueError):
+                return None
+            if any(entry not in SageZZ for entry in contragredient.list()):
+                return None
+            frame = self.quotient_frame_lifts()
+            frame_vectors = tuple(frame[label] for label in sorted(frame, key=int))
+            basis = tuple(plane) + tuple(complement) + frame_vectors
+            change = matrix(SageZZ, [self.coordinates(vector) for vector in basis])
+            if abs(int(change.determinant())) != 1:
+                raise ArithmeticError(
+                    f"the plane basis, the complement and the reduction's frame do not form a "
+                    f"ZZ-basis of {lattice}: their coordinate matrix has determinant "
+                    f"{change.determinant()}"
+                )
+            size = len(tuple(lattice.module_generating_set()))
+            block = matrix(SageZZ, size, size, 0)
+            for row in range(2):
+                for column in range(2):
+                    block[row, column] = plane_action[row, column]
+                    block[2 + row, 2 + column] = contragredient[row, column]
+            if quotient_action is None:
+                for position in range(4, size):
+                    block[position, position] = 1
+            else:
+                frame_block = self._frame_matrix(quotient_action)
+                for row in range(size - 4):
+                    for column in range(size - 4):
+                        block[4 + row, 4 + column] = frame_block[row, column]
+            lifted = change.inverse() * block * change
+            if any(entry not in SageZZ for entry in lifted.list()):
+                return None
+            images = {
+                label: lattice.linear_combination(
+                    {
+                        other: ring(int(lifted[row, column]))
+                        for row, other in enumerate(lattice.module_generating_set())
+                        if int(lifted[row, column])
+                    }
+                )
+                for column, label in enumerate(lattice.module_generating_set())
+            }
+            candidate = lattice.Aut()(images)
+            return candidate if self._preserves_the_form(candidate) is True else None
+
+        def _reduction_orbit_witness(self, source, target):
+            r"""Return an element of ``P_I`` carrying ``source`` onto ``target`` through ``I^perp/I``, or ``None``.
+
+            Both vectors must lie in \(I^\perp\), where the reduction modulo
+            \(I\) is defined, and \(I^\perp/I\) must be definite, so that its
+            isometry group is finite.
+
+            If the two reductions lie in different orbits of
+            \(O(I^\perp/I)\), no element of \(P_I\) carries one vector onto
+            the other, and ``None`` is the decision: an element of \(P_I\)
+            stabilizes \(I^\perp\), hence descends to an isometry of
+            \(I^\perp/I\), so it can only carry a class into the
+            \(O(I^\perp/I)\)-orbit of that class.  That is a statement about
+            the whole orthogonal group of the quotient, not about a selected
+            generating family of it.
+
+            Otherwise the two vectors reduce to classes in one orbit, their
+            difference after the carrying isometry lies in \(I\), and an
+            element with plane block \(A\) and quotient block \(\psi\) acts on
+            the reduction's frame by
+            \(i + \tilde\kappa \mapsto A i + \widetilde{\psi(\kappa)}\).
+            So a witness is sought among the pairs \((A, \psi)\) with
+            \(\psi\) carrying one class onto the other and \(A\)
+            (:meth:`_unimodular_carrying`) carrying one \(I\)-part onto the
+            other; :meth:`_levi_block_isometry` realizes each pair by the block
+            equation of Dutour Sikirić–Hulek, *Moduli of polarised Enriques
+            surfaces — computational aspects*, J. London Math. Soc. 110 (2024),
+            arXiv:2302.01679v2, §"The Tits building", Theorem
+            (`theorem_isotropic_k_planes`, printed p. 22), and the composed
+            element is returned only after it is evaluated on ``source``.
+
+            The call raises rather than answering ``None`` where it cannot
+            decide: when \(I^\perp/I\) is not definite, when a vector lies
+            outside \(I^\perp\) (the action of \(P_I\) on \(L/I^\perp\) is
+            not computed here), when the \(I\)-parts have different contents so
+            that no unimodular matrix carries one onto the other, or when the
+            block element for the pair is not integral.
+            """
+            reduction = self.isotropic_reduction()
+            quotient = reduction.quotient_lattice()
+            if quotient.is_definite() is not True:
+                raise ArithmeticError(
+                    f"cannot decide whether {source} and {target} are equivalent under "
+                    f"{self.parabolic_subgroup()} through the reduction modulo I: that "
+                    f"reduction is I^perp/I = {quotient} of signature "
+                    f"{quotient.signature_pair()}, whose isometry group is infinite, so its "
+                    f"orbits are not a finite computation here.  The pointwise kernel and the "
+                    f"two reduction contents are already decided"
+                )
+            source_class, _source_lift, source_part = self._reduction_classes(source)
+            target_class, _target_lift, target_part = self._reduction_classes(target)
+            automorphisms = quotient.Aut()
+            if not any(
+                automorphism(source_class) == target_class
+                for automorphism in automorphisms
+            ):
+                return None
+            action = self._unimodular_carrying(
+                self._plane_coordinates(source_part),
+                self._plane_coordinates(target_part),
+            )
+            if action is None:
+                raise ArithmeticError(
+                    f"cannot decide whether {source} and {target} are equivalent under "
+                    f"{self.parabolic_subgroup()}: their reductions modulo I lie in one orbit "
+                    f"of O(I^perp/I), but the I-parts of their reductions have contents "
+                    f"{_content(self._plane_coordinates(source_part))} and "
+                    f"{_content(self._plane_coordinates(target_part))}, and the elements "
+                    f"realized here act on I by unimodular matrices, which preserve content"
+                )
+            for automorphism in automorphisms:
+                if automorphism(source_class) != target_class:
+                    continue
+                element = self._levi_block_isometry(action, automorphism)
+                if element is not None and element(source) == target:
+                    return element
             raise ArithmeticError(
                 f"cannot decide whether {source} and {target} are equivalent under "
-                f"{self.parabolic_subgroup()}: they have the same square "
-                f"{lattice.q(source)} and the same reduction contents, and no element of the "
-                f"pointwise kernel ker(P_I -> O(I^perp)) carries one onto the other.  The "
-                f"remainder of the parabolic is its image in O(I^perp); its orbits on the "
-                f"reduction I^perp/I are not computed here, so neither answer is claimed"
+                f"{self.parabolic_subgroup()}: their reductions modulo I lie in one orbit of "
+                f"O(I^perp/I) and their I-parts have one content, but no element with the "
+                f"carrying plane block and the carrying quotient block was realized integrally "
+                f"by the block equation.  Neither answer is claimed"
+            )
+
+        def _plane_coordinates(self, element):
+            r"""Return the coordinates of an element of ``I`` on ``plane_basis()``."""
+            inclusion = self.inclusion()
+            coordinates = inclusion.lift(element).to_vector()
+            return tuple(
+                int(coordinates(label)) for label in self.module_generating_set()
             )
 
         def _reduction_values(self, vector):

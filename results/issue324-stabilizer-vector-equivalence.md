@@ -103,22 +103,28 @@ indefinite lattice refuses there, and that refusal propagates.
 `3 passed in 1.07 s`. The three claims are relations only; no number in the
 module is a computation's own output.
 
-## Two defects found on the way (not repaired here)
+## One defect found on the way, and one repaired elsewhere
 
-1. `isotropic_parabolics.PrimitiveIsotropicSubobjects.PrimitiveIsotropicSubobjects.quotient_reflection_generators`
-   raises on a **maximal** isotropic plane, because the Levi quotient
-   $I^\perp/I$ is then the zero lattice and `shortest_vectors()` asks the zero
+1. `isotropic_parabolics.PrimitiveIsotropicSubobjects.quotient_reflection_generators`
+   raised on a **maximal** isotropic plane, because the Levi quotient
+   $I^\perp/I$ is then the zero lattice and `shortest_vectors()` asked the zero
    lattice for a minimum: `ValueError: the zero lattice has no nonzero vector
    and no minimum`. Reached from
    `parabolic_stabilizer_generators` → `_isotropic_plane_parabolic_generators`,
-   so `setwise_stabilizer(...).group_generators()` does not return on
-   $U \oplus U(2)$ at $\langle e_1, e_3\rangle$. The vector decision above does
-   not need those generators.
+   so `setwise_stabilizer(...).group_generators()` did not return on
+   $U \oplus U(2)$ at $\langle e_1, e_3\rangle$. **Repaired by `093a1063ca`**
+   ("Give no reflection generator for a trivial Levi quotient"): a rank-zero
+   quotient returns no reflection, which is the trivial Levi factor. The vector
+   decision above never needed those generators.
 2. `PrimitiveIsotropicSubobjects.unipotent_group_generators` calls
    `RECURSION.isotropic_quotient_kernel_generators` (`lattices.py:10549`), which
    the pinned port's `EichlerRecursion` does not define:
    `AttributeError: 'EichlerRecursion' object has no attribute
-   'isotropic_quotient_kernel_generators'`.
+   'isotropic_quotient_kernel_generators'`. Still open. The same family blocks
+   `levi_image` / `levi_lift` at plane rank: `_levi_integral_lift_or_none` calls
+   `RECURSION.isotropic_quotient_lift`, which the pinned port also does not
+   define, so the Levi image is read from the images of the generating family
+   instead (`quotient_image_lifts`, #327).
 
 ## Left red, deliberately
 
