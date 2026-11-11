@@ -1521,21 +1521,110 @@ def _genus_classes(gram):
     )
 
 
+def _dominant_block_vectors(weight_basis, bound):
+    r"""The dominant vectors of one ``E8(-1)`` block of square at least ``-bound``.
+
+    ``weight_basis`` is ``-C^{-1}`` for the block's Cartan matrix ``C``, whose
+    columns are therefore ``-\omega_i``.  A vector ``x`` of the block is
+    dominant -- ``b(\alpha_i, x) \ge 0`` for the block's simple roots -- exactly
+    when ``x = -\sum_i c_i \omega_i`` with every ``c_i \ge 0``, and then
+    ``q(x) = -c^T C^{-1} c`` and ``b(\alpha_i, x) = c_i``.  Returns the
+    dictionary taking ``-q(x) \ge 0`` to the coordinate vectors ``x`` of that
+    square, for every dominant ``x`` of square at least ``-bound``.
+
+    The enumeration is finite because ``C^{-1}`` has no negative entry for
+    ``E8`` (asserted): then ``c^T C^{-1} c \ge c_i^2 (C^{-1})_{ii}`` for every
+    ``i``, so ``c_i \le \sqrt{\mathrm{bound} / \min_j (C^{-1})_{jj}}``, and a
+    prefix of the coefficient vector whose own value is already below
+    ``-\mathrm{bound}`` has no extension back above it, which is the pruning.
+    Both facts are properties of the matrix, not conventions about it: the
+    identity ``(-C^{-1}) C (-C^{-1})^T = -C^{-1}`` asserted where the basis is
+    built pins ``weight_basis`` to ``-C^{-1}``.
+    """
+    from math import isqrt
+
+    from sage.matrix.constructor import matrix
+    from sage.rings.integer_ring import ZZ as SageZZ
+
+    dimension = int(weight_basis.nrows())
+    reciprocal_diagonal = [-int(weight_basis[index, index]) for index in range(dimension)]
+    assert min(reciprocal_diagonal) >= 1, (
+        f"the E8 block's inverse Cartan matrix has diagonal {reciprocal_diagonal}, so the bound on its "
+        f"coefficients is not the one this enumeration assumes"
+    )
+    assert all(
+        int(weight_basis[i, j]) <= 0 for i in range(dimension) for j in range(dimension)
+    ), (
+        "the E8 block's inverse Cartan matrix has a positive entry, so the pruning below is not monotone"
+    )
+    cap = isqrt(bound // min(reciprocal_diagonal)) + 1
+    vectors: dict[int, list[list[int]]] = {}
+    coefficients: list[int] = []
+
+    def square(prefix):
+        return sum(
+            prefix[i] * int(weight_basis[i, j]) * prefix[j]
+            for i in range(len(prefix))
+            for j in range(len(prefix))
+        )
+
+    def collect() -> None:
+        if len(coefficients) == dimension:
+            value = -square(coefficients)
+            assert value <= bound, (
+                f"the dominant block vector with coefficients {coefficients} has square {-value} beyond "
+                f"the bound {bound}"
+            )
+            vector = weight_basis * matrix(SageZZ, dimension, 1, list(coefficients))
+            vectors.setdefault(value, []).append([int(entry) for entry in vector.list()])
+            return
+        for choice in range(cap + 1):
+            coefficients.append(choice)
+            if square(coefficients) + bound >= 0:
+                collect()
+            coefficients.pop()
+
+    collect()
+    return vectors
+
+
 @cached_function
 def _unimodular_complement_frame(rank, blocks):
     r"""The frame the chamber enumeration of ``_genus_classes_through_the_chamber`` uses.
 
-    Returns ``(gram, model_rank, walls, dominant)`` for ``II_{1,rank}``: its Gram in
-    the model's module generators, the rank of that model, the wall roots as
-    coordinate vectors, and the dominant-chamber vectors of one ``E8`` block
-    grouped by their norm.  Every wall root is asserted to be of square ``-2`` in
-    the model's own form, so the chamber's inequalities ``b(r, x) >= 0`` are taken
-    in the form the enumeration also uses.  ``E8`` is unimodular, so its dominant
-    vectors are the nonnegative integral combinations of its fundamental weights,
-    the columns of the inverse Cartan matrix, with ``q(x) = c^T M c``; those of norm
-    at least ``-40`` are collected.  That floor is a truncation of the dominant
-    chamber, never a claim about the genus: a class it hides fails the mass
-    assertion in the caller and the caller declines.
+    Returns ``(gram, model_rank, walls, weight_basis, highest_root)`` for
+    ``II_{1,rank} = U \oplus E_8(-1) \oplus \cdots``: the model's Gram matrix in
+    its own module generators, the model's rank, the wall roots of its Vinberg
+    chamber as coordinate vectors, the weight basis ``-C^{-1}`` of one
+    ``E8(-1)`` block, and that block's highest root.
+
+    The model's Gram is ``U`` at ``[0:2]``, ``q(a, b) = 2ab``, orthogonal to one
+    ``E8(-1)`` block per eight ranks at ``[2:10]`` and ``[10:18]`` (both asserted
+    here), so a vector is ``v = (a, b, x, y)`` with
+    ``q(v) = 2ab + q(x) + q(y)``.  The wall roots come from the library's
+    ``fundamental_chamber`` (Vinberg's algorithm; E. B. Vinberg, *Some
+    arithmetical discrete groups in Lobacevskii spaces*, 1975, and Conway--Sloane,
+    *SPLAG*, 3rd ed., Ch. 27, §2, whose Fig. 27.1 is the same chamber for
+    ``II_{9,1}``), and every one is asserted to have square ``-2`` in this very
+    form, so the chamber's inequalities ``b(r, v) \ge 0`` are the ones the
+    enumeration uses.
+
+    Of the nineteen walls, sixteen are the two blocks' simple roots -- the
+    coordinate vectors of ``[2:10]`` and ``[10:18]``, which is what makes
+    ``b(r, v) \ge 0`` dominance in each block -- and the three that carry the
+    hyperbolic coordinates are asserted to be, in these coordinates,
+
+    - ``(-1, 1, 0, 0)``, the inequality ``|b| \ge |a|``;
+    - ``(0, -1, -\theta, 0)`` and ``(0, -1, 0, -\theta)``, for one and the same
+      ``\theta`` of square ``-2`` whose every coordinate is at least ``1``.
+
+    ``\theta`` is the block's highest root: the two walls are the two blocks'
+    affine nodes, and the middle one is the diagram's ``A_1``, which is the
+    ``2E_8 + A_1`` elliptic subdiagram of ``19`` nodes that H. A. Heckman,
+    *Hyperbolic reflection groups and the Leech lattice* (master's thesis,
+    Radboud, Ch. 4) reads off ``II_{17,1}``.  Asserting the three shapes is what
+    licenses the bound in ``_genus_classes_through_the_chamber``; a chamber whose
+    hyperbolic walls are of another shape is a refusal, not a guess.
     """
     from sage.matrix.constructor import matrix
     from sage.rings.integer_ring import ZZ as SageZZ
@@ -1548,7 +1637,8 @@ def _unimodular_complement_frame(rank, blocks):
         model = model + Lattices(integers)("E8")
     model = HyperbolicLattices(integers)(model)
     gram = _engine_component_matrix(model.gram_tensor()).change_ring(SageZZ)
-    model_rank = gram.nrows()
+    model_rank = int(gram.nrows())
+    width = (model_rank - 2) // blocks
     labels = tuple(model.module_generating_set())
     chamber = model.fundamental_chamber()
     walls = []
@@ -1562,37 +1652,73 @@ def _unimodular_complement_frame(rank, blocks):
             f"the wall root {root} of the Vinberg chamber of {model} is not of square -2 in the model's form, so the chamber's inequalities are not the ones the enumeration uses"
         )
         walls.append(vector)
-    block = matrix(SageZZ, [[int(gram[2 + i, 2 + j]) for j in range(8)] for i in range(8)])
+    assert len(walls) == blocks * width + 3, (
+        f"the Vinberg chamber of {model} has {len(walls)} walls, but the bound of this route is stated for "
+        f"{blocks * width + 3}: the blocks' simple roots plus the three walls that carry the hyperbolic "
+        f"coordinates"
+    )
+
+    def pairing(left, right):
+        return sum(left[i] * gram[i, j] * right[j] for i in range(model_rank) for j in range(model_rank))
+
+    assert all(
+        gram[i, j] == 0 for i in (0, 1) for j in range(2, model_rank)
+    ), f"the two hyperbolic coordinates of {model} are not orthogonal to the blocks"
+    assert all(
+        gram[i, j] == 0
+        for block in range(blocks)
+        for i in range(2 + block * width, 2 + (block + 1) * width)
+        for j in range(2, model_rank)
+        if not (2 + block * width <= j < 2 + (block + 1) * width)
+    ), f"the E8 blocks of {model} are not mutually orthogonal"
+
+    hyperbolic_walls = [wall for wall in walls if wall[0] or wall[1]]
+    assert len(hyperbolic_walls) == 3, (
+        f"the Vinberg chamber of {model} has {len(hyperbolic_walls)} walls with a hyperbolic component, but "
+        f"the bound of this route is stated for three"
+    )
+    block_walls = [wall for wall in walls if not (wall[0] or wall[1])]
+    for wall in block_walls:
+        nonzero = [index for index in range(2, model_rank) if wall[index]]
+        assert len(nonzero) == 1 and wall[nonzero[0]] == 1, (
+            f"the block wall {wall} of {model} is not a simple root of a block, so the chamber does not "
+            f"give dominance in the blocks"
+        )
+    middle = [wall for wall in hyperbolic_walls if wall[0] and wall[1]]
+    assert len(middle) == 1 and middle[0] == [-1, 1] + [0] * (model_rank - 2), (
+        f"the chamber of {model} has no unique wall (-1, 1, 0, ...), which is the inequality |b| >= |a| the "
+        f"bound uses"
+    )
+    affine = [wall for wall in hyperbolic_walls if not (wall[0] and wall[1])]
+    block_parts = []
+    for wall in affine:
+        assert wall[0] == 0 and wall[1] == -1, (
+            f"the wall {wall} of {model} is not of the shape (0, -1, ...) the bound uses"
+        )
+        halves = [wall[2 + block * width : 2 + (block + 1) * width] for block in range(blocks)]
+        nonzero = [half for half in halves if any(half)]
+        assert len(nonzero) == 1, (
+            f"the wall {wall} of {model} does not sit in exactly one block, so it is not an affine node"
+        )
+        block_parts.append(nonzero[0])
+    assert block_parts[0] == block_parts[1], (
+        f"the two affine walls {affine} of {model} are not the two blocks' copies of one root"
+    )
+    highest_root = [-entry for entry in block_parts[0]]
+    assert all(entry >= 1 for entry in highest_root), (
+        f"the affine wall {affine[0]} of {model} is not minus a dominant root, so dominance does not make "
+        f"its pairing with a block vector nonnegative"
+    )
+
+    block = matrix(SageZZ, [[int(gram[2 + i, 2 + j]) for j in range(width)] for i in range(width)])
     weight_basis = matrix(SageZZ, [[int(round(value)) for value in row] for row in block.inverse().rows()])
     assert weight_basis * block * weight_basis.transpose() == weight_basis, (
         "the E8 block's inverse Cartan matrix is not the weight basis the enumeration assumes"
     )
-    dominant = {}
-
-    def collect(coefficients):
-        if len(coefficients) == 8:
-            value = sum(
-                coefficients[i] * int(weight_basis[i, j]) * coefficients[j]
-                for i in range(8)
-                for j in range(8)
-            )
-            if value >= -40:
-                vector = (weight_basis * matrix(SageZZ, 8, 1, list(coefficients))).list()
-                dominant.setdefault(value, []).append([int(entry) for entry in vector])
-            return
-        for choice in range(13):
-            coefficients.append(choice)
-            partial = sum(
-                coefficients[i] * int(weight_basis[i, j]) * coefficients[j]
-                for i in range(len(coefficients))
-                for j in range(len(coefficients))
-            )
-            if partial >= -40:
-                collect(coefficients)
-            coefficients.pop()
-
-    collect([])
-    return gram, model_rank, walls, dominant
+    assert weight_basis * block == matrix(SageZZ, width, width, lambda i, j: 1 if i == j else 0), (
+        f"the weight basis -C^-1 of {model} does not invert the block's Cartan matrix"
+    )
+    return gram, model_rank, tuple(walls), weight_basis, tuple(highest_root)
 
 
 def _genus_classes_through_the_chamber(gram):
@@ -1614,23 +1740,70 @@ def _genus_classes_through_the_chamber(gram):
     primitive ``v`` of square ``d``.
 
     Those orbits are read from the fundamental chamber of the Vinberg reflection
-    group of ``II_{1,n}`` (Vinberg 1975; Conway--Sloane, *SPLAG*, ch. 27): every
-    orbited vector is carried into the closed chamber ``{x : b(r, x) >= 0}`` by a
-    reflection, and the chamber's own walls are the only filter needed.  The
-    enumeration is finite: each wall of square ``-2`` inside an ``E8`` block is
-    that block's simple root, so ``b(r, x) >= 0`` puts each ``E8`` part in the
-    dominant chamber, where a definite lattice has finitely many vectors of norm
-    at least ``-B``; and the walls with hyperbolic components bound those two
-    coordinates.  The Siegel mass of the genus is the completeness check, and it
-    is asserted, so a class missed by the enumeration cannot pass silently.
+    group of ``II_{1,n}`` (Vinberg 1975; Conway--Sloane, *SPLAG*, ch. 27, §2):
+    every orbited vector is carried into the closed chamber
+    ``{x : b(r, x) >= 0}`` by a reflection, so one representative of every orbit
+    lies in the chamber, and the chamber's own walls are the only filter needed.
+
+    **The three hyperbolic walls and the bound.**  With ``v = (a, b, x, y)`` in
+    the chamber, ``q(v) = 2ab + q(x) + q(y) = d`` and ``x, y`` in the two
+    ``E8(-1)`` blocks, ``_unimodular_complement_frame`` supplies the nineteen
+    walls and asserts the shape of the three that carry ``(a, b)``:
+    ``(-1, 1, 0, 0)``, ``(0, -1, -\theta, 0)`` and ``(0, -1, 0, -\theta)`` with
+    ``\theta`` the block's highest root.  In order:
+
+    1. *The walls.*  ``b(r, v) >= 0`` for the nineteen roots the library's
+       ``fundamental_chamber`` returns, each of square ``-2`` (asserted in the
+       frame).  Vinberg's algorithm gives that chamber as the closed fundamental
+       polyhedron of the reflection group, and a chamber is a fundamental domain
+       of the group it generates (Vinberg 1975; *SPLAG* Ch. 27, §2, for the
+       ``II_{9,1}`` instance of the same algorithm).
+    2. *Dominance.*  Sixteen of the walls are the blocks' simple roots
+       (asserted), so ``b(\alpha_i, x) >= 0`` and ``b(\alpha_i, y) >= 0``: both
+       blocks are dominant.  ``E8`` is unimodular, so a dominant vector is
+       ``x = -\sum_i c_i \omega_i`` with ``c_i = b(\alpha_i, x) >= 0`` integral,
+       and then ``q(x) = -c^T C^{-1} c``.
+    3. *The signs.*  Write ``A = -a`` and ``B = -b``.  The middle wall gives
+       ``B >= A``.  The other two give ``A >= b(\theta, x) = \sum_i \theta_i c_i``
+       and ``B >= \sum_i \theta_i d_i``, and ``\theta`` has every coordinate at
+       least ``1`` (asserted), so both right sides are ``>= 0``: hence ``A, B >= 0``,
+       and since ``q(v) = d > 0`` forbids either being ``0`` (``q(x) + q(y) <= 0``),
+       ``a, b < 0``.  A chamber vector of positive square therefore has both
+       hyperbolic coordinates negative, with ``|b| >= |a| >= 1``.
+    4. *The block norms.*  ``X := -q(x)`` and ``Y := -q(y)`` are bounded by the
+       hyperbolic coordinates: for ``c >= 0`` with ``\sum_i \theta_i c_i <= A``,
+       Cauchy--Schwarz in the positive definite form ``C^{-1}`` gives
+       ``(\sum_i \theta_i c_i)^2 <= (\theta^T C \theta)(c^T C^{-1} c)`` with
+       ``\theta^T C \theta = -q(\theta) = 2``, while the maximum of
+       ``c^T C^{-1} c`` over that simplex is attained at a vertex, the function
+       being convex, so it is ``A^2 \max_i (C^{-1})_{ii} / \theta_i^2``.  That
+       maximum is ``\Lambda``, computed here and asserted ``<= 1`` for ``E8``, and
+       so ``X <= A^2`` and ``Y <= B^2``.  The bound is sharp -- the vertex
+       ``c = (A/\theta_j) e_j`` attains it -- which is why no bound on ``|a|``
+       itself follows from the walls, and why the enumeration below is not a box
+       in ``(a, b)``.
+    5. *The enumeration.*  ``q(v) = d`` reads ``2AB = d + h`` with
+       ``h := X + Y >= 0``, and step 4 keeps ``0 <= X <= \min(h, A^2)`` and
+       ``0 <= Y <= \min(h, B^2)``.  So for a fixed height ``h`` the pairs
+       ``(A, B)`` are the divisors of ``(d + h)/2`` with ``A <= B``, each block's
+       norm is confined to an interval, and the height is walked in increasing
+       order: the walk is exhaustive over the closed chamber and every height is
+       finite.  It stops when the classes' masses reach the Siegel mass [CS99,
+       Ch. 16], which is the completeness certificate -- a class the walk had not
+       reached yet would leave the mass short, and the assertion below would fail
+       rather than return a short genus.  The walk does not terminate on a genus
+       whose mass it cannot close, and it is entered only for rank ``17`` with
+       even cyclic discriminant, where the complement correspondence and step 3
+       both apply; any other genus declines here and keeps the caller's
+       ``p``-neighbour traversal.
     """
+    from math import isqrt
+
     from sage.matrix.constructor import matrix
     from sage.quadratic_forms.genera.genus import Genus as SageGenus
     from sage.quadratic_forms.quadratic_form import QuadraticForm
     from sage.rings.integer_ring import ZZ as SageZZ_local
     from sage.rings.rational_field import QQ as SageQQ_local
-
-    from sage_extensions.categories.hyperbolic_lattices import HyperbolicLattices
 
     SageZZ = SageZZ_local
     SageQQ = SageQQ_local
@@ -1648,6 +1821,12 @@ def _genus_classes_through_the_chamber(gram):
     factors = [abs(int(smith[index, index])) for index in range(rank) if abs(int(smith[index, index])) != 1]
     if factors != [order]:
         return None
+    # Every vector of the even unimodular ``II_{1,rank}`` has even square, and a
+    # primitive such vector's square is the determinant of its complement
+    # (Nikulin, Proposition 1.15.1), so an odd ``order`` is complemented by no
+    # vector at all and this route does not serve it.
+    if order % 2:
+        return None
     scale = SageZZ(-1) if positive == 0 else SageZZ(1)
     negative_definite = QuadraticForm(SageZZ, scale * gram)
 
@@ -1658,37 +1837,60 @@ def _genus_classes_through_the_chamber(gram):
     blocks = (rank - 1) // 8
     if blocks != 2:
         return None
-    lattice_gram, model_rank, walls, dominant = _unimodular_complement_frame(rank, blocks)
+    # The chamber route returns the whole class set as one group, which is the
+    # improper spinor split of the genus only when that quotient is trivial.  A
+    # genus with several improper spinor genera declines here and keeps the
+    # caller's seed-and-walk machinery, which reports the split.
+    if _spinor_generating_primes(genus, proper=False):
+        return None
+    lattice_gram, model_rank, walls, weight_basis, highest_root = _unimodular_complement_frame(rank, blocks)
+    width = (model_rank - 2) // blocks
 
     def pairing(left, right):
         return sum(left[i] * lattice_gram[i, j] * right[j] for i in range(model_rank) for j in range(model_rank))
 
-    # The hyperbolic coordinates of a chamber vector of square ``order`` with
-    # ``order <= 4``: the walls that carry a hyperbolic component bound them, and
-    # 10 is the bound at which the two genera of rank 17 close (k = 1 and k = 2).
-    # It is a truncation, not a claim: a class it hides leaves the mass short, the
-    # assertion below fails to reach the genus mass, and this route declines.
-    coordinate_bound = 10
+    # The sharp constant of step 4: ``X <= Lambda A^2`` with ``Lambda`` the
+    # largest of ``(C^-1)_ii / theta_i^2`` at the simplex's vertices.
+    sharpness = max(
+        SageQQ(-int(weight_basis[index, index])) / SageQQ(int(highest_root[index])) ** 2
+        for index in range(width)
+    )
+    assert 0 < sharpness <= 1, (
+        f"the largest of (C^-1)_ii / theta_i^2 for {gram} is {sharpness}, so the block norms are not "
+        f"bounded by the square of the hyperbolic coordinate and the enumeration's restriction is not the "
+        f"one proved"
+    )
+
     classes = []
     classes_mass = SageQQ.zero()
     total = negative_definite.conway_mass()
-    for left_coordinate in range(-coordinate_bound, coordinate_bound + 1):
-        for right_coordinate in range(-coordinate_bound, coordinate_bound + 1):
-            target = order - 2 * left_coordinate * right_coordinate
-            if target > 0:
+    height = 0
+    pool: dict[int, list[list[int]]] = {}
+    pool_bound = -1
+    while classes_mass != total:
+        if height > pool_bound:
+            pool = _dominant_block_vectors(weight_basis, height)
+            pool_bound = height
+        # ``2AB = d + height``: the height is the sum of the two block norms.
+        product = (order + height) // 2
+        assert 2 * product == order + height
+        for left_coordinate in range(1, isqrt(product) + 1):
+            if product % left_coordinate:
                 continue
-            for left_norm in sorted(dominant):
-                right_norm = target - left_norm
-                if right_norm not in dominant:
+            right_coordinate = product // left_coordinate
+            low = max(0, height - (sharpness * right_coordinate**2).floor())
+            high = min(height, (sharpness * left_coordinate**2).floor())
+            for left_norm in sorted(pool):
+                if left_norm > high:
+                    break
+                if left_norm < low:
                     continue
-                # Every vector of both norm buckets is tried: a bucket is finite
-                # because the E8 block is definite and the floor of the showered
-                # norm range is where the wall inequalities cut it off, and the
-                # nineteen wall tests below run before the exact isometry test, so
-                # the expensive part sees only the chamber's own vectors.
-                for left in dominant[left_norm]:
-                    for right in dominant[right_norm]:
-                        vector = [left_coordinate, right_coordinate] + left + right
+                right_norm = height - left_norm
+                if right_norm not in pool:
+                    continue
+                for left in pool[left_norm]:
+                    for right in pool[right_norm]:
+                        vector = [-left_coordinate, -right_coordinate] + left + right
                         if len(vector) != model_rank or pairing(vector, vector) != order:
                             continue
                         if any(pairing(wall, vector) < 0 for wall in walls):
@@ -1700,12 +1902,16 @@ def _genus_classes_through_the_chamber(gram):
                         system = matrix(SageZZ, [covector])
                         _, _, kernel = system.smith_form()
                         basis = kernel[:, int(system.rank()):]
-                        if basis.ncols() != rank - 1:
+                        if basis.ncols() != model_rank - 1:
                             continue
                         hessian = basis.transpose() * lattice_gram * basis
                         if abs(int(hessian.det())) != order:
                             continue
                         candidate = QuadraticForm(SageZZ, scale * hessian)
+                        # The root count of ``v^perp`` is a cheap invariant that
+                        # separates most classes, so it is read first and the
+                        # exact PARI isometry test runs only against the classes
+                        # it does not separate.
                         roots = len(candidate.short_vector_list_up_to_length(2)[1])
                         if any(
                             record[0] == roots and record[1].qfisom(candidate.__pari__())
@@ -1713,11 +1919,17 @@ def _genus_classes_through_the_chamber(gram):
                         ):
                             continue
                         order_of_group = candidate.number_of_automorphisms()
-                        classes.append((roots, candidate.__pari__().qfisominit(), order_of_group))
+                        classes.append(
+                            (roots, candidate.__pari__().qfisominit(), order_of_group, hessian.change_ring(SageZZ))
+                        )
                         classes_mass += SageQQ.one() / order_of_group
+                        assert classes_mass <= total, (
+                            f"the classes found in the genus of {gram} have mass {classes_mass}, beyond the "
+                            f"genus mass {total}, so two of them are isometric"
+                        )
                         if classes_mass == total:
-                            return (tuple(hessian.change_ring(SageZZ) for roots, _init, _order in classes),)
-    return None
+                            return (tuple(found for _roots, _init, _order, found in classes),)
+        height += 2
 
 
 def _local_density(form, prime, value):
