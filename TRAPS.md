@@ -4332,3 +4332,39 @@ although the class of the vectors modulo `I` is an invariant the call never read
 Both are repaired in the #328 commit; the decision is now
 `None`-or-witness on the invariants plus a construction, and a refusal naming the
 datum where the construction is not exhaustive.
+
+### A cardinal's `parent()` is the element class, so `.parent().one()` is not a unit (2026-11-11, #288)
+
+Measured 2026-11-11 in the adopted runtime (SageMath 11.0.beta5, Python 3.14) on
+`a0d9ad37`: `cardinal(1).parent()` returns the element *class*
+`sage_extensions.categories.sets.cardinals.Cardinalities.parent_class`, not the
+category instance, and that class has no `one`:
+
+```
+first:      1    <class '...categories.sets.cardinals.Cardinalities.parent_class'>
+first.parent():  <class '...categories.sets.cardinals.Cardinalities.parent_class'>
+isinstance(first.parent(), type): True
+Cardinalities() has one: True
+first.is_finite(): True        first.finite_value(): 1
+int(cardinal(Infinity)): TypeError: cannot convert infinite cardinal ℵ_0 to integer
+```
+
+So every site that wrote "the signature count is one" as `positive.parent().one()`
+raised `AttributeError: type object 'Cardinalities.parent_class' has no attribute
+'one'`; on `a0d9ad37` three sites did
+(`Lattices.component_character`, `Lattices.positive_cone_subgroup`,
+`LatticeIsometryMethods.preserves_positive_cone`), and both consumers named by #288
+were among them. The count was available the whole time as `int` of the cardinal.
+
+The signature owner (`_lattice.signature_pairs()`) returns elements of
+`Card × Card`, so an entry is a cardinal and the comparison is an **integer**
+comparison; `is_finite()` has to be asked first, since `int` of an infinite cardinal
+raises `TypeError` and the owner's own docstring admits infinite inertia
+(`Z^{(N)}` has `(p,q) = (ℵ_0, 0)`).
+
+Repaired at one owner — `Lattices.has_two_component_positive_cone()` — which every
+site stating "signature (1,n) with n >= 1" now calls: the three above and the two in
+`hyperbolic_geometry.PositiveConeComponents`, whose `int(...)` spelling was already
+correct and is now the only spelling. `cardinal(1).parent()` itself is left alone:
+the observable wrongness was the comparison, and the element class's `parent()` is
+not this unit's to change.

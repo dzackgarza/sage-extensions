@@ -143,10 +143,9 @@ class PositiveConeComponents(OwnedParameterizedCategory):
     r"""Chosen components of ``{x : q(x)>0}`` for lattices of signature ``(1,n)``."""
 
     def __init__(self, lattice) -> None:
-        signature = lattice.signature_pair()
-        assert int(signature.first()) == 1 and int(signature.second()) >= 1, (
+        assert lattice.has_two_component_positive_cone() is True, (
             f"{lattice} has no category of positive-cone components: it must have "
-            f"signature (1, n) with n >= 1, but its signature is {signature}"
+            f"signature (1, n) with n >= 1, but its signature is {lattice.signature_pair()}"
         )
         super().__init__(lattice)
 
@@ -209,12 +208,11 @@ class PositiveConeComponents(OwnedParameterizedCategory):
 
     class ParentMethods:
         def __init__(self, lattice, timelike, **rest) -> None:
-            signature = lattice.signature_pair()
-            if int(signature.first()) != 1 or int(signature.second()) < 1:
+            if lattice.has_two_component_positive_cone() is not True:
                 raise ValueError(
                     f"cannot select a component of the positive cone of {lattice}: the "
                     f"lattice must have signature (1, n) with n >= 1, but its signature "
-                    f"is {signature}"
+                    f"is {lattice.signature_pair()}"
                 )
             timelike = lattice(timelike)
             if lattice.q(timelike) <= 0:

@@ -2086,14 +2086,11 @@ class LatticeIsometryMethods:
                 f"cannot ask whether {self} preserves the positive cone: it is an isometry from {self.domain()} to {self.codomain()}, not an automorphism of one lattice"
             )
         lattice = self.domain()
-        _signature = lattice.signature_pair()
-        positive, negative = _signature.first(), _signature.second()
-        integers = positive.parent()
-        if positive != integers.one() or negative < integers.one():
+        if lattice.has_two_component_positive_cone() is not True:
             raise ValueError(
                 f"cannot ask whether {self} preserves the positive cone of {lattice}: the "
                 f"positive cone has two components only in signature (1,n) with n >= 1, "
-                f"but {lattice} has signature {(positive, negative)}"
+                f"but {lattice} has signature {lattice.signature_pair()}"
             )
 
         rationals = lattice.base_ring().fraction_field()

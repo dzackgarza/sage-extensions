@@ -4288,6 +4288,32 @@ class Lattices(OwnedCategoryOverBaseRing):
             return SpinorNormSequence(self, form_multiplier)
 
         @cached_method
+        def has_two_component_positive_cone(self) -> bool:
+            r"""Return whether the positive cone is the two-sheeted case of signature ``(1,n)`` with ``n >= 1``.
+
+            The cone \(\{v : b(v,v) > 0\}\) is a hyperboloid of two sheets
+            exactly when \(L \otimes \mathbf R\) has one positive and at least
+            one negative direction, and an isometry then either preserves each
+            sheet or exchanges the two.  In a definite space the set is one
+            component or empty, and the rank-one positive form is below the
+            dimension at which the Lorentzian picture starts; every caller of
+            :meth:`component_character` states ``(1,n)`` with ``n >= 1``, and
+            this method states exactly that condition, once, for all of them.
+
+            The counts are read off :meth:`signature_pair` as integers: an
+            entry of the product \(\mathbf{Card} \times \mathbf{Card}\) is a
+            cardinal (:func:`sage_extensions.categories._lattice.signature_pairs`),
+            so ``int`` of a finite entry is its count and an infinite entry is
+            not this case.  No comparison against a cardinal or against a
+            ring's unit is made here.
+            """
+            signature = self.signature_pair()
+            positive, negative = signature.first(), signature.second()
+            if positive.is_finite() is not True or negative.is_finite() is not True:
+                return False
+            return int(positive) == 1 and int(negative) >= 1
+
+        @cached_method
         def component_character(self):
             r"""Return \(\chi_\Omega\colon O(L)\to C_2\), the character of the positive cone.
 
@@ -4297,12 +4323,9 @@ class Lattices(OwnedCategoryOverBaseRing):
             cyclic group of order two, and :meth:`positive_cone_subgroup` is
             its kernel.
             """
-            _signature = self.signature_pair()
-            positive, negative = _signature.first(), _signature.second()
-            integers = positive.parent()
-            if positive != integers.one() or negative < integers.one():
+            if self.has_two_component_positive_cone() is not True:
                 raise ValueError(
-                    f"{self!r} has no positive-cone component character: the cone b(v,v) > 0 has two components only in signature (1,n) with n >= 1, but this lattice has signature {(positive, negative)}"
+                    f"{self!r} has no positive-cone component character: the cone b(v,v) > 0 has two components only in signature (1,n) with n >= 1, but this lattice has signature {self.signature_pair()}"
                 )
 
             target = OwnedGroups().C(2)
@@ -4315,12 +4338,9 @@ class Lattices(OwnedCategoryOverBaseRing):
 
         def positive_cone_subgroup(self):
             r"""Return the positive-cone-preserving subgroup in signature ``(1,n)``."""
-            _signature = self.signature_pair()
-            positive, negative = _signature.first(), _signature.second()
-            integers = positive.parent()
-            if positive != integers.one() or negative < integers.one():
+            if self.has_two_component_positive_cone() is not True:
                 raise ValueError(
-                    f"{self!r} has no positive-cone-preserving subgroup of O(L): the positive cone has two components only in signature (1,n) with n >= 1, but this lattice has signature {(positive, negative)}"
+                    f"{self!r} has no positive-cone-preserving subgroup of O(L): the positive cone has two components only in signature (1,n) with n >= 1, but this lattice has signature {self.signature_pair()}"
                 )
 
             return self.Aut().predicate_subgroup(
