@@ -1919,15 +1919,18 @@ class Lattices(OwnedCategoryOverBaseRing):
         a marking of an indefinite lattice.
 
         When the marking is a primitive isotropic *plane* of an indefinite even
-        lattice over `ZZ` that splits along it, the generators are constructed
-        here rather than by the indefinite port
+        lattice over `ZZ`, the generators are constructed here rather than by
+        the indefinite port
         (:meth:`sage_extensions.categories.isotropic_parabolics.PrimitiveIsotropicSubobjects.ParentMethods.parabolic_stabilizer_generators`):
         they are the unipotent radical, the reflections of the Levi factor on
         \(P^\perp/P\) and the integral lifts of the Levi factor on \(P\), and they
-        are computed by integer linear algebra in this repository.  The port's
-        rank-two branch answers the same question by converting each rational
-        generator of its integral-structure action to an integral isometry, and
-        on \(T_{\mathrm{En}}\) that conversion does not return (#295, `TRAPS.md`).
+        are computed by integer linear algebra in this repository, from Dutour
+        Sikirić--Hulek's block equations (Theorem 4.9, `theorem_isotropic_k_planes`,
+        printed p. 22), which determine them whether or not the plane splits off
+        the lattice.  The port's rank-two branch answers the same question by
+        converting each rational generator of its integral-structure action to
+        an integral isometry, and on \(T_{\mathrm{En}}\) that conversion did not
+        return on the recorded runs (#295, #326, `TRAPS.md`).
         """
         parabolic = self._isotropic_plane_parabolic_generators(marked)
         if parabolic is not None:
@@ -1982,9 +1985,10 @@ class Lattices(OwnedCategoryOverBaseRing):
         ) != zero:
             return None
         subobject = codomain.primitive_isotropic_subobject(*images)
-        if not subobject.is_parabolic_complete():
+        family = subobject.parabolic_stabilizer_generators()
+        if not family:
             return None
-        return finite_ordered_set(subobject.parabolic_stabilizer_generators())
+        return finite_ordered_set(family)
 
     def _marking_component(self, source_marking, target_marking, apex):
         r"""Implementer side of the marked-diagram contract: ``alpha`` with ``kappa alpha = g iota``.
