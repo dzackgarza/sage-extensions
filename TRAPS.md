@@ -4069,3 +4069,53 @@ The 13 generators come from `lattice.Aut().isotropic_stabilizer_generators(plane
 which is what the port's plane branch answers on `U + U(2)` — so the escape hatch
 that supplies `ρ(G_x)` is usable on small lattices even where the ambient orbit is
 not enumerable.
+
+### The `T_Co` lift locus is a 262144-class search whose answer is one lattice condition (2026-11-11, #322)
+
+`isotropic_lifts.IsotropicReductionLiftTorsors.integral_parameter_classes` decides its
+residue locus by listing the parameter module (`elements()`) and building a rational
+isometry per class.  On `T_Co = <2> + E(2)`, `E = U + E8(-1)` (Dolgachev--Kondo, (3.6),
+p. 513), the marked `U(2)` line `<e_1>` and its identity reduction:
+
+```
+parameter space rank                        9
+|P/mP|                                     262144 = 4^9      (m = 4)
+one class test: parameterization + integral_restriction
+                                           0.353 s + 0.039 s
+Witt base point integral                   True
+=> the present method's cost               262144 * 0.39 s ~ 28 h
+U + <2> (control)                          |P/mP| = 2, locus 2 classes
+```
+
+So the public call `L.Aut().isotropic_orbit_representatives(1)` stops at
+`isotropic_lifts.py:385 -> modules.py:3374 elements() -> fgp_module.list`, measured with
+`faulthandler` at 420 s and recorded in `.tmp/p322-red.log`; the frames above it are the
+port's `recursive.py:1720 -> isotropic_lifts.py:278 -> :234`.
+
+The answer is one lattice condition, not a search.  From the Eichler transvection formula
+(Gritsenko--Hulek--Sankaran, arXiv:0810.1614, section 3.1, (4)--(5)) with `f` a primitive
+isotropic of the even lattice `L'`:
+
+```
+E_{f,x}(y) = y + b(y,x) f - (q(x)/2) b(y,f) f - b(y,f) x
+E_{f,x} preserves L'  <=>  x in L'
+```
+
+(the forward direction uses `q(x)/2` integral by evenness; the converse uses a `y` with
+`b(y,f) = 1`, which a primitive isotropic supplies).  Since `phi(a) = E_{f,s(a)} phi(0)`
+and `phi(x+y) = E(y) phi(x)`, **when `phi(0)` is integral** the locus is the kernel of
+`a + mP |-> s(a) + L'`, a subgroup of `P/mP` of index at most `|A_{L'}| = 2048`.
+
+Computing that kernel needs the section on a basis of `P` as coordinates in `L'`, then an
+exact integer Smith form.  Both exist only outside the owned boundary: the coordinate
+routes are Mor-level and yield owned value elements, and handing them to Sage's matrix
+code fails at the coercion --
+`ValueError: Fraction Field of Integer Ring is not in Category of sets with partial maps`
+(`.tmp/p322-probe7.log`).  The missing primitive is therefore an owned rational coordinate
+matrix of a module morphism into a lattice with its Smith normal form, or an owned
+"rational vector lies in this lattice" test at O(rank^2).  Do not restate the transvection
+formula to get around it: that is a second implementation of `eichler_transvection`.
+
+The criterion is conditional on `phi(0)` being integral; with a non-integral base point the
+transvection must also cancel the base point's fractional part, so the kernel statement
+does not apply.  Do not drop that test to make the cheap route look general.
