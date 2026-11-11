@@ -134,6 +134,22 @@ def test_the_supplied_setwise_stabilizer_generators_close_the_plane_index() -> N
     and the Levi-on-$P$ lifts leave alone.  Until that family is completed, the
     honest answer of the call is this refusal.
 
+    The exact index is nevertheless known, and by a theorem rather than by a
+    family: `thm:enriques-integral-plane-stabilizers`
+    (`writing/coble/lattices-and-moduli/lattices.md:454`) proves
+    $\\rho(\\mathrm{Stab}_{O(T_En)}(\\varPi)) = \\mathrm{Stab}_{O(A,q)}(D(\\varPi))$
+    for every primitive totally isotropic plane, and `lem:ten-base-stabilizers`
+    evaluates the $P_1$ case at $89181388800 = |Q|/527$ while the $P_2$ case is
+    $1981808640 = |Q|/23715$.  The gap above is the subgroup named there:
+    `lem:half-vector-eichler` transvections $E_{\\eta,w}$ along a vector
+    $w \\in T_En^\\#$ form a group $U_{d_1}$ of order $2^8$, and the image is
+    $L \\cdot U_{d_1}$ with $|L| = 348364800$ — which is exactly the reflection
+    family this call is handed.  `stabilizer_discriminant_image()` does not
+    substitute for it as a closure here: it needs $S$ with $G = \\langle S
+    \\rangle$ of the whole rational plane stabilizer, and on $T_En$ it did not
+    return in 11.3 min even for a line (recording in
+    `results/issue325-plane-index.md`).
+
     The same numbers come out on `1756b91`: the setwise stabilizer returns
     150 generators in 493 s and the call raises the index `134912` against
     the class orbit's `527`.

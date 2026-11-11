@@ -119,6 +119,63 @@ $A_{U(2)}$.  The missing $2^8$ therefore lives in elements of $P_{P_1}$ that mix
 the $E_8(-2)$ and $U(2)$ components of $A_L$; constructing them integrally is
 the open step, and it is not a repair inside this call.
 
+## 2b. The exact index, and the missing $2^8$ named
+
+`stabilizer_discriminant_image()` was the candidate for computing
+$\rho(G_{P_1})$ outright, on the strength of research#750
+`thm:schreier-discriminant-image` (`writing/coble/computations/discriminant-form-descent.md`).
+That theorem's hypotheses, read at the page and at
+`def:stabilizer-congruence-data`:
+
+1. $V$ finite dimensional over $\mathbb{Q}$ with a nondegenerate symmetric form $\beta$;
+2. $L \subseteq V$ an integral nondegenerate lattice;
+3. $M \subseteq V$ finitely generated and full with $L \subseteq M$, and $G \leq O(V)$ with $GM = M$;
+4. $m \geq 1$ with $mM \subseteq L$ (or $mM \subseteq e_2L$, by `cor:stabilizer-modulus`);
+5. $S \subseteq G$ finite and symmetric with $G = \langle S \rangle$;
+
+and its conclusion is $\rho_L(\operatorname{Stab}_G(L)) = \langle \rho_L(k_{s,p}) \rangle$
+over the Schreier elements $k_{s,p} = t_{sp}^{-1} s t_p$.
+
+**It does not cover a rank-2 isotropic sublattice as stated, and the rank is not
+what fails.**  The theorem's data contain no isotropic subspace: it computes the
+stabilizer of a *lattice*.  Applying it to $P_1$ requires $G$ = the rational
+stabilizer of $P_1$ in $O(V)$ and $L = T_{\mathrm{En}}$, so that
+$\operatorname{Stab}_G(L) = \operatorname{Stab}_{O(T_{\mathrm{En}})}(P_1)$; then
+(1)–(4) hold, and the hypothesis that fails is (5): a finite symmetric $S$ with
+$G = \langle S \rangle$ **exactly**.  `isotropic_stabilizer_action` supplies the
+approximate family $A_E$ together with the $GL(I)$-radical images, and nothing in
+this tree exhibits that family as a generating set of the whole rational plane
+stabilizer; a subgroup where the theorem needs $G$ returns a subgroup of the
+wanted image.  Measured: the call had not returned on $T_{\mathrm{En}}$ after
+11.3 min even for the rank-one line $\langle e_1 \rangle$
+(`.tmp/issue325-exact-image.log`), against 30.4 s on $T_{\mathrm{Co}}$, so it is
+not the closure for this issue either.
+
+**What settles the index is a theorem, and it is on the page.**
+`thm:enriques-integral-plane-stabilizers`
+(`writing/coble/lattices-and-moduli/lattices.md:454`), proved, states
+$$\rho\bigl(\operatorname{Stab}_{O(T_{\mathrm{En}})}(\varPi)\bigr) =
+\operatorname{Stab}_{O(A,q)}\bigl(D(\varPi)\bigr)$$
+for **every** primitive totally isotropic plane $\varPi$.  For $P_1$ it is
+`lem:ten-base-stabilizers`, which computes $|F_1| = 89\,181\,388\,800$; for
+$P_2$ the proof of the plane theorem computes $|F| = 1\,981\,808\,640 =
+6 \cdot 40\,320 \cdot 2^{13}$, and $|Q|/23\,715 = 1\,981\,808\,640$.  So the
+index per class is $527$ and $23\,715$ — card `029J`'s two plane indices — and
+their sum is the card's `Otilde+` row, $24\,242$.
+
+**The missing factor has a name.**  `lem:half-vector-eichler` gives, for a
+primitive isotropic $\eta$ of divisibility two and $w \in T_{\mathrm{En}}^\#$,
+the Eichler transvection $E_{\eta,w}$: it is integral, fixes $\eta$, preserves
+every primitive isotropic plane through $\eta$, and its discriminant image is
+$T_{d,[w]}$; these form a subgroup $U_d$ of order $2^8$
+(`lem:half-vector-eichler`(3)).  The proof of `lem:ten-base-stabilizers` gets
+$\rho(\operatorname{Stab}(P_1)) = L \cdot U_{d_1}$ with
+$|L| = 348\,364\,800$ and $|U_{d_1}| = 2^8$, product $89\,181\,388\,800$.  The
+family this repository builds is exactly $L$: its reflection image has order
+$348\,364\,800$, and the $2^8$ it misses is $U_{d_1}$ — the images of the
+transvections along a *half* lattice vector, $w \in T_{\mathrm{En}}^\#$, which no
+integral-parameter transvection and no plane-preserving lift produces.
+
 ## 3. What returns today
 
 * `O(T_En).isotropic_plane_orbits((P1, P2))` — the published-index route —
