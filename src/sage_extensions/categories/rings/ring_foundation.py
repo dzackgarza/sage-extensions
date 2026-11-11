@@ -1688,6 +1688,7 @@ class LocalizationRings(OwnedCategory):
             return self.element_class(self, source(numerator), source(denominator))
 
         def _element_constructor_(self, value):
+            from fractions import Fraction
             from sage.structure.element import parent as element_parent
 
             from sage_extensions.categories.modules.pure.modules import Modules
@@ -1699,6 +1700,15 @@ class LocalizationRings(OwnedCategory):
                 return value
             if isinstance(value, tuple) and len(value) == 2:
                 return self.fraction(value[0], value[1])
+            # A Python ``fractions.Fraction`` names its own parts the way an
+            # element of a fraction field does: its ``numerator`` and
+            # ``denominator`` are integers, so it is the fraction of those two
+            # and not a coercion of the whole value into the source.  Without
+            # this split the value reaches the source as a numerator and the
+            # source's own conversion refuses it with a message that names a
+            # coercion to an integer (#347).
+            if isinstance(value, Fraction):
+                return self.fraction(value.numerator, value.denominator)
             # An element of a fraction field denotes the fraction of its own
             # numerator and denominator.  Reading it through the source ring
             # alone would round it to an element of the source -- `ZZ(1/2)` is
