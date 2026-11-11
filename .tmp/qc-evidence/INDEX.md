@@ -285,3 +285,8 @@ Exact command shape (the venv lacks `pytest-timeout`/`pytest-reportlog`, so
 
 The new module's class enumeration costs 29.62 s, above the 20 s per-call
 ceiling, so a gated session reports it as a red cost (reported, not hidden).
+
+Re-run on the rebased tree (main at `c31e90d`): `issue317-rebased-on-main.log`,
+`pytest tests/lattices/test_genus_of_the_scattone_summands.sage` — **3 passed in
+57.79 s**, exit 0 (enumeration call 56.48 s on the busier VM; the same four
+classes and the same mass).
