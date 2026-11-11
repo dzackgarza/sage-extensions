@@ -2362,7 +2362,7 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
         r"""The orientation-preserving natural transformations ``F => G``.
 
         The subset of the ``Fun([t], Lattices)`` Mor of the underlying flag
-        diagrams cut out by the condition that the flags have one type and
+        diagrams (``F.natural_transformations_to(G)``) cut out by the condition that the flags have one type and
         every graded determinant of the apex component, from the source to
         the target adapted basis, is ``+1``.  A natural transformation
         carries each term into the next, so the matrix of its apex component
@@ -2382,8 +2382,6 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
 
     @cached_method(key=lambda self, source, target: (id(source), id(target)))
     def _oriented_mor(self, source, target):
-        from sage_extensions.categories.abstract_categories.cat import _FunctorCategory
-
         _shape, top = self._marking_shape()
         source_flag, target_flag = source.oriented_flag().flag(), target.oriented_flag().flag()
 
@@ -2393,7 +2391,11 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
             apex = transformation.component(top)
             return all(sign == 1 for sign in _graded_orientation_signs(apex, source_flag, target_flag))
 
-        subset = _FunctorCategory.Mor(self, source, target).condition_set(preserves_orientations)
+        # The universe is the Mor that owns the natural transformations of the
+        # underlying diagrams, Fun([t], Lattices)(F, G): the transformations
+        # built on an apex component are its elements, and a Mor of this
+        # category's own packet would be a second parent that admits none of them.
+        subset = source.natural_transformations_to(target).condition_set(preserves_orientations)
         subset._retain_point_computation(lambda: self._oriented_transformation(source, target))
         return subset
 
