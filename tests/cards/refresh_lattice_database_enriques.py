@@ -42,6 +42,8 @@ DISCRIMINANT_FORM_TAGS = ("6JRR",)
 # The Enriques period lattice card, whose 0-cusp chamber rows #312 and #285
 # read: the wall count of the restricted chamber at each of Sterk's five cusps.
 CUSP_CHAMBER_TAGS = ("029J",)
+# The Enriques period lattice card, whose 0-cusp chamber diagrams #254 reads.
+CUSP_DIAGRAM_TAGS = ("029J",)
 
 
 def fetch(ref: str, path: str) -> str:
@@ -148,6 +150,58 @@ def plane_orbits(ref: str, tag: str) -> dict:
     }
 
 
+def cusp_diagrams(ref: str, tag: str) -> dict:
+    r"""The Coxeter diagram of each 0-cusp chamber of one lattice card (#254).
+
+    ``integral.cusp_chambers.<subgroup>`` is a list of chambers, and each row's
+    ``walls`` and ``diagram`` state the chamber's Coxeter diagram: the walls are
+    its vertices and each ``diagram`` entry is one bond, with its Coxeter order.
+    ``#312`` reads the same block for the wall counts; this projection keeps the
+    diagram itself, which is what an orbit query on the cusp diagrams consumes.
+    The row is read by tag, so a test names the cusp's statement number and
+    never transcribes its edges.
+    """
+    path = LATTICE_PATH.format(tag=tag)
+    card = front_matter(fetch(ref, path), path)
+    block = card["integral"]["cusp_chambers"]
+    return {
+        "tag": card["tag"],
+        "path": path,
+        "name": card["name"],
+        "latex": card["latex"],
+        "rank": card["rank"],
+        "signature": card.get("signature"),
+        "certification": card["certifications"]["integral.cusp_chambers"],
+        "rows": {
+            subgroup: [
+                {
+                    "statement": row["statement"],
+                    "cusp": [int(entry) for entry in row["cusp"]],
+                    "printed_page": row.get("printed_page"),
+                    "figure": row.get("figure"),
+                    "wall_count": row["wall_count"],
+                    "vertices": [wall["name"] for wall in row["walls"]],
+                    # A bond's order is the Coxeter entry: a positive integer, or
+                    # the element of infinite order the card writes ``inf``, kept
+                    # as JSON's null so the digest stays valid JSON.
+                    "edges": [
+                        {
+                            "left": edge["a"],
+                            "right": edge["b"],
+                            "order": None
+                            if edge["order"] in (float("inf"), "inf")
+                            else int(edge["order"]),
+                        }
+                        for edge in row["diagram"]
+                    ],
+                }
+                for row in rows
+            ]
+            for subgroup, rows in block.items()
+        },
+    }
+
+
 def discriminant_form(ref: str, tag: str) -> dict:
     """The discriminant-form rows of one lattice card.
 
@@ -249,6 +303,7 @@ def main(argv: list[str]) -> int:
                 "plane_orbits": "integral.primitive_orbits.{group}.planes and .orbit_lengths(per-orbit sizes) and .constant(the line count),reference.citation",
                 "cusp_chambers": "integral.cusp_chambers.{subgroup}.{cusp,statement,wall_count,printed_page,figure},certifications.integral.cusp_chambers",
                 "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
+                "cusp_diagrams": "integral.cusp_chambers.{subgroup}.{statement,cusp,walls,diagram,printed_page,figure},certifications.integral.cusp_chambers",
             },
             "generated_by": "tests/cards/refresh_lattice_database_enriques.py",
         },
@@ -257,13 +312,15 @@ def main(argv: list[str]) -> int:
         "plane_orbits": {tag: plane_orbits(ref, tag) for tag in PLANE_ORBIT_TAGS},
         "discriminant_forms": {tag: discriminant_form(ref, tag) for tag in DISCRIMINANT_FORM_TAGS},
         "cusp_chambers": {tag: cusp_chambers(ref, tag) for tag in CUSP_CHAMBER_TAGS},
+        "cusp_diagrams": {tag: cusp_diagrams(ref, tag) for tag in CUSP_DIAGRAM_TAGS},
     }
     DIGEST.write_text(json.dumps(digest, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
     print(
         f"wrote {DIGEST} at database ref {ref}: {len(groups)} group cards, "
         f"{len(digest['polarization_counts']['rows'])} polarization-count degrees, "
         f"{len(digest['discriminant_forms'])} discriminant forms, "
-        f"{sum(len(rows) for card in digest['cusp_chambers'].values() for rows in card['rows'].values())} cusp chambers"
+        f"{sum(len(rows) for card in digest['cusp_chambers'].values() for rows in card['rows'].values())} cusp chambers",
+        f"{sum(len(rows) for card in digest['cusp_diagrams'].values() for rows in card['rows'].values())} cusp diagrams"
     )
     return 0
 

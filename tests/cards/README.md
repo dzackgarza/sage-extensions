@@ -30,6 +30,7 @@ What is read, and from where:
 | `discriminant_forms[tag].certification` | same | `certifications.integral.discriminant_form` — the stamp the database computed the block under |
 | `cusp_chambers[tag].rows[subgroup][i].walls`, `.statement`, `.cusp`, `.printed_page`, `.figure` | `lattices/029J.md` | `integral.cusp_chambers.{subgroup}.{wall_count,statement,cusp,printed_page,figure}` |
 | `cusp_chambers[tag].certification` | same | `certifications.integral.cusp_chambers` — the stamp the database computed the block under |
+| `cusp_diagrams[tag].rows[subgroup][i].{statement,vertices,edges,wall_count}` | `lattices/029J.md` | `integral.cusp_chambers.{subgroup}[i]`: the walls are the vertices and `diagram` the bonds, with an infinite order written `inf` on the card and `null` here |
 
 A test reads these by tag through `card(section, tag)`, bound as a builtin by
 `tests/lattices/conftest.py`: `test_lint` rejects a file read inside a test file
