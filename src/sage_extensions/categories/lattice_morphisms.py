@@ -3665,6 +3665,75 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         )
         return self.discriminant_preimage(stabilizer, orbit_point=point)
 
+    def discriminant_point_stabilizer_image_generators(self, point):
+        r"""Return a small subfamily of ``rho_L^{-1}`` of ``point``'s stabilizer whose images generate it.
+
+        ``point`` is a finite set of classes of ``A_L``, and ``P <= O(A_L)`` is
+        its stabilizer.  The result is a subfamily of the Schreier family of
+        :meth:`discriminant_point_stabilizer`, selected so that its images in
+        ``O(A_L)`` generate ``P``: members are added, in the family's own
+        order, exactly when the subgroup their images have generated so far
+        does not already contain the next one's image, and the selection stops
+        when that subgroup's order reaches ``|O(A_L)| / |orbit of point|``,
+        which is ``|P|`` by the index-stabilizer identity.  The order is
+        computed in ``O(A_L)``'s permutation representation on the classes of
+        ``A_L``, through GAP.
+
+        **What the result generates.**  Every member is an element of
+        ``rho_L^{-1}(P)``, so the subfamily generates a subgroup ``H <=
+        rho_L^{-1}(P)`` with ``rho_L(H) = P`` --- it maps onto the whole
+        stabilizer.  It does *not* generate ``rho_L^{-1}(P)`` itself: that needs
+        generators of ``ker rho_L`` as well, which this library does not have
+        (``_MISSING_ARITHMETIC_GENERATING_SET``), and no member of the
+        subfamily is claimed to lie outside the kernel's coset of ``H``'s
+        stabilizer part.  A consumer that needs the preimage itself takes the
+        whole family of :meth:`discriminant_point_stabilizer`.
+
+        This is the form the lattice database can store: the Schreier family
+        of the orbit has ``|S| * |orbit|`` members, and a card row needs a
+        generating set of ``P``'s preimage part, not that family.
+        """
+        from sage.libs.gap.libgap import libgap
+        from sage_extensions.categories.group.groups import _element_to_engine, _gap_model
+        from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+
+        form = self.domain().discriminant_group()
+        orthogonal = form.orthogonal_group()
+        point = frozenset(point)
+        orbit = self.discriminant_point_orbit(point)
+        orbit_size = int(orbit.cardinality())
+        order = int(orthogonal.cardinality())
+        if order % orbit_size != 0:
+            raise ArithmeticError(
+                f"the orbit of {point} in A_L has {orbit_size} points, which does not divide "
+                f"|O(A_L)| = {order}: the index-stabilizer identity fails, so the stabilizer's "
+                "order is not the quotient and the selection below has no target"
+            )
+        target_order = order // orbit_size
+        preimage = self.discriminant_point_stabilizer(point)
+        family = preimage.group_generators()
+        image_of = preimage.preimage_morphism()
+        ambient = _gap_model(orthogonal)
+        selected = []
+        images = []
+        subgroup = None
+        for label in range(int(family.cardinality())):
+            candidate = family.value(label)
+            image = _element_to_engine(orthogonal, image_of(candidate))
+            if subgroup is not None and image in subgroup:
+                continue
+            selected.append(candidate)
+            images.append(image)
+            subgroup = libgap.Subgroup(ambient, images)
+            if int(libgap.Size(subgroup)) == target_order:
+                return finite_ordered_set(tuple(selected))
+        raise ArithmeticError(
+            f"the images of the whole Schreier family of {point} generate a subgroup of "
+            f"order {0 if subgroup is None else int(libgap.Size(subgroup))} in O(A_L), not the "
+            f"stabilizer's order {target_order}: the family's image is not the whole stabilizer, "
+            "so no subfamily of it can be"
+        )
+
     def discriminant_point_orbit(self, point):
         r"""Return the orbit of a finite set of classes of ``A_L`` under ``O(L)`` as a finite ``O(L)``-set.
 

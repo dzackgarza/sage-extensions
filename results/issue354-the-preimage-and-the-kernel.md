@@ -180,3 +180,38 @@ plus the span closure 0.4 s, `q` on the 1024 classes 7.0 s, one permutation of t
 generator 4 s.  `pointed_orbit` over the 67456-point orbit 34 s, `schreier_generating_morphism`
 15 s, the whole `group_generators()` 21 s.  `preimage.discriminant_image()` (the character
 quotient route) had not returned after 300 s and is not used.
+
+## The storable generating set: a nine-member subfamily (this turn)
+
+The family above is the honest generating set of `rho_L^-1(P)`, and 944 385 members is not
+something a lattice-database card can store.  What a card needs is a generating set of `P`'s
+preimage *part*, and that exists inside the family: the family's images generate `P`, so a
+subfamily selected to keep enlarging the subgroup their images generate reaches `P` while
+staying small.
+
+**Selection.**  Members are taken in the family's own order and added exactly when the subgroup
+their images have generated so far does not already contain the next member's image (a GAP
+membership test in `O(A_L)`'s permutation representation on the 1024 classes, through `libgap`);
+the selection stops when that subgroup's order, `Size` in GAP, reaches
+`|O(A_L)| / |orbit| = 696729600`.  No cutoff: the loop either reaches the stabilizer's order or
+raises naming the order the whole family's images did reach.
+
+```
+subfamily size                     9
+|image of the subfamily|          696729600  = 2 * 348364800  (the summand route)
+|O(q)| / |orbit|                  46998591897600 / 67456 = 696729600  (the order's other route)
+time for the call                  44.8 s (whole call, including the family it selects from)
+```
+
+**What it generates.**  Every member lies in `rho_L^-1(P)`, so the subfamily generates a subgroup
+`H <= rho_L^-1(P)` with `rho_L(H) = P`.  It does not generate `rho_L^-1(P)`: that needs generators
+of `ker rho_L`, which this library does not have.  `discriminant_point_stabilizer_image_generators`
+says exactly that in its docstring, and says where the whole family is
+(`discriminant_point_stabilizer`).
+
+**Test.**  Extended, not replaced: besides the earlier assertions,
+`tests/lattices/test_the_decomposition_preimage_returns_generators.sage` now takes the subfamily,
+asserts it is nonempty and smaller than the family, forms its image subgroup through
+`orthogonal.subgroup(...)` and asserts that subgroup's order is the two summands' product, and
+asserts every member lies in the preimage and preserves `A_{U(2)}`.
+`1 passed in 93.81 s` (call 93.35 s).  Writing the card row is lattice-database#40.

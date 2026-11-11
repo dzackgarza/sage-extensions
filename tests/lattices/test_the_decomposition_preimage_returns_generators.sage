@@ -108,3 +108,16 @@ def test_the_decomposition_preimage_returns_generators() -> None:
         generator = family.value(label)
         assert generator in preimage
         assert frozenset(rho(generator)(class_) for class_ in point) == point
+
+    subfamily = group.discriminant_point_stabilizer_image_generators(point)
+    assert int(subfamily.cardinality()) > 0
+    assert int(subfamily.cardinality()) < count
+    members = tuple(subfamily)
+    generated = orthogonal.subgroup(
+        tuple(rho(member) for member in members),
+        "the image of the selected subfamily",
+    )
+    assert int(generated.cardinality()) == first_summand * second_summand
+    for member in members:
+        assert member in preimage
+        assert frozenset(rho(member)(class_) for class_ in point) == point
