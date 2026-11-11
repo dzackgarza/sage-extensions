@@ -39,6 +39,7 @@ from sage_extensions.categories.group.predicate_subgroups import (
     IntersectionSubgroups,
     PredicateSubgroups,
     StabilizerSubgroups,
+    _fix_selected_generating_morphism,
 )
 from sage_extensions.categories.isotropic_orbits import (
     _primitive_isotropic_vector_orbit_decomposition,
@@ -456,6 +457,130 @@ def _labelled_generator_images(domain, images):
         ): value
         for key, value in images.items()
     }
+
+
+def _discriminant_mask_image(matrix, mask):
+    r"""The mask of the image of ``mask`` under the ``F_2`` matrix ``matrix``.
+
+    ``matrix`` holds the images of the basis masks, so the image of a sum of
+    basis classes is the exclusive-or of their images.
+    """
+    image = 0
+    remaining = mask
+    while remaining:
+        low = remaining & -remaining
+        image ^= matrix[low.bit_length() - 1]
+        remaining ^= low
+    return image
+
+
+class _DiscriminantF2Model:
+    r"""The discriminant form of a 2-elementary even lattice as a quadratic space over ``F_2``.
+
+    A finite abelian group of exponent 2 is an ``F_2``-vector space, and on it
+    ``q`` takes exactly the two values of ``Q/2Z``.  So the pair
+    ``(A_L, q)`` of a 2-elementary even lattice is a quadratic space over
+    ``F_2``, every orthogonal automorphism of it is an ``F_2`` matrix, and
+    every subspace is a set of bit masks.
+
+    The model reads the owned form once: a basis of ``A_L`` over ``F_2`` with
+    the coordinate mask of every class, and the ``q`` value of every class.
+    Everything afterwards is integer arithmetic on masks.  That is the point:
+    the owned discriminant-form operations cost milliseconds each, while an
+    orbit search over the ``|O(q)|``-cosets of a subgroup evaluates one
+    action per letter per point.
+
+    The basis is built by closing the span of the classes of order two, so a
+    form that is not 2-elementary raises instead of returning a model with
+    missing classes.
+    """
+
+    def __init__(self, form) -> None:
+        zero = form.zero()
+        elements = tuple(form.elements())
+        masks = {zero: 0}
+        basis = []
+        while len(masks) < len(elements):
+            for point in elements:
+                if point in masks:
+                    continue
+                masks.update({
+                    vector + point: mask | (1 << len(basis))
+                    for vector, mask in masks.items()
+                })
+                basis.append(point)
+                break
+            else:
+                raise ArithmeticError(
+                    f"the discriminant form {form} is not 2-elementary: the classes of order two "
+                    f"span {len(masks)} of its {len(elements)} classes, so it has no F_2 model whose "
+                    "matrices are the orthogonal automorphisms"
+                )
+        self._form = form
+        self._basis = tuple(basis)
+        self._masks = masks
+        classes = [None] * len(masks)
+        for point, mask in masks.items():
+            classes[mask] = point
+        self._classes = tuple(classes)
+        q_zero = form.q(zero)
+        self._quadratic = tuple(0 if form.q(point) == q_zero else 1 for point in self._classes)
+
+    @property
+    def form(self):
+        r"""The discriminant form this model reads."""
+        return self._form
+
+    def dimension(self) -> int:
+        r"""The dimension of ``A_L`` over ``F_2``."""
+        return len(self._basis)
+
+    def cardinality(self) -> int:
+        r"""The number of classes of ``A_L``."""
+        return len(self._classes)
+
+    def quadratic_values(self):
+        r"""The ``q`` value ``0`` or ``1`` of each class, indexed by bit mask."""
+        return self._quadratic
+
+    def coordinates(self, point):
+        r"""The coordinate masks of a finite set of classes, sorted."""
+        return tuple(sorted(self._masks[class_] for class_ in point))
+
+    def point(self, masks):
+        r"""The set of classes at the given bit masks, as a finite set."""
+        return frozenset(self._classes[mask] for mask in masks)
+
+    def matrix_of(self, automorphism):
+        r"""The ``F_2`` matrix of an automorphism of ``A_L``, as its images of the basis."""
+        return tuple(self._masks[automorphism(class_)] for class_ in self._basis)
+
+    def permutation_of(self, automorphism):
+        r"""The permutation of the classes of ``A_L`` an automorphism induces, indexed by mask."""
+        matrix = self.matrix_of(automorphism)
+        return tuple(_discriminant_mask_image(matrix, mask) for mask in range(len(self._classes)))
+
+    def orbit_of(self, masks, permutations):
+        r"""The orbit of the subspace ``masks`` under the given class permutations.
+
+        Breadth first over the supplied permutations, which are the class
+        actions of one generating family of the acting group.  The result is
+        the complete orbit, in the order the search reached it, and its length
+        is the index of the stabilizer of the subspace.  The search terminates
+        because the acting group's image in the permutations is finite: the
+        hypothesis is the caller's.
+        """
+        order = [tuple(masks)]
+        seen = {tuple(masks)}
+        position = 0
+        while position < len(order):
+            for permutation in permutations:
+                image = tuple(sorted(permutation[mask] for mask in order[position]))
+                if image not in seen:
+                    seen.add(image)
+                    order.append(image)
+            position += 1
+        return tuple(order)
 
 
 class LatticeMorphismMethods:
@@ -3441,12 +3566,42 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         stable = lattice.stable_orthogonal_group()
         return Sets().product((stable, self))((stable(isometry * ~lift), lift))
 
-    def discriminant_preimage(self, subgroup):
+    def discriminant_preimage(self, subgroup, *, orbit_point=None):
         r"""Return ``rho_L^{-1}(subgroup)`` as a predicate subgroup of ``O(L)``.
 
         ``subgroup`` is a subgroup ``H`` of ``O(A_L)``, given with its
         inclusion ``H -> O(A_L)``.  The preimage is cut out of ``O(L)`` by the
         one predicate ``rho_L(g) in H``.
+
+        With ``orbit_point`` --- a finite set of classes of ``A_L``, such as
+        the four classes of a 2-dimensional subspace, whose stabilizer in
+        ``O(A_L)`` is ``subgroup`` --- the returned subgroup also carries a
+        selected generating family, so that ``group_generators()`` answers
+        instead of needing ``ker(rho_L)``'s own generators (which this library
+        does not have: the arithmetic generating set of an indefinite
+        lattice's orthogonal group is the open capability named by
+        ``_MISSING_ARITHMETIC_GENERATING_SET``).
+
+        The route replaces the two-factor description ``<lifts of H> .
+        ker(rho_L)`` by one point stabilizer.  ``O(L)`` acts on ``A_L`` through
+        ``rho_L``, so ``rho_L^{-1}(H)`` is the stabilizer of ``orbit_point`` in
+        that action; and the stabilizer of a point of a transitive action is
+        generated by Schreier generators, from generators of the group and a
+        transversal of the orbit (Seress, *Permutation Group Algorithms*,
+        Cambridge Tracts in Mathematics 152, Cambridge University Press, 2003,
+        Lemma 4.2.1, p. 57: for ``H <= G = <S>`` and a right transversal ``R``
+        of ``G`` mod ``H`` containing the identity, the set
+        ``{r s \overline{rs}^{-1} | r in R, s in S}`` generates ``H``).
+
+        The orbit and the transversal are read from the ``F_2`` model of
+        :meth:`discriminant_point_orbit`; the Schreier family itself is the
+        group layer's construction on the resulting pointed coset space
+        (``FiniteGSets.pointed_orbit``, ``LeftCosetGSets.schreier_generating_morphism``),
+        and Holt--Eick--O'Brien, *Handbook of Computational Group Theory*,
+        Chapman & Hall/CRC, 2005, Section 4.1, p. 79, records that the
+        Schreier generator of an orbit-tree edge is trivial by definition and
+        need not be appended to the family --- the trivial members are those
+        the orbit search itself identifies.
         """
         if self.domain() is not self.codomain():
             raise ValueError(f"the isometries {self.domain()} -> {self.codomain()} form no orthogonal group O(L), so {subgroup} has no preimage under O(L) -> O(A_L)")
@@ -3455,11 +3610,146 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             f"{subgroup} has no preimage under O(L) -> O(A_L) for L = {self.domain()}: "
             f"it is a subgroup of {subgroup.inclusion().codomain()}, not of {target}"
         )
-        return self.discriminant_representation().preimage_subgroup(
+        character_data = {"discriminant_preimages": (subgroup,)}
+        if orbit_point is None:
+            return self.discriminant_representation().preimage_subgroup(
+                subgroup,
+                description=f"rho_L(g) lies in {subgroup}",
+                character_data=character_data,
+            )
+        point = frozenset(orbit_point)
+        model = _DiscriminantF2Model(self.domain().discriminant_group())
+        if not point:
+            raise ValueError(
+                f"cannot take the preimage of {subgroup} as the stabilizer of an orbit point of "
+                f"A_L for L = {self.domain()}: the supplied point is empty, and the stabilizer of "
+                "the empty set is all of O(L), not a preimage of a proper subgroup"
+            )
+        for class_ in point:
+            if class_ not in self.domain().discriminant_group():
+                raise ValueError(
+                    f"the supplied orbit point has a member {class_!r} that is not a class of "
+                    f"A_L for L = {self.domain()}"
+                )
+        preimage = self.discriminant_representation().preimage_subgroup(
             subgroup,
             description=f"rho_L(g) lies in {subgroup}",
-            character_data={"discriminant_preimages": (subgroup,)},
+            character_data=character_data,
         )
+        _fix_selected_generating_morphism(
+            preimage,
+            lambda preimage: self._discriminant_point_stabilizer_morphism(preimage, point),
+            replace=True,
+        )
+        return preimage
+
+    def discriminant_point_stabilizer(self, point):
+        r"""Return ``rho_L^{-1}`` of the stabilizer of ``point`` in ``O(A_L)``, with generators.
+
+        ``point`` is a finite set of classes of ``A_L``.  Its stabilizer in
+        ``O(A_L)`` is the subgroup ``P`` this call takes the preimage of, so the
+        result is ``{g in O(L) : g.point = point}`` --- Sterk's `G_e` on card
+        `0125`, where ``point`` is `A_{U(2)}` inside `A_L` and ``P`` is the
+        stabilizer of the decomposition `A_{U(2)} + A_{E8(-2)}`.  The
+        generating family is the one :meth:`discriminant_preimage` selects from
+        the point's orbit; the same subgroup is
+        ``discriminant_preimage(P, orbit_point=point)`` when ``P`` is already in
+        hand as a subgroup of ``O(A_L)``.
+        """
+        form = self.domain().discriminant_group()
+        orthogonal = form.orthogonal_group()
+        point = frozenset(point)
+        stabilizer = PredicateSubgroups(orthogonal)(
+            lambda isometry: frozenset(isometry(class_) for class_ in point) == point,
+            f"fixes the point {point} of A_L",
+        )
+        return self.discriminant_preimage(stabilizer, orbit_point=point)
+
+    def discriminant_point_orbit(self, point):
+        r"""Return the orbit of a finite set of classes of ``A_L`` under ``O(L)`` as a finite ``O(L)``-set.
+
+        ``O(L)`` acts on its discriminant group through ``rho_L: O(L) ->
+        O(A_L)``, and the orbit of a subspace is finite because ``O(A_L)`` is.
+        The action is evaluated on the ``F_2`` model of ``A_L``
+        (:class:`_DiscriminantF2Model`): one permutation of the classes per
+        selected generator of ``O(L)``, and a search in bit masks.  For a
+        subgroup ``P <= O(A_L)`` realized as the stabilizer of ``point``, the
+        returned set's cardinality is the index ``[O(A_L) : P]``.
+
+        The points of the returned ``O(L)``-set are the orbit's subspaces, each
+        a finite set of classes of ``A_L``.
+        """
+        from sage_extensions.categories.group.g_sets import FiniteGSets
+
+        if self.domain() is not self.codomain():
+            raise ValueError(
+                f"the isometries {self.domain()} -> {self.codomain()} form no orthogonal group O(L), "
+                f"so they do not act on a subspace of A_L for L = {self.domain()}"
+            )
+        form = self.domain().discriminant_group()
+        point = frozenset(point)
+        for class_ in point:
+            if class_ not in form:
+                raise ValueError(
+                    f"the orbit of {point} needs classes of A_L for L = {self.domain()}, but "
+                    f"{class_!r} is not one"
+                )
+        return FiniteGSets(self).from_finite_orbits((point,), self._discriminant_class_action())
+
+    @cached_method
+    def _discriminant_class_action(self):
+        r"""The action of ``O(L)`` on the classes of ``A_L``, read on the ``F_2`` model.
+
+        The returned callable is the action ``(g, point) -> g.point`` for the
+        orbit searches of this owner, with one permutation of the classes per
+        selected generator of ``O(L)``.  A generator the map has not seen
+        --- the group layer evaluates the selected cover's letters --- gets its
+        permutation from the model on first use.
+        """
+        model = _DiscriminantF2Model(self.domain().discriminant_group())
+        generators = tuple(self.group_generators())
+        permutations = tuple(
+            model.permutation_of(generator.discriminant_morphism()) for generator in generators
+        )
+        by_identity = {
+            id(isometry): permutation for isometry, permutation in zip(generators, permutations)
+        }
+        # The table is keyed by object identity, so the elements in it must stay
+        # alive: an id is reused once its object is collected, and a reused id
+        # would hand this action a different element's permutation --- which
+        # silently shrinks the orbit.  ``retained`` is that ownership.
+        retained = list(generators)
+
+        def action(element, point):
+            permutation = by_identity.get(id(element))
+            if permutation is None:
+                permutation = model.permutation_of(element.discriminant_morphism())
+                by_identity[id(element)] = permutation
+                retained.append(element)
+            return frozenset(
+                model.point(tuple(permutation[mask] for mask in model.coordinates(point)))
+            )
+
+        return action
+
+    def _discriminant_point_stabilizer_morphism(self, preimage, point):
+        r"""The Schreier generating morphism of ``rho_L^{-1}(H)`` as the stabilizer of ``point``.
+
+        ``preimage`` is ``rho_L^{-1}(H)``, ``point`` a finite set of classes of
+        ``A_L`` whose stabilizer in ``O(A_L)`` is ``H``.  The action of ``O(L)``
+        on the orbit of ``point`` is evaluated in the ``F_2`` model
+        (:meth:`_discriminant_class_action`), so the coset space
+        ``O(L)/rho_L^{-1}(H)`` is searched without the owned discriminant-form
+        arithmetic a coset of ``H`` in ``O(A_L)`` would need; the descent from
+        the transversal to the generators is the group layer's Schreier
+        construction (``FiniteGSets.pointed_orbit``), not a second one here.
+        """
+        from sage_extensions.categories.group.g_sets import FiniteGSets
+
+        coset_space = FiniteGSets(self).pointed_orbit(
+            preimage, point, self._discriminant_class_action()
+        )
+        return coset_space.schreier_generating_morphism(drop_trivial=True)
 
     def discriminant_representation(self):
         r"""Return ``rho_A: O(L) -> O(A_L)``."""
