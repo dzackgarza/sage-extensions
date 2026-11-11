@@ -717,8 +717,7 @@ class _Genus(Sets().ObjectType):
         is not the length of Sage's ``spinor_generators`` list: that call
         adjoins each new prime to the quotient's own generators rather than to
         the accumulated subgroup and so returns at most one prime, which made
-        ``2 ** len(...)`` report two spinor genera on a genus with four
-        (``results/sage-upstream-spinor-generators.md``).
+        ``2 ** len(...)`` report two spinor genera on a genus with four.
         """
         integers = _owned_integers()
         rank = int(self._lattice.module_rank())
@@ -1194,9 +1193,9 @@ def _spinor_generating_primes(genus, *, proper):
     accumulated subgroup, so after the first accepted prime the subgroup is
     the whole quotient and the call returns at most one prime for every genus.
     Counting that list reports two spinor genera for every genus with four.
-    Reported upstream in ``results/sage-upstream-spinor-generators.md``; the
-    loop here is the one that call intends, and it is what the genus
-    enumeration and :meth:`_Genus.spinor_genus_count` consult.
+    #330 (`bfc9bcb871`) owns the count.  The loop below is the one that call
+    intends; it is what the genus enumeration and
+    :meth:`_Genus.spinor_genus_count` consult.
     """
     from sage.sets.primes import Primes
 
@@ -1259,9 +1258,9 @@ def _genus_classes(gram):
     classes found -- including explicitly inserted seeds on the indefinite
     route -- must add up exactly to the mass of the genus; this is the
     completeness check after enumeration.  The seeds are ours rather than
-    Sage's ``spinor_generators`` because that call returns at most one prime
-    (``results/sage-upstream-spinor-generators.md``), which would start this
-    traversal in half the spinor genera and stop it at half the mass.
+    Sage's ``spinor_generators`` because that call returns at most one prime,
+    which would start this traversal in half the spinor genera and stop it at
+    half the mass.
     """
     from itertools import combinations
 
@@ -1721,11 +1720,19 @@ def _unimodular_complement_frame(rank, blocks):
     assert weight_basis * block == matrix(SageZZ, width, width, lambda i, j: 1 if i == j else 0), (
         f"the weight basis -C^-1 of {model} does not invert the block's Cartan matrix"
     )
-    return gram, model_rank, tuple(walls), weight_basis, tuple(highest_root)
+    return model, gram, model_rank, tuple(walls), weight_basis, tuple(highest_root)
 
 
-def _genus_classes_through_the_chamber(gram):
-    r"""Private computation of a definite genus by the unimodular complement, or ``None``.
+def _chamber_genus_records(gram):
+    r"""The chamber enumeration's per-class records, with the model and the vectors, or ``None``.
+
+    Each record is one class of the genus of ``gram``, exhibited by a chamber
+    vector: the ``(vector, root count, PARI init, automorphism order, complement
+    Gram)`` of one member, the vector an integer coordinate list in the module
+    generators of the returned ``model``.  The model is ``II_{1,n}`` built from
+    the named blocks ``U + E8(-1)^2``, so a caller that owns a lattice
+    isometric to it maps a record's vector into its own frame through one
+    isometry, the library's own ``Isom(...).an_element()``.
 
     For a definite lattice ``N`` of rank ``n = 1 mod 8`` whose discriminant group
     is cyclic of order ``d = |det N|``, gluing ``N`` with ``<d>`` along the
@@ -1846,7 +1853,9 @@ def _genus_classes_through_the_chamber(gram):
     # caller's seed-and-walk machinery, which reports the split.
     if _spinor_generating_primes(genus, proper=False):
         return None
-    lattice_gram, model_rank, walls, weight_basis, highest_root = _unimodular_complement_frame(rank, blocks)
+    model, lattice_gram, model_rank, walls, weight_basis, highest_root = (
+        _unimodular_complement_frame(rank, blocks)
+    )
     width = (model_rank - 2) // blocks
 
     def pairing(left, right):
@@ -1917,13 +1926,13 @@ def _genus_classes_through_the_chamber(gram):
                         # it does not separate.
                         roots = len(candidate.short_vector_list_up_to_length(2)[1])
                         if any(
-                            record[0] == roots and record[1].qfisom(candidate.__pari__())
+                            record[1] == roots and record[2].qfisom(candidate.__pari__())
                             for record in classes
                         ):
                             continue
                         order_of_group = candidate.number_of_automorphisms()
                         classes.append(
-                            (roots, candidate.__pari__().qfisominit(), order_of_group, hessian.change_ring(SageZZ))
+                            (vector, roots, candidate.__pari__().qfisominit(), order_of_group, hessian.change_ring(SageZZ))
                         )
                         classes_mass += SageQQ.one() / order_of_group
                         assert classes_mass <= total, (
@@ -1931,8 +1940,27 @@ def _genus_classes_through_the_chamber(gram):
                             f"genus mass {total}, so two of them are isometric"
                         )
                         if classes_mass == total:
-                            return (tuple(found for _roots, _init, _order, found in classes),)
+                            return model, tuple(classes)
         height += 2
+
+
+def _genus_classes_through_the_chamber(gram):
+    r"""Private computation of a definite genus by the unimodular complement, or ``None``.
+
+    The Gram matrices of one lattice from each isometry class of the genus of
+    the definite ``gram``, when Nikulin's complement correspondence serves it,
+    through the chamber of ``II_{1,17}``: the classes are the ``v^perp`` of the
+    primitive vectors ``v`` of square ``|det gram|`` read from the fundamental
+    chamber, and the class masses close on the Siegel mass, asserted.  The
+    chamber vectors that exhibited the classes, and the model they are
+    coordinates in, are :func:`_chamber_genus_records`; the Gram matrices here
+    are that enumeration's complement records, read without the vectors.
+    """
+    records = _chamber_genus_records(gram)
+    if records is None:
+        return None
+    _model, classes = records
+    return (tuple(found for _vector, _roots, _init, _order, found in classes),)
 
 
 def _local_density(form, prime, value):
@@ -6717,11 +6745,16 @@ class Lattices(OwnedCategoryOverBaseRing):
 
                 ``a b = -q(w)/(2 h)``   with ``a = a_0`` and ``b = b_0`` modulo ``d``,
 
-            so the residues of ``a`` and ``b`` are kept and the equation is decided by the
-            finite set of divisor pairs of ``q(w)/(2 h)``.  Fixing ``w`` at the residue's own
-            representative is not enough: inside one residue class ``w -> w + d k`` leaves the
-            class unchanged while changing the divisor structure of ``q(w)``, so ``k`` runs
-            over ``K/dK``.
+            so the residues of ``a`` and ``b`` are kept and the equation is decided in two
+            ways: for a nonzero ``q(w)`` by the finite set of divisor pairs of
+            ``q(w)/(2 h)``, and for ``q(w) = 0`` by ``a b = 0``, where one coefficient
+            vanishes and the other ranges over its class (``vanishing_pairs``).  The second
+            case is the one every divisor-one loop meets, since its residue has no complement
+            part, and reading ``a b = 0`` as the single pair ``(0, 0)`` is what reported the
+            classes of `0016` and `026E` unrealized (#345).  Fixing ``w`` at the residue's own
+            representative is likewise not enough: inside one residue class ``w -> w + d k``
+            leaves the class unchanged while changing the divisor structure of ``q(w)``, so
+            ``k`` runs over ``K/dK``.
 
             Every candidate is checked: ``q(v) = 0``, ``v`` primitive, ``b(v, L) = d Z``, and
             ``[v/d]`` the class of the residue it came from.  A class with no lift after the
@@ -6844,6 +6877,40 @@ class Lattices(OwnedCategoryOverBaseRing):
                     pairs.append((-candidate, -(value // candidate)))
                 return tuple(pairs)
 
+            def class_steps(residue):
+                r"""Nonzero members of one residue class modulo the divisor, nearest zero first.
+
+                The smallest positive member of the class and its two neighbours one
+                divisor step away, with their negatives: divisibility exactly ``d``
+                is a condition on the vector, not a congruence on its coefficients,
+                so a single representative of a class does not decide it and the
+                neighbours are what the caller's validation chooses between.
+                """
+                base = residue if residue else divisor
+                return tuple(dict.fromkeys((base, base + divisor, -base, -(base + divisor))))
+
+            def vanishing_pairs(left_residue, right_residue):
+                r"""The coefficient pairs the residues allow with ``a b = 0``.
+
+                A complement vector of norm zero makes the equation ``a b = 0`` --
+                which is what every divisor-one loop meets, and what a lattice whose
+                hyperbolic plane already carries its isotropic direction always
+                meets.  Then one coefficient vanishes and the other ranges over its
+                own class: ``(a, 0)`` keeps ``b``'s class only when ``b``'s residue is
+                zero, and ``(0, b)`` keeps ``a``'s only when ``a``'s is.  Offering
+                only ``(0, 0)`` there -- the zero vector, which is not primitive --
+                is what left the classes of `0016` and `026E` unrealized at divisor
+                one although ``e`` itself realizes them (#345).
+                """
+                pairs = []
+                if right_residue == 0:
+                    for left_coefficient in class_steps(left_residue):
+                        pairs.append((left_coefficient, 0))
+                if left_residue == 0:
+                    for right_coefficient in class_steps(right_residue):
+                        pairs.append((0, right_coefficient))
+                return tuple(pairs)
+
             # The residues to try.  A residue of L/dL is (a mod d, b mod d, w mod d), and the
             # translation ``w -> w + d k`` leaves it fixed: so the residue is the class's, and
             # only the translation is free.  With ``classes`` given, the class fixes its
@@ -6883,7 +6950,13 @@ class Lattices(OwnedCategoryOverBaseRing):
                     target = -norm
                     if target % (2 * int(pairing)):
                         continue
-                    for a, b in divisor_pairs(target // (2 * int(pairing))):
+                    value = target // (2 * int(pairing))
+                    pairs = (
+                        divisor_pairs(value)
+                        if value
+                        else vanishing_pairs(left_residue, right_residue)
+                    )
+                    for a, b in pairs:
                         if not in_classes(a, left_residue, divisor):
                             continue
                         if not in_classes(b, right_residue, divisor):

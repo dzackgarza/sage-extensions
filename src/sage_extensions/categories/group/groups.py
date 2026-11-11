@@ -2021,44 +2021,73 @@ def _generated_subgroup(
 
 
 def _supplied_generator(group, element):
-    r"""Read one supplied generator as an element of ``group``, without deciding membership.
+    r"""Read one supplied generator as an element of ``group``, from the construction that supplied it.
 
     ``group.subgroup(generators)`` takes a family the caller states generates a subgroup of
-    ``group``: that statement is the construction's datum (``OWN-05``), and ``OWN-22`` for a
-    premise stated on an infinite group.  On an infinite generated group it cannot be
-    *checked* — ``GeneratedSubgroups.membership_decision`` answers a general infinite
-    subgroup-membership question with an unevaluated proposition — so asking it makes the
-    construction refuse a family that a construction of this library supplied.
+    ``group``.  On an infinite generated group that statement cannot be *checked*:
+    ``GeneratedSubgroups.membership_decision`` answers a general infinite
+    subgroup-membership question with an unevaluated proposition.  So the construction
+    reads a datum instead of asking the question — the datum of the construction that
+    supplied the element, never a premise the caller states about the family.
 
-    What is readable is the construction that supplied the element.  Nothing in this
-    library reparents a subgroup's elements: a stabilizer builds its generator family
-    through its own selected free cover into the ambient group ``L.Aut()``, and each
-    generator keeps that ambient parent.  So
+    That datum is written by the subgroup that supplies the family: reading a group's own
+    selected generators (:meth:`OwnedGroups.ParentMethods.group_generators`) records each
+    of them as a member of the group it acts by, through the element-side mark a free
+    cover's word values get (:meth:`GeneratedSubgroups._mark_admitted`,
+    sage-extensions#287).  A stabilizer ``S = G.stabilizer(x)`` builds its generator family
+    in its own selected resolution, so the family ``S.group_generators()`` hands out
+    carries the mark naming ``S.supergroup() = G``;
+    ``G.subgroup(S.group_generators())`` reads that mark and puts no question to ``G``.
 
-    * an element whose parent is ``group`` already is that element;
-    * an element whose parent is ``group``'s ambient group is a member of ``group`` by the
-      supplied premise, and it is recorded through the same element-side admission a free
-      cover's word values get (:meth:`GeneratedSubgroups._retain_admitted_member`), so no
-      later question about it is put to ``group`` either.  That admission is a generated
-      subgroup's own record — the family it was handed — and is not written for any other
-      kind of subgroup: a predicate subgroup's membership is its predicate, and recording a
-      supplied element there would answer a question its predicate has not decided;
-    * an element whose parent is neither is coerced through ``group``, exactly as before —
-      a foreign element is not admitted here, and a subgroup of another ambient group still
-      refuses.
+    A family with no such mark is read exactly as before, through ``group(element)``: on a
+    finite group that is the membership decision — ``<-1>.subgroup((swap,))`` in ``O(U)``
+    refuses the swap, which is not in it — and on an infinite generated group it is the
+    present undecided-membership ``TypeError``.
     """
     if element_parent(element) is group:
         return element
-    ambient = group.supergroup()
-    admit = getattr(group, "_retain_admitted_member", None)
-    if (
-        admit is not None
-        and ambient is not group
-        and group in GeneratedSubgroups(ambient)
-        and element_parent(element) is ambient
-    ):
-        return admit(element)
+    admits = getattr(group, "_admits_member", None)
+    if admits is not None and admits(element):
+        return element
     return group(element)
+
+
+def _record_generators_in_supergroup(group, generators):
+    r"""Record each of ``group``'s own selected generators as a member of ``group.supergroup()``.
+
+    ``group_generators`` reads the family that ``group``'s selected resolution states
+    generates ``group``.  ``group`` is a subgroup of ``group.supergroup()`` by the
+    construction that built it, so each of those generators is a member of the supergroup
+    by construction too — and that is the datum the construction supplies when the family
+    is later handed to ``supergroup().subgroup(...)``, where a general membership question
+    about an infinite generated group is undecided (:func:`_supplied_generator`).
+
+    The record is the one a free cover's word values get: the groups whose construction
+    supplied the element, on the element, compared by identity
+    (:meth:`GeneratedSubgroups._mark_admitted`, sage-extensions#287).  It is written only
+    for a proper subgroup whose supergroup keeps that admission, so an ambient group, or a
+    supergroup with no such record, writes nothing and the later question is asked as
+    before.
+
+    The family itself is returned unchanged, the same object the resolution retains: the
+    resolution caches it, and handing back a mapped copy would make two reads of one
+    group's generators different objects.  The mark is on the elements, not a value of the
+    family.
+
+    This is the subgroup construction's own statement about its own generator family, and
+    nothing else: no family a caller merely asserts lies in the supergroup is admitted
+    here, which is the difference sage-extensions#341 draws between this datum and a
+    premise stated about arbitrary elements.
+    """
+    supergroup = group.supergroup()
+    if supergroup is group:
+        return generators
+    mark = getattr(supergroup, "_mark_admitted", None)
+    if mark is None:
+        return generators
+    for generator in generators:
+        mark(generator)
+    return generators
 
 
 def _engine_subgroup(
@@ -2072,8 +2101,8 @@ def _engine_subgroup(
 
     ``refinements`` are placements proved by the calling construction
     (``_generated_subgroup``).  Each generator is read as an element of ``group`` by
-    :func:`_supplied_generator`, which carries the datum of the construction that supplied
-    it instead of putting a membership question to an infinite group.
+    :func:`_supplied_generator`, which reads the datum of the construction that supplied it
+    instead of putting a membership question to an infinite group.
     """
     selected = finite_ordered_set(tuple(_supplied_generator(group, generator) for generator in generators))
     return _generated_subgroup(
@@ -5716,8 +5745,22 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             return next(iter(generators))
 
         def group_generators(self):
-            return self.selected_group_resolution().generators(
-                name="Group generators"
+            r"""The selected generating family of ``self``, recorded in the group it acts by.
+
+            Each of ``self``'s selected generators generates ``self``, so it is a member of
+            ``self.supergroup()`` by the construction that built ``self`` as a subgroup;
+            reading the family here writes that datum on the elements
+            (:func:`_record_generators_in_supergroup`), which is what a later
+            ``supergroup().subgroup(self.group_generators())`` reads instead of asking an
+            infinite generated subgroup a membership question it cannot answer
+            (:func:`_supplied_generator`, sage-extensions#341).  The mark is written on each
+            element as the family is read and asks for no computation of its own, and the
+            returned family is still the resolution's own object, so two reads of one
+            group's generators remain the same objects.
+            """
+            return _record_generators_in_supergroup(
+                self,
+                self.selected_group_resolution().generators(name="Group generators"),
             )
 
         def is_trivial(self):

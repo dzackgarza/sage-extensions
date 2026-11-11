@@ -1402,6 +1402,69 @@ class OrthogonalCharacterQuotient:
             for label in sign_labels
         )
 
+    def _kernel_sign_flip(self, label):
+        r"""One explicit element of ``ker rho`` whose ``label`` sign is nontrivial, or ``None``.
+
+        ``label`` is a sign character -- ``"spinor"`` or ``"determinant"`` -- that does not
+        descend to ``im rho``.  The double-coset machinery then needs one *witness* of that:
+        an isometry with ``rho(g) = 1`` and the named sign ``-1``, which lifts the remaining
+        sign coset.  It does **not** need a generating family of ``ker rho = Otilde(L)``, and
+        for the Enriques period lattice no statement supplies one: Kneser's conditions fail
+        there (``rank_2(N) = 2``) and ``N`` has no second hyperbolic plane, so
+        Gritsenko--Hulek--Sankaran's generation statements do not reach it
+        (arXiv:0810.1614v1, Proposition 5.6, p. 17; sage-extensions#17's reading in
+        ``results/issue17-kernel-generation-blocker.md``).  Asking for that family is what
+        stopped the ``Otilde^+(N)`` row, since ``Otilde(L)`` is an infinite arithmetic group
+        with no selected resolution (sage-extensions#310, #339).
+
+        A witness, on the other hand, is a single reflection, and for ``N = U + U(2) +
+        E8(-2)`` it is named on the page: *"the reflection with respect to a vector of length
+        2 in the summand U of N gives an element in Otilde(N) with real spinor norm -1"* --
+        D. Dutour Sikirić and K. Hulek, *Moduli of polarised Enriques surfaces --
+        computational aspects*, J. London Math. Soc. 110 (2024), arXiv:2302.01679v2, p. 2,
+        where that element is what makes ``Otilde^+(N)`` the index-two subgroup of
+        ``Otilde(N)``.  In the multiplier convention of §1 of
+        Gritsenko--Hulek--Sankaran the real spinor norm of a reflection is ``-(r,r)/2``, so a
+        vector of square ``2`` has sign ``-1``.
+
+        The candidates are the lattice's own basis and its pairwise sums and differences --
+        finitely many, the same list :meth:`isotropic_line_stabilizer_image` searches for its
+        sign witness -- and each is checked before it is returned: the reflection must be
+        integral, its discriminant image must be trivial, and the named sign must be ``-1``.
+        A lattice where none of them is a witness returns ``None``, and the caller refuses,
+        which is the honest reading of "no witness was exhibited" rather than a guess.
+        """
+        from itertools import chain, combinations
+
+        lattice = self.lattice
+        ring = lattice.base_ring()
+        rho = lattice.discriminant_representation()
+        trivial_discriminant = self._discriminant_group.one()
+
+        def sign_of(element):
+            if label == "spinor":
+                return lattice.O_plus().preimage_morphism()(element).is_one()
+            return ring(element.determinant()) == ring.one()
+
+        basis = tuple(lattice.module_generators())
+        candidates = chain(
+            basis,
+            (
+                first + sign * second
+                for first, second in combinations(basis, 2)
+                for sign in (1, -1)
+            ),
+        )
+        for vector in candidates:
+            if not vector.is_integral_reflection_vector():
+                continue
+            reflection = lattice.reflection(vector)
+            if rho(reflection) != trivial_discriminant:
+                continue
+            if not sign_of(reflection):
+                return reflection
+        return None
+
     def _splitting_isometries_in_im_rho_from_image(
         self, discriminant_image_generators, stab_sign_flip, *, right=None, point=None,
     ):
@@ -1442,19 +1505,15 @@ class OrthogonalCharacterQuotient:
         j, sign_labels = self._sign_descent_rank()
         engine, im_rho, _section, ambient = self._im_rho_engine_and_section()
         rho_images = self.ambient_discriminant_images()
-        ring = self.lattice.base_ring()
-
-        def sign_of(element, label):
-            if label == "spinor":
-                return self.lattice.O_plus().preimage_morphism()(element).is_one()
-            return ring(element.determinant()) == ring.one()
 
         flip_element = None
         if j >= 1 and sign_labels:
-            stable = self.lattice.stable_orthogonal_group()
-            for candidate in stable.group_generators():
-                if any(not sign_of(candidate, label) for label in sign_labels):
-                    flip_element = candidate
+            # A sign character that does not descend to im rho is lifted by one explicit
+            # element of ker rho, exhibited below; Otilde(L)'s generating family is neither
+            # needed nor known (sage-extensions#17, #310).
+            for label in sign_labels:
+                flip_element = self._kernel_sign_flip(label)
+                if flip_element is not None:
                     break
             if len(sign_labels) == 1 and not stab_sign_flip and flip_element is None:
                 raise ValueError(
@@ -1718,6 +1777,78 @@ class OrthogonalCharacterQuotient:
         )
         projected = libgap.Image(projections[position], self._gap_subgroup())
         return _subgroup_from_gap(self._discriminant_group, projected)
+
+    @cached_method
+    def discriminant_image_membership(self):
+        r"""Return the membership test of ``rho(self.subgroup)`` inside ``O(A_L)``.
+
+        The decision is one stabilizer chain of ``\rho(\Gamma)`` acting on the
+        discriminant group, built once and reused, and each question is answered
+        by sifting the element through that chain: the cost of a question is the
+        length of the chain, never the size of the group (A. Seress, *Permutation
+        Group Algorithms*, Cambridge University Press 2003, Chapter 4, the
+        Schreier--Sims stabilizer chain and its sifting test; GAP answers
+        ``x in G`` for a group with a known chain exactly that way).
+
+        Listing the image is not an option here and not a fallback: on the
+        Enriques period lattice ``T_{\mathrm{En}}`` the image
+        ``rho(\Gamma_{\mathrm{En},2})`` has order ``696729600`` (H. Sterk,
+        *Compactifications of the period space of Enriques surfaces, Part I*,
+        Math. Z. 207 (1991), Proposition 2.7, p. 6 for the group; the order is
+        measured by :meth:`subgroup_image_order`), and the elementwise reads of
+        this quotient (:meth:`image_keys`, :meth:`subgroup_image_keys`) are
+        deliberately not on this path.
+
+        The chain is the ``O(A_L)`` engine's own: the group tested is the one
+        :meth:`_joint_discriminant_image_gap` computes inside that engine, which
+        is the same subgroup :meth:`discriminant_image` returns as owned data.
+        """
+        return DiscriminantImageMembership(self)
+
+
+class DiscriminantImageMembership:
+    r"""Membership in ``\rho(\Gamma)`` inside ``O(A_L)``, decided by sifting one chain.
+
+    ``quotient`` is an :class:`OrthogonalCharacterQuotient`; the group is
+    ``\rho(quotient.subgroup)`` in the ``O(A_L)`` engine that
+    :meth:`OrthogonalCharacterQuotient.discriminant_image` also reads, and the
+    chain is built on the first question and kept for the object's lifetime
+    (the quotient caches the object, so a call site that asks once per root asks
+    one chain, not one chain per root).
+
+    A question is answered by GAP's ``\in`` on that group, which is the sifting
+    membership test of Seress, *Permutation Group Algorithms*, Chapter 4: walk
+    the chain from the top, and at each level multiply the point back to a
+    previously stored orbit representative; a point that fails at any level is
+    not in the group.  Nothing here lists the group's elements.
+    """
+
+    def __init__(self, quotient) -> None:
+        from sage_extensions.categories.group.groups import _gap_model
+
+        self._quotient = quotient
+        self._discriminant_group = quotient._discriminant_group
+        self._engine = _gap_model(self._discriminant_group)
+        self._image = quotient._joint_discriminant_image_gap()
+
+    def quotient(self):
+        r"""Return the character quotient whose discriminant image this tests."""
+        return self._quotient
+
+    def image(self):
+        r"""Return ``\rho(\Gamma)`` as the ``O(A_L)`` engine subgroup the chain is of."""
+        return self._image
+
+    def contains(self, isometry) -> bool:
+        r"""Whether the isometry of ``O(A_L)`` lies in ``\rho(\Gamma)``."""
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        return bool(
+            _element_to_engine(self._discriminant_group, isometry) in self._image
+        )
+
+    def __contains__(self, isometry) -> bool:
+        return self.contains(isometry)
 
 
 _MISSING_ARITHMETIC_GENERATING_SET = (

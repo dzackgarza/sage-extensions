@@ -1,0 +1,20 @@
+
+===== 6JRY (k = 2) =====
+[     0.5s] lattice: rank 21 det -4
+[  1334.5s] planes: 9 (card 6JRY O row: 9)
+[  1334.5s] every plane primitive isotropic of rank two: yes
+DONE
+[peakrss] issue335: child waited=0 shell_code=0 samples=671
+[peakrss] peak tree RSS      : 806 MiB
+[peakrss] low-water MemAvail : 5557 MiB
+[peakrss] peak single VmHWM  : 806 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      795 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   543.6s procs=  3 rss=   806 MiB hwm=   806 MiB avail=  6850 MiB
+[peakrss]   t=   545.6s procs=  3 rss=   806 MiB hwm=   806 MiB avail=  6846 MiB
+[peakrss]   t=   547.7s procs=  3 rss=   806 MiB hwm=   806 MiB avail=  6823 MiB
+[peakrss]   t=   541.6s procs=  3 rss=   805 MiB hwm=   805 MiB avail=  6869 MiB
+[peakrss]   t=   551.7s procs=  3 rss=   805 MiB hwm=   805 MiB avail=  6586 MiB
+launcher exit: 0

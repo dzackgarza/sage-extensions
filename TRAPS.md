@@ -4398,8 +4398,7 @@ becomes `[3, 11]` and the same call returns twelve matrices with the warning gon
 Repaired locally in #330: `_spinor_generating_primes` runs the walk the call intends,
 `_genus_classes` hands those seeds to Sage's own `neighbor_iteration`, and the count is
 read as the order of the quotient `A/K = \prod_{p|2d} Z_p^\times/Z_p^{\times2} / K`
-rather than as `2 ** len(spinor_generators)`. Upstream text:
-`results/sage-upstream-spinor-generators.md`.
+rather than as `2 ** len(spinor_generators)`.
 
 Second, smaller observation from the same function: `_improper_spinor_kernel`
 (`genus.py:2586`) falls through to `_proper_is_improper` (`genus.py:2688`) whenever `K`

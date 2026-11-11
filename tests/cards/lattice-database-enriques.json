@@ -5,7 +5,7 @@
    "lattice": "lattices/{tag}.md"
   },
   "generated_by": "tests/cards/refresh_lattice_database_enriques.py",
-  "ref": "d6a539339bac5ea0ee8d8bde5dc19564955eb152",
+  "ref": "dbc9fc6add622459d60dba3dc62d3e4be6b903d7",
   "repository": "dzackgarza/lattice-database",
   "rows": {
    "arithmetic_group": [
@@ -19,9 +19,13 @@
     "lattice",
     "parent_group"
    ],
+   "cusp_chambers": "integral.cusp_chambers.{subgroup}.{cusp,statement,wall_count,printed_page,figure},certifications.integral.cusp_chambers",
+   "cusp_diagrams": "integral.cusp_chambers.{subgroup}.{statement,cusp,walls,diagram,printed_page,figure},certifications.integral.cusp_chambers",
    "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
+   "hyperbolic_reflectivity": "gram_tensor,hyperbolic.reflective,certifications.hyperbolic.reflective,references",
    "lattice": "integral.polarization_counts.{degree}.{#h,#Γ̄_h,reference.citation}",
-   "plane_orbits": "integral.primitive_orbits.{group}.planes and .orbit_lengths(per-orbit sizes) and .constant(the line count),reference.citation"
+   "plane_orbits": "integral.primitive_orbits.{group}.planes and .orbit_lengths(per-orbit sizes) and .constant(the line count),reference.citation",
+   "primitive_orbit_series": "gram_tensor,integral.primitive_orbits.{subgroup}.{constant,z,w},certifications.integral.primitive_orbits"
   }
  },
  "arithmetic_groups": {
@@ -1244,6 +1248,626 @@
    "tag": "gamma-h-9"
   }
  },
+ "cusp_chambers": {
+  "029J": {
+   "certification": "c67663ee2cb0aade7b4069583e0e73b87f8f86970ddec9f6835e4dfc65c19b34",
+   "latex": "U \\oplus U(2) \\oplus E_{8}(-2)",
+   "name": "U + U(2) + E8(-2)",
+   "path": "lattices/029J.md",
+   "rank": 12,
+   "rows": {
+    "gamma-en-2": [
+     {
+      "cusp": [
+       1,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "figure": 4,
+      "printed_page": 19,
+      "statement": "4.3.5",
+      "walls": 12
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       1,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "figure": 6,
+      "printed_page": 21,
+      "statement": "4.3.6",
+      "walls": 10
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       1,
+       1,
+       -2,
+       -3,
+       -4,
+       -6,
+       -5,
+       -4,
+       -3,
+       -2
+      ],
+      "figure": 8,
+      "printed_page": 22,
+      "statement": "4.3.7",
+      "walls": 12
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       2,
+       1,
+       -4,
+       -5,
+       -7,
+       -10,
+       -8,
+       -6,
+       -4,
+       -2
+      ],
+      "figure": 10,
+      "printed_page": 23,
+      "statement": "4.3.8",
+      "walls": 11
+     },
+     {
+      "cusp": [
+       2,
+       2,
+       0,
+       0,
+       -4,
+       -5,
+       -7,
+       -10,
+       -8,
+       -6,
+       -4,
+       -2
+      ],
+      "figure": 12,
+      "printed_page": 24,
+      "statement": "4.3.9",
+      "walls": 14
+     }
+    ]
+   },
+   "signature": [
+    2,
+    10
+   ],
+   "tag": "029J"
+  }
+ },
+ "cusp_diagrams": {
+  "029J": {
+   "certification": "c67663ee2cb0aade7b4069583e0e73b87f8f86970ddec9f6835e4dfc65c19b34",
+   "latex": "U \\oplus U(2) \\oplus E_{8}(-2)",
+   "name": "U + U(2) + E8(-2)",
+   "path": "lattices/029J.md",
+   "rank": 12,
+   "rows": {
+    "gamma-en-2": [
+     {
+      "cusp": [
+       1,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "edges": [
+       {
+        "left": "\\alpha_1",
+        "order": 3,
+        "right": "\\alpha_3"
+       },
+       {
+        "left": "\\alpha_1",
+        "order": 3,
+        "right": "\\alpha_11"
+       },
+       {
+        "left": "\\alpha_2",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_2",
+        "order": null,
+        "right": "\\alpha_12"
+       },
+       {
+        "left": "\\alpha_3",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_4",
+        "order": 3,
+        "right": "\\alpha_5"
+       },
+       {
+        "left": "\\alpha_5",
+        "order": 3,
+        "right": "\\alpha_6"
+       },
+       {
+        "left": "\\alpha_6",
+        "order": 3,
+        "right": "\\alpha_7"
+       },
+       {
+        "left": "\\alpha_7",
+        "order": 3,
+        "right": "\\alpha_8"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 3,
+        "right": "\\alpha_10"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 3,
+        "right": "\\alpha_11"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": null,
+        "right": "\\alpha_10"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": null,
+        "right": "\\alpha_12"
+       }
+      ],
+      "figure": 4,
+      "printed_page": 19,
+      "statement": "4.3.5",
+      "vertices": [
+       "\\alpha_1",
+       "\\alpha_2",
+       "\\alpha_3",
+       "\\alpha_4",
+       "\\alpha_5",
+       "\\alpha_6",
+       "\\alpha_7",
+       "\\alpha_8",
+       "\\alpha_9",
+       "\\alpha_10",
+       "\\alpha_11",
+       "\\alpha_12"
+      ],
+      "wall_count": 12
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       1,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "edges": [
+       {
+        "left": "\\alpha_1",
+        "order": 3,
+        "right": "\\alpha_3"
+       },
+       {
+        "left": "\\alpha_2",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_3",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_4",
+        "order": 3,
+        "right": "\\alpha_5"
+       },
+       {
+        "left": "\\alpha_5",
+        "order": 3,
+        "right": "\\alpha_6"
+       },
+       {
+        "left": "\\alpha_6",
+        "order": 3,
+        "right": "\\alpha_7"
+       },
+       {
+        "left": "\\alpha_7",
+        "order": 3,
+        "right": "\\alpha_8"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 3,
+        "right": "\\alpha_9"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": 4,
+        "right": "\\alpha_10"
+       }
+      ],
+      "figure": 6,
+      "printed_page": 21,
+      "statement": "4.3.6",
+      "vertices": [
+       "\\alpha_1",
+       "\\alpha_2",
+       "\\alpha_3",
+       "\\alpha_4",
+       "\\alpha_5",
+       "\\alpha_6",
+       "\\alpha_7",
+       "\\alpha_8",
+       "\\alpha_9",
+       "\\alpha_10"
+      ],
+      "wall_count": 10
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       1,
+       1,
+       -2,
+       -3,
+       -4,
+       -6,
+       -5,
+       -4,
+       -3,
+       -2
+      ],
+      "edges": [
+       {
+        "left": "\\alpha_1",
+        "order": 3,
+        "right": "\\alpha_3"
+       },
+       {
+        "left": "\\alpha_1",
+        "order": 3,
+        "right": "\\alpha_12"
+       },
+       {
+        "left": "\\alpha_2",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_3",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_4",
+        "order": 3,
+        "right": "\\alpha_5"
+       },
+       {
+        "left": "\\alpha_5",
+        "order": 3,
+        "right": "\\alpha_6"
+       },
+       {
+        "left": "\\alpha_6",
+        "order": 3,
+        "right": "\\alpha_7"
+       },
+       {
+        "left": "\\alpha_7",
+        "order": 4,
+        "right": "\\alpha_13"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": 4,
+        "right": "\\alpha_11"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": 4,
+        "right": "\\alpha_12"
+       },
+       {
+        "left": "\\alpha_10",
+        "order": null,
+        "right": "\\alpha_11"
+       },
+       {
+        "left": "\\alpha_10",
+        "order": 4,
+        "right": "\\alpha_13"
+       }
+      ],
+      "figure": 8,
+      "printed_page": 22,
+      "statement": "4.3.7",
+      "vertices": [
+       "\\alpha_1",
+       "\\alpha_2",
+       "\\alpha_3",
+       "\\alpha_4",
+       "\\alpha_5",
+       "\\alpha_6",
+       "\\alpha_7",
+       "\\alpha_9",
+       "\\alpha_10",
+       "\\alpha_11",
+       "\\alpha_12",
+       "\\alpha_13"
+      ],
+      "wall_count": 12
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       2,
+       1,
+       -4,
+       -5,
+       -7,
+       -10,
+       -8,
+       -6,
+       -4,
+       -2
+      ],
+      "edges": [
+       {
+        "left": "\\alpha_2",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_3",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_3",
+        "order": 4,
+        "right": "\\alpha_11"
+       },
+       {
+        "left": "\\alpha_4",
+        "order": 3,
+        "right": "\\alpha_5"
+       },
+       {
+        "left": "\\alpha_5",
+        "order": 3,
+        "right": "\\alpha_6"
+       },
+       {
+        "left": "\\alpha_6",
+        "order": 3,
+        "right": "\\alpha_7"
+       },
+       {
+        "left": "\\alpha_7",
+        "order": 3,
+        "right": "\\alpha_8"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 3,
+        "right": "\\alpha_10"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 3,
+        "right": "\\alpha_12"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": 4,
+        "right": "\\alpha_12"
+       }
+      ],
+      "figure": 10,
+      "printed_page": 23,
+      "statement": "4.3.8",
+      "vertices": [
+       "\\alpha_2",
+       "\\alpha_3",
+       "\\alpha_4",
+       "\\alpha_5",
+       "\\alpha_6",
+       "\\alpha_7",
+       "\\alpha_8",
+       "\\alpha_9",
+       "\\alpha_10",
+       "\\alpha_11",
+       "\\alpha_12"
+      ],
+      "wall_count": 11
+     },
+     {
+      "cusp": [
+       2,
+       2,
+       0,
+       0,
+       -4,
+       -5,
+       -7,
+       -10,
+       -8,
+       -6,
+       -4,
+       -2
+      ],
+      "edges": [
+       {
+        "left": "\\widetilde\\alpha_1",
+        "order": null,
+        "right": "\\alpha_9"
+       },
+       {
+        "left": "\\widetilde\\alpha_1",
+        "order": 4,
+        "right": "\\alpha_13"
+       },
+       {
+        "left": "\\widetilde\\alpha_1",
+        "order": 4,
+        "right": "\\alpha_14"
+       },
+       {
+        "left": "\\alpha_2",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_2",
+        "order": 3,
+        "right": "\\alpha_10"
+       },
+       {
+        "left": "\\alpha_4",
+        "order": 3,
+        "right": "\\alpha_5"
+       },
+       {
+        "left": "\\alpha_4",
+        "order": 4,
+        "right": "\\alpha_14"
+       },
+       {
+        "left": "\\alpha_5",
+        "order": 3,
+        "right": "\\alpha_6"
+       },
+       {
+        "left": "\\alpha_6",
+        "order": 3,
+        "right": "\\alpha_7"
+       },
+       {
+        "left": "\\alpha_6",
+        "order": 4,
+        "right": "\\alpha_12"
+       },
+       {
+        "left": "\\alpha_7",
+        "order": 3,
+        "right": "\\alpha_8"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 3,
+        "right": "\\overline{\\widetilde\\alpha}_8"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 4,
+        "right": "\\alpha_13"
+       },
+       {
+        "left": "\\overline{\\widetilde\\alpha}_8",
+        "order": 3,
+        "right": "\\alpha_10"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": 4,
+        "right": "\\alpha_11"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": 4,
+        "right": "\\alpha_12"
+       },
+       {
+        "left": "\\alpha_10",
+        "order": 4,
+        "right": "\\alpha_11"
+       }
+      ],
+      "figure": 12,
+      "printed_page": 24,
+      "statement": "4.3.9",
+      "vertices": [
+       "\\widetilde\\alpha_1",
+       "\\alpha_2",
+       "\\alpha_4",
+       "\\alpha_5",
+       "\\alpha_6",
+       "\\alpha_7",
+       "\\alpha_8",
+       "\\overline{\\widetilde\\alpha}_8",
+       "\\alpha_9",
+       "\\alpha_10",
+       "\\alpha_11",
+       "\\alpha_12",
+       "\\alpha_13",
+       "\\alpha_14"
+      ],
+      "wall_count": 14
+     }
+    ]
+   },
+   "signature": [
+    2,
+    10
+   ],
+   "tag": "029J"
+  }
+ },
  "discriminant_forms": {
   "6JRR": {
    "certification": "0be391409303d25f25d126795ee881040661b4883ad7473272b34b60b8c414da",
@@ -1260,6 +1884,45 @@
     9
    ],
    "tag": "6JRR"
+  }
+ },
+ "hyperbolic_reflectivity": {
+  "0026": {
+   "certification": "cdb2911d3762f8d79e0ef7481321aefd9a4c7c05b6229c955f18514562a2457a",
+   "determinant": 2,
+   "gram": [
+    [
+     0,
+     1,
+     0
+    ],
+    [
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     -2
+    ]
+   ],
+   "latex": "U \\oplus A_{1}(-1)",
+   "name": "U + A1(-1)",
+   "path": "lattices/0026.md",
+   "rank": 3,
+   "references": [
+    {
+     "citation": "V. V. Nikulin, \"Factor groups of groups of automorphisms of hyperbolic forms with respect to subgroups generated by 2-reflections. Algebrogeometric applications\", J. Soviet Math. 22 (1983), 1401-1475, §4, Table 1 and Theorem 4.3.2.",
+     "url": "https://doi.org/10.1007/BF01094757"
+    }
+   ],
+   "reflective": true,
+   "signature": [
+    1,
+    2
+   ],
+   "tag": "0026"
   }
  },
  "plane_orbits": {
@@ -1619,5 +2282,192 @@
    }
   },
   "tag": "0128"
+ },
+ "primitive_orbit_series": {
+  "0016": {
+   "certification": "f7a0c10019c967ac46b34bcf7d6774bce8f7802d5b9bec628092435367e26101",
+   "determinant": -1,
+   "gram": [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     0
+    ]
+   ],
+   "latex": "U",
+   "name": "U",
+   "path": "lattices/0016.md",
+   "rank": 2,
+   "rows": {
+    "O": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "O+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SO": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    },
+    "SO+": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    },
+    "SOtilde": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    },
+    "SOtilde+": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    }
+   },
+   "signature": [
+    1,
+    1
+   ],
+   "tag": "0016"
+  },
+  "026E": {
+   "certification": "71acd10a9086e12004375735a77f3c09cfa35d98687b9746995f994599b427c3",
+   "determinant": 8,
+   "gram": [
+    [
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     -2,
+     1,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     -2,
+     1,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1,
+     -2,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1,
+     0,
+     -2,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     -2
+    ]
+   ],
+   "latex": "U \\oplus D_{4}(-1) \\oplus A_{1}(-1)",
+   "name": "U + D4(-1) + A1(-1)",
+   "path": "lattices/026E.md",
+   "rank": 7,
+   "rows": {
+    "O": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "O+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SO": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SO+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SOtilde": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SOtilde+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    }
+   },
+   "signature": [
+    1,
+    6
+   ],
+   "tag": "026E"
+  }
  }
 }

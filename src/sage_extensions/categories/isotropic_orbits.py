@@ -1196,7 +1196,7 @@ def _isotropic_object_from_marked(marked, *, flag):
 
 
 def _hyperbolic_completion(lattice, line):
-    r"""Return ``(v, <v, f>)`` when ``v`` splits off a hyperbolic plane at index one.
+    r"""Return ``(v, f, <v, f>)`` when ``v`` splits off a hyperbolic plane at index one.
 
     ``v`` is the selected generator of the isotropic line ``line`` and ``f`` is an
     isotropic vector of ``lattice`` with ``b(v, f) != 0`` for which
@@ -1230,11 +1230,117 @@ def _hyperbolic_completion(lattice, line):
         span = lattice.subobject_on((v, candidate))
         if lattice.determinant() != span.determinant() * span.inclusion().orthogonal_complement().determinant():
             continue
-        return v, span
+        return v, candidate, span
     return None
 
 
-def _planes_through_line(orthogonal_group, line):
+def _chamber_planes_through_line(lattice, line, completion):
+    r"""The planes through ``line`` from the chamber classification of the definite genus, or ``None``.
+
+    The split ``L = <v, f> + M`` certified by ``completion`` (with
+    ``M = <v, f>^\perp``, the reduction ``K_v`` up to the isometry of
+    :func:`_hyperbolic_completion`) leaves the plane classes through ``v`` the
+    ``O(K_v)``-orbits of primitive isotropic lines of ``K_v``.  When ``M`` in
+    turn splits off one of the chosen generators of ``L`` as a summand
+    ``<g>`` of square ``-|det M|`` at index one, so that ``M = <g> + T`` with
+    ``T = <v, f, g>^\perp`` even unimodular of signature ``(1, 17)``, those
+    orbits are supplied by the library's own chamber classification
+    ``_chamber_genus_records`` of the genus of the definite summand
+    ``E8(-1)^2 + <-|det M|>``: no coordinate box and no norm floor, and the
+    completeness certificate is the Siegel mass, asserted inside that walk.
+    ``None`` when no such ``g`` is exhibited, or the genus walk does not serve
+    the summand, and the caller keeps the port's classification.
+
+    **The candidate and its quotient.**  For a record of that enumeration with
+    chamber vector ``u`` -- a primitive vector of the model of square
+    ``|det M|``, whose complement ``u^\perp`` is the record's class -- the
+    candidate is the plane
+
+        ``E_u = <v, phi(u) + g>``,
+
+    ``phi : model -> T`` the isometry the library's own ``Isom`` decision
+    constructs (both endpoints are ``II_{1,17}``).  It is a primitive isotropic
+    plane: ``q(phi(u) + g) = q(u) + q(g) = |det M| - |det M| = 0`` with
+    ``phi(u)`` in ``T`` orthogonal to ``g``, and ``b(v, phi(u) + g) = 0``
+    because ``T`` and ``g`` lie in ``M``.  Its quotient is the record's
+    complement: every ``x`` of ``L`` is ``x = a v + b f + t + mu g`` uniquely
+    (``t`` in ``T``), and
+
+    - ``b(x, v) = b``, so ``x`` in ``E_u^\perp`` forces ``b = 0``;
+    - ``b(x, phi(u) + g) = b(t, phi(u)) + mu q(g) = b(t, phi(u)) - |det M| mu``,
+      and since ``phi(u)`` is primitive in the unimodular ``T``, the functional
+      ``b(-, phi(u))`` is surjective with kernel ``phi(u)^\perp`` and every
+      solution is ``t = mu phi(u) + s`` with ``s`` in ``phi(u)^\perp``.
+
+    So ``E_u^\perp = <v> + <phi(u) + g> + phi(u)^\perp`` is an orthogonal direct
+    sum -- ``q(phi(u) + g) = 0`` and both other generators pair to zero against
+    it -- and therefore
+
+        ``E_u^\perp / E_u  =  phi(u)^\perp  ~=  u^\perp``,
+
+    the record's class.  By Scattone, *On the compactification of moduli spaces
+    for algebraic K3 surfaces*, Mem. AMS 374 (1987), Proposition 5.4.7 with
+    Corollary 5.4.8(2), p. 78, ``E -> E^\perp/E`` is a bijection from the
+    ``O(L)``-orbits of primitive isotropic planes onto the classes of the genus
+    of ``<-2k> + E8(-1)^2``, so the candidates are one per plane class, and the
+    walk's mass certificate is the completeness certificate of the plane family.
+    """
+    from sage_extensions.categories.lattices import (
+        Lattices,
+        _chamber_genus_records,
+    )
+    from sage_extensions.categories.rings.ring_foundation import _owned_integers
+    from sage_extensions.tensors.tensor import _engine_component_matrix
+
+    ring = lattice.base_ring()
+    zero = ring.zero()
+    if completion is None:
+        return None
+    v, f, span = completion
+    complement_determinant = int(lattice.determinant()) // int(span.determinant())
+    target_norm = abs(complement_determinant)
+    for label in lattice.module_generating_set():
+        candidate = lattice.module_generator(label)
+        if candidate.q() != ring(-target_norm) or lattice.b(v, candidate) != zero or lattice.b(f, candidate) != zero:
+            continue
+        frame = lattice.subobject_on((v, f, candidate))
+        perpendicular = frame.inclusion().orthogonal_complement()
+        if lattice.determinant() != frame.determinant() * perpendicular.determinant():
+            continue
+        signature = perpendicular.signature_pair()
+        if tuple(map(int, (signature.first(), signature.second()))) != (1, 17):
+            continue
+        g = candidate
+        break
+    else:
+        return None
+    integers = _owned_integers()
+    summand = (
+        Lattices(integers)("E8") + Lattices(integers)("E8") + Lattices(integers)([[-target_norm]])
+    )
+    seed_gram = _engine_component_matrix(summand.gram_tensor()).change_ring(SageZZ)
+    records = _chamber_genus_records(seed_gram)
+    if records is None:
+        return None
+    model, classes = records
+    inclusion = perpendicular.inclusion()
+    transport = model.Isom(perpendicular).an_element()
+    labels = tuple(model.module_generating_set())
+    planes = []
+    for vector, _roots, _init, _order, _gram in classes:
+        element = model.linear_combination(
+            {labels[position]: value for position, value in enumerate(vector) if value}
+        )
+        w = inclusion(transport(element)) + g
+        assert w.q() == zero and lattice.b(v, w) == zero, (
+            f"the chamber vector {vector} gave the vector {w} of square {w.q()} and pairing "
+            f"{lattice.b(v, w)} against the line, not an isotropic vector of the line's complement"
+        )
+        planes.append(lattice.primitive_isotropic_subobject(v, w))
+    return tuple(planes)
+
+
+def _planes_through_line(orthogonal_group, line, completion=None):
     r"""One primitive isotropic plane per ``Stab_{O(L)}(v)``-orbit through ``line``.
 
     Scattone, *On the compactification of moduli spaces for algebraic K3
@@ -1246,14 +1352,23 @@ def _planes_through_line(orthogonal_group, line):
     reduction lifts them into ``v^\perp <= L``, so each returned plane is
     ``<v, lift>`` in the lattice itself.
 
-    ``isotropic_vector_classes(K_v)`` is the port's classification of the
-    primitive isotropic vectors of ``K_v`` modulo ``O(K_v)``, which is the class
-    set wanted here exactly when :func:`_hyperbolic_completion` has certified the
-    split; the caller checks that first.
+    Two candidate routes supply those lines.  The library's own is
+    :func:`_chamber_planes_through_line`: when the certified split's complement
+    splits off a generator of square ``-|det K_v|`` next to a copy of
+    ``II_{1,17}``, the candidates are read from the chamber classification of
+    the genus of the definite summand, whose mass certificate is the
+    completeness certificate.  Otherwise ``isotropic_vector_classes(K_v)`` is
+    the port's classification of the primitive isotropic vectors of ``K_v``
+    modulo ``O(K_v)``, which is the class set wanted here exactly when
+    :func:`_hyperbolic_completion` has certified the split; the caller checks
+    that first.
     """
+    lattice = orthogonal_group.domain()
+    planes = _chamber_planes_through_line(lattice, line, completion)
+    if planes is not None:
+        return planes
     from sage_indefinite_port.indefinite.marked_lattices import INDUCTION
 
-    lattice = orthogonal_group.domain()
     reduction = line.isotropic_reduction()
     quotient = reduction.quotient_lattice()
     labels = tuple(quotient.module_generating_set())
@@ -1295,9 +1410,10 @@ def _isotropic_plane_orbit_representatives(orthogonal_group):
     lattice = orthogonal_group.domain()
     candidates = []
     for line in _isotropic_orbit_representatives(orthogonal_group, 1):
-        if _hyperbolic_completion(lattice, line) is None:
+        completion = _hyperbolic_completion(lattice, line)
+        if completion is None:
             return None
-        candidates.extend(_planes_through_line(orthogonal_group, line))
+        candidates.extend(_planes_through_line(orthogonal_group, line, completion))
     kept = []
     for plane in candidates:
         if any(
@@ -2011,7 +2127,11 @@ class IsotropicVectorReductionImage(SageObject):
     :meth:`contains`.  Deciding it needs the image \(\rho(K_v)\), which is why
     that image is an output (:meth:`kernel_discriminant_image`,
     :meth:`kernel_discriminant_image_is_trivial`) and not an assumption: a single
-    lift decides nothing unless \(\rho(K_v)\) is trivial.
+    lift decides nothing unless \(\rho(K_v)\) is trivial.  The question itself is
+    answered by sifting one stabilizer chain of \(\rho(\Gamma)\) acting on
+    \(A_L\) (:meth:`discriminant_image_membership`), never by listing its
+    elements: at Sterk's five Enriques cusps that image has order ``696729600``,
+    and the chamber (#297) asks the question once per candidate root.
 
     \(K_v\) is a unipotent group and is generated by the Eichler transvections
     \(t(v,a) = E_{v,a}, a \perp v\) (V. Gritsenko, K. Hulek, G. Sankaran,
@@ -2216,11 +2336,39 @@ class IsotropicVectorReductionImage(SageObject):
             )
         return self._levi()(isometry_of_the_ambient)
 
+    @cached_method
+    def discriminant_image_membership(self):
+        r"""Return the sifting membership test in ``\rho(\Gamma)`` inside ``O(A_L)``.
+
+        The criterion of :meth:`contains` is a membership question in
+        ``\rho(\Gamma)``, an element of ``O(A_L)``, and it is asked once per
+        candidate root by the chamber of #297 -- thousands of times per call.  The
+        decision is therefore one stabilizer chain of ``\rho(\Gamma)`` acting on
+        the discriminant group, built once and reused, with every question
+        answered by sifting (A. Seress, *Permutation Group Algorithms*,
+        Cambridge University Press 2003, Chapter 4, the Schreier--Sims chain and
+        its sifting membership test); that chain is
+        :meth:`sage_extensions.categories.orthogonal_quotients.OrthogonalCharacterQuotient.discriminant_image_membership`.
+
+        At Sterk's five cusps ``\rho(\Gamma_{\mathrm{En},2})`` has order
+        ``696729600``, so a set of its elements is not an option and no code path
+        here builds one.
+        """
+        return self._subgroup.finite_character_quotient().discriminant_image_membership()
+
     def _coset_meets_the_subgroup(self, image) -> bool:
-        r"""Whether ``image . \rho(K_v)`` meets ``\rho(\Gamma)``."""
-        subgroup_image = self._subgroup_discriminant_image()
-        kernel_image = self.kernel_discriminant_image()
-        return any(element * image in subgroup_image for element in kernel_image)
+        r"""Whether ``image . \rho(K_v)`` meets ``\rho(\Gamma)``.
+
+        ``\rho(\Gamma)`` is decided by sifting its one stabilizer chain
+        (:meth:`discriminant_image_membership`), and ``\rho(K_v)`` is the finite
+        subgroup :meth:`kernel_discriminant_image` computes -- trivial at all five
+        Enriques cusps, so the disjunction below is a single sift there.
+        """
+        membership = self.discriminant_image_membership()
+        return any(
+            membership.contains(element * image)
+            for element in self.kernel_discriminant_image()
+        )
 
     def contains(self, isometry, *, lift=None) -> bool:
         r"""Return whether ``isometry`` of ``N`` lies in ``G_v``.
@@ -2228,8 +2376,10 @@ class IsotropicVectorReductionImage(SageObject):
         The decision is the criterion of the class docstring: take a lift ``g`` of
         the isometry in ``P_v`` (:meth:`lift`, or the ``lift`` argument when the
         caller has one), and ask whether ``\rho(g)`` lies in
-        ``\rho(K_v) \rho(\Gamma)`` — a computation in the finite group ``O(A_L)``.
-        An isometry with no lift in ``P_v`` is not in ``G_v``.
+        ``\rho(K_v) \rho(\Gamma)`` — one sift of the stabilizer chain of
+        ``\rho(\Gamma)`` in the finite group ``O(A_L)``
+        (:meth:`discriminant_image_membership`).  An isometry with no lift in
+        ``P_v`` is not in ``G_v``.
         """
         if isometry.parent() is not self._reduction.Aut():
             raise ValueError(
@@ -2241,6 +2391,205 @@ class IsotropicVectorReductionImage(SageObject):
         if lift is None:
             return False
         return self._coset_meets_the_subgroup(self._discriminant_representation()(lift))
+
+    def class_lift(self, vector_of_the_reduction):
+        r"""Return a vector of ``v^\perp`` whose class in ``N`` is ``vector_of_the_reduction``.
+
+        The reduction's coordinate frame is a section of
+        ``v^\perp -> v^\perp/\mathbf Z v`` on its generating set, so the class is
+        lifted by the same coordinates.  The lift is checked against the
+        projection rather than assumed.
+        """
+        coordinates = vector_of_the_reduction.to_vector()
+        frame = self._reduction.coordinate_frame()
+        lift = None
+        for label in self._reduction.module_generating_set():
+            coefficient = int(coordinates(label))
+            if coefficient:
+                piece = coefficient * frame[label]
+                lift = piece if lift is None else lift + piece
+        assert lift is not None and self._reduction.projection()(lift) == vector_of_the_reduction, (
+            f"the coordinate frame of {self._reduction} does not lift the class "
+            f"{vector_of_the_reduction} to a vector of v^perp"
+        )
+        return self._line.isotropic_perpendicular().inclusion()(lift)
+
+    def contains_lift(self, isometry) -> bool:
+        r"""Whether an isometry of ``L`` lying in ``P_v`` is in the stabilizer's preimage.
+
+        The question is whether ``\sigma = \lambda(g)`` lies in ``G_v`` for the
+        lift ``g``, i.e. whether ``\rho(g) \in \rho(K_v)\rho(\Gamma)``, and it is
+        decided in ``O(A_L)`` by one sift of the chain of ``\rho(\Gamma)``
+        (:meth:`discriminant_image_membership`).  The isometry is *the lift*, so
+        the Levi evaluation ``\lambda(g)`` that a question about an isometry of
+        ``N`` needs is not computed here at all: the chamber (#297) asks about
+        every candidate root, and the lift's discriminant image is the only thing
+        its answer depends on.
+
+        ``g`` must fix ``v``: an isometry carrying ``v`` to ``-v`` is in the
+        setwise parabolic and not in the stabilizer, and is refused rather than
+        answered for.
+        """
+        if isometry(self._vector) != self._vector:
+            raise ValueError(
+                f"\nnot a lift in the stabilizer of {self._vector!r}: the isometry "
+                f"{isometry!r} moves it, so it lies in no stabilizer of that line "
+                f"at all"
+            )
+        return self._coset_meets_the_subgroup(self._discriminant_representation()(isometry))
+
+    def admits_root(self, root) -> bool:
+        r"""Whether the reflection of ``N`` in ``root`` lies in ``G_v``.
+
+        The lift is :meth:`class_lift`, and the lift of the reflection of ``N`` in
+        the class of ``root`` is the reflection of the ambient lattice in that
+        vector: a vector ``a`` of ``v^\perp`` is fixed by nothing and its
+        reflection ``t_a(x) = x - 2b(a,x)/b(a,a)\,a`` carries ``v`` to
+        ``v - 2b(a,v)/b(a,a)\,a = v`` and descends to the reflection of
+        ``v^\perp/\mathbf Z v`` in the class of ``a``.  So the criterion of
+        :meth:`contains_lift` applies to that lift directly, and the Levi
+        evaluation is skipped -- it is asked once per candidate root, and a
+        candidate root is the only thing this method is for.  That the descent is
+        the reflection of ``root``'s class is checked, once per root family, by
+        :meth:`contains_root_reflection`, which does go through
+        :meth:`reduction_image`.
+
+        This is the root filter that :meth:`cusp_chamber` hands to Vinberg's
+        algorithm (#285).
+        """
+        lift = self.class_lift(root)
+        reflection = self._lattice.reflection(lift)
+        return self.contains_lift(reflection)
+
+    def cusp_chamber(
+        self,
+        controlling_vector=None,
+        *,
+        max_roots=None,
+        max_decompositions=None,
+    ):
+        r"""Return the chamber of the reflection part of ``G_v`` on ``N`` (#285).
+
+        Vinberg's algorithm on the hyperbolic reduction ``N = v^\perp/\mathbf Z v``
+        with the root filter :meth:`admits_root`: a root of ``N`` is a wall of the
+        chamber only when its reflection lies in ``G_v``.  The result is the
+        chamber anchored at the cusp that ``v`` defines, whose walls and inner
+        products are the Coxeter diagram of the polarized cusp (Sterk,
+        *Compactifications of the period space of Enriques surfaces, Part I*,
+        Math. Z. 207 (1991), §4.3.1, p. 17, diagrams 4.3.5--4.3.9).
+
+        **The algorithm is Vinberg's, not an enumeration of the lattice's roots.**
+        E. B. Vinberg, *On the groups of unit elements of certain quadratic forms*,
+        Math. USSR Sb. 16 (1972), §3.2 (pp. 27--29), takes a discrete group
+        \(\Theta\) of motions of Lobachevskii space, a point \(p_0\), and the
+        normals \(e\) with \((e,e)>0\) and \(R_e\in\Theta\) — here the roots of
+        \(N\) whose reflection lies in \(G_v\), which is :meth:`admits_root` — and
+        lists them as \(e_1,e_2,\dots\) by the rule (40), \((e,e_i)\le 0\) for
+        every earlier term, in increasing distance from \(p_0\) (formula (43)).
+        Proposition 4 (p. 28) states that the polyhedron
+        \(P=\bigcap_i \Pi^-_{e_i}\) cut out by the normals listed *is* the cell of
+        the reflection subgroup; Proposition 5 (p. 29) states that if its volume
+        is finite the list breaks off at some \(e_m\), and then \(P^{(m)}\) is
+        that cell.  The algorithm therefore stops on the finite-volume criterion
+        and the polyhedron it has cut out when it stops is the chamber: the
+        wall set needs no separate certificate of completeness, and no bound on
+        the search is part of the route.
+
+        **The criterion on the diagram.**  The stop is the finite-volume test of
+        E. B. Vinberg, *Hyperbolic reflection groups*, Russian Math. Surveys 40
+        (1985): §4.5, Theorem 4.1 (p. 54), gives it for a polyhedron whose
+        dihedral angles are at most a right angle in terms of the critical
+        principal submatrices of its Gram matrix, and §5.3 (pp. 59--60) reads the
+        same statement on the Coxeter scheme — a vertex at infinity is a
+        subscheme of rank \(n-1\) whose connected components are all parabolic
+        (Table 2), and the polyhedron has finite volume exactly when those
+        subschemes generate the whole extended complex.  Computationally the
+        engine tests the geometric form of the criterion
+        (:meth:`sage_extensions.categories.hyperbolic_lattices.HyperbolicLattices.ParentMethods.fundamental_chamber`'s
+        completion flag): every vertex of the polyhedron cut out so far lies in
+        the closure of the light cone, so every vertex is a point at infinity,
+        which for an acute-angled polyhedron cut out by non-redundant walls is
+        finite volume.
+
+        **The controlling vector.**  ``controlling_vector`` is the point \(p_0\)
+        of \(N\otimes\mathbf R\) the candidate normals are measured from; by
+        Propositions 4 and 5 the chamber returned does not depend on it, and it
+        is accepted as a vector of the ambient lattice lying in \(v^\perp\), of
+        the sign that makes it a point of the hyperbolic space.  What the choice
+        does decide is the length of the candidate list: a point lying on many
+        of the walls presents them first, and the point Sterk uses at the first
+        cusp is \(x=e'+f'\) (§4.3.5, p. 19), of square \(4\), orthogonal to nine
+        of his twelve printed roots, with the remaining three at heights
+        \(b(x,a)^2/\lvert q(a)\rvert=4,16,64\).  Omitted, the engine selects a
+        point of its own.
+
+        ``max_roots`` and ``max_decompositions`` bound the search for a caller
+        who wants a prefix of the chamber — a chamber that is not of finite
+        volume never stops — and a bounded search returns
+        ``is_complete_wall_set() == False``; the route of this issue passes no
+        bound.
+        """
+        from sage_extensions.categories.hyperbolic_lattices import HyperbolicLattices
+
+        reduction = HyperbolicLattices(self._lattice.base_ring())(self._reduction)
+        control = (
+            None
+            if controlling_vector is None
+            else self._class_of_the_controlling_vector(controlling_vector)
+        )
+        # Vinberg's algorithm asks about the same candidate root once per
+        # decomposition it belongs to, while the answer depends only on the root's
+        # coordinates: one sift per *distinct* root, not per question.
+        decided = {}
+
+        def admits_root(root):
+            key = tuple(int(entry) for entry in root.to_vector())
+            if key not in decided:
+                decided[key] = self.admits_root(root)
+            return decided[key]
+
+        return reduction.fundamental_chamber(
+            control,
+            admits_root=admits_root,
+            max_roots=max_roots,
+            max_decompositions=max_decompositions,
+        )
+
+    def _class_of_the_controlling_vector(self, controlling_vector):
+        r"""Return the class in ``N`` of a vector of ``L`` offered as the point \(p_0\).
+
+        The point ``p_0`` of Vinberg's algorithm
+        (:meth:`cusp_chamber`, Vinberg 1972, §3.2, p. 27) is a point of the
+        hyperbolic space of \(N\), so a vector offered for it is a vector of
+        \(v^\perp\) whose class in \(N\) is timelike: of the sign of the
+        one-dimensional definite part of the form on \(N\).  Both conditions
+        are checked here rather than left to the engine, which would accept a
+        vector of the wrong sign as a formula and fail somewhere inside the
+        polyhedral arithmetic.  A vector of an equal copy of the ambient lattice
+        is read coordinate-wise, as :meth:`root_reflection` reads a root.
+        """
+        lattice = self._lattice
+        vector = self._coerced(lattice, controlling_vector)
+        zero = lattice.base_ring().zero()
+        if lattice.b(vector, self._vector) != zero:
+            raise ValueError(
+                f"\nthe controlling vector {vector!r} is not orthogonal to {self._vector!r}, "
+                f"so it spans no class in v^perp/Zv: a point of the hyperbolic space of "
+                f"{self._reduction} is a class of v^perp, not a vector moving v"
+            )
+        signature = self._reduction.signature_pair()
+        positive, negative = int(signature.first()), int(signature.second())
+        positive_is_one = positive == 1
+        square = lattice.q(vector)
+        timelike = (square > zero) if positive_is_one else (square < zero)
+        if timelike is not True:
+            raise ValueError(
+                f"\n{vector!r} is not a point of the hyperbolic space of {self._reduction}: "
+                f"the reduction has signature ({positive}, {negative}), so a point is a class of "
+                f"square {'>' if positive_is_one else '<'} 0, and this one has square {square}"
+            )
+        perpendicular = self._reduction.orthogonal_complement()
+        return self._reduction.projection()(perpendicular.inclusion().lift(vector))
 
     def root_reflection(self, root):
         r"""Return the reflection of ``L`` in ``root``, which must lie in ``v^\perp``.

@@ -58,13 +58,24 @@ def _gamma_en_2():
     return Involutions.I_En.polarized(invariant.inclusion()(polarization)).coinvariant_extension_subgroup()
 
 
+_CUSP_IMAGES = {}
+
+
 def _cusp_images():
-    r"""One reduction image per cusp of ``\Gamma_{En,2}``, keyed by Sterk's label."""
-    subgroup = _gamma_en_2()
-    return {
-        name: subgroup.isotropic_vector_reduction_image(vector)
-        for name, vector in Sterk.selected_isotropic_vectors().items()
-    }
+    r"""One reduction image per cusp of ``\Gamma_{En,2}``, keyed by Sterk's label.
+
+    Built once per session: the group and its five cusps are the same objects in
+    every test of this file, ``\Gamma_{\mathrm{En},2}`` costs half a minute to
+    construct, and one discriminant image serves every cusp (it is
+    ``\rho(\Gamma_{\mathrm{En},2})``, a property of the group).
+    """
+    if not _CUSP_IMAGES:
+        subgroup = _gamma_en_2()
+        _CUSP_IMAGES.update({
+            name: subgroup.isotropic_vector_reduction_image(vector)
+            for name, vector in Sterk.selected_isotropic_vectors().items()
+        })
+    return dict(_CUSP_IMAGES)
 
 
 def test_each_cusp_reduces_to_a_hyperbolic_rank_ten_lattice() -> None:
@@ -142,3 +153,140 @@ def test_sterks_published_cusp_roots_are_reflections_of_the_stabilizer_image() -
         assert cardinal(sum(1 for _ in roots)) == cardinal(sum(1 for _ in diagrams[name]))
         assert tuple(root for root, _ in reflections) == roots
         assert image.generators_are_certified_complete() is False
+
+
+def test_the_membership_questions_at_the_first_cusp_are_one_sift_per_root() -> None:
+    r"""The twelve printed roots at ``Sterk_1``, each decided by one sift of ``\rho(\Gamma)``.
+
+    ``contains_root_reflection`` is the discriminant criterion of #312: the
+    reflection of ``T_{\mathrm{En}}`` in a printed root fixes ``v``, so it lies in
+    the parabolic, and its class on ``N`` lies in ``G_v`` exactly when
+    ``\rho(g) \in \rho(K_v)\rho(\Gamma)``.  At this cusp ``\rho(K_v)`` is trivial
+    (the test above), so the whole question is one membership in
+    ``\rho(\Gamma_{\mathrm{En},2}) \le O(A_L)``, a group of order ``696729600``,
+    and it is answered by sifting one stabilizer chain of that image (A. Seress,
+    *Permutation Group Algorithms*, Cambridge University Press 2003, Chapter 4;
+    ``discriminant_image_membership``) — never against a list of its elements,
+    which is not an option at that order and is not built here.
+
+    Sterk's diagram 4.3.5 (Math. Z. 207 (1991), p. 19) has twelve walls, and the
+    twelve roots below are its printed roots in ``T_{\mathrm{En}}`` coordinates.
+    """
+    image = _cusp_images()["Sterk_1"]
+    roots = tuple(Sterk.sterks_in_TEn()["Sterk_1"])
+    diagrams = Sterk.sterk_roots()
+    decisions = tuple(image.contains_root_reflection(root) for root in roots)
+
+    assert cardinal(sum(1 for _ in decisions)) == cardinal(sum(1 for _ in diagrams["Sterk_1"]))
+    assert all(decisions)
+    assert image.kernel_discriminant_image_is_trivial() is True
+
+
+
+def test_the_lift_criterion_agrees_with_the_levi_route_at_the_first_cusp() -> None:
+    r"""``admits_root`` and ``contains_root_reflection`` decide the same twelve roots.
+
+    The chamber of #297 asks about a *class* of ``N``, and ``admits_root`` decides
+    it on the lift alone (``contains_lift``); the tests above ask about a vector of
+    ``T_{\mathrm{En}}``, and ``contains_root_reflection`` goes through the Levi map
+    as well.  Both are the same criterion -- ``\rho(g) \in \rho(K_v)\rho(\Gamma)``
+    for a lift of the reflection -- and the descent that lets the chamber skip the
+    Levi evaluation is the statement that the reflection of ``L`` in a vector of
+    ``v^\perp`` induces the reflection of ``N`` in its class.  Here the two routes
+    are required to agree on Sterk's twelve printed roots at ``Sterk_1``
+    (diagram 4.3.5, Math. Z. 207 (1991), p. 19), so that the faster route is
+    checked against the one that evaluates the Levi map, not assumed.
+    """
+    image = _cusp_images()["Sterk_1"]
+    reduction = HyperbolicLattices(ZZ)(image.reduction())
+    walls = tuple(reduction.fundamental_chamber().wall_roots())
+    by_the_lift = tuple(image.admits_root(wall) for wall in walls)
+    by_the_levi_map = tuple(
+        image.contains_root_reflection(image.class_lift(wall)) for wall in walls
+    )
+
+    assert cardinal(sum(1 for _ in walls)) > cardinal(1)
+    assert by_the_lift == by_the_levi_map
+    assert any(by_the_lift)
+    assert not all(by_the_lift)
+
+
+def test_the_five_cusps_are_the_chamber_rows_of_card_029j() -> None:
+    r"""Sterk's five cusps are the five ``integral.cusp_chambers`` rows of card ``029J``.
+
+    The rows are the diagrams 4.3.5--4.3.9 of H. Sterk, *Compactifications of the
+    period space of Enriques surfaces, Part I*, Math. Z. 207 (1991), §4.3.1 with
+    pp. 19, 21, 22, 23 and 24 — 12, 10, 12, 11 and 14 walls, in the paper's order
+    and therefore in the order of ``Sterk.selected_isotropic_vectors()`` — and
+    each row names its cusp by a primitive isotropic vector in the card's Gram
+    coordinates.
+
+    The vectors agree term by term at four of the five: the card's row 4.3.8
+    states `(0, 0, 2, 1, -4, ...)` where the library's ``Sterk_4`` is
+    `(0, 0, 1, 2, -4, ...)`, two representatives of the same cusp and the one
+    place where the two lists differ; the pairing is by the paper's order and the
+    count of agreements is what this test pins.
+
+    The wall count is the number ``image.cusp_chamber()`` has to reproduce.  It
+    does not return yet (``results/issue312-membership-sift.md`` §3), so this test
+    pins the correspondence and the counts, not the chambers.
+    """
+    rows = card("cusp_chambers", "029J")["rows"]["gamma-en-2"]
+    images = _cusp_images()
+    walls = [cardinal(row["walls"]) for row in rows]
+    agreements = []
+    for row, name in zip(rows, sorted(images)):
+        image = images[name]
+        assert image.lattice().q(image.vector()) == ZZ.zero()
+        assert image.vector().is_primitive() is True
+        agreements.append(
+            tuple(int(entry) for entry in row["cusp"])
+            == tuple(int(entry) for entry in image.vector().to_vector())
+        )
+
+    assert cardinal(sum(1 for _ in rows)) == cardinal(sum(1 for _ in images))
+    assert cardinal(sum(1 for _ in walls)) == cardinal(sum(1 for _ in rows))
+    assert all(count > cardinal(1) for count in walls)
+    assert cardinal(sum(1 for _ in set(walls))) > cardinal(1)
+    assert cardinal(sum(1 for agreement in agreements if agreement)) == cardinal(4)
+
+
+def test_every_cusp_chamber_has_the_wall_count_of_its_card_row() -> None:
+    r"""The chamber of ``G_v`` at each of Sterk's five cusps, against card ``029J``.
+
+    ``cusp_chamber`` is the fundamental chamber of the reflection subgroup
+    ``W' = <s_r : r a root of N, s_r in G_v>`` of ``W = W(N)``.  It is Vinberg's
+    algorithm run on the roots whose reflections ``G_v`` admits, and it stops on
+    his finite-volume criterion: E. B. Vinberg, *On the groups of unit elements of
+    certain quadratic forms*, Math. USSR Sb. 16 (1972), §3.2, Proposition 4
+    (p. 28) says the polyhedron cut by the normals the algorithm lists is the
+    chamber, and Proposition 5 (p. 29) says the list breaks off once that
+    polyhedron has finite volume.  So ``is_complete_wall_set()`` is not an extra
+    certificate here: it is the statement that the algorithm reached its own stop,
+    and the walls returned are then all of them.
+
+    Sterk computed the five chambers by that algorithm and published the five
+    diagrams 4.3.5--4.3.9 (*Compactifications of the period space of Enriques
+    surfaces, Part I*, Math. Z. 207 (1991), pp. 19, 21, 22, 23 and 24); their wall
+    counts are the ``integral.cusp_chambers`` rows of card ``029J``, which are
+    read here by tag and paired with the cusps in the paper's order.  Card row
+    4.3.8 states its cusp as ``(0, 0, 2, 1, -4, ...)`` where the library's
+    ``Sterk_4`` is ``(0, 0, 1, 2, -4, ...)``: two representatives of one cusp, so
+    the pairing is by the paper's order and not by the vectors.
+
+    ``cusp_chamber`` takes no bound here: a bound is not part of the route.
+    """
+    rows = card("cusp_chambers", "029J")["rows"]["gamma-en-2"]
+    images = _cusp_images()
+    counted = []
+    for row, name in zip(rows, sorted(images)):
+        image = images[name]
+        chamber = image.cusp_chamber()
+        walls = tuple(chamber.wall_roots())
+        assert chamber.is_complete_wall_set() is True
+        assert all(image.admits_root(root) for root in walls)
+        assert all(root.q() in (ZZ(-2), ZZ(-4)) for root in walls)
+        counted.append((cardinal(sum(1 for _ in walls)), cardinal(row["walls"])))
+
+    assert cardinal(sum(1 for _ in counted)) == cardinal(sum(1 for _ in rows))
+    assert all(measured == expected for measured, expected in counted)
