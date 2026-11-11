@@ -1627,9 +1627,9 @@ class _LeftCosetPoint(Element):
 
     @cached_method
     def _canonical_key(self):
-        r"""The transversal position of ``gH`` in a finite GAP-encoded ``G``, else ``None``."""
-        positions = self.parent()._positions()
-        return None if positions is None else positions.position_of(self.representative())
+        r"""The canonical transversal position of ``gH`` (see ``_LeftCosetPointSet._coset_key``), else ``None``."""
+        key = self.parent()._coset_key()
+        return None if key is None else key(self.representative())
 
     def __eq__(self, other):
         if not (isinstance(other, _LeftCosetPoint) and other.parent() is self.parent()):
@@ -1664,9 +1664,28 @@ class _LeftCosetPointSet(Parent):
         return self._subgroup
 
     @cached_method
-    def _positions(self):
-        r"""The finite engine's canonical coset positions of ``G/H``, when ``G`` has them."""
-        return _engine_left_coset_positions(self._group, self._subgroup)
+    def _coset_key(self):
+        r"""A map ``g |-> key(gH)`` with equal keys exactly for equal cosets, or ``None``.
+
+        For finite GAP-encoded ``G`` the key is the position of ``g`` in
+        GAP's transversal of ``H``.  For a preimage ``H = f^-1(K)`` along
+        ``f: G -> Q`` into a finite GAP-encoded ``Q``, ``gH = g'H`` exactly
+        when ``f(g)K = f(g')K``, so the key is the transversal position of
+        ``f(g)`` in ``Q/K``.  Otherwise no canonical form is available.
+        """
+        from sage_extensions.categories.group.predicate_subgroups import PreimageSubgroups
+
+        positions = _engine_left_coset_positions(self._group, self._subgroup)
+        if positions is not None:
+            return positions.position_of
+        if self._subgroup in PreimageSubgroups(self._group) and self._subgroup.supergroup() is self._group:
+            morphism = self._subgroup.preimage_morphism()
+            image_positions = _engine_left_coset_positions(
+                morphism.codomain(), self._subgroup.target_subgroup()
+            )
+            if image_positions is not None:
+                return lambda element: image_positions.position_of(morphism(element))
+        return None
 
     def _element_constructor_(self, representative):
         if isinstance(representative, _LeftCosetPoint) and representative.parent() is self:
