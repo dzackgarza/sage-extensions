@@ -9,7 +9,8 @@ that $g$ when it exists.
 ## What was red
 
 `tests/lattices/test_pointwise_stabilizer_of_an_isotropic_line_vector_equivalence.sage`,
-commit `994c01f37a500b6b54c3960e965954b134a675df`, run on `9fa28c1`:
+commit `8d3c063` on `main`, rebased from `994c01f` when the base moved to
+`1756b915`, run on `9fa28c1`:
 
 ```
 FFFF                                                                     [100%]
