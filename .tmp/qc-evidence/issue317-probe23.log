@@ -1,0 +1,18 @@
+PARI stack size set to 2147483648 bytes, maximum size set to 8589934592
+D_17 roots 544, in the genus True; mass 642332179/18881368343036559360000
+[    56.0s] done: 0 splits, 0 planes, 0 classes, mass 0 vs 642332179/18881368343036559360000: equal False
+DONE
+[peakrss] issue286: child waited=0 shell_code=0 samples=29
+[peakrss] peak tree RSS      : 349 MiB
+[peakrss] low-water MemAvail : 7069 MiB
+[peakrss] peak single VmHWM  : 349 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      338 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   349 MiB hwm=   349 MiB avail=  8743 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   349 MiB hwm=   349 MiB avail=  8743 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   349 MiB hwm=   349 MiB avail=  8749 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   349 MiB hwm=   349 MiB avail=  8756 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   349 MiB hwm=   349 MiB avail=  8760 MiB
+launcher exit: 0

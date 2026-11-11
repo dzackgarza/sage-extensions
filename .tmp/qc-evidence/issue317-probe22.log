@@ -1,0 +1,163 @@
+PARI stack size set to 2147483648 bytes, maximum size set to 8589934592
+D_17 roots 544; in the genus True
+E8 pool: 1400 vectors of norm -2, -4, -6
+alpha pools for q = [2, 4, 6]
+genus mass 642332179/18881368343036559360000
+    NEW class 1: |Aut| 1941728542064640000, roots 480, mass 1/1941728542064640000 / 642332179/18881368343036559360000 equal False
+[    20.4s] 10 hyperbolic splits, 110 planes, 1 classes, 6 planes/s
+[    25.4s] 20 hyperbolic splits, 254 planes, 1 classes, 11 planes/s
+[    30.2s] 30 hyperbolic splits, 394 planes, 1 classes, 14 planes/s
+[    33.6s] 40 hyperbolic splits, 512 planes, 1 classes, 16 planes/s
+[    37.9s] 50 hyperbolic splits, 616 planes, 1 classes, 17 planes/s
+[    44.5s] 60 hyperbolic splits, 758 planes, 1 classes, 18 planes/s
+[    47.5s] 70 hyperbolic splits, 888 planes, 1 classes, 20 planes/s
+[    50.3s] 80 hyperbolic splits, 1010 planes, 1 classes, 21 planes/s
+[    52.8s] 90 hyperbolic splits, 1122 planes, 1 classes, 22 planes/s
+[    55.9s] 100 hyperbolic splits, 1226 planes, 1 classes, 23 planes/s
+[    59.1s] 110 hyperbolic splits, 1344 planes, 1 classes, 24 planes/s
+[    62.2s] 120 hyperbolic splits, 1458 planes, 1 classes, 24 planes/s
+[    66.4s] 130 hyperbolic splits, 1580 planes, 1 classes, 25 planes/s
+[    74.4s] 140 hyperbolic splits, 1770 planes, 1 classes, 25 planes/s
+[    80.6s] 150 hyperbolic splits, 1936 planes, 1 classes, 25 planes/s
+[    83.7s] 160 hyperbolic splits, 2094 planes, 1 classes, 26 planes/s
+[    86.4s] 170 hyperbolic splits, 2202 planes, 1 classes, 26 planes/s
+[    92.3s] 180 hyperbolic splits, 2384 planes, 1 classes, 27 planes/s
+[    95.6s] 190 hyperbolic splits, 2536 planes, 1 classes, 27 planes/s
+[    97.9s] 200 hyperbolic splits, 2654 planes, 1 classes, 28 planes/s
+[    99.9s] 210 hyperbolic splits, 2794 planes, 1 classes, 29 planes/s
+[   101.9s] 220 hyperbolic splits, 2916 planes, 1 classes, 29 planes/s
+[   103.6s] 230 hyperbolic splits, 3024 planes, 1 classes, 30 planes/s
+[   104.9s] 240 hyperbolic splits, 3140 planes, 1 classes, 31 planes/s
+[   107.3s] 250 hyperbolic splits, 3272 planes, 1 classes, 31 planes/s
+[   109.3s] 260 hyperbolic splits, 3386 planes, 1 classes, 32 planes/s
+[   112.4s] 270 hyperbolic splits, 3504 planes, 1 classes, 32 planes/s
+[   114.0s] 280 hyperbolic splits, 3602 planes, 1 classes, 32 planes/s
+[   116.4s] 290 hyperbolic splits, 3744 planes, 1 classes, 33 planes/s
+[   119.4s] 300 hyperbolic splits, 3890 planes, 1 classes, 33 planes/s
+[   121.7s] 310 hyperbolic splits, 4018 planes, 1 classes, 34 planes/s
+[   123.4s] 320 hyperbolic splits, 4140 planes, 1 classes, 34 planes/s
+[   125.7s] 330 hyperbolic splits, 4248 planes, 1 classes, 35 planes/s
+[   127.1s] 340 hyperbolic splits, 4354 planes, 1 classes, 35 planes/s
+[   129.1s] 350 hyperbolic splits, 4464 planes, 1 classes, 35 planes/s
+[   132.9s] 360 hyperbolic splits, 4604 planes, 1 classes, 35 planes/s
+[   134.7s] 370 hyperbolic splits, 4732 planes, 1 classes, 36 planes/s
+[   136.9s] 380 hyperbolic splits, 4870 planes, 1 classes, 36 planes/s
+[   139.8s] 390 hyperbolic splits, 4982 planes, 1 classes, 36 planes/s
+[   142.0s] 400 hyperbolic splits, 5090 planes, 1 classes, 36 planes/s
+[   143.8s] 410 hyperbolic splits, 5202 planes, 1 classes, 37 planes/s
+[   145.9s] 420 hyperbolic splits, 5332 planes, 1 classes, 37 planes/s
+[   147.5s] 430 hyperbolic splits, 5452 planes, 1 classes, 38 planes/s
+[   150.2s] 440 hyperbolic splits, 5566 planes, 1 classes, 38 planes/s
+[   152.5s] 450 hyperbolic splits, 5674 planes, 1 classes, 38 planes/s
+[   155.9s] 460 hyperbolic splits, 5802 planes, 1 classes, 38 planes/s
+[   158.0s] 470 hyperbolic splits, 5942 planes, 1 classes, 38 planes/s
+[   159.6s] 480 hyperbolic splits, 6074 planes, 1 classes, 39 planes/s
+[   161.8s] 490 hyperbolic splits, 6214 planes, 1 classes, 39 planes/s
+[   163.4s] 500 hyperbolic splits, 6312 planes, 1 classes, 39 planes/s
+[   165.8s] 510 hyperbolic splits, 6408 planes, 1 classes, 39 planes/s
+[   168.1s] 520 hyperbolic splits, 6522 planes, 1 classes, 39 planes/s
+[   170.9s] 530 hyperbolic splits, 6654 planes, 1 classes, 40 planes/s
+[   172.6s] 540 hyperbolic splits, 6808 planes, 1 classes, 40 planes/s
+[   174.3s] 550 hyperbolic splits, 6946 planes, 1 classes, 40 planes/s
+[   175.5s] 560 hyperbolic splits, 7058 planes, 1 classes, 41 planes/s
+[   177.5s] 570 hyperbolic splits, 7174 planes, 1 classes, 41 planes/s
+[   179.7s] 580 hyperbolic splits, 7322 planes, 1 classes, 41 planes/s
+[   182.3s] 590 hyperbolic splits, 7468 planes, 1 classes, 42 planes/s
+[   184.9s] 600 hyperbolic splits, 7616 planes, 1 classes, 42 planes/s
+[   186.8s] 610 hyperbolic splits, 7702 planes, 1 classes, 42 planes/s
+[   187.9s] 620 hyperbolic splits, 7798 planes, 1 classes, 42 planes/s
+[   190.6s] 630 hyperbolic splits, 7934 planes, 1 classes, 42 planes/s
+[   192.4s] 640 hyperbolic splits, 8040 planes, 1 classes, 42 planes/s
+[   194.0s] 650 hyperbolic splits, 8156 planes, 1 classes, 43 planes/s
+[   196.2s] 660 hyperbolic splits, 8268 planes, 1 classes, 43 planes/s
+[   199.5s] 670 hyperbolic splits, 8440 planes, 1 classes, 43 planes/s
+[   201.9s] 680 hyperbolic splits, 8584 planes, 1 classes, 43 planes/s
+[   203.5s] 690 hyperbolic splits, 8704 planes, 1 classes, 43 planes/s
+[   205.7s] 700 hyperbolic splits, 8818 planes, 1 classes, 43 planes/s
+[   207.4s] 710 hyperbolic splits, 8966 planes, 1 classes, 44 planes/s
+[   209.6s] 720 hyperbolic splits, 9094 planes, 1 classes, 44 planes/s
+[   211.7s] 730 hyperbolic splits, 9196 planes, 1 classes, 44 planes/s
+[   214.7s] 740 hyperbolic splits, 9338 planes, 1 classes, 44 planes/s
+[   216.9s] 750 hyperbolic splits, 9474 planes, 1 classes, 44 planes/s
+[   218.3s] 760 hyperbolic splits, 9576 planes, 1 classes, 44 planes/s
+[   219.5s] 770 hyperbolic splits, 9712 planes, 1 classes, 45 planes/s
+[   221.1s] 780 hyperbolic splits, 9834 planes, 1 classes, 45 planes/s
+[   222.9s] 790 hyperbolic splits, 9962 planes, 1 classes, 45 planes/s
+[   224.3s] 800 hyperbolic splits, 10082 planes, 1 classes, 45 planes/s
+[   225.8s] 810 hyperbolic splits, 10198 planes, 1 classes, 46 planes/s
+[   227.4s] 820 hyperbolic splits, 10338 planes, 1 classes, 46 planes/s
+[   229.5s] 830 hyperbolic splits, 10476 planes, 1 classes, 46 planes/s
+[   231.9s] 840 hyperbolic splits, 10606 planes, 1 classes, 46 planes/s
+[   234.1s] 850 hyperbolic splits, 10766 planes, 1 classes, 47 planes/s
+[   235.9s] 860 hyperbolic splits, 10886 planes, 1 classes, 47 planes/s
+[   237.2s] 870 hyperbolic splits, 11004 planes, 1 classes, 47 planes/s
+[   238.0s] 880 hyperbolic splits, 11104 planes, 1 classes, 47 planes/s
+[   239.6s] 890 hyperbolic splits, 11226 planes, 1 classes, 47 planes/s
+[   241.7s] 900 hyperbolic splits, 11366 planes, 1 classes, 48 planes/s
+[   243.9s] 910 hyperbolic splits, 11516 planes, 1 classes, 48 planes/s
+[   245.8s] 920 hyperbolic splits, 11660 planes, 1 classes, 48 planes/s
+[   248.5s] 930 hyperbolic splits, 11756 planes, 1 classes, 48 planes/s
+[   250.9s] 940 hyperbolic splits, 11884 planes, 1 classes, 48 planes/s
+[   252.8s] 950 hyperbolic splits, 12018 planes, 1 classes, 48 planes/s
+[   254.7s] 960 hyperbolic splits, 12166 planes, 1 classes, 48 planes/s
+[   257.0s] 970 hyperbolic splits, 12318 planes, 1 classes, 48 planes/s
+[   258.9s] 980 hyperbolic splits, 12442 planes, 1 classes, 49 planes/s
+[   261.1s] 990 hyperbolic splits, 12598 planes, 1 classes, 49 planes/s
+[   262.8s] 1000 hyperbolic splits, 12708 planes, 1 classes, 49 planes/s
+[   265.1s] 1010 hyperbolic splits, 12822 planes, 1 classes, 49 planes/s
+[   266.8s] 1020 hyperbolic splits, 12934 planes, 1 classes, 49 planes/s
+[   267.9s] 1030 hyperbolic splits, 13038 planes, 1 classes, 49 planes/s
+[   270.9s] 1040 hyperbolic splits, 13190 planes, 1 classes, 49 planes/s
+[   273.2s] 1050 hyperbolic splits, 13316 planes, 1 classes, 49 planes/s
+[   275.8s] 1060 hyperbolic splits, 13458 planes, 1 classes, 49 planes/s
+[   277.5s] 1070 hyperbolic splits, 13600 planes, 1 classes, 49 planes/s
+[   280.9s] 1080 hyperbolic splits, 13732 planes, 1 classes, 49 planes/s
+[   282.5s] 1090 hyperbolic splits, 13846 planes, 1 classes, 49 planes/s
+[   284.6s] 1100 hyperbolic splits, 13974 planes, 1 classes, 50 planes/s
+[   286.6s] 1110 hyperbolic splits, 14076 planes, 1 classes, 50 planes/s
+[   289.0s] 1120 hyperbolic splits, 14210 planes, 1 classes, 50 planes/s
+[   291.1s] 1130 hyperbolic splits, 14324 planes, 1 classes, 50 planes/s
+[   292.5s] 1140 hyperbolic splits, 14448 planes, 1 classes, 50 planes/s
+[   294.7s] 1150 hyperbolic splits, 14582 planes, 1 classes, 50 planes/s
+[   297.1s] 1160 hyperbolic splits, 14716 planes, 1 classes, 50 planes/s
+[   298.8s] 1170 hyperbolic splits, 14838 planes, 1 classes, 50 planes/s
+[   301.1s] 1180 hyperbolic splits, 14950 planes, 1 classes, 50 planes/s
+[   304.0s] 1190 hyperbolic splits, 15120 planes, 1 classes, 50 planes/s
+[   305.1s] 1200 hyperbolic splits, 15218 planes, 1 classes, 50 planes/s
+[   307.4s] 1210 hyperbolic splits, 15332 planes, 1 classes, 50 planes/s
+[   310.3s] 1220 hyperbolic splits, 15474 planes, 1 classes, 50 planes/s
+[   312.3s] 1230 hyperbolic splits, 15630 planes, 1 classes, 50 planes/s
+[   315.1s] 1240 hyperbolic splits, 15760 planes, 1 classes, 50 planes/s
+[   317.1s] 1250 hyperbolic splits, 15872 planes, 1 classes, 50 planes/s
+[   318.9s] 1260 hyperbolic splits, 15992 planes, 1 classes, 51 planes/s
+[   320.6s] 1270 hyperbolic splits, 16074 planes, 1 classes, 51 planes/s
+[   323.9s] 1280 hyperbolic splits, 16218 planes, 1 classes, 50 planes/s
+[   326.2s] 1290 hyperbolic splits, 16332 planes, 1 classes, 50 planes/s
+[   329.2s] 1300 hyperbolic splits, 16474 planes, 1 classes, 50 planes/s
+[   330.9s] 1310 hyperbolic splits, 16570 planes, 1 classes, 50 planes/s
+[   333.7s] 1320 hyperbolic splits, 16702 planes, 1 classes, 50 planes/s
+[   338.2s] 1330 hyperbolic splits, 16880 planes, 1 classes, 50 planes/s
+[   340.0s] 1340 hyperbolic splits, 16976 planes, 1 classes, 50 planes/s
+[   343.2s] 1350 hyperbolic splits, 17104 planes, 1 classes, 50 planes/s
+[   345.5s] 1360 hyperbolic splits, 17224 planes, 1 classes, 50 planes/s
+[   347.3s] 1370 hyperbolic splits, 17348 planes, 1 classes, 50 planes/s
+[   350.0s] 1380 hyperbolic splits, 17506 planes, 1 classes, 50 planes/s
+[   352.1s] 1390 hyperbolic splits, 17646 planes, 1 classes, 50 planes/s
+[   354.5s] 1400 hyperbolic splits, 17778 planes, 1 classes, 51 planes/s
+[   354.5s] done: 1400 splits, 17778 planes, 1 classes, mass 1/1941728542064640000 vs 642332179/18881368343036559360000: equal False
+DONE
+[peakrss] issue286: child waited=0 shell_code=0 samples=180
+[peakrss] peak tree RSS      : 621 MiB
+[peakrss] low-water MemAvail : 5214 MiB
+[peakrss] peak single VmHWM  : 621 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      610 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        0 MiB peak
+[peakrss]   t=    22.0s procs=  3 rss=   621 MiB hwm=   621 MiB avail=  8567 MiB
+[peakrss]   t=    24.0s procs=  3 rss=   620 MiB hwm=   620 MiB avail=  8313 MiB
+[peakrss]   t=    20.0s procs=  3 rss=   608 MiB hwm=   608 MiB avail=  8920 MiB
+[peakrss]   t=    26.0s procs=  3 rss=   598 MiB hwm=   620 MiB avail=  8078 MiB
+[peakrss]   t=    28.1s procs=  3 rss=   598 MiB hwm=   620 MiB avail=  8004 MiB
+launcher exit: 0

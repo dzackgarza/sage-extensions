@@ -290,3 +290,9 @@ Re-run on the rebased tree (main at `c31e90d`): `issue317-rebased-on-main.log`,
 `pytest tests/lattices/test_genus_of_the_scattone_summands.sage` — **3 passed in
 57.79 s**, exit 0 (enumeration call 56.48 s on the busier VM; the same four
 classes and the same mass).
+
+Follow-up on issue 317's ninth class, on the same tree: `issue317-probe24.log`
+(sampled first generator, solved second generator — 7 u, 565 planes, 5 classes,
+roots 204/224/264/480 against `D_17`'s 544), `issue317-probe22.log` (1400 splits,
+17778 planes, 1 class), `issue317-probe23.log` (0 splits in 56 s).  All three logs
+are byte-for-byte the launcher's redirected output.
