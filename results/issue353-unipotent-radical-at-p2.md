@@ -12,8 +12,8 @@ infinite.**  At Sterk's `P₂` of `T_En`, in the block basis `(U | P | K)` with
 | rank fixed by the translation map (`Z = ker τ`) | **1** | same system with `N(K) = 0` |
 | rank of `U_I/Z ⊆ Hom(K, I)` | **16** `= 2 rank(K)` | difference of the two, checked against `I^⊥/I` |
 | rank of the returned family's translations | **12** | `unipotent_translation_rank()` |
-| rank of the span of their logarithms | **13** | `.tmp/353-structure2.log` |
-| rank of the 28 parabolic generators that lie in `U_I`, translations | **14** | `parabolic_obstruction()`, `.tmp/353-obstruction.log` |
+| rank of the span of their logarithms | **13** | `.tmp/qc-evidence/issue353-structure2.log` |
+| rank of the 28 parabolic generators that lie in `U_I`, translations | **14** | `parabolic_obstruction()`, `.tmp/qc-evidence/issue353-obstruction.log` |
 
 `12 < 16`, so `unipotent_radical_index()` returns `aleph_0` and
 `is_parabolic_complete()` stays `False` at P₂ — now on a measured obstruction, not on a
@@ -95,7 +95,7 @@ from `unipotent_radical_index`.
 
 ## The call, as it now reports
 
-`.tmp/353-obstruction.log`, 97.0 s for the whole call (93 s of it the parabolic's own
+`.tmp/qc-evidence/issue353-obstruction.log`, 97.0 s for the whole call (93 s of it the parabolic's own
 generating family):
 
 ```
@@ -112,9 +112,28 @@ parabolic_obstruction() =
   subgroups of infinite index, and unipotent_radical_index() returns aleph_0. ...
 ```
 
-## Evidence
+## Evidence, with the commands
 
-Probe, on the pinned runtime (`.tmp/353-structure2.log`):
+```
+/sage/.venv/bin/python -m pytest -p qc_sage_session -o addopts= -q \
+    tests/lattices/test_the_unipotent_radical_of_the_plane_is_measured.sage \
+    tests/lattices/test_the_parabolic_completeness_of_an_enriques_plane.sage
+7 passed in 187.09s (0:03:07)          # exit 0; log .tmp/qc-evidence/issue353-tests.log
+
+/sage/.venv/bin/python -m sage_extensions.testing.test_lint \
+    tests/lattices/test_the_unipotent_radical_of_the_plane_is_measured.sage
+1 files, 0 findings                     # log .tmp/qc-evidence/issue353-lint.log
+
+python3 ~/ai-review-ci/scripts/local-check.py --mode push --remote omm
+Push syntax: 1 file(s) checked; no errors.
+```
+
+The probes that produced the numbers below are committed with their logs
+(`.tmp/qc-evidence/issue353-structure2.py`, `issue353-conventions.py`,
+`issue353-obstruction.py`) and are run through the adopted runtime's launcher; the
+timings are the VM's, with other sessions' jobs running.
+
+Probe, on the pinned runtime (`.tmp/qc-evidence/issue353-structure2.log`):
 
 ```
 rank U = dim of its Lie algebra = 17 (block form says 2*rank(K)+1 = 17)
@@ -124,7 +143,7 @@ returned unipotent generators: 14 elements | in U: 14 | outside U: 0
   rank of their translations = 12 of rank(U/Z) = 16
 ```
 
-The conventions of that probe are checked in the probe itself (`.tmp/353-conventions.log`):
+The conventions of that probe are checked in the probe itself (`.tmp/qc-evidence/issue353-conventions.log`):
 `is_in_image` agrees with an exact coordinate solve on vectors whose answer is known, and
 the block matrix agrees with the direct image of a `K` vector.
 

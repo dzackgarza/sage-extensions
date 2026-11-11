@@ -1,0 +1,45 @@
+[    1.3s] block basis rows 0..3 (U then P): [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0] [2, 2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0] [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    1.3s] plane rows: [[2, 2, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+[    1.3s] 
+[    1.3s] membership test, on vectors whose answer is known by hand:
+[    2.0s]   0: is_in_image=True by solve=True
+[    2.0s]   the first plane vector: is_in_image=True by solve=True
+[    2.0s]   twice the second plane vector: is_in_image=True by solve=True
+[    2.0s]   e_3 (index 3, NOT in the plane): is_in_image=False by solve=False
+[    2.0s]   e_8 (index 8, NOT in the plane): is_in_image=False by solve=False
+[    5.1s] 
+[    5.1s] |unipotent_radical_generators| = 14
+[    5.1s] #0: block matrix agrees on a K vector: False
+[    5.1s]   (g-1)(plane basis 0) = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    5.1s]   (g-1)(plane basis 1) = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    5.2s]   k_4: (g-1)k in P by solve = True | library is_in_image = True | block components outside P = [-64, 0, -78, -64, 3, -14, 0, 0, 0, 0]
+[    5.2s]   k_5: (g-1)k in P by solve = True | library is_in_image = True | block components outside P = [40, 0, 50, 40, -5, 10, 0, 0, 0, 0]
+[    5.2s]   k_6: (g-1)k in P by solve = True | library is_in_image = True | block components outside P = [-4, 0, -4, -4, -2, 0, 0, 0, 0, 0]
+[    5.2s]   k_7: (g-1)k in P by solve = True | library is_in_image = True | block components outside P = [14, 0, 16, 14, 2, 2, 0, 0, 0, 0]
+[    5.2s]   k_8: (g-1)k in P by solve = True | library is_in_image = True | block components outside P = [4, 0, 4, 4, 2, 0, 0, 0, 0, 0]
+[    5.2s] #1: block matrix agrees on a K vector: False
+[    5.2s]   (g-1)(plane basis 0) = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    5.2s]   (g-1)(plane basis 1) = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    5.2s]   k_4: (g-1)k in P by solve = True | library is_in_image = True | block components outside P = [-52, 0, -66, -80, 2, -14, 0, 0, 0, 0]
+[    5.3s]   k_5: (g-1)k in P by solve = True | library is_in_image = True | block components outside P = [32, 0, 42, 52, -4, 10, 0, 0, 0, 0]
+[    5.3s]   k_6: (g-1)k in P by solve = True | library is_in_image = True | block components outside P = [-4, 0, -4, -4, -2, 0, 0, 0, 0, 0]
+[    5.3s]   k_7: (g-1)k in P by solve = True | library is_in_image = True | block components outside P = [12, 0, 14, 16, 2, 2, 0, 0, 0, 0]
+[    5.3s]   k_8: (g-1)k in P by solve = True | library is_in_image = True | block components outside P = [4, 0, 4, 4, 2, 0, 0, 0, 0, 0]
+[    5.3s] #2: block matrix agrees on a K vector: False
+[    5.3s]   (g-1)(plane basis 0) = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    5.3s]   (g-1)(plane basis 1) = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[    5.3s] done
+[peakrss] issue353: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 318 MiB
+[peakrss] low-water MemAvail : 5781 MiB
+[peakrss] peak single VmHWM  : 318 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      307 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.1s procs=  3 rss=   318 MiB hwm=   318 MiB avail=  5805 MiB
+[peakrss]   t=    12.1s procs=  3 rss=   317 MiB hwm=   317 MiB avail=  5781 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   316 MiB hwm=   316 MiB avail=  6099 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   285 MiB hwm=   285 MiB avail=  5930 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   242 MiB hwm=   242 MiB avail=  6060 MiB
+launcher exit: 0

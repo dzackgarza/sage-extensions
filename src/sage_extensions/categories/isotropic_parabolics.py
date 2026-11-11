@@ -1577,7 +1577,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
             Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): `17 = 2 \cdot 8 + 1`,
             against `16` translations and `1` central dimension
-            (`.tmp/353-structure2.log`).
+            (`.tmp/qc-evidence/issue353-structure2.log`).
             """
             return self._unipotent_rank(zero_on_perpendicular=False)
 
@@ -1592,7 +1592,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
             Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): `1`, so `U_I/Z` has rank
             `17 - 1 = 16 = 2 \operatorname{rank}(K)`, the whole of
-            `\operatorname{Hom}(I^\perp/I, I)` (`.tmp/353-structure2.log`).
+            `\operatorname{Hom}(I^\perp/I, I)` (`.tmp/qc-evidence/issue353-structure2.log`).
             """
             return self._unipotent_rank(zero_on_perpendicular=True)
 
@@ -1676,10 +1676,10 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             raises, rather than being silently dropped from the rank.
 
             Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): `(12, 16)` for the
-            fourteen returned unipotent transvections (`.tmp/353-structure2.log`) and
+            fourteen returned unipotent transvections (`.tmp/qc-evidence/issue353-structure2.log`) and
             `(14, 16)` for the twenty-eight generators of
             :meth:`parabolic_stabilizer_generators` that lie in the radical
-            (`.tmp/353-obstruction.log`).  Neither reaches `16`, so neither generates
+            (`.tmp/qc-evidence/issue353-obstruction.log`).  Neither reaches `16`, so neither generates
             the radical, of rank `17` (:meth:`unipotent_radical_rank`).
             """
             from sage.rings.rational_field import QQ as SageQQ
@@ -1752,7 +1752,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             `16`, out of a radical of rank `17`: the fourteen returned transvections
             do **not** generate `U_I`, and neither do the twenty-eight generators of
             the parabolic that lie in it, whose translations have rank `14`
-            (`.tmp/353-structure2.log`, `.tmp/353-obstruction.log`).  What is missing
+            (`.tmp/qc-evidence/issue353-structure2.log`, `.tmp/qc-evidence/issue353-obstruction.log`).  What is missing
             is a family that translates
             in all sixteen directions, or a cited generation statement; Scattone's
             Proposition 3.7.3 is a generation statement for a lattice with two
