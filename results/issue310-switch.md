@@ -110,3 +110,43 @@ measurement or the substitution `x_1 = 1, x_2 = -q(x)/2` over a box in the `E8(-
 which turns the isotropic condition into a solved coordinate and leaves 8 free coordinates.
 Until one of them is measured, the call has no bound it can name, and a bound it cannot name
 is exactly what the refusal must not invent.
+
+## The residue construction: the convention, the derived condition, and the coverage
+
+The person's construction is finite by the residue set: `[v/d]` depends only on `v` mod `dL`,
+so there are at most `|L/dL| = d^rank` residues to treat, and each class of the orbit is the
+class of a residue. On `T_Co`, `d = 2` and `|L/2L| = 2048 = |A_L|`, and the map
+residue → class is a bijection, so every class has exactly one residue.
+
+**The convention this library uses is `q(x) = b(x,x)`, not `b(x,x)/2`.** Measured
+(`.tmp/p310-probe14.log`): `q(e_0) = 2` with `b(e_0,e_0) = 2`; `q(e_1 + e_2) = 4` with
+`b(e_1+e_2, e_1+e_2) = 4`; `q(e_3) = -4` with `b(e_3,e_3) = -4`. A derivation that assumes
+`q = b/2` writes `2ab` where the truth is `4ab` and then rejects its own solutions: the first
+attempts did exactly that and reported 903 "q nonzero" hits with `q = 8` where `0` was
+predicted (`.tmp/p310-probe13.log`).
+
+**The derived condition.** For `L` with a scaled hyperbolic summand `⟨e_1, e_2⟩`,
+`b(e_1,e_2) = h`, orthogonal to a complement `K`, and `v = a e_1 + b e_2 + w`,
+
+    q(v) = 2 h a b + q(w)          (with q = b(x,x); for T_Co's U(2), h = 2, so 4ab + q(w))
+
+so for a residue `(a_0, b_0, w_0)` with `w = w_0` fixed, the equation is linear in `b` and has
+an integral solution exactly when there is a divisor pair `a·b = -q(w_0)/(2h)` with
+`a ≡ a_0 (mod d)` and `b ≡ b_0 (mod d)`; the search over the divisor pairs is finite and
+exact. Both coordinates must stay in their residue classes, which the first attempt dropped.
+
+**The coverage.** With that condition, over all 2048 residues on `T_Co`
+(`.tmp/p310-probe15.log`):
+
+* 408 of the 527 orbit classes get a primitive isotropic lift with `q = 0`, divisor 2 and the
+  residue's class, at 16.9 s for the whole residue set;
+* **119 orbit classes are not reached**.
+
+The 119 are not an artefact of a missing class: every class of `ρ(G)·c` is realized by
+`g·v` for some `g`, so a lift exists. What the residue's own representative misses is the
+freedom `w → w + 2k` inside its residue class: `q(w + 2k) = q(w) + 4 b(w,k) + 4 q(k)`, so
+`q` mod 4 is invariant but the magnitude changes, and with it the divisor structure of
+`q(w)/(2h)` — `q(w_0) = -4` has only odd divisor pairs and so refuses an even `b_0`, while
+`q(w_0 + 2k) = -16` accepts `b = ±2`. That finite variation (`k` over `K/2K`, `2^9` values on
+`T_Co`) is what the construction still needs before the row can return, and it is the step
+to write next; it is not a coordinate box.
