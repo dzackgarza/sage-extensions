@@ -1,0 +1,33 @@
+PARI stack size set to 2147483648 bytes, maximum size set to 8589934592
+genus mass 642332179/18881368343036559360000; seed |Aut| 1941728542064640000
+    NEW class 2: |Aut| 129448569470976000, roots 384, mass 1/121358033879040000 / 642332179/18881368343036559360000 equal False
+    NEW class 3: |Aut| 809053559193600, roots 264, mass 151/121358033879040000 / 642332179/18881368343036559360000 equal False
+    NEW class 4: |Aut| 106542032486400, roots 224, mass 20641/1941728542064640000 / 642332179/18881368343036559360000 equal False
+[   395.5s] 5000 lines, 4998 distinct reduced neighbours, 4 classes, 13 lines/s
+[   782.1s] 10000 lines, 9989 distinct reduced neighbours, 4 classes, 13 lines/s
+[  1136.9s] 15000 lines, 14988 distinct reduced neighbours, 4 classes, 13 lines/s
+[  1519.8s] 20000 lines, 19974 distinct reduced neighbours, 4 classes, 13 lines/s
+[  1915.1s] 25000 lines, 24964 distinct reduced neighbours, 4 classes, 13 lines/s
+[  2360.0s] 30000 lines, 29957 distinct reduced neighbours, 4 classes, 13 lines/s
+    NEW class 5: |Aut| 1371195958099968000, roots 480, mass 5903731/555334363030487040000 / 642332179/18881368343036559360000 equal False
+[  3223.0s] done: 33296 lines, 1 refused, 33250 distinct reduced neighbours, 5 classes, mass 5903731/555334363030487040000 vs 642332179/18881368343036559360000: equal False
+    class |Aut| 1941728542064640000 roots 480
+    class |Aut| 129448569470976000 roots 384
+    class |Aut| 809053559193600 roots 264
+    class |Aut| 106542032486400 roots 224
+    class |Aut| 1371195958099968000 roots 480
+DONE
+[peakrss] issue286: child waited=0 shell_code=0 samples=1612
+[peakrss] peak tree RSS      : 655 MiB
+[peakrss] low-water MemAvail : 4186 MiB
+[peakrss] peak single VmHWM  : 667 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      656 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  2754.7s procs=  3 rss=   655 MiB hwm=   661 MiB avail=  7314 MiB
+[peakrss]   t=  2756.7s procs=  3 rss=   655 MiB hwm=   661 MiB avail=  7878 MiB
+[peakrss]   t=  2758.7s procs=  3 rss=   655 MiB hwm=   661 MiB avail=  7897 MiB
+[peakrss]   t=  2760.7s procs=  3 rss=   655 MiB hwm=   661 MiB avail=  7909 MiB
+[peakrss]   t=  2762.7s procs=  3 rss=   655 MiB hwm=   661 MiB avail=  7898 MiB
+launcher exit: 0

@@ -172,3 +172,40 @@ as a genus with four spinor genera; Sage's symbol yields two generators, so the
 count is 2, and the same `2 == 4` failure reproduces on a `git archive` copy of
 the base commit.  It is untouched by this change because it never reaches
 `_genus_classes`.
+
+## The ninth class: the prime ladder and an exhaustive p = 2 sweep
+
+Two more measurements, both from the repaired accounting (the mass accumulated
+over *all* classes including the seed, which Sage does not do).
+
+`issue317-probe30b.log` — the sampled walk at fifteen primes
+(2, 3, 5, 7, 11 … 47), 1440 lines drawn:
+
+    8 classes, mass 2698873/79333480432926720000, ratio 0.99999937,
+    shortfall 1/46620662575398912000
+    |Aut| / roots: 1941728542064640000/480, 1371195958099968000/480,
+                   106542032486400/224, 809053559193600/264,
+                   3767021862912000/304, 49662885888000/204,
+                   334764638208000/244, 129448569470976000/384
+
+The 384-root class arrives at p = 2, so widening the prime set does help (it took
+the walk from seven to eight).  The 544-root class does not arrive at any of the
+fifteen primes.
+
+`issue317-probe31b.log` — an exhaustive sweep of the seed's 2-divisible lines
+instead of a sample (`find_primitive_p_divisible_vector__next(2, …)`, every
+reduced neighbour cached so each distinct one is tested once), 33296 of the
+131071 lines of `N/2N` in 3223 s at 13 lines/s:
+
+    5 classes, mass 5903731/555334363030487040000, ratio 0.917
+    shortfall includes 1/46620662575398912000
+
+so p = 2 from the seed's class does not produce it either, and at 13 lines/s the
+whole 131071-line sweep is 2.8 h.
+
+What is left is a *complete* class-valued neighbour set at an odd prime: at p = 3
+that is the 6.4e7 isotropic lines of `N/3N`, which is `orbits_lines_mod_p` — the
+computation that needs `automorphism_group()` and does not return at rank 17.
+Sampling cannot substitute for it: fifteen primes and 1440 sampled lines, or
+33296 exhaustively enumerated lines at p = 2, reach eight classes and not the
+ninth, whose mass is exactly 1/|Aut(D_17(-1))| of the genus.

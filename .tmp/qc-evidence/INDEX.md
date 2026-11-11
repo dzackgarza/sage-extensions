@@ -316,3 +316,10 @@ Re-run on the rebased tree (main at `d35c72c`): `issue317-rebased2.log`,
 `test_genus_of_the_scattone_summands.sage` plus `test_genus.sage` — 13 passed,
 1 failed in 30.92 s, and the failure is the pre-existing
 `spinor_genus_count() == 2` on `diag(1,20,400)`.
+
+Third batch on issue 317 (the k = 2 prime ladder and an exhaustive p = 2 sweep):
+`issue317-probe30.log` — the mass-accounted walk at fifteen primes (2 … 47),
+1440 lines, **8 of 9 classes**, mass ratio 0.99999937;
+`issue317-probe31.log` — exhaustive enumeration of the seed's 2-divisible lines
+(33296 of 131071 in 3223 s at 13 lines/s), **5 classes**, no 544-root class.
+Neither reaches `D_17(-1)`.
