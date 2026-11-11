@@ -19,6 +19,7 @@
     "lattice",
     "parent_group"
    ],
+   "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
    "lattice": "integral.polarization_counts.{degree}.{#h,#Γ̄_h,reference.citation}",
    "plane_orbits": "integral.primitive_orbits.{group}.planes,reference.citation"
   }
@@ -1241,6 +1242,24 @@
    "path": "arithmetic-groups/gamma-h-9.md",
    "plane_orbits": 34,
    "tag": "gamma-h-9"
+  }
+ },
+ "discriminant_forms": {
+  "6JRR": {
+   "certification": "0be391409303d25f25d126795ee881040661b4883ad7473272b34b60b8c414da",
+   "determinant": -2048,
+   "isotropic_classes": 528,
+   "isotropic_orbits": 2,
+   "latex": "T_{\\mathrm{Co}}",
+   "name": "T_Co",
+   "orthogonal_group_order": 46998591897600,
+   "path": "lattices/6JRR.md",
+   "rank": 11,
+   "signature": [
+    2,
+    9
+   ],
+   "tag": "6JRR"
   }
  },
  "plane_orbits": {

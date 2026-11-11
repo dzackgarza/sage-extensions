@@ -34,6 +34,9 @@ ARITHMETIC_GROUP_PATH = "arithmetic-groups/{slug}.md"
 SCATTONE_TAGS = ("6JRX", "6JRY")
 LATTICE_PATH = "lattices/{tag}.md"
 
+# The Coble lattice card, whose discriminant-form rows #323 reads.
+DISCRIMINANT_FORM_TAGS = ("6JRR",)
+
 
 def fetch(ref: str, path: str) -> str:
     return subprocess.run(
@@ -120,6 +123,33 @@ def plane_orbits(ref: str, tag: str) -> dict:
     }
 
 
+def discriminant_form(ref: str, tag: str) -> dict:
+    """The discriminant-form rows of one lattice card.
+
+    ``orthogonal_group_order`` is the order of `O(A_L, q_L)` on the
+    discriminant form of the card's Gram tensor, ``isotropic_classes`` the
+    number of classes on which `q_L` vanishes, and ``isotropic_orbits`` the
+    number of `O(A_L, q_L)`-orbits among them.  The card certifies the block,
+    so the digest keeps the certificate with the numbers it stamps.
+    """
+    path = LATTICE_PATH.format(tag=tag)
+    card = front_matter(fetch(ref, path), path)
+    rows = card["integral"]["discriminant_form"]
+    return {
+        "tag": card["tag"],
+        "path": path,
+        "name": card["name"],
+        "latex": card["latex"],
+        "rank": card["rank"],
+        "signature": card.get("signature"),
+        "determinant": card.get("determinant"),
+        "certification": card["certifications"]["integral.discriminant_form"],
+        "orthogonal_group_order": rows["orthogonal_group_order"],
+        "isotropic_classes": rows["isotropic_classes"],
+        "isotropic_orbits": rows["isotropic_orbits"],
+    }
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ref", required=True, help="full lattice-database commit SHA")
@@ -155,17 +185,20 @@ def main(argv: list[str]) -> int:
                 ],
                 "lattice": "integral.polarization_counts.{degree}.{#h,#Γ̄_h,reference.citation}",
                 "plane_orbits": "integral.primitive_orbits.{group}.planes,reference.citation",
+                "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
             },
             "generated_by": "tests/cards/refresh_lattice_database_enriques.py",
         },
         "arithmetic_groups": groups,
         "polarization_counts": lattice_table4(ref, "0128"),
         "plane_orbits": {tag: plane_orbits(ref, tag) for tag in SCATTONE_TAGS},
+        "discriminant_forms": {tag: discriminant_form(ref, tag) for tag in DISCRIMINANT_FORM_TAGS},
     }
     DIGEST.write_text(json.dumps(digest, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
     print(
         f"wrote {DIGEST} at database ref {ref}: {len(groups)} group cards, "
-        f"{len(digest['polarization_counts']['rows'])} polarization-count degrees"
+        f"{len(digest['polarization_counts']['rows'])} polarization-count degrees, "
+        f"{len(digest['discriminant_forms'])} discriminant forms"
     )
     return 0
 
