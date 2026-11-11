@@ -1,0 +1,19 @@
+..                                                                       [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_scattone_plane_orbits.sage::test_6jrx_has_the_cards_plane_orbits_under_o: 875.44 s > 20 s
+tests/lattices/test_scattone_plane_orbits.sage::test_6jry_has_the_cards_plane_orbits_under_o: 421.02 s > 20 s
+2 passed, 3 deselected in 1298.46s (0:21:38)
+[peakrss] issue335pytest: child waited=0 shell_code=0 samples=654
+[peakrss] peak tree RSS      : 881 MiB
+[peakrss] low-water MemAvail : 998 MiB
+[peakrss] peak single VmHWM  : 887 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      876 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  1312.1s procs=  3 rss=   881 MiB hwm=   887 MiB avail= 10411 MiB
+[peakrss]   t=  1282.1s procs=  3 rss=   878 MiB hwm=   885 MiB avail= 10426 MiB
+[peakrss]   t=  1294.1s procs=  3 rss=   876 MiB hwm=   885 MiB avail= 10421 MiB
+[peakrss]   t=  1296.1s procs=  3 rss=   876 MiB hwm=   885 MiB avail= 10421 MiB
+[peakrss]   t=  1298.1s procs=  3 rss=   876 MiB hwm=   885 MiB avail= 10422 MiB
+launcher exit: 0

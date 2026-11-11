@@ -1717,11 +1717,19 @@ def _unimodular_complement_frame(rank, blocks):
     assert weight_basis * block == matrix(SageZZ, width, width, lambda i, j: 1 if i == j else 0), (
         f"the weight basis -C^-1 of {model} does not invert the block's Cartan matrix"
     )
-    return gram, model_rank, tuple(walls), weight_basis, tuple(highest_root)
+    return model, gram, model_rank, tuple(walls), weight_basis, tuple(highest_root)
 
 
-def _genus_classes_through_the_chamber(gram):
-    r"""Private computation of a definite genus by the unimodular complement, or ``None``.
+def _chamber_genus_records(gram):
+    r"""The chamber enumeration's per-class records, with the model and the vectors, or ``None``.
+
+    Each record is one class of the genus of ``gram``, exhibited by a chamber
+    vector: the ``(vector, root count, PARI init, automorphism order, complement
+    Gram)`` of one member, the vector an integer coordinate list in the module
+    generators of the returned ``model``.  The model is ``II_{1,n}`` built from
+    the named blocks ``U + E8(-1)^2``, so a caller that owns a lattice
+    isometric to it maps a record's vector into its own frame through one
+    isometry, the library's own ``Isom(...).an_element()``.
 
     For a definite lattice ``N`` of rank ``n = 1 mod 8`` whose discriminant group
     is cyclic of order ``d = |det N|``, gluing ``N`` with ``<d>`` along the
@@ -1842,7 +1850,9 @@ def _genus_classes_through_the_chamber(gram):
     # caller's seed-and-walk machinery, which reports the split.
     if _spinor_generating_primes(genus, proper=False):
         return None
-    lattice_gram, model_rank, walls, weight_basis, highest_root = _unimodular_complement_frame(rank, blocks)
+    model, lattice_gram, model_rank, walls, weight_basis, highest_root = (
+        _unimodular_complement_frame(rank, blocks)
+    )
     width = (model_rank - 2) // blocks
 
     def pairing(left, right):
@@ -1913,13 +1923,13 @@ def _genus_classes_through_the_chamber(gram):
                         # it does not separate.
                         roots = len(candidate.short_vector_list_up_to_length(2)[1])
                         if any(
-                            record[0] == roots and record[1].qfisom(candidate.__pari__())
+                            record[1] == roots and record[2].qfisom(candidate.__pari__())
                             for record in classes
                         ):
                             continue
                         order_of_group = candidate.number_of_automorphisms()
                         classes.append(
-                            (roots, candidate.__pari__().qfisominit(), order_of_group, hessian.change_ring(SageZZ))
+                            (vector, roots, candidate.__pari__().qfisominit(), order_of_group, hessian.change_ring(SageZZ))
                         )
                         classes_mass += SageQQ.one() / order_of_group
                         assert classes_mass <= total, (
@@ -1927,8 +1937,27 @@ def _genus_classes_through_the_chamber(gram):
                             f"genus mass {total}, so two of them are isometric"
                         )
                         if classes_mass == total:
-                            return (tuple(found for _roots, _init, _order, found in classes),)
+                            return model, tuple(classes)
         height += 2
+
+
+def _genus_classes_through_the_chamber(gram):
+    r"""Private computation of a definite genus by the unimodular complement, or ``None``.
+
+    The Gram matrices of one lattice from each isometry class of the genus of
+    the definite ``gram``, when Nikulin's complement correspondence serves it,
+    through the chamber of ``II_{1,17}``: the classes are the ``v^perp`` of the
+    primitive vectors ``v`` of square ``|det gram|`` read from the fundamental
+    chamber, and the class masses close on the Siegel mass, asserted.  The
+    chamber vectors that exhibited the classes, and the model they are
+    coordinates in, are :func:`_chamber_genus_records`; the Gram matrices here
+    are that enumeration's complement records, read without the vectors.
+    """
+    records = _chamber_genus_records(gram)
+    if records is None:
+        return None
+    _model, classes = records
+    return (tuple(found for _vector, _roots, _init, _order, found in classes),)
 
 
 def _local_density(form, prime, value):

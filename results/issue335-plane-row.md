@@ -1,9 +1,9 @@
 # The Scattone plane rows of `6JRX` and `6JRY` (#335, stage 1 of #317)
 
-`isotropic_orbit_representatives(2)` on Scattone's degree-4 lattice must return the `O`
+`isotropic_orbit_representatives(2)` on Scattone's degree-4 lattice returns the `O`
 row of card `6JRY` (nine primitive isotropic plane orbits) and on the degree-2 lattice
-the `O` row of `6JRX` (four). This note records what the cards say, what the call does on
-this tree, the nine classes the row is made of, and why the count cannot be returned yet.
+the `O` row of `6JRX` (four). This note records what the cards say, the route the call
+now takes, the nine classes the row is made of, and the runs.
 
 ## 1. What the cards say, and which group each row counts
 
@@ -38,49 +38,59 @@ The plane rows, with the citation as the cards give it:
   count and carries no plane row; the digest keeps only rows with a `planes` key.
 
 The two numbers the acceptance compares against are therefore the cards' `O` rows, and
-`tests/lattices/test_scattone_plane_orbits.sage` now reads them by tag through
-`card_plane_orbit_row("6JRY", "O")` and `card_plane_orbit_row("6JRX", "O")` instead of
-restating `4` and `9` in the test.
+`tests/lattices/test_scattone_plane_orbits.sage` reads them by tag through
+`card_plane_orbit_row("6JRY", "O")` and `card_plane_orbit_row("6JRX", "O")`.
 
-## 2. What the call does on this tree
+## 2. The candidate route the call now takes
 
-Base: `7519715` (`main`), pinned port `991b88b0`, adopted runtime, `peakrss`
-`PEAKRSS_LIMIT_MIB=6144`. The logs are `.tmp/qc-evidence/issue335-probe*.log`, and the
-probes that produced them are `.scratch/issue335_probe*.py`.
+The rank-2 branch reads the planes from the lines, exactly as Scattone 5.4.7 does: it
+classifies the `O(L)`-orbits of primitive isotropic lines (one class on both lattices,
+the port's marking classes), and then, per line, reads the planes through it. The
+certified split of `_hyperbolic_completion` — `L = ⟨v, f⟩ ⊕ M` at index one — makes the
+plane classes through `v` the `O(K_v)`-orbits of primitive isotropic lines of the
+reduction `K_v`, and that is where the old route lost the row: its candidates were the
+port's `isotropic_vector_classes(K_v)`, the Lorentzian perfect-cell traversal of the
+rank-19 Witt-index-one reduction, which passes the 6144 MiB tree guard at 84 s without
+returning.
 
-The rank-2 branch of `_isotropic_orbit_representatives` (`categories/isotropic_orbits.py`)
-reads the planes from the lines of `K_v = v^⊥/Zv` over the line classes, exactly as
-Scattone 5.4.7 does. On `Λ₄` (`issue335-probe2.log`, `.scratch/issue335_probe2.py`):
+The candidates now come from the library's own chamber classification
+`_chamber_genus_records` (`categories/lattices.py`), the walk #334 introduced for the
+definite genus and closed with the Siegel mass. When the certified split's complement
+`M` splits off one of `L`'s own generators as a summand `⟨g⟩` of square `−|det M|` at
+index one — so `M = ⟨g⟩ ⊕ T` with `T = ⟨v, f, g⟩^⊥` even unimodular of signature
+`(1, 17)`, hence `II_{1,17}` — the walk is run on the definite summand
+`E8(−1)² ⊕ ⟨−|det M|⟩`, and each of its records supplies one candidate:
 
-```
-[     0.2s] L: rank 21 det -4 signature (2, 19)
-[    23.1s] 1 O(L)-orbits of primitive isotropic lines
-[    23.9s]   line 0: split certified; v = [1, 0, ..., 0] plane basis -1
-[peakrss] STOPPED_AT_MEMORY_LIMIT: tree RSS 6156 MiB exceeded 6144 MiB
-[peakrss] issue335: child waited=143 shell_code=143 samples=43
-```
+    E_u = ⟨v, φ(u) + g⟩,   φ : model → T the isometry the library's Isom constructs.
 
-The next step is `_planes_through_line`'s `INDUCTION.isotropic_vector_classes(K_v)` on the
-rank-19 reduction `⟨−4⟩ ⊕ U ⊕ E8(−1)²`, signature (1, 18), the port's Lorentzian
-perfect-cell route. It passes the 6144 MiB tree guard after 84 s. The same reduction in
-the **card's own basis** (`.scratch/issue335_probe3.log`) costs 125.8 s for the line class
-alone and the library's own classification of its isotropic vectors did not return in
-fifteen minutes and was stopped; the port's perfect-cell route on the `k = 1` reduction
-did not return in 2400 s at 1086 MiB in the earlier record (`results/issue286-batch.md`,
-`TRAPS.md`).
+The vector is isotropic — `q(φ(u)) = |det M| = −q(g)` with `φ(u) ∈ T` orthogonal to
+`g` — and its quotient is the record's own class: writing `x = a v + b f + t + μ g`
+(`t ∈ T`), the conditions `b(x, v) = 0` and `b(x, φ(u) + g) = 0` force `b = 0` and
+`t = μ φ(u) + s` with `s ∈ φ(u)^⊥` (the functional `b(−, φ(u))` is surjective with that
+kernel because `φ(u)` is primitive in the unimodular `T`), so
 
-**So the call does not return eight on this host; it does not return.** The `8` in #335
-cannot be reproduced with the pinned port and the standing memory guard, and no list of
-eight planes can be printed from it here. What can be produced is the class set itself,
-by a route that does not go through the port.
+    E_u^⊥ = ⟨v⟩ ⊕ ⟨φ(u) + g⟩ ⊕ φ(u)^⊥,   E_u^⊥/E_u ≅ φ(u)^⊥ ≅ u^⊥,
+
+the record's complement. By Scattone 5.4.7 with 5.4.8(2) the candidates are therefore
+one per plane class, and the walk's mass certificate — the class masses close on the
+Siegel mass of the genus — is the completeness certificate of the plane family. No
+coordinate box and no norm floor enters: the walk's bound is the one #334 proved from
+the three hyperbolic walls, and the class the bounded sweeps of §4 could never reach
+(544 roots, `|Aut| = 46620662575398912000`) is the ninth chamber vector of the
+`k = 2` walk.
+
+The identification is unchanged: the caller still collapses the candidates through
+`_isotropic_equivalence_witness`, the exact plane equivalence, and §5's measurements of
+that decision stand. A lattice whose complement exhibits no such `g` — or whose summand
+the chamber walk does not serve — keeps the port's classification, which never returns
+a partial family.
 
 ## 3. The nine classes of the row
 
 `6JRY`'s `O` row is the class set of the genus of `N = ⟨−4⟩ ⊕ E8(−1)²` (rank 17, det 4,
-negative definite), by Scattone 5.4.7 + 5.4.8(2). #334's probe (`issue317-probe37.log`)
-closes that genus with the mass formula, so the following nine classes are complete and
-not a truncation: the sum of `1/|Aut|` equals the mass
-`642332179/18881368343036559360000` exactly.
+negative definite), by Scattone 5.4.7 + 5.4.8(2). The chamber walk closes that genus
+with the mass formula, so the following nine classes are complete and not a truncation:
+the sum of `1/|Aut|` equals the mass `642332179/18881368343036559360000` exactly.
 
 | # | roots of `E^⊥/E` | `|Aut(E^⊥/E)|` |
 |---|---|---|
@@ -99,88 +109,73 @@ the same row is the four classes of `⟨−2⟩ ⊕ E8(−1)²`: `(482, 13711959
 `(306, 12804747411456000)`, `(306, 5393690394624000)`, `(482, 1941728542064640000)`,
 mass `2499347/9440684171518279680000` exact.
 
-## 4. The planes themselves, and the one class a bounded search does not exhibit
+## 4. The bounded sweeps this route replaces
 
-`.scratch/issue335_probe4.py` and `.scratch/issue335_probe7.py` build the planes without
-the port. By the certified split, every plane class is `⟨e₁, w⟩` with `w ∈ K_v` isotropic
-and `w = c e₃ + d e₄ + n`, `n ∈ N`, `q(n) = −2cd`, so `E^⊥/E` is computed exactly by
-integer linear algebra. Two candidates are the same class when their `LLL`-reduced Gram
-matrices are equal — an equal Gram **is** an isometry, so that dedupe can never merge two
-classes (`issue335-probe4.log`, `issue335-probe7.log`).
-
-With `|c|, |d| ≤ 3`, `|z| ≤ 2` and both `E8` blocks dominant with norm ≥ −24 the
-enumeration exhibits five of the nine classes and no others:
-
-```
-  class roots 204 |Aut| 49662885888000        from w = [0, 0, -3, -3, -5, -10, -15, -12, -9, -6, -3, -8, -4, -8, -12, -10, -8, -6, -3, -6, -1]
-  class roots 224 |Aut| 106542032486400       from w = [0, 0, -3, -3, -4, -7, -10, -8, -6, -4, -2, -5, -6, -11, -16, -13, -10, -7, -4, -8, -1]
-  class roots 264 |Aut| 809053559193600      from w = [0, 0, -3, -3, -4, -8, -12, -10, -8, -6, -4, -6, -4, -8, -12, -10, -8, -6, -3, -6, -1]
-  class roots 384 |Aut| 129448569470976000   from w = [0, 0, -3, -3, 0, 0, 0, 0, 0, 0, 0, 0, -7, -14, -20, -16, -12, -8, -4, -10, -1]
-  class roots 480 |Aut| 1941728542064640000  from w = [0, 0, -3, -3, 0, 0, 0, 0, 0, 0, 0, 0, -2, -4, -6, -5, -4, -3, -2, -3, -2]
-k = 2: mass 657131/21359013962711040000 vs 642332179/18881368343036559360000: SHORT
-```
-
-The shortfall is exactly the sum of the four shares the enumeration does not reach,
-
-    642332179/18881368343036559360000 − 657131/21359013962711040000
-      = 6067/1864826503015956480
-      = 1/46620662575398912000 + 1/1371195958099968000 + 1/3767021862912000 + 1/334764638208000,
-
-so the five planes are of the five classes named and the four classes 1, 2, 3 and 4 of §3
-— roots 544, 480 with `|Aut|` 1371195958099968000, 304 and 244 — have no plane in the box.
-Widening the box to `|c|, |d| ≤ 10` with norm ≥ −40, which is the bound #317's shipped
-chamber route uses, exhibits the classes of roots 244 and 304 as well
-(`issue335-probe7.log`: `roots 244 rep 1` at 111.0 s, `roots 304 rep 1` at 115.0 s), and
-in the 1525 candidates it examines through `c = −6` it exhibits nothing of roots 544, and
-the run was then stopped by its own 3000 s inner cap (`launcher exit: 124`, peak tree RSS
-1307 MiB). So the class no enumeration here reaches is the one whose `E^⊥/E` has 544
-roots, `|Aut| = 46620662575398912000`, the first row of §3; a bounded sweep that reaches it
-costs more than the guard allows, which is the same statement as §6 in cost form.
+Two probes of the previous turn enumerated the planes by hand, over a coordinate box
+in `(c, d, z)` and a norm floor in the `E8` blocks. With `|c|, |d| ≤ 3`, `|z| ≤ 2` and
+norm `≥ −24` the enumeration exhibits five of the nine classes
+(`.tmp/qc-evidence/issue335-probe4.log`); widened to `|c|, |d| ≤ 10` and norm `≥ −40` it
+exhibits the classes of roots 244 and 304 as well and nothing of roots 544 before its
+own cap stops it (`issue335-probe7.log`: 1525 candidates examined through `c = −6`,
+`launcher exit: 124`, peak tree RSS 1307 MiB). Those truncations are what the chamber
+route replaces: its bound is proved from the chamber's own walls (#334), and the height
+walk ends at the Siegel mass, so no class is left behind and none is truncated.
+`.scratch/issue335_probe9.py` checked the correspondence before it was wired in: for
+every chamber vector `u` of both walks, the plane `⟨e₁, u + g⟩` has `E^⊥/E` of exactly
+the record's `(roots, |Aut|)` — nine of nine at `k = 2`, four of four at `k = 1`, mass
+exact, peak tree RSS 631 MiB (`issue335-probe9.log`).
 
 ## 5. The equivalence is not the defect
 
 `.scratch/issue335_probe8.py` (`issue335-probe8.log`) takes five of those planes, whose
 `E^⊥/E` classes are pairwise distinct (`|Aut|` 49662885888000, 106542032486400,
 809053559193600, 129448569470976000, 1941728542064640000), and asks the call's own
-identification `_isotropic_equivalence_witness` for each of the ten pairs:
+identification `_isotropic_equivalence_witness` for each of the ten pairs: all ten
+distinct, each pair 0.4–50 s. The call does not merge two classes; the loss, when there
+was one, was in the classification that supplies the candidates, and that
+classification is the chamber walk's now.
 
-```
-  roots 204 vs 224: distinct in 50.0s
-  roots 204 vs 264: distinct in 31.4s
-  roots 204 vs 384: distinct in 30.1s
-  roots 204 vs 480: distinct in 30.1s
-  roots 224 vs 264: distinct in 1.7s
-  ... all ten distinct
-```
+## 6. The runs
 
-So the call does not merge two classes; the exact plane equivalence answers correctly and
-each pair costs 0.4–50 s. The loss, when there is one, is in the classification that
-supplies the candidates.
+Every run below is one process in the adopted runtime (`~/sage-image/run.sh` with the
+worktree at `.scratch/wt335` as the provider, the port bound at `/work` with its `src`
+ahead, `peakrss` `PEAKRSS_LIMIT_MIB=6144`, `PYTHONPATH` set inside the inner shell).
+The tree is the commit this turn pushes.
 
-## 6. What a repair needs
+- **The correspondence, checked before it was wired in.** `.scratch/issue335_probe9.py`
+  runs #334's walk by hand on both summands and asks, for every chamber vector `u`,
+  whether the plane `⟨e₁, u + g⟩` has `E^⊥/E` of the record's own `(roots, |Aut|)`:
+  nine of nine at `k = 2` — the ninth is the 544-root class the bounded sweeps never
+  reached — and four of four at `k = 1`, mass exact in both, peak tree RSS 631 MiB
+  (`.tmp/qc-evidence/issue335-probe9.log`).
+- **The public call on both lattices.** `.scratch/issue335_probe10.py` calls
+  `isotropic_orbit_representatives(2)` on the two card lattices and asserts every
+  returned plane primitive of rank two and totally isotropic: `6JRX` four planes in
+  946.1 s, `6JRY` nine planes in 1334.5 s, both equal to the cards' `O` rows read by
+  tag, peak tree RSS 806 MiB (`.tmp/qc-evidence/issue335-probe10.log`,
+  `issue335-probe10b.log`).
+- **The genus regression.** `tests/lattices/test_genus_of_the_scattone_summands.sage`
+  with the test lint: `8 passed in 542.44 s` (`.tmp/qc-evidence/issue335-genus-test.log`)
+  — the walk refactor that exposes the chamber vectors leaves #334's module green.
+- **The plane rows.** `tests/lattices/test_scattone_plane_orbits.sage` with the test
+  lint, selected `-k 'orbits_under_o and not plus'`: `2 passed, 3 deselected in
+  1298.46 s (0:21:38)`, peak tree RSS 881 MiB — both `O`-row tests green
+  (`.tmp/qc-evidence/issue335-plane-o-test.log`).
+- **The `O+` stop.** The full module in one process is killed by the standing
+  6144 MiB tree guard during the `O+` tests: peak tree RSS 6179 MiB at 3253 s
+  (`.tmp/qc-evidence/issue335-plane-test.log`). The `O+` route's own cost, measured
+  alone on the degree-2 lattice (`.scratch/issue335_probe11.py`), is 5099 MiB at
+  3600 s without completing — the subgroup machinery
+  (`_subgroup_isotropic_orbit_representative`: per-plane stabilizer generators and
+  splitting isometries) is the consumer, not the candidate route, which the `O`-row
+  runs above carry at 881 MiB. Repairing that cost is #317's, not this stage's.
 
-The candidates come from one place: `INDUCTION.isotropic_vector_classes(K_v)` — the
-`O(K_v)`-orbits of the primitive isotropic vectors of a rank-19 lattice of Witt index one.
-The reduction's own split is certified (`det L = det⟨v,f⟩·det⟨v,f⟩^⊥`, `−1` against
-`−2k`), which is what makes the image of `Stab_{O(L)}(v)` all of `O(K_v)`, so that
-classification, and only it, decides the plane count.
-
-Neither in-tree route to it returns here: the port's Lorentzian perfect-cell traversal
-passes the memory guard at 84 s on `k = 2` and did not return in 2400 s on `k = 1`, and
-the library's own marking-class classification of the same rank-19 lattice did not return
-in fifteen minutes. A hand-rolled enumeration is what §4 runs, and it terminates on a
-coordinate bound and a norm floor — precisely the truncations #334 must replace with a
-proved bound, after which the same enumeration closes the mass and the call may return the
-row. Until then a plane call that returned a number would be returning either a bounded
-search's partial family or a count from a classifier that does not finish.
 
 ## 7. What this tree now does
 
-`tests/lattices/test_scattone_plane_orbits.sage` reads both cards' `O` and `O+` rows by tag
-and asserts the public calls against them; it is red for `6JRY` and for `6JRX` because the
-call does not return the row. The `O+` rows are split out of the same call —
-`_subgroup_isotropic_orbit_representatives` starts from
-`orthogonal_group.isotropic_orbit_representatives(rank)` — so they are blocked by the same
-classifier. `python -m pytest tests/lattices/test_scattone_plane_orbits.sage
--k test_the_card_inputs -p sage_extensions.testing.test_lint` collects five tests, runs the
-invariant-only one (1 passed, 4 deselected) and the test lint reports no findings.
+`tests/lattices/test_scattone_plane_orbits.sage` reads both cards' `O` and `O+` rows by
+tag and asserts the public calls against them; every returned plane is asserted
+primitive of rank two and totally isotropic through the lattice's own pairing. The
+`O+` rows go through `_subgroup_isotropic_orbit_representatives`, which starts from the
+ambient `orthogonal_group.isotropic_orbit_representatives(rank)`, so the same candidate
+route carries them.

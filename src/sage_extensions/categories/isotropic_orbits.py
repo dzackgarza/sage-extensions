@@ -1182,7 +1182,7 @@ def _isotropic_object_from_marked(marked, *, flag):
 
 
 def _hyperbolic_completion(lattice, line):
-    r"""Return ``(v, <v, f>)`` when ``v`` splits off a hyperbolic plane at index one.
+    r"""Return ``(v, f, <v, f>)`` when ``v`` splits off a hyperbolic plane at index one.
 
     ``v`` is the selected generator of the isotropic line ``line`` and ``f`` is an
     isotropic vector of ``lattice`` with ``b(v, f) != 0`` for which
@@ -1216,11 +1216,117 @@ def _hyperbolic_completion(lattice, line):
         span = lattice.subobject_on((v, candidate))
         if lattice.determinant() != span.determinant() * span.inclusion().orthogonal_complement().determinant():
             continue
-        return v, span
+        return v, candidate, span
     return None
 
 
-def _planes_through_line(orthogonal_group, line):
+def _chamber_planes_through_line(lattice, line, completion):
+    r"""The planes through ``line`` from the chamber classification of the definite genus, or ``None``.
+
+    The split ``L = <v, f> + M`` certified by ``completion`` (with
+    ``M = <v, f>^\perp``, the reduction ``K_v`` up to the isometry of
+    :func:`_hyperbolic_completion`) leaves the plane classes through ``v`` the
+    ``O(K_v)``-orbits of primitive isotropic lines of ``K_v``.  When ``M`` in
+    turn splits off one of the chosen generators of ``L`` as a summand
+    ``<g>`` of square ``-|det M|`` at index one, so that ``M = <g> + T`` with
+    ``T = <v, f, g>^\perp`` even unimodular of signature ``(1, 17)``, those
+    orbits are supplied by the library's own chamber classification
+    ``_chamber_genus_records`` of the genus of the definite summand
+    ``E8(-1)^2 + <-|det M|>``: no coordinate box and no norm floor, and the
+    completeness certificate is the Siegel mass, asserted inside that walk.
+    ``None`` when no such ``g`` is exhibited, or the genus walk does not serve
+    the summand, and the caller keeps the port's classification.
+
+    **The candidate and its quotient.**  For a record of that enumeration with
+    chamber vector ``u`` -- a primitive vector of the model of square
+    ``|det M|``, whose complement ``u^\perp`` is the record's class -- the
+    candidate is the plane
+
+        ``E_u = <v, phi(u) + g>``,
+
+    ``phi : model -> T`` the isometry the library's own ``Isom`` decision
+    constructs (both endpoints are ``II_{1,17}``).  It is a primitive isotropic
+    plane: ``q(phi(u) + g) = q(u) + q(g) = |det M| - |det M| = 0`` with
+    ``phi(u)`` in ``T`` orthogonal to ``g``, and ``b(v, phi(u) + g) = 0``
+    because ``T`` and ``g`` lie in ``M``.  Its quotient is the record's
+    complement: every ``x`` of ``L`` is ``x = a v + b f + t + mu g`` uniquely
+    (``t`` in ``T``), and
+
+    - ``b(x, v) = b``, so ``x`` in ``E_u^\perp`` forces ``b = 0``;
+    - ``b(x, phi(u) + g) = b(t, phi(u)) + mu q(g) = b(t, phi(u)) - |det M| mu``,
+      and since ``phi(u)`` is primitive in the unimodular ``T``, the functional
+      ``b(-, phi(u))`` is surjective with kernel ``phi(u)^\perp`` and every
+      solution is ``t = mu phi(u) + s`` with ``s`` in ``phi(u)^\perp``.
+
+    So ``E_u^\perp = <v> + <phi(u) + g> + phi(u)^\perp`` is an orthogonal direct
+    sum -- ``q(phi(u) + g) = 0`` and both other generators pair to zero against
+    it -- and therefore
+
+        ``E_u^\perp / E_u  =  phi(u)^\perp  ~=  u^\perp``,
+
+    the record's class.  By Scattone, *On the compactification of moduli spaces
+    for algebraic K3 surfaces*, Mem. AMS 374 (1987), Proposition 5.4.7 with
+    Corollary 5.4.8(2), p. 78, ``E -> E^\perp/E`` is a bijection from the
+    ``O(L)``-orbits of primitive isotropic planes onto the classes of the genus
+    of ``<-2k> + E8(-1)^2``, so the candidates are one per plane class, and the
+    walk's mass certificate is the completeness certificate of the plane family.
+    """
+    from sage_extensions.categories.lattices import (
+        Lattices,
+        _chamber_genus_records,
+    )
+    from sage_extensions.categories.rings.ring_foundation import _owned_integers
+    from sage_extensions.tensors.tensor import _engine_component_matrix
+
+    ring = lattice.base_ring()
+    zero = ring.zero()
+    if completion is None:
+        return None
+    v, f, span = completion
+    complement_determinant = int(lattice.determinant()) // int(span.determinant())
+    target_norm = abs(complement_determinant)
+    for label in lattice.module_generating_set():
+        candidate = lattice.module_generator(label)
+        if candidate.q() != ring(-target_norm) or lattice.b(v, candidate) != zero or lattice.b(f, candidate) != zero:
+            continue
+        frame = lattice.subobject_on((v, f, candidate))
+        perpendicular = frame.inclusion().orthogonal_complement()
+        if lattice.determinant() != frame.determinant() * perpendicular.determinant():
+            continue
+        signature = perpendicular.signature_pair()
+        if tuple(map(int, (signature.first(), signature.second()))) != (1, 17):
+            continue
+        g = candidate
+        break
+    else:
+        return None
+    integers = _owned_integers()
+    summand = (
+        Lattices(integers)("E8") + Lattices(integers)("E8") + Lattices(integers)([[-target_norm]])
+    )
+    seed_gram = _engine_component_matrix(summand.gram_tensor()).change_ring(SageZZ)
+    records = _chamber_genus_records(seed_gram)
+    if records is None:
+        return None
+    model, classes = records
+    inclusion = perpendicular.inclusion()
+    transport = model.Isom(perpendicular).an_element()
+    labels = tuple(model.module_generating_set())
+    planes = []
+    for vector, _roots, _init, _order, _gram in classes:
+        element = model.linear_combination(
+            {labels[position]: value for position, value in enumerate(vector) if value}
+        )
+        w = inclusion(transport(element)) + g
+        assert w.q() == zero and lattice.b(v, w) == zero, (
+            f"the chamber vector {vector} gave the vector {w} of square {w.q()} and pairing "
+            f"{lattice.b(v, w)} against the line, not an isotropic vector of the line's complement"
+        )
+        planes.append(lattice.primitive_isotropic_subobject(v, w))
+    return tuple(planes)
+
+
+def _planes_through_line(orthogonal_group, line, completion=None):
     r"""One primitive isotropic plane per ``Stab_{O(L)}(v)``-orbit through ``line``.
 
     Scattone, *On the compactification of moduli spaces for algebraic K3
@@ -1232,14 +1338,23 @@ def _planes_through_line(orthogonal_group, line):
     reduction lifts them into ``v^\perp <= L``, so each returned plane is
     ``<v, lift>`` in the lattice itself.
 
-    ``isotropic_vector_classes(K_v)`` is the port's classification of the
-    primitive isotropic vectors of ``K_v`` modulo ``O(K_v)``, which is the class
-    set wanted here exactly when :func:`_hyperbolic_completion` has certified the
-    split; the caller checks that first.
+    Two candidate routes supply those lines.  The library's own is
+    :func:`_chamber_planes_through_line`: when the certified split's complement
+    splits off a generator of square ``-|det K_v|`` next to a copy of
+    ``II_{1,17}``, the candidates are read from the chamber classification of
+    the genus of the definite summand, whose mass certificate is the
+    completeness certificate.  Otherwise ``isotropic_vector_classes(K_v)`` is
+    the port's classification of the primitive isotropic vectors of ``K_v``
+    modulo ``O(K_v)``, which is the class set wanted here exactly when
+    :func:`_hyperbolic_completion` has certified the split; the caller checks
+    that first.
     """
+    lattice = orthogonal_group.domain()
+    planes = _chamber_planes_through_line(lattice, line, completion)
+    if planes is not None:
+        return planes
     from sage_indefinite_port.indefinite.marked_lattices import INDUCTION
 
-    lattice = orthogonal_group.domain()
     reduction = line.isotropic_reduction()
     quotient = reduction.quotient_lattice()
     labels = tuple(quotient.module_generating_set())
@@ -1281,9 +1396,10 @@ def _isotropic_plane_orbit_representatives(orthogonal_group):
     lattice = orthogonal_group.domain()
     candidates = []
     for line in _isotropic_orbit_representatives(orthogonal_group, 1):
-        if _hyperbolic_completion(lattice, line) is None:
+        completion = _hyperbolic_completion(lattice, line)
+        if completion is None:
             return None
-        candidates.extend(_planes_through_line(orthogonal_group, line))
+        candidates.extend(_planes_through_line(orthogonal_group, line, completion))
     kept = []
     for plane in candidates:
         if any(

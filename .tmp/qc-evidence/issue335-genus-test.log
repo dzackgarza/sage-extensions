@@ -1,0 +1,19 @@
+........                                                                 [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_the_cards_class_count: 421.74 s > 20 s
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_has_the_cards_class_count: 99.88 s > 20 s
+8 passed in 542.44s (0:09:02)
+[peakrss] issue335pytest: child waited=0 shell_code=0 samples=280
+[peakrss] peak tree RSS      : 686 MiB
+[peakrss] low-water MemAvail : 3262 MiB
+[peakrss] peak single VmHWM  : 698 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      688 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   553.6s procs=  3 rss=   686 MiB hwm=   693 MiB avail=  7438 MiB
+[peakrss]   t=   555.6s procs=  3 rss=   686 MiB hwm=   693 MiB avail=  7518 MiB
+[peakrss]   t=   549.6s procs=  3 rss=   683 MiB hwm=   690 MiB avail=  7563 MiB
+[peakrss]   t=   551.6s procs=  3 rss=   683 MiB hwm=   690 MiB avail=  7517 MiB
+[peakrss]   t=   539.5s procs=  3 rss=   667 MiB hwm=   674 MiB avail=  7475 MiB
+launcher exit: 0

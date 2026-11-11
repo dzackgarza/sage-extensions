@@ -1,0 +1,56 @@
+PARI stack size set to 2147483648 bytes, maximum size set to 8589934592
+
+===== k = 2 =====
+[     0.5s] L: rank 21 det -4
+[   396.2s]   chamber class roots 480 |Aut| 1941728542064640000 from u = [-1, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[   396.5s]   chamber class roots 384 |Aut| 129448569470976000 from u = [-2, -2, 0, 0, 0, 0, 0, 0, 0, 0, -4, -7, -10, -8, -6, -4, -2, -5]
+[   401.6s]   chamber class roots 264 |Aut| 809053559193600 from u = [-2, -2, -2, -4, -6, -5, -4, -3, -2, -3, -2, -4, -6, -5, -4, -3, -2, -3]
+[   404.2s]   chamber class roots 224 |Aut| 106542032486400 from u = [-2, -3, -4, -7, -10, -8, -6, -4, -2, -5, -4, -7, -10, -8, -6, -4, -2, -5]
+[   409.5s]   chamber class roots 204 |Aut| 49662885888000 from u = [-3, -3, -4, -8, -12, -10, -8, -6, -3, -6, -5, -10, -15, -12, -9, -6, -3, -8]
+[   415.6s]   chamber class roots 304 |Aut| 3767021862912000 from u = [-4, -4, -6, -12, -18, -15, -12, -8, -4, -9, -8, -14, -20, -16, -12, -8, -4, -10]
+[   417.3s]   chamber class roots 244 |Aut| 334764638208000 from u = [-4, -4, -7, -14, -20, -16, -12, -8, -4, -10, -7, -14, -20, -16, -12, -8, -4, -10]
+[   423.3s]   chamber class roots 544 |Aut| 46620662575398912000 from u = [-6, -6, -10, -20, -30, -24, -18, -12, -6, -16, -12, -21, -30, -24, -18, -12, -6, -15]
+[   485.9s]   chamber class roots 480 |Aut| 1371195958099968000 from u = [-6, -6, -11, -21, -30, -24, -18, -12, -6, -15, -12, -21, -30, -24, -18, -12, -6, -15]
+[   508.2s] chamber: 9 classes, mass 642332179/18881368343036559360000
+[   508.2s] model gram == L's (U_2, E8_1, E8_2) block gram
+[   509.5s] g of square -4, index-one split of <-2k> in L: True, det T = 1
+[   518.1s] plane from u = [-1, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]: (roots, |Aut|) of E^perp/E = (480, 1941728542064640000) vs chamber (480, 1941728542064640000): match
+[   518.3s] plane from u = [-2, -2, 0, 0, 0, 0, 0, 0, 0, 0, -4, -7, -10, -8, -6, -4, -2, -5]: (roots, |Aut|) of E^perp/E = (384, 129448569470976000) vs chamber (384, 129448569470976000): match
+[   519.5s] plane from u = [-2, -2, -2, -4, -6, -5, -4, -3, -2, -3, -2, -4, -6, -5, -4, -3, -2, -3]: (roots, |Aut|) of E^perp/E = (264, 809053559193600) vs chamber (264, 809053559193600): match
+[   520.2s] plane from u = [-2, -3, -4, -7, -10, -8, -6, -4, -2, -5, -4, -7, -10, -8, -6, -4, -2, -5]: (roots, |Aut|) of E^perp/E = (224, 106542032486400) vs chamber (224, 106542032486400): match
+[   522.3s] plane from u = [-3, -3, -4, -8, -12, -10, -8, -6, -3, -6, -5, -10, -15, -12, -9, -6, -3, -8]: (roots, |Aut|) of E^perp/E = (204, 49662885888000) vs chamber (204, 49662885888000): match
+[   524.2s] plane from u = [-4, -4, -6, -12, -18, -15, -12, -8, -4, -9, -8, -14, -20, -16, -12, -8, -4, -10]: (roots, |Aut|) of E^perp/E = (304, 3767021862912000) vs chamber (304, 3767021862912000): match
+[   525.0s] plane from u = [-4, -4, -7, -14, -20, -16, -12, -8, -4, -10, -7, -14, -20, -16, -12, -8, -4, -10]: (roots, |Aut|) of E^perp/E = (244, 334764638208000) vs chamber (244, 334764638208000): match
+[   525.4s] plane from u = [-6, -6, -10, -20, -30, -24, -18, -12, -6, -16, -12, -21, -30, -24, -18, -12, -6, -15]: (roots, |Aut|) of E^perp/E = (544, 46620662575398912000) vs chamber (544, 46620662575398912000): match
+[   529.3s] plane from u = [-6, -6, -11, -21, -30, -24, -18, -12, -6, -15, -12, -21, -30, -24, -18, -12, -6, -15]: (roots, |Aut|) of E^perp/E = (480, 1371195958099968000) vs chamber (480, 1371195958099968000): match
+[   529.3s] k = 2: 9 of 9 classes match; card O row = 9
+
+===== k = 1 =====
+[   529.4s] L: rank 21 det -2
+[   529.6s]   chamber class roots 482 |Aut| 1941728542064640000 from u = [-1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[   533.2s]   chamber class roots 306 |Aut| 5393690394624000 from u = [-2, -2, -2, -4, -6, -5, -4, -3, -2, -3, -4, -7, -10, -8, -6, -4, -2, -5]
+[   542.0s]   chamber class roots 306 |Aut| 12804747411456000 from u = [-3, -3, -5, -10, -15, -12, -9, -6, -3, -8, -5, -10, -15, -12, -9, -6, -3, -8]
+[   550.4s]   chamber class roots 482 |Aut| 1371195958099968000 from u = [-4, -4, -7, -14, -20, -16, -12, -8, -4, -10, -8, -14, -20, -16, -12, -8, -4, -10]
+[   550.8s] chamber: 4 classes, mass 2499347/9440684171518279680000
+[   550.8s] model gram == L's (U_2, E8_1, E8_2) block gram
+[   552.3s] g of square -2, index-one split of <-2k> in L: True, det T = 1
+[   552.5s] plane from u = [-1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]: (roots, |Aut|) of E^perp/E = (482, 1941728542064640000) vs chamber (482, 1941728542064640000): match
+[   554.5s] plane from u = [-2, -2, -2, -4, -6, -5, -4, -3, -2, -3, -4, -7, -10, -8, -6, -4, -2, -5]: (roots, |Aut|) of E^perp/E = (306, 5393690394624000) vs chamber (306, 5393690394624000): match
+[   556.0s] plane from u = [-3, -3, -5, -10, -15, -12, -9, -6, -3, -8, -5, -10, -15, -12, -9, -6, -3, -8]: (roots, |Aut|) of E^perp/E = (306, 12804747411456000) vs chamber (306, 12804747411456000): match
+[   559.7s] plane from u = [-4, -4, -7, -14, -20, -16, -12, -8, -4, -10, -8, -14, -20, -16, -12, -8, -4, -10]: (roots, |Aut|) of E^perp/E = (482, 1371195958099968000) vs chamber (482, 1371195958099968000): match
+[   559.7s] k = 1: 4 of 4 classes match; card O row = 4
+DONE
+[peakrss] issue335: child waited=0 shell_code=0 samples=284
+[peakrss] peak tree RSS      : 631 MiB
+[peakrss] low-water MemAvail : 3210 MiB
+[peakrss] peak single VmHWM  : 638 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      627 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   540.5s procs=  3 rss=   631 MiB hwm=   638 MiB avail=  5659 MiB
+[peakrss]   t=   542.5s procs=  3 rss=   631 MiB hwm=   638 MiB avail=  6112 MiB
+[peakrss]   t=   544.5s procs=  3 rss=   628 MiB hwm=   638 MiB avail=  6093 MiB
+[peakrss]   t=   528.5s procs=  3 rss=   625 MiB hwm=   631 MiB avail=  6236 MiB
+[peakrss]   t=   530.5s procs=  3 rss=   625 MiB hwm=   632 MiB avail=  6123 MiB
+launcher exit: 0
