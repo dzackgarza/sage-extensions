@@ -45,6 +45,9 @@ CUSP_CHAMBER_TAGS = ("029J",)
 # The Enriques period lattice card, whose 0-cusp chamber diagrams #254 reads.
 CUSP_DIAGRAM_TAGS = ("029J",)
 
+# The catalogued lattices whose primitive-orbit rows #345 reads.
+PRIMITIVE_ORBIT_TAGS = ("0016", "026E")
+
 
 def fetch(ref: str, path: str) -> str:
     return subprocess.run(
@@ -202,6 +205,41 @@ def cusp_diagrams(ref: str, tag: str) -> dict:
     }
 
 
+def primitive_orbit_series(ref: str, tag: str) -> dict:
+    r"""The primitive-orbit rows of one catalogued lattice card (#345).
+
+    ``integral.primitive_orbits`` is the card's own record, for ``O``, ``SO``,
+    ``Otilde``, ``SOtilde`` and their ``+`` pieces, of the orbits of primitive
+    vectors by norm: ``constant`` counts the orbits of primitive isotropic lines,
+    ``z`` and ``w`` the orbits of positive and negative norm inside the card's
+    own bound.  The lattice is stated by the card's ``gram_tensor``, so a test
+    builds the lattice from the card and compares the series' terms with the row
+    rather than typing a number.
+    """
+    path = LATTICE_PATH.format(tag=tag)
+    card = front_matter(fetch(ref, path), path)
+    rows = card["integral"]["primitive_orbits"]
+    return {
+        "tag": card["tag"],
+        "path": path,
+        "name": card["name"],
+        "latex": card["latex"],
+        "rank": card["rank"],
+        "signature": card.get("signature"),
+        "determinant": card.get("determinant"),
+        "gram": [[int(entry) for entry in row] for row in card["gram_tensor"]],
+        "certification": card["certifications"]["integral.primitive_orbits"],
+        "rows": {
+            subgroup: {
+                "constant": int(row["constant"]),
+                "z": [int(entry) for entry in row.get("z", [])],
+                "w": [int(entry) for entry in row.get("w", [])],
+            }
+            for subgroup, row in rows.items()
+        },
+    }
+
+
 def discriminant_form(ref: str, tag: str) -> dict:
     """The discriminant-form rows of one lattice card.
 
@@ -304,6 +342,7 @@ def main(argv: list[str]) -> int:
                 "cusp_chambers": "integral.cusp_chambers.{subgroup}.{cusp,statement,wall_count,printed_page,figure},certifications.integral.cusp_chambers",
                 "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
                 "cusp_diagrams": "integral.cusp_chambers.{subgroup}.{statement,cusp,walls,diagram,printed_page,figure},certifications.integral.cusp_chambers",
+                "primitive_orbit_series": "gram_tensor,integral.primitive_orbits.{subgroup}.{constant,z,w},certifications.integral.primitive_orbits",
             },
             "generated_by": "tests/cards/refresh_lattice_database_enriques.py",
         },
@@ -313,6 +352,7 @@ def main(argv: list[str]) -> int:
         "discriminant_forms": {tag: discriminant_form(ref, tag) for tag in DISCRIMINANT_FORM_TAGS},
         "cusp_chambers": {tag: cusp_chambers(ref, tag) for tag in CUSP_CHAMBER_TAGS},
         "cusp_diagrams": {tag: cusp_diagrams(ref, tag) for tag in CUSP_DIAGRAM_TAGS},
+        "primitive_orbit_series": {tag: primitive_orbit_series(ref, tag) for tag in PRIMITIVE_ORBIT_TAGS},
     }
     DIGEST.write_text(json.dumps(digest, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
     print(
@@ -320,7 +360,8 @@ def main(argv: list[str]) -> int:
         f"{len(digest['polarization_counts']['rows'])} polarization-count degrees, "
         f"{len(digest['discriminant_forms'])} discriminant forms, "
         f"{sum(len(rows) for card in digest['cusp_chambers'].values() for rows in card['rows'].values())} cusp chambers",
-        f"{sum(len(rows) for card in digest['cusp_diagrams'].values() for rows in card['rows'].values())} cusp diagrams"
+        f"{sum(len(rows) for card in digest['cusp_diagrams'].values() for rows in card['rows'].values())} cusp diagrams, "
+        f"{len(digest['primitive_orbit_series'])} primitive-orbit cards"
     )
     return 0
 

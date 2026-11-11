@@ -23,7 +23,8 @@
    "cusp_diagrams": "integral.cusp_chambers.{subgroup}.{statement,cusp,walls,diagram,printed_page,figure},certifications.integral.cusp_chambers",
    "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
    "lattice": "integral.polarization_counts.{degree}.{#h,#Γ̄_h,reference.citation}",
-   "plane_orbits": "integral.primitive_orbits.{group}.planes and .orbit_lengths(per-orbit sizes) and .constant(the line count),reference.citation"
+   "plane_orbits": "integral.primitive_orbits.{group}.planes and .orbit_lengths(per-orbit sizes) and .constant(the line count),reference.citation",
+   "primitive_orbit_series": "gram_tensor,integral.primitive_orbits.{subgroup}.{constant,z,w},certifications.integral.primitive_orbits"
   }
  },
  "arithmetic_groups": {
@@ -2241,5 +2242,192 @@
    }
   },
   "tag": "0128"
+ },
+ "primitive_orbit_series": {
+  "0016": {
+   "certification": "f7a0c10019c967ac46b34bcf7d6774bce8f7802d5b9bec628092435367e26101",
+   "determinant": -1,
+   "gram": [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     0
+    ]
+   ],
+   "latex": "U",
+   "name": "U",
+   "path": "lattices/0016.md",
+   "rank": 2,
+   "rows": {
+    "O": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "O+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SO": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    },
+    "SO+": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    },
+    "SOtilde": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    },
+    "SOtilde+": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    }
+   },
+   "signature": [
+    1,
+    1
+   ],
+   "tag": "0016"
+  },
+  "026E": {
+   "certification": "71acd10a9086e12004375735a77f3c09cfa35d98687b9746995f994599b427c3",
+   "determinant": 8,
+   "gram": [
+    [
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     -2,
+     1,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     -2,
+     1,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1,
+     -2,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1,
+     0,
+     -2,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     -2
+    ]
+   ],
+   "latex": "U \\oplus D_{4}(-1) \\oplus A_{1}(-1)",
+   "name": "U + D4(-1) + A1(-1)",
+   "path": "lattices/026E.md",
+   "rank": 7,
+   "rows": {
+    "O": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "O+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SO": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SO+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SOtilde": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SOtilde+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    }
+   },
+   "signature": [
+    1,
+    6
+   ],
+   "tag": "026E"
+  }
  }
 }
