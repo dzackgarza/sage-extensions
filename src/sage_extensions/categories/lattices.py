@@ -2330,6 +2330,52 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
     def _object_on(self, oriented):
         return OrientedFlagDiagram(oriented)
 
+    def Mor(self, domain, codomain):
+        r"""The orientation-preserving natural transformations ``F => G``.
+
+        The subset of the ``Fun([t], Lattices)`` Mor of the underlying flag
+        diagrams cut out by the condition that the flags have one type and
+        every graded determinant of the apex component, from the source to
+        the target adapted basis, is ``+1``.  A natural transformation
+        carries each term into the next, so the matrix of its apex component
+        on the adapted bases is block triangular and its diagonal blocks are
+        the induced maps of graded pieces.  Its chosen element is the
+        isomorphism on the oriented transporter.
+        """
+        from sage_extensions.categories.abstract_categories.cat import _FunctorObject
+
+        source, target = (
+            self(obj.functor() if isinstance(obj, _FunctorObject) else obj)
+            for obj in (domain, codomain)
+        )
+        return self._oriented_mor(source, target)
+
+    two_mor = Mor
+
+    @cached_method(key=lambda self, source, target: (id(source), id(target)))
+    def _oriented_mor(self, source, target):
+        from sage_extensions.categories.abstract_categories.cat import _FunctorCategory
+
+        _shape, top = self._marking_shape()
+        source_flag, target_flag = source.oriented_flag().flag(), target.oriented_flag().flag()
+
+        def preserves_orientations(transformation):
+            if source_flag.flag_type() != target_flag.flag_type():
+                return False
+            apex = transformation.component(top)
+            return all(sign == 1 for sign in _graded_orientation_signs(apex, source_flag, target_flag))
+
+        subset = _FunctorCategory.Mor(self, source, target).condition_set(preserves_orientations)
+        subset._retain_point_computation(lambda: self._oriented_transformation(source, target))
+        return subset
+
+    def _oriented_transformation(self, source, target):
+        r"""The natural isomorphism on the oriented transporter; it raises when there is none."""
+        apex = self.codomain_category()._marked_isometry(self, source, target)
+        if apex is None:
+            raise ValueError(f"no isometry carries {source.oriented_flag()} onto {target.oriented_flag()} with its orientations")
+        return self._natural_transformation_from_apex(source, target, apex)
+
     def __contains__(self, candidate) -> bool:
         from sage_extensions.categories.abstract_categories.cat import _FunctorObject
 

@@ -147,3 +147,64 @@ def test_marked_oriented_complete_flags_of_three_u_form_one_class():
         assert line.inclusion().is_in_image(element(e2) - e2)
         assert plane.inclusion().is_in_image(element(e3) - e3)
     assert ambient.O().split_orbit(positive, ambient.O()).cardinality() == cardinal(1)
+
+
+def test_oriented_mor_is_the_orientation_preserving_natural_transformations():
+    r"""``-1`` on the first summand U of 2U fixes the null plane ``<e1, e2>`` and acts on it
+    with determinant -1, so its natural transformation lies in the ``Fun([1], Lattices)``
+    Mor of the plane but not in the oriented Mor. The chosen element of the oriented Mor
+    from ``e1 ^ e2`` to ``e2 ^ e1`` has determinant -1 in the basis (e1, e2).
+    """
+    lattices = Lattices(ZZ)
+    hyperbolic = lattices("U")
+    ambient = hyperbolic + hyperbolic
+    category = OrientedIsotropicFlags(lattices, 1)
+    e1, f1, e2, f2 = tuple(ambient.module_generators())
+    plane = ambient.primitive_isotropic_subobject(e1, e2)
+    labels = tuple(plane.inclusion().domain().module_generating_set())
+
+    def determinant(element):
+        coordinates = tuple(plane.inclusion().lift(element(point)).to_vector() for point in (e1, e2))
+        return coordinates[0](labels[0])*coordinates[1](labels[1]) - coordinates[0](labels[1])*coordinates[1](labels[0])
+
+    positive = category(OrientedIsotropicFlag(ambient, (e1, e2)))
+    negative = category(OrientedIsotropicFlag(ambient, (e2, e1)))
+    reflection = ambient.Aut()(dict(zip(tuple(ambient.module_generating_set()), (-e1, -f1, e2, f2), strict=True)))
+    reversing = category._natural_transformation_from_apex(positive, positive, reflection)
+    identity = category._natural_transformation_from_apex(positive, positive, ambient.Aut().one())
+    endomorphisms = category.Mor(positive, positive)
+    assert reversing not in endomorphisms
+    assert identity in endomorphisms
+    chosen = category.Mor(positive, negative).an_element()
+    assert chosen in category.Mor(positive, negative)
+    assert determinant(chosen.component(tuple(category.domain_category().objects())[-1])) == -1
+
+
+def test_oriented_isometry_between_two_presentations_of_three_u():
+    r"""The target presents 3U with e0 replaced by e0 + f0, so its form has b(f0, f0) = 2 and
+    f0 - f1 is null. Both lattices are 3U, whose complete null flags form one class with every
+    graded sign attained, so the oriented flags (e0, e2, e4) and (f0 - f1, f2, -f4) are isomorphic.
+    """
+    lattices = Lattices(ZZ)
+    gram = [[int(i // 2 == j // 2 and i != j) for j in range(6)] for i in range(6)]
+    source = lattices(gram)
+    target_gram = [row[:] for row in gram]
+    target_gram[0][0] = 2
+    target = lattices(target_gram)
+    e = tuple(source.module_generators())
+    f = tuple(target.module_generators())
+    complete = FlagType.complete(3)
+    category = OrientedIsotropicFlags(lattices, 3)
+    first = category(OrientedIsotropicFlag(source, (e[0], e[2], e[4]), flag_type=complete))
+    target_basis = (f[0] - f[1], f[2], -f[4])
+    second = category(OrientedIsotropicFlag(target, target_basis, flag_type=complete))
+    homset = category.Core().Mor(first, second)
+    assert homset.is_empty() is False
+    apex = _apex(category, homset.an_element())
+    assert apex.domain() is source and apex.codomain() is target
+    assert all(target.b(apex(x), apex(y)) == source.b(x, y) for x in e for y in e)
+    line = target.primitive_isotropic_subobject(target_basis[0])
+    plane = target.primitive_isotropic_subobject(*target_basis[:2])
+    assert apex(e[0]) == target_basis[0]
+    assert line.inclusion().is_in_image(apex(e[2]) - target_basis[1])
+    assert plane.inclusion().is_in_image(apex(e[4]) - target_basis[2])
