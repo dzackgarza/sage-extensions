@@ -559,6 +559,11 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                     f"reflection family is available here"
                 )
             lattice = self.ambient_lattice()
+            if int(quotient.module_rank()) == 0:
+                # P^perp = P: the whole group is the parabolic, and the Levi factor
+                # on K = P^perp/P = 0 is trivial.  A rank-zero cartesian lattice has
+                # no shortest vector, so the shell enumeration below must not run.
+                return ()
             labels = tuple(quotient.module_generating_set())
             lifts = self.quotient_frame_lifts()
 
