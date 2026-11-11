@@ -1719,6 +1719,78 @@ class OrthogonalCharacterQuotient:
         projected = libgap.Image(projections[position], self._gap_subgroup())
         return _subgroup_from_gap(self._discriminant_group, projected)
 
+    @cached_method
+    def discriminant_image_membership(self):
+        r"""Return the membership test of ``rho(self.subgroup)`` inside ``O(A_L)``.
+
+        The decision is one stabilizer chain of ``\rho(\Gamma)`` acting on the
+        discriminant group, built once and reused, and each question is answered
+        by sifting the element through that chain: the cost of a question is the
+        length of the chain, never the size of the group (A. Seress, *Permutation
+        Group Algorithms*, Cambridge University Press 2003, Chapter 4, the
+        Schreier--Sims stabilizer chain and its sifting test; GAP answers
+        ``x in G`` for a group with a known chain exactly that way).
+
+        Listing the image is not an option here and not a fallback: on the
+        Enriques period lattice ``T_{\mathrm{En}}`` the image
+        ``rho(\Gamma_{\mathrm{En},2})`` has order ``696729600`` (H. Sterk,
+        *Compactifications of the period space of Enriques surfaces, Part I*,
+        Math. Z. 207 (1991), Proposition 2.7, p. 6 for the group; the order is
+        measured by :meth:`subgroup_image_order`), and the elementwise reads of
+        this quotient (:meth:`image_keys`, :meth:`subgroup_image_keys`) are
+        deliberately not on this path.
+
+        The chain is the ``O(A_L)`` engine's own: the group tested is the one
+        :meth:`_joint_discriminant_image_gap` computes inside that engine, which
+        is the same subgroup :meth:`discriminant_image` returns as owned data.
+        """
+        return DiscriminantImageMembership(self)
+
+
+class DiscriminantImageMembership:
+    r"""Membership in ``\rho(\Gamma)`` inside ``O(A_L)``, decided by sifting one chain.
+
+    ``quotient`` is an :class:`OrthogonalCharacterQuotient`; the group is
+    ``\rho(quotient.subgroup)`` in the ``O(A_L)`` engine that
+    :meth:`OrthogonalCharacterQuotient.discriminant_image` also reads, and the
+    chain is built on the first question and kept for the object's lifetime
+    (the quotient caches the object, so a call site that asks once per root asks
+    one chain, not one chain per root).
+
+    A question is answered by GAP's ``\in`` on that group, which is the sifting
+    membership test of Seress, *Permutation Group Algorithms*, Chapter 4: walk
+    the chain from the top, and at each level multiply the point back to a
+    previously stored orbit representative; a point that fails at any level is
+    not in the group.  Nothing here lists the group's elements.
+    """
+
+    def __init__(self, quotient) -> None:
+        from sage_extensions.categories.group.groups import _gap_model
+
+        self._quotient = quotient
+        self._discriminant_group = quotient._discriminant_group
+        self._engine = _gap_model(self._discriminant_group)
+        self._image = quotient._joint_discriminant_image_gap()
+
+    def quotient(self):
+        r"""Return the character quotient whose discriminant image this tests."""
+        return self._quotient
+
+    def image(self):
+        r"""Return ``\rho(\Gamma)`` as the ``O(A_L)`` engine subgroup the chain is of."""
+        return self._image
+
+    def contains(self, isometry) -> bool:
+        r"""Whether the isometry of ``O(A_L)`` lies in ``\rho(\Gamma)``."""
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        return bool(
+            _element_to_engine(self._discriminant_group, isometry) in self._image
+        )
+
+    def __contains__(self, isometry) -> bool:
+        return self.contains(isometry)
+
 
 _MISSING_ARITHMETIC_GENERATING_SET = (
     "Over an indefinite lattice L, O(L) is an infinite arithmetic group and no "

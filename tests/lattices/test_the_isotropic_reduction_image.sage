@@ -58,13 +58,24 @@ def _gamma_en_2():
     return Involutions.I_En.polarized(invariant.inclusion()(polarization)).coinvariant_extension_subgroup()
 
 
+_CUSP_IMAGES = {}
+
+
 def _cusp_images():
-    r"""One reduction image per cusp of ``\Gamma_{En,2}``, keyed by Sterk's label."""
-    subgroup = _gamma_en_2()
-    return {
-        name: subgroup.isotropic_vector_reduction_image(vector)
-        for name, vector in Sterk.selected_isotropic_vectors().items()
-    }
+    r"""One reduction image per cusp of ``\Gamma_{En,2}``, keyed by Sterk's label.
+
+    Built once per session: the group and its five cusps are the same objects in
+    every test of this file, ``\Gamma_{\mathrm{En},2}`` costs half a minute to
+    construct, and one discriminant image serves every cusp (it is
+    ``\rho(\Gamma_{\mathrm{En},2})``, a property of the group).
+    """
+    if not _CUSP_IMAGES:
+        subgroup = _gamma_en_2()
+        _CUSP_IMAGES.update({
+            name: subgroup.isotropic_vector_reduction_image(vector)
+            for name, vector in Sterk.selected_isotropic_vectors().items()
+        })
+    return dict(_CUSP_IMAGES)
 
 
 def test_each_cusp_reduces_to_a_hyperbolic_rank_ten_lattice() -> None:
@@ -142,3 +153,30 @@ def test_sterks_published_cusp_roots_are_reflections_of_the_stabilizer_image() -
         assert cardinal(sum(1 for _ in roots)) == cardinal(sum(1 for _ in diagrams[name]))
         assert tuple(root for root, _ in reflections) == roots
         assert image.generators_are_certified_complete() is False
+
+
+def test_the_membership_questions_at_the_first_cusp_are_one_sift_per_root() -> None:
+    r"""The twelve printed roots at ``Sterk_1``, each decided by one sift of ``\rho(\Gamma)``.
+
+    ``contains_root_reflection`` is the discriminant criterion of #312: the
+    reflection of ``T_{\mathrm{En}}`` in a printed root fixes ``v``, so it lies in
+    the parabolic, and its class on ``N`` lies in ``G_v`` exactly when
+    ``\rho(g) \in \rho(K_v)\rho(\Gamma)``.  At this cusp ``\rho(K_v)`` is trivial
+    (the test above), so the whole question is one membership in
+    ``\rho(\Gamma_{\mathrm{En},2}) \le O(A_L)``, a group of order ``696729600``,
+    and it is answered by sifting one stabilizer chain of that image (A. Seress,
+    *Permutation Group Algorithms*, Cambridge University Press 2003, Chapter 4;
+    ``discriminant_image_membership``) — never against a list of its elements,
+    which is not an option at that order and is not built here.
+
+    Sterk's diagram 4.3.5 (Math. Z. 207 (1991), p. 19) has twelve walls, and the
+    twelve roots below are its printed roots in ``T_{\mathrm{En}}`` coordinates.
+    """
+    image = _cusp_images()["Sterk_1"]
+    roots = tuple(Sterk.sterks_in_TEn()["Sterk_1"])
+    diagrams = Sterk.sterk_roots()
+    decisions = tuple(image.contains_root_reflection(root) for root in roots)
+
+    assert cardinal(sum(1 for _ in decisions)) == cardinal(sum(1 for _ in diagrams["Sterk_1"]))
+    assert all(decisions)
+    assert image.kernel_discriminant_image_is_trivial() is True
