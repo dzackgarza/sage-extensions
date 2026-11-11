@@ -32,6 +32,7 @@ What is read, and from where:
 | `cusp_chambers[tag].certification` | same | `certifications.integral.cusp_chambers` — the stamp the database computed the block under |
 | `cusp_diagrams[tag].rows[subgroup][i].{statement,vertices,edges,wall_count}` | `lattices/029J.md` | `integral.cusp_chambers.{subgroup}[i]`: the walls are the vertices and `diagram` the bonds, with an infinite order written `inf` on the card and `null` here |
 | `primitive_orbit_series[tag].rows[subgroup].{constant,z,w}`, `.gram` | `lattices/0016.md`, `lattices/026E.md` | `integral.primitive_orbits.{subgroup}.{constant,z,w}` for the lattice of `gram_tensor`, with `certifications.integral.primitive_orbits` |
+| `hyperbolic_reflectivity[tag].reflective`, `.gram` | `lattices/0026.md` | `hyperbolic.reflective` for the lattice of `gram_tensor`, with `certifications.hyperbolic.reflective` and the card's `references` |
 
 A test reads these by tag through `card(section, tag)`, bound as a builtin by
 `tests/lattices/conftest.py`: `test_lint` rejects a file read inside a test file

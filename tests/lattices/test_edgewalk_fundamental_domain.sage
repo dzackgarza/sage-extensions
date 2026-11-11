@@ -1,72 +1,48 @@
-r"""The edgewalk of the pinned port, through the owning public call.
+r"""The edgewalk's verdict on card 0026's lattice, read by tag.
 
 `sage-indefinite-port` is paused at `991b88b0`, and its entry point is
 `sage_indefinite_port.indefinite.edgewalk.edgewalk_fundamental_domain(lattice)`:
 one lattice, no start vertex, no root-norm filter, no termination switch, and no
 isometry route.  ``allcock_edgewalk`` on a hyperbolic lattice is the owning public
-call for that walk (#344); the options an earlier revision of it advertised --
-``option_norms="K3"``, ``initial_vertex``, ``early_termination`` and
-``edgewalk_isometry`` -- have no engine in the pinned port, are not part of the
-API, and are not tested here.  What is tested is what the walk decides.
+call for that walk (#344), and this module asks it one question on one lattice.
 
-U+<2n> are in Nikulin's rank-three classification: U+<46> is non-reflective.  In
-U+<4> the vector x of norm 4 pairs evenly with L, so it is a wall of the full
-walk: the walk is over every root, and that is the invariant the first test
-states.
+The expected verdict is not typed here.  Card `0026` of
+`dzackgarza/lattice-database` is ``U + A1(-1)`` with Gram
+`[[0,1,0],[1,0,0],[0,0,-2]]` and signature `(1, 2)`, and its ``hyperbolic`` block
+states ``reflective: true`` with ``certifications`` stamping
+``hyperbolic.reflective``: the value is the database's own decision, read by tag
+through the digest, and the card's ``references`` names the source it cites for
+it.  The lattice is built from that card's ``gram_tensor``, so the test's lattice
+and the card's are the same matrix, and its `(1, n)` signature exercises the
+wrapper's twist transport rather than the direct `(n, 1)` route.
+
+Two lattices of the earlier version of this module are gone, and their absence is
+deliberate: `U + <4>` and `U + <46>` have no card in `dzackgarza/lattice-database`
+-- the catalogue's rank-three lattices of signature `(1, 2)` with `|det| = 4` are
+eight odd forms and none is the even `U + <4>`, and it holds no such lattice of
+`|det| = 46` at all -- and no source with a numbered statement and a printed page
+was found for their reflectivity verdicts.  An expected verdict with no card and
+no citation is not kept.
 """
 
 from sage_extensions.all import *
 
 
-def _hyperbolic_plus(square):
-    summand = Lattices(ZZ)("A1").twist(-square // 2)
-    return HyperbolicLattices(ZZ)(Lattices(ZZ)("U") + summand)
+def test_the_walk_returns_the_reflective_verdict_card_0026_certifies() -> None:
+    r"""`U + A1(-1)` is reflective by its card, and the walk says so.
 
-
-def test_the_walk_is_over_every_root_so_the_norm_four_wall_is_one():
-    r"""In ``U + <4>`` the walk returns the norm-four wall beside the norm-two ones.
-
-    The vector ``x`` of norm 4 pairs evenly with the lattice — ``b(x, L)`` is even —
-    so a reflection in it is an isometry and its hyperplane is a wall of the full
-    walk.  A walk restricted to the norm-two roots would not return it, and no such
-    restriction is asked for here.
+    The card's Gram is the lattice's Gram, so the comparison is about the
+    database's lattice and not a lookalike; the verdict comes back through the
+    `(1, n)` transport of the wrapper.
     """
-    lattice = _hyperbolic_plus(4)
-    x = tuple(lattice.module_generators())[2]
-    assert lattice.q(x) == 4
+    stated = card("hyperbolic_reflectivity", "0026")
+    lattice = HyperbolicLattices(ZZ)(Lattices(ZZ)(stated["gram"]))
+    basis = tuple(lattice.module_generators())
 
-    walls = tuple(lattice.allcock_edgewalk().simple_roots())
-
-    assert x in walls or -x in walls
-    assert sorted({int(root.q()) for root in walls}) == [2, 4]
-
-
-def test_the_walk_certifies_the_reflectivity_of_the_chamber_it_finds():
-    r"""``U + <2>`` is reflective, and the certificate comes with a nonempty chamber.
-
-    The report's ``reason_non_reflective`` is ``None`` for a reflective verdict,
-    which the pinned port records by not setting it; the simple roots it returns
-    are roots of the lattice, of the norm-two kind this one has.
-    """
-    lattice = _hyperbolic_plus(2)
-    report = lattice.allcock_edgewalk()
-
-    assert report.is_reflective() is True
-    assert report.reason_non_reflective() is None
-    assert report.vertices().cardinality() > 0
-    assert all(lattice.q(root) == 2 for root in report.simple_roots())
-
-
-def test_a_non_reflective_lattice_is_reported_and_no_reason_is_recorded():
-    r"""``U + <46>`` is non-reflective: the walk stops without a certificate.
-
-    The pinned port reports the verdict and the vertices it enumerated, and records
-    no reason string, so ``reason_non_reflective`` is ``None`` on this side too —
-    asserted as the engine's behaviour, not as a claim that nothing stopped it.
-    """
-    lattice = _hyperbolic_plus(46)
-    report = lattice.allcock_edgewalk()
-
-    assert report.is_reflective() is False
-    assert report.reason_non_reflective() is None
-    assert report.vertices().cardinality() > 0
+    assert [
+        [int(lattice.b(left, right)) for right in basis] for left in basis
+    ] == stated["gram"]
+    assert [int(entry) for entry in lattice.signature()] == [
+        int(entry) for entry in stated["signature"]
+    ]
+    assert lattice.allcock_edgewalk().is_reflective() is bool(stated["reflective"])

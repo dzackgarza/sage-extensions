@@ -48,6 +48,9 @@ CUSP_DIAGRAM_TAGS = ("029J",)
 # The catalogued lattices whose primitive-orbit rows #345 reads.
 PRIMITIVE_ORBIT_TAGS = ("0016", "026E")
 
+# The catalogued lattice whose certified reflection verdict #344 reads.
+REFLECTIVITY_TAGS = ("0026",)
+
 
 def fetch(ref: str, path: str) -> str:
     return subprocess.run(
@@ -205,6 +208,34 @@ def cusp_diagrams(ref: str, tag: str) -> dict:
     }
 
 
+def hyperbolic_reflectivity(ref: str, tag: str) -> dict:
+    r"""One card's certified ``hyperbolic.reflective`` verdict, with the lattice it is about (#344).
+
+    ``hyperbolic.reflective`` is the card's own decision, stored when the
+    preamble's Vinberg search completes, and ``certifications`` stamps it; the
+    lattice is the card's ``gram_tensor``.  A test builds the lattice from the
+    card and compares the edgewalk's verdict with this field rather than typing a
+    verdict of its own.  The card's ``references`` block carries the source the
+    database cites for the value.
+    """
+    path = LATTICE_PATH.format(tag=tag)
+    card = front_matter(fetch(ref, path), path)
+    block = card["hyperbolic"]
+    return {
+        "tag": card["tag"],
+        "path": path,
+        "name": card["name"],
+        "latex": card["latex"],
+        "rank": card["rank"],
+        "signature": card.get("signature"),
+        "determinant": card.get("determinant"),
+        "gram": [[int(entry) for entry in row] for row in card["gram_tensor"]],
+        "reflective": bool(block["reflective"]),
+        "certification": card["certifications"]["hyperbolic.reflective"],
+        "references": card.get("references"),
+    }
+
+
 def primitive_orbit_series(ref: str, tag: str) -> dict:
     r"""The primitive-orbit rows of one catalogued lattice card (#345).
 
@@ -343,6 +374,7 @@ def main(argv: list[str]) -> int:
                 "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
                 "cusp_diagrams": "integral.cusp_chambers.{subgroup}.{statement,cusp,walls,diagram,printed_page,figure},certifications.integral.cusp_chambers",
                 "primitive_orbit_series": "gram_tensor,integral.primitive_orbits.{subgroup}.{constant,z,w},certifications.integral.primitive_orbits",
+                "hyperbolic_reflectivity": "gram_tensor,hyperbolic.reflective,certifications.hyperbolic.reflective,references",
             },
             "generated_by": "tests/cards/refresh_lattice_database_enriques.py",
         },
@@ -353,6 +385,7 @@ def main(argv: list[str]) -> int:
         "cusp_chambers": {tag: cusp_chambers(ref, tag) for tag in CUSP_CHAMBER_TAGS},
         "cusp_diagrams": {tag: cusp_diagrams(ref, tag) for tag in CUSP_DIAGRAM_TAGS},
         "primitive_orbit_series": {tag: primitive_orbit_series(ref, tag) for tag in PRIMITIVE_ORBIT_TAGS},
+        "hyperbolic_reflectivity": {tag: hyperbolic_reflectivity(ref, tag) for tag in REFLECTIVITY_TAGS},
     }
     DIGEST.write_text(json.dumps(digest, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
     print(
@@ -361,7 +394,8 @@ def main(argv: list[str]) -> int:
         f"{len(digest['discriminant_forms'])} discriminant forms, "
         f"{sum(len(rows) for card in digest['cusp_chambers'].values() for rows in card['rows'].values())} cusp chambers",
         f"{sum(len(rows) for card in digest['cusp_diagrams'].values() for rows in card['rows'].values())} cusp diagrams, "
-        f"{len(digest['primitive_orbit_series'])} primitive-orbit cards"
+        f"{len(digest['primitive_orbit_series'])} primitive-orbit cards, "
+        f"{len(digest['hyperbolic_reflectivity'])} reflectivity cards"
     )
     return 0
 
