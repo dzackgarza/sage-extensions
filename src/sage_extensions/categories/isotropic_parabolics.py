@@ -34,7 +34,9 @@ projection ``I^perp ->> K_I`` that the owned ``isotropic_reduction`` does not
 return; see ``isotropic_quotient_projection`` below.
 """
 
+from sage.matrix.constructor import matrix
 from sage.misc.cachefunc import cached_method
+from sage.rings.integer_ring import ZZ as SageZZ
 
 from sage_extensions.categories.modules.pure.modules import ModuleSubobjects
 from sage_extensions.categories.rings.ring_foundation import (
@@ -403,4 +405,442 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             )
 
 
+        # -- the parabolic subgroup of a primitive isotropic plane -------------
+
+        def plane_basis(self):
+            r"""Return the two generators of this subobject, as vectors of the ambient lattice.
+
+            The parabolic construction below is stated for a rank-two totally
+            isotropic ``P``: its basis ``(p_1, p_2)`` fixes the coordinates in
+            which the action on ``P`` is read.
+            """
+            embedded = self.embedded_module_generators()
+            labels = tuple(self.module_generating_set())
+            if len(labels) != 2:
+                raise ValueError(
+                    f"the parabolic construction here is stated for a primitive isotropic plane, "
+                    f"but {self} has rank {int(self.module_rank())}"
+                )
+            return (embedded[labels[0]], embedded[labels[1]])
+
+        def coordinates(self, vector):
+            r"""Return the coordinates of ``vector`` on the ambient lattice's generating set."""
+            lattice = self.ambient_lattice()
+            coordinates = vector.to_vector()
+            return tuple(
+                int(coordinates(label)) for label in lattice.module_generating_set()
+            )
+
+        def vector_from_coordinates(self, coordinates):
+            r"""Return the ambient-lattice vector with the given coordinates."""
+            lattice = self.ambient_lattice()
+            labels = tuple(lattice.module_generating_set())
+            ring = lattice.base_ring()
+            return lattice.linear_combination(
+                {
+                    label: ring(int(entry))
+                    for label, entry in zip(labels, coordinates, strict=True)
+                    if int(entry)
+                }
+            )
+
+        def gram_matrix(self):
+            r"""Return the Gram matrix of the ambient lattice on its generating set."""
+            lattice = self.ambient_lattice()
+            labels = tuple(lattice.module_generating_set())
+            generators = tuple(lattice.module_generator(label) for label in labels)
+            return [
+                [int(lattice.b(left, right)) for right in generators]
+                for left in generators
+            ]
+
+        @cached_method
+        def perpendicular_basis(self):
+            r"""Return a `ZZ`-basis of \(P^\perp\) as vectors of the ambient lattice."""
+            return self.vector_perpendicular_basis(self.plane_basis())
+
+        def vector_perpendicular_basis(self, vectors):
+            r"""Return a `ZZ`-basis of the perpendicular of a family of ambient vectors."""
+            lattice = self.ambient_lattice()
+            generators = tuple(
+                lattice.module_generator(label)
+                for label in lattice.module_generating_set()
+            )
+            rows = [
+                [int(lattice.b(generator, vector)) for generator in generators]
+                for vector in vectors
+            ]
+            basis = _kernel_basis_rows(matrix(SageZZ, rows))
+            return tuple(self.vector_from_coordinates(row) for row in basis)
+
+        @cached_method
+        def unipotent_radical_generators(self):
+            r"""Return the Eichler transvections that generate the unipotent radical of the parabolic.
+
+            For an isotropic \\(p \\in P\\) and \\(x \\in p^\\perp\\) the Eichler
+            transvection
+
+            \\[ t(p, x)(y) = y - b(x, y)\\, p + b(p, y)\\, x - \\tfrac12 q(x)\\, b(p, y)\\, p \\]
+
+            (Gritsenko--Hulek--Sankaran, arXiv:0810.1614, section 3.1, equations
+            (4)--(5), transcribed in
+            :meth:`sage_extensions.categories.lattices.Lattices.ParentMethods.eichler_transvection`,
+            after Dawes, section 2 equation (7)) is an integral isometry on an even
+            lattice, fixes `p`, and for `x\\perp p` it acts on \\(P^\\perp/P\\) as the
+            identity: for \\(k \\in P^\\perp\\) it sends `k` to
+            \\(k - b(x,k)p \\in k + P\\).  So every one of them lies in the
+            unipotent radical \\(U_I\\) of the parabolic at the plane, and
+            Eichler's criterion takes exactly this family, one parameter per basis
+            vector of \\(p^\\perp\\): Dutour Sikirić--Hulek, arXiv:2302.01679v2,
+            subsection "Approximate models and the case of signature \\(p,q\\geq 2\\)"
+            (Lemma `sublattice_approx_model`, which cites Eichler's criterion and
+            Scattone, Ph.D. thesis, section 3.7, Proposition 3.7.3: generators of
+            \\(SL_2(ZZ)^2\\) together with the transvections \\(E_{e_i, v_{i,j}}\\)
+            over a `ZZ`-basis \\((v_{i,j})\\) of \\(e_i^\\perp\\)).
+
+            On \\(L = U \\oplus U(2) \\oplus E_8(-2)\\) at \\(P_1\\) this family has
+            2 x 11 members, and the radical they generate has the rank 17 that the
+            root count of the parabolic gives: \\(2 \\cdot 8\\) from
+            \\(\\mathrm{Hom}(K, P)\\) and one from the skew part of
+            \\(\\mathrm{End}(P^*)\\).
+            """
+            lattice = self.ambient_lattice()
+            assert lattice.is_even() is True, (
+                f"the Eichler transvections of the radical at {self} need the half-integral "
+                f"coefficient q(x)/2 of an even lattice, and {lattice} is odd"
+            )
+            generators = []
+            for isotropic in self.plane_basis():
+                seen = set()
+                for vector in self.vector_perpendicular_basis((isotropic,)):
+                    if vector.is_zero():
+                        continue
+                    key = self.coordinates(vector)
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    transvection = lattice.eichler_transvection(isotropic, vector)
+                    if all(
+                        transvection(generator) == generator
+                        for generator in lattice.module_generators()
+                    ):
+                        continue
+                    generators.append(transvection)
+            return tuple(generators)
+
+        @cached_method
+        def quotient_reflection_generators(self):
+            r"""Return the pointwise-plane reflections in the root shells of \(P^\perp/P\).
+
+            The quotient \(K = P^\perp/P\) is the lattice the Levi acts on.  When
+            it is definite its shells are finite; a vector `w` of `K` lifts to a
+            vector `\tilde w` of \(P^\perp\) through the reduction's frame, and
+            the reflection \(s_{\tilde w}\) is an integral isometry of `L`
+            (asserted by the lattice's own reflection) that fixes `P` pointwise,
+            since \(P \subseteq \tilde w^\perp\).  So every such reflection lies
+            in the parabolic, and its image in \(O(K)\) is the reflection in
+            `w`: the Levi factor.
+
+            A shell is taken whole, and further shells are taken while the
+            running count stays below 128: for \(T_{\mathrm{En}}\) at \(P_1\),
+            \(K = E_8(-4)\) (the catalogue's doubling of \(E_8(-2)\)) has one
+            shell of 240 vectors, whose reflections generate
+            \(W(E_8) = O(E_8)/(\pm 1)\) and so the whole Levi factor; for the
+            odd \(I_{0,7}(2)\) of the Coble ambient the first shell alone gives
+            only the sign changes and the second is needed for the permutations.
+            """
+            reduction = self.isotropic_reduction()
+            quotient = reduction.quotient_lattice()
+            if quotient.is_definite() is not True:
+                raise ValueError(
+                    f"the Levi factor of the parabolic at {self} is not spanned by "
+                    f"reflections: the quotient P^perp/P = {quotient} is not definite, "
+                    f"so its shells are infinite and no shell enumeration of the "
+                    f"reflection family is available here"
+                )
+            lattice = self.ambient_lattice()
+            labels = tuple(quotient.module_generating_set())
+            lifts = self.quotient_frame_lifts()
+
+            def coordinates(element):
+                vector = element.to_vector()
+                return tuple(int(vector(label)) for label in labels)
+
+            def lift(element):
+                entries = coordinates(element)
+                return sum(
+                    (
+                        lattice.scalar_multiple(
+                            lattice.base_ring()(entries[position]), lifts[label]
+                        )
+                        for position, label in enumerate(labels)
+                        if entries[position]
+                    ),
+                    lattice.zero(),
+                )
+
+            shortest = tuple(quotient.shortest_vectors())
+            if not shortest:
+                raise ValueError(
+                    f"the Levi factor of the parabolic at {self} has no reflection to "
+                    f"lift: the definite quotient P^perp/P = {quotient} has no shortest "
+                    f"vector other than zero"
+                )
+            square = int(quotient.b(shortest[0], shortest[0]))
+            shells = [shortest]
+            count = len(shortest)
+            step = 1
+            while count <= 128 and step <= 3:
+                shells.append(tuple(quotient.vectors_of_square(square * (step + 1))))
+                count = sum(len(shell) for shell in shells)
+                step += 1
+            lifted = []
+            seen = set()
+            for shell in shells:
+                for element in shell:
+                    key = coordinates(element)
+                    if all(-entry == 0 for entry in key):
+                        continue
+                    negative = tuple(-entry for entry in key)
+                    if negative in seen:
+                        continue
+                    seen.add(key)
+                    lifted.append(lift(element))
+            generators = []
+            for vector in lifted:
+                if vector.is_integral_reflection_vector():
+                    generators.append(lattice.reflection(vector))
+            return tuple(generators)
+
+        @cached_method
+        def quotient_frame_lifts(self):
+            r"""Return the reduction's frame, lifted into the ambient lattice, by quotient label.
+
+            ``isotropic_reduction().coordinate_frame()`` is a section of
+            \(P^\perp \twoheadrightarrow P^\perp/P\) on a generating set of the
+            quotient lattice; this returns the same section with values in the
+            ambient lattice, so a vector of the quotient can be lifted linearly.
+            """
+            reduction = self.isotropic_reduction()
+            quotient = reduction.quotient_lattice()
+            perpendicular_inclusion = reduction.orthogonal_complement().inclusion()
+            frame = reduction.coordinate_frame()
+            return {
+                label: perpendicular_inclusion(frame(label))
+                for label in quotient.module_generating_set()
+            }
+
+        @cached_method
+        def splitting_complement(self):
+            r"""Return a `ZZ`-basis complement of `P^\perp` that is orthogonal to `K`, or ``None``.
+
+            The Levi action on `P` is read in the coordinates `(P, U)` where `U`
+            completes a `ZZ`-basis of \(P^\perp\) to one of `L`.  A Levi element
+            acts on `P` by `M` and on `U` by the contragredient matrix; it is an
+            isometry of `L` exactly when that matrix is integral, which is what
+            makes the lift constructive in the *split* case of
+            :meth:`levi_lift_generators`: `P \perp U` is then an orthogonal
+            summand of `L` carrying the plane.  The returned pair is ``None``
+            when no such complement exists, i.e. when the complement pairs
+            nontrivially with \(K = P^\perp/P\).
+            """
+            lattice = self.ambient_lattice()
+            labels = tuple(lattice.module_generating_set())
+            rank = len(labels)
+            current = matrix(
+                SageZZ, [self.coordinates(vector) for vector in self.perpendicular_basis()]
+            )
+            complement = []
+            for position in range(rank):
+                row = tuple(1 if other == position else 0 for other in range(rank))
+                augmented = matrix(SageZZ, tuple(current.rows()) + (row,))
+                if augmented.rank() > current.rank():
+                    current = augmented
+                    complement.append(row)
+                if len(complement) == 2:
+                    break
+            if len(complement) != 2:
+                return None
+            vectors = tuple(self.vector_from_coordinates(row) for row in complement)
+            zero = lattice.base_ring().zero()
+            for lifted in self.quotient_frame_lifts().values():
+                for vector in vectors:
+                    if lattice.b(vector, lifted) != zero:
+                        return None
+            return vectors
+
+        @cached_method
+        def levi_lift_generators(self):
+            r"""Return the integral Levi lifts of the elementary matrices of \(GL(P)\).
+
+            For a fixed plane basis `(p_1, p_2)` and a complement `(u_1, u_2)` of
+            \(P^\perp\) the isometry `g` with `g|_P = M` and `g|_{K} = 1` has
+            contragredient matrix
+
+            \[
+            g|_{U} = {}^{t}\left(J\,M^{-1}\,J^{-1}\right),
+            \qquad J = (b(p_i, u_j)),
+            \]
+
+            the block equation `J = g|_P J g|_U^t` of Dutour Sikirić--Hulek,
+            *Moduli of polarised Enriques surfaces -- computational aspects*,
+            J. London Math. Soc. 110 (2024), arXiv:2302.01679v2, §"The Tits
+            building", Theorem (`theorem_isotropic_k_planes`, printed p. 22),
+            which determines the `P`-block from the `U`-block uniquely (their
+            `P_1` from `Q_1`); the same equations give `g|_{P^\perp}` from the
+            action on `K`.  Row-vector convention there, column-vector
+            convention here: `J = P_1 J Q_1^t` becomes `g|_P J g|_U^t = J`.
+            So `g` is integral exactly when that matrix is, and the lifts of the
+            elementary matrices of `GL_2(ZZ)` generate the image of the
+            parabolic in `GL(P)`: for `J = diag(1, 2)` the condition is
+            `b` even on `[[a, b], [c, d]]`, i.e. `\Gamma^0(2)`, generated by
+            `[[1, 0], [1, 1]]`, `[[1, 2], [0, 1]]` and `\pm 1`.
+            """
+            complement = self.splitting_complement()
+            if complement is None:
+                return ()
+            lattice = self.ambient_lattice()
+            plane = self.plane_basis()
+            ring = lattice.base_ring()
+            pairing = matrix(
+                SageZZ,
+                [
+                    [int(lattice.b(left, right)) for right in complement]
+                    for left in plane
+                ],
+            )
+            if int(pairing.determinant()) == 0:
+                raise ValueError(
+                    f"the complement of P^perp found for {self} does not pair "
+                    f"nondegenerately with the plane"
+                )
+            # A ZZ-basis of P^perp on the plane's own generators, continued by a frame
+            # of K = P^perp/P; the plane's vectors are already inside P^perp.
+            rank = len(lattice.module_generating_set())
+            current = matrix(SageZZ, [self.coordinates(vector) for vector in plane])
+            frame = []
+            for vector in self.perpendicular_basis():
+                row = self.coordinates(vector)
+                augmented = matrix(SageZZ, tuple(current.rows()) + (row,))
+                if augmented.rank() > current.rank():
+                    current = augmented
+                    frame.append(row)
+                if len(frame) == rank - 4:
+                    break
+            basis = tuple(plane) + tuple(complement) + tuple(
+                self.vector_from_coordinates(row) for row in frame
+            )
+            change = matrix(
+                SageZZ,
+                [self.coordinates(vector) for vector in basis],
+            )
+            inverse = change.inverse()
+            images = {}
+            candidates = [
+                ((1, 0), (1, 1)),
+                ((1, 0), (-1, 1)),
+                ((1, 0), (2, 1)),
+                ((1, 2), (0, 1)),
+                ((1, -2), (0, 1)),
+                ((1, 4), (0, 1)),
+                ((1, 6), (0, 1)),
+                ((1, 0), (3, 1)),
+                ((1, 0), (6, 1)),
+                ((-1, 0), (0, -1)),
+                ((-1, 0), (0, 1)),
+                ((1, 0), (0, -1)),
+            ]
+            found = []
+            for entries in candidates:
+                action = matrix(SageZZ, [[entries[0][0], entries[0][1]], [entries[1][0], entries[1][1]]])
+                if int(action.determinant()) not in (1, -1):
+                    continue
+                contragredient = (pairing * action.inverse() * pairing.inverse()).transpose()
+                if any(entry not in SageZZ for entry in contragredient.list()):
+                    continue
+                block = matrix(SageZZ, rank, rank, 0)
+                for row in range(2):
+                    for column in range(2):
+                        block[row, column] = action[row, column]
+                        block[2 + row, 2 + column] = contragredient[row, column]
+                for position in range(4, rank):
+                    block[position, position] = 1
+                lifted = inverse * block * change
+                if any(entry not in SageZZ for entry in lifted.list()):
+                    continue
+                images = {}
+                for column, label in enumerate(lattice.module_generating_set()):
+                    images[label] = lattice.linear_combination(
+                        {
+                            other: ring(int(lifted[row, column]))
+                            for row, other in enumerate(
+                                lattice.module_generating_set()
+                            )
+                            if lifted[row, column]
+                        }
+                    )
+                found.append(lattice.Aut()(images))
+            return tuple(found)
+
+        def is_parabolic_complete(self) -> bool:
+            r"""Return whether the split hypothesis of :meth:`levi_lift_generators` holds."""
+            return self.splitting_complement() is not None
+
+        @cached_method
+        def parabolic_stabilizer_generators(self):
+            r"""Return generators of the parabolic \(P_I = \mathrm{Stab}_{O(L)}(I)\) at this plane.
+
+            The construction is the published block decomposition of the
+            parabolic, and its three factors are constructed separately:
+
+            * the **unipotent radical**, as `1 + n` over a `ZZ`-basis of the
+              nilpotent endomorphisms that kill `I` and carry \(I^\perp\) into
+              `I` (:meth:`unipotent_radical_generators`);
+            * the **Levi factor on \(I^\perp/I\)**, as the reflections in the
+              root shells of the definite quotient lifted into \(I^\perp\)
+              (:meth:`quotient_reflection_generators`);
+            * the **Levi factor on \(I\)**, as the integral lifts of the
+              elementary matrices of `GL_2(ZZ)` (:meth:`levi_lift_generators`).
+
+            When `L` splits along the plane as `P \perp U \perp K` with
+            `(P, U)` an orthogonal summand and `K = P^\perp/P`, this is a
+            generating set of the whole parabolic: an isometry `g` preserving
+            `I` induces `(g|_I, g|_K)` in `GL(I) \times O(K)`, a lift of that
+            pair differs from `g` by an element of the radical, and each of the
+            three factors is generated above.  Without the splitting the last
+            two factors are only a subgroup, and :meth:`is_parabolic_complete`
+            says so; the discriminant image is what the caller compares.
+
+            Sources, all read in the arXiv text of the cited version: Dutour
+            Sikirić--Hulek, arXiv:2302.01679v2, §"The Tits building",
+            Theorem `theorem_isotropic_k_planes` (the block form of an isometry
+            preserving an isotropic `k`-plane, its Levi blocks `P_1, Q_1, Q_3`
+            and the unipotent blocks, with their row-vector convention), and
+            the "Approximate models" subsection (Eichler's criterion: the
+            transvections `E_{e,x}`, `e` isotropic and `x \perp e`, after
+            Scattone, *Ph.D. thesis*, §3.7 Proposition 3.7.3).
+            """
+            return (
+                self.unipotent_radical_generators()
+                + self.quotient_reflection_generators()
+                + self.levi_lift_generators()
+            )
+
+
 __all__ = ["PrimitiveIsotropicSubobjects"]
+
+# ---------------------------------------------------------------------------
+# The parabolic subgroup of an isotropic plane, by its published block form.
+# ---------------------------------------------------------------------------
+
+
+def _kernel_basis_rows(integer_matrix):
+    r"""Return the integer kernel of ``integer_matrix`` as a tuple of coordinate rows.
+
+    The kernel of an integer matrix is a saturated sublattice of ``ZZ^n``, so the
+    rows returned span its integer points and not only its rational span.  Sage's
+    ``kernel()`` is the left kernel, so the transpose is what carries the rows
+    ``x`` with ``A x = 0``.
+    """
+    kernel = integer_matrix.transpose().kernel()
+    return tuple(tuple(int(entry) for entry in row) for row in kernel.basis_matrix().rows())

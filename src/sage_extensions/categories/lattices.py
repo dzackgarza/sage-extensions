@@ -1917,12 +1917,71 @@ class Lattices(OwnedCategoryOverBaseRing):
         ``_FunctorCategory``, and ``LatticeIsometryMor``, whose orbit
         splitting and vector stabilizers read the apex image of ``Aut`` of
         a marking of an indefinite lattice.
+
+        When the marking is a primitive isotropic *plane* of an indefinite even
+        lattice over `ZZ` that splits along it, the generators are constructed
+        here rather than by the indefinite port
+        (:meth:`sage_extensions.categories.isotropic_parabolics.PrimitiveIsotropicSubobjects.ParentMethods.parabolic_stabilizer_generators`):
+        they are the unipotent radical, the reflections of the Levi factor on
+        \(P^\perp/P\) and the integral lifts of the Levi factor on \(P\), and they
+        are computed by integer linear algebra in this repository.  The port's
+        rank-two branch answers the same question by converting each rational
+        generator of its integral-structure action to an integral isometry, and
+        on \(T_{\mathrm{En}}\) that conversion does not return (#295, `TRAPS.md`).
         """
+        parabolic = self._isotropic_plane_parabolic_generators(marked)
+        if parabolic is not None:
+            return parabolic
         from sage_indefinite_port.indefinite.marked_lattices import (
             automorphism_group_generators,
         )
 
         return automorphism_group_generators(diagram_category, marked)
+
+    def _isotropic_plane_parabolic_generators(self, marked):
+        r"""Generators of the parabolic at a plane marking, or ``None`` when this is not one.
+
+        The marking must be an arrow whose source is a primitive totally
+        isotropic plane of an indefinite lattice over `ZZ`, and the lattice must
+        split along the plane; otherwise ``None`` is returned and the caller
+        keeps its own route.
+        """
+        from sage_extensions.categories.isotropic_parabolics import (
+            PrimitiveIsotropicSubobjects,
+        )
+
+        arrow = getattr(marked, "arrow", None)
+        if arrow is None:
+            return None
+        codomain = arrow.codomain()
+        if not hasattr(codomain, "lattice_category") or codomain.base_ring() is not _owned_integers():
+            return None
+        if codomain.is_definite() is not False:
+            return None
+        if codomain.is_even() is not True:
+            # The radical's elementary transvections have the half-integral
+            # coefficient q(x)/2 of an even lattice; on an odd lattice the
+            # elementary generators are the reflections in the norm-+-1 vectors
+            # instead, and this construction is not stated for them.
+            return None
+        domain = arrow.domain()
+        if domain.module_rank() != cardinal(2):
+            return None
+        images = tuple(
+            arrow(domain.module_generator(label))
+            for label in domain.module_generating_set()
+        )
+        if len(images) != 2:
+            return None
+        zero = codomain.base_ring().zero()
+        if any(codomain.q(image) != zero for image in images) or codomain.b(
+            images[0], images[1]
+        ) != zero:
+            return None
+        subobject = codomain.primitive_isotropic_subobject(*images)
+        if not subobject.is_parabolic_complete():
+            return None
+        return finite_ordered_set(subobject.parabolic_stabilizer_generators())
 
     def _marking_component(self, source_marking, target_marking, apex):
         r"""Implementer side of the marked-diagram contract: ``alpha`` with ``kappa alpha = g iota``.

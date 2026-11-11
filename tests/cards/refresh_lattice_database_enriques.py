@@ -30,8 +30,10 @@ RAW = "https://raw.githubusercontent.com/dzackgarza/lattice-database/{ref}/{path
 # The two card paths, as the database lays them out.
 ARITHMETIC_GROUP_PATH = "arithmetic-groups/{slug}.md"
 
-# The two Scattone rank-21 cards whose primitive-isotropic-plane rows are read.
-SCATTONE_TAGS = ("6JRX", "6JRY")
+# The lattice cards whose primitive-isotropic-plane rows are read: the two
+# Scattone rank-21 cards, and the Enriques period lattice 029J whose two
+# O(N)-orbits of primitive isotropic planes (#295, #316) are Sterk's.
+PLANE_ORBIT_TAGS = ("6JRX", "6JRY", "029J")
 LATTICE_PATH = "lattices/{tag}.md"
 
 # The Coble lattice card, whose discriminant-form rows #323 reads.
@@ -191,7 +193,7 @@ def main(argv: list[str]) -> int:
         },
         "arithmetic_groups": groups,
         "polarization_counts": lattice_table4(ref, "0128"),
-        "plane_orbits": {tag: plane_orbits(ref, tag) for tag in SCATTONE_TAGS},
+        "plane_orbits": {tag: plane_orbits(ref, tag) for tag in PLANE_ORBIT_TAGS},
         "discriminant_forms": {tag: discriminant_form(ref, tag) for tag in DISCRIMINANT_FORM_TAGS},
     }
     DIGEST.write_text(json.dumps(digest, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
