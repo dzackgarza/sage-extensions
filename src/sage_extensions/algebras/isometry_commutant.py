@@ -103,6 +103,19 @@ def _integer_solution(equations, target):
     return right * vector(ZZ, solution)
 
 
+def _factor_centralizer_generators(factor):
+    r"""Return the centralizer generators of a central factor through the port's dispatch.
+
+    A factor can be a division quaternion algebra over `Q` or central simple over a field `K \ne Q`;
+    their arithmetic groups are built by ``sage_indefinite_port.indefinite.commutant_groups``
+    (Voronoi units, unitary models over `O_K`), which falls back to this class otherwise and
+    raises :class:`NotImplementedError` naming the factor when no route exists.
+    """
+    from sage_indefinite_port.indefinite.commutant_groups import centralizer_generators
+
+    return centralizer_generators(factor)
+
+
 class IsometryCommutant:
     r"""The commutant algebra and integral order of a set of isometries."""
 
@@ -679,7 +692,7 @@ class IsometryCommutant:
                 matrix(ZZ, [pieces[k * size + i] for i in range(size)]).transpose()
                 for k in range(len(self.isometries))
             ]
-            for generator in IsometryCommutant(gram_block, restricted).centralizer_generators():
+            for generator in _factor_centralizer_generators(IsometryCommutant(gram_block, restricted)):
                 basis = image.stack(matrix(ZZ, sum((matrix(ZZ, e).transpose().row_module().basis_matrix().rows() for j, e in enumerate(idempotents) if j != index), [])))
                 block = identity_matrix(ZZ, self.rank)
                 block[:size, :size] = generator.transpose()
@@ -712,7 +725,7 @@ class IsometryCommutant:
             scaled = matrix(ZZ, form.denominator() * form)
             restricted = [matrix(ZZ, basis.solve_right(F * basis)) for F in self.isometries]
             size = basis.ncols()
-            for generator in IsometryCommutant(scaled, restricted).centralizer_generators():
+            for generator in _factor_centralizer_generators(IsometryCommutant(scaled, restricted)):
                 move = identity_matrix(ZZ, self.rank)
                 move[offset : offset + size, offset : offset + size] = generator
                 generators.append(move)
