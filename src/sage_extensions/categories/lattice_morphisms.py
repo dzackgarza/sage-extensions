@@ -4153,18 +4153,24 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         r"""The category of marked lattices with apex ``L`` of which ``marked`` is an object.
 
         The marking categories over ``Lattices(R)`` are ``Ar(Lattices)``,
-        ``Fun([n], Lattices)`` and the coslices ``X/Lattices``; a coslice
-        object names its ``X`` as the source of its arrow.
+        ``Fun([n], Lattices)``, the oriented isotropic flags and the coslices
+        ``X/Lattices``; a coslice object names its ``X`` as the source of its
+        arrow, and an oriented flag diagram its number of terms.
         """
+        from sage_extensions.categories.abstract_categories.cat import _FunctorObject
         from sage_extensions.categories.abstract_categories.products import (
             FiniteOrdinalCategory,
         )
+        from sage_extensions.categories.lattices import OrientedFlagDiagram, OrientedIsotropicFlags
 
         lattice = self.lattice()
         lattices = lattice.lattice_category()
         sublattices = Cat().Mor(FiniteOrdinalCategory(2), lattices)
         flags = Cat().Mor(FiniteOrdinalCategory(3), lattices)
-        match marked:
+        diagram = marked.functor() if isinstance(marked, _FunctorObject) else marked
+        match diagram:
+            case OrientedFlagDiagram():
+                category = OrientedIsotropicFlags(lattices, int(diagram.oriented_flag().flag().flag_length()))
             case _ if marked in sublattices:
                 category = sublattices
             case _ if marked in flags:

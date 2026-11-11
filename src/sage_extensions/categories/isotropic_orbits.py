@@ -1139,14 +1139,19 @@ def _marked_isotropic_object(obj, *, flag):
             from sage_extensions.categories.abstract_categories.products import FiniteSequenceDiagram
             from sage_extensions.categories.lattices import Lattices
 
-            terms = tuple(obj.terms())
-            arrows = tuple(
-                left.inclusion().factor_through(right.inclusion())
-                for left, right in pairwise(terms)
-            ) + (terms[-1].inclusion(),)
-            objects = (arrows[0].domain(), *(arrow.codomain() for arrow in arrows))
+            objects, arrows = _flag_diagram_data(obj)
             diagram = FiniteSequenceDiagram(objects, arrows, Lattices(obj.lattice().base_ring()))
-            return _marked_isotropic_category(obj.lattice(), len(terms))(diagram)
+            return _marked_isotropic_category(obj.lattice(), len(arrows))(diagram)
+
+
+def _flag_diagram_data(flag):
+    r"""The objects and adjacent arrows of the chain ``I_{d_1} -> ... -> I_{d_t} -> L`` of a flag."""
+    terms = tuple(flag.terms())
+    arrows = tuple(
+        left.inclusion().factor_through(right.inclusion())
+        for left, right in pairwise(terms)
+    ) + (terms[-1].inclusion(),)
+    return (arrows[0].domain(), *(arrow.codomain() for arrow in arrows)), arrows
 
 
 def _isotropic_object_from_marked(marked, *, flag):

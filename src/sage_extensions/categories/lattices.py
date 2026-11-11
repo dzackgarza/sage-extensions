@@ -77,7 +77,7 @@ from sage_extensions.categories.abstract_categories.arrow_categories import (
     CosliceCategory,
     _WalkingArrowFunctorCategory,
 )
-from sage_extensions.categories.abstract_categories.products import _FiniteSequenceFunctorCategory
+from sage_extensions.categories.abstract_categories.products import FiniteSequenceDiagram, _FiniteSequenceFunctorCategory
 from sage_extensions.categories.definite_lattices import (
     _babai,
     _bkz_reduction,
@@ -124,6 +124,9 @@ from sage_extensions.categories.group.predicate_subgroups import (
 )
 from sage_extensions.categories.isotropic_orbits import (
     IsotropicFlag,
+    OrientedIsotropicFlag,
+    _flag_diagram_data,
+    _graded_orientation_signs,
     _isotropic_flag_locus,
     _isotropic_sublattice_locus,
     _primitive_isotropic_sublattice_locus,
@@ -2254,6 +2257,129 @@ class _MarkedLatticeMethods:
         return primitive_marking_classes(self, source, lattice)
 
 
+class OrientedFlagDiagram(FiniteSequenceDiagram):
+    r"""The chain ``I_{d_1} -> ... -> I_{d_t} -> L`` of an oriented isotropic flag, with its orientations.
+
+    The diagram is that of the underlying flag; the orientation of each
+    graded piece ``I_{d_j}/I_{d_{j-1}}`` is the one of the adapted basis of
+    :class:`~sage_extensions.categories.isotropic_orbits.OrientedIsotropicFlag`.
+    Two orientations of one flag are two diagrams.
+    """
+
+    def __init__(self, oriented: OrientedIsotropicFlag) -> None:
+        self._oriented = oriented
+        objects, arrows = _flag_diagram_data(oriented.flag())
+        super().__init__(objects, arrows, oriented.lattice().lattice_category())
+
+    def oriented_flag(self) -> OrientedIsotropicFlag:
+        return self._oriented
+
+    def _repr_(self) -> str:
+        return f"Diagram of {self._oriented}"
+
+
+class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCategory):
+    r"""Lattices marked by an oriented primitive isotropic flag with ``t`` terms.
+
+    An object is a flag ``I_{d_1} ⊂ ... ⊂ I_{d_t}`` of primitive totally
+    isotropic sublattices of ``L`` together with an orientation of each
+    graded piece ``I_{d_j}/I_{d_{j-1}}``: a generator of its top exterior
+    power up to positive scalars.  An isomorphism is a natural isomorphism of
+    the flag diagrams in ``Fun([t], Lattices)`` whose apex isometry ``g``
+    carries each orientation onto the orientation, so ``g`` determines it.
+    The isomorphism decisions are those of
+    :meth:`~sage_extensions.categories.lattice_morphisms.LatticeIsometryMor.oriented_isotropic_equivalence_witness`
+    and ``oriented_isotropic_stabilizer_generators``, reached through the
+    marked-diagram contract of the lattice category.
+    """
+
+    @staticmethod
+    @cached_function(key=lambda cls, lattices, length: (cls, id(lattices), int(length)))
+    def __classcall__(cls, lattices, length):
+        from sage.misc.classcall_metaclass import typecall
+        from sage.structure.dynamic_class import DynamicMetaclass
+
+        from sage_extensions.categories.abstract_categories.cat import Cat
+        from sage_extensions.categories.abstract_categories.products import FiniteOrdinalCategory
+
+        match cls:
+            case DynamicMetaclass():
+                return cls.__base__(lattices, length)
+        assert int(length) >= 1, f"an oriented isotropic flag has at least one term, not {length}"
+        return typecall(cls, Cat(), FiniteOrdinalCategory(int(length) + 1), lattices)
+
+    def _make_named_class_key(self, name):
+        return OrientedIsotropicFlags, self.category_of_categories(), self.domain_category(), self.codomain_category()
+
+    def __call__(self, oriented):
+        r"""The object on an oriented flag, or the oriented diagram itself."""
+        match oriented:
+            case OrientedIsotropicFlag():
+                diagram = self._object_on(oriented)
+            case OrientedFlagDiagram():
+                diagram = oriented
+            case _:
+                raise TypeError(f"{oriented} is not an oriented isotropic flag, so it is not an object of {self}")
+        if not self._has_endpoints_of(diagram):
+            raise ValueError(f"{diagram} is not an object of {self}: its shape or its category is wrong")
+        return diagram
+
+    object = __call__
+
+    @cached_method(key=lambda self, oriented: id(oriented))
+    def _object_on(self, oriented):
+        return OrientedFlagDiagram(oriented)
+
+    def __contains__(self, candidate) -> bool:
+        from sage_extensions.categories.abstract_categories.cat import _FunctorObject
+
+        if isinstance(candidate, _FunctorObject):
+            candidate = candidate.functor()
+        return isinstance(candidate, OrientedFlagDiagram) and self._has_endpoints_of(candidate)
+
+    def apex_action(self, automorphism, marked):
+        r"""The oriented flag ``g(F)`` with the orientations ``g`` carries: the adapted basis moved by ``g``."""
+        oriented = marked.functor().oriented_flag()
+        return self(
+            OrientedIsotropicFlag(
+                oriented.lattice(),
+                tuple(automorphism(point) for point in oriented.basis()),
+                flag_type=oriented.flag().flag_type(),
+            )
+        )
+
+    def apex_stabilizer(self, marked):
+        r"""``{g in O(L) : g(I_{d_j}) = I_{d_j} and det(g | I_{d_j}/I_{d_{j-1}}) = 1 for every j}``."""
+        oriented = marked.functor().oriented_flag()
+        flag = oriented.flag()
+        orthogonal_group = oriented.lattice().O()
+        terms = tuple(
+            (term.inclusion(), oriented.basis()[:rank])
+            for term, rank in zip(flag.terms(), flag.flag_type().dimensions, strict=True)
+        )
+
+        def preserves(automorphism):
+            inverse = automorphism.inverse()
+            stabilizes = all(
+                inclusion.is_in_image(automorphism(point)) and inclusion.is_in_image(inverse(point))
+                for inclusion, points in terms
+                for point in points
+            )
+            return stabilizes and all(sign == 1 for sign in _graded_orientation_signs(automorphism, flag, flag))
+
+        stabilizer = orthogonal_group.predicate_subgroup(
+            preserves,
+            f"g carries {oriented} onto itself with every graded orientation",
+        )
+        return stabilizer.select_group_generators(
+            lambda: orthogonal_group._marking_stabilizer_generators(self, marked, stabilizer)
+        )
+
+    def _repr_(self) -> str:
+        length = int(self.domain_category().object_set().cardinality()) - 1
+        return f"Oriented isotropic flags with {length} terms in {self.codomain_category()}"
+
+
 def _dynkin_numbering(lattice_gram, cartan):
     r"""Return the numbering ``sigma`` with ``lattice_gram[i][j] == -cartan[sigma[i]][sigma[j]]``.
 
@@ -2511,12 +2637,13 @@ class Lattices(OwnedCategoryOverBaseRing):
         an integral isometry, and on \(T_{\mathrm{En}}\) that conversion did not
         return on the recorded runs (#295, #326, `TRAPS.md`).
 
-        A coslice marking asks for the pointwise stabilizer of the plane, a
-        proper subgroup of the parabolic, so it keeps the port's route.
+        A coslice marking asks for the pointwise stabilizer of the plane, and an
+        oriented plane for the kernel of the determinant on the plane; both are
+        proper subgroups of the parabolic, so they keep the port's route.
         """
         parabolic = (
             None
-            if isinstance(diagram_category, CosliceCategory)
+            if isinstance(diagram_category, (CosliceCategory, OrientedIsotropicFlags))
             else self._isotropic_plane_parabolic_generators(marked)
         )
         if parabolic is not None:

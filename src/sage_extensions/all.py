@@ -211,6 +211,7 @@ from sage_extensions.categories.lattices import (  # noqa: F401  # noqa: F401
     FiniteRankLattices,
     IsotropicReductions,
     Lattices,
+    OrientedIsotropicFlags,
     NoncrystallographicRootLattices,
     NondegenerateLattices,
     NotPrimitiveError,
