@@ -521,12 +521,12 @@ def test_doubled_jordan_block_has_nonabelian_skew_radical():
 
 
 def test_product_levi_quotient_centralizer_reaches_both_signs():
-    gram = sage_matrix(SageZZ, 4, 4, [0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1])
-    F = sage_matrix(SageZZ, 4, 4, [1, -1, -2, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1])
+    gram = sage_matrix(SageZZ, int(4), int(4), [int(0), int(1), int(0), int(0), int(1), int(0), int(0), int(0), int(0), int(0), int(2), int(0), int(0), int(0), int(0), int(1)])
+    F = sage_matrix(SageZZ, int(4), int(4), [int(1), -int(1), -int(2), int(0), int(0), int(1), int(0), int(0), int(0), int(1), int(1), int(0), int(0), int(0), int(0), int(1)])
     commutant = IsometryCommutant(gram, [F])
-    assert commutant.dimension() - len(commutant.radical_basis()) == 2
+    assert commutant.dimension() - len(commutant.radical_basis()) == int(2)
     generators = commutant.centralizer_generators()
     assert all(g * F == F * g and g.transpose() * gram * g == gram for g in generators)
-    signs = sage_matrix(SageGF(2), [[0 if g[1, 1] == 1 else 1, 0 if g[3, 3] == 1 else 1] for g in generators])
-    assert all(g[1, 1] in (1, -1) and g[3, 3] in (1, -1) for g in generators)
-    assert signs.rank() == 2
+    signs = sage_matrix(SageGF(int(2)), [[int(0) if g[int(1), int(1)] == int(1) else int(1), int(0) if g[int(3), int(3)] == int(1) else int(1)] for g in generators])
+    assert all(g[int(1), int(1)] in (int(1), -int(1)) and g[int(3), int(3)] in (int(1), -int(1)) for g in generators)
+    assert signs.rank() == int(2)
