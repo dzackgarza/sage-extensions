@@ -176,16 +176,69 @@ $348\,364\,800$, and the $2^8$ it misses is $U_{d_1}$ — the images of the
 transvections along a *half* lattice vector, $w \in T_{\mathrm{En}}^\#$, which no
 integral-parameter transvection and no plane-preserving lift produces.
 
+## 2c. The repair: the half-vector transvections
+
+The obstruction of §2b is the transvection along a vector of the metric dual
+that is not a lattice vector, and it is now in the family.
+
+*Construction.*  For a primitive isotropic `e` of divisibility two and
+`w ∈ L^#` with `b(e,w) = 0`, `2w ∈ L` and `q(w) ∈ Z`,
+
+$$E_{e,w}(x) = x - b(w,x)e + b(e,x)w - \tfrac12 q(w)b(e,x)e,$$
+
+the Eichler transvection formula — Dawes, section 2 equation (7), the
+transcription `Lattices.ParentMethods.eichler_transvection` already carries for
+`w ∈ L`; Gritsenko–Hulek–Sankaran, *The desingularization of the moduli space of
+Enriques surfaces*, arXiv:0810.1614, section 3.1, equations (4)–(5); and
+Scattone, *On the compactification of moduli spaces for algebraic K3 surfaces*,
+Mem. Amer. Math. Soc. 374 (1987), section 3.7, Proposition 3.7.3, whose criterion
+generates the radical of the parabolic at an isotropic sublattice by the
+transvections over a basis of `e^⊥`.  With those hypotheses every coefficient is
+an integer: `b(w,x) ∈ Z` because `2w ∈ L` and `L` is even, `q(w)/2 · b(e,x) ∈ Z`
+because `q(w) ∈ Z` and `b(e,x) ∈ 2Z`, and `b(e,x)w ∈ L` because `b(e,x)` is even
+and `2w ∈ L`.
+
+*Owner.*  `Lattices.ParentMethods.half_vector_transvection_parameters` decides
+the hypotheses on the dual basis and
+`…eichler_transvection_half_vector` builds the isometry, asserting integrality of
+every image before it constructs it;
+`PrimitiveIsotropicSubobjects.half_vector_transvection_generators` collects them
+for the plane, and `parabolic_stabilizer_generators` includes them beside the
+radical, the reflected Levi factor and the plane lifts.  The plane-lift code
+(`plane_block_lift`, `levi_lift_generators`) is untouched.
+
+*The checks, on `T_En` at `P_1`.*  The metric dual's 12 basis vectors give 10
+generators: one is excluded because `b(e,w) ≠ 0`, one gives the identity.  Each
+is integral (constructed in `Aut(L)`), an isometry of `T_En` on the full Gram
+matrix, and carries `P_1` onto itself —
+`True / True / True` in `.tmp/issue325-halfvector.log`.
+
+*Exactness by computation.*  In `O(A_L)`:
+
+| family | order of the image | index in `Q` |
+| --- | --- | --- |
+| radical + reflections + plane lifts | 348 364 800 | 134 912 |
+| half-vector transvections alone | 256 | 183 588 249 600 |
+| all four | **89 181 388 800** | **527** |
+| `Stab_Q(D(P_1))` (finite-group stabilizer) | **89 181 388 800** | **527** |
+
+The last two orders are equal, and that equality — `ρ(G_{P_1})` against the
+finite stabilizer both computed here — is the exactness, with no page used as
+evidence.  The half-vector family alone is the `2^8` of §2b.
+
 ## 3. What returns today
 
 * `O(T_En).isotropic_plane_orbits((P1, P2))` — the published-index route —
   returns `2` orbits, and `2` is card `029J`'s `O` row read by tag through
   `card_plane_orbit_row`.
 * `O(T_En).isotropic_plane_orbits((P1,), stabilizer_generators={0: family})` —
-  the #325 acceptance — refuses with the index above.
+  the #325 acceptance — **returns** since the half-vector transvections joined
+  the family: the call closes the sandwich at `[Q : ρ(G_{P_1})] = 527 =
+  |Q · J_{P_1}|`, and it raises rather than returning if the two indices differ.
 
-`tests/lattices/test_the_enriques_plane_index_returns.sage` pins both: the first
-green against the card, the second red, with the measured index in its docstring.
+`tests/lattices/test_the_enriques_plane_index_returns.sage`: `2 passed in
+186.52 s` (`.tmp/issue325-green.log`); before the repair, the same module was
+`1 failed, 1 passed` with the index `134912` of §2.
 
 ## 4. The five plane-orbit modules
 

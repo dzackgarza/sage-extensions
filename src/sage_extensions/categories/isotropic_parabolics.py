@@ -1346,6 +1346,49 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                     generators.append(transvection)
             return tuple(generators)
 
+        def half_vector_transvection_generators(self):
+            r"""Return the Eichler transvections of the plane along its half lattice vectors.
+
+            For a primitive isotropic `\\(e \\in P\\)` of divisibility two and
+            `\\(w \\in L^{\\#}\\)` with `\\(b(e,w) = 0\\)`, `\\(2w \\in L\\)` and
+            `\\(q(w) \\in \\mathbb{Z}\\)`, the transvection
+
+            \\[ E_{e,w}(x) = x - b(w,x)\\, e + b(e,x)\\, w - \\tfrac12 q(w)\\, b(e,x)\\, e \\]
+
+            is an integral isometry of `L` fixing `e` (Dawes, section 2 equation
+            (7); Gritsenko--Hulek--Sankaran, arXiv:0810.1614, section 3.1,
+            equations (4)--(5); Scattone, Mem. Amer. Math. Soc. 374, section 3.7,
+            Proposition 3.7.3, whose criterion generates the radical of the
+            parabolic at an isotropic sublattice by these transvections).  It
+            fixes `e` and moves `e^\\perp` by multiples of `e`, so it lies in the
+            parabolic at `P` and acts trivially on `P^\\perp/P`; on `P` it is
+            unipotent.  Because `\\(w \\notin L\\)` it acts nontrivially on the
+            discriminant classes of `L`, where every transvection of
+            :meth:`unipotent_radical_generators` acts trivially: measured on
+            `T_{\\mathrm{En}}` at `P_1`, those 20 generate a subgroup of
+            `\\rho(O(L))` of order 1, while these generate one of order
+            `\\(2^8\\)`.
+
+            The construction and its integrality conditions are
+            :meth:`sage_extensions.categories.lattices.Lattices.ParentMethods.eichler_transvection_half_vector`
+            and ``half_vector_transvection_parameters``; every returned
+            generator is checked there to be an integral isometry before it is
+            built.
+            """
+            lattice = self.ambient_lattice()
+            generators = []
+            seen = set()
+            for isotropic in self.plane_basis():
+                for parameter in lattice.half_vector_transvection_parameters(isotropic):
+                    transvection = lattice.eichler_transvection_half_vector(isotropic, parameter)
+                    key = tuple(int(transvection(vector).to_vector()(label)) for vector in lattice.module_generators() for label in lattice.module_generating_set())
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    generators.append(transvection)
+            return tuple(generators)
+
+
         @cached_method
         def quotient_reflection_generators(self):
             r"""Return the pointwise-plane reflections in the root shells of \(P^\perp/P\).
@@ -1862,6 +1905,10 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
               (:meth:`quotient_reflection_generators`);
             * the **Levi factor on \(I\)**, as the integral lifts of the
               elementary matrices of `GL_2(ZZ)` (:meth:`levi_lift_generators`).
+            * the **half-vector transvections**, as the Eichler transvections
+              `E_{e,w}` along a vector `w` of the metric dual and not of the
+              lattice (:meth:`half_vector_transvection_generators`), which are
+              the ones that move the discriminant classes.
 
             When `L` splits along the plane as `P \perp U \perp K` with
             `(P, U)` an orthogonal summand and `K = P^\perp/P`, this is a
@@ -1883,6 +1930,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             """
             return (
                 self.unipotent_radical_generators()
+                + self.half_vector_transvection_generators()
                 + self.quotient_reflection_generators()
                 + self.levi_lift_generators()
             )

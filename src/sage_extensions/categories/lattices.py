@@ -7015,6 +7015,208 @@ class Lattices(OwnedCategoryOverBaseRing):
                 self._eichler_transvection_column_matrix(isotropic, orthogonal)
             )
 
+        def _half_vector_coordinates(self, vector):
+            r"""Return the coordinates of a vector of the metric dual in the basis of `L`.
+
+            An element of ``self.dual_lattice()`` is written in the *dual* basis
+            `v_i^*`, whose Gram matrix is the inverse of the Gram matrix of `L`.
+            The transvection formula of
+            :meth:`eichler_transvection_half_vector` needs the coordinates in the
+            basis `v_i` of `L`, which are `G^-1 c` for the dual coordinates `c`.
+            """
+            from sage.matrix.constructor import matrix as sage_matrix
+            from sage.rings.rational_field import QQ as SageQQ
+
+            values = vector.to_vector()
+            dual_coordinates = []
+            for label in self.module_generating_set():
+                entry = values(label)
+                numerator = getattr(entry, "numerator", entry)
+                numerator = numerator() if callable(numerator) else numerator
+                denominator = getattr(entry, "denominator", 1)
+                denominator = denominator() if callable(denominator) else denominator
+                dual_coordinates.append(SageQQ(int(numerator)) / SageQQ(int(denominator)))
+            labels = tuple(self.module_generating_set())
+            basis = tuple(self.module_generator(label) for label in labels)
+            gram = sage_matrix(
+                SageQQ,
+                [[SageQQ(int(self.b(left, right))) for right in basis] for left in basis],
+            )
+            column = sage_matrix(SageQQ, len(labels), 1, dual_coordinates)
+            image = gram.inverse() * column
+            return [image[position, 0] for position in range(len(labels))]
+
+        def half_vector_transvection_parameters(self, isotropic):
+            r"""Return the dual basis vectors admissible for a half-vector transvection along ``isotropic``.
+
+            The transvection :meth:`eichler_transvection_half_vector` needs, for
+            \(w\) in the metric dual \(L^\#\) of `L`:
+
+            * \(b(e,w) = 0\), so that \(w \in e^\perp\) and the transvection
+              fixes \(e\);
+            * \(2w \in L\), so that \(b(e,x)\,w \in L\) for \(x \in L\)
+              whenever \(b(e,x)\) is even;
+            * \(q(w) \in \mathbb{Z}\), so that the half-norm coefficient is an
+              integer;
+            * \(b(e,x) \in 2\mathbb{Z}\) for every \(x \in L\), i.e. \(e\) of
+              divisibility two — otherwise \(b(e,x)\,w\) is not a lattice
+              vector for \(w \notin L\).
+
+            These are the integrality conditions of the transvection formula: its
+            three coefficients are \(b(w,x)\), \(q(w)/2\) and \(b(e,x)\), and
+            on a lattice with an integral form the first is integral because
+            \(2w \in L\), so the remaining two are exactly what is left.
+
+            A dual basis vector that fails any of them gives either a
+            non-integral map or the identity, and is not returned.
+            """
+            from sage.rings.integer_ring import ZZ as SageZZ
+            from sage.rings.rational_field import QQ as SageQQ
+
+            labels = tuple(self.module_generating_set())
+            basis = tuple(self.module_generator(label) for label in labels)
+            gram = self.gram_tensor()
+            if any(
+                SageZZ(int(self.b(isotropic, vector))) % SageZZ(2)
+                for vector in basis
+            ):
+                return ()
+            gram_values = [
+                [SageQQ(int(self.b(left, right))) for right in basis] for left in basis
+            ]
+            isotropic_coordinates = [
+                SageQQ(int(isotropic.to_vector()(label))) for label in labels
+            ]
+
+            def pairing(left_coordinates, right_coordinates):
+                return sum(
+                    (
+                        left_coordinates[row]
+                        * sum(
+                            (
+                                gram_values[row][column] * right_coordinates[column]
+                                for column in range(len(labels))
+                            ),
+                            SageQQ(0),
+                        )
+                        for row in range(len(labels))
+                    ),
+                    SageQQ(0),
+                )
+
+            admissible = []
+            for parameter in self.dual_lattice().module_generators():
+                coordinates = self._half_vector_coordinates(parameter)
+                if pairing(isotropic_coordinates, coordinates) != 0:
+                    continue
+                if any(
+                    SageQQ(2) * entry not in SageZZ
+                    for entry in coordinates
+                ):
+                    continue
+                if pairing(coordinates, coordinates).denominator() != 1:
+                    continue
+                admissible.append(parameter)
+            return tuple(admissible)
+
+        def eichler_transvection_half_vector(self, isotropic, parameter):
+            r"""Return the Eichler transvection \(t(e,w)\) for \(w\) in the metric dual.
+
+            The formula is the one of :meth:`eichler_transvection`,
+            \[
+            t(e,w)(x) = x - b(w,x)\,e + b(e,x)\,w - \tfrac12 q(w)\,b(e,x)\,e ,
+            \]
+            read with \(w \in L^\#\) instead of \(w \in L\) — Dawes, section 2
+            equation (7), transcribed for the integral case there and for this
+            one by Gritsenko--Hulek--Sankaran, *The desingularization of the
+            moduli space of Enriques surfaces*, arXiv:0810.1614, section 3.1,
+            equations (4)--(5), and by Scattone, *On the compactification of
+            moduli spaces for algebraic K3 surfaces*, Mem. Amer. Math. Soc. 374
+            (1987), section 3.7, Proposition 3.7.3, whose criterion generates the
+            radical of the parabolic at an isotropic sublattice by the
+            transvections \(E_{e,x}\) over a basis of \(e^\perp\).
+
+            The hypotheses are those of
+            :meth:`half_vector_transvection_parameters`, and they are asserted
+            here rather than assumed: with them every coefficient of the formula
+            is an integer and every image is a lattice vector, which is checked
+            entry by entry before the isometry is constructed.  \(w \notin L\)
+            is the point: these transvections act nontrivially on the
+            discriminant classes of `L` where the integral ones do not.
+            """
+            from sage.rings.integer_ring import ZZ as SageZZ
+            from sage.rings.rational_field import QQ as SageQQ
+
+            dual = self.dual_lattice()
+            assert parameter.parent() is dual, (
+                f"the half-vector transvection t(e, w) of {self!r} needs w in the metric dual "
+                f"{dual!r}, but {parameter!r} lies in {parameter.parent()!r}"
+            )
+            assert parameter in self.half_vector_transvection_parameters(isotropic), (
+                f"{parameter} is not an admissible half-vector parameter for the transvection "
+                f"along {isotropic} of {self!r}: the integrality conditions of "
+                f"`half_vector_transvection_parameters` fail"
+            )
+            labels = tuple(self.module_generating_set())
+            basis = tuple(self.module_generator(label) for label in labels)
+            gram_values = [
+                [SageQQ(int(self.b(left, right))) for right in basis] for left in basis
+            ]
+            isotropic_coordinates = [
+                SageQQ(int(isotropic.to_vector()(label))) for label in labels
+            ]
+            parameter_coordinates = self._half_vector_coordinates(parameter)
+
+            def pairing(left_coordinates, right_coordinates):
+                return sum(
+                    (
+                        left_coordinates[row]
+                        * sum(
+                            (
+                                gram_values[row][column] * right_coordinates[column]
+                                for column in range(len(labels))
+                            ),
+                            SageQQ(0),
+                        )
+                        for row in range(len(labels))
+                    ),
+                    SageQQ(0),
+                )
+
+            half_norm = pairing(parameter_coordinates, parameter_coordinates) / SageQQ(2)
+            images = []
+            for label, vector in zip(labels, basis, strict=True):
+                vector_coordinates = [SageQQ(int(vector.to_vector()(other))) for other in labels]
+                pairing_with_isotropic = pairing(isotropic_coordinates, vector_coordinates)
+                pairing_with_parameter = pairing(parameter_coordinates, vector_coordinates)
+                coordinates = [
+                    vector_coordinates[position]
+                    + pairing_with_isotropic * parameter_coordinates[position]
+                    - (
+                        pairing_with_parameter
+                        + half_norm * pairing_with_isotropic
+                    )
+                    * isotropic_coordinates[position]
+                    for position in range(len(labels))
+                ]
+                assert all(entry.denominator() == 1 for entry in coordinates), (
+                    f"the Eichler transvection t(e, w) with e = {isotropic} and w = {parameter} "
+                    f"is not an integral isometry of {self!r}: it carries {label} outside the "
+                    f"lattice, with coordinates {coordinates}"
+                )
+                images.append(
+                    self.linear_combination(
+                        dict(
+                            zip(
+                                labels,
+                                (self.base_ring()(int(entry)) for entry in coordinates),
+                                strict=True,
+                            )
+                        )
+                    )
+                )
+            return self.Aut()(tuple(images))
+
         def is_positive_definite(self) -> bool:
             signature = self.signature_pair()
             return (
