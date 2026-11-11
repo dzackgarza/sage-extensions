@@ -507,7 +507,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 self, rank, flag=flag
             )
 
-        def isotropic_plane_orbits(self, representatives=None):
+        def isotropic_plane_orbits(self, representatives=None, *, stabilizer_generators=None):
             r"""Return this subgroup's orbits of primitive isotropic planes, one per divided-class point.
 
             The planes of an indefinite lattice are classified inside each
@@ -550,24 +550,41 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             ``\rho(\Gamma)``-orbits on the finite ``\rho(O(L))``-orbit of the
             plane's class set, which is the computation here.
 
-            **4. The check the published indices supply.**  On
-            ``T_{\mathrm{En}}`` the images of the stabilizers of ``P_1`` and
-            ``P_2`` have index ``527 = 17\cdot 31`` and
-            ``23715 = 3^2\cdot 5\cdot 17\cdot 31`` in ``\rho(O(L))``
-            (Dutour Sikirić--Hulek, §3.6, p. 22), and the class sets of the two
-            representatives are exactly those sizes, so the two class orbits
-            are ``527`` and ``23715`` points and the trivial-image subgroup has
-            ``527 + 23715 = 24242`` plane orbits, the ``1``-cusps of that
-            paper's ``\widetilde{\mathcal{M}}_{\mathrm{En}}``.  For
-            ``\Gamma = \Gamma_{\mathrm{En},2}`` -- the image in
-            ``O(T_{\mathrm{En}})`` of ``\{g \in O(L) : g I_{\mathrm{En}} =
-            I_{\mathrm{En}} g,\ g(h) = h\}``, V. Alexeev, P. Engel,
-            D. Z. Garza, L. Schaffler, *Compact moduli of Enriques surfaces of
-            degree 2*, Nagoya Math. J. 259 (2025), Def. 2.6, with ``F_{En,2} =
-            \mathbb{D}(T_{\mathrm{En}})/\Gamma_{\mathrm{En},2}`` of Def. 2.7 and
-            the boundary of Cor. 3.12 -- the same finite computation returns
-            the ``9`` plane orbits those authors state for the ``1``-cusps of
-            ``F_{En,2}`` (§3.3, p. 590).
+            **4. The check the published indices supply, and the check the call now
+            demands.**  The count in step 3 is the number of ``\Gamma``-orbits of
+            planes only when ``\rho(G_x) = \mathrm{Stab}_Q(J_x)``, ``G_x`` being the
+            stabilizer of the plane ``x`` and ``J_x`` its divided class set:
+            ``\rho(G_x) \subseteq \mathrm{Stab}_Q(J_x)`` always, since ``x \mapsto J_x``
+            is built from lattice operations and ``\widetilde{O}(L) = \ker \rho`` acts
+            trivially, so ``|Q . J_x| \le [Q : \rho(G_x)]`` and a count read off
+            ``Q . J_x`` is a *lower bound* until the two agree.  Dutour Sikirić--Hulek,
+            §3.6, p. 22 supply that agreement for ``N = U \oplus U(2) \oplus E_8(-2)``:
+            the images of the stabilizers of ``P_1`` and ``P_2`` have index
+            ``527 = 17 \cdot 31`` and ``23715 = 3^2 \cdot 5 \cdot 17 \cdot 31`` in
+            ``\rho(O(N))``, and their class sets are exactly those sizes, so the trivial-image subgroup has
+            ``527 + 23715 = 24242`` plane orbits, the ``1``-cusps of that paper's
+            ``\widetilde{\mathcal{M}}_{\mathrm{En}}``.  With both of the paper's orbits
+            present, a computed set of class-orbit sizes equal to ``{527, 23715}``
+            forces the equality orbit by orbit, because each size bounds its own index
+            from below and the two published indices are distinct.  For
+            ``\Gamma = \Gamma_{\mathrm{En},2}`` -- the image in ``O(T_{\mathrm{En}})``
+            of ``\{g \in O(L) : g I_{\mathrm{En}} = I_{\mathrm{En}} g,\ g(h) = h\}``,
+            V. Alexeev, P. Engel, D. Z. Garza, L. Schaffler, *Compact moduli of
+            Enriques surfaces of degree 2*, Nagoya Math. J. 259 (2025), Def. 2.6, with
+            ``F_{En,2} = \mathbb{D}(T_{\mathrm{En}})/\Gamma_{\mathrm{En},2}`` of Def. 2.7
+            and the boundary of Cor. 3.12 -- the same finite computation returns the
+            ``9`` plane orbits those authors state for the ``1``-cusps of ``F_{En,2}``
+            (§3.3, p. 590).  The lattice hypothesis of that citation is checked by
+            exhibiting an isometry onto ``N``, not by comparing invariants.
+
+            Where neither applies the call raises, naming the representative and the
+            missing fact, instead of returning a lower bound: on another lattice
+            (``T_{\mathrm{Co}}`` is the motivating one) the plane row is not yet
+            available.  An alternative for such a lattice is
+            ``stabilizer_generators``, a mapping from the position of a representative
+            to generators of its stabilizer in ``O(L)``; each is checked to stabilize
+            the plane, and ``[Q : \langle\rho(h)\rangle]`` then bounds ``[Q : \rho(G_x)]``
+            from above, closing the same sandwich.
 
             Each returned :class:`IsotropicPlaneOrbit` realizes its plane from
             the representative it was split out of, by the word in the ambient
@@ -578,7 +595,9 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 _divided_class_isotropic_plane_orbits,
             )
 
-            return _divided_class_isotropic_plane_orbits(self, representatives)
+            return _divided_class_isotropic_plane_orbits(
+                self, representatives, stabilizer_generators
+            )
 
         def isotropic_orbit_iterator(self, rank, *, height_bound=None):
             r"""Yield the first primitive isotropic subobject of each orbit of this subgroup (#62)."""

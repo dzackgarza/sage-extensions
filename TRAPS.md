@@ -3952,3 +3952,35 @@ The exact fix, measured: `SAGE_PYTHON_RUNWORK=<port repo>` plus
 `PYTHONPATH=/work/src:/work:<pytest_plugins>` so that the port is at `/work` and its
 `src` is ahead.  With that, the four-module gate run passes; without it, it fails on
 setup alone.
+
+### The plane-orbit call's stabilizer image, and two traps found measuring it (2026-11-11, #321)
+
+**`quotient.image_order()` is not `|ρ(O(L))|`.** On `U + U + <-2>` the character
+quotient of `Õ⁺` answers `image_order() = 2` while `libgap.Subgroup(engine,
+SmallGeneratingSet(image)).Size() = 1`: the two characters are the *discriminant*
+image and the sign image (`O^+` is a determinant/spinor kernel), and the quotient's
+`image_order` is the product of both. Any count that needs `[Q : ρ(G_x)]` with
+`Q = ρ(O(L))` must read the discriminant factor, which is
+`quotient._im_rho_engine_and_section()`'s image, not `image_order()`. Substituting
+one for the other makes the trivial-image test silently wrong on every lattice whose
+sign character is nontrivial while `\rho` is trivial.
+
+**`Lattices(ZZ)("U") * 2` is a set product, not a scaling.** It raises
+`AssertionError: the product ... x Y needs Y a set, but 2 is not in the category of
+sets`, from `set_categories.py:2613`. The scaled hyperbolic plane is the Gram matrix
+`Lattices(ZZ)([[0, 2], [2, 0]])`; `twist(-1)`/`twist(2)` exist for scaling by an
+integer but the Gram spelling is what the discriminant-group tests use.
+
+**Measured, for the plane-stabilizer-image question (#321).** One process, adopted
+runtime, port bound at `/work` with `/work/src` ahead:
+
+| specimen | `\|ρ(O(L))\|` | class-set orbit of `<e_1, e_3>` | outcome |
+| --- | ---: | ---: | --- |
+| `U + U + <-2>` | 1 | 1 | trivial-image closure, 1 plane orbit |
+| `U + U(2)`, `U(2)` = `[[0,2],[2,0]]` | 2 | 2 | no stabilizer data: refusal; with the stabilizer's 13 generators (1.76 s): 2 plane orbits |
+| `T_En`, `P_1`, `P_2` | 46998591897600 | 527, 23715 | published-index closure, rows 9 and 24242 |
+
+The 13 generators come from `lattice.Aut().isotropic_stabilizer_generators(plane)`,
+which is what the port's plane branch answers on `U + U(2)` — so the escape hatch
+that supplies `ρ(G_x)` is usable on small lattices even where the ambient orbit is
+not enumerable.

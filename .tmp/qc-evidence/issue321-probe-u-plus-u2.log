@@ -1,0 +1,31 @@
+lattice: Integral lattice of rank 4 and signature (2, 2) det 4
+discriminant group: Finitely presented module on 4 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2] order 4
+generators: ['e_0', 'e_1', 'e_2', 'e_3']
+plane: ['e_0', 'e_2']
+group complete: True
+|chi(O(L))| = 4
+|rho(O(L))| = 2
+classes: ['0', '[1]', '[3]']
+class-set Q-orbit size = 2
+[    10.4] sizes
+  no generators: REFUSED the discriminant image of the stabilizer of Integral lattice of rank 2 and signature (0, 0) in O(Integral lattice of rank 4 and signature (2, 2)) is not established: the orbit of the plane's divided classes has 2 points,
+[    14.5] no generators
+  stabilizer generators: 13 in 1.7591012410121039 s
+[    16.3] stabilizers
+  with generators: RETURNED 2
+[    16.5] with generators
+TOTAL 16.49348539498169
+[peakrss] issue275: child waited=0 shell_code=0 samples=12
+[peakrss] peak tree RSS      : 501 MiB
+[peakrss] low-water MemAvail : 10544 MiB
+[peakrss] peak single VmHWM  : 501 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      490 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    20.0s procs=  3 rss=   501 MiB hwm=   501 MiB avail= 10544 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   490 MiB hwm=   490 MiB avail= 10557 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   485 MiB hwm=   485 MiB avail= 10564 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   480 MiB hwm=   480 MiB avail= 10553 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   476 MiB hwm=   476 MiB avail= 10552 MiB
+launcher exit: 0

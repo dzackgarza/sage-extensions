@@ -1470,23 +1470,61 @@ class IsotropicPlaneOrbit:
         return f"An orbit of primitive isotropic planes of {self.lattice()} under {self.group()}"
 
 
+def _enriques_period_lattice_isometry(lattice):
+    r"""Return an isometry from ``lattice`` onto the Enriques period lattice, or ``None``.
+
+    The published plane-stabilizer indices used below are stated for the single
+    lattice ``N = U \oplus U(2) \oplus E_8(-2)`` (Dutour Sikirić--Hulek,
+    *Moduli of polarised Enriques surfaces -- computational aspects*,
+    J. London Math. Soc. 110 (2024), arXiv:2302.01679, §3.6 (the Tits
+    building), p. 22), so that lattice is the hypothesis to check.  It is
+    checked by *exhibiting* an isometry: equal rank, signature, determinant and
+    discriminant group do not determine an indefinite lattice's isometry class,
+    and the predicate that compares those is not a class test.  The cheap
+    invariants above it only avoid starting an isometry search that cannot
+    succeed.
+    """
+    from sage_extensions.catalogue import NamedLattices
+
+    patent = NamedLattices.TEn
+    if lattice is patent:
+        return lattice.Aut().one()
+    if (
+        int(lattice.module_rank()) != int(patent.module_rank())
+        or tuple(lattice.signature_pair()) != tuple(patent.signature_pair())
+        or lattice.determinant() != patent.determinant()
+        or lattice.discriminant_group().cardinality()
+        != patent.discriminant_group().cardinality()
+    ):
+        return None
+    try:
+        return lattice.Isom(patent).an_element()
+    except (ValueError, ArithmeticError):
+        return None
+
+
+_ENRIQUES_PERIOD_LATTICE_PLANE_INDICES = (527, 23715)
+
+
 class _DividedClassPlaneOrbitDecomposition:
     r"""The finite divided-class decomposition behind :class:`IsotropicPlaneOrbit`.
 
     The reduction is Dutour Sikirić--Hulek, arXiv:2302.01679, Lemma 3.6
     (printed p. 22, in §3.6 "The Tits building"): for ``G = O(L)``, its
     discriminant kernel ``U = \widetilde{O}(L)`` contained in ``K = \Gamma`` and
-    a stabilizer ``H = G_x``, the quotient map ``G -> G/U`` carries the double
-    cosets ``K \backslash G / H`` onto those of ``K/U \backslash G/U /
-    \overline{H}``, and the double cosets ``\Gamma \backslash O(L) / G_x`` are
-    the ``\Gamma``-orbits on the ``O(L)``-orbit ``xG`` of the plane ``x``.  The
-    ambient quotient is the discriminant image ``Q = \rho(O(L)) \subset O(A_L)``,
-    of order ``46998591897600`` on ``T_{\mathrm{En}}``, and ``\Gamma`` is a
-    character kernel, so everything below is a finite permutation-group
-    computation on the divided classes.
+    the stabilizer ``H = G_x`` of the plane ``x``, the quotient map
+    ``G -> G/U`` carries the double cosets ``K \backslash G / H`` bijectively
+    onto those of ``K/U \backslash G/U / \overline{H}``, and the double cosets
+    ``\Gamma \backslash O(L) / G_x`` are the ``\Gamma``-orbits on the
+    ``O(L)``-orbit ``xG`` of the plane.  The ambient quotient is the
+    discriminant image ``Q = \rho(O(L)) \subset O(A_L)``, of order
+    ``46998591897600`` on ``T_{\mathrm{En}}``, and ``\Gamma`` is a character
+    kernel, so the count is a finite permutation-group computation -- but only
+    once ``\overline{H} = \rho(G_x)`` is known, which is what
+    :meth:`_establish_plane_stabilizer_images` decides.
     """
 
-    def __init__(self, subgroup, representatives) -> None:
+    def __init__(self, subgroup, representatives, stabilizer_generators=None) -> None:
         from sage.libs.gap.libgap import libgap
         from sage_extensions.categories.group.groups import _element_to_engine
 
@@ -1521,12 +1559,158 @@ class _DividedClassPlaneOrbitDecomposition:
         images = [_element_to_engine(orthogonal, generator) for generator in subgroup_generators]
         self._subgroup_image = libgap.Subgroup(engine, images)
         self._subgroup_image_generators = libgap.SmallGeneratingSet(self._subgroup_image)
+        self._supplied_stabilizers = dict(stabilizer_generators or {})
 
     def lattice(self):
         return self._lattice
 
     def group(self):
         return self._group
+
+    def _establish_plane_stabilizer_images(self, sizes) -> None:
+        r"""Require ``\rho(G_x) = \mathrm{Stab}_Q(J_x)`` for each representative ``x``, or refuse.
+
+        ``J_x`` is the divided class set of ``x`` and ``G_x = \mathrm{Stab}_{O(L)}(x)``.
+        The inclusion ``\rho(G_x) \subseteq \mathrm{Stab}_Q(J_x)`` holds for
+        every lattice: ``J_x`` is built from ``x`` by the lattice operations, so
+        an isometry carrying ``x`` to ``x`` carries ``J_x`` to ``J_x``, and
+        ``\widetilde{O}(L) = \ker \rho`` acts trivially.  Hence
+        ``|Q . J_x| = [Q : \mathrm{Stab}_Q(J_x)] \le [Q : \rho(G_x)]``, and the
+        count of ``\Gamma``-orbits on the finite set ``Q . J_x`` is the count of
+        ``\Gamma``-orbits of planes exactly when the two indices agree --
+        otherwise it is too small (Dutour Sikirić--Hulek, Lemma 3.6, p. 22, is
+        the bijection that makes the two counts the same object).
+
+        Three ways to close the inequality are accepted, and nothing else is:
+
+        * ``\rho(G_x)`` from supplied stabilizer generators (:meth:`_establish_by_stabilizer_generators`);
+        * a trivial discriminant image ``Q = 1``, where the equality is vacuous:
+          ``\rho(G_x) = 1 = \mathrm{Stab}_Q(J_x)`` for every plane, so its class set
+          is a single point (:meth:`_establish_when_the_image_is_trivial`);
+        * the published indices of the two ``O(N)``-orbits of ``N = U \oplus U(2) \oplus E_8(-2)``,
+          ``527 = 17 \cdot 31`` and ``23715 = 3^2 \cdot 5 \cdot 17 \cdot 31``
+          (Dutour Sikirić--Hulek, §3.6, p. 22), on a lattice exhibited to be
+          ``N`` (:meth:`_establish_by_published_indices`).
+
+        A representative for which none applies raises, naming it and the
+        missing fact, rather than returning a count.
+        """
+        if self._establish_when_the_image_is_trivial(sizes):
+            return
+        pending = []
+        for position, size in enumerate(sizes):
+            supplied = self._supplied_stabilizers.get(position)
+            if supplied is None:
+                pending.append(position)
+                continue
+            self._establish_by_stabilizer_generators(position, tuple(supplied), size)
+        if pending:
+            self._establish_by_published_indices(pending, sizes)
+
+    def _establish_when_the_image_is_trivial(self, sizes) -> bool:
+        r"""Decide the vacuous case ``\rho(O(L)) = 1``, and return whether it applied.
+
+        If the discriminant representation has trivial image then
+        ``\rho(G_x) = 1 = \mathrm{Stab}_Q(J_x)`` for every plane ``x``, as
+        ``Q = \rho(O(L))`` is a single element, so the equality the count needs
+        holds without any information about the stabilizer.  The class set of
+        each representative is then a single point; anything else would
+        contradict the trivial image and is reported rather than assumed away.
+        """
+        if int(self._image.Size()) != 1:
+            return False
+        unexpected = [size for size in sizes if size != 1]
+        if unexpected:
+            raise ArithmeticError(
+                f"the discriminant image of O({self._lattice}) is trivial, so the divided classes of a "
+                f"plane form a single point, but the class sets of the representatives have "
+                f"{unexpected} points: the class set and the discriminant action disagree, and no orbit "
+                f"count is returned from them"
+            )
+        return True
+
+    def _establish_by_stabilizer_generators(self, position, stabilizers, size) -> None:
+        r"""Establish the equality from generators of ``G_x``, or refuse.
+
+        ``[\rho(O(L)) : \langle\rho(h)\rangle] = [\rho(O(L)) : \rho(G_x)]``
+        when the generated subgroup is the whole image, so the sandwich closes:
+        ``|Q . J_x| \le [Q : \rho(G_x)] \le [Q : \langle\rho(h)\rangle]``.
+        Every supplied element is checked to stabilize the plane first, so a
+        generator of some other subgroup contributes nothing.
+        """
+        from sage.libs.gap.libgap import libgap
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        plane = self._starts[position][0]
+        inclusion = plane.inclusion()
+        basis = tuple(inclusion(generator) for generator in inclusion.domain().module_generators())
+        if self._lattice is not self._group.finite_character_quotient().lattice:
+            raise ValueError(
+                f"the stabilizer generators given for {plane} are isometries of {self._lattice}, but the "
+                f"discriminant image of {self._group} is computed on "
+                f"{self._group.finite_character_quotient().lattice}: the two lattices would have to be the "
+                f"same object for the image of a supplied isometry to be read"
+            )
+        images = []
+        for isometry in stabilizers:
+            moved = self._lattice.primitive_isotropic_subobject(*[isometry(vector) for vector in basis])
+            if not _same_subobject(moved, plane):
+                raise ValueError(
+                    f"the supplied isometry {isometry} does not stabilize the plane {plane}: it carries the "
+                    f"plane to {moved}, so it is not a generator of the stabilizer whose discriminant image "
+                    f"the orbit count needs"
+                )
+            images.append(_element_to_engine(self._orthogonal, self._lattice.discriminant_representation()(isometry)))
+        hull = libgap.Subgroup(self._engine, images)
+        index = int(self._image.Size()) // int(hull.Size())
+        if index != size:
+            raise ValueError(
+                f"the discriminant image of the stabilizer of {plane} is not established: the supplied "
+                f"generators generate a subgroup of index {index} in rho(O({self._lattice})), while the "
+                f"orbit of the plane's divided classes has {size} points. The two indices agree only when "
+                f"rho(G_x) = Stab(class set of x), which is what the count needs; supply generators of the "
+                f"whole stabilizer, or a lattice whose published plane-stabilizer indices apply"
+            )
+
+    def _establish_by_published_indices(self, positions, sizes) -> None:
+        r"""Establish the equality from the published indices of ``N = U \oplus U(2) \oplus E_8(-2)``, or refuse.
+
+        Dutour Sikirić--Hulek, §3.6, p. 22: the two ``O(N)``-orbits of primitive
+        isotropic planes are ``P_1`` and ``P_2``, and the images of their
+        stabilizers have index ``527`` and ``23715`` in ``\rho(O(N))``.  So for
+        the two orbits the multiset of indices is ``{527, 23715}``; since
+        ``|Q . J_x| \le [Q : \rho(G_x)]`` for each orbit and the indices of
+        distinct orbits are distinct, a set of class-set orbit sizes equal to
+        ``{527, 23715}`` forces equality orbit by orbit.  That argument needs
+        both orbits, so one representative alone is refused here.
+        """
+        plane = self._starts[positions[0]][0]
+        others = ", ".join(str(self._starts[position][0]) for position in positions[1:])
+        isometry = _enriques_period_lattice_isometry(self._lattice)
+        if isometry is None:
+            raise ValueError(
+                f"the discriminant image of the stabilizer of {plane}"
+                + (f" (and of {others})" if others else "")
+                + f" in O({self._lattice}) is not established: the orbit of the plane's divided classes has "
+                f"{sizes[positions[0]]} points, which bounds [rho(O(L)) : rho(G_x)] from above without "
+                f"determining it, so the orbit count would be a lower bound. The published indices are "
+                f"stated for N = U + U(2) + E8(-2) and no isometry from {self._lattice} onto it is exhibited. "
+                f"Pass stabilizer_generators for the representatives, or a lattice isometric to N with the "
+                f"paper's two plane orbits"
+            )
+        computed = {sizes[position] for position in positions}
+        published = set(_ENRIQUES_PERIOD_LATTICE_PLANE_INDICES)
+        if computed != published:
+            raise ValueError(
+                f"the discriminant image of the stabilizer of {plane}"
+                + (f" (and of {others})" if others else "")
+                + f" is not established: the divided-class orbits of the representatives have "
+                f"{sorted(computed)} points, while the two plane orbits of N = U + U(2) + E8(-2) have "
+                f"stabilizer-image indices {sorted(published)} (Dutour Sikirić--Hulek, §3.6, p. 22). "
+                f"Both of those two orbits are needed for the published indices to bound each "
+                f"representative's stabilizer image, so this is a lower bound, not the orbit count. "
+                f"Pass stabilizer_generators for the representatives"
+            )
 
     def _point_of_classes(self, classes):
         return _libgap().Set([self._orthogonal._engine_abelian_element(c) for c in classes])
@@ -1543,6 +1727,7 @@ class _DividedClassPlaneOrbitDecomposition:
             _libgap().AsList(_libgap().Orbit(self._image, point, action))
             for _plane, _classes, point in self._starts
         ]
+        self._establish_plane_stabilizer_images([len(orbit) for orbit in ambient_orbits])
         points = []
         owners = []
         for start, orbit in enumerate(ambient_orbits):
@@ -1618,7 +1803,7 @@ def _libgap():
     return libgap
 
 
-def _divided_class_isotropic_plane_orbits(subgroup, representatives):
+def _divided_class_isotropic_plane_orbits(subgroup, representatives, stabilizer_generators=None):
     r"""Return the subgroup's orbits of primitive isotropic planes, by divided classes."""
     if representatives is None:
         raise ValueError(
@@ -1631,7 +1816,7 @@ def _divided_class_isotropic_plane_orbits(subgroup, representatives):
     representatives = tuple(representatives)
     if not representatives:
         raise ValueError(f"the divided-class plane orbits of {subgroup} need at least one ambient representative")
-    return _DividedClassPlaneOrbitDecomposition(subgroup, representatives).orbits()
+    return _DividedClassPlaneOrbitDecomposition(subgroup, representatives, stabilizer_generators).orbits()
 
 
 __all__ = [

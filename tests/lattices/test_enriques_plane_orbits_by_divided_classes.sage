@@ -25,6 +25,7 @@ below are the cards', never the computation's own output.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
+import pytest
 
 
 def _enriques_plane_representatives(lattice):
@@ -173,3 +174,82 @@ def test_a_split_orbit_realizes_its_plane() -> None:
     transported = orbits[4].representative()
     _assert_primitive_isotropic_plane(transported, lattice)
     assert _divided_classes(lattice, transported) != _divided_classes(lattice, representatives[0])
+
+
+def _cross_span_plane(lattice):
+    r"""The span of the two isotropic generators of the first and second $U$ summand."""
+    basis_elements = list(lattice.module_generators())
+    return lattice.primitive_isotropic_subobject(basis_elements[0], basis_elements[2])
+
+
+def _u_plus_u_two():
+    r"""$U \oplus U(2)$: rank four, determinant four, $\rho(O(L))$ of order two.
+
+    $U(2)$ is the Gram matrix $\begin{pmatrix}0&2\\2&0\end{pmatrix}$, the same
+    summand the Enriques period lattice carries.
+    """
+    return Lattices(ZZ)("U") + Lattices(ZZ)([[0, 2], [2, 0]])
+
+
+def test_a_lattice_whose_published_indices_do_not_apply_refuses() -> None:
+    r"""A lattice that is not $N$ refuses the count, naming the representative and the missing fact.
+
+    On $U \oplus U(2)$ the discriminant image $\rho(O(L))$ has order two and the
+    divided-class orbit of $\langle e_1, e_3\rangle$ has two points, so the
+    sandwich $|Q . J_x| \le [Q : \rho(G_x)]$ admits both one and two for the
+    stabilizer's index.  No isometry onto $N = U \oplus U(2) \oplus E_8(-2)$ is
+    exhibited and no stabilizer generators are supplied, so
+    $\rho(G_x) = \mathrm{Stab}_Q(J_x)$ is not established and the call refuses
+    instead of returning a count.
+    """
+    lattice = _u_plus_u_two()
+    plane = _cross_span_plane(lattice)
+    _assert_primitive_isotropic_plane(plane, lattice)
+    group = lattice.stable_orthogonal_group().intersection(lattice.O_plus())
+    assert group.contains_character_kernel()
+
+    with pytest.raises(ValueError):
+        group.isotropic_plane_orbits((plane,))
+
+
+def test_supplied_stabilizer_generators_establish_the_equality() -> None:
+    r"""Generators of $G_x$ close the sandwich on $U \oplus U(2)$, so the count is returned.
+
+    The stabilizer's own generators are asked of the orthogonal group and
+    supplied: their discriminant images generate $\rho(G_x)$, whose index in
+    $\rho(O(L))$ is then an upper bound for $[Q : \rho(G_x)]$, and it equals the
+    two points of the class orbit.  The same two-point ambient orbit then splits
+    into the subgroup's orbits, here two of them because $\rho(\Gamma)$ is
+    trivial.
+    """
+    lattice = _u_plus_u_two()
+    plane = _cross_span_plane(lattice)
+    _assert_primitive_isotropic_plane(plane, lattice)
+    group = lattice.stable_orthogonal_group().intersection(lattice.O_plus())
+    stabilizers = tuple(lattice.Aut().isotropic_stabilizer_generators(plane))
+    assert stabilizers
+
+    orbits = group.isotropic_plane_orbits(
+        (plane,), stabilizer_generators={0: stabilizers}
+    )
+
+    assert orbits.cardinality() == cardinal(2)
+
+
+def test_a_trivial_discriminant_image_establishes_the_equality_vacuously() -> None:
+    r"""Where $\rho(O(L))$ is trivial the equality holds with no stabilizer data.
+
+    On $U \oplus U \oplus \langle -2\rangle$ the discriminant representation of
+    $O(L)$ has trivial image (measured: $\rho(O(L)) = 1$, while the character
+    quotient's image has order two through the sign character).  Then
+    $\rho(G_x) = 1 = \mathrm{Stab}_Q(J_x)$ for every plane and its class set is a
+    single point, so the count needs no stabilizer input.
+    """
+    lattice = Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[-2]])
+    plane = _cross_span_plane(lattice)
+    _assert_primitive_isotropic_plane(plane, lattice)
+    group = lattice.stable_orthogonal_group().intersection(lattice.O_plus())
+
+    orbits = group.isotropic_plane_orbits((plane,))
+
+    assert orbits.cardinality() == cardinal(1)
