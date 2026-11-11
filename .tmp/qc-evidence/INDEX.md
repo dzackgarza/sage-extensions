@@ -311,3 +311,8 @@ with the expected count read from card 6JRX plus the two-spinor-genus split test
 summand genera have one improper spinor genus and Sage uses p = 3;
 `issue317-probe25d.log` — the repaired walk at p = 2, 3, 5, 7 reaches seven of the
 nine k = 2 classes.
+
+Re-run on the rebased tree (main at `d35c72c`): `issue317-rebased2.log`,
+`test_genus_of_the_scattone_summands.sage` plus `test_genus.sage` — 13 passed,
+1 failed in 30.92 s, and the failure is the pre-existing
+`spinor_genus_count() == 2` on `diag(1,20,400)`.
