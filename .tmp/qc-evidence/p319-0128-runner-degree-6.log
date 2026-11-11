@@ -1,0 +1,32 @@
+cards: dzackgarza/lattice-database at 587d56febe5856d54c6bc9fc023fa5a425f76bfb
+replica of the paper read: arXiv:2302.01679v2 (26 Sep 2023), Tables 1 and 2 pp. 13-14, Table 4 p. 17
+per-call cap 300 s, budget unbounded s
+lattice 029J is T_En: rank 12, determinant 1024
+
+ROW 0128 degree=6 (genus 3)
+  citation: D. Dutour Sikirić, K. Hulek, "Moduli of polarised Enriques surfaces — computational aspects", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.
+  #h: expected 2, call 2   (285 s)
+  class 1/2: q = 6
+  UNDECIDED #Gamma-bar_h: lines: the public call did not return inside 300 s (300 s elapsed) (after 630 s)
+
+SUMMARY
+  pass: 0
+  fail: 0
+  undecided: 1
+    0128 degree 6
+  notreached: 0
+exit status 1
+[peakrss] issue275: child waited=0 shell_code=0 samples=330
+[peakrss] peak tree RSS      : 995 MiB
+[peakrss] low-water MemAvail : 2428 MiB
+[peakrss] peak single VmHWM  : 995 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      984 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   649.0s procs=  3 rss=   995 MiB hwm=   995 MiB avail=  4254 MiB
+[peakrss]   t=   651.0s procs=  3 rss=   995 MiB hwm=   995 MiB avail=  4247 MiB
+[peakrss]   t=   653.0s procs=  3 rss=   995 MiB hwm=   995 MiB avail=  4215 MiB
+[peakrss]   t=   655.0s procs=  3 rss=   995 MiB hwm=   995 MiB avail=  4196 MiB
+[peakrss]   t=   657.0s procs=  3 rss=   995 MiB hwm=   995 MiB avail=  4180 MiB
+launcher exit: 0

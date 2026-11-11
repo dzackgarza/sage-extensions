@@ -1,0 +1,40 @@
+..........                                                               [100%]
+-------------- generated report log file: tests/.report/run.jsonl --------------
+========================== test-call performance gate ==========================
+tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_gamma_en_2_plane_row_is_nine: 224.95 s > 20 s
+tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_otilde_plus_plane_row_is_24242: 100.31 s > 20 s
+tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_lines: 64.19 s > 20 s
+tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_planes: 39.75 s > 20 s
+tests/lattices/test_enriques_anti_invariant_cusps.sage::test_the_enriques_period_lattice_has_two_isotropic_line_orbits_and_two_isotropic_plane_orbits: 20.36 s > 20 s
+============================== slowest durations ===============================
+224.95s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_gamma_en_2_plane_row_is_nine
+100.31s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_otilde_plus_plane_row_is_24242
+64.19s call     tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_lines
+39.75s call     tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_planes
+20.36s call     tests/lattices/test_enriques_anti_invariant_cusps.sage::test_the_enriques_period_lattice_has_two_isotropic_line_orbits_and_two_isotropic_plane_orbits
+10.12s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_two_representatives_are_primitive_isotropic_planes_with_different_classes
+3.39s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_a_split_orbit_realizes_its_plane
+2.84s call     tests/lattices/test_enriques_anti_invariant_cusps.sage::test_enriques_coinvariant_group_is_the_glue_compatible_discriminant_preimage
+0.79s call     tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_line_stabilizer_image_refuses_where_the_criterion_does_not_apply
+0.02s call     tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_hyperbolic_plane_the_enlargement_adds_is_where_the_criterion_applies
+0.00s teardown tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_two_representatives_are_primitive_isotropic_planes_with_different_classes
+0.00s teardown tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_lines
+0.00s setup    tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_two_representatives_are_primitive_isotropic_planes_with_different_classes
+0.00s teardown tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_hyperbolic_plane_the_enlargement_adds_is_where_the_criterion_applies
+0.00s teardown tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_a_split_orbit_realizes_its_plane
+0.00s teardown tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_line_stabilizer_image_refuses_where_the_criterion_does_not_apply
+0.00s teardown tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_gamma_en_2_plane_row_is_nine
+0.00s teardown tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_otilde_plus_plane_row_is_24242
+0.00s setup    tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_line_stabilizer_image_refuses_where_the_criterion_does_not_apply
+0.00s teardown tests/lattices/test_enriques_anti_invariant_cusps.sage::test_enriques_coinvariant_group_is_the_glue_compatible_discriminant_preimage
+0.00s teardown tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_planes
+0.00s setup    tests/lattices/test_enriques_anti_invariant_cusps.sage::test_enriques_coinvariant_group_is_the_glue_compatible_discriminant_preimage
+0.00s teardown tests/lattices/test_enriques_anti_invariant_cusps.sage::test_the_enriques_period_lattice_has_two_isotropic_line_orbits_and_two_isotropic_plane_orbits
+0.00s setup    tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_lines
+0.00s setup    tests/lattices/test_unpolarized_enriques_strata.sage::test_the_o_row_states_two_primitive_isotropic_planes
+0.00s setup    tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_a_split_orbit_realizes_its_plane
+0.00s setup    tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_otilde_plus_plane_row_is_24242
+0.00s setup    tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage::test_the_hyperbolic_plane_the_enlargement_adds_is_where_the_criterion_applies
+0.00s setup    tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_gamma_en_2_plane_row_is_nine
+0.00s setup    tests/lattices/test_enriques_anti_invariant_cusps.sage::test_the_enriques_period_lattice_has_two_isotropic_line_orbits_and_two_isotropic_plane_orbits
+10 passed in 468.06s (0:07:48)

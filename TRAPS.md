@@ -3812,3 +3812,310 @@ the same mathematics: that method's own hypothesis
 makes `rho(Gamma) \ O(q) / Stab(c)` the `rho(Gamma)`-orbits on the isotropic classes of
 `A_{T_En}` up to sign — 265 pairs, enumerated by `covering_discriminant_classes(0)` and
 acted on by `discriminant_generator_lifts()`.
+
+### Eichler's criterion does not transfer to an enlargement, and the line-stabilizer image refuses without its hypothesis (2026-11-10, #315)
+
+`OrthogonalCharacterQuotient.isotropic_line_stabilizer_image` may return a class set only
+where Eichler's criterion applies to `L` itself: two orthogonal hyperbolic planes in `L`
+(Gritsenko--Hulek--Sankaran, Lemma 7.8, p. 503).  Commit `82715b7c94` deleted that refusal
+with a "sandwich" -- apply the criterion on `L + U`, which has the same discriminant group
+-- and the argument is false: the criterion classifies `\widetilde{SO}(L + U)`-orbits on
+`L + U`, and the element it produces need not preserve `L`.  The refusal is restored.
+
+Specimen `L = U + E8(-1)^2 = II_{1,17}`, rank 18, determinant -1, one hyperbolic plane
+(`NamedLattices.U + NamedLattices.E8 ** 2`), primitive isotropic line `<e_0>`:
+
+```
+_two_hyperbolic_planes(L)                                     False
+L.eichler_criterion_applies()                                 False
+_two_hyperbolic_planes(L + U) / (L+U).eichler_criterion_applies()   True / True
+L.O_plus().finite_character_quotient()
+  .isotropic_line_stabilizer_image(<e_0>)
+    at 82715b7c94                no return at 900 s; faulthandler at 180 s puts the
+                                 frame in orthogonal_quotients.py:1179, the
+                                 `for root in lattice.vectors_of_square_and_divisibility(2, 1)`
+                                 walk of the zero-class branch (set_categories.py:4468
+                                 `_points_satisfying` below it)
+    with the refusal restored    None in 0.77 s (the pytest call)
+L.Aut().isotropic_orbit_representatives(1)   no return at 1800 s
+```
+
+`L` is unimodular, so `A_L` is trivial and the call reaches the *zero*-class branch first:
+the sandwich branch is what the `T_En` rows used, and the specimen the issue names is
+refused before it.  A positive control, the same call through `L.O_plus()` on lattices that
+do split two hyperbolic planes, returns a claim rather than refusing: `U + U + E8(-2)`
+(rank 12, determinant 256) `NOSPLIT` in 15.6 s, and `U + U + E8(-1)` (rank 12, determinant
+1) `NOSPLIT` in 25.0 s.
+
+The `O(L)`-orbit count of `II_{1,17}` is **not** decided by these probes.  Five constructed
+primitive isotropic vectors (`e_0`, `e_0+e_1+r`, `2e_0+e_1+r_1+r_2`, `e_0+2e_1+r_1+r_2`,
+`2e_0+2e_1+(r_1+..+r_4)` with the roots pairwise orthogonal) have reductions
+`v^\perp/\mathbb{Z} v` of rank 16, determinant 1, signature (0,16), and `is_isometric`
+reported every pair equal -- which decides nothing, because that predicate is
+`not Isom(other).is_empty()` and a definite isometry Mor of equal determinant is undecided
+(see *`is_isometric` is not a lattice-class test*, above).  The count belongs to the
+`integral.primitive_orbits` row of `dzackgarza/lattice-database` card `0236`
+(`U + E8(-1)^2`, alias `II_{1,17}`); that card exists and carries **no** orbit row at all,
+so there is nothing to compare against yet.
+
+Reproduce: `bash .scratch/issue315_launch.sh` with `PROBE=issue315_probe9.py` against the
+tree at `82715b7` for the stack, and `.scratch/p315_gate.sh` for the pytest figures; both
+run under `peakrss.py` with `PEAKRSS_LIMIT_MIB=6144`.  The gate is
+`tests/lattices/test_line_stabilizer_image_requires_eichlers_hypothesis.sage`,
+**2 passed in 2.03 s**, exit 0 (0.77 s and 0.02 s per `--durations=0`).
+
+Cost of the refusal on the `Gamma_h` rows, measured on
+`tests/lattices/test_enriques_polarization_orbits.sage::test_the_source_line_row_is_the_public_line_orbit_count[case-3]`:
+at `82715b7` it **passes in 128.61 s** (test call 126.92 s); with the refusal it
+prints `F` and is then killed at the 1800 s inner cap, pytest never flushing the
+failure summary because its teardown (`sage.misc.temporary_file` cleanup under proot)
+does not return, and a `--tb=long` attempt segfaulted in CPython while formatting the
+traceback (`inspect.getmodule`).  The fallback route's exception is therefore not
+identified; logs `.tmp/p315-enriques-case3-base.log` and
+`.tmp/p315-enriques-case3-after-native.log`.
+
+### The Enriques plane rows by divided classes, and the eager apex stabilizer that blocked them (2026-11-11, #316)
+
+**Delivered: a plane-orbit call that returns.** `IsotropicPlaneOrbits` are computed
+as the subgroup's orbits on the *divided discriminant classes* of the two
+`O(T_En)`-orbit representatives, in the finite discriminant image
+`Q = rho(O(T_En))`, `|Q| = 46998591897600`.  Reduced from the double cosets by
+Dutour Sikirić--Hulek, arXiv:2302.01679, Lemma 3.6 (printed p. 22, §3.6 "The Tits
+building"): with `U = ker rho ⊂ K = Γ` the map `O(L) -> O(L)/U` carries
+`Γ \backslash O(L) / G_x` bijectively onto the double cosets of the finite image,
+and those are the `Γ`-orbits on the `O(L)`-orbit of the plane.  Measured, one
+process, `PEAKRSS_LIMIT_MIB=6144`:
+
+```
+class point of P1 = Z e_1 + Z e_3              Q-orbit 527     in 0.0 s
+class point of P2 = Z(2e_1+2e_2+w) + Z e_3     Q-orbit 23715   in 0.3 s
+                                                     total   24242   = 029J `Otilde+` planes
+rho(Gamma_En,2)-orbits on the union (24242 pts)      9            = 029J `gamma-en-2` planes
+   orbit lengths 2, 120, 135, 270, 270, 1575, 3780, 8640, 9450
+|rho(Gamma_En,2)| = 696729600 (= |W(E8)|), [Q : rho(Gamma)] = 67456, |rho(Otilde+)| = 1
+```
+
+The two orbit sizes `527` and `23715` are exactly the stabilizer-image indices
+Dutour Sikirić--Hulek print (p. 22), so the class-point orbit and the coset space
+`Q/rho(Stab)` have equal size and the identification is certified by the published
+indices rather than assumed.  Module
+`tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage`; evidence
+`.tmp/p316-evidence/` (`INDEX.md`).
+
+**The rows are over the call gate, and the module is run with the gates off.**
+`224.95 s` for the `Γ_En,2` row and `100.31 s` for the `Õ⁺` row.  Under the
+repository's default `addopts` the second exceeds the 20 s call gate and the first
+is killed by `pytest-timeout` at 60 s, which ends the whole session rather than
+reporting a red gate — so a module with a row at this cost cannot even produce a
+verdict under the default flags.  This is the same intrinsic cost the `029J` `O`
+row already reports (64.19 s and 39.75 s in the same run), not a separate defect.
+Run with the repo's own documented flag set, the module and three neighbours are
+**10 passed in 468.06 s**, exit 0.
+
+**The prerequisite defect: `vector_stabilizer_generators` built an apex stabilizer it
+never uses.** `Γ_{En,2}` is built by the coinvariant route
+(`Involutions.I_En.polarized(h).coinvariant_extension_subgroup()`), which reaches
+`image_under` -> `group_generators()` on the invariant lattice's vector stabilizer ->
+`vector_stabilizer_generators` -> `_marking_stabilizer_generators(category, marked,
+category.apex_stabilizer(marked))`.  The third argument is evaluated **eagerly**, and
+for indefinite `L` `_marking_stabilizer_generators` ignores it: the generators come
+from the lattice category's marked-diagram decision.  `apex_stabilizer` calls
+`pointwise_stabilizer`, whose first statement is
+`from sage_indefinite_port.indefinite.pairing_slices import pointwise_transporter`, and
+the pinned port has **no** module `pairing_slices` (its indefinite modules are
+`pointwise_shell`, `exact_isotropic`, `marked_lattices`, `recursive`, ...; the names
+`pointwise_transporter`, `setwise_transporter` and `SubgroupVectorOrbits` appear
+nowhere in the port).  So `Γ_{En,2}` failed inside 46 s with `ModuleNotFoundError` in
+**most** fresh processes and built in one; the difference is whether something earlier
+in the session had given the invariant lattice's stabilizer complete character data, in
+which case `image_under` answers through `discriminant_image()` and no vector
+stabilizer is formed.  Repair at the caller that evaluates an argument it cannot need:
+`vector_stabilizer_generators` now asks the category for the apex stabilizer only when
+`lattice.is_definite()`, where `_marking_stabilizer_generators` actually reduces it;
+the indefinite branch passes `None`.  Behaviour on definite lattices is unchanged.
+`Γ_{En,2}` then builds in 30-45 s in every run measured.
+
+Still stale, not repaired here (outside #316): `lattice_morphisms.py:3723`
+(`setwise_transporter`) and `:4018` (`SubgroupVectorOrbits`) import the same absent
+module, so `pointwise_stabilizer`, the setwise stabilizer of a sublattice and
+`vector_orbit_set` raise `ModuleNotFoundError` on any indefinite lattice that reaches
+them.
+
+**The gate entrypoint does not bind the port, and that is a setup artefact.** The
+repository's declared `.scratch/sage-python` binds `$RUNWORK` (an empty directory) at
+`/work` and does **not** bind the pinned indefinite port.  A run through it therefore
+imports the image's port copy and dies in the recorded way, here as
+`../sage-indefinite-port/src/sage_indefinite_port/indefinite/recursive.py:154`
+(`recursive.py:154 int()` on an owned coordinate) inside
+`O(T_En).group_generators()`, which reads as six failures in modules that are green.
+The exact fix, measured: `SAGE_PYTHON_RUNWORK=<port repo>` plus
+`PYTHONPATH=/work/src:/work:<pytest_plugins>` so that the port is at `/work` and its
+`src` is ahead.  With that, the four-module gate run passes; without it, it fails on
+setup alone.
+
+### The plane-orbit call's stabilizer image, and two traps found measuring it (2026-11-11, #321)
+
+**`quotient.image_order()` is not `|ρ(O(L))|`.** On `U + U + <-2>` the character
+quotient of `Õ⁺` answers `image_order() = 2` while `libgap.Subgroup(engine,
+SmallGeneratingSet(image)).Size() = 1`: the two characters are the *discriminant*
+image and the sign image (`O^+` is a determinant/spinor kernel), and the quotient's
+`image_order` is the product of both. Any count that needs `[Q : ρ(G_x)]` with
+`Q = ρ(O(L))` must read the discriminant factor, which is
+`quotient._im_rho_engine_and_section()`'s image, not `image_order()`. Substituting
+one for the other makes the trivial-image test silently wrong on every lattice whose
+sign character is nontrivial while `\rho` is trivial.
+
+**`Lattices(ZZ)("U") * 2` is a set product, not a scaling.** It raises
+`AssertionError: the product ... x Y needs Y a set, but 2 is not in the category of
+sets`, from `set_categories.py:2613`. The scaled hyperbolic plane is the Gram matrix
+`Lattices(ZZ)([[0, 2], [2, 0]])`; `twist(-1)`/`twist(2)` exist for scaling by an
+integer but the Gram spelling is what the discriminant-group tests use.
+
+**Measured, for the plane-stabilizer-image question (#321).** One process, adopted
+runtime, port bound at `/work` with `/work/src` ahead:
+
+| specimen | `\|ρ(O(L))\|` | class-set orbit of `<e_1, e_3>` | outcome |
+| --- | ---: | ---: | --- |
+| `U + U + <-2>` | 1 | 1 | trivial-image closure, 1 plane orbit |
+| `U + U(2)`, `U(2)` = `[[0,2],[2,0]]` | 2 | 2 | no stabilizer data: refusal; with the stabilizer's 13 generators (1.76 s): 2 plane orbits |
+| `T_En`, `P_1`, `P_2` | 46998591897600 | 527, 23715 | published-index closure, rows 9 and 24242 |
+
+The 13 generators come from `lattice.Aut().isotropic_stabilizer_generators(plane)`,
+which is what the port's plane branch answers on `U + U(2)` — so the escape hatch
+that supplies `ρ(G_x)` is usable on small lattices even where the ambient orbit is
+not enumerable.
+
+### The `T_Co` line classes of #286 stop in the owned lift locus, and `O(A_{T_Co})` stops in `_isom_fqf` (2026-11-11, #286)
+
+Specimen `T_Co = <2> + E(2)`, `E = E8 + U` (Dolgachev--Kondo, Izv. Math. 77:3 (2013),
+(3.6), p. 513), built as `Lattices(ZZ)([[2]]) + (NamedLattices.U +
+NamedLattices.E8).twist(2)`: rank 11, signature (2, 9), determinant -2048, even,
+2-elementary, `A = (Z/2)^11`, **528 isotropic classes, 527 of them nonzero** (61 s for the
+single pass over the 2048 classes), `q(h) = 2`, `div(h) = 2`, `q([h/2]) = 1/2`.
+
+Two stages do not return, each measured once:
+
+```
+L.Aut().isotropic_orbit_representatives(1)                    no return at 600 s
+  stack: isotropic_lifts.py:385 integral_parameter_classes
+         <- :234 _integral_lift_locus <- :278 integral_members
+         <- port recursive.py:1720 _isotropic_pointed_isometry
+         <- :1597 pointed_isometry <- :1771 primitive_vector_classes
+         <- isotropic_induction.py:109 <- marked_lattices.py:195
+         <- isotropic_orbits.py:1348 <- lattice_morphisms.py:4441
+  the enumeration is modules/pure/modules.py:3374 elements() ->
+  finite_ordered_sets.from_indexed -> fgp_module.list
+
+Tco.stable_orthogonal_group().intersection(Tco.O_plus())
+  .isotropic_orbit_representatives(1)                          no return at 600 s
+  same ambient stage, entered at orthogonal_quotients.py:2039
+
+Tco.discriminant_group().O().cardinality()                     no return at 1500 s
+  stack: groups.py:540 _finite_order <- torsion_form_modules.py:2004 _engine_group
+         <- :2839 _engine_orthogonal_group
+         <- Sage TorsionQuadraticModule.orthogonal_group -> fqf_orthogonal._isom_fqf
+```
+
+The second row is the curve of *`TorsionQuadraticModule.orthogonal_group()` enumerates
+isometries by brute force*, above, at `|A| = 2048` -- past that table's largest measured
+specimen (`n = 6`, 4.90 s). It blocks every character-quotient row of `#286`, including
+`R_{Gamma_En,2} = rho^-1(P)`, whose `P` is a stabilizer inside `O(A_{T_Co})`.
+
+`DiscriminantClass.is_characteristic` cannot decide on this form either: it compares
+`q(x).lift() - b(x,v).lift()` against `ZZ`, and both lifts are `OwnedJoinCategory`
+value elements, for which `in ZZ` is `False` even at `0`, so all 2048 classes answer
+`False` -- see `results/issue-to-file-discriminant-characteristic-undecided.md`.
+
+The gate `tests/lattices/test_the_coble_lattice_from_the_cited_formula.sage` (the
+construction, the invariants and the 528/527 pair) is **3 passed in 31.25 s**, exit 0
+(calls 26.13 s, 3.23 s, 0.59 s).  Reproduce the stages with
+`bash .scratch/issue315_launch.sh` and `PROBE=issue286_probe4.py` (row `O`),
+`issue286_probe5.py` (row `Otilde+`) or `issue286_probe3.py` (`O(A).cardinality()`).
+
+Re-measured on `9fdcabe` (the Enriques plane-row repair, which changed `isotropic_orbits.py`
+and `predicate_subgroups.py`, both on this call's path): the two line rows stop at the same
+frame, unchanged, at 700 s each, and the 528/527 isotropic count reproduces (57.7 s).  Logs
+`.tmp/p286-probe4-post319.log` and `.tmp/p286-probe5-post319.log`.  So the plane-row repair
+does not move the line-class stage.
+
+### The plane-orbit call's stabilizer image, and two traps found measuring it (2026-11-11, #321)
+
+**`quotient.image_order()` is not `|ρ(O(L))|`.** On `U + U + <-2>` the character
+quotient of `Õ⁺` answers `image_order() = 2` while `libgap.Subgroup(engine,
+SmallGeneratingSet(image)).Size() = 1`: the two characters are the *discriminant*
+image and the sign image (`O^+` is a determinant/spinor kernel), and the quotient's
+`image_order` is the product of both. Any count that needs `[Q : ρ(G_x)]` with
+`Q = ρ(O(L))` must read the discriminant factor, which is
+`quotient._im_rho_engine_and_section()`'s image, not `image_order()`. Substituting
+one for the other makes the trivial-image test silently wrong on every lattice whose
+sign character is nontrivial while `\rho` is trivial.
+
+**`Lattices(ZZ)("U") * 2` is a set product, not a scaling.** It raises
+`AssertionError: the product ... x Y needs Y a set, but 2 is not in the category of
+sets`, from `set_categories.py:2613`. The scaled hyperbolic plane is the Gram matrix
+`Lattices(ZZ)([[0, 2], [2, 0]])`; `twist(-1)`/`twist(2)` exist for scaling by an
+integer but the Gram spelling is what the discriminant-group tests use.
+
+**Measured, for the plane-stabilizer-image question (#321).** One process, adopted
+runtime, port bound at `/work` with `/work/src` ahead:
+
+| specimen | `\|ρ(O(L))\|` | class-set orbit of `<e_1, e_3>` | outcome |
+| --- | ---: | ---: | --- |
+| `U + U + <-2>` | 1 | 1 | trivial-image closure, 1 plane orbit |
+| `U + U(2)`, `U(2)` = `[[0,2],[2,0]]` | 2 | 2 | no stabilizer data: refusal; with the stabilizer's 13 generators (1.76 s): 2 plane orbits |
+| `T_En`, `P_1`, `P_2` | 46998591897600 | 527, 23715 | published-index closure, rows 9 and 24242 |
+
+The 13 generators come from `lattice.Aut().isotropic_stabilizer_generators(plane)`,
+which is what the port's plane branch answers on `U + U(2)` — so the escape hatch
+that supplies `ρ(G_x)` is usable on small lattices even where the ambient orbit is
+not enumerable.
+
+### The `T_Co` lift locus is a 262144-class search whose answer is one lattice condition (2026-11-11, #322)
+
+`isotropic_lifts.IsotropicReductionLiftTorsors.integral_parameter_classes` decides its
+residue locus by listing the parameter module (`elements()`) and building a rational
+isometry per class.  On `T_Co = <2> + E(2)`, `E = U + E8(-1)` (Dolgachev--Kondo, (3.6),
+p. 513), the marked `U(2)` line `<e_1>` and its identity reduction:
+
+```
+parameter space rank                        9
+|P/mP|                                     262144 = 4^9      (m = 4)
+one class test: parameterization + integral_restriction
+                                           0.353 s + 0.039 s
+Witt base point integral                   True
+=> the present method's cost               262144 * 0.39 s ~ 28 h
+U + <2> (control)                          |P/mP| = 2, locus 2 classes
+```
+
+So the public call `L.Aut().isotropic_orbit_representatives(1)` stops at
+`isotropic_lifts.py:385 -> modules.py:3374 elements() -> fgp_module.list`, measured with
+`faulthandler` at 420 s and recorded in `.tmp/p322-red.log`; the frames above it are the
+port's `recursive.py:1720 -> isotropic_lifts.py:278 -> :234`.
+
+The answer is one lattice condition, not a search.  From the Eichler transvection formula
+(Gritsenko--Hulek--Sankaran, arXiv:0810.1614, section 3.1, (4)--(5)) with `f` a primitive
+isotropic of the even lattice `L'`:
+
+```
+E_{f,x}(y) = y + b(y,x) f - (q(x)/2) b(y,f) f - b(y,f) x
+E_{f,x} preserves L'  <=>  x in L'
+```
+
+(the forward direction uses `q(x)/2` integral by evenness; the converse uses a `y` with
+`b(y,f) = 1`, which a primitive isotropic supplies).  Since `phi(a) = E_{f,s(a)} phi(0)`
+and `phi(x+y) = E(y) phi(x)`, **when `phi(0)` is integral** the locus is the kernel of
+`a + mP |-> s(a) + L'`, a subgroup of `P/mP` of index at most `|A_{L'}| = 2048`.
+
+Computing that kernel needs the section on a basis of `P` as coordinates in `L'`, then an
+exact integer Smith form.  Both exist only outside the owned boundary: the coordinate
+routes are Mor-level and yield owned value elements, and handing them to Sage's matrix
+code fails at the coercion --
+`ValueError: Fraction Field of Integer Ring is not in Category of sets with partial maps`
+(`.tmp/p322-probe7.log`).  The missing primitive is therefore an owned rational coordinate
+matrix of a module morphism into a lattice with its Smith normal form, or an owned
+"rational vector lies in this lattice" test at O(rank^2).  Do not restate the transvection
+formula to get around it: that is a second implementation of `eichler_transvection`.
+
+The criterion is conditional on `phi(0)` being integral; with a non-integral base point the
+transvection must also cancel the base point's fractional part, so the kernel statement
+does not apply.  Do not drop that test to make the cheap route look general.

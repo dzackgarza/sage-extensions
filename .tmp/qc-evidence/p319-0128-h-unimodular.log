@@ -1,0 +1,23 @@
+card 0128 model: rank 10 det -1
+Aut built in 0.0 s
+#h at 2d=2 (card says 1): did not return in 120 s
+#h at 2d=4 (card says 2): did not return in 120 s
+#h at 2d=6 (card says 2): 2 in 111.8 s
+#h at 2d=8 (card says 2): did not return in 120 s
+#h at 2d=10 (card says 3): did not return in 120 s
+#h at 2d=12 (card says 4): did not return in 120 s
+done
+[peakrss] issue275: child waited=0 shell_code=0 samples=353
+[peakrss] peak tree RSS      : 707 MiB
+[peakrss] low-water MemAvail : 748 MiB
+[peakrss] peak single VmHWM  : 713 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      702 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   732.3s procs=  3 rss=   707 MiB hwm=   713 MiB avail=  6401 MiB
+[peakrss]   t=   730.3s procs=  3 rss=   704 MiB hwm=   710 MiB avail=  6516 MiB
+[peakrss]   t=   695.5s procs=  3 rss=   693 MiB hwm=   701 MiB avail=   779 MiB
+[peakrss]   t=   689.5s procs=  3 rss=   692 MiB hwm=   700 MiB avail=   804 MiB
+[peakrss]   t=   691.5s procs=  3 rss=   692 MiB hwm=   701 MiB avail=   812 MiB
+launcher exit: 0

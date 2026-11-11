@@ -1,0 +1,40 @@
+P1: ['0', '[f]', '[fp]', '[f] + 2*[fp]']
+P2: ['0', '[e] + [f] - 2*[a1] - 2*[a2] + [a3] + [a4]', '[fp]', '[e] + [f] + [fp] - 2*[a1] - 2*[a2] + [a3] + [a4]']
+[    30.5] Gamma_En,2 built
+|Q| = 46998591897600  |rho(Gamma)| = 696729600
+[   115.8] im rho engine
+small generating set of Q: 2
+[   116.0] Q small generators
+owned rho(Gamma) generators: 5
+rho(Gamma) order from its generators: 696729600
+small generating set of rho(Gamma): 2
+[   116.2] rho(Gamma) generators
+Q-orbit of P1: 527 in 0.0 s
+[   116.2] orbit P1
+Q-orbit of P2: 23715 in 0.3 s
+[   116.5] orbit P2
+Q-orbit total: 24242
+union: 24242
+  rho(Gamma) generator 0: 0.3 s
+  rho(Gamma) generator 1: 0.3 s
+[   117.3] permutation tables
+rho(Gamma_En,2)-orbits on the union: 9
+orbit length multiset: [2, 120, 135, 270, 270, 1575, 3780, 8640, 9450]
+[   117.3] Gamma orbit count
+Otilde+ image order: 1
+[   162.9] Otilde+
+TOTAL 162.89872734202072
+[peakrss] issue275: child waited=0 shell_code=0 samples=84
+[peakrss] peak tree RSS      : 714 MiB
+[peakrss] low-water MemAvail : 9347 MiB
+[peakrss] peak single VmHWM  : 714 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      704 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   166.2s procs=  3 rss=   714 MiB hwm=   714 MiB avail=  9969 MiB
+[peakrss]   t=   164.2s procs=  3 rss=   713 MiB hwm=   713 MiB avail=  9968 MiB
+[peakrss]   t=   162.2s procs=  3 rss=   712 MiB hwm=   712 MiB avail=  9998 MiB
+[peakrss]   t=   160.2s procs=  3 rss=   710 MiB hwm=   710 MiB avail=  9898 MiB
+[peakrss]   t=   158.2s procs=  3 rss=   706 MiB hwm=   706 MiB avail=  9956 MiB
+launcher exit: 0

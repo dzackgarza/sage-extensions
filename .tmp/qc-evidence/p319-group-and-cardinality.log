@@ -1,0 +1,24 @@
+model built 0.0 s det -1024
+h_M square 4
+group built 38.0 s
+contains_character_kernel True
+character_data_is_complete True
+has_finite_coset_space True
+quotient 0.0 s
+discriminant image 136.7 s
+discriminant image order 696729600 in 0.1 s (card gamma-h-1 says 696729600)
+done
+[peakrss] issue275: child waited=0 shell_code=0 samples=98
+[peakrss] peak tree RSS      : 636 MiB
+[peakrss] low-water MemAvail : 3650 MiB
+[peakrss] peak single VmHWM  : 636 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      625 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   192.3s procs=  3 rss=   636 MiB hwm=   636 MiB avail=  5768 MiB
+[peakrss]   t=   194.3s procs=  3 rss=   636 MiB hwm=   636 MiB avail=  5660 MiB
+[peakrss]   t=   188.3s procs=  3 rss=   635 MiB hwm=   635 MiB avail=  5898 MiB
+[peakrss]   t=   190.3s procs=  3 rss=   635 MiB hwm=   635 MiB avail=  5845 MiB
+[peakrss]   t=   176.3s procs=  3 rss=   634 MiB hwm=   634 MiB avail=  6237 MiB
+launcher exit: 0
