@@ -2744,6 +2744,11 @@ class Lattices(OwnedCategoryOverBaseRing):
         ) != zero:
             return None
         subobject = codomain.primitive_isotropic_subobject(*images)
+        # Without a splitting L = P + U + K the block-equation family is only a
+        # subgroup of the parabolic (is_parabolic_complete); the port's route
+        # computes the whole stabilizer there.
+        if not subobject.is_parabolic_complete():
+            return None
         family = subobject.parabolic_stabilizer_generators()
         if not family:
             return None
