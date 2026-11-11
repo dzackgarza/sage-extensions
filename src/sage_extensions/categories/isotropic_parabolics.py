@@ -1513,9 +1513,12 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             :meth:`parabolic_transvection_generators` keeps the ones that move the
             plane, which the parabolic needs.
 
-            What is *not* claimed: that these elements generate \(U_I\).  The
-            radical is a lattice of rank \(2\operatorname{rank}(K) + 1\) by the
-            block form, and a rank statement about it is not made here (#331).
+            What is *not* claimed: that these elements generate \(U_I\).  The rank
+            \(2\operatorname{rank}(K) + 1\) this docstring used to quote from the block
+            form is unverified here, and :meth:`unipotent_radical_index` refuses the index,
+            naming the port operation that would supply the radical's own generating family
+            and the cited statement whose hypothesis fails at a plane of 2-rank two (#331,
+            #353).
             """
             return tuple(
                 transvection
@@ -1523,6 +1526,67 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 if self._fixes_isotropic_pointwise(transvection)
                 and self.acts_trivially_on_isotropic_reduction(transvection)
             )
+
+        @cached_method
+        def unipotent_radical_index(self) -> int:
+            r"""Return `[U_I : \langle\text{the returned unipotent generators}\rangle]`, or refuse.
+
+            `U_I = \ker(P_I \to \GL(I) \times O(I^\perp/I))` is the unipotent radical of
+            the setwise stabilizer, and :meth:`unipotent_radical_generators` returns a
+            subfamily of it.  An index needs both sides of the comparison, and the
+            radical's own side is not available in this tree: the kernel is modelled by
+            :meth:`~sage_extensions.categories.lattices.IsotropicReductions.ParentMethods.unipotent_kernel`,
+            whose selected generating family is read from the port operation
+            ``EichlerRecursion.isotropic_quotient_kernel_generators``, and that operation
+            does not exist (measured at `P_2` of `T_{\mathrm{En}}`: reading it raises
+            ``AttributeError: 'EichlerRecursion' object has no attribute
+            'isotropic_quotient_kernel_generators'``).  So the call refuses, and names
+            that operation: an index of a subfamily in a group whose own generators cannot
+            be read is not a number this owner can produce.
+
+            **The structure is not cited either.**  The repository quotes Scattone's
+            criterion (Mem. Amer. Math. Soc. 374, §3.7, Proposition 3.7.3) for *generating
+            the radical by Eichler transvections* at an isotropic sublattice, and the
+            hypothesis that makes it a generation statement -- two orthogonal hyperbolic
+            planes, which is what turns transvections into a transitive family (Dutour
+            Sikiric--Hulek, arXiv:2302.01679v2, Lemma 4.2 and proof, p. 28) -- is not
+            available at `P_2`: `T_{\mathrm{En}}` has `\operatorname{rank}_2 = 2` and no
+            second hyperbolic plane (Gritsenko--Hulek--Sankaran, arXiv:0810.1614v1,
+            Proposition 5.6, p. 17; sage-extensions#17's reading in
+            ``results/issue17-kernel-generation-blocker.md``).  The rank `2\operatorname{rank}(K)+1`
+            that :meth:`parabolic_obstruction` used to quote is likewise unverified here.
+
+            What the returned family *is*, measured at `P_2`: all
+            :meth:`unipotent_radical_generators` returned fix the plane pointwise and act
+            trivially on `I^\perp/I` (so they lie in the radical), and 28 of the 122
+            generators of :meth:`parabolic_stabilizer_generators` do.  That is a subfamily
+            of the radical, not a proof that it generates it.
+            """
+            reduction = self.isotropic_reduction()
+            kernel = reduction.unipotent_kernel()
+            try:
+                radical_generators = tuple(kernel.group_generators())
+            except AttributeError as error:
+                raise ValueError(
+                    f"no index of the returned unipotent generators in the radical is "
+                    f"available at {self}: the radical's own generating family is read "
+                    f"from EichlerRecursion.isotropic_quotient_kernel_generators, which "
+                    f"this runtime does not provide ({error}). The missing statement is "
+                    f"also a cited generation of the radical by transvections: Scattone "
+                    f"3.7.3 is quoted for it, and its hypothesis -- two orthogonal "
+                    f"hyperbolic planes -- does not hold at a plane of a lattice of "
+                    f"2-rank 2 without a second hyperbolic plane"
+                ) from error
+            generated = kernel.subgroup(tuple(self.unipotent_radical_generators()))
+            total = int(kernel.cardinality())
+            part = int(generated.cardinality())
+            if total % part != 0:
+                raise ArithmeticError(
+                    f"the subgroup of the unipotent radical generated by the returned "
+                    f"transvections at {self} has order {part}, which does not divide the "
+                    f"radical's order {total}; Lagrange says it must"
+                )
+            return total // part
 
         def half_vector_transvection_generators(self):
             r"""Return the Eichler transvections of the plane along its half lattice vectors.
@@ -2396,13 +2460,14 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
               :meth:`levi_quotient_image_index` computes settles `M` exactly when
               it is `1`, which is what happens at Sterk's `P_2` of
               `T_{\\mathrm{En}}`;
-            * the radical: `U_I` has rank `2 \\cdot \\operatorname{rank}(K) + 1`
-              by the block form, and the returned transvections are not all of
-              it -- an Eichler transvection `E_{p,x}` moves `p^\\perp` by
-              multiples of `p` and acts on `I` unipotently, so it is in the
-              parabolic and not in the kernel.  That the members of the family
-              that are in the kernel generate `U_I` is a rank statement about a
-              torsion-free nilpotent lattice, and it is not made here.
+            * the radical -- still open: the returned transvections that lie in
+              `U_I` do lie in it (checked pointwise on `I` and on `I^\\perp/I`),
+              but generation of `U_I` by them is not shown, and
+              :meth:`unipotent_radical_index` refuses the index because the
+              radical's own generating family is read from a port operation this
+              runtime does not provide.  No cited statement generates the radical
+              at a plane whose lattice has no second hyperbolic plane, which is
+              what Scattone 3.7.3's criterion needs.
             """
             if self.is_parabolic_complete():
                 return None
@@ -2425,10 +2490,13 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 f"= {quotient_index} for the image H_0 of the returned generators in "
                 f"O(I^perp/I), so the image of the whole setwise stabilizer there is "
                 f"{'H_0, i.e. all of O(I^perp/I)' if quotient_index == 1 else 'not identified: it lies between H_0 and O(I^perp/I)'}. "
-                f"Not decided: the radical U_I, of rank "
-                f"2 * {int(self.isotropic_reduction().quotient_lattice().module_rank())} + 1 "
-                f"by the block form (det A = {int(self.plane_block_gram()[5].determinant())}), "
-                f"which the family's kernel elements are not shown to generate."
+                f"Not decided: the radical U_I. The returned generators that lie in it do "
+                f"lie in it ({len(self.unipotent_radical_generators())} of them fix the "
+                f"plane pointwise and act trivially on I^perp/I, measured), and "
+                f"{sum(1 for generator in self.parabolic_stabilizer_generators() if self._fixes_isotropic_pointwise(generator) and self.acts_trivially_on_isotropic_reduction(generator))} "
+                f"of the {len(self.parabolic_stabilizer_generators())} parabolic generators "
+                f"do; but neither their generation of U_I nor a cited generation of it is "
+                f"available here, as unipotent_radical_index() states when it refuses."
             )
 
         @cached_method
