@@ -79,6 +79,78 @@ The #289 test file is not committed: #289 is closed and its subject moved to
 `sage-indefinite-port#72`, so it was run untracked as the `Tco.Aut().group_generators()`
 acceptance call.
 
+
+## Addition (chat mkeo's report): three further lattices, and the Õ⁺(T_En) line row
+
+Four further inputs hit the same frame on the pre-repair tip. Measured with the port at
+`/work`, in one process per tree: the pre-repair tree is `6db8551` (the parent of the
+repair), the post-repair tree is `main` with it.
+
+| input | pre-repair `6db8551` | post-repair |
+| --- | --- | --- |
+| `U(2) ⊕ U(2)` (rank 4, signature (2,2)), `Aut().group_generators()` | `TypeError: membership … is undecided`, 3.13 s | 33 members, 4.34 s |
+| `U(2) ⊕ U(2) ⊕ ⟨−6⟩` (rank 5, (2,3)), same call | `TypeError`, 6.49 s | 152 members, 11.71 s |
+| `U(2) ⊕ U(2) ⊕ U(2)` (rank 6, (3,3)), same call | `TypeError`, 10.38 s | 105 members, 38.60 s |
+| `Otilde^+(T_En)` line row = `TEn.stable_orthogonal_group().intersection(TEn.O_plus()).isotropic_orbit_representatives(1)` | `TypeError` at `eichler.py:901` → `groups.py:1594`, 139.47 s | no exception; stops inside `group_generators()` at 6.44 s (below) |
+
+The three lattices are even, of signature (2,2), (2,3) and (3,3); each is a `2U` sum with
+an extra summand, so each takes the port's envelope branch that reaches
+`approximate_generators`.
+
+**The member counts are not comparable across revisions and are not asserted.** Chat mkeo
+recorded 9, 9 and 35 at `8d44136`; the repaired tree gives 33, 152 and 105. The count is
+whatever the port's sampled search settles on (#289, moved to `sage-indefinite-port#72`),
+and the tree's generator route has changed since `8d44136` as well, so the recorded three
+are agent results and not a card value: they identify the input, and what the repair
+restores is that the call returns. Nothing in the test tree asserts them.
+
+**The `Otilde^+(T_En)` line row: the crash is gone, the count is not in yet.** After the
+repair the row no longer raises. It builds `stable = {g : ρ_L(g) ∈ 1}` and
+`O⁺ = {g : sn_RR(g) = 1}` in 6.4 s, and is then inside `group_generators()` on their
+intersection:
+
+```
+[    0.07s] lattice built
+[    6.34s] stable_orthogonal_group() built: {g in O(T_En) : rho_L(g) lies in ...}
+[    6.43s] O_plus() built: {g in O(T_En) : sn_RR(g) = 1}
+[    6.44s] intersection built: {g in O(T_En) : g lies in every selected subgroup}
+[    6.44s] group_generators ...
+```
+
+A first post-repair run did not leave `group_generators()` inside an 1800 s cap; a second
+runs under a 3300 s cap (background job `jmwc0f4px`) and had not left it when this file was
+written. So what is established for this row is that the reported exception is gone and
+where the remaining cost is; **no count is claimed for it here**.
+
+The comparable number is a card value, not a run's: card `029J`'s `Otilde+` row states
+`constant: 528` — 528 primitive isotropic lines, which its citation splits into two orbits
+of lengths 1 and 527 — read by tag through `card_line_orbit_row("029J", "Otilde+")` and
+`card_line_orbit_lengths("029J", "Otilde+")` on the digest pinned at
+`d6a539339bac5ea0ee8d8bde5dc19564955eb152`. When the row returns, its count is compared
+with that card value; nothing here asserts a value the run produced.
+
+I also checked that the recorded numbers are not another call on the same lattices: on
+`U(2) ⊕ U(2)` the number of plane orbits is 1, the discriminant image's order is 72, and
+`O^+`'s generator family has 66 members — none of them 9.
+
+**Which tree each measurement is on.** The repair is `src/sage_extensions/categories/sets/set_categories.py`
+alone and is unchanged from `6d486c2` to the tip this file is pushed at; `groups.py`,
+`lattice_morphisms.py` and `lattices.py` are byte-identical across those two commits as
+well, so the acceptance runs below hold at the tip. The one exception is the row's count:
+`isotropic_orbits.py` gained 394 lines between them (#312, #297), and the row's last step
+is `isotropic_orbit_representatives`, so the row's post-repair stage — measured on the
+`#339` commit itself — must be re-measured at the tip before any count is claimed for it.
+
+## Acceptance items, as they stand on `main`
+
+| item | state |
+| --- | --- |
+| `tests/lattices/test_the_orthogonal_group_of_ten_has_a_discriminant_image.sage` (#333) | established: 1 passed in 96.82 s |
+| `Tco.Aut().group_generators()` returning | established: 1 passed in 164.09 s (the held #289 test, run untracked) |
+| #287's `test_a_double_coset_section_returns_its_group_elements` | established: 41 passed in 14.76 s with seven neighbours |
+| `U(2) ⊕ U(2)`, `U(2) ⊕ U(2) ⊕ ⟨−6⟩`, `U(2) ⊕ U(2) ⊕ U(2)` | established: the three calls return |
+| the `Otilde^+(T_En)` line row | the exception is gone; its count is not established |
+
 ## Issue closure text
 
 > Repaired at `SetMethods._retain_admitted_member`. Instrumented on `T_Co`, the retaining
