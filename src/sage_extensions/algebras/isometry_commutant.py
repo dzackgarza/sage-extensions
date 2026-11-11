@@ -428,89 +428,8 @@ class IsometryCommutant:
         return tuple(result.values())
 
     def radical_centralizer_generators(self):
-        r"""Return generators of the centralizer when `rad \ne 0` and `O / (O \cap rad)` is `M_n(Z)`.
-
-        `O / (O \cap rad)` acts on `\bar M = O e / (rad e)`, carrying the form defined by
-        `x^\dagger y = b(x, y) t` modulo the radical. An isometry of `\bar M` has a preimage `p`
-        in `A` with `r = p^\dagger p - 1` in the radical and self-adjoint, so
-        `u = p (1 + r)^{-1/2}`, a polynomial in `r`, is a rational unitary lift. The unitary lifts
-        are `u N(Q)`, and :meth:`_integral_point` decides whether that coset meets `M_r(Z)`.
-        The kernel is :meth:`unipotent_kernel_generators`. No condition on `rad^2` is needed.
-        """
-        radical = self.radical_basis()
-        assert radical, f"the commutant of {self.isometries} is semisimple"
-        size = self.dimension()
-        radical_rows = matrix(QQ, [self.coordinates(x) for x in radical])
-        scale = radical_rows.denominator()
-        radical_lattice = matrix(ZZ, scale * radical_rows).saturation()
-        _diagonal, _left, change = radical_lattice.smith_form()
-        kernel_rank = radical_lattice.nrows()
-        project = lambda element: (self.coordinates(element) * change.change_ring(QQ))[kernel_rank:]
-        inverse_change = change.inverse().change_ring(QQ)
-        section = tuple(
-            sum(c * m.change_ring(QQ) for c, m in zip(inverse_change.row(kernel_rank + i), self.order_basis))
-            for i in range(size - kernel_rank)
-        )
-        quotient_dimension = size - kernel_rank
-        degree = ZZ(quotient_dimension).isqrt()
-        assert degree**2 == quotient_dimension, f"the semisimple quotient of the commutant is not M_n(Q)"
-        e = self._primitive_idempotent(degree)
-        images = matrix(QQ, [project(m * e) for m in self.order_basis])
-        denominator = images.denominator()
-        hermite = matrix(ZZ, denominator * images).hermite_form(include_zero_rows=False)
-        assert hermite.nrows() == degree
-        basis = matrix(QQ, hermite) / denominator
-        lifts = [
-            sum(c * m for c, m in zip(combination, self.order_basis)) * e
-            for combination in (images.solve_left(row) for row in basis.rows())
-        ]
-
-        def on_module(element):
-            return matrix(QQ, [basis.solve_left(project(element * m)) for m in lifts]).transpose()
-
-        action_rows = matrix(QQ, [on_module(m).list() for m in section])
-        assert action_rows.denominator() == 1 and abs(action_rows.det()) == 1, (
-            f"the semisimple quotient of the order of the commutant of {self.isometries} is not End(M)"
-        )
-        adjoint_e = self.adjoint(e)
-        line = matrix(QQ, [project(adjoint_e * m.change_ring(QQ) * e) for m in self.order_basis])
-        line_scale = line.denominator()
-        generator = matrix(QQ, matrix(ZZ, line_scale * line).hermite_form(include_zero_rows=False)) / line_scale
-        assert generator.nrows() == 1
-        gram = matrix(
-            ZZ,
-            [[generator.solve_left(project(self.adjoint(x) * y))[0] for y in lifts] for x in lifts],
-        )
-        identity = identity_matrix(QQ, self.rank)
-        action_inverse = action_rows.inverse()
-        nilpotency = self._radical_nilpotency()[0]
-
-        def lift(isometry):
-            combination = vector(QQ, isometry.list()) * action_inverse
-            preimage = sum(c * m for c, m in zip(combination, section))
-            defect = self.adjoint(preimage) * preimage - identity
-            assert (defect**(nilpotency + 1)).is_zero() and self.adjoint(defect) == defect
-            root = sum(binomial(QQ((-1, 2)), k) * defect**k for k in range(nilpotency + 1))
-            element = self._integral_point(preimage * root, 1)
-            if element is None:
-                return None
-            assert self.is_centralizer_element(element)
-            return element
-
-        # The image of C(Z) in the isometry group of the quotient form is arithmetic, hence of
-        # finite index (Platonov-Rapinchuk, Thm. 4.1); its elements are those with a lift, and
-        # lifting is a coset invariant because the kernel is contained in C(Z). Schreier's
-        # lemma on liftability gives the image when a generator does not lift.
-        from sage_extensions.categories.lattice_centralizers import finite_preimage_generators
-
-        quotient_generators = tuple(matrix(ZZ, g) for g in _form_generators(gram))
-        lifts_ = [lift(g) for g in quotient_generators]
-        if any(value is None for value in lifts_):
-            image, _index = finite_preimage_generators(
-                quotient_generators, lambda element: element, lambda element: lift(element) is not None
-            )
-            lifts_ = [lift(g) for g in image]
-        return (*self.unipotent_kernel_generators(), *lifts_)
+        r"""Return generators of the centralizer when `rad \ne 0` (:class:`LeviQuotient`)."""
+        return LeviQuotient(self).centralizer_generators()
 
     def inversion_transporter(self):
         r"""Return `t \in O(L)` with `t F t^{-1} = F^{-1}`, or ``None``, for `A` a real quadratic field."""
@@ -945,3 +864,272 @@ class IsometryCommutant:
             and element.det() in (1, -1)
             and self.adjoint(element) * element == identity_matrix(QQ, self.rank)
         )
+
+
+def _lift_idempotent(element):
+    r"""Return the idempotent lifting ``element``, idempotent modulo a nilpotent ideal containing `e^2 - e`.
+
+    The iteration `e \mapsto 3e^2 - 2e^3` moves `e^2 - e` from `I^k` into `I^{2k}` (Lam, *A First Course in
+    Noncommutative Rings*, Thm. 21.28), so it stops at an exact idempotent.
+    """
+    while True:
+        square = element * element
+        if square == element:
+            return element
+        element = 3 * square - 2 * square * element
+
+
+def _splitting_idempotents(element, minimal):
+    r"""Return `\iota_i(x)` for the coprime factorization `\mu = \prod_i P_i` into prime powers, `\iota_i \equiv \delta_{ij} \bmod P_j`."""
+    result = []
+    for factor, multiplicity in minimal.factor():
+        power = factor**multiplicity
+        cofactor = minimal // power
+        _d, inverse, _other = cofactor.xgcd(power)
+        result.append((inverse * cofactor)(element))
+    return result
+
+
+def _general_linear_generators(size):
+    r"""Return generators of `GL_n(Z)`: the elementary matrices and `\mathrm{diag}(-1, 1, \ldots)`.
+
+    Elementary matrices generate `SL_n(Z)` since `Z` is Euclidean (Hahn-O'Meara, *The Classical Groups and
+    K-Theory*, 1.2.10), and `\mathrm{diag}(-1, 1, \ldots)` has determinant `-1`.
+    """
+    sign = identity_matrix(ZZ, size)
+    sign[0, 0] = -1
+    result = [sign]
+    for i in range(size):
+        for j in range(size):
+            if i != j:
+                move = identity_matrix(ZZ, size)
+                move[i, j] = 1
+                result.append(move)
+    return result
+
+
+class LeviQuotient:
+    r"""The Levi modules and forms of a commutant `A` with radical, for `A / rad = \prod_k M_{n_k}(Q)`.
+
+    Let `S = A / rad` with central primitive idempotents `\bar c_k` and `S_k = \bar c_k S \cong M_{n_k}(Q)`. For a
+    primitive idempotent `e_k` of `A` over `S_k` (lifted modulo the nilpotent radical), `\bar M_k = O e_k / rad\, e_k`
+    is a lattice on which `S_k` acts as `M_{n_k}(Q)` and the other factors act as zero; `S` acts faithfully on
+    `\bar M = \bigoplus_k \bar M_k`, and the image `\bar O` of `O` is an order of finite index in `\prod_k End(\bar M_k)`.
+    The adjoint permutes the factors, `\bar c_k^\dagger = \bar c_{\pi(k)}`. Since `e_j^\dagger` lies over `S_{\pi(j)}`, the
+    space `e_j^\dagger A e_{\pi(j)}` is a line modulo the radical, and `x^\dagger h y = b^h_j(x, y)\, t_j` defines pairings
+    `\bar M_j \times \bar M_{\pi(j)} \to Q` for self-adjoint `h`. A rational `\bar a = (g_k)` is the image of a solution of
+    `a^\dagger h a = 1` exactly when `g_j^t G^h_j g_{\pi(j)} = G_j` for every `j`: the orthogonal or symplectic group
+    of `G_j` when `\pi(j) = j`, and `GL(\bar M_j)` with `g_{\pi(j)} = G_j^{-1} g_j^{-t} G_j` for a swapped pair.
+
+    The integral image `\bar\Gamma` of `C(Z)` is an arithmetic subgroup of finite index in the group `H` generated by
+    these factor groups (Platonov-Rapinchuk, *Algebraic Groups and Number Theory*, Thm. 4.1). A preimage `p` of
+    `\bar a` has `d = p^\dagger h p - 1` self-adjoint in the radical, so `p (1 + d)^{-1/2}` is a rational solution,
+    and all solutions over `\bar a` are `p (1 + d)^{-1/2} N(Q)`, decided by :meth:`IsometryCommutant._integral_point`.
+    A factor whose centre is a field `\ne Q` or that is not split raises :class:`NotImplementedError`.
+    """
+
+    def __init__(self, commutant):
+        self.commutant = commutant
+        radical = commutant.radical_basis()
+        assert radical, f"the commutant of {commutant.isometries} is semisimple"
+        size = commutant.dimension()
+        radical_rows = matrix(QQ, [commutant.coordinates(x) for x in radical])
+        radical_lattice = matrix(ZZ, radical_rows.denominator() * radical_rows).saturation()
+        _diagonal, _left, change = radical_lattice.smith_form()
+        kernel_rank = radical_lattice.nrows()
+        self._project = lambda element: (commutant.coordinates(element) * change.change_ring(QQ))[kernel_rank:]
+        inverse_change = change.inverse().change_ring(QQ)
+        order = [m.change_ring(QQ) for m in commutant.order_basis]
+        self._order = order
+        self._section = tuple(
+            sum(c * m for c, m in zip(inverse_change.row(kernel_rank + i), order)) for i in range(size - kernel_rank)
+        )
+        project, section = self._project, self._section
+        equations = block_matrix(
+            QQ, [[matrix(QQ, [project(x * m - m * x) for x in section]).transpose()] for m in order], subdivide=False
+        )
+        center = [sum(c * x for c, x in zip(v, section)) for v in equations.right_kernel().basis()]
+        left = lambda element: matrix(QQ, [project(element * x) for x in section])
+        generic = next(
+            (
+                z
+                for values in product(range(-3, 4), repeat=len(center))
+                for z in (sum(c * m for c, m in zip(values, center)),)
+                if left(z).minimal_polynomial().degree() == len(center)
+            ),
+            None,
+        )
+        if generic is None:
+            raise ArithmeticError(f"no generator of the centre of the Levi quotient of {commutant.isometries} in the box")
+        minimal = left(generic).minimal_polynomial()
+        if any(factor.degree() != 1 for factor, _m in minimal.factor()):
+            raise NotImplementedError(
+                f"the Levi quotient of the commutant of {commutant.isometries} has a central factor field of degree > 1 "
+                f"(centre minimal polynomial {minimal}); its unitary group has no Levi-module route (#54)"
+            )
+        self._central = _splitting_idempotents(generic, minimal)
+        self.degrees = []
+        self._idempotents = []
+        for c in self._central:
+            dimension = matrix(QQ, [project(c * x) for x in section]).rank()
+            n = ZZ(dimension).isqrt()
+            if n**2 != dimension:
+                raise NotImplementedError(
+                    f"a factor of dimension {dimension} of the Levi quotient of the commutant of {commutant.isometries} "
+                    f"is not M_n(Q); a division Levi factor has no Levi-module route (#54)"
+                )
+            self.degrees.append(n)
+            self._idempotents.append(self._primitive(c, n))
+        self._bases, self._lifts = [], []
+        for e, n in zip(self._idempotents, self.degrees):
+            images = matrix(QQ, [project(m * e) for m in order])
+            hermite = matrix(ZZ, images.denominator() * images).hermite_form(include_zero_rows=False)
+            assert hermite.nrows() == n
+            basis = matrix(QQ, hermite) / images.denominator()
+            self._bases.append(basis)
+            self._lifts.append([sum(c * m for c, m in zip(images.solve_left(row), order)) * e for row in basis.rows()])
+        self.offsets = [sum(self.degrees[:k]) for k in range(len(self.degrees))]
+        self.size = sum(self.degrees)
+        action_rows = matrix(QQ, [self._flatten(self.on_module(x)) for x in section])
+        assert action_rows.is_square() and action_rows.denominator() == 1 and action_rows.det() != 0
+        self._action_inverse = action_rows.inverse()
+        self.partner = [
+            next(j for j, other in enumerate(self._central) if all(v == 0 for v in project(commutant.adjoint(c) - other)))
+            for c in self._central
+        ]
+        self._lines = []
+        for j, e in enumerate(self._idempotents):
+            other = self._idempotents[self.partner[j]]
+            line = matrix(QQ, [project(commutant.adjoint(e) * m * other) for m in order])
+            generator = matrix(QQ, matrix(ZZ, line.denominator() * line).hermite_form(include_zero_rows=False))
+            assert generator.nrows() == 1
+            self._lines.append(generator / line.denominator())
+        one = identity_matrix(QQ, commutant.rank)
+        self.grams = [self.form(one, j) for j in range(len(self.degrees))]
+
+    def _primitive(self, central, degree):
+        r"""Return a primitive idempotent of `A` over the factor of ``central``: `\dim \bar e S \bar e = 1`.
+
+        Candidates are the idempotents `\iota_i(y)` of the primary decomposition of `y = c\, m` for order elements
+        `m` and their products, lifted by :func:`_lift_idempotent`.
+        """
+        project, order = self._project, self._order
+        corner = lambda a: matrix(QQ, [project(a * m * a) for m in order]).rank()
+        if degree == 1:
+            return _lift_idempotent(central)
+        left = lambda element: matrix(QQ, [project(element * x) for x in self._section])
+        found = []
+        for m in order:
+            y = central * m * central
+            for a in _splitting_idempotents(y, left(y).minimal_polynomial()):
+                a = central * a * central
+                if all(v == 0 for v in project(a * a - a)) and any(v != 0 for v in project(a)):
+                    found.append(a)
+        for a in found:
+            if corner(a) == 1:
+                return _lift_idempotent(a)
+        for a, b in product(found, repeat=2):
+            for c in (a * b * a, a * b, b * a * b):
+                if all(v == 0 for v in project(c * c - c)) and any(v != 0 for v in project(c)) and corner(c) == 1:
+                    return _lift_idempotent(c)
+        raise ArithmeticError(
+            f"no primitive idempotent of the factor M_{degree}(Q) of the Levi quotient of {self.commutant.isometries} "
+            f"among the primary idempotents of order elements"
+        )
+
+    def _block(self, matrix_, k):
+        o, n = self.offsets[k], self.degrees[k]
+        return matrix_[o : o + n, o : o + n]
+
+    def _flatten(self, blocks):
+        return [c for k in range(len(self.degrees)) for c in self._block(blocks, k).list()]
+
+    def block_diagonal(self, blocks):
+        result = matrix(QQ, self.size, self.size)
+        for k, block in enumerate(blocks):
+            o, n = self.offsets[k], self.degrees[k]
+            result[o : o + n, o : o + n] = block
+        return result
+
+    def on_module(self, element):
+        r"""Return the block-diagonal action of ``element`` on `\bar M = \bigoplus_k \bar M_k`."""
+        return self.block_diagonal(
+            [
+                matrix(QQ, [basis.solve_left(self._project(element * m)) for m in lifts]).transpose()
+                for basis, lifts in zip(self._bases, self._lifts)
+            ]
+        )
+
+    def form(self, middle, j):
+        r"""Return `G^h_j`, the Gram of `b^h_j` on `\bar M_j \times \bar M_{\pi(j)}`, `h =` ``middle``."""
+        adjoint = self.commutant.adjoint
+        return matrix(
+            QQ,
+            [
+                [self._lines[j].solve_left(self._project(adjoint(x) * middle * y))[0] for y in self._lifts[self.partner[j]]]
+                for x in self._lifts[j]
+            ],
+        )
+
+    def group_generators(self):
+        r"""Return block-diagonal generators of `H`: `O(G_j)` for `\pi(j) = j`, `GL(\bar M_j)` for a swapped pair."""
+        result = []
+        identity_blocks = [identity_matrix(QQ, n) for n in self.degrees]
+        for j, k in enumerate(self.partner):
+            if k < j:
+                continue
+            gram = self.grams[j]
+            if k == j:
+                moves = [(g,) for g in _form_generators(matrix(ZZ, gram.denominator() * gram))]
+            else:
+                moves = [(g, gram.inverse() * g.transpose().inverse() * gram) for g in _general_linear_generators(self.degrees[j])]
+            for move in moves:
+                blocks = list(identity_blocks)
+                blocks[j] = matrix(QQ, move[0])
+                if k != j:
+                    blocks[k] = move[1]
+                result.append(self.block_diagonal(blocks))
+        return result
+
+    def lift(self, start, middle, isometry):
+        r"""Return an integral `t_0 a` with `\bar a =` ``isometry`` and `a^\dagger h a = 1`, or ``None``."""
+        commutant = self.commutant
+        combination = vector(QQ, self._flatten(isometry)) * self._action_inverse
+        preimage = sum(c * m for c, m in zip(combination, self._section))
+        defect = commutant.adjoint(preimage) * middle * preimage - identity_matrix(QQ, commutant.rank)
+        nilpotency = commutant._radical_nilpotency()[0]
+        assert (defect ** (nilpotency + 1)).is_zero() and commutant.adjoint(defect) == defect
+        root = sum(binomial(QQ((-1, 2)), k) * defect**k for k in range(nilpotency + 1))
+        return commutant._integral_point(start * preimage * root, 1)
+
+    def coset_representatives(self):
+        r"""Return representatives `g` of the left cosets `g \bar\Gamma` in `H`; `x \bar\Gamma = y \bar\Gamma` when `y^{-1} x` lifts."""
+        if not hasattr(self, "_cosets"):
+            one = identity_matrix(QQ, self.commutant.rank)
+            representatives = [identity_matrix(QQ, self.size)]
+            position = 0
+            while position < len(representatives):
+                current = representatives[position]
+                position += 1
+                for generator in self.group_generators():
+                    moved = generator * current
+                    if not any(self.lift(one, one, known.inverse() * moved) is not None for known in representatives):
+                        representatives.append(moved)
+            self._cosets = tuple(representatives)
+        return self._cosets
+
+    def centralizer_generators(self):
+        r"""Return the unipotent kernel and lifts of generators of `\bar\Gamma` (Schreier's lemma on liftability)."""
+        from sage_extensions.categories.lattice_centralizers import finite_preimage_generators
+
+        commutant = self.commutant
+        one = identity_matrix(QQ, commutant.rank)
+        generators = self.group_generators()
+        lifts = [self.lift(one, one, g) for g in generators]
+        if any(value is None for value in lifts):
+            image, _index = finite_preimage_generators(
+                generators, lambda element: element, lambda element: self.lift(one, one, element) is not None
+            )
+            lifts = [self.lift(one, one, g) for g in image]
+        assert all(commutant.is_centralizer_element(g) for g in lifts)
+        return (*commutant.unipotent_kernel_generators(), *lifts)
