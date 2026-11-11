@@ -2972,28 +2972,52 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             the block `K = b(U, K)` is their `K` and vanishes for a splitting
             plane only, while `b(P, K) = 0` always, because `K` lies in
             \(P^\perp\).
+
+            **The two completions are the cokernels'.**  Each completion above
+            is of a *saturated* sublattice, so each is available from the
+            quotient rather than by a search.  `P` is saturated in
+            \(P^\perp\): it is saturated in `L`, and if `n v` lies in `P` for a
+            `v` of \(P^\perp\) then `v` lies in `L` and `n v` in `P`, so `v`
+            itself lies in `P`; likewise \(P^\perp\) is saturated in `L` by its
+            own definition as the perpendicular of a family of vectors.  So
+            \(P^\perp/P\) and \(L/P^\perp\) are torsion-free, and a finitely
+            generated torsion-free module over the principal ideal domain `ZZ`
+            is free -- :meth:`...finite_free_trivialization`, which returns the
+            isomorphism with the free module on the quotient's own generators.
+            Lifting those basis points back along the cokernel projection gives
+            the completing vectors.  Keeping standard basis vectors in order
+            while they raise the rank does **not** compute this: on
+            \(T_{\mathrm{Co}}\) at a plane whose generators are congruent modulo
+            `2`, the first such vector to raise the rank of \(P^\perp\)'s
+            chosen basis to `9` leaves a sublattice of index `2`, and the
+            assembled rows were then not a `ZZ`-basis of `L` at all.
             """
             lattice = self.ambient_lattice()
             labels = tuple(lattice.module_generating_set())
             rank = len(labels)
+            perpendicular = lattice.subobject_on(tuple(self.perpendicular_basis()))
+            into_perpendicular = self.inclusion().factor_through(perpendicular.inclusion())
+            plane_labels = tuple(into_perpendicular.domain().module_generating_set())
+            perpendicular_basis = _completed_basis(
+                into_perpendicular,
+                tuple(
+                    into_perpendicular(into_perpendicular.domain().module_generator(label))
+                    for label in plane_labels
+                ),
+            )
+            into_lattice = perpendicular.inclusion()
+            from_perpendicular = tuple(into_lattice(vector) for vector in perpendicular_basis)
+            completing = _completed_basis(
+                into_lattice,
+                tuple(
+                    into_lattice(into_lattice.domain().module_generator(label))
+                    for label in into_lattice.domain().module_generating_set()
+                ),
+            )[len(perpendicular_basis):]
             plane_rows = [self.coordinates(vector) for vector in self.plane_basis()]
-            current = matrix(SageZZ, plane_rows)
-            perpendicular_rows = []
-            for row in (
-                self.coordinates(vector)
-                for vector in self.vector_perpendicular_basis(self.plane_basis())
-            ):
-                augmented = matrix(SageZZ, tuple(current.rows()) + (row,))
-                if augmented.rank() > current.rank():
-                    current = augmented
-                    perpendicular_rows.append(row)
-            complement_rows = []
-            for position in range(rank):
-                row = tuple(1 if other == position else 0 for other in range(rank))
-                augmented = matrix(SageZZ, tuple(current.rows()) + (row,))
-                if augmented.rank() > current.rank():
-                    current = augmented
-                    complement_rows.append(row)
+            perpendicular_rows = [self.coordinates(vector) for vector in from_perpendicular[2:]]
+            complement_rows = [self.coordinates(vector) for vector in completing]
+            current = matrix(SageZZ, plane_rows + perpendicular_rows + complement_rows)
             assert (
                 len(complement_rows) == 2
                 and len(perpendicular_rows) == rank - 4
@@ -3737,6 +3761,35 @@ __all__ = ["PrimitiveIsotropicSubobjects"]
 # ---------------------------------------------------------------------------
 # The parabolic subgroup of an isotropic plane, by its published block form.
 # ---------------------------------------------------------------------------
+
+
+def _completed_basis(arrow, basis):
+    r"""Return ``basis``, a `ZZ`-basis of ``arrow``'s image, extended to one of its codomain.
+
+    ``arrow`` is an inclusion of lattices whose quotient is torsion-free, and
+    ``basis`` a `ZZ`-basis of the image.  A finitely generated torsion-free
+    module over the principal ideal domain `ZZ` is free
+    (:meth:`sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules.ParentMethods.finite_free_trivialization`,
+    which returns the isomorphism with the free module on the quotient's own
+    generators), so lifting those basis points back along the cokernel
+    projection gives vectors of the codomain; they complete ``basis`` to a
+    `ZZ`-basis of it.  A quotient with torsion means the included lattice is not
+    saturated, and then no basis completes it -- that is refused, not guessed.
+    """
+    quotient = arrow.cokernel()
+    if quotient.is_torsion_free() is not True:
+        raise ArithmeticError(
+            f"the quotient {quotient} of the inclusion {arrow} has torsion: the included "
+            f"lattice is not saturated in the ambient one, and no basis of the ambient one "
+            f"contains its basis"
+        )
+    trivialization = quotient.finite_free_trivialization()
+    free = trivialization.codomain()
+    projection = arrow.cokernel_projection()
+    return tuple(basis) + tuple(
+        projection.preimage(trivialization.inverse()(point))
+        for point in free.module_generators()
+    )
 
 
 def _kernel_basis_rows(integer_matrix):

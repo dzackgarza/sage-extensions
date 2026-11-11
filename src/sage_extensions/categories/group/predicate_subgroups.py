@@ -625,10 +625,25 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             (§3.3, p. 590).  The lattice hypothesis of that citation is checked by
             exhibiting an isometry onto ``N``, not by comparing invariants.
 
-            Where neither applies the call raises, naming the representative and the
-            missing fact, instead of returning a lower bound: on another lattice
-            (``T_{\mathrm{Co}}`` is the motivating one) the plane row is not yet
-            available.  An alternative for such a lattice is
+            Where neither applies the call uses the plane's own setwise
+            stabilizer: its generators are constructed at any primitive
+            isotropic plane by integer linear algebra from the block equations
+            of the parabolic (Dutour Sikirić--Hulek, Theorem 4.9, printed
+            p. 22), and ``is_parabolic_complete()`` decides on three computed
+            indices whether they are the whole stabilizer (#331, #366).  That
+            route needs neither the lattice to be ``N`` nor the two indices
+            above to agree, because with ``\rho(G_x)`` in hand the orbits are
+            the double cosets ``\rho(\Gamma) \backslash \rho(O(L)) /
+            \rho(G_x)`` themselves, computed by ``splitting_isometries``.  On
+            ``T_{\mathrm{Co}}`` the agreement genuinely fails — the plane's
+            stabilizer maps onto a subgroup of index ``8`` in the stabilizer of
+            its order-four isotropic subgroup, while its divided class set is a
+            single ``\rho(O(L))``-orbit of ``23715`` points — so the class set
+            there is short by a factor of ``8`` and the double cosets are what
+            the count is read from.  Where the parabolic's family is *not*
+            established to be all of ``\rho(G_x)`` the call raises, naming the
+            representative and the missing factor, instead of returning a
+            count.  An alternative for such a lattice is
             ``stabilizer_generators``, a mapping from the position of a representative
             to generators of its stabilizer in ``O(L)``; each is checked to stabilize
             the plane, and ``[Q : \langle\rho(h)\rangle]`` then bounds ``[Q : \rho(G_x)]``

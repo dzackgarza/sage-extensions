@@ -1336,7 +1336,18 @@ class OrthogonalCharacterQuotient:
         ``g x`` in each ``Gamma``-orbit.  The order matters when the image is
         not abelian: a transversal of ``rho(Stab) \ Q / rho(Gamma)`` need not
         be one of ``rho(Gamma) \ Q / rho(Stab)``.
+
+        ``self.index() == 1`` means ``rho(Gamma) = Q = rho(O(L))``, and since
+        ``Gamma`` is ``rho^{-1}`` of its own character image it is then all of
+        ``O(L)``; so ``Gamma g Stab = O(L)`` for every ``g``, the double-coset
+        space is a single point, and the identity lift is its representative.
+        That is the same computation's answer read rather than enumerated,
+        which matters because -- as
+        :meth:`_splitting_isometries_in_im_rho_from_image` records -- the
+        enumeration does not return inside a group of order ``|Q|``.
         """
+        if self.index() == 1:
+            return finite_ordered_set((self.supergroup.one(),))
         # A stabilizer can correlate its signs with its discriminant image.
         # Joint conditions use the full joint image of every supplied generator.
         if self._has_discriminant and not (self.determinant_kernel or self.spinor_kernel):
