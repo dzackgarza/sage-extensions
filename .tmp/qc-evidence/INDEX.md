@@ -332,3 +332,13 @@ seed in **155.6 s** (repeat 186.8 s), and `orbits_lines_mod_p(3)` is killed at t
 (corrected: the 2-neighbour lattice is not built this way);
 `issue317-probe34.log` — k = 1 has 0 elements of order two in N^#/N and k = 2 has
 exactly 1, so p = 2 cannot walk either genus.
+
+Fifth batch on issue 317 (Nikulin's correspondence and the Vinberg chamber):
+`issue317-nikulin-chamber.md` — the citation (Nikulin, Thm 1.14.2 p. 125, Prop.
+1.15.1 with its proof p. 128-129), the chamber call, and the stop;
+`issue317-probe35.log` — `fundamental_chamber()` on `U + E8(-1)^2` returns **19
+wall roots in 76.9 s**, and the chamber vectors of square 2k reach 1 of 4 classes
+for k = 1 and 1 of 9 for k = 2, with the right genus masses;
+`issue317-probe35-walls-negative.log` — the same run with the wall sign reversed,
+returning the same candidates, which is the diagnostic that the wall roots are
+carried in a framing other than the coordinate basis.
