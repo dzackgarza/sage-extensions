@@ -1436,18 +1436,6 @@ class CoxeterDiagrams(OwnedCategory):
             )
             return symmetric.subgroup(automorphisms)
 
-        def _aut_vertex_map(self, automorphism):
-            r"""The permutation of the vertices that the element ``automorphism`` of :meth:`Aut` is.
-
-            Part of the private adapter of :meth:`_bond_preserving_permutation_group`:
-            that group is a subgroup of the symmetric group on the vertex
-            positions numbered from one, and this reads its elements back as
-            maps of vertices.
-            """
-            ranking = self.index_set().ranking_map()
-            vertices = tuple(self.index_set())
-            return lambda vertex: vertices[int(automorphism(int(ranking(vertex)) + 1)) - 1]
-
         def Aut(self):
             r"""Return the group of diagram automorphisms.
 
@@ -1457,11 +1445,6 @@ class CoxeterDiagrams(OwnedCategory):
             \(E_8\) trivial.
             """
             return self._bond_preserving_permutation_group()
-
-        @cached_method
-        def _subdiagram_vertex_sets(self):
-            r"""The vertex set of each induced subdiagram, indexed by its rank in :meth:`induced_subdiagrams`."""
-            return tuple(frozenset(diagram.index_set()) for diagram in self.induced_subdiagrams())
 
         def _subdiagram_rank_of_positions(self, positions):
             r"""The rank of the induced subdiagram on the vertex ``positions``, without building it.
