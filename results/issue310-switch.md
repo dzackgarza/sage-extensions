@@ -150,3 +150,34 @@ freedom `w → w + 2k` inside its residue class: `q(w + 2k) = q(w) + 4 b(w,k) + 
 `q(w_0 + 2k) = -16` accepts `b = ±2`. That finite variation (`k` over `K/2K`, `2^9` values on
 `T_Co`) is what the construction still needs before the row can return, and it is the step
 to write next; it is not a coordinate box.
+
+## The construction, landed
+
+`Lattices.ParentMethods.hyperbolic_basis_pair` and `isotropic_lines_by_divided_class(d)` /
+`primitive_isotropic_vector_of_divided_class(class, d)` implement the finite residue loop at
+the lattice that owns both the class and the vector: residues of `L/dL`, the `k` variation in
+`K/dK`, the divisor-pair test `a b = -q(w)/(2h)` with `a ≡ a_0`, `b ≡ b_0 (mod d)`, and every
+candidate checked for `q = 0`, primitivity, divisor `d` and its class.  A class the loop does
+not reach is refused with the residue count and the translation count named.  On
+`U(2) + <-6>` it covers both classes of the exact image and refuses an absent one:
+`tests/lattices/test_the_divided_class_construction.sage`, **3 passed in 2.19 s**
+(`.tmp/p310-construction.log`).
+
+`_line_orbit_from_divided_classes` wires it into the subgroup line row for
+`Otilde(L) = ker rho` when the computed index per class `[Stab_(rho(G))(c) : rho(Stab_G(x))]`
+is 1, and returns `None` (leaving the explicit-isometry route) when it is greater -- the case
+of several isometries per class, decided by computation, not a fallback.  `Otilde^+` is the
+kernel of `rho x (real spinor norm)`, whose index is not this one, so it is excluded there.
+
+Rows after the wiring (`.tmp/p310-probe18.log`): `U(2)+U(2)` 9 lines in 11.7 s,
+`U(2)+U(2)+<-6>` 9 lines in 34.8 s, `U(2)^3` 35 lines in 87.7 s -- unchanged from the
+representative-family route.
+
+**The `T_Co` stop.** `Otilde(T_Co)` does not return within 600 s: the row reaches the GAP word
+section (`f.PreImagesRepresentative`) inside the discriminant-image computation and stays
+there (`.tmp/p310-probe18.log`).  The residue loop itself is refused before it runs on `T_Co`
+by the named budget guard (11 free coordinates give `2048 * 512 * 4` pairs), so the stop is
+in the images the index needs, not in the construction.  The two things that would move it:
+computing `rho(O(T_Co))` once per lattice rather than once per row (it is recomputed inside
+the call), and the same for `rho(Stab)`; both are `cached_method`s on their owners already, so
+the call is paying for them under contention.  `Otilde^+(T_Co)` was not reached.
