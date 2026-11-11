@@ -1,85 +1,148 @@
-# #353: the unipotent radical at Sterk's P₂ — what is measured, and what is refused
+# #353: the unipotent radical at Sterk's P₂ — its rank, and the index
 
-## The statement, and why none applies
+## The answer
 
-The unit asks for a cited statement giving the *structure* of the unipotent radical
-`U_I = ker(P_I → GL(I) × O(I^⊥/I))` at P₂, with its hypotheses checked there.  The only
-candidate the repository has ever quoted is **Scattone, Mem. Amer. Math. Soc. 374, §3.7,
-Proposition 3.7.3**, cited in `half_vector_transvection_generators` as the criterion that
-"generates the radical of the parabolic at an isotropic sublattice by these transvections".
-That statement is about generation by Eichler transvections, and the hypothesis that makes
-transvections a transitive generating family is **two orthogonal hyperbolic planes**
-(D. Dutour Sikirić and K. Hulek, arXiv:2302.01679v2, **Lemma 4.2 and its proof, printed
-p. 28**: the transvections `E_{e_i,v_ij}` over a `Z`-basis of `e_i^⊥`, together with
-`SL₂(Z)²`, generate the approximate subgroup — and `e_i` ranges over the four canonical
-isotropic vectors "coming from the two hyperbolic planes").
+**The returned unipotent generators do not generate the radical at P₂, and the index is
+infinite.**  At Sterk's `P₂` of `T_En`, in the block basis `(U | P | K)` with
+`K = P₂^⊥/P₂`:
 
-**P₂ does not meet it.** `T_En` has `rank₂ = 2`, and a `U ⊕ U` sublattice would be a
-unimodular sublattice of rank 4, so no second hyperbolic plane exists in it
-(Gritsenko–Hulek–Sankaran, arXiv:0810.1614v1, **Proposition 5.6, p. 17**, says exactly this
-for this lattice; sage-extensions#17's reading is
-`results/issue17-kernel-generation-blocker.md`).
+| quantity | value | how |
+| --- | --- | --- |
+| rank of `U_I` | **17** | dimension of the block-form system, `_unipotent_rank` |
+| rank fixed by the translation map (`Z = ker τ`) | **1** | same system with `N(K) = 0` |
+| rank of `U_I/Z ⊆ Hom(K, I)` | **16** `= 2 rank(K)` | difference of the two, checked against `I^⊥/I` |
+| rank of the returned family's translations | **12** | `unipotent_translation_rank()` |
+| rank of the span of their logarithms | **13** | `.tmp/353-structure2.log` |
+| rank of the 28 parabolic generators that lie in `U_I`, translations | **14** | `parabolic_obstruction()`, `.tmp/353-obstruction.log` |
 
-So the structure is **not** cited, and the rank `2·rank(K) + 1 = 17` that
-`parabolic_obstruction` used to quote from the block form was unverified here; it is now
-marked as such rather than repeated.
+`12 < 16`, so `unipotent_radical_index()` returns `aleph_0` and
+`is_parabolic_complete()` stays `False` at P₂ — now on a measured obstruction, not on a
+missing citation.
 
-## The code site
+## The structure, and where it comes from
 
-`src/sage_extensions/categories/isotropic_parabolics.py`, at the plane's parabolic owner:
+`U_I = ker(P_I → GL(I) × O(I^⊥/I))`.  In the basis `(U | P | K)` of
+`plane_block_basis()` — the basis of Dutour Sikirić–Hulek, *Moduli of polarised Enriques
+surfaces — computational aspects*, JLMS 110 (2024), arXiv:2302.01679v2, **Theorem 4.9**
+(`theorem_isotropic_k_planes`), proof, printed **p. 22**, whose Gram matrix `B` is built
+and checked by `plane_block_gram()` — an element of the radical has
 
-* **new** `unipotent_radical_index()` — returns `[U_I : ⟨the returned unipotent generators⟩]`
-  when both sides can be read, and otherwise **refuses, naming what is missing**: the
-  radical's own generating family is read from the port operation
-  `EichlerRecursion.isotropic_quotient_kernel_generators`, which this runtime does not
-  provide (measured: `AttributeError: 'EichlerRecursion' object has no attribute
-  'isotropic_quotient_kernel_generators'`), and no cited statement generates `U_I` at a
-  plane of a lattice without two hyperbolic planes.
-* `unipotent_radical_generators()` — its "rank `2·rank(K)+1` by the block form" claim is
-  replaced by the measured facts and the refusal.
-* `parabolic_obstruction()` — names the radical as the failing factor, with the measured
-  counts, and no longer quotes the unverified rank.  `is_parabolic_complete()` stays `False`
-  at P₂.
+```
+g = ( 1  a  τ )        A = 1,   τ + cᵗ A_K = 0,   a + aᵗ + cᵗ A_K c = 0,
+    ( 0  A  0 )   ⟺    A_K = b(K, K),
+    ( 0  c  1 )
+```
 
-## The result at P₂
+because it fixes `P` pointwise and carries `P^⊥` into `P^⊥`, and `P^⊥` into `P` modulo
+`P`.  So:
 
-Measured on this tree (`.scratch/issue353_pointwise.py`, `.tmp/353-pointwise.log`):
+* the Levi torus `GL(U) × O(K)` is **not** in the radical (`A = 1`), which is why `U_I` is
+  unipotent with a well-defined rank;
+* the translation `τ` is determined by `c ∈ Hom(U, K)`, so `U_I/Z ↪ Hom(K, I)` with kernel
+  the `c = 0`, `τ = 0` part;
+* only the *skew* part of `a` is free, which is the one-dimensional `Z = ker τ`; it is
+  central (`n m = m n = 0` for every element `m` supported on the `(U, P)`-block), and no
+  element with `c ≠ 0` is central, so `Z` is the centre;
+* hence `rank U_I = 2 rank(K) + 1 = 17` at P₂.
 
-| quantity | value |
+`2 rank(K) + 1` is the number an earlier session removed as "unverified".  It is right,
+and it is no longer quoted: `_unipotent_rank` builds the `182 × 144` linear system of the
+three block conditions over `ZZ` and returns `144 − rank = 17`, and `rank(U_I/Z) = 16`
+agrees with `2 rank(K)` computed from `I^⊥/I` — the two routes to the same number are
+asserted against each other in `unipotent_radical_index()`.
+
+**No published numbered statement gives this structure** at a plane of a lattice without
+two hyperbolic planes.  Scattone, *Mem. Amer. Math. Soc.* 374, §3.7, Proposition 3.7.3, is
+a generation statement — the radical is generated by the Eichler transvections over a
+`ZZ`-basis of `e^⊥` — and generation is exactly what fails at P₂; its hypothesis (two
+orthogonal hyperbolic planes: Dutour Sikirić–Hulek, Lemma 4.2 and proof, p. 28) is not
+met, `rank₂(T_En) = 2` (Gritsenko–Hulek–Sankaran, arXiv:0810.1614v1, Proposition 5.6,
+p. 17).  The derivation above is written in the module rather than attributed, which is
+what the person allowed when the citation was found not to exist.
+
+## Why 12 of 16 is a deficiency and not a bookkeeping artefact
+
+`τ(g)(x̄) = g(x) − x` is a homomorphism `U_I → Hom(K, I)` — `τ(gh) = τ(g) + τ(h)` because
+`h` fixes `I` pointwise — so a family `F` generates a subgroup of rank at most
+`rank τ(F) + rank ker τ = 12 + 1 = 13 < 17`.  The bound is what makes the answer infinite;
+no Smith normal form, no product of two indices, is needed to see it, and no finite index
+exists to compute.
+
+The previous session's reading of the same measurement ("rank 12 against 16") was right;
+what was missing was the other side, `rank(U_I/Z) = 16` *of `U_I` itself*, which is now
+computed rather than read off the ambient `Hom`.
+
+## What the calls do now
+
+| call | at P₂ |
 | --- | --- |
-| `unipotent_radical_generators()` | 14 generators |
-| of those, fixing `P₂` pointwise | **14 / 14** |
-| of those, acting trivially on `P₂^⊥/P₂` | **14 / 14** |
-| `parabolic_stabilizer_generators()` | 122 generators |
-| of those, fixing `P₂` pointwise | 92 |
-| of those, in the radical (both conditions) | **28** |
-| the same count by the kernel's own membership | **28** (the two readings agree) |
+| `unipotent_radical_generators()` | 14 transvections, all in `U_I` (both conditions recomputed here, and the kernel's own membership agrees) |
+| `unipotent_radical_rank()` | `17` |
+| `unipotent_translation_kernel_rank()` | `1` |
+| `unipotent_translation_rank()` | `(12, 16)` |
+| `unipotent_radical_index()` | `aleph_0` |
+| `is_parabolic_complete()` | `False` |
+| `parabolic_obstruction()` | names the radical, with the three ranks |
 
-So the returned unipotent generators **do** lie in the radical at P₂ — the concern filed as
-#337 does not reproduce here — and the parabolic's family meets the radical in 28 elements.
-What is *not* available is the other side: the radical's own generating family, hence
-`[U_I : ⟨returned⟩]`, hence a claim that the family generates `U_I`.
+`unipotent_radical_index()` returns `aleph_0` rather than raising when the translations
+fall short, because an infinite index is an answer; it raises `NotImplementedError` only in
+the finite branch, which no specimen in this tree reaches, and `ArithmeticError` if the two
+computations of `rank τ(U_I)` disagree.
 
-`is_parabolic_complete()` therefore remains `False` at P₂, and `parabolic_obstruction()`
-names the radical.  The other two factors are decided, by earlier units: the plane action
-(index 1 by the `Γ(2)` certificate, `698e661ab3`) and the quotient action on `P₂^⊥/P₂`
-(index 1 by computed orders, `be18ef76c6`).
+No port call is made anywhere in this path.  The earlier route through
+`EichlerRecursion.isotropic_quotient_kernel_generators` (absent in the pinned port) is gone
+from `unipotent_radical_index`.
 
-## Runs
+## The call, as it now reports
+
+`.tmp/353-obstruction.log`, 97.0 s for the whole call (93 s of it the parabolic's own
+generating family):
 
 ```
-tests/lattices/test_the_unipotent_radical_of_the_plane_is_measured.sage
-2 passed in 84.55s
-tests/lattices/test_the_parabolic_completeness_of_an_enriques_plane.sage
-tests/lattices/test_the_plane_stabilizer_reaches_the_whole_quotient_group.sage
-5 passed in 129.79s
-just test-lint on the new file: 1 files, 0 findings
+rank U = 17 | rank Z = 1 | translation rank (returned family) = (12, 16)
+|unipotent_radical_generators| = 14 | unipotent_radical_index() = ℵ_0
+is_parabolic_complete() = False
+parabolic_obstruction() =
+  ... Decided, and negative: the radical U_I is not generated. All 14 returned
+  unipotent transvections lie in it ..., and 28 of the 122 generators of this family do;
+  but U_I has rank 17 = 2 rank(I^perp/I) + 1 by the block form (unipotent_radical_rank()),
+  of which 1 is fixed by the translation map (unipotent_translation_kernel_rank()) and 16
+  are translations, while the translations of the returned family have rank 12 and those
+  of the 28 radical members of this family have rank 14. Both families therefore generate
+  subgroups of infinite index, and unipotent_radical_index() returns aleph_0. ...
 ```
+
+## Evidence
+
+Probe, on the pinned runtime (`.tmp/353-structure2.log`):
+
+```
+rank U = dim of its Lie algebra = 17 (block form says 2*rank(K)+1 = 17)
+rank Z = 1 | rank(U/Z) = 16 | rank Hom(K, P) = 2*rank(K) = 16
+returned unipotent generators: 14 elements | in U: 14 | outside U: 0
+  rank of span(log family) = 13 of rank U = 17 -> infinite index
+  rank of their translations = 12 of rank(U/Z) = 16
+```
+
+The conventions of that probe are checked in the probe itself (`.tmp/353-conventions.log`):
+`is_in_image` agrees with an exact coordinate solve on vectors whose answer is known, and
+the block matrix agrees with the direct image of a `K` vector.
+
+## Two corrections to the handed-over record
+
+1. The uncommitted edit it left behind measured the translation ranks correctly but built
+   the wrong lattice for "the radical": the system it solved (`N(L) ⊆ P`, `N(P) = 0`, skew)
+   cuts out `Z`, not `U_I`, so it returned rank 1.  `U_I` needs the block conditions of the
+   derivation above, which is why `Z` and `U_I` have to be separated before any index is
+   meaningful.
+2. The structure is **not** "missing a citation" and the rank is **not** unverified: both
+   are now derived from the cited block form and computed, and `2 rank(K) + 1` holds.
 
 ## What this does not claim
 
-The parity of the parabolic with the stabilizer is **not** established at P₂: `#331`'s
-acceptance is not reached by this unit.  No index of the returned family in the radical is
-claimed, no rank of the radical is claimed, and nothing here says the radical is trivial or
-that it is generated by the family.  What is claimed is the subfamily relation, measured two
-independent ways, and the refusal with its two named causes.
+`#331` is not reached: the parabolic at P₂ is not shown to be the whole setwise
+stabilizer, and the radical factor is now the reason it is not.  Nothing here finds a
+generating family of `U_I` at this plane — the 28 generators of
+`parabolic_stabilizer_generators()` that lie in `U_I` fall short as well
+(`parabolic_obstruction()` prints their rank) — so a generating family, or a cited
+generation statement, remains the missing input for #331.

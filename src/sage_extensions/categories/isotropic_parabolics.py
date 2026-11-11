@@ -1513,12 +1513,18 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             :meth:`parabolic_transvection_generators` keeps the ones that move the
             plane, which the parabolic needs.
 
-            What is *not* claimed: that these elements generate \(U_I\).  The rank
-            \(2\operatorname{rank}(K) + 1\) this docstring used to quote from the block
-            form is unverified here, and :meth:`unipotent_radical_index` refuses the index,
-            naming the port operation that would supply the radical's own generating family
-            and the cited statement whose hypothesis fails at a plane of 2-rank two (#331,
-            #353).
+            What is claimed: measured at Sterk's `P_2` of \(T_{\mathrm{En}}\), all
+            fourteen of them fix the plane pointwise and act trivially on
+            \(I^\perp/I\), so all fourteen lie in \(U_I\) (#337 does not reproduce
+            there).  What is *not* claimed is that they generate it: the radical has
+            rank \(2\operatorname{rank}(K) + 1 = 17\) at that plane
+            (:meth:`unipotent_radical_rank`), their translations span \(12\) of the
+            \(16\) dimensions of \(\mathrm{Hom}(I^\perp/I, I)\)
+            (:meth:`unipotent_translation_rank`), and so the subgroup they generate
+            has infinite index in \(U_I\): :meth:`unipotent_radical_index` returns
+            \(\aleph_0\).  The generation statement that would close the gap is
+            Scattone's Proposition 3.7.3, whose hypothesis -- two orthogonal hyperbolic
+            planes -- \(T_{\mathrm{En}}\) does not meet (#331, #353).
             """
             return tuple(
                 transvection
@@ -1528,65 +1534,251 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             )
 
         @cached_method
-        def unipotent_radical_index(self) -> int:
-            r"""Return `[U_I : \langle\text{the returned unipotent generators}\rangle]`, or refuse.
+        def unipotent_radical_rank(self) -> int:
+            r"""Return the rank of `U_I` as a free abelian group, from the plane's block form.
 
-            `U_I = \ker(P_I \to \GL(I) \times O(I^\perp/I))` is the unipotent radical of
-            the setwise stabilizer, and :meth:`unipotent_radical_generators` returns a
-            subfamily of it.  An index needs both sides of the comparison, and the
-            radical's own side is not available in this tree: the kernel is modelled by
-            :meth:`~sage_extensions.categories.lattices.IsotropicReductions.ParentMethods.unipotent_kernel`,
-            whose selected generating family is read from the port operation
-            ``EichlerRecursion.isotropic_quotient_kernel_generators``, and that operation
-            does not exist (measured at `P_2` of `T_{\mathrm{En}}`: reading it raises
-            ``AttributeError: 'EichlerRecursion' object has no attribute
-            'isotropic_quotient_kernel_generators'``).  So the call refuses, and names
-            that operation: an index of a subfamily in a group whose own generators cannot
-            be read is not a number this owner can produce.
+            `U_I` is unipotent, so it is a free abelian group whose rank is its
+            dimension, and the dimension is read off the block form.  In the basis
+            `(U \mid P \mid K)` of :meth:`plane_block_basis`, with `K = P^\perp/P`
+            and the Gram matrix `B` of :meth:`plane_block_gram`, an element of the
+            radical acts as
 
-            **The structure is not cited either.**  The repository quotes Scattone's
-            criterion (Mem. Amer. Math. Soc. 374, §3.7, Proposition 3.7.3) for *generating
-            the radical by Eichler transvections* at an isotropic sublattice, and the
-            hypothesis that makes it a generation statement -- two orthogonal hyperbolic
-            planes, which is what turns transvections into a transitive family (Dutour
-            Sikiric--Hulek, arXiv:2302.01679v2, Lemma 4.2 and proof, p. 28) -- is not
-            available at `P_2`: `T_{\mathrm{En}}` has `\operatorname{rank}_2 = 2` and no
-            second hyperbolic plane (Gritsenko--Hulek--Sankaran, arXiv:0810.1614v1,
-            Proposition 5.6, p. 17; sage-extensions#17's reading in
-            ``results/issue17-kernel-generation-blocker.md``).  The rank `2\operatorname{rank}(K)+1`
-            that :meth:`parabolic_obstruction` used to quote is likewise unverified here.
+            .. math::
+                g = \begin{pmatrix} 1 & a & \tau \\ 0 & A & 0 \\ 0 & c & 1
+                \end{pmatrix},
 
-            What the returned family *is*, measured at `P_2`: all
-            :meth:`unipotent_radical_generators` returned fix the plane pointwise and act
-            trivially on `I^\perp/I` (so they lie in the radical), and 28 of the 122
-            generators of :meth:`parabolic_stabilizer_generators` do.  That is a subfamily
-            of the radical, not a proof that it generates it.
+            because it fixes `P` pointwise (no `P`-column outside the first block),
+            carries `P^\perp` into `P^\perp` and `P^\perp` into `P` modulo `P` (no
+            `K`-row above the last block).  The isometry condition `g^t B g = B`
+            then reads, block by block,
+
+            .. math::
+                A = 1, \qquad \tau + c^t A_K = 0, \qquad a + a^t + c^t A_K c = 0,
+
+            with `A_K = b(K, K)`: the Levi torus of the plane is not in the radical,
+            the translation `\tau` is determined by `c \in \operatorname{Hom}(U, K)`,
+            and only the skew part of `a` is left free.  So `U_I` is nilpotent of
+            class two, `2 \operatorname{rank}(K_I)` of its dimensions are translations
+            (:meth:`unipotent_translation_rank`) and one is fixed by the translation
+            map (:meth:`unipotent_translation_kernel_rank`).
+
+            **The block form is cited; the consequence is derived and computed.**
+            The basis and the Gram matrix are those of Dutour Sikirić--Hulek,
+            arXiv:2302.01679v2, Theorem 4.9 (`theorem_isotropic_k_planes`), proof,
+            printed p. 22, and :meth:`plane_block_basis` and :meth:`plane_block_gram`
+            build and check them.  No published numbered statement gives this
+            structure at a plane of a lattice without two hyperbolic planes --
+            Scattone, *Mem. Amer. Math. Soc.* 374, §3.7, Proposition 3.7.3, which
+            the repository quotes, generates the radical *by transvections*, and
+            generation is exactly what fails at Sterk's `P_2`
+            (:meth:`unipotent_radical_index`) -- so the derivation above is written
+            here and its dimension is computed by `_unipotent_rank` rather than
+            quoted.
+
+            Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): `17 = 2 \cdot 8 + 1`,
+            against `16` translations and `1` central dimension
+            (`.tmp/353-structure2.log`).
             """
-            reduction = self.isotropic_reduction()
-            kernel = reduction.unipotent_kernel()
-            try:
-                radical_generators = tuple(kernel.group_generators())
-            except AttributeError as error:
-                raise ValueError(
-                    f"no index of the returned unipotent generators in the radical is "
-                    f"available at {self}: the radical's own generating family is read "
-                    f"from EichlerRecursion.isotropic_quotient_kernel_generators, which "
-                    f"this runtime does not provide ({error}). The missing statement is "
-                    f"also a cited generation of the radical by transvections: Scattone "
-                    f"3.7.3 is quoted for it, and its hypothesis -- two orthogonal "
-                    f"hyperbolic planes -- does not hold at a plane of a lattice of "
-                    f"2-rank 2 without a second hyperbolic plane"
-                ) from error
-            generated = kernel.subgroup(tuple(self.unipotent_radical_generators()))
-            total = int(kernel.cardinality())
-            part = int(generated.cardinality())
-            if total % part != 0:
+            return self._unipotent_rank(zero_on_perpendicular=False)
+
+        @cached_method
+        def unipotent_translation_kernel_rank(self) -> int:
+            r"""Return the rank of the kernel of the radical's translation map.
+
+            This is the part of `U_I` that fixes `I^\perp` pointwise: the centre, in
+            the block form of :meth:`unipotent_radical_rank`, where it is the skew
+            part of `a` with `c = 0` and `\tau = 0`.  It is computed as the dimension
+            of the same linear system with the extra conditions `N(K) = 0`.
+
+            Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): `1`, so `U_I/Z` has rank
+            `17 - 1 = 16 = 2 \operatorname{rank}(K)`, the whole of
+            `\operatorname{Hom}(I^\perp/I, I)` (`.tmp/353-structure2.log`).
+            """
+            return self._unipotent_rank(zero_on_perpendicular=True)
+
+        def _unipotent_rank(self, zero_on_perpendicular: bool) -> int:
+            r"""Return the dimension of the radical's block-form system.
+
+            The unknowns are the `n^2` entries of `N = g - 1` in the block
+            coordinates of :meth:`plane_block_basis`, the conditions are the three
+            of :meth:`unipotent_radical_rank` -- `N` kills the two plane vectors,
+            `N` carries the `n - 4` basis vectors of `K` into the plane, and
+            `N^t B + B N = 0` -- and the dimension of the solution space is the rank
+            of `U_I`, because exp and log are polynomial bijections between a
+            unipotent group in characteristic zero and its Lie algebra.  With
+            ``zero_on_perpendicular`` the conditions `N(K) = 0` are added, which cuts
+            out the kernel of the translation map.
+            """
+            from sage.rings.rational_field import QQ as SageQQ
+
+            change = self.plane_block_gram()[0]
+            gram = change * matrix(SageQQ, self.gram_matrix()) * change.transpose()
+            size = change.nrows()
+            unknowns = size * size
+            plane_positions = (2, 3)
+            kernel_positions = tuple(range(4, size))
+
+            def empty():
+                return [SageQQ(0)] * unknowns
+
+            rows = []
+            for column in plane_positions:
+                for index in range(size):
+                    entry = empty()
+                    entry[size * index + column] = SageQQ(1)
+                    rows.append(entry)
+            for column in kernel_positions:
+                for index in range(size):
+                    if index in plane_positions:
+                        continue
+                    entry = empty()
+                    entry[size * index + column] = SageQQ(1)
+                    rows.append(entry)
+            if zero_on_perpendicular:
+                for column in kernel_positions:
+                    for index in range(size):
+                        entry = empty()
+                        entry[size * index + column] = SageQQ(1)
+                        rows.append(entry)
+            for first in range(size):
+                for second in range(first, size):
+                    entry = empty()
+                    for middle in range(size):
+                        if gram[middle, second]:
+                            entry[size * middle + first] += gram[middle, second]
+                        if gram[first, middle]:
+                            entry[size * middle + second] += gram[first, middle]
+                    rows.append(entry)
+            return unknowns - int(matrix(SageQQ, rows).rank())
+
+        @cached_method
+        def unipotent_translation_rank(self, family=None) -> tuple[int, int]:
+            r"""Return the rank of ``family``'s translations, and the rank of their target.
+
+            An element of the radical fixes `I` pointwise, so its *translation*
+
+            .. math:: \tau(g): I^\perp/I \to I, \qquad \bar x \mapsto g(x) - x
+
+            is a homomorphism of groups -- `\tau(g h) = \tau(g) + \tau(h)`, because
+            `h` fixes `I` pointwise and `g` fixes `I` pointwise -- with values in the
+            free abelian group `\operatorname{Hom}(K_I, I)` of rank
+            `2 \operatorname{rank}(K_I)`.  The subgroup a family generates sits in
+            the preimage of the span of its translations, so its rank is at most
+            `\operatorname{rank} \tau(\text{family})` plus the rank of the translation
+            kernel: a family whose translations fall short of the target therefore
+            generates a subgroup of infinite index in the radical, and a target the
+            translations reach does *not* by itself prove the index finite (the
+            kernel direction can still be missed).
+
+            ``family`` defaults to :meth:`unipotent_radical_generators`, since that
+            is the family whose index :meth:`unipotent_radical_index` reports.  A
+            member that does not act trivially on `I^\perp/I` has no translation and
+            raises, rather than being silently dropped from the rank.
+
+            Measured at Sterk's `P_2` of \(T_{\mathrm{En}}\): `(12, 16)` for the
+            fourteen returned unipotent transvections (`.tmp/353-structure2.log`) and
+            `(14, 16)` for the twenty-eight generators of
+            :meth:`parabolic_stabilizer_generators` that lie in the radical
+            (`.tmp/353-obstruction.log`).  Neither reaches `16`, so neither generates
+            the radical, of rank `17` (:meth:`unipotent_radical_rank`).
+            """
+            from sage.rings.rational_field import QQ as SageQQ
+
+            if family is None:
+                family = self.unipotent_radical_generators()
+            lattice = self.ambient_lattice()
+            labels = tuple(lattice.module_generating_set())
+            rank = int(lattice.module_rank())
+            plane_vectors = [self.coordinates(vector) for vector in self.plane_basis()]
+            plane = matrix(
+                SageQQ,
+                [[plane_vectors[column][position] for column in range(len(plane_vectors))] for position in range(rank)],
+            )
+            perpendicular = self.isotropic_perpendicular()
+            perpendicular_vectors = [
+                perpendicular.inclusion()(perpendicular.module_generator(label))
+                for label in perpendicular.module_generating_set()
+            ]
+
+            def plane_coordinates(vector):
+                r"""Return the coordinates of ``vector`` on the plane's basis, or ``None``."""
+                image = matrix(SageQQ, rank, 1, [int(vector.to_vector()(label)) for label in labels])
+                try:
+                    solution = plane.solve_right(image)
+                except (ValueError, ArithmeticError):
+                    return None
+                if (plane * solution - image).norm() != 0:
+                    return None
+                if any(entry.denominator() != 1 for entry in solution.list()):
+                    return None
+                return [int(entry) for entry in solution.list()]
+
+            translations = []
+            for generator in family:
+                entry = []
+                for vector in perpendicular_vectors:
+                    written = plane_coordinates(generator(vector) - vector)
+                    if written is None:
+                        raise ValueError(
+                            f"the element {generator} at {self} does not act trivially on "
+                            f"I^perp/I, so it has no translation and is not in the radical"
+                        )
+                    entry.extend(written)
+                translations.append(entry)
+            return (
+                int(matrix(SageQQ, translations).rank()) if translations else 0,
+                2 * (len(perpendicular_vectors) - int(self.module_rank())),
+            )
+
+        @cached_method
+        def unipotent_radical_index(self):
+            r"""Return `[U_I : \langle\text{the returned unipotent generators}\rangle]`.
+
+            The value is `\aleph_0` when that index is infinite -- which is the answer
+            at Sterk's `P_2`, and the reason `is_parabolic_complete()` is `False`
+            there -- and is raised as unimplemented when it is finite, because no
+            specimen in this tree exercises the finite branch.
+
+            The comparison is between `\operatorname{rank} \tau(\langle\text{the
+            returned generators}\rangle)` and `\operatorname{rank} \tau(U_I)`:
+            :meth:`unipotent_translation_rank` gives the first and the target, and
+            the second is :meth:`unipotent_radical_rank` less
+            :meth:`unipotent_translation_kernel_rank`.  A family whose translations
+            span fewer dimensions than the radical's own generates a subgroup of
+            infinite index, and the index is the cardinality of the cosets, so
+            `\aleph_0`.
+
+            At Sterk's `P_2` of \(T_{\mathrm{En}}\) the three numbers are `12` against
+            `16`, out of a radical of rank `17`: the fourteen returned transvections
+            do **not** generate `U_I`, and neither do the twenty-eight generators of
+            the parabolic that lie in it, whose translations have rank `14`
+            (`.tmp/353-structure2.log`, `.tmp/353-obstruction.log`).  What is missing
+            is a family that translates
+            in all sixteen directions, or a cited generation statement; Scattone's
+            Proposition 3.7.3 is a generation statement for a lattice with two
+            orthogonal hyperbolic planes, which \(T_{\mathrm{En}}\) does not have.
+            """
+            from sage_extensions.categories.sets.cardinals import aleph0
+
+            translation, target = self.unipotent_translation_rank()
+            rank = self.unipotent_radical_rank()
+            image = rank - self.unipotent_translation_kernel_rank()
+            if image != target:
                 raise ArithmeticError(
-                    f"the subgroup of the unipotent radical generated by the returned "
-                    f"transvections at {self} has order {part}, which does not divide the "
-                    f"radical's order {total}; Lagrange says it must"
+                    f"two computations of the rank of the radical's translation image at "
+                    f"{self} disagree: the block form gives {rank} - "
+                    f"{rank - image} = {image}, and I^perp/I gives {target}; one of the "
+                    f"two is wrong, and the index below would be meaningless"
                 )
-            return total // part
+            if translation < image:
+                return aleph0
+            raise NotImplementedError(
+                f"the translations of the returned unipotent generators at {self} span "
+                f"Hom(I^perp/I, I), so the subgroup they generate has finite index there; "
+                f"that index is [U_I/Z : tau(H)] [Z : H cap Z], read off Smith normal "
+                f"forms of the two lattices, and no specimen in this tree reaches this "
+                f"branch"
+            )
 
         def half_vector_transvection_generators(self):
             r"""Return the Eichler transvections of the plane along its half lattice vectors.
@@ -2455,19 +2647,24 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             factors the earlier reading left open, one is now decided:
 
             * the quotient factor -- no longer open: `H_0` is the image of the
-              returned generators in `O(I^\\perp/I)`, and since
-              `H_0 \\subseteq M \\subseteq O(I^\\perp/I)` the index
+              returned generators in `O(I^\perp/I)`, and since
+              `H_0 \\subseteq M \\subseteq O(I^\perp/I)` the index
               :meth:`levi_quotient_image_index` computes settles `M` exactly when
               it is `1`, which is what happens at Sterk's `P_2` of
               `T_{\\mathrm{En}}`;
-            * the radical -- still open: the returned transvections that lie in
-              `U_I` do lie in it (checked pointwise on `I` and on `I^\\perp/I`),
-              but generation of `U_I` by them is not shown, and
-              :meth:`unipotent_radical_index` refuses the index because the
-              radical's own generating family is read from a port operation this
-              runtime does not provide.  No cited statement generates the radical
-              at a plane whose lattice has no second hyperbolic plane, which is
-              what Scattone 3.7.3's criterion needs.
+            * the radical -- decided, negatively: every returned transvection that
+              lies in `U_I` does lie in it (checked pointwise on `I` and on
+              `I^\perp/I`), but `U_I` has rank
+              `2 \operatorname{rank}(I^\perp/I) + 1` here
+              (:meth:`unipotent_radical_rank`), and the translations of the returned
+              family span only `12` of its `16` translation dimensions
+              (:meth:`unipotent_translation_rank`), so
+              :meth:`unipotent_radical_index` returns `\aleph_0`: the family
+              generates a subgroup of infinite index and the radical is not
+              generated.  Scattone, Mem. Amer. Math. Soc. 374, section 3.7,
+              Proposition 3.7.3, is a generation statement over two orthogonal
+              hyperbolic planes, which `T_{\mathrm{En}}` does not have, so no
+              cited statement closes the gap either.
             """
             if self.is_parabolic_complete():
                 return None
@@ -2475,6 +2672,18 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             quotient_order = int(quotient.cardinality())
             quotient_index = self.levi_quotient_image_index()
             quotient_image_order = quotient_order // quotient_index
+            family = tuple(self.parabolic_stabilizer_generators())
+            radical_members = tuple(
+                generator
+                for generator in family
+                if self._fixes_isotropic_pointwise(generator)
+                and self.acts_trivially_on_isotropic_reduction(generator)
+            )
+            unipotent = tuple(self.unipotent_radical_generators())
+            returned_translation, translation_target = self.unipotent_translation_rank()
+            radical_translation = self.unipotent_translation_rank(radical_members)[0]
+            radical_rank = self.unipotent_radical_rank()
+            translation_kernel = self.unipotent_translation_kernel_rank()
             return (
                 f"no cited statement shows that the generators of the parabolic at {self} "
                 f"generate the setwise stabilizer: Dutour Sikirić--Hulek Theorem 4.9 "
@@ -2490,13 +2699,22 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 f"= {quotient_index} for the image H_0 of the returned generators in "
                 f"O(I^perp/I), so the image of the whole setwise stabilizer there is "
                 f"{'H_0, i.e. all of O(I^perp/I)' if quotient_index == 1 else 'not identified: it lies between H_0 and O(I^perp/I)'}. "
-                f"Not decided: the radical U_I. The returned generators that lie in it do "
-                f"lie in it ({len(self.unipotent_radical_generators())} of them fix the "
-                f"plane pointwise and act trivially on I^perp/I, measured), and "
-                f"{sum(1 for generator in self.parabolic_stabilizer_generators() if self._fixes_isotropic_pointwise(generator) and self.acts_trivially_on_isotropic_reduction(generator))} "
-                f"of the {len(self.parabolic_stabilizer_generators())} parabolic generators "
-                f"do; but neither their generation of U_I nor a cited generation of it is "
-                f"available here, as unipotent_radical_index() states when it refuses."
+                f"Decided, and negative: the radical U_I is not generated. All "
+                f"{len(unipotent)} returned unipotent transvections lie in it (each fixes the "
+                f"plane pointwise and acts trivially on I^perp/I, measured), and "
+                f"{len(radical_members)} of the {len(family)} generators of this family do; "
+                f"but U_I has rank {radical_rank} = 2 rank(I^perp/I) + 1 by the block form "
+                f"(unipotent_radical_rank()), of which {translation_kernel} is fixed by the "
+                f"translation map (unipotent_translation_kernel_rank()) and "
+                f"{translation_target} are translations, while the translations of the "
+                f"returned family have rank {returned_translation} and those of the "
+                f"{len(radical_members)} radical members of this family have rank "
+                f"{radical_translation}. Both families therefore generate subgroups of "
+                f"infinite index, and unipotent_radical_index() returns aleph_0. A cited "
+                f"generation statement is missing for the same reason it was missing before: "
+                f"Scattone, Mem. Amer. Math. Soc. 374, section 3.7, Proposition 3.7.3, "
+                f"generates the radical by Eichler transvections only over two orthogonal "
+                f"hyperbolic planes, which T_En does not have."
             )
 
         @cached_method
