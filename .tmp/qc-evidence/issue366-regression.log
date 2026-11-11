@@ -1,0 +1,65 @@
+FFF.......F..F..FFFF.....                                                [100%]
+=================================== FAILURES ===================================
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   KeyError: ((Morphism from Integral lattice of rank 3 and signature (2, 1) to Integral lattice of rank 3 and signature (2, 1),), ())
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11949: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+E   KeyError: ((Morphism from Integral lattice of rank 3 and signature (2, 1) to Integral lattice of rank 3 and signature (2, 1),), ())
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11949: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+E   KeyError: ((Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1),), ())
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11949: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+E   KeyError: ((Morphism from Integral lattice of rank 1 and signature (1, 0) to Integral lattice of rank 1 and signature (1, 0),), ())
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11949: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+========================== test-call performance gate ==========================
+tests/lattices/test_the_enriques_plane_discriminant_image_bound.sage::test_the_plane_classes_and_their_cusp_count_are_card_029J_s_rows: 75.90 s > 20 s
+tests/lattices/test_the_enriques_plane_discriminant_image_bound.sage::test_the_plane_that_does_not_split_has_an_exact_discriminant_image: 167.35 s > 20 s
+tests/lattices/test_the_enriques_plane_index_returns.sage::test_the_o_row_of_the_plane_index_returns_on_the_enriques_lattice: 229.72 s > 20 s
+tests/lattices/test_the_enriques_plane_index_returns.sage::test_the_supplied_setwise_stabilizer_generators_close_the_plane_index: 108.80 s > 20 s
+tests/lattices/test_the_plane_stabilizer_reaches_the_whole_quotient_group.sage::test_the_plane_stabilizer_reaches_the_whole_quotient_orthogonal_group: 83.97 s > 20 s
+=========================== short test summary info ============================
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[reduction]
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[radical]
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[generators]
+FAILED tests/lattices/test_parabolic_induction.sage::test_primitive_isotropic_refinement_selects_the_line_eichler_operation
+FAILED tests/lattices/test_parabolic_induction.sage::test_the_eichler_transvections_of_a_line_form_an_abelian_group
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[line]
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[plane]
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_glued_line_pointwise_image_excludes_quotient_negation
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_zero_null_pointwise_levi_lift_and_joint_kernel
+9 failed, 16 passed in 680.72s (0:11:20)
+[peakrss] issue353: child waited=1 shell_code=1 samples=352
+[peakrss] peak tree RSS      : 2494 MiB
+[peakrss] low-water MemAvail : 1481 MiB
+[peakrss] peak single VmHWM  : 2556 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      1927 MiB peak
+[peakrss]   python                      618 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   prooted-630441-               0 MiB peak
+[peakrss]   t=   408.8s procs=  4 rss=  2494 MiB hwm=  2556 MiB avail=  2554 MiB
+[peakrss]   t=   406.8s procs=  4 rss=  2492 MiB hwm=  2553 MiB avail=  2570 MiB
+[peakrss]   t=   404.8s procs=  4 rss=  2490 MiB hwm=  2552 MiB avail=  2583 MiB
+[peakrss]   t=   402.8s procs=  4 rss=  2489 MiB hwm=  2551 MiB avail=  2585 MiB
+[peakrss]   t=   398.8s procs=  4 rss=  2488 MiB hwm=  2549 MiB avail=  2617 MiB
+launcher exit: 1

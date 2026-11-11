@@ -1,0 +1,44 @@
+[    0.3s] plane Integral lattice of rank 2 and signature (0, 0)
+[    0.9s] splits: False | is_parabolic_complete(): False
+[   11.9s] unipotent_radical_index(): 1
+[   12.0s] 
+[   12.0s] stabilizer = {g in Orthogonal group O(Integral lattice of rank 12 and signature (2, 10)) : g(im(Generic morphism:
+  From: Integral lattice of rank 2 and signature (0, 0)
+  To:   Integral lattice of rank 12 and signature (2, 10)))=im(Generic morphism:
+  From: Integral lattice of rank 2 and signature (0, 0)
+  To:   Integral lattice of rank 12 and signature (2, 10))}
+[   12.0s] has selected group resolution: True
+[   12.0s] asking for group_generators() with a 240 s wall-clock cap
+[   28.2s] group_generators() returned 23 elements in 16.2s
+[   28.6s]   radical block generators among them: 1 of 17
+[   28.6s]   the centre's generator among them: True
+[  148.6s]   parabolic_stabilizer_generators among them: 5 of 139
+[  148.6s] 
+[  148.6s] Levi image halves:
+[  158.5s]   [GL_2(ZZ) : plane actions of the generators trivial on P^perp/P] = 1
+[  158.9s]   [GL_2(ZZ) : plane actions of all generators] = 1
+[  158.9s]   |quotient_reflection_generators| = 64
+[  159.0s]   all of them fix the plane pointwise: True
+[  159.0s]   all of them act trivially on P^perp/P: False
+[  159.1s]   |O(P^perp/P)| = 10321920
+[  164.3s]   |<images of the reflections>| = 10321920
+[  164.3s]   index: 1
+[  176.2s]   [O(P^perp/P) : all generators' quotient images] = 1
+[  176.2s] 
+[  176.2s] parabolic_stabilizer_generators: 139
+[  176.2s] done
+[peakrss] issue353: child waited=0 shell_code=0 samples=91
+[peakrss] peak tree RSS      : 2442 MiB
+[peakrss] low-water MemAvail : 6377 MiB
+[peakrss] peak single VmHWM  : 2442 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      1982 MiB peak
+[peakrss]   python                      450 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   178.4s procs=  4 rss=  2442 MiB hwm=  2442 MiB avail=  6377 MiB
+[peakrss]   t=   148.3s procs=  4 rss=  2420 MiB hwm=  2420 MiB avail=  6742 MiB
+[peakrss]   t=   150.3s procs=  4 rss=  2420 MiB hwm=  2420 MiB avail=  6738 MiB
+[peakrss]   t=   146.3s procs=  4 rss=  2418 MiB hwm=  2418 MiB avail=  6804 MiB
+[peakrss]   t=   144.3s procs=  4 rss=  2417 MiB hwm=  2417 MiB avail=  6726 MiB
+launcher exit: 0
