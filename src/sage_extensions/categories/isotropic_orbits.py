@@ -1307,7 +1307,7 @@ def _hilbert_model_gram(field_discriminant):
 
     This is the lattice ``L = ZZ + ZZ + O_F`` of Bruinier, *Hilbert modular forms
     and their applications*, in *The 1-2-3 of Modular Forms* (Universitext,
-    Springer, 2008), pp. 105-179, §2.7, p. 143, for the form printed there,
+    Springer, 2008), pp. 105-179, §2.7, printed pp. 143-144, for the form printed there,
     ``Q(a, b, nu) = nu conj(nu) - a b``.  This library's quadratic form is
     ``q(x) = b(x, x)``, so the matrix below is twice the source's, i.e.
     ``q = 2Q = -2 det`` on the Hermitian matrices ``X = [[a, beta],
@@ -1338,14 +1338,14 @@ def _witt_one_hilbert_line_representatives(lattice):
     group instead:
 
     * Bruinier, *Hilbert modular forms and their applications*, in *The 1-2-3 of
-      Modular Forms* (Universitext, Springer, 2008), pp. 105-179, §2.7, p. 143:
+      Modular Forms* (Universitext, Springer, 2008), pp. 105-179, §2.7, printed pp. 143-144:
       the Hilbert lattice is ``L = ZZ + ZZ + O_F`` inside ``V = QQ + QQ + F`` with
       ``Q(a, b, nu) = nu conj(nu) - a b``, and ``Gamma_F = SL_2(O_F) =
       Spin_L``; the same section identifies ``H^2`` with ``K^+`` and states that
       the identification commutes with the action of ``SL_2(F)``.  Since
       ``Spin_L <= O(L)``, the group ``O(L)`` has no more orbits than
       ``Gamma_F``.
-    * Bruinier, ibid., Corollary 1.4 (§1.1, printed pp. 106-108): the number of
+    * Bruinier, ibid., Corollary 1.4 (§1.1, printed pp. 106-109): the number of
       cusps of ``Gamma_F`` equals the class number ``h(F)``.  A cusp is a
       ``Gamma_F``-orbit of ``P^1(F)`` (§1.1, printed p. 106), the rational
       boundary points of ``K^+`` are ``P^1(F)`` (ibid. (1.9)), and the projective
@@ -1354,6 +1354,18 @@ def _witt_one_hilbert_line_representatives(lattice):
       rank-one primitive sublattice, and every primitive isotropic vector spans
       such a line, so the ``Gamma_F``-orbits of primitive isotropic lines of
       ``L`` number ``h(F)``.
+
+    The printed pages above are the publisher's table-of-contents pages for the
+    two sections: §1.1 begins on p. 106 and §1.2 on p. 109, and Corollary 1.4 is
+    the last numbered statement of §1.1, so it stands on one of pp. 106-109;
+    §2.7 begins on p. 143 and carries the lattice and ``Gamma_F = Spin_L`` over
+    to p. 144.  The same count is stated with an exact printed page, without a
+    statement number, in Hirzebruch-Van de Ven, *Hilbert modular surfaces and the
+    classification of algebraic surfaces*, Invent. Math. 23 (1974), 1-29,
+    pp. 12-13: the cusps "are in one-to-one correspondence with the ideal
+    classes", and the compactified space has ``h(p)`` of them, in the case
+    ``K = QQ(sqrt p)`` for a prime ``p = 1 mod 4`` that covers the ``F = 5``
+    lattice.
 
     Hence ``h(F) = 1`` forces exactly one ``O(L)``-orbit of primitive isotropic
     lines, and *any* primitive isotropic vector of ``L`` represents it: the

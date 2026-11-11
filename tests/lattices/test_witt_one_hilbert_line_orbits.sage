@@ -9,19 +9,25 @@ hyperbolic plane, so the Eichler envelope that classifies isotropic orbits on
 the cusp count of the Hilbert modular group instead:
 
 * Bruinier, *Hilbert modular forms and their applications*, in *The 1-2-3 of
-  Modular Forms* (Universitext, Springer, 2008), pp. 105-179, §2.7, p. 143: the
+  Modular Forms* (Universitext, Springer, 2008), pp. 105-179, §2.7, printed pp. 143-144: the
   Hilbert lattice is ``L = ZZ + ZZ + O_F`` inside ``V = QQ + QQ + F`` with
   ``Q(a, b, nu) = nu conj(nu) - a b``, and ``Gamma_F = SL_2(O_F) = Spin_L``.
   This library's form is ``q = 2Q``, so the Gram matrix below is twice the
   source's; isotropy and the orthogonal group are unchanged.  ``Spin_L <= O(L)``,
   so ``O(L)`` has no more orbits of isotropic lines than ``Gamma_F``.
-* Bruinier, ibid., Corollary 1.4 (§1.1, printed pp. 106-108): the number of
+* Bruinier, ibid., Corollary 1.4 (§1.1, printed pp. 106-109): the number of
   cusps of ``Gamma_F`` is the class number ``h(F)``.  Cusps are the
   ``Gamma_F``-orbits of ``P^1(F)`` (§1.1, printed p. 106), the rational boundary
   points of the projective model are ``P^1(F)`` (ibid. (1.9)), and those are the
   rational isotropic lines (ibid. Lemma 2.20 and §2.7).  A rational isotropic
   line meets ``L`` in a rank-one primitive sublattice, so the ``Gamma_F``-orbits
-  of primitive isotropic lines of ``L`` number ``h(F)``.
+  of primitive isotropic lines of ``L`` number ``h(F)``.  The printed pages are
+  the publisher's contents pages for the sections: Corollary 1.4 is the last
+  numbered statement of §1.1, which runs from p. 106 to the page where §1.2
+  begins, p. 109.  Hirzebruch-Van de Ven, *Hilbert modular surfaces and the
+  classification of algebraic surfaces*, Invent. Math. 23 (1974), 1-29,
+  pp. 12-13, states the same count on an exact printed page, without a statement
+  number, for ``K = QQ(sqrt p)`` with ``p = 1 mod 4`` prime.
 
 Hence on a field of class number one there is exactly one ``O(L)``-orbit of
 primitive isotropic lines, and every returned line must be primitive, generated
