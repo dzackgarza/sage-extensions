@@ -29,6 +29,7 @@ from sage_extensions.categories.group.groups import (
     SymmetricGroups,
     _GroupMorRealizationMixin,
     _engine_group,
+    _engine_left_coset_positions,
     _engine_point,
     _owned_group,
 )
@@ -1624,12 +1625,23 @@ class _LeftCosetPoint(Element):
     def __contains__(self, element):
         return self.representative().inverse() * element in self.parent().subgroup()
 
+    @cached_method
+    def _canonical_key(self):
+        r"""The transversal position of ``gH`` in a finite GAP-encoded ``G``, else ``None``."""
+        positions = self.parent()._positions()
+        return None if positions is None else positions.position_of(self.representative())
+
     def __eq__(self, other):
-        return (isinstance(other, _LeftCosetPoint) and other.parent() is self.parent()
-                and self.representative().inverse() * other.representative() in self.parent().subgroup())
+        if not (isinstance(other, _LeftCosetPoint) and other.parent() is self.parent()):
+            return False
+        key = self._canonical_key()
+        if key is not None:
+            return key == other._canonical_key()
+        return self.representative().inverse() * other.representative() in self.parent().subgroup()
 
     def __hash__(self):
-        return hash(id(self.parent()))
+        r"""Hash by the canonical coset key, so orbit searches look cosets up instead of comparing pairwise."""
+        return hash((id(self.parent()), self._canonical_key()))
 
     def _repr_(self):
         return f"{self.representative()} * {self.parent().subgroup()}"
@@ -1650,6 +1662,11 @@ class _LeftCosetPointSet(Parent):
 
     def subgroup(self):
         return self._subgroup
+
+    @cached_method
+    def _positions(self):
+        r"""The finite engine's canonical coset positions of ``G/H``, when ``G`` has them."""
+        return _engine_left_coset_positions(self._group, self._subgroup)
 
     def _element_constructor_(self, representative):
         if isinstance(representative, _LeftCosetPoint) and representative.parent() is self:

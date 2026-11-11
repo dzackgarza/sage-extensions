@@ -715,6 +715,20 @@ def _engine_left_coset_g_set(group, subgroup):
     )
 
 
+def _engine_left_coset_positions(group, subgroup):
+    r"""GAP's transversal of ``G/H`` for a finite GAP-encoded ``G``, or ``None``.
+
+    The transversal position of ``g`` is the canonical key of ``gH``:
+    two elements have the same position exactly when they lie in the same
+    left coset (GAP Reference Manual 39.8-1, ``PositionCanonical`` on a
+    ``RightTransversal``). Without a finite GAP encoding of ``G`` there is
+    no canonical form, and the coset is decided by membership in ``H``.
+    """
+    if group in OwnedFiniteGroups() and _encodes_elements_in_gap(_engine_group(group)):
+        return _TransversalCosets(group, subgroup)
+    return None
+
+
 def _engine_cosets(group, subgroup, side):
     r"""Return the cosets of ``subgroup`` on ``side``, each an ordered set of elements."""
     engine = _engine_group(group)
