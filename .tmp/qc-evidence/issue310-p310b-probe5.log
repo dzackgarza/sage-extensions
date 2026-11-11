@@ -1,0 +1,8 @@
+U(2): ValueError @ 2.0 s: no primitive isotropic vector of Integral lattice of rank 2 and signature (1, 1) has divisor 2 and divided class -[1]: the residue of the class in L/2L was fixed, all of its 1 translations k in K/2K were tried with every divisor pair of q(w)/(2h) in the residue classes of a and b, and no candidate passed q = 0, primitivity, divisor 2, and the class check
+U(2)+<-6>: RETURNED 2 orbits @ 4.0 s
+U(2)U(2): RETURNED 9 orbits @ 12.2 s
+U(2)U(2)+<-6>: RETURNED 9 orbits @ 36.2 s
+U(2)U(2)U(2): RETURNED 35 orbits @ 81.5 s
+029J O lines: AttributeError @ 0.0 s: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'isotropic_orbit_representatives'
+029J O planes: AttributeError @ 0.0 s: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'isotropic_orbit_representatives'
+Otilde+(T_Co) built @ 2.8 s

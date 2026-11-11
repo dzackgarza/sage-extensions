@@ -437,6 +437,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 )
             return OrthogonalCharacterQuotient(self)
 
+        @cached_method
         def discriminant_image(self):
             r"""``rho(self)`` in ``O(A_L)``, exactly, from the retained character data.
 

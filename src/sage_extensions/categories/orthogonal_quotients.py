@@ -645,10 +645,7 @@ class OrthogonalCharacterQuotient:
             return int(libgap.Order(libgap.Group(tuples)))
         og = self._discriminant_group
         engine = _gap_model(og)
-        rho = self.lattice.discriminant_representation()
-        rho_images = [
-            _element_to_engine(og, rho(generator)) for generator in ambient
-        ]
+        rho_images = list(self.ambient_discriminant_images())
         im_rho = libgap.Subgroup(engine, rho_images)
         ambient_order = int(libgap.Order(im_rho))
         if not sign_labels:
@@ -722,21 +719,21 @@ class OrthogonalCharacterQuotient:
         elif self.determinant_kernel:
             kernel_selection = lattice.SO()
         else:
+            kernel_selection = None
+        if kernel_selection is None:
             # No sign factor: K_0 is the whole ambient group, and its
             # rho-image piece is exactly what carries rho(O(L)) into the meet
             # (dropping it reintroduces the refuted target-alone answer on
-            # nonsurjective rho).
-            kernel_selection = self.supergroup
-        rho = lattice.discriminant_representation()
-        pieces.append(
-            libgap.Subgroup(
-                og_engine,
-                [
-                    _element_to_engine(self._discriminant_group, rho(g))
-                    for g in kernel_selection.group_generators()
-                ],
-            )
-        )
+            # nonsurjective rho).  The images of that same generating family are
+            # the quotient's cached sweep, so K_0 contributes no second one.
+            kernel_images = list(self.ambient_discriminant_images())
+        else:
+            rho = lattice.discriminant_representation()
+            kernel_images = [
+                _element_to_engine(self._discriminant_group, rho(g))
+                for g in kernel_selection.group_generators()
+            ]
+        pieces.append(libgap.Subgroup(og_engine, kernel_images))
         if not pieces:
             raise ValueError(
                 f"{self.subgroup} retains no discriminant preimage: its joint "
@@ -991,6 +988,15 @@ class OrthogonalCharacterQuotient:
         The subgroup is bound to the FQF engine of ``O(A_L)`` (whose chains are
         measured instant at the Enriques size, `.tmp/measure_pathB.log`), and
         letters index the ambient ``O(L)`` generators through ``rho``.
+
+        ``rho`` is evaluated on *every* ambient generator, so this is the one
+        computation of ``rho(O(L))`` the quotient schedules: the returned tuple
+        is cached per subgroup (hence per lattice), and the callers that need the
+        ambient generator images read them from here rather than sweeping the
+        generating family again.  On ``T_Co`` one sweep is 26 s of
+        ``discriminant_morphism`` constructions
+        over 340 generators (`.tmp/p310b-probe1.log`), and the row used to
+        schedule four of them before its first lift.
         """
         from sage_extensions.categories.group.groups import (
             _element_to_engine,
@@ -1000,12 +1006,36 @@ class OrthogonalCharacterQuotient:
         og = self._discriminant_group
         engine = _gap_model(og)
         ambient = self._ambient_generators()
-        rho = self.lattice.discriminant_representation()
-        images = [_element_to_engine(og, rho(g)) for g in ambient]
+        images = list(self.ambient_discriminant_images())
         subgroup = libgap.Subgroup(engine, images)
         section = _GapWordSection(images, parent=engine)
         return engine, subgroup, section, ambient
 
+    @cached_method
+    def ambient_discriminant_images(self):
+        r"""``rho`` on the selected generating family of ``O(L)``, once per lattice.
+
+        ``rho`` is the lattice's discriminant representation and the family is
+        the ambient group's selected generating set; both are fixed objects of
+        the lattice's own construction, so the images are a datum of the lattice,
+        not of a row, a class or a call.  They are engine elements of the
+        ``O(A_L)`` model, the form every caller here wants: the word section of
+        :meth:`_im_rho_engine_and_section`, the sign-descent test, and the
+        double-coset walk all consume them.
+
+        Computing them is a ``discriminant_morphism`` construction per generator
+        (340 generators on ``T_Co``; 26 s in one sweep, `.tmp/p310b-probe1.log`),
+        which is why this is memoized rather than recomputed where it is needed.
+        """
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        og = self._discriminant_group
+        rho = self.lattice.discriminant_representation()
+        return tuple(
+            _element_to_engine(og, rho(g)) for g in self._ambient_generators()
+        )
+
+    @cached_method
     def _sign_descent_rank(self):
         r"""``(j, sign_labels)``: F2-dimension of sign patterns realized on ``ker rho``.
 
@@ -1013,12 +1043,16 @@ class OrthogonalCharacterQuotient:
         homomorphism on ``im rho``; each of the ``2^m`` products is tested by
         ``GroupHomomorphismByImages`` on the rho-images of the ambient
         generators, inside the ``O(A_L)`` engine only.
+
+        The rho-images are read from :meth:`_im_rho_engine_and_section`, which is
+        the quotient's single evaluation of ``rho`` on the ambient family; the
+        rank itself is a property of the lattice and its characters, not of a
+        row, so the pair is cached as well.
         """
         from itertools import product as _product_tuples
 
         from sage_extensions.categories.group.groups import (
             OwnedGroups,
-            _element_to_engine,
             _gap_model,
         )
 
@@ -1029,8 +1063,7 @@ class OrthogonalCharacterQuotient:
         if not self._has_discriminant or m == 0:
             return m, sign_labels
         _engine, im_rho, _section, ambient = self._im_rho_engine_and_section()
-        rho = self.lattice.discriminant_representation()
-        rho_images = [_element_to_engine(self._discriminant_group, rho(g)) for g in ambient]
+        rho_images = self.ambient_discriminant_images()
         ring = self.lattice.base_ring()
         # F2 encoding of signs: 0 = +1 (trivial), 1 = -1, so the sign of a
         # product is the F2 sum of the selected values.
@@ -1408,8 +1441,7 @@ class OrthogonalCharacterQuotient:
 
         j, sign_labels = self._sign_descent_rank()
         engine, im_rho, _section, ambient = self._im_rho_engine_and_section()
-        rho = self.lattice.discriminant_representation()
-        rho_images = [_element_to_engine(self._discriminant_group, rho(g)) for g in ambient]
+        rho_images = self.ambient_discriminant_images()
         ring = self.lattice.base_ring()
 
         def sign_of(element, label):

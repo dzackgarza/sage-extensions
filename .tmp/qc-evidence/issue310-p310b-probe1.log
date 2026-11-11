@@ -1,0 +1,28 @@
+build T_Co: 0.15s
+rank 11 sig (2, 9) det 2048
+L.Aut(): 0.00s
+group_generators: 115.32s
+ambient generator count: 340
+group_generators again: 0.01s
+G.discriminant_image(): 26.66s
+G.discriminant_image() again: 0.02s
+|rho(O(L))| = 46998591897600
+surjective?: 0.00s
+stable_orthogonal_group: 0.01s
+stab is a PreimageSubgroups.parent_class supergroup is Aut: True
+finite_character_quotient: 0.00s
+has_discriminant True det_kernel False spinor_kernel False labels None
+_ambient_generators: 0.01s
+quotient ambient count: 340
+_im_rho_engine_and_section #1: 0.04s
+_im_rho_engine_and_section #2: 0.00s
+_sign_descent_rank: 0.00s
+subgroup_image_order: 0.07s
+index: 0.11s
+primitive_isotropic_subobject: 0.02s
+stabilizer_discriminant_image: 25.91s
+stabilizer_discriminant_image again: 4.48s
+|rho(Stab)| = 89181388800
+isotropic_line_stabilizer_image: 0.02s
+line image -> NoneType None
+launcher exit: 0

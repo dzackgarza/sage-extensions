@@ -6227,6 +6227,54 @@ class Lattices(OwnedCategoryOverBaseRing):
                 )
             return self.discriminant_class(self.primitive_dual(element))
 
+        def divided_class_residue(self, divided_class, divisibility):
+            r"""Return the residue ``v mod d L`` of the divided class ``[v/d]``, by coordinates.
+
+            Let ``d = divisibility`` and ``c = [v/d]`` in ``A_L = L^#/L`` for a primitive
+            ``v`` with ``div(v) = d``.  Then ``d c = [v] = 0`` in ``A_L``, so ``d`` times any
+            lift ``x`` of ``c`` to ``L^#`` is a lattice vector, and ``d x = v + d t`` for some
+            ``t`` in ``L``: the residue is ``d x mod d L``.
+
+            The lift is :meth:`discriminant_module`'s selected section
+            (``dual_lattice_lift``), and its coordinates in the *lattice's* basis are
+            :meth:`_half_vector_coordinates` -- the owner of ``G^-1 c`` for a dual element,
+            which states there that the dual basis and the lattice basis are the same index
+            set and that the transformation is the inverse Gram matrix.  The result is
+            required to be integral: a lift whose ``d``-th multiple is not in ``L`` would be a
+            class of order not dividing ``d``, which a caller with a divided class of this
+            divisor cannot have.
+
+            This is what makes the residue loop of :meth:`isotropic_lines_by_divided_class`
+            restrictable: a named class fixes ``v`` modulo ``d L``, so only the translations
+            ``w -> w + d k`` in ``K/dK`` are free for it.
+            """
+            divisor = int(divisibility)
+            if divisor <= 0:
+                raise ValueError(
+                    f"a divided class of {self!r} has a residue modulo {divisibility} only for a "
+                    f"positive divisor"
+                )
+            labels = tuple(self.module_generating_set())
+            if tuple(self.dual_lattice().module_generating_set()) != labels:
+                raise ArithmeticError(
+                    f"the dual module of {self!r} is indexed by "
+                    f"{tuple(self.dual_lattice().module_generating_set())} and the lattice by "
+                    f"{labels}: the residue of a divided class is read through the one "
+                    f"identification in which the selected dual basis pairs with this basis, so "
+                    f"these are required to be the same index set, not merely the same size"
+                )
+            lift = self.discriminant_module().dual_lattice_lift(divided_class)
+            scaled = self.dual_lattice().scalar_multiple(divisor, lift)
+            coordinates = self._half_vector_coordinates(scaled)
+            for entry in coordinates:
+                if entry.denominator() != 1:
+                    raise ArithmeticError(
+                        f"the class {divided_class} of {self!r} has no residue modulo "
+                        f"{divisor}: {divisor} times its lift to the dual lattice is not in the "
+                        f"lattice, so the class does not have order dividing {divisor}"
+                    )
+            return tuple(int(entry) for entry in coordinates)
+
         def hyperbolic_basis_pair(self):
             r"""Return a scaled hyperbolic pair of basis vectors orthogonal to the rest, or ``None``.
 
@@ -6255,7 +6303,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             return None
 
         @cached_method
-        def isotropic_lines_by_divided_class(self, divisibility):
+        def isotropic_lines_by_divided_class(self, divisibility, *, classes=None):
             r"""One primitive isotropic vector per divided class at this divisor, by residues.
 
             Let ``d = divisibility`` and ``v`` a primitive isotropic vector of ``L`` with
@@ -6282,6 +6330,14 @@ class Lattices(OwnedCategoryOverBaseRing):
             ``[v/d]`` the class of the residue it came from.  A class with no lift after the
             whole loop is absent from the returned map; :meth:`primitive_isotropic_vector_of_
             divided_class` refuses it by name.
+
+            ``classes`` restricts the loop to the residues those classes determine, through
+            :meth:`divided_class_residue`: a class fixes ``v`` modulo ``d L``, so for a named
+            class the loop's residue is one point and only its ``|K/dK|`` translations are
+            enumerated.  With ``classes`` omitted the loop covers every residue of ``L/dL``,
+            which is what a whole-map answer needs and what the budget below bounds.  The
+            budget counts the loop that will actually run -- the requested residues times the
+            translations -- and its refusal names the lattice and that count.
             """
             ring = self.base_ring()
             divisor = int(divisibility)
@@ -6299,14 +6355,25 @@ class Lattices(OwnedCategoryOverBaseRing):
                 )
             residue_count = divisor ** int(self.module_rank())
             translation_count = divisor ** (int(self.module_rank()) - 2)
-            if residue_count * translation_count * divisor * divisor > 4000000:
+            # The loop below is ``(a mod d) x (b mod d) x (w mod d) x (k in K/dK)``:
+            # the first three factors *are* the residues of ``L/dL`` (the hyperbolic
+            # pair's residue choice is inside them, not a second factor), and the
+            # last is the translation that leaves the residue fixed.  So the count
+            # is ``residue_count * translation_count``, and an earlier form of this
+            # guard multiplied it by ``divisor * divisor`` again and refused lattices
+            # whose loop is ``divisor**2`` times smaller than it said -- ``T_Co`` at
+            # divisor 2 was refused at 4194304 for a loop of 1048576.
+            requested_residues = (
+                residue_count if classes is None else len(tuple(dict.fromkeys(classes)))
+            )
+            candidate_count = requested_residues * translation_count
+            if candidate_count > 4000000:
                 raise ValueError(
                     f"the divided classes of {self!r} at divisor {divisor} are not constructed "
                     f"here: the finite loop is {residue_count} residues of L/{divisor}L times "
-                    f"{translation_count} translations in K/{divisor}K times {divisor * divisor} "
-                    f"residue choices for the hyperbolic pair, above the budget this construction "
-                    f"runs in; the loop is exhaustive, not merely bounded, only where that product "
-                    f"is within budget"
+                    f"{translation_count} translations in K/{divisor}K, {candidate_count} "
+                    f"candidates in all, above the budget this construction runs in; the loop is "
+                    f"exhaustive, not merely bounded, only where that count is within budget"
                 )
             first, second, pairing = pair
             labels = tuple(self.module_generating_set())
@@ -6346,15 +6413,27 @@ class Lattices(OwnedCategoryOverBaseRing):
                         if column_coefficient:
                             total += row_coefficient * complement_gram[row][column] * column_coefficient
                 complement_norms[entry] = total
-            cross = {
-                (start, step): sum(
-                    start[row] * complement_gram[row][column] * step[column]
-                    for row in range(len(others))
+            # The bilinear form of the complement, one row per ``w`` residue and evaluated
+            # against the translation only when the translation is reached.  Evaluating the
+            # whole ``|K/dK|``-square table first was the loop's dominant cost -- 2**18
+            # entries on ``T_Co`` at divisor two -- and a named class never reads more than
+            # one row of it, so the row is what is computed.
+            def cross_row(start):
+                return tuple(
+                    sum(
+                        start[row] * complement_gram[row][column]
+                        for row in range(len(others))
+                        if start[row]
+                    )
                     for column in range(len(others))
                 )
-                for start in complements
-                for step in complements
-            }
+
+            def cross_value(row, step):
+                return sum(
+                    row[column] * step[column]
+                    for column in range(len(others))
+                    if step[column]
+                )
 
             def divisor_pairs(value):
                 if value == 0:
@@ -6368,60 +6447,86 @@ class Lattices(OwnedCategoryOverBaseRing):
                     pairs.append((-candidate, -(value // candidate)))
                 return tuple(pairs)
 
+            # The residues to try.  A residue of L/dL is (a mod d, b mod d, w mod d), and the
+            # translation ``w -> w + d k`` leaves it fixed: so the residue is the class's, and
+            # only the translation is free.  With ``classes`` given, the class fixes its
+            # residue by :meth:`divided_class_residue` and the loop runs that residue alone --
+            # one residue instead of ``d**rank`` of them, which is the difference between a
+            # construction a caller can ask for a class of and a walk over the whole module.
+            if classes is None:
+                residues = [
+                    (left_residue, right_residue, start)
+                    for left_residue in range(divisor)
+                    for right_residue in range(divisor)
+                    for start in complements
+                ]
+            else:
+                residues = []
+                for divided_class in classes:
+                    coordinates = self.divided_class_residue(divided_class, divisor)
+                    residues.append(
+                        (
+                            coordinates[left] % divisor,
+                            coordinates[right] % divisor,
+                            tuple(coordinates[position] % divisor for position in others),
+                        )
+                    )
+                residues = list(dict.fromkeys(residues))
+
             found = {}
-            for left_residue in range(divisor):
-                for right_residue in range(divisor):
-                    for start in complements:
-                        start_norm = complement_norms[start]
-                        for step in complements:
-                            norm = (
-                                start_norm
-                                + 2 * divisor * cross[(start, step)]
-                                + divisor * divisor * complement_norms[step]
-                            )
-                            target = -norm
-                            if target % (2 * int(pairing)):
-                                continue
-                            for a, b in divisor_pairs(target // (2 * int(pairing))):
-                                if not in_classes(a, left_residue, divisor):
-                                    continue
-                                if not in_classes(b, right_residue, divisor):
-                                    continue
-                                coordinates = [0] * len(vectors)
-                                coordinates[left] = a
-                                coordinates[right] = b
-                                for position, coefficient in enumerate(
-                                    start[index] + divisor * step[index]
-                                    for index in range(len(others))
-                                ):
-                                    coordinates[others[position]] = coefficient
-                                candidate = self.linear_combination(
-                                    {
-                                        label: ring(coordinates[index])
-                                        for index, label in enumerate(labels)
-                                        if coordinates[index]
-                                    }
-                                )
-                                if candidate.q() != ring.zero():
-                                    continue
-                                if candidate.is_primitive() is not True:
-                                    continue
-                                if self.div(candidate) != ring(divisor):
-                                    continue
-                                found.setdefault(self.divided_discriminant_class(candidate), candidate)
+            for left_residue, right_residue, start in residues:
+                start_norm = complement_norms[start]
+                start_row = cross_row(start)
+                for step in complements:
+                    norm = (
+                        start_norm
+                        + 2 * divisor * cross_value(start_row, step)
+                        + divisor * divisor * complement_norms[step]
+                    )
+                    target = -norm
+                    if target % (2 * int(pairing)):
+                        continue
+                    for a, b in divisor_pairs(target // (2 * int(pairing))):
+                        if not in_classes(a, left_residue, divisor):
+                            continue
+                        if not in_classes(b, right_residue, divisor):
+                            continue
+                        coordinates = [0] * len(vectors)
+                        coordinates[left] = a
+                        coordinates[right] = b
+                        for position, coefficient in enumerate(
+                            start[index] + divisor * step[index]
+                            for index in range(len(others))
+                        ):
+                            coordinates[others[position]] = coefficient
+                        candidate = self.linear_combination(
+                            {
+                                label: ring(coordinates[index])
+                                for index, label in enumerate(labels)
+                                if coordinates[index]
+                            }
+                        )
+                        if candidate.q() != ring.zero():
+                            continue
+                        if candidate.is_primitive() is not True:
+                            continue
+                        if self.div(candidate) != ring(divisor):
+                            continue
+                        found.setdefault(self.divided_discriminant_class(candidate), candidate)
             return found
 
         def primitive_isotropic_vector_of_divided_class(self, divided_class, divisibility):
             r"""A primitive isotropic vector with divisor ``divisibility`` and this divided class.
 
-            The construction is :meth:`isotropic_lines_by_divided_class`, the finite residue
-            loop over ``L/dL`` with the complement's ``K/dK`` variation and the divisor-pair
-            test.  A class that the loop does not reach is refused by name, together with the
-            exhausted loop: ``|L/dL| |K/dK|`` candidate residues with their divisor pairs, all
-            of them tried, is the bound.
+            The construction is :meth:`isotropic_lines_by_divided_class`, run at the one residue
+            the class determines (:meth:`divided_class_residue`): the divided class fixes
+            ``v`` modulo ``d L``, so the loop's only freedom left is the translation
+            ``w -> w + d k`` in ``K/dK`` with its divisor pairs, and those are tried
+            exhaustively for this class.  A class with no lift there is refused by name,
+            together with the loop that was exhausted, and naming the class and the divisor.
             """
             divisor = int(divisibility)
-            lines = self.isotropic_lines_by_divided_class(divisibility)
+            lines = self.isotropic_lines_by_divided_class(divisibility, classes=(divided_class,))
             for candidate_class, vector in lines.items():
                 if candidate_class == divided_class:
                     return vector
@@ -6432,15 +6537,13 @@ class Lattices(OwnedCategoryOverBaseRing):
                     f"class {divided_class}: the lattice exhibits no scaled hyperbolic basis pair, "
                     f"so the residue construction is not available"
                 )
-            residue_count = divisor ** int(self.module_rank())
-            complement_rank = int(self.module_rank()) - 2
+            translation_count = divisor ** (int(self.module_rank()) - 2)
             raise ValueError(
                 f"no primitive isotropic vector of {self!r} has divisor {divisor} and divided "
-                f"class {divided_class}: the residue loop is exhausted -- every one of the "
-                f"{residue_count} residues of L/{divisor}L was tried, each with its "
-                f"{divisor ** complement_rank} translations k in K/{divisor}K and every divisor "
-                f"pair of q(w)/(2h) in the residue classes of a and b, and no candidate passed "
-                f"q = 0, primitivity, divisor {divisor}, and the class check"
+                f"class {divided_class}: the residue of the class in L/{divisor}L was fixed, all "
+                f"of its {translation_count} translations k in K/{divisor}K were tried with every "
+                f"divisor pair of q(w)/(2h) in the residue classes of a and b, and no candidate "
+                f"passed q = 0, primitivity, divisor {divisor}, and the class check"
             )
 
         def get_isotropic_type(self, element) -> str:

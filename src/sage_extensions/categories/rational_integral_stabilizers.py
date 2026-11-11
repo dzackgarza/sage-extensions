@@ -407,6 +407,7 @@ class _FiniteIntegralRepresentation(SageObject):
             )
         return source["lattice"].Isom(target["lattice"])(images)
 
+    @cached_method
     def stabilizer_discriminant_image(self):
         r"""Return ``rho(G_L) <= O(A_L)`` by the action-groupoid construction.
 
@@ -424,6 +425,13 @@ class _FiniteIntegralRepresentation(SageObject):
         point and letter.  No letter is applied to ``A_L`` on its own, and no
         hypothesis that a rational transporter preserves ``L`` is used.  The real
         sign character is a separate datum and is not derived here.
+
+        The composite family is a datum of *this* subobject -- its lattice orbit,
+        the letters, and the discriminants of the transports -- so it is
+        computed once per subobject and cached.  On the ``T_Co`` line it is 26 s
+        (`.tmp/p310b-probe1.log`), an order of magnitude more than the orbit
+        enumeration that consumes it, and the row asked for it once per
+        representative.
         """
         action = self.action()
         inclusion = action.lattice_inclusion()
