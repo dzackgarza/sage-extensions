@@ -1,0 +1,18 @@
+base ring: Integer Ring
+x = 0: q.lift = 0, b.lift = 0, difference = 0, in base ring = True, in SageZZ = False
+x = [1]: q.lift = (3)/(2), b.lift = (1)/(2), difference = (4)/(4), in base ring = True, in SageZZ = False
+x = [0]: q.lift = (1)/(2), b.lift = (1)/(2), difference = (0)/(4), in base ring = True, in SageZZ = False
+x = [0] + [1]: q.lift = 0, b.lift = 0, difference = 0, in base ring = True, in SageZZ = False
+is_characteristic: False
+DONE
+[peakrss] issue348: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 273 MiB
+[peakrss] low-water MemAvail : 9294 MiB
+[peakrss] peak single VmHWM  : 273 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      262 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   273 MiB hwm=   273 MiB avail=  9294 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  9454 MiB
+launcher exit: 0
