@@ -5,7 +5,7 @@
    "lattice": "lattices/{tag}.md"
   },
   "generated_by": "tests/cards/refresh_lattice_database_enriques.py",
-  "ref": "e8a7f880dd21931d54da1e99217e924db9c88e33",
+  "ref": "dbc9fc6add622459d60dba3dc62d3e4be6b903d7",
   "repository": "dzackgarza/lattice-database",
   "rows": {
    "arithmetic_group": [
@@ -1247,7 +1247,7 @@
  },
  "cusp_chambers": {
   "029J": {
-   "certification": "3d07d82fc2fb4bc5f2171e4d73ef7c6e534354d0d9e7ad2e55910f0a7ce25022",
+   "certification": "c67663ee2cb0aade7b4069583e0e73b87f8f86970ddec9f6835e4dfc65c19b34",
    "latex": "U \\oplus U(2) \\oplus E_{8}(-2)",
    "name": "U + U(2) + E8(-2)",
    "path": "lattices/029J.md",
@@ -1352,7 +1352,7 @@
       "figure": 12,
       "printed_page": 24,
       "statement": "4.3.9",
-      "walls": 13
+      "walls": 14
      }
     ]
    },

@@ -112,17 +112,20 @@ the paper's order, not by exact vector equality.  The test
 `test_the_five_cusps_are_the_chamber_rows_of_card_029j` pins the count of
 agreements (four) rather than pretending to five.
 
-Card 029J's five rows, as read by tag at `e8a7f88`:
+Card 029J's five rows, as read by tag at `dbc9fc6a`:
 4.3.5 with 12 walls (printed p. 19), 4.3.6 with 10 (p. 21), 4.3.7 with 12
-(p. 22), 4.3.8 with 11 (p. 23), 4.3.9 with 13 (p. 24).
+(p. 22), 4.3.8 with 11 (p. 23), 4.3.9 with 14 (p. 24).
 
-## 5. The one count that differs, and it differs before any chamber runs
+## 5. The one count that differed, and how it was settled
 
 `Sterk.sterk_roots()["Sterk_5"]` — `Sterk.sterk5_in_U_E8_2()`, "Sterk 5's
 fourteen roots in `U + E8(2)` coordinates" in `sterk.py` — holds **14** roots,
-and card `029J`'s `integral.cusp_chambers` row for that cusp, statement **4.3.9**,
-states `wall_count: 13` with thirteen wall vectors.  Both values are recorded
-here and neither is typed into the test.  Which is right is not decided by
-anything measured in this work: the chamber that would decide it does not return
-(§3), so this is a discrepancy between the library's transcription of Sterk's
-figure and the database's row for it, filed for whoever owns the transcription.
+while card `029J`'s `integral.cusp_chambers` row for that cusp, statement
+**4.3.9**, stated `wall_count: 13`.  Both values were recorded and neither is
+typed into a test.
+
+The card was the one that was short: `dzackgarza/lattice-database#35` adds the
+missing wall (α₈ = e₁₂) and the seventeenth edge, and the digest regenerated at
+`dbc9fc6a` — the database's main at the time of writing — now reads **14 walls,
+17 edges** for that row.  The library's transcription and the card agree; §4's
+list of the five rows reads 12, 10, 12, 11 and **14**.

@@ -9,7 +9,7 @@ python3 tests/cards/refresh_lattice_database_enriques.py --ref <40-character dat
 ```
 
 `_provenance.ref` names the database commit the digest was read at; the digest
-was last refreshed at `e8a7f880dd21931d54da1e99217e924db9c88e33`. The script
+was last refreshed at `dbc9fc6add622459d60dba3dc62d3e4be6b903d7`. The script
 fetches only the front matter of the named cards and keeps only the rows the
 tests read, so a refresh is one HTTP request per card and the diff is the
 database's change, not a transcription.
