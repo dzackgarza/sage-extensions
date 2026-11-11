@@ -27,10 +27,20 @@ What is asserted is what the construction states: the subgroup is a subgroup of 
 group, and its selected generators are the supplied family.  No order and no index is
 asserted — an infinite generated subgroup has no decided order here, and asserting one
 would be the very question this construction declines to ask.
+
+The reading side is `_supplied_generator`, and a family it admits must carry the
+construction that supplied it, not a premise the caller states about it.  A third
+specimen, `U` over `ZZ`, is where that distinction is decidable: `O(U)` is finite (the
+isometries are `+-1`, the swap and `-swap`, so `|O(U)| = 4`), `G = <-1>` has order 2, and
+the swap is not in `G`.  `G.subgroup((swap,))` must therefore refuse, and a construction
+that admits every element parented by the ambient group instead answers with a subgroup
+of `G` that `G` does not contain.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
 from sage_extensions.categories.rational_integral_stabilizers import IntegralStructureAction
+
+import pytest
 
 
 def _euclid_specimen():
@@ -80,3 +90,35 @@ def test_the_enriques_orthogonal_groups_line_stabilizer_generates_a_subgroup():
 
     assert generated.supergroup() is group
     assert frozenset(generated.group_generators()) == frozenset(generators)
+
+
+def _hyperbolic_plane_specimen():
+    r"""`U` over `ZZ`, its finite `O(U)`, and `G = <-1>` as a subgroup of it."""
+    lattice = NamedLattices.U
+    ambient = lattice.Aut()
+    labels = tuple(lattice.module_generating_set())
+    e, f = tuple(lattice.module_generator(label) for label in labels)
+    return (
+        ambient,
+        ambient.subgroup((ambient({labels[0]: -e, labels[1]: -f}),)),
+        ambient({labels[0]: f, labels[1]: e}),
+    )
+
+
+def test_a_family_outside_the_group_is_refused() -> None:
+    r"""`G.subgroup((swap,))` raises: `G = <-1> <= O(U)` and the swap is not in `G`.
+
+    Membership here is decided, so the refusal is a decision and not a retreat:
+    `O(U)` is finite, `G` is its order-two subgroup, and `swap not in G`.  A
+    construction that admits any element parented by `G`'s ambient group instead
+    returns a subgroup of `G` whose generator is not in `G`.
+    """
+    ambient, group, swap = _hyperbolic_plane_specimen()
+
+    assert ambient.cardinality() == 4
+    assert group.supergroup() is ambient
+    assert group.cardinality() == 2
+    assert swap not in group
+
+    with pytest.raises(ValueError):
+        group.subgroup((swap,))
