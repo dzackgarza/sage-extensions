@@ -1,0 +1,69 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_chosen_target_embedding_filters_a_nontrivial_genus ____________
+tests/lattices/test_chosen_target_primitive_embeddings.sage:21: in test_chosen_target_embedding_filters_a_nontrivial_genus
+    embedding = source.Emb(target).an_element()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattice_morphisms.py:2948: in an_element
+    target_embedding_data = self._target_primitive_embedding_data()
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/lattice_morphisms.py:2353: in _target_primitive_embedding_data
+    return lattice_engines._oscar_lattices.target_primitive_embedding(
+src/sage_extensions/categories/lattice_engines.py:1316: in target_primitive_embedding
+    result = self._bridge().call(
+../sage-julia-bridge/src/sage_julia_bridge/interface.py:589: in call
+    response = self._request("call", payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sage-julia-bridge/src/sage_julia_bridge/interface.py:345: in _request
+    return self._request_unlocked(op, payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../sage-julia-bridge/src/sage_julia_bridge/interface.py:383: in _request_unlocked
+    raise error_class(
+E   sage_julia_bridge.errors.JuliaError: ArgumentError: L must be unique in its genus
+E   Stacktrace:
+E     [1] macro expansion
+E       @ /opt/julia-depot/packages/AbstractAlgebra/u52o2/src/Assertions.jl:602 [inlined]
+E     [2] primitive_embeddings(L::Hecke.ZZLat, M::Hecke.ZZLat; classification::Symbol, check::Bool)
+E       @ Oscar /opt/julia-depot/packages/Oscar/fhgxX/src/NumberTheory/QuadFormAndIsom/embeddings.jl:1390
+E     [3] primitive_embeddings
+E       @ /opt/julia-depot/packages/Oscar/fhgxX/src/NumberTheory/QuadFormAndIsom/embeddings.jl:1382 [inlined]
+E     [4] target_primitive_embedding(source_gram_entries::Matrix{Int64}, target_gram_entries::Matrix{Int64})
+E       @ Main.DzackResearchOscarLatticeAdapter ./sage_julia_bridge:157
+E     [5] (::var"#handle_request##2#handle_request##3")()
+E       @ Main /repos/sage-julia-bridge/src/sage_julia_bridge/julia_bridge.jl:513
+E     [6] (::var"#capture##0#capture##1"{var"#handle_request##2#handle_request##3", Pipe, Pipe})()
+E       @ Main /repos/sage-julia-bridge/src/sage_julia_bridge/julia_bridge.jl:360
+E     [7] redirect_stdio(f::var"#capture##0#capture##1"{var"#handle_request##2#handle_request##3", Pipe, Pipe}; stdin::Nothing, stderr::Pipe, stdout::Pipe)
+E       @ Base ./stream.jl:1448
+E     [8] handle_request(op::String, payload::String)
+E       @ Main /repos/sage-julia-bridge/src/sage_julia_bridge/julia_bridge.jl:485
+E     [9] top-level scope
+E       @ /repos/sage-julia-bridge/src/sage_julia_bridge/julia_bridge.jl:608
+E    [10] include(mod::Module, _path::String)
+E       @ Base ./Base.jl:306
+E    [11] exec_options(opts::Base.JLOptions)
+E       @ Base ./client.jl:317
+E    [12] _start()
+E       @ Base ./client.jl:550
+========================== test-call performance gate ==========================
+tests/lattices/test_chosen_target_primitive_embeddings.sage::test_chosen_target_embedding_filters_a_nontrivial_genus: 396.32 s > 20 s
+=========================== short test summary info ============================
+FAILED tests/lattices/test_chosen_target_primitive_embeddings.sage::test_chosen_target_embedding_filters_a_nontrivial_genus
+1 failed in 399.92s (0:06:39)
+[peakrss] issue317base: child waited=1 shell_code=1 samples=205
+[peakrss] peak tree RSS      : 5677 MiB
+[peakrss] low-water MemAvail : 767 MiB
+[peakrss] peak single VmHWM  : 5795 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      5480 MiB peak
+[peakrss]   python                      304 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   406.8s procs=  4 rss=  5677 MiB hwm=  5757 MiB avail=  3410 MiB
+[peakrss]   t=   404.8s procs=  4 rss=  5588 MiB hwm=  5682 MiB avail=  3453 MiB
+[peakrss]   t=   216.6s procs=  4 rss=  5478 MiB hwm=  5580 MiB avail=  5222 MiB
+[peakrss]   t=   214.6s procs=  4 rss=  5477 MiB hwm=  5579 MiB avail=  5363 MiB
+[peakrss]   t=   218.6s procs=  4 rss=  5476 MiB hwm=  5580 MiB avail=  5145 MiB
+launcher exit: 1

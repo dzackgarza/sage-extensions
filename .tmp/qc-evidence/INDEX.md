@@ -264,3 +264,24 @@ library.  Each log is byte-for-byte the run's redirected output.
 | `issue321-probe-u-plus-u2.log` | `#321` | `U + U(2)`: `\|ρ(O(L))\| = 2`, class-set orbit 2; refusal without stabilizer data; 13 stabilizer generators (1.76 s) give 2 plane orbits |
 | `issue321-module.log` | `#321` | `tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage`: **7 passed in 256.15 s**, exit 0 (`--no-time-gates --timeout=0`; rows 158.16 s and 68.91 s) |
 | `issue321-gate-setA.log` | `#321` | the module plus `test_unpolarized_enriques_strata`, `test_enriques_anti_invariant_cusps`, `test_stable_isotropic_plane_orbits`, `test_line_stabilizer_image_requires_eichlers_hypothesis`: **16 passed in 420.13 s**, exit 0 |
+
+## issue 317 — the genus of the Scattone summand `<-2k> + E8(-1)^2`
+
+| log | commit | command | result |
+| --- | --- | --- | --- |
+| `issue317-genus-of-the-scattone-summands.log` | `HEAD` @ 317 | `pytest tests/lattices/test_genus_of_the_scattone_summands.sage` | 3 passed in 30.32 s, exit 0 |
+| `issue317-genus-regression.log` | same | `pytest` over the seven genus-touching lattice modules | 2 failed, 21 passed in 577.11 s |
+| `issue317-base-genus.log` | `git archive HEAD` tree | `pytest tests/lattices/test_genus.sage` at base | 1 failed, 9 passed — the same `spinor_genus_count() == 2` failure, so pre-existing |
+| `issue317-base-embeddings.log` | base tree | `pytest tests/lattices/test_chosen_target_primitive_embeddings.sage` | 1 failed in 399.92 s inside the Julia bridge, so pre-existing |
+| `issue317-k2-ninth-class.md` | — | probe logs quoted line by line | k = 2 reaches 8 of 9 classes; the ninth is `D_17(-1)` by the exact mass shortfall |
+
+Exact command shape (the venv lacks `pytest-timeout`/`pytest-reportlog`, so
+`addopts` is blanked and both repo plugins are named):
+
+    PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work:/repos/sage-extensions/src \
+      /sage/.venv/bin/python -m pytest <paths> -q -o addopts="" \
+        -p qc_sage_session -p sage_extensions.testing.suite_budget \
+        --tb=short -rf -p no:cacheprovider --no-time-gates
+
+The new module's class enumeration costs 29.62 s, above the 20 s per-call
+ceiling, so a gated session reports it as a red cost (reported, not hidden).

@@ -1,0 +1,81 @@
+.......F...........F...                                                  [100%]
+=================================== FAILURES ===================================
+_______ test_published_four_spinor_genus_is_counted_from_all_generators ________
+/repos/sage-extensions/tests/lattices/test_genus.sage:91: in test_published_four_spinor_genus_is_counted_from_all_generators
+    assert lattice.spinor_genus_count() == 4
+E   assert 2 == 4
+E    +  where 2 = spinor_genus_count()
+E    +    where spinor_genus_count = Integral lattice of rank 3 and signature (3, 0).spinor_genus_count
+E    +  and   4 = Integer(4)
+___________ test_chosen_target_embedding_filters_a_nontrivial_genus ____________
+/repos/sage-extensions/tests/lattices/test_chosen_target_primitive_embeddings.sage:21: in test_chosen_target_embedding_filters_a_nontrivial_genus
+    embedding = source.Emb(target).an_element()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:2948: in an_element
+    target_embedding_data = self._target_primitive_embedding_data()
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:2353: in _target_primitive_embedding_data
+    return lattice_engines._oscar_lattices.target_primitive_embedding(
+/repos/sage-extensions/src/sage_extensions/categories/lattice_engines.py:1316: in target_primitive_embedding
+    result = self._bridge().call(
+/repos/sage-julia-bridge/src/sage_julia_bridge/interface.py:589: in call
+    response = self._request("call", payload)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/repos/sage-julia-bridge/src/sage_julia_bridge/interface.py:345: in _request
+    return self._request_unlocked(op, payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/repos/sage-julia-bridge/src/sage_julia_bridge/interface.py:361: in _request_unlocked
+    raise JuliaWorkerError(self._dead_process_message(), kind="worker-death")
+E   sage_julia_bridge.errors.JuliaWorkerError: Julia bridge process exited unexpectedly
+========================== test-call performance gate ==========================
+tests/lattices/test_chosen_target_primitive_embeddings.sage::test_chosen_target_embedding_filters_a_nontrivial_genus: 528.29 s > 20 s
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_four_classes_by_the_mass: 31.61 s > 20 s
+============================== slowest durations ===============================
+528.29s call     tests/lattices/test_chosen_target_primitive_embeddings.sage::test_chosen_target_embedding_filters_a_nontrivial_genus
+31.61s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_four_classes_by_the_mass
+2.74s call     tests/lattices/test_genus.sage::test_definite_genus_mass_and_class_number_are_exact
+2.37s call     tests/lattices/test_definite_isometry_witnesses.sage::test_definite_lattice_isometry_witnesses_across_integral_basis_changes[negative_E8]
+2.34s call     tests/lattices/test_definite_genus_mass_archive.sage::test_archived_e8_genus_has_one_owned_representative
+1.12s call     tests/lattices/test_genus.sage::test_genus_of_a2_is_determined_by_signature_and_discriminant_form
+0.64s call     tests/lattices/test_genus.sage::test_indefinite_isotropic_genus_has_complete_spinor_seed_enumeration
+0.56s call     tests/lattices/test_genus.sage::test_indefinite_genus_enumerates_each_nontrivial_spinor_seed
+0.41s call     tests/lattices/test_definite_isometry_witnesses.sage::test_definite_lattice_isometry_witnesses_across_integral_basis_changes[negative_D4]
+0.36s call     tests/lattices/test_definite_isometry_witnesses.sage::test_definite_lattice_isometry_witnesses_across_integral_basis_changes[negative_I8]
+0.28s call     tests/lattices/test_definite_isometry_witnesses.sage::test_even_binary_forms_of_determinant_twenty_three_with_different_minima_are_not_isometric
+0.22s call     tests/lattices/test_genus.sage::test_level_uses_the_quadratic_discriminant_form_for_even_lattices
+0.16s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_is_the_rank_seventeen_lattice
+0.11s call     tests/lattices/test_definite_isometry_witnesses.sage::test_definite_lattice_isometry_witnesses_across_integral_basis_changes[A2]
+0.07s call     tests/lattices/test_genus.sage::test_indefinite_signature_does_not_imply_rational_isotropy
+0.06s call     tests/lattices/test_genus.sage::test_level_of_an_odd_lattice_is_the_bilinear_level
+0.06s call     tests/lattices/test_genus.sage::test_published_four_spinor_genus_is_counted_from_all_generators
+0.05s call     tests/lattices/test_splag_genus_archive.sage::test_splag_ternary_forms_share_one_genus_of_class_number_two
+0.02s call     tests/lattices/test_genus.sage::test_unimodular_even_lattice_has_level_one
+0.01s call     tests/lattices/test_definite_genus_mass_archive.sage::test_archived_e8_genus_mass_is_the_reciprocal_orthogonal_group_order
+0.01s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_mass_is_the_siegel_mass
+0.01s call     tests/lattices/test_genus.sage::test_local_genus_symbol_and_excess_detect_nonisometry
+0.01s call     tests/lattices/test_splag_51ab_genus_archive.sage::test_splag_51a_and_51b_share_one_two_class_genus
+
+(46 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED ../repos/sage-extensions/tests/lattices/test_genus.sage::test_published_four_spinor_genus_is_counted_from_all_generators
+FAILED ../repos/sage-extensions/tests/lattices/test_chosen_target_primitive_embeddings.sage::test_chosen_target_embedding_filters_a_nontrivial_genus
+2 failed, 21 passed in 577.11s (0:09:37)
+[peakrss] issue317: child waited=1 shell_code=1 samples=213
+[peakrss] peak tree RSS      : 5759 MiB
+[peakrss] low-water MemAvail : 708 MiB
+[peakrss] peak single VmHWM  : 5803 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      5255 MiB peak
+[peakrss]   python                      612 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   groebner                      0 MiB peak
+[peakrss]   t=   244.4s procs=  4 rss=  5759 MiB hwm=  5802 MiB avail=  3243 MiB
+[peakrss]   t=   246.4s procs=  4 rss=  5759 MiB hwm=  5802 MiB avail=  3171 MiB
+[peakrss]   t=   248.4s procs=  4 rss=  5759 MiB hwm=  5803 MiB avail=  3106 MiB
+[peakrss]   t=   250.5s procs=  4 rss=  5759 MiB hwm=  5803 MiB avail=  2997 MiB
+[peakrss]   t=   232.4s procs=  4 rss=  5758 MiB hwm=  5802 MiB avail=  3718 MiB
+launcher exit: 1

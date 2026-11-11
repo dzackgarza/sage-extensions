@@ -1110,21 +1110,27 @@ def _genus_classes(gram):
     Thm. 14, p. 388] is sufficient for the isotropic witness but not the
     strongest available theorem used here.
     A definite
-    spinor genus is enumerated by ``p``-neighbours at a prime ``p`` not
-    dividing the determinant, with ``p`` in the improper spinor kernel so
-    that neighbours stay in the spinor genus.  The masses of all enumerated
-    classes, including explicitly inserted seeds, must add up exactly to the
-    mass of the genus; this is the completeness check after enumeration.
+    spinor genus is enumerated by Sage's own mass-stopped ``p``-neighbour
+    traversal at a prime coprime to the determinant, which seeds from the
+    genus symbol's spinor generators and stops when the class masses reach the
+    Siegel mass.  The masses of all classes found -- including explicitly
+    inserted seeds on the indefinite route -- must add up exactly to the mass
+    of the genus; this is the completeness check after enumeration.
     """
     from itertools import combinations
 
+    from sage.libs.pari.all import pari
     from sage.quadratic_forms.binary_qf import BinaryQF
     from sage.quadratic_forms.genera.genus import Genus as SageGenus
     from sage.quadratic_forms.quadratic_form import QuadraticForm
-    from sage.quadratic_forms.quadratic_form__neighbors import neighbor_iteration
-    from sage.rings.infinity import Infinity
     from sage.rings.rational_field import QQ as SageQQ
-    from sage.sets.primes import Primes
+
+    # Every class the enumeration discovers costs one PARI ``qfauto`` call, and at
+    # rank 17 the 1 GiB default stack overflows inside it (#317).  PARI's own
+    # remedy is a larger stack, which ``allocatemem`` sets; ``silent`` keeps it
+    # out of the caller's output.  This is the same arithmetic with a stack that
+    # can hold it, so it changes no count.
+    pari.allocatemem(2**31, 2**33, silent=True)
 
     genus = SageGenus(gram)
     positive, negative = genus.signature_pair()
@@ -1240,67 +1246,27 @@ def _genus_classes(gram):
     if indefinite:
         return tuple(grams((seed,)) for seed in seeds)
 
-    # A ``p``-neighbour ``M`` of ``L`` with ``p`` prime to ``2 det`` has
-    # ``[L : L cap M] = [M : L cap M] = p``, so its spinor genus is that of
-    # ``L`` moved by the spinor operator of ``p`` [CS10, Ch. 15, §9.2,
-    # Thm. 15]; at a prime whose operator lies in the improper spinor kernel
-    # the neighbours stay in their spinor genus. Start at the odd prime ``3``
-    # so the cited theorem's coprimality hypothesis with ``2 * det`` always
-    # applies, including to even lattices of odd determinant. The search
-    # terminates: Chebotarev applied to the spinor class field gives infinitely
-    # many primes in the identity spinor class, and only finitely many divide
-    # the determinant (Neukirch, *Algebraic Number Theory*, Ch. VII, §13).
-    prime = SageZZ(3)
-    while prime.divides(genus.determinant()) or (
-        spinor_primes and not spinor_classes(spinor_operators.delta(prime)).is_one()
-    ):
-        prime = Primes().next(prime)
-    assert prime > 2 and not prime.divides(genus.determinant())
-    assert not spinor_primes or spinor_classes(
-        spinor_operators.delta(prime)
-    ).is_one()
+    # The definite genus is enumerated by Sage's own mass-stopped
+    # ``p``-neighbour traversal, ``GenusSymbol_global_ring.representatives``
+    # with the Sage backend: it seeds from the genus symbol's spinor
+    # generators, walks ``p``-neighbours at a prime coprime to the determinant,
+    # and stops exactly when the class masses reach the Siegel mass, which is
+    # the completeness criterion re-asserted below on the returned classes.
+    # The exhaustive ``orbits`` traversal is unusable at these ranks: it asks
+    # PARI for ``automorphism_group()``, which does not return, while
+    # ``number_of_automorphisms()`` answers from the same ``qfauto`` call.
+    # ``-entry`` is the positive definite form whose automorphism order is the
+    # class's, since ``qfauto`` requires a positive definite matrix.
     total = form.conway_mass()
-    found_mass = SageQQ.zero()
-    classes = []
-    for seed in seeds:
-        # Do not use ``neighbor_iteration``'s mass stopping condition here:
-        # it measures only discovered neighbours and excludes traversal seeds,
-        # whereas ``found_mass`` below counts each spinor genus including its
-        # seed. Completeness is checked against the full genus mass afterward.
-        spinor_genus = neighbor_iteration(
-            [seed],
-            prime,
-            algorithm="orbits",
-            # The definite genus is finite, and the full mass equality below
-            # is the completeness criterion. An arbitrary class-count cap
-            # would reject otherwise supported genera with more than 10^6
-            # classes rather than enumerate them completely.
-            max_classes=Infinity,
-        )
-        # ``neighbor_iteration`` uses its seeds only as traversal roots; its
-        # returned class list starts empty and therefore need not contain a
-        # seed at all. Include the seed class explicitly, deduplicating it if
-        # a neighbour equivalent to the seed was discovered during traversal.
-        seed_position = next(
-            (
-                index
-                for index, found in enumerate(spinor_genus)
-                if seed.is_globally_equivalent_to(found)
-            ),
-            None,
-        )
-        if seed_position is None:
-            spinor_genus.insert(0, seed)
-        else:
-            spinor_genus.insert(0, spinor_genus.pop(seed_position))
-        found_mass += sum(
-            SageQQ.one() / found.number_of_automorphisms() for found in spinor_genus
-        )
-        classes.append(grams(spinor_genus))
+    representative_grams = tuple(genus.representatives(backend="sage"))
+    found_forms = tuple(QuadraticForm(SageZZ, -entry) for entry in representative_grams)
+    found_mass = sum(
+        SageQQ.one() / found.number_of_automorphisms() for found in found_forms
+    )
     assert found_mass == total, (
         f"the classes found in the genus of {gram} have mass {found_mass}, but the genus has mass {total}"
     )
-    return tuple(classes)
+    return (representative_grams,)
 
 
 def _local_density(form, prime, value):
