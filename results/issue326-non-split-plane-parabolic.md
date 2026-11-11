@@ -57,9 +57,12 @@ cases we considered, a practical algorithm allowed us to solve this problem".
 ## Measured on $T_{\mathrm{En}}$
 
 ```
-P1 (split):     det J 2, K block zero      76 integral lifts   (all isometries)
-P2 (non-split): det J 4, K block nonzero   13 integral lifts   (all isometries)
+P1 (split):     det J 2, K block zero      13 integral lifts   (all isometries)
+P2 (non-split): det J 4, K block nonzero   18 integral lifts   (all isometries)
 ```
+
+With the radical and the quotient reflections: $P_1$ has $20 + 120 + 13 = 153$
+generators, $P_2$ has $21 + 64 + 18 = 103$, which is the family the public call returns.
 
 ## Tests
 
