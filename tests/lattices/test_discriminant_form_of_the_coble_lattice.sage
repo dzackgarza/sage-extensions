@@ -178,6 +178,33 @@ def test_the_rank_one_half_integral_form_has_the_trivial_orthogonal_group() -> N
     assert form.orthogonal_group().cardinality() == cardinal(1)
 
 
+def test_a_half_integral_two_part_with_isotropic_dual_keeps_the_general_route() -> None:
+    r"""`diag(6,6)`'s 2-primary part has `delta(B^-1 delta) = 0`, which is not this branch.
+
+    There `q = 3/2` on both Smith generators and `B = 2b` is the identity, so the
+    `B`-dual of `delta = (1,1)` is `(1,1)` itself: it is isotropic, `ker delta`
+    is its own orthogonal complement, and `B` restricted to `ker delta` is
+    degenerate.  The odd-rank split does not apply, the owner must keep Sage's
+    general route for that part, and that route's answer has to stay a genuine
+    isometry group -- this is the regression the branch's second precondition
+    exists for.
+    """
+    form = Lattices(ZZ)([[6, 0], [0, 6]]).discriminant_quadratic_form()
+    group = form.orthogonal_group()
+    statements = tuple(group.group_generators())
+    basis = tuple(form.module_generator(label) for label in form.module_generating_set())
+    probes = basis + tuple(
+        left + right for index, left in enumerate(basis) for right in basis[index + 1 :]
+    )
+
+    assert group.cardinality() > cardinal(1)
+    assert all(
+        form.q(statement.forward()(point)) == form.q(point)
+        for statement in statements
+        for point in probes
+    )
+
+
 def test_discriminant_representation_of_the_coble_lattice_returns_on_an_isometry() -> None:
     r"""`rho_{T_Co}` returns its morphism, and a real isometry of `T_Co` lands in `O(q)`."""
     record = card("discriminant_forms", CARD_TAG)
