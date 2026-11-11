@@ -2373,7 +2373,7 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
         r"""The orientation-preserving natural transformations ``F => G``.
 
         The subset of the ``Fun([t], Lattices)`` Mor of the underlying flag
-        diagrams (``F.natural_transformations_to(G)``) cut out by the condition that the flags have one type and
+        diagrams (``_diagram_mor``) cut out by the condition that the flags have one type and
         every graded determinant of the apex component, from the source to
         the target adapted basis, is ``+1``.  A natural transformation
         carries each term into the next, so the matrix of its apex component
@@ -2391,6 +2391,12 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
 
     two_mor = Mor
 
+    def _diagram_mor(self, source, target):
+        r"""The Mor ``Fun([t], Lattices)(F, G)`` of the underlying diagrams, of which ``Mor(F, G)`` is a subobject."""
+        from sage_extensions.categories.abstract_categories.cat import Cat, _FunctorCategory
+
+        return _FunctorCategory.Mor(Cat().Mor(self.domain_category(), self.codomain_category()), source, target)
+
     @cached_method(key=lambda self, source, target: (id(source), id(target)))
     def _oriented_mor(self, source, target):
         _shape, top = self._marking_shape()
@@ -2402,11 +2408,10 @@ class OrientedIsotropicFlags(_MarkedLatticeMethods, _FiniteSequenceFunctorCatego
             apex = transformation.component(top)
             return all(sign == 1 for sign in _graded_orientation_signs(apex, source_flag, target_flag))
 
-        # The universe is the Mor that owns the natural transformations of the
-        # underlying diagrams, Fun([t], Lattices)(F, G): the transformations
-        # built on an apex component are its elements, and a Mor of this
-        # category's own packet would be a second parent that admits none of them.
-        universe = source.natural_transformations_to(target)
+        # The universe is the one Mor of the underlying diagrams that
+        # Fun([t], Lattices) admits its arrows by; the transformations built on
+        # an apex component are its elements.
+        universe = self._diagram_mor(source, target)
         if source is target:
             # Mor(F, F) has the identity of the universe, whose graded
             # determinants are all 1; no condition set of a Mor in the

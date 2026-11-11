@@ -1733,21 +1733,28 @@ class _FunctorCategory(CategoricalMor):
             )
             for obj in shape.objects()
         }
-        # The element of Fun(J, D)(F, G) on this construction datum, as every
-        # Mor of the functor category constructs its arrows from one.
-        return first.natural_transformations_to(second)(
+        # The element of the one Mor of [J, D](F, G) that the core groupoid
+        # and _category_mor admit arrows by; it constructs its arrows from
+        # this datum.
+        return self._diagram_mor(source, target)(
             NaturalTransformation(first, second, lambda obj: components[obj.position()])
         )
+
+    def _diagram_mor(self, source, target):
+        r"""The Mor of ``[J, D]`` holding the natural transformations of the diagrams ``F => G`` (protected contract above).
+
+        A subcategory of ``[J, D]`` whose Mor is a subobject of this one
+        (``CON-17``) states the same Mor of its underlying diagrams.
+        """
+        return _FunctorCategory.Mor(self, source, target)
 
     def _core_isomorphism_from_apex(self, core_mor, apex):
         r"""The isomorphism of ``core_mor`` whose apex component is ``apex`` (protected contract above)."""
         source, target = core_mor.domain(), core_mor.codomain()
-        forward = self.Mor(source, target)(
-            self._natural_transformation_from_apex(source, target, apex)
-        )
-        inverse = self.Mor(target, source)(
-            self._natural_transformation_from_apex(target, source, ~apex)
-        )
+        # Both are already elements of the diagram Mor; core_mor admits them
+        # through _category_mor, the same Mor or its subobject.
+        forward = self._natural_transformation_from_apex(source, target, apex)
+        inverse = self._natural_transformation_from_apex(target, source, ~apex)
         return core_mor(forward, inverse)
 
     def _core_isomorphism_witness(self, core_mor):
