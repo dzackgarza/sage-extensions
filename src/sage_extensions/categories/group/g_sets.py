@@ -1675,9 +1675,6 @@ class _LeftCosetPointSet(Parent):
         """
         from sage_extensions.categories.group.predicate_subgroups import PreimageSubgroups
 
-        positions = _engine_left_coset_positions(self._group, self._subgroup)
-        if positions is not None:
-            return positions.position_of
         if self._subgroup in PreimageSubgroups(self._group) and self._subgroup.supergroup() is self._group:
             morphism = self._subgroup.preimage_morphism()
             image_positions = _engine_left_coset_positions(
@@ -1685,6 +1682,9 @@ class _LeftCosetPointSet(Parent):
             )
             if image_positions is not None:
                 return lambda element: image_positions.position_of(morphism(element))
+        positions = _engine_left_coset_positions(self._group, self._subgroup)
+        if positions is not None:
+            return positions.position_of
         return None
 
     def _element_constructor_(self, representative):

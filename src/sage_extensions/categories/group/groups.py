@@ -723,8 +723,13 @@ def _engine_left_coset_positions(group, subgroup):
     left coset (GAP Reference Manual 39.8-1, ``PositionCanonical`` on a
     ``RightTransversal``). Without a finite GAP encoding of ``G`` there is
     no canonical form, and the coset is decided by membership in ``H``.
+    Finiteness is read from the placed category before any engine is
+    requested: the engine of an infinite group such as an indefinite
+    ``O(L)`` is not a finite group.
     """
-    if group in OwnedFiniteGroups() and _encodes_elements_in_gap(_engine_group(group)):
+    if not group.category().is_subcategory(OwnedFiniteGroups()):
+        return None
+    if _encodes_elements_in_gap(_engine_group(group)):
         return _TransversalCosets(group, subgroup)
     return None
 
