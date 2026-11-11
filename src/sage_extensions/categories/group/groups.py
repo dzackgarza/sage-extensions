@@ -3824,8 +3824,13 @@ class GroupMorphism:
     def image_section(self):
         r"""A selected set section of G ->> im(f), when the image is finite.
 
-        Cayley traversal supplies private preimage witnesses; the returned
-        section is a Sets morphism, not generally a group morphism.
+        The returned section is a Sets morphism, not generally a group
+        morphism. When the image is GAP-encoded and the source has a selected
+        finite generating family, each requested value is lifted on its own:
+        GAP factors it as a word in the generator images, and the word is
+        evaluated in the source generators (``_image_word_lift``). Only the
+        values a consumer asks for are lifted. Otherwise the Cayley traversal
+        of the image supplies a witness above every element.
         """
         from sage_extensions.categories.sets.set_categories import Sets
 
@@ -3836,10 +3841,55 @@ class GroupMorphism:
                 f"a finite-image section of {self} needs its image {image} "
                 "to have a selected finite group realization"
             )
-        section = self.domain().finite_image_section(epic)
-        return Sets().Mor(image, self.domain())(
+        source = self.domain()
+        if (
+            _encodes_elements_in_gap(_engine_group(image))
+            and source.has_selected_group_resolution()
+            and source.has_selected_finite_group_generating_set()
+        ):
+            return Sets().Mor(image, source)(lambda value: self._image_word_lift(image(value)))
+        section = source.finite_image_section(epic)
+        return Sets().Mor(image, source)(
             lambda value: section(section.domain()(image(value)))
         )
+
+    @cached_method
+    def _image_word_section(self):
+        r"""The selected source generators and GAP's word section of their images in ``f(G)``."""
+        from sage_extensions.categories.orthogonal_quotients import _GapWordSection
+
+        epic, inclusion = self.image_factorization()
+        image = inclusion.domain()
+        generators = tuple(self.domain().group_generators())
+        return generators, _GapWordSection(
+            tuple(_element_to_engine(image, epic(generator)) for generator in generators)
+        )
+
+    def _image_word_lift(self, value):
+        r"""One source element above ``value`` of the finite image, by a word in the source generators.
+
+        GAP Reference Manual 39.5-1: ``PreImagesRepresentative`` of the
+        free-group epimorphism onto the generated image returns a word in the
+        supplied generator positions (``_GapWordSection``). The word evaluates
+        in the selected source generators, read in the owned order of the
+        image's law, and the lift is checked once against ``f``, as in
+        ``LatticeIsometryMor.discriminant_lift``.
+        """
+        epic, inclusion = self.image_factorization()
+        image = inclusion.domain()
+        generators, words = self._image_word_section()
+        letters = words.letters_of(_element_to_engine(image, value))
+        if _law_reversed(image):
+            letters = letters[::-1]
+        lift = self.domain().one()
+        for index in letters:
+            lift = lift * (generators[index - 1] if index > 0 else ~generators[-index - 1])
+        if epic(lift) != value:
+            raise ArithmeticError(
+                f"the word lift of {value} along {self} maps to {epic(lift)}: GAP's word section "
+                "is inconsistent with the morphism, so the lift cannot be trusted"
+            )
+        return lift
 
     def _image_model(self):
         r"""The GAP model of ``f(G)`` inside the model of a finite codomain."""
