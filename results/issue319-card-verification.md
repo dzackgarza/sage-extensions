@@ -17,7 +17,7 @@ every Table 4 row.
 | `tests/cards/refresh_lattice_database_enriques.py` | regenerates that digest from one database commit; it refuses a ref that is not a full 40-hex SHA |
 | `tests/cards/README.md` | which card field backs which digest field, and the paper version the cited pages belong to |
 | `tests/enriques_polarization_rows_by_card.py` | the acceptance module: builds each lattice and group as its card states, calls the public method, compares, prints a defect block on a difference, exit 1 on any difference or undecided row |
-| `.github/workflows/enriques-polarization-rows.yml` | the one CI job the long rows live in: `workflow_dispatch` (cards, degrees, per-call cap, budget) and nightly, 350-minute ceiling |
+| `.github/workflows/enriques-polarization-rows.yml` | the one CI job the long rows live in: `workflow_dispatch` (cards, degrees, per-call cap, budget) and nightly, 350-minute ceiling.  Stored at `results/issue319-enriques-polarization-rows.workflow.yml`: the GitHub connection of this session has no `workflows` permission, so a push creating a file under `.github/workflows/` is rejected for the whole ref (measured; see below) |
 
 ## The acceptance, item by item
 
@@ -92,8 +92,14 @@ here rather than left implicit.
   named above.
 * `#Gamma-bar_h` is compared nowhere yet: it needs the same orbit call the
   `gamma-h-N` rows need, so it becomes decidable when they do.
-* The 350-minute CI job has not run — no run of the repository's CI has ever run
-  (the shared workflow drops the Sage container when the caller passes a setup
-  recipe).  The job is written so that the rows report progressively: `--cap` bounds
-  one call, `--budget` bounds one run, and a run that exhausts its budget names the
-  rows it did not reach instead of failing without a finding.
+* The workflow file is not installed under `.github/workflows/`.  The push that
+  carried it there was rejected — `refusing to allow a GitHub App to create or update
+  workflow .github/workflows/enriques-polarization-rows.yml without workflows
+  permission` — so it sits at `results/issue319-enriques-polarization-rows.workflow.yml`
+  with the one-command install in its header, and `just enriques-card-rows` runs the
+  same module from any checkout with the Sage container.
+* The job has not run: no run of this repository's CI has ever run (the shared
+  workflow drops the Sage container when the caller passes a setup recipe).  The job
+  is written so that the rows report progressively: `--cap` bounds one call,
+  `--budget` bounds one run, and a run that exhausts its budget names the rows it did
+  not reach instead of failing without a finding.

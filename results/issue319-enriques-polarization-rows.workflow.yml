@@ -1,3 +1,9 @@
+# This file is the workflow of #319, kept here because the GitHub connection of the
+# session that wrote it holds no `workflows` permission: a push that creates a file
+# under .github/workflows/ is rejected by GitHub for the whole ref.  Install it with
+#   git mv results/issue319-enriques-polarization-rows.workflow.yml \
+#          .github/workflows/enriques-polarization-rows.yml
+# from a connection that may write workflow files; its content is the job as written.
 name: Enriques polarization rows (#319)
 
 # The 87 numerical polarizations of Dutour Sikirić–Hulek and card 0128's
