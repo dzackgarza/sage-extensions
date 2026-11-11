@@ -290,3 +290,37 @@ def test_every_cusp_chamber_has_the_wall_count_of_its_card_row() -> None:
 
     assert cardinal(sum(1 for _ in counted)) == cardinal(sum(1 for _ in rows))
     assert all(measured == expected for measured, expected in counted)
+
+
+def test_the_first_cusp_writes_down_no_candidate_outside_its_layer() -> None:
+    r"""A bounded prefix of the first cusp's walk returns roots and nothing else.
+
+    Every candidate the layer enumeration writes down is a vector of the lattice
+    whose square is the layer's own, because conditions (58) of E. B. Vinberg,
+    *On the groups of unit elements of certain quadratic forms*, Math. USSR Sb. 16
+    (1972), §4.1, p. 30, are applied while the layer is written down and not to a
+    finished list.  Before that, the enumeration used the first term of a layer
+    as if it were the layer's offset — `a` is a point of the parallelepiped of
+    `VinAl`'s decomposition, not a multiple of the controlling vector — so it
+    returned vectors of the wrong square at `Sterk_1` and the walk died with
+    `ZeroDivisionError` on a candidate of square zero.
+
+    The search is stopped by ``max_decompositions`` here because this test is the
+    regression for that error and not the acceptance of the chamber: the wall
+    count is asserted, unbounded, by
+    ``test_every_cusp_chamber_has_the_wall_count_of_its_card_row``, which does
+    not return yet.  The controlling vector is Sterk's own, `x = e' + f'`
+    (§4.3.5, p. 19), whose cell at the cusp is the nine walls his diagram puts
+    through it.
+    """
+    lattice = NamedLattices.TEn
+    labels = {label: lattice.module_generator(label) for label in lattice.module_generating_set()}
+    x = labels["ep"] + labels["fp"]
+    image = _cusp_images()["Sterk_1"]
+    reduction = HyperbolicLattices(ZZ)(image.reduction())
+    chamber = image.cusp_chamber(x, max_decompositions=8)
+    walls = tuple(chamber.wall_roots())
+
+    assert all(root.q() in (ZZ(-2), ZZ(-4)) for root in walls)
+    assert all(image.admits_root(root) for root in walls)
+    assert all(reduction.b(root, root) == root.q() for root in walls)

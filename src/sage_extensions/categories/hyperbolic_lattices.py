@@ -34,6 +34,8 @@ and roots return negated, preserving every half-space condition
 \(b(x,r)\leq 0\).
 """
 
+from fractions import Fraction
+from math import isqrt
 from pathlib import Path
 
 from sage.matrix.constructor import matrix as engine_matrix
@@ -397,6 +399,60 @@ class NumberFieldVinbergLattice(SageObject):
         return f"Number-field Vinberg lattice ({self.lattice()}, {self.real_embedding()})"
 
 
+#: Sentinel for "the cell at the controlling vector has not been asked for yet".
+_NO_CELL = object()
+
+
+def _square_root_bound(value):
+    r"""Return a rational bound of \(\sqrt{\text{value}}\), or ``None`` below zero.
+
+    ``value`` is a non-negative :class:`fractions.Fraction`; since
+    \(\sqrt{p/q}=\sqrt{pq}/q\), an integer square root of the product gives the
+    bound exactly at the denominator's scale, and the caller's floor of it is
+    the floor of the real root.
+    """
+    if value < 0:
+        return None
+    return Fraction(isqrt(value.numerator * value.denominator), value.denominator)
+
+
+def _ldl_factorisation(gram):
+    r"""Return \((D,L)\) with \(L\) unit lower triangular and \(L^tDL=\) ``gram``.
+
+    Exact rational \(LDL^t\) of a symmetric matrix, or ``None`` when a pivot is not
+    positive.  The Gram of the normals of a cell is positive definite, so a
+    ``None`` here means the normals are not the normals of a cell, and the caller
+    enumerates the whole layer instead of trusting a factor that does not exist.
+    """
+    size = int(gram.nrows())
+    rational = gram.change_ring(SageQQ)
+    diagonal = [Fraction(0)] * size
+    triangular = [[Fraction(0)] * size for _ in range(size)]
+    for index in range(size):
+        pivot = Fraction(int(rational[index, index])) - sum(
+            (triangular[index][k] ** 2 * diagonal[k] for k in range(index)), Fraction(0)
+        )
+        if pivot <= 0:
+            return None
+        diagonal[index] = pivot
+        triangular[index][index] = Fraction(1)
+        for row in range(index + 1, size):
+            numerator = Fraction(int(rational[row, index])) - sum(
+                (triangular[row][k] * triangular[index][k] * diagonal[k] for k in range(index)),
+                Fraction(0),
+            )
+            triangular[row][index] = numerator / pivot
+    return diagonal, triangular
+
+
+def _exact_square_root(value):
+    r"""Return the rational root of ``value`` when it is a square, and ``None`` otherwise."""
+    if value < 0:
+        return None
+    root = _square_root_bound(value)
+    return root if root * root == value else None
+
+
 def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions, admits_root=None):
     r"""Run Vinberg's algorithm on a Gram matrix of signature \((n,1)\).
 
@@ -445,6 +501,7 @@ def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions
 
             def __init__(self, *arguments, **keywords) -> None:
                 self._admits_root = admits_root
+                self._cell = _NO_CELL
                 super().__init__(*arguments, **keywords)
 
             def _in_the_subgroup(self, vector) -> bool:
@@ -470,6 +527,169 @@ def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions
                 if not all(vector.inner_product(root) <= 0 for root in self.roots):
                     return False
                 return self._in_the_subgroup(vector)
+
+            def cell(self):
+                r"""Return the cell at the controlling vector, or ``None`` when it is not a basis.
+
+                Vinberg 1972, §3.2, rule 1 and (39) (p. 27): before the sequence
+                (38) starts, the normals are the roots whose mirrors pass through
+                the point \(p_0\), and they cut the cell \(P_0\) at it.  Those are
+                the roots orthogonal to ``v0``, which is what ``FundCone``
+                returns and what ``roots`` holds when the candidate enumeration
+                begins.
+
+                For the layer enumeration of §4.1 (p. 30) the normals of \(P_0\)
+                are useful only when they generate the lattice \(v_0^\perp\)
+                integrally, so the cell is returned with its Gram matrix and a
+                factor \(R\) with \(R^tR=G\), and ``None`` when the count of
+                normals is not the rank, when the Gram has a positive entry off
+                the diagonal (a cell of an acute-angled polyhedron has
+                \(g_{ij}\le0\)), or when the normals span a proper sublattice.
+                The Gram of such a cell is a Stieltjes matrix, so its inverse has
+                no negative entry, and that is what makes the cone of (58) the
+                orthant of the coefficients: see :meth:`Roots_decomposed_into`.
+                """
+                if self._cell is not _NO_CELL:
+                    return self._cell
+                roots = getattr(self, "roots", None)
+                if not roots:
+                    # ``FundCone`` is cutting the cell itself and asks the layer
+                    # enumeration on the way; there is nothing to cache yet.
+                    return None
+                self._cell = None
+                normals = tuple(root for root in roots if self.v0.inner_product(root) == 0)
+                rank = int(self.n) - 1
+                if len(normals) == rank:
+                    _g = engine_matrix([[int(u.inner_product(v)) for v in normals] for u in normals])
+                if len(normals) != rank:
+                    return None
+                gram = engine_matrix([[int(u.inner_product(v)) for v in normals] for u in normals])
+                if any(gram[i, j] > 0 for i in range(rank) for j in range(rank) if i != j):
+                    return None
+                if int(abs(gram.det())) != int(abs(self.M1.det())):
+                    return None
+                factor = _ldl_factorisation(gram)
+                if factor is None:
+                    return None
+                self._cell = (normals, gram.change_ring(SageQQ), factor)
+                return self._cell
+
+            def Roots_decomposed_into(self, a, k):
+                r"""Return the candidates of one layer that satisfy conditions (58).
+
+                Vinberg, *On the groups of unit elements of certain quadratic
+                forms*, Math. USSR Sb. 16 (1972), §4.1, p. 30: "Construction of
+                the sequence (38) thus reduces to writing down those solutions of
+                the Diophantine equation (57) that satisfy conditions (58) in
+                increasing order of the quantity (59), and in checking conditions
+                (49) for each solution as it is written down."  Conditions (58)
+                are the inequalities \(b_0\le0,\dots,b_n\le0\) against the normals
+                already accepted — the cone conditions — and (49) is the height
+                comparison, which :meth:`IsNewRoot` makes of every solution.
+
+                This method writes down only the solutions of (58) against the
+                normals of the cell at the controlling vector, and never a
+                solution outside that cone.  With \(v_1\) in the layer's
+                \(v_0^\perp\) and \(w_1,\dots,w_{n-1}\) those normals,
+                \(v_1=\sum c_iw_i\) and \(b(v_1,w_i)=\sum_jg_{ij}c_j\), so
+                (58) says \(Gc\le0\), and for a Stieltjes \(G\) that is exactly
+                \(c\le0\): \(G^{-1}\) has no negative entry, so \(c=G^{-1}(Gc)\)
+                is non-positive whenever \(Gc\) is, and conversely.  Writing
+                \(d=-c\ge0\), the layer's norm equation (57),
+                \(q(a+v_1)=k\), becomes \(d^tGd=k-q(a)\) with \(d\) in the
+                orthant, which is enumerated by completion of squares along the
+                factor \(R\): the down-set of every partial choice bounds the next
+                coefficient, and every coefficient is non-negative, so nothing
+                outside the cone is written down and nothing inside it is
+                skipped.
+
+                Layers whose cone is not available — the initial cone's own
+                enumeration, and a controlling vector whose cell is not a basis —
+                keep ``VinAl``'s enumeration of the whole layer.
+                """
+                cell = self.cell()
+                if cell is None:
+                    return super().Roots_decomposed_into(a, k)
+                normals, gram, factor = cell
+                squares, triangular = factor
+                beta = [Fraction(int(a.inner_product(normal))) for normal in normals]
+                center = [
+                    Fraction(int(value.numerator()), int(value.denominator()))
+                    for value in gram.solve_right(engine_vector(SageQQ, beta))
+                ]
+                offsets = [
+                    sum((triangular[j][i] * center[j] for j in range(len(normals))), Fraction(0))
+                    for i in range(len(normals))
+                ]
+                remaining = Fraction(int(k) - int(a.inner_product(a))) + sum(
+                    (beta[i] * center[i] for i in range(len(normals))), Fraction(0)
+                )
+                if remaining < 0:
+                    return []
+                candidates = self._cone_combinations(normals, factor, offsets, remaining)
+                found = [a + vector for vector in candidates]
+                for candidate in found:
+                    if int(candidate.inner_product(candidate)) != int(k):
+                        raise ArithmeticError(
+                            f"the cone enumeration of the layer at {a} returned {candidate}, whose square is "
+                            f"{candidate.inner_product(candidate)}, not the layer's {k}"
+                        )
+                return found
+
+            @staticmethod
+            def _cone_combinations(normals, factor, offsets, square):
+                r"""Return \(-d_1w_1-\dots-d_nw_n\) for \(d\ge0\) integral with \(d^tGd=\) ``square``.
+
+                ``factor`` is the pair \((D,L)\) of :func:`_ldl_factorisation`, so
+                \(d^tGd=\sum_iD_i(L^td)_i^2\) and the \(i\)-th entry
+                \((L^td)_i=d_i+\sum_{j>i}L_{ji}d_j\) depends on \(d_i,\dots,d_n\)
+                only.  Descending from \(d_n\), the value
+                \(s-\sum_{j>i}D_j(L^td)_j^2\) bounds \(d_i\) from both sides, and the
+                last coefficient is pinned to an exact square.  Every coefficient is
+                non-negative: that is conditions (58).
+                """
+                size = len(normals)
+                squares, triangular = factor
+                coefficients = [0] * size
+                found = []
+
+                def descend(level, remaining):
+                    shift = sum(
+                        (triangular[j][level] * coefficients[j] for j in range(level + 1, size)),
+                        Fraction(0),
+                    ) - offsets[level]
+                    if level == 0:
+                        root = _exact_square_root(remaining / squares[0])
+                        if root is None:
+                            return
+                        for sign in ((1,) if root == 0 else (1, -1)):
+                            value = sign * root - shift
+                            if value.denominator != 1 or value < 0:
+                                continue
+                            coefficients[0] = int(value)
+                            combination = [0] * int(normals[0].degree())
+                            for position, coefficient in enumerate(coefficients):
+                                if coefficient:
+                                    combination = [
+                                        entry - coefficient * int(other)
+                                        for entry, other in zip(combination, normals[position])
+                                    ]
+                            found.append(normals[0].parent()(combination))
+                        coefficients[0] = 0
+                        return
+                    bound = _square_root_bound(remaining / squares[level])
+                    if bound is None:
+                        return
+                    low = int((-bound - shift).__floor__())
+                    high = int((bound - shift).__floor__())
+                    for value in range(max(0, low), high + 1):
+                        coefficients[level] = value
+                        entry = value + shift
+                        descend(level - 1, remaining - squares[level] * entry * entry)
+                    coefficients[level] = 0
+
+                descend(size - 1, Fraction(square))
+                return found
 
         algorithm = _FilteredVinAl(gram, controlling_vector, False, None)
     complete = algorithm.FindRoots(max_roots=max_roots, max_decompositions=max_decompositions)
