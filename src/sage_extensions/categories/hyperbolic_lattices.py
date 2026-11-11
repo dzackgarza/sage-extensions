@@ -152,10 +152,29 @@ def _rational_pair(value):
 
 
 def _framing_coordinates(element):
-    r"""Return ordered framing coefficients at a private engine boundary."""
+    r"""Return the element's ordered framing coefficients, lowered to the engine ring.
+
+    The coefficients are the element's coordinates in the framing of its own lattice,
+    taken in the order of ``module_generating_set``, and they come back in that lattice's
+    *private computation-engine* ring (:func:`_engine_element`), because every caller
+    immediately hands them to an engine computation: the root enumeration's controlling
+    vector, the wall normals multiplied by the engine Gram matrix, a polyhedral cone.
+
+    An owned-ring coefficient is the ring mismatch sage-extensions#299 records: the engine
+    vector constructor cannot find a common ring for owned coefficients, and the
+    polyhedral owners do not accept them either, so the chamber's vertex computation
+    raised ``TypeError: unable to find a common ring for all elements`` here while
+    Vinberg's root search, which passes the same coefficients to a port that reads them as
+    integers, returned.  The lowering belongs to this boundary and not to each caller:
+    it is the one place where an owned framing coordinate becomes engine data.
+    """
     parent = element.parent()
+    ring = parent.base_ring()
     coordinates = element.to_vector()
-    return tuple(coordinates(label) for label in parent.module_generating_set())
+    return tuple(
+        _engine_element(ring, coordinates(label))
+        for label in parent.module_generating_set()
+    )
 
 
 def _number_field_coefficients(field_engine, value):
@@ -692,9 +711,17 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             The chamber is \(\{x : b(x,r)\leq 0\text{ for every wall } r\}\),
             which in coordinates is the cone dual to the one spanned by the
             rows \(rG\).  Its extreme rays are the vertices of the polyhedron,
-            and the square of a ray decides its kind: negative inside the light
-            cone, so an ordinary point of hyperbolic space, and zero on the
-            cone, so an ideal point of the boundary.
+            and the square of a ray decides its kind: nonzero inside the light
+            cone — negative or positive according as the lattice's form presents
+            the component, \((n,1)\) or \((1,n)\) — and zero on the cone, so an
+            ideal point of the boundary.  That is why `is_cocompact` reads only
+            whether a square is zero.
+
+            One ring carries the computation: the lattice's private engine ring
+            (:func:`_engine_element`).  The Gram, the wall normals and the
+            polyhedral cone are engine data, the framing coordinates arrive
+            lowered (:func:`_framing_coordinates`), and each vertex ray is raised
+            back into the owned ring only for the final contraction.
             """
             from sage.geometry.cone import Cone
 
@@ -896,6 +923,11 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                 f"{timelike} is not timelike in {self}: a vector is timelike exactly when its orthogonal complement is definite, and {complement} is not definite"
             )
             inclusion = complement.inclusion()
+            # The framing coordinates arrive in the engine ring, so the divisibility test and
+            # the reconstruction are engine arithmetic, and the candidate is read back as
+            # integers: ``coordinate // square`` is a quotient of engine integers by the
+            # engine image of ``square``, which is what makes the reconstruction integral.
+            engine_square = _engine_element(integers, square)
 
             isotropic = []
             for height_value in range(-int(height), int(height) + 1):
@@ -909,9 +941,11 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                 for perpendicular in shell:
                     numerator = inclusion(perpendicular) + pairing * timelike
                     coordinates = _framing_coordinates(numerator)
-                    if not all(square.divides(coordinate) for coordinate in coordinates):
+                    if not all(engine_square.divides(coordinate) for coordinate in coordinates):
                         continue
-                    candidate = self(tuple(coordinate // square for coordinate in coordinates))
+                    candidate = self(
+                        tuple(int(coordinate // engine_square) for coordinate in coordinates)
+                    )
                     if candidate.q() != integers.zero():
                         raise ArithmeticError(
                             f"the isotropic vectors of {self} at height {pairing} from "
