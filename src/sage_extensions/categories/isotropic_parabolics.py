@@ -1789,6 +1789,54 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 block_gram[4:rank, 4:rank],
             )
 
+        def plane_block_parameter_period(self, action):
+            r"""Return the period of the free parameter of the plane block equations.
+
+            With the block basis of :meth:`plane_block_basis` and the notation of
+            :meth:`plane_block_lift`, the solutions of the `P_2` equation
+
+            \[
+            (P_1 J P_2^t)^t + P_1 J P_2^t = \mathrm{remainder}
+            \]
+
+            are `P_2 = (\mathrm{remainder}/2 + sK)^t (P_1J)^{-t}` over the skew
+            matrices `sK`, `K = ((0,-1),(1,0))`, so their integrality is a condition
+            on one rational parameter `s`.  It is periodic: adding the least common
+            multiple of the denominators of `K (P_1J)^{-t}` to `s` adds an integral
+            matrix to `P_2`, and nothing smaller does.  That multiple is the period
+            returned here, and searching `s` over it is a complete residue system --
+            the exact criterion, where #336 found a range.
+
+            The period divides `|\det J|`: `(P_1J)^{-t} = J^{-t} Q_1` with
+            `J^{-t} = \mathrm{adj}(J)^t/\det J` and `Q_1` the integral plane action,
+            so the denominators of `K (P_1J)^{-t}` divide `\det J`.  The range
+            `\pm(2|\det J| + 2)` that :meth:`plane_block_lift` searched before was
+            therefore already a complete residue system, and a lift that exists
+            cannot have been reported as `None` for an integral `action`.  Computing
+            the period states that criterion instead of relying on the inequality.
+            """
+            from sage.rings.rational_field import QQ as SageQQ
+
+            J = self.plane_block_gram()[3].change_ring(SageQQ)
+            if int(J.determinant()) == 0:
+                raise ValueError(
+                    f"the complement of P^perp found for {self} does not pair "
+                    f"nondegenerately with the plane"
+                )
+            # P_1 = J Q_1^{-t} J^{-1} makes P_1 J = J Q_1^{-t}, hence
+            # (P_1 J)^{-t} = J^{-t} Q_1: the linear part of P_2 in the parameter is
+            # K J^{-t} Q_1, whose denominators divide det J.
+            linear = (
+                matrix(SageQQ, [[0, -1], [1, 0]])
+                * J.inverse().transpose()
+                * action.change_ring(SageQQ)
+            )
+            period = SageZZ.one()
+            for entry in linear.list():
+                denominator = SageZZ(entry.denominator())
+                period = period * denominator // period.gcd(denominator)
+            return period
+
         def plane_block_lift(self, action):
             r"""Return the integral isometry of `L` carrying `P` by ``action``, or ``None``.
 
@@ -1818,13 +1866,15 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             uniquely; the first is the linear system their proof calls
             (Equa_P2) for `P_2`, whose kernel has dimension `k(k-1)/2` -- one for
             a plane -- so its integral solutions, when there are any, form a
-            coset of that one-parameter family.  ``None`` is returned when the
-            solution is not integral for any parameter in the searched range:
-            that is the paper's own caveat, that an extension is rational for
-            every isometry of \(P^\perp\) but integral only on a finite-index
-            subgroup, "we could not find a universal construction of such a
-            lattice.  However, in all the cases we considered, a practical
-            algorithm allowed us to solve this problem".
+            coset of that one-parameter family, and the parameter is searched over a
+            complete residue system of its period
+            (:meth:`plane_block_parameter_period`), so ``None`` means that *no*
+            integral solution exists and not that none was found in some range.  What
+            remains is the paper's own caveat, that an extension is rational for every
+            isometry of \(P^\perp\) but integral only on a finite-index subgroup: "we
+            could not find a universal construction of such a lattice.  However, in all
+            the cases we considered, a practical algorithm allowed us to solve this
+            problem".
             """
             from sage.rings.rational_field import QQ as SageQQ
 
@@ -1850,10 +1900,12 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 - third * A * third.transpose()
                 - (third * K.transpose() * first.transpose() + first * K * third.transpose())
             )
-            bound = 2 * abs(int(J.determinant() * A.determinant() / A.determinant())) + 2
             inverting = (first * J).transpose().inverse()
             ring = lattice.base_ring()
-            for parameter in range(-bound, bound + 1):
+            # A complete residue system of the free parameter: its period is the lcm
+            # of the denominators of the linear part, and the integral solutions of
+            # the P_2 equation are one coset of it (plane_block_parameter_period).
+            for parameter in range(self.plane_block_parameter_period(action)):
                 skew = matrix(rational, [[0, parameter], [-parameter, 0]])
                 second = (remainder / 2 + skew).transpose() * inverting
                 block = matrix(rational, rank, rank, 0)
