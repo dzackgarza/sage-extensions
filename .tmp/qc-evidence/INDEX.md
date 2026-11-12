@@ -577,3 +577,22 @@ No. 1, Proposition 1, printed p. 22).
 | --- | --- | --- |
 | `issue355-criterion-test.log` | the tree of this push | the criterion test of `tests/lattices/test_the_rank_n_minus_one_parabolic_count_on_the_we_chamber.sage`: **1 passed in 11.54 s** (the reproductions 36 and 44; the ideal-vertex count nine, read from the primitive rays; each ideal vertex's orthogonal walls have form rank \\(n - 1\\), the subdiagram parabolic or a parabolic union) |
 | `issue355-criterion-lint.log` | the tree of this push | `test_lint` on the test module: **1 file, 0 findings** |
+
+## #298 and #370 — the lattice isometry matrix, and the printed cusps carried into `T_En`
+
+`results/issue298-the-lattice-isometry-matrix.md` and `results/issue370-the-coble-root-orbits.md`
+state the calls and the counts; these are the runs behind them, at the trees of the two pushes this
+batch made (`28422f9` + `f7eaa5d` for #298, `73d02b7` for #370).
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue298-isometry-matrix-tests.log` | `f7eaa5d` (#298) | `tests/lattices/test_the_isometry_matrix_between_isometric_lattices.sage`: **3 passed in 28.42 s**, the rank-eleven indefinite pair 26.64 s over the 20 s call ceiling; no lint findings |
+| `issue298-isometry-matrix-probe.log` | the tree of the #298 push | the decision, the witness and the Gram equation of both test pairs and of a non-isometric control, pair by pair |
+| `issue370-tests-at-the-fixed-head.log` | `73d02b7` (#370) | both files: **8 passed in 906.94 s** — the five-cusp card comparison 213.60 s, the `T_Co` cusp 3 run 359.16 s, the `T_En` cusps 4 and 5 orbits 243.86 s, the `T_Co` cusp 5 orbits 61.73 s, the #298 rank-eleven call 23.91 s; no lint findings |
+| `issue370-cusp-transport-probe.log` | the tree of this push | the model `U + E8(-2)` against `K_J` at cusp 5 (pairings preserved, `is_isometric_to` `True`, transport determinant `2` for cusp 4 and `1` for cusp 5 by the matrix) and the lifted classes at both cusps |
+| `issue370-cusp-lines-probe.log` | the tree of this push | the library's cusp vector against card `029J`'s row at all five cusps, and the eleven printed roots of 4.3.8 paired with each line: `[-6, 14, -8, 14, 6, 8, 12, 0, -6, -6, -12]` against the card's, all zeros against the library's |
+| `issue370-t-co-cusp-orbits-probe.log` | the tree of this push | `T_Co`'s cusps 4 and 5: `K_I`, the classes in `T_Co`, the root classes, the line stabilizer's generator count and `root_class_orbits`' orbit count |
+| `issue370-ten-cusps-orbits-probe.log` | the tree of this push | `T_En`'s cusps 4 and 5: eleven and fourteen distinct classes of `K_J`, two and four of them roots, and two and four orbits of one class each |
+| `issue370-chambers-at-the-library-cusps-probe.log` | the tree of this push | the fundamental chamber of `K_I` at `T_Co`'s cusps 3, 4 and 5 read at the library's cusp vectors: nine walls each, eight of square `-4` and one of `-2` |
+
+The probe scripts sit beside their logs under the same names with `.py`.

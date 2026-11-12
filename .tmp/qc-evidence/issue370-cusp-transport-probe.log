@@ -1,0 +1,33 @@
+G1: cusp 5
+  model Gram == image Gram: True
+  det model 0 det images 0
+  is_isometric_to(model5, K_J): True
+==================== cusp 5
+  eta pairings of the lifted vectors [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  vectors lying in T_Co 11 squares [-4, -4, -4, -4, -4, -4, -4, -2, -2, -2, -4]
+  of those, (-2) 3
+G2: cusp 4
+[    9.25s]   sublattice_from in 0.13s rank 10 det -1024 signature (1, 9)
+  is_empty: False in 181.6 s
+[  193.41s]   an_element in 2.19s
+  transport det 2
+  printed Gram == transported Gram: True
+==================== cusp 4
+  eta pairings of the lifted vectors [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  vectors lying in T_Co 9 squares [-4, -4, -4, -4, -4, -4, -2, -4, -4]
+  of those, (-2) 1
+[  193.53s] done
+[peakrss] p298g: child waited=0 shell_code=0 samples=100
+[peakrss] peak tree RSS      : 745 MiB
+[peakrss] low-water MemAvail : 7640 MiB
+[peakrss] peak single VmHWM  : 745 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      734 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   196.2s procs=  3 rss=   745 MiB hwm=   745 MiB avail=  9224 MiB
+[peakrss]   t=   194.2s procs=  3 rss=   743 MiB hwm=   743 MiB avail=  9224 MiB
+[peakrss]   t=   192.2s procs=  3 rss=   699 MiB hwm=   699 MiB avail=  9250 MiB
+[peakrss]   t=   190.2s procs=  3 rss=   696 MiB hwm=   696 MiB avail=  9252 MiB
+[peakrss]   t=   188.2s procs=  3 rss=   694 MiB hwm=   694 MiB avail=  9254 MiB
+launcher exit: 0
