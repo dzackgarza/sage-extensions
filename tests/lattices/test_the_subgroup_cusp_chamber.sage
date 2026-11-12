@@ -90,9 +90,9 @@ def test_the_subgroup_cusp_chamber_at_the_first_cusp_has_the_card_wall_count() -
         lattice([int(root.to_vector()(label)) for label in labels]) for root in roots
     )
     K = HyperbolicLattices(ZZ)(lattice)
-    generators = tuple(K.reflection(cls) for cls in transported)
+    group_generators = tuple(K.reflection(cls) for cls in transported)
     cusp = lattice.module_generator("ep")
-    chamber = K.subgroup_cusp_chamber(cusp, generators=generators)
+    chamber = K.subgroup_cusp_chamber(cusp, group_generators=group_generators)
     walls = tuple(chamber.wall_roots())
     row = card("cusp_chambers", "029J")["rows"]["gamma-en-2"][0]
 

@@ -1228,11 +1228,11 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                 admits_root=admits_root,
             )
 
-        def subgroup_cusp_chamber(self, cusp, *, generators, max_roots=None, max_decompositions=None):
+        def subgroup_cusp_chamber(self, cusp, *, group_generators, max_roots=None, max_decompositions=None):
             r"""Return the chamber of the reflection part of ``Γ′`` anchored at the cusp ``cusp`` (#297).
 
             ``cusp`` is a primitive isotropic vector of this hyperbolic lattice,
-            naming the \(0\)-cusp the chamber is anchored at, and ``generators``
+            naming the \(0\)-cusp the chamber is anchored at, and ``group_generators``
             are isometries of this lattice generating the finite-index subgroup
             \(\Gamma' \le O(L)\).  The chamber returned is the fundamental
             polyhedron of the reflection part of \(\Gamma'\) — the subgroup
@@ -1253,7 +1253,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             polyhedron has finite volume.  A candidate root is a wall only when
             its reflection lies in \(\Gamma'\), and that question is decided
             where it is decidable: the discriminant images of the given
-            generators generate a subgroup of the finite orthogonal group
+            group_generators generate a subgroup of the finite orthogonal group
             \(O(A_L)\), and membership in that subgroup is one sifting test of
             a Schreier--Sims stabilizer chain (A. Seress, *Permutation Group
             Algorithms*, Cambridge University Press 2003, chapter 4).  The sift
@@ -1301,7 +1301,7 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             discriminant = self.discriminant_group()
             ambient = discriminant.orthogonal_group()
             rho = self.discriminant_representation()
-            images = tuple(rho(generator) for generator in generators)
+            images = tuple(rho(generator) for generator in group_generators)
             subgroup = ambient.subgroup(
                 tuple(image for image in images if image != ambient.one())
             )
