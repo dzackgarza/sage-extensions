@@ -5,7 +5,10 @@ D. Dutour Sikirić and K. Hulek's Lemma 3.6, to one computed element per `O(L)`-
 planes — an element of the plane stabilizer whose character image is odd — and that
 element is produced by the plane block equations rather than by enumerating a
 stabilizer's generating family.  The route is wired at its owner and pinned by a test on
-two specimens.  CARD_ROWS**
+two specimens.  The two rank-21 rows this unit exists for are **not both in**: card `6JRX`'s `O` row
+returned (4 orbits, 1006.6 s) and its `O⁺` row was still running when this was committed,
+and card `6JRY`'s `O` row had not returned either.  So #379 is **not accepted** by this
+turn: the route is in the tree and pinned, and the two long rows are the next run.**
 
 ## The route, and its hypotheses on Scattone's lattices
 
@@ -98,3 +101,27 @@ witness, which the first run of the file showed (`assert 1 == -1`) before the as
 was moved to the invariant the route actually uses.  The two cards' own `O+` rows are read by tag — `card_plane_orbit_row("6JRX",
 "O+")`, `card_plane_orbit_row("6JRY", "O+")` — in
 `tests/lattices/test_scattone_plane_orbits.sage`, which is where the rank-21 runs live.
+That file is unchanged and stays red on its two `O+` rows until the rank-21 runs below
+return.
+
+## The rank-21 runs, as far as they got
+
+Two probes, each in the pinned image with the port at `991b88b0` and this branch as the
+provider, on a VM whose load average was 18–37 (four CPUs, other projects' jobs):
+
+| card | card's `O` row | call, `O` planes | time | card's `O+` row | call, `O⁺` planes |
+| --- | ---: | ---: | ---: | ---: | --- |
+| `6JRX` (`Λ₂`) | 4 | **4** | 1006.6 s | 4 | not returned in ~1700 s |
+| `6JRY` (`Λ₄`) | 9 | not returned in ~1600 s | — | 9 | not run |
+
+Both rows agree where they returned, and nothing disagrees.  What is measured about the
+`O⁺` stage is its lower bound, not its cost: it spends that time in the character
+quotient's own image computation (the ambient discriminant image over `O(Λ)`'s selected
+generators was measured at 130–417 s in `results/issue17-double-coset-row.md`) and then in
+one plane-block lift solve per candidate action per plane.  That stage is the next unit's
+measurement, and it is an engineering cost at this owner — the double-coset argument does
+not depend on it.
+
+The two card rows the acceptance asks for are therefore **not** produced here, and no
+count is asserted for them: `6JRX`'s `O` row is the only rank-21 number this turn
+computed, and it equals the card's 4.
