@@ -562,3 +562,18 @@ a finite generating set of `Õ(L)` whose hypotheses this lattice meets.
 | `issue369-refusal-test.log` | the tree of this push | the refusal test of `tests/lattices/test_the_stable_orthogonal_group_generators_refuse.sage`: **1 passed in 14.43 s** (the call certifies the Bertini family's membership in `ker ρ_L` inside `pytest.raises(ValueError)` and refuses; the index `|ρ_L(O(L))|` read by tag equals the card's own `46998591897600`) |
 | `issue369-refusal-lint.log` | the tree of this push | `test_lint` on the new test module: **1 file, 0 findings** |
 | `issue370-tests-at-the-pushed-head.log` | `6664495b7c` (#370) | the same test file at the pushed head, after the cherry-pick onto `72c40a2` (#363): **3 passed in 311.40 s** (26.88 s and 280.60 s), no lint findings, peak tree RSS 1477 MiB |
+
+## #355 — the rank-(n - 1) parabolic count on the W_e chamber of card 0125
+
+The reported calls on the twelve-wall chamber of `W_e ⊂ G_e`
+(`integral.cusp_chambers['g-e']`, Sterk, Math. Z. 207 (1991), (4.3.5), p. 19,
+Fig. 4) are maximal for inclusion, not the criterion's rank condition, so the
+criterion's computation is asserted from the chamber's own rays, with Vinberg's
+citation (E. B. Vinberg, *The groups of units of certain quadratic forms*,
+Mat. Sb. 87 (129) (1972), the English translation Math. USSR Sb. 16 (1972),
+No. 1, Proposition 1, printed p. 22).
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue355-criterion-test.log` | the tree of this push | the criterion test of `tests/lattices/test_the_rank_n_minus_one_parabolic_count_on_the_we_chamber.sage`: **1 passed in 11.54 s** (the reproductions 36 and 44; the ideal-vertex count nine, read from the primitive rays; each ideal vertex's orthogonal walls have form rank \\(n - 1\\), the subdiagram parabolic or a parabolic union) |
+| `issue355-criterion-lint.log` | the tree of this push | `test_lint` on the test module: **1 file, 0 findings** |

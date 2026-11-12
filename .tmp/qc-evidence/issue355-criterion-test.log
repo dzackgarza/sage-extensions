@@ -1,0 +1,21 @@
+.                                                                        [100%]
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+11.06s call     tests/lattices/test_the_rank_n_minus_one_parabolic_count_on_the_we_chamber.sage::test_the_rank_n_minus_one_parabolic_count_equals_the_ideal_vertex_count
+0.00s setup    tests/lattices/test_the_rank_n_minus_one_parabolic_count_on_the_we_chamber.sage::test_the_rank_n_minus_one_parabolic_count_equals_the_ideal_vertex_count
+0.00s teardown tests/lattices/test_the_rank_n_minus_one_parabolic_count_on_the_we_chamber.sage::test_the_rank_n_minus_one_parabolic_count_equals_the_ideal_vertex_count
+1 passed in 11.54s
+[peakrss] issue355test: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 333 MiB
+[peakrss] low-water MemAvail : 11024 MiB
+[peakrss] peak single VmHWM  : 333 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      322 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.0s procs=  3 rss=   333 MiB hwm=   333 MiB avail= 11033 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   313 MiB hwm=   313 MiB avail= 11031 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   310 MiB hwm=   310 MiB avail= 11031 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   308 MiB hwm=   308 MiB avail= 11030 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   305 MiB hwm=   305 MiB avail= 11024 MiB
+launcher exit: 0
