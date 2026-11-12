@@ -81,6 +81,19 @@ def _integral_solution(system, target):
     return values
 
 
+def _primitive_completion(rows):
+    r"""Return integer rows that complete the primitive rows ``rows`` (``k x m``) to a basis of `Z^m`.
+
+    With the Smith form `D = U R V`, `D = [I_k 0]` because `R` is primitive, so the rows of
+    `V^{-1}` after the first `k` complete `U R`, and hence `R`, to a basis (Cohen, A Course in
+    Computational Algebraic Number Theory, Alg. 2.4.10).
+    """
+    k = rows.nrows()
+    diagonal, _left, right = rows.smith_form()
+    assert all(diagonal[i, i] == 1 for i in range(k)), f"the rows {rows} are not primitive"
+    return right.inverse().change_ring(SageZZ)[k:]
+
+
 def _content(values):
     r"""Return the content of an integer vector: the gcd of its entries, and zero for the zero vector."""
     content = SageZZ.zero()
@@ -2974,26 +2987,22 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             \(P^\perp\).
             """
             lattice = self.ambient_lattice()
-            labels = tuple(lattice.module_generating_set())
-            rank = len(labels)
-            plane_rows = [self.coordinates(vector) for vector in self.plane_basis()]
-            current = matrix(SageZZ, plane_rows)
-            perpendicular_rows = []
-            for row in (
-                self.coordinates(vector)
-                for vector in self.vector_perpendicular_basis(self.plane_basis())
-            ):
-                augmented = matrix(SageZZ, tuple(current.rows()) + (row,))
-                if augmented.rank() > current.rank():
-                    current = augmented
-                    perpendicular_rows.append(row)
-            complement_rows = []
-            for position in range(rank):
-                row = tuple(1 if other == position else 0 for other in range(rank))
-                augmented = matrix(SageZZ, tuple(current.rows()) + (row,))
-                if augmented.rank() > current.rank():
-                    current = augmented
-                    complement_rows.append(row)
+            rank = len(tuple(lattice.module_generating_set()))
+            plane = matrix(SageZZ, [self.coordinates(vector) for vector in self.plane_basis()])
+            perpendicular = matrix(
+                SageZZ, [self.coordinates(vector) for vector in self.vector_perpendicular_basis(self.plane_basis())]
+            )
+            # P is primitive and isotropic, so it is primitive in P^perp, and P^perp is primitive in L.
+            # A primitive k x m integer matrix C has Smith form U C V = [I 0]; the rows of V^-1 after the
+            # first k complete U C, hence C, to a basis of Z^m (Cohen, A Course in CANT, Alg. 2.4.10).
+            inside = perpendicular.transpose().solve_right(plane.transpose()).transpose()
+            assert inside.denominator() == 1, f"the plane {plane} does not lie in its perpendicular {perpendicular}"
+            perpendicular_rows = [
+                tuple(row) for row in _primitive_completion(inside.change_ring(SageZZ)) * perpendicular
+            ]
+            complement_rows = [tuple(row) for row in _primitive_completion(perpendicular)]
+            plane_rows = [tuple(row) for row in plane.rows()]
+            current = matrix(SageZZ, complement_rows + plane_rows + perpendicular_rows)
             assert (
                 len(complement_rows) == 2
                 and len(perpendicular_rows) == rank - 4
