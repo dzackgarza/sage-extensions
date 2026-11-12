@@ -2261,6 +2261,39 @@ def _two_hyperbolic_planes(lattice):
     return len(planes) >= 2
 
 
+def _bezout_partner(row):
+    r"""Return ``(divisor, partner)``, the Bezout data of a pairing row.
+
+    ``row`` holds ``b(e, g_j)`` for the module generators ``g_j``; the divisor is
+    the positive generator of the ideal the row spans -- the ideal ``b(e, L)``
+    for the primitive isotropic ``e`` the row belongs to -- and the partner is
+    the coefficient list with ``sum(m_j row_j) = divisor``, so the lattice vector
+    ``f = sum(m_j g_j)`` has ``b(e, f) = divisor``.  For a divisor-1 vector this
+    is the hyperbolic partner of the plane the split-signature witness fixes
+    (S. Zemel, *The Structure of Integral Parabolic Subgroups of Orthogonal
+    Groups*, J. Algebra 559 (2020) 95-128, arXiv:1902.08264v2, proposition 1.10,
+    p. 13); for a divisor-2 vector the partner pairs ``b(e, f) = 2``, the divisor
+    itself.
+    """
+    from sage.arith.misc import xgcd
+
+    divisor = 0
+    partner = [0] * len(row)
+    for position, entry in enumerate(row):
+        if entry == 0:
+            continue
+        if divisor == 0:
+            divisor, partner[position] = entry, 1
+            continue
+        step, left, right = xgcd(divisor, entry)
+        partner = [left * coefficient for coefficient in partner]
+        partner[position] = right
+        divisor = step
+    if divisor < 0:
+        divisor, partner = -divisor, [-coefficient for coefficient in partner]
+    return divisor, partner
+
+
 def _split_signature_witness(lattice, vector):
     r"""Return the Levi-part witness ``1_plane + (-1) complement`` at a primitive isotropic line.
 
@@ -2271,15 +2304,22 @@ def _split_signature_witness(lattice, vector):
     with Levi part ``(M, gamma)``, the determinant is ``det gamma`` and the real
     spinor norm is the class of ``det M`` times the spinor norm of ``gamma``).
     The element that fixes the plane pointwise and negates the complement is the
-    Levi part ``(1, -1)``: it is an isometry whenever the selected basis
-    exhibits the orthogonal decomposition of the lattice into the hyperbolic
-    plane spanned by the representative and its partner, and their complement.
+    Levi part ``(1, -1)``: the decomposition is built from the vector itself,
+    never from the selected basis -- the partner ``f`` is the Bezout combination
+    of the module generators with ``b(e, f) = div(e)`` (the divisor, the positive
+    generator of the ideal ``b(e, L)``; for a divisor-1 vector this is the
+    hyperbolic partner with ``b(e, f) = 1``), the plane is ``<e, f>``, and the
+    complement is the kernel of the two pairing constraints, computed from the
+    Gram matrix.  The witness ``w = 1_plane + (-1)_complement`` is read on the
+    module generators as the matrix ``2*Proj_plane - 1`` whose ``j``-th column
+    holds the coordinates of the image of the ``j``-th generator.
 
     Four properties are computed here, never assumed, because the construction
     is a candidate the caller must certify (it is not a claim to assert):
 
-    * the images define an isometry -- the constructor of ``Aut`` verifies form
-      preservation and raises when they do not;
+    * the images define an isometry -- the matrix identity ``W^t G W = G`` and
+      the integrality of ``W`` are computed here, and the ``Aut`` constructor's
+      column-matrix route raises when they fail;
     * the witness fixes the representative's generating vector;
     * the discriminant image is trivial: the complement's negation acts as the
       identity on a 2-elementary discriminant group, and the fixed plane
@@ -2293,28 +2333,62 @@ def _split_signature_witness(lattice, vector):
     the caller keeps its refusal rather than a guess.
     """
     labels = tuple(lattice.module_generating_set())
-    generators = {label: lattice.module_generator(label) for label in labels}
-    own = [label for label in labels if generators[label] == vector]
-    if not own:
-        # The representative's generating vector is not a basis vector, so the
-        # selected basis does not exhibit the decomposition this construction
-        # needs; refusing is the honest answer, not searching for a basis.
-        return None
-    zero = lattice.base_ring().zero()
-    partners = [
-        label
-        for label in labels
-        if label != own[0]
-        and lattice.b(vector, generators[label]) != zero
+    basis = tuple(lattice.module_generator(label) for label in labels)
+    gram = [[int(lattice.b(left, right)) for right in basis] for left in basis]
+    coordinates = [int(vector.to_vector()(label)) for label in labels]
+    row = [
+        sum(gram[i][j] * coordinates[i] for i in range(len(coordinates)))
+        for j in range(len(basis))
     ]
-    fixed = set(own) | set(partners)
+    divisor, partner = _bezout_partner(row)
+    if divisor == 0:
+        # The pairing row vanishes identically, so the vector pairs trivially
+        # with every module generator: no partner realizes the divisor.
+        return None
+    pairing = sum(
+        gram[i][j] * coordinates[i] * partner[j]
+        for i in range(len(coordinates))
+        for j in range(len(partner))
+    )
+    if pairing != divisor and pairing != -divisor:
+        # The Bezout data does not realize the divisor: the plane is degenerate.
+        return None
+    norm = sum(
+        gram[i][j] * partner[i] * partner[j]
+        for i in range(len(partner))
+        for j in range(len(partner))
+    )
+    from sage.matrix.constructor import matrix as sage_matrix
+    from sage.rings.rational_field import QQ as SageQQ
 
-    def image(label):
-        source = generators[label]
-        return source if label in fixed else -source
+    # The witness w = 1_plane + (-1)_complement on the module generators: its
+    # j-th column holds the coordinates of the image of the j-th generator,
+    # computed as 2*alpha*e + 2*beta*f - g_j for the plane <e, f>.
+    columns = []
+    for j in range(len(basis)):
+        beta = SageQQ(sum(gram[k][j] * coordinates[k] for k in range(len(coordinates)))) / pairing
+        alpha = (
+            SageQQ(sum(gram[k][j] * partner[k] for k in range(len(partner)))) - beta * norm
+        ) / pairing
+        column = [
+            2 * alpha * coordinates[position] + 2 * beta * partner[position]
+            for position in range(len(coordinates))
+        ]
+        column[j] -= 1
+        columns.append(column)
+    transformation = sage_matrix(SageQQ, columns).transpose()
+    if any(entry.denominator() != 1 for entry in transformation.list()):
+        return None
+    gram_matrix = sage_matrix(SageQQ, gram)
+    if transformation.transpose() * gram_matrix * transformation != gram_matrix:
+        return None
+    from sage.rings.integer_ring import ZZ as SageZZ
 
+    integral = sage_matrix(
+        SageZZ, [[int(entry) for entry in row] for row in transformation.rows()]
+    )
     try:
-        witness = lattice.Aut()({label: image(label) for label in labels})
+        witness = lattice.Aut()._isometry_from_column_matrix(integral)
     except (TypeError, ValueError, ArithmeticError):
         return None
     if witness(vector) != vector:
@@ -2337,31 +2411,44 @@ def _complement_discriminant_surjective(lattice, vector):
     therefore contains the complement's image; at a divisor-1 line -- where the
     complement's discriminant group is the ambient one, the plane contributing
     nothing -- the class-stabilizer equality ``rho(Stab(v)) = O(A_L)`` therefore
-    holds exactly when that image is surjective.  The complement is the span of
-    the basis vectors outside the plane, and its Gram matrix is the pairing
-    matrix of those vectors.
+    holds exactly when that image is surjective.  The complement is the kernel of
+    the two pairing constraints -- the vectors orthogonal to the representative
+    and to its Bezout partner -- computed from the Gram matrix, and its Gram
+    matrix is the pairing matrix of that kernel's basis.
     """
     labels = tuple(lattice.module_generating_set())
-    generators = {label: lattice.module_generator(label) for label in labels}
-    own = [label for label in labels if generators[label] == vector]
-    if not own:
-        return False
-    zero = lattice.base_ring().zero()
-    partners = [
-        label
-        for label in labels
-        if label != own[0]
-        and lattice.b(vector, generators[label]) != zero
+    basis = tuple(lattice.module_generator(label) for label in labels)
+    gram = [[int(lattice.b(left, right)) for right in basis] for left in basis]
+    coordinates = [int(vector.to_vector()(label)) for label in labels]
+    row = [
+        sum(gram[i][j] * coordinates[i] for i in range(len(coordinates)))
+        for j in range(len(basis))
     ]
-    plane = set(own) | set(partners)
-    complement = [label for label in labels if label not in plane]
-    if not complement:
+    divisor, partner = _bezout_partner(row)
+    if divisor == 0:
+        # The pairing row vanishes identically, so no partner realizes the
+        # divisor and the complement is not defined here.
         return False
-    vectors = [generators[label] for label in complement]
-    sub_gram = [[lattice.b(one, other) for other in vectors] for one in vectors]
+    from sage.matrix.constructor import matrix as sage_matrix
+    from sage.rings.integer_ring import ZZ as SageZZ
+
+    paired = [
+        sum(gram[i][j] * coordinates[j] for j in range(len(coordinates)))
+        for i in range(len(coordinates))
+    ]
+    partner_product = [
+        sum(gram[i][j] * partner[j] for j in range(len(partner)))
+        for i in range(len(coordinates))
+    ]
+    constraints = sage_matrix(SageZZ, [paired, partner_product])
+    kernel = constraints.right_kernel_matrix()
+    if kernel.nrows() != len(basis) - 2:
+        return False
+    sub_gram = kernel * sage_matrix(SageZZ, gram) * kernel.transpose()
+    integer_gram = [[int(entry) for entry in row] for row in sub_gram.rows()]
     from sage_extensions.categories.lattices import Lattices
 
-    complement_lattice = Lattices(lattice.base_ring())(sub_gram)
+    complement_lattice = Lattices(lattice.base_ring())(integer_gram)
     image = complement_lattice.discriminant_image()
     order = image.cardinality().finite_value()
     target = complement_lattice.discriminant_group().orthogonal_group()
