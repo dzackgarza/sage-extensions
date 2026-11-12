@@ -37,13 +37,13 @@ the second row reusing the first's ambient stage and gate):
 
 | row | call | count | time |
 | --- | --- | ---: | ---: |
-| `Otilde(T_Co) = ker rho` | `Tco.stable_orthogonal_group().isotropic_orbit_representatives(1)` | **527** | 2643.7 s |
-| `Otilde+(T_Co) = ker(rho, sn)` | `Tco.stable_orthogonal_group().intersection(Tco.O_plus()).isotropic_orbit_representatives(1)` | **527** | 608.3 s |
+| `Otilde(T_Co) = ker rho` | `Tco.stable_orthogonal_group().isotropic_orbit_representatives(1)` | **527** | 1934.1 s |
+| `Otilde+(T_Co) = ker(rho, sn)` | `Tco.stable_orthogonal_group().intersection(Tco.O_plus()).isotropic_orbit_representatives(1)` | **527** | 294.0 s |
 
-The total was 3306.9 s, the peak tree RSS 1055 MiB under a 6144 MiB guard.  Every
+The total was 2299.4 s, the peak tree RSS 1176 MiB under a 6144 MiB guard.  Every
 representative is a primitive isotropic vector of divisor 2 with a nonzero
-divided class (the first being `-[ep]`, the last
-`-24012*[h] - 11238*[ep] + ...`), as the divided-class construction returns.
+divided class (the first being `[fp]`, the last a class of
+`-354*[h] + 32*[ep] + ...`), as the divided-class construction returns.
 
 ## The comparison with the page
 

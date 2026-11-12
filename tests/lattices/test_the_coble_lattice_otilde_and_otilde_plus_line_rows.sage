@@ -19,9 +19,9 @@ surjectivity both hold at the ambient representative, so the gate passes and
 neither row falls through to the exact integral route.
 
 Recorded, not asserted from the page: on 2026-11-12 at provider ``a5fa20dc63``
-the ``Otilde`` row returned **527** representatives in 2643.7 s and the
-``Otilde+`` row returned **527** representatives in 608.3 s (one process, the
-second row reusing the first's ambient stage and gate), peak tree RSS 1055 MiB
+the ``Otilde`` row returned **527** representatives in 1934.1 s and the
+``Otilde+`` row returned **527** representatives in 294.0 s (one process, the
+second row reusing the first's ambient stage and gate), peak tree RSS 1176 MiB
 under a 6144 MiB guard (``.tmp/357b-rows.log``).  The page-proof value of
 research ``sec-cusp-lifting`` is 527 line orbits with index 1 over every class:
 both recorded counts agree with it, and the agreement is reported here rather
