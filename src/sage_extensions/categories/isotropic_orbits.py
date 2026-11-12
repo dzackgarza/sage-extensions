@@ -2716,25 +2716,26 @@ class IsotropicVectorReductionImage(SageObject):
         -- the full-group search on the reduction and the subgroup's own root
         filter -- and never typed.
 
-        The selection maximizes the admitted count so that the cell at the
-        chosen vertex is spanned by admitted walls: the walk's own layer
-        enumeration then prunes to the cone of that cell, which is what keeps
-        the candidate list short.
+        The selection ranks the vertices by the admitted count, with the
+        \\(\\mathbf Z\\)-basis flag as the tiebreaker: a vertex with more
+        admitted walls wins, and among equals the one whose walls span its
+        orthogonal complement integrally.  The cell at the chosen vertex is
+        then spanned by admitted walls as far as the ranking allows, and the
+        walk's own layer enumeration prunes to the cone of that cell, which
+        is what keeps the candidate list short.
         """
         from sage_extensions.categories.hyperbolic_lattices import HyperbolicLattices
 
         reduction = HyperbolicLattices(self._lattice.base_ring())(self._reduction)
         best = None
         for coordinates, square, through, basis in reduction._full_chamber_vertices():
-            if square <= 0 or not basis:
-                # An ideal vertex is not a point of the hyperbolic space, and a
-                # vertex whose walls are not a Z-basis of its orthogonal
-                # complement leaves the walk's own cell condition unsatisfied,
-                # so the layer enumeration would not be pruned to the cone.
+            if square <= 0:
+                # An ideal vertex lies on the light cone and is not a point of
+                # the hyperbolic space.
                 continue
             admitted = sum(1 for root in through if self.admits_root(root))
-            if best is None or admitted > best[0]:
-                best = (admitted, coordinates)
+            if best is None or (admitted, basis) > best[0]:
+                best = ((admitted, basis), coordinates)
         if best is None:
             raise ValueError(
                 f"no vertex of the chamber of the full reflection group of {self._reduction} "
