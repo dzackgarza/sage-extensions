@@ -33,95 +33,6 @@ def _family_gram(lattice, vectors):
     return coordinates * gram * coordinates.transpose()
 
 
-def _cusp_class_lift(line, reduction, class_vector):
-    r"""Return a vector of the ambient lattice, in ``v^\perp``, whose class in the reduction is ``class_vector``.
-
-    The reduction's coordinate frame is its retained section of
-    `v^\perp \to v^\perp/\mathbf Z v`, so a class is lifted by its coordinates there and the lift is
-    checked against the projection.  This is the same section
-    :meth:`sage_extensions.categories.isotropic_orbits.IsotropicVectorReductionImage.class_lift`
-    takes, read here from the lattice-level owners so that a printed root can be read at a cusp
-    without a group.
-    """
-    frame = reduction.coordinate_frame()
-    given = class_vector.to_vector()
-    lift = None
-    for label in reduction.module_generating_set():
-        coefficient = int(given(label))
-        if coefficient:
-            piece = coefficient * frame[label]
-            lift = piece if lift is None else lift + piece
-    assert lift is not None, (
-        f"the class {class_vector!r} of {reduction!r} is the zero class, which is no printed root"
-    )
-    assert reduction.projection()(lift) == class_vector, (
-        f"the coordinate frame of {reduction!r} does not lift the class {class_vector!r}"
-    )
-    return line.isotropic_perpendicular().inclusion()(lift)
-
-
-def _transported_roots(printed, span, identification, reduction, line):
-    r"""Carry the printed roots of ``span`` through ``identification`` into classes of ``reduction``.
-
-    ``identification`` is an isometry or an isometric embedding of ``span`` into the boundary lattice;
-    its matrix is read off the images of ``span``'s generators, each printed root is written in that
-    basis by one exact solve, and the product is the class of the root in the boundary lattice.  The
-    class is then lifted back into the ambient lattice by :func:`_cusp_class_lift`.
-    """
-    ambient = span.inclusion().codomain()
-    labels_span = tuple(span.module_generating_set())
-    labels_reduction = tuple(reduction.module_generating_set())
-    columns = []
-    for label in labels_span:
-        given = identification(span.module_generator(label)).to_vector()
-        columns.append([int(given(target)) for target in labels_reduction])
-    transport = sage_matrix(
-        QQ,
-        [
-            [column[row] for column in columns]
-            for row in range(len(labels_reduction))
-        ],
-    )
-    span_columns = [
-        _coordinates(ambient, span.inclusion()(span.module_generator(label)))
-        for label in labels_span
-    ]
-    system = sage_matrix(
-        QQ,
-        [
-            [column[row] for column in span_columns]
-            for row in range(int(ambient.module_rank()))
-        ],
-    )
-    ring = reduction.base_ring()
-    roots = []
-    for root in printed:
-        solution = system.solve_right(
-            sage_matrix(QQ, int(ambient.module_rank()), 1, _coordinates(ambient, root))
-        )
-        assert all(entry.denominator() == 1 for entry in solution.list()), (
-            f"the printed root {root!r} is not in the span of the printed family: its "
-            f"coordinates there are {solution.list()}"
-        )
-        transported = [
-            sum(
-                int(transport[row, column]) * int(solution[column, 0])
-                for column in range(len(labels_span))
-            )
-            for row in range(len(labels_reduction))
-        ]
-        class_vector = reduction.linear_combination(
-            {
-                label: ring(value)
-                for label, value in zip(labels_reduction, transported)
-                if value
-            }
-        )
-        roots.append(_cusp_class_lift(line, reduction, class_vector))
-    return tuple(roots), transport
-
-
-
 def _correlation_preimage_from_gram_inverse(lattice, dual_element, inverse_gram):
     r"""Compute the exact integral preimage under ``v |-> b(v,-)``.
 
@@ -223,7 +134,176 @@ _STERK_DIAGRAM_LAYOUTS = {
 }
 
 
+_STERK_FIG10_VERTEX_ORDER = (10, 7, 6, 5, 4, 3, 2, 0, 9, 8, 1)
+r"""The `II_{18,2}` vertex of Sterk's Fig. 10 (p. 23) carrying each printed label, in the order
+``a₂, a₃, …, a₈, a₉, a₁₀, a₁₁, a₁₂`` of `Sterk._sterk4_in_TEn_cached`.
+
+Read off the figure's own shape, a chain of nine `α₁₁—α₃—α₄—α₅—α₆—α₇—α₈—α₁₂—α₉` with `α₂` on `α₄`
+and `α₁₀` on `α₈`: the chain's two endpoints are the only `(-2)`-vertices, the two degree-three
+vertices are `α₄` and `α₈`, and the two remaining leaves are `α₂` and `α₁₀`.  The shape does not
+separate the two orientations of the chain -- the diagram's Gram is invariant under reversing it --
+but the *vectors* are fixed by the printed formulas, so the transcription does not depend on this
+order; the order only lets the diagram be compared as a matrix.
+"""
+
+_STERK_FIG3_MINUS_EIGHT_COEFFICIENTS = (-4, -5, -7, -10, -8, -6, -4, -2)
+r"""Sterk's `(-8)`-vector `\bar\alpha₁` of `E8(-2)`, in the library's `a₁, …, a₈` basis.
+
+H. Sterk, *Compactifications of the period space of Enriques surfaces, Part I*, Math. Z. 207 (1991),
+4.3.4 with Fig. 3, p. 19: "Let `\bar\alpha \in E8(-2)` with `\bar\alpha^2 = -8`. As all `(-8)`-vectors
+in `E8(-2)` are `O(E8(-2))`-equivalent" one may assume the coefficients Fig. 3 prints, node by node
+`4, 7, 10, 8, 6, 4, 2` along `α₁—α₃—α₄—α₅—α₆—α₇—α₈` with `5` on `α₂`.  The library's `E8(-2)` is
+the negative-definite one, so those coefficients appear with the opposite sign here, and that this is
+the `\bar\alpha₁` of 4.3.8 is checked by the diagram it produces and by the card's row, not assumed.
+"""
+
+_STERK_FIG10_ALPHA8_COEFFICIENTS = (-2, -3, -4, -6, -5, -4, -3, -2)
+r"""The `E8(-2)` vector Sterk writes `\bar\alpha₈` in Fig. 10, p. 23, in the library's `a`-basis.
+
+4.3.8 prints `α₁₀ = \bar\alpha₈ + 2e'` and `α₁₂ = 2e - 2e' + \bar\alpha₈ - \bar\alpha₁`, so `\bar\alpha₈`
+is the one vector of `E8(-2)` the printed formulas name without giving its coefficients.  It is the
+only such vector for which the eleven printed vectors have the pairings Fig. 10 draws, which
+`Sterk._sterk4_in_TEn_cached` checks against the diagram this library already realizes for that
+figure; it is a `(-4)`-vector, and card `029J`'s 4.3.8 row stores the resulting walls.
+"""
+
+
 class Sterk:
+    @staticmethod
+    @cache
+    def _sterk4_in_TEn_cached():
+        r"""Return Sterk's Fig. 10 walls as vectors of ``T_En``, transcribed from the printed ones.
+
+        H. Sterk, *Compactifications of the period space of Enriques surfaces, Part I*,
+        Math. Z. 207 (1991), 4.3.8, p. 23, draws the chamber of the fourth `0`-cusp at
+
+            v = 2e' + f' + \bar\alpha₁
+
+        in `L_- = H \oplus H(2) \oplus E8(-2)` -- which is `T_En` with `e, f` the `H`, `e', f'` the
+        `H(2)` and `α₁, …, α₈` the `E8(-2)` (1.2--1.4, pp. 3--4) -- and prints there:
+
+        * a basis of `v^\perp/\mathbf Z v \cong H \oplus E8(-2)`: `e, f, -e' + α₁, α₂, …, α₈`;
+        * the eleven walls as explicit vectors of `L_-`: `α₂, …, α₈` (the `E8(-2)` basis),
+          `α₉ = f - e`, `α₁₀ = \bar\alpha₈ + 2e'`, `α₁₁ = e + f + α₁ - e'`,
+          `α₁₂ = 2e - 2e' + \bar\alpha₈ - \bar\alpha₁`;
+        * and (4.3.10, p. 25) that the roots span `\mathbf Z{e + f, e - f} \oplus E8(-2)`.
+
+        `\bar\alpha₁` is the `(-8)`-vector of Fig. 3 (`_STERK_FIG3_MINUS_EIGHT_COEFFICIENTS`) and
+        `\bar\alpha₈` the vector of `_STERK_FIG10_ALPHA8_COEFFICIENTS`; both are printed formulas, not
+        a search, so this transcription returns the same eleven vectors in every session.
+
+        Everything asserted is a consequence of Sterk's own statements or of card `029J`'s row: `v` is
+        isotropic and primitive and is a different line from (4.2.3)'s representative of the same cusp,
+        which it pairs to `2` with; the eleven vectors lie in `v^\perp` with the figure's squares;
+        their span is the `\mathbf Z{e + f, e - f} \oplus E8(-2)` of 4.3.10, of determinant `-1024`,
+        index two in `K_J = H \oplus E8(-2)`; and their diagram is the one this library already
+        realizes for Fig. 10 in `II_{18,2}` coordinates, in the order
+        `_STERK_FIG10_VERTEX_ORDER`.
+        """
+        lattice = NamedLattices.TEn
+        generators = _named_generators(lattice)
+        indices = tuple(range(1, 9))
+        ring = lattice.base_ring()
+
+        def e8_vector(coefficients):
+            total = None
+            for index, coefficient in zip(indices, coefficients, strict=True):
+                piece = ring(coefficient) * generators[f"a{index}"]
+                total = piece if total is None else total + piece
+            return total
+
+        minus_eight = e8_vector(_STERK_FIG3_MINUS_EIGHT_COEFFICIENTS)
+        alpha_eight = e8_vector(_STERK_FIG10_ALPHA8_COEFFICIENTS)
+        assert lattice.q(minus_eight) == -ring(8), (
+            f"Sterk's (-8)-vector has square {lattice.q(minus_eight)} in {lattice}, not -8: the "
+            "coefficients Fig. 3 prints do not read into this E8(-2)"
+        )
+        assert lattice.q(alpha_eight) == -ring(4), (
+            f"the vector written alpha-bar-eight in Sterk's Fig. 10 has square "
+            f"{lattice.q(alpha_eight)}, not -4 in {lattice}"
+        )
+        e = generators["e"]
+        f = generators["f"]
+        eprime = generators["ep"]
+        fprime = generators["fp"]
+        isotropic = 2 * eprime + fprime + minus_eight
+        assert isotropic == Sterk.sterk4_cusp_vector(), (
+            f"Sterk's printed cusp vector {isotropic} is not the one this library returns for 4.3.8"
+        )
+        other_cusp = Sterk.selected_isotropic_vectors()["Sterk_4"]
+        assert lattice.b(isotropic, other_cusp) == ring(2), (
+            f"Sterk's (4.3.8) vector {isotropic} and (4.2.3)'s {other_cusp} do not pair to 2, so they "
+            "are not the paper's two vectors for the fourth cusp"
+        )
+        walls = tuple(
+            [generators[f"a{index}"] for index in range(2, 9)]
+            + [
+                f - e,
+                alpha_eight + 2 * eprime,
+                e + f + generators["a1"] - eprime,
+                2 * e - 2 * eprime + alpha_eight - minus_eight,
+            ]
+        )
+        assert all(lattice.b(wall, isotropic) == ring.zero() for wall in walls), (
+            f"a printed wall of Sterk's Fig. 10 is not orthogonal to the cusp vector {isotropic}, so "
+            "it is no class of the boundary lattice there"
+        )
+        squares = [lattice.q(wall) for wall in walls]
+        assert all(square in (-ring(2), -ring(4)) for square in squares), (
+            f"the printed walls of Sterk's Fig. 10 do not have the figure's squares: {squares}"
+        )
+        order = list(_STERK_FIG10_VERTEX_ORDER)
+        printed_diagram = _family_gram(
+            NamedLattices.TdP, tuple(Sterk.sterk_roots()["Sterk_4"])
+        )[order, order]
+        assert _family_gram(lattice, walls) == printed_diagram, (
+            "the transcription of Sterk's Fig. 10 from the printed vectors does not have the diagram "
+            "this library realizes for that figure in II_{18,2} coordinates"
+        )
+        span = lattice.sublattice_from(walls)
+        boundary = lattice.primitive_isotropic_subobject(isotropic).isotropic_reduction()
+        assert span.determinant() == 4 * boundary.determinant(), (
+            f"the walls of Sterk's Fig. 10 span a lattice of determinant {span.determinant()}, which "
+            f"is not of index two in the boundary lattice {boundary} of determinant "
+            f"{boundary.determinant()}"
+        )
+        return walls
+
+    @staticmethod
+    def sterk4_cusp_vector():
+        r"""Return the cusp vector of Sterk's (4.3.8), p. 23: `2e' + f' + \bar\alpha₁`.
+
+        Two vectors of `T_En` represent the fourth `0`-cusp, and the paper prints both:
+
+        * (4.2.3), p. 16, lists `e' + 2f' + \gamma`, `\gamma` of square `-8`, as one of the five cusp
+          representatives; that is what :meth:`selected_isotropic_vectors` returns for ``Sterk_4``;
+        * (4.3.8), p. 23, draws the chamber of that cusp at `2e' + f' + \bar\alpha₁`, and the eleven
+          walls of Fig. 10 are its classes: they pair `4, -2, -4` with `α₁₀, α₁₁, α₁₂` against
+          (4.2.3)'s vector and are orthogonal to this one.
+
+        The two pair to `2`, so they span different lines; they are representatives of the same cusp,
+        whose reductions are isometric.  `\bar\alpha₁` is the `(-8)`-vector of Fig. 3, p. 19.  Card
+        `029J`'s `cusp_chambers` row for 4.3.8 stores this vector, term by term, and is what the tests
+        read; a chamber is at this line and a cusp is either.
+        """
+        lattice = NamedLattices.TEn
+        generators = _named_generators(lattice)
+        ring = lattice.base_ring()
+        minus_eight = None
+        for index, coefficient in zip(
+            range(1, 9), _STERK_FIG3_MINUS_EIGHT_COEFFICIENTS, strict=True
+        ):
+            piece = ring(coefficient) * generators[f"a{index}"]
+            minus_eight = piece if minus_eight is None else minus_eight + piece
+        vector = 2 * generators["ep"] + generators["fp"] + minus_eight
+        assert lattice.q(vector) == ring.zero(), (
+            f"Sterk's (4.3.8) vector {vector} is not isotropic in {lattice}"
+        )
+        assert vector.is_primitive() is True, (
+            f"Sterk's (4.3.8) vector {vector} is not primitive"
+        )
+        return vector
+
     @staticmethod
     @cache
     def _roots_18_2_0_cached():
@@ -443,6 +523,27 @@ class Sterk:
 
     @staticmethod
     def selected_isotropic_vectors():
+        r"""Return Sterk's five cusp vectors, in the coordinates of ``T_En``.
+
+        H. Sterk, *Compactifications of the period space of Enriques surfaces, Part I*,
+        Math. Z. 207 (1991), (4.2.2)--(4.2.3), p. 16: the five `0`-cusps of `\Gamma_{En,2}` are the
+        orbits of `e`, `e'`, `e' + f' + \omega` with `\omega` of square `-4`, `e' + 2f' + \gamma` with
+        `\gamma` of square `-8`, and `2e + 2f + \alpha` with `\alpha` of square `-8`.  Those are the
+        five vectors below, in this lattice's basis --- `e, f` the `H`, `e', f'` the `H(2)`,
+        `α₁, …, α₈` the `E8(-2)` --- the last two read through the correlation, with
+        `\gamma = \alpha = \bar\alpha₁` the `(-8)`-vector of Fig. 3, p. 19
+        (`_STERK_FIG3_MINUS_EIGHT_COEFFICIENTS`).
+
+        **The fourth cusp has two vectors in the paper.**  This call returns (4.2.3)'s,
+        `e' + 2f' + \gamma`.  The chamber printed for that cusp, (4.3.8) with Fig. 10, p. 23, is drawn
+        at `2e' + f' + \bar\alpha₁` instead, which :meth:`sterk4_cusp_vector` returns and which card
+        `029J`'s `cusp_chambers` row for that statement stores; the eleven walls of Fig. 10 are its
+        classes, pairing `4, -2, -4` with `α₁₀, α₁₁, α₁₂` against `e' + 2f' + \gamma`.  The two pair to
+        `2` and span different lines, but they are two representatives of one cusp: their reductions
+        are isometric (`tests/lattices/test_cusp_lattices.sage` asserts it for all five cusps).  A
+        reduction read at either is the cusp's; a chamber is at the second.  This is the disagreement
+        filed as `dzackgarza/lattice-database` #44, closed by storing the chamber's vector on the row.
+        """
         TEn = NamedLattices.TEn
         b = _named_generators(TEn)
         dual = tuple(TEn.dual_lattice().module_generators())
@@ -567,7 +668,9 @@ class Sterk:
                 f"Sterk's printed cusp roots are the five diagrams of Math. Z. 207 (1991), section "
                 f"4.3.1, diagrams 4.3.5--4.3.9, and {name!r} is none of them"
             )
-        eta = cusps[name]
+        # The chamber's own cusp vector: (4.2.3) lists representatives of the five cusps, and for
+        # (4.3.8) the figure is drawn at the other of the paper's two vectors for that cusp.
+        eta = Sterk.sterk4_cusp_vector() if name == "Sterk_4" else cusps[name]
         line = lattice.primitive_isotropic_subobject(eta)
         reduction = line.isotropic_reduction()
         match name:
@@ -588,27 +691,14 @@ class Sterk:
                 roots = tuple(Embeddings.U_E8_2_into_TEn(root) for root in printed)
                 printed_gram = _family_gram(model, printed)
             case "Sterk_4":
-                # Eleven roots in II_{18,2} coordinates.  No map into T_En carries them: their span is a
-                # rank-ten lattice of determinant -1024, an index-two sublattice of K_J (determinant
-                # -256), so the identification is an isometric embedding and not an isometry.
-                ambient = NamedLattices.TdP
-                printed = tuple(Sterk.sterk_roots()["Sterk_4"])
-                span = ambient.sublattice_from(printed)
-                embeddings = span.Emb(reduction)
-                assert embeddings.is_empty() is False, (
-                    f"the printed roots of Sterk's diagram 4.3.8 span {span}, which this library does "
-                    f"not embed into the boundary lattice {reduction} of the cusp of that diagram, so "
-                    "they cannot be read there"
-                )
-                roots, transport = _transported_roots(
-                    printed, span, embeddings.an_element(), reduction, line
-                )
-                assert transport.det() * transport.det() == QQ(4), (
-                    f"the identification of Sterk's diagram 4.3.8 with the boundary lattice {reduction} "
-                    f"is not of index two: its matrix has determinant {transport.det()}, while the span "
-                    f"has determinant {span.determinant()} and the boundary lattice {reduction.determinant()}"
-                )
-                printed_gram = _family_gram(ambient, printed)
+                # Eleven walls printed as explicit vectors in the basis e, f, e', f', a₁, ..., a₈ of
+                # L_- = H + H(2) + E8(-2), which is this lattice: no identification of lattices is
+                # needed and none is chosen, only Sterk's printed vectors are read.
+                roots = Sterk._sterk4_in_TEn_cached()
+                order = list(_STERK_FIG10_VERTEX_ORDER)
+                printed_gram = _family_gram(
+                    NamedLattices.TdP, tuple(Sterk.sterk_roots()["Sterk_4"])
+                )[order, order]
             case _:
                 raise ValueError(f"no cusp roots are held for {name!r}")
         assert all(lattice.b(root, eta) == lattice.base_ring().zero() for root in roots), (
@@ -623,53 +713,42 @@ class Sterk:
 
     @staticmethod
     def cusp_roots_in_TEn(name):
-        r"""Return the printed roots of Sterk's cusp diagram ``name`` as vectors of ``T_{En}``.
+        r"""Return the printed walls of Sterk's cusp diagram ``name`` as vectors of ``T_{En}``.
 
         H. Sterk, *Compactifications of the period space of Enriques surfaces, Part I*, Math. Z. 207
         (1991), section 4.3.1, diagrams 4.3.5--4.3.9 (pp. 19, 21, 22, 23, 24), prints at each of the
-        five `0`-cusps of the Enriques period domain the roots of the chamber of the boundary lattice
+        five `0`-cusps of the Enriques period domain the walls of the chamber of the boundary lattice
         `K_J = eta^\perp/\mathbf Z eta`; the five diagrams have 12, 10, 12, 11 and 14 walls (card
-        `029J`'s `cusp_chambers` row `gamma-en-2`, read there by tag).  The cusp vector of each diagram
-        is :meth:`selected_isotropic_vectors`'.
+        `029J`'s `cusp_chambers` row `gamma-en-2`, read there by tag).
 
-        Three of the five are held as hand-read ``T_{En}'`` coordinates (:meth:`sterks_in_TEn`) and are
-        returned unchanged.  The other two are printed in coordinates of a *model* of `K_J` and are
-        carried here by an identification of lattices, each one *checked* rather than assumed:
+        **Every printed vector is read, none is searched for.**  Sterk's coordinates are those of
+        `L_- = H \oplus H(2) \oplus E8(-2)` (1.2--1.4, pp. 3--4), which *is* `T_En`, so:
 
-        * ``Sterk_5`` (4.3.9, p. 24): :meth:`sterk5_in_U_E8_2` prints the fourteen roots in
-          `U + E8(-2)`, a rank-ten model of `K_J` of the same determinant `-256`.
-          :attr:`sage_extensions.catalogue.Embeddings.U_E8_2_into_TEn` carries that model into
-          `T_{En}`, its image lies in `eta^\perp`, and the composite with the projection to `K_J` is an
-          isometry onto `K_J`: that the model *is* the boundary lattice is the isometry decision of
+        * ``Sterk_1``--``Sterk_3``: :meth:`sterks_in_TEn`, the hand-read `T_En` coordinates;
+        * ``Sterk_4`` (4.3.8, p. 23): :meth:`_sterk4_in_TEn_cached`, the eleven vectors of Fig. 10
+          transcribed from the printed formulas and checked against the diagram this library
+          realizes for that figure;
+        * ``Sterk_5`` (4.3.9, p. 24): :meth:`sterk5_in_U_E8_2`'s fourteen vectors, printed in the
+          model `U + E8(-2)` and carried in by
+          :attr:`sage_extensions.catalogue.Embeddings.U_E8_2_into_TEn`, whose image lies in
+          `eta^\perp` and keeps the pairings; that the model *is* `K_J` is the isometry decision of
           sage-extensions#298, asserted here.
-        * ``Sterk_4`` (4.3.8, p. 23): :meth:`sterk_roots` prints the eleven roots in `II_{18,2}`
-          coordinates (:attr:`NamedLattices.TdP`), and no map into `T_{En}` carries them.  Their span
-          is a rank-ten lattice of determinant `-1024`, an index-two sublattice of `K_J`
-          (determinant `-256`), so the identification is the isometric *embedding* the lattice
-          embedding Mor decides, and its matrix has determinant `2` -- the equation
-          `M^T G_{K_J} M = G_span` of an isometry with a non-unimodular `M`, which sage-extensions#298's
-          isometry call, stated for a unimodular change of basis, correctly reports as no isometry
-          between the two lattices.
 
-        **What a returned vector is.**  A class of `K_J` has no canonical vector of `T_{En}`: its lifts
-        are the class modulo `\mathbf Z eta`.  For ``Sterk_5`` the model's own vectors are the lifts;
-        for ``Sterk_4`` the class is lifted through the section the reduction's coordinate frame
-        retains.  In both cases the square and the pairing with a vector of `T_Co` are invariants of
-        the class -- `eta` lies in `T_Co`, so it is orthogonal to `delta` -- and those are what a
-        caller asks of a printed root.
+        So a caller gets the same vectors in every session, and the classes of `K_J` they give are the
+        same too.  The cusp vector for ``Sterk_4`` is :meth:`sterk4_cusp_vector`'s, the one that
+        figure's chamber is drawn at; for the others it is :meth:`selected_isotropic_vectors`'.
 
-        **What the identification does not fix.**  Any element of `O(K_J)` composes with it, so a
-        statement that depends on *which* sublattice or which copy of the model was chosen is a
-        statement about the identification and not about Sterk's diagram.  The pairwise pairings are
-        preserved by construction and asserted, so the number of printed *classes* is
-        identification-free; how many of them lie in `T_Co` is not, and is reported as this
-        identification's.
+        **What a returned vector is.**  A class of `K_J` has no canonical vector of `T_{En}`: its
+        lifts are the class modulo `\mathbf Z eta`.  The vectors returned are the printed ones, which
+        lie in `eta^\perp`, and their square and pairing with a vector of `T_Co` are invariants of
+        their class --- `eta` lies in `T_Co`, so it is orthogonal to `delta` --- and those are what a
+        caller asks of a printed wall.
 
         EXAMPLES::
 
             sage: from sage_extensions.sterk import Sterk
-            sage: roots = Sterk.cusp_roots_in_TEn("Sterk_5")
-            sage: all(root.q() in (-2, -4) for root in roots)
+            sage: walls = Sterk.cusp_roots_in_TEn("Sterk_4")
+            sage: all(wall.q() in (-2, -4) for wall in walls)
             True
         """
         return tuple(Sterk._cusp_roots_in_TEn_cached(name))

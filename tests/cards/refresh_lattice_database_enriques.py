@@ -195,6 +195,12 @@ def cusp_diagrams(ref: str, tag: str) -> dict:
                     "figure": row.get("figure"),
                     "wall_count": row["wall_count"],
                     "vertices": [wall["name"] for wall in row["walls"]],
+                    # The walls themselves, in the card's Gram coordinates: a chamber row stores
+                    # them, and #370 reads the printed walls of (4.3.8) and (4.3.9) here rather than
+                    # transcribing them, so every root it orbits is the card's vector by tag.
+                    "wall_vectors": [
+                        [int(entry) for entry in wall["vector"]] for wall in row["walls"]
+                    ],
                     # A bond's order is the Coxeter entry: a positive integer, or
                     # the element of infinite order the card writes ``inf``, kept
                     # as JSON's null so the digest stays valid JSON.
@@ -430,7 +436,7 @@ def main(argv: list[str]) -> int:
                 "plane_orbits": "integral.primitive_orbits.{group}.planes and .orbit_lengths(per-orbit sizes) and .constant(the line count),reference.citation",
                 "cusp_chambers": "integral.cusp_chambers.{subgroup}.{cusp,statement,wall_count,printed_page,figure},certifications.integral.cusp_chambers",
                 "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
-                "cusp_diagrams": "integral.cusp_chambers.{subgroup}.{statement,cusp,walls,diagram,printed_page,figure},certifications.integral.cusp_chambers",
+                "cusp_diagrams": "integral.cusp_chambers.{subgroup}.{statement,cusp,walls,wall_count,wall_vectors,diagram,printed_page,figure},certifications.integral.cusp_chambers",
                 "parabolic_subdiagrams": "gram_tensor,integral.cusp_chambers.{subgroup}.{walls,parabolic_orbits,statement,wall_count,printed_page,figure},certifications.integral.cusp_chambers",
                 "primitive_orbit_series": "gram_tensor,integral.primitive_orbits.{subgroup}.{constant,z,w},certifications.integral.primitive_orbits",
                 "hyperbolic_reflectivity": "gram_tensor,hyperbolic.reflective,certifications.hyperbolic.reflective,references",
