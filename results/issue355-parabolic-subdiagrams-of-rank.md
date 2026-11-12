@@ -34,26 +34,37 @@ the Schlaefli form.
 
 ## The change
 
-No new method is added to `CoxeterDiagrams`: the criterion's computation
-needs the chamber's own primitive rays (a lattice-level computation, not a
-diagram-level one), so it is asserted in the test with Vinberg's citation.
+`parabolic_subdiagrams_of_rank` is added to `CoxeterDiagrams`: it returns the
+parabolic subdiagrams, connected or not, of the form rank asked for — the
+criterion's family for rank \\(n - 1\\).  In Vinberg's sense a parabolic
+subdiagram is a disjoint union of connected affine diagrams, and its rank is
+its vertex count less its component count, which is the rank of its Gram
+matrix; the call's docstring states the criterion with its citation and page.
 The existing maximality calls are unchanged: they are correct for their own
 stated meaning (maximal for inclusion), and the criterion's rank condition
-is documented beside them in the test's docstring.
+is now answered by the new call.
+
+The digest gains a `parabolic_subdiagrams` section: card `0125`'s
+`integral.cusp_chambers['g-e']` row holds the twelve walls and the
+parabolic-subdiagram orbits of the chamber of `W_e ⊂ G_e` (Sterk, Fig. 5,
+p. 20: four labelled classes, of sizes 1, 2, 2 and 4).  The digest was
+regenerated at the pinned database ref `1e1cadcf`, not edited, and every
+other section is unchanged from the previous pin `dbc9fc6a`.
 
 ## The test
 
 `tests/lattices/test_the_rank_n_minus_one_parabolic_count_on_the_we_chamber.sage`
-asserts exactly the proved facts: the reproductions of the reported calls
-(36 and 44), and the count of the parabolic subdiagrams of rank \\(n - 1\\)
-equals the chamber's own ideal-vertex count — nine, read from the primitive
-rays of the chamber.  Card `0125`'s `integral.cusp_chambers['g-e']` row
-states no `ideal_vertices` count, so the assertion compares the call's count
-with the computed ray count and names the missing card field
-(`ideal_vertices`) rather than read a value the card does not hold.
+asserts exactly the proved facts: the call's count on the `g-e` chamber
+equals the sum of the card's `parabolic_orbits` sizes — nine — and each
+returned subdiagram is the orthogonal-wall subdiagram of one of the chamber's
+own ideal rays.  The lattice and the walls are built from the card, read by
+tag, so the Gram matrix and the twelve wall vectors are never typed in the
+test; the reproductions of the reported calls (36 and 44) are deleted, and
+the ideal-vertex count is read from the card's orbits rather than computed
+and compared with the ray count.
 
 ## The run
 
-`1 passed` (`.tmp/qc-evidence/issue355-parabolic-test.log`); the test lint on
-the file: `1 files, 0 findings`
+`1 passed in 22.37 s` (`.tmp/qc-evidence/issue355-parabolic-test.log`); the
+test lint on the file: `1 files, 0 findings`
 (`.tmp/qc-evidence/issue355-parabolic-lint.log`).

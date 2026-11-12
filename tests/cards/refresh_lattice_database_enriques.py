@@ -47,6 +47,10 @@ CUSP_CHAMBER_TAGS = ("029J",)
 # The Enriques period lattice card, whose 0-cusp chamber diagrams #254 reads.
 CUSP_DIAGRAM_TAGS = ("029J",)
 
+# The card of U(2) + E8(-2), whose g-e chamber row #355 reads: the twelve
+# walls and the parabolic-subdiagram orbits of the chamber of W_e ⊂ G_e.
+PARABOLIC_SUBDIAGRAM_TAGS = ("0125",)
+
 # The catalogued lattices whose primitive-orbit rows #345 reads: the hyperbolic
 # plane and U + D4(-1) + A1(-1), and the positive definite A2 that the
 # lattice-database certify run of #375 certifies beside the hyperbolic plane.
@@ -339,6 +343,56 @@ def cusp_chambers(ref: str, tag: str) -> dict:
     }
 
 
+def parabolic_subdiagrams(ref: str, tag: str) -> dict:
+    """The subgroup chamber rows with their parabolic-subdiagram orbits (#355).
+
+    ``integral.cusp_chambers.<subgroup>`` is a list of chambers, and a row keyed
+    by a subgroup slug -- not one of the eight standard subgroups -- carries that
+    subgroup's chamber with its walls as vectors and its maximal parabolic
+    subdiagrams given as orbits modulo the subgroup's symmetries.  This
+    projection keeps the walls, the orbits and the lattice's own Gram tensor,
+    which is what the parabolic-subdiagram call's acceptance compares with; the
+    wall count and the diagram itself stay in the cusp-chamber sections.  A row
+    that states no ``parabolic_orbits`` is a computed chamber of the full
+    reflection group and cites no source, so only the rows that state them are
+    kept, by subgroup.
+    """
+    path = LATTICE_PATH.format(tag=tag)
+    card = front_matter(fetch(ref, path), path)
+    block = card["integral"]["cusp_chambers"]
+    return {
+        "tag": card["tag"],
+        "path": path,
+        "name": card["name"],
+        "latex": card["latex"],
+        "rank": card["rank"],
+        "signature": card.get("signature"),
+        "gram": [[int(entry) for entry in row] for row in card["gram_tensor"]],
+        "certification": card["certifications"]["integral.cusp_chambers"],
+        "rows": {
+            subgroup: [
+                {
+                    "statement": row["statement"],
+                    "printed_page": row.get("printed_page"),
+                    "figure": row.get("figure"),
+                    "wall_count": row["wall_count"],
+                    "walls": [
+                        [int(entry) for entry in wall["vector"]]
+                        for wall in row["walls"]
+                    ],
+                    "parabolic_orbits": [
+                        [list(subdiagram) for subdiagram in orbit["subdiagrams"]]
+                        for orbit in row["parabolic_orbits"]
+                    ],
+                }
+                for row in rows
+            ]
+            for subgroup, rows in block.items()
+            if all("parabolic_orbits" in row for row in rows)
+        },
+    }
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ref", required=True, help="full lattice-database commit SHA")
@@ -377,6 +431,7 @@ def main(argv: list[str]) -> int:
                 "cusp_chambers": "integral.cusp_chambers.{subgroup}.{cusp,statement,wall_count,printed_page,figure},certifications.integral.cusp_chambers",
                 "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
                 "cusp_diagrams": "integral.cusp_chambers.{subgroup}.{statement,cusp,walls,diagram,printed_page,figure},certifications.integral.cusp_chambers",
+                "parabolic_subdiagrams": "gram_tensor,integral.cusp_chambers.{subgroup}.{walls,parabolic_orbits,statement,wall_count,printed_page,figure},certifications.integral.cusp_chambers",
                 "primitive_orbit_series": "gram_tensor,integral.primitive_orbits.{subgroup}.{constant,z,w},certifications.integral.primitive_orbits",
                 "hyperbolic_reflectivity": "gram_tensor,hyperbolic.reflective,certifications.hyperbolic.reflective,references",
             },
@@ -388,6 +443,7 @@ def main(argv: list[str]) -> int:
         "discriminant_forms": {tag: discriminant_form(ref, tag) for tag in DISCRIMINANT_FORM_TAGS},
         "cusp_chambers": {tag: cusp_chambers(ref, tag) for tag in CUSP_CHAMBER_TAGS},
         "cusp_diagrams": {tag: cusp_diagrams(ref, tag) for tag in CUSP_DIAGRAM_TAGS},
+        "parabolic_subdiagrams": {tag: parabolic_subdiagrams(ref, tag) for tag in PARABOLIC_SUBDIAGRAM_TAGS},
         "primitive_orbit_series": {tag: primitive_orbit_series(ref, tag) for tag in PRIMITIVE_ORBIT_TAGS},
         "hyperbolic_reflectivity": {tag: hyperbolic_reflectivity(ref, tag) for tag in REFLECTIVITY_TAGS},
     }

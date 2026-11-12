@@ -596,3 +596,5 @@ batch made (`28422f9` + `f7eaa5d` for #298, `73d02b7` for #370).
 | `issue370-chambers-at-the-library-cusps-probe.log` | the tree of this push | the fundamental chamber of `K_I` at `T_Co`'s cusps 3, 4 and 5 read at the library's cusp vectors: nine walls each, eight of square `-4` and one of `-2` |
 
 The probe scripts sit beside their logs under the same names with `.py`.
+| `issue355-parabolic-test.log` | the tree of this push | the rewritten criterion test of `tests/lattices/test_the_rank_n_minus_one_parabolic_count_on_the_we_chamber.sage`: **1 passed in 22.37 s** (the call's count on the `g-e` chamber against the sum of the card's `parabolic_orbits` sizes — nine; each returned subdiagram the orthogonal-wall subdiagram of an ideal ray) |
+| `issue355-parabolic-lint.log` | the tree of this push | `test_lint` on the rewritten test module: **1 file, 0 findings** |

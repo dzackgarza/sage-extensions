@@ -212,3 +212,5 @@ bcfa8c748f7d698df62b9a07818d4713517e78e205bf9fc661f6061be52f16f8  issue370-t-co-
 c09e1bdd174618631101cd1cef0dcf4460d05047f1e943b57fea82178ad8cf23  issue370-ten-cusps-orbits-probe.py
 abe341075174bcff0992d78449c3b6fedb0db36d5a7f5dbc7f184f66d573a6cb  issue370-chambers-at-the-library-cusps-probe.log
 43fb86c79fdb6df9061907ee930a23942dac04d68389bb5389802d44665f6f3e  issue370-chambers-at-the-library-cusps-probe.py
+957a73ec5146c6a961257840f4e0cc85babe1e0af8d55c85324c579b32876ac3  issue355-parabolic-test.log
+2b2c9b53a00f0892d3d03653b3089fee0fb2406ff1e669287e01185c91d03cf0  issue355-parabolic-lint.log
