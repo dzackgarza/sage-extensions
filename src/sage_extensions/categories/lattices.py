@@ -4705,11 +4705,22 @@ class Lattices(OwnedCategoryOverBaseRing):
             Here $K=\operatorname{Frac}(R)$. A nonzero radical already gives
             an isotropic vector; in the nondegenerate case isotropy is
             equivalent to positive Witt index.  Over ``ZZ`` and ``QQ`` the
-            question is whether ``b(x, x) = 0`` has a nonzero rational
-            solution, which PARI's ``qfsolve`` decides with a witness or an
-            obstruction (Hasse--Minkowski, Serre, *A Course in Arithmetic*,
-            Ch. IV, 3.2, Thm. 8); ``TRAPS.md`` records why this route is not
-            the Witt index.
+            question is whether $b(x, x) = 0$ has a nonzero rational solution,
+            and three statements decide it
+            (:func:`sage_extensions.categories.lattice_engines._rational_isotropy_decision`):
+
+            * a definite form represents no zero, at any rank;
+            * an indefinite form of rank at least five is isotropic — Meyer's
+              theorem (Serre, *A Course in Arithmetic*, Ch. IV, §3.2, Cor. 2,
+              printed p. 43);
+            * an indefinite form of rank at most four is decided by the local
+              invariants, which is Hasse--Minkowski's theorem (Serre, Ch. IV,
+              §3.2, Thm. 8, printed p. 41) and which PARI's ``qfsolve``
+              implements, with a witness or an obstruction.
+
+            So no search runs above rank four, which is what makes the answer
+            available above nine variables, where the solver refuses; ``TRAPS.md``
+            records why this route is not the Witt index.
             If nondegeneracy itself is undecided, the common formed-module
             zero-fibre construction retains the isotropy proposition.
             An undecided hypothesis does not produce ``None``.
@@ -4728,7 +4739,7 @@ class Lattices(OwnedCategoryOverBaseRing):
                     _engine_ring(self.base_ring()) is SageZZ
                     or _engine_ring(self.base_ring()) is SageQQ
                 ):
-                    return lattice_engines._isotropic_vector_witness(self) is not None
+                    return lattice_engines._rational_isotropy_decision(self)
                 case True:
                     return bool(self.witt_index() > 0)
                 case _:
