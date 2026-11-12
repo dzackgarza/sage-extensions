@@ -69,7 +69,7 @@ call that runs the certification inside the method), and the index
 `integral.discriminant_form.orthogonal_group_order`
 (`46998591897600`, `card("discriminant_forms", "0125")`).
 
-`1 passed in 13.40 s` (`.scratch/p369b-test1.log`, peak 504 MiB,
+`1 passed in 14.43 s` (`.scratch/p369b-test2.log`, peak 498 MiB,
 launcher exit 0); the test lint on the file: `1 files, 0 findings`
 (`.scratch/p369b-lint.log`).
 
