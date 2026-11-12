@@ -8377,6 +8377,111 @@ class Lattices(OwnedCategoryOverBaseRing):
                 self._eichler_transvection_column_matrix(isotropic, orthogonal)
             )
 
+        @cached_method
+        def rational_gram_matrix(self):
+            r"""Return the Gram matrix of the selected basis, over the rationals.
+
+            :meth:`gram_tensor` is the form as a tensor and :meth:`b` evaluates it on two
+            vectors; a computation that works in coordinates -- the transvection matrix
+            of :meth:`eichler_transvection_matrix`, which multiplies coordinate columns
+            -- needs the matrix of the same form once.  Its entries are the pairings of
+            the selected basis, read through the same crossing `rational_coordinates`
+            documents, and they are cached on the lattice as a datum of it.
+            """
+            from sage.matrix.constructor import matrix
+            from sage.rings.rational_field import QQ as SageQQ
+
+            from sage_extensions.categories.rings.ring_foundation import _engine_element
+
+            ring = self.base_ring()
+            labels = tuple(self.module_generating_set())
+            basis = tuple(self.module_generator(label) for label in labels)
+            return matrix(
+                SageQQ,
+                [
+                    [
+                        SageQQ(_engine_element(ring, self.b(left, right)))
+                        for right in basis
+                    ]
+                    for left in basis
+                ],
+            )
+
+        def eichler_transvection_matrix(self, isotropic, orthogonal):
+            r"""Return the matrix of the Eichler transvection \(t(e,a)\) in the selected basis.
+
+            The formula is the one :meth:`eichler_transvection` assembles into a whole
+            isometry,
+
+            \[
+            t(e,a)(x) = x - b(a,x)\,e + b(e,x)\,a - \tfrac12 q(a)\,b(e,x)\,e ,
+            \]
+
+            transcribed at ``notes/topics/coble-enriques-lattice-theory/``
+            ``reflective-two-elementary-lattices.md`` and attributed there to Dawes,
+            section 2 equation (7), and stated as Gritsenko--Hulek--Sankaran,
+            arXiv:0810.1614, section 3.1, (4)--(5).  With \(G\) the Gram matrix of the
+            selected basis, \(E\) and \(A\) the coordinate columns of \(e\) and
+            \(a\), and \(q(a) = A^t G A\), the same formula is the single matrix
+
+            \[
+            T = 1 - E\,(A^t G) + A\,(E^t G) - \tfrac12 q(a)\,E\,(E^t G),
+            \]
+
+            whose columns are the images of the selected basis.  A caller that needs the
+            transvection's effect on a family of vectors multiplies the family's
+            coordinate matrix by \(T\); assembling an isometry from it and applying that
+            isometry vector by vector costs one object per call, which is what the
+            integral lift locus's own lift test was paying for each of its classes (#361).
+
+            The transvection preserves the lattice exactly when \(\tfrac12 q(a)b(e,x)\)
+            is integral for every \(x\) in it, which is automatic on an even lattice and
+            asserted otherwise, as in :meth:`eichler_transvection`.
+
+            EXAMPLES::
+
+                sage: from sage_extensions.categories.lattices import Lattices
+                sage: L = Lattices(ZZ)("U") + Lattices(ZZ)("A2")
+                sage: e, f, a, b = L.module_generators()
+                sage: transvection = L.eichler_transvection(e, a)
+                sage: matrix_of = L.eichler_transvection_matrix(e, a)
+                sage: all(
+                ....:     matrix_of * L.rational_coordinates(vector)
+                ....:     == L.rational_coordinates(transvection(vector))
+                ....:     for vector in L.module_generators()
+                ....: )
+                True
+            """
+            from sage.matrix.constructor import matrix
+            from sage.rings.rational_field import QQ as SageQQ
+
+            ring = self.base_ring()
+            zero = ring.zero()
+            assert isotropic.parent() is self and orthogonal.parent() is self, (
+                f"cannot form the Eichler transvection t(e, a) of {self!r} with e = {isotropic!r}, a = {orthogonal!r}: they lie in {isotropic.parent()!r} and {orthogonal.parent()!r}, not both in {self!r}"
+            )
+            assert isotropic.q() == zero, (
+                f"cannot form the Eichler transvection t(e, a) of {self!r}: e = {isotropic!r} must be isotropic, but q(e) = {isotropic.q()}"
+            )
+            assert isotropic.b(orthogonal) == zero, (
+                f"cannot form the Eichler transvection t(e, a) of {self!r}: a = {orthogonal!r} must lie in e^perp for e = {isotropic!r}, but b(e, a) = {isotropic.b(orthogonal)}"
+            )
+            labels = tuple(self.module_generating_set())
+            gram = self.rational_gram_matrix()
+            isotropic_coordinates = self.rational_coordinates(isotropic)
+            orthogonal_coordinates = self.rational_coordinates(orthogonal)
+            half_norm = (
+                orthogonal_coordinates.transpose() * gram * orthogonal_coordinates
+            )[0, 0] / SageQQ(2)
+            pairing_with_orthogonal = orthogonal_coordinates.transpose() * gram
+            pairing_with_isotropic = isotropic_coordinates.transpose() * gram
+            return (
+                matrix.identity(SageQQ, len(labels))
+                - isotropic_coordinates * pairing_with_orthogonal
+                + orthogonal_coordinates * pairing_with_isotropic
+                - half_norm * isotropic_coordinates * pairing_with_isotropic
+            )
+
         def _half_vector_coordinates(self, vector):
             r"""Return the coordinates of a vector of the metric dual in the basis of `L`.
 
