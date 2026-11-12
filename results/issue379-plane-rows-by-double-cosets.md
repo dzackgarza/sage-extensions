@@ -111,10 +111,14 @@ provider, on a VM whose load average was 18–37 (four CPUs, other projects' job
 
 | card | card's `O` row | call, `O` planes | time | card's `O+` row | call, `O⁺` planes |
 | --- | ---: | ---: | ---: | ---: | --- |
-| `6JRX` (`Λ₂`) | 4 | **4** | 1006.6 s | 4 | not returned in ~1700 s |
-| `6JRY` (`Λ₄`) | 9 | not returned in ~1600 s | — | 9 | not run |
+| `6JRX` (`Λ₂`) | 4 | **4** | 1006.6 s | 4 | not returned: the stage ran past the job's 3300 s cap, ≈2290 s of it after the `O` row |
+| `6JRY` (`Λ₄`) | 9 | not returned inside its own 3300 s cap | — | 9 | not run |
 
-Both rows agree where they returned, and nothing disagrees.  What is measured about the
+Both rows agree where they returned, and nothing disagrees.  The `O⁺` stage is not a
+close call: it passed a cap of 3300 s, which is more than three times the `O` row's own
+1006.6 s, so the next unit's first job is to attribute that stage between its two parts
+(the quotient's image computation and the per-plane block-lift solves) rather than to give
+it a bigger cap.  What is measured about the
 `O⁺` stage is its lower bound, not its cost: it spends that time in the character
 quotient's own image computation (the ambient discriminant image over `O(Λ)`'s selected
 generators was measured at 130–417 s in `results/issue17-double-coset-row.md`) and then in
