@@ -522,3 +522,26 @@ worked around: `Gamma_{Co,2}`'s Schreier family (`|S| * 67456 - 67455` members, 
 | `issue358-index-per-class.log` | `7ef38d52cf` | the four divided classes rebuilt from those vectors reproduce the row's own printed lines; `[Stab_{O(q)}(c) : rho(Stab_Gamma(v))]` = 256, 17 280, 34 560, 15 360 and the class counts 2, 135, 270, 120 summing to the 527 nonzero isotropic classes |
 | `issue358-card0125-regression.log` | `7ef38d52cf` | `tests/lattices/test_the_decomposition_preimage_returns_generators.sage` with the repair and the set-image function: 1 passed in 320.85 s |
 | `issue358-tests.log` | pushed head | `tests/lattices/test_the_coble_gamma_co_2_line_row_returns_generators.sage` and the card-`0125` test with `-p qc_sage_session -p suite_budget -p test_lint --no-time-gates`: **2 passed in 541.79 s** (391.07 s and 150.14 s), no lint findings, peak tree RSS 4381 MiB |
+
+## #370: the `Gamma_{Co,2}`-orbits of the admissible roots of `K_I` at a marked 0-cusp of `T_Co`
+
+`IsotropicVectorReductionImage.root_class_orbits(roots, *, stabilizer_generators=None)` returns the
+orbits of a finite family of **root classes** of `K_I = eta^perp/ZZ eta` under the certified action
+of `Stab_{Gamma_{Co,2}}(ZZ eta)` on `K_I`, with a transporter (an isometry of `K_I` in `G_v`) per
+class, checked by re-application; `root_class(vector)` reads the class of an ambient root.  Rank-one
+difficulty: the acting family is not certified to generate `G_v` (#312), so an orbit of more than one
+class proves equivalence and a singleton proves nothing.  Card `029J`'s `cusp_chambers` wall counts
+(12, 10, 12) equal the computed number of distinct `K_J`-classes of the printed roots at cusps 1–3;
+at `T_Co`'s cusp 3 the printed family meets `T_Co` in exactly one `(-2)`-class and the call returns
+its orbit with the identity transporter.  Cusps 4–5 are blocked on the missing `T_En` transcription
+of Sterk's diagrams 4.3.8 and 4.3.9.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue370-tco-cusps-and-reductions.log` | `8e88c6a1c5` (pre-push base) | card `029J`'s cusp vectors read in `T_Co` at cusps 3–5: `q = 0`, primitive, `div = 2`; `K_I` rank 9, det 512, signature (1,8) at all three; `O(K_I)`'s chamber has 9 walls |
+| `issue370-k-i-chambers.log` | `8e88c6a1c5` | the chamber's wall norms at cusps 3, 4, 5: eight `-4` and one `-2` each — the chamber is not the root family |
+| `issue370-printed-roots-in-t-co.log` | `8e88c6a1c5` | `delta = e - f`; of the printed roots, 12/12 (`Sterk_1`, all `-4`), 8 of 10 (`Sterk_2`, all `-4`, the other two `±delta`) and 9 of 12 (`Sterk_3`, eight `-4` and one `-2`) are `delta`-orthogonal |
+| `issue370-line-stabilizer-and-certification.log` | `8e88c6a1c5` | `T_Co` cusp 3: the line stabilizer returns **31** generators in 21.5 s, **16** of them certified in `G_v` in 159 s; `rho(K_v)` trivial; one `(-2)` printed root |
+| `issue370-the-transcription-is-not-linear.log` | `8e88c6a1c5` | the 34 `TdP`↔`T_En` root pairs of the three transcribed cusps span rank 16 of 20 and impose an inconsistent linear system: no single linear map gives cusps 4–5's coordinates |
+| `issue370-root-class-orbit-probe.log` | `8e88c6a1c5` | the orbit call on the printed roots: 12/10/12 distinct classes at cusps 1–3 and the refusal of a `-4` class |
+| `issue370-tests.log` | pushed head | `tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage` with `-p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates`: **3 passed in 344.08 s**, no lint findings, peak tree RSS 1509 MiB |

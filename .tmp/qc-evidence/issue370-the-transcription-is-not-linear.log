@@ -1,0 +1,15 @@
+pairs 34 source rank 20 target rank 12
+rank of the source vectors: 16
+row 0 does not solve: ValueError
+one linear map for every row: False rows solved: 0
+[peakrss] p370p7b: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 279 MiB
+[peakrss] low-water MemAvail : 11090 MiB
+[peakrss] peak single VmHWM  : 279 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      268 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   279 MiB hwm=   279 MiB avail= 11090 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 11313 MiB
+launcher exit: 0
