@@ -16,8 +16,8 @@ element of the parabolic whose plane action is that action.  This file pins the 
 things the route rests on, on specimens small enough for the per-test gate:
 
 * `[O(L):O⁺] = 2` is computed, not read off a class;
-* the witness exists, lies in `O(L)`, fixes the plane setwise, and has odd determinant —
-  so it is genuinely outside `O⁺` and genuinely in the stabilizer;
+* the witness exists, lies in `O(L)`, fixes the plane setwise, and lies outside `O⁺` —
+  so its character image is the odd one and it is genuinely in the stabilizer;
 * `O⁺`'s plane count then equals `O`'s, which on these specimens is one orbit.
 
 `U(2) + U(2)` is the specimen that matters: it has **no** square-two vector, so no
@@ -45,10 +45,12 @@ def test_o_plus_is_the_index_two_spinor_kernel() -> None:
 def test_the_plane_witness_is_an_odd_element_of_the_plane_stabilizer() -> None:
     r"""One plane-block witness per ambient plane, in `O(L)`, fixing the plane, odd.
 
-    Every returned witness is checked on the four properties the double-coset argument
-    uses: it is an integral isometry, it stabilizes the plane, its determinant is `-1`
-    (hence its character image is the odd one), and it is the lift the block equations
-    produced rather than a guess.
+    Every returned witness is checked on the three properties the double-coset argument
+    uses: it is an integral isometry, it stabilizes the plane, and it lies **outside**
+    `O⁺`, which is what puts its character image in the odd coset.  The last check is
+    membership in `O⁺` itself, not a determinant or a spinor norm read separately: the
+    witness returned on these specimens is a rotation (determinant `+1`) of real spinor
+    norm `-1`, so a determinant test would reject a valid witness.
     """
     for lattice in _SPECIMENS:
         quotient = lattice.O_plus().finite_character_quotient()
@@ -57,7 +59,7 @@ def test_the_plane_witness_is_an_odd_element_of_the_plane_stabilizer() -> None:
             witness = quotient.plane_odd_character_witness(plane)
             assert witness in automorphisms
             assert plane.stabilizes(witness) is True
-            assert witness.determinant() == -lattice.base_ring().one()
+            assert witness not in lattice.O_plus()
 
 
 def test_the_plane_count_under_o_plus_is_the_count_under_o() -> None:
