@@ -1869,6 +1869,22 @@
   }
  },
  "discriminant_forms": {
+  "0125": {
+   "certification": "b298f9ee07553d1f6f93710a554da24a7f4bf0cdb2a69e7f03c4142e22dfb839",
+   "determinant": -1024,
+   "isotropic_classes": 528,
+   "isotropic_orbits": 2,
+   "latex": "U(2) \\oplus E_{8}(-2)",
+   "name": "U(2) + E8(-2)",
+   "orthogonal_group_order": 46998591897600,
+   "path": "lattices/0125.md",
+   "rank": 10,
+   "signature": [
+    1,
+    9
+   ],
+   "tag": "0125"
+  },
   "6JRR": {
    "certification": "0be391409303d25f25d126795ee881040661b4883ad7473272b34b60b8c414da",
    "determinant": -2048,

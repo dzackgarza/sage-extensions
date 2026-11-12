@@ -36,8 +36,10 @@ ARITHMETIC_GROUP_PATH = "arithmetic-groups/{slug}.md"
 PLANE_ORBIT_TAGS = ("6JRX", "6JRY", "029J")
 LATTICE_PATH = "lattices/{tag}.md"
 
-# The Coble lattice card, whose discriminant-form rows #323 reads.
-DISCRIMINANT_FORM_TAGS = ("6JRR",)
+# The Coble lattice card, whose discriminant-form rows #323 reads, and the card
+# of U(2) + E8(-2), whose discriminant-form order is the index of the stable
+# orthogonal group #369 generates.
+DISCRIMINANT_FORM_TAGS = ("6JRR", "0125")
 
 # The Enriques period lattice card, whose 0-cusp chamber rows #312 and #285
 # read: the wall count of the restricted chamber at each of Sterk's five cusps.
