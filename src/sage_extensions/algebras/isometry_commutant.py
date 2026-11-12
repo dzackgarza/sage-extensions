@@ -77,7 +77,9 @@ def _short_vectors(gram, bound):
     ``qfminim``, which lists one vector of each pair `\pm x`.
     """
     denominator = gram.denominator()
-    found = pari(matrix(ZZ, denominator * gram)).qfminim(denominator * bound)[2].sage()
+    # flag 2: Fincke-Pohst with exact arithmetic; the default floating Gram-Schmidt raises
+    # "precision too low" on Gram matrices with large entries.
+    found = pari(matrix(ZZ, denominator * gram)).qfminim(denominator * bound, None, 2)[2].sage()
     vectors = [vector(ZZ, column) for column in found.columns()]
     return vectors + [-v for v in vectors]
 
