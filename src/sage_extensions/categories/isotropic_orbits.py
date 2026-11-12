@@ -1714,10 +1714,11 @@ class IsotropicPlaneOrbit:
     for the reduction that makes one point stand for one orbit.
     """
 
-    def __init__(self, decomposition, start, point) -> None:
+    def __init__(self, decomposition, start, point, plane=None) -> None:
         self._decomposition = decomposition
         self._start = start
         self._point = point
+        self._plane = plane
 
     def lattice(self):
         r"""Return the lattice whose planes are being classified."""
@@ -1735,13 +1736,18 @@ class IsotropicPlaneOrbit:
     def representative(self):
         r"""Return a primitive isotropic plane in this orbit.
 
-        The plane is the image of the ``O(L)``-orbit representative under an
-        isometry whose discriminant image carries the representative's class
-        set to this orbit's point.  The isometry is read as a word in the
-        ambient generators (the section of the finite character image), and
-        the transported plane is checked against the point it is supposed to
-        reach before it is returned.
+        Two routes produce it.  An orbit that sits over a point of the finite
+        divided-class set realizes the plane as the image of the ``O(L)``-orbit
+        representative under an isometry whose discriminant image carries the
+        representative's class set to this orbit's point; the isometry is read
+        as a word in the ambient generators (the section of the finite character
+        image), and the transported plane is checked against the point it is
+        supposed to reach before it is returned.  An orbit obtained from the
+        plane's own stabilizer generators (:meth:`_orbits_from_stabilizer`) was
+        transported by its splitting isometry already and returns that plane.
         """
+        if self._plane is not None:
+            return self._plane
         return self._decomposition.plane_of(self._start, self._point)
 
     def __repr__(self):
@@ -1838,6 +1844,7 @@ class _DividedClassPlaneOrbitDecomposition:
         self._subgroup_image = libgap.Subgroup(engine, images)
         self._subgroup_image_generators = libgap.SmallGeneratingSet(self._subgroup_image)
         self._supplied_stabilizers = dict(stabilizer_generators or {})
+        self._parabolic_stabilizers = {}
 
     def lattice(self):
         return self._lattice
@@ -1868,13 +1875,27 @@ class _DividedClassPlaneOrbitDecomposition:
         * the published indices of the two ``O(N)``-orbits of ``N = U \oplus U(2) \oplus E_8(-2)``,
           ``527 = 17 \cdot 31`` and ``23715 = 3^2 \cdot 5 \cdot 17 \cdot 31``
           (Dutour Sikirić--Hulek, §3.6, p. 22), on a lattice exhibited to be
-          ``N`` (:meth:`_establish_by_published_indices`).
+          ``N`` (:meth:`_establish_by_published_indices`);
+        * the plane's own setwise stabilizer, when its generators are established
+          to be the whole of it (:meth:`_establish_by_plane_parabolic`).  That
+          closure does not need the lattice to be ``N``: the block equations of
+          the parabolic are solved over ``ZZ`` at any primitive isotropic plane,
+          whether or not the plane splits off the lattice (#331, #366), and
+          ``is_parabolic_complete()`` decides on computed indices whether the
+          solution is all of the stabilizer.  It also does not need the two
+          indices to agree, because with ``\rho(G_x)`` in hand the orbits are
+          the double cosets themselves (:meth:`_orbits_from_stabilizer`) and
+          the class-set count is not used.
 
         A representative for which none applies raises, naming it and the
         missing fact, rather than returning a count.
+
+        The returned positions are the ones whose orbits are computed from the
+        plane's own stabilizer generators, i.e. by double cosets; the others are
+        computed on the finite class sets.
         """
         if self._establish_when_the_image_is_trivial(sizes):
-            return
+            return ()
         pending = []
         for position, size in enumerate(sizes):
             supplied = self._supplied_stabilizers.get(position)
@@ -1882,8 +1903,24 @@ class _DividedClassPlaneOrbitDecomposition:
                 pending.append(position)
                 continue
             self._establish_by_stabilizer_generators(position, tuple(supplied), size)
-        if pending:
+        if not pending:
+            return ()
+        try:
             self._establish_by_published_indices(pending, sizes)
+            return ()
+        except ValueError as published_refusal:
+            unpublished = published_refusal
+        refusals = []
+        for position in pending:
+            try:
+                self._establish_by_plane_parabolic(position)
+            except ValueError as parabolic_refusal:
+                refusals.append(str(parabolic_refusal))
+        if refusals:
+            raise ValueError(
+                "\n".join((str(unpublished), *refusals))
+            ) from None
+        return tuple(pending)
 
     def _establish_when_the_image_is_trivial(self, sizes) -> bool:
         r"""Decide the vacuous case ``\rho(O(L)) = 1``, and return whether it applied.
@@ -1990,6 +2027,54 @@ class _DividedClassPlaneOrbitDecomposition:
                 f"Pass stabilizer_generators for the representatives"
             )
 
+    def _establish_by_plane_parabolic(self, position) -> None:
+        r"""Retain generators of the plane's setwise stabilizer, or refuse naming the factor.
+
+        The setwise stabilizer of a primitive isotropic plane ``x`` in ``O(L)``
+        is the parabolic ``P_x`` of Dutour Sikirić--Hulek, arXiv:2302.01679v2,
+        Theorem 4.9 (``theorem_isotropic_k_planes``), printed pp. 33--34: the
+        isometries preserving ``x`` satisfy that theorem's block equations, and
+        :meth:`sage_extensions.categories.isotropic_parabolics.PrimitiveIsotropicSubobjects.ParentMethods.parabolic_stabilizer_generators`
+        solves them over ``ZZ`` -- the unipotent radical, the reflections of
+        ``x^\perp/x`` and the integral lifts of the plane's ``GL_2(ZZ)``.  Those
+        constructions do not need ``x`` to split off ``L``; what they need is
+        the statement that they are *all* of ``P_x``, and
+        :meth:`...PrimitiveIsotropicSubobjects.ParentMethods.is_parabolic_complete`
+        decides that on three computed indices (the radical's, the plane
+        actions' and the quotient actions' -- #331, #366).
+
+        A family so established generates ``G_x``, so its discriminant image is
+        ``\rho(G_x)`` itself and the orbits are the double cosets of
+        :meth:`_orbits_from_stabilizer` -- with no comparison against the
+        class-set orbit, which on some lattices is strictly larger than
+        ``\rho(G_x)``.  On \(T_{\mathrm{Co}}\) it is: the stabilizer of a plane's
+        order-`4` isotropic subgroup has order `1981808640` and the plane's own
+        stabilizer maps onto a subgroup of index `8` in it, while the plane's
+        divided class set is a single `\rho(O(L))`-orbit of `23715` points, so
+        the class-set count would be short by a factor `8` at every class
+        (research #645's `thm:plane-fibre`).
+
+        When the family is not established to be all of ``P_x``, the refusal
+        names the plane and the missing factor
+        (:meth:`...ParentMethods.parabolic_obstruction`): an unknown image means
+        an unknown double-coset count in either direction.
+        """
+        plane = _primitive_isotropic_plane_of(self._lattice, self._starts[position][0])
+        if plane.is_parabolic_complete() is not True:
+            raise ValueError(
+                f"the stabilizer of {plane} in O({self._lattice}) is not established: the generators "
+                f"of the plane's parabolic are not established to be the whole setwise stabilizer, and "
+                f"no other statement supplies them. The missing factor: {plane.parabolic_obstruction()}"
+            )
+        family = tuple(plane.parabolic_stabilizer_generators())
+        if not family:
+            raise ValueError(
+                f"the stabilizer of {plane} in O({self._lattice}) is not established: its parabolic is "
+                f"decided complete but returned no generators, so there is nothing to compute the "
+                f"double cosets with"
+            )
+        self._parabolic_stabilizers[position] = family
+
     def _point_of_classes(self, classes):
         return _libgap().Set([self._orthogonal._engine_abelian_element(c) for c in classes])
 
@@ -2005,10 +2090,12 @@ class _DividedClassPlaneOrbitDecomposition:
             _libgap().AsList(_libgap().Orbit(self._image, point, action))
             for _plane, _classes, point in self._starts
         ]
-        self._establish_plane_stabilizer_images([len(orbit) for orbit in ambient_orbits])
+        from_stabilizer = self._establish_plane_stabilizer_images([len(orbit) for orbit in ambient_orbits])
         points = []
         owners = []
         for start, orbit in enumerate(ambient_orbits):
+            if start in from_stabilizer:
+                continue
             for point in orbit:
                 points.append(point)
                 owners.append(start)
@@ -2033,7 +2120,30 @@ class _DividedClassPlaneOrbitDecomposition:
                         seen[following] = True
                         stack.append(following)
             orbits.append(IsotropicPlaneOrbit(self, owners[start], points[start]))
+        for start in sorted(from_stabilizer):
+            orbits.extend(self._orbits_from_stabilizer(start))
         return finite_ordered_set(tuple(orbits))
+
+    def _orbits_from_stabilizer(self, start):
+        r"""One orbit per double coset ``\Gamma \backslash G / G_x``, from the plane's stabilizer.
+
+        The orbits of ``\Gamma`` on the ``G = O(L)``-orbit of ``x`` are the
+        double cosets ``\Gamma \backslash G / G_x``, and because ``\Gamma``
+        contains ``\ker \rho`` they are computed in the finite discriminant
+        image (:meth:`sage_extensions.categories.orthogonal_quotients.OrthogonalCharacterQuotient.splitting_isometries`,
+        which walks ``\rho(\Gamma)``-orbits on the coset space, not the group).
+        Each returned lift is an actual isometry, so each orbit is realized as
+        the plane it carries ``x`` to; no class-set point is asked for, which is
+        what makes this route exact where the class-set route is not.
+        """
+        plane = self._starts[start][0]
+        quotient = self._group.finite_character_quotient()
+        return tuple(
+            IsotropicPlaneOrbit(
+                self, start, None, splitting.transport_isotropic_object(plane)
+            )
+            for splitting in quotient.splitting_isometries(self._parabolic_stabilizers[start])
+        )
 
     def plane_of(self, start, point):
         r"""Return the plane at ``point`` as the image of the ``start`` representative."""
@@ -2081,6 +2191,27 @@ def _libgap():
     return libgap
 
 
+def _primitive_isotropic_plane_of(lattice, plane):
+    r"""Read ``plane`` as a primitive isotropic subobject of ``lattice``.
+
+    An ambient representative arrives either as the subobject the lattice
+    operations produce (``subobject_on``) or as a primitive isotropic subobject
+    (``primitive_isotropic_subobject``).  The parabolic's own methods
+    (``PrimitiveIsotropicSubobjects`` in
+    :mod:`sage_extensions.categories.isotropic_parabolics`) are stated on the
+    second, so the plane's own generators -- what both spellings carry -- are
+    read into it.  Constructing it asserts primitivity, which is the hypothesis
+    of those methods: a rank-two totally isotropic subobject that is not
+    primitive has torsion in its quotient and no parabolic of the stated block
+    form.
+    """
+    inclusion = plane.inclusion()
+    domain = inclusion.domain()
+    return lattice.primitive_isotropic_subobject(
+        *(inclusion(domain.module_generator(label)) for label in domain.module_generating_set())
+    )
+
+
 def _divided_class_isotropic_plane_orbits(subgroup, representatives, stabilizer_generators=None):
     r"""Return the subgroup's orbits of primitive isotropic planes, by divided classes."""
     if representatives is None:
@@ -2110,7 +2241,7 @@ class IsotropicVectorReductionImage(SageObject):
     there is the Levi map \(\lambda: P_v \to O(N)\) (D. Dutour Sikirić and
     K. Hulek, *Moduli of polarised Enriques surfaces — computational aspects*,
     arXiv:2302.01679v2, §"The Tits building", theorem `theorem_isotropic_k_planes`,
-    printed p. 22, the block form of an isometry preserving a primitive isotropic
+    printed pp. 33--34, the block form of an isometry preserving a primitive isotropic
     sublattice, with its quotient block).  Then
     \(G_v = \lambda(\Gamma \cap P_v) \le O(N)\) and
     \(K_v = \ker \lambda\) is the unipotent radical of \(P_v\).
@@ -2520,8 +2651,20 @@ class IsotropicVectorReductionImage(SageObject):
         of the walls presents them first, and the point Sterk uses at the first
         cusp is \(x=e'+f'\) (§4.3.5, p. 19), of square \(4\), orthogonal to nine
         of his twelve printed roots, with the remaining three at heights
-        \(b(x,a)^2/\lvert q(a)\rvert=4,16,64\).  Omitted, the engine selects a
-        point of its own.
+        \(b(x,a)^2/\lvert q(a)\rvert=4,16,64\).  Omitted, the call computes a
+        point of its own: a vertex of the chamber of the full reflection group
+        \\(W(N)\\), selected by how many of its walls the subgroup filter admits
+        (:meth:`_computed_controlling_vector`).  Every such vertex lies in the
+        subgroup's chamber, and E. B. Vinberg, *On the groups of unit elements
+        of certain quadratic forms*, Math. USSR Sb. 16 (1972), §3.2,
+        shows that a point of the chamber gives the same chamber: the
+        construction after Proposition 3 (p. 27) takes the point \\(p_0\\) and
+        the unique cell of \\(\Gamma\\) coinciding with \\(P_0\\) near it,
+        Proposition 4 (p. 28) states that the polyhedron cut out by the normals
+        listed is that cell, and Proposition 5 (p. 29) states that the list
+        breaks off once its volume is finite, so the chamber returned does not
+        depend on the point chosen within the subgroup's chamber.  The point is
+        computed from the input and never typed.
 
         ``max_roots`` and ``max_decompositions`` bound the search for a caller
         who wants a prefix of the chamber — a chamber that is not of finite
@@ -2533,7 +2676,7 @@ class IsotropicVectorReductionImage(SageObject):
 
         reduction = HyperbolicLattices(self._lattice.base_ring())(self._reduction)
         control = (
-            None
+            self._computed_controlling_vector()
             if controlling_vector is None
             else self._class_of_the_controlling_vector(controlling_vector)
         )
@@ -2554,6 +2697,51 @@ class IsotropicVectorReductionImage(SageObject):
             max_roots=max_roots,
             max_decompositions=max_decompositions,
         )
+
+    def _computed_controlling_vector(self):
+        r"""Return the class in ``N`` computed as the point of the hyperbolic space.
+
+        The point is a vertex of the chamber of the full reflection group
+        \\(W(N)\\) of the reduction, selected among the vertices of positive
+        square by how many of the walls through it the subgroup filter admits:
+        every vertex of that chamber lies in the chamber of every reflection
+        subgroup of \\(W(N)\\) -- a group generated by fewer reflections cuts out
+        a bigger polyhedron -- so the vertex lies in the subgroup's chamber, and
+        by Vinberg 1972, §3.2, the construction after Proposition 3 (p. 27: the
+        unique cell of \\(\\Gamma\\) coinciding with \\(P_0\\) in a neighborhood of
+        the point \\(p_0\\)) with Proposition 4 (p. 28: the polyhedron cut out by
+        the normals listed is that cell) and Proposition 5 (p. 29: the
+        finite-volume termination), the search anchored there computes the
+        subgroup's chamber and no other.  The vertex is computed from the input
+        -- the full-group search on the reduction and the subgroup's own root
+        filter -- and never typed.
+
+        The selection maximizes the admitted count so that the cell at the
+        chosen vertex is spanned by admitted walls: the walk's own layer
+        enumeration then prunes to the cone of that cell, which is what keeps
+        the candidate list short.
+        """
+        from sage_extensions.categories.hyperbolic_lattices import HyperbolicLattices
+
+        reduction = HyperbolicLattices(self._lattice.base_ring())(self._reduction)
+        best = None
+        for coordinates, square, through, basis in reduction._full_chamber_vertices():
+            if square <= 0 or not basis:
+                # An ideal vertex is not a point of the hyperbolic space, and a
+                # vertex whose walls are not a Z-basis of its orthogonal
+                # complement leaves the walk's own cell condition unsatisfied,
+                # so the layer enumeration would not be pruned to the cone.
+                continue
+            admitted = sum(1 for root in through if self.admits_root(root))
+            if best is None or admitted > best[0]:
+                best = (admitted, coordinates)
+        if best is None:
+            raise ValueError(
+                f"no vertex of the chamber of the full reflection group of {self._reduction} "
+                f"is a point of the hyperbolic space, so no controlling vector can be computed "
+                f"from the input"
+            )
+        return self._reduction([int(entry) for entry in best[1]])
 
     def _class_of_the_controlling_vector(self, controlling_vector):
         r"""Return the class in ``N`` of a vector of ``L`` offered as the point \(p_0\).
@@ -2678,6 +2866,199 @@ class IsotropicVectorReductionImage(SageObject):
             (root, self.reduction_image(reflection))
             for root, reflection in self._reflections(tuple(roots))
         )
+
+    def root_class(self, vector):
+        r"""Return the class in ``N`` of a vector of the ambient lattice lying in ``v^\perp``.
+
+        A caller holding a root family written in the *ambient* lattice --- Sterk's
+        printed cusp roots, for instance --- needs its classes in
+        \(N = v^\perp/\mathbf Z v\) before the orbit question can be asked, and
+        :meth:`root_class_orbits` speaks the classes that :meth:`admits_root` and
+        the chamber of \(N\) speak.  The class is computed by writing the vector in
+        the perpendicular's own frame together with the line's generator, which is
+        the decomposition \(v^\perp = \langle\text{frame}\rangle \oplus \mathbf Z v\)
+        that the reduction retains, and then projecting; the solution is checked to
+        be integral and to reproduce the vector.
+        """
+        from sage.all import QQ, matrix
+
+        lattice = self._lattice
+        vector = self._coerced(lattice, vector)
+        zero = lattice.base_ring().zero()
+        if lattice.b(vector, self._vector) != zero:
+            raise ValueError(
+                f"the vector {vector!r} is not orthogonal to {self._vector!r}, so it has no class "
+                f"in the reduction {self._reduction!r}"
+            )
+        perpendicular = self._line.isotropic_perpendicular()
+        labels = tuple(perpendicular.module_generating_set())
+        rank = int(lattice.module_rank())
+        columns = [
+            [
+                int(entry)
+                for entry in perpendicular.inclusion()(
+                    perpendicular.module_generator(label)
+                ).to_vector()
+            ]
+            for label in labels
+        ] + [[int(entry) for entry in self._vector.to_vector()]]
+        system = matrix(QQ, [[column[row] for column in columns] for row in range(rank)])
+        target = matrix(QQ, rank, 1, [int(entry) for entry in vector.to_vector()])
+        solution = system.solve_right(target)
+        coefficients = [solution[index, 0] for index in range(len(labels))]
+        assert all(coefficient in QQ for coefficient in coefficients)
+        if any(coefficient.denominator() != 1 for coefficient in coefficients):
+            raise ArithmeticError(
+                f"the vector {vector!r} is not in the lattice generated by the perpendicular's "
+                f"frame and {self._vector!r}: its coordinates are {coefficients}"
+            )
+        ring = lattice.base_ring()
+        element = perpendicular.linear_combination(
+            {
+                label: ring(int(coefficient))
+                for label, coefficient in zip(labels, coefficients)
+            }
+        )
+        class_ = self._reduction.projection()(element)
+        difference = vector - perpendicular.inclusion()(element)
+        line_system = matrix(
+            QQ, rank, 1, [int(entry) for entry in self._vector.to_vector()]
+        )
+        scale = line_system.solve_right(
+            matrix(QQ, rank, 1, [int(entry) for entry in difference.to_vector()])
+        )
+        if difference != lattice.scalar_multiple(lattice.base_ring()(int(scale[0, 0])), self._vector):
+            raise ArithmeticError(
+                f"the class of {vector!r} is not the projection of its perpendicular part: the "
+                f"remainder is {difference!r}, which is not a multiple of {self._vector!r}"
+            )
+        return class_
+
+    def root_class_orbits(self, roots, *, stabilizer_generators=None):
+        r"""Return the orbits of the classes ``roots`` of ``N`` under the certified reflections.
+
+        ``roots`` is a finite family of vectors of the reduction
+        \(N = v^\perp/\mathbf Z v\) --- the **classes** of admissible roots of the
+        boundary lattice \(K_I\), which is the form the chamber of \(N\)
+        (:meth:`cusp_chamber`) and :meth:`admits_root` already speak.  The
+        returned object has one member per orbit: an indexed family from the
+        orbit's classes to the **transporters**, one isometry of \(N\) per class,
+        carrying the orbit's representative to it and checked by re-application.
+
+        **The acting family.**  Two sources are used, and both are certified in
+        \(G_v = \lambda(\Gamma \cap P_v)\) by :meth:`contains`, which decides the
+        question in \(O(A_L)\) and never lists the group:
+
+        * ``stabilizer_generators``, when given: isometries of the ambient
+          lattice fixing ``v`` --- the family
+          ``supergroup().isotropic_stabilizer_generators(line)`` returns, each
+          reduced to \(N\) by :meth:`reduction_image`.  This is the action of
+          \(\mathrm{Stab}_{\Gamma}(\mathbf Z v)\) the caller already holds.
+        * the reflections of \(N\) in the given classes themselves
+          (:meth:`contains_root_reflection`), so a wall family generates its own
+          reflection subgroup.
+
+        They are *not* certified to generate \(G_v\):
+        :meth:`generators_are_certified_complete` is ``False`` at a primitive
+        isotropic line (sage-extensions#312), so a component is an
+        **identification** --- a class carried to another one by an exhibited
+        element of \(G_v\) is \(\Gamma\)-equivalent to it --- while a component of
+        one class is *not* a proof of inequivalence.  Two classes are known to lie
+        in different \(\Gamma\)-orbits only once a generating family of \(G_v\) is
+        certified.
+
+        **Why the walk is over the given classes.**  The orbits of \(N\)'s roots
+        under \(G_v\) are infinite; what a cusp fixes is a finite family, and the
+        question research asks of it is which of *those* classes the group
+        identifies.  So the walk stays inside the given family, and an image
+        outside it is dropped rather than followed: following it would enumerate
+        the orbit, not answer the question.
+        """
+        from sage_extensions.categories.sets.finite_ordered_sets import (
+            finite_ordered_set,
+        )
+        from sage_extensions.categories.sets.indexed_families import (
+            finite_indexed_family_from_values,
+        )
+
+        reduction = self._reduction
+        given = finite_ordered_set(
+            tuple(self._coerced(reduction, root) for root in roots)
+        )
+        if int(given.cardinality()) == 0:
+            raise ValueError(
+                f"no root classes were supplied for the reduction {reduction!r}: the orbits of "
+                "the empty family are empty and are not the orbits of a cusp's roots"
+            )
+        acting = []
+        root_square = -reduction.base_ring()(2)
+        for root in given:
+            if reduction.q(root) != root_square:
+                raise ValueError(
+                    f"the class {root!r} of {reduction!r} has square {reduction.q(root)}, not "
+                    f"{root_square}, so it is no root of the boundary lattice"
+                )
+            lift = self.class_lift(root)
+            reflection = self.root_reflection(lift)
+            image = self.reduction_image(reflection)
+            if self.contains(image, lift=reflection):
+                acting.append(image)
+        for generator in stabilizer_generators if stabilizer_generators is not None else ():
+            if generator(self._vector) != self._vector:
+                continue
+            image = self.reduction_image(generator)
+            if self.contains(image, lift=generator):
+                acting.append(image)
+        identity = reduction.Aut().one()
+        remaining = list(given)
+        orbits = []
+        while remaining:
+            representative = remaining.pop(0)
+            transports = {representative: identity}
+            frontier = [representative]
+            while frontier:
+                current = frontier.pop()
+                for image_map in acting:
+                    reached = image_map(current)
+                    if reached in transports or reached not in given:
+                        continue
+                    candidate = image_map * transports[current]
+                    if candidate(representative) != reached:
+                        candidate = transports[current] * image_map
+                    if candidate(representative) != reached:
+                        raise ArithmeticError(
+                            f"the product of the transporter for {current!r} and the reflection "
+                            f"in {image_map!r} carries {representative!r} to "
+                            f"{candidate(representative)!r}, not to {reached!r}: the isometries of "
+                            f"{reduction!r} compose in neither order as this walk assumes"
+                        )
+                    transports[reached] = candidate
+                    frontier.append(reached)
+                    if reached in remaining:
+                        remaining.remove(reached)
+            transports = {
+                root: transports[root]
+                for root in given
+                if root in transports
+            }
+            for root, transporter in transports.items():
+                if transporter(representative) != root:
+                    raise ArithmeticError(
+                        f"the transporter recorded for {root!r} carries {representative!r} to "
+                        f"{transporter(representative)!r}: the walk's product is not the "
+                        f"transporter it is recorded as"
+                    )
+            orbits.append(
+                finite_indexed_family_from_values(
+                    finite_ordered_set(tuple(transports)),
+                    transports,
+                    name=(
+                        f"the classes of {reduction!r} carried to {representative!r} by the "
+                        f"certified reflections, with their transporters"
+                    ),
+                )
+            )
+        return finite_ordered_set(tuple(orbits))
 
     def generators_are_certified_complete(self) -> bool:
         r"""Whether :meth:`generators` is known to generate all of ``G_v``."""

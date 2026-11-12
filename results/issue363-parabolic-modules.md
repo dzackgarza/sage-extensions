@@ -1,0 +1,156 @@
+# #363: the nine failures in the parabolic test modules
+
+At `690734952d` — and unchanged at `85284b8d18`, where this unit starts — the three
+parabolic test modules gave nine failures and four passes in 9.65 s:
+
+```
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[reduction]
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[radical]
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[generators]
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[line]
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[plane]
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_glued_line_pointwise_image_excludes_quotient_negation
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_zero_null_pointwise_levi_lift_and_joint_kernel
+FAILED tests/lattices/test_parabolic_induction.sage::test_primitive_isotropic_refinement_selects_the_line_eichler_operation
+FAILED tests/lattices/test_parabolic_induction.sage::test_the_eichler_transvections_of_a_line_form_an_abelian_group
+9 failed, 4 passed in 9.65s
+```
+
+The same nine are in `.tmp/qc-evidence/issue353-regression-baseline.log`, which #353
+recorded at `f899ebdb92`.
+
+## One cause, two missing operations, four call sites
+
+Every one of the nine raised the *same* two `AttributeError`s, from
+`src/sage_extensions/categories/lattices.py`:
+
+```
+EichlerRecursion.isotropic_quotient_lift          # :11995 and :12140
+EichlerRecursion.isotropic_quotient_kernel_generators   # :12042 and :12130
+```
+
+Those four sites are the pointwise and setwise quotient action of the null
+stabilizer, and they call `sage_indefinite_port.indefinite.marked_lattices.RECURSION`.
+The port is paused and pinned, and the pinned tree does not ship either method
+(`grep -rn isotropic_quotient_lift` over the port checkout: nothing), so the call is
+not a route: #353's closing comment says so for this operation, and the owner is
+`sage-extensions`.
+
+Note the exception type. `KeyError: ((Morphism …), ())` appears in the traceback
+above each failure; that is `@cached_method` missing on the first call of
+`_pointwise_levi_integral_lift_or_none`, not a defect of its own.
+
+So no test was reading a value a call no longer returns, and no test was wrong.
+Each of the nine is a defect of a call the pipeline uses. **No test in these three
+modules was edited**: the expected values are structural statements about each
+test's own specimen (`the images of the generators span Hom(U, ZZ^2)`, `the invariant
+cokernel of the shifts is trivial`, `levi_action(lift) == quotient_map`, `lift fixes
+the null basis pointwise`, `lift is None` for the glued line whose pairing congruence
+forbids it). None of them is a lattice-database count, so no card read replaces
+anything and no card is missing.
+
+## The repair, at the owner of the operation
+
+| rank of `I` | what decides the pointwise fibre | owner |
+| --- | --- | --- |
+| 0 | `I = 0`, `I^perp = L`, the reduction's projection `L ->> K_I` is an isomorphism; the class isometry is carried across it and the pairing is checked | `isotropic_parabolics.py: pointwise_quotient_lift` |
+| 1 | the marked-line lift torsor `F^+(gamma)`, whose integral base point is decided by the finite integral residue locus, not by one rational lift | `lattices.py: _pointwise_levi_integral_lift_or_none` → `isotropic_lifts.py: integral_base_point_or_none` |
+| 2 | the block `diag(1, 1, Q_3)` of the split hypothesis, where the complement of `I^perp` pairs trivially with `K_I`; `Q_3^t A Q_3 = A` holds because the class action is an isometry of `K_I` | `isotropic_parabolics.py: pointwise_quotient_lift` → `_pointwise_block_isometry` |
+
+and generators of the kernel of the pointwise action, which is the unipotent radical
+`U_I = ker(P_I^1 -> O(K_I))`:
+
+| rank of `I` | family | completeness |
+| --- | --- | --- |
+| 0 | empty | `U_I` is trivial |
+| 1 | the Eichler transvections `E_{e,x}` over one lift of each generator of `K_I` | `x |-> E_{e,x}` is a morphism killing `e` (Gritsenko–Hulek–Sankaran, arXiv:0810.1614, §3.1 (4)–(5)) and `U_I` acts on `I^perp` by `y |-> y + lambda(y)e`, so the family is all of `U_I` once `b(x,-)` exhausts `Hom(K_I, ZZ)` — that is, once `K_I` is unimodular, and the call refuses where it is not |
+| 2 | `PrimitiveIsotropicSubobjects.unipotent_radical_generators` — one element over each vector of the exact parameter lattice plus a centre generator | the parameter lattice `unipotent_parameter_lattice` decides |
+
+The kernel generators now *are* the family `unipotent_radical_generators` presents,
+so `reduction.unipotent_kernel()` and `space.unipotent_radical()` are generated by
+the same family instead of by two computations.
+
+The two `None` answers that the tests assert are decisions, not the failure of a
+construction: the glued line's `pointwise_levi_lift` comes back `None` because
+`F^+(minus)`'s residue locus is empty (`b(f, x) = 1` would have to become `-1`
+modulo `3`), and `pointwise_quotient_lift` raises instead of answering `None` where
+its block equation applies, because a `None` there would claim an empty fibre that
+the block equation contradicts.
+
+## Measured here
+
+The three modules, at the change, in the pinned runtime
+(`.scratch/wt363_pytest.sh`, `pytest … -q -o addopts= -p qc_sage_session -p
+sage_extensions.testing.suite_budget --durations=20`):
+
+```
+13 passed in 9.96s
+2.33s call  test_glued_line_pointwise_image_excludes_quotient_negation
+1.37s call  test_primitive_isotropic_refinement_selects_the_line_eichler_operation
+1.30s call  test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[reduction]
+1.25s call  test_split_pointwise_levi_lift_over_an_infinite_quotient[line]
+0.45s call  test_split_pointwise_levi_lift_over_an_infinite_quotient[plane]
+0.60s call  test_zero_null_pointwise_levi_lift_and_joint_kernel
+0.21s call  test_the_eichler_transvections_of_a_line_form_an_abelian_group
+```
+
+against `9 failed, 4 passed in 9.65s` at `85284b8d18`.  No call in the three modules
+is near the 20 s per-call ceiling of `sage_extensions.testing.suite_budget`, and the
+E10 line's family — the call that took 29.07 s when it went through the port — is now
+eight transvections built in 0.19 s.
+
+Main moved to `c59af293234c` before this landed, and the same command on the commit
+that carries this file, whose base is that head, gives the same three modules
+`13 passed in 9.81s` with the same slowest calls (2.33 s, then 1.37 s).
+
+Inside those calls, measured directly: on `U + U + U` the plane family is eleven
+elements in 0.39 s, whose translation parameters span rank 4 (`cokernel cardinality
+1`) and whose central parameters have ideal `(1)`.
+
+## The neighbouring modules
+
+The same operations are what the parabolic rows of neighbouring modules call, so the
+ten committed modules that mention them were run one at a time on both sides
+(`.scratch/wt363_sweep.sh`, `TREE` = this worktree and a clean worktree at
+`85284b8d18`, 240 s cap each):
+
+| module | at `85284b8d18` | here |
+| --- | --- | --- |
+| `test_higher_rank_unipotent_kernel` | 3 failed | **13 passed** (three modules together) |
+| `test_pointwise_levi_images` | 4 failed | |
+| `test_parabolic_induction` | 2 failed | |
+| `test_isotropic_reduction` | 7 passed, 2.17 s | 7 passed, 1.83 s |
+| `test_the_unipotent_radical_of_a_plane` | 3 passed, 9.35 s | 3 passed, 8.06 s |
+| `test_the_parameter_lattice_of_the_unipotent_radical` | 5 passed, 13.82 s | 5 passed, 11.40 s |
+| `test_the_unipotent_radical_of_the_plane_is_measured` | 3 passed, gate 76.05 s | 3 passed, gate 76.19 s |
+| `test_the_stabilizer_generators_carry_the_radical` | 1 passed, gate 128.46 s | 1 passed, gate 78.50 s |
+| `test_congruence_levi_images` | **1 failed** (`isotropic_quotient_lift`) | 1 passed, 8.47 s |
+| `test_subgroup_levi_images` | **2 failed, 1 passed** (`isotropic_quotient_lift`) | 3 passed, 10.02 s |
+| `test_the_parabolic_completeness_of_an_enriques_plane` | 4 passed, gates 93.86 s and 26.77 s | 4 passed, gates 87.83 s and 24.99 s |
+| `test_hermitian_parabolics` | cap 240 s after 10 tests | cap 240 s after 10 tests |
+| `test_isometry_commutant` | 1 failed (`No module named 'sage_indefinite_port.indefinite.commutant_groups'`), 24 passed | identical |
+
+Two modules outside #363's list are greened by the same repair — the Levi image of a
+subgroup at a null line and at a null plane both went through the pointwise fibre — and
+nothing in this set passes before and fails after.  The four gate failures and the
+`commutant_groups` import are before/after identical: they are the T_En `P_2` rows and a
+missing port module, not this change.  The 128.46 s → 78.50 s and 93.86 s → 87.83 s rows
+were not run under a controlled load and no cause is claimed for them.
+
+## Not verified here
+
+* The port's own implementation cannot be read — the pinned port has no such
+  methods — so nothing here is a comparison against it.
+* Rank 1 with `K_I` not unimodular, rank 1 whose `I^perp` has no complement pairing
+  trivially with `K_I`, and planes that do not split off all refuse, naming the
+  missing statement.  No test of these three modules reaches those cases.
+* The plane family's completeness is #364's open item at Sterk's `P_2` of
+  `T_En`, where a parameter outside the computed lattice is a missing generator.
+  This unit routes the kernel to that family and does not repair it.
+* Two call sites of the paused port remain, `lattices.py:11993`
+  (`_levi_integral_lift_or_none`) and `:12040` (`_levi_kernel_generators`), both at
+  rank other than one.  They are the *setwise* quotient image and kernel, where the
+  plane's own action on `I` is free as well; that is the plane-action factor of
+  #331, it is not decided by the pointwise block used here, and no test of this
+  batch reaches it.  It should be filed: the call raises `AttributeError` from a
+  module that ships no such method.

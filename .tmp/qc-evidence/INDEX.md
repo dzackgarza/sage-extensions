@@ -446,3 +446,171 @@ solves.
 | `issue366-lint.log` | `8430450` (#366) | `test_lint` on the new and changed test files |
 | `issue366-regression.log` | `8430450` (#366) | the neighbouring files with the change |
 | `issue366-base.log` | `75b048f` (main without #366) | the same neighbouring file set without it |
+
+### #360: the plane row of `T_Co` for `O(T_Co)`, and the parabolic at a `T_Co` plane (2026-11-11, base `2a43ce4`)
+
+The plane-orbit call no longer reads its count off the finite divided-class set
+where that set is not the orbit set: at a representative whose parabolic
+`is_parabolic_complete()` establishes, it computes the double cosets
+`ρ(Γ) \ ρ(O(L)) / ρ(G_x)` themselves and realizes each orbit by the splitting
+isometry's transport (`_orbits_from_stabilizer`).  On `T_Co` that is what the
+row needs, because the plane's stabilizer maps onto a subgroup of index **8** in
+the stabilizer of its order-four isotropic subgroup — `1981808640 / 247726080`,
+both orders computed — while its class set is one `ρ(O(L))`-orbit of `23715`
+points, so the class-set count is short by exactly that factor.  The plane's
+block basis was also repaired at its owner: completing it by keeping standard
+basis vectors while they raise the rank leaves a sublattice of index `2` at that
+plane, and the two completions are now the cokernels'
+(`finite_free_trivialization`), which is the statement that a saturated
+sublattice of a free `ZZ`-module is a direct summand.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue360-parabolic-at-a-tco-plane.py`, `issue360-parabolic-at-a-tco-plane.log` | the tree of this push | at the `T_Co` plane of `test_the_tco_plane_orbit_and_its_composed_automorphisms.sage`: `is_parabolic_complete() = True` from its three factors (radical `1` in 6.4 s, plane actions `1` in 41.0 s, quotient images `1` in 4.9 s), `105` generators, `stabilizer_discriminant_image_orders() = (1981808640, 247726080)` and index `8` in 79.7 s; the block basis is `11` rows of determinant `1` (it was `2` before the repair, which now falls back on the cokernel completion); `T_En` at Sterk's `P₁`, `P₂` returns `±1` as before |
+| `issue360-plane-orbit-by-stabilizer.py`, `issue360-plane-orbit-by-stabilizer.log` | the tree of this push | `ρ̄⁻¹(ρ(O(T_Co)))` has `[O(L) : Γ] = 1`, and `isotropic_plane_orbits([P])` returns **1** orbit in 82.6 s, its representative primitive and its divided class set the one handed in |
+| `issue360-coble-plane-row.py`, `issue360-coble-plane-row.log` | the tree of this push | `Tco.Aut().isotropic_orbit_representatives(2)` stops after 9 min 6 s at `PariError: sorry, qfsolve, dim >= 10 is not yet implemented` (`lattice_engines.py:496` ← `lattices.py:4687` ← `isotropic_induction.py:84` ← `isotropic_orbits.py:1393`); the incidence stops with it |
+| `issue360-regression.log` | the tree of this push | the neighbouring parabolic, plane-block, radical, divided-class and this issue's own rows with the change: **16 passed in 617.12 s** |
+| `issue360-lint.log` | the tree of this push | `test_lint` on the new test module: **1 file, 0 findings** |
+
+### #371: isotropy decided by theorem, and `T_Co`'s plane and incidence rows return (2026-11-12, base `40200e1`)
+
+`is_isotropic` decided isotropy only by a witness search over the whole Gram
+matrix, so it stopped where PARI's `qfsolve` does.  It is now decided by three
+statements — definite forms represent no zero; an indefinite form of rank at
+least five is isotropic by Meyer's theorem (Serre, *A Course in Arithmetic*,
+Ch. IV, §3.2, Cor. 2, printed p. 43); rank at most four by Hasse–Minkowski and
+the local invariants (Serre, Ch. IV, §3.2, Thm. 8, printed p. 41) — and the
+witness of a rank-five-and-above form is built from five diagonal directions of
+both signs, solved there with `qfsolve` (Denis Simon's code, as Sage's
+`qfsolve` module states) and carried back; Hecke's `QuadForm/Quad/Spaces.jl`
+`_isotropic_subspace` is the reference for answering rational isotropy by that
+method, with Simon, *Quadratic equations in dimensions 4, 5 and more*.  The
+reduction is stated for rank five, not rank ten, because the refusal is a
+property of the solver's way and not of the dimension: a diagonal form of size
+eleven answers and a nine-variable form of `T_Co` refuses.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue371-test.log` | the tree of this push | `tests/lattices/test_the_isotropy_decisions_in_high_rank.sage`: **4 passed in 3.25 s** — `U + E8(-1)` (rank 10) and `T_Co` (rank 11) isotropic with a primitive witness of square zero, `E8(-1) + E8(-1)` (rank 16, definite) and `⟨1, -2⟩` (rank 2, indefinite) not isotropic and refusing a witness |
+| `issue371-lint.log` | the tree of this push | `test_lint` on the new module: **1 file, 0 findings** |
+| `issue371-qfsolve-bound.py`, `issue371-qfsolve-bound.log` | the tree of this push | `qfsolve` on `diag(-1, 1, …, 1)` for sizes 2 to 11: every size answers, so the `dim >= 10` refusal is not a size bound alone |
+| `issue371-tco-plane-call.py`, `issue371-tco-plane-call.log` | the tree of this push | `T_Co.Aut().isotropic_orbit_representatives(2)` = **1** orbit in 1423.4 s, `cusps(2)` = 1, `isotropic_orbit_representatives(1)` = 1, `cusps(1)` = 1, `tits_building_incidence()` = **1** edge in 62.2 s; whole run 1495.3 s, peak 747 MiB |
+## #358: the `Gamma_{Co,2}` line row on `T_Co`
+
+The row is `isotropic_orbit_representatives(1)` on `Gamma_{Co,2} = rho^{-1}(P)`, `P` the
+stabilizer in `O(q)` of `A_{U(2)} + A_{E8(-2)}` inside `A_{T_Co}`.  It returns **4 line orbits**.
+`|O(q)| = 46998591897600` and `|P| = 696729600` (the two summands' isometry-group orders; the
+engine's setwise stabilizer; and `|O(q)| / 67456`), `[O(T_Co) : Gamma_{Co,2}] = 67456`.  The stop
+this unit repaired was the point stabilizer handed over as a bare predicate: a generator request on
+a predicate subgroup of the *finite* group `O(A_{T_Co})` filtered an enumeration of all `4.7e13`
+elements, killed at 4282 MiB.  `TorsionFormOrthogonalGroup.stabilizer_of_classes` gives `P` its
+family (GAP's `Stabilizer` on the engine's own action) and `discriminant_point_stabilizer` keeps
+its predicate with that family attached.  Two stages do **not** realize and are recorded, not
+worked around: `Gamma_{Co,2}`'s Schreier family (`|S| * 67456 - 67455` members, ~2.3e7, killed at
+5484 MiB) and `discriminant_lift` of one generator of `P` (killed at 6254 MiB).
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue358-reproduction-and-summands.log` | `7ef38d52cf` (pre-push base) | `O(A_{T_Co})`'s order **returns in 4.0 s** (`46 998 591 897 600`, GAP `HasSize` true, the `#323` half-integral odd-rank branch); the three summands of `A_{T_Co}` and `A_{U(2)}^\perp = A_{E8(-2)} + <[h/2]>` from the Gram data; `\|P\|` two ways = 696 729 600; orbit of `A_{U(2)}` = 67 456 |
+| `issue358-the-predicate-stop.log` | `7ef38d52cf` | the stop: `orthogonal_quotients.py:706` -> `groups.py:5763` -> `groups.py:6755` -> `set_categories.py:4482`, **STOPPED at 4282 MiB** without returning in 2400 s; also the public `discriminant_point_orbit` at 67 456 in 318.9 s |
+| `issue358-the-engine-stabilizer.log` | `7ef38d52cf` | the engine's setwise stabilizer of the four classes: order 696 729 600, three generators, every one fixing the point (307.7 s with the set-image function) |
+| `issue358-the-action-comparison.log` | `7ef38d52cf` | GAP's own action against the set-image function on the same orbit: `Orbit` 67 456 in **2.89 s**, `Stabilizer` 696 729 600 in **86.85 s** |
+| `issue358-schreier-family-stop.log` | `7ef38d52cf` | `preimage.group_generators()` on `T_Co`: **killed at 5484 MiB** (no stack; the process was reaped with `MemAvail` 764 MiB) after `index = 67456` and the image orders were computed |
+| `issue358-the-lift-stop.log` | `7ef38d52cf` | `discriminant_lift` of one generator of `P`: **killed at 6254 MiB** |
+| `issue358-row-idle.log` | `7ef38d52cf` | the row on an idle machine: `isotropic_orbit_representatives(1)` -> **4** in 265.8 s, with `image_order`, `subgroup_image_order = 696729600` and `index = 67456` |
+| `issue358-row-and-representatives.log` | `7ef38d52cf` | the row's four representatives (vectors in the named basis, `div = 2`, `q = 0`) and their divided classes; the ambient stage costs 1917.5 s under contention |
+| `issue358-index-per-class.log` | `7ef38d52cf` | the four divided classes rebuilt from those vectors reproduce the row's own printed lines; `[Stab_{O(q)}(c) : rho(Stab_Gamma(v))]` = 256, 17 280, 34 560, 15 360 and the class counts 2, 135, 270, 120 summing to the 527 nonzero isotropic classes |
+| `issue358-card0125-regression.log` | `7ef38d52cf` | `tests/lattices/test_the_decomposition_preimage_returns_generators.sage` with the repair and the set-image function: 1 passed in 320.85 s |
+| `issue358-tests.log` | pushed head | `tests/lattices/test_the_coble_gamma_co_2_line_row_returns_generators.sage` and the card-`0125` test with `-p qc_sage_session -p suite_budget -p test_lint --no-time-gates`: **2 passed in 541.79 s** (391.07 s and 150.14 s), no lint findings, peak tree RSS 4381 MiB |
+
+## #370: the `Gamma_{Co,2}`-orbits of the admissible roots of `K_I` at a marked 0-cusp of `T_Co`
+
+`IsotropicVectorReductionImage.root_class_orbits(roots, *, stabilizer_generators=None)` returns the
+orbits of a finite family of **root classes** of `K_I = eta^perp/ZZ eta` under the certified action
+of `Stab_{Gamma_{Co,2}}(ZZ eta)` on `K_I`, with a transporter (an isometry of `K_I` in `G_v`) per
+class, checked by re-application; `root_class(vector)` reads the class of an ambient root.  Rank-one
+difficulty: the acting family is not certified to generate `G_v` (#312), so an orbit of more than one
+class proves equivalence and a singleton proves nothing.  Card `029J`'s `cusp_chambers` wall counts
+(12, 10, 12) equal the computed number of distinct `K_J`-classes of the printed roots at cusps 1–3;
+at `T_Co`'s cusp 3 the printed family meets `T_Co` in exactly one `(-2)`-class and the call returns
+its orbit with the identity transporter.  Cusps 4–5 are blocked on the missing `T_En` transcription
+of Sterk's diagrams 4.3.8 and 4.3.9.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue370-tco-cusps-and-reductions.log` | `8e88c6a1c5` (pre-push base) | card `029J`'s cusp vectors read in `T_Co` at cusps 3–5: `q = 0`, primitive, `div = 2`; `K_I` rank 9, det 512, signature (1,8) at all three; `O(K_I)`'s chamber has 9 walls |
+| `issue370-k-i-chambers.log` | `8e88c6a1c5` | the chamber's wall norms at cusps 3, 4, 5: eight `-4` and one `-2` each — the chamber is not the root family |
+| `issue370-printed-roots-in-t-co.log` | `8e88c6a1c5` | `delta = e - f`; of the printed roots, 12/12 (`Sterk_1`, all `-4`), 8 of 10 (`Sterk_2`, all `-4`, the other two `±delta`) and 9 of 12 (`Sterk_3`, eight `-4` and one `-2`) are `delta`-orthogonal |
+| `issue370-line-stabilizer-and-certification.log` | `8e88c6a1c5` | `T_Co` cusp 3: the line stabilizer returns **31** generators in 21.5 s, **16** of them certified in `G_v` in 159 s; `rho(K_v)` trivial; one `(-2)` printed root |
+| `issue370-the-transcription-is-not-linear.log` | `8e88c6a1c5` | the 34 `TdP`↔`T_En` root pairs of the three transcribed cusps span rank 16 of 20 and impose an inconsistent linear system: no single linear map gives cusps 4–5's coordinates |
+| `issue370-root-class-orbit-probe.log` | `8e88c6a1c5` | the orbit call on the printed roots: 12/10/12 distinct classes at cusps 1–3 and the refusal of a `-4` class |
+| `issue370-tests.log` | pushed head | `tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage` with `-p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates`: **3 passed in 344.08 s**, no lint findings, peak tree RSS 1509 MiB |
+## #369 — the stable orthogonal group generators call of card 0125 refuses
+
+The owner's comment (2026-11-12) records that `5b75461d72` returned a family
+under a generation claim that no published statement supports: the normal
+closure of one Bertini involution in `W237` needs all its conjugates, not only
+those by the simple reflections. The search this turn (Allcock's paper read in
+full, the machine's research library, arXiv and the web) found no published
+finite generating set of `Õ(L)`, so the call now refuses: it constructs and
+certifies the family it could return (each member's discriminant image is
+trivial) and then raises, stating that no published generation statement gives
+a finite generating set of `Õ(L)` whose hypotheses this lattice meets.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue369-refusal-test.log` | the tree of this push | the refusal test of `tests/lattices/test_the_stable_orthogonal_group_generators_refuse.sage`: **1 passed in 14.43 s** (the call certifies the Bertini family's membership in `ker ρ_L` inside `pytest.raises(ValueError)` and refuses; the index `|ρ_L(O(L))|` read by tag equals the card's own `46998591897600`) |
+| `issue369-refusal-lint.log` | the tree of this push | `test_lint` on the new test module: **1 file, 0 findings** |
+| `issue370-tests-at-the-pushed-head.log` | `6664495b7c` (#370) | the same test file at the pushed head, after the cherry-pick onto `72c40a2` (#363): **3 passed in 311.40 s** (26.88 s and 280.60 s), no lint findings, peak tree RSS 1477 MiB |
+
+## #355 — the rank-(n - 1) parabolic count on the W_e chamber of card 0125
+
+The reported calls on the twelve-wall chamber of `W_e ⊂ G_e`
+(`integral.cusp_chambers['g-e']`, Sterk, Math. Z. 207 (1991), (4.3.5), p. 19,
+Fig. 4) are maximal for inclusion, not the criterion's rank condition, so the
+criterion's computation is asserted from the chamber's own rays, with Vinberg's
+citation (E. B. Vinberg, *The groups of units of certain quadratic forms*,
+Mat. Sb. 87 (129) (1972), the English translation Math. USSR Sb. 16 (1972),
+No. 1, Proposition 1, printed p. 22).
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue355-criterion-test.log` | the tree of this push | the criterion test of `tests/lattices/test_the_rank_n_minus_one_parabolic_count_on_the_we_chamber.sage`: **1 passed in 11.54 s** (the reproductions 36 and 44; the ideal-vertex count nine, read from the primitive rays; each ideal vertex's orthogonal walls have form rank \\(n - 1\\), the subdiagram parabolic or a parabolic union) |
+| `issue355-criterion-lint.log` | the tree of this push | `test_lint` on the test module: **1 file, 0 findings** |
+
+## #298 and #370 — the lattice isometry matrix, and the printed cusps carried into `T_En`
+
+`results/issue298-the-lattice-isometry-matrix.md` and `results/issue370-the-coble-root-orbits.md`
+state the calls and the counts; these are the runs behind them, at the trees of the two pushes this
+batch made (`28422f9` + `f7eaa5d` for #298, `73d02b7` for #370).
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue298-isometry-matrix-tests.log` | `f7eaa5d` (#298) | `tests/lattices/test_the_isometry_matrix_between_isometric_lattices.sage`: **3 passed in 28.42 s**, the rank-eleven indefinite pair 26.64 s over the 20 s call ceiling; no lint findings |
+| `issue298-isometry-matrix-probe.log` | the tree of the #298 push | the decision, the witness and the Gram equation of both test pairs and of a non-isometric control, pair by pair |
+| `issue370-tests-at-the-fixed-head.log` | `73d02b7` (#370) | both files: **8 passed in 906.94 s** — the five-cusp card comparison 213.60 s, the `T_Co` cusp 3 run 359.16 s, the `T_En` cusps 4 and 5 orbits 243.86 s, the `T_Co` cusp 5 orbits 61.73 s, the #298 rank-eleven call 23.91 s; no lint findings |
+| `issue370-cusp-transport-probe.log` | the tree of this push | the model `U + E8(-2)` against `K_J` at cusp 5 (pairings preserved, `is_isometric_to` `True`, transport determinant `2` for cusp 4 and `1` for cusp 5 by the matrix) and the lifted classes at both cusps |
+| `issue370-cusp-lines-probe.log` | the tree of this push | the library's cusp vector against card `029J`'s row at all five cusps, and the eleven printed roots of 4.3.8 paired with each line: `[-6, 14, -8, 14, 6, 8, 12, 0, -6, -6, -12]` against the card's, all zeros against the library's |
+| `issue370-t-co-cusp-orbits-probe.log` | the tree of this push | `T_Co`'s cusps 4 and 5: `K_I`, the classes in `T_Co`, the root classes, the line stabilizer's generator count and `root_class_orbits`' orbit count |
+| `issue370-ten-cusps-orbits-probe.log` | the tree of this push | `T_En`'s cusps 4 and 5: eleven and fourteen distinct classes of `K_J`, two and four of them roots, and two and four orbits of one class each |
+| `issue370-chambers-at-the-library-cusps-probe.log` | the tree of this push | the fundamental chamber of `K_I` at `T_Co`'s cusps 3, 4 and 5 read at the library's cusp vectors: nine walls each, eight of square `-4` and one of `-2` |
+
+The probe scripts sit beside their logs under the same names with `.py`.
+| `issue355-parabolic-test.log` | the tree of this push | the rewritten criterion test of `tests/lattices/test_the_rank_n_minus_one_parabolic_count_on_the_we_chamber.sage`: **1 passed in 22.37 s** (the call's count on the `g-e` chamber against the sum of the card's `parabolic_orbits` sizes — nine; each returned subdiagram the orthogonal-wall subdiagram of an ideal ray) |
+| `issue355-parabolic-lint.log` | the tree of this push | `test_lint` on the rewritten test module: **1 file, 0 findings** |
+
+## #376 — the sign in the two `2U + K` models
+
+`results/issue376-two-u-signatures.md` states the four signatures, the wrong sign and the repair;
+these are the runs behind it, at the tree of this push.  No log here shows a green module: the
+third assertion of `tests/lattices/test_two_u_recursive_isometry.sage` asks for the port's isometry
+witness, which does not return (see the last two rows).
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue376-signatures-probe.log` | the tree of this push | the four signatures and the two models' from their Gram matrices: `E8` (0, 8), `E8.twist(-1)` (8, 0), `_d16_plus_gram()` (16, 0), `D16+(-1)` (0, 16), the models (18, 2) and (2, 18); both decisions on that pair `False` in 0.0 s |
+| `issue376-decision-probe.log` | the tree of this push | with the repair: `source.is_isometric_to(target)` **`True` in 126.1 s** (68.0 s and 56.6 s of it the two `discriminant_module().invariant_factors()` calls), and the complements' decision `False` in 43.3 s |
+| `issue376-module-run-postrepair-2400s.log` | the tree of this push | the module: the first two tests pass, the third killed at the 2400 s inner cap (`shell_code=124`) inside the port's witness |
+| `issue376-other-two-tests.log` | the tree of this push | the same module with the third test deselected: **2 passed, 1 deselected in 1.30 s**, no lint findings |
+| `issue376-witness-cost-probe.log` | the tree of this push | the port's per-level costs on the rank-20 target: `OrbitCoverModel` 0.08 s, `source_easy_generators` 4.3 s for 8 generators, `covering_vectors(0, 1)` 37.2 s for one vector |
+| `issue376-rank18-witness-probe.log` | the tree of this push | one Witt cancellation down: `(U + E8^2).is_isometric_to(U + D16^+)` `True` in 28.4 s, and its `isometry_to` killed at 300 s in `lorentzian_cells.py` `_expand_traversal_once` |

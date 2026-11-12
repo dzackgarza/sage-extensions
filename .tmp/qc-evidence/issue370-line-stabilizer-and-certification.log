@@ -1,0 +1,49 @@
+[  129.23s] Gamma_Co,2 built in 122.8s
+[  129.67s] cusp 3 reduction: rank 9, det 512
+[  151.19s] line stabilizer generators: 31 in 21.5s
+Timeout (0:05:00)!
+Thread 0x000079469cb19780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 806 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1631 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 406 in <lambda>
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 248 in _element_constructor_
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 112 in _value_at_normalized_index
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 90 in value
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1095 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1091 in _linear_combination_of_generator_images
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1126 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 810 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2159 in _normalized_form_automorphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 3255 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2133 in from_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 2202 in discriminant_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 4212 in image
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 3255 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1035 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1034 in ambient_discriminant_images
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 729 in _joint_discriminant_image_gap
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1843 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1817 in discriminant_image_membership
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 2488 in discriminant_image_membership
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 2498 in _coset_meets_the_subgroup
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 2524 in contains
+  File "/probes/p370_p5.py", line 47 in <module>
+[  310.45s] certified in G_v: 16 of 31 in 159.3s
+kernel discriminant image trivial: True
+Sterk_3 printed roots in T_Co: 9 squares: [-4, -4, -4, -4, -4, -4, -4, -4, -2]
+of square -2: 1
+[  310.67s] roots identified
+[peakrss] p370p5: child waited=0 shell_code=0 samples=158
+[peakrss] peak tree RSS      : 1369 MiB
+[peakrss] low-water MemAvail : 9795 MiB
+[peakrss] peak single VmHWM  : 1369 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1358 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   312.2s procs=  3 rss=  1369 MiB hwm=  1369 MiB avail= 10018 MiB
+[peakrss]   t=   314.2s procs=  3 rss=  1369 MiB hwm=  1369 MiB avail= 10011 MiB
+[peakrss]   t=   310.2s procs=  3 rss=  1368 MiB hwm=  1368 MiB avail=  9962 MiB
+[peakrss]   t=   272.2s procs=  3 rss=  1367 MiB hwm=  1367 MiB avail= 10157 MiB
+[peakrss]   t=   274.2s procs=  3 rss=  1367 MiB hwm=  1367 MiB avail= 10157 MiB
+launcher exit: 0

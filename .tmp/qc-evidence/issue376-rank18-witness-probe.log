@@ -1,0 +1,21 @@
+[     0.1s] complements: (1, 17), (1, 17)
+[     0.1s] --> rank 18: is_isometric_to
+[    28.5s] rank 18: is_isometric_to: True  [28.4 s]
+[    28.5s] --> rank 18: isometry_to
+Timeout (0:03:00)!
+Thread 0x0000787a2800c780 [python] (most recent call first):
+  File "/work/src/sage_indefinite_port/indefinite/lorentzian_cells.py", line 1058 in _normaliz_cell_h_presentation
+  File "/work/src/sage_indefinite_port/indefinite/lorentzian_cells.py", line 1110 in _iter_cell_halfspace_pairing_rows
+  File "/work/src/sage_indefinite_port/indefinite/lorentzian_cells.py", line 1437 in facet_keys
+  File "/work/src/sage_indefinite_port/indefinite/lorentzian_cells.py", line 1512 in _facet_mask_data
+  File "/work/src/sage_indefinite_port/indefinite/lorentzian_cells.py", line 2641 in _expand_traversal_once
+  File "/work/src/sage_indefinite_port/indefinite/lorentzian_cells.py", line 2723 in isometry_to
+  File "/work/src/sage_indefinite_port/indefinite/lorentzian_cells.py", line 495 in lorentzian_isometry
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 899 in _indefinite_isometry
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 870 in isometry
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 89 in isometry
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5333 in an_element
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 5560 in isometry_to
+  File "/probes/probe376_rank18.py", line 56 in <lambda>
+  File "/probes/probe376_rank18.py", line 23 in timed
+  File "/probes/probe376_rank18.py", line 56 in <module>

@@ -13,7 +13,7 @@ surfaces of degree 2*, Nagoya Math. J. 259 (2025), §3.3, p. 590`` counts five
 For a primitive isotropic ``v`` the group that the stabilizer induces on
 ``N = v^\perp/\mathbf Z v`` is the image of ``\Gamma_{\mathrm{En},2} \cap P_v``
 under the Levi map ``P_v \to O(N)`` (Dutour Sikirić--Hulek, arXiv:2302.01679v2,
-theorem `theorem_isotropic_k_planes`, printed p. 22).  An isometry of ``N`` has
+theorem `theorem_isotropic_k_planes`, printed pp. 33--34).  An isometry of ``N`` has
 many lifts in ``P_v`` and two differ by an element of the kernel ``K_v``, so
 membership is decided on the discriminant image: ``\sigma`` is in the image when
 ``\rho`` of one lift lies in ``\rho(K_v)\rho(\Gamma)``.  ``K_v`` contains the

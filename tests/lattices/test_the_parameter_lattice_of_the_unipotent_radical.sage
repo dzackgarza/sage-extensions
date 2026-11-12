@@ -3,7 +3,7 @@ r"""The parameter lattice of the unipotent radical at Sterk's $P_2$ of $T_{\math
 The radical of the setwise stabilizer at a primitive isotropic plane $I$ is
 $U_I = \ker(P_I \to \GL(I) \times O(I^\perp/I))$, and in the basis $(U \mid P \mid K)$
 of `plane_block_basis` — Dutour Sikirić–Hulek, arXiv:2302.01679v2, Theorem 4.9, proof,
-printed p. 22 — an element of it has the block matrix
+printed pp. 33--34 — an element of it has the block matrix
 
 .. math::
     g = \begin{pmatrix} 1 & 0 & 0 \\ a & 1 & \tau \\ c & 0 & 1 \end{pmatrix},

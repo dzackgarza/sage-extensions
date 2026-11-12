@@ -13,7 +13,7 @@ there, by comparing computed values:
   it is fixed by the translation map and the other $2\\operatorname{rank}(K_I)$ are
   translations.  That is the block form of #353 written down and computed rather than
   quoted: Dutour Sikirić--Hulek, arXiv:2302.01679v2, Theorem 4.9
-  (`theorem_isotropic_k_planes`), printed p. 22, gives the basis $(U \\mid P \\mid K)$;
+  (`theorem_isotropic_k_planes`), printed pp. 33--34, gives the basis $(U \\mid P \\mid K)$;
 * the returned family's translations do reach that target, because the family includes
   the block generators of #365 (`unipotent_radical_block_generators()`, one over each
   vector of the parameter lattice `unipotent_parameter_lattice()` and one over the

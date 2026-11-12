@@ -1,0 +1,18 @@
+................                                                         [100%]
+16 passed in 617.12s (0:10:17)
+[peakrss] p360regression2: child waited=0 shell_code=0 samples=316
+[peakrss] peak tree RSS      : 2569 MiB
+[peakrss] low-water MemAvail : 3591 MiB
+[peakrss] peak single VmHWM  : 2824 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      1928 MiB peak
+[peakrss]   python                      889 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=   623.2s procs=  5 rss=  2569 MiB hwm=  2824 MiB avail=  7636 MiB
+[peakrss]   t=   621.2s procs=  5 rss=  2325 MiB hwm=  2824 MiB avail=  7631 MiB
+[peakrss]   t=   619.2s procs=  5 rss=  2321 MiB hwm=  2820 MiB avail=  7633 MiB
+[peakrss]   t=   617.2s procs=  5 rss=  2315 MiB hwm=  2814 MiB avail=  7633 MiB
+[peakrss]   t=   611.1s procs=  5 rss=  2314 MiB hwm=  2813 MiB avail=  7637 MiB
+launcher exit: 0

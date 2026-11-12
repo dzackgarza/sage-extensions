@@ -1,0 +1,32 @@
+[    5.73s] T_Co rebuilt, generators ('h', 'ep', 'fp', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8')
+[  126.36s] Gamma_Co,2 built in 120.5s
+cusp 3: eta (0, 0, 1, 1, -2, -3, -4, -6, -5, -4, -3, -2) -> T_Co vector q = 0 primitive: True div: 2
+[  126.81s] cusp 3: reduction image built in 0.4s
+  K_I rank 9 det 512 signature (1, 8)
+[  129.83s] cusp 3: chamber with 9 walls in 3.0s
+  admissible walls: 8 of 9 in 133.9 s
+cusp 4: eta (0, 0, 2, 1, -4, -5, -7, -10, -8, -6, -4, -2) -> T_Co vector q = 0 primitive: True div: 2
+[  264.06s] cusp 4: reduction image built in 0.3s
+  K_I rank 9 det 512 signature (1, 8)
+[  268.75s] cusp 4: chamber with 9 walls in 3.8s
+  admissible walls: 7 of 9 in 3.4 s
+cusp 5: eta (2, 2, 0, 0, -4, -5, -7, -10, -8, -6, -4, -2) -> T_Co vector q = 0 primitive: True div: 2
+[  272.50s] cusp 5: reduction image built in 0.3s
+  K_I rank 9 det 512 signature (1, 8)
+[  274.18s] cusp 5: chamber with 9 walls in 1.7s
+  admissible walls: 8 of 9 in 3.3 s
+[  277.44s] done
+[peakrss] p370p1: child waited=0 shell_code=0 samples=141
+[peakrss] peak tree RSS      : 1280 MiB
+[peakrss] low-water MemAvail : 8499 MiB
+[peakrss] peak single VmHWM  : 1285 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1275 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   280.2s procs=  3 rss=  1280 MiB hwm=  1285 MiB avail=  9974 MiB
+[peakrss]   t=   278.2s procs=  3 rss=  1278 MiB hwm=  1284 MiB avail=  9974 MiB
+[peakrss]   t=   276.2s procs=  3 rss=  1276 MiB hwm=  1281 MiB avail=  9983 MiB
+[peakrss]   t=   266.2s procs=  3 rss=  1275 MiB hwm=  1281 MiB avail= 10026 MiB
+[peakrss]   t=   268.2s procs=  3 rss=  1275 MiB hwm=  1281 MiB avail= 10007 MiB
+launcher exit: 0

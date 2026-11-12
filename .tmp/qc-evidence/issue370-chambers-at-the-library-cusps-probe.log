@@ -1,0 +1,17 @@
+cusp 3: K_I rank 9 det 512 signature (1, 8); chamber 9 walls, norms [-4, -4, -4, -4, -4, -4, -4, -4, -2]
+cusp 4: K_I rank 9 det 512 signature (1, 8); chamber 9 walls, norms [-4, -4, -4, -4, -4, -4, -4, -4, -2]
+cusp 5: K_I rank 9 det 512 signature (1, 8); chamber 9 walls, norms [-4, -4, -4, -4, -4, -4, -2, -4, -4]
+[peakrss] p298k: child waited=0 shell_code=0 samples=11
+[peakrss] peak tree RSS      : 341 MiB
+[peakrss] low-water MemAvail : 8491 MiB
+[peakrss] peak single VmHWM  : 341 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      330 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    20.0s procs=  3 rss=   341 MiB hwm=   341 MiB avail=  8786 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   339 MiB hwm=   339 MiB avail=  8491 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   337 MiB hwm=   337 MiB avail=  8494 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   336 MiB hwm=   336 MiB avail=  8494 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   335 MiB hwm=   335 MiB avail=  8494 MiB
+launcher exit: 0

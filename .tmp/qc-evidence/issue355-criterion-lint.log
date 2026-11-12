@@ -1,0 +1,12 @@
+1 files, 0 findings
+[peakrss] issue355lint: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 281 MiB
+[peakrss] low-water MemAvail : 11025 MiB
+[peakrss] peak single VmHWM  : 281 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      270 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   281 MiB hwm=   281 MiB avail= 11025 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     2 MiB avail= 11235 MiB
+exit: 0

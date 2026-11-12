@@ -149,10 +149,12 @@ def describe_subset(nodes, barred):
     return f"overline{printed}" if barred else printed
 
 
-def orbit_rows(group, cap):
-    """Return the card's three rows -- lines, planes, flags -- from the public call."""
-    rows = []
+def orbit_rows(group, cap, rows=("lines", "planes", "flags")):
+    """Return the requested rows -- lines, planes, flags -- from the public call."""
+    selected = []
     for label, rank, flag in (("lines", 1, False), ("planes", 2, False), ("flags", 2, True)):
+        if label not in rows:
+            continue
         started = time.time()
         signal.alarm(cap)
         try:
@@ -165,8 +167,8 @@ def orbit_rows(group, cap):
             )
         finally:
             signal.alarm(0)
-        rows.append((int(count), time.time() - started))
-    return tuple(rows)
+        selected.append((label, int(count), time.time() - started))
+    return tuple(selected)
 
 
 class Enriques:
@@ -226,7 +228,7 @@ class Enriques:
         ).coinvariant_extension_subgroup()
 
 
-def report_card_row(orthogonal, card, cap):
+def report_card_row(orthogonal, card, cap, selection=("lines", "planes", "flags")):
     """Compare one ``gamma-h-N`` card with the public call on the group it names."""
     tag = card["tag"]
     label = f"{tag}"
@@ -243,19 +245,20 @@ def report_card_row(orthogonal, card, cap):
     indices = support(nodes, barred)
     log(f"  group: S = {describe_subset(nodes, barred)}, h = sum of g_{{{','.join(map(str, indices))}}}, "
         f"|Gamma-bar_h| = {card['cardinality']}")
-    expected = (card["line_orbits"], card["plane_orbits"], card["flag_orbits"])
+    expected = {"lines": card["line_orbits"], "planes": card["plane_orbits"], "flags": card["flag_orbits"]}
     started = time.time()
     try:
         group = orthogonal.group(orthogonal.doubled_point(indices))
-        rows = orbit_rows(group, cap)
+        rows = orbit_rows(group, cap, selection)
     except RowUndecided as undecided:
         log(f"  UNDECIDED: {undecided} (after {time.time() - started:.0f} s)")
         return "undecided", None
-    got = tuple(count for count, _elapsed in rows)
-    timings = ", ".join(f"{elapsed:.0f} s" for _count, elapsed in rows)
-    log(f"  expected lines/planes/flags = {expected[0]}/{expected[1]}/{expected[2]}")
-    log(f"  call     lines/planes/flags = {got[0]}/{got[1]}/{got[2]}   ({timings})")
-    if got == expected:
+    got = {label: count for label, count, _elapsed in rows}
+    timings = ", ".join(f"{label} {elapsed:.0f} s" for label, _count, elapsed in rows)
+    log("  expected " + ", ".join(f"{label} {expected[label]}" for label in got))
+    log("  call     " + ", ".join(f"{label} {got[label]}" for label in got) + f"   ({timings})")
+    disagreeing = [label for label in got if got[label] != expected[label]]
+    if not disagreeing:
         log(f"  PASS (row total {time.time() - started:.0f} s)")
         return "pass", None
     log(f"  FAIL (row total {time.time() - started:.0f} s)")
@@ -263,8 +266,8 @@ def report_card_row(orthogonal, card, cap):
         "card": tag,
         "lattice": card["lattice"],
         "group": f"{card['name']}, S = {describe_subset(nodes, barred)}, |Gamma-bar_h| = {card['cardinality']}",
-        "expected": f"lines/planes/flags = {expected[0]}/{expected[1]}/{expected[2]}",
-        "actual": f"lines/planes/flags = {got[0]}/{got[1]}/{got[2]}",
+        "expected": ", ".join(f"{label} {expected[label]}" for label in disagreeing),
+        "actual": ", ".join(f"{label} {got[label]}" for label in disagreeing),
         "citation": card["citation"],
     }
     return "fail", defect
@@ -310,11 +313,11 @@ def report_table4_row(orthogonal, lattice_card, degree, cap):
         log(f"  class {index + 1}/{len(representatives)}: q = {representative.q()}")
         try:
             group = orthogonal.group(orthogonal.doubled_from_unimodular(representative))
-            rows = orbit_rows(group, cap)
+            rows = orbit_rows(group, cap, ("lines", "planes", "flags"))
         except RowUndecided as undecided:
             log(f"  UNDECIDED #Gamma-bar_h: {undecided} (after {time.time() - started:.0f} s)")
             return "undecided", defect
-        triples.append(tuple(count for count, _elapsed in rows))
+        triples.append(tuple(count for _label, count, _elapsed in rows))
         log(f"    lines/planes/flags = {'/'.join(str(count) for count in triples[-1])}")
     distinct = len(set(triples))
     expected_distinct = int(row["group_classes"])
@@ -342,6 +345,8 @@ def main(argv=None):
                         help="seconds one public call may take before its row is undecided")
     parser.add_argument("--budget", type=int, default=int(os.environ.get("ENRIQUES_ROW_BUDGET", "0")),
                         help="seconds for the whole run; 0 runs every selected row")
+    parser.add_argument("--rows", default=os.environ.get("ENRIQUES_ROWS", "lines,planes,flags"),
+                        help="comma-separated rows of a gamma-h card to run: lines, planes, flags")
     arguments = parser.parse_args(argv)
 
     digest = json.loads(DIGEST_PATH.read_text())
@@ -368,6 +373,12 @@ def main(argv=None):
     log(f"lattice {ENRIQUES_LATTICE_TAG} is T_En: rank {orthogonal.ambient.module_rank()}, "
         f"determinant {orthogonal.ambient.determinant()}")
 
+    selection = tuple(part.strip() for part in arguments.rows.split(",") if part.strip())
+    unknown = tuple(row for row in selection if row not in ("lines", "planes", "flags"))
+    if unknown:
+        parser.error(f"unknown row(s) {unknown}: choose from lines, planes, flags")
+    log(f"rows per card: {', '.join(selection)}")
+
     deadline = time.time() + arguments.budget if arguments.budget else None
     outcomes = {"pass": [], "fail": [], "undecided": [], "notreached": []}
     defects = []
@@ -376,7 +387,9 @@ def main(argv=None):
         if deadline is not None and time.time() > deadline:
             outcomes["notreached"].append(tag)
             continue
-        outcome, defect = report_card_row(orthogonal, digest["arithmetic_groups"][tag], arguments.cap)
+        outcome, defect = report_card_row(
+            orthogonal, digest["arithmetic_groups"][tag], arguments.cap, selection
+        )
         outcomes[outcome].append(tag)
         if defect is not None:
             defects.append(defect)

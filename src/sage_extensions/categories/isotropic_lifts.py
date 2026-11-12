@@ -560,14 +560,37 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
 
             inverse_right = right.inverse()
 
-            def parameter_class(indices):
-                r"""The class of the parameter ``V^-1 indices`` in ``P/mP``."""
+            def coefficients_at(indices):
+                r"""The coordinates ``V^-1 indices`` of one class of ``P/mP``."""
                 column = inverse_right * matrix(
                     ZZ, parameter_rank, 1, [ZZ(index) for index in indices]
                 )
-                return class_of(
-                    tuple(int(entry) % int(period_scalar) for entry in column.list())
-                )
+                return tuple(int(entry) % int(period_scalar) for entry in column.list())
+
+            def parameter_class(indices):
+                r"""The class of the parameter ``V^-1 indices`` in ``P/mP``."""
+                return class_of(coefficients_at(indices))
+
+            def parameter_at(indices):
+                r"""The parameter of the class :func:`parameter_class` gives for ``indices``.
+
+                The class's coordinates name a parameter of it, namely the linear
+                combination of ``P``'s generators with those coefficients, so the
+                parameter is read off rather than solved for.  Solving instead -- the
+                quotient's ``preimage`` -- was 64% of one locus's time on `T_Co`: it
+                rebuilds an element of the quotient and inverts the projection per class
+                (#361).
+                """
+                coefficients = coefficients_at(indices)
+                parameter_ring = parameter_lattice.base_ring()
+                return inclusion(
+                    parameter_lattice.linear_combination(
+                        {
+                            label: parameter_ring(coefficient)
+                            for label, coefficient in zip(labels, coefficients)
+                        }
+                    )
+                ).underlying_element()
 
             # K itself, as the classes of P/mP with w = V a a multiple of the steps.
             transvection_kernel = tuple(
@@ -576,19 +599,87 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
                 )
                 for indices in parameters(counts)
             )
-            parameterization = self.parameterization()
+            # The lift at a parameter is ``phi(a) = t(f, s(a)) * base``
+            # (:meth:`parameterization`): the Eichler transvection of the section
+            # composed with the base point.  Its images of the source basis are
+            # therefore the transvection's matrix times the base point's coordinate
+            # matrix, and the lift is integral exactly when those images are integral
+            # combinations of the target's generators with a unimodular coordinate
+            # matrix -- the reading
+            # :meth:`...LatticeIsometryMethods.integral_restriction` makes on its
+            # integral branch.  The one product is formed per class: composing the two
+            # isometries and asking the composed object answers the same question
+            # through three constructions per class -- the transvection, the
+            # composition, and the torsor's membership check of the composition --
+            # which were 581 of the `T_Co` line row's 637 seconds (#361).
+            ring = source.base_ring()
+            assert ring is target.base_ring(), (
+                f"the integral lift locus of {self.reduction_isometry()!r} is read in "
+                f"the target's coordinates only when both endpoints are lattices over "
+                f"one ring, but the source is over {ring} and the target over "
+                f"{target.base_ring()}"
+            )
+            base = self.base_point()
+            rational_source = base.domain()
+            rational_target = base.codomain()
+            isotropic_vector = self._target_witt.isotropic_vector()
+            source_labels = tuple(source.module_generating_set())
+            target_labels = tuple(target.module_generating_set())
+            assert (
+                tuple(rational_target.module_generating_set()) == target_labels
+                and isotropic_vector.parent() is rational_target
+            ), (
+                f"the integral lift locus of {self.reduction_isometry()!r} is read in "
+                f"the target's own coordinates only when its rationalization carries "
+                f"the target's generators and the marked isotropic vector: "
+                f"{rational_target!r} is indexed by "
+                f"{tuple(rational_target.module_generating_set())} against the target's "
+                f"{target_labels}, and the marked vector lies in "
+                f"{isotropic_vector.parent()!r}"
+            )
+            # The base point's images of the source generators, one rational column
+            # each, so a class's lift is one matrix product away.
+            base_images = matrix(
+                QQ,
+                len(target_labels),
+                len(source_labels),
+                [
+                    entry
+                    for label in source_labels
+                    for entry in rational_target.rational_coordinates(
+                        base(rational_source.module_generator(label))
+                    ).list()
+                ],
+            )
 
-            def lifts_integrally(residue):
-                r"""Whether the lift of this parameter class restricts to an isometry of ``L'``."""
-                parameter = inclusion(quotient.preimage(residue)).underlying_element()
-                return parameterization(parameter).integral_restriction(source, target) is not None
+            def lifts_integrally(parameter):
+                r"""Whether the lift at ``parameter`` restricts to an isometry of ``L'``.
+
+                The lift is ``phi(a) = t(f, s(a)) * base``, so its images of the source
+                generators are the transvection's matrix times the base point's, and it
+                restricts to an isometry of ``L'`` exactly when every coordinate of
+                every image in the target's basis lies in the common base ring and the
+                coordinate matrix has determinant ``+-1``.
+                """
+                section = self._target_section(parameter)
+                images = (
+                    rational_target.eichler_transvection_matrix(
+                        isotropic_vector, section
+                    )
+                    * base_images
+                )
+                for entry in images.list():
+                    if entry.denominator() != 1:
+                        return False
+                return int(matrix(ZZ, [[int(entry) for entry in row] for row in images.rows()]).determinant()) in (1, -1)
 
             passing = tuple(
                 residue
-                for residue in (
-                    parameter_class(indices) for indices in parameters(coset_steps)
+                for residue, parameter in (
+                    (parameter_class(indices), parameter_at(indices))
+                    for indices in parameters(coset_steps)
                 )
-                if lifts_integrally(residue)
+                if lifts_integrally(parameter)
             )
             # The locus is the union of the cosets that pass, each translated
             # from its own tested representative by the transvection kernel.

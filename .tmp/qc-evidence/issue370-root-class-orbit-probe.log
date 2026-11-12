@@ -1,0 +1,24 @@
+[   25.72s] Gamma_En,2 built in 23.4s
+Sterk_1: 12 printed roots -> 12 distinct classes in 0.1s
+Traceback (most recent call last):
+  File "/probes/p370_p8.py", line 41, in <module>
+    orbits = image.root_class_orbits(classes)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 2940, in root_class_orbits
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: the class e_2 of Integral lattice of rank 10 and signature (1, 9) has square -4, not -2, so it is no root of the boundary lattice
+[peakrss] p370p8: child waited=1 shell_code=1 samples=15
+[peakrss] peak tree RSS      : 481 MiB
+[peakrss] low-water MemAvail : 10987 MiB
+[peakrss] peak single VmHWM  : 481 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      470 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    28.0s procs=  3 rss=   481 MiB hwm=   481 MiB avail= 10987 MiB
+[peakrss]   t=    26.0s procs=  3 rss=   474 MiB hwm=   474 MiB avail= 10987 MiB
+[peakrss]   t=    24.0s procs=  3 rss=   465 MiB hwm=   465 MiB avail= 11002 MiB
+[peakrss]   t=    22.0s procs=  3 rss=   461 MiB hwm=   461 MiB avail= 10997 MiB
+[peakrss]   t=    20.0s procs=  3 rss=   449 MiB hwm=   449 MiB avail= 11005 MiB
+launcher exit: 1

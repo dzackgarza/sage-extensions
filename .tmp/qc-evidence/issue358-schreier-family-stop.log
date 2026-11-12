@@ -1,0 +1,27 @@
+[    9.47s] T_Co rank 11, |A| 2048, |O(q)| 46998591897600
+A_U2 perp A_E8: True
+[h/2]^perp order 1024
+summand order product 1024
+|P| = product of the summands: 2 * 348364800 = 696729600
+[  153.02s] summand orders
+[  294.63s] O(T_Co) generators: 339 in 141.6s
+preimage constructed in 146.3 s
+character image order 46998591897600 55.4 s
+subgroup image order 696729600 0.7 s
+index [O(L) : Gamma] = 67456 0.1 s
+index * product == |O(q)|: True subgroup image order == product: True
+[  497.13s] quotient orders
+[peakrss] p358row: child waited=0 shell_code=0 samples=374
+[peakrss] peak tree RSS      : 5484 MiB
+[peakrss] low-water MemAvail : 764 MiB
+[peakrss] peak single VmHWM  : 5490 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     5480 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   746.0s procs=  3 rss=  5484 MiB hwm=  5490 MiB avail=   764 MiB
+[peakrss]   t=   743.2s procs=  3 rss=  4754 MiB hwm=  4906 MiB avail=  1428 MiB
+[peakrss]   t=   739.2s procs=  3 rss=  4450 MiB hwm=  4906 MiB avail=  1764 MiB
+[peakrss]   t=   741.2s procs=  3 rss=  4450 MiB hwm=  4906 MiB avail=  1730 MiB
+[peakrss]   t=   737.2s procs=  3 rss=  4444 MiB hwm=  4906 MiB avail=  1924 MiB
+launcher exit: 0

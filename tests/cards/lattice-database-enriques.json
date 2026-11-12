@@ -5,7 +5,7 @@
    "lattice": "lattices/{tag}.md"
   },
   "generated_by": "tests/cards/refresh_lattice_database_enriques.py",
-  "ref": "dbc9fc6add622459d60dba3dc62d3e4be6b903d7",
+  "ref": "1e1cadcfdca4dba2c0084a0bdc095b2d691126a8",
   "repository": "dzackgarza/lattice-database",
   "rows": {
    "arithmetic_group": [
@@ -24,6 +24,7 @@
    "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
    "hyperbolic_reflectivity": "gram_tensor,hyperbolic.reflective,certifications.hyperbolic.reflective,references",
    "lattice": "integral.polarization_counts.{degree}.{#h,#Γ̄_h,reference.citation}",
+   "parabolic_subdiagrams": "gram_tensor,integral.cusp_chambers.{subgroup}.{walls,parabolic_orbits,statement,wall_count,printed_page,figure},certifications.integral.cusp_chambers",
    "plane_orbits": "integral.primitive_orbits.{group}.planes and .orbit_lengths(per-orbit sizes) and .constant(the line count),reference.citation",
    "primitive_orbit_series": "gram_tensor,integral.primitive_orbits.{subgroup}.{constant,z,w},certifications.integral.primitive_orbits"
   }
@@ -1869,6 +1870,22 @@
   }
  },
  "discriminant_forms": {
+  "0125": {
+   "certification": "b298f9ee07553d1f6f93710a554da24a7f4bf0cdb2a69e7f03c4142e22dfb839",
+   "determinant": -1024,
+   "isotropic_classes": 528,
+   "isotropic_orbits": 2,
+   "latex": "U(2) \\oplus E_{8}(-2)",
+   "name": "U(2) + E8(-2)",
+   "orthogonal_group_order": 46998591897600,
+   "path": "lattices/0125.md",
+   "rank": 10,
+   "signature": [
+    1,
+    9
+   ],
+   "tag": "0125"
+  },
   "6JRR": {
    "certification": "0be391409303d25f25d126795ee881040661b4883ad7473272b34b60b8c414da",
    "determinant": -2048,
@@ -1923,6 +1940,410 @@
     2
    ],
    "tag": "0026"
+  }
+ },
+ "parabolic_subdiagrams": {
+  "0125": {
+   "certification": "0430d4dde789760ff670bab6269cf5bf69ae312faa1ff13d935c83c5f5a4fce7",
+   "gram": [
+    [
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     2,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     -4,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     -4,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     2,
+     0,
+     -4,
+     2,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     2,
+     2,
+     -4,
+     2,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     -4,
+     2,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     -4,
+     2,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     -4,
+     2
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     -4
+    ]
+   ],
+   "latex": "U(2) \\oplus E_{8}(-2)",
+   "name": "U(2) + E8(-2)",
+   "path": "lattices/0125.md",
+   "rank": 10,
+   "rows": {
+    "g-e": [
+     {
+      "figure": 4,
+      "parabolic_orbits": [
+       [
+        [
+         "\\alpha_1",
+         "\\alpha_3",
+         "\\alpha_4",
+         "\\alpha_5",
+         "\\alpha_6",
+         "\\alpha_7",
+         "\\alpha_8",
+         "\\alpha_9",
+         "\\alpha_11",
+         "\\alpha_12"
+        ]
+       ],
+       [
+        [
+         "\\alpha_1",
+         "\\alpha_2",
+         "\\alpha_3",
+         "\\alpha_4",
+         "\\alpha_5",
+         "\\alpha_6",
+         "\\alpha_7",
+         "\\alpha_9",
+         "\\alpha_10",
+         "\\alpha_11"
+        ],
+        [
+         "\\alpha_1",
+         "\\alpha_2",
+         "\\alpha_3",
+         "\\alpha_5",
+         "\\alpha_6",
+         "\\alpha_7",
+         "\\alpha_8",
+         "\\alpha_10",
+         "\\alpha_11",
+         "\\alpha_12"
+        ]
+       ],
+       [
+        [
+         "\\alpha_1",
+         "\\alpha_2",
+         "\\alpha_3",
+         "\\alpha_4",
+         "\\alpha_5",
+         "\\alpha_7",
+         "\\alpha_8",
+         "\\alpha_10",
+         "\\alpha_11"
+        ],
+        [
+         "\\alpha_2",
+         "\\alpha_3",
+         "\\alpha_4",
+         "\\alpha_5",
+         "\\alpha_6",
+         "\\alpha_7",
+         "\\alpha_8",
+         "\\alpha_10",
+         "\\alpha_11"
+        ]
+       ],
+       [
+        [
+         "\\alpha_1",
+         "\\alpha_2",
+         "\\alpha_3",
+         "\\alpha_4",
+         "\\alpha_5",
+         "\\alpha_6",
+         "\\alpha_7",
+         "\\alpha_8",
+         "\\alpha_10"
+        ],
+        [
+         "\\alpha_1",
+         "\\alpha_2",
+         "\\alpha_3",
+         "\\alpha_4",
+         "\\alpha_5",
+         "\\alpha_6",
+         "\\alpha_8",
+         "\\alpha_10",
+         "\\alpha_11"
+        ],
+        [
+         "\\alpha_1",
+         "\\alpha_2",
+         "\\alpha_3",
+         "\\alpha_4",
+         "\\alpha_6",
+         "\\alpha_7",
+         "\\alpha_8",
+         "\\alpha_10",
+         "\\alpha_11"
+        ],
+        [
+         "\\alpha_1",
+         "\\alpha_2",
+         "\\alpha_4",
+         "\\alpha_5",
+         "\\alpha_6",
+         "\\alpha_7",
+         "\\alpha_8",
+         "\\alpha_10",
+         "\\alpha_11"
+        ]
+       ]
+      ],
+      "printed_page": 19,
+      "statement": "4.3.5",
+      "wall_count": 12,
+      "walls": [
+       [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+       ],
+       [
+        -1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        2,
+        0,
+        -2,
+        -3,
+        -4,
+        -6,
+        -5,
+        -4,
+        -3,
+        -2
+       ],
+       [
+        2,
+        2,
+        -6,
+        -8,
+        -11,
+        -16,
+        -13,
+        -10,
+        -7,
+        -4
+       ],
+       [
+        5,
+        3,
+        -10,
+        -16,
+        -20,
+        -30,
+        -24,
+        -18,
+        -12,
+        -6
+       ]
+      ]
+     }
+    ]
+   },
+   "signature": [
+    1,
+    9
+   ],
+   "tag": "0125"
   }
  },
  "plane_orbits": {
@@ -2284,6 +2705,151 @@
   "tag": "0128"
  },
  "primitive_orbit_series": {
+  "0012": {
+   "certification": "5a4430096eb02533237fe05d0abeb1c97203b4d0fc7f4e828937a335ae18a3d9",
+   "determinant": 3,
+   "gram": [
+    [
+     2,
+     -1
+    ],
+    [
+     -1,
+     2
+    ]
+   ],
+   "latex": "A_{2}",
+   "name": "A2",
+   "path": "lattices/0012.md",
+   "rank": 2,
+   "rows": {
+    "O": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      1,
+      0,
+      0
+     ]
+    },
+    "O+": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      1,
+      0,
+      0
+     ]
+    },
+    "Otilde": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      1,
+      0,
+      0
+     ]
+    },
+    "Otilde+": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      2,
+      0,
+      0
+     ]
+    },
+    "SO": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      1,
+      0,
+      0
+     ]
+    },
+    "SO+": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      1,
+      0,
+      0
+     ]
+    },
+    "SOtilde": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      2,
+      0,
+      0
+     ]
+    },
+    "SOtilde+": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      2,
+      0,
+      0
+     ]
+    }
+   },
+   "signature": [
+    2,
+    0
+   ],
+   "tag": "0012"
+  },
   "0016": {
    "certification": "f7a0c10019c967ac46b34bcf7d6774bce8f7802d5b9bec628092435367e26101",
    "determinant": -1,

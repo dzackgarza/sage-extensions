@@ -473,13 +473,66 @@ def _signed_vector_witness(lattice, sign):
     return None if coordinates is None else _raise_lattice_direction(lattice, coordinates)
 
 
-def _isotropic_vector_witness(lattice):
-    r"""Raise PARI's rational isotropic vector into the given lattice.
+def _rational_isotropy_decision(lattice):
+    r"""Decide whether a nondegenerate finite-rank form over `ZZ` or `QQ` has a zero.
 
-    Migrated from ``sage-indefinite-port``'s ``find_hyperbolic_pair``.
-    Sage's ``quadratic_forms.qfsolve.qfsolve`` returns an integer obstruction,
-    a vector, or a matrix whose columns span the radical. Integral inputs
-    receive a primitive integral vector after clearing denominators.
+    Three statements decide it; a search runs only where none of them does.
+
+    * A **definite** form represents no zero: `q(x) > 0` for `x != 0` is the
+      definition of positive definiteness, and the negative case is `-q`.
+    * An **indefinite form of rank at least five** is isotropic -- Meyer's
+      theorem (Serre, *A Course in Arithmetic*, Ch. IV, §3.2, Cor. 2, printed
+      p. 43, as sage-extensions#371 cites it).  Nothing is solved: the answer is
+      the theorem's.
+    * **Otherwise** the rank is at most four, and Hasse--Minkowski decides the
+      question by the local invariants -- a rational form represents zero iff it
+      does over `RR` and over every `QQ_p` (Serre, Ch. IV, §3.2, Thm. 8, printed
+      p. 41).  PARI's ``qfsolve`` is that decision procedure, with a witness when
+      the answer is yes (see :func:`_isotropic_vector_witness`).
+
+    This is why the answer does not depend on a search in high rank: over `QQ`
+    the search refuses at dimension ten, while the theorem decides every
+    indefinite form of rank five and above.
+    """
+    rank = int(lattice.module_rank())
+    if rank == 0:
+        return False
+    positive, negative = (int(part) for part in lattice.signature_pair())
+    if not positive or not negative:
+        return False
+    if rank >= 5:
+        return True
+    return _isotropic_vector_witness(lattice) is not None
+
+
+def _isotropic_vector_witness(lattice):
+    r"""Return a nonzero isotropic vector of ``lattice``, or ``None`` when there is none.
+
+    Migrated from ``sage-indefinite-port``'s ``find_hyperbolic_pair``.  Sage's
+    ``quadratic_forms.qfsolve.qfsolve`` returns an integer obstruction, a vector,
+    or a matrix whose columns span the radical; integral inputs receive a
+    primitive integral vector after clearing denominators.
+
+    ``qfsolve`` is Denis Simon's code (Sage's ``qfsolve`` module: "Interface to
+    the PARI/GP quadratic forms code of Denis Simon").  Its reduction is not
+    available in every dimension: it answers a diagonal form of size eleven and
+    refuses a certain nine-variable form of ``T_Co`` with ``qfsolve, dim >= 10 is
+    not yet implemented``, so the dimension of the *call* is what has to be small
+    and not the dimension of the space.  From rank five up the witness is
+    therefore *built* from a subspace instead of searched for: over `QQ` the form
+    is diagonalized once, the five diagonal directions carrying both signs span a
+    subspace on which Meyer's theorem (Serre, *A Course in Arithmetic*, Ch. IV,
+    §3.2, Cor. 2, printed p. 43) guarantees a nonzero zero, ``qfsolve`` runs
+    there -- five variables, the size Simon's method is stated for -- and the
+    solution is carried back through the diagonalizing change of basis.  Below
+    rank five the whole form is inside that size already, and the search is the
+    decision procedure.  The
+    reference for answering rational isotropy by Simon's method is Hecke's
+    ``src/QuadForm/Quad/Spaces.jl``, ``_isotropic_subspace``, which cites Simon,
+    *Quadratic equations in dimensions 4, 5 and more*, and which is the source
+    this module's ``_rational_witt_index`` already follows; the reduction to a
+    rank-five definite-signature subspace is this module's own, and the theorem
+    is what makes it a witness and not a search.
     """
     ring = lattice.base_ring()
     engine_ring = _engine_ring(ring)
@@ -489,16 +542,90 @@ def _isotropic_vector_witness(lattice):
     assert lattice.module_rank().is_finite(), (
         f"PARI isotropic witnesses require finite rank, not {lattice.module_rank()}"
     )
-    if lattice.module_rank() == 0:
+    rank = int(lattice.module_rank())
+    if rank == 0:
         return None
+    if rank >= 5:
+        return _isotropic_witness_through_a_rank_five_subspace(lattice)
+    return _qfsolve_direction(lattice.gram_tensor(), lattice)
+
+
+def _qfsolve_direction(gram, lattice):
+    r"""Solve ``q = 0`` for the Gram tensor ``gram`` and raise the answer in ``lattice``.
+
+    ``lattice`` is the module the solution is raised in: the whole lattice, or
+    the ambient one when ``gram`` is a subspace's restricted Gram tensor and the
+    caller maps the answer back itself.
+    """
     from sage.quadratic_forms.qfsolve import qfsolve
 
-    solution = qfsolve(_engine_component_matrix(lattice.gram_tensor()).change_ring(SageQQ))
+    solution = qfsolve(_engine_component_matrix(gram).change_ring(SageQQ))
     if isinstance(solution, SageInteger):
         return None
     if isinstance(solution, Matrix):
         solution = solution.column(0)
     return _raise_lattice_direction(lattice, solution)
+
+
+def _isotropic_witness_through_a_rank_five_subspace(lattice):
+    r"""A nonzero zero of ``lattice``, read in a rank-five subspace Meyer's theorem decides.
+
+    ``lattice`` is nondegenerate of rank at least five.  Its rational
+    diagonalization supplies a basis of orthogonal directions; five of them
+    carrying both signs span a subspace of rank five whose form is indefinite and
+    therefore isotropic (Serre, Ch. IV, §3.2, Cor. 2, printed p. 43).  A zero of
+    that subspace is a zero of the whole space, and the diagonalizing change of
+    basis carries it back in the ambient coordinates.
+    """
+    from sage_extensions.categories._lattice import _congruence_diagonal_form
+
+    rank = int(lattice.module_rank())
+    diagonal, change = _congruence_diagonal_form(lattice.gram_tensor())
+    entries = tuple(diagonal.matrix()[position, position] for position in range(rank))
+    positives = [position for position in range(rank) if entries[position] > 0]
+    negatives = [position for position in range(rank) if entries[position] < 0]
+    if not positives or not negatives:
+        # The signature is definite, and a definite form has no zero.
+        return None
+    chosen = (positives[0], negatives[0]) + tuple(
+        position
+        for position in range(rank)
+        if position not in (positives[0], negatives[0])
+    )[:3]
+    subspace = engine_matrix(
+        SageQQ,
+        [[entries[left] if left == right else SageQQ.zero() for right in chosen] for left in chosen],
+    )
+    solution = _qfsolve_direction_on_a_subspace(subspace)
+    if solution is None:
+        raise ArithmeticError(
+            f"the five diagonal directions {chosen} of {lattice} span an indefinite form of rank "
+            f"{len(chosen)}, which Meyer's theorem makes isotropic, but qfsolve returned no zero for it: "
+            f"the diagonalization and the solver disagree"
+        )
+    coordinates = sum(
+        (solution[position] * change.column(direction) for position, direction in enumerate(chosen)),
+        sage_vector(SageQQ, rank),
+    )
+    vector = _raise_lattice_direction(lattice, coordinates)
+    if lattice.q(vector) != lattice.base_ring().zero():
+        raise ArithmeticError(
+            f"the vector {vector} read from the five diagonal directions {chosen} of {lattice} has square "
+            f"{lattice.q(vector)}, not zero: the diagonalizing change of basis and the solver disagree"
+        )
+    return vector
+
+
+def _qfsolve_direction_on_a_subspace(subspace):
+    r"""Return ``qfsolve``'s rational zero of the symmetric matrix ``subspace``, or ``None``."""
+    from sage.quadratic_forms.qfsolve import qfsolve
+
+    solution = qfsolve(subspace)
+    if isinstance(solution, SageInteger):
+        return None
+    if isinstance(solution, Matrix):
+        solution = solution.column(0)
+    return sage_vector(SageQQ, solution)
 
 
 def _rational_witt_index(space):

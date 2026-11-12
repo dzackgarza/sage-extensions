@@ -1,0 +1,57 @@
+[    5.28s] built T_Co: rank 11, |A| 2048
+[    9.07s] |O(q)| = 46998591897600
+two-primary invariants Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]
+orthogonal group type OwnedTorsionFormOrthogonalGroup_with_category_with_category
+q([h/2]) [(1)/(2)] in Fraction Field of Integer Ring / (2)Integer Ring b([h/2],[h/2]) [(1)/(2)] in Fraction Field of Integer Ring / (1)Integer Ring
+|A_U2| 4 |A_E8| 256 q(A_U2) ['[0] in Fraction Field of Integer Ring / (2)Integer Ring', '[1] in Fraction Field of Integer Ring / (2)Integer Ring']
+A_U2 perp A_E8: True
+A_U2 perp [h/2]: True
+[h/2]^perp order 1024
+summand product order 1024
+[  152.57s] point built
+|O(q_{U(2)})| 2 |O(q_{E8(-2) + <2>})| 348364800 product 696729600
+|G| == |O(q)|: True
+orbit 67456 setwise stabilizer 696729600
+product * orbit == |O(q)|: True
+stabilizer == product: True
+[  190.78s] |P| two ways
+[  349.14s] O(T_Co) group generators: 344 in 158.3s
+public orbit cardinality 67456 318.9 s
+[  668.04s] discriminant_point_orbit
+preimage constructed in 46.0 s
+Timeout (0:38:20)!
+Thread 0x00007cd040db9780 [python] (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/groups/abelian_gps/abelian_aut.py", line 170 in __call__
+  File "/sage/.venv/lib/python3.14/site-packages/sage/groups/abelian_gps/abelian_group_gap.py", line 152 in exponents
+  File "/sage/.venv/lib/python3.14/site-packages/sage/groups/abelian_gps/abelian_aut.py", line 203 in matrix
+  File "/sage/.venv/lib/python3.14/site-packages/sage/groups/fqf_orthogonal.py", line 484 in _act_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2047 in _normalized_map
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2074 in _transported_map
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2102 in _from_engine
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2250 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 4482 in _points_satisfying
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 6753 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 6753 in <lambda>
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 1174 in selected_resolution
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 116 in realize
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 383 in selected_resolution
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 6755 in selected_group_resolution
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 5763 in group_generators
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 706 in _joint_discriminant_image_gap
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 754 in subgroup_image_order
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 766 in index
+  File "/probes/p358_p2.py", line 100 in <module>
+[peakrss] p358p2: child waited=1 shell_code=1 samples=1149
+[peakrss] peak tree RSS      : 4276 MiB
+[peakrss] low-water MemAvail : 1519 MiB
+[peakrss] peak single VmHWM  : 4282 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     4272 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   611.1s procs=  3 rss=  4276 MiB hwm=  4282 MiB avail=  2561 MiB
+[peakrss]   t=   717.4s procs=  3 rss=  3855 MiB hwm=  4282 MiB avail=  4007 MiB
+[peakrss]   t=   715.3s procs=  3 rss=  3853 MiB hwm=  4282 MiB avail=  4106 MiB
+[peakrss]   t=  2294.4s procs=  3 rss=  3853 MiB hwm=  4282 MiB avail=  4589 MiB
+[peakrss]   t=  2296.4s procs=  3 rss=  3853 MiB hwm=  4282 MiB avail=  4597 MiB
+launcher exit: 1

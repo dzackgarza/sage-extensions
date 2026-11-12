@@ -1,0 +1,110 @@
+[     0.3s] built source (2, 18) and target (2, 18)
+[     0.3s] built the Mor
+[     0.3s] --> engine grams
+[     0.3s] engine grams: ((20, 20), (20, 20))  [0.0 s]
+[     0.3s] --> equal engine grams
+[     0.3s] equal engine grams: False  [0.0 s]
+[     0.3s] --> domain.is_nondegenerate()
+[     0.3s] domain.is_nondegenerate(): True  [0.0 s]
+[     0.3s] --> domain.is_even()
+[     0.3s] domain.is_even(): True  [0.0 s]
+[     0.3s] --> domain.discriminant()
+[     0.3s] domain.discriminant(): 1  [0.0 s]
+[     0.3s] --> discriminant_module().invariant_factors()
+[    68.3s] discriminant_module().invariant_factors(): Invariant-factor family: []  [68.0 s]
+[    68.3s] --> genus equality
+[    68.5s] genus equality: True  [0.2 s]
+[    68.5s] --> spinor_genus_count
+[    69.5s] spinor_genus_count: 1  [1.0 s]
+[    69.5s] --> mor.is_empty()
+Timeout (0:01:30)!
+Thread 0x00007d00ce654780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 1141 in _add_
+  File "/repos/sage-extensions/src/sage_extensions/categories/algebras/algebras.py", line 1491 in __add__
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 6830 in rational_pairing
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 3366 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/form_modules.py", line 2137 in b
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/discriminant_modules.py", line 967 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/discriminant_modules.py", line 961 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/discriminant_modules.py", line 960 in _descended_quadratic_gram
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/discriminant_modules.py", line 1013 in _discriminant_module
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 6912 in discriminant_module
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5182 in _isometry_decision
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5024 in _emptiness_decision
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 2445 in is_empty
+  File "/probes/probe376_steps2.py", line 63 in <lambda>
+  File "/probes/probe376_steps2.py", line 23 in timed
+  File "/probes/probe376_steps2.py", line 63 in <module>
+[   126.1s] mor.is_empty(): False  [56.6 s]
+[   126.1s] --> source.is_isometric_to(target)
+[   126.1s] source.is_isometric_to(target): True  [0.0 s]
+[   126.1s] --> source.isometry_to(target)
+Timeout (0:01:30)!
+Thread 0x00007d00ce654780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/owned_category.py", line 865 in _subcategory_hook_
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py", line 3140 in is_subcategory
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 806 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1631 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 116 in _value_at_normalized_index
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 90 in value
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 334 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/logic.py", line 160 in conjunction
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 334 in __eq__
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 339 in __ne__
+  File "/repos/sage-extensions/src/sage_extensions/tensors/tensor.py", line 468 in __eq__
+  File "/repos/sage-extensions/src/sage_extensions/tensors/tensor.py", line 107 in _tensor_richcmp
+  File "/repos/sage-extensions/src/sage_extensions/tensors/tensor.py", line 2193 in _richcmp_
+  File "/repos/sage-extensions/src/sage_extensions/tensors/tensor.py", line 649 in contract
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 5758 in _evaluate_gram
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 5771 in b
+  File "/work/src/sage_indefinite_port/indefinite/eichler.py", line 532 in _computed_easy_generators
+  File "/work/src/sage_indefinite_port/indefinite/eichler.py", line 514 in source_easy_generators
+  File "/work/src/sage_indefinite_port/indefinite/eichler.py", line 710 in _computed_generator_matrices
+  File "/work/src/sage_indefinite_port/indefinite/eichler.py", line 675 in source_generator_matrices
+  File "/work/src/sage_indefinite_port/indefinite/eichler.py", line 465 in stabilizer_of_lattice
+  File "/work/src/sage_indefinite_port/indefinite/eichler.py", line 489 in right_coset_transversal
+  File "/work/src/sage_indefinite_port/indefinite/eichler.py", line 1000 in primitive_covering_vectors
+  File "/work/src/sage_indefinite_port/indefinite/eichler.py", line 1029 in covering_vectors
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 912 in _indefinite_isometry
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 870 in isometry
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 89 in isometry
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5333 in an_element
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 5560 in isometry_to
+  File "/probes/probe376_steps2.py", line 65 in <lambda>
+  File "/probes/probe376_steps2.py", line 23 in timed
+  File "/probes/probe376_steps2.py", line 65 in <module>
+Timeout (0:01:30)!
+Thread 0x00007d00ce654780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 2060 in zero
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 359 in _element_constructor_
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 333 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 329 in _linear_combination_from_generator_coefficients
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 1993 in linear_combination
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 7769 in image
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 118 in _value_at_normalized_index
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 90 in value
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 7105 in _matrix_column_coordinates
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 7114 in matrix_entry
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 7119 in __getitem__
+  File "/repos/sage-extensions/src/sage_extensions/tensors/tensor.py", line 2691 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/tensors/tensor.py", line 2690 in from_matrix
+  File "/repos/sage-extensions/src/sage_extensions/tensors/tensor.py", line 2703 in from_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 409 in _tensor_view
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 1284 in _coordinate_tensor
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 1904 in __hash__
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/g_sets.py", line 372 in _from_orbit_sweep
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/g_sets.py", line 346 in from_finite_orbits
+  File "/repos/sage-extensions/src/sage_extensions/categories/rational_integral_stabilizers.py", line 181 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/rational_integral_stabilizers.py", line 700 in finite_representation
+  File "/repos/sage-extensions/src/sage_extensions/categories/rational_integral_stabilizers.py", line 842 in right_cosets
+  File "/work/src/sage_indefinite_port/indefinite/eichler.py", line 489 in right_coset_transversal
+  File "/work/src/sage_indefinite_port/indefinite/eichler.py", line 1000 in primitive_covering_vectors
+  File "/work/src/sage_indefinite_port/indefinite/eichler.py", line 1029 in covering_vectors
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 912 in _indefinite_isometry
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 870 in isometry
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 89 in isometry
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5333 in an_element
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 5560 in isometry_to
+  File "/probes/probe376_steps2.py", line 65 in <lambda>
+  File "/probes/probe376_steps2.py", line 23 in timed
+  File "/probes/probe376_steps2.py", line 65 in <module>

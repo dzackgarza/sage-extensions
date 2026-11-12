@@ -16,6 +16,112 @@ def _named_generators(lattice):
     return {str(label): lattice.module_generator(label) for label in lattice.module_generating_set()}
 
 
+def _coordinates(lattice, vector):
+    r"""Return the coordinates of ``vector`` in the selected basis of ``lattice``, as integers."""
+    given = vector.to_vector()
+    return [int(given(label)) for label in lattice.module_generating_set()]
+
+
+def _family_gram(lattice, vectors):
+    r"""Return the pairwise pairing matrix of ``vectors`` in one exact contraction.
+
+    In the selected basis the family's Gram is ``C G C^T``, so the whole family is checked by one
+    matrix product rather than one pairing at a time.
+    """
+    coordinates = sage_matrix(QQ, [_coordinates(lattice, vector) for vector in vectors])
+    gram = _engine_component_matrix(lattice.gram_tensor()).change_ring(QQ)
+    return coordinates * gram * coordinates.transpose()
+
+
+def _cusp_class_lift(line, reduction, class_vector):
+    r"""Return a vector of the ambient lattice, in ``v^\perp``, whose class in the reduction is ``class_vector``.
+
+    The reduction's coordinate frame is its retained section of
+    `v^\perp \to v^\perp/\mathbf Z v`, so a class is lifted by its coordinates there and the lift is
+    checked against the projection.  This is the same section
+    :meth:`sage_extensions.categories.isotropic_orbits.IsotropicVectorReductionImage.class_lift`
+    takes, read here from the lattice-level owners so that a printed root can be read at a cusp
+    without a group.
+    """
+    frame = reduction.coordinate_frame()
+    given = class_vector.to_vector()
+    lift = None
+    for label in reduction.module_generating_set():
+        coefficient = int(given(label))
+        if coefficient:
+            piece = coefficient * frame[label]
+            lift = piece if lift is None else lift + piece
+    assert lift is not None, (
+        f"the class {class_vector!r} of {reduction!r} is the zero class, which is no printed root"
+    )
+    assert reduction.projection()(lift) == class_vector, (
+        f"the coordinate frame of {reduction!r} does not lift the class {class_vector!r}"
+    )
+    return line.isotropic_perpendicular().inclusion()(lift)
+
+
+def _transported_roots(printed, span, identification, reduction, line):
+    r"""Carry the printed roots of ``span`` through ``identification`` into classes of ``reduction``.
+
+    ``identification`` is an isometry or an isometric embedding of ``span`` into the boundary lattice;
+    its matrix is read off the images of ``span``'s generators, each printed root is written in that
+    basis by one exact solve, and the product is the class of the root in the boundary lattice.  The
+    class is then lifted back into the ambient lattice by :func:`_cusp_class_lift`.
+    """
+    ambient = span.inclusion().codomain()
+    labels_span = tuple(span.module_generating_set())
+    labels_reduction = tuple(reduction.module_generating_set())
+    columns = []
+    for label in labels_span:
+        given = identification(span.module_generator(label)).to_vector()
+        columns.append([int(given(target)) for target in labels_reduction])
+    transport = sage_matrix(
+        QQ,
+        [
+            [column[row] for column in columns]
+            for row in range(len(labels_reduction))
+        ],
+    )
+    span_columns = [
+        _coordinates(ambient, span.inclusion()(span.module_generator(label)))
+        for label in labels_span
+    ]
+    system = sage_matrix(
+        QQ,
+        [
+            [column[row] for column in span_columns]
+            for row in range(int(ambient.module_rank()))
+        ],
+    )
+    ring = reduction.base_ring()
+    roots = []
+    for root in printed:
+        solution = system.solve_right(
+            sage_matrix(QQ, int(ambient.module_rank()), 1, _coordinates(ambient, root))
+        )
+        assert all(entry.denominator() == 1 for entry in solution.list()), (
+            f"the printed root {root!r} is not in the span of the printed family: its "
+            f"coordinates there are {solution.list()}"
+        )
+        transported = [
+            sum(
+                int(transport[row, column]) * int(solution[column, 0])
+                for column in range(len(labels_span))
+            )
+            for row in range(len(labels_reduction))
+        ]
+        class_vector = reduction.linear_combination(
+            {
+                label: ring(value)
+                for label, value in zip(labels_reduction, transported)
+                if value
+            }
+        )
+        roots.append(_cusp_class_lift(line, reduction, class_vector))
+    return tuple(roots), transport
+
+
+
 def _correlation_preimage_from_gram_inverse(lattice, dual_element, inverse_gram):
     r"""Compute the exact integral preimage under ``v |-> b(v,-)``.
 
@@ -447,6 +553,126 @@ class Sterk:
                 for index, point in _STERK_DIAGRAM_LAYOUTS[name].items()
             },
         )
+
+    @staticmethod
+    @cache
+    def _cusp_roots_in_TEn_cached(name):
+        r"""Carry the printed roots of Sterk's diagram ``name`` into ``T_En``, once."""
+        from sage_extensions.catalogue import Embeddings
+
+        lattice = NamedLattices.TEn
+        cusps = Sterk.selected_isotropic_vectors()
+        if name not in cusps:
+            raise ValueError(
+                f"Sterk's printed cusp roots are the five diagrams of Math. Z. 207 (1991), section "
+                f"4.3.1, diagrams 4.3.5--4.3.9, and {name!r} is none of them"
+            )
+        eta = cusps[name]
+        line = lattice.primitive_isotropic_subobject(eta)
+        reduction = line.isotropic_reduction()
+        match name:
+            case "Sterk_1" | "Sterk_2" | "Sterk_3":
+                # The hand-read transcription: the printed roots are already vectors of T_En.
+                roots = tuple(Sterk.sterks_in_TEn()[name])
+                printed_gram = _family_gram(lattice, roots)
+            case "Sterk_5":
+                # Fourteen roots in U + E8(-2), a rank-ten model of K_J.  The library's embedding
+                # U + E8(-2) -> T_En lands in eta^perp, and both lattices have determinant -256, so
+                # the composite with the projection to K_J is an isometry onto K_J.
+                model, printed = Sterk.sterk5_in_U_E8_2()
+                assert reduction.is_isometric_to(model) is True, (
+                    f"Sterk's diagram 4.3.9 is printed in the model {model}, which is not the boundary "
+                    f"lattice {reduction} of the cusp of that diagram: the two are not isometric, so the "
+                    "printed roots are no classes of K_J"
+                )
+                roots = tuple(Embeddings.U_E8_2_into_TEn(root) for root in printed)
+                printed_gram = _family_gram(model, printed)
+            case "Sterk_4":
+                # Eleven roots in II_{18,2} coordinates.  No map into T_En carries them: their span is a
+                # rank-ten lattice of determinant -1024, an index-two sublattice of K_J (determinant
+                # -256), so the identification is an isometric embedding and not an isometry.
+                ambient = NamedLattices.TdP
+                printed = tuple(Sterk.sterk_roots()["Sterk_4"])
+                span = ambient.sublattice_from(printed)
+                embeddings = span.Emb(reduction)
+                assert embeddings.is_empty() is False, (
+                    f"the printed roots of Sterk's diagram 4.3.8 span {span}, which this library does "
+                    f"not embed into the boundary lattice {reduction} of the cusp of that diagram, so "
+                    "they cannot be read there"
+                )
+                roots, transport = _transported_roots(
+                    printed, span, embeddings.an_element(), reduction, line
+                )
+                assert transport.det() * transport.det() == QQ(4), (
+                    f"the identification of Sterk's diagram 4.3.8 with the boundary lattice {reduction} "
+                    f"is not of index two: its matrix has determinant {transport.det()}, while the span "
+                    f"has determinant {span.determinant()} and the boundary lattice {reduction.determinant()}"
+                )
+                printed_gram = _family_gram(ambient, printed)
+            case _:
+                raise ValueError(f"no cusp roots are held for {name!r}")
+        assert all(lattice.b(root, eta) == lattice.base_ring().zero() for root in roots), (
+            f"a printed root of Sterk's diagram {name} is not orthogonal to the cusp vector {eta!r}, "
+            "so it is no class of the boundary lattice K_J there"
+        )
+        assert _family_gram(lattice, roots) == printed_gram, (
+            f"the printed roots of Sterk's diagram {name} do not keep their pairwise pairings when "
+            "read in T_En, so the identification used here is not a form-preserving one"
+        )
+        return tuple(roots)
+
+    @staticmethod
+    def cusp_roots_in_TEn(name):
+        r"""Return the printed roots of Sterk's cusp diagram ``name`` as vectors of ``T_{En}``.
+
+        H. Sterk, *Compactifications of the period space of Enriques surfaces, Part I*, Math. Z. 207
+        (1991), section 4.3.1, diagrams 4.3.5--4.3.9 (pp. 19, 21, 22, 23, 24), prints at each of the
+        five `0`-cusps of the Enriques period domain the roots of the chamber of the boundary lattice
+        `K_J = eta^\perp/\mathbf Z eta`; the five diagrams have 12, 10, 12, 11 and 14 walls (card
+        `029J`'s `cusp_chambers` row `gamma-en-2`, read there by tag).  The cusp vector of each diagram
+        is :meth:`selected_isotropic_vectors`'.
+
+        Three of the five are held as hand-read ``T_{En}'`` coordinates (:meth:`sterks_in_TEn`) and are
+        returned unchanged.  The other two are printed in coordinates of a *model* of `K_J` and are
+        carried here by an identification of lattices, each one *checked* rather than assumed:
+
+        * ``Sterk_5`` (4.3.9, p. 24): :meth:`sterk5_in_U_E8_2` prints the fourteen roots in
+          `U + E8(-2)`, a rank-ten model of `K_J` of the same determinant `-256`.
+          :attr:`sage_extensions.catalogue.Embeddings.U_E8_2_into_TEn` carries that model into
+          `T_{En}`, its image lies in `eta^\perp`, and the composite with the projection to `K_J` is an
+          isometry onto `K_J`: that the model *is* the boundary lattice is the isometry decision of
+          sage-extensions#298, asserted here.
+        * ``Sterk_4`` (4.3.8, p. 23): :meth:`sterk_roots` prints the eleven roots in `II_{18,2}`
+          coordinates (:attr:`NamedLattices.TdP`), and no map into `T_{En}` carries them.  Their span
+          is a rank-ten lattice of determinant `-1024`, an index-two sublattice of `K_J`
+          (determinant `-256`), so the identification is the isometric *embedding* the lattice
+          embedding Mor decides, and its matrix has determinant `2` -- the equation
+          `M^T G_{K_J} M = G_span` of an isometry with a non-unimodular `M`, which sage-extensions#298's
+          isometry call, stated for a unimodular change of basis, correctly reports as no isometry
+          between the two lattices.
+
+        **What a returned vector is.**  A class of `K_J` has no canonical vector of `T_{En}`: its lifts
+        are the class modulo `\mathbf Z eta`.  For ``Sterk_5`` the model's own vectors are the lifts;
+        for ``Sterk_4`` the class is lifted through the section the reduction's coordinate frame
+        retains.  In both cases the square and the pairing with a vector of `T_Co` are invariants of
+        the class -- `eta` lies in `T_Co`, so it is orthogonal to `delta` -- and those are what a
+        caller asks of a printed root.
+
+        **What the identification does not fix.**  Any element of `O(K_J)` composes with it, so a
+        statement that depends on *which* sublattice or which copy of the model was chosen is a
+        statement about the identification and not about Sterk's diagram.  The pairwise pairings are
+        preserved by construction and asserted, so the number of printed *classes* is
+        identification-free; how many of them lie in `T_Co` is not, and is reported as this
+        identification's.
+
+        EXAMPLES::
+
+            sage: from sage_extensions.sterk import Sterk
+            sage: roots = Sterk.cusp_roots_in_TEn("Sterk_5")
+            sage: all(root.q() in (-2, -4) for root in roots)
+            True
+        """
+        return tuple(Sterk._cusp_roots_in_TEn_cached(name))
 
     @staticmethod
     def diagrams():

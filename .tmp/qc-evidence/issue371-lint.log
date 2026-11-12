@@ -1,0 +1,13 @@
+1 files, 0 findings
+[peakrss] p371lint: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 235 MiB
+[peakrss] low-water MemAvail : 8023 MiB
+[peakrss] peak single VmHWM  : 235 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      222 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     2.0s procs=  4 rss=   235 MiB hwm=   235 MiB avail=  8023 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  8215 MiB
+launcher exit: 0

@@ -1,0 +1,29 @@
+[   12.26s] T_Co rebuilt, |O(q)| = 46998591897600
+reconstructed [('ep', -1)] ... q 0 div 2 divided class -[fp] matches the row's line: True
+reconstructed [('a1', 30120546496), ('a2', 74620371507), ('a3', 65644225591)] ... q 0 div 2 divided class 44168457980*[h] + 28029145070*[ep] + 1820311546*[fp] + 5403132599*[a1] - 23866891361*[a2] + 24205946967*[a3] - 16601420288*[a4] - 12610130265*[a5] + 25549854981*[a6] - 4872971159*[a7] + 15623875447*[a8] matches the row's line: True
+reconstructed [('a1', 2), ('a2', 5), ('a3', 5)] ... q 0 div 2 divided class 4*[h] - 4*[ep] - [fp] + [a1] - 3*[a2] - [a3] - [a5] + 5*[a6] - [a7] - [a8] matches the row's line: True
+reconstructed [('a1', -4739366612966), ('a2', -11144527454303), ('a3', -11048550525707)] ... q 0 div 2 divided class -12563877094386*[h] - 2958671514421*[ep] + 1972188049887*[fp] - 1569817299775*[a1] - 133004338205*[a2] - 5064324808363*[a3] + 9081670739160*[a4] + 2313729891987*[a5] - 10265587654622*[a6] + 529790458166*[a7] - 1359125635398*[a8] matches the row's line: True
+[   12.35s] vectors reconstructed
+[  100.72s] P built in 88.3s, |P| = 696729600
+permutation model built in 29.2 s |G| == |O(q)|: True |P| = 696729600
+P-orbits on the isotropic classes: 9 sizes [1, 1, 2, 120, 120, 135, 135, 240, 270]
+[  203.21s] permutation model
+  orbit 0 |Stab_{O(q)}(c)| 89181388800 |rho(Stab_Gamma(v))| 348364800 index 256 divisible: True
+  orbit 1 |Stab_{O(q)}(c)| 89181388800 |rho(Stab_Gamma(v))| 5160960 index 17280 divisible: True
+  orbit 2 |Stab_{O(q)}(c)| 89181388800 |rho(Stab_Gamma(v))| 2580480 index 34560 divisible: True
+  orbit 3 |Stab_{O(q)}(c)| 89181388800 |rho(Stab_Gamma(v))| 5806080 index 15360 divisible: True
+[  203.23s] done
+[peakrss] p358index: child waited=0 shell_code=0 samples=105
+[peakrss] peak tree RSS      : 1101 MiB
+[peakrss] low-water MemAvail : 7539 MiB
+[peakrss] peak single VmHWM  : 1103 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1093 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   208.2s procs=  3 rss=  1101 MiB hwm=  1103 MiB avail=  8240 MiB
+[peakrss]   t=   206.2s procs=  3 rss=  1095 MiB hwm=  1098 MiB avail=  8254 MiB
+[peakrss]   t=   204.2s procs=  3 rss=  1092 MiB hwm=  1095 MiB avail=  8263 MiB
+[peakrss]   t=   202.2s procs=  3 rss=  1088 MiB hwm=  1091 MiB avail=  8268 MiB
+[peakrss]   t=   200.2s procs=  3 rss=  1085 MiB hwm=  1088 MiB avail=  8267 MiB
+launcher exit: 0

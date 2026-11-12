@@ -296,6 +296,20 @@ def test_the_table_3_minimal_representatives_are_the_decoded_ones() -> None:
         )
 
 
+def _card_row(number):
+    r"""The three rows of card ``gamma-h-N``, read by tag from the database digest.
+
+    The expected value of every row is the card's: ``gamma-h-N`` states
+    ``#I_1``, ``#I_2`` and ``#I_12`` -- the orbit counts of isotropic lines,
+    planes and flags under ``Gamma_h`` -- with the citation
+    (Dutour Sikirić--Hulek, arXiv:2302.01679v2, Tables 1 and 2, pp. 13-14) the
+    digest keeps beside them.  ``_CASES`` keeps the source's node set, which is
+    the case's own definition, and the numbers it cites are pinned against the
+    card by :func:`test_the_cited_rows_are_the_cards_rows`.
+    """
+    return card("arithmetic_groups", f"gamma-h-{number}")
+
+
 def _case_group(case):
     r"""Return the public Gamma_h preimage subgroup of the case's representative."""
     model = _doubled_invariant_model()
@@ -314,21 +328,23 @@ def _case_group(case):
 @pytest.mark.parametrize("case", _CASES, ids=lambda case: f"case-{case[0]}")
 def test_the_source_line_row_is_the_public_line_orbit_count(case) -> None:
     r"""The case's cited line-orbit row, compared with the public orbit count."""
-    number, _nodes, _barred, lines, _planes, _flags = case
+    number, _nodes, _barred, _lines, _planes, _flags = case
     group = _case_group(case)
-    assert group.isotropic_orbit_representatives(1).cardinality() == cardinal(lines), (
-        f"case {number}: the public line orbits differ from the cited row"
-    )
+    stated = _card_row(number)
+    assert group.isotropic_orbit_representatives(1).cardinality() == cardinal(
+        stated["line_orbits"]
+    ), f"gamma-h-{number}: the public line orbits differ from the card's row"
 
 
 @pytest.mark.parametrize("case", _CASES, ids=lambda case: f"case-{case[0]}")
 def test_the_source_plane_row_is_the_public_plane_orbit_count(case) -> None:
     r"""The case's cited plane-orbit row, compared with the public orbit count."""
-    number, _nodes, _barred, _lines, planes, _flags = case
+    number, _nodes, _barred, _lines, _planes, _flags = case
     group = _case_group(case)
-    assert group.isotropic_orbit_representatives(2).cardinality() == cardinal(planes), (
-        f"case {number}: the public plane orbits differ from the cited row"
-    )
+    stated = _card_row(number)
+    assert group.isotropic_orbit_representatives(2).cardinality() == cardinal(
+        stated["plane_orbits"]
+    ), f"gamma-h-{number}: the public plane orbits differ from the card's row"
 
 
 @pytest.mark.parametrize("case", _CASES, ids=lambda case: f"case-{case[0]}")
@@ -339,8 +355,26 @@ def test_the_source_flag_row_is_the_public_flag_orbit_count(case) -> None:
     (research #748's flag argument has a gap), so a difference here is a result about
     that boundary, not an assertion to relax.
     """
-    number, _nodes, _barred, _lines, _planes, flags = case
+    number, _nodes, _barred, _lines, _planes, _flags = case
     group = _case_group(case)
+    stated = _card_row(number)
     assert group.isotropic_orbit_representatives(2, flag=True).cardinality() == cardinal(
-        flags
-    ), f"case {number}: the public flag orbits differ from the cited row"
+        stated["flag_orbits"]
+    ), f"gamma-h-{number}: the public flag orbits differ from the card's row"
+
+
+def test_the_cited_rows_are_the_cards_rows() -> None:
+    r"""Every count ``_CASES`` cites is its card's row, read by tag.
+
+    The table below is the transcription of the source's Tables 1 and 2; the
+    cards are the authority the acceptance compares against, so a stale or
+    mistyped transcription shows up here rather than inside a long row.
+    """
+    for case in _CASES:
+        number, _nodes, _barred, lines, planes, flags = case
+        stated = _card_row(number)
+        assert (lines, planes, flags) == (
+            stated["line_orbits"],
+            stated["plane_orbits"],
+            stated["flag_orbits"],
+        ), f"gamma-h-{number}: the transcribed row is not the card's"

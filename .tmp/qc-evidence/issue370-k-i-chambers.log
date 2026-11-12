@@ -1,0 +1,21 @@
+cusp 3: eta div 2, reduction rank 9
+   walls 9 norms [-4, -4, -4, -4, -4, -4, -4, -4, -2] roots: 1
+cusp 4: eta div 2, reduction rank 9
+   walls 9 norms [-4, -4, -4, -4, -4, -4, -4, -4, -2] roots: 1
+cusp 5: eta div 2, reduction rank 9
+   walls 9 norms [-4, -4, -4, -4, -4, -4, -2, -4, -4] roots: 1
+elapsed 10.3 s
+[peakrss] p370p3: child waited=0 shell_code=0 samples=7
+[peakrss] peak tree RSS      : 338 MiB
+[peakrss] low-water MemAvail : 10770 MiB
+[peakrss] peak single VmHWM  : 338 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      327 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   338 MiB hwm=   338 MiB avail= 10784 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   334 MiB hwm=   334 MiB avail= 10776 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   334 MiB hwm=   334 MiB avail= 10782 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   328 MiB hwm=   328 MiB avail= 10772 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   327 MiB hwm=   327 MiB avail= 10770 MiB
+launcher exit: 0

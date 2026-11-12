@@ -1788,6 +1788,48 @@ class CoxeterDiagrams(OwnedCategory):
                 maximal = tuple(entry for entry in maximal if int(entry.form_rank()) <= limit)
             return finite_ordered_set(maximal)
 
+        def parabolic_subdiagrams_of_rank(self, rank):
+            r"""Return the parabolic subdiagrams of the given form rank — Vinberg's criterion's family.
+
+            Vinberg's criterion (E. B. Vinberg, *The groups of units of certain
+            quadratic forms*, Mat. Sb. 87 (129) (1972), the English translation
+            Math. USSR Sb. 16 (1972), No. 1, Proposition 1, printed p. 22): the
+            ideal vertices of a finite-volume chamber in the Lobachevskii space
+            \\(\\Lambda^n\\) are in bijection with the parabolic subdiagrams of
+            rank \\(n - 1\\) — one per vertex at infinity.  In Vinberg's sense a
+            parabolic subdiagram is a disjoint union of connected affine
+            diagrams, and its rank is its vertex count less its component count,
+            which is the rank of its Gram matrix; ``rank`` below is that rank, so
+            for a finite-volume chamber in \\(\\Lambda^n\\) the caller passes
+            \\(n - 1\\) and the returned family is the chamber's ideal vertices.
+
+            Every member is decided by the maintained classification: a single
+            connected affine component is :meth:`is_parabolic`, a union of at
+            least two of them is :meth:`is_parabolic_union`, and the geometric
+            rank of either is :meth:`form_rank`.  The Schlaefli form of an
+            induced subdiagram is the principal submatrix of this diagram's form
+            on that vertex subset, so componentwise affineness and the rank are
+            decided on subsets and only the survivors are constructed.
+            """
+            target = int(rank)
+            vertices = tuple(self.index_set())
+            family = []
+            for size in range(len(vertices) + 1):
+                for subset in combinations(range(len(vertices)), size):
+                    positions = tuple(subset)
+                    if not positions:
+                        continue
+                    if not self._is_componentwise_affine_on(positions):
+                        continue
+                    _positive, _negative, zero = self._principal_inertia_counts(positions)
+                    if len(positions) - int(zero) == target:
+                        family.append(
+                            self.induced_subdiagram(
+                                tuple(vertices[index] for index in positions)
+                            )
+                        )
+            return finite_ordered_set(tuple(family))
+
         def _subdiagram_poset_on(self, subdiagrams):
             r"""The poset of ``subdiagrams`` ordered by inclusion of their vertex sets."""
 

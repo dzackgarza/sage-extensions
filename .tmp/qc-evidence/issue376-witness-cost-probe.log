@@ -1,0 +1,25 @@
+[     0.1s] target lattice (2, 18)
+[     0.3s] OrbitCoverModel(target) in 0.08 s
+[     0.3s] attributes: ['envelope', 'lattice', 'model']
+[     0.3s] model lattice signature (2, 18), same object as target: True
+[     0.3s] model lattice gram tensor: _BiproductGram
+[     0.3s] model basis: 20 vectors
+[     0.3s] _engine_component_matrix(model gram) in 0.00 s
+[     0.3s] 5 b() on the model basis in 0.01 s
+[     4.6s] source_easy_generators(model): 8 generators in 4.3 s
+[    41.8s] covering_vectors(0, 1): 1 vectors in 37.2 s
+[    41.8s] done
+[peakrss] 376env: child waited=0 shell_code=0 samples=24
+[peakrss] peak tree RSS      : 514 MiB
+[peakrss] low-water MemAvail : 6959 MiB
+[peakrss] peak single VmHWM  : 515 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      504 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    34.0s procs=  3 rss=   514 MiB hwm=   514 MiB avail=  7445 MiB
+[peakrss]   t=    36.1s procs=  3 rss=   514 MiB hwm=   514 MiB avail=  7389 MiB
+[peakrss]   t=    38.1s procs=  3 rss=   514 MiB hwm=   514 MiB avail=  7389 MiB
+[peakrss]   t=    40.1s procs=  3 rss=   514 MiB hwm=   514 MiB avail=  7187 MiB
+[peakrss]   t=    42.1s procs=  3 rss=   514 MiB hwm=   514 MiB avail=  7058 MiB
+launcher exit: 0

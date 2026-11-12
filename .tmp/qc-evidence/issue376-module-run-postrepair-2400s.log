@@ -1,0 +1,14 @@
+..[peakrss] 376test: child waited=124 shell_code=124 samples=1196
+[peakrss] peak tree RSS      : 1121 MiB
+[peakrss] low-water MemAvail : 3837 MiB
+[peakrss] peak single VmHWM  : 1128 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1117 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  2342.1s procs=  3 rss=  1121 MiB hwm=  1127 MiB avail=  3913 MiB
+[peakrss]   t=  2382.2s procs=  3 rss=  1121 MiB hwm=  1127 MiB avail=  4152 MiB
+[peakrss]   t=  2384.2s procs=  3 rss=  1121 MiB hwm=  1127 MiB avail=  4432 MiB
+[peakrss]   t=  2386.3s procs=  3 rss=  1121 MiB hwm=  1127 MiB avail=  4328 MiB
+[peakrss]   t=  2388.3s procs=  3 rss=  1121 MiB hwm=  1127 MiB avail=  4217 MiB
+launcher exit: 124

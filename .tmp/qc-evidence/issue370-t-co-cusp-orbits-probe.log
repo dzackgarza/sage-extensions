@@ -1,0 +1,35 @@
+[  162.83s] Gamma_Co,2 built in 159.9s
+==================== cusp 4
+[  163.51s]   K_I rank 9 det 512 signature (1, 8)
+  printed roots 11 in T_Co 8 squares in T_En [-2, -4, -4, -4, -4, -4, -2, -4]
+  classes 8 squares in K_I [-2, -4, -4, -4, -4, -4, -2, -4]
+  root classes 2
+[  388.80s]   line stabilizer: 37 generators in 25.0s
+[  532.47s]   root_class_orbits: 2 orbits in 143.7s
+    orbit 0: 1 classes, squares [-2]
+    orbit 1: 1 classes, squares [-2]
+==================== cusp 5
+[  532.85s]   K_I rank 9 det 512 signature (1, 8)
+  printed roots 14 in T_Co 11 squares in T_En [-4, -4, -4, -4, -4, -4, -4, -2, -2, -2, -4]
+  classes 11 squares in K_I [-4, -4, -4, -4, -4, -4, -4, -2, -2, -2, -4]
+  root classes 3
+[  576.67s]   line stabilizer: 65 generators in 38.5s
+[  602.23s]   root_class_orbits: 3 orbits in 25.6s
+    orbit 0: 1 classes, squares [-2]
+    orbit 1: 1 classes, squares [-2]
+    orbit 2: 1 classes, squares [-2]
+[  602.23s] done
+[peakrss] p298i: child waited=0 shell_code=0 samples=307
+[peakrss] peak tree RSS      : 1692 MiB
+[peakrss] low-water MemAvail : 6065 MiB
+[peakrss] peak single VmHWM  : 1692 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1681 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   604.7s procs=  3 rss=  1692 MiB hwm=  1692 MiB avail=  6660 MiB
+[peakrss]   t=   606.7s procs=  3 rss=  1692 MiB hwm=  1692 MiB avail=  6622 MiB
+[peakrss]   t=   608.7s procs=  3 rss=  1692 MiB hwm=  1692 MiB avail=  6597 MiB
+[peakrss]   t=   610.7s procs=  3 rss=  1692 MiB hwm=  1692 MiB avail=  6572 MiB
+[peakrss]   t=   612.7s procs=  3 rss=  1692 MiB hwm=  1692 MiB avail=  6483 MiB
+launcher exit: 0
