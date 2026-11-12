@@ -4,7 +4,12 @@ from sage_extensions.all import *
 def _d16_plus_gram():
     r"""Gram rows of \(D_{16}^+\) on the basis \(2e_1,\ e_2-e_1,\dots,e_{15}-e_{14},\ h\)
     with \(h=\tfrac12(e_1+\dots+e_{16})\) in \(\mathbb Z^{16}\); these sixteen vectors
-    span \(D_{16}\) together with \(h\)."""
+    span \(D_{16}\) together with \(h\).
+
+    The entries are the inner products in the Euclidean form
+    \(x\cdot x=\sum_i x_i^2\) on \(\mathbb Z^{16}\), so this Gram is positive
+    definite and has inertia \((16,0)\): it is \(D_{16}^+(+1)\), and the test
+    twists it by \(-1\) to reach \(D_{16}^+(-1)\)."""
     def entry(i, j):
         if i == j:
             return 4 if i in (0, 15) else 2
@@ -51,8 +56,20 @@ def test_2U_plus_E8_squared_is_isometric_to_2U_plus_D16_plus_with_nonisometric_c
     \(E_8 \oplus E_8\) and \(D_{16}^+\) are the two inequivalent even unimodular
     16-dimensional lattices (Conway--Sloane, *Sphere Packings*, Ch. 2, Sec. 2.3,
     after Witt). This is the pair on which deciding \(2U \oplus K\) by \(K\) fails
-    (research#402)."""
-    e8_squared = Lattices(ZZ)("E8").twist(-1) + Lattices(ZZ)("E8").twist(-1)
+    (research#402).
+
+    The catalogue's named \(E_8\) is the negative-definite root lattice, i.e.
+    \(E_8(-1)\) and not \(E_8(+1)\): ``Lattices.root_lattice`` returns "the exact
+    negative-definite root lattice", ``Lattices.IIPQ`` spells \(II_{(p,q)}\) with
+    \(p>q\) as \(U^q\oplus E_8^{\oplus (p-q)/8}\), and ``NamedLattices.Tco`` states
+    the convention with its source (Dolgachev--Kondo, *Enriques surfaces and
+    Borel--Weil--Bott type duality*, Izv. Math. 77:3 (2013), Sec. 3, eq. (3.6),
+    printed p. 513), where the signature \((2,9)\) forces the negative sign. So
+    \(E_8(-1)^2\) here is ``E8 + E8`` with no twist, while ``E8.twist(-1)`` would
+    be \(E_8(+1)^2\) and would give inertia \((16,0)\) against this
+    \(D_{16}^+(-1)\)'s \((0,16)\) -- signatures \((18,2)\) against \((2,18)\).
+    """
+    e8_squared = Lattices(ZZ)("E8") + Lattices(ZZ)("E8")
     d16_plus = Lattices(ZZ)(_d16_plus_gram()).twist(-1)
     source = e8_squared.two_u_eichler_model().lattice()
     target = d16_plus.two_u_eichler_model().lattice()

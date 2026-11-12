@@ -598,3 +598,19 @@ batch made (`28422f9` + `f7eaa5d` for #298, `73d02b7` for #370).
 The probe scripts sit beside their logs under the same names with `.py`.
 | `issue355-parabolic-test.log` | the tree of this push | the rewritten criterion test of `tests/lattices/test_the_rank_n_minus_one_parabolic_count_on_the_we_chamber.sage`: **1 passed in 22.37 s** (the call's count on the `g-e` chamber against the sum of the card's `parabolic_orbits` sizes — nine; each returned subdiagram the orthogonal-wall subdiagram of an ideal ray) |
 | `issue355-parabolic-lint.log` | the tree of this push | `test_lint` on the rewritten test module: **1 file, 0 findings** |
+
+## #376 — the sign in the two `2U + K` models
+
+`results/issue376-two-u-signatures.md` states the four signatures, the wrong sign and the repair;
+these are the runs behind it, at the tree of this push.  No log here shows a green module: the
+third assertion of `tests/lattices/test_two_u_recursive_isometry.sage` asks for the port's isometry
+witness, which does not return (see the last two rows).
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue376-signatures-probe.log` | the tree of this push | the four signatures and the two models' from their Gram matrices: `E8` (0, 8), `E8.twist(-1)` (8, 0), `_d16_plus_gram()` (16, 0), `D16+(-1)` (0, 16), the models (18, 2) and (2, 18); both decisions on that pair `False` in 0.0 s |
+| `issue376-decision-probe.log` | the tree of this push | with the repair: `source.is_isometric_to(target)` **`True` in 126.1 s** (68.0 s and 56.6 s of it the two `discriminant_module().invariant_factors()` calls), and the complements' decision `False` in 43.3 s |
+| `issue376-module-run-postrepair-2400s.log` | the tree of this push | the module: the first two tests pass, the third killed at the 2400 s inner cap (`shell_code=124`) inside the port's witness |
+| `issue376-other-two-tests.log` | the tree of this push | the same module with the third test deselected: **2 passed, 1 deselected in 1.30 s**, no lint findings |
+| `issue376-witness-cost-probe.log` | the tree of this push | the port's per-level costs on the rank-20 target: `OrbitCoverModel` 0.08 s, `source_easy_generators` 4.3 s for 8 generators, `covering_vectors(0, 1)` 37.2 s for one vector |
+| `issue376-rank18-witness-probe.log` | the tree of this push | one Witt cancellation down: `(U + E8^2).is_isometric_to(U + D16^+)` `True` in 28.4 s, and its `isometry_to` killed at 300 s in `lorentzian_cells.py` `_expand_traversal_once` |
