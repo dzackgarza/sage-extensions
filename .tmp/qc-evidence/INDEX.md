@@ -614,3 +614,16 @@ witness, which does not return (see the last two rows).
 | `issue376-other-two-tests.log` | the tree of this push | the same module with the third test deselected: **2 passed, 1 deselected in 1.30 s**, no lint findings |
 | `issue376-witness-cost-probe.log` | the tree of this push | the port's per-level costs on the rank-20 target: `OrbitCoverModel` 0.08 s, `source_easy_generators` 4.3 s for 8 generators, `covering_vectors(0, 1)` 37.2 s for one vector |
 | `issue376-rank18-witness-probe.log` | the tree of this push | one Witt cancellation down: `(U + E8^2).is_isometric_to(U + D16^+)` `True` in 28.4 s, and its `isometry_to` killed at 300 s in `lorentzian_cells.py` `_expand_traversal_once` |
+
+## #370 — the cusp-4 chamber anchored at the vector its figure is drawn at
+
+`results/issue370-the-coble-root-orbits.md` states the map and the counts; these are the runs behind
+them, at the tree of the push `1df83be`.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue370-cusp-four-tests.log` | `1df83be` (#370) | the whole file: **4 passed in 3429.24 s** — the five-cusp card comparison 154.07 s, the two `T_En` cusps 698.21 s, the three `T_Co` cusps 2557.82 s; no lint findings |
+| `issue370-cusp-four-test-alone.log` | the tree of this push | `-k cusps_four_and_five`: **1 passed in 580.35 s**, the card's `wall_vectors` against Sterk's transcription, wall for wall, and the `K_J` orbits |
+| `issue370-t-co-cusps-test-alone.log` | the tree of this push | `-k coble_cusps_three_four_and_five`: **1 passed in 408.73 s**, the three `K_I` runs with their transporters |
+| `issue370-cusp-lattice-consumer.log` | the tree of this push | `tests/lattices/test_cusp_lattices.sage`: **11 passed in 72.81 s** — where the two vectors of the fourth cusp are checked to be one cusp (their reductions are isometric) |
+| `issue370-card-row-consumer.log` | the tree of this push | `test_the_five_cusps_are_the_chamber_rows_of_card_029j`: **1 passed in 98.65 s** — the card comparison still finding four agreements, `Sterk_4` being (4.2.3)'s vector, not the chamber's |

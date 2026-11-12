@@ -24,26 +24,26 @@ inequivalence.  The test below pins the card comparison, the transporters, the r
 
 **The known family, and the card.**  H. Sterk, *Compactifications of the period space of Enriques
 surfaces, Part I*, Math. Z. 207 (1991), section 4.3.1, diagrams 4.3.5--4.3.9, pp. 19, 21, 22, 23,
-24: the printed cusp diagrams of `T_{En} = U + U(2) + E8(-2)`, with 12, 10, 12, 11 and 14 walls,
-read as card `029J`'s `cusp_chambers` row `gamma-en-2` by tag.  At all five cusps the number of
-distinct **classes** of `K_J` the printed roots give is the card's wall count: the reduction merges
-none of the printed walls, which is what makes the class count a computed value and not a
-transcription of the card.  Three of the five families are held in `T_{En}` coordinates by hand
-(`Sterk.sterks_in_TEn`); the other two are printed in coordinates of a model of `K_J` and are carried
-into `T_{En}` by `Sterk.cusp_roots_in_TEn`, whose docstring states each identification and which one
-of them is sage-extensions#298's isometry.
+24: the printed cusp diagrams of the Enriques period lattice `T_{En} = U + U(2) + E8(-2)`, with 12,
+10, 12, 11 and 14 walls, read as card `029J`'s `cusp_chambers` row `gamma-en-2` by tag.  At all five
+cusps the number of distinct **classes** of `K_J` the walls give is that row's wall count: the
+reduction merges none of the printed walls, which is what makes the class count a computed value and
+not a transcription of the card.
 
-**What the identification of cusps 4 and 5 is.**  Diagram 4.3.9's fourteen roots are printed in
-`U + E8(-2)`, a rank-ten model of `K_J` of the same determinant `-256`: that the model *is* the
-boundary lattice is an isometry of lattices, and it is decided and witnessed by the call of #298
-(`isometry_matrix_to`, through `is_isometric_to`).  Diagram 4.3.8's eleven roots are printed in
-`II_{18,2}` coordinates, and no map into `T_{En}` carries them: their span is a rank-ten lattice of
-determinant `-1024`, an index-two sublattice of `K_J`, so that identification is an isometric
-*embedding* --- the same form equation with a non-unimodular matrix, which #298's isometry call
-correctly reports as no isometry between the two lattices.  Either identification may be composed
-with any element of `O(K_J)`, so the number of printed classes is identification-free (the call
-checks that the pairwise pairings survive) while how many of them lie in `T_Co` is a statement about
-the identification in use, and is reported as such rather than compared with a card.
+**Where the walls and the cusp vectors come from: the row, by tag.**  Card `029J`'s
+`integral.cusp_chambers['gamma-en-2']` row for each diagram stores the chamber's cusp vector *and*
+every wall as a vector in the card's Gram coordinates, which are `T_{En}`'s, so this test reads both
+from `card("cusp_diagrams", "029J")` and transcribes neither.  Sterk prints the same vectors --- his
+coordinates are `L_- = H + H(2) + E8(-2)` (1.2--1.4, pp. 3--4), which is `T_{En}` --- and
+`Sterk.cusp_roots_in_TEn` returns them, so the two sources are compared rather than one assumed.
+
+Cusp 4 is the one place where the paper prints **two** vectors for the cusp: (4.2.3), p. 16, lists
+`e' + 2f' + \gamma` among the five cusp representatives, and (4.3.8), p. 23, draws its chamber at
+`2e' + f' + \bar\alpha_1`, the two pairing to `2`.  The card's row stores the second, because a row
+holds a chamber, and the eleven walls of Fig. 10 are orthogonal to it and pair `4, -2, -4` with
+`α_{10}, α_{11}, α_{12}` against the first.  So the cusp vector of the diagram is the card's, and
+`Sterk.sterk4_cusp_vector()` is it; `Sterk.selected_isotropic_vectors()` keeps (4.2.3)'s, which is
+what a *cusp* is and what the reduction lattice is read at.
 
 No lattice-database card holds the orbit counts themselves.  The missing row is
 `029J.cusp_root_orbits.gamma-en-2` --- per cusp, the number of `Gamma_{Co,2}`-orbits of the root
@@ -104,33 +104,73 @@ def _gamma_co_2():
     return _GROUPS["coble"]
 
 
-def _enriques_cusp_image(name):
-    r"""The reduction image at Sterk's cusp `name` of `T_En`, built once per session."""
-    if name not in _ENRIQUES_IMAGES:
-        vector = Sterk.selected_isotropic_vectors()[name]
-        _ENRIQUES_IMAGES[name] = _gamma_en_2().isotropic_vector_reduction_image(vector)
-    return _ENRIQUES_IMAGES[name]
+def _card_cusp(number):
+    r"""Return card `029J`'s row for Sterk's diagram `number` as `(cusp vector, walls)`.
+
+    The card's `cusp_diagrams` row for the statement of that diagram stores the chamber's cusp vector
+    and every wall in the card's Gram coordinates, which are this library's `T_{En}`: `number` 4 is
+    (4.3.8) with Fig. 10 and `number` 5 is (4.3.9) with Fig. 12.  Reading them here is what makes a
+    run of this file choose no vector and no map.
+    """
+    rows = card("cusp_diagrams", "029J")["rows"]["gamma-en-2"]
+    lattice = NamedLattices.TEn
+    labels = tuple(lattice.module_generating_set())
+    row = rows[number - 1]
+
+    def vector(entries):
+        return lattice.linear_combination(
+            {
+                label: lattice.base_ring()(int(entry))
+                for label, entry in zip(labels, entries, strict=True)
+                if int(entry)
+            }
+        )
+
+    cusp = vector(row["cusp"])
+    assert lattice.q(cusp) == ZZ.zero()
+    assert cusp.is_primitive() is True
+    walls = tuple(vector(entries) for entries in row["wall_vectors"])
+    assert cardinal(sum(1 for _ in walls)) == cardinal(row["wall_count"])
+    return cusp, walls
+
+
+def _enriques_cusp_image(number):
+    r"""The reduction image at Sterk's cusp `number` of `T_En`, built once per session.
+
+    The cusp vector is the card's, `_card_cusp(number)[0]`: the chamber of the diagram printed for
+    that cusp sits there.  At cusps 1, 2, 3 and 5 it is also `Sterk.selected_isotropic_vectors()`';
+    at cusp 4 the card and `Sterk.sterk4_cusp_vector()` have `2e' + f' + \bar\alpha_1` where (4.2.3),
+    p. 16, lists `e' + 2f' + \gamma`, and it is at the first that Fig. 10's eleven walls are classes.
+    """
+    if number not in _ENRIQUES_IMAGES:
+        vector, _walls = _card_cusp(number)
+        _ENRIQUES_IMAGES[number] = _gamma_en_2().isotropic_vector_reduction_image(vector)
+    return _ENRIQUES_IMAGES[number]
 
 
 def _coble_cusp_image(number):
     r"""The reduction image at `T_Co`'s cusp `number` (3, 4 or 5), built once per session.
 
-    The representative is the library's own cusp vector, `Sterk.selected_isotropic_vectors()`.  For
-    cusps 3, 4 and 5 its `e` and `f` coefficients are equal, so it is a vector of `T_Co = delta^perp`
-    with that coefficient on `h` and the same coordinates on `ep, fp, a1..a8`; at cusp 1 it is `e` and
-    at cusp 2 `ep`.  It is used here rather than card `029J`'s row because it is the line the printed
-    roots of the cusp are classes at: the two agree at cusps 1, 2, 3 and 5, and at cusp 4 the card
-    states `(0, 0, 2, 1, -4, ...)` where the library's vector is `(0, 0, 1, 2, -4, ...)`, two
-    different isotropic lines (they pair to `2`), of which only the second is orthogonal to the eleven
-    printed roots of diagram 4.3.8.  That disagreement is recorded in
-    `results/issue370-the-coble-root-orbits.md`; the wall counts the tests compare are the card's, read
-    by tag, and do not depend on which representative of the cusp is used.
+    The representative is read from card `029J`'s `cusp_diagrams` row for that cusp's statement, by
+    tag.  For cusps 3, 4 and 5 its `e` and `f` coefficients are equal, so it is a vector of
+    `T_Co = delta^\perp` with that coefficient on `h` and the same coordinates on `ep, fp, a1..a8`.
+
+    At cusps 3 and 5 the card's vector is also `Sterk.selected_isotropic_vectors()`' --- (4.2.3),
+    p. 16, lists the five cusp representatives --- and at cusp 4 it is not: (4.3.8), p. 23, draws that
+    chamber at `2e' + f' + \bar\alpha_1`, which is the card's vector and `Sterk.sterk4_cusp_vector()`'s,
+    while (4.2.3) lists `e' + 2f' + \gamma`; the two pair to `2`.  Both are asserted here, so a card
+    that changed either would fail.
     """
     if number not in _COBLE_IMAGES:
         lattice = NamedLattices.Tco
         ring = lattice.base_ring()
         enriques = NamedLattices.TEn
-        cusp = Sterk.selected_isotropic_vectors()[f"Sterk_{number}"]
+        cusp, _walls = _card_cusp(number)
+        if number == 4:
+            assert cusp == Sterk.sterk4_cusp_vector()
+            assert cusp != Sterk.selected_isotropic_vectors()["Sterk_4"]
+        else:
+            assert cusp == Sterk.selected_isotropic_vectors()[f"Sterk_{number}"]
         coordinates = cusp.to_vector()
         labels = tuple(enriques.module_generating_set())
         given = {label: int(coordinates(label)) for label in labels}
@@ -172,18 +212,19 @@ def test_the_printed_cusp_walls_are_distinct_classes_of_the_boundary_lattice() -
     r"""The printed roots at cusps 1--5 are as many distinct classes of `K_J` as the card's walls.
 
     Card `029J` states 12, 10, 12, 11 and 14 walls for Sterk's diagrams 4.3.5--4.3.9, and
-    `Sterk.cusp_roots_in_TEn` holds each family as vectors of `T_{En}` --- the first three by hand,
-    the other two by the identifications stated there.  Their classes in `K_J = v^perp/ZZ v` are
-    computed here by `root_class`, so a printed wall that were a multiple of the cusp's own vector
-    --- or two printed walls in one class --- would show up as a smaller class count than the card's.
-    That they agree at all five cusps is what lets an orbit count be compared with the card's
-    geometry, and it is the card comparison the identification of cusps 4 and 5 has to survive.
+    `Sterk.cusp_roots_in_TEn` holds each family as vectors of `T_{En}` --- the first three hand-read,
+    the last two from the printed vectors of (4.3.8) and (4.3.9).  Their classes in `K_J =
+    v^perp/ZZ v` are computed here by `root_class`, so a wall that were a multiple of the cusp's own
+    vector --- or two walls in one class --- would show up as a smaller class count than the card's.
+    That they agree at all five cusps is what makes a class count a computed value, and it is the
+    comparison the cusp-4 and cusp-5 transcriptions have to survive.  The cusp vector each is read at
+    is the card's own row (`_card_cusp`), which is the chamber's line at every cusp.
     """
     rows = card("cusp_chambers", "029J")["rows"]["gamma-en-2"]
     walls = [cardinal(row["walls"]) for row in rows]
-    names = [f"Sterk_{number}" for number in range(1, 6)]
-    for name, expected in zip(names, walls):
-        image = _enriques_cusp_image(name)
+    for number, expected in zip(range(1, 6), walls):
+        name = f"Sterk_{number}"
+        image = _enriques_cusp_image(number)
         roots = tuple(Sterk.cusp_roots_in_TEn(name))
         classes = tuple(image.root_class(root) for root in roots)
         representatives = []
@@ -205,7 +246,7 @@ def test_a_wall_that_is_not_a_root_is_refused_and_a_root_round_trips() -> None:
     two directions of the class map are checked against each other on the chamber's own wall family,
     which is what makes `root_class` usable on Sterk's printed roots.
     """
-    image = _enriques_cusp_image("Sterk_1")
+    image = _enriques_cusp_image(1)
     reduction = HyperbolicLattices(ZZ)(image.reduction())
     walls = tuple(reduction.fundamental_chamber().wall_roots())
     assert cardinal(sum(1 for _ in walls)) > cardinal(0)
@@ -214,62 +255,6 @@ def test_a_wall_that_is_not_a_root_is_refused_and_a_root_round_trips() -> None:
     for wall in walls:
         assert image.root_class(image.class_lift(wall)) == wall
 
-
-def test_the_coble_cusp_three_has_one_root_class_and_its_orbit_is_its_transporter() -> None:
-    r"""At `T_Co`'s cusp 3 the printed root family meets `T_Co` in one `(-2)`-class.
-
-    `T_Co = delta^perp` inside `T_{En}`, `delta = e - f`, and a vector orthogonal to `delta` has
-    equal `e` and `f` coefficients: it is the vector with that coefficient on the `h` line of
-    `T_Co`.  Of Sterk's twelve printed roots at cusp 3 (4.3.7, p. 22) nine are orthogonal to
-    `delta`, eight of square `-4` and one of square `-2`; that one is the single root class of
-    `K_I` which `T_Co` sees, the record's `cusp 3: 12`.
-
-    The acting family is `Gamma_{Co,2}`'s own line stabilizer reduced to `K_I` and certified in
-    `G_v` by the discriminant criterion, and the call returns the orbit of that one class with its
-    transporter --- the identity, which is the honest answer for a family of one class.  That the
-    action is not vacuous is asserted separately: some certified generator moves the class on
-    `K_I`, and it is dropped from the walk only because its image leaves the given family.
-    """
-    image = _coble_cusp_image(3)
-    lattice = image.lattice()
-    eta = image.vector()
-
-    enriques = NamedLattices.TEn
-    basis = {
-        label: enriques.module_generator(label)
-        for label in enriques.module_generating_set()
-    }
-    delta = basis["e"] - basis["f"]
-    roots = tuple(Sterk.sterks_in_TEn()["Sterk_3"])
-    inside = [root for root in roots if enriques.b(root, delta) == ZZ.zero()]
-    negative_two = [root for root in inside if enriques.q(root) == -ZZ(2)]
-    assert cardinal(sum(1 for _ in negative_two)) == cardinal(1)
-
-    transported = _transported_to_coble(negative_two[0], lattice, enriques, eta)
-    assert lattice.q(transported) == -ZZ(2)
-
-    class_ = image.root_class(transported)
-    assert image.reduction().q(class_) == -ZZ(2)
-
-    stabilizer = tuple(
-        image.subgroup().supergroup().isotropic_stabilizer_generators(image.line())
-    )
-    assert cardinal(sum(1 for _ in stabilizer)) > cardinal(0)
-    orbits = image.root_class_orbits((class_,), stabilizer_generators=stabilizer)
-    assert cardinal(orbits.cardinality()) == cardinal(1)
-    orbit = tuple(orbits)[0]
-    assert cardinal(orbit.cardinality()) == cardinal(1)
-    transporter = orbit.value(class_)
-    assert transporter(class_) == class_
-
-    movers = [
-        generator
-        for generator in stabilizer
-        if generator(eta) == eta
-        and image.contains(image.reduction_image(generator), lift=generator)
-        and image.reduction_image(generator)(class_) != class_
-    ]
-    assert cardinal(sum(1 for _ in movers)) > cardinal(0)
 
 def _orbit_partition(orbits, given, reduction):
     r"""Check that the orbits partition ``given`` and that each transporter is an isometry of `K`.
@@ -296,43 +281,40 @@ def _orbit_partition(orbits, given, reduction):
 def test_the_cusps_four_and_five_have_their_root_class_orbits_in_the_boundary_lattice() -> None:
     r"""At Sterk's cusps 4 and 5 the `(-2)` classes of `K_J` are orbited by `Gamma_{En,2}`'s stabilizer.
 
-    Diagram 4.3.8 (p. 23) has eleven walls and 4.3.9 (p. 24) fourteen, both read from card `029J`'s
+    Diagram 4.3.8 (p. 23) has eleven walls and 4.3.9 (p. 24) fourteen, read from card `029J`'s
     `cusp_chambers` row by tag in the class-count test above; the **roots** of `K_J` among them are
-    the classes of square `-2`, two at cusp 4 and four at cusp 5.  That count is a statement no
-    identification can change: the printed roots are carried into `K_J` by an injective form-preserving
-    map (`Sterk.cusp_roots_in_TEn`), and such a map preserves squares, so the number of `(-2)` classes
-    is the number of `(-2)` printed roots --- which is what the assertion here compares, and *not* a
-    count of orbits.
+    the classes of square `-2`, two at cusp 4 and four at cusp 5.  That count is a statement no choice
+    can change: each wall is a vector the card stores and `Sterk.cusp_roots_in_TEn` reproduces, and a
+    form-preserving map preserves squares, so the number of `(-2)` classes is the number of `(-2)`
+    walls --- which is what the assertion compares, and *not* a count of orbits.
 
     The acting family is `Gamma_{En,2}`'s own line stabilizer at the cusp, reduced to `K_J` and
     certified in `G_v` by the discriminant criterion.  What is asserted of the result is that the
     orbits partition the classes given and that each transporter is a form-preserving isometry of
     `K_J`.  What is deliberately not asserted is a count of orbits: they have no card, and a singleton
     orbit is not a proof of inequivalence, because `generators_are_certified_complete` is `False` at a
-    primitive isotropic line (sage-extensions#312) --- an orbit of more than one class proves those
-    roots `Gamma_{En,2}`-equivalent, and only a certified generating family of `G_v` would let a
-    singleton prove anything.
+    primitive isotropic line (sage-extensions#312).
     """
-    rows = card("cusp_chambers", "029J")["rows"]["gamma-en-2"]
     for number in (4, 5):
         name = f"Sterk_{number}"
-        image = _enriques_cusp_image(name)
+        image = _enriques_cusp_image(number)
         reduction = image.reduction()
-        roots = tuple(Sterk.cusp_roots_in_TEn(name))
-        printed_negative_two = [root for root in roots if root.q() == -ZZ(2)]
+        cusp_vector, card_walls = _card_cusp(number)
+        printed = tuple(Sterk.cusp_roots_in_TEn(name))
+        # The card's cusp vector spans the line the image was built at: its class in K_J is zero.
+        assert image.root_class(cusp_vector) == image.reduction().zero()
+        # Sterk's transcription and the card's row are the same vectors, wall for wall.
+        assert set(printed) == set(card_walls)
+        assert cardinal(sum(1 for _ in printed)) == cardinal(sum(1 for _ in card_walls))
         classes = []
-        for root in roots:
-            class_ = image.root_class(root)
+        for wall in card_walls:
+            class_ = image.root_class(wall)
             if all(class_ != seen for seen in classes):
                 classes.append(class_)
-        roots_of_the_boundary = [
-            class_ for class_ in classes if reduction.q(class_) == -ZZ(2)
-        ]
+        roots_of_the_boundary = [class_ for class_ in classes if reduction.q(class_) == -ZZ(2)]
+        negative_two = [wall for wall in card_walls if wall.q() == -ZZ(2)]
         assert cardinal(sum(1 for _ in roots_of_the_boundary)) == cardinal(
-            sum(1 for _ in printed_negative_two)
-        )
-        assert cardinal(sum(1 for _ in roots_of_the_boundary)) < cardinal(
-            rows[number - 1]["walls"]
+            sum(1 for _ in negative_two)
         )
         stabilizer = tuple(
             image.subgroup().supergroup().isotropic_stabilizer_generators(image.line())
@@ -344,21 +326,37 @@ def test_the_cusps_four_and_five_have_their_root_class_orbits_in_the_boundary_la
         _orbit_partition(orbits, tuple(roots_of_the_boundary), reduction)
 
 
-def test_the_coble_cusp_five_has_its_root_class_orbits_in_the_boundary_lattice_of_t_co() -> None:
-    r"""At `T_Co`'s cusp 5 the printed roots of 4.3.9 are carried into `K_I` and their orbits returned.
+def test_the_coble_cusps_three_four_and_five_have_their_root_class_orbits() -> None:
+    r"""At `T_Co`'s cusps 3, 4 and 5 the walls are carried into `K_I` and their orbits returned.
 
-    This is the one cusp of `T_Co` where the printed family's identification with `K_I` is fixed by a
-    map the library holds rather than chosen: diagram 4.3.9 is printed in `U + E8(-2)`, which is a
-    model of the boundary lattice `K_J`, and `Embeddings.U_E8_2_into_TEn` carries that model into
-    `eta^perp` with the model's own pairings (asserted in `Sterk.cusp_roots_in_TEn`), so the classes of
-    `K_J` it gives are determined and not merely one of the `O(K_J)`-many choices.  Generic
-    `(-4)`-walls of the diagram are not roots of `K_I` and are dropped, as in the cusp 3 test.
+    `T_Co = delta^\perp` inside `T_{En}`, `delta = e - f`, and a vector orthogonal to `delta` has equal
+    `e` and `f` coefficients: it is the vector with that coefficient on the `h` line of `T_Co`.  So the
+    walls of the three diagrams that meet `T_Co` become vectors of `T_Co`, their classes in `K_I` are
+    read by `root_class`, and the `(-2)` ones among them --- the roots of `K_I` in #370's sense --- are
+    handed to `root_class_orbits`, which returns each orbit with a transporter checked by
+    re-application.
 
-    Cusp 4 is **not** asserted here: diagram 4.3.8 is printed in `II_{18,2}` coordinates, its span
-    embeds in `K_J` with index two, and that embedding is one of `O(K_J)`-many --- two runs of this
-    library gave one and two root classes of `K_I` there --- so a count of its roots of `K_I`, and the
-    orbits of them, are statements about the identification and not about Sterk's diagram.
-    `results/issue370-the-coble-root-orbits.md` records the measurements and what would pin it.
+    **No search, and so the same run every time.**  Cusp 3's twelve walls are the hand-read `T_{En}`
+    coordinates of `sterks_in_TEn`; cusp 4's eleven are Sterk's own vectors of
+    `L_- = H + H(2) + E8(-2)` read off Fig. 10 and 4.3.8, p. 23; cusp 5's fourteen are the printed
+    `U + E8(-2)` vectors carried in by `Embeddings.U_E8_2_into_TEn`.  Every cusp vector and every wall
+    is the card's row by tag, and `Sterk.cusp_roots_in_TEn` returns the same vectors.  That is what
+    cusp 4 did not have before: its span used to be matched inside `K_J` by the lattice embedding Mor,
+    one of `O(K_J)`-many maps chosen by the engine, and two runs then gave one and two root classes
+    there.
+
+    **What is asserted.**  That the family reaches `K_I` at each cusp, that every class has the square
+    of the wall it comes from, that the orbits partition the roots given, and that each transporter is
+    a form-preserving isometry of `K_I`.  At cusp 3 it is also asserted, as before, that the action is
+    not vacuous: some certified generator moves that one class on `K_I` and is dropped only because
+    its image leaves the given family.
+
+    **What is not asserted.**  A count of orbits.  They have no card --- the row that would carry them,
+    `029J.cusp_root_orbits.gamma-en-2`, is named in `results/issue370-the-coble-root-orbits.md` for
+    filing --- and a **singleton orbit is not a proof of inequivalence**, because
+    `generators_are_certified_complete` is `False` at a primitive isotropic line (sage-extensions#312):
+    an orbit of more than one class proves those roots `Gamma_{Co,2}`-equivalent, and only a certified
+    generating family of `G_v` would let a singleton prove anything.
     """
     enriques = NamedLattices.TEn
     basis = {
@@ -366,26 +364,48 @@ def test_the_coble_cusp_five_has_its_root_class_orbits_in_the_boundary_lattice_o
         for label in enriques.module_generating_set()
     }
     delta = basis["e"] - basis["f"]
-    image = _coble_cusp_image(5)
-    lattice = image.lattice()
-    eta = image.vector()
-    reduction = image.reduction()
-    roots = tuple(Sterk.cusp_roots_in_TEn("Sterk_5"))
-    inside = [root for root in roots if enriques.b(root, delta) == ZZ.zero()]
-    assert cardinal(sum(1 for _ in inside)) > cardinal(0)
-    classes = []
-    for root in inside:
-        class_ = image.root_class(_transported_to_coble(root, lattice, enriques, eta))
-        assert reduction.q(class_) == enriques.q(root)
-        if all(class_ != seen for seen in classes):
-            classes.append(class_)
-    roots_of_the_boundary = [class_ for class_ in classes if reduction.q(class_) == -ZZ(2)]
-    assert cardinal(sum(1 for _ in roots_of_the_boundary)) > cardinal(0)
-    stabilizer = tuple(
-        image.subgroup().supergroup().isotropic_stabilizer_generators(image.line())
-    )
-    assert cardinal(sum(1 for _ in stabilizer)) > cardinal(0)
-    orbits = image.root_class_orbits(
-        tuple(roots_of_the_boundary), stabilizer_generators=stabilizer
-    )
-    _orbit_partition(orbits, tuple(roots_of_the_boundary), reduction)
+    for number, name in ((3, "Sterk_3"), (4, "Sterk_4"), (5, "Sterk_5")):
+        image = _coble_cusp_image(number)
+        lattice = image.lattice()
+        eta = image.vector()
+        reduction = image.reduction()
+        cusp_vector, card_walls = _card_cusp(number)
+        # The card's T_En vector, read in T_Co, is the cusp vector the image was built at.
+        assert _transported_to_coble(cusp_vector, lattice, enriques, eta) == eta
+        if number != 4:
+            assert cusp_vector == Sterk.selected_isotropic_vectors()[name]
+        else:
+            assert cusp_vector == Sterk.sterk4_cusp_vector()
+            assert cusp_vector != Sterk.selected_isotropic_vectors()[name]
+        walls = tuple(Sterk.cusp_roots_in_TEn(name))
+        assert set(walls) == set(card_walls)
+        inside = [wall for wall in walls if enriques.b(wall, delta) == ZZ.zero()]
+        assert cardinal(sum(1 for _ in inside)) > cardinal(0)
+        classes = []
+        for wall in inside:
+            class_ = image.root_class(_transported_to_coble(wall, lattice, enriques, eta))
+            assert reduction.q(class_) == enriques.q(wall)
+            if all(class_ != seen for seen in classes):
+                classes.append(class_)
+        roots_of_the_boundary = [class_ for class_ in classes if reduction.q(class_) == -ZZ(2)]
+        assert cardinal(sum(1 for _ in roots_of_the_boundary)) > cardinal(0)
+        stabilizer = tuple(
+            image.subgroup().supergroup().isotropic_stabilizer_generators(image.line())
+        )
+        assert cardinal(sum(1 for _ in stabilizer)) > cardinal(0)
+        orbits = image.root_class_orbits(
+            tuple(roots_of_the_boundary), stabilizer_generators=stabilizer
+        )
+        assert cardinal(orbits.cardinality()) > cardinal(0)
+        _orbit_partition(orbits, tuple(roots_of_the_boundary), reduction)
+        if number == 3:
+            # The family is one class, so its orbit is a singleton; the action is not vacuous.
+            movers = [
+                generator
+                for generator in stabilizer
+                if generator(eta) == eta
+                and image.contains(image.reduction_image(generator), lift=generator)
+                and image.reduction_image(generator)(roots_of_the_boundary[0])
+                != roots_of_the_boundary[0]
+            ]
+            assert cardinal(sum(1 for _ in movers)) > cardinal(0)

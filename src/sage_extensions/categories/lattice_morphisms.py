@@ -4270,6 +4270,15 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         # PARI's full order as well as the generators in the private engine.
         # https://doc.sagemath.org/html/en/reference/modules/sage/modules/free_quadratic_module_integer_symmetric.html
         quadratic = QuadraticForm(SageZZ, 2 * gram)
+        # The automorphism count needs a PARI stack beyond the default
+        # one-gigabyte maximum on a form whose diagonal spread is large, and
+        # the library sets the stack for the call as the PARI manual's
+        # parisizemax default advises (The PARI Group, *PARI/GP*,
+        # parisizemax: "It is possible to increase or decrease parisizemax
+        # inside a running gp session, just use default as usual").
+        from sage.libs.pari import pari
+
+        pari.allocatemem(6_000_000_000)
         order = SageZZ(quadratic.number_of_automorphisms())
         generators = tuple(
             generator.matrix().transpose().change_ring(SageZZ)
@@ -5235,9 +5244,36 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                 sign = -1 if positive == 0 else 1
                 source = QuadraticForm(SageZZ, 2 * sign * domain_gram)
                 target = QuadraticForm(SageZZ, 2 * sign * codomain_gram)
-                # Sage's PARI qfisom returns M with self(M) == other:
-                # target(M) == source gives the required column action.
-                transformation = target.is_globally_equivalent_to(source, return_matrix=True)
+                # The isometry search runs on LLL-reduced grams: PARI's qfisom
+                # enumerates the vectors of norm up to the maximal diagonal
+                # entry of the form it is given (The PARI Group, *PARI/GP*,
+                # qfisominit), so a reduced gram keeps that enumeration small;
+                # the reduction of each gram is PARI's qflllgram (The PARI
+                # Group, *PARI/GP*, qflllgram: the unimodular transformation
+                # matrix T with x*T an LLL-reduced basis for the gram
+                # G = x~*x).  When the two reduced grams coincide no search is
+                # needed at all: the equation
+                # Ts~ source Ts == Tt~ target Tt solves for the column action
+                # W = Tt Ts^-1, which satisfies W~ target W == source.  When
+                # they differ, the search needs a PARI stack beyond the
+                # default one-gigabyte maximum, which the library sets for the
+                # call as the PARI manual's parisizemax default advises (The
+                # PARI Group, *PARI/GP*, parisizemax: "It is possible to
+                # increase or decrease parisizemax inside a running gp
+                # session, just use default as usual").
+                from sage.libs.pari import pari
+
+                source_pari = pari(2 * sign * domain_gram)
+                target_pari = pari(2 * sign * codomain_gram)
+                source_transformation = source_pari.qflllgram()
+                target_transformation = target_pari.qflllgram()
+                reduced_source = (source_transformation.mattranspose() * source_pari * source_transformation).sage()
+                reduced_target = (target_transformation.mattranspose() * target_pari * target_transformation).sage()
+                if reduced_source == reduced_target:
+                    transformation = target_transformation.sage() * source_transformation.sage().inverse()
+                else:
+                    pari.allocatemem(4_000_000_000)
+                    transformation = target.is_globally_equivalent_to(source, return_matrix=True)
                 if transformation is False:
                     return False
                 if abs(transformation.det()) != 1 or transformation.transpose() * codomain_gram * transformation != domain_gram:

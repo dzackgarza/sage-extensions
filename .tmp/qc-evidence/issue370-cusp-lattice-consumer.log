@@ -1,0 +1,18 @@
+...........                                                              [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_cusp_lattices.sage::test_E10_has_a_single_cusp_and_it_reduces_to_E8: 22.89 s > 20 s
+11 passed in 72.81s (0:01:12)
+[peakrss] p370ccusplat: child waited=0 shell_code=0 samples=45
+[peakrss] peak tree RSS      : 595 MiB
+[peakrss] low-water MemAvail : 6636 MiB
+[peakrss] peak single VmHWM  : 595 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      584 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    86.2s procs=  3 rss=   595 MiB hwm=   595 MiB avail=  6697 MiB
+[peakrss]   t=    88.2s procs=  3 rss=   595 MiB hwm=   595 MiB avail=  6636 MiB
+[peakrss]   t=    84.2s procs=  3 rss=   593 MiB hwm=   593 MiB avail=  6697 MiB
+[peakrss]   t=    82.2s procs=  3 rss=   589 MiB hwm=   589 MiB avail=  6708 MiB
+[peakrss]   t=    80.2s procs=  3 rss=   584 MiB hwm=   584 MiB avail=  6714 MiB
+launcher exit: 0

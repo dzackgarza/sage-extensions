@@ -5248,6 +5248,52 @@ class Lattices(OwnedCategoryOverBaseRing):
             )
 
         @cached_method
+        @cached_method
+        def odd_spinor_norm_isometry(self):
+            r"""Return an integral isometry of \(L\) with real spinor norm \(-1\).
+
+            \(\mathrm{sn}_{\mathbb R}\) takes the value \(-\tfrac12 q(v)\) on the
+            reflection \(s_v\) (Gritsenko--Hulek--Sankaran, arXiv:0810.1614, §1), so a
+            vector of square \(2\) whose reflection is integral gives an isometry outside
+            \(O^+(L)\) -- the odd coset of \(O(L)/O^+(L)\), which the double-coset
+            statement of D. Dutour Sikirić and K. Hulek (arXiv:2302.01679v2, Lemma 3.6,
+            p. 22) uses to split an \(O(L)\)-orbit into two \(O^+\)-orbits.
+
+            The candidates are the lattice's own basis vectors and the sums and
+            differences of their pairs; each is checked, never assumed: the reflection
+            must be an integral isometry of \(L\) and must fail membership in
+            :meth:`O_plus`.  A lattice in which no candidate is odd raises instead of
+            returning a substitute, because an element of the even coset would certify
+            the wrong orbit count.
+            """
+            from itertools import chain, combinations
+
+            ring = self.base_ring()
+            target = ring(2)
+            basis = tuple(self.module_generators())
+            candidates = chain(
+                basis,
+                (
+                    first + sign * second
+                    for first, second in combinations(basis, 2)
+                    for sign in (1, -1)
+                ),
+            )
+            for vector in candidates:
+                if vector.q() != target:
+                    continue
+                if not vector.is_integral_reflection_vector():
+                    continue
+                reflection = self.reflection(vector)
+                if reflection not in self.O_plus():
+                    return reflection
+            raise ValueError(
+                f"no basis vector or sum of two basis vectors of {self!r} is a "
+                f"square-two vector whose reflection is integral, so no integral "
+                f"isometry of odd real spinor norm is exhibited here: the odd coset of "
+                f"O(L)/O^+(L) is not certified by this construction"
+            )
+
         def O_plus(self):
             r"""Return \(O^+(L)=O(L)\cap\ker\mathrm{sn}_{\mathbb R}\) (Gritsenko--Hulek--Sankaran, arXiv:0810.1614, §1).
 
