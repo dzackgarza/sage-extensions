@@ -59,5 +59,5 @@ filed on research.
 `tests/lattices/test_the_coble_lattice_otilde_and_otilde_plus_line_rows.sage`
 records both counts (527 and 527) and compares each with the page-proof value in
 its docstring; the assertions are the recorded computed counts, never the page.
-The test's own run (`.tmp/357-test.log`): `1 passed` in <TEST_TIME>, the peak
-tree RSS <TEST_RSS>.
+The test's own run (`.tmp/357-test.log`): `1 passed` in 672.51 s (0:11:12), the
+test call measured at 671.93 s and the peak tree RSS at 1198 MiB.

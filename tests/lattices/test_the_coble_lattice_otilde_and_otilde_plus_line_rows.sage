@@ -29,7 +29,7 @@ than asserted -- a computed row that disagreed would be a defect filed on
 research the same day, not a test failure of this file.
 
 This file, run on its own with the time gates lifted (the call legitimately
-exceeds the 20 s ceiling): ``1 passed`` in ``3306.9 s``.
+exceeds the 20 s ceiling): ``1 passed`` in ``672.51 s``.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
