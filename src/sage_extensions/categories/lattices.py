@@ -12125,19 +12125,134 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             restricted.select_section(Sets().Mor(image, restricted.domain())(self._pointwise_levi_section))
 
             def generators():
-                from sage_indefinite_port.indefinite.marked_lattices import RECURSION
-
-                return finite_ordered_set(tuple(RECURSION.isotropic_quotient_kernel_generators(self, radical_images=())))
+                return finite_ordered_set(tuple(self._pointwise_kernel_generators()))
 
             restricted.select_kernel_generators(generators)
             return restricted
 
         @cached_method
-        def _pointwise_levi_integral_lift_or_none(self, isometry):
-            r"""An integral quotient lift fixing the null sublattice pointwise, or None."""
-            from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+        def _pointwise_kernel_generators(self):
+            r"""Integral generators of ``ker(P_I^1 -> O(K_I))``, the unipotent radical \(U_I\).
 
-            return RECURSION.isotropic_quotient_lift(self, isometry, radical_images=())
+            \(U_I = \{g : g|_I = 1,\ (g-1)(I^\perp)\subseteq I\}\) is the
+            common kernel on \(I\) and on \(I^\perp/I\), so the kernel of
+            :meth:`pointwise_levi_action` is exactly the group
+            :meth:`sage_extensions.categories.isotropic_parabolics.PrimitiveIsotropicSubobjects.unipotent_radical_generators`
+            presents, and this method asks that owner for the family rather
+            than rebuilding one.  What each rank asks for:
+
+            * rank zero: \(U_I\) is trivial and the family is empty;
+            * rank one \(I=\mathbf Z e\): the Eichler transvections
+              \(E_{e,x}\) over one lift \(x\) of each generator of
+              \(K_I=I^\perp/I\).  The assignment \(x\mapsto E_{e,x}\) is a
+              group morphism killing \(e\)
+              (Gritsenko--Hulek--Sankaran, arXiv:0810.1614, section 3.1,
+              equations (4)--(5), the additivity of the transvection
+              parameter) and every element of \(U_I\) acts on \(I^\perp\) by
+              \(y\mapsto y+\lambda(\bar y)e\) for one
+              \(\lambda\in\operatorname{Hom}(K_I,\mathbf Z)\), so the family
+              generates \(U_I\) once the parameters \(b(x,-)\), \(x\in K_I\),
+              exhaust \(\operatorname{Hom}(K_I,\mathbf Z)\) -- that is, once
+              \(K_I\) is unimodular.  Where they do not, the exact group is
+              the integral kernel of the marked-line reduction
+              (``integral_kernel_group_generators`` of
+              :mod:`sage_extensions.categories.isotropic_lifts`) and the call
+              refuses rather than returning a family of finite index in the
+              radical;
+            * rank at least two: the plane's own family, whose completeness
+              is the parameter lattice
+              :meth:`...unipotent_parameter_lattice` decides -- one element
+              over each vector of the exact integral parameter lattice
+              together with a generator of the centre.  That is the family
+              :meth:`...unipotent_radical_generators` presents, and the
+              completeness claim travels with it: a parameter outside that
+              lattice is a missing generator, which is what is open at
+              Sterk's `P_2` of \(T_{\mathrm{En}}\) (#364).
+
+            The line case also needs the splitting hypothesis: a complement
+            \(U\) of \(I^\perp\) pairing trivially with \(K_I\) is what makes
+            the transvection parameters the whole of the radical, and where
+            \(U\) pairs nontrivially with \(K_I\) that step is not justified
+            here.
+            """
+            lattice = self.isotropic_embedding().codomain()
+            subobject = self.isotropic_sublattice()
+            parabolic = self.pointwise_parabolic_subgroup()
+            rank = int(subobject.module_rank())
+            if rank == 0:
+                return ()
+            if rank >= 2:
+                return tuple(
+                    parabolic(generator)
+                    for generator in subobject.unipotent_radical_generators()
+                )
+            quotient = self.quotient_lattice()
+            if quotient.is_unimodular() is not True:
+                raise NotImplementedError(
+                    f"cannot present the radical of the pointwise stabilizer of {self} from its "
+                    f"Eichler transvections: they realize the functionals b(x, -) for x in "
+                    f"K_I = {quotient}, whose image has index |disc(K_I)| in Hom(K_I, ZZ), and "
+                    f"K_I is not unimodular, so those parameters span only a proper sublattice of "
+                    f"the radical.  The exact integral group there is the integral kernel of the "
+                    f"marked-line reduction, "
+                    f"isotropic_lifts.IsotropicReductionLiftTorsors.integral_kernel_group_generators"
+                )
+            if subobject.splitting_complement() is None:
+                raise NotImplementedError(
+                    f"cannot present the radical of the pointwise stabilizer of {self} from its "
+                    f"Eichler transvections: I = {subobject} has no complement in {lattice} that "
+                    f"pairs trivially with K_I = {quotient}, so an element of the radical may also "
+                    f"act on such a complement, and the transvection parameters alone are not "
+                    f"shown to generate the whole radical"
+                )
+            family = []
+            identity = lattice.Aut().identity()
+            frame = subobject.quotient_frame_lifts()
+            for label in sorted(frame, key=int):
+                vector = frame[label]
+                if vector.is_zero():
+                    continue
+                transvection = subobject.eichler_transvection(vector)
+                if transvection == identity:
+                    continue
+                family.append(parabolic(transvection))
+            return tuple(family)
+
+        @cached_method
+        def _pointwise_levi_integral_lift_or_none(self, isometry):
+            r"""An integral quotient lift fixing the null sublattice pointwise, or ``None``.
+
+            The fibre over ``isometry`` is the set of \(g\in O(L)\) with
+            \(g|_I = 1\) and \(g\) acting as ``isometry`` on \(I^\perp/I\).
+            Each null rank is decided by its own owner, and no rank answers
+            ``None`` from the failure of one construction:
+
+            * rank zero: \(I=0\), so \(K_I=L\), \(P_I^1=O(L)\), and the class
+              isometry is carried across the identification of the two by
+              :meth:`...PrimitiveIsotropicSubobjects.pointwise_quotient_lift`;
+            * rank one: \(g\) fixes the single generator \(e\), so the fibre
+              is the marked-line lift torsor \(F^+(\gamma)\) of
+              :meth:`_levi_fibres`, and
+              :meth:`...IsotropicReductionLiftTorsors.integral_base_point_or_none`
+              decides emptiness from the finite integral residue locus rather
+              than from one chosen rational lift
+              (:mod:`sage_extensions.categories.isotropic_lifts`);
+            * rank at least two: the block equation of
+              :meth:`...PrimitiveIsotropicSubobjects.pointwise_quotient_lift`,
+              whose docstring states the hypotheses under which it
+              constructs the lift.
+
+            The lift is returned as an automorphism of the ambient lattice, as
+            :meth:`_levi_section` and :meth:`_pointwise_levi_section` expect.
+            """
+            lattice = self.isotropic_embedding().codomain()
+            subobject = self.isotropic_sublattice()
+            rank = int(subobject.module_rank())
+            if rank == 1:
+                fixing, _reversing = self._levi_fibres(isometry)
+                point = fixing.integral_base_point_or_none()
+                return None if point is None else lattice.integral_isometry(point)
+            return subobject.pointwise_quotient_lift(isometry)
 
         def _pointwise_levi_section(self, isometry):
             r"""An element of the pointwise parabolic realizing an isometry in its image."""

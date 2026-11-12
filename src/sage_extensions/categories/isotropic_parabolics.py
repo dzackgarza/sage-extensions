@@ -1263,6 +1263,127 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 result = result * other
             return result
 
+        def pointwise_quotient_lift(self, quotient_action):
+            r"""Return the isometry fixing ``I`` pointwise whose class action is ``quotient_action``.
+
+            ``quotient_action`` is an isometry of \(K_I=I^\perp/I\), read on
+            the reduction's frame.  In the basis
+            \((u_a\mid p_a\mid\tilde\kappa_b)\) of
+            \(U\mid I\mid I^\perp/I\) the Gram matrix is
+            \(\begin{pmatrix}H&J&0\\J^t&0&0\\0&0&A\end{pmatrix}\) with \(J\)
+            and \(A\) non-degenerate, and
+            :meth:`_pointwise_block_isometry` realizes the block
+            \(\mathrm{diag}(1,1,Q_3)\) for the matrix \(Q_3\) of
+            ``quotient_action`` on that frame.  The block is an isometry
+            exactly when \(Q_3^tAQ_3=A\), which holds because
+            ``quotient_action`` is an isometry of the form on \(K_I\); its
+            \(U\)- and \(I\)-blocks are the identity, so the element it
+            conjugates back to fixes \(I\) pointwise; and its mixed entries
+            are zero, which is the split hypothesis of
+            :meth:`splitting_complement` that the complement \(U\) pairs
+            trivially with \(K_I\) (Dutour Sikirić--Hulek, *Moduli of
+            polarised Enriques surfaces — computational aspects*, J. London
+            Math. Soc. 110 (2024), arXiv:2302.01679v2, Theorem 4.9 and its
+            proof, printed pp. 33--34, the block form of an isometry
+            preserving a totally isotropic \(k\)-plane).
+
+            Under that hypothesis a lift exists for every
+            ``quotient_action``, so this method raises rather than answering
+            ``None`` when the construction does not produce one: a ``None``
+            here would say that the fibre over an isometry of \(K_I\) is
+            empty, which the block equation contradicts.  Two cases are
+            declined, each naming the missing datum: a line, whose pointwise
+            fibre is decided by its signed lift torsor instead, and a plane
+            with no complement of \(I^\perp\) pairing trivially with
+            \(K_I\), where the lift needs the mixed block entries that the
+            split hypothesis makes vanish.  At rank zero \(I=0\),
+            \(I^\perp=L\), and the reduction's projection
+            \(L\twoheadrightarrow K_I\) is an isomorphism, so the class
+            isometry is carried across that identification and the result is
+            kept only after it is checked against the pairing.
+            """
+            rank = int(self.module_rank())
+            lattice = self.ambient_lattice()
+            ring = lattice.base_ring()
+            if rank == 1:
+                raise ValueError(
+                    f"no pointwise quotient lift is constructed at {self}: the block equation here "
+                    f"is stated for a totally isotropic plane and {self} has rank one, whose "
+                    f"pointwise fibre is decided by the marked-line lift torsors"
+                )
+            if rank == 0:
+                # I = 0, so I^perp = L and the reduction's projection L -> K_I
+                # is an isomorphism; the lift of a class isometry is that
+                # isomorphism conjugated by it, read on the reduction's frame.
+                reduction = self.isotropic_reduction()
+                quotient = reduction.quotient_lattice()
+                quotient_labels = tuple(quotient.module_generating_set())
+                perpendicular = reduction.orthogonal_complement()
+                perpendicular_labels = tuple(perpendicular.module_generating_set())
+                ambient_labels = tuple(lattice.module_generating_set())
+                if len(perpendicular_labels) != len(ambient_labels):
+                    raise ArithmeticError(
+                        f"the perpendicular of the zero subobject {self} has "
+                        f"{len(perpendicular_labels)} generators and {lattice} has "
+                        f"{len(ambient_labels)}: they are the same lattice, so the identification "
+                        f"of K_I with {lattice} does not apply"
+                    )
+                frame = self.quotient_frame_lifts()
+                projection = reduction.projection()
+
+                def frame_value(element):
+                    coordinates = element.to_vector()
+                    total = lattice.zero()
+                    for position in quotient_labels:
+                        coefficient = int(coordinates(position))
+                        if coefficient:
+                            total = total + lattice.scalar_multiple(
+                                ring(coefficient), frame[position]
+                            )
+                    return total
+
+                images = {
+                    ambient_label: frame_value(
+                        quotient_action(
+                            projection(perpendicular.module_generator(perpendicular_label))
+                        )
+                    )
+                    for perpendicular_label, ambient_label in zip(
+                        perpendicular_labels, ambient_labels, strict=True
+                    )
+                }
+                candidate = lattice.Aut()(images)
+                if self._preserves_the_form(candidate) is not True:
+                    raise ArithmeticError(
+                        f"the lift of {quotient_action} through the identification of K_I with "
+                        f"{lattice} at the zero subobject {self} does not preserve the pairing"
+                    )
+                return candidate
+            if self.splitting_complement() is None:
+                raise NotImplementedError(
+                    f"cannot construct the pointwise lift of {quotient_action} in {lattice}: the "
+                    f"lift here is the block diag(1, 1, Q_3), whose mixed entries vanish because "
+                    f"the complement of I^perp pairs trivially with K_I = "
+                    f"{self.isotropic_reduction().quotient_lattice()}, and {self} has no such "
+                    f"complement, so the lift needs mixed block entries that are not solved here. "
+                    f"Neither answer is claimed"
+                )
+            lift = self._pointwise_block_isometry(quotient_action)
+            if lift is None:
+                raise ArithmeticError(
+                    f"the block diag(1, 1, Q_3) of {quotient_action} at {self} does not conjugate "
+                    f"back to an automorphism of {lattice} that preserves the form, although "
+                    f"{self} splits off with a complement orthogonal to K_I and Q_3 is the frame "
+                    f"matrix of an isometry of K_I.  The block equation and this construction "
+                    f"disagree"
+                )
+            if not self._fixes_isotropic_pointwise(lift):
+                raise ArithmeticError(
+                    f"the lift of {quotient_action} constructed at {self} does not fix I "
+                    f"pointwise, although its I-block is the identity"
+                )
+            return lift
+
         def _pointwise_block_isometry(self, quotient_action):
             r"""Return the isometry fixing ``I`` pointwise with ``quotient_action`` on \(I^\perp/I\), or ``None``.
 
