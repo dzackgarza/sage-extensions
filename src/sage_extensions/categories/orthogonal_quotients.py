@@ -1097,6 +1097,58 @@ class OrthogonalCharacterQuotient:
         rank = _f2_rank(descended_vectors, m)
         return m - rank, sign_labels
 
+    def plane_odd_character_witness(self, representative):
+        r"""Return an isometry fixing the plane whose character image is outside the subgroup's.
+
+        For a primitive isotropic plane `P` and a subgroup `Gamma = chi^{-1}(A)` of
+        finite index, the `Gamma`-orbits inside the `O(L)`-orbit of `P` are the double
+        cosets `A \\ F / F_P` with `F = chi(O(L))`, `A = chi(Gamma)` and
+        `F_P = chi(Stab_{O(L)}(P))` (D. Dutour Sikirić and K. Hulek,
+        arXiv:2302.01679v2, Lemma 3.6, p. 22).  When `[F : A] = 2` and `A` is normal --
+        the case of `Gamma = O^+ = ker(sn)`, whose image is the kernel of the real
+        spinor norm in `F` -- *one* element of `F_P` outside `A` decides the count:
+        then `A F_P = F`, so there is one double coset and the whole `O(L)`-orbit of
+        `P` is a single `Gamma`-orbit.
+
+        The element is searched over the plane actions of odd determinant, through
+        :meth:`...PrimitiveIsotropicSubobjects.plane_block_lift` (Dutour Sikirić--Hulek,
+        Theorem 4.9, printed pp. 33--34) with the quotient block prescribed as the
+        identity, and every candidate is an integral isometry of the lattice by that
+        construction.  The candidate's *character image* is compared with the
+        subgroup's, so the answer is about `chi`, never about a determinant or a
+        spinor norm read separately.
+
+        ``None`` means no candidate action in the list admitted a lift whose image is
+        outside `A`; it is not a claim that `F_P` is contained in `A`, and the caller
+        must then keep the exact route (:func:`_plane_orbit_from_odd_stabilizer` keeps
+        it by splitting with an ambient odd isometry instead, only after checking that
+        the subgroup has index two).
+        """
+        from sage.matrix.constructor import matrix
+        from sage.rings.integer_ring import ZZ as SageZZ
+
+        if int(representative.module_rank()) != 2:
+            raise ValueError(
+                f"the plane witness is defined for a rank-two primitive isotropic "
+                f"subobject, but {representative!r} has rank {int(representative.module_rank())}"
+            )
+        accepted = self.subgroup_image_keys()
+        for action in (
+            matrix(SageZZ, [[0, 1], [1, 0]]),
+            matrix(SageZZ, [[1, 0], [0, -1]]),
+            matrix(SageZZ, [[-1, 0], [0, 1]]),
+            matrix(SageZZ, [[1, 1], [0, -1]]),
+            matrix(SageZZ, [[1, 0], [1, -1]]),
+            matrix(SageZZ, [[0, 1], [-1, 0]]),
+            matrix(SageZZ, [[1, 1], [1, 0]]),
+        ):
+            lift = representative.plane_block_lift(action)
+            if lift is None:
+                continue
+            if self.image(lift) not in accepted:
+                return lift
+        return None
+
     def isotropic_line_stabilizer_image(self, representative):
         r"""Return ``(discriminant image, whether a sign factor is covered)`` for an isotropic line.
 
@@ -2565,6 +2617,46 @@ def _line_orbit_from_divided_classes(subgroup, representative):
     )
 
 
+def _plane_orbit_from_odd_stabilizer(subgroup, representative):
+    r"""The `O^+`-orbits inside one `O(L)`-orbit of planes, or ``None``.
+
+    Let `G = O(L)`, `P` a primitive isotropic plane, `H = Stab_G(P)` and
+    `Gamma = O^+ = ker(sn)`, the kernel of the real spinor norm (Gritsenko--Hulek--
+    Sankaran, arXiv:0810.1614, section 1).  `Gamma` is normal of index two, so by
+    D. Dutour Sikirić and K. Hulek, arXiv:2302.01679v2, Lemma 3.6, p. 22, the
+    `Gamma`-orbits inside `G.P` are the double cosets
+    `chi(Gamma) \\ chi(G) / chi(H)`, where `chi = (rho, sn)` is the joint finite
+    character.
+
+    Exactly two answers, and both are computed:
+
+    * an element of `H` whose character image lies outside `chi(Gamma)` puts
+      `chi(H)` across both cosets, so `chi(Gamma) chi(H) = chi(G)` and the whole
+      `G`-orbit is one `Gamma`-orbit -- its representative is the ambient one;
+    * when no such element is found, the ambient `G`-orbit can still split, and it
+      splits into exactly two because `Gamma` has index two and `chi(H)` would then
+      be contained in `chi(Gamma)`: the two representatives are `P` and `g_0 P`, with
+      `g_0` any integral isometry of odd real spinor norm, which is computed here as a
+      reflection in a square-two vector and checked not to lie in `O^+`.
+
+    Nothing here enumerated a stabilizer's generating family, and no isometry is
+    guessed: the odd stabilizer element comes from the plane block equations
+    (:meth:`...PrimitiveIsotropicSubobjects.plane_block_lift`), and the ambient odd
+    element is a reflection the constructor verifies.
+    """
+    lattice = subgroup.supergroup().domain()
+    if subgroup != lattice.O_plus():
+        return None
+    quotient = subgroup.finite_character_quotient()
+    if quotient.index() != 2:
+        return None
+    witness = quotient.plane_odd_character_witness(representative)
+    if witness is not None:
+        return (representative,)
+    odd_ambient = lattice.odd_spinor_norm_isometry()
+    return (representative, odd_ambient.transport_isotropic_object(representative))
+
+
 def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
     if not flag and index(rank) == 0:
         return subgroup.supergroup().isotropic_orbit_representatives(0)
@@ -2598,6 +2690,11 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
             from_divided_classes = _line_orbit_from_divided_classes(subgroup, representative)
             if from_divided_classes is not None:
                 representatives.extend(from_divided_classes)
+                continue
+        if not flag and rank == 2 and index(rank) == 2:
+            from_planes = _plane_orbit_from_odd_stabilizer(subgroup, representative)
+            if from_planes is not None:
+                representatives.extend(from_planes)
                 continue
         stabilizer = orthogonal_group.isotropic_stabilizer_generators(
             representative, flag=flag
