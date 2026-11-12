@@ -1169,10 +1169,19 @@ class OrthogonalCharacterQuotient:
         # Lemma 7.8, p. 503): two orthogonal hyperbolic planes in ``L``.  It is not
         # transferred from the enlargement ``L + U``, whose classification is of
         # ``\widetilde{SO}(L + U)``-orbits and whose moving element need not preserve
-        # ``L``.  Without the hypothesis the class set below is uncertified, so the
-        # call refuses and the caller keeps its exact integral route.
+        # ``L``.  Without the hypothesis the parabolic route below applies instead:
+        # the split-signature witness -- an element of the stabilizer with trivial
+        # discriminant image and real spinor norm ``-1``, the Levi part ``(1, -1)``
+        # of Zemel's Proposition 1.10 (arXiv:1902.08264v2, p. 13) -- together with
+        # the complement's discriminant image being surjective, which at a
+        # divisor-1 line is exactly the class-stabilizer equality.  Both are
+        # computed, never asserted; a failure of either returns ``None`` and the
+        # caller keeps its exact integral route.
         if not _two_hyperbolic_planes(lattice):
-            return None
+            if _split_signature_witness(lattice, vector) is None:
+                return None
+            if not _complement_discriminant_surjective(lattice, vector):
+                return None
         discriminant_class = lattice.divided_discriminant_class(vector)
         if discriminant_class == lattice.discriminant_group().zero():
             # Double cosets Gamma \\ im rho / im rho are one coset, *provided* no sign
@@ -1202,6 +1211,16 @@ class OrthogonalCharacterQuotient:
             # is a lattice vector, so the class is unchanged.  lattice.reflection has
             # already checked the integral-reflection-vector condition; the remaining
             # sign factor is the only character left to test.
+            # The split-signature witness is tried FIRST: the reflection
+            # enumerations below are a slow route for an indefinite lattice,
+            # and the witness -- the Levi part ``(1, -1)`` of the parabolic
+            # (Zemel, arXiv:1902.08264v2, Proposition 1.10, p. 13), an
+            # element of the stabilizer with trivial discriminant image and
+            # real spinor norm ``-1``, computed by the four checks of
+            # ``_split_signature_witness`` -- certifies the same conclusion.
+            witness = _split_signature_witness(lattice, vector)
+            if witness is not None and witness not in self.subgroup:
+                return "NOSPLIT"
             basis = tuple(lattice.module_generators())
             for index, first in enumerate(basis):
                 for second in basis[index + 1 :]:
@@ -1282,16 +1301,29 @@ class OrthogonalCharacterQuotient:
         square_two = lattice.base_ring()(2)
         trivial_discriminant = self._discriminant_group.one()
         zero_scalar = lattice.base_ring().zero()
-        for root in lattice.vectors_of_square_and_divisibility(square_two, lattice.base_ring().one()):
-            if lattice.b(root, vector) != zero_scalar:
-                continue
-            reflection = lattice.reflection(root)
-            if (
-                rho(reflection) == trivial_discriminant
-                and reflection not in self.subgroup
+        # The split-signature witness is tried FIRST: the reflection
+        # enumeration below is a slow route for an indefinite lattice, and the
+        # witness -- the Levi part ``(1, -1)`` of the parabolic (Zemel,
+        # arXiv:1902.08264v2, Proposition 1.10, p. 13), an element of the
+        # stabilizer with trivial discriminant image and real spinor norm
+        # ``-1``, computed by the four checks of
+        # ``_split_signature_witness`` -- certifies the same flip.
+        witness = _split_signature_witness(lattice, vector)
+        if witness is not None and witness not in self.subgroup:
+            flip = True
+        if not flip:
+            for root in lattice.vectors_of_square_and_divisibility(
+                square_two, lattice.base_ring().one()
             ):
-                flip = True
-                break
+                if lattice.b(root, vector) != zero_scalar:
+                    continue
+                reflection = lattice.reflection(root)
+                if (
+                    rho(reflection) == trivial_discriminant
+                    and reflection not in self.subgroup
+                ):
+                    flip = True
+                    break
         if not flip:
             # No kernel-sign witness is exhibited, so this cannot certify that the sign
             # factor is included in the stabilizer's image: the double-coset machinery
@@ -2227,6 +2259,114 @@ def _two_hyperbolic_planes(lattice):
                 planes.append((e, f))
                 break
     return len(planes) >= 2
+
+
+def _split_signature_witness(lattice, vector):
+    r"""Return the Levi-part witness ``1_plane + (-1) complement`` at a primitive isotropic line.
+
+    The parabolic at a primitive isotropic line has Levi factor
+    ``GL(plane) x O(complement)`` (S. Zemel, *The Structure of Integral Parabolic
+    Subgroups of Orthogonal Groups*, J. Algebra 559 (2020) 95-128,
+    arXiv:1902.08264v2, Proposition 1.10, p. 13: for an element of the parabolic
+    with Levi part ``(M, gamma)``, the determinant is ``det gamma`` and the real
+    spinor norm is the class of ``det M`` times the spinor norm of ``gamma``).
+    The element that fixes the plane pointwise and negates the complement is the
+    Levi part ``(1, -1)``: it is an isometry whenever the selected basis
+    exhibits the orthogonal decomposition of the lattice into the hyperbolic
+    plane spanned by the representative and its partner, and their complement.
+
+    Four properties are computed here, never assumed, because the construction
+    is a candidate the caller must certify (it is not a claim to assert):
+
+    * the images define an isometry -- the constructor of ``Aut`` verifies form
+      preservation and raises when they do not;
+    * the witness fixes the representative's generating vector;
+    * the discriminant image is trivial: the complement's negation acts as the
+      identity on a 2-elementary discriminant group, and the fixed plane
+      contributes nothing;
+    * the real spinor norm is ``-1``: the complement's negation is a product of
+      reflections in an orthogonal basis of the complement's real span, and an
+      odd count of positive-norm factors makes the product negative in either
+      sign convention.
+
+    A witness that fails any check is not a witness, and ``None`` is returned so
+    the caller keeps its refusal rather than a guess.
+    """
+    labels = tuple(lattice.module_generating_set())
+    generators = {label: lattice.module_generator(label) for label in labels}
+    own = [label for label in labels if generators[label] == vector]
+    if not own:
+        # The representative's generating vector is not a basis vector, so the
+        # selected basis does not exhibit the decomposition this construction
+        # needs; refusing is the honest answer, not searching for a basis.
+        return None
+    zero = lattice.base_ring().zero()
+    partners = [
+        label
+        for label in labels
+        if label != own[0]
+        and lattice.b(vector, generators[label]) != zero
+    ]
+    fixed = set(own) | set(partners)
+
+    def image(label):
+        source = generators[label]
+        return source if label in fixed else -source
+
+    try:
+        witness = lattice.Aut()({label: image(label) for label in labels})
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    if witness(vector) != vector:
+        return None
+    orthogonal = lattice.discriminant_group().orthogonal_group()
+    if lattice.discriminant_representation()(witness) != orthogonal.one():
+        return None
+    if lattice.O_plus().preimage_morphism()(witness).is_one():
+        return None
+    return witness
+
+
+def _complement_discriminant_surjective(lattice, vector):
+    r"""Return whether the complement's discriminant representation is surjective.
+
+    The isometries ``1_plane + gamma`` with ``gamma`` in the orthogonal group of
+    the complement fix the representative's plane pointwise, so they lie in the
+    line stabilizer, and their discriminant image is the discriminant action of
+    ``gamma`` on the complement's own discriminant group.  The stabilizer's image
+    therefore contains the complement's image; at a divisor-1 line -- where the
+    complement's discriminant group is the ambient one, the plane contributing
+    nothing -- the class-stabilizer equality ``rho(Stab(v)) = O(A_L)`` therefore
+    holds exactly when that image is surjective.  The complement is the span of
+    the basis vectors outside the plane, and its Gram matrix is the pairing
+    matrix of those vectors.
+    """
+    labels = tuple(lattice.module_generating_set())
+    generators = {label: lattice.module_generator(label) for label in labels}
+    own = [label for label in labels if generators[label] == vector]
+    if not own:
+        return False
+    zero = lattice.base_ring().zero()
+    partners = [
+        label
+        for label in labels
+        if label != own[0]
+        and lattice.b(vector, generators[label]) != zero
+    ]
+    plane = set(own) | set(partners)
+    complement = [label for label in labels if label not in plane]
+    if not complement:
+        return False
+    vectors = [generators[label] for label in complement]
+    sub_gram = [[lattice.b(one, other) for other in vectors] for one in vectors]
+    from sage_extensions.categories.lattices import Lattices
+
+    complement_lattice = Lattices(lattice.base_ring())(sub_gram)
+    image = complement_lattice.discriminant_image()
+    order = image.cardinality().finite_value()
+    target = complement_lattice.discriminant_group().orthogonal_group()
+    target_order = target.cardinality().finite_value()
+    return order == target_order
 
 
 def _line_orbit_from_divided_classes(subgroup, representative):
