@@ -218,6 +218,71 @@ def _generated_image_order(generators, modulus):
     return len(seen)
 
 
+def _general_linear_order(modulus):
+    r"""Return `|\GL_2(\ZZ/m)|`, which is `m^4 \prod_{p | m} (1 - 1/p)(1 - 1/p^2)`.
+
+    For `m = p^k` the order is `p^{4(k-1)} \cdot p(p-1)^2(p+1)`: the matrix is
+    fixed by its four entries modulo `p^k`, and a matrix is invertible exactly
+    when its reduction modulo `p` is, which leaves `|\GL_2(\FF_p)| =
+    (p^2-1)(p^2-p)` of the `p^4` reductions and `p^{4(k-1)}` lifts of each.
+    """
+    order = SageZZ.one()
+    for prime in SageZZ(modulus).prime_divisors():
+        p = int(prime)
+        power = 0
+        remaining = int(modulus)
+        while remaining % p == 0:
+            remaining //= p
+            power += 1
+        order *= p ** (4 * (power - 1)) * p * (p - 1) ** 2 * (p + 1)
+    return int(order)
+
+
+def _first_block_stabilizer_index(pairing):
+    r"""Return `[\GL_2(\ZZ) : \{A : J A^{-t} J^{-1} \text{ is integral}\}]`.
+
+    `J` is the `(U, P)` block of :meth:`...plane_block_gram`.  The set is a
+    subgroup of `\GL_2(\ZZ)`: it contains the congruence subgroup
+    `\Gamma(|\det J|)`, because `J A^{-t} J^{-1} = J A^{-t} \operatorname{adj}(J)
+    / \det J` and `A^{-t}` is integral, so the condition depends on `A` only
+    modulo `|\det J|` and the index is the number of classes divided by the
+    number of those that satisfy it.  Dutour Sikirić--Hulek, Theorem 4.9, printed
+    p. 34, is the containment: the plane actions that admit an integral lift with
+    a trivial class action preserve the lattice spanned by the rows of `J^t`, and
+    those are exactly the `A` for which `J A^{-t} J^{-1}` -- their `P_1` -- is
+    integral.  This index is therefore an upper bound on the index of the plane
+    actions that lift.
+    """
+    from itertools import product
+
+    determinant = abs(int(pairing.determinant()))
+    if determinant == 0:
+        raise ValueError(
+            "the complement of P^perp does not pair nondegenerately with the plane"
+        )
+    total = _general_linear_order(determinant)
+    adjugate = pairing.adjugate()
+    preserving = 0
+    for first, second, third, fourth in product(range(determinant), repeat=4):
+        if SageZZ(first * fourth - second * third).gcd(SageZZ(determinant)) != 1:
+            continue
+        inverse_transpose = matrix(SageZZ, [[fourth, -second], [-third, first]])
+        try:
+            block = pairing * inverse_transpose * adjugate
+        except (TypeError, ValueError):
+            continue
+        if all(
+            SageZZ(int(entry)) % SageZZ(determinant) == 0 for entry in block.list()
+        ):
+            preserving += 1
+    if preserving == 0 or total % preserving != 0:
+        raise ArithmeticError(
+            f"{preserving} of the {total} classes of GL_2(ZZ/{determinant}) make "
+            f"J A^-t J^-1 integral, which does not divide the group order"
+        )
+    return total // preserving
+
+
 def _plane_action_index(actions, plane):
     r"""Return `[\GL_2(ZZ) : \langle \text{actions} \rangle]` by the `\Gamma(2)` certificate.
 
@@ -3277,7 +3342,56 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 period = period * denominator // period.gcd(denominator)
             return period
 
-        def plane_block_lift(self, action):
+        def quotient_block_matrix(self, quotient_action):
+            r"""Return the matrix of ``quotient_action`` on the basis `K` of \\(K_I\\) that :meth:`plane_block_basis` carries.
+
+            The `K` block of the block basis is a `ZZ`-basis of
+            \\(K_I=I^\\perp/I\\) -- the reduction's own frame is only a section on
+            a generating set -- so a class action is read on it, one column per
+            basis class.  Writing the classes of the basis vectors in the
+            reduction's coordinates turns "the image of the `i`-th basis class"
+            into one integral linear system, solved exactly by Smith normal form;
+            a system with no integral solution means the vectors are not a basis
+            of the quotient and is refused rather than solved approximately.
+            """
+            reduction = self.isotropic_reduction()
+            quotient = reduction.quotient_lattice()
+            labels = tuple(quotient.module_generating_set())
+            perpendicular_inclusion = reduction.orthogonal_complement().inclusion()
+            projection = reduction.projection()
+            basis = self.plane_block_basis()
+            rank = len(basis)
+            width = rank - 4
+            classes = tuple(
+                projection(perpendicular_inclusion.lift(vector)) for vector in basis[4:rank]
+            )
+            coordinates = matrix(
+                SageZZ,
+                [
+                    [int(vector.to_vector()(label)) for vector in classes]
+                    for label in labels
+                ],
+            )
+            block = matrix(SageZZ, width, width, 0)
+            for column, vector in enumerate(classes):
+                image = quotient_action(vector)
+                target = matrix(
+                    SageZZ,
+                    width,
+                    1,
+                    [int(image.to_vector()(label)) for label in labels],
+                )
+                solution = _integral_solution(coordinates, target)
+                if solution is None:
+                    raise ArithmeticError(
+                        f"the classes of the K block of {self} do not span the quotient "
+                        f"K_I = {quotient} integrally, so the class action cannot be read on them"
+                    )
+                for row in range(width):
+                    block[row, column] = int(solution[row])
+            return block
+
+        def plane_block_lift(self, action, quotient_action=None):
             r"""Return the integral isometry of `L` carrying `P` by ``action``, or ``None``.
 
             This solves the block equations of Dutour Sikirić--Hulek, Theorem
@@ -3287,8 +3401,17 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
             \[
             g = \begin{pmatrix} P_1 & P_2 & P_3\\ 0 & Q_1 & 0\\ 0 & Q_2 & Q_3\end{pmatrix},
-            \qquad Q_1 = \text{action},\quad Q_2 = 0,\quad Q_3 = 1,
+            \qquad Q_1 = \text{action},\quad Q_2 = 0,\quad Q_3 = \\text{quotient action},
             \]
+
+            ``quotient_action`` is an isometry of \\(K_I=P^\\perp/P\\), read on the
+            reduction's frame, and its matrix \\(Q_3\\) is the third diagonal block;
+            the default is the identity, which is the plane part of the kernel of the
+            Levi map.  \\(Q_2 = 0\\) loses nothing: an element with \\(Q_3\\) and a
+            nonzero \\(Q_2\\) differs from the one built here by an element with
+            \\(Q_1 = Q_3 = 1\\), i.e. by an element of the unipotent radical
+            (:meth:`unipotent_radical_generators`), so a lift of the pair \\((Q_1, Q_3)\\)
+            exists exactly when one with \\(Q_2 = 0\\) does.
 
             with the paper's equations, in their row-vector convention --
             "here we recall that we use the action on row vectors from the
@@ -3332,8 +3455,41 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             K = K.change_ring(rational)
             A = A.change_ring(rational)
             action = action.change_ring(rational)
+            breadth = rank - 4
+            requested_frame = None
+            if quotient_action is None:
+                identity_breadth = matrix(rational, breadth, breadth, 0)
+                for position in range(breadth):
+                    identity_breadth[position, position] = 1
+                quotients = [identity_breadth]
+            else:
+                read = self._frame_matrix(quotient_action)
+                requested_frame = read
+                if read.nrows() != breadth or read.ncols() != breadth:
+                    raise ValueError(
+                        f"the class action at {self} is read on {read.nrows()} x {read.ncols()} "
+                        f"coordinates, but the K block of the plane's basis has {breadth} vectors: "
+                        f"the reduction's frame is a section on a generating set and not a basis of "
+                        f"K_I here, so the block's Q_3 is not read from it"
+                    )
+                read = read.change_ring(rational)
+                quotients = [read.transpose(), read]
+            for quotient in quotients:
+                found = self._plane_block_lift_for(
+                    action, quotient, requested_frame, change, inverse, H, J, K, A, rank, rational
+                )
+                if found is not None:
+                    return found
+            return None
+
+        def _plane_block_lift_for(
+            self, action, quotient, requested_frame, change, inverse, H, J, K, A, rank, rational
+        ):
+            r"""Return the integral lift of the pair `(action, quotient)` for one `Q_3`, or ``None``."""
+            lattice = self.ambient_lattice()
+            ring = lattice.base_ring()
             first = J * action.transpose().inverse() * J.inverse()
-            third = (K - first * K) * A.inverse()
+            third = (K - first * K * quotient.transpose()) * (A * quotient.transpose()).inverse()
             remainder = (
                 H
                 - first * H * first.transpose()
@@ -3341,7 +3497,6 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 - (third * K.transpose() * first.transpose() + first * K * third.transpose())
             )
             inverting = (first * J).transpose().inverse()
-            ring = lattice.base_ring()
             # A complete residue system of the free parameter: its period is the lcm
             # of the denominators of the linear part, and the integral solutions of
             # the P_2 equation are one coset of it (plane_block_parameter_period).
@@ -3353,8 +3508,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                 block[0:2, 2:4] = second
                 block[0:2, 4:rank] = third
                 block[2:4, 2:4] = action
-                for position in range(4, rank):
-                    block[position, position] = 1
+                block[4:rank, 4:rank] = quotient
                 if any(entry not in SageZZ for entry in block.list()):
                     continue
                 # The paper's block is the matrix of the isometry acting on *row*
@@ -3375,8 +3529,177 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                             if lifted[row, column]
                         }
                     )
-                return lattice.Aut()(images)
+                candidate = lattice.Aut()(images)
+                if self._preserves_the_form(candidate) is not True:
+                    continue
+                if requested_frame is not None:
+                    induced = self.isotropic_reduction().levi_action()(candidate)
+                    if self._frame_matrix(induced) != requested_frame:
+                        continue
+                return candidate
             return None
+
+        def _plane_action_candidates(self):
+            r"""Return the plane actions searched for a lift of a class action.
+
+            The structure is Zemel, *The Structure of Integral Parabolic
+            Subgroups of Orthogonal Groups*, arXiv:1902.08264v2, section 1: the
+            parabolic maps onto a Levi quotient, `P_U -> GL(U) x O(W)` with
+            `W = U^\perp/U` (Lemma 1.1, printed p. 5), the kernel of that map is
+            the unipotent radical, and the quotient is the semi-direct product in
+            which `GL(U) x O(W)` acts on it (Proposition 1.6, printed p. 10;
+            Corollary 1.7, printed p. 12).  So the two factors are searched
+            independently: the class action is the caller's, and what remains is
+            which plane actions `Q_1` make the block integral.
+
+            Those are the ones Dutour Sikirić--Hulek, Theorem 4.9, printed
+            pp. 33--34, decides: `P_1` is determined by `Q_1` through
+            `J = P_1 J Q_1^t`, and it is integral once `Q_1` preserves the
+            lattice spanned by the rows of `J^t` -- their words, "if we force
+            `Q_1` to preserve the lattice `L_{J^T}` spanned by the rows of the
+            matrix `J^T`, then `P_1` is integral" (printed p. 34) -- which is a
+            congruence condition of level dividing `|det J|`.  The list returned
+            is the identity, `-1`, the two shears and the swap of `GL_2(ZZ)`, and
+            the two shears of level `|det J|`.  That list is what a class action
+            needs in the cases this repository measures, and it is not claimed to
+            reach every class action: :meth:`levi_quotient_lift` refuses rather
+            than answering ``None`` for that reason.  The completeness statements
+            here are the ones :meth:`levi_quotient_kernel_generators` computes, on
+            two indices rather than on this list.
+            """
+            modulus = abs(int(self.plane_block_gram()[3].determinant()))
+            if modulus == 0:
+                raise ValueError(
+                    f"the complement of P^perp found for {self} does not pair "
+                    f"nondegenerately with the plane"
+                )
+            level = modulus if modulus % 2 == 0 else 2 * modulus
+            return (
+                matrix(SageZZ, [[1, 0], [0, 1]]),
+                matrix(SageZZ, [[-1, 0], [0, -1]]),
+                matrix(SageZZ, [[1, 1], [0, 1]]),
+                matrix(SageZZ, [[1, 0], [1, 1]]),
+                matrix(SageZZ, [[0, 1], [1, 0]]),
+                matrix(SageZZ, [[1, level], [0, 1]]),
+                matrix(SageZZ, [[1, 0], [level, 1]]),
+            )
+
+        def levi_quotient_lift(self, quotient_action):
+            r"""Return an element of `P_I` inducing ``quotient_action`` on `K_I`, or raise.
+
+            This is the *setwise* quotient action, `P_I -> O(K_I)`, as opposed to
+            the pointwise one of
+            :meth:`~sage_extensions.categories.lattices.IsotropicReductions.ParentMethods.pointwise_levi_action`:
+            the plane's own action on `I` is free here, and the pair `(Q_1, Q_3)`
+            is realized by the block of :meth:`plane_block_lift` exactly when its
+            equations have an integral solution.  The plane actions searched are
+            :meth:`_plane_action_candidates`, and one of them is enough when the
+            class action is reached at all.
+
+            A found lift is a proof of membership in the image.  Not finding one
+            is *not* a proof that the fibre is empty -- the candidate list is
+            finite and the class action may need a plane action outside it -- so
+            this method raises instead of answering ``None``, and names the
+            candidates it tried.  No test of this repository is decided by an
+            absence claimed here.
+            """
+            for action in self._plane_action_candidates():
+                lift = self.plane_block_lift(action, quotient_action)
+                if lift is not None:
+                    return lift
+            raise NotImplementedError(
+                f"no integral lift of {quotient_action} is constructed at {self}: none of the "
+                f"{len(self._plane_action_candidates())} plane actions searched makes the block "
+                f"equations integral.  The image of P_I -> O(K_I) is a subgroup between the "
+                f"pointwise image, whose index levi_quotient_image_index(trivial_on_plane=True) "
+                f"measures, and O(K_I); which class actions occur with a nontrivial plane action "
+                f"is not decided by this search, and an absence is not claimed"
+            )
+
+        @cached_method
+        def levi_quotient_image_is_all(self) -> bool:
+            r"""Return whether every class action lifts, i.e. whether `P_I -> O(K_I)` is onto.
+
+            Two statements decide it, each checked when this runs:
+
+            * a plane that splits off, `I^\perp` a summand with a complement
+              orthogonal to `K_I`: the block `\mathrm{diag}(1, 1, Q_3)` of
+              :meth:`~sage_extensions.categories.lattices.IsotropicReductions.ParentMethods.pointwise_quotient_lift`
+              is an isometry for every `Q_3` preserving the form on `K_I`, so the
+              pointwise stabilizer already maps onto `O(K_I)`;
+            * otherwise the computed orders of
+              :meth:`levi_quotient_image_index` with ``trivial_on_plane=True``:
+              the image of the elements fixing `I` pointwise is a subgroup of
+              `O(K_I)`, and index `1` says it is all of it.
+
+            A larger index does not identify the image -- it lies between that
+            subgroup and `O(K_I)` -- so the answer raises there, naming the
+            bound, instead of answering.
+            """
+            if self.splitting_complement() is not None:
+                return True
+            index = self.levi_quotient_image_index(trivial_on_plane=True)
+            if index == 1:
+                return True
+            raise NotImplementedError(
+                f"the image of P_I -> O(K_I) at {self} is not decided: the elements fixing I "
+                f"pointwise map onto a subgroup of index {index} in O(K_I), so the full image "
+                f"lies between that subgroup and O(K_I), and no statement here separates the two"
+            )
+
+        @cached_method
+        def levi_quotient_kernel_generators(self):
+            r"""Return generators of `\ker(P_I -> O(K_I))`, the setwise quotient kernel.
+
+            The kernel consists of the elements whose class action is trivial, and
+            the block form splits them: modulo the unipotent radical (the elements
+            with `Q_1 = Q_3 = 1`, hence the radical of the *pointwise* stabilizer,
+            :meth:`unipotent_radical_generators`) an element of the kernel is
+            determined by its plane action `Q_1`, normalized to `Q_2 = 0`
+            (:meth:`plane_block_lift`).  So
+
+            .. math:: \ker(P_I \to O(K_I)) = U_I \rtimes \Gamma', \qquad
+                \Gamma' = \{A \in GL_2(ZZ) : \text{a lift with } Q_1 = A,\ Q_3 = 1 \text{ exists}\},
+
+            which is the integral form of Zemel, arXiv:1902.08264v2, section 1,
+            Proposition 1.6 (printed p. 10): over a field the quotient is the
+            semi-direct product in which `GL(U) x O(W)` acts on the radical, and
+            the kernel of the class map is the radical extended by the plane
+            actions.
+
+            `\Gamma'` is decided here by two computed indices, and the answer is
+            returned only when they agree: `H = <the plane actions of the lifts
+            below>` is a subgroup of `\Gamma'`, and `\Gamma'` is a subgroup of
+            the stabilizer of the lattice spanned by the rows of `J^t` (Dutour
+            Sikirić--Hulek, Theorem 4.9, printed p. 34: "if we force `Q_1` to
+            preserve the lattice `L_{J^T}` ... then `P_1` is integral").  When
+            `[GL_2(ZZ) : H]` and `[GL_2(ZZ) : \mathrm{Stab}(L_{J^T})]` agree,
+            all three groups coincide.  Where they do not, the call raises and
+            names both indices.
+            """
+            radical = self.unipotent_radical_generators()
+            lifts = []
+            for action in self._plane_action_candidates():
+                lift = self.plane_block_lift(action)
+                if lift is not None:
+                    lifts.append(lift)
+            if not lifts:
+                raise NotImplementedError(
+                    f"no plane action lifts at {self} with a trivial class action, so the kernel "
+                    f"of the setwise quotient action is not presented here"
+                )
+            generated = _plane_action_index(
+                tuple(_plane_action_matrix(self, lift) for lift in lifts), self
+            )
+            stabilizer = _first_block_stabilizer_index(self.plane_block_gram()[3])
+            if generated != stabilizer:
+                raise NotImplementedError(
+                    f"the plane actions of the constructed lifts at {self} generate a subgroup "
+                    f"of index {generated} in GL_2(ZZ), while the stabilizer of the lattice "
+                    f"spanned by the rows of J^t has index {stabilizer}: the kernel of the "
+                    f"setwise quotient action lies between them and is not decided here"
+                )
+            return tuple(radical) + tuple(lifts)
 
         @cached_method
         def levi_lift_generators(self):

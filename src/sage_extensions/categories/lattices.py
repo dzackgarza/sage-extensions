@@ -12010,15 +12010,41 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
 
         @cached_method
         def _levi_integral_lift_or_none(self, isometry):
-            r"""An integral lift at a rank other than one, with the quotient map prescribed."""
-            from sage_indefinite_port.indefinite.marked_lattices import RECURSION
+            r"""An integral lift at a rank other than one, with the quotient map prescribed.
 
-            return RECURSION.isotropic_quotient_lift(self, isometry)
+            The setwise quotient action \(P_I\to O(K_I)\) leaves the plane's own
+            action on \(I\) free, so a lift of ``isometry`` is a solution of the
+            block equations of Dutour Sikirić--Hulek, Theorem 4.9, printed
+            pp. 33--34, for a pair \((Q_1, Q_3)\) with \(Q_3\) prescribed
+            (Zemel, arXiv:1902.08264v2, section 1, Lemma 1.1 on printed p. 5 and
+            Proposition 1.6 on printed p. 10, is the structure: the parabolic maps
+            onto the Levi quotient, and the kernel is the unipotent radical).  The
+            solve is
+            :meth:`...PrimitiveIsotropicSubobjects.ParentMethods.levi_quotient_lift`,
+            which searches the plane actions :meth:`..._plane_action_candidates`
+            lists and raises rather than answering ``None`` when none of them
+            reaches the class action: absence is not decided by that search, and a
+            ``None`` here would claim it is.
+            """
+            subobject = self.isotropic_sublattice()
+            if int(subobject.module_rank()) == 0:
+                return subobject.pointwise_quotient_lift(isometry)
+            return subobject.levi_quotient_lift(isometry)
 
         def _levi_image_contains(self, isometry):
-            r"""Whether the prescribed quotient isometry has an integral parabolic lift."""
+            r"""Whether the prescribed quotient isometry has an integral parabolic lift.
+
+            At rank at least two this answers ``True`` exactly when
+            :meth:`_levi_integral_lift_or_none` constructs a lift, and the
+            construction itself raises when its search finds none: the image of
+            \(P_I\) is a subgroup between the pointwise image and \(O(K_I)\)
+            (:meth:`...PrimitiveIsotropicSubobjects.ParentMethods.levi_quotient_image_is_all`),
+            and a ``False`` here would claim that the class action has no lift at
+            all, which this search does not decide.
+            """
             if self.isotropic_sublattice().module_rank() != NN(1):
-                return self._levi_integral_lift_or_none(isometry) is not None
+                self._levi_integral_lift_or_none(isometry)
+                return True
             return any(
                 fibre.integral_base_point_or_none() is not None
                 for fibre in self._levi_fibres(isometry)
@@ -12054,13 +12080,23 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             ``integral_kernel_group_generators`` of the identity marking;
             \(F^-(1)\) is empty or a coset \(\tau K_{\mathbf Z}\), so one point
             \(\tau\) of it is added when it is nonempty.
-            Other ranks use the port's quotient-trivial triangular action
-            and its integral-structure stabilizer.
+            At rank at least two the kernel is the unipotent radical extended by
+            the plane actions whose class action is trivial, and both factors are
+            computed here:
+            :meth:`...PrimitiveIsotropicSubobjects.ParentMethods.levi_quotient_kernel_generators`
+            returns the radical's generators together with one lift per generator
+            of that plane-action subgroup, and refuses when the two computed
+            indices that pin the subgroup down do not agree.
             """
-            if self.isotropic_sublattice().module_rank() != NN(1):
-                from sage_indefinite_port.indefinite.marked_lattices import RECURSION
-
-                return RECURSION.isotropic_quotient_kernel_generators(self)
+            subobject = self.isotropic_sublattice()
+            rank = int(subobject.module_rank())
+            if rank == 0:
+                return finite_ordered_set(())
+            if rank != NN(1):
+                parabolic = self.parabolic_subgroup()
+                return finite_ordered_set(
+                    tuple(parabolic(generator) for generator in subobject.levi_quotient_kernel_generators())
+                )
             lattice = self.isotropic_embedding().codomain()
             parabolic = self.parabolic_subgroup()
             fixing, reversing = self._levi_fibres(self.Aut().one())
