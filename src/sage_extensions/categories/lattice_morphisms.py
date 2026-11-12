@@ -4270,15 +4270,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         # PARI's full order as well as the generators in the private engine.
         # https://doc.sagemath.org/html/en/reference/modules/sage/modules/free_quadratic_module_integer_symmetric.html
         quadratic = QuadraticForm(SageZZ, 2 * gram)
-        # The automorphism count needs a PARI stack beyond the default
-        # one-gigabyte maximum on a form whose diagonal spread is large, and
-        # the library sets the stack for the call as the PARI manual's
-        # parisizemax default advises (The PARI Group, *PARI/GP*,
-        # parisizemax: "It is possible to increase or decrease parisizemax
-        # inside a running gp session, just use default as usual").
-        from sage.libs.pari import pari
-
-        pari.allocatemem(6_000_000_000)
         order = SageZZ(quadratic.number_of_automorphisms())
         generators = tuple(
             generator.matrix().transpose().change_ring(SageZZ)

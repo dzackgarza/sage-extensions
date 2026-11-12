@@ -1269,20 +1269,12 @@ def _genus_classes(gram):
     """
     from itertools import combinations
 
-    from sage.libs.pari.all import pari
     from sage.quadratic_forms.binary_qf import BinaryQF
     from sage.quadratic_forms.genera.genus import Genus as SageGenus
     from sage.quadratic_forms.quadratic_form import QuadraticForm
     from sage.quadratic_forms.quadratic_form__neighbors import neighbor_iteration
     from sage.rings.rational_field import QQ as SageQQ
     from sage.sets.primes import Primes
-
-    # Every class the enumeration discovers costs one PARI ``qfauto`` call, and at
-    # rank 17 the 1 GiB default stack overflows inside it (#317).  PARI's own
-    # remedy is a larger stack, which ``allocatemem`` sets; ``silent`` keeps it
-    # out of the caller's output.  This is the same arithmetic with a stack that
-    # can hold it, so it changes no count.
-    pari.allocatemem(2**31, 2**33, silent=True)
 
     genus = SageGenus(gram)
     positive, negative = genus.signature_pair()
