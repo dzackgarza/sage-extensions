@@ -561,3 +561,4 @@ a finite generating set of `Õ(L)` whose hypotheses this lattice meets.
 | --- | --- | --- |
 | `issue369-refusal-test.log` | the tree of this push | the refusal test of `tests/lattices/test_the_stable_orthogonal_group_generators_refuse.sage`: **1 passed in 14.43 s** (the call certifies the Bertini family's membership in `ker ρ_L` inside `pytest.raises(ValueError)` and refuses; the index `|ρ_L(O(L))|` read by tag equals the card's own `46998591897600`) |
 | `issue369-refusal-lint.log` | the tree of this push | `test_lint` on the new test module: **1 file, 0 findings** |
+| `issue370-tests-at-the-pushed-head.log` | `6664495b7c` (#370) | the same test file at the pushed head, after the cherry-pick onto `72c40a2` (#363): **3 passed in 311.40 s** (26.88 s and 280.60 s), no lint findings, peak tree RSS 1477 MiB |
