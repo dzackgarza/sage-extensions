@@ -12120,10 +12120,15 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             onto the Levi quotient, and the kernel is the unipotent radical).  The
             solve is
             :meth:`...PrimitiveIsotropicSubobjects.ParentMethods.levi_quotient_lift`,
-            which searches the plane actions :meth:`..._plane_action_candidates`
-            lists and raises rather than answering ``None`` when none of them
-            reaches the class action: absence is not decided by that search, and a
-            ``None`` here would claim it is.
+            which decides the plane actions over the whole of \(GL_2(ZZ)\): it
+            returns a lift, raises
+            :class:`...isotropic_parabolics.LeviQuotientLiftAbsent` when no plane
+            action admits an integral block at all, and raises
+            ``NotImplementedError`` only when plane actions of a possible lift do
+            exist and the one block equation left undecided there -- the paper's
+            system (13) for \(P_2\) -- has no integral solution at any of them.
+            The first of those refusals is a proof of absence and the second is
+            not, so only the first is answered as ``None`` here.
             """
             subobject = self.isotropic_sublattice()
             if int(subobject.module_rank()) == 0:
@@ -12134,15 +12139,26 @@ class IsotropicReductions(OwnedCategoryOverBaseRing):
             r"""Whether the prescribed quotient isometry has an integral parabolic lift.
 
             At rank at least two this answers ``True`` exactly when
-            :meth:`_levi_integral_lift_or_none` constructs a lift, and the
-            construction itself raises when its search finds none: the image of
-            \(P_I\) is a subgroup between the pointwise image and \(O(K_I)\)
-            (:meth:`...PrimitiveIsotropicSubobjects.ParentMethods.levi_quotient_image_is_all`),
-            and a ``False`` here would claim that the class action has no lift at
-            all, which this search does not decide.
+            :meth:`_levi_integral_lift_or_none` constructs a lift, and ``False``
+            exactly when that call proves there is none: the setwise quotient
+            action is decided by
+            :meth:`...PrimitiveIsotropicSubobjects.ParentMethods.plane_action_congruence_classes`,
+            whose necessary conditions are read on a complete residue system of
+            \(GL_2(ZZ)\), and
+            :class:`...isotropic_parabolics.LeviQuotientLiftAbsent` is raised only
+            when no class of that system satisfies them.  The
+            ``NotImplementedError`` naming the undecided \(P_2\) equation is *not*
+            an absence, and it is left to propagate.
             """
+            from sage_extensions.categories.isotropic_parabolics import (
+                LeviQuotientLiftAbsent,
+            )
+
             if self.isotropic_sublattice().module_rank() != NN(1):
-                self._levi_integral_lift_or_none(isometry)
+                try:
+                    self._levi_integral_lift_or_none(isometry)
+                except LeviQuotientLiftAbsent:
+                    return False
                 return True
             return any(
                 fibre.integral_base_point_or_none() is not None
