@@ -1,11 +1,10 @@
 # #17: the Γ_h line rows as preimages, by card
 
 **Result: the Γ_h line row is `Γ_h.isotropic_orbit_representatives(1)` with `Γ_h` built as a
-preimage of a subgroup `H ≤ O(q_N) × {±1}` under `(ρ, sn)`, and every expected value is now
-the card's own row read by tag.  77 of the 87 cards are decided and every one of
-them equals its card: 0 disagree and 0 is `UNDECIDED`.  The rows not
-decided when this was written are gamma-h-78, gamma-h-79, gamma-h-80, gamma-h-81, gamma-h-82, gamma-h-83, gamma-h-84, gamma-h-85, gamma-h-86, gamma-h-87; that run is still
-going and its log is `.scratch/wt17b_rows.log`.**
+preimage of a subgroup `H ≤ O(q_N) × {±1}` under `(ρ, sn)`, and every expected value is the
+card's own row read by tag.  The one background run decided all 87 cards: **87 pass, 0 fail,
+0 `UNDECIDED`, 0 not reached**, so every `gamma-h-N` line row equals card `gamma-h-N`'s
+`line_orbits`.**
 
 ## Γ_h, and the subgroup H ≤ O(q_N) × {±1} it is the preimage of
 
@@ -59,7 +58,7 @@ the card is read by tag from `tests/cards/lattice-database-enriques.json` (latti
 not a pass.
 
 ```
-decided 77 cards: 77 pass, 0 fail, 0 undecided
+decided 87 cards: 87 pass, 0 fail, 0 undecided
 gamma-h-1  PASS  203 s
 gamma-h-2  PASS  13 s
 gamma-h-3  PASS  12 s
@@ -137,9 +136,19 @@ gamma-h-74  PASS  117 s
 gamma-h-75  PASS  132 s
 gamma-h-76  PASS  118 s
 gamma-h-77  PASS  181 s
+gamma-h-78  PASS  186 s
+gamma-h-79  PASS  176 s
+gamma-h-80  PASS  174 s
+gamma-h-81  PASS  168 s
+gamma-h-82  PASS  214 s
+gamma-h-83  PASS  204 s
+gamma-h-84  PASS  315 s
+gamma-h-85  PASS  325 s
+gamma-h-86  PASS  226 s
+gamma-h-87  PASS  188 s
 ```
 
-`gamma-h-1` pays the one-off ambient sweep (203 s); the other rows take 10-181 s each on a
+`gamma-h-1` pays the one-off ambient sweep (203 s); the other rows take 10-325 s each on a
 machine whose load average was 6-18 during the run, so these times are recorded, not claimed
 as the rows' cost.
 
