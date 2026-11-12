@@ -5,10 +5,12 @@ D. Dutour Sikirić and K. Hulek's Lemma 3.6, to one computed element per `O(L)`-
 planes — an element of the plane stabilizer whose character image is odd — and that
 element is produced by the plane block equations rather than by enumerating a
 stabilizer's generating family.  The route is wired at its owner and pinned by a test on
-two specimens.  The two rank-21 rows this unit exists for are **not both in**: card `6JRX`'s `O` row
-returned (4 orbits, 1006.6 s) and its `O⁺` row was still running when this was committed,
-and card `6JRY`'s `O` row had not returned either.  So #379 is **not accepted** by this
-turn: the route is in the tree and pinned, and the two long rows are the next run.**
+two specimens.  **Both cards' `O` plane rows return through the public call and equal their cards — 4 for
+`6JRX` in 1006.6 s and 9 for `6JRY` in 2878.0 s.  Neither `O⁺` row returns: the route
+reaches it, and its stage outran a 3300 s cap.  #379 is therefore not accepted by this
+turn: the double-coset route and its witness are in the tree and pinned on small
+specimens, the two `O` rows agree, and the two `O⁺` rows are what the next unit must
+make affordable.**
 
 ## The route, and its hypotheses on Scattone's lattices
 
@@ -112,13 +114,14 @@ provider, on a VM whose load average was 18–37 (four CPUs, other projects' job
 | card | card's `O` row | call, `O` planes | time | card's `O+` row | call, `O⁺` planes |
 | --- | ---: | ---: | ---: | ---: | --- |
 | `6JRX` (`Λ₂`) | 4 | **4** | 1006.6 s | 4 | not returned: the stage ran past the job's 3300 s cap, ≈2290 s of it after the `O` row |
-| `6JRY` (`Λ₄`) | 9 | not returned inside its own 3300 s cap | — | 9 | not run |
+| `6JRY` (`Λ₄`) | 9 | **9** | 2878.0 s | 9 | not run: the job was killed at its cap while the `O` row was still finishing |
 
-Both rows agree where they returned, and nothing disagrees.  The `O⁺` stage is not a
-close call: it passed a cap of 3300 s, which is more than three times the `O` row's own
-1006.6 s, so the next unit's first job is to attribute that stage between its two parts
-(the quotient's image computation and the per-plane block-lift solves) rather than to give
-it a bigger cap.  What is measured about the
+**Both `O` rows agree with their cards, and neither `O⁺` row returned.**  Each `O` row is on its own expensive: 1006.6 s on `Λ₂` and 2878.0 s on `Λ₄` at load
+around 25, so the two lattices differ by a factor near three in the ambient call itself.
+The `O⁺` stage is not a close call: on `6JRX` it passed a cap of 3300 s, more than three
+times the `O` row's own 1006.6 s, so the next unit's first job is to attribute that stage
+between its two parts (the quotient's image computation and the per-plane block-lift
+solves) rather than to give it a bigger cap.  What is measured about the
 `O⁺` stage is its lower bound, not its cost: it spends that time in the character
 quotient's own image computation (the ambient discriminant image over `O(Λ)`'s selected
 generators was measured at 130–417 s in `results/issue17-double-coset-row.md`) and then in
