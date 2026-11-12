@@ -2793,16 +2793,25 @@ def _plane_orbit_from_odd_stabilizer(subgroup, representative):
     element is a reflection the constructor verifies.
     """
     lattice = subgroup.supergroup().domain()
-    if subgroup != lattice.O_plus():
+    # Recognise `O^+` by the character data that defines it, never by comparing
+    # subgroup objects: a comparison of two preimage subgroups can be false for the
+    # same subgroup reached by another route, and a false answer here does not fail
+    # loudly -- it falls through to the stabilizer enumeration this route exists to
+    # avoid (measured: 9.3 GiB and no return on `6JRX`, #379).  `O^+ = sn^{-1}(+1)` is
+    # exactly the subgroup cut out by the spinor character alone.
+    quotient = subgroup.finite_character_quotient()
+    if not (
+        quotient.spinor_kernel
+        and not quotient.determinant_kernel
+        and not quotient._has_discriminant
+    ):
         return None
     # `O^+ = sn^{-1}(+1)` is the kernel of the real spinor norm, which is onto
     # `{+-1}` as soon as the lattice exhibits one integral odd element, so its index
     # is two and neither character image's order has to be computed: the odd element
     # below either exists -- and then it both certifies the index and supplies the
     # second representative of the split -- or the call refuses by name.
-    witness = subgroup.finite_character_quotient().plane_odd_character_witness(
-        representative
-    )
+    witness = quotient.plane_odd_character_witness(representative)
     if witness is not None:
         return (representative,)
     odd_ambient = lattice.odd_spinor_norm_isometry()
