@@ -545,3 +545,19 @@ of Sterk's diagrams 4.3.8 and 4.3.9.
 | `issue370-the-transcription-is-not-linear.log` | `8e88c6a1c5` | the 34 `TdP`↔`T_En` root pairs of the three transcribed cusps span rank 16 of 20 and impose an inconsistent linear system: no single linear map gives cusps 4–5's coordinates |
 | `issue370-root-class-orbit-probe.log` | `8e88c6a1c5` | the orbit call on the printed roots: 12/10/12 distinct classes at cusps 1–3 and the refusal of a `-4` class |
 | `issue370-tests.log` | pushed head | `tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage` with `-p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates`: **3 passed in 344.08 s**, no lint findings, peak tree RSS 1509 MiB |
+## #369 — the stable orthogonal group generators call of card 0125 refuses
+
+The owner's comment (2026-11-12) records that `5b75461d72` returned a family
+under a generation claim that no published statement supports: the normal
+closure of one Bertini involution in `W237` needs all its conjugates, not only
+those by the simple reflections. The search this turn (Allcock's paper read in
+full, the machine's research library, arXiv and the web) found no published
+finite generating set of `Õ(L)`, so the call now refuses: it constructs and
+certifies the family it could return (each member's discriminant image is
+trivial) and then raises, stating that no published generation statement gives
+a finite generating set of `Õ(L)` whose hypotheses this lattice meets.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue369-refusal-test.log` | the tree of this push | the refusal test of `tests/lattices/test_the_stable_orthogonal_group_generators_refuse.sage`: **1 passed in 13.40 s** (the call certifies the Bertini family's membership in `ker ρ_L` inside `pytest.raises(ValueError)` and refuses; the index `|ρ_L(O(L))|` read by tag equals the card's own `46998591897600`) |
+| `issue369-refusal-lint.log` | the tree of this push | `test_lint` on the new test module: **1 file, 0 findings** |

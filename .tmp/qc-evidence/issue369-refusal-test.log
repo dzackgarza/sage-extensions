@@ -1,0 +1,21 @@
+.                                                                        [100%]
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+12.79s call     tests/lattices/test_the_stable_orthogonal_group_generators_refuse.sage::test_the_stable_orthogonal_group_generators_refuse_on_card_0125
+0.00s setup    tests/lattices/test_the_stable_orthogonal_group_generators_refuse.sage::test_the_stable_orthogonal_group_generators_refuse_on_card_0125
+0.00s teardown tests/lattices/test_the_stable_orthogonal_group_generators_refuse.sage::test_the_stable_orthogonal_group_generators_refuse_on_card_0125
+1 passed in 13.40s
+[peakrss] issue369test: child waited=0 shell_code=0 samples=10
+[peakrss] peak tree RSS      : 504 MiB
+[peakrss] low-water MemAvail : 10165 MiB
+[peakrss] peak single VmHWM  : 504 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      493 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    18.0s procs=  3 rss=   504 MiB hwm=   504 MiB avail= 10167 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   501 MiB hwm=   501 MiB avail= 10165 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   476 MiB hwm=   476 MiB avail= 10234 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   356 MiB hwm=   356 MiB avail= 10355 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   352 MiB hwm=   352 MiB avail= 10357 MiB
+launcher exit: 0
