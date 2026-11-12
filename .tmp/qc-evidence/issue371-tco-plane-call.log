@@ -1,0 +1,37 @@
+T_Co rank 11 signature (2, 9) det -2048 classes 2048 |O(q)| 46998591897600
+T_Co is_isotropic(): True
+[00:25:28] setup: 9.7 s
+[00:25:28] isotropic_orbit_representatives(2) ...
+[00:49:11] isotropic_orbit_representatives(2) = {Integral lattice of rank 2 and signature (0, 0)}: 1423.4 s
+PLANE ROW: 1
+  plane representative: ((2, 0, 0, 0, -1, -1, -2, -2, -2, -2, -2), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)) | primitive True
+  divided classes of the representative: ['2*[h] - [a1] + 2*[a8]', '[fp]']
+[00:49:11] cusps(2) ...
+[00:49:11] cusps(2) = {Cusp of rank 2 in Integral lattice of rank 11 and signature (2, 9)}: 0.0 s
+PLANE CUSPS: 1
+[00:49:11] isotropic_orbit_representatives(1) ...
+[00:49:11] isotropic_orbit_representatives(1) = {Integral lattice of rank 1 and signature (0, 0)}: 0.0 s
+LINE ROW: 1
+  line representative: (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0) | q 0 | div -
+[00:49:11] cusps(1) ...
+[00:49:11] cusps(1) = {Cusp of rank 1 in Integral lattice of rank 11 and signature (2, 9)}: 0.0 s
+LINE CUSPS: 1
+[00:49:11] tits_building_incidence() ...
+[00:50:13] tits_building_incidence() = {Tits-building incidence Cusp of rank 1 in Integral lattice of rank 11 and signature (2, 9) < Cusp of rank 2 in Integral lattice of rank 11 and signature (2, 9)}: 62.2 s
+INCIDENCE EDGES: 1
+  edge: line (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0) -> plane Integral lattice of rank 2 and signature (0, 0)
+[00:50:13] whole run: 1495.3 s
+[peakrss] p371run2: child waited=0 shell_code=0 samples=751
+[peakrss] peak tree RSS      : 747 MiB
+[peakrss] low-water MemAvail : 3118 MiB
+[peakrss] peak single VmHWM  : 747 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      736 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  1499.9s procs=  3 rss=   747 MiB hwm=   747 MiB avail=  4887 MiB
+[peakrss]   t=  1497.9s procs=  3 rss=   746 MiB hwm=   746 MiB avail=  4888 MiB
+[peakrss]   t=  1501.9s procs=  3 rss=   745 MiB hwm=   747 MiB avail=  4880 MiB
+[peakrss]   t=  1495.9s procs=  3 rss=   743 MiB hwm=   743 MiB avail=  4977 MiB
+[peakrss]   t=  1493.9s procs=  3 rss=   742 MiB hwm=   742 MiB avail=  5066 MiB
+launcher exit: 0

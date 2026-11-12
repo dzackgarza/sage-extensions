@@ -471,3 +471,27 @@ sublattice of a free `ZZ`-module is a direct summand.
 | `issue360-coble-plane-row.py`, `issue360-coble-plane-row.log` | the tree of this push | `Tco.Aut().isotropic_orbit_representatives(2)` stops after 9 min 6 s at `PariError: sorry, qfsolve, dim >= 10 is not yet implemented` (`lattice_engines.py:496` ← `lattices.py:4687` ← `isotropic_induction.py:84` ← `isotropic_orbits.py:1393`); the incidence stops with it |
 | `issue360-regression.log` | the tree of this push | the neighbouring parabolic, plane-block, radical, divided-class and this issue's own rows with the change: **16 passed in 617.12 s** |
 | `issue360-lint.log` | the tree of this push | `test_lint` on the new test module: **1 file, 0 findings** |
+
+### #371: isotropy decided by theorem, and `T_Co`'s plane and incidence rows return (2026-11-12, base `40200e1`)
+
+`is_isotropic` decided isotropy only by a witness search over the whole Gram
+matrix, so it stopped where PARI's `qfsolve` does.  It is now decided by three
+statements — definite forms represent no zero; an indefinite form of rank at
+least five is isotropic by Meyer's theorem (Serre, *A Course in Arithmetic*,
+Ch. IV, §3.2, Cor. 2, printed p. 43); rank at most four by Hasse–Minkowski and
+the local invariants (Serre, Ch. IV, §3.2, Thm. 8, printed p. 41) — and the
+witness of a rank-five-and-above form is built from five diagonal directions of
+both signs, solved there with `qfsolve` (Denis Simon's code, as Sage's
+`qfsolve` module states) and carried back; Hecke's `QuadForm/Quad/Spaces.jl`
+`_isotropic_subspace` is the reference for answering rational isotropy by that
+method, with Simon, *Quadratic equations in dimensions 4, 5 and more*.  The
+reduction is stated for rank five, not rank ten, because the refusal is a
+property of the solver's way and not of the dimension: a diagonal form of size
+eleven answers and a nine-variable form of `T_Co` refuses.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue371-test.log` | the tree of this push | `tests/lattices/test_the_isotropy_decisions_in_high_rank.sage`: **4 passed in 3.25 s** — `U + E8(-1)` (rank 10) and `T_Co` (rank 11) isotropic with a primitive witness of square zero, `E8(-1) + E8(-1)` (rank 16, definite) and `⟨1, -2⟩` (rank 2, indefinite) not isotropic and refusing a witness |
+| `issue371-lint.log` | the tree of this push | `test_lint` on the new module: **1 file, 0 findings** |
+| `issue371-qfsolve-bound.py`, `issue371-qfsolve-bound.log` | the tree of this push | `qfsolve` on `diag(-1, 1, …, 1)` for sizes 2 to 11: every size answers, so the `dim >= 10` refusal is not a size bound alone |
+| `issue371-tco-plane-call.py`, `issue371-tco-plane-call.log` | the tree of this push | `T_Co.Aut().isotropic_orbit_representatives(2)` = **1** orbit in 1423.4 s, `cusps(2)` = 1, `isotropic_orbit_representatives(1)` = 1, `cusps(1)` = 1, `tits_building_incidence()` = **1** edge in 62.2 s; whole run 1495.3 s, peak 747 MiB |

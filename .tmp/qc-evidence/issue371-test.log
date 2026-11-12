@@ -1,0 +1,15 @@
+....                                                                     [100%]
+4 passed in 3.25s
+[peakrss] p371test3: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 299 MiB
+[peakrss] low-water MemAvail : 3782 MiB
+[peakrss] peak single VmHWM  : 299 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      287 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  4 rss=   299 MiB hwm=   299 MiB avail=  3782 MiB
+[peakrss]   t=     2.0s procs=  4 rss=   208 MiB hwm=   208 MiB avail=  3994 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  4145 MiB
+launcher exit: 0

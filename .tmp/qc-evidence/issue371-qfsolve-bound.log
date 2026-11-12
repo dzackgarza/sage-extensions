@@ -1,0 +1,18 @@
+2 ok (1, -1)
+3 ok (-1, 1, 0)
+4 ok (-1, 1, 0, 0)
+5 ok (-1, 1, 0, 0, 0)
+6 ok (-1, 1, 0, 0, 0, 0)
+7 ok (-1, 1, 0, 0, 0, 0, 0)
+8 ok (-1, 1, 0, 0, 0, 0, 0, 0)
+9 ok (-1, 1, 0, 0, 0, 0, 0, 0, 0)
+10 ok (-1, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+11 ok (-1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+[peakrss] p371probe5: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 6056 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       1 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail=  6056 MiB
+launcher exit: 0
