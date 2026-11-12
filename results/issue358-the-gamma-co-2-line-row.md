@@ -180,5 +180,13 @@ Measured (`p358-tests.log`, `.tmp/qc-evidence/issue358-tests.log`), both tests i
 no lint findings, peak tree RSS 4381 MiB.  Both calls are over the local 20 s call ceiling, which
 this run reports and does not enforce.
 
+Gate and push: `just test-push` → `Push syntax: 8 file(s) checked; no errors.`  The commit is
+**`92f3327ffa3a03d247d67c28803be4817f556389`** on `main`, confirmed by
+`git ls-remote omm main` (`92f3327ffa3a03d247d67c28803be4817f556389  refs/heads/main`).  The first
+push was rejected non-fast-forward because `main` had moved to `85284b8`
+(sage-extensions `#371`); the commit was cherry-picked onto that head, the two append-only
+evidence files (`INDEX.md`, `SHA256SUMS`) resolved by keeping both sides' appends, and the gate and
+push re-run — no file of another unit was touched.
+
 Logs (`issue358-*.log`) and the probes behind them (`issue358-probe-*.py`) are committed under
 `.tmp/qc-evidence/` with their `SHA256SUMS` rows.
