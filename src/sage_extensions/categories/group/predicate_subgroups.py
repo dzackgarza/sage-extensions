@@ -759,6 +759,21 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     f"the Tits building incidence of {self} has a cusp incidence in a lattice "
                     f"other than {lattice}, the lattice {self.supergroup()} acts on"
                 )
+            # Two flag records over one (line cusp, plane cusp) pair are a multiple
+            # edge.  Each record must be a distinct Gamma-orbit of flags, so a pair
+            # of records whose flags are Gamma-equivalent is an over-split orbit,
+            # never an edge of the building.
+            for position, first in enumerate(incidences):
+                for second in incidences[position + 1:]:
+                    if first.line_cusp() is not second.line_cusp() or first.plane_cusp() is not second.plane_cusp():
+                        continue
+                    if self.isotropic_equivalence_witness(first.flag(), second.flag(), flag=True) is not None:
+                        raise ArithmeticError(
+                            f"the flags {first.flag()} and {second.flag()} of {lattice} are "
+                            f"equivalent under {self}, yet they are recorded as two flag orbits "
+                            f"over the line cusp {first.line_cusp()} and the plane cusp "
+                            f"{first.plane_cusp()}: the flag orbits are over-split"
+                        )
             return finite_ordered_set(tuple(incidences))
 
         def _repr_(self):

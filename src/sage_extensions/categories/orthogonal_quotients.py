@@ -1352,6 +1352,104 @@ class OrthogonalCharacterQuotient:
             (), stab_sign_flip, point=class_points
         )
 
+    def exact_isotropic_stabilizer_generators(self, representative, *, flag=False):
+        r"""Return elements of ``H = Stab_{O(L)}(representative)`` whose image ``chi(H)`` is exact.
+
+        The double-coset split of :meth:`splitting_isometries` is
+        ``chi(Gamma) \ Q / chi(H)`` with ``Q = chi(O(L))``, so it needs the finite
+        image ``chi(H)`` exactly; generators of a proper subgroup of ``H`` with a
+        smaller image split one ``Gamma``-orbit into several.  The ambient
+        family ``isotropic_stabilizer_generators`` need not generate ``H``: the
+        plane-parabolic family is complete only when the lattice splits along the
+        plane (``is_parabolic_complete``), which fails on ``U(2) + U(2) + A_2``.
+
+        **Upper bound.**  Every term ``W`` of the representative (the subobject
+        itself, or each term of a flag) has the divided class set
+        ``D(W) = {[u/div(u)] : u primitive in W}`` in ``A_L``
+        (:func:`_isotropic_divided_class_set`).  An element of ``H`` carries each
+        term onto itself and primitive vectors to primitive vectors of the same
+        divisibility, so ``rho(h)`` preserves every ``D(W)``.  Hence
+        ``chi(H) <= U = {q in Q : pi_disc(q) D(W) = D(W) for every term W}``,
+        and ``|U| = |Q| / |orbit of the data|`` by orbit--stabilizer.
+
+        **Lower bound and closure.**  ``chi`` of the ambient family generates
+        ``V <= chi(H)``.  While ``V != U``, each right-coset representative ``r``
+        of ``V`` in ``U`` is lifted to ``g`` in ``O(L)`` by the word section
+        (checked against the character map); ``g`` carries the representative to
+        an object with the same divided data, and the ambient equivalence
+        witness ``k`` with ``k(g x) = x`` gives ``k g`` in ``H``.  Its image is
+        added to ``V``.  The loop ends when ``|V| = |U|``, which proves
+        ``chi(H) = U`` with every generator an exhibited element of ``H``.  A
+        pass that adds nothing certifies nothing, and raises: the divided data
+        need not be a complete invariant, and no smaller image is guessed.
+        """
+        ambient = self.supergroup
+        generators = list(ambient.isotropic_stabilizer_generators(representative, flag=flag))
+        _section_generators, _images, section = self._image_section()
+        image = self._gap_image()
+        factors, product, _embeddings, projections = self._gap_product()
+        if self._has_discriminant:
+            position = next(
+                index for index, (label, _group) in enumerate(factors) if label == "discriminant"
+            )
+            projection = libgap.RestrictedMapping(projections[position], image)
+            discriminant_image = libgap.Image(projection)
+            terms = tuple(representative.terms()) if flag else (representative,)
+            finite_orthogonal = self._discriminant_group
+            data = libgap(
+                [
+                    libgap.Set(
+                        [
+                            finite_orthogonal._engine_abelian_element(divided_class)
+                            for divided_class in _isotropic_divided_class_set(self.lattice, term)
+                        ]
+                    )
+                    for term in terms
+                ]
+            )
+            termwise_action = libgap.function_factory(
+                "function(x, g) return List(x, part -> Set(List(part, y -> ImageElm(g, y)))); end"
+            )
+            upper = libgap.PreImages(
+                projection, libgap.Stabilizer(discriminant_image, data, termwise_action)
+            )
+        else:
+            upper = image
+        lower = libgap.Subgroup(
+            product, [self._gap_of_key(self.image(generator)) for generator in generators]
+        )
+        if not bool(libgap.IsSubset(upper, lower)):
+            raise ArithmeticError(
+                f"an ambient stabilizer generator of {representative} moves its divided "
+                f"discriminant data: it does not stabilize {representative}"
+            )
+        target = int(libgap.Size(upper))
+        while int(libgap.Size(lower)) < target:
+            before = int(libgap.Size(lower))
+            for coset in libgap.AsList(libgap.RightTransversal(upper, lower)):
+                lift = self._checked_lift(self._key_of_gap(coset), section.letters_of(coset))
+                moved = lift.transport_isotropic_object(representative)
+                witness = ambient.isotropic_equivalence_witness(moved, representative, flag=flag)
+                if witness is None:
+                    raise ArithmeticError(
+                        f"{lift} is an element of {ambient}, yet {ambient} does not carry "
+                        f"{moved} back to {representative}"
+                    )
+                element = witness * lift
+                key = self._gap_of_key(self.image(element))
+                closed = libgap.ClosureGroup(lower, key)
+                if int(libgap.Size(closed)) > int(libgap.Size(lower)):
+                    generators.append(element)
+                    lower = closed
+            if int(libgap.Size(lower)) == before:
+                raise ArithmeticError(
+                    f"the stabilizer of {representative} in {ambient} has character image of "
+                    f"order at least {before}, and the stabilizer of its divided discriminant "
+                    f"data has order {target}; no exhibited stabilizer element closes the index "
+                    f"{target // before}, so the exact image chi(Stab) is not certified"
+                )
+        return tuple(generators)
+
     def splitting_isometries(self, stabilizer_generators):
         r"""Return one lift ``g`` per double coset ``Gamma g Stab`` of ``O(L)``.
 
@@ -2258,6 +2356,50 @@ def _isotropic_line_representatives(lattice, quotient):
     return finite_ordered_set(tuple(representatives))
 
 
+def _isotropic_divided_class_set(lattice, term):
+    r"""Return ``D(W) = {[u/div(u)] : u primitive in W}`` for a primitive isotropic ``W``.
+
+    Let ``N`` be the exponent of ``A_L``.  For primitive ``u`` the class
+    ``[u/div(u)]`` has order ``div(u)``, so ``div(u) | N``; then
+    ``div(u) = gcd(N, b(u, L))`` and ``u/div(u)`` modulo ``L`` depend only on
+    ``u mod N W``.  For rank one the primitive vectors are ``+-w``, so
+    ``D(W) = {c, -c}``.  For rank ``k >= 2`` every residue ``a`` in ``(Z/N)^k``
+    with ``gcd(a, N) = 1`` is the residue of a primitive vector, because
+    ``SL_k(Z) -> SL_k(Z/N)`` is onto (Shimura, *Introduction to the Arithmetic
+    Theory of Automorphic Functions*, Lemma 1.38).  A representative ``a`` in
+    ``[0, N)^k`` is ``g a'`` with ``a'`` primitive and ``gcd(g, N) = 1``, and the
+    primitive lift of ``a`` is congruent to ``g u'`` modulo ``N W``, so its class
+    is ``g [u'/div(u')]``.
+    """
+    from itertools import product as _product_tuples
+    from math import gcd
+
+    inclusion = term.inclusion()
+    domain = inclusion.domain()
+    basis = tuple(inclusion(domain.module_generator(label)) for label in domain.module_generating_set())
+    if len(basis) == 1:
+        divided_class = lattice.divided_discriminant_class(basis[0])
+        return (divided_class, -divided_class)
+    exponent = int(abs(lattice.correlation_morphism().cokernel().exponent()))
+    zero = lattice.discriminant_group().zero()
+    classes = []
+    for coefficients in _product_tuples(range(exponent), repeat=len(basis)):
+        common = gcd(*coefficients)
+        if common == 0 or gcd(common, exponent) != 1:
+            continue
+        vector = None
+        for coefficient, element in zip(coefficients, basis):
+            if coefficient:
+                piece = (coefficient // common) * element
+                vector = piece if vector is None else vector + piece
+        divided_class = lattice.divided_discriminant_class(vector)
+        scaled = zero
+        for _ in range(common):
+            scaled = scaled + divided_class
+        classes.append(scaled)
+    return tuple(classes)
+
+
 def _two_hyperbolic_planes(lattice):
     r"""Whether two orthogonal unimodular hyperbolic planes are exhibited in the chosen basis.
 
@@ -2599,7 +2741,7 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
             if from_divided_classes is not None:
                 representatives.extend(from_divided_classes)
                 continue
-        stabilizer = orthogonal_group.isotropic_stabilizer_generators(
+        stabilizer = quotient.exact_isotropic_stabilizer_generators(
             representative, flag=flag
         )
         representatives.extend(
@@ -2619,12 +2761,9 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
     if witness in subgroup:
         return witness
     _assert_isotropic_splitting_has_character_data(subgroup)
-    stabilizer = orthogonal_group.isotropic_stabilizer_generators(
-        right, flag=flag
-    )
-    return subgroup.finite_character_quotient().adjust_witness_into_subgroup(
-        witness, stabilizer
-    )
+    quotient = subgroup.finite_character_quotient()
+    stabilizer = quotient.exact_isotropic_stabilizer_generators(right, flag=flag)
+    return quotient.adjust_witness_into_subgroup(witness, stabilizer)
 
 
 __all__ = ["OrthogonalCharacterQuotient"]
