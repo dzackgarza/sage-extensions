@@ -99,6 +99,10 @@ is near the 20 s per-call ceiling of `sage_extensions.testing.suite_budget`, and
 E10 line's family — the call that took 29.07 s when it went through the port — is now
 eight transvections built in 0.19 s.
 
+Main moved to `c59af293234c` before this landed, and the same command on the commit
+that carries this file, whose base is that head, gives the same three modules
+`13 passed in 9.81s` with the same slowest calls (2.33 s, then 1.37 s).
+
 Inside those calls, measured directly: on `U + U + U` the plane family is eleven
 elements in 0.39 s, whose translation parameters span rank 4 (`cokernel cardinality
 1`) and whose central parameters have ideal `(1)`.
