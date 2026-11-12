@@ -47,8 +47,10 @@ CUSP_CHAMBER_TAGS = ("029J",)
 # The Enriques period lattice card, whose 0-cusp chamber diagrams #254 reads.
 CUSP_DIAGRAM_TAGS = ("029J",)
 
-# The catalogued lattices whose primitive-orbit rows #345 reads.
-PRIMITIVE_ORBIT_TAGS = ("0016", "026E")
+# The catalogued lattices whose primitive-orbit rows #345 reads: the hyperbolic
+# plane and U + D4(-1) + A1(-1), and the positive definite A2 that the
+# lattice-database certify run of #375 certifies beside the hyperbolic plane.
+PRIMITIVE_ORBIT_TAGS = ("0016", "026E", "0012")
 
 # The catalogued lattice whose certified reflection verdict #344 reads.
 REFLECTIVITY_TAGS = ("0026",)
