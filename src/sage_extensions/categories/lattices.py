@@ -5559,18 +5559,117 @@ class Lattices(OwnedCategoryOverBaseRing):
             )
             return mor.an_element()
 
+        def _isometry_absent(self, other):
+            r"""Return whether there is no isometry ``other -> self``, raising when it is undecided.
+
+            The one decision behind :meth:`is_isometric_to` and
+            :meth:`isometry_matrix_to`: the emptiness of the lattice isometry Mor
+            ``Isom(other, self)``, which that Mor's own exact machinery decides
+            (:meth:`sage_extensions.categories.lattice_morphisms.LatticeIsometryMor._isometry_decision`,
+            the genus/spinor-genus route of Conway--Sloane, *Sphere packings,
+            lattices and groups*, Ch. 15, Thms 14--15, and the engine searches it
+            names).  A witness is a *separate* construction
+            (:meth:`Isom(...).an_element`): a Mor is often known nonempty by a
+            theorem whose own machinery exhibits no element, so asking this
+            question must not cost an isometry.
+            """
+            empty = other.Isom(self).is_empty()
+            assert empty is True or empty is False, (
+                f"cannot decide whether {self!r} and {other!r} are isometric: no available exact classification algorithm decides this pair"
+            )
+            return empty
+
         def is_isometric_to(self, other):
             r"""Return the verified boolean isometry decision.
 
             Unlike :meth:`is_isometric`, this semantic spelling is strictly
             boolean: an unresolved exact-classification case raises instead of
-            returning the undecided proposition.
+            returning the undecided proposition.  The question asked is the one
+            :meth:`isometry_matrix_to` asks -- an isometry exists exactly when
+            that call has a matrix to return -- so the library decides isometry
+            in one place and both spellings read that decision
+            (:meth:`_isometry_absent`).
             """
-            decision = self.is_isometric(other)
-            assert decision is True or decision is False, (
-                f"cannot decide whether {self!r} and {other!r} are isometric: no available exact classification algorithm decides this pair"
+            return not self._isometry_absent(other)
+
+        def isometry_matrix_to(self, other):
+            r"""Return an isometry ``other -> self`` as the matrix ``M`` with ``M^T G_self M = G_other``.
+
+            The columns of ``M`` are the coordinates, in the selected basis of
+            ``self``, of the images of the selected generators of ``other``: the
+            isometry this returns is ``other -> self``, so a vector of ``other``
+            with coordinate column ``x`` has image ``M x``, and
+            ``x^T G_other x = (M x)^T G_self (M x)`` is the form the equation
+            states.  Read the other way, ``M`` is the change of basis that writes
+            ``other``'s Gram matrix as ``G_self``'s form on the columns --
+            ``L' = {M x : x in ZZ^n}`` with ``G_{L'} = M^T G_L M``.
+
+            **The decision.**  There is an isometry exactly when ``Isom(other,
+            self)`` is not empty, which is :meth:`_isometry_absent`'s question and
+            the only place the library decides isometry
+            (:meth:`is_isometric_to` reads the same answer).  A pair that is not
+            isometric raises ``ValueError``; a pair the exact machinery cannot
+            decide, or a pair it knows isometric without exhibiting an element,
+            raises the undecidable assertion -- the same two cases
+            :meth:`isometry_to` distinguishes.
+
+            **The witness, per regime of the one owner.**
+
+            * Equal Gram matrices: the identity.
+            * A definite pair: Sage's ``QuadraticForm.is_globally_equivalent_to``,
+              i.e. PARI's ``qfisom`` (The PARI Group, *PARI/GP* reference card,
+              "Arithmetic functions on lattices": ``qfisom`` returns the
+              transformation carrying one Gram matrix to the other), reached
+              through the Mor's own witness
+              (:meth:`sage_extensions.categories.lattice_morphisms.LatticeIsometryMor._witness_matrix`).
+            * An indefinite pair of rank at least three: the indefinite
+              construction the library already uses, the port's Eichler recursion
+              (``sage_indefinite_port.indefinite.marked_lattices.isometry`` ->
+              ``EichlerRecursion.isometry``, its isotropic reduction, induction
+              and pointed equivalence), which is the Mor's own
+              :meth:`Isom(...).an_element`.
+            * An indefinite binary pair: the port's cycle walk
+              (``_binary_indefinite_isometry_matrix``).
+
+            The engine's matrix is an untrusted answer: the Gram equation is
+            checked here, on the returned object, before it is returned.
+
+            EXAMPLES::
+
+                sage: from sage_extensions.categories.lattices import Lattices
+                sage: L = Lattices(ZZ)("U") + Lattices(ZZ)([[-1]])
+                sage: M = L.isometry_matrix_to(Lattices.IPQ(1, 2))
+                sage: M.transpose() * L.gram_matrix() * M == Lattices.IPQ(1, 2).gram_matrix()
+                True
+            """
+            if self._isometry_absent(other):
+                raise ValueError(
+                    f"there is no isometry from {other!r} to {self!r}: the two lattices are not isometric"
+                )
+            assert self.module_rank().is_finite() and other.module_rank().is_finite(), (
+                f"no isometry matrix is returned between {other!r} and {self!r}: a matrix needs both to have finite rank"
             )
-            return decision
+            rank = int(self.module_rank())
+            assert rank == int(other.module_rank()), (
+                f"no isometry matrix is returned between {other!r} and {self!r}: their ranks {int(other.module_rank())} and {rank} differ"
+            )
+            isometry = other.Isom(self).an_element()
+            labels = tuple(self.module_generating_set())
+            columns = tuple(
+                tuple(isometry(generator).to_vector()(label) for label in labels)
+                for generator in other.module_generators()
+            )
+            matrix = self.base_ring().matrix_space(rank, rank).from_rows(
+                tuple(
+                    tuple(column[row] for column in columns)
+                    for row in range(rank)
+                )
+            )
+            if matrix.transpose() * self.gram_matrix() * matrix != other.gram_matrix():
+                raise ArithmeticError(
+                    f"the isometry {isometry!r} of {other!r} into {self!r} fails the integral form equation: its coordinate matrix does not satisfy M^T G_self M = G_other, so it presents no isometry of these two lattices"
+                )
+            return matrix
 
         def with_isometry(self, isometry):
             r"""Return the infinite-cyclic action on this lattice generated by ``isometry``."""
