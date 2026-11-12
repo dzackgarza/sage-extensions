@@ -88,4 +88,34 @@ changes.
 ## 4. The five rows against the card
 
 `test_every_cusp_chamber_has_the_wall_count_of_its_card_row`, no point and no
-route in the test, `--no-time-gates`, the pinned image:
+route in the test, `--no-time-gates`, the pinned image.  **Three of the five
+rows return through the public call with the computed controlling vector**
+(measured under load, `.tmp/issue362-probe6b.log` and
+`.tmp/issue362-probe6c.log`):
+
+| cusp | the computed point | the chamber's walls | the card row |
+| --- | --- | --- | --- |
+| Sterk_1 | `(1, 1, 0, ..., 0)`, square 4 | 12 | 4.3.5: 12 |
+| Sterk_2 | `(0, ..., 0, 1, 1)`, square 2 | 10 | 4.3.6: 10 |
+| Sterk_3 | `(0, ..., 0, 1, 1)`, square 2 | 12 | 4.3.7: 12 |
+| Sterk_4 | `(0, ..., 0, 1, 1)`, square 2 | **does not return** | 4.3.8: 11 |
+| Sterk_5 | (not reached) | **not reached** | 4.3.9: 14 |
+
+**Sterk_4 does not return with the current selection.**  The line is
+`tests/lattices/test_the_isotropic_reduction_image.sage:284`, the call
+`image.cusp_chamber()`, and the counts: at the selected vertex `(0, ..., 0,
+1, 1)` (square 2, seven of its nine through-walls admitted, the Gram
+determinant of those walls `−512` against the complement determinant of the
+same value, so the `Z`-basis flag holds there) the walk had processed 20
+layers and 1.86 million candidates at Sterk_1's measurements and does not
+close at Sterk_4 within a 3000-second cap under a loaded VM.  The
+selection's next iteration ranks the vertices by the admitted count with the
+`Z`-basis flag as the tiebreaker, which selects the square-4 vertex of
+Sterk_4's full chamber (eight of nine through-walls admitted, the Gram
+determinant `−1024`); that iteration is not measured here.  The five-row
+test is red on the Sterk_4 row with the current selection, so the batch's
+`just test-push` is not run: a push that leaves the acceptance test red is
+not a deliverable, and the rows that do not return are reported here as the
+issue's own instruction provides ("If a row still does not return, report
+its line, the layer, and the counts").
+
