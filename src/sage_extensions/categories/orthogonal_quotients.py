@@ -1114,13 +1114,15 @@ class OrthogonalCharacterQuotient:
         :meth:`...PrimitiveIsotropicSubobjects.plane_block_lift` (Dutour Sikirić--Hulek,
         Theorem 4.9, printed pp. 33--34) with the quotient block prescribed as the
         identity, and every candidate is an integral isometry of the lattice by that
-        construction.  The candidate's *character image* is compared with the
-        subgroup's, so the answer is about `chi`, never about a determinant or a
-        spinor norm read separately.
+        construction.  The candidate is then asked whether it lies in the subgroup,
+        which is the same question as whether its character image lies in `chi(Gamma)`,
+        because `Gamma` is `chi^{-1}` of its own image: the decision is about `chi` --
+        never about a determinant or a spinor norm read separately -- and it is one
+        element's evaluation, not an enumeration of the image.
 
-        ``None`` means no candidate action in the list admitted a lift whose image is
-        outside `A`; it is not a claim that `F_P` is contained in `A`, and the caller
-        must then keep the exact route (:func:`_plane_orbit_from_odd_stabilizer` keeps
+        ``None`` means no candidate action in the list admitted a lift outside `Gamma`;
+        it is not a claim that `chi(Stab(P))` is contained in `chi(Gamma)`, and the
+        caller must then keep the exact route (:func:`_plane_orbit_from_odd_stabilizer` keeps
         it by splitting with an ambient odd isometry instead, only after checking that
         the subgroup has index two).
         """
@@ -1132,7 +1134,11 @@ class OrthogonalCharacterQuotient:
                 f"the plane witness is defined for a rank-two primitive isotropic "
                 f"subobject, but {representative!r} has rank {int(representative.module_rank())}"
             )
-        accepted = self.subgroup_image_keys()
+        # One element decides it: `Gamma` is the preimage `chi^{-1}(A)` of its own
+        # character image, so `chi(g) in A` exactly when `g in Gamma`.  Asking the
+        # subgroup itself is one character evaluation on one isometry; listing
+        # `chi(Gamma)` first (`subgroup_image_keys`) builds one live lift per element
+        # of the ambient image -- of order ~4.7*10^13 here -- and does not return.
         for action in (
             matrix(SageZZ, [[0, 1], [1, 0]]),
             matrix(SageZZ, [[1, 0], [0, -1]]),
@@ -1145,7 +1151,7 @@ class OrthogonalCharacterQuotient:
             lift = representative.plane_block_lift(action)
             if lift is None:
                 continue
-            if self.image(lift) not in accepted:
+            if lift not in self.subgroup:
                 return lift
         return None
 
@@ -2775,9 +2781,9 @@ def _plane_orbit_from_odd_stabilizer(subgroup, representative):
     * an element of `H` whose character image lies outside `chi(Gamma)` puts
       `chi(H)` across both cosets, so `chi(Gamma) chi(H) = chi(G)` and the whole
       `G`-orbit is one `Gamma`-orbit -- its representative is the ambient one;
-    * when no such element is found, the ambient `G`-orbit can still split, and it
-      splits into exactly two because `Gamma` has index two and `chi(H)` would then
-      be contained in `chi(Gamma)`: the two representatives are `P` and `g_0 P`, with
+    * when no such element is found, the ambient `G`-orbit splits, and it splits into
+      exactly two because `Gamma` has index two and `chi(H)` would then be contained
+      in `chi(Gamma)`: the two representatives are `P` and `g_0 P`, with
       `g_0` any integral isometry of odd real spinor norm, which is computed here as a
       reflection in a square-two vector and checked not to lie in `O^+`.
 
@@ -2789,10 +2795,14 @@ def _plane_orbit_from_odd_stabilizer(subgroup, representative):
     lattice = subgroup.supergroup().domain()
     if subgroup != lattice.O_plus():
         return None
-    quotient = subgroup.finite_character_quotient()
-    if quotient.index() != 2:
-        return None
-    witness = quotient.plane_odd_character_witness(representative)
+    # `O^+ = sn^{-1}(+1)` is the kernel of the real spinor norm, which is onto
+    # `{+-1}` as soon as the lattice exhibits one integral odd element, so its index
+    # is two and neither character image's order has to be computed: the odd element
+    # below either exists -- and then it both certifies the index and supplies the
+    # second representative of the split -- or the call refuses by name.
+    witness = subgroup.finite_character_quotient().plane_odd_character_witness(
+        representative
+    )
     if witness is not None:
         return (representative,)
     odd_ambient = lattice.odd_spinor_norm_isometry()
@@ -2833,7 +2843,7 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
             if from_divided_classes is not None:
                 representatives.extend(from_divided_classes)
                 continue
-        if not flag and rank == 2 and index(rank) == 2:
+        if not flag and rank == 2:
             from_planes = _plane_orbit_from_odd_stabilizer(subgroup, representative)
             if from_planes is not None:
                 representatives.extend(from_planes)
