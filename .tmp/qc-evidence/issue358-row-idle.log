@@ -1,0 +1,75 @@
+[    9.10s] T_Co rank 11, |A| 2048, |O(q)| 46998591897600
+|P| = product of the summands: 696729600
+[   13.49s] summand orders
+[  130.52s] O(T_Co) generators: 345 in 117.0s
+[  261.36s] preimage constructed in 130.8s
+[  292.94s] image order 46998591897600
+[  293.45s] subgroup image order 696729600 (== |P|: True)
+[  293.57s] index 67456 (index * |P| == |O(q)|: True)
+[  293.58s] rho(Gamma) as an owned subgroup: order 696729600 in 0.0s
+P's generator count 3
+Timeout (0:05:00)!
+Thread 0x000077886fce0780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 166 in __iter__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1124 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 810 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1631 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/functors/scalar_change.py", line 236 in <lambda>
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py", line 1106 in _call_
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 810 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/orbit_spans.py", line 68 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/orbit_spans.py", line 67 in _rational_orbit_span
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/orbit_spans.py", line 133 in _call_
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py", line 592 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/g_objects.py", line 997 in orbit_generated_submodule
+  File "/repos/sage-extensions/src/sage_extensions/categories/rational_integral_stabilizers.py", line 647 in invariant_module_construction
+  File "/repos/sage-extensions/src/sage_extensions/categories/rational_integral_stabilizers.py", line 653 in invariant_module
+  File "/repos/sage-extensions/src/sage_extensions/categories/rational_integral_stabilizers.py", line 672 in finite_quotient_action
+  File "/repos/sage-extensions/src/sage_extensions/categories/rational_integral_stabilizers.py", line 676 in finite_module
+  File "/repos/sage-extensions/src/sage_extensions/categories/rational_integral_stabilizers.py", line 170 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/rational_integral_stabilizers.py", line 700 in finite_representation
+  File "/repos/sage-extensions/src/sage_extensions/categories/rational_integral_stabilizers.py", line 842 in right_cosets
+  File "/work/src/sage_indefinite_port/indefinite/eichler.py", line 489 in right_coset_transversal
+  File "/work/src/sage_indefinite_port/indefinite/eichler.py", line 1000 in primitive_covering_vectors
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1769 in primitive_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 109 in _computed_isotropic_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 75 in isotropic_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 195 in primitive_marking_classes
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 1626 in _isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 4898 in isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2318 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 513 in isotropic_orbit_representatives
+  File "/probes/p358_p10.py", line 58 in <module>
+[  559.37s] isotropic_orbit_representatives(1): 4 in 265.8s
+Traceback (most recent call last):
+  File "sage/structure/category_object.pyx", line 858, in sage.structure.category_object.CategoryObject.getattr_from_category
+    return self._cached_methods[name]
+KeyError: 'value'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/probes/p358_p10.py", line 63, in <module>
+    subobject = representatives.value(position_index)
+                ^^^^^^^^^^^^^^^^^^^^^
+  File "sage/structure/category_object.pyx", line 852, in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+  File "sage/structure/category_object.pyx", line 867, in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+  File "sage/cpython/getattr.pyx", line 362, in sage.cpython.getattr.getattr_from_other_class
+    raise AttributeError(dummy_error_message)
+AttributeError: 'FiniteOrderedSets.parent_class' object has no attribute 'value'
+[peakrss] p358row10: child waited=1 shell_code=1 samples=286
+[peakrss] peak tree RSS      : 1335 MiB
+[peakrss] low-water MemAvail : 5806 MiB
+[peakrss] peak single VmHWM  : 1335 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1324 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   306.4s procs=  3 rss=  1335 MiB hwm=  1335 MiB avail=  8852 MiB
+[peakrss]   t=   304.4s procs=  3 rss=  1333 MiB hwm=  1333 MiB avail=  8882 MiB
+[peakrss]   t=   302.4s procs=  3 rss=  1330 MiB hwm=  1330 MiB avail=  8904 MiB
+[peakrss]   t=   300.4s procs=  3 rss=  1328 MiB hwm=  1328 MiB avail=  8943 MiB
+[peakrss]   t=   298.4s procs=  3 rss=  1324 MiB hwm=  1324 MiB avail=  9001 MiB
+launcher exit: 1

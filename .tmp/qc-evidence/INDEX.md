@@ -495,3 +495,30 @@ eleven answers and a nine-variable form of `T_Co` refuses.
 | `issue371-lint.log` | the tree of this push | `test_lint` on the new module: **1 file, 0 findings** |
 | `issue371-qfsolve-bound.py`, `issue371-qfsolve-bound.log` | the tree of this push | `qfsolve` on `diag(-1, 1, …, 1)` for sizes 2 to 11: every size answers, so the `dim >= 10` refusal is not a size bound alone |
 | `issue371-tco-plane-call.py`, `issue371-tco-plane-call.log` | the tree of this push | `T_Co.Aut().isotropic_orbit_representatives(2)` = **1** orbit in 1423.4 s, `cusps(2)` = 1, `isotropic_orbit_representatives(1)` = 1, `cusps(1)` = 1, `tits_building_incidence()` = **1** edge in 62.2 s; whole run 1495.3 s, peak 747 MiB |
+## #358: the `Gamma_{Co,2}` line row on `T_Co`
+
+The row is `isotropic_orbit_representatives(1)` on `Gamma_{Co,2} = rho^{-1}(P)`, `P` the
+stabilizer in `O(q)` of `A_{U(2)} + A_{E8(-2)}` inside `A_{T_Co}`.  It returns **4 line orbits**.
+`|O(q)| = 46998591897600` and `|P| = 696729600` (the two summands' isometry-group orders; the
+engine's setwise stabilizer; and `|O(q)| / 67456`), `[O(T_Co) : Gamma_{Co,2}] = 67456`.  The stop
+this unit repaired was the point stabilizer handed over as a bare predicate: a generator request on
+a predicate subgroup of the *finite* group `O(A_{T_Co})` filtered an enumeration of all `4.7e13`
+elements, killed at 4282 MiB.  `TorsionFormOrthogonalGroup.stabilizer_of_classes` gives `P` its
+family (GAP's `Stabilizer` on the engine's own action) and `discriminant_point_stabilizer` keeps
+its predicate with that family attached.  Two stages do **not** realize and are recorded, not
+worked around: `Gamma_{Co,2}`'s Schreier family (`|S| * 67456 - 67455` members, ~2.3e7, killed at
+5484 MiB) and `discriminant_lift` of one generator of `P` (killed at 6254 MiB).
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue358-reproduction-and-summands.log` | `7ef38d52cf` (pre-push base) | `O(A_{T_Co})`'s order **returns in 4.0 s** (`46 998 591 897 600`, GAP `HasSize` true, the `#323` half-integral odd-rank branch); the three summands of `A_{T_Co}` and `A_{U(2)}^\perp = A_{E8(-2)} + <[h/2]>` from the Gram data; `\|P\|` two ways = 696 729 600; orbit of `A_{U(2)}` = 67 456 |
+| `issue358-the-predicate-stop.log` | `7ef38d52cf` | the stop: `orthogonal_quotients.py:706` -> `groups.py:5763` -> `groups.py:6755` -> `set_categories.py:4482`, **STOPPED at 4282 MiB** without returning in 2400 s; also the public `discriminant_point_orbit` at 67 456 in 318.9 s |
+| `issue358-the-engine-stabilizer.log` | `7ef38d52cf` | the engine's setwise stabilizer of the four classes: order 696 729 600, three generators, every one fixing the point (307.7 s with the set-image function) |
+| `issue358-the-action-comparison.log` | `7ef38d52cf` | GAP's own action against the set-image function on the same orbit: `Orbit` 67 456 in **2.89 s**, `Stabilizer` 696 729 600 in **86.85 s** |
+| `issue358-schreier-family-stop.log` | `7ef38d52cf` | `preimage.group_generators()` on `T_Co`: **killed at 5484 MiB** (no stack; the process was reaped with `MemAvail` 764 MiB) after `index = 67456` and the image orders were computed |
+| `issue358-the-lift-stop.log` | `7ef38d52cf` | `discriminant_lift` of one generator of `P`: **killed at 6254 MiB** |
+| `issue358-row-idle.log` | `7ef38d52cf` | the row on an idle machine: `isotropic_orbit_representatives(1)` -> **4** in 265.8 s, with `image_order`, `subgroup_image_order = 696729600` and `index = 67456` |
+| `issue358-row-and-representatives.log` | `7ef38d52cf` | the row's four representatives (vectors in the named basis, `div = 2`, `q = 0`) and their divided classes; the ambient stage costs 1917.5 s under contention |
+| `issue358-index-per-class.log` | `7ef38d52cf` | the four divided classes rebuilt from those vectors reproduce the row's own printed lines; `[Stab_{O(q)}(c) : rho(Stab_Gamma(v))]` = 256, 17 280, 34 560, 15 360 and the class counts 2, 135, 270, 120 summing to the 527 nonzero isotropic classes |
+| `issue358-card0125-regression.log` | `7ef38d52cf` | `tests/lattices/test_the_decomposition_preimage_returns_generators.sage` with the repair and the set-image function: 1 passed in 320.85 s |
+| `issue358-tests.log` | pushed head | `tests/lattices/test_the_coble_gamma_co_2_line_row_returns_generators.sage` and the card-`0125` test with `-p qc_sage_session -p suite_budget -p test_lint --no-time-gates`: **2 passed in 541.79 s** (391.07 s and 150.14 s), no lint findings, peak tree RSS 4381 MiB |

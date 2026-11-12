@@ -1,0 +1,140 @@
+[   37.87s] T_Co rank 11, |A| 2048, |O(q)| 46998591897600
+|P| = product of the summands: 696729600
+[   50.59s] summand orders
+[  202.75s] O(T_Co) generators: 346 in 152.2s
+Timeout (0:05:00)!
+Thread 0x00007e1bc8fd3780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2652 in stabilizer_of_classes
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3685 in discriminant_point_stabilizer
+  File "/probes/p358_p11.py", line 41 in <module>
+[  353.09s] preimage constructed in 150.3s
+[  389.90s] image order 46998591897600
+[  390.39s] subgroup image order 696729600 (== |P|: True)
+[  390.55s] index 67456 (index * |P| == |O(q)|: True)
+[  390.56s] rho(Gamma) as an owned subgroup: order 696729600 in 0.0s
+P's generator count 3
+Timeout (0:05:00)!
+Thread 0x00007e1bc8fd3780 [python] (most recent call first):
+  <invalid frame>
+Timeout (0:05:00)!
+Thread 0x00007e1bc8fd3780 [python] (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py", line 709 in __contains__
+  <invalid frame>
+Timeout (0:05:00)!
+Thread 0x00007e1bc8fd3780 [python] (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py", line 709 in __contains__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 172 in __contains__
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 1655 in source_element
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 1663 in fraction
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 2060 in zero
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 103 in __init__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 204 in _add_
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5061 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5060 in _isometry_from_column_matrix
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 8060 in eichler_transvection
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 193 in <lambda>
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 810 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line 1631 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 584 in lifts_integrally
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 591 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 586 in integral_parameter_classes
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 234 in _integral_lift_locus
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py", line 278 in integral_members
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1720 in _isotropic_pointed_isometry
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1597 in pointed_isometry
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1771 in <genexpr>
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1771 in primitive_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 109 in _computed_isotropic_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 75 in isotropic_vector_classes
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 195 in primitive_marking_classes
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 1626 in _isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 4898 in isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2318 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 513 in isotropic_orbit_representatives
+  File "/probes/p358_p11.py", line 58 in <module>
+Timeout (0:05:00)!
+Thread 0x00007e1bc8fd3780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line ??? in zero
+  <invalid frame>
+Timeout (0:05:00)!
+Thread 0x00007e1bc8fd3780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line ??? in __contains__
+  <invalid frame>
+Timeout (0:05:00)!
+Thread 0x00007e1bc8fd3780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/submonoids.py", line ??? in _selected_representation_kind
+  <invalid frame>
+[ 2308.05s] isotropic_orbit_representatives(1): 4 in 1917.5s
+  representative 0 {'ep': -1} q 0 div 2 divided class -[fp]
+  representative 1 {'h': 44168457980, 'ep': 1820311546, 'fp': 28029145070, 'a1': 30120546496, 'a2': 74620371507, 'a3': 65644225591, 'a4': 125373851653, 'a5': 93881685920, 'a6': 49779389922, 'a7': 31226948905, 'a8': 7801536729} q 0 div 2 divided class 44168457980*[h] + 28029145070*[ep] + 1820311546*[fp] + 5403132599*[a1] - 23866891361*[a2] + 24205946967*[a3] - 16601420288*[a4] - 12610130265*[a5] + 25549854981*[a6] - 4872971159*[a7] + 15623875447*[a8]
+  representative 2 {'h': 4, 'ep': -1, 'fp': -4, 'a1': 2, 'a2': 5, 'a3': 5, 'a4': 7, 'a5': 4, 'a7': 1, 'a8': 1} q 0 div 2 divided class 4*[h] - 4*[ep] - [fp] + [a1] - 3*[a2] - [a3] - [a5] + 5*[a6] - [a7] - [a8]
+  representative 3 {'h': -12563877094386, 'ep': 1972188049887, 'fp': -2958671514421, 'a1': -4739366612966, 'a2': -11144527454303, 'a3': -11048550525707, 'a4': -22422059246811, 'a5': -13569369774452, 'a6': -2402950410106, 'a7': -1502118700382, 'a8': -71496532492} q 0 div 2 divided class -12563877094386*[h] - 2958671514421*[ep] + 1972188049887*[fp] - 1569817299775*[a1] - 133004338205*[a2] - 5064324808363*[a3] + 9081670739160*[a4] + 2313729891987*[a5] - 10265587654622*[a6] + 529790458166*[a7] - 1359125635398*[a8]
+[ 2308.19s] row
+|P| as a permutation group: 696729600 == product: True
+------------------------------------------------------------------------
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x86e5) [0x7e1bc730a6e5]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8786) [0x7e1bc730a786]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8b54) [0x7e1bc730ab54]
+/lib/x86_64-linux-gnu/libc.so.6(+0x3fd70) [0x7e1bc9015d70]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa06a6) [0x7e1bc90766a6]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa1eeb) [0x7e1bc9077eeb]
+/lib/x86_64-linux-gnu/libc.so.6(malloc+0xfe) [0x7e1bc90789ce]
+/sage/.venv/bin/python() [0x1803a33]
+/sage/.venv/bin/python() [0x184a734]
+/sage/.venv/bin/python() [0x184a467]
+/sage/.venv/bin/python() [0x180e937]
+/sage/.venv/bin/python() [0x1812d85]
+/sage/.venv/bin/python() [0x1813512]
+/sage/.venv/bin/python() [0x18079ad]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/classcall_metaclass.cpython-314-x86_64-linux-gnu.so(+0xce9a) [0x7e1bc75d7e9a]
+/sage/.venv/bin/python() [0x1831230]
+/sage/.venv/bin/python() [0x1812dbd]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/classcall_metaclass.cpython-314-x86_64-linux-gnu.so(+0x9f78) [0x7e1bc75d4f78]
+/sage/.venv/bin/python() [0x1807764]
+/sage/.venv/bin/python() [0x1812dbd]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x182cc) [0x7e1bc74d02cc]
+/sage/.venv/bin/python() [0x1807764]
+/sage/.venv/bin/python() [0x1812dbd]
+/sage/.venv/bin/python() [0x1812656]
+/sage/.venv/bin/python() [0x1831230]
+/sage/.venv/bin/python() [0x1812dbd]
+/sage/.venv/bin/python() [0x1930c55]
+/sage/.venv/bin/python() [0x1807764]
+/sage/.venv/bin/python() [0x1812dbd]
+/sage/.venv/bin/python() [0x1812656]
+/sage/.venv/bin/python() [0x1831230]
+/sage/.venv/bin/python() [0x1812dbd]
+/sage/.venv/bin/python() [0x1930c55]
+/sage/.venv/bin/python() [0x1807764]
+/sage/.venv/bin/python() [0x1812dc6]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x182cc) [0x7e1bc74d02cc]
+/sage/.venv/bin/python() [0x1807764]
+/sage/.venv/bin/python() [0x1855b91]
+/sage/.venv/bin/python(PyEval_EvalCode+0xa6) [0x189b67c]
+/sage/.venv/bin/python() [0x18e2351]
+/sage/.venv/bin/python() [0x1a7048d]
+/sage/.venv/bin/python() [0x1a702c1]
+/sage/.venv/bin/python() [0x1984486]
+/sage/.venv/bin/python() [0x19843d4]
+/sage/.venv/bin/python() [0x19842e3]
+/sage/.venv/bin/python(Py_RunMain+0x40c) [0x1984f0c]
+/sage/.venv/bin/python() [0x1984ad6]
+/sage/.venv/bin/python() [0x198492c]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29ca8) [0x7e1bc8fffca8]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x85) [0x7e1bc8fffd65]
+/sage/.venv/bin/python(_start+0x29) [0x19fab29]
+------------------------------------------------------------------------
+[peakrss] p358row11: child waited=124 shell_code=124 samples=1199
+[peakrss] peak tree RSS      : 1527 MiB
+[peakrss] low-water MemAvail : 3647 MiB
+[peakrss] peak single VmHWM  : 1533 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1522 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  2314.7s procs=  3 rss=  1527 MiB hwm=  1533 MiB avail=  7862 MiB
+[peakrss]   t=  2316.7s procs=  3 rss=  1527 MiB hwm=  1533 MiB avail=  7860 MiB
+[peakrss]   t=  2318.7s procs=  3 rss=  1527 MiB hwm=  1533 MiB avail=  7854 MiB
+[peakrss]   t=  2320.7s procs=  3 rss=  1527 MiB hwm=  1533 MiB avail=  7849 MiB
+[peakrss]   t=  2322.7s procs=  3 rss=  1527 MiB hwm=  1533 MiB avail=  7848 MiB
+launcher exit: 124
