@@ -53,6 +53,56 @@ def test_the_full_chamber_of_the_cusp_lattice_has_ten_walls() -> None:
     assert all(lattice.b(root, root) in (ZZ(-2), ZZ(-4)) for root in roots)
 
 
+def test_the_subgroup_cusp_chamber_at_the_first_cusp_has_the_card_wall_count() -> None:
+    r"""Twelve walls on ``U(2) + E8(-2)`` with Sterk's twelve reflections, against card ``029J``.
+
+    The Enriques cusp lattice at Sterk's first cusp is ``U(2) + E8(-2)``: the
+    reduction ``v^perp/Zv`` of ``T_En = U + U(2) + E8(-2)`` at ``v = e``, the
+    generator of the unimodular plane, is the ``U(2) + E8(-2)`` part orthogonal
+    to ``e``, and the twelve roots Sterk prints for diagram 4.3.5 are vectors of
+    ``T_En`` lying in ``e^perp``, so their classes in the reduction are read here
+    by dropping the ``e``-coordinate.
+
+    The subgroup is the one Sterk names for that cusp: the reflections in the
+    twelve printed roots, which generate the reflection part of the image of the
+    stabilizer, since the reflections in the walls of a fundamental chamber
+    generate the reflection group.  The chamber of that subgroup anchored at the
+    cusp is what ``subgroup_cusp_chamber`` returns, and its wall count is the
+    number Sterk publishes for the diagram: the ``gamma-en-2`` row 4.3.5 of card
+    ``029J`` (H. Sterk, *Compactifications of the period space of Enriques
+    surfaces, Part I*, Math. Z. 207 (1991), §4.3.5, p. 19), read here by tag.
+
+    The membership is decided where it is decidable: the discriminant images of
+    the twelve reflections generate a subgroup of the finite orthogonal group of
+    the discriminant quotient, and one sifting test of a Schreier--Sims
+    stabilizer chain (A. Seress, *Permutation Group Algorithms*, Cambridge
+    University Press 2003, chapter 4) answers each root's question.  The walk
+    itself is Vinberg's (E. B. Vinberg, *On the groups of unit elements of
+    certain quadratic forms*, Math. USSR Sb. 16 (1972), §3.2, Proposition 4
+    (p. 28) and Proposition 5 (p. 29)), and it stops on the finite-volume
+    criterion, so ``is_complete_wall_set()`` is the algorithm's own termination
+    and not an extra certificate.
+    """
+    lattice = NamedLattices.SEn
+    roots = tuple(Sterk.sterks_in_TEn()["Sterk_1"])
+    labels = ("ep", "fp") + tuple(f"a{index}" for index in range(1, 9))
+    transported = tuple(
+        lattice([int(root.to_vector()(label)) for label in labels]) for root in roots
+    )
+    K = HyperbolicLattices(ZZ)(lattice)
+    generators = tuple(K.reflection(cls) for cls in transported)
+    cusp = lattice.module_generator("ep")
+    chamber = K.subgroup_cusp_chamber(cusp, generators=generators)
+    walls = tuple(chamber.wall_roots())
+    row = card("cusp_chambers", "029J")["rows"]["gamma-en-2"][0]
+
+    assert cardinal(sum(1 for _ in roots)) == cardinal(12)
+    assert all(lattice.q(cls) == ZZ(-4) for cls in transported)
+    assert chamber.is_complete_wall_set() is True
+    assert cardinal(sum(1 for _ in walls)) == cardinal(row["walls"])
+    assert all(lattice.b(root, root) in (ZZ(-2), ZZ(-4)) for root in walls)
+
+
 def test_the_root_filter_removes_a_wall_whose_reflection_it_refuses() -> None:
     r"""A refused root is not a wall, and every returned wall passes the filter.
 
