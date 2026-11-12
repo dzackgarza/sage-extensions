@@ -5573,7 +5573,7 @@ class Lattices(OwnedCategoryOverBaseRing):
             theorem whose own machinery exhibits no element, so asking this
             question must not cost an isometry.
             """
-            empty = other.Isom(self).is_empty()
+            empty = self.Isom(other).is_empty()
             assert empty is True or empty is False, (
                 f"cannot decide whether {self!r} and {other!r} are isometric: no available exact classification algorithm decides this pair"
             )
@@ -5644,30 +5644,35 @@ class Lattices(OwnedCategoryOverBaseRing):
             """
             if self._isometry_absent(other):
                 raise ValueError(
-                    f"there is no isometry from {other!r} to {self!r}: the two lattices are not isometric"
+                    f"there is no isometry from {self!r} to {other!r}: the two lattices are not isometric"
                 )
             assert self.module_rank().is_finite() and other.module_rank().is_finite(), (
-                f"no isometry matrix is returned between {other!r} and {self!r}: a matrix needs both to have finite rank"
+                f"no isometry matrix is returned between {self!r} and {other!r}: a matrix needs both to have finite rank"
             )
             rank = int(self.module_rank())
             assert rank == int(other.module_rank()), (
-                f"no isometry matrix is returned between {other!r} and {self!r}: their ranks {int(other.module_rank())} and {rank} differ"
+                f"no isometry matrix is returned between {self!r} and {other!r}: their ranks {rank} and {int(other.module_rank())} differ"
             )
-            isometry = other.Isom(self).an_element()
-            labels = tuple(self.module_generating_set())
+            isometry = self.Isom(other).an_element()
+            labels = tuple(other.module_generating_set())
             columns = tuple(
                 tuple(isometry(generator).to_vector()(label) for label in labels)
-                for generator in other.module_generators()
+                for generator in self.module_generators()
             )
-            matrix = self.base_ring().matrix_space(rank, rank).from_rows(
+            witness = self.base_ring().matrix_space(rank, rank).from_rows(
                 tuple(
                     tuple(column[row] for column in columns)
                     for row in range(rank)
                 )
             )
+            if witness.transpose() * other.gram_matrix() * witness != self.gram_matrix():
+                raise ArithmeticError(
+                    f"the isometry {isometry!r} of {self!r} into {other!r} fails the integral form equation: its coordinate matrix does not satisfy M^T G_other M = G_self, so it presents no isometry of these two lattices"
+                )
+            matrix = witness.inverse()
             if matrix.transpose() * self.gram_matrix() * matrix != other.gram_matrix():
                 raise ArithmeticError(
-                    f"the isometry {isometry!r} of {other!r} into {self!r} fails the integral form equation: its coordinate matrix does not satisfy M^T G_self M = G_other, so it presents no isometry of these two lattices"
+                    f"the inverse of the coordinate matrix of the isometry {isometry!r} does not satisfy M^T G_self M = G_other, so the matrix returned would not be the isometry it is documented as"
                 )
             return matrix
 
