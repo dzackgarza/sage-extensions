@@ -1,6 +1,6 @@
 r"""The free parameter of the plane block equations, and its exact search (#336).
 
-The `P_2` equation of Dutour Sikirić--Hulek, Theorem 4.9, printed p. 22, is
+The `P_2` equation of Dutour Sikirić--Hulek, Theorem 4.9, printed pp. 33--34, is
 
 $$(P_1 J P_2^t)^t + P_1 J P_2^t = \mathrm{remainder},$$
 

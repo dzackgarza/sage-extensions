@@ -1263,7 +1263,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             Sikirić–Hulek, *Moduli of polarised Enriques surfaces —
             computational aspects*, J. London Math. Soc. 110 (2024),
             arXiv:2302.01679v2, §"The Tits building", Theorem
-            (`theorem_isotropic_k_planes`, printed p. 22), which determines the
+            (`theorem_isotropic_k_planes`, printed pp. 33--34), which determines the
             \(I\)-block from the \(U\)-block; :meth:`levi_lift_generators`
             reads the same equation for the elementary matrices of \(GL(I)\).
             ``quotient_action`` is the isometry of \(I^\perp/I\) the element
@@ -1364,7 +1364,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             equation of Dutour Sikirić–Hulek, *Moduli of polarised Enriques
             surfaces — computational aspects*, J. London Math. Soc. 110 (2024),
             arXiv:2302.01679v2, §"The Tits building", Theorem
-            (`theorem_isotropic_k_planes`, printed p. 22), and the composed
+            (`theorem_isotropic_k_planes`, printed pp. 33--34), and the composed
             element is returned only after it is evaluated on ``source``.
 
             The call raises rather than answering ``None`` where it cannot
@@ -2170,7 +2170,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             normal form of the four images `\phi(E_{ij})` in the three coordinates
             `(s_{11}, s_{12}, s_{22})` of a symmetric matrix.  `J` is invertible in
             the block form of Dutour Sikirić--Hulek, Theorem 4.9
-            (`theorem_isotropic_k_planes`), arXiv:2302.01679v2, printed p. 22, so
+            (`theorem_isotropic_k_planes`), arXiv:2302.01679v2, printed pp. 33--34, so
             the image has rank three and that normal form is a `3 \times 3` basis
             `H`: then `s \in \Lambda_J` exactly when `\operatorname{adj}(H) s` is
             divisible by `\det H` entrywise, which is what the returned pair decides.
@@ -2475,7 +2475,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             :meth:`unipotent_parameter_vector`.  The block equations of
             :meth:`unipotent_block_solution` -- derived from the block form of Dutour
             Sikirić--Hulek, Theorem 4.9 (`theorem_isotropic_k_planes`),
-            arXiv:2302.01679v2, printed p. 22 -- determine the rest of the element
+            arXiv:2302.01679v2, printed pp. 33--34 -- determine the rest of the element
             from `c`:
 
             .. math::
@@ -2952,7 +2952,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             **The block form is cited; the consequence is derived and computed.**
             The basis and the Gram matrix are those of Dutour Sikirić--Hulek,
             arXiv:2302.01679v2, Theorem 4.9 (`theorem_isotropic_k_planes`), proof,
-            printed p. 22, and :meth:`plane_block_basis` and :meth:`plane_block_gram`
+            printed pp. 33--34, and :meth:`plane_block_basis` and :meth:`plane_block_gram`
             build and check them.  No published numbered statement gives this
             structure at a plane of a lattice without two hyperbolic planes --
             Scattone, *Mem. Amer. Math. Soc.* 374, §3.7, Proposition 3.7.3, which
@@ -3404,7 +3404,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             Dutour Sikirić--Hulek, *Moduli of polarised Enriques surfaces --
             computational aspects*, J. London Math. Soc. 110 (2024),
             arXiv:2302.01679v2, Theorem 4.9 (`theorem_isotropic_k_planes`),
-            proof, printed p. 22: "Let us take a basis
+            proof, printed pp. 33--34: "Let us take a basis
             \((e_{k+1}, \dots, e_{2k})\) of `Is` ... we can complete this to a
             basis \((e_{k+1}, \dots, e_n)\) of \(Is^\perp\) ... We then complete
             this to a basis of `L` by finding suitable vectors
@@ -3525,7 +3525,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             ``change`` is the change-of-basis matrix whose rows are the basis
             vectors' coordinates on the ambient lattice's generating set and
             ``inverse`` its inverse, and the blocks are as stated by Dutour
-            Sikirić--Hulek, Theorem 4.9, printed p. 22: `H = b(U,U)`,
+            Sikirić--Hulek, Theorem 4.9, printed pp. 33--34: `H = b(U,U)`,
             `J = b(U,P)`, `K = b(U,K)`, `A = b(K,K)`; the block `b(P,K)` is zero
             and is not returned.
             """
@@ -3656,7 +3656,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             r"""Return the integral isometry of `L` carrying `P` by ``action``, or ``None``.
 
             This solves the block equations of Dutour Sikirić--Hulek, Theorem
-            4.9 (`theorem_isotropic_k_planes`), printed p. 22, in the basis
+            4.9 (`theorem_isotropic_k_planes`), printed pp. 33--34, in the basis
             `(U \mid P \mid K)` of :meth:`plane_block_basis`, for an isometry
             whose block form is
 
@@ -4262,7 +4262,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             searched are Dutour Sikirić--Hulek, *Moduli of polarised Enriques
             surfaces -- computational aspects*, J. London Math. Soc. 110 (2024),
             arXiv:2302.01679v2, Theorem 4.9 (`theorem_isotropic_k_planes`,
-            printed p. 22): the second equation `J = P_1 J Q_1^t` determines
+            printed pp. 33--34): the second equation `J = P_1 J Q_1^t` determines
             `P_1` from the plane action alone, the third determines the
             `K`-mixing block, and the first is a linear system for the last
             block whose right side is symmetric and which therefore always has a
@@ -4621,7 +4621,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
 
             A **split** plane needs none of this: there `L = P \perp U \perp K`, the third
             block equation of Dutour Sikirić--Hulek, Theorem 4.9
-            (`theorem_isotropic_k_planes`), arXiv:2302.01679v2, printed p. 22, reads
+            (`theorem_isotropic_k_planes`), arXiv:2302.01679v2, printed pp. 33--34, reads
             `0 = P_3 A Q_3^t` and forces `P_3 = 0` for *every* quotient action, so every
             pair `(Q_1, Q_3)` lifts and the image is the product by the same equations.
 
@@ -4639,7 +4639,7 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
                     False,
                     f"no cited statement shows that the generators of the parabolic at {self} "
                     f"generate it: the block equations of Dutour Sikirić--Hulek, Theorem 4.9 "
-                    f"(arXiv:2302.01679v2, printed p. 22), and the three factors this decides "
+                    f"(arXiv:2302.01679v2, printed pp. 33--34), and the three factors this decides "
                     f"for a plane, are stated for a primitive isotropic plane, and this "
                     f"subobject has rank {rank}",
                 )

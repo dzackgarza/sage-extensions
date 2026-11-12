@@ -20,7 +20,7 @@ with the third block equation a linear system for $P_2$ that always has a
 rational solution and an integral one only on a finite-index subgroup of plane
 actions: D. Dutour Sikirić and K. Hulek, *Moduli of polarised Enriques surfaces
 -- computational aspects*, J. London Math. Soc. 110 (2024), arXiv:2302.01679v2,
-**Theorem 4.9** (`theorem_isotropic_k_planes`), proof, printed **p. 22**, in
+**Theorem 4.9** (`theorem_isotropic_k_planes`), proof, printed **pp. 33--34**, in
 their row-vector convention.  This module asserts that the plane's own lift
 family is nonempty at $P_2$ and that every generator the public call returns is
 an isometry of $T_{\mathrm{En}}$, carries $P_2$ onto itself, and has a
@@ -90,7 +90,7 @@ def test_the_plane_that_does_not_split_has_integral_levi_lifts() -> None:
     r"""$P_2$ has no complement orthogonal to $P_2^\perp/P_2$, and still has integral lifts.
 
     The lift of a plane action $M$ is the block matrix of Theorem 4.9 (Dutour
-    Sikirić--Hulek, arXiv:2302.01679v2, printed p. 22) solved over the integers;
+    Sikirić--Hulek, arXiv:2302.01679v2, printed pp. 33--34) solved over the integers;
     at $P_2$ the block $K = b(U, K)$ is nonzero and the $P_3$ block it forces is
     what the split case never needed.
     """
@@ -115,7 +115,7 @@ def test_the_setwise_stabilizer_of_the_plane_that_does_not_split_has_generators(
     are the unipotent radical's Eichler transvections, the reflections of the
     Levi factor on $P_2^\perp/P_2$, and the integral lifts of the Levi factor on
     $P_2$ -- the last the block equations of Dutour Sikirić--Hulek, Theorem 4.9,
-    printed p. 22, which a plane that does not split needs with its nonzero $K$
+    printed pp. 33--34, which a plane that does not split needs with its nonzero $K$
     block.
     """
     lattice = NamedLattices.TEn

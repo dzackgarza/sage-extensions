@@ -539,7 +539,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             the criterion is ``rho(g)`` in ``rho(K_v) rho(Gamma)``, computed in the
             finite group ``O(A_L)``; the quotient action is the quotient block of
             Dutour Sikirić--Hulek, arXiv:2302.01679v2, theorem
-            `theorem_isotropic_k_planes`, printed p. 22.
+            `theorem_isotropic_k_planes`, printed pp. 33--34.
 
             Where it is needed: Sterk's five Enriques cusp diagrams (H. Sterk,
             *Compactifications of the period space of Enriques surfaces, Part I*,

@@ -2032,7 +2032,7 @@ class _DividedClassPlaneOrbitDecomposition:
 
         The setwise stabilizer of a primitive isotropic plane ``x`` in ``O(L)``
         is the parabolic ``P_x`` of Dutour Sikirić--Hulek, arXiv:2302.01679v2,
-        Theorem 4.9 (``theorem_isotropic_k_planes``), printed p. 22: the
+        Theorem 4.9 (``theorem_isotropic_k_planes``), printed pp. 33--34: the
         isometries preserving ``x`` satisfy that theorem's block equations, and
         :meth:`sage_extensions.categories.isotropic_parabolics.PrimitiveIsotropicSubobjects.ParentMethods.parabolic_stabilizer_generators`
         solves them over ``ZZ`` -- the unipotent radical, the reflections of
@@ -2241,7 +2241,7 @@ class IsotropicVectorReductionImage(SageObject):
     there is the Levi map \(\lambda: P_v \to O(N)\) (D. Dutour Sikirić and
     K. Hulek, *Moduli of polarised Enriques surfaces — computational aspects*,
     arXiv:2302.01679v2, §"The Tits building", theorem `theorem_isotropic_k_planes`,
-    printed p. 22, the block form of an isometry preserving a primitive isotropic
+    printed pp. 33--34, the block form of an isometry preserving a primitive isotropic
     sublattice, with its quotient block).  Then
     \(G_v = \lambda(\Gamma \cap P_v) \le O(N)\) and
     \(K_v = \ker \lambda\) is the unipotent radical of \(P_v\).

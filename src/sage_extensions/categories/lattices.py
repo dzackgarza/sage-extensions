@@ -2749,7 +2749,7 @@ class Lattices(OwnedCategoryOverBaseRing):
         \(P^\perp/P\) and the integral lifts of the Levi factor on \(P\), and they
         are computed by integer linear algebra in this repository, from Dutour
         Sikirić--Hulek's block equations (Theorem 4.9, `theorem_isotropic_k_planes`,
-        printed p. 22), which determine them whether or not the plane splits off
+        printed pp. 33--34), which determine them whether or not the plane splits off
         the lattice.  The port's rank-two branch answers the same question by
         converting each rational generator of its integral-structure action to
         an integral isometry, and on \(T_{\mathrm{En}}\) that conversion did not
@@ -8607,7 +8607,10 @@ class Lattices(OwnedCategoryOverBaseRing):
             :meth:`half_vector_transvection_parameters`, and they are asserted
             here rather than assumed: with them every coefficient of the formula
             is an integer and every image is a lattice vector, which is checked
-            entry by entry before the isometry is constructed.  \(w \notin L\)
+            entry by entry before the isometry is constructed.  Each of them is
+            read on `w`'s own coordinates, so the check costs one pass over the
+            coordinates this method already holds and not a rescan of the dual
+            lattice's generators per parameter.  \(w \notin L\)
             is the point: these transvections act nontrivially on the
             discriminant classes of `L` where the integral ones do not.
             """
@@ -8618,11 +8621,6 @@ class Lattices(OwnedCategoryOverBaseRing):
             assert parameter.parent() is dual, (
                 f"the half-vector transvection t(e, w) of {self!r} needs w in the metric dual "
                 f"{dual!r}, but {parameter!r} lies in {parameter.parent()!r}"
-            )
-            assert parameter in self.half_vector_transvection_parameters(isotropic), (
-                f"{parameter} is not an admissible half-vector parameter for the transvection "
-                f"along {isotropic} of {self!r}: the integrality conditions of "
-                f"`half_vector_transvection_parameters` fail"
             )
             labels = tuple(self.module_generating_set())
             basis = tuple(self.module_generator(label) for label in labels)
@@ -8651,6 +8649,41 @@ class Lattices(OwnedCategoryOverBaseRing):
                 )
 
             half_norm = pairing(parameter_coordinates, parameter_coordinates) / SageQQ(2)
+            # The hypotheses are checked on this parameter alone -- the three conditions
+            # of `half_vector_transvection_parameters` that involve `w` together with the
+            # divisibility of `e` -- because they are exactly the conditions the formula
+            # below needs, and every one of them is read on the coordinates already held
+            # here.  Asking instead whether `parameter` lies in the family that method
+            # returns would recompute that family's scan of the dual lattice's generators
+            # and its Gram matrix once per parameter, which is the whole cost of
+            # `half_vector_transvection_generators`.
+            assert not any(
+                SageZZ(int(self.b(isotropic, vector))) % SageZZ(2) for vector in basis
+            ), (
+                f"the half-vector transvection t(e, w) of {self!r} needs e of divisibility "
+                f"two, and {isotropic} has an odd pairing with a generator of the lattice"
+            )
+            assert pairing(isotropic_coordinates, parameter_coordinates) == 0, (
+                f"{parameter} is not an admissible half-vector parameter for the transvection "
+                f"along {isotropic} of {self!r}: b(e, w) = "
+                f"{pairing(isotropic_coordinates, parameter_coordinates)}, which is not zero, "
+                f"so the formula would not fix e"
+            )
+            assert all(
+                SageQQ(2) * entry in SageZZ for entry in parameter_coordinates
+            ), (
+                f"{parameter} is not an admissible half-vector parameter for the transvection "
+                f"along {isotropic} of {self!r}: 2w = "
+                f"{[entry * 2 for entry in parameter_coordinates]} is not a lattice vector"
+            )
+            assert (
+                pairing(parameter_coordinates, parameter_coordinates).denominator() == 1
+            ), (
+                f"{parameter} is not an admissible half-vector parameter for the transvection "
+                f"along {isotropic} of {self!r}: q(w) = "
+                f"{pairing(parameter_coordinates, parameter_coordinates)} is not an integer, "
+                f"so the half-norm coefficient would not be"
+            )
             images = []
             for label, vector in zip(labels, basis, strict=True):
                 vector_coordinates = [SageQQ(int(vector.to_vector()(other))) for other in labels]

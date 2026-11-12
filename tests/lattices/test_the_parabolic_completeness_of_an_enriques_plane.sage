@@ -14,7 +14,7 @@ pointwise — and `is_parabolic_complete()` is `True` exactly when all three are
 At Sterk's $P_2$ of $T_{\mathrm{En}}$, which does *not* split off the lattice, all three
 hold, so the parabolic there is generated and `parabolic_obstruction()` is `None`; at
 $P_1$, which does split, the block equations force the answer directly.  What the block
-equations of Dutour Sikirić–Hulek, Theorem 4.9 (arXiv:2302.01679v2, printed p. 22), give
+equations of Dutour Sikirić–Hulek, Theorem 4.9 (arXiv:2302.01679v2, printed pp. 33--34), give
 on their own is the *lifts* of plane actions — their **Alg 1** computes the integral points
 of the rational group by a set-stabilizer computation in $GL_n(\mathbb{Z}/d\mathbb{Z})$ plus
 Schreier's lemma, which is the whole of $M$ and not a generating set of it — so the
@@ -81,7 +81,7 @@ def test_the_plane_actions_at_p2_are_all_of_the_general_linear_group() -> None:
     r"""Every plane action in $\mathrm{GL}_2(\mathbb{Z})$ occurs at $P_2$.
 
     The block equation of Dutour Sikirić--Hulek, Theorem 4.9 (arXiv:2302.01679v2,
-    printed p. 22), is $P_1 = J Q_1^{-t} J^{-1}$ with $J = b(U, P)$, so a plane
+    printed pp. 33--34), is $P_1 = J Q_1^{-t} J^{-1}$ with $J = b(U, P)$, so a plane
     action $Q_1$ admits an integral lift only if it preserves the row lattice of
     $J^t$.  At $P_2$ the block data is $J = 2 \cdot 1_2$, so that lattice is
     $2\mathbb{Z}^2$ and *no* congruence condition on $Q_1$ follows: the group of
