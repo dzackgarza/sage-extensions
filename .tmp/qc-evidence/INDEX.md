@@ -627,3 +627,15 @@ them, at the tree of the push `1df83be`.
 | `issue370-t-co-cusps-test-alone.log` | the tree of this push | `-k coble_cusps_three_four_and_five`: **1 passed in 408.73 s**, the three `K_I` runs with their transporters |
 | `issue370-cusp-lattice-consumer.log` | the tree of this push | `tests/lattices/test_cusp_lattices.sage`: **11 passed in 72.81 s** — where the two vectors of the fourth cusp are checked to be one cusp (their reductions are isometric) |
 | `issue370-card-row-consumer.log` | the tree of this push | `test_the_five_cusps_are_the_chamber_rows_of_card_029j`: **1 passed in 98.65 s** — the card comparison still finding four agreements, `Sterk_4` being (4.2.3)'s vector, not the chamber's |
+
+## #370 — the cusp-4 run at the card's vector, twice, for determinism
+
+`results/issue370-the-coble-root-orbits.md` §4 states that the cusp-4 classes no longer depend on an
+engine choice.  These are the two runs of that probe, in separate processes, at the tree of `8a21290`.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue370-cusp-four-determinism-run1.log` | `8a21290` (#370) | the eleven walls of Fig. 10, the card's cusp vector `(0,0,2,1,-4,...)` beside (4.2.3)'s `(0,0,1,2,-4,...)`, nine classes of `K_I`, one root class `[-2,4,8,12,16,20,14,-5,1]`, 37 stabilizer generators and **one orbit with its transporter**, in 2140.6 s |
+| `issue370-cusp-four-determinism-run2.log` | the tree of this push | the same probe again: the same eleven walls, the same nine classes, the same root class and the same one orbit |
+
+The probe is `issue370-cusp-four-determinism-probe.py`.
