@@ -749,13 +749,25 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             # transported by it.
             orthogonal_group = self.supergroup()
             ambient_flags = tuple(orthogonal_group.isotropic_orbit_representatives(2, flag=True))
+            quotient = self.finite_character_quotient()
             sourced_flags = []
             parabolic_routed = True
             for plane in self.isotropic_orbit_representatives(2):
                 plane_orbit_flags = []
                 for ambient_flag in ambient_flags:
                     _ambient_line, ambient_plane = ambient_flag.terms()
-                    witness = orthogonal_group.isotropic_equivalence_witness(ambient_plane, plane)
+                    # The row's own lifts carry the ambient representative to
+                    # each plane of the split, so the flag over it is read off
+                    # the lift instead of an isometry search (#391: the search
+                    # between word-transported planes reaches the port's
+                    # generic enumeration on this lattice).
+                    source_lift = quotient.isotropic_lift_of(ambient_plane)
+                    target_lift = quotient.isotropic_lift_of(plane)
+                    witness = (
+                        target_lift * ~source_lift
+                        if source_lift is not None and target_lift is not None
+                        else orthogonal_group.isotropic_equivalence_witness(ambient_plane, plane)
+                    )
                     if witness is None:
                         continue
                     plane_orbit_flags.append(witness.transport_isotropic_object(ambient_flag))
@@ -810,18 +822,30 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             # Two flag records over one (line cusp, plane cusp) pair are a multiple
             # edge.  Each record must be a distinct Gamma-orbit of flags, so a pair
             # of records whose flags are Gamma-equivalent is an over-split orbit,
-            # never an edge of the building.
-            for position, first in enumerate(incidences):
-                for second in incidences[position + 1:]:
-                    if first.line_cusp() is not second.line_cusp() or first.plane_cusp() is not second.plane_cusp():
-                        continue
-                    if self.isotropic_equivalence_witness(first.flag(), second.flag(), flag=True) is not None:
-                        raise ArithmeticError(
-                            f"the flags {first.flag()} and {second.flag()} of {lattice} are "
-                            f"equivalent under {self}, yet they are recorded as two flag orbits "
-                            f"over the line cusp {first.line_cusp()} and the plane cusp "
-                            f"{first.plane_cusp()}: the flag orbits are over-split"
-                        )
+            # never an edge of the building.  Where the flags came from the
+            # parabolic route this is decided already and the pairwise witness
+            # search is skipped: a Gamma-equivalence of two flags over one plane
+            # stabilizes that plane, so it lies in K = Gamma cap Stab(P), and the
+            # double cosets K \ Pi / (Pi cap Stab(ell_0)) enumerate the K-orbits
+            # of the lines of P -- two flags from distinct double cosets are in
+            # distinct K-orbits by construction (D. Dutour Sikirić and K. Hulek,
+            # arXiv:2302.01679v2, Lemma 3.6, printed p. 22, and the orbit--coset
+            # bijection the plane-orbit split of the same lemma uses).  Re-running
+            # it through the flag route would reach the indefinite port's generic
+            # flag-stabilizer enumeration, which is killed at the memory guard on
+            # this lattice.  The flag row keeps its own check below.
+            if not parabolic_routed:
+                for position, first in enumerate(incidences):
+                    for second in incidences[position + 1:]:
+                        if first.line_cusp() is not second.line_cusp() or first.plane_cusp() is not second.plane_cusp():
+                            continue
+                        if self.isotropic_equivalence_witness(first.flag(), second.flag(), flag=True) is not None:
+                            raise ArithmeticError(
+                                f"the flags {first.flag()} and {second.flag()} of {lattice} are "
+                                f"equivalent under {self}, yet they are recorded as two flag orbits "
+                                f"over the line cusp {first.line_cusp()} and the plane cusp "
+                                f"{first.plane_cusp()}: the flag orbits are over-split"
+                            )
             return finite_ordered_set(tuple(incidences))
 
         def _repr_(self):

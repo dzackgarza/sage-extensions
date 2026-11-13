@@ -191,6 +191,80 @@ class _GapWordSection:
         return tuple(int(index) for index in libgap.LetterRepAssocWord(word))
 
 
+def _double_coset_adjustment(subgroup_permutation, stabilizer_permutation, coset_point, permutation_product):
+    r"""One element of ``stabilizer_permutation`` inside ``subgroup_permutation * coset_point``, or ``None``.
+
+    This is the coset question :meth:`OrthogonalCharacterQuotient.adjust_witness_into_subgroup`
+    asks: an element ``x`` of the stabilizer image ``W`` with ``x`` in ``S * t``
+    (``S`` the subgroup's character image, ``t`` the witness image) exists
+    exactly when ``t`` lies in the product ``S * W``, because ``x = s t``
+    reads ``t = s^-1 x`` with ``s^-1`` in ``S`` and ``x`` in ``W``.  Membership
+    in a double coset of this shape is answered by GAP without listing it
+    (measured at ``|S| * |W| ~ 1.6 * 10^9``: instant), where
+    ``Intersection`` of a group with a coset domain enumerates the coset
+    (measured on the ``Gamma_{Co,2}`` row of ``T_Co``: the ambient witness and
+    the exact stabilizer both returned in seconds, and the intersection was
+    killed at 6.5 GiB against the runtime's memory guard,
+    ``.tmp/probe391d-tco.log``; the coset has ``|S| = 696729600`` elements
+    there).
+
+    The exhibited element walks the right cosets of ``W`` under right
+    multiplication by the generators of ``S`` and their inverses: ``t`` in
+    ``S * W`` means ``W t^-1 = W s^-1`` for some ``s`` in ``S`` (from
+    ``t = s w``), so the coset ``W t^-1`` lies on that walk, and the element
+    ``s`` that reaches it satisfies ``s t`` in ``W`` -- the required ``x``.
+    Each coset is keyed by its ``CanonicalRightCosetElement`` (two equal right
+    cosets have equal canonical elements, measured in the same log), so the
+    walk visits every coset once and its length is the index
+    ``[S : S cap W]``, never an enumeration of ``S``, of ``W`` or of the coset.
+    """
+    from sage.libs.gap.libgap import libgap
+
+    one = libgap.One(permutation_product)
+    if not bool(
+        coset_point
+        in libgap.DoubleCoset(subgroup_permutation, one, stabilizer_permutation)
+    ):
+        return None
+    generators = list(libgap.GeneratorsOfGroup(subgroup_permutation))
+    steps = [generator for generator in generators]
+    steps.extend(generator ** -1 for generator in generators)
+    base_key = str(
+        libgap.CanonicalRightCosetElement(stabilizer_permutation, one)
+    )
+    needle_key = str(
+        libgap.CanonicalRightCosetElement(stabilizer_permutation, coset_point ** -1)
+    )
+    reached = {base_key: one}
+    frontier = [one]
+    while needle_key not in reached:
+        following = []
+        for element in frontier:
+            for step in steps:
+                image = element * step
+                key = str(
+                    libgap.CanonicalRightCosetElement(stabilizer_permutation, image)
+                )
+                if key in reached:
+                    continue
+                reached[key] = image
+                following.append(image)
+        if not following:
+            # The double coset above contains coset_point, so the coset
+            # W coset_point^-1 is W s^-1 for the s that factors coset_point
+            # over S * W: the walk must reach it.  Missing it means the
+            # canonical keys do not identify the cosets GAP's DoubleCoset
+            # membership decided on, which is an engine inconsistency rather
+            # than a negative answer.
+            raise ArithmeticError(
+                "the double-coset membership admitted a coset element that the "
+                "canonical coset walk did not reach: the coset keys and the "
+                "double coset disagree on the same finite permutation group"
+            )
+        frontier = following
+    return reached[needle_key] * coset_point
+
+
 class OrthogonalCharacterQuotient:
     r"""The finite image of ``O(L)`` under the characters defining a subgroup.
 
@@ -1932,6 +2006,214 @@ class OrthogonalCharacterQuotient:
     def witness_meets_subgroup(self, witness, stabilizer_generators) -> bool:
         return self.adjust_witness_into_subgroup(witness, stabilizer_generators) is not None
 
+    def separates_witness_orbits(self, witness, left) -> bool:
+        r"""Whether the finite character image proves no subgroup element carries ``left`` past ``witness``.
+
+        ``witness`` is an isometry of the lattice carrying the primitive
+        isotropic subobject ``left`` to ``witness(left)``.  The two lie in one
+        subgroup orbit exactly when some subgroup element does the same
+        carrying, and this method decides *separation* -- that no such element
+        exists -- on the finite character image alone, before any integral
+        stabilizer is computed (#391: on the ``Gamma_{Co,2}`` row of ``T_Co``
+        every failed transporter search of the cusp rows reached the exact
+        stabilizer route through the absence of this decision, and the
+        adjustment inside it was killed at the memory guard).
+
+        * **Rank one.**  The divided discriminant class of a line is
+          equivariant, ``[g v / div(g v)] = chi(g) [v / div(v)]`` -- an
+          isometry preserves primitivity and divisibility, and the class of the
+          image is the image of the class under the discriminant
+          representation.  A subgroup element carrying ``left`` to
+          ``witness(left)`` therefore maps the class set of ``left`` onto the
+          class set of ``witness(left)``, so the two lines are separated as
+          soon as their class sets lie in different orbits of ``rho(Gamma)``
+          (the discriminant projection of the retained character condition,
+          :meth:`_joint_discriminant_image_gap`).  The test walks that orbit:
+          its length is the orbit of a class set, at most the number of
+          isotropic classes of ``A_L``.  This direction needs no hypothesis:
+          the equivariance holds for every isometry.
+
+        * **Rank two, complete parabolic.**  A subgroup element ``gamma``
+          carrying ``left`` to ``witness(left)`` factors as ``witness s`` with
+          ``s`` in ``Stab(left)``, so ``chi(witness)`` lies in
+          ``chi(Gamma) chi(Stab(left))``.  Where the plane's parabolic is
+          certified complete (:meth:`is_parabolic_complete`, #331, #366) the
+          image of its family is exactly ``chi(Stab(left))``, and the test is
+          one double-coset membership -- answered by GAP without listing the
+          double coset.  Both answers are exact for a quotient without sign
+          factors; with sign factors a negative still separates (the
+          discriminant component of a subgroup element lies in
+          ``rho(Gamma)``), while a positive is inconclusive and the caller
+          keeps its integral route.
+
+        Any other case returns ``False``: no cheap decision is claimed, and the
+        caller decides through its own exact route.
+        """
+        from sage.libs.gap.libgap import libgap
+
+        if not self._has_discriminant:
+            return False
+        lattice = self.lattice
+        rank = int(left.module_rank())
+        if rank == 1:
+            source = _isotropic_line_class_points(lattice, left)
+            target = _isotropic_line_class_points(
+                lattice, witness.transport_isotropic_object(left)
+            )
+            return str(target) not in self.isotropic_class_orbit(source)
+        if rank == 2 and left.is_parabolic_complete() is True:
+            from sage_extensions.categories.group.groups import (
+                _element_to_engine,
+                _gap_model,
+            )
+
+            witness_image = _element_to_engine(
+                self._discriminant_group, self.image(witness)["discriminant"]
+            )
+            engine = _gap_model(self._discriminant_group)
+            stabilizer_image = self.parabolic_image_subgroup(left)
+            return not bool(
+                witness_image
+                in libgap.DoubleCoset(
+                    self._joint_discriminant_image_gap(),
+                    libgap.One(engine),
+                    stabilizer_image,
+                )
+            )
+        return False
+
+    @cached_method
+    def isotropic_class_orbit(self, point):
+        r"""The ``rho(Gamma)``-orbit of a set of discriminant classes, as a set of string keys.
+
+        The equivariance of the divided class makes this orbit an invariant of
+        the subgroup orbits (see :meth:`separates_witness_orbits`); the walk
+        is bounded by the orbit of the class data, at most the number of
+        classes of ``A_L``.
+        """
+        from sage.libs.gap.libgap import libgap
+
+        generators = list(
+            libgap.GeneratorsOfGroup(self._joint_discriminant_image_gap())
+        )
+        setwise_action = libgap.function_factory(
+            "function(x, g) return Set(List(x, y -> ImageElm(g, y))); end"
+        )
+        seen = {str(point)}
+        frontier = [point]
+        while frontier:
+            following = []
+            for reached in frontier:
+                for generator in generators:
+                    image = setwise_action(reached, generator)
+                    marker = str(image)
+                    if marker in seen:
+                        continue
+                    seen.add(marker)
+                    following.append(image)
+            frontier = following
+        return seen
+
+    def invariant_separates_isotropic_orbits(self, left, right) -> bool:
+        r"""Whether the equivariant class data of two primitive isotropic subobjects lies in different ``rho(Gamma)``-orbits.
+
+        A subgroup element carrying ``left`` to ``right`` maps the divided
+        class data of ``left`` onto that of ``right`` -- the class of the
+        image is the image of the class -- so differing orbits separate the
+        subobjects before any isometry search runs (#391: on ``T_Co`` the
+        indefinite port's plane isometry between two word-transported
+        representatives of the ``Gamma_{Co,2}`` row reaches PARI's ``qfauto``
+        on the reduction of the transported basis, and the search is killed
+        at the memory guard; the separated pairs never start it).  For a
+        line the data is its divided class set; for a plane the divided
+        classes of its two generators and their sum.
+        """
+        if not self._has_discriminant:
+            return False
+        lattice = self.lattice
+        rank = int(left.module_rank())
+        if rank == 1:
+            source = _isotropic_line_class_points(lattice, left)
+            target = _isotropic_line_class_points(lattice, right)
+        elif rank == 2:
+            from sage.libs.gap.libgap import libgap
+
+            from sage_extensions.categories.isotropic_orbits import (
+                _divided_discriminant_classes,
+            )
+
+            finite_orthogonal = lattice.discriminant_group().orthogonal_group()
+            engine_set = lambda classes: libgap.Set(
+                [
+                    finite_orthogonal._engine_abelian_element(class_)
+                    for class_ in classes
+                ]
+            )
+            source = engine_set(_divided_discriminant_classes(lattice, left))
+            target = engine_set(_divided_discriminant_classes(lattice, right))
+        else:
+            return False
+        return str(target) not in self.isotropic_class_orbit(source)
+
+    def register_isotropic_lift(self, plane, lift):
+        r"""Record the parabolic split's lift of one plane representative.
+
+        The plane-orbit split transports the ambient representative to each
+        orbit's representative by one lift; the registry retains the pair, so
+        the composite of two registered lifts is an ambient isometry between
+        the two representatives that no isometry search has to find (#391:
+        the search itself is what reaches the port's generic enumeration on
+        this lattice).  The registry retains its keys.
+        """
+        self.__dict__.setdefault("_isotropic_lift_registry", {})[plane] = lift
+
+    def isotropic_lift_of(self, plane):
+        r"""The registered lift of a plane, matched by span equality.
+
+        Two registered planes lie in one subgroup orbit exactly when the
+        composite of one lift with the inverse of the other lies in the
+        subgroup -- a question the finite character image decides.  The
+        matching is by span equality, so an equal-but-distinct object finds
+        its lift too.
+        """
+        from sage_extensions.categories.isotropic_orbits import _same_subobject
+
+        for registered, lift in self.__dict__.get(
+            "_isotropic_lift_registry", {}
+        ).items():
+            if _same_subobject(registered, plane):
+                return lift
+        return None
+
+    @cached_method
+    def parabolic_image_subgroup(self, plane):
+        r"""The discriminant image of a complete plane's parabolic, as a GAP subgroup of ``O(A_L)``.
+
+        The family of :meth:`plane.parabolic_stabilizer_generators` generates
+        the plane's stabilizer exactly when :meth:`is_parabolic_complete`
+        holds, and the image of a generated group is the group generated by
+        the images, so the subgroup returned here *is*
+        ``rho(Stab_{O(L)}(plane))`` in that case -- the right-hand group the
+        double-coset decisions of :meth:`separates_witness_orbits` and the
+        plane-orbit split need.  The family is the plane's own cached one, so
+        the images are computed once per plane, not once per pair.
+        """
+        from sage.libs.gap.libgap import libgap
+        from sage_extensions.categories.group.groups import (
+            _element_to_engine,
+            _gap_model,
+        )
+
+        rho = self.lattice.discriminant_representation()
+        engine = _gap_model(self._discriminant_group)
+        return libgap.Subgroup(
+            engine,
+            [
+                _element_to_engine(self._discriminant_group, rho(generator))
+                for generator in plane.parabolic_stabilizer_generators()
+            ],
+        )
+
     def adjust_witness_into_subgroup(self, witness, target_stabilizer_generators):
         r"""Left-adjust ``witness`` by the target stabilizer until it lies in the subgroup.
 
@@ -1966,16 +2248,20 @@ class OrthogonalCharacterQuotient:
         stabilizer_permutation = libgap.Image(to_permutation, stabilizer_gap)
         subgroup_permutation = libgap.Image(to_permutation, self._gap_character_target())
         reversed_product = _law_reversed(self._model_factors()[0][1])
-        # For a reversed model, chi(t*g) is a*w. Choose u in S*a
-        # intersect W and set w=u^-1, so a*w lies in S. For a model
-        # preserving products, choose w directly from S*a^-1 intersect W.
-        candidates = libgap.Intersection(
+        # The element of the stabilizer image inside the subgroup's coset is
+        # exhibited by a double-coset membership and a canonical coset walk,
+        # never by an intersection with a coset domain: GAP answers membership
+        # in a double coset of hundreds of millions of elements instantly,
+        # while the intersection enumerates the coset (both measured; see
+        # _double_coset_adjustment).
+        chosen = _double_coset_adjustment(
+            subgroup_permutation,
             stabilizer_permutation,
-            libgap.RightCoset(subgroup_permutation, point if reversed_product else point ** -1),
+            point if reversed_product else point ** -1,
+            permutation_product,
         )
-        if bool(libgap.IsEmpty(candidates)):
+        if chosen is None:
             return None
-        chosen = libgap.Representative(candidates)
         if reversed_product:
             chosen = chosen ** -1
         # Factor the chosen stabilizer image over the stabilizer's own
@@ -2906,9 +3192,42 @@ def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
     if not family:
         return None
     quotient = subgroup.finite_character_quotient()
-    return tuple(
-        splitting.transport_isotropic_object(representative)
-        for splitting in quotient.splitting_isometries(family)
+    splittings = tuple(quotient.splitting_isometries(family))
+    # The split's own lifts are retained with the representatives they
+    # produced: they are ambient isometries between the representatives, so
+    # the consumers of the row never search for one (#391 -- the search is
+    # what reaches the port's generic enumeration on this lattice).
+    quotient.register_isotropic_lift(representative, quotient.supergroup.one())
+    representatives = []
+    for splitting in splittings:
+        transported = splitting.transport_isotropic_object(representative)
+        quotient.register_isotropic_lift(transported, splitting)
+        representatives.append(transported)
+    return tuple(representatives)
+
+
+def _isotropic_line_class_points(lattice, line):
+    r"""The engine set of the divided classes ``{c, -c}`` of a primitive isotropic line.
+
+    The line's generator ``v`` has a divisibility ``div(v)`` and a divided
+    class ``[v / div(v)]`` in ``A_L``; an unoriented line is the *set*
+    ``{v, -v}``, so the class datum of the line is the set ``{c, -c}`` -- the
+    same set :meth:`OrthogonalCharacterQuotient.isotropic_line_stabilizer_image`
+    builds for its stabilizer, read here for the equivariance alone.
+    """
+    from sage.libs.gap.libgap import libgap
+
+    inclusion = line.inclusion()
+    domain = inclusion.domain()
+    label = next(iter(domain.module_generating_set()))
+    vector = inclusion(domain.module_generator(label))
+    discriminant_class = lattice.divided_discriminant_class(vector)
+    finite_orthogonal = lattice.discriminant_group().orthogonal_group()
+    return libgap.Set(
+        [
+            finite_orthogonal._engine_abelian_element(discriminant_class),
+            finite_orthogonal._engine_abelian_element(-discriminant_class),
+        ]
     )
 
 
@@ -3123,15 +3442,36 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
 
 def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False):
     orthogonal_group = subgroup.supergroup()
-    witness = orthogonal_group.isotropic_equivalence_witness(
-        left, right, flag=flag
+    quotient = None
+    if subgroup.contains_character_kernel():
+        quotient = subgroup.finite_character_quotient()
+        # The equivariant class data separates the orbits of two primitive
+        # isotropic subobjects before any isometry search runs: a subgroup
+        # element carrying one to the other maps the class data of the first
+        # onto that of the second (#391: the plane isometry between two
+        # word-transported representatives reaches the port's generic
+        # enumeration on this lattice, and the separated pairs never start it).
+        if not flag and quotient.invariant_separates_isotropic_orbits(left, right):
+            return None
+    # The parabolic split's own lifts are ambient isometries between the
+    # representatives it produced, so two registered planes have a witness
+    # that no isometry search has to find (#391).
+    left_lift = quotient.isotropic_lift_of(left) if quotient is not None else None
+    right_lift = quotient.isotropic_lift_of(right) if quotient is not None else None
+    witness = (
+        right_lift * ~left_lift
+        if left_lift is not None and right_lift is not None
+        else orthogonal_group.isotropic_equivalence_witness(left, right, flag=flag)
     )
     if witness is None:
         return None
     if witness in subgroup:
         return witness
     _assert_isotropic_splitting_has_character_data(subgroup)
-    quotient = subgroup.finite_character_quotient()
+    if quotient is None:
+        quotient = subgroup.finite_character_quotient()
+    if not flag and quotient.separates_witness_orbits(witness, left):
+        return None
     stabilizer = quotient.exact_isotropic_stabilizer_generators(right, flag=flag)
     return quotient.adjust_witness_into_subgroup(witness, stabilizer)
 
