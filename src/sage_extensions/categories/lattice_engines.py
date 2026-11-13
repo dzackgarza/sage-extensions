@@ -7,6 +7,7 @@ from sage.rings.integer import Integer as SageInteger
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.rational_field import QQ as SageQQ
 from sage.modules.free_module_element import vector as sage_vector
+from sage.libs.pari import pari
 from itertools import combinations_with_replacement
 
 from sage_extensions.categories.rings.ring_foundation import (
@@ -27,6 +28,19 @@ from sage_extensions.tensors.tensor import (
     tensor,
 )
 from sage_extensions.validation import validator
+
+
+# The PARI stack grows to what a computation needs, not beyond the
+# one-gigabyte maximum Sage constructs its PARI instance with.  The library
+# sets that growth limit here, at its PARI owner, once per session, as the
+# PARI manual's parisizemax default advises (The PARI Group, *PARI/GP*,
+# parisizemax: "It is possible to increase or decrease parisizemax inside a
+# running gp session, just use default as usual").  The ceiling is the
+# eight-gigabyte maximum the Sage image already sets (c052225, from
+# dzackgarza/sage c2c314e), so this owner never lowers it: it covers the
+# library's heaviest measured need, the rank-17 genus enumeration (#317),
+# and the automorphism count of <18> + E8 (#377).
+pari.default("parisizemax", "8G")
 
 
 @validator

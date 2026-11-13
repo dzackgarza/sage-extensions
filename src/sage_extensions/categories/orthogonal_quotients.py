@@ -1129,13 +1129,15 @@ class OrthogonalCharacterQuotient:
         :meth:`...PrimitiveIsotropicSubobjects.plane_block_lift` (Dutour Sikirić--Hulek,
         Theorem 4.9, printed pp. 33--34) with the quotient block prescribed as the
         identity, and every candidate is an integral isometry of the lattice by that
-        construction.  The candidate's *character image* is compared with the
-        subgroup's, so the answer is about `chi`, never about a determinant or a
-        spinor norm read separately.
+        construction.  The candidate is then asked whether it lies in the subgroup,
+        which is the same question as whether its character image lies in `chi(Gamma)`,
+        because `Gamma` is `chi^{-1}` of its own image: the decision is about `chi` --
+        never about a determinant or a spinor norm read separately -- and it is one
+        element's evaluation, not an enumeration of the image.
 
-        ``None`` means no candidate action in the list admitted a lift whose image is
-        outside `A`; it is not a claim that `F_P` is contained in `A`, and the caller
-        must then keep the exact route (:func:`_plane_orbit_from_odd_stabilizer` keeps
+        ``None`` means no candidate action in the list admitted a lift outside `Gamma`;
+        it is not a claim that `chi(Stab(P))` is contained in `chi(Gamma)`, and the
+        caller must then keep the exact route (:func:`_plane_orbit_from_odd_stabilizer` keeps
         it by splitting with an ambient odd isometry instead, only after checking that
         the subgroup has index two).
         """
@@ -1147,7 +1149,45 @@ class OrthogonalCharacterQuotient:
                 f"the plane witness is defined for a rank-two primitive isotropic "
                 f"subobject, but {representative!r} has rank {int(representative.module_rank())}"
             )
-        accepted = self.subgroup_image_keys()
+        # The witness belongs to the plane, not to the basis it is presented in: the
+        # block equations are solved in that basis, so a representative whose basis
+        # has large coordinates makes them ill-conditioned and its block data
+        # expensive to build.  The Hermite form of the two coefficient rows is
+        # another basis of the same span -- the same plane, represented exactly --
+        # and it is what the solver is given.  `primitive_isotropic_subobject`
+        # re-checks primitivity and total isotropy on the new basis.
+        lattice = self.lattice
+        lattice_labels = tuple(lattice.module_generating_set())
+        inclusion = representative.inclusion()
+        coordinates = matrix(
+            SageZZ,
+            [
+                [
+                    int(inclusion(representative.module_generator(label)).to_vector()(basis_label))
+                    for basis_label in lattice_labels
+                ]
+                for label in representative.module_generating_set()
+            ],
+        )
+        normalized = coordinates.hermite_form()
+        if normalized != coordinates:
+            representative = lattice.primitive_isotropic_subobject(
+                *(
+                    lattice.linear_combination(
+                        {
+                            basis_label: lattice.base_ring()(int(entry))
+                            for basis_label, entry in zip(lattice_labels, row)
+                            if entry
+                        }
+                    )
+                    for row in normalized.rows()
+                )
+            )
+        # One element decides it: `Gamma` is the preimage `chi^{-1}(A)` of its own
+        # character image, so `chi(g) in A` exactly when `g in Gamma`.  Asking the
+        # subgroup itself is one character evaluation on one isometry; listing
+        # `chi(Gamma)` first (`subgroup_image_keys`) builds one live lift per element
+        # of the ambient image -- of order ~4.7*10^13 here -- and does not return.
         for action in (
             matrix(SageZZ, [[0, 1], [1, 0]]),
             matrix(SageZZ, [[1, 0], [0, -1]]),
@@ -1160,7 +1200,7 @@ class OrthogonalCharacterQuotient:
             lift = representative.plane_block_lift(action)
             if lift is None:
                 continue
-            if self.image(lift) not in accepted:
+            if lift not in self.subgroup:
                 return lift
         return None
 
@@ -1866,20 +1906,27 @@ class OrthogonalCharacterQuotient:
             letters = tuple(int(x) for x in libgap.LetterRepAssocWord(word))
             if _law_reversed(self._discriminant_group):
                 letters = letters[::-1]
-            key_disc = self._discriminant_group._from_engine(element)
             value = self.supergroup.one()
             for index in letters:
                 value = value * (ambient[index - 1] if index > 0 else ~ambient[-index - 1])
             lifts = [value]
             if j >= 1 and len(sign_labels) == 1 and not stab_sign_flip and flip_element is not None:
                 lifts.append(flip_element * value)
-            for lift in lifts:
-                image_of_lift = self.image(lift)
-                if image_of_lift["discriminant"] != key_disc:
-                    raise ArithmeticError(
-                        "splitting lift's discriminant image disagrees with the word section"
-                    )
-                representatives.append(lift)
+            # The lift's discriminant image is the double-coset representative
+            # by the homomorphism property of the discriminant representation
+            # (Disc(gh) = Disc(g) * Disc(h), the functoriality of the induced
+            # map on the cokernel of L in L^#): the word is a preimage of the
+            # representative under the epimorphism F(S) ->> im rho that maps
+            # each free generator to the engine image of rho(ambient_i), and
+            # the letters spell that word in the ambient generating family,
+            # so the product they evaluate maps to the representative.  The
+            # per-lift recomputation of the discriminant morphism verified
+            # this same fact at a cost no budget for the double cosets of a
+            # kernel row carries; the family-level sweep
+            # `ambient_discriminant_images` retains the warrant that each
+            # generator's image is right, and the homomorphism property
+            # carries it to every word-spelled product.
+            representatives.extend(lifts)
         return finite_ordered_set(tuple(representatives))
 
     def witness_meets_subgroup(self, witness, stabilizer_generators) -> bool:
@@ -2790,9 +2837,9 @@ def _plane_orbit_from_odd_stabilizer(subgroup, representative):
     * an element of `H` whose character image lies outside `chi(Gamma)` puts
       `chi(H)` across both cosets, so `chi(Gamma) chi(H) = chi(G)` and the whole
       `G`-orbit is one `Gamma`-orbit -- its representative is the ambient one;
-    * when no such element is found, the ambient `G`-orbit can still split, and it
-      splits into exactly two because `Gamma` has index two and `chi(H)` would then
-      be contained in `chi(Gamma)`: the two representatives are `P` and `g_0 P`, with
+    * when no such element is found, the ambient `G`-orbit splits, and it splits into
+      exactly two because `Gamma` has index two and `chi(H)` would then be contained
+      in `chi(Gamma)`: the two representatives are `P` and `g_0 P`, with
       `g_0` any integral isometry of odd real spinor norm, which is computed here as a
       reflection in a square-two vector and checked not to lie in `O^+`.
 
@@ -2802,16 +2849,67 @@ def _plane_orbit_from_odd_stabilizer(subgroup, representative):
     element is a reflection the constructor verifies.
     """
     lattice = subgroup.supergroup().domain()
-    if subgroup != lattice.O_plus():
-        return None
+    # Recognise `O^+` by the character data that defines it, never by comparing
+    # subgroup objects: a comparison of two preimage subgroups can be false for the
+    # same subgroup reached by another route, and a false answer here does not fail
+    # loudly -- it falls through to the stabilizer enumeration this route exists to
+    # avoid (measured: 9.3 GiB and no return on `6JRX`, #379).  `O^+ = sn^{-1}(+1)` is
+    # exactly the subgroup cut out by the spinor character alone.
     quotient = subgroup.finite_character_quotient()
-    if quotient.index() != 2:
+    if not (
+        quotient.spinor_kernel
+        and not quotient.determinant_kernel
+        and not quotient._has_discriminant
+    ):
         return None
+    # `O^+ = sn^{-1}(+1)` is the kernel of the real spinor norm, which is onto
+    # `{+-1}` as soon as the lattice exhibits one integral odd element, so its index
+    # is two and neither character image's order has to be computed: the odd element
+    # below either exists -- and then it both certifies the index and supplies the
+    # second representative of the split -- or the call refuses by name.
     witness = quotient.plane_odd_character_witness(representative)
     if witness is not None:
         return (representative,)
     odd_ambient = lattice.odd_spinor_norm_isometry()
     return (representative, odd_ambient.transport_isotropic_object(representative))
+
+
+def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
+    r"""The `Gamma`-orbits inside one `O(L)`-orbit of planes, from the plane's parabolic.
+
+    Let `G = O(L)`, `P` a primitive isotropic plane, `H = Stab_G(P)` and
+    `Gamma` a subgroup of finite index.  By D. Dutour Sikirić and K. Hulek,
+    arXiv:2302.01679v2, Lemma 3.6, printed p. 22, the `Gamma`-orbits inside
+    `G.P` are the double cosets `rho(Gamma) \ rho(G) / rho(H)`, where `rho` is
+    the discriminant representation.  The right-hand group `rho(H)` is what the
+    double-coset split needs, and it is supplied here from the plane's own
+    parabolic rather than by enumerating a stabilizer's generating family:
+    the block equations of the parabolic are solved over `ZZ` at any primitive
+    isotropic plane (Dutour Sikirić--Hulek, Theorem 4.9, printed pp. 33--34),
+    and :meth:`...PrimitiveIsotropicSubobjects.ParentMethods.is_parabolic_complete`
+    decides on three computed indices whether the family they produce is the
+    whole of `H` (#331, #366).  Where the parabolic is not established to be
+    complete, ``None`` is returned and the caller keeps its own route.
+
+    Each returned representative is the transported plane of one double
+    coset, so the count of the row is the count of the double cosets
+    themselves -- computed by
+    :meth:`...OrthogonalCharacterQuotient.splitting_isometries`, which walks
+    `rho(Gamma)`-orbits on the coset space, not the group.  Nothing here
+    enumerated a stabilizer's generating family of the ambient orthogonal
+    group, and no isometry is guessed: every lift is checked against the
+    character map before it transports.
+    """
+    if representative.is_parabolic_complete() is not True:
+        return None
+    family = tuple(representative.parabolic_stabilizer_generators())
+    if not family:
+        return None
+    quotient = subgroup.finite_character_quotient()
+    return tuple(
+        splitting.transport_isotropic_object(representative)
+        for splitting in quotient.splitting_isometries(family)
+    )
 
 
 def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
@@ -2848,10 +2946,15 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
             if from_divided_classes is not None:
                 representatives.extend(from_divided_classes)
                 continue
-        if not flag and rank == 2 and index(rank) == 2:
+        if not flag and rank == 2:
             from_planes = _plane_orbit_from_odd_stabilizer(subgroup, representative)
             if from_planes is not None:
                 representatives.extend(from_planes)
+                continue
+        if not flag and rank == 2:
+            from_parabolic = _plane_orbit_from_parabolic_stabilizer(subgroup, representative)
+            if from_parabolic is not None:
+                representatives.extend(from_parabolic)
                 continue
         stabilizer = quotient.exact_isotropic_stabilizer_generators(
             representative, flag=flag

@@ -627,3 +627,29 @@ them, at the tree of the push `1df83be`.
 | `issue370-t-co-cusps-test-alone.log` | the tree of this push | `-k coble_cusps_three_four_and_five`: **1 passed in 408.73 s**, the three `K_I` runs with their transporters |
 | `issue370-cusp-lattice-consumer.log` | the tree of this push | `tests/lattices/test_cusp_lattices.sage`: **11 passed in 72.81 s** — where the two vectors of the fourth cusp are checked to be one cusp (their reductions are isometric) |
 | `issue370-card-row-consumer.log` | the tree of this push | `test_the_five_cusps_are_the_chamber_rows_of_card_029j`: **1 passed in 98.65 s** — the card comparison still finding four agreements, `Sterk_4` being (4.2.3)'s vector, not the chamber's |
+
+## #370 — the cusp-4 run at the card's vector, twice, for determinism
+
+`results/issue370-the-coble-root-orbits.md` §4 states that the cusp-4 classes no longer depend on an
+engine choice.  These are the two runs of that probe, in separate processes, at the tree of `8a21290`.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue370-cusp-four-determinism-run1.log` | `8a21290` (#370) | the eleven walls of Fig. 10, the card's cusp vector `(0,0,2,1,-4,...)` beside (4.2.3)'s `(0,0,1,2,-4,...)`, nine classes of `K_I`, one root class `[-2,4,8,12,16,20,14,-5,1]`, 37 stabilizer generators and **one orbit with its transporter**, in 2140.6 s |
+| `issue370-cusp-four-determinism-run2.log` | the tree of this push | the same probe again: the same eleven walls, the same nine classes, the same root class and the same one orbit |
+
+The probe is `issue370-cusp-four-determinism-probe.py`.
+
+## #380 — the Kneser 2-neighbour route and its runs
+
+The route behind `isometry_to` for `2U ⊕ E8(−1)² → 2U ⊕ D16⁺(−1)` is
+`LatticeIsometryMor._kneser_neighbour_isometry` (`lattice_morphisms.py`),
+cited to Conway–Sloane 3rd ed. (Preface "Neighbours" p. lv; Ch. 26 §1 p. 525;
+Ch. 17 §1 pp. 421–422).  These are its runs at the tree of this push.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue380-kneser-neighbour.log` | the tree of this push | the neighbour search: the first candidate of the norm-(−4) shell of one `E8(−1)` summand, `v = [3, 6, 9, 8, 6, 4, 2, 4]`, gives `w = v + v` with `w·w = −8 ∈ 8ℤ`, `½w ∉ K`, and the neighbour `K′ = K_w + ℤ(½w)` of `|O(K′)| = 685597979049984000` — the order of `D16⁺(−1)` — in 10.9 s |
+| `issue380-assembly.log` | the tree of this push | the assembly: `u = 2e + 2f + w` isotropic of divisibility one; `z = z₀ − (z₀²/2)u` with `z₀² = −2`; `M₁ = u^⊥ ∩ z^⊥` of the `D16⁺(−1)` order; the definite isometry `T₁₆` of determinant `−1` verified exactly; the placed column matrix verified exactly (`placed^⊤ G′ placed = G`); `M^⊤ G M = G′` **True** |
+| `issue380-route.log` | the tree of this push | the public API: `source.is_isometric_to(target)` `True` in 308 s; `isometry_to` returned the witness, the inverse's row matrix of determinant `−1`, and the acceptance equation `M^⊤ G M = G′` **True** in 450 s |
+| `issue380-test.log` | the tree of this push | the module: **3 passed in 423.56 s**, the target test 422.68 s under `--no-time-gates`, at 611 MiB peak, no lint findings |

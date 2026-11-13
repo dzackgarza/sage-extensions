@@ -1,0 +1,53 @@
+source SHA: 4f7fad73d7fcba6c09997ed92f9e6361beb84d1b
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+[     1.4s] source and target built
+[     1.4s] source gram 20x20, target gram 20x20
+[     1.5s] source gram has the two hyperbolic planes first, then the complement
+[     2.2s] u = 2f + w + 2e is isotropic of divisibility one in the source
+[     2.2s] z = z0 - (z0^2/2)u with z0^2 = -2: u.z = 1, z^2 = 0
+[     2.3s] M1 = u^perp cap z^perp computed (16 vectors)
+[     2.3s] target complement gram (16x16 block) extracted
+[     2.4s] definite lattices built; asking Isom(M1, K2) for the witness
+[   141.0s] definite isometry matrix T16 (16x16) extracted: det -1
+[   141.0s] T16^T G_M1 T16 == G_K2 verified exactly
+[   141.0s] change-of-basis matrix P: 20x20, det 1
+[   141.0s] P is unimodular: (u, z, M1, e_b, f_b) is a basis of the source
+[   141.0s] assembled T_full (20x20): det -1
+[   141.0s] T_full^T G' T_full == G: True
+[   141.0s] M^T G M == G': True
+[   141.0s] ACCEPTance: M^T G M = G' verified exactly
+[   141.0s] M (20x20, the inverse column matrix):
+[  2   2   0   0  -2   2   0  -2   0   2  -1   0   0   0   0   0   0   1  -1   0]
+[  2   2   0   0  -2   2   0  -2   0   2  -1   0   0   0   0   0   0   0   1   0]
+[  0   0   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
+[  0   0   0   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
+[  3   3   0   0  -3   3   0  -3   0   3  -1  -1   0   1   0  -1   1   1   0   1]
+[  6   6   0   0  -6   6   0  -6   0   6  -2  -2   0   2   0  -1   0   3   0   2]
+[  9   9   0   0  -9   9   0  -9   0   9  -3  -3   0   3  -1   0   0   4   0   3]
+[  8   8   0   0  -8   8   0  -8   0   8  -3  -2   0   2  -1   0   0   4   0   2]
+[  6   6   0   0  -6   6   0  -6   0   6  -2  -2   1   1  -1   0   0   3   0   2]
+[  4   4   0   0  -4   4   0  -4   0   4  -1  -2   1   0   0   0   0   2   0   1]
+[  2   2   0   0  -2   2   0  -2   0   2   0  -1   0   0   0   0   0   1   0   1]
+[  4   4   0   0  -4   4   0  -4   0   4  -1  -2   0   2  -1   0   0   2   0   1]
+[  3   3   0   0  -2   2   1  -4   0   4  -2   0   0   0   0   0   0   0   0  -1]
+[  6   6   0   0  -6   5   2  -8   0   7  -3   0   0   0   0   0   0   0   0  -3]
+[  9   9   0   0  -8   8   2 -12   0  10  -4   0   0   0   0   0   0   0   0  -4]
+[  8   8   0   0  -8   8   1 -10   0   9  -4   0   0   0   0   0   0   0   0  -3]
+[  6   6   0   0  -6   6   0  -7   0   7  -3   0   0   0   0   0   0   0   0  -3]
+[  4   4   0   0  -4   4   0  -5   1   4  -2   0   0   0   0   0   0   0   0  -2]
+[  2   2   0   0  -2   2   0  -2   0   2  -1   0   0   0   0   0   0   0   0  -1]
+[  4   5   0   0  -4   4   1  -6   0   5  -2   0   0   0   0   0   0   0   0  -2]
+[peakrss] issue380-assembly: child waited=0 shell_code=0 samples=82
+[peakrss] peak tree RSS      : 475 MiB
+[peakrss] low-water MemAvail : 5769 MiB
+[peakrss] peak single VmHWM  : 480 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      470 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   162.8s procs=  3 rss=   475 MiB hwm=   480 MiB avail=  6205 MiB
+[peakrss]   t=   160.8s procs=  3 rss=   473 MiB hwm=   478 MiB avail=  6212 MiB
+[peakrss]   t=   158.8s procs=  3 rss=   466 MiB hwm=   472 MiB avail=  5851 MiB
+[peakrss]   t=   156.8s procs=  3 rss=   459 MiB hwm=   464 MiB avail=  5923 MiB
+[peakrss]   t=   154.8s procs=  3 rss=   457 MiB hwm=   463 MiB avail=  6036 MiB
+launcher exit: 0
