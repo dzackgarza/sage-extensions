@@ -118,3 +118,30 @@ is the discriminant criterion of `contains_lift`
 (`src/sage_extensions/categories/isotropic_orbits.py`).  No run of the row
 through the public call is pasted here beyond the probes above, and the row
 has no green test to report.
+
+## 6. The test runs behind the push
+
+With the two repairs in place, run through the adopted runtime against the
+worktree, `-o addopts='' -p qc_sage_session -p sage_extensions.testing.suite_budget
+-p sage_extensions.testing.test_lint --no-time-gates`:
+
+- `tests/lattices/test_the_isotropic_reduction_image.sage` and
+  `tests/lattices/test_the_subgroup_cusp_chamber.sage`, `-k 'not
+  every_cusp_chamber'`: **10 passed, 1 deselected, 313.49 s**
+  (`.tmp/qc-evidence/issue387-tests-a.log`) -- the twelve-wall first-cusp
+  chamber and the bounded layer regression are green on the repaired engine.
+- `test_hyperbolic_chambers.sage`, `test_weyl_chamber_complex.sage`,
+  `test_the_chamber_vertex_squares_and_cocompactness.sage`,
+  `test_genus_of_the_scattone_summands.sage`,
+  `test_the_coble_root_orbits_at_a_marked_cusp.sage`: **4 failed, 15 passed,
+  602.21 s** (`.tmp/qc-evidence/issue387-tests-b.log`).  The four failures are
+  pre-existing: the same four fail on the clean base `634af9c` (4 failed,
+  1 deselected, 1.97 s, `.tmp/qc-evidence/issue387-tests-base.log`), so the
+  FAILED-id sets are equal and the repairs introduce no regression.
+
+The row itself, through the public call `cusp_chamber(max_decompositions=260)`,
+did not return inside a 1600 s outer budget: the constructor returns in
+milliseconds and the walk proceeds -- the run's resident set grows through the
+layer enumeration -- but the bounded call does not finish, which is the qsolve
+fallback's cost at an anchor without a cell, and the chamber it is computing is
+the sixteen-wall one of section 3 in any case.

@@ -1,0 +1,33 @@
+..........                                                               [100%]
+=============================== warnings summary ===============================
+tests/lattices/test_the_isotropic_reduction_image.sage: 18 warnings
+tests/lattices/test_the_subgroup_cusp_chamber.sage: 102 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/lattices/test_the_isotropic_reduction_image.sage: 18 warnings
+tests/lattices/test_the_subgroup_cusp_chamber.sage: 102 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================== test-call performance gate ==========================
+tests/lattices/test_the_isotropic_reduction_image.sage::test_each_cusp_reduces_to_a_hyperbolic_rank_ten_lattice: 23.32 s > 20 s
+tests/lattices/test_the_isotropic_reduction_image.sage::test_sterks_published_cusp_roots_are_reflections_of_the_stabilizer_image: 79.20 s > 20 s
+tests/lattices/test_the_isotropic_reduction_image.sage::test_the_first_cusp_writes_down_no_candidate_outside_its_layer: 37.70 s > 20 s
+tests/lattices/test_the_subgroup_cusp_chamber.sage::test_the_subgroup_cusp_chamber_at_the_first_cusp_has_the_card_wall_count: 155.94 s > 20 s
+10 passed, 1 deselected, 240 warnings in 313.49s (0:05:13)
+[peakrss] issue387: child waited=0 shell_code=0 samples=160
+[peakrss] peak tree RSS      : 1838 MiB
+[peakrss] low-water MemAvail : 12611 MiB
+[peakrss] peak single VmHWM  : 1838 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1826 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   266.1s procs=  3 rss=  1838 MiB hwm=  1838 MiB avail= 12612 MiB
+[peakrss]   t=   268.1s procs=  3 rss=  1838 MiB hwm=  1838 MiB avail= 12611 MiB
+[peakrss]   t=   270.1s procs=  3 rss=  1838 MiB hwm=  1838 MiB avail= 12611 MiB
+[peakrss]   t=   272.1s procs=  3 rss=  1838 MiB hwm=  1838 MiB avail= 12611 MiB
+[peakrss]   t=   274.1s procs=  3 rss=  1765 MiB hwm=  1837 MiB avail= 12611 MiB
+### exit=0
