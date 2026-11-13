@@ -655,3 +655,14 @@ Ch. 17 §1 pp. 421–422).  These are its runs at the tree of this push.
 | `issue380-assembly.log` | the tree of this push | the assembly: `u = 2e + 2f + w` isotropic of divisibility one; `z = z₀ − (z₀²/2)u` with `z₀² = −2`; `M₁ = u^⊥ ∩ z^⊥` of the `D16⁺(−1)` order; the definite isometry `T₁₆` of determinant `−1` verified exactly; the placed column matrix verified exactly (`placed^⊤ G′ placed = G`); `M^⊤ G M = G′` **True** |
 | `issue380-route.log` | the tree of this push | the public API: `source.is_isometric_to(target)` `True` in 308 s; `isometry_to` returned the witness, the inverse's row matrix of determinant `−1`, and the acceptance equation `M^⊤ G M = G′` **True** in 450 s |
 | `issue380-test.log` | the tree of this push | the module: **3 passed in 423.56 s**, the target test 422.68 s under `--no-time-gates`, at 611 MiB peak, no lint findings |
+
+## #391 — the transported plane retains its parabolic structure
+
+`tests/lattices/test_isotropic_transport_retains_parabolic_structure.sage` exercises
+`transport_isotropic_object` at the split plane of `2U`.  Its repair is issue #397,
+needed by the Γ_{Co,2} plane row of #391.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue397-transport-regression.log` | the tree of this push | **1 passed in 1.90 s**, transported primitive isotropic plane retains `is_parabolic_complete` and its exact inclusion in both directions |
+| `issue397-transport-lint.log` | the tree of this push | **1 test collected, no lint findings** |
