@@ -102,10 +102,14 @@ eight walls of `K_I` and two and one root classes.  The choice existed only beca
 (4.2.3)'s vector, which is not the line Fig. 10 belongs to; at the correct line no embedding is needed,
 since the walls are already vectors of `T_En`.
 
-The runs now: the cusp-4 probe, run three times in three processes, printed the same eleven vectors,
-the same nine classes of `K_I` — `[1, -2, -4, -6, -8, -10, -7, 2, 0]`, six unit vectors and
-`[1, -4, -7, -10, -13, -16, -11, 4, 0]` — and the same single root class
-`[-2, 4, 8, 12, 16, 20, 14, -5, 1]`, with the last run returning its orbit and its transporter.
+The runs now: the cusp-4 probe (`issue370-cusp-four-determinism-probe.py` in `.tmp/qc-evidence/`),
+run twice in two separate processes, printed the same eleven walls, the same nine classes of `K_I` —
+`[1, -2, -4, -6, -8, -10, -7, 2, 0]`, six unit vectors and `[1, -4, -7, -10, -13, -16, -11, 4, 0]` —
+the same single root class `[-2, 4, 8, 12, 16, 20, 14, -5, 1]`, the same 37 stabilizer generators and
+**one orbit with its transporter**, and the two logs agree line for line once their timings are
+removed (`issue370-cusp-four-determinism-run1.log`, `-run2.log`).  Runs before the anchor was fixed, of
+the embedding route, gave nine and eight walls; no log of theirs is kept, which is why the claim here
+rests on the two runs that are.
 
 ## 5. The runs
 
