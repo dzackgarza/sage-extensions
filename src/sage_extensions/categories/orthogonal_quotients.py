@@ -2852,6 +2852,44 @@ def _plane_orbit_from_odd_stabilizer(subgroup, representative):
     return (representative, odd_ambient.transport_isotropic_object(representative))
 
 
+def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
+    r"""The `Gamma`-orbits inside one `O(L)`-orbit of planes, from the plane's parabolic.
+
+    Let `G = O(L)`, `P` a primitive isotropic plane, `H = Stab_G(P)` and
+    `Gamma` a subgroup of finite index.  By D. Dutour Sikirić and K. Hulek,
+    arXiv:2302.01679v2, Lemma 3.6, printed p. 22, the `Gamma`-orbits inside
+    `G.P` are the double cosets `rho(Gamma) \ rho(G) / rho(H)`, where `rho` is
+    the discriminant representation.  The right-hand group `rho(H)` is what the
+    double-coset split needs, and it is supplied here from the plane's own
+    parabolic rather than by enumerating a stabilizer's generating family:
+    the block equations of the parabolic are solved over `ZZ` at any primitive
+    isotropic plane (Dutour Sikirić--Hulek, Theorem 4.9, printed pp. 33--34),
+    and :meth:`...PrimitiveIsotropicSubobjects.ParentMethods.is_parabolic_complete`
+    decides on three computed indices whether the family they produce is the
+    whole of `H` (#331, #366).  Where the parabolic is not established to be
+    complete, ``None`` is returned and the caller keeps its own route.
+
+    Each returned representative is the transported plane of one double
+    coset, so the count of the row is the count of the double cosets
+    themselves -- computed by
+    :meth:`...OrthogonalCharacterQuotient.splitting_isometries`, which walks
+    `rho(Gamma)`-orbits on the coset space, not the group.  Nothing here
+    enumerated a stabilizer's generating family of the ambient orthogonal
+    group, and no isometry is guessed: every lift is checked against the
+    character map before it transports.
+    """
+    if representative.is_parabolic_complete() is not True:
+        return None
+    family = tuple(representative.parabolic_stabilizer_generators())
+    if not family:
+        return None
+    quotient = subgroup.finite_character_quotient()
+    return tuple(
+        splitting.transport_isotropic_object(representative)
+        for splitting in quotient.splitting_isometries(family)
+    )
+
+
 def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
     if not flag and index(rank) == 0:
         return subgroup.supergroup().isotropic_orbit_representatives(0)
@@ -2890,6 +2928,11 @@ def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
             from_planes = _plane_orbit_from_odd_stabilizer(subgroup, representative)
             if from_planes is not None:
                 representatives.extend(from_planes)
+                continue
+        if not flag and rank == 2:
+            from_parabolic = _plane_orbit_from_parabolic_stabilizer(subgroup, representative)
+            if from_parabolic is not None:
+                representatives.extend(from_parabolic)
                 continue
         stabilizer = quotient.exact_isotropic_stabilizer_generators(
             representative, flag=flag
