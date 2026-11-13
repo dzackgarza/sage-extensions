@@ -138,10 +138,25 @@ class _GapWordSection:
         Group orders use the parent-bound native group. Word preimages use
         this model together with the explicit epimorphism from the original
         ordered generator family, independently of the model's generators.
+
+        With a parent, the model is the parent's own ``IsomorphismPermGroup``
+        restricted to the generated subgroup (GAP reference 40.6,
+        ``RestrictedMapping``). For a group of form automorphisms this is the
+        action on the finite module, of degree at most its order: O^+_8(2)
+        gets a model of degree 255 in under a second, where a fresh
+        ``Group(gens)`` without the parent's filters did not finish in 1175 s.
         """
         if self._permutation_model is None:
-            to_permutation = libgap.IsomorphismPermGroup(libgap.Group(self._generators))
-            self._permutation_model = (to_permutation, libgap.Range(to_permutation))
+            if self._parent is None:
+                to_permutation = libgap.IsomorphismPermGroup(libgap.Group(self._generators))
+                self._permutation_model = (to_permutation, libgap.Range(to_permutation))
+            else:
+                parent_model = libgap.IsomorphismPermGroup(self._parent)
+                group = self.gap_group
+                self._permutation_model = (
+                    libgap.RestrictedMapping(parent_model, group),
+                    libgap.Image(parent_model, group),
+                )
         return self._permutation_model[1]
 
     @property
