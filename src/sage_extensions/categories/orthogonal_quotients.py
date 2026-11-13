@@ -2912,6 +2912,161 @@ def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
     )
 
 
+def _line_generator_in_plane(plane, line):
+    r"""Return the line's generator and its coordinates, read in the plane's own domain.
+
+    The line must be a subobject of the plane: its inclusion factors through
+    the plane's, and the factored morphism reads the line's generator as a
+    point of the plane's domain.  The coordinates are that point's coordinate
+    vector, so a Levi restriction of the plane acts on them directly.
+    """
+    line_in_plane = line.inclusion().factor_through(plane.inclusion())
+    line_domain = line.inclusion().domain()
+    labels = tuple(line_domain.module_generating_set())
+    line_vector = line_in_plane(line_domain.module_generator(labels[0]))
+    return line_vector, line_vector.to_vector()
+
+
+def _levi_restriction_fixes_line(plane, generator, line_vector, coordinates):
+    r"""Whether the Levi restriction of ``generator`` on the plane fixes the line setwise.
+
+    The Levi restriction acts on the plane's own domain, and the line's
+    generator is read in the plane's coordinates: two vectors of a
+    torsion-free rank-two module are proportional exactly when the determinant
+    of their coordinate matrix vanishes, which is the setwise stabilizer
+    condition on the line.
+    """
+    action = plane.levi_restriction(generator)
+    image = action(line_vector)
+    image_coordinates = image.to_vector()
+    labels = tuple(plane.inclusion().domain().module_generating_set())
+    determinant = image_coordinates(labels[0]) * coordinates(labels[1]) - image_coordinates(
+        labels[1]
+    ) * coordinates(labels[0])
+    return determinant == plane.inclusion().domain().base_ring().zero()
+
+
+def _plane_parabolic_incidence_flags(subgroup, plane, flag):
+    r"""The edges of the Tits building at one plane, from the plane's parabolic (#391).
+
+    Let ``G = O(L)``, ``P`` a primitive isotropic plane, ``F_0 = (ell_0 < P)``
+    a flag whose line is one line of ``P``, ``Pi = Stab_G(P)`` the plane's
+    parabolic and ``K = Stab_Gamma(P) = Gamma cap Pi``.  The edges at the
+    orbit of ``P`` are the ``K``-orbits on the lines of ``P``.  Those lines
+    decompose into ``Pi``-orbits -- the divisibility of a line of ``P`` is
+    preserved by ``Pi``, so there can be several -- and this function returns
+    the ``K``-orbits inside the ``Pi``-orbit of ``ell_0``: they are the double
+    cosets
+
+    ``K \ Pi / (Pi cap Stab_G(ell_0))``,
+
+    whose right-hand group is the subfamily of the parabolic fixing the line,
+    read on the Levi restriction itself.  Because the subgroup is the full
+    preimage of its own discriminant image, it contains ``ker rho`` restricted
+    to ``Pi``, so replacing the right-hand group by its product with that
+    kernel changes no double coset and the double cosets descend to the finite
+    image (D. Dutour Sikiri'c and K. Hulek, arXiv:2302.01679v2, Lemma 3.6,
+    printed p. 22: the quotient map by a normal subgroup contained in the
+    left group pairs the double-coset decompositions).  The left group is
+    then exactly ``rho(Gamma) cap rho(Pi)``, computed as that intersection,
+    and the right group is the discriminant image of the line-fixing members
+    of the certified family.
+
+    Each returned flag is ``F_0`` transported by one lifted double-coset
+    representative, an element of the parabolic spelled as a word in the
+    certified family and checked against the discriminant map before it
+    transports; its line term is one line of the ``Pi``-orbit per ``K``-orbit,
+    and its plane term is the plane itself.  Where the parabolic is not
+    established to be complete, or the subgroup is not a discriminant
+    preimage, ``None`` is returned and the caller keeps its own route.
+    """
+    lattice = subgroup.supergroup().domain()
+    if plane.is_parabolic_complete() is not True:
+        return None
+    family = tuple(plane.parabolic_stabilizer_generators())
+    if not family:
+        return None
+    quotient = subgroup.finite_character_quotient()
+    if not quotient._has_discriminant or quotient.determinant_kernel or quotient.spinor_kernel:
+        # The reduction below needs ker rho inside Gamma: a subgroup cut out
+        # by a sign character alone does not contain it, and its stabilizer
+        # orbits are not these double cosets.
+        return None
+    from sage_extensions.categories.group.groups import (
+        _element_to_engine,
+        _gap_model,
+    )
+
+    rho = lattice.discriminant_representation()
+    engine = _gap_model(quotient._discriminant_group)
+    images = tuple(
+        _element_to_engine(quotient._discriminant_group, rho(generator))
+        for generator in family
+    )
+    section = _GapWordSection(images, parent=engine)
+    parabolic_image = section.gap_group
+    # rho(Gamma) as a generated subgroup of the same engine model, then the
+    # left group rho(Gamma) cap rho(Pi) = rho(Gamma cap Pi): the subgroup is
+    # the full preimage of its own discriminant image, so the image of the
+    # intersection is the intersection of the images.  At index one the
+    # subgroup is all of O(L), so rho(Gamma) contains rho(Pi) and the
+    # intersection is rho(Pi) itself, read rather than computed.
+    if quotient.index() == 1:
+        left = parabolic_image
+    else:
+        owned_image = subgroup.discriminant_image()
+        gamma_image = libgap.Subgroup(
+            engine,
+            [
+                _element_to_engine(quotient._discriminant_group, generator)
+                for generator in owned_image.group_generators()
+            ],
+        )
+        left = libgap.Intersection(gamma_image, parabolic_image)
+    # The right group: the discriminant image of the members of the certified
+    # family whose Levi restriction on the plane fixes the line.
+    line, plane_term = flag.terms()
+    line_vector, line_coordinates = _line_generator_in_plane(plane_term, line)
+    right_generators = [
+        image
+        for generator, image in zip(family, images, strict=True)
+        if _levi_restriction_fixes_line(
+            plane_term, generator, line_vector, line_coordinates
+        )
+    ]
+    if not right_generators:
+        return None
+    right = libgap.Subgroup(engine, right_generators)
+    to_permutation = section._to_permutation
+    permutation_image = section.permutation_group
+    flags = []
+    for double_coset in libgap.AsList(
+        libgap.DoubleCosets(
+            permutation_image,
+            libgap.Image(to_permutation, left),
+            libgap.Image(to_permutation, right),
+        )
+    ):
+        point = libgap.Representative(double_coset)
+        letters = _letters_in_owned_order(
+            quotient._model_factors(), section.letters_of_permutation(point)
+        )
+        element = quotient.supergroup.one()
+        for letter in letters:
+            element = element * (
+                family[letter - 1] if letter > 0 else ~family[-letter - 1]
+            )
+        expected = libgap.PreImagesRepresentative(to_permutation, point)
+        if _element_to_engine(quotient._discriminant_group, rho(element)) != expected:
+            raise ArithmeticError(
+                f"the word-section lift of a double-coset representative at {plane_term} was "
+                f"checked against the discriminant map and maps elsewhere: the parabolic word "
+                f"section is inconsistent with the discriminant representation"
+            )
+        flags.append(element.transport_isotropic_object(flag))
+    return tuple(flags)
+
+
 def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
     if not flag and index(rank) == 0:
         return subgroup.supergroup().isotropic_orbit_representatives(0)

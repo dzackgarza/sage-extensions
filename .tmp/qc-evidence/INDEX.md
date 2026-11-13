@@ -251,6 +251,8 @@ library.  Each log is byte-for-byte the run's redirected output.
 
 | log | result |
 | --- | --- |
+| `391-incidence-route-smoke.log` | this push (#391) | the new incidence route vs the flag row on `U + U(2) + <2>`: **both routes 2 edges, agreeing, exit 0**, peak tree RSS 2800 MiB |
+| `391-incidence-test-lint.log` | this push (#391) | `python -m sage_extensions.testing.test_lint` on the new test: **1 file, 0 findings** |
 | `p319-group-and-cardinality.log` | card `gamma-h-1` (`029J`, `S = overline{0}`): `Involutions.I_En.polarized(h).coinvariant_extension_subgroup()` builds in **38.0 s**, `contains_character_kernel()` and `character_data_is_complete()` `True`, and `finite_character_quotient().discriminant_image().order()` is **696729600** — the card's own `data.cardinality` — computed in 136.7 s.  Peak tree RSS 636 MiB |
 | `p319-gamma-h-1-orbit-calls.log` | the same group, `group.isotropic_orbit_representatives(1)`, `(2)` and `(2, flag=True)` (the card's 5/9/18) each **did not return in 300 s** (SIGALRM stage abort); group rebuilt in 53.0 s, peak tree RSS 1174 MiB |
 | `p319-gamma-h-1-runner.log` | the runner itself on `--tags gamma-h-1 --cap 120`: card citation printed, `S = overline{0}`, `|Gamma-bar_h| = 696729600`, then `UNDECIDED: lines: the public call did not return inside 120 s (after 185 s)`, `pass: 0, undecided: 1`, exit 1 |

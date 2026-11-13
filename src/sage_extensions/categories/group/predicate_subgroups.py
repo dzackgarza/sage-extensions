@@ -699,13 +699,25 @@ class PredicateSubgroups(OwnedParameterizedCategory):
         def tits_building_incidence(self):
             r"""Return this subgroup's line/plane quotient-building incidence.
 
-            Rank-two flags are split under the same finite-character quotient
-            as the line and plane orbits, so each edge retains actual subgroup
-            transporters to its two cusp vertices rather than transporters
-            inherited from the full orthogonal group.
+            The edges at the orbit of one plane ``P`` are the
+            ``Stab_Gamma(P)``-orbits of the isotropic lines of ``P``, each
+            mapped to the line orbit of one of its lines: the lines of a
+            totally isotropic plane are isotropic, and two flags over the same
+            plane are ``Gamma``-equivalent exactly when their lines lie in one
+            ``Stab_Gamma(P)``-orbit.  Where the plane's parabolic is complete
+            the stabilizer is supplied by it, so the edges never reach the
+            indefinite port's generic stabilizer enumeration
+            (:func:`...orthogonal_quotients._plane_parabolic_incidence_flags`,
+            #391); where it is not, the flag row keeps its own route.  Each
+            edge retains actual subgroup transporters to its two cusp vertices
+            rather than transporters inherited from the full orthogonal group.
             """
             from sage_extensions.categories.isotropic_orbits import (
                 ArithmeticCuspIncidence,
+                IsotropicFlag,
+            )
+            from sage_extensions.categories.orthogonal_quotients import (
+                _plane_parabolic_incidence_flags,
             )
             from sage_extensions.categories.sets.finite_ordered_sets import (
                 finite_ordered_set,
@@ -725,8 +737,44 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         matches.append((cusp, witness))
                 return matches
 
+            # The edges, one flag per Gamma-orbit of flags: at each plane
+            # representative the Stab_Gamma(P)-orbits of the lines of P from
+            # the plane's own parabolic, and the flag row wherever that route
+            # does not apply.  The lines of P need not form one orbit of the
+            # parabolic -- the divisibility of a line of P is an invariant the
+            # parabolic preserves -- so the Stab_Gamma(P)-orbits are computed
+            # per orbit of the parabolic on the lines of P, and those orbits
+            # are the ambient flag orbits read at this plane: the ambient
+            # flags whose plane term is carried to P by an ambient isometry,
+            # transported by it.
+            orthogonal_group = self.supergroup()
+            ambient_flags = tuple(orthogonal_group.isotropic_orbit_representatives(2, flag=True))
+            sourced_flags = []
+            parabolic_routed = True
+            for plane in self.isotropic_orbit_representatives(2):
+                plane_orbit_flags = []
+                for ambient_flag in ambient_flags:
+                    _ambient_line, ambient_plane = ambient_flag.terms()
+                    witness = orthogonal_group.isotropic_equivalence_witness(ambient_plane, plane)
+                    if witness is None:
+                        continue
+                    plane_orbit_flags.append(witness.transport_isotropic_object(ambient_flag))
+                if not plane_orbit_flags:
+                    parabolic_routed = False
+                    break
+                for orbit_flag in plane_orbit_flags:
+                    from_parabolic = _plane_parabolic_incidence_flags(self, plane, orbit_flag)
+                    if from_parabolic is None:
+                        parabolic_routed = False
+                        break
+                    sourced_flags.extend(from_parabolic)
+                if not parabolic_routed:
+                    break
+            if not parabolic_routed:
+                sourced_flags = list(self.isotropic_orbit_representatives(2, flag=True))
+
             incidences = []
-            for flag in self.isotropic_orbit_representatives(2, flag=True):
+            for flag in sourced_flags:
                 line, plane = flag.terms()
                 line_vertices = matching_cusps(line, line_cusps)
                 plane_vertices = matching_cusps(plane, plane_cusps)
