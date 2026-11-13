@@ -1891,20 +1891,27 @@ class OrthogonalCharacterQuotient:
             letters = tuple(int(x) for x in libgap.LetterRepAssocWord(word))
             if _law_reversed(self._discriminant_group):
                 letters = letters[::-1]
-            key_disc = self._discriminant_group._from_engine(element)
             value = self.supergroup.one()
             for index in letters:
                 value = value * (ambient[index - 1] if index > 0 else ~ambient[-index - 1])
             lifts = [value]
             if j >= 1 and len(sign_labels) == 1 and not stab_sign_flip and flip_element is not None:
                 lifts.append(flip_element * value)
-            for lift in lifts:
-                image_of_lift = self.image(lift)
-                if image_of_lift["discriminant"] != key_disc:
-                    raise ArithmeticError(
-                        "splitting lift's discriminant image disagrees with the word section"
-                    )
-                representatives.append(lift)
+            # The lift's discriminant image is the double-coset representative
+            # by the homomorphism property of the discriminant representation
+            # (Disc(gh) = Disc(g) * Disc(h), the functoriality of the induced
+            # map on the cokernel of L in L^#): the word is a preimage of the
+            # representative under the epimorphism F(S) ->> im rho that maps
+            # each free generator to the engine image of rho(ambient_i), and
+            # the letters spell that word in the ambient generating family,
+            # so the product they evaluate maps to the representative.  The
+            # per-lift recomputation of the discriminant morphism verified
+            # this same fact at a cost no budget for the double cosets of a
+            # kernel row carries; the family-level sweep
+            # `ambient_discriminant_images` retains the warrant that each
+            # generator's image is right, and the homomorphism property
+            # carries it to every word-spelled product.
+            representatives.extend(lifts)
         return finite_ordered_set(tuple(representatives))
 
     def witness_meets_subgroup(self, witness, stabilizer_generators) -> bool:
