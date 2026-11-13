@@ -51,6 +51,7 @@ jobs:
           set -o pipefail
           "$SAGE_BIN" --version
           git rev-parse HEAD
-          "$SAGE_BIN" -python tests/coble_kernel_plane_rows.py \
+          sage_python="$("$SAGE_BIN" -c "import sys; print(sys.executable)")"
+          "$sage_python" tests/coble_kernel_plane_rows.py \
             --cap "$COBLE_CALL_CAP" --budget "$COBLE_ROW_BUDGET"
         shell: bash
