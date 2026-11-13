@@ -35,12 +35,15 @@ and roots return negated, preserving every half-space condition
 """
 
 from fractions import Fraction
+from itertools import product as _cartesian_product
 from math import isqrt
 from pathlib import Path
 
 from sage.matrix.constructor import matrix as engine_matrix
 from sage.misc.cachefunc import cached_method
+from sage.modules.free_module import FreeModule as SageFreeModule
 from sage.modules.free_module_element import vector as engine_vector
+from sage.rings.integer import GCD_list
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.rings.qqbar import AA as SageAA
 from sage.rings.rational_field import QQ as SageQQ
@@ -453,6 +456,53 @@ def _exact_square_root(value):
     return root if root * root == value else None
 
 
+def _vinal_parallelepiped_points(inserted):
+    r"""Return the integer points of the half-open parallelepiped of the rows.
+
+    ``inserted`` is a nonsingular integer matrix -- in the engine's constructor
+    it is a basis of the controlling vector's orthogonal complement with the
+    controlling vector inserted as the last row.  The integer points of
+    ``{t * inserted : 0 <= t_i < 1}`` are one representative of each coset of
+    the row lattice in ``ZZ^n``; they are the engine's ``W``, the offsets the
+    layer enumeration adds to the multiples of the controlling vector, and
+    ``VinAl`` checks them against the controlling vector on construction.
+
+    vinal's ``GetIntegerPoints`` (Bogachev and Perepechko's ``vinal``,
+    ``src/sage/vinal.py``) finds them by enumerating the coordinate box between
+    the negative and the positive row sums and testing each point against the
+    parallelepiped; that box has the product of those sums as its size, which
+    at the fourth Enriques cusp is about `1.3 \cdot 10^{14}` points for a
+    two-element ``W``, and the engine's constructor does not return.  The same
+    set is found without enumeration: the Smith normal form
+    ``D = U * inserted * V`` (Sage's ``smith_form``, with ``U`` and ``V``
+    unimodular) writes the row lattice as ``{s * D * V^{-1} : s in ZZ^n}``, so
+    ``x = a * V^{-1}`` with ``a`` in the box ``prod_i [0, D_i)`` runs once
+    through every coset, and the representative of ``x``'s coset inside the
+    half-open parallelepiped is
+    ``x - floor(x * inserted^{-1}) * inserted``: subtracting the floor of the
+    row-basis coordinates moves the point by a row-lattice element and leaves
+    every row-basis coordinate in ``[0, 1)``.  Each point returned is integral
+    because both ``x`` and the subtracted row combination are, and the set is
+    exactly the one the bounding-box enumeration would return, so the engine's
+    behaviour changes only in the time the constructor takes.
+    """
+    size = inserted.nrows()
+    diagonal, _left, right = inserted.smith_form()
+    inverse = right.inverse()
+    reduction = inserted.inverse()
+    points = []
+    for coefficients in _cartesian_product(
+        *[range(abs(int(diagonal[index, index]))) for index in range(size)]
+    ):
+        representative = engine_vector(SageQQ, coefficients) * inverse
+        coordinates = representative * reduction
+        shifted = representative - engine_vector(
+            SageQQ, [entry.floor() for entry in coordinates]
+        ) * inserted
+        points.append(tuple(int(entry) for entry in shifted))
+    return points
+
+
 def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions, admits_root=None):
     r"""Run Vinberg's algorithm on a Gram matrix of signature \((n,1)\).
 
@@ -468,7 +518,7 @@ def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions
     full group's, so the restriction is part of the algorithm and not a filter
     of its output (#297).
     """
-    from vinal import VinAl
+    from vinal import NegativeVector, VinAl
 
     if admits_root is None:
         algorithm = VinAl(gram, controlling_vector, False, None)
@@ -499,10 +549,43 @@ def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions
             either way, because the conjunction is.
             """
 
-            def __init__(self, *arguments, **keywords) -> None:
+            def __init__(self, M, v0=None, use_coxiter=False, output=None) -> None:
+                r"""Mirror ``VinAl.__init__`` with the library's own ``W``.
+
+                The engine's constructor finds the coset representatives of the
+                row lattice of the inserted matrix by enumerating a coordinate
+                bounding box, which at the fourth Enriques cusp has about
+                `1.3 \cdot 10^{14}` points for a two-element ``W`` and does not
+                return; :func:`_vinal_parallelepiped_points` returns the same
+                points in polynomial time, and the rest of the construction is
+                ``VinAl``'s own, attribute for attribute.  The controlling
+                vector may be omitted, in which case the engine's own
+                ``NegativeVector`` picks one.
+                """
                 self._admits_root = admits_root
                 self._cell = _NO_CELL
-                super().__init__(*arguments, **keywords)
+                self.output = output
+                self.use_coxiter = use_coxiter
+                self.M = M
+                self.n = M.ncols()
+                self.V = SageFreeModule(SageZZ, self.n, inner_product_matrix=M)
+                self.v0 = NegativeVector(self.V) if v0 is None else self.V(v0)
+                kernel_matrix = engine_matrix(
+                    [self.v0.dot_product(column) for column in M.columns()]
+                )
+                self.V1 = self.V.submodule(kernel_matrix.right_kernel())
+                self.M1 = self.V1.gram_matrix()
+                inserted = self.V1.matrix().insert_row(self.n - 1, self.v0)
+                self.W = [self.V(w) for w in _vinal_parallelepiped_points(inserted)]
+                self.W.sort(key=lambda entry: -self.v0.inner_product(entry))
+                self.En = abs(self.M.det() / GCD_list(self.M.adjugate().list()))
+                self.root_lengths = [
+                    k
+                    for k in range(1, 2 * int(self.En) + 1)
+                    if ((2 * int(self.En)) % k == 0)
+                ]
+                self.roots = []
+                self.check_validity()
 
             def _in_the_subgroup(self, vector) -> bool:
                 return bool(
@@ -529,11 +612,22 @@ def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions
                 test took 337.8 s and its dependence check 92.9 s, against
                 72.4 s for the whole layer enumeration):
 
-                - the dependence check asks whether the candidate lies in the
-                  span of the first accepted roots; when the cell exists those
-                  roots are a \(\mathbf Z\)-basis of \(v_0^\perp\), so the span
-                  is \(v_0^\perp\) itself and the check is one inner product
-                  \(b(\text{candidate}, v_0)=0\);
+                - the repeat check asks whether the candidate is at distance
+                  zero from the controlling vector, that is one inner product
+                  \(b(\text{candidate}, v_0)=0\).  ``VinAl`` instead asks
+                  whether the candidate lies in the span of the first
+                  \(n-1\) accepted roots, which is the same question when
+                  those roots span \(v_0^\perp\) and is not when they do not:
+                  at the fourth Enriques cusp the distance-zero admitted roots
+                  span rank eight of the rank nine, the engine's span is a
+                  foreign rank-nine subspace, and the walls it wrongly refuses
+                  are the ones the chamber needs to close.  Every root at
+                  distance zero was already decided by ``FundCone``, whose
+                  walls are exactly the cell at \(v_0\): a chamber coincides
+                  with that cell near \(v_0\) (Vinberg 1972, §3.2, the
+                  construction after Proposition 3, p. 27), so no further
+                  distance-zero mirror bounds it, and each such candidate is
+                  refused whatever the span is;
                 - the root test asks whether the candidate's reflection
                   preserves the lattice, i.e. whether its square divides twice
                   each of its pairings with the framing generators; the
@@ -545,10 +639,7 @@ def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions
                 answers; the accepted set is the same, and only the cost of
                 asking changes.
                 """
-                if self.cell() is not None:
-                    if vector.inner_product(self.v0) == 0:
-                        return False
-                elif self.V.are_linearly_dependent(self.roots[:self.V.degree() - 1] + [vector]):
+                if vector.inner_product(self.v0) == 0:
                     return False
                 pairings = vector * self.M
                 square = vector.inner_product(vector)
@@ -557,6 +648,27 @@ def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions
                 if not all(vector.inner_product(root) <= 0 for root in self.roots):
                     return False
                 return self._in_the_subgroup(vector)
+
+            def NextRoot(self, max_decompositions=None, progress=None):
+                r"""Yield the engine's new roots, re-checked against the accepted ones.
+
+                ``VinAl.NextRoot`` filters a whole layer against the roots
+                accepted when the layer starts and then yields every survivor,
+                so two candidates of one layer that pair positively both become
+                walls, and a candidate the layer solver lists twice is appended
+                twice -- at the fourth Enriques cusp the same wall appeared
+                twice in the accepted list.  Vinberg's sequence (38) asks the
+                wall condition of every root as it is written down (1972,
+                §4.1, p. 30), so each root is yielded only after it still
+                pairs nonpositively with everything accepted so far and is not
+                already among them.
+                """
+                for root in super().NextRoot(max_decompositions, progress):
+                    if root in self.roots:
+                        continue
+                    if any(root.inner_product(other) > 0 for other in self.roots):
+                        continue
+                    yield root
 
             def cell(self):
                 r"""Return the cell at the controlling vector, or ``None`` when it is not a basis.
