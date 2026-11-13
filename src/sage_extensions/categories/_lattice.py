@@ -1478,8 +1478,10 @@ def _congruence_diagonal_form(gram: Tensor):
     signs were later checked in RR. Selected exact computation fields
     remain available through the shared linear-algebra scalar choice.
     """
-    ring = gram.base_ring()
-    field = _linear_algebra_ring(ring)
+    # Over a field, Sage's QuadraticForm reads any symmetric matrix as the Hessian
+    # 2Q; over ZZ it rejects an odd diagonal, so an odd lattice is diagonalized
+    # over its fraction field.
+    field = _linear_algebra_ring(gram.base_ring().fraction_field())
     components = _engine_component_matrix(gram).change_ring(field)
     return QuadraticForm(field, components).rational_diagonal_form(return_matrix=True)
 
