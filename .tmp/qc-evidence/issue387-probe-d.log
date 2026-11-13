@@ -1,0 +1,36 @@
+[18:39:01] importing
+[18:39:02] imported in 1.1 s
+[18:39:23] subgroup built in 22.9 s
+[18:39:24] cusp (4.2.3) vector: (0, 0, 1, 2, -4, -5, -7, -10, -8, -6, -4, -2)
+[18:39:24] cusp (4.3.8) vector: (0, 0, 2, 1, -4, -5, -7, -10, -8, -6, -4, -2)
+[18:39:24] their pairing: 2
+[18:40:55] v1 controlling vector: (7, -17, -34, -51, -68, -85, -60, 21, 4, 4)
+[18:41:15] v1: 176 distance-0 admitted roots, span rank 8
+[18:41:15] v1: the kernel of (distance-0 roots + v0) has rank 1
+[18:41:15]   fixed-line vector (3, 0, 0, 0, 0, 0, 0, -1, 0, 0), square 128
+[18:41:15]     b(line, walk wall (6, -13, -27)...) = 4
+[18:41:15]     b(line, walk wall (5, -12, -25)...) = -16
+[18:41:15]     b(line, walk wall (13, -31, -62)...) = -14
+[18:41:15]     b(line, walk wall (30, -72, -145)...) = -34
+[18:41:15]     b(line, walk wall (21, -50, -100)...) = -12
+[18:41:15]     b(line, walk wall (20, -49, -98)...) = -32
+[18:41:15]     b(line, walk wall (29, -69, -138)...) = -12
+[18:41:15]     b(line, walk wall (27, -67, -134)...) = -52
+[18:41:28] v2 controlling vector: (7, -17, -34, -51, -68, -85, -60, 21, 4, 4)
+[18:41:28] heartbeat v2: elapsed 148 s, walls 0
+[18:41:49] v2: FundCone returned 8 roots in 20.3 s
+[18:41:49] v2: 176 distance-0 admitted roots, span rank 8
+[18:41:49]   v2 initial root: (-2, 5, 10, 15, 20, 25, 18, -6, 0, -2), square 4
+[18:41:49]   v2 initial root: (0, -1, 0, 0, 0, 0, 0, 0, 0, 0), square 4
+[18:41:49]   v2 initial root: (0, 0, -1, 0, 0, 0, 0, 0, 0, 0), square 4
+[18:41:49]   v2 initial root: (0, 0, 0, -1, 0, 0, 0, 0, 0, 0), square 4
+[18:41:49]   v2 initial root: (0, 0, 0, 0, -1, 0, 0, 0, 0, 0), square 4
+[18:41:49]   v2 initial root: (0, 0, 0, 0, 0, -1, 0, 0, 0, 0), square 4
+[18:41:49]   v2 initial root: (0, 0, 0, 0, 0, 0, -1, 0, 0, 0), square 4
+[18:41:49]   v2 initial root: (0, 0, 0, 0, 0, 0, 0, 0, -1, 1), square 2
+[18:43:28] heartbeat v2: elapsed 268 s, walls 14
+[18:45:28] heartbeat v2: elapsed 388 s, walls 16
+[18:47:28] heartbeat v2: elapsed 508 s, walls 16
+[18:49:28] heartbeat v2: elapsed 628 s, walls 16
+[18:51:28] heartbeat v2: elapsed 748 s, walls 16
+[18:53:28] heartbeat v2: elapsed 868 s, walls 16

@@ -1,0 +1,39 @@
+[13:08:40] importing
+[13:08:41] imported in 0.9 s
+[13:09:02] subgroup built in 21.6 s
+[13:09:02] Sterk_4 image built in 22.0 s
+[13:10:29] controlling vector: (7, -17, -34, -51, -68, -85, -60, 21, 4, 4)
+[13:10:29] engine gram computed, negated True
+[13:10:29] framing coordinates: [7, -17, -34, -51, -68, -85, -60, 21, 4, 4]
+Traceback (most recent call last):
+  File "/probe.py", line 56, in <module>
+    V = FreeModule(ZZ, engine_gram.nrows(), inner_product_matrix=engine_gram)
+  File "/sage/.venv/lib/python3.14/site-packages/sage/modules/free_module.py", line 572, in FreeModule
+    return FreeModuleFactory_with_standard_basis(base_ring, rank, sparse,
+                                                 inner_product_matrix, **args)
+  File "sage/structure/factory.pyx", line 370, in sage.structure.factory.UniqueFactory.__call__
+    key, kwds = self.create_key_and_extra_args(*args, **kwds)
+  File "sage/structure/factory.pyx", line 476, in sage.structure.factory.UniqueFactory.create_key_and_extra_args
+    return self.create_key(*args, **kwds), {}
+  File "/sage/.venv/lib/python3.14/site-packages/sage/modules/free_module.py", line 246, in create_key
+    inner_product_matrix = sage.matrix.matrix_space.MatrixSpace(base_ring, rank)(inner_product_matrix)
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "sage/misc/classcall_metaclass.pyx", line 328, in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    return cls.classcall(cls, *args, **kwds)
+  File "/sage/.venv/lib/python3.14/site-packages/sage/matrix/matrix_space.py", line 795, in __classcall__
+    raise TypeError("base_ring (=%s) must be a ring or a semiring" % base_ring)
+TypeError: base_ring (=Integer Ring) must be a ring or a semiring
+[peakrss] issue362: child waited=1 shell_code=1 samples=56
+[peakrss] peak tree RSS      : 662 MiB
+[peakrss] low-water MemAvail : 14105 MiB
+[peakrss] peak single VmHWM  : 662 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      651 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   110.0s procs=  3 rss=   662 MiB hwm=   662 MiB avail= 14257 MiB
+[peakrss]   t=   104.0s procs=  3 rss=   660 MiB hwm=   660 MiB avail= 14265 MiB
+[peakrss]   t=   106.0s procs=  3 rss=   660 MiB hwm=   660 MiB avail= 14265 MiB
+[peakrss]   t=   108.0s procs=  3 rss=   660 MiB hwm=   660 MiB avail= 14265 MiB
+[peakrss]   t=   102.0s procs=  3 rss=   659 MiB hwm=   659 MiB avail= 14266 MiB
+launcher exit: 1

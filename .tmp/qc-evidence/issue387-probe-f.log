@@ -1,0 +1,90 @@
+[19:07:03] importing
+[19:07:04] imported in 1.0 s
+[19:07:25] subgroup built in 22.1 s
+[19:07:26] Sterk_4 image built in 22.5 s
+[19:09:16] the walk's wall family: 16 roots
+[19:09:16] their span has rank 10
+[19:09:16] the span computation failed: 'OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'span'
+[19:09:16]   walk wall lift: 2*e_0 + 2*e_2 + 6*e_3 - 10*e_4 - 12*e_5 - 18*e_6 - 25*e_7 - 20*e_8 - 15*e_9 - 10*e_10 - 5*e_11
+[19:09:16]   walk wall lift: e_11
+[19:09:16]   walk wall lift: e_10
+[19:09:16]   walk wall lift: e_9
+[19:09:16]   walk wall lift: e_8
+[19:09:16]   walk wall lift: e_7
+[19:09:16]   walk wall lift: e_6
+[19:09:16]   walk wall lift: -e_0 + e_1
+[19:09:16]   walk wall lift: -3*e_0 - 3*e_1 - 6*e_2 - 17*e_3 + 29*e_4 + 34*e_5 + 49*e_6 + 69*e_7 + 55*e_8 + 41*e_9 + 27*e_10 + 13*e_11
+[19:09:16]   walk wall lift: -3*e_0 - 3*e_1 - 5*e_2 - 16*e_3 + 26*e_4 + 32*e_5 + 45*e_6 + 64*e_7 + 51*e_8 + 38*e_9 + 25*e_10 + 12*e_11
+[19:09:16]   walk wall lift: -7*e_0 - 7*e_1 - 13*e_2 - 39*e_3 + 65*e_4 + 78*e_5 + 111*e_6 + 157*e_7 + 125*e_8 + 93*e_9 + 62*e_10 + 31*e_11
+[19:09:16]   walk wall lift: -16*e_0 - 16*e_1 - 30*e_2 - 90*e_3 + 150*e_4 + 180*e_5 + 257*e_6 + 364*e_7 + 291*e_8 + 218*e_9 + 145*e_10 + 72*e_11
+[19:09:16]   walk wall lift: -11*e_0 - 11*e_1 - 21*e_2 - 62*e_3 + 104*e_4 + 124*e_5 + 177*e_6 + 250*e_7 + 200*e_8 + 150*e_9 + 100*e_10 + 50*e_11
+[19:09:16]   walk wall lift: -11*e_0 - 11*e_1 - 20*e_2 - 61*e_3 + 101*e_4 + 122*e_5 + 173*e_6 + 245*e_7 + 196*e_8 + 147*e_9 + 98*e_10 + 49*e_11
+[19:09:16]   walk wall lift: -15*e_0 - 15*e_1 - 29*e_2 - 85*e_3 + 143*e_4 + 170*e_5 + 244*e_6 + 345*e_7 + 276*e_8 + 207*e_9 + 138*e_10 + 69*e_11
+[19:09:16]   walk wall lift: -15*e_0 - 15*e_1 - 27*e_2 - 83*e_3 + 137*e_4 + 166*e_5 + 236*e_6 + 335*e_7 + 268*e_8 + 201*e_9 + 134*e_10 + 67*e_11
+[19:09:17] Sterk's printed walls: 11
+[19:09:17]   Sterk wall 0: e_a2, square -4, in v1-perp True
+[19:09:17]     admitted by the filter: True
+[19:09:17]   Sterk wall 1: e_a3, square -4, in v1-perp True
+[19:09:17]     admitted by the filter: True
+[19:09:17]   Sterk wall 2: e_a4, square -4, in v1-perp True
+[19:09:17]     admitted by the filter: True
+[19:09:17]   Sterk wall 3: e_a5, square -4, in v1-perp True
+[19:09:18]     admitted by the filter: True
+[19:09:18]   Sterk wall 4: e_a6, square -4, in v1-perp True
+[19:09:18]     admitted by the filter: True
+[19:09:18]   Sterk wall 5: e_a7, square -4, in v1-perp True
+[19:09:18]     admitted by the filter: True
+[19:09:18]   Sterk wall 6: e_a8, square -4, in v1-perp True
+[19:09:18]     admitted by the filter: True
+[19:09:18]   Sterk wall 7: -e_e + e_f, square -2, in v1-perp True
+[19:09:18]     admitted by the filter: True
+[19:09:18]   Sterk wall 8: 2*e_ep - 2*e_a1 - 3*e_a2 - 4*e_a3 - 6*e_a4 - 5*e_a5 - 4*e_a6 - 3*e_a7 - 2*e_a8, square -4, in v1-perp False
+[19:09:18]     pairs 4 with the cusp vector, so it names no class of the v1 reduction
+[19:09:18]   Sterk wall 9: e_e + e_f - e_ep + e_a1, square -2, in v1-perp False
+[19:09:18]     pairs -2 with the cusp vector, so it names no class of the v1 reduction
+[19:09:18]   Sterk wall 10: 2*e_e - 2*e_ep + 2*e_a1 + 2*e_a2 + 3*e_a3 + 4*e_a4 + 3*e_a5 + 2*e_a6 + e_a7, square -4, in v1-perp False
+[19:09:18]     pairs -4 with the cusp vector, so it names no class of the v1 reduction
+[19:09:18] Sterk walls' Gram matrix (the card chamber's):
+[19:09:18]   [-4, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0]
+[19:09:18]   [0, -4, 2, 0, 0, 0, 0, 0, 0, 2, 0]
+[19:09:18]   [2, 2, -4, 2, 0, 0, 0, 0, 0, 0, 0]
+[19:09:18]   [0, 0, 2, -4, 2, 0, 0, 0, 0, 0, 0]
+[19:09:18]   [0, 0, 0, 2, -4, 2, 0, 0, 0, 0, 0]
+[19:09:18]   [0, 0, 0, 0, 2, -4, 2, 0, 0, 0, 0]
+[19:09:18]   [0, 0, 0, 0, 0, 2, -4, 0, 2, 0, 2]
+[19:09:18]   [0, 0, 0, 0, 0, 0, 0, -2, 0, 0, 2]
+[19:09:18]   [0, 0, 0, 0, 0, 0, 2, 0, -4, 0, 0]
+[19:09:18]   [0, 2, 0, 0, 0, 0, 0, 0, 0, -2, 0]
+[19:09:18]   [0, 0, 0, 0, 0, 0, 2, 2, 0, 0, -4]
+[19:09:18] the walk walls' Gram matrix:
+[19:09:18]   [4, 0, 0, 0, 0, 0, -2, -2, 0, 0, 0, -2, 0, 0, -2, -2]
+[19:09:18]   [0, 4, -2, 0, 0, 0, 0, 0, -2, -2, 0, -2, 0, 0, 0, 0]
+[19:09:18]   [0, -2, 4, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[19:09:18]   [0, 0, -2, 4, -2, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0]
+[19:09:18]   [0, 0, 0, -2, 4, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[19:09:18]   [0, 0, 0, 0, -2, 4, -2, 0, 0, 0, 0, 0, -2, -2, 0, 0]
+[19:09:18]   [-2, 0, 0, 0, 0, -2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[19:09:18]   [-2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0]
+[19:09:18]   [0, -2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, -2, 0, -4]
+[19:09:18]   [0, -2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, -2, 0, -4, 0]
+[19:09:18]   [0, 0, 0, -2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, -2, -2]
+[19:09:18]   [-2, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0]
+[19:09:18]   [0, 0, 0, 0, 0, -2, 0, 0, 0, -2, 0, 0, 2, 0, 0, -4]
+[19:09:18]   [0, 0, 0, 0, 0, -2, 0, 0, -2, 0, 0, 0, 0, 2, -4, 0]
+[19:09:18]   [-2, 0, 0, 0, 0, 0, 0, 0, 0, -4, -2, 0, 0, -4, 2, -6]
+[19:09:18]   [-2, 0, 0, 0, 0, 0, 0, 0, -4, 0, -2, 0, -4, 0, -6, 2]
+[19:09:18] probe complete in 134.8 s
+[peakrss] issue387: child waited=0 shell_code=0 samples=69
+[peakrss] peak tree RSS      : 662 MiB
+[peakrss] low-water MemAvail : 14220 MiB
+[peakrss] peak single VmHWM  : 662 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      651 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   136.1s procs=  3 rss=   662 MiB hwm=   662 MiB avail= 14225 MiB
+[peakrss]   t=   106.0s procs=  3 rss=   661 MiB hwm=   661 MiB avail= 14226 MiB
+[peakrss]   t=   108.0s procs=  3 rss=   661 MiB hwm=   661 MiB avail= 14225 MiB
+[peakrss]   t=   110.0s procs=  3 rss=   661 MiB hwm=   661 MiB avail= 14220 MiB
+[peakrss]   t=   112.0s procs=  3 rss=   661 MiB hwm=   661 MiB avail= 14225 MiB
+launcher exit: 0
