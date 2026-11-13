@@ -108,6 +108,58 @@ def _pointed_marking(lattice, vector):
     return category, category.object(arrow)
 
 
+def _kneser_neighbour_gram(gram, coordinates):
+    r"""Return the Gram matrix of the Kneser 2-neighbour ``K_w + Z(w/2)``.
+
+    The construction is the one of Conway--Sloane, *Sphere Packings, Lattices
+    and Groups*, 3rd ed., read as text at
+    ``.tmp/conway-sloane-splag-3rd-ed.pdf``: Preface to the Third Edition,
+    Notes on Chapter 17, section ``Neighbours``, printed p. lv ([Kne4],
+    [Ven2], [Wan96]).  For ``w`` in a unimodular ``L`` with ``1/2 w`` not in
+    ``L`` and ``w . w`` in ``4Z``, the neighbor ``L'' = L_w + Z(w/2)`` is
+    unimodular, all unimodular neighbors of ``L`` arise in this way, and
+    ``L''`` is even exactly when ``w . w`` lies in ``8Z``.
+
+    ``K_w = {x in K : x . w even}`` is ``Z(2v) + ker(a)`` for ``a`` the
+    pairing vector of ``w`` and ``a . v = 1``.  With ``c = s B`` on that
+    basis and ``r = s mod 2``, ``K'`` has B-coordinates
+    ``Z^16 + Z(s/2) = (1/2)(2Z^16 + Z r)``: half the echelon basis of the
+    row span of the ``2e_i`` and ``r``.
+    """
+    from math import gcd
+
+    from sage.modules.free_module_element import vector as engine_vector
+    from sage.rings.rational_field import QQ as SageQQ
+
+    pairings = gram * coordinates
+    divisibility = gcd(*(int(entry) for entry in pairings))
+    if divisibility != 1:
+        raise ValueError(f"the neighbour needs a divisibility-one vector, but w has divisibility {divisibility}")
+    solution = engine_matrix(SageZZ, [list(pairings)]).solve_right(engine_vector(SageZZ, [1]))
+    kernel = engine_matrix(SageZZ, [list(pairings)]).right_kernel().basis()
+    basis = engine_matrix(SageZZ, [list(SageZZ(2) * solution)] + [list(k) for k in kernel])
+    if basis.rank() != basis.nrows() or abs(int(basis.det())) != 2:
+        raise ValueError("the even-pairing sublattice K_w is degenerate")
+    coordinates_of_w = basis.solve_left(coordinates)
+    if coordinates_of_w * basis != coordinates or not all(coefficient in SageZZ for coefficient in coordinates_of_w):
+        raise ValueError("w does not lie in the even-pairing sublattice K_w")
+    residue = engine_vector(SageZZ, [int(coefficient) % 2 for coefficient in coordinates_of_w])
+    if residue == 0:
+        raise ValueError("w lies in 2K_w: no neighbour")
+    doubled = engine_matrix(
+        SageZZ,
+        [list(SageZZ(2) * engine_vector(SageZZ, [SageZZ(1) if i == j else SageZZ(0) for j in range(len(residue))])) for i in range(len(residue))]
+        + [list(residue)],
+    )
+    echelon = doubled.echelon_form()
+    rows = [echelon.row(index) for index in range(echelon.nrows()) if echelon.row(index) != 0]
+    if len(rows) != len(residue):
+        raise ValueError("the doubled lattice is degenerate")
+    half = engine_matrix(SageQQ, [[SageQQ(coefficient) / 2 for coefficient in row] for row in rows])
+    prime = half * basis.change_ring(SageQQ)
+    return prime * gram.change_ring(SageQQ) * prime.transpose()
+
+
 def _primitive_isotropic_subobject_or_none(lattice, embedded):
     r"""Return the primitive totally isotropic subobject spanned by ``embedded``, or ``None``.
 
@@ -5282,6 +5334,230 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         )
         return _binary_indefinite_isometry_matrix(domain_gram, codomain_gram)
 
+    def _kneser_neighbour_isometry(self):
+        r"""Return the isometry that the Kneser 2-neighbour route constructs, or ``None``.
+
+        The route serves a pair of even unimodular indefinite ``ZZ``-lattices
+        that both split as ``U + U + K`` in their represented
+        decompositions, whose complements are even, unimodular and definite
+        of equal rank: for rank-16 complements these are the two
+        inequivalent even unimodular lattices ``E8(-1)^2`` and ``D16+(-1)``,
+        the pair on which deciding ``2U + K`` by ``K`` fails.  Every
+        decision below is a computation on the Gram matrices, and each
+        source statement is cited with its printed page in Conway--Sloane,
+        *Sphere Packings, Lattices and Groups*, 3rd ed., held as text at
+        ``.tmp/conway-sloane-splag-3rd-ed.pdf`` and read with ``pdftotext``:
+
+        - Preface to the Third Edition, Notes on Chapter 17, section
+          ``Neighbours``, printed p. lv ([Kne4], [Ven2], [Wan96]): for ``u``
+          in a unimodular ``L`` with ``1/2 u`` not in ``L`` and ``u.u`` in
+          ``4Z``, the neighbour ``L'' = L_u + Z(1/2 u)`` is unimodular, all
+          unimodular neighbours of ``L`` arise in this way, and ``L''`` is
+          even exactly when ``u.u`` lies in ``8Z``.  The neighbour of the
+          source's complement along the diagonal ``w = v + v`` of one
+          norm-``-4``, divisibility-one vector ``v`` of one ``E8(-1)``
+          summand is computed, not assumed: its Gram matrix comes from the
+          sublattice ``K_w = {x in K : x . w even}`` and the half vector
+          ``w/2``, and the class decision compares the order of its
+          orthogonal group with the target complement's.
+
+        - Ch. 26 sec. 1, printed p. 525: for an isotropic ``u`` of
+          divisibility one in a unimodular Lorentzian lattice,
+          ``(u^perp cap Lambda)/u`` is an integral unimodular Euclidean
+          lattice.  With ``u = 2f + w + 2e`` in the first ``U + K``, the
+          quotient is the neighbour of the previous item, so its class is
+          the target complement's; the member ``M1 = u^perp cap z^perp`` of
+          the split exhibits it.
+
+        - Ch. 17 sec. 1, printed pp. 421-422: neighbours are the lattices
+          whose intersection has index 2 in each, and the orbits of
+          primitive norm-0 vectors correspond to the even unimodular
+          lattices of the complement.  The new basis
+          ``(u, z, M1, e_b, f_b)`` of the source and the images
+          ``(e_a', f_a', T16, e_b', f_b')`` compose into the column matrix
+          of the isometry, and its equation is verified exactly before the
+          witness is returned.
+
+        The route returns ``None`` outside its scope, leaving the pair to
+        the port.
+        """
+        from math import gcd
+
+        from sage.modules.free_module_element import vector as engine_vector
+        from sage.quadratic_forms.quadratic_form import QuadraticForm
+
+        from sage_extensions.categories.lattices import Lattices
+
+        domain = self.domain()
+        codomain = self.codomain()
+        if _engine_ring(domain.base_ring()) is not SageZZ or _engine_ring(codomain.base_ring()) is not SageZZ:
+            return None
+        if not domain.is_even() or not codomain.is_even():
+            return None
+        if not domain.is_nondegenerate() or not codomain.is_nondegenerate():
+            return None
+        if int(domain.module_rank()) != int(codomain.module_rank()):
+            return None
+        # The route serves indefinite pairs; a definite pair (one signature
+        # part zero) is the definite route's, and the port only receives
+        # what no route of this library decided.
+        signature = domain.signature_pair()
+        if signature.first() == 0 or signature.second() == 0:
+            return None
+
+        # The represented U + U + K decompositions, with the two hyperbolic
+        # planes first and the even unimodular definite complement last.
+        try:
+            domain_planes = (domain.biproduct_factor(0), domain.biproduct_factor(1))
+            codomain_planes = (codomain.biproduct_factor(0), codomain.biproduct_factor(1))
+            domain_complement = domain.biproduct_factor(2)
+            codomain_complement = codomain.biproduct_factor(2)
+        except (IndexError, KeyError):
+            return None
+        for plane in domain_planes + codomain_planes:
+            if int(plane.module_rank()) != 2 or not plane.is_unimodular():
+                return None
+            if tuple(int(value) for value in plane.signature_pair()) != (1, 1):
+                return None
+        for complement in (domain_complement, codomain_complement):
+            signature = complement.signature_pair()
+            if signature.first() != 0 and signature.second() != 0:
+                return None
+            if not complement.is_even() or not complement.is_unimodular():
+                return None
+        if int(domain_complement.module_rank()) != int(codomain_complement.module_rank()):
+            return None
+
+        # The E8(-1)^2 side: its complement splits as two rank-8 unimodular
+        # even definite factors.  The route constructs from that side
+        # towards the other; when the codomain is that side, the constructed
+        # column matrix is inverted for the forward witness.
+        def _splits_as_two_e8_sums(complement):
+            try:
+                factors = (complement.biproduct_factor(0), complement.biproduct_factor(1))
+            except (IndexError, KeyError):
+                return False
+            for factor in factors:
+                if int(factor.module_rank()) != 8 or not factor.is_unimodular() or not factor.is_even():
+                    return False
+                signature = factor.signature_pair()
+                if signature.first() != 0 and signature.second() != 0:
+                    return False
+            return True
+
+        if _splits_as_two_e8_sums(domain_complement):
+            source, target = domain, codomain
+            invert = False
+        elif _splits_as_two_e8_sums(codomain_complement):
+            source, target = codomain, domain
+            invert = True
+        else:
+            return None
+
+        source_gram = _engine_component_matrix(source.gram_tensor()).change_ring(SageZZ)
+        target_gram = _engine_component_matrix(target.gram_tensor()).change_ring(SageZZ)
+        rank = int(source.module_rank())
+        gram8 = source_gram.matrix_from_rows_and_columns(range(4, 12), range(4, 12))
+        # The complement K of the source's own 2U-splitting: the neighbour is
+        # constructed on K's Gram matrix, and the E8(-1) summand shells live
+        # in it.
+        complement_gram = source_gram.matrix_from_rows_and_columns(range(4, rank), range(4, rank))
+        target_complement_gram = target_gram.matrix_from_rows_and_columns(range(4, rank), range(4, rank))
+        target_order = QuadraticForm(SageZZ, -target_complement_gram).number_of_automorphisms()
+
+        # The neighbour search: the diagonal w = v + v over the norm-(-4),
+        # divisibility-one shell of one E8(-1) summand, in the shell's order.
+        shell = QuadraticForm(SageZZ, -gram8).short_vector_list_up_to_length(4)[2]
+        chosen = None
+        for coordinates in shell:
+            v = engine_vector(SageZZ, list(coordinates))
+            if gcd(*(int(entry) for entry in gram8 * v)) != 1:
+                continue
+            w = engine_vector(SageZZ, list(v) + list(v))
+            square = int(w * complement_gram * w)
+            if square % 8:
+                continue
+            try:
+                neighbour = _kneser_neighbour_gram(complement_gram, w)
+            except ValueError:
+                continue
+            entries = neighbour.list()
+            if not all(entry in SageZZ for entry in entries):
+                continue
+            order = QuadraticForm(SageZZ, -neighbour.change_ring(SageZZ)).number_of_automorphisms()
+            if order == target_order:
+                chosen = (w, -square // 4)
+                break
+        if chosen is None:
+            return None
+        w, coefficient = chosen
+
+        # The isotropic vector u = 2f + w + ce in the first U + K; its
+        # divisibility and isotropy are decided by computation.
+        u = engine_vector(SageZZ, [coefficient, 2, 0, 0] + list(w))
+        pairings = source_gram * u
+        if int(pairings * u) != 0 or gcd(*(int(entry) for entry in pairings)) != 1:
+            return None
+
+        # z with u.z = 1, isotropic, from the Smith form of the pairing row.
+        system = engine_matrix(SageZZ, [list(pairings)])
+        _, _, V = system.smith_form()
+        z0 = V.column(0)
+        if pairings * z0 == -1:
+            z0 = -z0
+        if pairings * z0 != 1:
+            return None
+        square_z0 = int(z0 * source_gram * z0)
+        if square_z0 % 2:
+            return None
+        z = z0 - SageZZ(square_z0 // 2) * u
+        if int(z * source_gram * u) != 1 or int(z * source_gram * z) != 0:
+            return None
+
+        # M1 = u^perp cap z^perp within the first U + K: the second plane's
+        # coordinates are pinned to zero by the last two selector rows.
+        conditions = engine_matrix(
+            SageZZ,
+            [
+                list(pairings),
+                list(z * source_gram),
+                [0, 0, 1, 0] + [0] * (rank - 4),
+                [0, 0, 0, 1] + [0] * (rank - 4),
+            ],
+        )
+        member = engine_matrix(SageZZ, [list(row) for row in conditions.right_kernel().basis()])
+        if member.nrows() != rank - 4 or member.rank() != rank - 4:
+            return None
+        member_gram = member * source_gram * member.transpose()
+
+        # The definite isometry M1 -> the target complement, by the
+        # library's own exact route; its row matrix is verified exactly.
+        member_lattice = Lattices(SageZZ)([list(row) for row in member_gram])
+        target_lattice = Lattices(SageZZ)([list(row) for row in target_complement_gram])
+        witness = member_lattice.Isom(target_lattice).an_element()
+        rows = []
+        for generator in member_lattice.module_generators():
+            image = witness(generator)
+            rows.append([int(image.to_vector()(label)) for label in target_lattice.module_generating_set()])
+        definite = engine_matrix(SageZZ, rows)
+        if definite * target_complement_gram * definite.transpose() != member_gram:
+            return None
+
+        # The new basis (u, z, M1, e_b, f_b) of the source and the images
+        # (e_a', f_a', T16, e_b', f_b'); the change of basis is unimodular.
+        new_basis = [list(u), list(z)] + [list(row) for row in member.rows()]
+        new_basis += [[0, 0, 1, 0] + [0] * (rank - 4), [0, 0, 0, 1] + [0] * (rank - 4)]
+        change = engine_matrix(SageZZ, [list(column) for column in zip(*new_basis)])
+        if abs(int(change.det())) != 1:
+            return None
+        images = [[1, 0, 0, 0] + [0] * (rank - 4), [0, 1, 0, 0] + [0] * (rank - 4)]
+        images += [[0, 0, 0, 0] + list(definite.row(index)) for index in range(rank - 4)]
+        images += [[0, 0, 1, 0] + [0] * (rank - 4), [0, 0, 0, 1] + [0] * (rank - 4)]
+        placed = engine_matrix(SageZZ, [list(column) for column in zip(*images)]) * change.inverse()
+        if placed.transpose() * target_gram * placed != source_gram:
+            return None
+        return self._isometry_from_column_matrix(placed.inverse() if invert else placed)
+
     def an_element(self):
         r"""Return an isometry, constructed on request after the decision.
 
@@ -5355,6 +5631,10 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                 f"{domain} and {codomain} are isometric by {reason}, but the equivalence search found no isometry"
             )
             return self._isometry_from_column_matrix(transformation)
+
+        neighbour = self._kneser_neighbour_isometry()
+        if neighbour is not None:
+            return neighbour
 
         from sage_extensions.categories.lattices import Lattices
         from sage_indefinite_port.indefinite.marked_lattices import isometry

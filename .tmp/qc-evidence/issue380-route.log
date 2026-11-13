@@ -1,0 +1,24 @@
+source SHA: 4f7fad73d7fcba6c09997ed92f9e6361beb84d1b
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+[     1.0s] the test's pair built
+[   308.3s] source.is_isometric_to(target): True
+[   450.0s] isometry_to returned: Morphism from Integral lattice of rank 20 and signature (2, 18) to Integral lattice of rank 20 and signature (2, 18)
+[   450.0s] the witness has the test's domain and codomain
+[   450.0s] the inverse's row matrix R: 20x20, det -1
+[   450.0s] R G R^T == G': True
+[   450.0s] (M^T G M == G') with M = R^T: True
+[   450.0s] ACCEPTANCE: M^T G M = G' verified exactly through the public API
+[peakrss] issue380-route: child waited=0 shell_code=0 samples=234
+[peakrss] peak tree RSS      : 578 MiB
+[peakrss] low-water MemAvail : 4083 MiB
+[peakrss] peak single VmHWM  : 578 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      567 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   465.8s procs=  3 rss=   578 MiB hwm=   578 MiB avail=  8019 MiB
+[peakrss]   t=   463.8s procs=  3 rss=   576 MiB hwm=   576 MiB avail=  8112 MiB
+[peakrss]   t=   459.8s procs=  3 rss=   575 MiB hwm=   575 MiB avail=  8152 MiB
+[peakrss]   t=   461.8s procs=  3 rss=   575 MiB hwm=   575 MiB avail=  7983 MiB
+[peakrss]   t=   457.8s procs=  3 rss=   570 MiB hwm=   570 MiB avail=  7945 MiB
+launcher exit: 0

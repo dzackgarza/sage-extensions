@@ -639,3 +639,17 @@ engine choice.  These are the two runs of that probe, in separate processes, at 
 | `issue370-cusp-four-determinism-run2.log` | the tree of this push | the same probe again: the same eleven walls, the same nine classes, the same root class and the same one orbit |
 
 The probe is `issue370-cusp-four-determinism-probe.py`.
+
+## #380 — the Kneser 2-neighbour route and its runs
+
+The route behind `isometry_to` for `2U ⊕ E8(−1)² → 2U ⊕ D16⁺(−1)` is
+`LatticeIsometryMor._kneser_neighbour_isometry` (`lattice_morphisms.py`),
+cited to Conway–Sloane 3rd ed. (Preface "Neighbours" p. lv; Ch. 26 §1 p. 525;
+Ch. 17 §1 pp. 421–422).  These are its runs at the tree of this push.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue380-kneser-neighbour.log` | the tree of this push | the neighbour search: the first candidate of the norm-(−4) shell of one `E8(−1)` summand, `v = [3, 6, 9, 8, 6, 4, 2, 4]`, gives `w = v + v` with `w·w = −8 ∈ 8ℤ`, `½w ∉ K`, and the neighbour `K′ = K_w + ℤ(½w)` of `|O(K′)| = 685597979049984000` — the order of `D16⁺(−1)` — in 10.9 s |
+| `issue380-assembly.log` | the tree of this push | the assembly: `u = 2e + 2f + w` isotropic of divisibility one; `z = z₀ − (z₀²/2)u` with `z₀² = −2`; `M₁ = u^⊥ ∩ z^⊥` of the `D16⁺(−1)` order; the definite isometry `T₁₆` of determinant `−1` verified exactly; the placed column matrix verified exactly (`placed^⊤ G′ placed = G`); `M^⊤ G M = G′` **True** |
+| `issue380-route.log` | the tree of this push | the public API: `source.is_isometric_to(target)` `True` in 308 s; `isometry_to` returned the witness, the inverse's row matrix of determinant `−1`, and the acceptance equation `M^⊤ G M = G′` **True** in 450 s |
+| `issue380-test.log` | the tree of this push | the module: **3 passed in 423.56 s**, the target test 422.68 s under `--no-time-gates`, at 611 MiB peak, no lint findings |
