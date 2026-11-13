@@ -5233,25 +5233,24 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                 from sage.quadratic_forms.quadratic_form import QuadraticForm
 
                 sign = -1 if positive == 0 else 1
-                source = QuadraticForm(SageZZ, 2 * sign * domain_gram)
-                target = QuadraticForm(SageZZ, 2 * sign * codomain_gram)
                 # The isometry search runs on LLL-reduced grams: PARI's qfisom
                 # enumerates the vectors of norm up to the maximal diagonal
                 # entry of the form it is given (The PARI Group, *PARI/GP*,
-                # qfisominit), so a reduced gram keeps that enumeration small;
-                # the reduction of each gram is PARI's qflllgram (The PARI
-                # Group, *PARI/GP*, qflllgram: the unimodular transformation
-                # matrix T with x*T an LLL-reduced basis for the gram
+                # qfisominit), so a search on reduced grams keeps that
+                # enumeration small; the reduction of each gram is PARI's
+                # qflllgram (The PARI Group, *PARI/GP*, qflllgram: the
+                # unimodular transformation matrix T with x*T an LLL-reduced
+                # basis for the gram
                 # G = x~*x).  When the two reduced grams coincide no search is
                 # needed at all: the equation
                 # Ts~ source Ts == Tt~ target Tt solves for the column action
                 # W = Tt Ts^-1, which satisfies W~ target W == source.  When
-                # they differ, the search needs a PARI stack beyond the
-                # default one-gigabyte maximum, which the library sets for the
-                # call as the PARI manual's parisizemax default advises (The
-                # PARI Group, *PARI/GP*, parisizemax: "It is possible to
-                # increase or decrease parisizemax inside a running gp
-                # session, just use default as usual").
+                # they differ, the search runs on the reduced grams as well:
+                # the equation
+                # U~ Tt~ target Tt U == Ts~ source Ts solves for the column
+                # action U on the reduced pair, and the conjugation
+                # W = Tt U Ts^-1 carries it back, still satisfying
+                # W~ target W == source.
                 from sage.libs.pari import pari
 
                 source_pari = pari(2 * sign * domain_gram)
@@ -5263,8 +5262,11 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                 if reduced_source == reduced_target:
                     transformation = target_transformation.sage() * source_transformation.sage().inverse()
                 else:
-                    pari.allocatemem(4_000_000_000)
-                    transformation = target.is_globally_equivalent_to(source, return_matrix=True)
+                    reduced_source_form = QuadraticForm(SageZZ, reduced_source)
+                    reduced_target_form = QuadraticForm(SageZZ, reduced_target)
+                    transformation = reduced_target_form.is_globally_equivalent_to(reduced_source_form, return_matrix=True)
+                    if transformation is not False:
+                        transformation = target_transformation.sage() * transformation * source_transformation.sage().inverse()
                 if transformation is False:
                     return False
                 if abs(transformation.det()) != 1 or transformation.transpose() * codomain_gram * transformation != domain_gram:
