@@ -231,3 +231,4 @@ e94ef9646e74797c36d624f979d847cc6bb800048a97f60f05dbb4ea3f848244  issue370-card-
 eb18edd9033e060df5d5a4fe5d7728d562a934fdb2dcb3a19955b3635b29fe33  issue370-t-co-cusps-test-alone.log
 5c71d828426d0b818b0bfa3aa014c0fd994e8034616235ab97ba5840e3434d9d  issue370-cusp-four-determinism-probe.py
 49ed438505323e9c791ed1d75efbf49ee402f98dd77572c73c1988a0b4f8ef64  issue370-cusp-four-determinism-run1.log
+ad726286bcd2f48d90f9d521ab60836fe0b02de75cb7218ce736f6eb9154dd20  issue370-cusp-four-determinism-run2.log
