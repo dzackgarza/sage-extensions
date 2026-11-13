@@ -1,16 +1,9 @@
 # #379: the O⁺ plane rows by double cosets, and the plane-block witness that decides them
 
-**Result: the `O⁺` plane row of a lattice reduces, through the double cosets of
-D. Dutour Sikirić and K. Hulek's Lemma 3.6, to one computed element per `O(L)`-orbit of
-planes — an element of the plane stabilizer whose character image is odd — and that
-element is produced by the plane block equations rather than by enumerating a
-stabilizer's generating family.  The route is wired at its owner and pinned by a test on
-two specimens.  **Both cards' `O` plane rows return through the public call and equal their cards — 4 for
-`6JRX` in 1006.6 s and 9 for `6JRY` in 2878.0 s.  Neither `O⁺` row returns: the route
-reaches it, and its stage outran a 3300 s cap.  #379 is therefore not accepted by this
-turn: the double-coset route and its witness are in the tree and pinned on small
-specimens, the two `O` rows agree, and the two `O⁺` rows are what the next unit must
-make affordable.**
+**Result: both cards' `O⁺` plane rows return through the public call and equal the cards
+read by tag — `6JRX` 4 and `6JRY` 9 — and the `O` rows agree too.  The double-coset route
+needs one element per `O(L)`-orbit of planes, and that element is decided by the plane block
+equations rather than by enumerating the plane stabilizer.**
 
 ## The route, and its hypotheses on Scattone's lattices
 
@@ -106,29 +99,31 @@ was moved to the invariant the route actually uses.  The two cards' own `O+` row
 That file is unchanged and stays red on its two `O+` rows until the rank-21 runs below
 return.
 
-## The rank-21 runs, as far as they got
+## The rank-21 runs
 
-Two probes, each in the pinned image with the port at `991b88b0` and this branch as the
-provider, on a VM whose load average was 18–37 (four CPUs, other projects' jobs):
+One probe, in the pinned image with the port at `991b88b0` and this branch as the provider
+(`.scratch/wt379_both4.log`): 1203.0 s for both cards, peak tree RSS 978 MiB.
 
-| card | card's `O` row | call, `O` planes | time | card's `O+` row | call, `O⁺` planes |
-| --- | ---: | ---: | ---: | ---: | --- |
-| `6JRX` (`Λ₂`) | 4 | **4** | 1006.6 s | 4 | not returned: the stage ran past the job's 3300 s cap, ≈2290 s of it after the `O` row |
-| `6JRY` (`Λ₄`) | 9 | **9** | 2878.0 s | 9 | not run: the job was killed at its cap while the `O` row was still finishing |
+| card | card's `O` row | call, `O` planes | time | card's `O+` row | call, `O⁺` planes | time |
+| --- | ---: | ---: | ---: | ---: | --- | ---: |
+| `6JRX` (`Λ₂`) | 4 | **4** | 351.1 s | 4 | **4** | 96.0 s |
+| `6JRY` (`Λ₄`) | 9 | **9** | 617.3 s | 9 | **9** | 138.4 s |
 
-**Both `O` rows agree with their cards, and neither `O⁺` row returned.**  Each `O` row is on its own expensive: 1006.6 s on `Λ₂` and 2878.0 s on `Λ₄` at load
-around 25, so the two lattices differ by a factor near three in the ambient call itself.
-The `O⁺` stage is not a close call: on `6JRX` it passed a cap of 3300 s, more than three
-times the `O` row's own 1006.6 s, so the next unit's first job is to attribute that stage
-between its two parts (the quotient's image computation and the per-plane block-lift
-solves) rather than to give it a bigger cap.  What is measured about the
-`O⁺` stage is its lower bound, not its cost: it spends that time in the character
-quotient's own image computation (the ambient discriminant image over `O(Λ)`'s selected
-generators was measured at 130–417 s in `results/issue17-double-coset-row.md`) and then in
-one plane-block lift solve per candidate action per plane.  That stage is the next unit's
-measurement, and it is an engineering cost at this owner — the double-coset argument does
-not depend on it.
+Every row equals its card.  The `O⁺` rows cost a third to a fifth of the `O` rows they
+refine, because the ambient row is already computed and the split is one plane-block solve
+per ambient orbit.
 
-The two card rows the acceptance asks for are therefore **not** produced here, and no
-count is asserted for them: `6JRX`'s `O` row is the only rank-21 number this turn
-computed, and it equals the card's 4.
+The three repairs, in order, with what each removed:
+
+1. `image_order()` and `subgroup_image_keys()` — materializing the ambient character image
+   (~4.7·10^13 elements) to answer one membership question; replaced by one character
+   evaluation (`6acdded`).
+2. the equality test `subgroup != lattice.O_plus()`, false for the same subgroup reached
+   twice, which silently sent the row into the 11 052-generator stabilizer enumeration
+   (9.3 GiB); replaced by recognition through the character data that defines `O⁺`
+   (`45686c1`).
+3. the plane handed to the block solver was the port's own subobject, whose machinery the
+   solver pays for (7365 s, 8093 MiB); the plane is now rebuilt from the Hermite form of
+   its two coefficient rows — the same span, so the same plane — before solving
+   (`75a7101`).
+
