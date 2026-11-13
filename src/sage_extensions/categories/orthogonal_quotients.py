@@ -1134,6 +1134,40 @@ class OrthogonalCharacterQuotient:
                 f"the plane witness is defined for a rank-two primitive isotropic "
                 f"subobject, but {representative!r} has rank {int(representative.module_rank())}"
             )
+        # The witness belongs to the plane, not to the basis it is presented in: the
+        # block equations are solved in that basis, so a representative whose basis
+        # has large coordinates makes them ill-conditioned and its block data
+        # expensive to build.  The Hermite form of the two coefficient rows is
+        # another basis of the same span -- the same plane, represented exactly --
+        # and it is what the solver is given.  `primitive_isotropic_subobject`
+        # re-checks primitivity and total isotropy on the new basis.
+        lattice = self.lattice
+        lattice_labels = tuple(lattice.module_generating_set())
+        inclusion = representative.inclusion()
+        coordinates = matrix(
+            SageZZ,
+            [
+                [
+                    int(inclusion(representative.module_generator(label)).to_vector()(basis_label))
+                    for basis_label in lattice_labels
+                ]
+                for label in representative.module_generating_set()
+            ],
+        )
+        normalized = coordinates.hermite_form()
+        if normalized != coordinates:
+            representative = lattice.primitive_isotropic_subobject(
+                *(
+                    lattice.linear_combination(
+                        {
+                            basis_label: lattice.base_ring()(int(entry))
+                            for basis_label, entry in zip(lattice_labels, row)
+                            if entry
+                        }
+                    )
+                    for row in normalized.rows()
+                )
+            )
         # One element decides it: `Gamma` is the preimage `chi^{-1}(A)` of its own
         # character image, so `chi(g) in A` exactly when `g in Gamma`.  Asking the
         # subgroup itself is one character evaluation on one isometry; listing
