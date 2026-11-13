@@ -113,7 +113,7 @@ def test_the_odd_unimodular_lattice_of_signature_one_four_has_a_witness() -> Non
     lattice that reaches the rank-five subspace route with an odd form, and the
     form is isotropic by inspection, so a witness must come back.
     """
-    lattice = Lattices(ZZ)(diagonal_matrix(ZZ, [1, -1, -1, -1, -1]))
+    lattice = Lattices(ZZ)([[1 if i == j == 0 else -1 if i == j else 0 for j in range(5)] for i in range(5)])
 
     assert lattice.is_isotropic() is True
     _assert_isotropic_witness(lattice)
