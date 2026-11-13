@@ -45,6 +45,7 @@ jobs:
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Run the kernel plane rows
         env:
+          PYTHONPATH: src
           COBLE_CALL_CAP: ${{ inputs.cap || '10800' }}
           COBLE_ROW_BUDGET: ${{ inputs.budget || '28800' }}
         run: |
