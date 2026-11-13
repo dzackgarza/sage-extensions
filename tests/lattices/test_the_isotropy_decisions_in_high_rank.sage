@@ -104,3 +104,16 @@ def test_the_indefinite_rank_two_form_that_is_anisotropic_stays_anisotropic() ->
     assert lattice.is_isotropic() is False
     with pytest.raises(ValueError):
         lattice.isotropic_vector()
+
+
+def test_the_odd_unimodular_lattice_of_signature_one_four_has_a_witness() -> None:
+    r"""$I_{1,4} = \langle 1 \rangle \oplus \langle -1 \rangle^{\oplus 4}$ is isotropic: $e_0 + e_1$ has square zero.
+
+    It is odd, so its Gram matrix has an odd diagonal entry.  It is the smallest
+    lattice that reaches the rank-five subspace route with an odd form, and the
+    form is isotropic by inspection, so a witness must come back.
+    """
+    lattice = Lattices(ZZ)(diagonal_matrix(ZZ, [1, -1, -1, -1, -1]))
+
+    assert lattice.is_isotropic() is True
+    _assert_isotropic_witness(lattice)
