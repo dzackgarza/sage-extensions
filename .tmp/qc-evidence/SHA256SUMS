@@ -307,3 +307,5 @@ d2ee19d0c1d5ae7f793636f3b26363154d07ce13d5ec25c7253131875cba77ba  .tmp/qc-eviden
 2cf6b51ce49c78e9eefb7da477e7dcc1c3ce8e81b13b854a4b19589570ed9880  .tmp/qc-evidence/issue387-cusp4-nine-lifts.log
 ca7058afb94d72dda0cfe1e8d661406dfe820ee249eb781c1582b113faad05e8  .tmp/qc-evidence/issue387-cusp4-mirrors.py
 5b3c3a93c796b3cfefdfd4aeb08dd56c60b800dc7f90b5db8b15da96b71b4f52  .tmp/qc-evidence/issue387-cusp4-mirrors.log
+3dcbeb3fa1261fd1f1691030cbea289da0e7ea35d6201c387d5b7865b187af63  .tmp/qc-evidence/issue387-cusp4-lifts.py
+177332512ac3d009355c541389505cc7e4a60d049e4584ab1d94b710285eb531  .tmp/qc-evidence/issue387-cusp4-lifts.log
