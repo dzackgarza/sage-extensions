@@ -84,7 +84,10 @@ class GroupAlgebras(OwnedCategoryOverBaseRing):
             *Character Theory of Finite Groups*, Theorem 2.4).  Each class is
             the conjugation orbit of its representative.  That basis replaces
             the equalizers the general centre intersects; the algebra on it is
-            built the same way.
+            built the same way.  Each class sum is the linear combination of the
+            module's generators with coefficient one on the class
+            (`Modules.linear_combination`), which is the operation the module
+            owns for a finite family of generators.
             """
             group = self.group()
             assert group in FiniteGroups(), (
@@ -93,10 +96,12 @@ class GroupAlgebras(OwnedCategoryOverBaseRing):
             )
             class_sums = finite_ordered_set(
                 [
-                    sum(
-                        self.module_generator(element)
-                        for element in {
-                            g * representative * g.inverse() for g in group
+                    self.linear_combination(
+                        {
+                            element: self.base_ring().one()
+                            for element in {
+                                g * representative * g.inverse() for g in group
+                            }
                         }
                     )
                     for representative in group.conjugacy_classes_representatives()

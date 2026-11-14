@@ -1,0 +1,18 @@
+provider SHA: fa7553e2a62ee730355be4fb44ab565af636af80
+inner script: .scratch/qc/probe_closure.sh
+inner args: 
+Zmod(3) is GF(3): False equal: False type: IntegerModRing_generic_with_category
+Zmod is_prime_field: True GF is_prime_field: True
+Zmod: NotImplementedError: algebraic closures of finite fields are only implemented for prime fields
+GF: AttributeError: 'AlgebraicClosureFiniteField_pseudo_conway_with_category' object has no attribute 'degree'
+[peakrss] run: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 175 MiB
+[peakrss] low-water MemAvail : 7932 MiB
+[peakrss] peak single VmHWM  : 175 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      164 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   175 MiB hwm=   175 MiB avail=  7932 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  8114 MiB
+launcher exit: 0

@@ -1,0 +1,13 @@
+# test-id comparison of the 16 files, base 37b67b7 against the star-import tree
+# command: python3 issue468-star-cause-ids.py <base>/.tmp/causes468 <repair>/.tmp/causes468 issue468-flipped.txt
+base   : 141 ids, 43 red
+repair : 141 ids, 43 red
+same id set: True
+green on base, red on the repair: []
+red on base, green on the repair: []
+same failure kind for every shared red id: True
+
+the 15 ids of the two namespace causes, as recorded:
+  collected in the repair: 15/15
+  green in the repair    : 15
+  green on base          : 15

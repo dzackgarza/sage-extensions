@@ -1,0 +1,29 @@
+provider SHA: 37b67b7e467e7bfcfe6e6e1652d5f5111ed003c7
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line --junit-xml=.tmp/causes468/tests_objects_test_cyclic_module_zz6.sage.xml tests/objects/test_cyclic_module_zz6.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FF....F.                                                                 [100%]
+=================================== FAILURES ===================================
+E   TypeError: unsupported operand type(s) for /: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' and 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'
+/repos/sage-extensions/tests/objects/test_cyclic_module_zz6.sage:16: TypeError: unsupported operand type(s) for /: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' and 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'
+E   TypeError: unsupported operand type(s) for /: '_OwnedRingParent_with_category' and 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'
+/repos/sage-extensions/tests/objects/test_cyclic_module_zz6.sage:20: TypeError: unsupported operand type(s) for /: '_OwnedRingParent_with_category' and 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'
+E   AssertionError: GL(Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 6]) is realized as a matrix group only for a free module with a finite selected basis, but Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 6] is in Category of torsion modules with a represented selected finite-presentation backend over Integer Ring
+/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:4032: AssertionError: GL(Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 6]) is realized as a matrix group only for a free module with a finite selected basis, but Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 6] is in Category of torsion modules with a represented selected finite-presentation backend over Integer Ring
+=========================== short test summary info ============================
+FAILED tests/objects/test_cyclic_module_zz6.sage::test_the_cokernel_and_the_quotient_agree
+FAILED tests/objects/test_cyclic_module_zz6.sage::test_the_quotient_of_the_regular_module_by_the_ideal
+FAILED tests/objects/test_cyclic_module_zz6.sage::test_the_endomorphisms_and_automorphisms_of_zz6
+3 failed, 5 passed in 0.42s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 232 MiB
+[peakrss] low-water MemAvail : 10866 MiB
+[peakrss] peak single VmHWM  : 232 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      215 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     2.0s procs=  5 rss=   232 MiB hwm=   232 MiB avail= 10866 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail= 11118 MiB

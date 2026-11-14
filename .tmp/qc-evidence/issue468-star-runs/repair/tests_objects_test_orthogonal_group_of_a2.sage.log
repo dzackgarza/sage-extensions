@@ -1,0 +1,27 @@
+provider SHA: 37b67b7e467e7bfcfe6e6e1652d5f5111ed003c7
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line --junit-xml=.tmp/causes468/tests_objects_test_orthogonal_group_of_a2.sage.xml tests/objects/test_orthogonal_group_of_a2.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+...F...F...                                                              [100%]
+=================================== FAILURES ===================================
+E   AssertionError: the preimage {g in Orthogonal group O(Integral lattice of rank 2 and signature (0, 2)) : sn(g) = 1} needs Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 cap Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 generated through the finite coset space Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2/Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2, but Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 is not known to have finite index in Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2: realize Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2/Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 as a finite Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2-set and select it with Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2.select_left_cosets(...)
+/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py:1181: AssertionError: the preimage {g in Orthogonal group O(Integral lattice of rank 2 and signature (0, 2)) : sn(g) = 1} needs Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 cap Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 generated through the finite coset space Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2/Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2, but Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 is not known to have finite index in Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2: realize Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2/Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 as a finite Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2-set and select it with Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2.select_left_cosets(...)
+E   AttributeError: 'OwnedJoinCategory.element_class[_GeneralPresentedElement]' object has no attribute 'inclusion'
+sage/cpython/getattr.pyx:362: AttributeError: 'OwnedJoinCategory.element_class[_GeneralPresentedElement]' object has no attribute 'category_for'
+=========================== short test summary info ============================
+FAILED tests/objects/test_orthogonal_group_of_a2.sage::test_the_spinor_kernel_of_a2
+FAILED tests/objects/test_orthogonal_group_of_a2.sage::test_the_stabilizer_of_a_discriminant_class
+2 failed, 9 passed in 1.56s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 438 MiB
+[peakrss] low-water MemAvail : 10706 MiB
+[peakrss] peak single VmHWM  : 438 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      421 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   438 MiB hwm=   438 MiB avail= 10706 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   123 MiB hwm=   123 MiB avail= 10928 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 10913 MiB

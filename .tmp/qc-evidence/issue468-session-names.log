@@ -1,0 +1,28 @@
+tree: 51310d613cd8c27860c70ff2f3370fedc6a18f21 with this commit's all.py
+command: /sage/.venv/bin/python -u .tmp/probe_names.py
+Subgroups                          ClasscallMetaclass     owner                  no-sage-namesake
+SymmetricGroups                    ClasscallMetaclass     owner                  no-sage-namesake
+GeneralLinearGroups                ClasscallMetaclass     owner                  no-sage-namesake
+FreeGroupQuotients                 ClasscallMetaclass     owner                  no-sage-namesake
+Torsors                            ClasscallMetaclass     owner                  no-sage-namesake
+CoxeterGroups                      ClasscallMetaclass     owner                  SHADOWS-SAGE
+AbsoluteGaloisGroups               ClasscallMetaclass     owner                  no-sage-namesake
+FinitelyGeneratedGroups            function               owner                  no-sage-namesake
+FinitelyPresentedGroups            function               owner                  no-sage-namesake
+ProfiniteGroups                    ClasscallMetaclass     owner                  no-sage-namesake
+AlternatingAlgebras                ClasscallMetaclass     other-area-or-private  no-sage-namesake
+SymmetricAlgebras                  ClasscallMetaclass     other-area-or-private  no-sage-namesake
+TensorAlgebras                     ClasscallMetaclass     other-area-or-private  no-sage-namesake
+StrictlyGradedCommutativeAlgebras  ClasscallMetaclass     other-area-or-private  no-sage-namesake
+FractionalIdeals                   ClasscallMetaclass     other-area-or-private  no-sage-namesake
+ModulesWithConnection              ClasscallMetaclass     other-area-or-private  no-sage-namesake
+ModulesWithFlatConnection          ClasscallMetaclass     other-area-or-private  no-sage-namesake
+FinitelyGeneratedModules           ClasscallMetaclass     other-area-or-private  no-sage-namesake
+FinitelyPresentedModules           ClasscallMetaclass     other-area-or-private  no-sage-namesake
+ProjectiveModules                  ClasscallMetaclass     other-area-or-private  no-sage-namesake
+TorsionModules                     ClasscallMetaclass     other-area-or-private  no-sage-namesake
+TensorProductModules               ClasscallMetaclass     other-area-or-private  no-sage-namesake
+SymmetricBilinearFormModules       ClasscallMetaclass     other-area-or-private  no-sage-namesake
+
+area names published: 599
+private loop names leaked: []

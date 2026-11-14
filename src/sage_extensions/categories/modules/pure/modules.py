@@ -1697,19 +1697,22 @@ class Modules(OwnedCategoryOverBaseRing):
 
             ``v / r`` is the scalar action of the inverse of ``r`` in the
             module's scalar ring, so an integer divides a vector of a
-            ``QQ``-module through its image in ``QQ``.  A scalar that is not a
-            unit there is refused by the ring's own unit division.
+            ``QQ``-module through its image in ``QQ``, and a scalar that is not
+            a unit there is refused by the ring's own unit inverse,
+            ``Monoids.ElementMethods.inverse_of_unit``, whose computation hook
+            ``_unit_inverse_decision`` the ring's element realization supplies
+            (``v / r = r^{-1} v``, Bourbaki, *Algebra I*, Ch. II, Section 1.1).
 
-            The inverse is the scalar's own inversion, not the quotient
-            ``1 / r``.  ``v / r = r^{-1} v`` is one operation for every module,
-            including a ring over itself: its element class then carries this
-            method, and ``ring.one() / r`` would ask this method for ``1 / r``
-            again with the same operands.  The exact real field reached that
-            fixpoint and raised ``RecursionError`` on every division (#398);
-            a ring's own ``v / r`` is its own division, not a scalar action.
+            An element of the scalar ring is not divided here.  It divides
+            through the ring's own element methods, which state ``x y^{-1}``:
+            for the field realizations beside it, and for an owned ring with a
+            backend realization, that method precedes this one in the element
+            class.  The two agree when the ring is commutative and differ
+            otherwise, so the ring's own division is the one a ring element
+            gets.
             """
             ring = self.parent().base_ring()
-            return self.parent().scalar_multiple(ring(scalar) ** -1, self)
+            return self.parent().scalar_multiple(ring(scalar).inverse_of_unit(), self)
 
     class ParentMethods:
         # The ring acting on this module: the datum this level introduces.

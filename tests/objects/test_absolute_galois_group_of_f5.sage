@@ -2,11 +2,7 @@ from sage_extensions.all import *
 
 
 def galois():
-    return AbsoluteGaloisGroup(GF(5))
-
-
-def test_the_field_construction_agrees() -> None:
-    assert GF(5).absolute_galois_group() == galois()
+    return GF(5).absolute_galois_group()
 
 
 def test_the_categories_of_the_absolute_galois_group() -> None:

@@ -1,0 +1,26 @@
+provider SHA: c8a3cedb1ba27919c416101e98cdc7d36256415e
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_symmetric_algebra_of_qq2.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+..F....                                                                  [100%]
+=================================== FAILURES ===================================
+E   NameError: name 'SymmetricAlgebras' is not defined
+/repos/sage-extensions/tests/objects/test_symmetric_algebra_of_qq2.sage:26: NameError: name 'SymmetricAlgebras' is not defined
+=========================== short test summary info ============================
+FAILED tests/objects/test_symmetric_algebra_of_qq2.sage::test_the_categories_of_the_symmetric_algebra
+1 failed, 6 passed in 0.48s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=4
+[peakrss] peak tree RSS      : 307 MiB
+[peakrss] low-water MemAvail : 9337 MiB
+[peakrss] peak single VmHWM  : 307 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      289 MiB peak
+[peakrss]   sage                        212 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=     6.0s procs=  5 rss=   307 MiB hwm=   307 MiB avail=  9337 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   243 MiB hwm=   243 MiB avail=  9541 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   237 MiB hwm=   237 MiB avail=  9764 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     6 MiB hwm=     6 MiB avail=  9895 MiB

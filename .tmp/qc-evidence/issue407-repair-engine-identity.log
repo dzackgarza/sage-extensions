@@ -1,0 +1,1310 @@
+########## test_a_subgroup_acts_through_its_inclusion.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+....                                                                     [100%]
+4 passed in 6.52s
+########## test_abelian_groups_and_torsion_modules_are_public.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+...                                                                      [100%]
+3 passed in 0.49s
+########## test_absolute_galois.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FFFF.F                                                                   [100%]
+=================================== FAILURES ===================================
+_______ test_the_frobenius_of_f9_raises_to_the_ninth_power_and_fixes_f9 ________
+
+>   return cache[k]
+E   KeyError: 4
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_frobenius_of_f9_raises_to_the_ninth_power_and_fixes_f9() -> None:
+        r"""The arithmetic Frobenius of $G_{\mathbb{F}_9}$ is $x \mapsto x^9$, not $x \mapsto x^3$.
+    
+        On $\alpha$ generating $\mathbb{F}_{9^4}$, $\alpha^9 \ne \alpha^3$; on
+        $\mathbb{F}_9$ it is the identity.
+        """
+        field = GF(9, "u")
+        group = field.absolute_galois_group()
+        frobenius = group.frobenius()
+>       degree_four = group.finite_extension(4)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois.sage:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    ???
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    ???
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:789: in finite_extension
+    closure_embedding = extension_field.Mor(self._closure)(embedding_engine)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:939: in __call__
+    return CategoricalMor.__call__(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:945: in _element_constructor_
+    return _ringlike_mor_element(self, datum, RingMorphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+parent = Mor_Ring(Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (3) of Integer Ring... NN = {0, 1, 2, ...} over Integer Ring / Ideal (3) of Integer Ring, Ring over Integer Ring / Ideal (3) of Integer Ring)
+datum = Ring morphism:
+  From: Finite Field in z38 of size 3^8
+  To:   Algebraic closure of Finite Field of size 3
+  Defn: z38 |--> z38
+provider_type = <class 'sage_extensions.categories.rings.ring_foundation.RingMorphism'>
+
+    def _ringlike_mor_element(parent, datum, provider_type):
+        r"""Admit one rng/ring arrow at its fixed-Mor owner."""
+        if isinstance(datum, provider_type):
+            if datum.domain() is not parent.domain() or datum.codomain() is not parent.codomain():
+                raise ValueError(
+                    f"cannot view {datum} as an element of Mor({parent.domain()}, {parent.codomain()}): it is a "
+                    f"morphism {datum.domain()} -> {datum.codomain()}"
+                )
+            if datum.parent() is parent:
+                return datum
+            raise TypeError(f"{datum} belongs to another ring Mor; apply the functor between the categories")
+        if isinstance(datum, Mapping):
+            from sage_extensions.categories.algebras.algebras import (
+                _engine_algebra_morphism_from_generator_images,
+            )
+    
+            engine_morphism = _engine_algebra_morphism_from_generator_images(
+                parent.domain(),
+                parent.codomain(),
+                datum,
+            )
+            return _ringlike_mor_from_engine(parent, engine_morphism)
+        if isinstance(datum, Map):
+>           raise TypeError(f"{datum} is an arrow of another Mor; native ring computations use the protected engine crossing")
+E           TypeError: Ring morphism:
+E             From: Finite Field in z38 of size 3^8
+E             To:   Algebraic closure of Finite Field of size 3
+E             Defn: z38 |--> z38 is an arrow of another Mor; native ring computations use the protected engine crossing
+
+src/sage_extensions/categories/rings/ring_foundation.py:574: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (3) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (3) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (3) of Integer Ring on Integer Ring / Ideal (3) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+___ test_the_frobenius_of_f625_restricts_to_that_of_f25_with_two_extensions ____
+
+>   return cache[k]
+E   KeyError: 2
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_frobenius_of_f625_restricts_to_that_of_f25_with_two_extensions() -> None:
+        r"""$G_{\mathbb{F}_5} \to \operatorname{Gal}(\mathbb{F}_{5^4}/\mathbb{F}_5) \cong \mathbb{Z}/4$.
+    
+        Its kernel is normal of index $4$, contains $\mathrm{Frob}^4$ and not
+        $\mathrm{Frob}$; the Frobenius of $\mathbb{F}_{25}$ has exactly
+        $[\mathbb{F}_{625} : \mathbb{F}_{25}] = 2$ extensions to $\mathbb{F}_{625}$,
+        namely $\sigma$ and $\sigma^3$.  Source: Lang, *Algebra*, V §5.
+        """
+        group = GF(5).absolute_galois_group()
+        frobenius = group.frobenius()
+>       degree_two = group.finite_extension(2)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois.sage:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:789: in finite_extension
+    closure_embedding = extension_field.Mor(self._closure)(embedding_engine)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:939: in __call__
+    return CategoricalMor.__call__(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:945: in _element_constructor_
+    return _ringlike_mor_element(self, datum, RingMorphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+parent = Mor_Ring(Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring... NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring, Ring over Integer Ring / Ideal (5) of Integer Ring)
+datum = Ring morphism:
+  From: Finite Field in z52 of size 5^2
+  To:   Algebraic closure of Finite Field of size 5
+  Defn: z52 |--> z52
+provider_type = <class 'sage_extensions.categories.rings.ring_foundation.RingMorphism'>
+
+    def _ringlike_mor_element(parent, datum, provider_type):
+        r"""Admit one rng/ring arrow at its fixed-Mor owner."""
+        if isinstance(datum, provider_type):
+            if datum.domain() is not parent.domain() or datum.codomain() is not parent.codomain():
+                raise ValueError(
+                    f"cannot view {datum} as an element of Mor({parent.domain()}, {parent.codomain()}): it is a "
+                    f"morphism {datum.domain()} -> {datum.codomain()}"
+                )
+            if datum.parent() is parent:
+                return datum
+            raise TypeError(f"{datum} belongs to another ring Mor; apply the functor between the categories")
+        if isinstance(datum, Mapping):
+            from sage_extensions.categories.algebras.algebras import (
+                _engine_algebra_morphism_from_generator_images,
+            )
+    
+            engine_morphism = _engine_algebra_morphism_from_generator_images(
+                parent.domain(),
+                parent.codomain(),
+                datum,
+            )
+            return _ringlike_mor_from_engine(parent, engine_morphism)
+        if isinstance(datum, Map):
+>           raise TypeError(f"{datum} is an arrow of another Mor; native ring computations use the protected engine crossing")
+E           TypeError: Ring morphism:
+E             From: Finite Field in z52 of size 5^2
+E             To:   Algebraic closure of Finite Field of size 5
+E             Defn: z52 |--> z52 is an arrow of another Mor; native ring computations use the protected engine crossing
+
+src/sage_extensions/categories/rings/ring_foundation.py:574: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (5) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (5) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (5) of Integer Ring on Integer Ring / Ideal (5) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+__ test_open_subgroups_of_the_absolute_galois_group_of_f5_follow_the_degrees ___
+
+>   return cache[k]
+E   KeyError: 2
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_open_subgroups_of_the_absolute_galois_group_of_f5_follow_the_degrees() -> None:
+        r"""$G_{\mathbb{F}_{25}}$ has index $2$, its Frobenius is $\mathrm{Frob}_5^2$, and $G_{\mathbb{F}_{25}} \cap G_{\mathbb{F}_{125}} = G_{\mathbb{F}_{5^6}}$ has index $6$."""
+        group = GF(5).absolute_galois_group()
+        frobenius = group.frobenius()
+>       index_two = group.open_subgroup(group.finite_extension(2))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois.sage:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:789: in finite_extension
+    closure_embedding = extension_field.Mor(self._closure)(embedding_engine)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:939: in __call__
+    return CategoricalMor.__call__(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:945: in _element_constructor_
+    return _ringlike_mor_element(self, datum, RingMorphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+parent = Mor_Ring(Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring... NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring, Ring over Integer Ring / Ideal (5) of Integer Ring)
+datum = Ring morphism:
+  From: Finite Field in z52 of size 5^2
+  To:   Algebraic closure of Finite Field of size 5
+  Defn: z52 |--> z52
+provider_type = <class 'sage_extensions.categories.rings.ring_foundation.RingMorphism'>
+
+    def _ringlike_mor_element(parent, datum, provider_type):
+        r"""Admit one rng/ring arrow at its fixed-Mor owner."""
+        if isinstance(datum, provider_type):
+            if datum.domain() is not parent.domain() or datum.codomain() is not parent.codomain():
+                raise ValueError(
+                    f"cannot view {datum} as an element of Mor({parent.domain()}, {parent.codomain()}): it is a "
+                    f"morphism {datum.domain()} -> {datum.codomain()}"
+                )
+            if datum.parent() is parent:
+                return datum
+            raise TypeError(f"{datum} belongs to another ring Mor; apply the functor between the categories")
+        if isinstance(datum, Mapping):
+            from sage_extensions.categories.algebras.algebras import (
+                _engine_algebra_morphism_from_generator_images,
+            )
+    
+            engine_morphism = _engine_algebra_morphism_from_generator_images(
+                parent.domain(),
+                parent.codomain(),
+                datum,
+            )
+            return _ringlike_mor_from_engine(parent, engine_morphism)
+        if isinstance(datum, Map):
+>           raise TypeError(f"{datum} is an arrow of another Mor; native ring computations use the protected engine crossing")
+E           TypeError: Ring morphism:
+E             From: Finite Field in z52 of size 5^2
+E             To:   Algebraic closure of Finite Field of size 5
+E             Defn: z52 |--> z52 is an arrow of another Mor; native ring computations use the protected engine crossing
+
+src/sage_extensions/categories/rings/ring_foundation.py:574: TypeError
+_ test_the_core_of_the_subgroup_fixing_the_real_cube_root_of_two_has_index_six _
+
+    def test_the_core_of_the_subgroup_fixing_the_real_cube_root_of_two_has_index_six() -> None:
+        r"""$G_{\mathbb{Q}(\sqrt[3]{2})}$ has index $3$ and is not normal; its core fixes the splitting field of $x^3 - 2$, of degree $6$."""
+        group = QQ.absolute_galois_group()
+        subgroup = group.open_subgroup(_cubic_field(2))
+>       core = subgroup.core()
+               ^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois.sage:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:1038: in core
+    base_embedding = self.supergroup().base_field().Mor(normal_field)(base_backend)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:939: in __call__
+    return CategoricalMor.__call__(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:945: in _element_constructor_
+    return _ringlike_mor_element(self, datum, RingMorphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+parent = Mor_Ring(Fraction Field of Integer Ring, Free module on {1, normal_closure, normal_closure^2, normal_closure^3, normal_closure^4, normal_closure^5} over Fraction Field of Integer Ring)
+datum = Ring morphism:
+  From: Rational Field
+  To:   Number Field in normal_closure with defining polynomial normal_closure^6 + 3*normal_closure^5 + 6*normal_closure^4 + 3*normal_closure^3 + 9*normal_closure + 9
+  Defn: 1 |--> 1
+provider_type = <class 'sage_extensions.categories.rings.ring_foundation.RingMorphism'>
+
+    def _ringlike_mor_element(parent, datum, provider_type):
+        r"""Admit one rng/ring arrow at its fixed-Mor owner."""
+        if isinstance(datum, provider_type):
+            if datum.domain() is not parent.domain() or datum.codomain() is not parent.codomain():
+                raise ValueError(
+                    f"cannot view {datum} as an element of Mor({parent.domain()}, {parent.codomain()}): it is a "
+                    f"morphism {datum.domain()} -> {datum.codomain()}"
+                )
+            if datum.parent() is parent:
+                return datum
+            raise TypeError(f"{datum} belongs to another ring Mor; apply the functor between the categories")
+        if isinstance(datum, Mapping):
+            from sage_extensions.categories.algebras.algebras import (
+                _engine_algebra_morphism_from_generator_images,
+            )
+    
+            engine_morphism = _engine_algebra_morphism_from_generator_images(
+                parent.domain(),
+                parent.codomain(),
+                datum,
+            )
+            return _ringlike_mor_from_engine(parent, engine_morphism)
+        if isinstance(datum, Map):
+>           raise TypeError(f"{datum} is an arrow of another Mor; native ring computations use the protected engine crossing")
+E           TypeError: Ring morphism:
+E             From: Rational Field
+E             To:   Number Field in normal_closure with defining polynomial normal_closure^6 + 3*normal_closure^5 + 6*normal_closure^4 + 3*normal_closure^3 + 9*normal_closure + 9
+E             Defn: 1 |--> 1 is an arrow of another Mor; native ring computations use the protected engine crossing
+
+src/sage_extensions/categories/rings/ring_foundation.py:574: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Algebraic Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Real Algebraic Field on Classes in the multilinear tensor presentation -> Module over Real Algebraic Field on Algebraic Closure of Rational Field accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Free module on {1, a, a^2} over Fraction Field of Integer Ring as an algebra over Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+_ test_cyclotomic_and_kummer_characters_of_finite_fields_take_their_frobenius_values _
+
+    def test_cyclotomic_and_kummer_characters_of_finite_fields_take_their_frobenius_values() -> None:
+        r"""On $G_{\mathbb{F}_5}$: $\chi_3(\mathrm{Frob}) = 5 \equiv -1 \bmod 3$ and $\mathrm{Frob}(\sqrt2)/\sqrt2 = (2/5) = -1$.
+    
+        Both characters factor through $\mathbb{F}_{25}$ and have kernel of index
+        $2$.  On $G_{\mathbb{F}_9}$, $\chi_5(\mathrm{Frob}) = 9 \equiv 4 \bmod 5$.
+        """
+        group = GF(5).absolute_galois_group()
+        frobenius = group.frobenius()
+    
+>       for character in (group.cyclotomic_character(3), group.quadratic_character(2)):
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois.sage:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:867: in cyclotomic_character
+    return CyclotomicCharacter(self, n)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/classcall_metaclass.pyx:328: in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    ???
+src/sage_extensions/categories/group/profinite/galois_characters.py:210: in __classcall_private__
+    residues = integers.quotient_ring(integers.ideal(integers(n)))
+                                                     ^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:6487: in __call__
+    return self._element_constructor_(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Integer Ring, value = 3
+
+    def _element_constructor_(self, value):
+        r"""Construct a ring element, including the image of a finite cardinal.
+    
+        EXAMPLES::
+    
+            sage: from dzack_research.preamble.all import ZZ, finite_ordered_set
+            sage: ZZ(finite_ordered_set((4, 3)).cardinality()) == ZZ(2)
+            True
+        """
+        from sage_extensions.categories.sets.cardinals import Cardinalities
+    
+        # A cardinal is an owned parent, not an element with a scalar parent.
+        # Its finite value is the natural number mapped into this ring.
+        match value:
+            case Parent() if value in Cardinalities():
+                if not value.is_finite():
+                    raise TypeError(f"cannot convert infinite cardinal {value} into {self}")
+                return self._from_engine_element(self._engine(value.finite_value()))
+            case _:
+                pass
+        parent = element_parent(value)
+        if parent is self:
+            return value
+        from sage_extensions.categories.modules.pure.modules import Modules
+    
+        if parent in Modules(self.base_ring()) and parent.unformed_module() is self:
+            return parent._element_of_unformed_module(value)
+        if parent is not None:
+            if parent in OwnedRings():
+                return self._from_engine_element(
+                    self._engine(_rational_engine_value(self._engine, _engine_element(parent, value)))
+                )
+            from sage_extensions.categories.sets.set_categories import NN
+    
+            if parent is NN:
+                return self._from_engine_element(self._engine(int(value)))
+            if parent in SageRings() or parent is self._engine:
+>               raise TypeError(
+                    f"cannot convert {value!r} into {self}: it is a raw Sage element of {parent}; construct it "
+                    "from a ring of this session"
+                )
+E               TypeError: cannot convert 3 into Integer Ring: it is a raw Sage element of Integer Ring; construct it from a ring of this session
+
+src/sage_extensions/categories/rings/ring_foundation.py:6526: TypeError
+=========================== short test summary info ============================
+FAILED tests/groups/test_absolute_galois.sage::test_the_frobenius_of_f9_raises_to_the_ninth_power_and_fixes_f9
+FAILED tests/groups/test_absolute_galois.sage::test_the_frobenius_of_f625_restricts_to_that_of_f25_with_two_extensions
+FAILED tests/groups/test_absolute_galois.sage::test_open_subgroups_of_the_absolute_galois_group_of_f5_follow_the_degrees
+FAILED tests/groups/test_absolute_galois.sage::test_the_core_of_the_subgroup_fixing_the_real_cube_root_of_two_has_index_six
+FAILED tests/groups/test_absolute_galois.sage::test_cyclotomic_and_kummer_characters_of_finite_fields_take_their_frobenius_values
+5 failed, 1 passed in 3.35s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_absolute_galois_category_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__________ test_the_frobenius_of_f25_is_the_25th_power_not_the_fifth ___________
+
+>   return self._cached_methods[name]
+E   KeyError: 'multiplicative_generator'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_frobenius_of_f25_is_the_25th_power_not_the_fifth() -> None:
+        r"""For $q = 25$, $\mathrm{Frob}(x) = x^{25}$; on a generator $g$ of $\mathbb{F}_{25}^\times$ (order $24$), $g^{25} = g \ne g^5$."""
+        field = GF(25, "a")
+        group = field.absolute_galois_group()
+>       generator = group.base_embedding()(field.multiplicative_generator())
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois_category_archive.sage:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class' object has no attribute 'multiplicative_generator'. Did you mean: 'multiplicative_group'?
+
+sage/cpython/getattr.pyx:357: AttributeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (5) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (5) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (5) of Integer Ring on Integer Ring / Ideal (5) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+_ test_every_finite_quotient_of_the_galois_group_of_f5_is_cyclic_generated_by_frobenius _
+
+>   return cache[k]
+E   KeyError: 2
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_every_finite_quotient_of_the_galois_group_of_f5_is_cyclic_generated_by_frobenius() -> None:
+        r"""$G_{\mathbb{F}_5} \cong \widehat{\mathbb{Z}}$: infinite, abelian, and $\operatorname{Gal}(\mathbb{F}_{5^n}/\mathbb{F}_5)$ is cyclic of order $n$ generated by the image of Frobenius.
+    
+        Source: Serre, *Local Fields*, XIII §1.
+        """
+        group = GF(5).absolute_galois_group()
+        frobenius = group.frobenius()
+    
+        assert not group.is_finite()
+        assert group.is_abelian()
+        for degree in (2, 3, 6):
+>           stage = group.finite_extension(degree)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois_category_archive.sage:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    ???
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    ???
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:789: in finite_extension
+    closure_embedding = extension_field.Mor(self._closure)(embedding_engine)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:939: in __call__
+    return CategoricalMor.__call__(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:945: in _element_constructor_
+    return _ringlike_mor_element(self, datum, RingMorphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+parent = Mor_Ring(Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring... NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring, Ring over Integer Ring / Ideal (5) of Integer Ring)
+datum = Ring morphism:
+  From: Finite Field in z52 of size 5^2
+  To:   Algebraic closure of Finite Field of size 5
+  Defn: z52 |--> z52
+provider_type = <class 'sage_extensions.categories.rings.ring_foundation.RingMorphism'>
+
+    def _ringlike_mor_element(parent, datum, provider_type):
+        r"""Admit one rng/ring arrow at its fixed-Mor owner."""
+        if isinstance(datum, provider_type):
+            if datum.domain() is not parent.domain() or datum.codomain() is not parent.codomain():
+                raise ValueError(
+                    f"cannot view {datum} as an element of Mor({parent.domain()}, {parent.codomain()}): it is a "
+                    f"morphism {datum.domain()} -> {datum.codomain()}"
+                )
+            if datum.parent() is parent:
+                return datum
+            raise TypeError(f"{datum} belongs to another ring Mor; apply the functor between the categories")
+        if isinstance(datum, Mapping):
+            from sage_extensions.categories.algebras.algebras import (
+                _engine_algebra_morphism_from_generator_images,
+            )
+    
+            engine_morphism = _engine_algebra_morphism_from_generator_images(
+                parent.domain(),
+                parent.codomain(),
+                datum,
+            )
+            return _ringlike_mor_from_engine(parent, engine_morphism)
+        if isinstance(datum, Map):
+>           raise TypeError(f"{datum} is an arrow of another Mor; native ring computations use the protected engine crossing")
+E           TypeError: Ring morphism:
+E             From: Finite Field in z52 of size 5^2
+E             To:   Algebraic closure of Finite Field of size 5
+E             Defn: z52 |--> z52 is an arrow of another Mor; native ring computations use the protected engine crossing
+
+src/sage_extensions/categories/rings/ring_foundation.py:574: TypeError
+=========================== short test summary info ============================
+FAILED tests/groups/test_absolute_galois_category_archive.sage::test_the_frobenius_of_f25_is_the_25th_power_not_the_fifth
+FAILED tests/groups/test_absolute_galois_category_archive.sage::test_every_finite_quotient_of_the_galois_group_of_f5_is_cyclic_generated_by_frobenius
+2 failed in 2.86s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_absolute_galois_element_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_frobenius_restricts_to_the_generator_of_gal_f25_over_f5 _________
+
+>   return cache[k]
+E   KeyError: 2
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_frobenius_restricts_to_the_generator_of_gal_f25_over_f5() -> None:
+        r"""$\mathrm{Frob}|_{\mathbb{F}_{25}}$ is $x \mapsto x^5$, of order $2$; the Frobenius class of the abelian group $G_{\mathbb{F}_5}$ is $\{\mathrm{Frob}\}$, so it excludes $\mathrm{Frob}^2$."""
+        group = GF(5).absolute_galois_group()
+>       stage = group.finite_extension(2)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois_element_archive.sage:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    ???
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    ???
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:789: in finite_extension
+    closure_embedding = extension_field.Mor(self._closure)(embedding_engine)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:939: in __call__
+    return CategoricalMor.__call__(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:945: in _element_constructor_
+    return _ringlike_mor_element(self, datum, RingMorphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+parent = Mor_Ring(Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring... NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring, Ring over Integer Ring / Ideal (5) of Integer Ring)
+datum = Ring morphism:
+  From: Finite Field in z52 of size 5^2
+  To:   Algebraic closure of Finite Field of size 5
+  Defn: z52 |--> z52
+provider_type = <class 'sage_extensions.categories.rings.ring_foundation.RingMorphism'>
+
+    def _ringlike_mor_element(parent, datum, provider_type):
+        r"""Admit one rng/ring arrow at its fixed-Mor owner."""
+        if isinstance(datum, provider_type):
+            if datum.domain() is not parent.domain() or datum.codomain() is not parent.codomain():
+                raise ValueError(
+                    f"cannot view {datum} as an element of Mor({parent.domain()}, {parent.codomain()}): it is a "
+                    f"morphism {datum.domain()} -> {datum.codomain()}"
+                )
+            if datum.parent() is parent:
+                return datum
+            raise TypeError(f"{datum} belongs to another ring Mor; apply the functor between the categories")
+        if isinstance(datum, Mapping):
+            from sage_extensions.categories.algebras.algebras import (
+                _engine_algebra_morphism_from_generator_images,
+            )
+    
+            engine_morphism = _engine_algebra_morphism_from_generator_images(
+                parent.domain(),
+                parent.codomain(),
+                datum,
+            )
+            return _ringlike_mor_from_engine(parent, engine_morphism)
+        if isinstance(datum, Map):
+>           raise TypeError(f"{datum} is an arrow of another Mor; native ring computations use the protected engine crossing")
+E           TypeError: Ring morphism:
+E             From: Finite Field in z52 of size 5^2
+E             To:   Algebraic closure of Finite Field of size 5
+E             Defn: z52 |--> z52 is an arrow of another Mor; native ring computations use the protected engine crossing
+
+src/sage_extensions/categories/rings/ring_foundation.py:574: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (5) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (5) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (5) of Integer Ring on Integer Ring / Ideal (5) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+FAILED tests/groups/test_absolute_galois_element_archive.sage::test_frobenius_restricts_to_the_generator_of_gal_f25_over_f5
+1 failed in 2.22s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_absolute_galois_subgroups_elements_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_the_subgroup_fixing_f25_is_normal_of_index_two ______________
+
+>   return cache[k]
+E   KeyError: 2
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_subgroup_fixing_f25_is_normal_of_index_two() -> None:
+        r"""$G_{\mathbb{F}_{25}} \trianglelefteq G_{\mathbb{F}_5}$ has index $2$, excludes $\mathrm{Frob}_5$, and its own Frobenius is $\mathrm{Frob}_5^2$."""
+        group = GF(5).absolute_galois_group()
+        frobenius = group.frobenius()
+>       subgroup = group.open_subgroup(group.finite_extension(2))
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois_subgroups_elements_archive.sage:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    ???
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    ???
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:789: in finite_extension
+    closure_embedding = extension_field.Mor(self._closure)(embedding_engine)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:939: in __call__
+    return CategoricalMor.__call__(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:945: in _element_constructor_
+    return _ringlike_mor_element(self, datum, RingMorphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+parent = Mor_Ring(Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring... NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring, Ring over Integer Ring / Ideal (5) of Integer Ring)
+datum = Ring morphism:
+  From: Finite Field in z52 of size 5^2
+  To:   Algebraic closure of Finite Field of size 5
+  Defn: z52 |--> z52
+provider_type = <class 'sage_extensions.categories.rings.ring_foundation.RingMorphism'>
+
+    def _ringlike_mor_element(parent, datum, provider_type):
+        r"""Admit one rng/ring arrow at its fixed-Mor owner."""
+        if isinstance(datum, provider_type):
+            if datum.domain() is not parent.domain() or datum.codomain() is not parent.codomain():
+                raise ValueError(
+                    f"cannot view {datum} as an element of Mor({parent.domain()}, {parent.codomain()}): it is a "
+                    f"morphism {datum.domain()} -> {datum.codomain()}"
+                )
+            if datum.parent() is parent:
+                return datum
+            raise TypeError(f"{datum} belongs to another ring Mor; apply the functor between the categories")
+        if isinstance(datum, Mapping):
+            from sage_extensions.categories.algebras.algebras import (
+                _engine_algebra_morphism_from_generator_images,
+            )
+    
+            engine_morphism = _engine_algebra_morphism_from_generator_images(
+                parent.domain(),
+                parent.codomain(),
+                datum,
+            )
+            return _ringlike_mor_from_engine(parent, engine_morphism)
+        if isinstance(datum, Map):
+>           raise TypeError(f"{datum} is an arrow of another Mor; native ring computations use the protected engine crossing")
+E           TypeError: Ring morphism:
+E             From: Finite Field in z52 of size 5^2
+E             To:   Algebraic closure of Finite Field of size 5
+E             Defn: z52 |--> z52 is an arrow of another Mor; native ring computations use the protected engine crossing
+
+src/sage_extensions/categories/rings/ring_foundation.py:574: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (5) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (5) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (5) of Integer Ring on Integer Ring / Ideal (5) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+___________ test_the_subgroups_fixing_f25_and_f125_meet_in_index_six ___________
+
+>   return cache[k]
+E   KeyError: 2
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_subgroups_fixing_f25_and_f125_meet_in_index_six() -> None:
+        r"""$G_{\mathbb{F}_{25}} \cap G_{\mathbb{F}_{125}} = G_{\mathbb{F}_{5^6}}$ has index $\operatorname{lcm}(2, 3) = 6$."""
+        group = GF(5).absolute_galois_group()
+>       index_two = group.open_subgroup(group.finite_extension(2))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois_subgroups_elements_archive.sage:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:789: in finite_extension
+    closure_embedding = extension_field.Mor(self._closure)(embedding_engine)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:939: in __call__
+    return CategoricalMor.__call__(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:945: in _element_constructor_
+    return _ringlike_mor_element(self, datum, RingMorphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+parent = Mor_Ring(Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring... NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring, Ring over Integer Ring / Ideal (5) of Integer Ring)
+datum = Ring morphism:
+  From: Finite Field in z52 of size 5^2
+  To:   Algebraic closure of Finite Field of size 5
+  Defn: z52 |--> z52
+provider_type = <class 'sage_extensions.categories.rings.ring_foundation.RingMorphism'>
+
+    def _ringlike_mor_element(parent, datum, provider_type):
+        r"""Admit one rng/ring arrow at its fixed-Mor owner."""
+        if isinstance(datum, provider_type):
+            if datum.domain() is not parent.domain() or datum.codomain() is not parent.codomain():
+                raise ValueError(
+                    f"cannot view {datum} as an element of Mor({parent.domain()}, {parent.codomain()}): it is a "
+                    f"morphism {datum.domain()} -> {datum.codomain()}"
+                )
+            if datum.parent() is parent:
+                return datum
+            raise TypeError(f"{datum} belongs to another ring Mor; apply the functor between the categories")
+        if isinstance(datum, Mapping):
+            from sage_extensions.categories.algebras.algebras import (
+                _engine_algebra_morphism_from_generator_images,
+            )
+    
+            engine_morphism = _engine_algebra_morphism_from_generator_images(
+                parent.domain(),
+                parent.codomain(),
+                datum,
+            )
+            return _ringlike_mor_from_engine(parent, engine_morphism)
+        if isinstance(datum, Map):
+>           raise TypeError(f"{datum} is an arrow of another Mor; native ring computations use the protected engine crossing")
+E           TypeError: Ring morphism:
+E             From: Finite Field in z52 of size 5^2
+E             To:   Algebraic closure of Finite Field of size 5
+E             Defn: z52 |--> z52 is an arrow of another Mor; native ring computations use the protected engine crossing
+
+src/sage_extensions/categories/rings/ring_foundation.py:574: TypeError
+=========================== short test summary info ============================
+FAILED tests/groups/test_absolute_galois_subgroups_elements_archive.sage::test_the_subgroup_fixing_f25_is_normal_of_index_two
+FAILED tests/groups/test_absolute_galois_subgroups_elements_archive.sage::test_the_subgroups_fixing_f25_and_f125_meet_in_index_six
+2 failed in 3.63s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_field_absolute_galois_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_the_frobenius_of_f7_generates_every_finite_quotient ___________
+
+>   return cache[k]
+E   KeyError: 2
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_frobenius_of_f7_generates_every_finite_quotient() -> None:
+        r"""$\operatorname{Gal}(\mathbb{F}_{7^n}/\mathbb{F}_7)$ is cyclic of order $n$, generated by $x \mapsto x^7$; so $G_{\mathbb{F}_7}$ is abelian and one element topologically generates it."""
+        group = GF(7).absolute_galois_group()
+        frobenius = group.frobenius()
+    
+        assert group.is_abelian()
+        assert group.topological_generating_family().cardinality() == 1
+        for degree in (2, 3, 4):
+>           stage = group.finite_extension(degree)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_field_absolute_galois_archive.sage:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    ???
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    ???
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:789: in finite_extension
+    closure_embedding = extension_field.Mor(self._closure)(embedding_engine)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:939: in __call__
+    return CategoricalMor.__call__(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:945: in _element_constructor_
+    return _ringlike_mor_element(self, datum, RingMorphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+parent = Mor_Ring(Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (7) of Integer Ring... NN = {0, 1, 2, ...} over Integer Ring / Ideal (7) of Integer Ring, Ring over Integer Ring / Ideal (7) of Integer Ring)
+datum = Ring morphism:
+  From: Finite Field in z72 of size 7^2
+  To:   Algebraic closure of Finite Field of size 7
+  Defn: z72 |--> z72
+provider_type = <class 'sage_extensions.categories.rings.ring_foundation.RingMorphism'>
+
+    def _ringlike_mor_element(parent, datum, provider_type):
+        r"""Admit one rng/ring arrow at its fixed-Mor owner."""
+        if isinstance(datum, provider_type):
+            if datum.domain() is not parent.domain() or datum.codomain() is not parent.codomain():
+                raise ValueError(
+                    f"cannot view {datum} as an element of Mor({parent.domain()}, {parent.codomain()}): it is a "
+                    f"morphism {datum.domain()} -> {datum.codomain()}"
+                )
+            if datum.parent() is parent:
+                return datum
+            raise TypeError(f"{datum} belongs to another ring Mor; apply the functor between the categories")
+        if isinstance(datum, Mapping):
+            from sage_extensions.categories.algebras.algebras import (
+                _engine_algebra_morphism_from_generator_images,
+            )
+    
+            engine_morphism = _engine_algebra_morphism_from_generator_images(
+                parent.domain(),
+                parent.codomain(),
+                datum,
+            )
+            return _ringlike_mor_from_engine(parent, engine_morphism)
+        if isinstance(datum, Map):
+>           raise TypeError(f"{datum} is an arrow of another Mor; native ring computations use the protected engine crossing")
+E           TypeError: Ring morphism:
+E             From: Finite Field in z72 of size 7^2
+E             To:   Algebraic closure of Finite Field of size 7
+E             Defn: z72 |--> z72 is an arrow of another Mor; native ring computations use the protected engine crossing
+
+src/sage_extensions/categories/rings/ring_foundation.py:574: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (7) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (7) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (7) of Integer Ring on Integer Ring / Ideal (7) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+FAILED tests/groups/test_field_absolute_galois_archive.sage::test_the_frobenius_of_f7_generates_every_finite_quotient
+1 failed in 3.44s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_galois_characters_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+______ test_the_mod_three_cyclotomic_character_of_f5_factors_through_f25 _______
+
+    def test_the_mod_three_cyclotomic_character_of_f5_factors_through_f25() -> None:
+        r"""$\chi_3(\mathrm{Frob}) = 5 \equiv 2 \bmod 3$ has order $2$, so $\chi_3$ factors through $\mathbb{F}_5(\mu_3) = \mathbb{F}_{25}$ and is multiplicative."""
+        group = GF(5).absolute_galois_group()
+>       character = group.cyclotomic_character(3)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_galois_characters_archive.sage:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:867: in cyclotomic_character
+    return CyclotomicCharacter(self, n)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/classcall_metaclass.pyx:328: in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    ???
+src/sage_extensions/categories/group/profinite/galois_characters.py:210: in __classcall_private__
+    residues = integers.quotient_ring(integers.ideal(integers(n)))
+                                                     ^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:6487: in __call__
+    return self._element_constructor_(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Integer Ring, value = 3
+
+    def _element_constructor_(self, value):
+        r"""Construct a ring element, including the image of a finite cardinal.
+    
+        EXAMPLES::
+    
+            sage: from dzack_research.preamble.all import ZZ, finite_ordered_set
+            sage: ZZ(finite_ordered_set((4, 3)).cardinality()) == ZZ(2)
+            True
+        """
+        from sage_extensions.categories.sets.cardinals import Cardinalities
+    
+        # A cardinal is an owned parent, not an element with a scalar parent.
+        # Its finite value is the natural number mapped into this ring.
+        match value:
+            case Parent() if value in Cardinalities():
+                if not value.is_finite():
+                    raise TypeError(f"cannot convert infinite cardinal {value} into {self}")
+                return self._from_engine_element(self._engine(value.finite_value()))
+            case _:
+                pass
+        parent = element_parent(value)
+        if parent is self:
+            return value
+        from sage_extensions.categories.modules.pure.modules import Modules
+    
+        if parent in Modules(self.base_ring()) and parent.unformed_module() is self:
+            return parent._element_of_unformed_module(value)
+        if parent is not None:
+            if parent in OwnedRings():
+                return self._from_engine_element(
+                    self._engine(_rational_engine_value(self._engine, _engine_element(parent, value)))
+                )
+            from sage_extensions.categories.sets.set_categories import NN
+    
+            if parent is NN:
+                return self._from_engine_element(self._engine(int(value)))
+            if parent in SageRings() or parent is self._engine:
+>               raise TypeError(
+                    f"cannot convert {value!r} into {self}: it is a raw Sage element of {parent}; construct it "
+                    "from a ring of this session"
+                )
+E               TypeError: cannot convert 3 into Integer Ring: it is a raw Sage element of Integer Ring; construct it from a ring of this session
+
+src/sage_extensions/categories/rings/ring_foundation.py:6526: TypeError
+_____ test_the_quadratic_character_of_two_over_f5_has_kernel_of_index_two ______
+
+>   return cache[k]
+E   KeyError: 2
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_quadratic_character_of_two_over_f5_has_kernel_of_index_two() -> None:
+        r"""$2$ is not a square mod $5$, so $\mathrm{Frob}(\sqrt2) = -\sqrt2$.
+    
+        The kernel fixes $\mathbb{F}_{25}$: index $2$, excluding $\mathrm{Frob}$
+        and containing $\mathrm{Frob}^2$; the character restricted to its kernel
+        is trivial.
+        """
+        group = GF(5).absolute_galois_group()
+>       character = group.quadratic_character(2)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_galois_characters_archive.sage:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:871: in quadratic_character
+    return QuadraticCharacter(self, a)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/classcall_metaclass.pyx:328: in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    ???
+src/sage_extensions/categories/group/profinite/galois_characters.py:319: in __classcall_private__
+    stage = domain.finite_extension(2)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    ???
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    ???
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:789: in finite_extension
+    closure_embedding = extension_field.Mor(self._closure)(embedding_engine)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:939: in __call__
+    return CategoricalMor.__call__(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:945: in _element_constructor_
+    return _ringlike_mor_element(self, datum, RingMorphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+parent = Mor_Ring(Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring... NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring, Ring over Integer Ring / Ideal (5) of Integer Ring)
+datum = Ring morphism:
+  From: Finite Field in z52 of size 5^2
+  To:   Algebraic closure of Finite Field of size 5
+  Defn: z52 |--> z52
+provider_type = <class 'sage_extensions.categories.rings.ring_foundation.RingMorphism'>
+
+    def _ringlike_mor_element(parent, datum, provider_type):
+        r"""Admit one rng/ring arrow at its fixed-Mor owner."""
+        if isinstance(datum, provider_type):
+            if datum.domain() is not parent.domain() or datum.codomain() is not parent.codomain():
+                raise ValueError(
+                    f"cannot view {datum} as an element of Mor({parent.domain()}, {parent.codomain()}): it is a "
+                    f"morphism {datum.domain()} -> {datum.codomain()}"
+                )
+            if datum.parent() is parent:
+                return datum
+            raise TypeError(f"{datum} belongs to another ring Mor; apply the functor between the categories")
+        if isinstance(datum, Mapping):
+            from sage_extensions.categories.algebras.algebras import (
+                _engine_algebra_morphism_from_generator_images,
+            )
+    
+            engine_morphism = _engine_algebra_morphism_from_generator_images(
+                parent.domain(),
+                parent.codomain(),
+                datum,
+            )
+            return _ringlike_mor_from_engine(parent, engine_morphism)
+        if isinstance(datum, Map):
+>           raise TypeError(f"{datum} is an arrow of another Mor; native ring computations use the protected engine crossing")
+E           TypeError: Ring morphism:
+E             From: Finite Field in z52 of size 5^2
+E             To:   Algebraic closure of Finite Field of size 5
+E             Defn: z52 |--> z52 is an arrow of another Mor; native ring computations use the protected engine crossing
+
+src/sage_extensions/categories/rings/ring_foundation.py:574: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (5) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (5) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (5) of Integer Ring on Integer Ring / Ideal (5) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+FAILED tests/groups/test_galois_characters_archive.sage::test_the_mod_three_cyclotomic_character_of_f5_factors_through_f25
+FAILED tests/groups/test_galois_characters_archive.sage::test_the_quadratic_character_of_two_over_f5_has_kernel_of_index_two
+2 failed in 1.54s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_galois_decomposition_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+_________________ test_two_is_inert_in_the_field_of_root_five __________________
+
+>   return self._cached_methods[name]
+E   KeyError: 'image'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_two_is_inert_in_the_field_of_root_five() -> None:
+        r"""$x^2 - x - 1$ is irreducible mod $2$, so the decomposition group of $G_{\mathbb{Q}}$ at $2$ maps onto $\operatorname{Gal}(\mathbb{Q}(\sqrt5)/\mathbb{Q})$ and inertia maps to $1$.
+    
+        Source: Neukirch, *Algebraic Number Theory*, I.8 and I.9.
+        """
+        group, quotient, prime = _root_five_quotient()
+    
+        assert quotient.order() == 2
+>       assert group.decomposition_group_class(2).image(quotient, prime).order() == 2
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_galois_decomposition_archive.sage:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'Sets.parent_class[_DecompositionGroupConjugacyClassEngine].ObjectType' object has no attribute 'image'
+
+sage/cpython/getattr.pyx:357: AttributeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Algebraic Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Real Algebraic Field on Classes in the multilinear tensor presentation -> Module over Real Algebraic Field on Algebraic Closure of Rational Field accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Free module on {1, a} over Fraction Field of Integer Ring as an algebra over Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+FAILED tests/groups/test_galois_decomposition_archive.sage::test_two_is_inert_in_the_field_of_root_five
+1 failed, 1 passed in 2.56s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_galois_extension_coset_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+.                                                                        [100%]
+1 passed in 1.12s
+########## test_galois_normalizer_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_the_normalizer_quotient_for_root_five_is_its_galois_group_of_order_two __
+
+    def test_the_normalizer_quotient_for_root_five_is_its_galois_group_of_order_two() -> None:
+        r"""$K = \mathbb{Q}(\sqrt5)$: $G_K$ is normal of index $2$ and $N(G_K)/G_K = \operatorname{Gal}(K/\mathbb{Q}) \cong \mathbb{Z}/2$."""
+        x = QQ.polynomial_ring("x").algebra_generator("x")
+        subgroup = QQ.absolute_galois_group().open_subgroup((x**2 - 5).number_field("a"))
+        quotient = subgroup.normalizer_quotient()
+    
+        assert subgroup.index() == 2
+        assert subgroup.is_normal()
+        assert quotient.order() == 2
+>       assert quotient.is_isomorphic_to(Groups.C(2))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_galois_normalizer_archive.sage:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/groups.py:6775: in is_isomorphic_to
+    found = _gap_model(left).IsomorphismGroups(_gap_model(right))
+            ^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:184: in _gap_model
+    return _gap_model_of_engine(_engine_group(group))
+                                ^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:155: in _engine_group
+    return group._engine_group()
+           ^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Gal(Free module on {1, a} over Fraction Field of Integer Ring / Fraction Field of Integer Ring)
+
+    @RealizationHook
+    def _engine_group(self):
+        r"""The selected group engine, when a realization supplies one (``OWN-05``)."""
+>       assert False, (
+               ^^^^^
+            f"computation with {self} through a group engine requires a selected realization; "
+            "this group supplies none"
+        )
+E       AssertionError: computation with Gal(Free module on {1, a} over Fraction Field of Integer Ring / Fraction Field of Integer Ring) through a group engine requires a selected realization; this group supplies none
+
+src/sage_extensions/categories/group/groups.py:5739: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Free module on {1, a} over Fraction Field of Integer Ring as an algebra over Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+FAILED tests/groups/test_galois_normalizer_archive.sage::test_the_normalizer_quotient_for_root_five_is_its_galois_group_of_order_two
+1 failed, 1 passed in 2.75s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_galois_quotient_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FF.                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_restriction_to_f625_has_kernel_of_index_four_containing_frobenius_to_the_fourth _
+
+>   return cache[k]
+E   KeyError: 4
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_restriction_to_f625_has_kernel_of_index_four_containing_frobenius_to_the_fourth() -> None:
+        r"""$G_{\mathbb{F}_5} \to \operatorname{Gal}(\mathbb{F}_{5^4}/\mathbb{F}_5) \cong \mathbb{Z}/4$ is surjective; $\mathrm{Frob} \notin \ker$, $\mathrm{Frob}^4 \in \ker$."""
+        group = GF(5).absolute_galois_group()
+        frobenius = group.frobenius()
+>       restriction = group.restriction_map(group.finite_extension(4))
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_galois_quotient_archive.sage:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    ???
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    ???
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:789: in finite_extension
+    closure_embedding = extension_field.Mor(self._closure)(embedding_engine)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:939: in __call__
+    return CategoricalMor.__call__(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:945: in _element_constructor_
+    return _ringlike_mor_element(self, datum, RingMorphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+parent = Mor_Ring(Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring... NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring, Ring over Integer Ring / Ideal (5) of Integer Ring)
+datum = Ring morphism:
+  From: Finite Field in z54 of size 5^4
+  To:   Algebraic closure of Finite Field of size 5
+  Defn: z54 |--> z54
+provider_type = <class 'sage_extensions.categories.rings.ring_foundation.RingMorphism'>
+
+    def _ringlike_mor_element(parent, datum, provider_type):
+        r"""Admit one rng/ring arrow at its fixed-Mor owner."""
+        if isinstance(datum, provider_type):
+            if datum.domain() is not parent.domain() or datum.codomain() is not parent.codomain():
+                raise ValueError(
+                    f"cannot view {datum} as an element of Mor({parent.domain()}, {parent.codomain()}): it is a "
+                    f"morphism {datum.domain()} -> {datum.codomain()}"
+                )
+            if datum.parent() is parent:
+                return datum
+            raise TypeError(f"{datum} belongs to another ring Mor; apply the functor between the categories")
+        if isinstance(datum, Mapping):
+            from sage_extensions.categories.algebras.algebras import (
+                _engine_algebra_morphism_from_generator_images,
+            )
+    
+            engine_morphism = _engine_algebra_morphism_from_generator_images(
+                parent.domain(),
+                parent.codomain(),
+                datum,
+            )
+            return _ringlike_mor_from_engine(parent, engine_morphism)
+        if isinstance(datum, Map):
+>           raise TypeError(f"{datum} is an arrow of another Mor; native ring computations use the protected engine crossing")
+E           TypeError: Ring morphism:
+E             From: Finite Field in z54 of size 5^4
+E             To:   Algebraic closure of Finite Field of size 5
+E             Defn: z54 |--> z54 is an arrow of another Mor; native ring computations use the protected engine crossing
+
+src/sage_extensions/categories/rings/ring_foundation.py:574: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (5) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (5) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (5) of Integer Ring on Integer Ring / Ideal (5) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+_________ test_the_frobenius_of_f25_has_exactly_two_extensions_to_f625 _________
+
+>   return cache[k]
+E   KeyError: 2
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_frobenius_of_f25_has_exactly_two_extensions_to_f625() -> None:
+        r"""The fibre of $\operatorname{Gal}(\mathbb{F}_{625}/\mathbb{F}_5) \to \operatorname{Gal}(\mathbb{F}_{25}/\mathbb{F}_5)$ over $\mathrm{Frob}$ has $[\mathbb{F}_{625}:\mathbb{F}_{25}] = 2$ elements, $\sigma$ and $\sigma^3$."""
+        group = GF(5).absolute_galois_group()
+        frobenius = group.frobenius()
+>       to_two = group.restriction_map(group.finite_extension(2))
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_galois_quotient_archive.sage:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:789: in finite_extension
+    closure_embedding = extension_field.Mor(self._closure)(embedding_engine)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:939: in __call__
+    return CategoricalMor.__call__(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:945: in _element_constructor_
+    return _ringlike_mor_element(self, datum, RingMorphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+parent = Mor_Ring(Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring... NN = {0, 1, 2, ...} over Integer Ring / Ideal (5) of Integer Ring, Ring over Integer Ring / Ideal (5) of Integer Ring)
+datum = Ring morphism:
+  From: Finite Field in z52 of size 5^2
+  To:   Algebraic closure of Finite Field of size 5
+  Defn: z52 |--> z52
+provider_type = <class 'sage_extensions.categories.rings.ring_foundation.RingMorphism'>
+
+    def _ringlike_mor_element(parent, datum, provider_type):
+        r"""Admit one rng/ring arrow at its fixed-Mor owner."""
+        if isinstance(datum, provider_type):
+            if datum.domain() is not parent.domain() or datum.codomain() is not parent.codomain():
+                raise ValueError(
+                    f"cannot view {datum} as an element of Mor({parent.domain()}, {parent.codomain()}): it is a "
+                    f"morphism {datum.domain()} -> {datum.codomain()}"
+                )
+            if datum.parent() is parent:
+                return datum
+            raise TypeError(f"{datum} belongs to another ring Mor; apply the functor between the categories")
+        if isinstance(datum, Mapping):
+            from sage_extensions.categories.algebras.algebras import (
+                _engine_algebra_morphism_from_generator_images,
+            )
+    
+            engine_morphism = _engine_algebra_morphism_from_generator_images(
+                parent.domain(),
+                parent.codomain(),
+                datum,
+            )
+            return _ringlike_mor_from_engine(parent, engine_morphism)
+        if isinstance(datum, Map):
+>           raise TypeError(f"{datum} is an arrow of another Mor; native ring computations use the protected engine crossing")
+E           TypeError: Ring morphism:
+E             From: Finite Field in z52 of size 5^2
+E             To:   Algebraic closure of Finite Field of size 5
+E             Defn: z52 |--> z52 is an arrow of another Mor; native ring computations use the protected engine crossing
+
+src/sage_extensions/categories/rings/ring_foundation.py:574: TypeError
+=========================== short test summary info ============================
+FAILED tests/groups/test_galois_quotient_archive.sage::test_restriction_to_f625_has_kernel_of_index_four_containing_frobenius_to_the_fourth
+FAILED tests/groups/test_galois_quotient_archive.sage::test_the_frobenius_of_f25_has_exactly_two_extensions_to_f625
+2 failed, 1 passed in 3.08s
+error: recipe `test` failed on line 154 with exit code 1

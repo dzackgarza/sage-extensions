@@ -1,0 +1,45 @@
+provider SHA: c8a3cedb1ba27919c416101e98cdc7d36256415e
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_standard_triangle.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+F.FFF.F                                                                  [100%]
+=================================== FAILURES ===================================
+E   TypeError: the proposition is_subset(Lattice Polygon of dimension 2 with 3 vertices, Lattice Polygon of dimension 2 with 3 vertices) and is_subset(Lattice Polygon of dimension 2 with 3 vertices, Lattice Polygon of dimension 2 with 3 vertices) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+/repos/sage-extensions/src/sage_extensions/logic.py:44: TypeError: the proposition is_subset(Lattice Polygon of dimension 2 with 3 vertices, Lattice Polygon of dimension 2 with 3 vertices) and is_subset(Lattice Polygon of dimension 2 with 3 vertices, Lattice Polygon of dimension 2 with 3 vertices) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+E   TypeError: cannot use 'sage_extensions.categories.sets.set_categories.ConvexPolytopes.Integral.parent_class[Sets.parent_class[_ConditionSetEngine].ObjectType].ObjectType' as a dict key (unhashable type: 'ConvexPolytopes.Integral.parent_class[Sets.parent_class[_ConditionSetEngine].ObjectType].ObjectType')
+
+During handling of the above exception, another exception occurred:
+E   ValueError: cannot form a finite set of distinct points: equality of supplied unhashable elements is undecided
+/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:362: ValueError: cannot form a finite set of distinct points: equality of supplied unhashable elements is undecided
+E   AttributeError: 'list' object has no attribute 'parent'
+/repos/sage-extensions/src/sage_extensions/categories/schemes/polytopes.py:684: AttributeError: 'list' object has no attribute 'parent'
+E   TypeError: 'Owned_NativeFreeAlgebraParent_with_category.element_class' object is not callable
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+/repos/sage-extensions/tests/objects/test_standard_triangle.sage:49: TypeError: 'Owned_NativeFreeAlgebraParent_with_category.element_class' object is not callable
+E   TypeError: ConvexPolytopes.Integral.ParentMethods.toric_variety() missing 1 required positional argument: 'base_ring'
+/repos/sage-extensions/tests/objects/test_standard_triangle.sage:60: TypeError: ConvexPolytopes.Integral.ParentMethods.toric_variety() missing 1 required positional argument: 'base_ring'
+=========================== short test summary info ============================
+FAILED tests/objects/test_standard_triangle.sage::test_the_order_of_the_vertices_does_not_matter
+FAILED tests/objects/test_standard_triangle.sage::test_the_invariants_of_the_triangle
+FAILED tests/objects/test_standard_triangle.sage::test_the_lattice_points_of_the_triangle
+FAILED tests/objects/test_standard_triangle.sage::test_the_ehrhart_polynomial_of_the_triangle
+FAILED tests/objects/test_standard_triangle.sage::test_the_toric_variety_of_the_triangle_is_the_projective_plane
+5 failed, 2 passed in 0.95s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=5
+[peakrss] peak tree RSS      : 322 MiB
+[peakrss] low-water MemAvail : 6923 MiB
+[peakrss] peak single VmHWM  : 322 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      304 MiB peak
+[peakrss]   sage                        176 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=     8.0s procs=  5 rss=   322 MiB hwm=   322 MiB avail=  9767 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   222 MiB hwm=   222 MiB avail=  9441 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   202 MiB hwm=   202 MiB avail=  7067 MiB
+[peakrss]   t=     4.0s procs=  5 rss=    93 MiB hwm=    93 MiB avail=  6923 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail=  7341 MiB

@@ -1,0 +1,32 @@
+provider SHA: 37b67b7e467e7bfcfe6e6e1652d5f5111ed003c7
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line --junit-xml=.tmp/causes468/tests_objects_test_free_module_of_rank_three.sage.xml tests/objects/test_free_module_of_rank_three.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+..F....FF..                                                              [100%]
+=================================== FAILURES ===================================
+E   KeyError: 'codomain'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'AugmentedSimplexCategory.parent_class' object has no attribute 'codomain'
+sage/cpython/getattr.pyx:362: AttributeError: 'AugmentedSimplexCategory.parent_class' object has no attribute 'codomain'
+E   TypeError: unsupported operand type(s) for /: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' and 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'
+/repos/sage-extensions/tests/objects/test_free_module_of_rank_three.sage:70: TypeError: unsupported operand type(s) for /: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' and 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'
+E   TypeError: the proposition is_finite(Aut_Category of modules over Integer Ring(Free module on {[0], [1], [2]} over Integer Ring)) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+/repos/sage-extensions/src/sage_extensions/logic.py:44: TypeError: the proposition is_finite(Aut_Category of modules over Integer Ring(Free module on {[0], [1], [2]} over Integer Ring)) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+=========================== short test summary info ============================
+FAILED tests/objects/test_free_module_of_rank_three.sage::test_the_module_category_applied_to_a_basis_set_agrees
+FAILED tests/objects/test_free_module_of_rank_three.sage::test_a_quotient_of_zz3
+FAILED tests/objects/test_free_module_of_rank_three.sage::test_the_automorphisms_of_zz3_are_infinite
+3 failed, 8 passed in 0.40s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 127 MiB
+[peakrss] low-water MemAvail : 11310 MiB
+[peakrss] peak single VmHWM  : 127 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      110 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     2.0s procs=  5 rss=   127 MiB hwm=   127 MiB avail= 11382 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 11310 MiB

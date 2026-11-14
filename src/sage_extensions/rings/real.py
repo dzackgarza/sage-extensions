@@ -565,6 +565,17 @@ class ExactRealNumber(FieldElement):
         r"""``x^{-1}``: every nonzero real number is a unit."""
         return ~self
 
+    def __truediv__(self, other):
+        r"""``x / y``: the field's own division, ``x y^{-1}``.
+
+        A real number is an element of the ring of reals as well as of that ring
+        regarded as a module over itself, and the two divisions differ for a
+        noncommutative ring: the ring's is ``x y^{-1}`` and the module's scalar
+        action is ``y^{-1} x``.  This method states the ring's, through the same
+        ``_div_`` that decides the zero and undecided-nonzero denominators.
+        """
+        return self._div_(self.parent()(other))
+
     def __pow__(self, exponent, modulus=None):
         if modulus is not None:
             raise TypeError(

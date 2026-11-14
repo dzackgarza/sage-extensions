@@ -1,0 +1,17 @@
+=== tests/lattices/test_definite.sage -> /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt410/.tmp/slice-test_definite.log
+FAILED tests/lattices/test_definite.sage::test_definite_target_embedding_mor_enumerates_all_a1_into_a2_roots
+FAILED tests/lattices/test_definite.sage::test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6
+FAILED tests/lattices/test_definite.sage::test_discriminant_group_of_a1_plus_a2_is_cyclic_of_order_6
+FAILED tests/lattices/test_definite.sage::test_a_hyperbolic_isometry_of_x2_minus_2y2_has_infinite_order
+FAILED tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so
+FAILED tests/lattices/test_definite.sage::test_definite_complement_extensions_exhaust_the_u_vector_cosets
+6 failed, 19 passed in 302.22s (0:05:02)
+=== tests/lattices/test_definite_genus_mass_archive.sage -> /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt410/.tmp/slice-test_definite_genus_mass_archive.log
+2 passed in 1.84s
+=== tests/lattices/test_definite_isometry_witnesses.sage -> /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt410/.tmp/slice-test_definite_isometry_witnesses.log
+5 passed in 2.09s
+=== tests/lattices/test_definite_metric_invariants_archive.sage -> /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt410/.tmp/slice-test_definite_metric_invariants_archive.log
+2 passed in 0.69s
+=== tests/lattices/test_full_definite_root_lattice_groups.sage -> /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt410/.tmp/slice-test_full_definite_root_lattice_groups.log
+3 passed in 1.23s
+SLICE DONE

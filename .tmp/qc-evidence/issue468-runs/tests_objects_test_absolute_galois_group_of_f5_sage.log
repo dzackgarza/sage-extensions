@@ -1,0 +1,20 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt468
+provider SHA: 51310d613cd8c27860c70ff2f3370fedc6a18f21
+tree dirty:  M src/sage_extensions/all.py 
+file: tests/objects/test_absolute_galois_group_of_f5.sage
+...F.                                                                    [100%]
+=================================== FAILURES ===================================
+E   KeyError: 3
+
+During handling of the above exception, another exception occurred:
+E   TypeError: Ring morphism:
+      From: Finite Field in z3 of size 5^3
+      To:   Algebraic closure of Finite Field of size 5
+      Defn: z3 |--> z3 is an arrow of another Mor; native ring computations use the protected engine crossing
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (5) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (5) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (5) of Integer Ring on Integer Ring / Ideal (5) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:573: TypeError: Ring morphism:
+=========================== short test summary info ============================
+FAILED tests/objects/test_absolute_galois_group_of_f5.sage::test_the_finite_quotients
+1 failed, 4 passed in 0.96s

@@ -1,0 +1,42 @@
+provider SHA: 415c2b44c173f482506a568d20c93eb683bc3924
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_root_lattice_e8.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FF.F.....                                                                [100%]
+=================================== FAILURES ===================================
+E   assert Integral latt...gnature (0, 8) == Integral latt...gnature (0, 8)
+      
+      Use -v to get more diff
+/repos/sage-extensions/tests/objects/test_root_lattice_e8.sage:9: assert Integral latt...gnature (0, 8) == Integral latt...gnature (0, 8)
+E     File "<string>", line 0
+        
+    SyntaxError: invalid syntax
+
+During handling of the above exception, another exception occurred:
+E   ValueError: ['E', 8] is not a valid Cartan type
+/sage/.venv/lib/python3.14/site-packages/sage/combinat/root_system/cartan_type.py:734: ValueError: ['E', 8] is not a valid Cartan type
+E   AssertionError: cannot compute the cardinality of Emb(Integral lattice of rank 1 and signature (0, 1), Integral lattice of rank 8 and signature (0, 8)): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of homsets of sets and Category of sets)
+/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:2503: AssertionError: cannot compute the cardinality of Emb(Integral lattice of rank 1 and signature (0, 1), Integral lattice of rank 8 and signature (0, 8)): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of homsets of sets and Category of sets)
+========================== test-call performance gate ==========================
+tests/objects/test_root_lattice_e8.sage::test_the_invariants_of_e8: 239.13 s > 20 s
+=========================== short test summary info ============================
+FAILED tests/objects/test_root_lattice_e8.sage::test_the_catalogue_entry_agrees
+FAILED tests/objects/test_root_lattice_e8.sage::test_the_root_system_construction_agrees
+FAILED tests/objects/test_root_lattice_e8.sage::test_the_invariants_of_e8 - A...
+3 failed, 6 passed in 245.97s (0:04:05)
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=121
+[peakrss] peak tree RSS      : 2033 MiB
+[peakrss] low-water MemAvail : 911 MiB
+[peakrss] peak single VmHWM  : 2092 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      1652 MiB peak
+[peakrss]   python                      422 MiB peak
+[peakrss]   sage                        140 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   256.2s procs=  6 rss=  2033 MiB hwm=  2092 MiB avail=  5939 MiB
+[peakrss]   t=   240.2s procs=  6 rss=  1864 MiB hwm=  1970 MiB avail=  5080 MiB
+[peakrss]   t=   250.2s procs=  6 rss=  1850 MiB hwm=  2077 MiB avail=  5349 MiB
+[peakrss]   t=   252.2s procs=  6 rss=  1849 MiB hwm=  2086 MiB avail=  6386 MiB
+[peakrss]   t=   254.2s procs=  6 rss=  1836 MiB hwm=  2092 MiB avail=  6140 MiB

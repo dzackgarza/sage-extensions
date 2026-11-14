@@ -1,0 +1,12 @@
+# tree wt468: 932 files, 1424 findings (TL01, TL02, TL03, TL04, TL05, TL07, TL08, TL09, TL10, TL11, TL13)
+# TL13 findings: 10
+tests/engineering/test_the_suite_plugins_report_what_they_measured.py:19: TL13 probe_run is not a session name
+tests/engineering/test_the_suite_plugins_report_what_they_measured.py:41: TL13 probe_run is not a session name
+tests/groups/test_group_morphisms_archive.sage:183: TL13 GeneratedSubgroups is not a session name
+tests/sets/test_cartesian_additive_group_placement.sage:47: TL13 AdditiveMonoids is not a session name
+tests/sets/test_cartesian_additive_group_placement.sage:48: TL13 AdditiveMonoids is not a session name
+tests/sets/test_cartesian_additive_group_placement.sage:78: TL13 AdditiveMonoids is not a session name
+tests/sets/test_cartesian_additive_group_placement.sage:91: TL13 AdditiveMonoids is not a session name
+tests/sets/test_cartesian_additive_group_placement.sage:107: TL13 AdditiveMonoids is not a session name
+tests/sets/test_cartesian_additive_group_placement.sage:108: TL13 AdditiveMonoids is not a session name
+tests/sets/test_cartesian_additive_group_placement.sage:119: TL13 AdditiveMonoids is not a session name

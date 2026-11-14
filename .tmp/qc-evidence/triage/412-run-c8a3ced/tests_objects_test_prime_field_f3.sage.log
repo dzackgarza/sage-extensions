@@ -1,0 +1,33 @@
+provider SHA: c8a3cedb1ba27919c416101e98cdc7d36256415e
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_prime_field_f3.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+.F.FF..                                                                  [100%]
+=================================== FAILURES ===================================
+E   AssertionError: cannot compute the cardinality of Mor_UnitalAlg(Integer Ring / Ideal (3) of Integer Ring, Integer Ring / Ideal (3) of Integer Ring): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of endsets and Category of homsets of sets and Category of sets)
+/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:2503: AssertionError: cannot compute the cardinality of Mor_UnitalAlg(Integer Ring / Ideal (3) of Integer Ring, Integer Ring / Ideal (3) of Integer Ring): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of endsets and Category of homsets of sets and Category of sets)
+E   AttributeError: 'OwnedJoinCategory.element_class' object has no attribute 'inverse'
+sage/cpython/getattr.pyx:357: AttributeError: 'OwnedJoinCategory.element_class' object has no attribute 'category_for'
+E   AssertionError: GL(Integer Ring / Ideal (3) of Integer Ring) is realized as a matrix group only for a free module with a finite selected basis, but Integer Ring / Ideal (3) of Integer Ring is in Join of Category of finite fields and Category of quotient rings and Category of prime fields and Category of commutative algebras and Category of modules over Integer Ring / Ideal (3) of Integer Ring
+/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:4032: AssertionError: GL(Integer Ring / Ideal (3) of Integer Ring) is realized as a matrix group only for a free module with a finite selected basis, but Integer Ring / Ideal (3) of Integer Ring is in Join of Category of finite fields and Category of quotient rings and Category of prime fields and Category of commutative algebras and Category of modules over Integer Ring / Ideal (3) of Integer Ring
+=========================== short test summary info ============================
+FAILED tests/objects/test_prime_field_f3.sage::test_the_quotient_of_the_integers_is_the_prime_field
+FAILED tests/objects/test_prime_field_f3.sage::test_the_arithmetic_of_f3 - At...
+FAILED tests/objects/test_prime_field_f3.sage::test_the_automorphisms_of_f3
+3 failed, 4 passed in 9.50s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=11
+[peakrss] peak tree RSS      : 331 MiB
+[peakrss] low-water MemAvail : 956 MiB
+[peakrss] peak single VmHWM  : 342 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      325 MiB peak
+[peakrss]   sage                        145 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=    21.5s procs=  5 rss=   331 MiB hwm=   342 MiB avail=  5165 MiB
+[peakrss]   t=    19.5s procs=  5 rss=   222 MiB hwm=   234 MiB avail=   956 MiB
+[peakrss]   t=    16.6s procs=  5 rss=   215 MiB hwm=   227 MiB avail=   958 MiB
+[peakrss]   t=    14.2s procs=  5 rss=   212 MiB hwm=   226 MiB avail=   973 MiB
+[peakrss]   t=    12.0s procs=  5 rss=   200 MiB hwm=   217 MiB avail=  1006 MiB

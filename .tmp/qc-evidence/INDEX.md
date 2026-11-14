@@ -947,6 +947,40 @@ One pytest process per file and per probe, never the suite.
 | `issue402-cusp4-chamber-at-vertex.py` / `issue402-cusp4-chamber-at-vertex.log` | the tree of this push | the public `cusp_chamber(p_0)` at card `029J` row 4.3.8's cusp, `p_0` the vertex of square 2 of the card's polyhedron (nine printed walls through it): **complete, 11 walls**, the nine through `p_0` printed, two more of squares `-4` and `-2`; 245 filter questions, 116 admitted |
 | `issue402-cusp4-chamber-gram.py` / `issue402-cusp4-chamber-gram.log` | the tree of this push | the eleven walls of that chamber and card `029J`'s eleven printed walls, in `N`: **the two Gram matrices are equal entry by entry**, and both polyhedra have 26 rays of squares `0..12`. The returned chamber contains `p_0` on the side where the two closing walls pair `-2` with it, the card's on the side where they pair `+2` |
 
+## #407 — the triage of `tests/groups`, and three repairs
+
+The triage of the slice `tests/groups` up to `test_group_adjunctions.sage` on `main` at
+`9b29712`: 39 files, 156 tests, 62 of them red, each in exactly one of the 17 causes whose
+paste-ready issue bodies are `triage/407-*.md`; `triage/407-triage-index.md` is the table.
+Two of the 62 are #399's; #384 owns none of them.
+
+Every log is the redirected output of the command that produced it, one file at a time
+with the repository's own invocation and its addopts blanked for the two plugins this venv
+lacks (`pytest-timeout`, `pytest-reportlog`):
+
+```
+just test -o addopts= -p sage_extensions.testing.suite_budget \
+    -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint <file>
+```
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue407-sweep-tests-groups.log` | `9b29712` | the 77-file sweep of the whole directory: exit status, file, wall time for each |
+| `issue407-failing-tests-slice.log` | `9b29712` | the 60 failing tests of the 38 finished files with the last error line of each, derived from that run's per-file junit xml |
+| `issue407-legacy-14b9cc1.log` | `14b9cc1` | the same files at the commit that brought them: 83 of 83 tests red, which is why no bisect on `main` has a green boundary |
+| `issue407-stabilizer-file.log` | `9b29712` | the file that does not finish: 1 of 3 passed, the second `Killed` at 2400 s, peak tree 1304 MiB, exit 137 |
+| `issue407-probe-stabilizer-steps.py` / `.log` | `fa7553e`'s tree | the file's own steps timed: `O()` 1.9 s, the isotropic subobject 2.2 s, the stabilizer 2.2 s, then `group_generators()` with no return |
+| `issue407-probe-stabilizer-section.py` / `.log` | `fa7553e`'s tree | `_GapWordSection.__init__`, `.permutation_group` and `.gap_group` instrumented: the section is never constructed before the hang, so the hang is not #384's `permutation_group` cost |
+| `issue407-lint-names-before.log` | `14b9cc1` | `sage_extensions.testing.test_lint` on three group tests: `TL13 Subgroups`, `TL13 Torsors`, `TL13 SymmetricGroups` (17), `TL13 GeneralLinearGroups` (17), `TL13 FreeGroupQuotients` (14), `TL13 OwnedGroups` (45), `TL13 FiniteGSets` (3) |
+| `issue407-lint-names-after.log` | this push's tree | the same three files: 0 `TL13` findings, their other findings unchanged |
+| `issue407-repair-namespace.log` | `eb203aa` | 10 files re-run on that commit's tree: 8 tests green, none new red |
+| `issue407-repair-closure.log` | `4706e99` | 11 files re-run: `AlgebraicClosureFiniteField() missing` gone from all of them, no test flipping |
+| `issue407-repair-engine-identity.log` | `fa7553e` | 12 files re-run: 3 tests green, none new red, two green-on-main guards held |
+| `issue407-probe-closure.py` / `.log` | `525dd1b`'s tree | `AlgebraicClosureFiniteField(Zmod(3), "z3")` raises `NotImplementedError: ... only implemented for prime fields`; the same call on `GF(3)` answers -- the reason the closure's base is `GF(p)` |
+| `issue407-repair6.log` | `c17910a` | 12 files re-run on the pushed tree: the same 3 tests green, nothing new red, and no `AlgebraicClosureFiniteField() missing` in the 11 closure files |
+
+`issue407-repair1.log` and `issue407-repair2.log` were superseded by
+`issue407-repair6.log` and the two replacement commits and are not kept.
 ## #406: the suite stopped before its first test (2026-11-14, `main` `9b297125`)
 
 The repository's own `addopts` in force (`suite_budget`, `test_lint`,
@@ -989,11 +1023,17 @@ Follow-up in the same session, after the two repairs:
 
 | `issue406-plugins-after-rewrite.log` | the plugin repairs, with the finding grouping rewritten as `itertools.groupby` | `tests/engineering/test_the_suite_plugins_report_what_they_measured.py -q` under the repository addopts | **2 passed in 13.30 s**, exit 0 |
 
-| `issue406-plugins-after-review.log` | the plugin repairs with the four review notes applied (ini ceilings, session-scoped conftest binding, unconditional cleanup, docstring stating what the module does) | `tests/engineering/test_the_suite_plugins_report_what_they_measured.py -q` under the repository addopts | **2 passed in 16.39 s**, exit 0; calls 8.60 s and 7.71 s, `setup` 0.00 s |
-
-| `issue406-plugins-on-the-pushed-tree.log` | the pushed tree (`b6b63d0`), whose parent is the #408 evidence commit it was rebased onto | `tests/engineering/test_the_suite_plugins_report_what_they_measured.py tests/rings/test_exact_real_division.sage -q` under the repository addopts | **4 passed in 19.56 s**, exit 0 |
-
-### #409, reopened — the counts the length assertions carried are stated again
+The `tests/groups` side of #408's namespace cause and of its closure cause are recorded in
+this triage's index, not filed twice: three cause bodies that this triage first wrote
+(`407-session-namespace-*`, `407-owned-algebraic-closure-*`,
+`407-cardinality-of-a-finitely-presented-group`) were folded into #408's filed causes
+`408-the-session-namespace-does-not-publish-the-constructors-the-suite`,
+`408-the-algebraic-closure-of-a-finite-field-is-raised-with-the-wrong` and
+`408-cardinality-refuses-for-a-group-whose-finiteness-is-a-predicate`, and their digests are
+removed from `SHA256SUMS`.  `issue407-repair7-merged-tree.log` is the run on the merged tree
+that is pushed: the identity repair's three greens hold there, nothing new is red, and the
+closure's `TypeError` is absent from all eleven files.
+## #409, reopened — the counts the length assertions carried are stated again
 
 `fba2e71` replaced the two `len(...)` assertions with the section's images
 equalling the orbit of the distinguished vector, and the review of it reads
@@ -1021,6 +1061,288 @@ VM; no test of this file causes it.
 | log | commit cited | result |
 | --- | --- | --- |
 | `issue409-slice-orbit-count-gate.log` | `b6b63d0`'s tree with this commit's change to `tests/test_finite_cosets.py` | gates and lint on, `tests/test_finite_cosets.py`: **4 passed in 22.18 s**, slowest call 13.02 s under the 20 s ceiling, star import under its 3 s ceiling, exit 0 |
+
+`issue407-repair8-second-merge.log` is the same check on the tree that is pushed after the
+second move of `main` (to `eb07c43`, #409): `test_galois_extension_coset_archive.sage` green,
+the normalizer and quotient files at one and two reds, `test_absolute_galois.sage` at five --
+the state the identity repair leaves behind, unchanged by the merge.
+
+# The tests/objects triage slices, 2026-11-14 (#408, #412)
+
+The second half of `tests/objects` (#412) is recorded under `triage/`: the slice run on
+`c8a3ced`, every failing test of it again at the suite's import commit `14b9cc1`, the
+bisect of each cause whose failure is not that import failure, the slice re-run on the
+rebased main with the workstream's one repair, and that repair's red test, its neighbours
+and the neighbour run without it. The 37 paste-ready cause bodies are beside them, one per
+defect, each stating its failing tests with the error each reports.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `triage/412-run-c8a3ced/` (25 files) | `c8a3ced` | the slice, one file per process: **75 failed, 99 passed** in 24 of the 25 files |
+| `triage/412-base-14b9cc1.txt` | `14b9cc1` | each failing test again at the import: 73 of the 75 fail there, 2 passed |
+| `triage/412-bisect.txt` | `14b9cc1..c8a3ced` | one bisect per cause whose signature is absent at the import |
+| `triage/412-run-415c2b4/` (25 files) | `415c2b4` | the slice re-run on the rebased main with the repair: **69 failed, 105 passed** |
+| `triage/412-c11-red-at-415c2b4.log` | `415c2b4` | the repair's red test: **1 failed, 9 passed** (the one red is C10) |
+| `triage/412-c11-neighbours-at-415c2b4.log` | `415c2b4` | `tests/sets` neighbours: **4 failed, 15 passed** |
+| `triage/412-c11-neighbours-clean.log` | `7817e87` | the same without the repair: **4 failed, 15 passed**, the same four ids |
+| `triage/412-c33-closed-7817e87.log` | `7817e87` | C33's five tests: **6 passed** (green on main via `d38845a`) |
+| `triage/412-c37-clean-7817e87.log` | `7817e87` | C37's two tests on a clean main: **2 failed**, the base-ring refusal |
+
+`triage/412-index.md` is the record #412 is accepted against: the cause table, the state of
+each repair, the acceptance count (75 failing tests, 75 assigned, none twice) and what the
+triage does not do.
+
+### #409, third review — every expected value in the file is counted from its construction
+
+`eb07c43` met the orbit-order finding but left the expected values themselves
+(72, 9, 8, and 8, 2, 4) typed, which `AGENTS.md:1405` does not allow: each is
+cited from a source or proved, independently of the implementation. Each is now
+counted in the test's own docstring from the two constructions the test builds.
+The split four-dimensional form: determinant $-4$ per copy gives four vectors a
+copy and $4 \cdot 4 = 16$ in all; $q = x_1x_2 + x_3x_4$ vanishes on
+$3 \cdot 3 + 1 \cdot 1 = 10$ vectors, leaving nine nonzero singular; the images
+of a hyperbolic basis number $9 \cdot 4 \cdot 2 \cdot 1 = 72$ (four because
+$v \mapsto v + u$ pairs the eight $v$ with $B(u,v) = 1$, exchanging $q = 0$ with
+$q = 1$; two because the orthogonal complement of a hyperbolic pair is
+hyperbolic, both Arf invariants being $0$; one because the fourth is then
+forced); and orbit-stabilizer gives $72/9 = 8$. The anisotropic ternary plane:
+determinant $9$ gives the nine vectors of $(Z/3)^2$; $q$ takes $1/3$ on the four
+vectors $\pm e_1, \pm e_2$ and $2/3$ on the other four, so an isometry carries
+those four among themselves ($4$ choices), and the image of $e_2$ must be
+orthogonal to that image, which $B(x,y) = (x_1y_1+x_2y_2)/3$ leaves to the
+other pair ($2$), so $|G| = 8$, the orbit is the four unit vectors, and the
+stabilizer is the sign change of the second coordinate, of order $2$, with
+$8/2 = 4$ cosets. Both tests also assert the form's own cardinality ($16$ and
+$9$), so the first clause of each count is a checked statement rather than
+prose. The ternary form is bilinear, which is why that proof uses $B$ directly
+and not $q(x+y) - q(x) - q(y)$, the doubled pairing there.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue409-slice-derived-values-gate.log` | `4a94605`'s tree with this commit's change to `tests/test_finite_cosets.py` | gates and lint on: **4 passed in 8.81 s**, slowest call 7.22 s under the 20 s ceiling, exit 0 |
+
+### #410 — the two repairs replaced by their principled forms
+
+`e9b6c2c` (division) and `6e85b07` (the GAP stabilizer) did not meet the repository's standard on
+re-reading them: the first dispatched on `self.parent() is ring`, the second guarded the empty
+generating family. Both are replaced, in `4b958ef`'s lineage and `852a901` as pushed: one formula
+at the module owner, with the reciprocal stated at the two fields' owner, and one GAP path that is
+given the group's own identity.
+
+The two spellings of the reciprocal differ exactly where a scalar is not a unit, which is why the
+replacement is not cosmetic. Measured, same probe, clean base and the tree of the push:
+
+| row | clean `8755b95` (`** -1`) | the tree of the push (`inverse_of_unit`) |
+| --- | --- | --- |
+| `ZZ(3) ** -1` / `ZZ(3).inverse_of_unit()` | `(1)/(3)` | `ZeroDivisionError: 3 is not a unit` |
+| a ZZ-module vector `/ ZZ(2)` | `TypeError: no conversion of this rational to integer` | `ZeroDivisionError: 2 is not a unit` |
+| `QQ[x].gen() ** -1` / `.inverse_of_unit()` | `1/x`, the fraction field | `ArithmeticError: x is not a unit in ...` |
+| `RR(1)/RR(2)`, `~RR(2)` | `1/2`, `1/2` | `1/2`, `1/2` |
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `410-probe-units.log`, `410-probe-units-on-clean-8755b95.log` | the tree of this push / clean `8755b95` | the unit-inverse and `** -1` columns above, on QQ, ZZ, QQ[x], Zmod(6), RR and CC |
+| `410-probe-zz.log`, `410-probe-zz-on-clean-8755b95.log` | the tree of this push / clean `8755b95` | the ZZ-module division: `ZeroDivisionError: 2 is not a unit` here, `TypeError` there |
+| `410-probe-design2.log` | the tree of this push | `RR(1)/RR(2) = 1/2`, `RR(3)/RR(2) = 3/2`, `RR(3)/ZZ(3) = 1`, `~RR(2) = 1/2`, `RR(2) * ~RR(2) = 1`, `~RR(0)` and `RR(1)/RR(0)` refused, `CC(1)/CC(2) = 1/2`, a QQ-module vector `/ 2 = (1)/(2)*e_0` and `/ ZZ(3) = (1)/(3)*e_0`, `packing_radius() = 1/2`, `center_density() = 1/4` |
+| `410-replacement-repairs-gate-at-1e0546d.log` | the tree of this push (`852a901`) | the four cause-A ids, the cause-B id and the #150 contract on the rebased tree: **6 passed in 5.61 s** |
+| `410-replacement-repairs-gate-at-8755b95.log` | `4b958ef` before the rebase | the same six ids: **6 passed in 10.79 s** |
+| `410-promoted-repairs-b-alone-at-8755b95.log` | repair B alone, on `8755b95` | the same six ids with only the GAP stabilizer changed: **6 passed in 6.23 s** |
+| `410-regression-set-comparison.log` | the tree of this push against clean `8755b95` | fourteen files, one pytest process per file per tree, FAILED-id sets compared: every row has an empty only-on-this-tree set, and the counts agree row by row (`tests/sets` 33 failed / 123 passed on both; `test_exact_real_division` 2 passed; `test_rational_exact_reals` 1 passed; `test_young_convolution` 3 failed / 4 passed; `test_lebesgue_spaces_on_the_line` 9 failed / 5 passed; `test_fraction_field_base_change_archive` 2 failed; `test_finite_cokernel_constructor` 1 failed; `test_predicate_kernel_and_stabilizer_subgroups_of_s4` 1 failed / 4 passed; `test_structured_subgroups` 1 passed; `test_group_law` 1 failed / 3 passed; `test_integral_stabilizers` 4 passed; `test_vector_family_stabilizers` 10 passed; `test_rational_scalars_on_a_base_changed_lattice` 1 passed; `test_definite_metric_invariants_archive` 2 passed). `test_a_stabilizers_generators_generate_a_subgroup` reached the 600 s cap on **both** trees (`exit=124`), so it is not claimed either way |
+
+## #411 — the second half of `tests/groups`
+
+The slice is the 38 files #411 lists (every `tests/groups` file from
+`test_group_automorphisms_archive.sage` on, plus `test_g_sets_torsor_archive.sage`):
+148 tests, run one file per pytest process in the published image with the
+repository's own `just test` and its `addopts` blanked, as in the commands above.
+Triage record: `results/issue411-triage.md`. The 22 open causes are staged as
+paste-ready issue bodies in `.tmp/qc-evidence/triage/411-*.md`.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue411-slice-red.log` | `36e5eac` | the sweep: 38 files, **42 failed / 106 passed**, 19 files with failures; each section is one file's run with its own pytest summary |
+| `issue411-slice-final.log` | `d0cfd20`, `dcfe72c` (on `8971654`) | the same 38 files on the repaired tree: **41 failed / 107 passed**, the same 41 ids that fail on `36e5eac` with the two repairs; the one green is the degree test of C02 |
+| `issue411-probes.log` | `d0cfd20`, `dcfe72c` | the three decisions the two repairs rest on, printed from the image: which values `_integral_rank` admits (`QQ(2)` yes, `2.5` no, a string no, an engine `ZZ(2)` no), `GL/SL/Sp/GU` of `GF(3)` at each, and `Z(QQ[S_3])`/`Z(ZZ[S_3])` of rank 3 through `Modules.linear_combination` |
+| `issue411-candidates.log` | `c8a3ced` (two dropped attempts) | the two candidate repairs measured and NOT landed: C05's engine crossing, which moves the five conjugation tests to `'...ArrowType' object has no attribute 'gap'` and leaves M12's file unfinished at 360 s where it failed in 0.87 s; and C20's ring-first `matrix`, whose result `Groups.SL(2, ZZ)` refuses as a Sage object |
+
+Two limits of this host, recorded rather than hidden: the image's venv has no
+`pytest-timeout` and no `pytest-reportlog`, so the repository's `addopts` are blanked
+and the two gate plugins named by hand (`--no-time-gates --no-test-lint` for the
+sweeps), and every run is a single file in its own process because other chats use the
+same VM.
+### #410 — the ring's division placed at the ring, the module formula left to modules
+
+The placement of `4b958ef`/`852a901` still sent a ring element's `/` through `Modules.ElementMethods`,
+the module's scalar action; that is the ring quotient only for a commutative ring. The two owned
+fields now state their division beside their `_div_`, and the module formula is left to modules
+whose elements are not ring elements.
+
+| row | before | the tree of this push |
+| --- | --- | --- |
+| `RR`'s `__truediv__` resolves from | `Modules.ElementMethods` (index 13 of the element class) | `sage_extensions.rings.real.ExactRealNumber` (index 0) |
+| `CC`'s `__truediv__` resolves from | `Modules.ElementMethods` (index 12) | `sage_extensions.rings.complex.ExactComplexNumber` (index 0) |
+| an engine-backed owned ring's | `_OwnedRingElement.__truediv__`, index 2, unchanged | the same |
+| `RR(3)/2`, `RR(3)/ZZ(3)`, `CC(3)/2` | by the module formula | `3/2`, `1`, `3/2` |
+| a QQ-module vector `/ 2`, `/ ZZ(3)`, `/ (1/2)` | the module formula | `(1)/(2)*e_0`, `(1)/(3)*e_0`, `2*e_0` |
+| a ZZ-module vector `/ ZZ(2)` | refused | `ZeroDivisionError: 2 is not a unit` |
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `410-ringdiv.log` | the tree of this push | the two resolution rows above and every statement in the table, including `RR(2) * ~RR(2) = 1`, `~RR(0)`, `CC(3)/2`, and `packing_radius() = 1/2` with `center_density() = 1/4` |
+| `410-ring-division-gate.log` | the tree of this push | the four cause-A ids, the cause-B id and #150's contract: **6 passed in 2.43 s** |
+| `410-ring-division-regression.log` | the tree of this push against clean `8755b95` | thirteen files, one pytest process per file per tree, FAILED ids not counts: an empty only-on-this-tree set and an empty fixed set row by row; `tests/rings` **77 failed, 251 passed on both**; `test_a_stabilizers_generators_generate_a_subgroup` reached its cap on both trees and is not claimed |
+
+### #410 — the slice closed out on the main it lands on
+
+The five files hold 37 tests; six were red at the base and are red on `51310d6`, each with a named
+owner in `triage/410-triage-index.md`. Causes A (division, four ids) and B (the GAP stabilizer, one
+id) are repaired on main; the division's further work is #500.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `410-final-slice-driver.log` | `51310d6` | the five files, one pytest process per file: `test_definite.sage` **6 failed, 19 passed in 302.22 s**, the metric archive **2 passed**, genus mass 2 passed, isometry witnesses 5 passed, root groups 3 passed |
+| `410-final-slice-test_definite.log` | `51310d6` | the six red ids, which are C, D, E, F, G and H and nothing else: the `Emb` cardinality, the predicate subset, `is_cyclic`, the infinite-order isometry, the bare tuple and the index-2 character image |
+
+## #468 — the session publishes the area packages' declarations, one authority per name
+
+Two triage repairs had contradicted each other on `main`: `b3747a0` reverted the
+six names `eb203aa` added to `sage_extensions/all.py` because that file restated
+the areas' declarations, and `c099996` added eighteen more to the same
+hand-written list 61 seconds later. The file is now derived: `all.py` names the
+22 packages that declare an `__all__` and binds each one's whole declaration, so
+no member name of an area is written by hand anywhere in it (`_AREA_PACKAGES`
+is the list of *packages*, not of names). 310 hand-written lines became 37, and
+the session publishes 599 names over those areas, 524 of them distinct.
+
+The six names of #407's namespace cause, and the eighteen of #408's, are now
+session names because their owners declare them —
+`sage_extensions/groups/__init__.py` has declared `Subgroups`,
+`SymmetricGroups`, `GeneralLinearGroups`, `FreeGroupQuotients`, `Torsors` and
+`CoxeterGroups` all along, and `all.py` imported that area nowhere. Each of the
+23 names of the two causes resolves to the preamble's object: the probe prints
+`CoxeterGroups` as the preamble's constructor and Sage's namesake shadowed, and
+the other 22 with no Sage namesake at all. `GeneratedSubgroups` and
+`AdditiveMonoids` remain `TL13` findings because no area declares them — an
+owner gap, not a namespace one, and the same defect `#411`'s `C01` files.
+
+Measured on the tree of this push against a clean worktree at the same base
+commit, one pytest process per file, `-o addopts= -p
+sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint
+--no-time-gates --no-test-lint`: 16 files of the two namespace causes, 15 test
+ids red before and green after, 0 ids green before and red after. The tree-wide
+`test_lint` reports `TL13` 86 findings over 86 names before and 10 over 10 after
+(1475 findings in all before, 1424 after), which is the signal #408's `C36`
+names. `import sage_extensions.all` is 2.34 s against 3.24 s before, under the
+suite's 3.0 s ceiling for that workload.
+
+Five names stay hand-written because their own area does not declare them:
+`MatrixAlgebras` (algebras), `LieGroups` and `TopologicalGroups` (groups),
+`MatrixSpaces` and `MatrixEndomorphismSpaces` (modules). They are the areas'
+surfaces to close, and the session publishes them in the meantime.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue468-allpy-rewrite.py` | — | the rewrite, re-runnable: reads each area's `__all__`, drops every hand-written binding of a declared name, and inserts `_AREA_PACKAGES` and the publication loop |
+| `issue468-session-names.py` / `.log` | the tree of this push | the 23 names of the two causes, their owner, and whether Sage has a namesake: `CoxeterGroups` `SHADOWS-SAGE`, the other 22 `no-sage-namesake`; 599 area names published, no loop variable leaked |
+| `issue468-baseline-outcomes.log` / `issue468-after-outcomes.log` | base `51310d6` / the tree of this push | the 16 files' pytest summaries side by side, e.g. `test_free_and_catalogued_groups.sage` 18 failed / 10 passed before, 10 failed / 18 passed after |
+| `issue468-flipped.txt` | the tree of this push | the 15 test ids that went red to green |
+| `issue468-runs/*.log` | the tree of this push | the 16 whole runs, one per file |
+| `issue468-lint-tl13-before.log` / `-after.log` | base `51310d6` / the tree of this push | every `TL13` line of the tree-wide `test_lint`, with the run's totals |
+| `issue468-star-import.log` | both trees | `import sage_extensions.all`: 3.24 s → 2.34 s |
+
+## #471 — the kernel-plane-rows driver reads the plane's Gram tensor
+
+`tests/coble_kernel_plane_rows.py` decided a returned plane's total isotropy by
+a double loop of `lattice.b(...)` over the plane's retained generators --
+`OWN-24`'s own violation example and the shape `STY-102` names -- and returned
+`(None, False)` both for a representative that breaks that contract and for a
+row that did not return inside its per-call cap, so a red CI job could not be
+read. The check is now the plane's induced Gram tensor against the zero tensor
+of the plane's own framing, and the two outcomes are separate reports and
+separate exit statuses (`decided` / `undecided` / `contract violation`, 0 / 1 /
+2 / 3).
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue471-row-step-probe.py` / `.log` | the tree of this push | the induced Gram tensor of a plane the row returns is the zero `(2,2)` tensor and equals `lattice.gram_tensor().pullback(plane.inclusion())`; a rank-two primitive *non-isotropic* subobject's is `[[0,1],[1,0]]` and the check reports "its induced Gram tensor is not zero", a rank-one subobject "its rank is 1, not two"; the old pairing loop says `True` / `False` on the same two, so the reading changed and the verdicts did not; warm cost per representative 0.262 ms against the old loop's 1.055 ms (x189720 planes = 49.8 s against 200.1 s) |
+| same | the tree of this push | the driver's own `main`, its `_coble_lattice` pointed at the gate lattice `U + U(2) + <-2>`: `[Otilde] 2 planes in 15.3 s` against 2 double cosets over 1 ambient class, `[Otilde+] 2 planes in 11.7 s` against 2, exit status 0, peak tree RSS 571 MiB |
+| same | the tree of this push | the two reports apart, and all four exit statuses, each driven by a stub row: a row holding the non-isotropic subobject → `contract violation` / status 2; a row that does not return inside a 3 s cap → `undecided` / status 1; a row of three planes against two double cosets → status 3. The Coble rows themselves were not run on this VM |
+
+Follow-up on #471 (review of `020eccfa24`): the three row statuses are one
+`RowStatus` enum instead of three module-level strings compared with `==`
+(`CON-08`: a chosen outcome is not a mode string; `STY-159`: a flag that
+changes the return shape is named). `run_row` and `main` use its members, with
+identity tests. `issue471-row-step-probe.py` and `.log` at the paths above are
+the re-run on that tree, not the run cited in `020eccfa24`'s body: the values
+move by noise only -- induced Gram tensor 0.231 ms against the old loop's
+1.228 ms per representative (×189720 = 43.9 s against 232.9 s), `[Otilde] 2
+planes in 15.4 s` and `[Otilde+] 2 planes in 11.9 s` against 2 double cosets
+each, exit status 0, peak tree RSS 569 MiB, and the enum's three members with
+statuses 2 / 1 / 3 driven by the stub rows.
+
+## #468 review repair — one static star import per area package
+
+The review of `de94fac512` accepted the one-authority result — no area-declared
+name is hand-imported in `all.py`, the 75 names two areas declare are the same
+objects, and `CoxeterGroups` and the #407 group categories resolve to the
+preamble's constructors — and refused the mechanism: `for _area_name in
+_area_package.__all__: globals()[_area_name] = getattr(_area_package,
+_area_name)` is a `globals()` mutation with a dynamic lookup (STY-120; AGENTS
+§3/§4 and "Dynamic peeking").  `all.py` now names each area once, in a static
+`from sage_extensions.<area> import *  # noqa: F403`, in the order the loop
+walked, and the `_AREA_PACKAGES` tuple is deleted, so the list of areas exists
+only where it is used.  `import *` is defined as binding the package's `__all__`,
+which is what the loop did by hand, so the mechanism is the declaration and
+nothing else.
+
+Measured on base `37b67b7` (that is `de94fac` plus #471, which changes only
+`tests/coble_kernel_plane_rows.py` and evidence files, nothing under `src/`)
+against the same commit with this repair's `all.py`.
+
+**Same bindings.**  Dumping every non-dunder name of `sage_extensions.all` in
+both trees, the two dumps differ in one line over 690 names: the private
+`_AREA_PACKAGES` tuple itself.  The 689 others agree in name, in the type of the
+bound object, and in the `__module__`/`__qualname__` that object declares itself
+under.  An audit of the declarations finds 599 over 524 distinct names in the 22
+areas, 75 declared by two areas, 0 names unbound in the session, no name bound to
+an object no declarer exports beyond `Integer` and `RealNumber` (which the
+session rebinds to its own runtime objects below the imports, in both trees), and
+no loop temporary left in the module.
+
+**The six names of #407's cause** resolve to the preamble's constructors and
+construct: `CoxeterGroups()([[1, 3], [3, 1]]).order()` is 6 and the group is in
+`FreeGroupQuotients()` and `OwnedGroups().Finite()`; `SymmetricGroups()(Sets.Δ[2])`
+has order 6; `Groups.S(3).predicate_subgroup(sgn = 1)` is in
+`Subgroups(Groups.S(3))` with order 3; `GeneralLinearGroups()(GF(2), 2).order()`
+is 6; `Torsors(C_3)(regular C_3-set)` has cardinality 3.  `CoxeterGroups` is the
+only one of the six with a Sage namesake, and the session's binding shadows it.
+
+**The 16 files of #407's and #408's namespace causes**, one pytest process per
+file, `-o addopts= -p sage_extensions.testing.suite_budget -p
+sage_extensions.testing.test_lint --no-time-gates --no-test-lint`, on the base
+and on this tree: 141 test ids each, 43 red each, the same id set, the same
+failure kind for every shared red id, and 0 ids green on the base and red here.
+The 15 ids the causes' record lists as red-to-green at `de94fac` are green in
+both.
+
+**Nothing else moves**: the tree-wide `test_lint` reports 932 files and 1424
+findings with identical lines in both trees, so `TL13` stays at the 10 names
+#408's `C36` filed; `import sage_extensions.all` after `sage.all` is 0.319 /
+0.254 / 0.252 s on the base against 0.319 / 0.309 / 0.320 s here, three fresh
+processes each, under the suite's 3.0 s ceiling for that workload.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue468-star-bindings.py` | — | the audit, re-runnable: reads the areas from `all.py` (star imports, or `_AREA_PACKAGES` on the base), checks every declaration is bound to the declarer's object, prints the six and eighteen names with owner, Sage namesake and origin, then constructs the six |
+| `issue468-star-bindings-base.log` / `-repair.log` | base `37b67b7` / the tree of this push | 22 areas, 599 declarations, 524 distinct, 75 shared, 0 unbound, no loop temporary; `CoxeterGroups` `SHADOWED`, the other 22 `none`; the five constructions |
+| `issue468-star-namespace-dump.py` | — | the dump: name, bound type, and the object's `__module__`/`__qualname__`; a `LazyImport` is recorded unresolved because ten `categories.functions` names raise on first access (#440, older than this repair) |
+| `issue468-star-namespace-dump-base.log` / `-repair.log`, `issue468-star-namespace-diff.log` | base `37b67b7` / the tree of this push | 690 names against 689; the `diff` is one deleted line, `_AREA_PACKAGES` |
+| `issue468-star-cause-ids.py` | — | the id-level comparison of two trees' JUnit reports |
+| `issue468-star-causes-base.log` / `-repair.log` | base `37b67b7` / the tree of this push | the 16 files' pytest summaries side by side; identical in every file |
+| `issue468-star-causes-ids.log` | base `37b67b7` / the tree of this push | 141 ids and 43 red in both; same id set; no id green on the base and red here; the 15 recorded ids green in both |
+| `issue468-star-runs/base/*.log`, `issue468-star-runs/repair/*.log` | base `37b67b7` / the tree of this push | the 32 whole runs, one process per file |
+| `issue468-star-lint-tree-base.log` / `-repair.log` | base `37b67b7` / the tree of this push | tree-wide `test_lint`: 932 files, 1424 findings in each, lines identical |
+| `issue468-star-import-time.py`, `-base.log`, `-repair.log` | base `37b67b7` / the tree of this push | `import sage_extensions.all` after `sage.all`, three fresh processes: 0.319 / 0.254 / 0.252 s against 0.319 / 0.309 / 0.320 s |
 | `issue452-controls.log` | `eb07c43`'s tree (the probe carries its own copy of the locus' class reading) | the control search for #405: `U(2) + U(2) + <2>`, 64 classes reported and 32 integral — **DISAGREE, 32 extra**; the four existing controls and five further candidates agree | 
 | `issue452-locus-cosets.log` | `eb07c43`'s tree (same probe) | the corrected coset reading at card 029J's 4.3.8 line: period 4, ten Smith invariants one, **1024 representatives, 256 passing, `|K| = 1024`**, the 275-member family all integral, **`ρ(K_v)` order 256**, passing+generator integral and refused+generator not | 
 | `issue452-locus-tests.log` | `eb07c43`'s tree with this commit's change to `isotropic_lifts.py` | `tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage`: **4 passed in 5.09 s**, lint on, exit 0 — the new `U(2) + U(2) + <2>` control included | 

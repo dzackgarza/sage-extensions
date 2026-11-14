@@ -1,0 +1,14 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt468
+provider SHA: 51310d613cd8c27860c70ff2f3370fedc6a18f21
+tree dirty:  M src/sage_extensions/all.py 
+file: tests/objects/test_fractional_ideal_2z.sage
+F.F..                                                                    [100%]
+=================================== FAILURES ===================================
+E   NotImplementedError
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:606: NotImplementedError
+E   AssertionError: the rank of Fractional ideal (2) of Integer Ring over Integer Ring is computed over a finite field for a finite module, or from a chosen basis or presentation, and Fractional ideal (2) of Integer Ring supplies none of these
+/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:2477: AssertionError: the rank of Fractional ideal (2) of Integer Ring over Integer Ring is computed over a finite field for a finite module, or from a chosen basis or presentation, and Fractional ideal (2) of Integer Ring supplies none of these
+=========================== short test summary info ============================
+FAILED tests/objects/test_fractional_ideal_2z.sage::test_the_category_construction_agrees
+FAILED tests/objects/test_fractional_ideal_2z.sage::test_2z_is_principal_and_free_of_rank_one
+2 failed, 3 passed in 0.29s

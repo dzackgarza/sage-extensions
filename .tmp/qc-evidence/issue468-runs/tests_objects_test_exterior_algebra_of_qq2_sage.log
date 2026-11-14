@@ -1,0 +1,14 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt468
+provider SHA: 51310d613cd8c27860c70ff2f3370fedc6a18f21
+tree dirty:  M src/sage_extensions/all.py 
+file: tests/objects/test_exterior_algebra_of_qq2.sage
+..F.F.                                                                   [100%]
+=================================== FAILURES ===================================
+E   AssertionError: the rank of Lambda(Free module on {[a], [b]} over Fraction Field of Integer Ring) over Fraction Field of Integer Ring is computed over a finite field for a finite module, or from a chosen basis or presentation, and Lambda(Free module on {[a], [b]} over Fraction Field of Integer Ring) supplies none of these
+/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:2477: AssertionError: the rank of Lambda(Free module on {[a], [b]} over Fraction Field of Integer Ring) over Fraction Field of Integer Ring is computed over a finite field for a finite module, or from a chosen basis or presentation, and Lambda(Free module on {[a], [b]} over Fraction Field of Integer Ring) supplies none of these
+E   AssertionError: cannot decide whether the cardinal sum_{i in Integer Ring} kappa_i is finite: it is not a finite sum, product, or supremum of known cardinals
+/repos/sage-extensions/src/sage_extensions/categories/sets/cardinals.py:732: AssertionError: cannot decide whether the cardinal sum_{i in Integer Ring} kappa_i is finite: it is not a finite sum, product, or supremum of known cardinals
+=========================== short test summary info ============================
+FAILED tests/objects/test_exterior_algebra_of_qq2.sage::test_the_graded_pieces_of_the_exterior_algebra
+FAILED tests/objects/test_exterior_algebra_of_qq2.sage::test_the_centre_of_the_exterior_algebra
+2 failed, 4 passed in 0.49s

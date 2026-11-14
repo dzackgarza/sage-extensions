@@ -235,7 +235,18 @@ class RingMorphism:
         return _ring_morphisms_equal(self, self.parent().identity())
 
     def _engine_is_identity(self) -> bool:
-        r"""Ask only the selected private engine realization about identity."""
+        r"""Ask only the selected private engine realization about identity.
+
+        An identity is an endomorphism: a map whose domain and codomain are not the same
+        parent is not one, and its engine realization is not asked.  This is the case that
+        matters here -- the canonical ``Z/p -> closure`` and ``QQ -> AA`` maps are Sage
+        coercion maps (``DefaultConvertMap_unique``), which are maps between two different
+        parents and carry no identity test of their own (Sage defines ``is_identity`` on
+        ``RingHomomorphism``-like maps, not on ``Map``).  ``__mul__`` then composes with
+        such a factor instead of eliding the composition, which is the same map.
+        """
+        if self.domain() is not self.codomain():
+            return False
         if self._engine_morphism is None:
             return False
         return bool(self._engine_morphism.is_identity())
@@ -3314,10 +3325,10 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                     hypothesis.
                     """
                     from sage_extensions.categories.group.profinite.absolute_galois_group import (
-                        AbsoluteGaloisGroup,
+                        _canonical_absolute_galois_group,
                     )
 
-                    return AbsoluteGaloisGroup(self)
+                    return _canonical_absolute_galois_group(_own_ring(self))
 
     class NoZeroDivisors(CategoryWithAxiom):
         r"""Rings in which ``xy = 0`` forces ``x = 0`` or ``y = 0``.
@@ -7608,11 +7619,9 @@ def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingPare
     ``FiniteField.algebraic_closure``, which returns one cached pseudo-Conway
     closure per characteristic (``GF(p).algebraic_closure() is
     GF(p).algebraic_closure()``), and that is the instance Sage's own
-    finite-field constructions resolve to.  Raising the closure through
-    ``AlgebraicClosureFiniteField`` instead would require a generator name, and
-    a name coined by an adapter is never a construction: Sage's constructor
-    takes ``(base_ring, name)``, so the characteristic this function is keyed by
-    does not select any closure there.
+    finite-field constructions resolve to.  A generator name coined here would
+    be the adapter's, not the construction's, so the closure is not raised
+    through a constructor that takes one.
     """
     engine = SageGF(int(characteristic)).algebraic_closure()
     return _OwnedRingParent(

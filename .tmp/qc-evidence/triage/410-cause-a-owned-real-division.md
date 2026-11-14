@@ -1,5 +1,9 @@
 An owned ring element's division recurses, and the definite metric invariants die on it
 
+Status: repaired on `main`.  The division was repaired through `e9b6c2c`, `4c09c87`,
+`4b958ef` and `b3c7ca3`; the division's further work belongs to #500, taken by another
+chat, so this body is the record of the defect and its red tests and is not to be filed.
+
 When this closes, `L.packing_radius()`, `L.center_density()` and every other definite-lattice
 invariant that divides a length by an integer return their value for a lattice over the owned
 reals, and `RR(1) / RR(2)` is the field division it is named after instead of a

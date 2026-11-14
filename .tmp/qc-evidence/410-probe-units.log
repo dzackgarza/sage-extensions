@@ -1,0 +1,10 @@
+QQ[x] gen ** -1 -> 1/x
+QQ[x] gen .inverse_of_unit() !! ArithmeticError: x is not a unit in Univariate Polynomial Ring in x over Rational Field
+QQ[x] unit 2 .inverse_of_unit() -> 1/2
+Zmod(6)(5) ** -1 -> 5
+Zmod(6)(5).inverse_of_unit() -> 5
+Zmod(6)(2).inverse_of_unit() !! ArithmeticError: element is not a unit
+Zmod(6)(2) ** -1 !! ZeroDivisionError: inverse of Mod(2, 6) does not exist
+QQ(2).inverse_of_unit() -> 1/2
+RR(2).inverse_of_unit() -> 1/2
+CC(2).inverse_of_unit() -> 1/2

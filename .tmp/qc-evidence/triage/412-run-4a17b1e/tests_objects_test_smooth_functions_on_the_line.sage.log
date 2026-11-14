@@ -1,0 +1,52 @@
+provider SHA: 4a17b1e90b82f4ae24e66b97c4b3b694cb895085
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_smooth_functions_on_the_line.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+E   KeyError: (('infinity',), 93006288, 93006288)
+
+During handling of the above exception, another exception occurred:
+E   AssertionError: C^k(X, Y) is a real vector space of maps, so Y must be a real vector space, but Real Field is not
+/repos/sage-extensions/src/sage_extensions/categories/functions/real_functions.py:708: AssertionError: C^k(X, Y) is a real vector space of maps, so Y must be a real vector space, but Real Field is not
+E   KeyError: (('infinity',), 93006288, 93006288)
+
+During handling of the above exception, another exception occurred:
+E   AssertionError: C^k(X, Y) is a real vector space of maps, so Y must be a real vector space, but Real Field is not
+/repos/sage-extensions/src/sage_extensions/categories/functions/real_functions.py:708: AssertionError: C^k(X, Y) is a real vector space of maps, so Y must be a real vector space, but Real Field is not
+E   KeyError: (('infinity',), 93006288, 93006288)
+
+During handling of the above exception, another exception occurred:
+E   AssertionError: C^k(X, Y) is a real vector space of maps, so Y must be a real vector space, but Real Field is not
+/repos/sage-extensions/src/sage_extensions/categories/functions/real_functions.py:708: AssertionError: C^k(X, Y) is a real vector space of maps, so Y must be a real vector space, but Real Field is not
+E   KeyError: (('infinity',), 93006288, 93006288)
+
+During handling of the above exception, another exception occurred:
+E   AssertionError: C^k(X, Y) is a real vector space of maps, so Y must be a real vector space, but Real Field is not
+/repos/sage-extensions/src/sage_extensions/categories/functions/real_functions.py:708: AssertionError: C^k(X, Y) is a real vector space of maps, so Y must be a real vector space, but Real Field is not
+E   KeyError: (('infinity',), 93006288, 93006288)
+
+During handling of the above exception, another exception occurred:
+E   AssertionError: C^k(X, Y) is a real vector space of maps, so Y must be a real vector space, but Real Field is not
+/repos/sage-extensions/src/sage_extensions/categories/functions/real_functions.py:708: AssertionError: C^k(X, Y) is a real vector space of maps, so Y must be a real vector space, but Real Field is not
+=========================== short test summary info ============================
+FAILED tests/objects/test_smooth_functions_on_the_line.sage::test_the_constructions_of_smooth_functions_agree
+FAILED tests/objects/test_smooth_functions_on_the_line.sage::test_the_categories_of_smooth_functions
+FAILED tests/objects/test_smooth_functions_on_the_line.sage::test_there_are_continuum_many_smooth_functions
+FAILED tests/objects/test_smooth_functions_on_the_line.sage::test_evaluating_a_gaussian
+FAILED tests/objects/test_smooth_functions_on_the_line.sage::test_smooth_functions_have_one_endomorphism_category
+5 failed in 0.48s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 295 MiB
+[peakrss] low-water MemAvail : 8873 MiB
+[peakrss] peak single VmHWM  : 295 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      277 MiB peak
+[peakrss]   sage                        223 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   295 MiB hwm=   295 MiB avail=  8873 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   249 MiB hwm=   249 MiB avail=  8915 MiB
+[peakrss]   t=     0.0s procs=  2 rss=    10 MiB hwm=    10 MiB avail=  9066 MiB

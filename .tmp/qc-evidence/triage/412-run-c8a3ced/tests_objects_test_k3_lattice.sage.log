@@ -1,0 +1,32 @@
+provider SHA: c8a3cedb1ba27919c416101e98cdc7d36256415e
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_k3_lattice.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+..F..                                                                    [100%]
+=================================== FAILURES ===================================
+E   KeyError: 'summands'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'summands'
+sage/cpython/getattr.pyx:362: AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'summands'
+========================== test-call performance gate ==========================
+tests/objects/test_k3_lattice.sage::test_the_catalogue_entry_is_three_hyperbolic_planes_and_two_e8: 23.26 s > 20 s
+=========================== short test summary info ============================
+FAILED tests/objects/test_k3_lattice.sage::test_the_invariants_of_the_k3_lattice
+1 failed, 4 passed in 29.90s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=25
+[peakrss] peak tree RSS      : 368 MiB
+[peakrss] low-water MemAvail : 990 MiB
+[peakrss] peak single VmHWM  : 380 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      362 MiB peak
+[peakrss]   sage                        128 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          2 MiB peak
+[peakrss]   t=    46.2s procs=  5 rss=   368 MiB hwm=   379 MiB avail=  3391 MiB
+[peakrss]   t=    48.2s procs=  5 rss=   368 MiB hwm=   380 MiB avail=  3415 MiB
+[peakrss]   t=    44.2s procs=  5 rss=   352 MiB hwm=   363 MiB avail=  3485 MiB
+[peakrss]   t=    22.1s procs=  5 rss=   216 MiB hwm=   231 MiB avail=  1012 MiB
+[peakrss]   t=    26.1s procs=  5 rss=   216 MiB hwm=   231 MiB avail=  1008 MiB

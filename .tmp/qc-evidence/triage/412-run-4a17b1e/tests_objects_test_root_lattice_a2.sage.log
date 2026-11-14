@@ -1,0 +1,51 @@
+provider SHA: 4a17b1e90b82f4ae24e66b97c4b3b694cb895085
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_root_lattice_a2.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FF..FF........F                                                          [100%]
+=================================== FAILURES ===================================
+E   assert Integral latt...gnature (0, 2) == Integral latt...gnature (0, 2)
+      
+      Use -v to get more diff
+/repos/sage-extensions/tests/objects/test_root_lattice_a2.sage:10: assert Integral latt...gnature (0, 2) == Integral latt...gnature (0, 2)
+E     File "<string>", line 0
+        
+    SyntaxError: invalid syntax
+
+During handling of the above exception, another exception occurred:
+E   ValueError: ['A', 2] is not a valid Cartan type
+/sage/.venv/lib/python3.14/site-packages/sage/combinat/root_system/cartan_type.py:734: ValueError: ['A', 2] is not a valid Cartan type
+E   assert -2 == -1
+     +  where -2 = q(e_0)
+     +    where q = Integral lattice of rank 2 and signature (0, 2).q
+     +  and   1 = Integer(1)
+/repos/sage-extensions/tests/objects/test_root_lattice_a2.sage:47: assert -2 == -1
+E   AssertionError: cannot compute the cardinality of Emb(Integral lattice of rank 1 and signature (0, 1), Integral lattice of rank 2 and signature (0, 2)): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of homsets of sets and Category of sets)
+/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:2504: AssertionError: cannot compute the cardinality of Emb(Integral lattice of rank 1 and signature (0, 1), Integral lattice of rank 2 and signature (0, 2)): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of homsets of sets and Category of sets)
+E   assert Free module on {Generic endomorphism of Integral lattice of rank 2 and signature (0, 2), Generic endomorphism of Integ...rank 2 and signature (0, 2), Generic endomorphism of Integral lattice of rank 2 and signature (0, 2)} over Integer Ring is LatticeMor(Integral lattice of rank 2 and signature (0, 2), Integral lattice of rank 2 and signature (0, 2))
+     +  where Free module on {Generic endomorphism of Integral lattice of rank 2 and signature (0, 2), Generic endomorphism of Integ...rank 2 and signature (0, 2), Generic endomorphism of Integral lattice of rank 2 and signature (0, 2)} over Integer Ring = <function Modules.ParentMethods.End at 0x7a127cefaae0>()
+     +    where <function Modules.ParentMethods.End at 0x7a127cefaae0> = Integral lattice of rank 2 and signature (0, 2).End
+/repos/sage-extensions/tests/objects/test_root_lattice_a2.sage:166: assert Free module on {Generic endomorphism of Integral lattice of rank 2 and signature (0, 2), Generic endomorphism of Integ...rank 2 and signature (0, 2), Generic endomorphism of Integral lattice of rank 2 and signature (0, 2)} over Integer Ring is LatticeMor(Integral lattice of rank 2 and signature (0, 2), Integral lattice of rank 2 and signature (0, 2))
+=========================== short test summary info ============================
+FAILED tests/objects/test_root_lattice_a2.sage::test_the_named_and_the_gram_constructions_agree
+FAILED tests/objects/test_root_lattice_a2.sage::test_the_root_system_construction_agrees
+FAILED tests/objects/test_root_lattice_a2.sage::test_the_invariants_of_a2 - a...
+FAILED tests/objects/test_root_lattice_a2.sage::test_the_roots_and_isometries_of_a2
+FAILED tests/objects/test_root_lattice_a2.sage::test_a2_has_one_endomorphism_category
+5 failed, 10 passed in 3.61s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=5
+[peakrss] peak tree RSS      : 502 MiB
+[peakrss] low-water MemAvail : 8633 MiB
+[peakrss] peak single VmHWM  : 502 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      485 MiB peak
+[peakrss]   sage                        220 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=     8.0s procs=  5 rss=   502 MiB hwm=   502 MiB avail=  8633 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   472 MiB hwm=   472 MiB avail=  8766 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   270 MiB hwm=   270 MiB avail=  9004 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   246 MiB hwm=   246 MiB avail=  8877 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  9045 MiB

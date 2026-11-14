@@ -1,0 +1,1307 @@
+===== tests_groups_test_g_sets_torsor_archive.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_g_sets_torsor_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 2 items
+
+tests/groups/test_g_sets_torsor_archive.sage::test_the_equivariant_self_maps_of_the_regular_c3_set_are_its_three_translations FAILED [ 50%]
+tests/groups/test_g_sets_torsor_archive.sage::test_the_transporter_of_the_regular_c3_torsor_from_x_to_gx_is_g FAILED [100%]
+
+=================================== FAILURES ===================================
+E   AssertionError: cannot compute the cardinality of Mor_Cyclic group C_3 of order 3({1, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action, {1, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of endsets and Category of homsets of sets and Category of sets)
+/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:2503: AssertionError: cannot compute the cardinality of Mor_Cyclic group C_3 of order 3({1, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action, {1, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of endsets and Category of homsets of sets and Category of sets)
+E   NameError: name 'Torsors' is not defined
+/repos/sage-extensions/tests/groups/test_g_sets_torsor_archive.sage:20: NameError: name 'Torsors' is not defined
+=========================== short test summary info ============================
+FAILED tests/groups/test_g_sets_torsor_archive.sage::test_the_equivariant_self_maps_of_the_regular_c3_set_are_its_three_translations
+FAILED tests/groups/test_g_sets_torsor_archive.sage::test_the_transporter_of_the_regular_c3_torsor_from_x_to_gx_is_g
+============================== 2 failed in 0.74s ===============================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=5
+[peakrss] peak tree RSS      : 304 MiB
+[peakrss] low-water MemAvail : 6829 MiB
+[peakrss] peak single VmHWM  : 304 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      286 MiB peak
+[peakrss]   sage                        196 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  5 rss=   304 MiB hwm=   304 MiB avail=  6886 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   254 MiB hwm=   254 MiB avail=  6911 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   222 MiB hwm=   222 MiB avail=  6979 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   103 MiB hwm=   103 MiB avail=  6829 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail=  7218 MiB
+
+===== tests_groups_test_group_automorphisms_archive.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_group_automorphisms_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 4 items
+
+tests/groups/test_group_automorphisms_archive.sage::test_aut_c8_is_the_klein_four_group PASSED [ 25%]
+tests/groups/test_group_automorphisms_archive.sage::test_aut_v4_and_aut_q8_have_the_literature_orders PASSED [ 50%]
+tests/groups/test_group_automorphisms_archive.sage::test_conjugation_realizes_all_automorphisms_of_s3 FAILED [ 75%]
+tests/groups/test_group_automorphisms_archive.sage::test_s6_has_outer_automorphisms_of_index_two FAILED [100%]
+
+=================================== FAILURES ===================================
+E   TypeError: a GAP whole group map is private engine output; give generator images
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:4592: TypeError: a GAP whole group map is private engine output; give generator images
+E   TypeError: a GAP whole group map is private engine output; give generator images
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:4592: TypeError: a GAP whole group map is private engine output; give generator images
+=========================== short test summary info ============================
+FAILED tests/groups/test_group_automorphisms_archive.sage::test_conjugation_realizes_all_automorphisms_of_s3
+FAILED tests/groups/test_group_automorphisms_archive.sage::test_s6_has_outer_automorphisms_of_index_two
+========================= 2 failed, 2 passed in 1.70s ==========================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=8
+[peakrss] peak tree RSS      : 420 MiB
+[peakrss] low-water MemAvail : 7942 MiB
+[peakrss] peak single VmHWM  : 420 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      402 MiB peak
+[peakrss]   sage                        202 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.0s procs=  5 rss=   420 MiB hwm=   420 MiB avail=  8009 MiB
+[peakrss]   t=    12.0s procs=  5 rss=   419 MiB hwm=   419 MiB avail=  7942 MiB
+[peakrss]   t=    10.0s procs=  5 rss=   297 MiB hwm=   297 MiB avail=  8201 MiB
+[peakrss]   t=     4.0s procs=  7 rss=   228 MiB hwm=   228 MiB avail=  8336 MiB
+[peakrss]   t=     8.0s procs=  5 rss=   220 MiB hwm=   220 MiB avail=  8422 MiB
+
+===== tests_groups_test_group_generators_use_the_supplied_family.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_group_generators_use_the_supplied_family.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 4 items
+
+tests/groups/test_group_generators_use_the_supplied_family.sage::test_the_small_orthogonal_group_states_generators_that_generate_it PASSED [ 25%]
+tests/groups/test_group_generators_use_the_supplied_family.sage::test_a_generated_subgroup_states_the_generators_it_was_given PASSED [ 50%]
+tests/groups/test_group_generators_use_the_supplied_family.sage::test_a_fresh_group_states_generators_before_any_read_could_warm_it PASSED [ 75%]
+tests/groups/test_group_generators_use_the_supplied_family.sage::test_the_large_orthogonal_group_of_a_finite_form_states_its_generators PASSED [100%]
+
+============================== 4 passed in 7.42s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=9
+[peakrss] peak tree RSS      : 455 MiB
+[peakrss] low-water MemAvail : 8109 MiB
+[peakrss] peak single VmHWM  : 455 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      437 MiB peak
+[peakrss]   sage                        223 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=    16.0s procs=  5 rss=   455 MiB hwm=   455 MiB avail=  8379 MiB
+[peakrss]   t=    14.0s procs=  5 rss=   452 MiB hwm=   452 MiB avail=  8514 MiB
+[peakrss]   t=    12.0s procs=  5 rss=   446 MiB hwm=   446 MiB avail=  8292 MiB
+[peakrss]   t=    10.0s procs=  5 rss=   323 MiB hwm=   323 MiB avail=  8428 MiB
+[peakrss]   t=     4.0s procs=  7 rss=   249 MiB hwm=   249 MiB avail=  8415 MiB
+
+===== tests_groups_test_group_hierarchy_archive.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_group_hierarchy_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 2 items
+
+tests/groups/test_group_hierarchy_archive.sage::test_the_coxeter_presentation_of_s3_presents_a_group_of_order_six FAILED [ 50%]
+tests/groups/test_group_hierarchy_archive.sage::test_one_generator_and_one_square_relator_present_the_group_of_order_two FAILED [100%]
+
+=================================== FAILURES ===================================
+E   AssertionError: cannot compute the cardinality of the group Group generated by Group generators: [0 ↦ g_1, 1 ↦ g_2]: its finiteness is is_finite(Group generated by Group generators: [0 ↦ g_1, 1 ↦ g_2]), it has no chosen free basis, and it is not known to be infinite and finitely generated (it is in Join of Category of presented groups and Category of groups with chosen finite presentation)
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:459: AssertionError: cannot compute the cardinality of the group Group generated by Group generators: [0 ↦ g_1, 1 ↦ g_2]: its finiteness is is_finite(Group generated by Group generators: [0 ↦ g_1, 1 ↦ g_2]), it has no chosen free basis, and it is not known to be infinite and finitely generated (it is in Join of Category of presented groups and Category of groups with chosen finite presentation)
+E   AssertionError: cannot compute the cardinality of the group Group generated by Group generators: [0 ↦ g_1]: its finiteness is is_finite(Group generated by Group generators: [0 ↦ g_1]), it has no chosen free basis, and it is not known to be infinite and finitely generated (it is in Join of Category of presented groups and Category of groups with chosen finite presentation and Category of abelian groups)
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:459: AssertionError: cannot compute the cardinality of the group Group generated by Group generators: [0 ↦ g_1]: its finiteness is is_finite(Group generated by Group generators: [0 ↦ g_1]), it has no chosen free basis, and it is not known to be infinite and finitely generated (it is in Join of Category of presented groups and Category of groups with chosen finite presentation and Category of abelian groups)
+=========================== short test summary info ============================
+FAILED tests/groups/test_group_hierarchy_archive.sage::test_the_coxeter_presentation_of_s3_presents_a_group_of_order_six
+FAILED tests/groups/test_group_hierarchy_archive.sage::test_one_generator_and_one_square_relator_present_the_group_of_order_two
+============================== 2 failed in 0.45s ===============================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 416 MiB
+[peakrss] low-water MemAvail : 8078 MiB
+[peakrss] peak single VmHWM  : 416 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      398 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   416 MiB hwm=   416 MiB avail=  8078 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   124 MiB hwm=   124 MiB avail=  8408 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail=  8602 MiB
+
+===== tests_groups_test_group_law.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_group_law.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 4 items
+
+tests/groups/test_group_law.sage::test_the_product_of_two_transpositions_in_s3_is_their_composite_three_cycle PASSED [ 25%]
+tests/groups/test_group_law.sage::test_the_natural_permutation_module_of_s3_has_character_3_1_0 FAILED [ 50%]
+tests/groups/test_group_law.sage::test_the_standard_presentations_of_s3_d4_a4_present_groups_of_orders_6_8_12 PASSED [ 75%]
+tests/groups/test_group_law.sage::test_a4_acts_transitively_on_four_points_with_cyclic_point_stabilizers_of_order_three PASSED [100%]
+
+=================================== FAILURES ===================================
+E   KeyError: 'character'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'GeneralModules.parent_class[_CoefficientModuleEngine].ObjectType' object has no attribute 'character'
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+sage/cpython/getattr.pyx:362: AttributeError: 'GeneralModules.parent_class[_CoefficientModuleEngine].ObjectType' object has no attribute 'character'
+=========================== short test summary info ============================
+FAILED tests/groups/test_group_law.sage::test_the_natural_permutation_module_of_s3_has_character_3_1_0
+========================= 1 failed, 3 passed in 0.87s ==========================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=4
+[peakrss] peak tree RSS      : 416 MiB
+[peakrss] low-water MemAvail : 8238 MiB
+[peakrss] peak single VmHWM  : 416 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      399 MiB peak
+[peakrss]   sage                        196 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  5 rss=   416 MiB hwm=   416 MiB avail=  8238 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   222 MiB hwm=   222 MiB avail=  8527 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   120 MiB hwm=   120 MiB avail=  8503 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  8652 MiB
+
+===== tests_groups_test_group_morphisms_archive.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_group_morphisms_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 25 items
+
+tests/groups/test_group_morphisms_archive.sage::test_reduction_c4_to_c2_has_kernel_of_order_two_and_c4_mod_kernel_is_the_image PASSED [  4%]
+tests/groups/test_group_morphisms_archive.sage::test_finite_group_mor_cardinality_uses_the_represented_gap_mor PASSED [  8%]
+tests/groups/test_group_morphisms_archive.sage::test_the_image_epimorphism_has_a_set_section_but_no_group_section PASSED [ 12%]
+tests/groups/test_group_morphisms_archive.sage::test_free_group_reduction_has_a_section_of_its_finite_image_as_sets PASSED [ 16%]
+tests/groups/test_group_morphisms_archive.sage::test_elementwise_free_group_map_to_finite_group_has_decided_surjectivity PASSED [ 20%]
+tests/groups/test_group_morphisms_archive.sage::test_elementwise_free_group_reduction_has_decided_noninjectivity PASSED [ 24%]
+tests/groups/test_group_morphisms_archive.sage::test_finite_group_cannot_surject_onto_infinite_group PASSED [ 28%]
+tests/groups/test_group_morphisms_archive.sage::test_infinite_group_cannot_inject_into_finite_group PASSED [ 32%]
+tests/groups/test_group_morphisms_archive.sage::test_finite_group_morphism_cardinality_obstructions PASSED [ 36%]
+tests/groups/test_group_morphisms_archive.sage::test_elementwise_finite_group_isomorphism_reuses_group_preimages PASSED [ 40%]
+tests/groups/test_group_morphisms_archive.sage::test_noninjective_group_map_factors_through_its_proper_image FAILED [ 44%]
+tests/groups/test_group_morphisms_archive.sage::test_image_factorization_retains_the_image_and_surjective_first_arrow PASSED [ 48%]
+tests/groups/test_group_morphisms_archive.sage::test_generated_subgroup_finite_image_lifts_use_its_selected_generators FAILED [ 52%]
+tests/groups/test_group_morphisms_archive.sage::test_generated_subgroup_map_image_uses_its_retained_generator_family FAILED [ 56%]
+tests/groups/test_group_morphisms_archive.sage::test_elementwise_generated_subgroup_map_has_gap_realization PASSED [ 60%]
+tests/groups/test_group_morphisms_archive.sage::test_generated_subgroup_homomorphisms_are_determined_by_generators PASSED [ 64%]
+tests/groups/test_group_morphisms_archive.sage::test_composition_out_of_generated_subgroup_uses_its_generators PASSED [ 68%]
+tests/groups/test_group_morphisms_archive.sage::test_finite_group_homomorphism_equality_uses_all_source_elements PASSED [ 72%]
+tests/groups/test_group_morphisms_archive.sage::test_generated_subgroup_inclusion_has_presented_group_cokernel PASSED [ 76%]
+tests/groups/test_group_morphisms_archive.sage::test_infinite_free_source_factors_through_a_proper_cyclic_image PASSED [ 80%]
+tests/groups/test_group_morphisms_archive.sage::test_finite_kernel_uses_the_exact_gap_structure_predicates PASSED [ 84%]
+tests/groups/test_group_morphisms_archive.sage::test_group_cokernels_quotient_by_the_normal_closure_of_the_image PASSED [ 88%]
+tests/groups/test_group_morphisms_archive.sage::test_cokernel_of_squaring_on_an_infinite_presented_group FAILED [ 92%]
+tests/groups/test_group_morphisms_archive.sage::test_reduction_then_inclusion_c4_to_c2_to_c4_is_the_squaring_endomorphism PASSED [ 96%]
+tests/groups/test_group_morphisms_archive.sage::test_automorphism_groups_of_c4_c5_v4_and_s3 PASSED [100%]
+
+=================================== FAILURES ===================================
+E   NameError: name 'Subgroups' is not defined
+/repos/sage-extensions/tests/groups/test_group_morphisms_archive.sage:148: NameError: name 'Subgroups' is not defined
+E   NameError: name 'GeneratedSubgroups' is not defined
+/repos/sage-extensions/tests/groups/test_group_morphisms_archive.sage:183: NameError: name 'GeneratedSubgroups' is not defined
+E   NameError: name 'Subgroups' is not defined
+/repos/sage-extensions/tests/groups/test_group_morphisms_archive.sage:199: NameError: name 'Subgroups' is not defined
+E   AssertionError: the dictionary does not define a homomorphism out of Group generated by Group generators: [0 ↦ g_0]: it must give an image for every element of the free basis {0,...,0}, but it has keys (g_0,)
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:4490: AssertionError: the dictionary does not define a homomorphism out of Group generated by Group generators: [0 ↦ g_0]: it must give an image for every element of the free basis {0,...,0}, but it has keys (g_0,)
+=========================== short test summary info ============================
+FAILED tests/groups/test_group_morphisms_archive.sage::test_noninjective_group_map_factors_through_its_proper_image
+FAILED tests/groups/test_group_morphisms_archive.sage::test_generated_subgroup_finite_image_lifts_use_its_selected_generators
+FAILED tests/groups/test_group_morphisms_archive.sage::test_generated_subgroup_map_image_uses_its_retained_generator_family
+FAILED tests/groups/test_group_morphisms_archive.sage::test_cokernel_of_squaring_on_an_infinite_presented_group
+========================= 4 failed, 21 passed in 1.11s =========================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=4
+[peakrss] peak tree RSS      : 420 MiB
+[peakrss] low-water MemAvail : 8104 MiB
+[peakrss] peak single VmHWM  : 420 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      402 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     6.0s procs=  5 rss=   420 MiB hwm=   420 MiB avail=  8104 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   245 MiB hwm=   245 MiB avail=  8315 MiB
+[peakrss]   t=     2.0s procs=  5 rss=    31 MiB hwm=    31 MiB avail=  8498 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     6 MiB hwm=     6 MiB avail=  8466 MiB
+
+===== tests_groups_test_group_products_and_coproducts_of_presentations.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_group_products_and_coproducts_of_presentations.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 14 items
+
+tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_group_product_retains_abelianity_from_factors_not_selected_category FAILED [  7%]
+tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_empty_group_diagrams_have_the_trivial_group_and_unique_maps PASSED [ 14%]
+tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_abelian_coproduct_of_two_cyclic_groups_is_product_not_free_product FAILED [ 21%]
+tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_mixed_abelian_coproduct_injections_are_sections_of_selected_projections FAILED [ 28%]
+tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_product_of_two_infinite_free_groups_retains_projections_and_universal_factor PASSED [ 35%]
+tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_free_product_of_infinite_free_and_finite_cyclic_groups FAILED [ 42%]
+tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_free_product_factors_a_cocone_into_a_non_gap_predicate_group FAILED [ 50%]
+tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_product_of_free_and_finite_cyclic_groups_transports_factor_maps FAILED [ 57%]
+tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_group_product_factors_a_cone_with_no_apex_gap_realization PASSED [ 64%]
+tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_free_product_with_a_trivial_factor_preserves_finiteness PASSED [ 71%]
+tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_group_equalizer_has_its_subgroup_inclusion_and_universal_map FAILED [ 78%]
+tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_group_coequalizer_has_quotient_projection_and_universal_map PASSED [ 85%]
+tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_group_coequalizer_from_generated_subgroup_uses_its_selected_relator PASSED [ 92%]
+tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_infinite_presented_group_coequalizer_descends_homomorphism FAILED [100%]
+
+=================================== FAILURES ===================================
+E   assert Group of order 4 generated by Group generators: [(1 2) ↦ (1 2), (3 4) ↦ (3 4)] in Category of abelian groups
+     +  where Category of abelian groups = AbelianGroups()
+/repos/sage-extensions/tests/groups/test_group_products_and_coproducts_of_presentations.sage:19: assert Group of order 4 generated by Group generators: [(1 2) ↦ (1 2), (3 4) ↦ (3 4)] in Category of abelian groups
+E   TypeError: the coproduct of Group coproduct factors: [0 ↦ Cyclic group C_2 of order 2, 1 ↦ Cyclic group C_2 of order 2] cannot be formed in Category of abelian groups: some factor is not an object of Category of abelian groups
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:5318: TypeError: the coproduct of Group coproduct factors: [0 ↦ Cyclic group C_2 of order 2, 1 ↦ Cyclic group C_2 of order 2] cannot be formed in Category of abelian groups: some factor is not an object of Category of abelian groups
+E   TypeError: the coproduct of Group coproduct factors: [0 ↦ Group generated by Group generators: [0 ↦ g_0], 1 ↦ Cyclic group C_2 of order 2] cannot be formed in Category of abelian groups: some factor is not an object of Category of abelian groups
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:5318: TypeError: the coproduct of Group coproduct factors: [0 ↦ Group generated by Group generators: [0 ↦ g_0], 1 ↦ Cyclic group C_2 of order 2] cannot be formed in Category of abelian groups: some factor is not an object of Category of abelian groups
+E   KeyError: 132396291248720
+
+During handling of the above exception, another exception occurred:
+E   KeyError: '_from_engine_morphism'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'OwnedIndexedFreeGroupMor_with_category_with_category' object has no attribute '_from_engine_morphism'
+sage/cpython/getattr.pyx:362: AttributeError: 'OwnedIndexedFreeGroupMor_with_category_with_category' object has no attribute '_from_engine_morphism'
+E   KeyError: 132396291248720
+
+During handling of the above exception, another exception occurred:
+E   KeyError: '_from_engine_morphism'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'OwnedIndexedFreeGroupMor_with_category_with_category' object has no attribute '_from_engine_morphism'
+sage/cpython/getattr.pyx:362: AttributeError: 'OwnedIndexedFreeGroupMor_with_category_with_category' object has no attribute '_from_engine_morphism'
+E   assert Group generated by Group generators: [0 ↦ g_0] x Cyclic group C_2 of order 2 in Category of finitely presented groups
+     +  where Group generated by Group generators: [0 ↦ g_0] x Cyclic group C_2 of order 2 = object()
+     +    where object = <sage_extensions.categories.abstract_categories.products.SelectedLimitConstruction object at 0x7869e9dbc8a0>.object
+     +  and   Category of finitely presented groups = FinitelyPresentedAsGroup()
+     +    where FinitelyPresentedAsGroup = Category of groups.FinitelyPresentedAsGroup
+     +      where Category of groups = Groups()
+/repos/sage-extensions/tests/groups/test_group_products_and_coproducts_of_presentations.sage:207: assert Group generated by Group generators: [0 ↦ g_0] x Cyclic group C_2 of order 2 in Category of finitely presented groups
+E   NameError: name 'Subgroups' is not defined
+/repos/sage-extensions/tests/groups/test_group_products_and_coproducts_of_presentations.sage:273: NameError: name 'Subgroups' is not defined
+E   AssertionError: the dictionary does not define a homomorphism out of Group generated by Group generators: [0 ↦ g_0]: it must give an image for every element of the free basis {0,...,0}, but it has keys (g_0,)
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:4490: AssertionError: the dictionary does not define a homomorphism out of Group generated by Group generators: [0 ↦ g_0]: it must give an image for every element of the free basis {0,...,0}, but it has keys (g_0,)
+=========================== short test summary info ============================
+FAILED tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_group_product_retains_abelianity_from_factors_not_selected_category
+FAILED tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_abelian_coproduct_of_two_cyclic_groups_is_product_not_free_product
+FAILED tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_mixed_abelian_coproduct_injections_are_sections_of_selected_projections
+FAILED tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_free_product_of_infinite_free_and_finite_cyclic_groups
+FAILED tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_free_product_factors_a_cocone_into_a_non_gap_predicate_group
+FAILED tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_product_of_free_and_finite_cyclic_groups_transports_factor_maps
+FAILED tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_group_equalizer_has_its_subgroup_inclusion_and_universal_map
+FAILED tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_infinite_presented_group_coequalizer_descends_homomorphism
+========================= 8 failed, 6 passed in 0.94s ==========================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=5
+[peakrss] peak tree RSS      : 419 MiB
+[peakrss] low-water MemAvail : 7838 MiB
+[peakrss] peak single VmHWM  : 419 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      401 MiB peak
+[peakrss]   sage                        196 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=     8.0s procs=  5 rss=   419 MiB hwm=   419 MiB avail=  7838 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   264 MiB hwm=   264 MiB avail=  7862 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   222 MiB hwm=   222 MiB avail=  8017 MiB
+[peakrss]   t=     4.0s procs=  5 rss=    71 MiB hwm=    71 MiB avail=  8159 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail=  8357 MiB
+
+===== tests_groups_test_groups_archive.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_groups_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 13 items
+
+tests/groups/test_groups_archive.sage::test_finite_group_product_retains_group_structure_and_order FAILED [  7%]
+tests/groups/test_groups_archive.sage::test_finite_group_centers_are_owned_subgroups PASSED [ 15%]
+tests/groups/test_groups_archive.sage::test_finite_group_commutator_subgroups_are_owned PASSED [ 23%]
+tests/groups/test_groups_archive.sage::test_group_coproduct_is_the_owned_free_product FAILED [ 30%]
+tests/groups/test_groups_archive.sage::test_group_coproduct_factorization_extends_the_factor_maps PASSED [ 38%]
+tests/groups/test_groups_archive.sage::test_finite_group_subgroups_are_owned_and_keep_the_ambient_group FAILED [ 46%]
+tests/groups/test_groups_archive.sage::test_the_three_cycle_generates_the_index_two_subgroup_a3_of_s3 PASSED [ 53%]
+tests/groups/test_groups_archive.sage::test_conjugation_on_d4_has_the_centre_as_kernel_and_inner_group_v4 FAILED [ 61%]
+tests/groups/test_groups_archive.sage::test_conjugation_on_s3_is_an_isomorphism_onto_its_automorphism_group FAILED [ 69%]
+tests/groups/test_groups_archive.sage::test_the_endomorphism_ring_of_z_mod_3_is_the_field_f3 PASSED [ 76%]
+tests/groups/test_groups_archive.sage::test_the_exponent_of_z2_times_z4_is_four PASSED [ 84%]
+tests/groups/test_groups_archive.sage::test_the_discriminant_group_of_a2_is_cyclic_of_order_three PASSED [ 92%]
+tests/groups/test_groups_archive.sage::test_archived_finite_group_character_surface_is_live_on_the_owned_group FAILED [100%]
+
+=================================== FAILURES ===================================
+E   assert Product of the family over {0,...,1} in Category of groups
+     +  where Category of groups = Groups()
+/repos/sage-extensions/tests/groups/test_groups_archive.sage:9: assert Product of the family over {0,...,1} in Category of groups
+E   assert Coproduct of the family over {0,...,1} in Category of groups
+     +  where Category of groups = Groups()
+/repos/sage-extensions/tests/groups/test_groups_archive.sage:37: assert Coproduct of the family over {0,...,1} in Category of groups
+E   AssertionError: cannot compute the cardinality of Subgroups of Cyclic group C_6 of order 6: its construction supplies no exact value or decided finite enumeration (it is in Join of Category of finite sets and Category of facade sets and Category of finite countable sets)
+/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:2503: AssertionError: cannot compute the cardinality of Subgroups of Cyclic group C_6 of order 6: its construction supplies no exact value or decided finite enumeration (it is in Join of Category of finite sets and Category of facade sets and Category of finite countable sets)
+E   TypeError: a GAP whole group map is private engine output; give generator images
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:4592: TypeError: a GAP whole group map is private engine output; give generator images
+E   TypeError: a GAP whole group map is private engine output; give generator images
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:4592: TypeError: a GAP whole group map is private engine output; give generator images
+E   assert Character of degree 1 of Symmetric group S_3 in {Character of degree 1 of Symmetric group S_3, Character of degree 2 of Symmetric group S_3, Character of degree 1 of Symmetric group S_3}
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+/repos/sage-extensions/tests/groups/test_groups_archive.sage:146: assert Character of degree 1 of Symmetric group S_3 in {Character of degree 1 of Symmetric group S_3, Character of degree 2 of Symmetric group S_3, Character of degree 1 of Symmetric group S_3}
+=========================== short test summary info ============================
+FAILED tests/groups/test_groups_archive.sage::test_finite_group_product_retains_group_structure_and_order
+FAILED tests/groups/test_groups_archive.sage::test_group_coproduct_is_the_owned_free_product
+FAILED tests/groups/test_groups_archive.sage::test_finite_group_subgroups_are_owned_and_keep_the_ambient_group
+FAILED tests/groups/test_groups_archive.sage::test_conjugation_on_d4_has_the_centre_as_kernel_and_inner_group_v4
+FAILED tests/groups/test_groups_archive.sage::test_conjugation_on_s3_is_an_isomorphism_onto_its_automorphism_group
+FAILED tests/groups/test_groups_archive.sage::test_archived_finite_group_character_surface_is_live_on_the_owned_group
+========================= 6 failed, 7 passed in 11.72s =========================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=12
+[peakrss] peak tree RSS      : 635 MiB
+[peakrss] low-water MemAvail : 6676 MiB
+[peakrss] peak single VmHWM  : 635 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      617 MiB peak
+[peakrss]   sage                        185 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=    22.0s procs=  5 rss=   635 MiB hwm=   635 MiB avail=  6993 MiB
+[peakrss]   t=    20.0s procs=  5 rss=   611 MiB hwm=   611 MiB avail=  6783 MiB
+[peakrss]   t=    18.0s procs=  5 rss=   609 MiB hwm=   609 MiB avail=  6966 MiB
+[peakrss]   t=    14.0s procs=  5 rss=   591 MiB hwm=   591 MiB avail=  6676 MiB
+[peakrss]   t=    16.0s procs=  5 rss=   591 MiB hwm=   591 MiB avail=  7037 MiB
+
+===== tests_groups_test_image_from_a_selected_section.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_image_from_a_selected_section.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 1 item
+
+tests/groups/test_image_from_a_selected_section.sage::test_squaring_image_retains_its_section_and_finite_group_structure PASSED [100%]
+
+============================== 1 passed in 0.66s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 292 MiB
+[peakrss] low-water MemAvail : 6176 MiB
+[peakrss] peak single VmHWM  : 292 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      275 MiB peak
+[peakrss]   sage                        172 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=     6.0s procs=  5 rss=   292 MiB hwm=   292 MiB avail=  6853 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   197 MiB hwm=   197 MiB avail=  6294 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   122 MiB hwm=   122 MiB avail=  6176 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail=  6722 MiB
+
+===== tests_groups_test_invariants_with_named_generators.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_invariants_with_named_generators.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 1 item
+
+tests/groups/test_invariants_with_named_generators.sage::test_a_swap_and_a_trivial_generator_have_one_invariant_and_coinvariant_dimension PASSED [100%]
+
+============================== 1 passed in 0.72s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 417 MiB
+[peakrss] low-water MemAvail : 6848 MiB
+[peakrss] peak single VmHWM  : 417 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      243 MiB peak
+[peakrss]   sage                        195 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=     2.0s procs=  8 rss=   417 MiB hwm=   417 MiB avail=  6848 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   261 MiB hwm=   261 MiB avail=  8117 MiB
+[peakrss]   t=     0.0s procs=  2 rss=     8 MiB hwm=     8 MiB avail=  6906 MiB
+
+===== tests_groups_test_mathieu_automorphism_archive.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_mathieu_automorphism_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 1 item
+
+tests/groups/test_mathieu_automorphism_archive.sage::test_m12_inner_automorphisms_have_index_two_in_the_full_automorphism_group FAILED [100%]
+
+=================================== FAILURES ===================================
+E   TypeError: a GAP whole group map is private engine output; give generator images
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:4592: TypeError: a GAP whole group map is private engine output; give generator images
+=========================== short test summary info ============================
+FAILED tests/groups/test_mathieu_automorphism_archive.sage::test_m12_inner_automorphisms_have_index_two_in_the_full_automorphism_group
+============================== 1 failed in 0.50s ===============================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 417 MiB
+[peakrss] low-water MemAvail : 7838 MiB
+[peakrss] peak single VmHWM  : 417 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      399 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   417 MiB hwm=   417 MiB avail=  7838 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   169 MiB hwm=   169 MiB avail=  7999 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  8027 MiB
+
+===== tests_groups_test_module_characters.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_module_characters.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 2 items
+
+tests/groups/test_module_characters.sage::test_the_character_of_sign_plus_trivial_of_s3_is_2_0_2 FAILED [ 50%]
+tests/groups/test_module_characters.sage::test_the_2_modular_brauer_character_of_the_order_three_action_of_c6_on_f2_squared_is_2_minus1_minus1 FAILED [100%]
+
+=================================== FAILURES ===================================
+E   KeyError: 'character'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'GeneralModules.parent_class[_CoefficientModuleEngine].ObjectType' object has no attribute 'character'
+sage/cpython/getattr.pyx:362: AttributeError: 'GeneralModules.parent_class[_CoefficientModuleEngine].ObjectType' object has no attribute 'character'
+E   KeyError: 'brauer_character'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'GeneralModules.parent_class[_CoefficientModuleEngine].ObjectType' object has no attribute 'brauer_character'
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (2) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (2) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (2) of Integer Ring on Integer Ring / Ideal (2) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+sage/cpython/getattr.pyx:362: AttributeError: 'GeneralModules.parent_class[_CoefficientModuleEngine].ObjectType' object has no attribute 'brauer_character'
+=========================== short test summary info ============================
+FAILED tests/groups/test_module_characters.sage::test_the_character_of_sign_plus_trivial_of_s3_is_2_0_2
+FAILED tests/groups/test_module_characters.sage::test_the_2_modular_brauer_character_of_the_order_three_action_of_c6_on_f2_squared_is_2_minus1_minus1
+============================== 2 failed in 0.79s ===============================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 420 MiB
+[peakrss] low-water MemAvail : 7834 MiB
+[peakrss] peak single VmHWM  : 420 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      402 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   420 MiB hwm=   420 MiB avail=  7834 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   149 MiB hwm=   149 MiB avail=  8210 MiB
+[peakrss]   t=     0.0s procs=  2 rss=     9 MiB hwm=     9 MiB avail=  7961 MiB
+
+===== tests_groups_test_multiplicative_submonoids_of_the_integers.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_multiplicative_submonoids_of_the_integers.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 5 items
+
+tests/groups/test_multiplicative_submonoids_of_the_integers.sage::test_the_odd_integers_form_a_multiplicative_submonoid PASSED [ 20%]
+tests/groups/test_multiplicative_submonoids_of_the_integers.sage::test_the_powers_of_two_are_not_all_odd PASSED [ 40%]
+tests/groups/test_multiplicative_submonoids_of_the_integers.sage::test_the_powers_of_two_contain_eight_and_not_six PASSED [ 60%]
+tests/groups/test_multiplicative_submonoids_of_the_integers.sage::test_the_powers_of_four_lie_in_the_powers_of_two PASSED [ 80%]
+tests/groups/test_multiplicative_submonoids_of_the_integers.sage::test_signed_and_zero_integer_multiplicative_generators PASSED [100%]
+
+============================== 5 passed in 0.27s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 303 MiB
+[peakrss] low-water MemAvail : 8114 MiB
+[peakrss] peak single VmHWM  : 303 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      286 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   303 MiB hwm=   303 MiB avail=  8114 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   123 MiB hwm=   123 MiB avail=  8215 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     6 MiB hwm=     6 MiB avail=  8393 MiB
+
+===== tests_groups_test_open_absolute_galois_subgroups_archive.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_open_absolute_galois_subgroups_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 2 items
+
+tests/groups/test_open_absolute_galois_subgroups_archive.sage::test_the_open_subgroup_of_the_galois_group_of_f5_fixing_f25_has_index_two FAILED [ 50%]
+tests/groups/test_open_absolute_galois_subgroups_archive.sage::test_open_subgroups_of_the_abelian_galois_group_of_f5_are_their_own_conjugacy_classes FAILED [100%]
+
+=================================== FAILURES ===================================
+E   KeyError: 2
+
+During handling of the above exception, another exception occurred:
+E   TypeError: Ring morphism:
+      From: Finite Field in z2 of size 5^2
+      To:   Algebraic closure of Finite Field of size 5
+      Defn: z2 |--> z2 is an arrow of another Mor; native ring computations use the protected engine crossing
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (5) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (5) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (5) of Integer Ring on Integer Ring / Ideal (5) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:573: TypeError: Ring morphism:
+E   KeyError: 3
+
+During handling of the above exception, another exception occurred:
+E   TypeError: Ring morphism:
+      From: Finite Field in z3 of size 5^3
+      To:   Algebraic closure of Finite Field of size 5
+      Defn: z3 |--> z3 is an arrow of another Mor; native ring computations use the protected engine crossing
+/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:573: TypeError: Ring morphism:
+=========================== short test summary info ============================
+FAILED tests/groups/test_open_absolute_galois_subgroups_archive.sage::test_the_open_subgroup_of_the_galois_group_of_f5_fixing_f25_has_index_two
+FAILED tests/groups/test_open_absolute_galois_subgroups_archive.sage::test_open_subgroups_of_the_abelian_galois_group_of_f5_are_their_own_conjugacy_classes
+============================== 2 failed in 0.60s ===============================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 316 MiB
+[peakrss] low-water MemAvail : 8450 MiB
+[peakrss] peak single VmHWM  : 316 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      299 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   316 MiB hwm=   316 MiB avail=  8497 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   122 MiB hwm=   122 MiB avail=  8605 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  8450 MiB
+
+===== tests_groups_test_orbit_generator_permutations.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_orbit_generator_permutations.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 4 items
+
+tests/groups/test_orbit_generator_permutations.sage::test_orbit_generator_permutations_equal_the_given_action[ordinal_points-single_orbit] PASSED [ 25%]
+tests/groups/test_orbit_generator_permutations.sage::test_orbit_generator_permutations_equal_the_given_action[ordinal_points-union_of_orbits] PASSED [ 50%]
+tests/groups/test_orbit_generator_permutations.sage::test_orbit_generator_permutations_equal_the_given_action[relabeled_points-single_orbit] PASSED [ 75%]
+tests/groups/test_orbit_generator_permutations.sage::test_orbit_generator_permutations_equal_the_given_action[relabeled_points-union_of_orbits] PASSED [100%]
+
+============================== 4 passed in 0.35s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 297 MiB
+[peakrss] low-water MemAvail : 8537 MiB
+[peakrss] peak single VmHWM  : 297 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      280 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   297 MiB hwm=   297 MiB avail=  8537 MiB
+[peakrss]   t=     2.0s procs=  5 rss=    52 MiB hwm=    52 MiB avail=  8578 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail=  8585 MiB
+
+===== tests_groups_test_orthogonal_reduction_image_orders.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_orthogonal_reduction_image_orders.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 7 items
+
+tests/groups/test_orthogonal_reduction_image_orders.sage::test_the_generated_reduction_has_its_actual_orthogonal_image_order[case_index0-prime0-expected0] PASSED [ 14%]
+tests/groups/test_orthogonal_reduction_image_orders.sage::test_the_generated_reduction_has_its_actual_orthogonal_image_order[case_index1-prime1-expected1] PASSED [ 28%]
+tests/groups/test_orthogonal_reduction_image_orders.sage::test_the_generated_reduction_has_its_actual_orthogonal_image_order[case_index2-prime2-expected2] PASSED [ 42%]
+tests/groups/test_orthogonal_reduction_image_orders.sage::test_the_scalar_subgroup_has_the_order_of_sign_reversal[prime0-expected0] PASSED [ 57%]
+tests/groups/test_orthogonal_reduction_image_orders.sage::test_the_scalar_subgroup_has_the_order_of_sign_reversal[prime1-expected1] PASSED [ 71%]
+tests/groups/test_orthogonal_reduction_image_orders.sage::test_the_scalar_subgroup_has_the_order_of_sign_reversal[prime2-expected2] PASSED [ 85%]
+tests/groups/test_orthogonal_reduction_image_orders.sage::test_the_five_dimensional_reflection_group_has_the_full_orthogonal_order PASSED [100%]
+
+============================== 7 passed in 2.62s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 427 MiB
+[peakrss] low-water MemAvail : 8463 MiB
+[peakrss] peak single VmHWM  : 427 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      409 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     6.0s procs=  5 rss=   427 MiB hwm=   427 MiB avail=  8463 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   303 MiB hwm=   306 MiB avail=  8580 MiB
+[peakrss]   t=     2.0s procs=  5 rss=    74 MiB hwm=    74 MiB avail=  8664 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail=  8740 MiB
+
+===== tests_groups_test_owned_groups.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_owned_groups.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 5 items
+
+tests/groups/test_owned_groups.sage::test_sl2_f3_is_sp2_f3_and_modulo_its_centre_is_a4 PASSED [ 20%]
+tests/groups/test_owned_groups.sage::test_groups_of_the_same_order_that_are_not_isomorphic PASSED [ 40%]
+tests/groups/test_owned_groups.sage::test_the_abelianization_of_the_free_product_of_c2_and_c3_is_c6 FAILED [ 60%]
+tests/groups/test_owned_groups.sage::test_the_four_cycle_generates_a_cyclic_subgroup_of_s4_of_order_four PASSED [ 80%]
+tests/groups/test_owned_groups.sage::test_centralizers_of_a_transposition_and_a_four_cycle_in_s4 PASSED [100%]
+
+=================================== FAILURES ===================================
+E   KeyError: 'abelianization'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'OwnedJoinCategory.parent_class[_GroupEngine].ObjectType' object has no attribute 'abelianization'
+sage/cpython/getattr.pyx:362: AttributeError: 'OwnedJoinCategory.parent_class[_GroupEngine].ObjectType' object has no attribute 'abelianization'
+=========================== short test summary info ============================
+FAILED tests/groups/test_owned_groups.sage::test_the_abelianization_of_the_free_product_of_c2_and_c3_is_c6
+========================= 1 failed, 4 passed in 0.53s ==========================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 419 MiB
+[peakrss] low-water MemAvail : 7376 MiB
+[peakrss] peak single VmHWM  : 419 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      401 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   419 MiB hwm=   419 MiB avail=  7376 MiB
+[peakrss]   t=     2.0s procs=  5 rss=    73 MiB hwm=    73 MiB avail=  8628 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     5 MiB avail=  8761 MiB
+
+===== tests_groups_test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 5 items
+
+tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage::test_the_even_permutations_of_s4_form_a_subgroup_of_order_twelve PASSED [ 20%]
+tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage::test_the_kernel_of_the_sign_of_s4_is_the_nonabelian_group_of_order_twelve PASSED [ 40%]
+tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage::test_the_even_permutations_fixing_four_form_a3 PASSED [ 60%]
+tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage::test_the_centralizer_of_a_double_transposition_in_s4_has_order_eight PASSED [ 80%]
+tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage::test_normalizer_retains_its_conjugation_action_functor FAILED [100%]
+
+=================================== FAILURES ===================================
+E   assert Subgroup of Symmetric group S_3 is Subgroup of Symmetric group S_3
+     +  where Subgroup of Symmetric group S_3 = Generic endomorphism of Subgroups of Symmetric group S_3 with Symmetric group S_3-action(Subgroup of Symmetric group S_3)
+     +    where Generic endomorphism of Subgroups of Symmetric group S_3 with Symmetric group S_3-action = Symmetric group S_3-action functor on Subgroups of Symmetric group S_3 with Symmetric group S_3-action: Category of the unique object of B(Symmetric group S_3) -> Category of sets(1 in B(Symmetric group S_3))
+/repos/sage-extensions/tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage:69: assert Subgroup of Symmetric group S_3 is Subgroup of Symmetric group S_3
+=========================== short test summary info ============================
+FAILED tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage::test_normalizer_retains_its_conjugation_action_functor
+========================= 1 failed, 4 passed in 0.54s ==========================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 294 MiB
+[peakrss] low-water MemAvail : 7152 MiB
+[peakrss] peak single VmHWM  : 294 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      276 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   294 MiB hwm=   294 MiB avail=  7152 MiB
+[peakrss]   t=     2.0s procs=  5 rss=    46 MiB hwm=    46 MiB avail=  7209 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail=  7317 MiB
+
+===== tests_groups_test_predicate_subgroups_archive.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_predicate_subgroups_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 2 items
+
+tests/groups/test_predicate_subgroups_archive.sage::test_even_permutations_of_s3_form_the_normal_subgroup_of_order_three FAILED [ 50%]
+tests/groups/test_predicate_subgroups_archive.sage::test_centralizers_in_s3_have_orders_given_by_the_class_equation PASSED [100%]
+
+=================================== FAILURES ===================================
+E   TypeError: unsupported operand type(s) for /: 'Cardinalities.parent_class' and 'Cardinalities.parent_class'
+/repos/sage-extensions/tests/groups/test_predicate_subgroups_archive.sage:12: TypeError: unsupported operand type(s) for /: 'Cardinalities.parent_class' and 'Cardinalities.parent_class'
+=========================== short test summary info ============================
+FAILED tests/groups/test_predicate_subgroups_archive.sage::test_even_permutations_of_s3_form_the_normal_subgroup_of_order_three
+========================= 1 failed, 1 passed in 0.40s ==========================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 415 MiB
+[peakrss] low-water MemAvail : 6674 MiB
+[peakrss] peak single VmHWM  : 415 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      398 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   415 MiB hwm=   415 MiB avail=  6674 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   153 MiB hwm=   153 MiB avail=  6848 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  6981 MiB
+
+===== tests_groups_test_preimage_intersection_generating_image.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_preimage_intersection_generating_image.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 2 items
+
+tests/groups/test_preimage_intersection_generating_image.sage::test_parity_kernel_intersected_with_a_point_stabilizer_generates_a3[engine] PASSED [ 50%]
+tests/groups/test_preimage_intersection_generating_image.sage::test_parity_kernel_intersected_with_a_point_stabilizer_generates_a3[predicate] PASSED [100%]
+
+============================== 2 passed in 0.53s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 419 MiB
+[peakrss] low-water MemAvail : 6522 MiB
+[peakrss] peak single VmHWM  : 419 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      401 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   419 MiB hwm=   419 MiB avail=  6635 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   138 MiB hwm=   138 MiB avail=  6525 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  6522 MiB
+
+===== tests_groups_test_products_of_infinite_groups.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_products_of_infinite_groups.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 4 items
+
+tests/groups/test_products_of_infinite_groups.sage::test_product_of_two_swap_groups_has_order_four_with_projections_and_inclusions PASSED [ 25%]
+tests/groups/test_products_of_infinite_groups.sage::test_orthogonal_sum_map_of_the_swap_groups_into_O_of_U_plus_U PASSED [ 50%]
+tests/groups/test_products_of_infinite_groups.sage::test_product_with_an_infinite_orthogonal_group_is_componentwise PASSED [ 75%]
+tests/groups/test_products_of_infinite_groups.sage::test_images_of_morphisms_out_of_finite_groups_are_placed_finite PASSED [100%]
+
+============================== 4 passed in 1.09s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 432 MiB
+[peakrss] low-water MemAvail : 5989 MiB
+[peakrss] peak single VmHWM  : 432 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      414 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   432 MiB hwm=   432 MiB avail=  5989 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   156 MiB hwm=   156 MiB avail=  6358 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  6653 MiB
+
+===== tests_groups_test_profinite_character_mor_archive.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_profinite_character_mor_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 1 item
+
+tests/groups/test_profinite_character_mor_archive.sage::test_mod_three_cyclotomic_character_of_f5_has_kernel_of_index_two FAILED [100%]
+
+=================================== FAILURES ===================================
+E   TypeError: cannot convert 3 into Integer Ring: it is a raw Sage element of Integer Ring; construct it from a ring of this session
+/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6525: TypeError: cannot convert 3 into Integer Ring: it is a raw Sage element of Integer Ring; construct it from a ring of this session
+=========================== short test summary info ============================
+FAILED tests/groups/test_profinite_character_mor_archive.sage::test_mod_three_cyclotomic_character_of_f5_has_kernel_of_index_two
+============================== 1 failed in 0.35s ===============================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 313 MiB
+[peakrss] low-water MemAvail : 5589 MiB
+[peakrss] peak single VmHWM  : 316 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      299 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   313 MiB hwm=   316 MiB avail=  5589 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   147 MiB hwm=   147 MiB avail=  5914 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  6048 MiB
+
+===== tests_groups_test_profinite_collection_ownership.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_profinite_collection_ownership.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 2 items
+
+tests/groups/test_profinite_collection_ownership.sage::test_exact_embeddings_are_an_owned_ordered_finite_set PASSED [ 50%]
+tests/groups/test_profinite_collection_ownership.sage::test_galois_group_of_gaussian_rationals_is_generated_by_complex_conjugation FAILED [100%]
+
+=================================== FAILURES ===================================
+E   KeyError: 'gen'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'Owned_OwnedAlgebraParent_with_category' object has no attribute 'gen'
+sage/cpython/getattr.pyx:362: AttributeError: 'Owned_OwnedAlgebraParent_with_category' object has no attribute 'gen'
+=========================== short test summary info ============================
+FAILED tests/groups/test_profinite_collection_ownership.sage::test_galois_group_of_gaussian_rationals_is_generated_by_complex_conjugation
+========================= 1 failed, 1 passed in 0.43s ==========================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 315 MiB
+[peakrss] low-water MemAvail : 6959 MiB
+[peakrss] peak single VmHWM  : 315 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      298 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   315 MiB hwm=   315 MiB avail=  6973 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   125 MiB hwm=   125 MiB avail=  7104 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  6959 MiB
+
+===== tests_groups_test_profinite_generator_archive.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_profinite_generator_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 1 item
+
+tests/groups/test_profinite_generator_archive.sage::test_frobenius_topologically_generates_zhat_which_is_not_finitely_generated PASSED [100%]
+
+============================== 1 passed in 0.33s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 316 MiB
+[peakrss] low-water MemAvail : 6188 MiB
+[peakrss] peak single VmHWM  : 316 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      298 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   316 MiB hwm=   316 MiB avail=  6188 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   108 MiB hwm=   108 MiB avail=  7095 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail=  7044 MiB
+
+===== tests_groups_test_profinite_groups_archive.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_profinite_groups_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 1 item
+
+tests/groups/test_profinite_groups_archive.sage::test_frobenius_generates_each_finite_galois_group_of_f5 FAILED [100%]
+
+=================================== FAILURES ===================================
+E   KeyError: 2
+
+During handling of the above exception, another exception occurred:
+E   TypeError: Ring morphism:
+      From: Finite Field in z2 of size 5^2
+      To:   Algebraic closure of Finite Field of size 5
+      Defn: z2 |--> z2 is an arrow of another Mor; native ring computations use the protected engine crossing
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (5) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (5) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (5) of Integer Ring on Integer Ring / Ideal (5) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:573: TypeError: Ring morphism:
+=========================== short test summary info ============================
+FAILED tests/groups/test_profinite_groups_archive.sage::test_frobenius_generates_each_finite_galois_group_of_f5
+============================== 1 failed in 0.54s ===============================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 318 MiB
+[peakrss] low-water MemAvail : 10277 MiB
+[peakrss] peak single VmHWM  : 318 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      300 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   318 MiB hwm=   318 MiB avail= 10296 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   122 MiB hwm=   122 MiB avail= 10291 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     2 MiB avail= 10277 MiB
+
+===== tests_groups_test_restricted_actions.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_restricted_actions.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 3 items
+
+tests/groups/test_restricted_actions.sage::test_the_standard_isotypic_component_is_the_standard_representation FAILED [ 33%]
+tests/groups/test_restricted_actions.sage::test_the_invariants_of_the_permutation_module_are_the_trivial_representation FAILED [ 66%]
+tests/groups/test_restricted_actions.sage::test_reflection_in_the_trivial_line_is_plus_one_on_standard_and_minus_one_on_invariants FAILED [100%]
+
+=================================== FAILURES ===================================
+E   TypeError: Generic morphism:
+      From: Free module on {[0], [1], [2]} over Fraction Field of Integer Ring
+      To:   Group algebra of Symmetric group S_3 over Fraction Field of Integer Ring belongs to Free module on Product of the family over {0,...,1} over Fraction Field of Integer Ring, not to Mor_Alg(Free module on {[0], [1], [2]} over Fraction Field of Integer Ring, Group algebra of Symmetric group S_3 over Fraction Field of Integer Ring); apply the functor between the categories instead of constructing an arrow from another arrow (CON-17)
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Free module on {1, zeta6} over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Free module on {1, zeta6} over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Free module on {1, zeta6} over Fraction Field of Integer Ring on Free module on {1, zeta6} over Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py:57: TypeError: Generic morphism:
+E   TypeError: Generic morphism:
+      From: Free module on {[0], [1], [2]} over Fraction Field of Integer Ring
+      To:   Group algebra of Symmetric group S_3 over Fraction Field of Integer Ring belongs to Free module on Product of the family over {0,...,1} over Fraction Field of Integer Ring, not to Mor_Alg(Free module on {[0], [1], [2]} over Fraction Field of Integer Ring, Group algebra of Symmetric group S_3 over Fraction Field of Integer Ring); apply the functor between the categories instead of constructing an arrow from another arrow (CON-17)
+/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py:57: TypeError: Generic morphism:
+E   TypeError: unsupported operand parent(s) for *: 'Fraction Field of Integer Ring' and 'Module over Group algebra of Symmetric group S_3 over Fraction Field of Integer Ring on Free module on {[0], [1], [2]} over Fraction Field of Integer Ring'
+sage/structure/coerce.pyx:1297: TypeError: unsupported operand parent(s) for *: 'Fraction Field of Integer Ring' and 'Module over Group algebra of Symmetric group S_3 over Fraction Field of Integer Ring on Free module on {[0], [1], [2]} over Fraction Field of Integer Ring'
+=========================== short test summary info ============================
+FAILED tests/groups/test_restricted_actions.sage::test_the_standard_isotypic_component_is_the_standard_representation
+FAILED tests/groups/test_restricted_actions.sage::test_the_invariants_of_the_permutation_module_are_the_trivial_representation
+FAILED tests/groups/test_restricted_actions.sage::test_reflection_in_the_trivial_line_is_plus_one_on_standard_and_minus_one_on_invariants
+============================== 3 failed in 1.91s ===============================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=4
+[peakrss] peak tree RSS      : 445 MiB
+[peakrss] low-water MemAvail : 10381 MiB
+[peakrss] peak single VmHWM  : 445 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      427 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     6.0s procs=  5 rss=   445 MiB hwm=   445 MiB avail= 10381 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   414 MiB hwm=   414 MiB avail= 10441 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   104 MiB hwm=   104 MiB avail= 10645 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     2 MiB avail= 10606 MiB
+
+===== tests_groups_test_schreier_generating_morphisms.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_schreier_generating_morphisms.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 4 items
+
+tests/groups/test_schreier_generating_morphisms.sage::test_kernel_of_c4_to_c2_has_a_schreier_epimorphism PASSED [ 25%]
+tests/groups/test_schreier_generating_morphisms.sage::test_preimage_schreier_generators_keep_the_free_basis_index PASSED [ 50%]
+tests/groups/test_schreier_generating_morphisms.sage::test_finite_index_predicate_subgroup_has_a_selected_generating_epimorphism PASSED [ 75%]
+tests/groups/test_schreier_generating_morphisms.sage::test_finite_index_kernel_of_parity_on_free_group_has_a_free_cover PASSED [100%]
+
+============================== 4 passed in 0.52s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 337 MiB
+[peakrss] low-water MemAvail : 10377 MiB
+[peakrss] peak single VmHWM  : 337 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      319 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   337 MiB hwm=   337 MiB avail= 10489 MiB
+[peakrss]   t=     2.0s procs=  5 rss=    63 MiB hwm=    63 MiB avail= 10377 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 10494 MiB
+
+===== tests_groups_test_selected_kernel_generators.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_selected_kernel_generators.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 1 item
+
+tests/groups/test_selected_kernel_generators.sage::test_squaring_kernel_has_the_supplied_free_generating_datum PASSED [100%]
+
+============================== 1 passed in 0.40s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 415 MiB
+[peakrss] low-water MemAvail : 10382 MiB
+[peakrss] peak single VmHWM  : 415 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      397 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   415 MiB hwm=   415 MiB avail= 10382 MiB
+[peakrss]   t=     2.0s procs=  5 rss=    49 MiB hwm=    49 MiB avail= 10597 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     4 MiB avail= 10551 MiB
+
+===== tests_groups_test_semidirect_products.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_semidirect_products.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 3 items
+
+tests/groups/test_semidirect_products.sage::test_inversion_of_c3_by_c2_gives_the_dihedral_relation PASSED [ 33%]
+tests/groups/test_semidirect_products.sage::test_the_split_radical_extension_preserves_the_form_and_projects_to_its_factors[gram0] PASSED [ 66%]
+tests/groups/test_semidirect_products.sage::test_the_split_radical_extension_preserves_the_form_and_projects_to_its_factors[gram1] PASSED [100%]
+
+============================== 3 passed in 1.18s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 436 MiB
+[peakrss] low-water MemAvail : 10420 MiB
+[peakrss] peak single VmHWM  : 436 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      418 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   436 MiB hwm=   436 MiB avail= 10463 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   123 MiB hwm=   123 MiB avail= 10420 MiB
+[peakrss]   t=     0.0s procs=  2 rss=     8 MiB hwm=     8 MiB avail= 10480 MiB
+
+===== tests_groups_test_sl2z_serre_archive.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_sl2z_serre_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 1 item
+
+tests/groups/test_sl2z_serre_archive.sage::test_sl2z_is_generated_by_elements_of_orders_four_and_six_amalgamated_over_minus_one FAILED [100%]
+
+=================================== FAILURES ===================================
+E   TypeError: matrix() takes 1 positional argument but 2 were given
+/repos/sage-extensions/tests/groups/test_sl2z_serre_archive.sage:13: TypeError: matrix() takes 1 positional argument but 2 were given
+=========================== short test summary info ============================
+FAILED tests/groups/test_sl2z_serre_archive.sage::test_sl2z_is_generated_by_elements_of_orders_four_and_six_amalgamated_over_minus_one
+============================== 1 failed in 0.37s ===============================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 414 MiB
+[peakrss] low-water MemAvail : 10481 MiB
+[peakrss] peak single VmHWM  : 414 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      396 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   414 MiB hwm=   414 MiB avail= 10481 MiB
+[peakrss]   t=     2.0s procs=  5 rss=    55 MiB hwm=    55 MiB avail= 10581 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 10553 MiB
+
+===== tests_groups_test_structured_subgroups.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_structured_subgroups.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 1 item
+
+tests/groups/test_structured_subgroups.sage::test_stabilizers_kernels_and_centralizers_in_the_orthogonal_group_of_a1 PASSED [100%]
+
+============================== 1 passed in 1.14s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 441 MiB
+[peakrss] low-water MemAvail : 10417 MiB
+[peakrss] peak single VmHWM  : 441 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      424 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     6.0s procs=  5 rss=   441 MiB hwm=   441 MiB avail= 10417 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   290 MiB hwm=   290 MiB avail= 10455 MiB
+[peakrss]   t=     2.0s procs=  5 rss=    48 MiB hwm=    48 MiB avail= 10625 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 10511 MiB
+
+===== tests_groups_test_the_classifying_category_of_s3.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_the_classifying_category_of_s3.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 1 item
+
+tests/groups/test_the_classifying_category_of_s3.sage::test_composition_in_b_s3_is_the_group_law_of_s3 PASSED [100%]
+
+============================== 1 passed in 0.24s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 305 MiB
+[peakrss] low-water MemAvail : 10353 MiB
+[peakrss] peak single VmHWM  : 305 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      288 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   305 MiB hwm=   305 MiB avail= 10353 MiB
+[peakrss]   t=     2.0s procs=  5 rss=    74 MiB hwm=    74 MiB avail= 10534 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     4 MiB avail= 10387 MiB
+
+===== tests_groups_test_the_orbit_schreier_family_reads_the_retained_sweep.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 7 items
+
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage::test_the_retained_sweep_and_the_explicit_sweep_agree PASSED [ 14%]
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage::test_the_schreier_morphism_from_the_table_is_the_comprehension_morphism PASSED [ 28%]
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage::test_the_stabilizer_of_a_transposition_under_conjugation_is_its_centralizer PASSED [ 42%]
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage::test_a_point_not_covered_by_the_retained_sweep_searches_as_before FAILED [ 57%]
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage::test_a_one_shot_seed_iterable_gets_the_same_retained_sweep PASSED [ 71%]
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage::test_the_deduped_generating_morphism_presents_the_same_subgroup_once_each PASSED [ 85%]
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage::test_the_image_dedupe_states_its_unhashable_boundary PASSED [100%]
+
+=================================== FAILURES ===================================
+E   AssertionError: assert '_retained_transitions' not in {'_point_set': {5}, '_permutation_representation': Generic morphism:\n  From: Cyclic group C_3 of order 3\n  To:   Symmetric group on 1 points, '_point_action': <bound method GObjects.ParentMethods.act of {1, 5, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action>, '_cache__action_of': {}, ...}
+     +  where {'_point_set': {5}, '_permutation_representation': Generic morphism:\n  From: Cyclic group C_3 of order 3\n  To:   Symmetric group on 1 points, '_point_action': <bound method GObjects.ParentMethods.act of {1, 5, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action>, '_cache__action_of': {}, ...} = {5} with Cyclic group C_3 of order 3-action.__dict__
+/repos/sage-extensions/tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:111: AssertionError: assert '_retained_transitions' not in {'_point_set': {5}, '_permutation_representation': Generic morphism:\n  From: Cyclic group C_3 of order 3\n  To:   Symmetric group on 1 points, '_point_action': <bound method GObjects.ParentMethods.act of {1, 5, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action>, '_cache__action_of': {}, ...}
+=========================== short test summary info ============================
+FAILED tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage::test_a_point_not_covered_by_the_retained_sweep_searches_as_before
+========================= 1 failed, 6 passed in 0.51s ==========================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 184 MiB
+[peakrss] low-water MemAvail : 10464 MiB
+[peakrss] peak single VmHWM  : 184 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      166 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     2.0s procs=  5 rss=   184 MiB hwm=   184 MiB avail= 10464 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail= 10553 MiB
+
+===== tests_groups_test_the_selected_resolution_keeps_its_basis.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_the_selected_resolution_keeps_its_basis.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 2 items
+
+tests/groups/test_the_selected_resolution_keeps_its_basis.sage::test_a_named_group_resolution_keeps_its_generator_basis PASSED [ 50%]
+tests/groups/test_the_selected_resolution_keeps_its_basis.sage::test_a_generated_subgroup_resolution_keeps_the_generators_it_was_given PASSED [100%]
+
+============================== 2 passed in 0.41s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 417 MiB
+[peakrss] low-water MemAvail : 10124 MiB
+[peakrss] peak single VmHWM  : 417 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      399 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   417 MiB hwm=   417 MiB avail= 10124 MiB
+[peakrss]   t=     2.0s procs=  5 rss=    75 MiB hwm=    75 MiB avail= 10463 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     3 MiB avail= 10462 MiB
+
+===== tests_groups_test_transporter_from_a_finite_orbit.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_transporter_from_a_finite_orbit.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 1 item
+
+tests/groups/test_transporter_from_a_finite_orbit.sage::test_exact_transporters_in_the_three_letter_and_fixed_orbits PASSED [100%]
+
+============================== 1 passed in 0.29s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 148 MiB
+[peakrss] low-water MemAvail : 10341 MiB
+[peakrss] peak single VmHWM  : 148 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      130 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     2.0s procs=  5 rss=   148 MiB hwm=   148 MiB avail= 10361 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail= 10341 MiB
+
+===== tests_groups_test_transporters_on_left_cosets.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_transporters_on_left_cosets.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 4 items
+
+tests/groups/test_transporters_on_left_cosets.sage::test_subgroup_transporters_on_nonnormal_left_cosets[alternating] PASSED [ 25%]
+tests/groups/test_transporters_on_left_cosets.sage::test_subgroup_transporters_on_nonnormal_left_cosets[stabilizer] PASSED [ 50%]
+tests/groups/test_transporters_on_left_cosets.sage::test_infinite_cyclic_parity_cosets_have_exact_subgroup_transporters PASSED [ 75%]
+tests/groups/test_transporters_on_left_cosets.sage::test_preimage_of_the_squares_in_c6_is_the_whole_group PASSED [100%]
+
+============================== 4 passed in 0.62s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 405 MiB
+[peakrss] low-water MemAvail : 10467 MiB
+[peakrss] peak single VmHWM  : 405 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      387 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   405 MiB hwm=   405 MiB avail= 10467 MiB
+[peakrss]   t=     2.0s procs=  5 rss=    74 MiB hwm=    74 MiB avail= 10687 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 10674 MiB
+
+===== tests_groups_test_transversal_positions_beyond_machine_int.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_transversal_positions_beyond_machine_int.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 5 items
+
+tests/groups/test_transversal_positions_beyond_machine_int.sage::test_the_entry_helper_agrees_with_sage_list_access_on_machine_int_positions PASSED [ 20%]
+tests/groups/test_transversal_positions_beyond_machine_int.sage::test_a_negative_position_is_refused_by_the_helper PASSED [ 40%]
+tests/groups/test_transversal_positions_beyond_machine_int.sage::test_a_position_beyond_the_machine_int_range_is_read_by_gap PASSED [ 60%]
+tests/groups/test_transversal_positions_beyond_machine_int.sage::test_a_finite_coset_space_still_reads_its_representatives_and_actions PASSED [ 80%]
+tests/groups/test_transversal_positions_beyond_machine_int.sage::test_rendering_a_coset_never_computes_a_representative PASSED [100%]
+
+============================== 5 passed in 0.29s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 310 MiB
+[peakrss] low-water MemAvail : 10496 MiB
+[peakrss] peak single VmHWM  : 310 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      293 MiB peak
+[peakrss]   timeout                       8 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   310 MiB hwm=   310 MiB avail= 10539 MiB
+[peakrss]   t=     2.0s procs=  5 rss=    56 MiB hwm=    56 MiB avail= 10496 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 10613 MiB
+
+===== tests_groups_test_weyl_orders_archive.sage =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -v --tb=line -rf --no-header tests/groups/test_weyl_orders_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+collecting ... collected 1 item
+
+tests/groups/test_weyl_orders_archive.sage::test_finite_weyl_group_orders_match_humphreys PASSED [100%]
+
+============================== 1 passed in 2.76s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 422 MiB
+[peakrss] low-water MemAvail : 10074 MiB
+[peakrss] peak single VmHWM  : 422 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      404 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     6.0s procs=  5 rss=   422 MiB hwm=   422 MiB avail= 10074 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   304 MiB hwm=   304 MiB avail= 10407 MiB
+[peakrss]   t=     2.0s procs=  5 rss=    73 MiB hwm=    73 MiB avail= 10448 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     3 MiB avail= 10418 MiB
+

@@ -376,6 +376,18 @@ class ExactComplexNumber(FieldElement):
         r"""``z^{-1}``: every nonzero complex number is a unit."""
         return ~self
 
+    def __truediv__(self, other):
+        r"""``z / w``: the field's own division, ``z w^{-1}``.
+
+        A complex number is an element of the ring of complex numbers as well as
+        of that ring regarded as a module over itself, and the two divisions
+        differ for a noncommutative ring: the ring's is ``z w^{-1}`` and the
+        module's scalar action is ``w^{-1} z``.  This method states the ring's,
+        through the same ``_div_`` that decides the zero and undecided-nonzero
+        denominators.
+        """
+        return self._div_(self.parent()(other))
+
     def __pow__(self, exponent, modulus=None):
         r"""The principal power \(z^w = \exp(w \log z)\); an integer power is the iterated product."""
         if modulus is not None:

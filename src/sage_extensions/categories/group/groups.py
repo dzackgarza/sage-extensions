@@ -2338,16 +2338,37 @@ def _free_group_constructor(n=None, names="x", index_set=None, abelian=False, **
     )
 
 
+def _integral_rank(degree):
+    r"""Return ``degree`` as the integer it is, or ``None`` when it is not one.
+
+    A rank is a discrete structural parameter, and the integers are the ring
+    that decides which values name one: the preamble's ``ZZ`` accepts its own
+    elements (the session's literals), the integers Python writes, and the
+    integral rationals, and refuses the fractional ones.  The rank is read
+    through that ring rather than through a conversion, so a string, a
+    non-integral float and an engine object -- which is not a preamble integer
+    -- are refused, and the integer the engine constructor receives is the
+    preamble integer's own value.  Every matrix group family reads its rank
+    through this one decision, so ``GL_n``, ``SL_n``, ``Sp_{2g}``, ``GU_n``,
+    ``GO_n`` and ``SO_n`` admit exactly the same values.
+    """
+    integers = _owned_integers()
+    if degree not in integers:
+        return None
+    return int(integers(degree))
+
+
 def _group_over_ring(constructor, degree, ring, *args, **kwargs):
     # Matrix and affine group degrees are discrete structural parameters.
     # The shared adapter must not ask an engine to interpret a fractional
     # rank, independently of which named group family is being constructed.
-    if degree not in ZZ or degree != ZZ(degree):
+    rank = _integral_rank(degree)
+    if rank is None:
         raise ValueError("a group degree must be an integer")
     engine_args, engine_kwargs = _lowered_arguments(args, kwargs)
     return _own_group(
         constructor(
-            _group_constructor_argument(degree),
+            _group_constructor_argument(rank),
             _engine_ring(_owned_ring(ring)),
             *engine_args,
             **engine_kwargs,
@@ -2442,10 +2463,11 @@ def _S(points):
 
 def _general_linear_group(ring, degree, var="a"):
     r"""``GL_n(R)`` from its defining data, cached on ``(R, n)``; see :func:`_general_linear_group_of`."""
-    assert degree in ZZ and degree == ZZ(degree) and degree >= 0, (
+    rank = _integral_rank(degree)
+    assert rank is not None and rank >= 0, (
         f"GL_n(R) needs a rank n that is an integer n >= 0, but got {degree!r}"
     )
-    return _general_linear_group_of(_owned_ring(ring), int(degree), var)
+    return _general_linear_group_of(_owned_ring(ring), rank, var)
 
 
 @cached_function
@@ -2502,15 +2524,12 @@ def _SL(degree, ring, var="a"):
     # Do not allow a nonintegral rank through either the arithmetic witness
     # or the generic engine adapter. This is a defining group parameter,
     # not an approximate numerical argument to be rounded or truncated.
-    # Hosted integer elements are integral by design: their int() is exact,
-    # and a rank that cannot be read as one is the error being guarded.
-    try:
-        rank_int = int(degree)
-    except (TypeError, ValueError):
-        raise ValueError("SL_n(R) requires an integral rank") from None
-    if rank_int != degree:
+    # The integers decide which values name one (`_integral_rank`), so the
+    # rank is read the same way here as in the other matrix families.
+    rank = _integral_rank(degree)
+    if rank is None:
         raise ValueError("SL_n(R) requires an integral rank")
-    degree = rank_int
+    degree = rank
     if degree < 1:
         raise ValueError("SL_n(R) requires a positive rank")
     # SL_n(ZZ) is constructed as the integral points of SL_n inside
@@ -2551,9 +2570,10 @@ def _Sp(degree, ring, var="a", invariant_form=None):
     # basis E_ii, E_ij + E_ji of Sym_g(ZZ).  Sage's Sp(2g, ZZ) has membership
     # but no generators, so the generators are selected here.
     if _owned_ring(ring) is _own_ring(ZZ) and invariant_form is None:
-        if degree not in ZZ or degree < 2 or ZZ(degree) % 2 != 0:
+        rank = _integral_rank(degree)
+        if rank is None or rank < 2 or rank % 2 != 0:
             raise ValueError("Sp_{2g}(ZZ) requires an even positive degree 2g")
-        genus = int(degree) // 2
+        genus = rank // 2
 
         def block(upper_left, upper_right, lower_left, lower_right):
             return [

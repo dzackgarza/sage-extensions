@@ -1,0 +1,28 @@
+slice files: 25
+HEAD: 415c2b44c173f482506a568d20c93eb683bc3924
+tests/objects/test_k3_lattice.sage                            10s  1 failed, 4 passed in 5.70s
+tests/objects/test_laurent_monomials.sage                     10s  3 failed in 0.23s
+tests/objects/test_orthogonal_group_of_a2.sage                18s  3 failed, 8 passed in 4.51s
+tests/objects/test_polynomial_ring_qq_x.sage                  16s  1 failed, 9 passed in 1.58s
+tests/objects/test_positive_integers.sage                     12s  3 failed in 0.70s
+tests/objects/test_power_set_of_a_three_element_set.sage      17s  1 failed, 9 passed in 0.94s
+tests/objects/test_prime_field_f3.sage                        14s  3 failed, 4 passed in 1.31s
+tests/objects/test_product_of_a_two_and_a_three_element_set.sage    12s  6 passed in 0.60s
+tests/objects/test_projective_plane_over_qq.sage              16s  3 failed, 3 passed in 1.71s
+tests/objects/test_quaternion_group.sage                       8s  4 failed, 3 passed in 0.76s
+tests/objects/test_regular_module_of_c2.sage                  12s  5 failed, 3 passed in 0.94s
+tests/objects/test_root_lattice_a2.sage                       16s  5 failed, 10 passed in 6.42s
+tests/objects/test_root_lattice_e8.sage                      261s  3 failed, 6 passed in 245.97s
+tests/objects/test_sinc_translates.sage                       12s  3 failed in 0.84s
+tests/objects/test_slice_set_invariants.sage                  12s  2 passed in 1.20s
+tests/objects/test_smooth_functions_on_the_line.sage          14s  5 failed in 0.52s
+tests/objects/test_square_integrable_functions.sage           16s  4 failed, 1 passed in 1.23s
+tests/objects/test_standard_triangle.sage                     16s  5 failed, 2 passed in 1.76s
+tests/objects/test_symmetric_algebra_of_qq2.sage              17s  1 failed, 6 passed in 0.58s
+tests/objects/test_symmetric_group_s3.sage                    16s  6 failed, 6 passed in 1.82s
+tests/objects/test_tensor_algebra_of_qq2.sage                 14s  2 failed, 4 passed in 0.41s
+tests/objects/test_tensor_product_of_zz2_and_zz3.sage         16s  5 passed in 1.03s
+tests/objects/test_three_element_set.sage                     16s  3 failed, 6 passed in 0.75s
+tests/objects/test_trivial_connection_on_the_affine_line.sage    16s  4 passed in 0.82s
+tests/objects/test_two_hyperbolic_planes.sage                 23s  5 failed, 4 passed in 4.36s
+BATCH DONE

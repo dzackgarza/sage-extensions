@@ -1,0 +1,30 @@
+provider SHA: 4a17b1e90b82f4ae24e66b97c4b3b694cb895085
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_power_set_of_a_three_element_set.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+F.........                                                               [100%]
+=================================== FAILURES ===================================
+E   assert Finite subsets of {0,...,2} == Power set of {0,...,2}
+     +  where Finite subsets of {0,...,2} = finite_subsets()
+     +    where finite_subsets = {0,...,2}.finite_subsets
+     +      where {0,...,2} = three()
+     +  and   Power set of {0,...,2} = power()
+/repos/sage-extensions/tests/objects/test_power_set_of_a_three_element_set.sage:15: assert Finite subsets of {0,...,2} == Power set of {0,...,2}
+=========================== short test summary info ============================
+FAILED tests/objects/test_power_set_of_a_three_element_set.sage::test_every_subset_of_a_finite_set_is_finite
+1 failed, 9 passed in 0.57s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=4
+[peakrss] peak tree RSS      : 306 MiB
+[peakrss] low-water MemAvail : 7814 MiB
+[peakrss] peak single VmHWM  : 306 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      288 MiB peak
+[peakrss]   sage                        223 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=     6.0s procs=  5 rss=   306 MiB hwm=   306 MiB avail=  7814 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   268 MiB hwm=   268 MiB avail=  7877 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   249 MiB hwm=   249 MiB avail=  8152 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     6 MiB hwm=     6 MiB avail=  8162 MiB

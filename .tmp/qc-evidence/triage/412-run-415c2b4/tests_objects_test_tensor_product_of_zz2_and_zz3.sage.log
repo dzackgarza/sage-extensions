@@ -1,0 +1,21 @@
+provider SHA: 415c2b44c173f482506a568d20c93eb683bc3924
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_tensor_product_of_zz2_and_zz3.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+.....                                                                    [100%]
+5 passed in 1.03s
+[peakrss] run: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 281 MiB
+[peakrss] low-water MemAvail : 4676 MiB
+[peakrss] peak single VmHWM  : 294 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      277 MiB peak
+[peakrss]   sage                        215 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=    12.1s procs=  5 rss=   281 MiB hwm=   288 MiB avail=  4676 MiB
+[peakrss]   t=    14.1s procs=  5 rss=   267 MiB hwm=   294 MiB avail=  4754 MiB
+[peakrss]   t=     4.0s procs=  7 rss=   239 MiB hwm=   241 MiB avail=  4895 MiB
+[peakrss]   t=    10.0s procs=  5 rss=   220 MiB hwm=   227 MiB avail=  4803 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   177 MiB hwm=   177 MiB avail=  4952 MiB

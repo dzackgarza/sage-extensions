@@ -1,0 +1,20 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt468
+provider SHA: 51310d613cd8c27860c70ff2f3370fedc6a18f21
+tree dirty:  M src/sage_extensions/all.py 
+file: tests/objects/test_free_module_of_rank_three.sage
+..F....FF..                                                              [100%]
+=================================== FAILURES ===================================
+E   KeyError: 'codomain'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'AugmentedSimplexCategory.parent_class' object has no attribute 'codomain'
+sage/cpython/getattr.pyx:362: AttributeError: 'AugmentedSimplexCategory.parent_class' object has no attribute 'codomain'
+E   TypeError: unsupported operand type(s) for /: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' and 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'
+/repos/sage-extensions/tests/objects/test_free_module_of_rank_three.sage:70: TypeError: unsupported operand type(s) for /: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' and 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'
+E   TypeError: the proposition is_finite(Aut_Category of modules over Integer Ring(Free module on {[0], [1], [2]} over Integer Ring)) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+/repos/sage-extensions/src/sage_extensions/logic.py:44: TypeError: the proposition is_finite(Aut_Category of modules over Integer Ring(Free module on {[0], [1], [2]} over Integer Ring)) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+=========================== short test summary info ============================
+FAILED tests/objects/test_free_module_of_rank_three.sage::test_the_module_category_applied_to_a_basis_set_agrees
+FAILED tests/objects/test_free_module_of_rank_three.sage::test_a_quotient_of_zz3
+FAILED tests/objects/test_free_module_of_rank_three.sage::test_the_automorphisms_of_zz3_are_infinite
+3 failed, 8 passed in 0.57s

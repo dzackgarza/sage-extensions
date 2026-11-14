@@ -1,0 +1,149 @@
+===== fix2-tests_groups_test_group_automorphisms_archive.sage =====
+provider SHA: c8a3cedb1ba27919c416101e98cdc7d36256415e
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=short -rf --no-header tests/groups/test_group_automorphisms_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+..FF                                                                     [100%]
+=================================== FAILURES ===================================
+______________ test_conjugation_realizes_all_automorphisms_of_s3 _______________
+tests/groups/test_group_automorphisms_archive.sage:31: in test_conjugation_realizes_all_automorphisms_of_s3
+    assert conjugation.kernel().order() == 1
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:6137: in order
+    size = cardinal(self.cardinality())
+                    ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:2502: in cardinality
+    construction_cardinality = self._cardinality_decision()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:1003: in _cardinality_decision
+    if self.kernel_morphism().is_injective() is True:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:4075: in is_injective
+    return bool(self._gap_morphism_crossing().IsInjective())
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3443: in _gap_morphism_crossing
+    [_element_to_engine(codomain, image) for image in images.values()],
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:319: in _element_to_engine
+    return element.gap()
+           ^^^^^^^^^^^
+sage/structure/element.pyx:494: in sage.structure.element.Element.__getattr__
+    ???
+sage/structure/element.pyx:507: in sage.structure.element.Element.getattr_from_category
+    ???
+sage/cpython/getattr.pyx:362: in sage.cpython.getattr.getattr_from_other_class
+    ???
+E   AttributeError: 'OwnedGroupAutomorphismGroup_with_category_with_category.ArrowType' object has no attribute 'gap'
+_________________ test_s6_has_outer_automorphisms_of_index_two _________________
+tests/groups/test_group_automorphisms_archive.sage:40: in test_s6_has_outer_automorphisms_of_index_two
+    assert conjugation.kernel().order() == 1
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:6137: in order
+    size = cardinal(self.cardinality())
+                    ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:2502: in cardinality
+    construction_cardinality = self._cardinality_decision()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:1003: in _cardinality_decision
+    if self.kernel_morphism().is_injective() is True:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:4075: in is_injective
+    return bool(self._gap_morphism_crossing().IsInjective())
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3443: in _gap_morphism_crossing
+    [_element_to_engine(codomain, image) for image in images.values()],
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:319: in _element_to_engine
+    return element.gap()
+           ^^^^^^^^^^^
+sage/structure/element.pyx:494: in sage.structure.element.Element.__getattr__
+    ???
+sage/structure/element.pyx:507: in sage.structure.element.Element.getattr_from_category
+    ???
+sage/cpython/getattr.pyx:362: in sage.cpython.getattr.getattr_from_other_class
+    ???
+E   AttributeError: 'OwnedGroupAutomorphismGroup_with_category_with_category.ArrowType' object has no attribute 'gap'
+=========================== short test summary info ============================
+FAILED tests/groups/test_group_automorphisms_archive.sage::test_conjugation_realizes_all_automorphisms_of_s3
+FAILED tests/groups/test_group_automorphisms_archive.sage::test_s6_has_outer_automorphisms_of_index_two
+2 failed, 2 passed in 6.38s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=7
+[peakrss] peak tree RSS      : 453 MiB
+[peakrss] low-water MemAvail : 8089 MiB
+[peakrss] peak single VmHWM  : 453 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      435 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=    10.0s procs=  5 rss=   453 MiB hwm=   453 MiB avail=  8211 MiB
+[peakrss]   t=    12.0s procs=  5 rss=   439 MiB hwm=   452 MiB avail=  8371 MiB
+[peakrss]   t=     8.0s procs=  5 rss=   417 MiB hwm=   417 MiB avail=  8089 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   288 MiB hwm=   288 MiB avail=  8220 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   193 MiB hwm=   193 MiB avail=  8388 MiB
+
+===== fix2-tests_groups_test_mathieu_automorphism_archive.sage =====
+provider SHA: c8a3cedb1ba27919c416101e98cdc7d36256415e
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=short -rf --no-header tests/groups/test_mathieu_automorphism_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+[peakrss] run: child waited=124 shell_code=124 samples=150
+[peakrss] peak tree RSS      : 518 MiB
+[peakrss] low-water MemAvail : 6657 MiB
+[peakrss] peak single VmHWM  : 518 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      501 MiB peak
+[peakrss]   sage                        223 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=   294.4s procs=  5 rss=   518 MiB hwm=   518 MiB avail=  7383 MiB
+[peakrss]   t=   296.4s procs=  5 rss=   518 MiB hwm=   518 MiB avail=  7379 MiB
+[peakrss]   t=   298.4s procs=  5 rss=   518 MiB hwm=   518 MiB avail=  7305 MiB
+[peakrss]   t=   284.4s procs=  5 rss=   515 MiB hwm=   515 MiB avail=  7993 MiB
+[peakrss]   t=   286.4s procs=  5 rss=   515 MiB hwm=   515 MiB avail=  7884 MiB
+
+===== fix5-sl2z =====
+provider SHA: c8a3cedb1ba27919c416101e98cdc7d36256415e
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=short -rf --no-header tests/groups/test_sl2z_serre_archive.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_sl2z_is_generated_by_elements_of_orders_four_and_six_amalgamated_over_minus_one _
+tests/groups/test_sl2z_serre_archive.sage:13: in test_sl2z_is_generated_by_elements_of_orders_four_and_six_amalgamated_over_minus_one
+    s = group(matrix(ZZ, [[0, -1], [1, 0]]))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:1578: in __call__
+    return self._element_constructor_(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:1589: in _element_constructor_
+    element = supergroup(value)
+              ^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:1578: in __call__
+    return self._element_constructor_(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:1598: in _element_constructor_
+    raise TypeError(f"{value} cannot be made an element of {self}: it is a Sage object, not an element of a preamble group")
+E   TypeError: Generic endomorphism of Free module on {[0], [1]} over Integer Ring cannot be made an element of Group in Category of infinite general linear groups: it is a Sage object, not an element of a preamble group
+=========================== short test summary info ============================
+FAILED tests/groups/test_sl2z_serre_archive.sage::test_sl2z_is_generated_by_elements_of_orders_four_and_six_amalgamated_over_minus_one
+1 failed in 1.26s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=5
+[peakrss] peak tree RSS      : 434 MiB
+[peakrss] low-water MemAvail : 6347 MiB
+[peakrss] peak single VmHWM  : 441 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      424 MiB peak
+[peakrss]   sage                        191 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=     8.0s procs=  5 rss=   434 MiB hwm=   441 MiB avail=  6347 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   293 MiB hwm=   293 MiB avail=  6544 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   217 MiB hwm=   217 MiB avail=  6910 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   122 MiB hwm=   122 MiB avail=  6796 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail=  7072 MiB
+

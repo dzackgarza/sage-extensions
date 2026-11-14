@@ -2649,12 +2649,18 @@ class Sets(CategoryPacketMethods, OwnedCategory):
 
         @cached_method
         def __pow__(self, exponent):
-            r"""Return $X^n$, the product of the constant family over `Sets.Δ[n-1]`."""
-            count = int(exponent)
-            if count < 0 or exponent != count:
-                raise ValueError(
-                    f"the power X^n of {self} needs n a nonnegative integer, but n = {exponent!r}"
-                )
+            r"""Return $X^n$, the product of the constant family over `Sets.Δ[n-1]`.
+
+            The exponent is a natural number, so it is read where a natural number
+            is read: `NN` decides the admission of the value it is handed and
+            refuses a negative, fractional or foreign one with a `ValueError`.
+            Python's `int` is not that boundary -- it truncates a fraction into a
+            different product, and it refuses an owned number with `TypeError`.
+            `NN` is usable here because its admission is decided from the value
+            itself, not through the owned rings, which are still being built when
+            a module of this tree states a product at import (`tensors/tensor.py`).
+            """
+            count = int(NN(exponent))
             return Sets().product(indexed_family(Sets.Δ[count - 1], lambda index: self))
 
         def subsets_of_size(self, size: int) -> Sets().ObjectType:
@@ -3800,12 +3806,7 @@ class FixedCardinalitySubsetSets(OwnedCategory):
             raise ValueError(
                 f"fixed-cardinality subsets require a set source, not {source!r}"
             )
-        selected_size = int(subset_cardinality)
-        if selected_size < 0 or subset_cardinality != selected_size:
-            raise ValueError(
-                f"the cardinality of a subset must be a nonnegative integer, not {subset_cardinality!r}"
-            )
-        subset_cardinality = selected_size
+        subset_cardinality = int(NN(subset_cardinality))
         placements = [
             self,
             _cardinalities().set_subset_category(source, fixed_size=subset_cardinality),
@@ -4048,11 +4049,7 @@ class FixedCardinalityMultisetSets(OwnedCategory):
         r"""Construct the ``multiset_size``-element multisets on ``source``."""
         if source not in Sets():
             raise ValueError(f"multisets require a set source, not {source!r}")
-        selected_size = int(multiset_size)
-        if selected_size < 0 or multiset_size != selected_size:
-            raise ValueError(
-                f"the cardinality of a multiset must be a nonnegative integer, not {multiset_size!r}"
-            )
+        selected_size = int(NN(multiset_size))
         return _object_of(
             owned_category_join(
                 (

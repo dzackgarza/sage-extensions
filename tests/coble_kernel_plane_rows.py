@@ -35,7 +35,10 @@ discriminant representation.
 (lattice-database#7), so no count is typed.  The assertion is what the cited
 construction guarantees for every output:
 
-* each representative is a primitive totally isotropic plane of ``T_Co``;
+* each representative is a primitive totally isotropic plane of ``T_Co``:
+  its rank is two, it is primitive in the lattice, and its induced Gram
+  tensor -- the form the subobject carries, the ambient form restricted
+  along its inclusion -- is the zero tensor of the plane's own framing;
 * the ``Gamma``-orbit count of a row is the number of double cosets -- the
   index ``[rho(O(L)) : rho(Stab P)]`` -- so the index per finite class (there
   is one ``O(T_Co)``-class) sums to the class count;
@@ -46,7 +49,13 @@ construction guarantees for every output:
 The counts each row returns are printed, and they are the numbers the commit
 body of the push that lands this file records.  A row that does not return
 inside its per-call cap is reported as undecided, never as failed: the cap
-is the caller's budget, not a mathematical statement.
+is the caller's budget, not a mathematical statement.  A returned
+representative that breaks the row's contract is reported apart from that,
+as a contract violation, because it is a statement about the library's
+answer and not about the budget; the driver's exit status says which
+happened -- 0 both rows decided and equal to their double cosets, 1 a row
+undecided or the whole-run budget spent, 2 a representative that breaks the
+contract, 3 a decided row whose count differs from its double cosets.
 
     sage -python tests/coble_kernel_plane_rows.py            # both rows
     sage -python tests/coble_kernel_plane_rows.py --cap 10800
@@ -54,6 +63,7 @@ is the caller's budget, not a mathematical statement.
 """
 
 import argparse
+import enum
 import signal
 import sys
 import time
@@ -81,39 +91,51 @@ def _coble_lattice():
     return NamedLattices.Tco
 
 
-def _is_a_primitive_isotropic_plane(lattice, subobject) -> bool:
-    r"""Whether ``subobject`` is a rank-two primitive totally isotropic subobject.
+class RowStatus(enum.Enum):
+    r"""What one kernel plane row did: decided, undecided, or a broken contract.
 
-    The three clauses are the row's own contract on every output: the rank is
-    two, the subobject is primitive in ``lattice``, and the pairing of every
-    ordered pair of its retained generators vanishes -- the Gram matrix of the
-    two-generator basis is zero.
+    Three outcomes, not a boolean: a cap the caller set and an answer of the
+    library's that breaks the row's contract are different facts about the
+    run, and the driver reports them apart (exit statuses 1 and 2).
+    """
+
+    DECIDED = "decided"
+    UNDECIDED = "undecided"
+    CONTRACT_VIOLATION = "contract violation"
+
+
+def _plane_contract_violation(subobject) -> str | None:
+    r"""Why ``subobject`` breaks the row's contract on its outputs, or ``None``.
+
+    The three clauses are the row's own contract on every representative a
+    row returns: its rank is two, it is primitive in the lattice it sits in,
+    and it is totally isotropic.  Total isotropy is decided by the plane's
+    induced Gram tensor being the zero tensor of its own framing -- the form
+    the subobject carries, which is the ambient form restricted along its
+    inclusion -- not by evaluating the pairings of chosen generators against
+    each other (`OWN-24`, `STY-102`).
     """
     if subobject.module_rank() != cardinal(2):
-        return False
+        return f"its rank is {subobject.module_rank()}, not two"
     if subobject.is_primitive() is not True:
-        return False
-    labels = tuple(subobject.module_generating_set())
-    for left in labels:
-        for right in labels:
-            if lattice.b(
-                subobject.inclusion()(subobject.module_generator(left)),
-                subobject.inclusion()(subobject.module_generator(right)),
-            ) != lattice.base_ring().zero():
-                return False
-    return True
+        return "it is not primitive in the lattice"
+    induced = subobject.gram_tensor()
+    if induced != induced.parent().zero():
+        return "its induced Gram tensor is not zero"
+    return None
 
 
-def run_row(lattice, subgroup, label, cap):
-    r"""Return ``(count, decided)`` for one kernel plane row of ``subgroup``.
+def run_row(subgroup, label, cap):
+    r"""Return ``(count, status)`` for one kernel plane row of ``subgroup``.
 
     The row step is the public call ``isotropic_orbit_representatives(2)``,
     whose returned subobjects are the orbit representatives of the row, under
     the per-row cap: the alarm's ``RowUndecided`` makes the row undecided,
     never failed, because the cap is the caller's budget and not a
     mathematical statement.  Every representative the call returns is checked
-    against the row's contract before its count is reported, and
-    ``check_row_count`` then compares that count with the row's double cosets.
+    against the row's contract before its count is reported, and that
+    violation is a different ``RowStatus`` -- the two are not the same report.
+    ``check_row_count`` then compares the count with the row's double cosets.
     """
     start = time.monotonic()
     try:
@@ -121,16 +143,20 @@ def run_row(lattice, subgroup, label, cap):
         planes = tuple(subgroup.isotropic_orbit_representatives(2))
     except RowUndecided:
         log(f"[{label}] undecided: the row did not return inside its {cap:.0f} s cap")
-        return None, False
+        return None, RowStatus.UNDECIDED
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)
     elapsed = time.monotonic() - start
-    for plane in planes:
-        if not _is_a_primitive_isotropic_plane(lattice, plane):
-            log(f"[{label}] a representative is not a primitive isotropic plane")
-            return None, False
+    for position, plane in enumerate(planes):
+        violation = _plane_contract_violation(plane)
+        if violation is not None:
+            log(
+                f"[{label}] contract violation: representative {position} of the "
+                f"{len(planes)} returned is not a primitive isotropic plane -- {violation}"
+            )
+            return None, RowStatus.CONTRACT_VIOLATION
     log(f"[{label}] {len(planes)} planes in {elapsed:.1f} s")
-    return len(planes), True
+    return len(planes), RowStatus.DECIDED
 
 
 def _kernel_row_expected_count(subgroup, plane):
@@ -236,6 +262,13 @@ def check_row_count(lattice, subgroup, label, count):
 
 
 def main(argv):
+    r"""Run both kernel plane rows and report each row's outcome as an exit status.
+
+    ``0`` when both rows are decided and equal to their double cosets, ``1``
+    when a row is undecided or the whole-run budget is spent, ``2`` when a
+    returned representative breaks the row's contract, and ``3`` when a
+    decided row's count differs from its double cosets.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cap", type=int, default=10800,
                         help="seconds one row call may take before it is undecided")
@@ -254,15 +287,17 @@ def main(argv):
         if arguments.budget and time.monotonic() - started > arguments.budget:
             log("the whole-run budget is spent")
             return 1
-        count, decided = run_row(lattice, subgroup, label, arguments.cap)
-        if not decided:
+        count, status = run_row(subgroup, label, arguments.cap)
+        if status is RowStatus.UNDECIDED:
             return 1
+        if status is RowStatus.CONTRACT_VIOLATION:
+            return 2
         if not check_row_count(lattice, subgroup, label, count):
-            return 1
+            return 3
         counts[label] = count
     if counts["Otilde+"] < counts["Otilde"]:
         log("the Otilde+ row has fewer planes than the Otilde row")
-        return 1
+        return 3
     log(f"the Otilde count is {counts['Otilde']} and the Otilde+ count is {counts['Otilde+']}")
     return 0
 

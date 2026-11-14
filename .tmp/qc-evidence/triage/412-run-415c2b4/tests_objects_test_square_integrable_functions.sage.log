@@ -1,0 +1,64 @@
+provider SHA: 415c2b44c173f482506a568d20c93eb683bc3924
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_square_integrable_functions.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+F.FFF                                                                    [100%]
+=================================== FAILURES ===================================
+E   KeyError: (('finite', 2), 93010688, 93010688)
+
+During handling of the above exception, another exception occurred:
+E   NotImplementedError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> Real Field accepted without exhaustive linearity verification; the source is not represented as finite
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:606: NotImplementedError
+E   KeyError: (('finite', 2), 93010688, 93010688)
+
+During handling of the above exception, another exception occurred:
+E   NotImplementedError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> Real Field accepted without exhaustive linearity verification; the source is not represented as finite
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:606: NotImplementedError
+E   KeyError: (('finite', 2), 93010688, 93010688)
+
+During handling of the above exception, another exception occurred:
+E   NotImplementedError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> Real Field accepted without exhaustive linearity verification; the source is not represented as finite
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:606: NotImplementedError
+E   KeyError: (('finite', 2), 93010688, 93010688)
+
+During handling of the above exception, another exception occurred:
+E   NotImplementedError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> Real Field accepted without exhaustive linearity verification; the source is not represented as finite
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:606: NotImplementedError
+=========================== short test summary info ============================
+FAILED tests/objects/test_square_integrable_functions.sage::test_l2_is_its_own_holder_conjugate
+FAILED tests/objects/test_square_integrable_functions.sage::test_the_categories_of_l2
+FAILED tests/objects/test_square_integrable_functions.sage::test_the_form_on_a_gaussian
+FAILED tests/objects/test_square_integrable_functions.sage::test_l2_has_one_endomorphism_category
+4 failed, 1 passed in 1.23s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=8
+[peakrss] peak tree RSS      : 281 MiB
+[peakrss] low-water MemAvail : 5104 MiB
+[peakrss] peak single VmHWM  : 298 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      281 MiB peak
+[peakrss]   sage                        208 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=    14.0s procs=  5 rss=   281 MiB hwm=   298 MiB avail=  5104 MiB
+[peakrss]   t=    12.0s procs=  5 rss=   276 MiB hwm=   287 MiB avail=  5202 MiB
+[peakrss]   t=    10.0s procs=  5 rss=   243 MiB hwm=   243 MiB avail=  5381 MiB
+[peakrss]   t=     4.0s procs=  7 rss=   234 MiB hwm=   234 MiB avail=  5773 MiB
+[peakrss]   t=     8.0s procs=  5 rss=   189 MiB hwm=   190 MiB avail=  5635 MiB

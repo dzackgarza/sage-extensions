@@ -1,0 +1,10 @@
+Measured in the published image, one process per tree: `import sage_extensions.all`.
+
+  wt468base (clean 51310d6)         : star import 3.24 s
+  wt468     (51310d6 + this commit) : star import 2.34 s
+
+The suite's own ceiling on that workload is STAR_IMPORT_CEILING = 3.0 s
+(src/sage_extensions/testing/suite_budget.py). The session publishes more names
+than before and imports no slower: the areas' defining modules were already
+imported by the hand-written blocks it replaces, and the loop resolves each
+declared name once.

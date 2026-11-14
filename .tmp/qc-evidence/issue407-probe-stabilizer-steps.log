@@ -1,0 +1,13 @@
+provider SHA: fa7553e2a62ee730355be4fb44ab565af636af80
+inner script: .scratch/qc/probe_stab_steps.sh
+inner args: 
+[     1.8s] import sage_extensions.all
+[     1.9s] NamedLattices.TEn
+[     1.9s] lattice.O() -> Orthogonal group O(Integral lattice of rank 12 and signature (2, 10))
+[     1.9s] generator e
+[     2.2s] primitive_isotropic_subobject -> Integral lattice of rank 1 and signature (0, 0)
+[     2.2s] stabilizer -> {g in Orthogonal group O(Integral lattice of rank 12 and signature (2, 10)) : g(im(Generic morphism:
+  From: Integral lattice of rank 1 and signature (0, 0)
+  To:   Integral lattice of rank 12 and signature (2, 10)))=im(Generic morphism:
+  From: Integral lattice of rank 1 and signature (0, 0)
+  To:   Integral lattice of rank 12 and signature (2, 10))}
