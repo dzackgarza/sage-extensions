@@ -89,6 +89,25 @@ class IndexedFamily[IndexT, ValueT]:
         """
         return self._value_at_normalized_index(self.index_set()(index))
 
+    def _finite_ranking(self):
+        r"""The ranking map of a provably finite enumerated index set, else ``None``.
+
+        The index set is fixed construction data, so this decision and its
+        ranking map are computed once per family.
+        """
+        try:
+            return self._finite_ranking_map
+        except AttributeError:
+            pass
+        from sage_extensions.categories.sets.set_categories import EnumeratedSets, Sets
+
+        indices = self.index_set()
+        ranking = None
+        if Sets().is_provably_finite(indices) and indices in EnumeratedSets():
+            ranking = indices.ranking_map()
+        self._finite_ranking_map = ranking
+        return ranking
+
     def _value_at_normalized_index(self, normalized: IndexT) -> ValueT:
         r"""Return the cached value at an index already supplied by ``index_set()``.
 
@@ -106,14 +125,12 @@ class IndexedFamily[IndexT, ValueT]:
         for an identical or decided-equal label. An undecided comparison keeps
         the labels separate without asserting that they are unequal.
         """
-        from sage_extensions.categories.sets.set_categories import EnumeratedSets, Sets
-
-        indices = self.index_set()
-        if Sets().is_provably_finite(indices) and indices in EnumeratedSets():
+        ranking = self._finite_ranking()
+        if ranking is not None:
             # The selected enumeration is a bijection: equal labels have
             # precisely the same ordinal rank. Use that mathematical datum
             # rather than a hash or an undecidable equality comparison.
-            rank = int(indices.ranking_map()(normalized))
+            rank = int(ranking(normalized))
             if rank not in self._rank_value_cache:
                 self._rank_value_cache[rank] = self._value_function(normalized)
             return self._rank_value_cache[rank]
