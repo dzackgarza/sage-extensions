@@ -36,7 +36,7 @@ environment has neither `pytest-timeout` nor `pytest-reportlog`, so the reposito
 image, recorded so the invocation is reproducible. `--no-time-gates` and
 `--no-test-lint` are the flags the issue records for the original run.
 
-**Result.** 61 failing tests in 19 of the 26 files, assigned to 35 causes; every failing test of the slice is in exactly one cause.
+**Result.** 61 failing tests in 19 of the 26 files, assigned to 36 causes; every failing test of the slice is in exactly one cause.
 
 | exception | tests |
 | --- | --- |
@@ -56,7 +56,7 @@ of the same defect that sit in files now belonging to #412.
 
 | cause | defect | tests | also in #412 | introduced by | repair |
 | --- | --- | --- | --- | --- | --- |
-| C01 | The session namespace does not publish the constructors the suite names | 11 | 7 | `c731175` | filed, scope beyond the slice |
+| C01 | The session namespace does not publish the constructors the suite names | 11 | 7 | `c731175` | repaired |
 | C02 | The owned ring adapter has no constructor for the symbolic ring | 6 | 6 | `not bisected` | filed |
 | C03 | The algebraic closure of a finite field is raised with the wrong constructor arity | 1 | 0 | `c731175` | repaired |
 | C04 | The owned parent and element classes do not carry `is_isomorphic_to` | 1 | 6 | `55927425bcff` | filed |
@@ -91,12 +91,13 @@ of the same defect that sit in files now belonging to #412.
 | C33 | The assertion at `test_affine_plane_over_qq.sage:15` does not hold: Spectrum of F...f Integer Ring == Spectrum of F...f Integer Ring | 1 | 0 | `not bisected` | filed |
 | C34 | `module_morphisms.py:1978` raises ValueError: [(1)/(2)] in Fraction Field of Integer Ring / (1)Integer Ring is not in the image of Generic morphism: | 1 | 0 | `not bisected` | filed |
 | C35 | The assertion at `test_integers.sage:28` does not hold: Generic endomorphism of Integer Ring == Generic endomorphism of Integer Ring | 1 | 0 | `c731175` | filed |
+| C36 | The session namespace restates the owners' `__all__` declarations | 0 | 0 | `not bisected` | filed |
 
 ## Each cause
 
 ### C01 — The session namespace does not publish the constructors the suite names
 
-`from sage_extensions.all import *` binds a namespace that omits nineteen owned constructors the suite names: `AbsoluteGaloisGroup`, `AbsoluteGaloisGroups`, `AbsoluteGaloisGroupsOfFiniteFields`, `FinitelyGeneratedGroups`, `FinitelyPresentedGroups`, `ProfiniteGroups`, `AlternatingAlgebras`, `SymmetricAlgebras`, `TensorAlgebras`, `StrictlyGradedCommutativeAlgebras`, `FractionalIdeals`, `ModulesWithConnection`, `ModulesWithFlatConnection`, `FinitelyGeneratedModules`, `FinitelyPresentedModules`, `ProjectiveModules`, `TorsionModules`, `TensorProductModules`, `SymmetricBilinearFormModules`. A user who writes the session-standard import gets `NameError` for a constructor the library owns, and the repository's own test lint reports the same names as TL13.
+`from sage_extensions.all import *` binds a namespace that omits eighteen owned categories the suite names: `AbsoluteGaloisGroups`, `AbsoluteGaloisGroupsOfFiniteFields`, `FinitelyGeneratedGroups`, `FinitelyPresentedGroups`, `ProfiniteGroups`, `AlternatingAlgebras`, `SymmetricAlgebras`, `TensorAlgebras`, `StrictlyGradedCommutativeAlgebras`, `FractionalIdeals`, `ModulesWithConnection`, `ModulesWithFlatConnection`, `FinitelyGeneratedModules`, `FinitelyPresentedModules`, `ProjectiveModules`, `TorsionModules`, `TensorProductModules`, `SymmetricBilinearFormModules`. A user who writes the session-standard import gets `NameError` for a category the library owns, and the repository's own test lint reports the same names as TL13. The standalone `AbsoluteGaloisGroup` the first attempt at this list also carried is not a category and is retired in its own cause.
 
 Failing tests (11, 6 files):
 
@@ -127,7 +128,7 @@ The same defect also fails 7 test(s) in files now belonging to #412: `tests/obje
 
 - Defective call: `src/sage_extensions/all.py` (the session namespace: the names the suite resolves through `from sage_extensions.all import *`).
 - Introduced by: main's root commit `c731175` (2026-10-26, Zack Garza <dzackgarza@gmail.com>): the file was run there and the same failure appears.
-- Repair: filed with the scope of the whole session namespace, not patched here. The repair is that `sage_extensions.all` publishes the area packages' declared surfaces instead of restating them: `sage_extensions/groups/__init__.py` declares 65 names in `__all__` and `sage_extensions/categories/modules/__init__.py` declares 82, including `FinitelyPresentedModules`, `BilinearMap` and `FinitelyGeneratedFreeModules`, so a constructor an owner declares would be a session name by construction and TL13 could not report one again. It reaches the `__all__` lists, the import order `all.py` protects for the catalogue, and every test that resolves a name through the session. A list edit adding the names the current suite names was committed as `d38845a` and reverted in `7bbe4fb`: it cleared this slice's 18 TL13 findings and left 21 distinct names still reported outside it, which is the drift the mechanism produces.
+- Repair: repaired in `69fc77b` for the eighteen categories the slice names; thirteen of the eighteen `NameError` tests pass and the other five report their next defect. The mechanism that let the two lists drift is its own cause (`C36`, the hand list against the owners' `__all__` declarations), filed with the whole session namespace's scope.
 
 ### C02 — The owned ring adapter has no constructor for the symbolic ring
 
@@ -621,45 +622,76 @@ Failing tests (1, 1 file: `test_integers.sage`):
 - Introduced by: main's root commit `c731175` (2026-10-26, Zack Garza <dzackgarza@gmail.com>): the file was run there and the same failure appears.
 - Repair: open; filed as this cause.
 
+### C36 — The session namespace restates the owners' `__all__` declarations
+
+`sage_extensions/all.py` publishes a hand-written list of names, and every area package already declares its own public surface: `sage_extensions/groups/__init__.py` states 65 names in `__all__`, `sage_extensions/categories/modules/__init__.py` states 82. Two lists, one authority: they drifted, and the drift is what the namespace cause below surfaced. When this closes, the session publishes the owners' declarations, so a constructor an owner declares is a session name by construction and the test lint's TL13 cannot report one again. The repair reaches the `__all__` lists, the import order `all.py` protects for the catalogue, and every test that resolves a name through the session, so it is filed with that scope: on this workstream's tree the tree-wide lint reports 117 TL13 findings over 41 distinct names.
+
+Failing tests (0, 0 files: ):
+
+
+- Defective call: .
+- Introduced by: not bisected: no failing test of the slice reaches it; the count that states the defect is the tree-wide lint's (117 TL13 findings over 41 distinct names).
+- Repair: open; filed as this cause.
+
 ## Repairs
 
-Two commits were made as repairs and both were then re-read against `CONTRIBUTING.md`
-(`OWN-01`..`OWN-24`, `STY-*`) and `AGENTS.md`. One survived; one was reverted.
+Four commits were made in this workstream and each was then re-read against
+`CONTRIBUTING.md` (`OWN-01`..`OWN-24`, `STY-*`) and `AGENTS.md`. Three stand; one was
+reverted and replaced.
 
-### Kept: the algebraic closure of a finite field
+### The algebraic closure of a finite field
 
-- `dda0328` raises the closure through `FiniteField.algebraic_closure`, the operation
-  on the object the closure belongs to, instead of calling Sage's
-  `AlgebraicClosureFiniteField` with a characteristic where it takes `(base_ring, name)`.
-  `526c985` states in the docstring what makes that the route: Sage returns one cached
-  pseudo-Conway closure per characteristic (`GF(p).algebraic_closure() is
-  GF(p).algebraic_closure()`, measured), and raising it through the name-taking
-  constructor would coin a generator name, which an adapter may not do.
-- Verified at the call, in the image, on the tree with the namespace commit reverted:
-  on main `c8a3ced`, `GF(5).absolute_galois_group()` raises `TypeError:
-  AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'` at
-  `ring_foundation.py:7608`; with `dda0328` it returns an
+- `dda0328` raises the closure through `FiniteField.algebraic_closure`, the operation on
+  the object the closure belongs to, instead of calling Sage's
+  `AlgebraicClosureFiniteField` with a characteristic where it takes
+  `(base_ring, name)`. `526c985` states in the docstring what makes that the route --
+  Sage returns one cached pseudo-Conway closure per characteristic
+  (`GF(p).algebraic_closure() is GF(p).algebraic_closure()`, measured) -- and `22f1b32`
+  removes the sentence that still argued about the constructor's signature, a call the
+  code no longer makes (STY-124).
+- Verified at the call in the image: on main `c8a3ced`, `GF(5).absolute_galois_group()`
+  raises `TypeError: AlgebraicClosureFiniteField() missing 1 required positional
+  argument: 'name'` at ring_foundation.py:7608; with the repair it returns an
   `AbsoluteGaloisGroupsOfFiniteFields` object.
-- **No failing test of the slice changes colour.** The only test that reaches this call
-  is `test_absolute_galois_group_of_f5.sage::test_the_field_construction_agrees`, and
-  every test of that file goes through its `galois()` helper, which names
-  `AbsoluteGaloisGroup` -- the namespace cause C01. The failure set of all 13 affected
-  files is identical before and after the revert (measured, one file per run): the
-  closure's red test stays red behind C01 and goes green when C01 is repaired.
+- Its red tests are the five construction tests of
+  `test_absolute_galois_group_of_f5.sage`, which pass once the namespace publishes the
+  category names they assert on (below).
 
-### Reverted: the session namespace
+### The absolute Galois group's constructor
 
-- `d38845a` added nineteen names to `sage_extensions/all.py`, chosen because the failing
-  tests named them. That is selection by test, and the names were never the repair's to
-  choose: the owners already declare their surfaces in `__all__`
-  (`sage_extensions/groups/__init__.py`: 65 names;
-  `sage_extensions/categories/modules/__init__.py`: 82), and `all.py`'s hand-written
-  imports are a second copy of those declarations, which is why the two had drifted.
-- `7bbe4fb` reverts it. The repair this cause needs is that the session publishes the
-  owners' declared surfaces instead of restating them, which reaches the whole session
-  namespace -- the `__all__` lists, the import order `all.py` protects for the
-  catalogue, and every test that resolves a name through the session -- so C01 is filed
-  with that scope and not patched.
+- `14ca8e7` retires the standalone `AbsoluteGaloisGroup(field, closure=None,
+  embedding=None)` and its three `__all__` entries. `AGENTS.md` "Placement -- one
+  home": "No standalone function constructs an object, and a shortcut is no
+  exception", and a name that belongs on the object "is retired, not aliased"; the
+  free function was a second spelling of `GF(p).absolute_galois_group()`, with `None`
+  sentinels choosing the case.
+- The field method now calls the private owner entry
+  `_canonical_absolute_galois_group(_own_ring(self))` -- the same normalization and the
+  same per-field cache the function performed -- and the two category specimens
+  construct through `GF(2).absolute_galois_group()`.
+- One test changes, and this is why: the exercise file's helper reads
+  `GF(5).absolute_galois_group()`, and `test_the_field_construction_agrees`, whose whole
+  content was that the free function and the method agree, is removed with the spelling
+  it compared. The file's other five tests state the mathematics and construct through
+  the field. Red: the file goes 6 failed -> 1 failed / 4 passed.
+
+### The session namespace
+
+- `69fc77b` publishes eighteen owned categories the slice names: `AbsoluteGaloisGroups`,
+  `AbsoluteGaloisGroupsOfFiniteFields`, `FinitelyGeneratedGroups`,
+  `FinitelyPresentedGroups`, `ProfiniteGroups`, `AlternatingAlgebras`,
+  `SymmetricAlgebras`, `TensorAlgebras`, `StrictlyGradedCommutativeAlgebras`,
+  `FractionalIdeals`, `ModulesWithConnection`, `ModulesWithFlatConnection`,
+  `FinitelyGeneratedModules`, `FinitelyPresentedModules`, `ProjectiveModules`,
+  `TorsionModules`, `TensorProductModules`, `SymmetricBilinearFormModules`. Thirteen of
+  the eighteen `NameError` tests pass; the other five now report their next defect.
+- What this is not: the first version of this change (`d38845a`) chose its names by
+  which tests failed and included `AbsoluteGaloisGroup`, the free function. It was
+  reverted (`50a83cb`) and replaced by the eighteen categories plus the retirement above.
+- The durable defect is filed, not patched: `all.py`'s hand list is a second copy of the
+  owners' `__all__` declarations (65 names in `sage_extensions/groups/__init__.py`, 82
+  in `sage_extensions/categories/modules/__init__.py`), and the tree-wide lint still
+  reports 117 TL13 findings over 41 distinct names. See the cause for the mechanism.
 
 ## What is not done
 
@@ -673,7 +705,8 @@ Two commits were made as repairs and both were then re-read against `CONTRIBUTIN
    blocked by C01, so no failing test of the slice changes colour yet (see Repairs).
 3. **C01 is filed with the scope of the whole session namespace.** On the tree this
    record was measured from, `python -m sage_extensions.testing.test_lint` over the 930
-   test files reports 117 TL13 findings over 41 distinct names -- names of owned
+   test files reports
+   117 TL13 findings over 41 distinct names -- names of owned categories and
    constructors, the slice's own 18 among them (`AbsoluteGaloisGroup`,
    `FinitelyPresentedModules`, `FractionalIdeals`, `ModulesWithConnection`, ...). The
    repair is the mechanism, not the names, so this count is the evidence for the cause
