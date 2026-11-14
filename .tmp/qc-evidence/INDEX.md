@@ -902,3 +902,13 @@ Repaired on main in fba2e71.
 | `issue409-slice-after-fix-default.log` | `fba2e71` | the same invocation on the repaired tree: **4 passed in 9.11 s**, 0 findings |
 | `issue409-slice-after-fix-context.log` | `fba2e71` | the repaired file behind seven sibling files (four `tests/groups` coset tests, `test_symmetric_group_s3.sage`, `test_orthogonal_group_of_a2.sage`): **36 passed, 9 failed**, all nine in the two sibling files, none here |
 | `issue409-slice-orbit-counts.py` / `.log` | `fba2e71` | the numbers the replaced `len()` calls carried: split four-dimensional form `|orbit| = 9`, `|G| = 72`, `|Stab| = 8`; anisotropic ternary plane `|orbit| = 4`, `|G| = 8`, `|Stab| = 2` |
+
+## Triage of the failing tests of `tests/objects` (#408)
+
+`triage/408-*.md` are the paste-ready issue bodies for the causes the #408 triage found
+in its slice (the 26 files of `tests/objects` up to
+`test_isomorphisms_of_a_two_element_set.sage`; the rest of the directory is #412). Each
+file is one cause: the first line is the issue title, the rest is the body, which names
+the failing tests with the error each reports, the defective call, the commit that
+introduced the cause and the scope. They are not logs. The run that produced them is
+recorded in `results/issue408-triage.md`, whose cause ids these bodies carry.

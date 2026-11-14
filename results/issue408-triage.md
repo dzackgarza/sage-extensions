@@ -623,12 +623,12 @@ Failing tests (1, 1 file: `test_integers.sage`):
 
 ## Repairs landed in this workstream
 
+- `8a9845b` evidence: Every failing test of this #408 slice is a recorded cause (#408)
 - `6df56ad` fix: The algebraic closure of GF(p) is raised through the field's closure (#408)
 - `57208eb` fix: The session namespace publishes the constructors the suite names (#408)
 - `9b29712` Merge remote-tracking branch 'origin/main' into perf/correctness-sample
 - `0ee5ad5` perf: definite Aut and isometry on the indecomposable decomposition
 - `484e4c5` perf: one engine sift per coset of the kernel image; the 4.3.8 chamber from a vertex (#402)
-- `bbb6608` perf: finite G-set stabilizers by GAP; integer point lookup by engine key
 
 Both are commits on main whose subject names #408; the two causes above are the only
 ones repaired here. Red tests: the failing tests listed under C01 and C03, which fail on
@@ -658,10 +658,10 @@ same files are untouched.
 ## What is not done
 
 1. **The causes are not filed as issues.** This session's GitHub connection reads issues
-   and pushes commits; it has no operation that creates an issue, and `gh` on the VM is
-   unauthenticated. `results/issue408-causes.sh` holds one reviewed `gh issue create` per
-   cause, with the failing tests, the error, the introducing commit and the scope in the
-   body, so filing is one run of that script.
+   and pushes commits but has no operation that creates an issue, and `gh` on the VM is
+   unauthenticated. Each cause is therefore committed paste-ready as
+   `.tmp/qc-evidence/triage/408-<slug>.md` on main, title line first and the body after,
+   for the orchestrator to file.
 2. **The other causes are not repaired.** They are filed with their evidence. The two
    repaired ones are the two whose defect was one wrong call at one owner.
 3. **The session-namespace cause reaches beyond this slice.** Tree-wide
