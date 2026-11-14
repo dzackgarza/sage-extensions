@@ -667,7 +667,27 @@ class CategoricalMor(
 
     @cached_method
     def _generated_arrow_type(self) -> type:
-        r"""Return the arrow type generated from this Mor category's graph."""
+        r"""Return the arrow type of this Mor, shared across its family's endpoints.
+
+        ``Mor_C(A, B)`` is a category for every pair of objects, and the
+        operations of its arrows depend on ``C`` alone: on the Mor class the
+        family builds, the placement of the Mor object and its diagonal
+        End/Aut role, never on ``A`` and ``B``.  So the type is generated
+        once per family and key, from the first Mor that asks, and every
+        later Mor of that family reuses it.  The forgetful inclusions into
+        the supercategories' Mors are not constructed for the others; they
+        are built only when ``super_categories`` is asked.
+        """
+        key = (type(self), self.category(), self.end_family(), self.aut_family())
+        arrow_types = self.mor_family()._arrow_types
+        result = arrow_types.get(key)
+        if result is None:
+            result = arrow_types[key] = self._arrow_type_from_declared_graph()
+        self._configure_generated_arrow_operations(result)
+        return result
+
+    def _arrow_type_from_declared_graph(self) -> type:
+        r"""Generate the arrow type from this Mor category's declared graph."""
         # Each level's ``__init__`` threads cooperatively to the levels it
         # declares, and only the set-map root runs Sage's non-cooperative
         # ``Morphism`` initialization.  So every Mor category precedes all of
@@ -767,13 +787,11 @@ class CategoricalMor(
             bases = [known for known in bases if not issubclass(candidate, known)]
             bases.append(candidate)
 
-        result = dynamic_class(
+        return dynamic_class(
             f"{type(self).__name__}.ArrowType",
             tuple(bases),
             doccls=providers[0] if providers else CategoricalMor.ElementMethods,
         )
-        self._configure_generated_arrow_operations(result)
-        return result
 
     def _configure_generated_arrow_operations(self, element_class):
         r"""Apply Sage's deferred parent-operation dispatch to an arrow type."""
@@ -2057,6 +2075,9 @@ class _MorCategoryOf(OwnedCategoryBase):
         # internals for it.
         self._objects = {}
         self._resolved_endpoint_categories = {}
+        # The arrow types of this family's Mor objects, keyed by what they
+        # depend on (``CategoricalMor._generated_arrow_type``).
+        self._arrow_types = {}
         super().__init__()
 
     def _make_named_class_key(self, name):

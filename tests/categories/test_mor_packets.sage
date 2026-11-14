@@ -46,3 +46,30 @@ def test_the_rank_one_lattice_has_automorphism_group_plus_minus_one() -> None:
     assert lattice.O().cardinality() == 2
     assert minus_one in lattice.O()
     assert lattice.Emb(lattice).cardinality() == 2
+
+
+def test_the_arrow_type_of_a_mor_depends_on_its_category_alone() -> None:
+    r"""``Mor_C(A, B)`` and ``Mor_C(B, A)`` have one arrow type, as do ``End(Z^2)`` and ``End(Z^3)``.
+
+    The operations of a ``C``-morphism are those of ``C`` and of the
+    placement of its Mor object, whatever its endpoints: both endomorphism
+    rings are noncommutative matrix algebras (``End(Z)`` is commutative, so
+    it is placed elsewhere).  The inclusion of ``Mor_C(A, A)`` into the Mor of a
+    supercategory of ``C`` is the forgetful functor on arrows, so a
+    ``C``-endomorphism of ``A`` is an arrow there between the same objects
+    and not between others.
+    """
+    modules = Modules(ZZ)
+    one = ZZ.free_module(1)
+    two = ZZ.free_module(2)
+    into = modules.Mor(one, two)
+    out_of = modules.Mor(two, one)
+    identity = modules.Mor(one, one).identity()
+    (forgotten,) = modules.Mor(one, one).super_categories()
+    (other_endpoints,) = into.super_categories()
+
+    assert into.element_class is out_of.element_class
+    three = ZZ.free_module(3)
+    assert modules.End(two).element_class is modules.End(three).element_class
+    assert identity in forgotten
+    assert identity not in other_endpoints
