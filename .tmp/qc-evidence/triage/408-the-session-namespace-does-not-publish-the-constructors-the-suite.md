@@ -39,6 +39,6 @@ Introduced by: main's root commit `c731175` (2026-10-26, Zack Garza <dzackgarza@
 Scope: 6 files of the #408 slice (tests/objects up to
 test_isomorphisms_of_a_two_element_set.sage).
 
-Repair: repaired in `69fc77b` for the eighteen categories the slice names; thirteen of the eighteen `NameError` tests pass and the other five report their next defect. The mechanism that let the two lists drift is its own cause (`C36`, the hand list against the owners' `__all__` declarations), filed with the whole session namespace's scope.
+Repair: repaired in `c099996` for the eighteen categories the slice names; thirteen of the eighteen `NameError` tests pass and the other five report their next defect. The mechanism that let the two lists drift is its own cause (`C36`, the hand list against the owners' `__all__` declarations), filed with the whole session namespace's scope.
 
 Cause C01 of the triage in results/issue408-triage.md.

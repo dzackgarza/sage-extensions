@@ -128,7 +128,7 @@ The same defect also fails 7 test(s) in files now belonging to #412: `tests/obje
 
 - Defective call: `src/sage_extensions/all.py` (the session namespace: the names the suite resolves through `from sage_extensions.all import *`).
 - Introduced by: main's root commit `c731175` (2026-10-26, Zack Garza <dzackgarza@gmail.com>): the file was run there and the same failure appears.
-- Repair: repaired in `69fc77b` for the eighteen categories the slice names; thirteen of the eighteen `NameError` tests pass and the other five report their next defect. The mechanism that let the two lists drift is its own cause (`C36`, the hand list against the owners' `__all__` declarations), filed with the whole session namespace's scope.
+- Repair: repaired in `c099996` for the eighteen categories the slice names; thirteen of the eighteen `NameError` tests pass and the other five report their next defect. The mechanism that let the two lists drift is its own cause (`C36`, the hand list against the owners' `__all__` declarations), filed with the whole session namespace's scope.
 
 ### C02 — The owned ring adapter has no constructor for the symbolic ring
 
@@ -166,7 +166,7 @@ Failing tests (1, 1 file: `test_absolute_galois_group_of_f5.sage`):
 
 - Defective call: `src/sage_extensions/categories/rings/ring_foundation.py:7608`.
 - Introduced by: main's root commit `c731175` (2026-10-26, Zack Garza <dzackgarza@gmail.com>): the file was run there and the same failure appears.
-- Repair: repaired in `?`, docstring in `23ae718`. In the image, `GF(5).absolute_galois_group()` raises `TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'` at ring_foundation.py:7608 on main `c8a3ced`, and returns an `AbsoluteGaloisGroupsOfFiniteFields` object with the repair. No failing test of the slice changes colour: its only test, `test_absolute_galois_group_of_f5.sage::test_the_field_construction_agrees`, reaches the call through the file's `galois()` helper, which names `AbsoluteGaloisGroup` -- C01 -- so it stays red until C01 is repaired.
+- Repair: repaired in `dda0328`, docstring in `23ae718`. In the image, `GF(5).absolute_galois_group()` raises `TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'` at ring_foundation.py:7608 on main `c8a3ced`, and returns an `AbsoluteGaloisGroupsOfFiniteFields` object with the repair. No failing test of the slice changes colour: its only test, `test_absolute_galois_group_of_f5.sage::test_the_field_construction_agrees`, reaches the call through the file's `galois()` helper, which names `AbsoluteGaloisGroup` -- C01 -- so it stays red until C01 is repaired.
 
 ### C04 — The owned parent and element classes do not carry `is_isomorphic_to`
 
@@ -644,9 +644,9 @@ reverted and replaced.
 - `dda0328` raises the closure through `FiniteField.algebraic_closure`, the operation on
   the object the closure belongs to, instead of calling Sage's
   `AlgebraicClosureFiniteField` with a characteristic where it takes
-  `(base_ring, name)`. `526c985` states in the docstring what makes that the route --
+  `(base_ring, name)`. `23ae718` states in the docstring what makes that the route --
   Sage returns one cached pseudo-Conway closure per characteristic
-  (`GF(p).algebraic_closure() is GF(p).algebraic_closure()`, measured) -- and `22f1b32`
+  (`GF(p).algebraic_closure() is GF(p).algebraic_closure()`, measured) -- and `e399a8e`
   removes the sentence that still argued about the constructor's signature, a call the
   code no longer makes (STY-124).
 - Verified at the call in the image: on main `c8a3ced`, `GF(5).absolute_galois_group()`
@@ -659,7 +659,7 @@ reverted and replaced.
 
 ### The absolute Galois group's constructor
 
-- `14ca8e7` retires the standalone `AbsoluteGaloisGroup(field, closure=None,
+- `7260f89` retires the standalone `AbsoluteGaloisGroup(field, closure=None,
   embedding=None)` and its three `__all__` entries. `AGENTS.md` "Placement -- one
   home": "No standalone function constructs an object, and a shortcut is no
   exception", and a name that belongs on the object "is retired, not aliased"; the
@@ -677,7 +677,7 @@ reverted and replaced.
 
 ### The session namespace
 
-- `69fc77b` publishes eighteen owned categories the slice names: `AbsoluteGaloisGroups`,
+- `c099996` publishes eighteen owned categories the slice names: `AbsoluteGaloisGroups`,
   `AbsoluteGaloisGroupsOfFiniteFields`, `FinitelyGeneratedGroups`,
   `FinitelyPresentedGroups`, `ProfiniteGroups`, `AlternatingAlgebras`,
   `SymmetricAlgebras`, `TensorAlgebras`, `StrictlyGradedCommutativeAlgebras`,
