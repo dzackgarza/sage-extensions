@@ -1,0 +1,17 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt468
+provider SHA: 51310d613cd8c27860c70ff2f3370fedc6a18f21
+tree dirty:  M src/sage_extensions/all.py 
+file: tests/objects/test_cyclic_module_zz6.sage
+FF....F.                                                                 [100%]
+=================================== FAILURES ===================================
+E   TypeError: unsupported operand type(s) for /: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' and 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'
+/repos/sage-extensions/tests/objects/test_cyclic_module_zz6.sage:16: TypeError: unsupported operand type(s) for /: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' and 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'
+E   TypeError: unsupported operand type(s) for /: '_OwnedRingParent_with_category' and 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'
+/repos/sage-extensions/tests/objects/test_cyclic_module_zz6.sage:20: TypeError: unsupported operand type(s) for /: '_OwnedRingParent_with_category' and 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType'
+E   AssertionError: GL(Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 6]) is realized as a matrix group only for a free module with a finite selected basis, but Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 6] is in Category of torsion modules with a represented selected finite-presentation backend over Integer Ring
+/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:4032: AssertionError: GL(Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 6]) is realized as a matrix group only for a free module with a finite selected basis, but Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 6] is in Category of torsion modules with a represented selected finite-presentation backend over Integer Ring
+=========================== short test summary info ============================
+FAILED tests/objects/test_cyclic_module_zz6.sage::test_the_cokernel_and_the_quotient_agree
+FAILED tests/objects/test_cyclic_module_zz6.sage::test_the_quotient_of_the_regular_module_by_the_ideal
+FAILED tests/objects/test_cyclic_module_zz6.sage::test_the_endomorphisms_and_automorphisms_of_zz6
+3 failed, 5 passed in 0.51s

@@ -1,0 +1,31 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt468
+provider SHA: 51310d613cd8c27860c70ff2f3370fedc6a18f21
+tree dirty:  M src/sage_extensions/all.py 
+file: tests/objects/test_two_hyperbolic_planes.sage
+.FF.F.FF.                                                                [100%]
+=================================== FAILURES ===================================
+E   assert Integral latt...gnature (2, 2) == Integral latt...gnature (2, 2)
+      
+      Use -v to get more diff
+/repos/sage-extensions/tests/objects/test_two_hyperbolic_planes.sage:14: assert Integral latt...gnature (2, 2) == Integral latt...gnature (2, 2)
+E   assert Integral lattice of rank 4 and signature (2, 2) in Category of objects of lattices with a chosen direct-sum decomposition
+     +  where Category of objects of lattices with a chosen direct-sum decomposition = DirectSumObjects(Lattices(Integer Ring))
+     +    where Lattices(Integer Ring) = Lattices(ZZ)
+/repos/sage-extensions/tests/objects/test_two_hyperbolic_planes.sage:21: assert Integral lattice of rank 4 and signature (2, 2) in Category of objects of lattices with a chosen direct-sum decomposition
+E   TypeError: the proposition is_finite(Orthogonal group O(Integral lattice of rank 4 and signature (2, 2))) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+/repos/sage-extensions/src/sage_extensions/logic.py:44: TypeError: the proposition is_finite(Orthogonal group O(Integral lattice of rank 4 and signature (2, 2))) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+E   TypeError: the proposition is_finite({g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g(im(Generic morphism:
+      From: Integral lattice of rank 2 and signature (0, 0)
+      To:   Integral lattice of rank 4 and signature (2, 2)))=im(Generic morphism:
+      From: Integral lattice of rank 2 and signature (0, 0)
+      To:   Integral lattice of rank 4 and signature (2, 2))}) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+/repos/sage-extensions/src/sage_extensions/logic.py:44: TypeError: the proposition is_finite({g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g(im(Generic morphism:
+E   TypeError: the proposition is_finite({g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g lies in every selected subgroup}) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+/repos/sage-extensions/src/sage_extensions/logic.py:44: TypeError: the proposition is_finite({g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g lies in every selected subgroup}) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+=========================== short test summary info ============================
+FAILED tests/objects/test_two_hyperbolic_planes.sage::test_the_sum_and_the_block_gram_agree
+FAILED tests/objects/test_two_hyperbolic_planes.sage::test_the_categories_of_u_plus_u
+FAILED tests/objects/test_two_hyperbolic_planes.sage::test_the_orthogonal_group_is_infinite
+FAILED tests/objects/test_two_hyperbolic_planes.sage::test_an_isotropic_plane_and_its_stabilizer
+FAILED tests/objects/test_two_hyperbolic_planes.sage::test_an_isotropic_flag_and_its_stabilizer
+5 failed, 4 passed in 1.06s

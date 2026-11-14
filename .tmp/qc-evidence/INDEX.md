@@ -1202,3 +1202,50 @@ id) are repaired on main; the division's further work is #500.
 | --- | --- | --- |
 | `410-final-slice-driver.log` | `51310d6` | the five files, one pytest process per file: `test_definite.sage` **6 failed, 19 passed in 302.22 s**, the metric archive **2 passed**, genus mass 2 passed, isometry witnesses 5 passed, root groups 3 passed |
 | `410-final-slice-test_definite.log` | `51310d6` | the six red ids, which are C, D, E, F, G and H and nothing else: the `Emb` cardinality, the predicate subset, `is_cyclic`, the infinite-order isometry, the bare tuple and the index-2 character image |
+
+## #468 — the session publishes the area packages' declarations, one authority per name
+
+Two triage repairs had contradicted each other on `main`: `b3747a0` reverted the
+six names `eb203aa` added to `sage_extensions/all.py` because that file restated
+the areas' declarations, and `c099996` added eighteen more to the same
+hand-written list 61 seconds later. The file is now derived: `all.py` names the
+22 packages that declare an `__all__` and binds each one's whole declaration, so
+no member name of an area is written by hand anywhere in it (`_AREA_PACKAGES`
+is the list of *packages*, not of names). 310 hand-written lines became 37, and
+the session publishes 599 names over those areas, 524 of them distinct.
+
+The six names of #407's namespace cause, and the eighteen of #408's, are now
+session names because their owners declare them —
+`sage_extensions/groups/__init__.py` has declared `Subgroups`,
+`SymmetricGroups`, `GeneralLinearGroups`, `FreeGroupQuotients`, `Torsors` and
+`CoxeterGroups` all along, and `all.py` imported that area nowhere. Each of the
+23 names of the two causes resolves to the preamble's object: the probe prints
+`CoxeterGroups` as the preamble's constructor and Sage's namesake shadowed, and
+the other 22 with no Sage namesake at all. `GeneratedSubgroups` and
+`AdditiveMonoids` remain `TL13` findings because no area declares them — an
+owner gap, not a namespace one, and the same defect `#411`'s `C01` files.
+
+Measured on the tree of this push against a clean worktree at the same base
+commit, one pytest process per file, `-o addopts= -p
+sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint
+--no-time-gates --no-test-lint`: 16 files of the two namespace causes, 15 test
+ids red before and green after, 0 ids green before and red after. The tree-wide
+`test_lint` reports `TL13` 86 findings over 86 names before and 10 over 10 after
+(1475 findings in all before, 1424 after), which is the signal #408's `C36`
+names. `import sage_extensions.all` is 2.34 s against 3.24 s before, under the
+suite's 3.0 s ceiling for that workload.
+
+Five names stay hand-written because their own area does not declare them:
+`MatrixAlgebras` (algebras), `LieGroups` and `TopologicalGroups` (groups),
+`MatrixSpaces` and `MatrixEndomorphismSpaces` (modules). They are the areas'
+surfaces to close, and the session publishes them in the meantime.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue468-allpy-rewrite.py` | — | the rewrite, re-runnable: reads each area's `__all__`, drops every hand-written binding of a declared name, and inserts `_AREA_PACKAGES` and the publication loop |
+| `issue468-session-names.py` / `.log` | the tree of this push | the 23 names of the two causes, their owner, and whether Sage has a namesake: `CoxeterGroups` `SHADOWS-SAGE`, the other 22 `no-sage-namesake`; 599 area names published, no loop variable leaked |
+| `issue468-baseline-outcomes.log` / `issue468-after-outcomes.log` | base `51310d6` / the tree of this push | the 16 files' pytest summaries side by side, e.g. `test_free_and_catalogued_groups.sage` 18 failed / 10 passed before, 10 failed / 18 passed after |
+| `issue468-flipped.txt` | the tree of this push | the 15 test ids that went red to green |
+| `issue468-runs/*.log` | the tree of this push | the 16 whole runs, one per file |
+| `issue468-lint-tl13-before.log` / `-after.log` | base `51310d6` / the tree of this push | every `TL13` line of the tree-wide `test_lint`, with the run's totals |
+| `issue468-star-import.log` | both trees | `import sage_extensions.all`: 3.24 s → 2.34 s |

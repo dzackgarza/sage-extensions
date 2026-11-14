@@ -21,42 +21,49 @@ from sage.misc.lazy_import import lazy_import as _lazy_import
 from sage.repl.load import load as _sage_load
 
 from sage_extensions import language_runtime as _language_runtime
-from sage_extensions.categories.abstract_categories import (  # noqa: F401
-    Cat,
-    CategoricalIsomorphism,
-    CommutativeSquare,
-    Coverage,
-    CoveringFamilies,
-    DescentData,
-    DescentDataOnCover,
-    DescentEqualizer,
-    DescentEqualizerComparison,
-    DirectedSystem,
-    DirectSumObjects,
-    FiniteOrdinalCategory,
-    InverseSystem,
-    MorCategories,
-    NaturalTransformationMorphism,
-    OpenCoveringFamilies,
-    OppositeMorphism,
-    PosetCategory,
-    ProductMorphism,
-    ResolutionMorphism,
-    Resolutions,
-    Sheaves,
-    SubobjectMor,
-    SubobjectMorphism,
-    TrivialCoveringFamilies,
-    trivial_coverage,
+
+# The session publishes what each area package declares.  A package's
+# ``__all__`` is the one authority for its names (OWN-19; AGENTS, "Names and
+# ownership"), so this module names no member of those declarations: the
+# packages below are the session's areas and each contributes its whole
+# ``__all__``.  An area's constructor is a session name by construction, so a
+# second hand-written list cannot drift from the owner's (API-06, API-07).
+_AREA_PACKAGES = (
+    "sage_extensions.categories.abstract_categories",
+    "sage_extensions.categories.algebras",
+    "sage_extensions.categories.divisors",
+    "sage_extensions.categories.forms",
+    "sage_extensions.categories.functions",
+    "sage_extensions.categories.group.profinite",
+    "sage_extensions.categories.modules",
+    "sage_extensions.categories.modules.framed",
+    "sage_extensions.categories.modules.framed.finitely_generated",
+    "sage_extensions.categories.modules.framed.formed",
+    "sage_extensions.categories.modules.group_modules",
+    "sage_extensions.categories.modules.pure",
+    "sage_extensions.categories.modules.pure.finitely_generated",
+    "sage_extensions.categories.schemes.toric",
+    "sage_extensions.categories.sets",
+    "sage_extensions.categories.sets.enumerated",
+    "sage_extensions.groups",
+    "sage_extensions.lexicon",
+    "sage_extensions.rings",
+    "sage_extensions.schemes",
+    "sage_extensions.static_types",
+    "sage_extensions.tensors",
 )
+for _area_package_name in _AREA_PACKAGES:
+    _area_package = _import_module(_area_package_name)
+    for _area_name in _area_package.__all__:
+        globals()[_area_name] = getattr(_area_package, _area_name)
+del _area_package_name, _area_package, _area_name
 from sage_extensions.categories.abstract_categories.functors import (  # noqa: F401
     DiscreteCategories,
     DiscreteCategory,
     ObjectSetFunctor,
 )
 from sage_extensions.categories.algebras.algebras import (  # noqa: F401
-    Algebras,
-    MatrixAlgebras as MatrixAlgebras,
+    MatrixAlgebras,
 )
 from sage_extensions.categories.cell_complexes import (  # noqa: F401
     CellComplexes,
@@ -78,40 +85,6 @@ from sage_extensions.categories.complex_analytic_spaces import (  # noqa: F401
 from sage_extensions.categories.coxeter_diagrams import (
     CoxeterDiagrams as CoxeterDiagrams,
 )
-from sage_extensions.categories.divisors import (  # noqa: F401
-    AlgebraicCycleGroups,
-    CartierDivisorGroups,
-    ChowGroups,
-    ClassGroups,
-    CompleteLinearSystems,
-    CoxRings,
-    DivisorGroups,
-    FormalDivisorGroups,
-    HomogeneousPolynomialSectionSpaces,
-    ImposedMultiplicityLinearSystems,
-    LineBundleCohomologySpaces,
-    PicardGroups,
-    ProjectiveJetSpaces,
-    ProjectiveLinearSystems,
-    SectionRings,
-    TorusInvariantCycleGroups,
-    WeilDivisorGroups,
-)
-from sage_extensions.categories.functions import (  # noqa: F401
-    C,
-    GradedLebesgueAlgebra,
-    GradedLebesgueModule,
-    GradedTensorProductModules,
-    GradedTensorSquare,
-    LebesgueConvolution,
-    LebesgueConvolutionAlgebra,
-    LebesgueConvolutionModule,
-    LebesgueGradedModules,
-    Lp,
-    ell,
-    graded_lebesgue_algebra,
-    lebesgue_convolution_algebra,
-)
 
 # Explicit redundant aliases below are public session exports, not private imports.
 from sage_extensions.categories.functors.core import (
@@ -132,33 +105,9 @@ from sage_extensions.categories.graph_categories import (  # noqa: F401
     LabelledDigraphs,
     LabelledGraphs,
 )
-from sage_extensions.categories.group.g_objects import (  # noqa: F401
-    GObjects,
-)
-from sage_extensions.categories.group.g_sets import (  # noqa: F401
-    FiniteGSets,
-)
 from sage_extensions.categories.group.groups import (  # noqa: F401
-    AbelianGroups,
-    FiniteAbelianGroups,
-    FinitelyGeneratedGroups,
-    FinitelyPresentedGroups,
-    Groups,
     LieGroups,
-    OwnedAbelianGroups,
-    OwnedFiniteAbelianGroups,
-    OwnedGroups,
     TopologicalGroups,
-)
-from sage_extensions.categories.group.magmas import (  # noqa: F401
-    AdditiveGroups,
-)
-from sage_extensions.categories.group.profinite.absolute_galois_group import (  # noqa: F401
-    AbsoluteGaloisGroups,
-    AbsoluteGaloisGroupsOfFiniteFields,
-)
-from sage_extensions.categories.group.profinite.profinite_groups import (  # noqa: F401
-    ProfiniteGroups,
 )
 from sage_extensions.categories.holomorphic_atlases import (  # noqa: F401
     HolomorphicAtlases,
@@ -259,32 +208,9 @@ from sage_extensions.categories.modules.hodge_structures import (  # noqa: F401
     MixedHodgeStructures,
     PolarizedHodgeStructures,
 )
-from sage_extensions.categories.modules.connections import (  # noqa: F401
-    ModulesWithConnection,
-    ModulesWithFlatConnection,
-)
-from sage_extensions.categories.modules.fractional_ideals import (  # noqa: F401
-    FractionalIdeals,
-)
-from sage_extensions.categories.modules.framed.formed.form_modules import (  # noqa: F401
-    BilinearFormModules,
-    FormModules,
-    SymmetricBilinearFormModules,
-)
-from sage_extensions.categories.modules.framed.fraction_field_quotients import (  # noqa: F401
-    FractionFieldQuotients,
-)
 from sage_extensions.categories.modules.pure.modules import (  # noqa: F401
-    FinitelyGeneratedModules,
-    FinitelyPresentedModules,
-    FinitelyPresentedTorsionModules,
-    FreeModules,
     MatrixEndomorphismSpaces,
     MatrixSpaces,
-    Modules,
-    ProjectiveModules,
-    TensorProductModules,
-    TorsionModules,
 )
 from sage_extensions.categories.orbifolds import (  # noqa: F401
     ComplexOrbifolds,
@@ -329,97 +255,6 @@ from sage_extensions.categories.triangulations import (  # noqa: F401
 )
 
 _lazy_import(
-    "sage_extensions.schemes",
-    (
-        "ADELogPairs",
-        "AlgebraSheaves",
-        "AffineGroupSchemeActions",
-        "AffineGroupSchemes",
-        "AffineGSchemes",
-        "AffineInvariantQuotientBaseChangeComparison",
-        "AffineSchemes",
-        "AffineSpaces",
-        "AbstractPolytopes",
-        "ConvexPolytopesIn",
-        "AnalyticDiscFamily",
-        "Blowups",
-        "ClosedEmbeddings",
-        "ClosedSubschemes",
-        "ConvexPolygons",
-        "ConvexPolytopes",
-        "EuclideanPolytopesIn",
-        "HyperbolicGeodesicPolytopesIn",
-        "LatticePolytopesIn",
-        "CurveLocalDeltaContribution",
-        "Curves",
-        "CyclicCoverBaseChangeComparison",
-        "DistinguishedAffineCoverRefinement",
-        "DistinguishedAffineCovers",
-        "EffectiveCartierDivisors",
-        "FiberProductSchemes",
-        "FiniteGluedInvariantQuotient",
-        "HesseBertiniFamily",
-        "HorikawaEnriquesSurface",
-        "HorikawaK3Family",
-        "IntegralSchemes",
-        "IsolatedHypersurfaceSingularity",
-        "LatticePolygons",
-        "LatticePolytopes",
-        "LegendreMonodromyFamily",
-        "LocallyRingedSpaces",
-        "LogPairs",
-        "ModuleSheaves",
-        "NodalCubic",
-        "NodalCubicIntegralTopology",
-        "NodalCubicNormalization",
-        "NormalSchemes",
-        "OpenImmersions",
-        "DistinguishedOpenImmersions",
-        "PGL2IntegralTopology",
-        "PointedAnalyticFundamentalGroup",
-        "ProductProjectiveSpaces",
-        "ProductSchemes",
-        "ProjectiveCompleteIntersections",
-        "ProjectiveGeneralLinearGroup2",
-        "ProjectivePointBlowups",
-        "ProjectiveSchemes",
-        "ProjectiveSpaces",
-        "ProjectiveLines",
-        "QuasiCoherentSheaves",
-        "RationalPolyhedralFans",
-        "RegularPolytopes",
-        "SphericalGeodesicPolytopesIn",
-        "RelativeCyclicCoverLift",
-        "RelativeProjectivizations",
-        "RingedSpaces",
-        "SchemeMonomorphisms",
-        "SchemeMorphism",
-        "Schemes",
-        "SchemesOverIntegralDomains",
-        "SchemesOverLocalRings",
-        "PresheafObjects",
-        "SheafObjects",
-        "SheafedSpaces",
-        "SideDecoration",
-        "SmoothSchemes",
-        "Surfaces",
-        "ToricFixedPointBlowups",
-        "ToricGeometricLineBundleCohomologySpaces",
-        "ToricLogPairs",
-        "ToricSchemes",
-        "ToricProjectiveSpaces",
-        "GorensteinToricSchemes",
-        "SmoothCompleteRationalToricSchemes",
-        "ToricWeightCohomologyComplexes",
-        "Varieties",
-        "ZariskiCoveringFamilies",
-        "distinguished_affine_coverage",
-        "rational_quintic_with_nonrational_node_normalization",
-        "rational_quintic_with_two_nodes_normalization",
-        "zariski_coverage",
-    ),
-)
-_lazy_import(
     "sage_extensions.categories.schemes.cyclic_covers",
     "CyclicCovers",
 )
@@ -428,14 +263,6 @@ from sage_extensions.categories.algebras.subalgebras import (  # noqa: F401
 )
 from sage_extensions.categories.algebras.algebra_ideals import (  # noqa: F401
     GeneratedAlgebraIdeals,
-)
-from sage_extensions.categories.algebras.free_algebras import (  # noqa: F401
-    AlternatingAlgebras,
-    SymmetricAlgebras,
-    TensorAlgebras,
-)
-from sage_extensions.categories.algebras.graded_commutative_algebras import (  # noqa: F401
-    StrictlyGradedCommutativeAlgebras,
 )
 from sage_extensions.categories.algebras.graded_lie_algebras import (  # noqa: F401
     GradedLieAlgebras,
@@ -453,50 +280,6 @@ from sage_extensions.categories.pointed_topological_spaces import (  # noqa: F40
 from sage_extensions.categories.rings.ring_foundation import (
     _OwnedRingParent,
 )
-from sage_extensions.categories.sets import (  # noqa: F401
-    NN,
-    AugmentedSimplexCategory,
-    CardinalComparison,
-    Cardinalities,
-    CartesianProductsOfSets,
-    CoproductsOfSets,
-    CountableSets,
-    CountablyInfiniteSets,
-    DisjointUnionsOfSets,
-    EnumeratedByIntegers,
-    EnumeratedByNaturals,
-    EnumeratedSets,
-    FinitelySupportedFunctionSets,
-    FunctionSets,
-    FinitePowerSets,
-    FiniteSets,
-    FourierCharacters,
-    FunctionEnumeratedSets,
-    HermitePolynomials,
-    InfiniteSets,
-    LaurentMonomials,
-    ObjectSetsOfDiscreteCategories,
-    Ord,
-    Ordinals,
-    PartiallyOrderedSets,
-    PowerSets,
-    Set,
-    SetInjection,
-    Sets,
-    SetSurjection,
-    SincTranslates,
-    TotallyOrderedSets,
-    UncountableSets,
-    WellOrderedSets,
-    aleph,
-    aleph0,
-    cardinal,
-    continuum,
-    finite_ordered_set,
-    omega,
-    omega0,
-    ordinal,
-)
 from sage_extensions.categories.topological_spaces import (  # noqa: F401
     ContinuousMap,
     TopologicalSpaceMor,
@@ -511,67 +294,11 @@ from sage_extensions.categories.vinberg_invariants import (  # noqa: F401
 )
 from sage_extensions.logic import Predicate, Propositions, Unknown, ask  # noqa: F401
 from sage_extensions.rings import (  # noqa: F401
-    CC,
-    RR,
-    AdicallyCompleteRings,
-    AdicCompletions,
-    ArtinianRings,
-    CommutativeIdeals,
-    CommutativeRings,
-    CompleteLocalRings,
-    DistinguishedOpenSubobjects,
-    DivisionRings,
-    ExactComplexField,
-    ExactComplexNumber,
-    ExactRealField,
-    ExactRealNumber,
-    Fields,
-    FormalPowerSeriesRings,
-    I,
-    IntegralDomains,
-    LocalRings,
-    NoetherianRings,
-    NonNegativeReals,
-    NumberFieldsWithChosenPrimitiveElement,
-    OrderedRings,
-    Orders,
-    OwnedCategoryOverBaseRing,
-    OwnedDivisionRings,
-    OwnedFields,
-    OwnedNumberFields,
-    OwnedOrders,
-    OwnedRings,
-    OwnedRngs,
-    OwnedSemirings,
-    PredicateSubrings,
-    PrimeFields,
-    PrimeSpectra,
-    PrincipalIdealDomains,
-    RealApproximation,
-    Rings,
-    UnitInterval,
-    ZariskiClosedSubobjects,
     _restore_session_ring_bindings,
-    binomial,
-    cos,
-    cosh,
-    e,
-    exp,
-    log,
-    pi,
-    sech,
-    sgn,
-    sin,
-    sinh,
-    sqrt,
-    tan,
-    tanh,
-    zeta,
 )
 from sage_extensions.rings import (
     session_ring_objects as _session_ring_objects,
 )
-from sage_extensions.tensors import Tensor, TensorModule, tensor  # noqa: F401
 from sage_extensions.utilities import (
     lmap as lmap,
 )
