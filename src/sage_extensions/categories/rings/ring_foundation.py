@@ -235,10 +235,22 @@ class RingMorphism:
         return _ring_morphisms_equal(self, self.parent().identity())
 
     def _engine_is_identity(self) -> bool:
-        r"""Ask only the selected private engine realization about identity."""
-        if self._engine_morphism is None:
+        r"""Ask only the selected private engine realization about identity.
+
+        An engine map that offers no identity test of its own is not treated as the
+        identity: `__mul__` then composes with it instead of eliding the composition,
+        which is the same map.  A coercion map is the case that matters -- it is a
+        map between two different parents, so it is not an identity, and Sage's
+        `DefaultConvertMap_unique` has no `is_identity` to ask (Sage defines
+        `is_identity` on `RingHomomorphism`-like maps, not on `Map`).
+        """
+        engine = self._engine_morphism
+        if engine is None:
             return False
-        return bool(self._engine_morphism.is_identity())
+        decide = getattr(engine, "is_identity", None)
+        if decide is None:
+            return False
+        return bool(decide())
 
     def inverse(self):
         r"""Return the inverse ring map of this ring isomorphism.
