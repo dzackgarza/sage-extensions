@@ -21,4 +21,6 @@ Introduced by: main's root commit `c731175` (2026-10-26, Zack Garza <dzackgarza@
 Scope: 2 files: `test_a1_plus_a2.sage`, `test_degenerate_plane.sage` of the #408 slice (tests/objects up to
 test_isomorphisms_of_a_two_element_set.sage).
 
+Repair: open; this issue is its record.
+
 Cause C28 of the triage in results/issue408-triage.md.

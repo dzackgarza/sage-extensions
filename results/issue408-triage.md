@@ -56,7 +56,7 @@ of the same defect that sit in files now belonging to #412.
 
 | cause | defect | tests | also in #412 | introduced by | repair |
 | --- | --- | --- | --- | --- | --- |
-| C01 | The session namespace does not publish the constructors the suite names | 11 | 7 | `c731175` | repaired |
+| C01 | The session namespace does not publish the constructors the suite names | 11 | 7 | `c731175` | filed, scope beyond the slice |
 | C02 | The owned ring adapter has no constructor for the symbolic ring | 6 | 6 | `not bisected` | filed |
 | C03 | The algebraic closure of a finite field is raised with the wrong constructor arity | 1 | 0 | `c731175` | repaired |
 | C04 | The owned parent and element classes do not carry `is_isomorphic_to` | 1 | 6 | `55927425bcff` | filed |
@@ -125,9 +125,9 @@ Failing tests (11, 6 files):
 
 The same defect also fails 7 test(s) in files now belonging to #412: `tests/objects/test_root_lattice_a2.sage::test_the_categories_of_a2`, `tests/objects/test_symmetric_algebra_of_qq2.sage::test_the_categories_of_the_symmetric_algebra`, `tests/objects/test_tensor_algebra_of_qq2.sage::test_the_categories_of_the_tensor_algebra`, `tests/objects/test_tensor_product_of_zz2_and_zz3.sage::test_the_categories_of_the_tensor_product`, `tests/objects/test_trivial_connection_on_the_affine_line.sage::test_the_categories_of_the_module_with_connection`, `tests/objects/test_trivial_connection_on_the_affine_line.sage::test_every_connection_on_a_line_over_a_curve_is_flat`, `tests/objects/test_trivial_connection_on_the_affine_line.sage::test_the_module_with_connection_has_one_endomorphism_category`.
 
-- Defective call: `tests/objects/test_absolute_galois_group_of_f5.sage:5`, `tests/objects/test_cyclic_module_zz6.sage:29`, `tests/objects/test_exterior_algebra_of_qq2.sage:20`, `tests/objects/test_fractional_ideal_2z.sage:13`, `tests/objects/test_fractional_ideal_2z.sage:9`, `tests/objects/test_free_group_of_rank_two.sage:15`, `tests/objects/test_free_module_of_rank_three.sage:37`.
+- Defective call: `src/sage_extensions/all.py` (the session namespace: the names the suite resolves through `from sage_extensions.all import *`).
 - Introduced by: main's root commit `c731175` (2026-10-26, Zack Garza <dzackgarza@gmail.com>): the file was run there and the same failure appears.
-- Repair: repaired in `d38845a`; tree-wide the session-namespace repair publishes nineteen constructors. In this slice's files: `test_fractional_ideal_2z`, `test_free_group_of_rank_two`, `test_free_module_of_rank_three`, `test_cyclic_module_zz6` and `test_absolute_galois_group_of_f5` go from failing to passing for this cause; `test_exterior_algebra_of_qq2` now fails at its next defect.
+- Repair: filed with the scope of the whole session namespace, not patched here. The repair is that `sage_extensions.all` publishes the area packages' declared surfaces instead of restating them: `sage_extensions/groups/__init__.py` declares 65 names in `__all__` and `sage_extensions/categories/modules/__init__.py` declares 82, including `FinitelyPresentedModules`, `BilinearMap` and `FinitelyGeneratedFreeModules`, so a constructor an owner declares would be a session name by construction and TL13 could not report one again. It reaches the `__all__` lists, the import order `all.py` protects for the catalogue, and every test that resolves a name through the session. A list edit adding the names the current suite names was committed as `d38845a` and reverted in `7bbe4fb`: it cleared this slice's 18 TL13 findings and left 21 distinct names still reported outside it, which is the drift the mechanism produces.
 
 ### C02 — The owned ring adapter has no constructor for the symbolic ring
 
@@ -165,7 +165,7 @@ Failing tests (1, 1 file: `test_absolute_galois_group_of_f5.sage`):
 
 - Defective call: `src/sage_extensions/categories/rings/ring_foundation.py:7608`.
 - Introduced by: main's root commit `c731175` (2026-10-26, Zack Garza <dzackgarza@gmail.com>): the file was run there and the same failure appears.
-- Repair: repaired in `dda0328`; `GF(5).absolute_galois_group()` constructs, five of the six tests of `test_absolute_galois_group_of_f5.sage` pass, and the sixth fails at `ring_foundation.py:562` (its own next defect).
+- Repair: repaired in `dda0328`, docstring in `526c985`. In the image, `GF(5).absolute_galois_group()` raises `TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'` at ring_foundation.py:7608 on main `c8a3ced`, and returns an `AbsoluteGaloisGroupsOfFiniteFields` object with the repair. No failing test of the slice changes colour: its only test, `test_absolute_galois_group_of_f5.sage::test_the_field_construction_agrees`, reaches the call through the file's `galois()` helper, which names `AbsoluteGaloisGroup` -- C01 -- so it stays red until C01 is repaired.
 
 ### C04 — The owned parent and element classes do not carry `is_isomorphic_to`
 
@@ -621,39 +621,45 @@ Failing tests (1, 1 file: `test_integers.sage`):
 - Introduced by: main's root commit `c731175` (2026-10-26, Zack Garza <dzackgarza@gmail.com>): the file was run there and the same failure appears.
 - Repair: open; filed as this cause.
 
-## Repairs landed in this workstream
+## Repairs
 
-- `9157bcf` evidence: Stage every #408 cause as a paste-ready issue body (#408)
-- `e110575` evidence: Every failing test of this #408 slice is a recorded cause (#408)
-- `dda0328` fix: The algebraic closure of GF(p) is raised through the field's closure (#408)
-- `d38845a` fix: The session namespace publishes the constructors the suite names (#408)
-- `c8a3ced` evidence: The #409 slice's runs, its one red and the counts it carried
-- `fba2e71` fix: tests/test_finite_cosets.py passes the session standard and runs under `just test` (#409)
+Two commits were made as repairs and both were then re-read against `CONTRIBUTING.md`
+(`OWN-01`..`OWN-24`, `STY-*`) and `AGENTS.md`. One survived; one was reverted.
 
-Both are commits on main whose subject names #408; the two causes above are the only
-ones repaired here. Red tests: the failing tests listed under C01 and C03, which fail on
-main and pass after the corresponding commit. Per file, before -> after:
+### Kept: the algebraic closure of a finite field
 
-| file | in this slice | failing on main | after |
-| --- | --- | --- | --- |
-| `test_absolute_galois_group_of_f5.sage` | yes | 6 | 1 |
-| `test_cyclic_module_zz6.sage` | yes | 4 | 3 |
-| `test_free_group_of_rank_two.sage` | yes | 7 | 3 |
-| `test_fractional_ideal_2z.sage` | yes | 3 | 2 |
-| `test_free_module_of_rank_three.sage` | yes | 6 | 4 |
-| `test_exterior_algebra_of_qq2.sage` | yes | 3 | 3 |
-| `test_trivial_connection_on_the_affine_line.sage` | no, #412 | 3 | 0 |
-| `test_tensor_product_of_zz2_and_zz3.sage` | no, #412 | 1 | 0 |
-| `test_root_lattice_a2.sage` | no, #412 | 6 | 5 |
-| `test_symmetric_algebra_of_qq2.sage` | no, #412 | 1 | 1 |
-| `test_tensor_algebra_of_qq2.sage` | no, #412 | 2 | 2 |
-| `test_symmetric_group_s3.sage` | no, #412 | 6 | 6 |
-| `test_square_integrable_functions.sage` | no, #412 | 4 | 4 |
+- `dda0328` raises the closure through `FiniteField.algebraic_closure`, the operation
+  on the object the closure belongs to, instead of calling Sage's
+  `AlgebraicClosureFiniteField` with a characteristic where it takes `(base_ring, name)`.
+  `526c985` states in the docstring what makes that the route: Sage returns one cached
+  pseudo-Conway closure per characteristic (`GF(p).algebraic_closure() is
+  GF(p).algebraic_closure()`, measured), and raising it through the name-taking
+  constructor would coin a generator name, which an adapter may not do.
+- Verified at the call, in the image, on the tree with the namespace commit reverted:
+  on main `c8a3ced`, `GF(5).absolute_galois_group()` raises `TypeError:
+  AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'` at
+  `ring_foundation.py:7608`; with `dda0328` it returns an
+  `AbsoluteGaloisGroupsOfFiniteFields` object.
+- **No failing test of the slice changes colour.** The only test that reaches this call
+  is `test_absolute_galois_group_of_f5.sage::test_the_field_construction_agrees`, and
+  every test of that file goes through its `galois()` helper, which names
+  `AbsoluteGaloisGroup` -- the namespace cause C01. The failure set of all 13 affected
+  files is identical before and after the revert (measured, one file per run): the
+  closure's red test stays red behind C01 and goes green when C01 is repaired.
 
-Fifteen tests of the directory turn green, ten of them in this slice's files. The rows
-that do not move fail for other causes. `python -m sage_extensions.testing.test_lint
-tests/objects` reports 18 -> 0 TL13 findings; the 16 TL01/TL02/TL04/TL11 findings in the
-same files are untouched.
+### Reverted: the session namespace
+
+- `d38845a` added nineteen names to `sage_extensions/all.py`, chosen because the failing
+  tests named them. That is selection by test, and the names were never the repair's to
+  choose: the owners already declare their surfaces in `__all__`
+  (`sage_extensions/groups/__init__.py`: 65 names;
+  `sage_extensions/categories/modules/__init__.py`: 82), and `all.py`'s hand-written
+  imports are a second copy of those declarations, which is why the two had drifted.
+- `7bbe4fb` reverts it. The repair this cause needs is that the session publishes the
+  owners' declared surfaces instead of restating them, which reaches the whole session
+  namespace -- the `__all__` lists, the import order `all.py` protects for the
+  catalogue, and every test that resolves a name through the session -- so C01 is filed
+  with that scope and not patched.
 
 ## What is not done
 
@@ -662,23 +668,21 @@ same files are untouched.
    unauthenticated. Each cause is therefore committed paste-ready as
    `.tmp/qc-evidence/triage/408-<slug>.md` on main, title line first and the body after,
    for the orchestrator to file.
-2. **The other causes are not repaired.** They are filed with their evidence. The two
-   repaired ones are the two whose defect was one wrong call at one owner.
-3. **The session-namespace cause reaches beyond this slice.** Tree-wide
-   `python -m sage_extensions.testing.test_lint` still reports 21 distinct names as TL13
-   outside `tests/objects`: `GeneralLinearGroups`, `FreeGroupQuotients`,
-   `ModulesOverCommutativeRings`, `AdditiveMonoids`, `Subgroups`, `BilinearMap`,
-   `ModulesOverIntegralDomains`, `Grp`, `DifferentialGradedAlgebras`,
-   `CommutativeGradedIntegralDomains`, `NondegenerateGenericFibreFormModules`,
-   `ModuleSubobjects`, `GroupsWithChosenFinitePresentation`,
-   `FinitelyGeneratedFreeModules`, `Torsors`, `SymmetricGroups`, `PairedModules`,
-   `OrdinaryCharacterRepresentations`, `ModuleBaseRingProjection`,
-   `GeneratedSubgroups`, `FramedFreeModules`. The same repair publishes them; this
-   slice's run does not exercise them, so they are not claimed.
+2. **All but one cause is unrepaired.** Every cause but C03 is filed with its evidence.
+   C03's repair is at its owner and is verified at the call, but its only red test is
+   blocked by C01, so no failing test of the slice changes colour yet (see Repairs).
+3. **C01 is filed with the scope of the whole session namespace.** On the tree as it
+   stands, `python -m sage_extensions.testing.test_lint` over the 930 test files reports
+   117 TL13 findings over 41 distinct names -- names of owned categories and
+   constructors, the slice's own 18 among them (`AbsoluteGaloisGroup`,
+   `FinitelyPresentedModules`, `FractionalIdeals`, `ModulesWithConnection`, ...). The
+   repair is the mechanism, not the names, so this count is the evidence for the cause
+   and not a list to add.
 4. **`just test` never ran as one suite.** The image cannot run it as written (above),
    and per-file runs are what this triage measures.
-5. **The whole-directory run is not re-run after the repairs.** The per-file table above
-   is the measurement.
+5. **The whole-directory run is not re-run after the repair.** The failure set of each
+   of the 13 files that name an affected call was compared before and after, and is
+   identical; that comparison is the measurement.
 
 ## Appendix: every failing test of the slice
 

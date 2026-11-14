@@ -17,4 +17,6 @@ Introduced by: main's root commit `c731175` (2026-10-26, Zack Garza <dzackgarza@
 Scope: 1 file: `test_divisors_on_three_points.sage` of the #408 slice (tests/objects up to
 test_isomorphisms_of_a_two_element_set.sage).
 
+Repair: open; this issue is its record.
+
 Cause C20 of the triage in results/issue408-triage.md.

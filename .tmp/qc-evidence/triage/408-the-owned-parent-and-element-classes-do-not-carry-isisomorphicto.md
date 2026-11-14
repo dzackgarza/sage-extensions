@@ -19,4 +19,6 @@ Introduced by: `git bisect` in the image on the signature `object has no attribu
 Scope: 1 file: `test_a_coordinate_line_in_the_affine_plane.sage` of the #408 slice (tests/objects up to
 test_isomorphisms_of_a_two_element_set.sage).
 
+Repair: open; this issue is its record.
+
 Cause C04 of the triage in results/issue408-triage.md.

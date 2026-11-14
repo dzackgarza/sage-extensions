@@ -29,4 +29,6 @@ Introduced by: not bisected; at main's root commit the same test fails through a
 Scope: 2 files: `test_fourier_characters.sage`, `test_hermite_polynomials.sage` of the #408 slice (tests/objects up to
 test_isomorphisms_of_a_two_element_set.sage).
 
+Repair: open; this issue is its record.
+
 Cause C02 of the triage in results/issue408-triage.md.

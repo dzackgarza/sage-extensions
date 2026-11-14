@@ -21,4 +21,6 @@ Introduced by: main's root commit `c731175` (2026-10-26, Zack Garza <dzackgarza@
 Scope: 2 files: `test_cyclic_module_zz6.sage`, `test_free_module_of_rank_three.sage` of the #408 slice (tests/objects up to
 test_isomorphisms_of_a_two_element_set.sage).
 
+Repair: open; this issue is its record.
+
 Cause C27 of the triage in results/issue408-triage.md.

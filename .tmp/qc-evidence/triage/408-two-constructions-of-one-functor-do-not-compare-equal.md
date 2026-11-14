@@ -19,4 +19,6 @@ Introduced by: not bisected; at main's root commit the same test fails through a
 Scope: 2 files: `test_cocone_under_a_one_object_diagram.sage`, `test_cone_over_a_one_object_diagram.sage` of the #408 slice (tests/objects up to
 test_isomorphisms_of_a_two_element_set.sage).
 
+Repair: open; this issue is its record.
+
 Cause C31 of the triage in results/issue408-triage.md.

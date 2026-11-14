@@ -21,4 +21,6 @@ Introduced by: `git bisect` in the image on the signature `the proposition is_fi
 Scope: 2 files: `test_free_group_of_rank_two.sage`, `test_free_module_of_rank_three.sage` of the #408 slice (tests/objects up to
 test_isomorphisms_of_a_two_element_set.sage).
 
+Repair: open; this issue is its record.
+
 Cause C14 of the triage in results/issue408-triage.md.

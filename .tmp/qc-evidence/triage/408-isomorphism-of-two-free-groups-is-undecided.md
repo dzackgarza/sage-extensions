@@ -17,4 +17,6 @@ Introduced by: not bisected; at main's root commit the same test fails through a
 Scope: 1 file: `test_free_group_of_rank_two.sage` of the #408 slice (tests/objects up to
 test_isomorphisms_of_a_two_element_set.sage).
 
+Repair: open; this issue is its record.
+
 Cause C22 of the triage in results/issue408-triage.md.
