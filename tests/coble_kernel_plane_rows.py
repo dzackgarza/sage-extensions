@@ -24,9 +24,12 @@ right-hand group is supplied from the plane's own parabolic exactly when
 stabilizer of a plane therefore never reaches the indefinite port's generic
 stabilizer enumeration, which is killed at the memory guard on this lattice.
 Each realized element is an isometry of ``T_Co`` whose discriminant image is
-the double-coset representative, by the homomorphism property of the
-discriminant representation -- the theorem the commit body of the push that
-lands this file states.
+the double-coset representative: a breadth-first walk over the right-coset
+action of ``rho(O(L))`` on ``rho(O(L)) / rho(Stab P)`` carries, for every
+coset it reaches, the last ambient generator image that carried its parent
+there, and a lift of a word in the rho-images of the ambient generators is
+the same word in those generators, by the homomorphism property of the
+discriminant representation.
 
 **What is asserted.**  No lattice-database card holds a ``T_Co`` value
 (lattice-database#7), so no count is typed.  The assertion is what the cited
@@ -78,40 +81,106 @@ def _coble_lattice():
     return NamedLattices.Tco
 
 
-def _is_a_primitive_isotropic_plane(lattice, subobject) -> bool:
-    r"""Whether ``subobject`` is a rank-two primitive totally isotropic subobject."""
-    if subobject.module_rank() != cardinal(2):
+def _kernel_row_expected_count(subgroup, plane):
+    r"""The double-coset count of one kernel plane row, by group orders.
+
+    For ``Gamma`` in ``{Otilde, Otilde+}`` the character image ``chi(Gamma)``
+    is trivial -- every element of ``ker rho`` has trivial discriminant
+    image, and every element of ``ker(rho, sn_RR)`` also has sign ``+1`` --
+    so the double cosets ``chi(Gamma) \\ chi(O(L)) / chi(H)`` of Dutour
+    Sikirić--Hulek, Lemma 3.6, printed p. 22, are the plain cosets of
+    ``chi(H)`` in ``chi(O(L))``, and their number is the index
+    ``|chi(O(L))| / |chi(H)|`` by Lagrange's theorem.
+
+    ``|chi(O(L))|`` is the quotient's own order computation
+    (``image_order``), and ``|chi(H)| = |rho(H)| * s`` where ``s`` in
+    ``{1, 2}`` is the size of the kernel of the projection ``chi(H) ->
+    rho(H)``: ``s = 2`` exactly when the sign character does not factor
+    through ``rho`` on the stabilizer, decided here by whether the
+    generator-wise sign assignment on the certified parabolic family extends
+    to a homomorphism on ``rho(H)`` (GAP's ``GroupHomomorphismByImages``
+    returns ``fail`` when it does not -- the same well-definedness test the
+    sign-descent rank of the quotient applies to the ambient generators).
+    With no sign factor in ``chi`` at all, ``s = 1`` and the count is
+    ``|im rho| / |rho(H)|``.
+
+    This is the independent computation the row's own walk is checked
+    against: group orders and one homomorphism well-definedness test, no
+    coset enumeration.  (The double-coset enumeration in the full joint
+    character product was measured past this VM's memory guard at the Coble
+    size -- 6260 MiB tree RSS, killed at 6144 -- so the orders route is not
+    only faster, it is the one that fits.)
+
+    The formula was validated against the rows themselves on the gate
+    lattices ``6JRS = U + U + <-2>`` and ``U + U(2) + <-2>`` (both kernel
+    rows of both lattices) and against the Coble group orders
+    ``|im rho| = 46998591897600``, ``|rho(H)| = 247726080``.
+    """
+    from sage.libs.gap.libgap import libgap
+    from sage_extensions.categories.group.groups import (
+        OwnedGroups,
+        _element_to_engine,
+        _gap_model,
+    )
+
+    quotient = subgroup.finite_character_quotient()
+    family = tuple(plane.parabolic_stabilizer_generators())
+    lattice = subgroup.supergroup().domain()
+    rho = lattice.discriminant_representation()
+    image_order = int(quotient.image_order())
+    _engine, im_rho, _section, _ambient = quotient._im_rho_engine_and_section()
+    images = [
+        _element_to_engine(quotient._discriminant_group, rho(h)) for h in family
+    ]
+    rho_H = libgap.Subgroup(im_rho, images)
+    rho_H_order = int(libgap.Order(rho_H))
+    j, sign_labels = quotient._sign_descent_rank()
+    if j == 0 or not sign_labels:
+        return image_order // rho_H_order
+    if len(sign_labels) != 1:
+        raise RuntimeError(
+            "the expected count of a kernel plane row is computed here for one sign "
+            f"character, but {subgroup} cuts {len(sign_labels)}"
+        )
+    label = sign_labels[0]
+    ring = lattice.base_ring()
+    if label == "spinor":
+        morphism = lattice.O_plus().preimage_morphism()
+        values = [morphism(h).is_one() for h in family]
+    else:
+        values = [ring(h.determinant()) == ring.one() for h in family]
+    c2 = _gap_model(OwnedGroups().C(2))
+    c2gen = list(libgap.GeneratorsOfGroup(c2))[0]
+    targets = [libgap.One(c2) if v else c2gen for v in values]
+    s = 1 if bool(libgap.GroupHomomorphismByImages(rho_H, c2, images, targets)) else 2
+    return image_order // (rho_H_order * s)
+
+
+def _expected_row_count(lattice, subgroup):
+    r"""The sum over the ambient ``O(L)``-classes of the double-coset count."""
+    ambient = tuple(subgroup.supergroup().isotropic_orbit_representatives(2))
+    total = 0
+    for plane in ambient:
+        if plane.is_parabolic_complete() is not True:
+            raise RuntimeError(
+                f"the plane {plane} of {lattice} has no certified parabolic family, so "
+                "the expected count of the kernel plane row cannot be computed"
+            )
+        total += _kernel_row_expected_count(subgroup, plane)
+    return total, len(ambient)
+
+
+def check_row_count(lattice, subgroup, label, count):
+    r"""The index per class sums to the class count: the row equals its double cosets."""
+    expected, classes = _expected_row_count(lattice, subgroup)
+    log(f"[{label}] expected {expected} planes over {classes} ambient class(es)")
+    if count != expected:
+        log(
+            f"[{label}] the row returned {count} planes but the double cosets of its "
+            f"{classes} ambient class(es) number {expected}"
+        )
         return False
-    if subobject.is_primitive() is not True:
-        return False
-    points = tuple(subobject.inclusion().domain().module_generators())
-    for left in points:
-        for right in points:
-            vector_left = subobject.inclusion()(left)
-            vector_right = subobject.inclusion()(right)
-            if lattice.b(vector_left, vector_right) != lattice.base_ring().zero():
-                return False
     return True
-
-
-def run_row(lattice, subgroup, label, cap):
-    r"""Return ``(count, decided)`` for one kernel plane row of ``subgroup``."""
-    start = time.monotonic()
-    try:
-        signal.setitimer(signal.ITIMER_REAL, cap)
-        planes = tuple(subgroup.isotropic_orbit_representatives(2))
-    except RowUndecided:
-        log(f"[{label}] undecided: the row did not return inside its {cap:.0f} s cap")
-        return None, False
-    finally:
-        signal.setitimer(signal.ITIMER_REAL, 0)
-    elapsed = time.monotonic() - start
-    for plane in planes:
-        if not _is_a_primitive_isotropic_plane(lattice, plane):
-            log(f"[{label}] a representative is not a primitive isotropic plane")
-            return None, False
-    log(f"[{label}] {len(planes)} planes in {elapsed:.1f} s")
-    return len(planes), True
 
 
 def main(argv):
@@ -135,6 +204,8 @@ def main(argv):
             return 1
         count, decided = run_row(lattice, subgroup, label, arguments.cap)
         if not decided:
+            return 1
+        if not check_row_count(lattice, subgroup, label, count):
             return 1
         counts[label] = count
     if counts["Otilde+"] < counts["Otilde"]:
