@@ -9,6 +9,8 @@ from sage.categories.map import Map
 from sage.groups.matrix_gps.finitely_generated import MatrixGroup
 from sage.categories.morphism import Morphism
 from sage.matrix.constructor import matrix as engine_matrix
+from sage.libs.pari import pari
+from sage.matrix.special import identity_matrix
 from sage.misc.cachefunc import cached_function, cached_method
 from sage.misc.mrange import cantor_product as _engine_cantor_product
 from sage.quadratic_forms.binary_qf import BinaryQF
@@ -3285,6 +3287,55 @@ def _orthogonal_group_is_finite_by_theorem(lattice) -> bool:
 
 
 
+def _summandwise_isometry(source, target):
+    r"""The column action ``W`` with ``W~ target W == source`` found summand by summand, ``False``, or ``None``.
+
+    Both positive definite Grams are split into indecomposable summands
+    (``_indecomposable_summands``); the decomposition is unique (Eichler),
+    so an isometry exists exactly when the summands match in isometric
+    pairs, and it is assembled from one PARI ``qfisom`` per matched pair
+    (Plesken-Souvignier on that summand's short vectors only). ``None``
+    means a decomposition is not decided, and the caller searches the whole
+    Gram.
+    """
+    source_summands = _indecomposable_summands(source)
+    target_summands = _indecomposable_summands(target)
+    if source_summands is None or target_summands is None:
+        return None
+    if len(source_summands) == 1 and len(target_summands) == 1:
+        return None
+    if len(source_summands) != len(target_summands):
+        return False
+    unmatched = list(range(len(target_summands)))
+    source_columns = []
+    target_columns = []
+    for source_basis in source_summands:
+        source_gram = source_basis * source * source_basis.transpose()
+        for position in unmatched:
+            target_basis = target_summands[position]
+            if target_basis.nrows() != source_basis.nrows():
+                continue
+            target_gram = target_basis * target * target_basis.transpose()
+            witness = pari(target_gram).qfisom(pari(source_gram))
+            if witness:
+                local = engine_matrix(SageZZ, witness.sage())
+                if local.transpose() * target_gram * local != source_gram:
+                    local = local.inverse()
+                assert local.transpose() * target_gram * local == source_gram, (
+                    "the qfisom witness does not carry one summand form to the other"
+                )
+                unmatched.remove(position)
+                source_columns.extend(source_basis.rows())
+                target_columns.extend((local.transpose() * target_basis).rows())
+                break
+        else:
+            return False
+    # W sends the source summand basis to the matched target images.
+    source_change = engine_matrix(SageZZ, source_columns).transpose()
+    target_change = engine_matrix(SageZZ, target_columns).transpose()
+    return target_change * source_change.inverse()
+
+
 @cached_function
 def _definite_isometry_matrix(domain_gram, codomain_gram, sign):
     r"""The column-action isometry ``W`` with ``W~ codomain W == domain``, or ``False``.
@@ -3323,9 +3374,11 @@ def _definite_isometry_matrix(domain_gram, codomain_gram, sign):
     if reduced_source == reduced_target:
         transformation = target_transformation.sage() * source_transformation.sage().inverse()
     else:
-        reduced_source_form = QuadraticForm(SageZZ, reduced_source)
-        reduced_target_form = QuadraticForm(SageZZ, reduced_target)
-        transformation = reduced_target_form.is_globally_equivalent_to(reduced_source_form, return_matrix=True)
+        transformation = _summandwise_isometry(reduced_source, reduced_target)
+        if transformation is None:
+            reduced_source_form = QuadraticForm(SageZZ, reduced_source)
+            reduced_target_form = QuadraticForm(SageZZ, reduced_target)
+            transformation = reduced_target_form.is_globally_equivalent_to(reduced_source_form, return_matrix=True)
         if transformation is not False:
             transformation = target_transformation.sage() * transformation * source_transformation.sage().inverse()
     if transformation is False:
@@ -3336,22 +3389,154 @@ def _definite_isometry_matrix(domain_gram, codomain_gram, sign):
     return transformation
 
 
+def _lll_basis(basis, gram):
+    r"""The rows of ``basis`` changed to an LLL-reduced basis of their span for ``gram`` (PARI ``qflllgram``)."""
+    reduction = pari(basis * gram * basis.transpose()).qflllgram().sage()
+    return reduction.transpose() * basis
+
+
+def _indecomposable_summands(gram):
+    r"""Row bases of the indecomposable orthogonal summands of a positive definite ``gram``, or ``None``.
+
+    Kneser's construction (Kneser, *Quadratische Formen*, section 27; the
+    decomposition is unique by Eichler's theorem): a minimal vector is not
+    the sum of two nonzero orthogonal vectors, so the minimal vectors fall
+    into the summands along the connected components of their
+    nonorthogonality graph. The saturated span of a component, its minimal
+    vectors spanning it with finite index along a connected graph, is an
+    indecomposable summand when it splits off orthogonally; the orthogonal
+    complement of those summands is decomposed the same way. ``None`` means
+    a step did not split off orthogonally, so the decomposition is not
+    decided by this construction.
+    """
+    rank = gram.nrows()
+    if rank == 1:
+        return (identity_matrix(SageZZ, 1),)
+    vectors = engine_matrix(SageZZ, pari(gram).qfminim()[2].sage()).columns()
+    unseen = set(range(len(vectors)))
+    components = []
+    while unseen:
+        stack = [unseen.pop()]
+        component = []
+        while stack:
+            current = stack.pop()
+            component.append(vectors[current])
+            for other in tuple(unseen):
+                if vectors[current] * gram * vectors[other] != 0:
+                    unseen.remove(other)
+                    stack.append(other)
+        components.append(component)
+    pieces = [engine_matrix(SageZZ, component).row_module().basis_matrix().saturation() for component in components]
+    if len(pieces) == 1 and pieces[0].nrows() == rank:
+        return (identity_matrix(SageZZ, rank),)
+    spanned = engine_matrix(SageZZ, [row for piece in pieces for row in piece.rows()])
+    complement = (spanned * gram).right_kernel_matrix()
+    if complement.nrows() + spanned.nrows() != rank:
+        return None
+    whole = spanned.stack(complement) if complement.nrows() else spanned
+    if abs(whole.det()) != 1:
+        return None
+    summands = [_lll_basis(piece, gram) for piece in pieces]
+    if complement.nrows():
+        rest = _indecomposable_summands(complement * gram * complement.transpose())
+        if rest is None:
+            return None
+        summands.extend(_lll_basis(basis * complement, gram) for basis in rest)
+    return tuple(summands)
+
+
 @cached_function
 def _definite_automorphisms(gram):
     r"""``|O(L)|`` and row-action generators for the positive definite integral Gram ``gram``.
 
-    One PARI ``qfauto`` call (PARI 2.17 manual, ``qfauto``) returns the order
-    and generators acting on columns; they are transposed to row actions.
+    PARI's ``qfauto`` (PARI 2.17 manual, ``qfauto``) enumerates the vectors
+    up to the largest diagonal entry of the form it is given, which for
+    ``E_8 + <2n>`` is every ``E_8`` vector of norm up to ``2n``. The Gram is
+    first split into its indecomposable orthogonal summands
+    (``_indecomposable_summands``), each in an LLL-reduced basis. The
+    decomposition into indecomposables is unique (Eichler), so
+    ``O(L)`` is the product over isometry classes of blocks of the wreath
+    products ``O(B) wr S_k``: generated by each block's ``qfauto``
+    generators and, for isometric blocks, the swaps by a ``qfisom``
+    witness. When the summands are not decided, or there is one, a single
+    ``qfauto`` call on the whole Gram decides it.
+    Generators act on columns in PARI and are transposed to row actions.
     The group depends only on the Gram matrix, so it is computed once per
     Gram for every lattice object carrying it.
     """
-    from sage.libs.pari import pari
+    from sage.arith.misc import factorial
 
-    order_and_generators = pari(gram).qfauto()
-    return SageZZ(order_and_generators[0]), tuple(
-        engine_matrix(SageZZ, generator.sage()).transpose()
-        for generator in order_and_generators[1]
-    )
+    summands = _indecomposable_summands(gram)
+    if summands is None or len(summands) == 1:
+        order_and_generators = pari(gram).qfauto()
+        return SageZZ(order_and_generators[0]), tuple(
+            engine_matrix(SageZZ, generator.sage()).transpose()
+            for generator in order_and_generators[1]
+        )
+    # Column action in the basis adapted to the summands.
+    change = engine_matrix(SageZZ, [row for basis in summands for row in basis.rows()]).transpose()
+    reduced = change.transpose() * gram * change
+    blocks = []
+    start = 0
+    for basis in summands:
+        blocks.append(tuple(range(start, start + basis.nrows())))
+        start += basis.nrows()
+    block_grams = tuple(reduced.matrix_from_rows_and_columns(block, block) for block in blocks)
+    size = reduced.nrows()
+    classes = []
+    for position, block_gram in enumerate(block_grams):
+        for members in classes:
+            first = members[0]
+            if block_grams[first].nrows() == block_gram.nrows():
+                witness = pari(block_grams[first]).qfisom(pari(block_gram))
+                if witness:
+                    members.append((position, engine_matrix(SageZZ, witness.sage())))
+                    break
+        else:
+            classes.append([position])
+    order = SageZZ.one()
+    column_generators = []
+    for members in classes:
+        first = members[0]
+        first_block = blocks[first]
+        order_and_generators = pari(block_grams[first]).qfauto()
+        order *= SageZZ(order_and_generators[0]) ** len(members) * factorial(len(members))
+        for generator in order_and_generators[1]:
+            local = generator.sage()
+            embedded = identity_matrix(SageZZ, size)
+            for row, source_row in enumerate(first_block):
+                for column, source_column in enumerate(first_block):
+                    embedded[source_row, source_column] = local[row, column]
+            column_generators.append(embedded)
+        for position, witness in members[1:]:
+            block = blocks[position]
+            if witness.transpose() * block_grams[first] * witness == block_grams[position]:
+                forward = witness
+            else:
+                forward = witness.inverse()
+            assert forward.transpose() * block_grams[first] * forward == block_grams[position], (
+                "the qfisom witness does not carry one block form to the other"
+            )
+            backward = forward.inverse()
+            swap = identity_matrix(SageZZ, size)
+            for index in first_block + block:
+                swap[index, index] = 0
+            for row, source_row in enumerate(first_block):
+                for column, source_column in enumerate(block):
+                    swap[source_row, source_column] = forward[row, column]
+            for row, source_row in enumerate(block):
+                for column, source_column in enumerate(first_block):
+                    swap[source_row, source_column] = backward[row, column]
+            column_generators.append(swap)
+    change_inverse = change.inverse()
+    generators = []
+    for generator in column_generators:
+        assert generator.transpose() * reduced * generator == reduced, (
+            "a block generator does not preserve the reduced Gram"
+        )
+        original = change * generator * change_inverse
+        generators.append(engine_matrix(SageZZ, original).transpose())
+    return order, tuple(generators)
 
 class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
     r"""``Isom(L, M)``: the core Mor of ``Lattices(R)``, its isomorphisms being the isometries.
