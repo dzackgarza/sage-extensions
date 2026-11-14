@@ -16,7 +16,7 @@ The same defect also fails `tests/objects/test_standard_triangle.sage::test_the_
 
 Defective call: /repos/sage-extensions/src/sage_extensions/logic.py:44.
 
-Introduced by: not bisected; at main's root commit the same test fails through an earlier error, so bisecting this signature reports the commit that unmasked the defect.
+Introduced by: `git bisect` in the image on the signature `the proposition is_finite(`; the first commit where it appears is `6c381ada0f03` -- fix: export the group owner, and compare the Sterk archive table in one representation (agent <agent@nucleus.local>), in 11 bisect steps.
 
 Scope: 2 files: `test_free_group_of_rank_two.sage`, `test_free_module_of_rank_three.sage` of the #408 slice (tests/objects up to
 test_isomorphisms_of_a_two_element_set.sage).

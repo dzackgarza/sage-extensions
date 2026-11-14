@@ -69,7 +69,7 @@ of the same defect that sit in files now belonging to #412.
 | C11 | `NumberFields()` does not carry `ring_of_integers` | 1 | 0 | `c731175` | filed |
 | C12 | `cardinality` refuses for the embedding set `Emb(L, L')` | 1 | 2 | `not bisected` | filed |
 | C13 | `cardinality` refuses for a group whose finiteness is a `Predicate` | 1 | 2 | `c731175` | filed |
-| C14 | A `Predicate` is evaluated as a Python truth value | 2 | 4 | `not bisected` | filed |
+| C14 | A `Predicate` is evaluated as a Python truth value | 2 | 4 | `6c381ada0f03` | filed |
 | C15 | `module_rank` refuses for a module over a non-field base | 2 | 1 | `c731175` | filed |
 | C16 | A cone or cocone morphism is constructed with one cone | 4 | 0 | `not bisected` | filed |
 | C17 | `GL` of a torsion module is refused | 1 | 1 | `not bisected` | filed |
@@ -127,7 +127,7 @@ The same defect also fails 7 test(s) in files now belonging to #412: `tests/obje
 
 - Defective call: `tests/objects/test_absolute_galois_group_of_f5.sage:5`, `tests/objects/test_cyclic_module_zz6.sage:29`, `tests/objects/test_exterior_algebra_of_qq2.sage:20`, `tests/objects/test_fractional_ideal_2z.sage:13`, `tests/objects/test_fractional_ideal_2z.sage:9`, `tests/objects/test_free_group_of_rank_two.sage:15`, `tests/objects/test_free_module_of_rank_three.sage:37`.
 - Introduced by: main's root commit `c731175` (2026-10-26, Zack Garza <dzackgarza@gmail.com>): the file was run there and the same failure appears.
-- Repair: repaired in `57208eb`; tree-wide the session-namespace repair publishes nineteen constructors. In this slice's files: `test_fractional_ideal_2z`, `test_free_group_of_rank_two`, `test_free_module_of_rank_three`, `test_cyclic_module_zz6` and `test_absolute_galois_group_of_f5` go from failing to passing for this cause; `test_exterior_algebra_of_qq2` now fails at its next defect.
+- Repair: repaired in `d38845a`; tree-wide the session-namespace repair publishes nineteen constructors. In this slice's files: `test_fractional_ideal_2z`, `test_free_group_of_rank_two`, `test_free_module_of_rank_three`, `test_cyclic_module_zz6` and `test_absolute_galois_group_of_f5` go from failing to passing for this cause; `test_exterior_algebra_of_qq2` now fails at its next defect.
 
 ### C02 — The owned ring adapter has no constructor for the symbolic ring
 
@@ -165,7 +165,7 @@ Failing tests (1, 1 file: `test_absolute_galois_group_of_f5.sage`):
 
 - Defective call: `src/sage_extensions/categories/rings/ring_foundation.py:7608`.
 - Introduced by: main's root commit `c731175` (2026-10-26, Zack Garza <dzackgarza@gmail.com>): the file was run there and the same failure appears.
-- Repair: repaired in `6df56ad`; `GF(5).absolute_galois_group()` constructs, five of the six tests of `test_absolute_galois_group_of_f5.sage` pass, and the sixth fails at `ring_foundation.py:562` (its own next defect).
+- Repair: repaired in `dda0328`; `GF(5).absolute_galois_group()` constructs, five of the six tests of `test_absolute_galois_group_of_f5.sage` pass, and the sixth fails at `ring_foundation.py:562` (its own next defect).
 
 ### C04 — The owned parent and element classes do not carry `is_isomorphic_to`
 
@@ -319,7 +319,7 @@ Failing tests (2, 2 files: `test_free_group_of_rank_two.sage`, `test_free_module
 The same defect also fails 4 test(s) in files now belonging to #412: `tests/objects/test_standard_triangle.sage::test_the_order_of_the_vertices_does_not_matter`, `tests/objects/test_two_hyperbolic_planes.sage::test_the_orthogonal_group_is_infinite`, `tests/objects/test_two_hyperbolic_planes.sage::test_an_isotropic_plane_and_its_stabilizer`, `tests/objects/test_two_hyperbolic_planes.sage::test_an_isotropic_flag_and_its_stabilizer`.
 
 - Defective call: `src/sage_extensions/logic.py:44`.
-- Introduced by: not bisected; at main's root commit the same test fails through an earlier error, so bisecting this signature reports the commit that unmasked the defect.
+- Introduced by: `git bisect` in the image on the signature `the proposition is_finite(`; the first commit where it appears is `6c381ada0f03` -- fix: export the group owner, and compare the Sterk archive table in one representation (agent <agent@nucleus.local>), in 11 bisect steps.
 - Repair: open; filed as this cause.
 
 ### C15 — `module_rank` refuses for a module over a non-field base
@@ -623,12 +623,12 @@ Failing tests (1, 1 file: `test_integers.sage`):
 
 ## Repairs landed in this workstream
 
-- `8a9845b` evidence: Every failing test of this #408 slice is a recorded cause (#408)
-- `6df56ad` fix: The algebraic closure of GF(p) is raised through the field's closure (#408)
-- `57208eb` fix: The session namespace publishes the constructors the suite names (#408)
-- `9b29712` Merge remote-tracking branch 'origin/main' into perf/correctness-sample
-- `0ee5ad5` perf: definite Aut and isometry on the indecomposable decomposition
-- `484e4c5` perf: one engine sift per coset of the kernel image; the 4.3.8 chamber from a vertex (#402)
+- `9157bcf` evidence: Stage every #408 cause as a paste-ready issue body (#408)
+- `e110575` evidence: Every failing test of this #408 slice is a recorded cause (#408)
+- `dda0328` fix: The algebraic closure of GF(p) is raised through the field's closure (#408)
+- `d38845a` fix: The session namespace publishes the constructors the suite names (#408)
+- `c8a3ced` evidence: The #409 slice's runs, its one red and the counts it carried
+- `fba2e71` fix: tests/test_finite_cosets.py passes the session standard and runs under `just test` (#409)
 
 Both are commits on main whose subject names #408; the two causes above are the only
 ones repaired here. Red tests: the failing tests listed under C01 and C03, which fail on
