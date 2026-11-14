@@ -67,6 +67,66 @@ def _has_finite_free_framing(module) -> bool:
     return _coordinate_framed_free_module(module, module.base_ring())
 
 
+def _engine_matrix_mor(parent) -> bool:
+    r"""Whether the arrows of ``parent`` are framed matrices over an exact engine.
+
+    That is a Mor of finite framed free modules (``MatrixSpaces``) whose
+    scalars have exact linear algebra.  Its arrows are then determined by one
+    engine matrix, and their evaluation, sums, negatives, scalar multiples,
+    composites and comparison are engine products.  The decision depends only
+    on the Mor, so it is made once per Mor.
+    """
+    decision = parent.__dict__.get("_engine_matrix_mor_decision")
+    if decision is not None:
+        return decision
+    from sage_extensions.categories.modules.pure.modules import MatrixSpaces
+
+    # A Mor whose arrows carry no scalar enrichment (isometries of formed
+    # modules, for instance) records no base ring and is no space of matrices.
+    ring = parent.base_ring()
+    decision = ring is not None and parent in MatrixSpaces(ring) and _linear_algebra_ring(ring).is_exact() is True
+    parent._engine_matrix_mor_decision = decision
+    return decision
+
+
+def _available_engine_matrix(arrow):
+    r"""The retained framed engine matrix of ``arrow``, or ``None`` outside a matrix Mor.
+
+    An arrow of a matrix Mor without a retained matrix has it materialized
+    once from its generator images (:func:`_engine_matrix`).
+    """
+    backend = arrow._engine_matrix_cache
+    if backend is not None:
+        return backend
+    if not _engine_matrix_mor(arrow.parent()):
+        return None
+    from sage_extensions.categories.modules.pure.modules import _engine_matrix
+
+    _engine_matrix(arrow)
+    return arrow._engine_matrix_cache
+
+
+def _engine_arrow(parent, backend):
+    r"""The arrow of the matrix Mor ``parent`` with framed engine matrix ``backend``.
+
+    Callers are the Mor operations (sum, negative, scalar multiple, composite)
+    on arrows already admitted as linear, so linear extension of the columns is
+    linear by the module axioms and no relation check is made.
+    """
+    from sage_extensions.categories.modules.pure.modules import _linear_arrow_from_engine_matrix
+
+    backend.set_immutable()
+    return _linear_arrow_from_engine_matrix(parent, backend)
+
+
+def _engine_operands(parent, *arrows):
+    r"""The engine matrices of ``arrows`` when ``parent`` is a matrix Mor and each has one, else ``None``."""
+    if not _engine_matrix_mor(parent):
+        return None
+    backends = tuple(_available_engine_matrix(arrow) for arrow in arrows)
+    return None if any(backend is None for backend in backends) else backends
+
+
 def _finite_generating_elements(module):
     r"""A finite generating set of ``module``, or ``None`` when none is supplied.
 
@@ -951,6 +1011,9 @@ class ModuleMorphismMethods:
         left, right = _scalar_identity_coefficient(self, parent), _scalar_identity_coefficient(summand, parent)
         if left is not None and right is not None:
             return parent._scalar_identity(left + right)
+        backends = _engine_operands(parent, self, summand)
+        if backends is not None:
+            return _engine_arrow(parent, backends[0] + backends[1])
         return parent.element_class(
             parent,
             lambda element: self(element) + summand(element),
@@ -966,6 +1029,9 @@ class ModuleMorphismMethods:
         scalar = _scalar_identity_coefficient(self, parent)
         if scalar is not None:
             return parent._scalar_identity(-scalar)
+        backends = _engine_operands(parent, self)
+        if backends is not None:
+            return _engine_arrow(parent, -backends[0])
         return parent.element_class(
             parent,
             lambda element: -self(element),
@@ -1000,6 +1066,11 @@ class ModuleMorphismMethods:
         left, right = _scalar_identity_coefficient(self, self.parent()), _scalar_identity_coefficient(other, self.parent())
         if left is not None and right is not None and (left == right) is True:
             return op == op_EQ
+        backends = _engine_operands(self.parent(), self, other)
+        if backends is not None:
+            # Arrows of one matrix Mor are equal exactly when their framed
+            # matrices are; both are already admitted as linear.
+            return (backends[0] == backends[1]) == (op == op_EQ)
         undecided = AtomicProposition("equal", self, other)
         elements = _finite_generating_elements(self.domain())
         if elements is None:
@@ -1102,28 +1173,68 @@ class ModuleMorphismMethods:
     def _call_(self, element):
         if element.parent() is not self.domain():
             element = self.domain()(element)
+        backend = self._engine_matrix_cache
+        if backend is not None and backend.base_ring().is_exact() is True:
+            return self._engine_image(backend, element)
         if self._element_function is not None:
             image = self._element_function(element)
             return image if image.parent() is self.codomain() else self.codomain()(image)
         coordinates = self.domain()._framing_lift(element)
-        backend = self._engine_matrix_cache
-        if backend is not None and backend.base_ring().is_exact() is True:
-            from sage.matrix.constructor import matrix as sage_matrix
-
-            # For left modules, row coefficients act by x*A^t. This
-            # retains coefficient order over noncommutative rings too.
-            ring = self.codomain().base_ring()
-            positions = {label: index for index, label in enumerate(self.parent().column_index_set())}
-            coefficients = coordinates.parent()._selected_module_coefficients(coordinates)
-            values = [backend.base_ring().zero()] * backend.ncols()
-            for label, coefficient in coefficients.items():
-                values[positions[label]] = _linear_algebra_element(ring, coefficient)
-            image = sage_matrix(backend.base_ring(), 1, backend.ncols(), values) * backend.transpose()
-            return self.codomain().linear_combination({
-                label: _owned_engine_element(ring, image[0, index])
-                for index, label in enumerate(self.parent().row_index_set())
-            })
         return self._linear_combination_of_generator_images(coordinates)
+
+    def _engine_image(self, backend, element):
+        r"""Evaluate the retained framed matrix ``A`` at ``element``: one engine product ``x A^t``.
+
+        For left modules, row coefficients act by ``x A^t``; this retains
+        coefficient order over noncommutative rings too.
+        """
+        from sage.modules.free_module_element import vector as engine_vector
+
+        from sage_extensions.categories.modules.framed.framed_free_modules import _SparseFreeModuleElement
+
+        parent = self.parent()
+        codomain = self.codomain()
+        ring = codomain.base_ring()
+        frame = parent.__dict__.get("_engine_frame")
+        if frame is None:
+            row_labels = tuple(parent.row_index_set())
+            # The codomain's framing is its selected basis: a coordinate
+            # family raises to the sparse element with those coefficients,
+            # and over the ring itself (one basis vector, the unit) to the
+            # scalar.
+            match codomain:
+                case _ if codomain is ring and len(row_labels) == 1 and (codomain.module_generator(row_labels[0]) == ring.one()) is True:
+                    raised = "scalar"
+                case _ if issubclass(codomain.element_class, _SparseFreeModuleElement):
+                    raised = "sparse"
+                case _:
+                    raised = "combination"
+            frame = (
+                {label: index for index, label in enumerate(parent.column_index_set())},
+                row_labels,
+                raised,
+            )
+            parent._engine_frame = frame
+        positions, row_labels, raised = frame
+        coordinates = self.domain()._framing_lift(element)
+        coefficients = coordinates.parent()._selected_module_coefficients(coordinates)
+        values = [backend.base_ring().zero()] * backend.ncols()
+        for label, coefficient in coefficients.items():
+            values[positions[label]] = _linear_algebra_element(ring, coefficient)
+        image = backend * engine_vector(backend.base_ring(), values)
+        match raised:
+            case "scalar":
+                return _owned_engine_element(ring, image[0])
+            case "sparse":
+                return codomain.element_class(codomain, {
+                    label: _owned_engine_element(ring, image[index])
+                    for index, label in enumerate(row_labels)
+                })
+            case "combination":
+                return codomain.linear_combination({
+                    label: _owned_engine_element(ring, image[index])
+                    for index, label in enumerate(row_labels)
+                })
 
     def alternating_extension(self):
         r"""Extend this linear map through the exterior-algebra universal property."""
@@ -3110,6 +3221,9 @@ class _ModuleMorCommonMethods:
         right_scalar = _scalar_identity_coefficient(right, self)
         if left_scalar is not None and right_scalar is not None:
             return self._scalar_identity(left_scalar * right_scalar)
+        backends = _engine_operands(self, left, right)
+        if backends is not None:
+            return _engine_arrow(self, backends[0] * backends[1])
         return self.element_class(
             self,
             lambda element: left(right(element)),
@@ -3134,6 +3248,10 @@ class _ModuleMorCommonMethods:
         coefficient = _scalar_identity_coefficient(morphism, self)
         if coefficient is not None:
             return self._scalar_identity(scalar * coefficient)
+        backends = _engine_operands(self, morphism)
+        if backends is not None and self.base_ring() is self.codomain().base_ring():
+            # (r f)(m) = r f(m) scales every image column on the left.
+            return _engine_arrow(self, _linear_algebra_element(self.base_ring(), scalar) * backends[0])
         return self.element_class(
             self,
             lambda element: self._apply_pointwise_scalar(scalar, morphism(element)),

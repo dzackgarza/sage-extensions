@@ -191,6 +191,7 @@ from sage_extensions.categories.rings.ring_foundation import (
     _engine_ring,
     _own_ring,
     _engine_ring_value,
+    _linear_algebra_ring,
     _owned_engine_element,
     _OwnedRingParent,
     _owned_integers,
@@ -10708,8 +10709,22 @@ class Lattices(OwnedCategoryOverBaseRing):
                 sage: e, f = U.module_generators()
                 sage: e.to_covector().parent() is U.dual_module()
                 True
+                sage: f.to_covector() == U.algebraic_correlation_morphism()(f)
+                True
+
+            The covector ``b(v, -)`` is the row ``v^T G`` of the retained
+            Gram, one engine product; it is linear by construction.
             """
-            return self.parent().algebraic_correlation_morphism()(self)
+            from sage.matrix.constructor import matrix as engine_matrix
+            from sage_extensions.categories.modules.module_morphisms.module_morphisms import _engine_arrow
+
+            lattice = self.parent()
+            ring, labels, gram = lattice._engine_gram()
+            coordinates = self.to_vector()
+            row = engine_vector(gram.base_ring(), [_engine_ring_value(ring, coordinates(label)) for label in labels]) * gram
+            dual = lattice.dual_module()
+            backend = engine_matrix(gram.base_ring(), 1, len(labels), list(row))
+            return _engine_arrow(dual, backend.change_ring(_linear_algebra_ring(dual.base_ring())))
 
         def sublattice(self):
             r"""Return \(Rv\hookrightarrow L\): the rank-one subobject spanned by this vector, with its inclusion."""

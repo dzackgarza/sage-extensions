@@ -7761,6 +7761,23 @@ def _morphism_from_engine_matrix(mor, backend):
         raise ValueError(f"the matrix has shape {backend.dimensions()}, not {mor.matrix_shape()}")
     snapshot = copy(backend.change_ring(_linear_algebra_ring(ring)))
     snapshot.set_immutable()
+    # Construct from the framed matrix datum and check its module relations.
+    morphism = _linear_arrow_from_engine_matrix(mor, snapshot)
+    morphism.validate_linearity()
+    return morphism
+
+
+def _linear_arrow_from_engine_matrix(mor, snapshot):
+    r"""The arrow of the matrix Mor ``mor`` whose framed matrix is the immutable ``snapshot``.
+
+    Internal constructor for pre-validated data: the caller states why the
+    linear extension of these columns is linear (a sum, negative, scalar
+    multiple or composite of linear arrows, or the correlation of a form on a
+    free module).  The public entry :func:`_morphism_from_engine_matrix`
+    checks the module relations.  Column ``s`` is the coordinate vector of the
+    image of ``e_s``; the generator images are raised from it when used.
+    """
+    ring = mor.base_ring()
     row_labels = tuple(mor.row_index_set())
     column_positions = {label: position for position, label in enumerate(mor.column_index_set())}
 
@@ -7771,9 +7788,7 @@ def _morphism_from_engine_matrix(mor, backend):
             for row_label, coefficient in zip(row_labels, column, strict=True)
         })
 
-    # Construct from the framed matrix datum and check its module relations.
     morphism = mor.element_class(mor, image)
-    morphism.validate_linearity()
     morphism._engine_matrix_cache = snapshot
     return morphism
 
