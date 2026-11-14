@@ -893,6 +893,12 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             section 4.1). The generators are those of GAP's small generating
             set, not the ``|orbit| * |letters|`` Schreier generators of the
             orbit search.
+
+            GAP's group constructor takes the identity beside the generators,
+            and the identity is a datum of ``G``: it is read from ``G`` itself,
+            so a generating family of any length presents the same group. The
+            trivial group has the empty family, and ``G``'s point stabilizers
+            there are trivial, which is the answer this hook returns.
             """
             group = self.acting_group()
             if not (
@@ -902,12 +908,6 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             ):
                 return None
             generators = tuple(group.group_generators())
-            if not generators:
-                # A group presented by no generators is the trivial group, so
-                # every point stabilizer is trivial and there is no image
-                # element to build from.  GAP's GroupByGenerators needs an
-                # identity element, which an empty family does not supply.
-                return group.subgroup((group.one(),))
             representation = self.permutation_representation()
             symmetric = representation.codomain()
             engine_generators = libgap([libgap(group._to_engine(generator)) for generator in generators])
@@ -916,7 +916,10 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                 for generator in generators
             ])
             homomorphism = libgap.GroupHomomorphismByImagesNC(
-                libgap.Group(engine_generators, libgap.Identity(engine_generators[0])),
+                libgap.Group(
+                    engine_generators,
+                    libgap.Identity(libgap(group._to_engine(group.one()))),
+                ),
                 libgap.SymmetricGroup(int(self.point_set().cardinality())),
                 engine_generators,
                 images,
