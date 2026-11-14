@@ -7608,11 +7608,9 @@ def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingPare
     ``FiniteField.algebraic_closure``, which returns one cached pseudo-Conway
     closure per characteristic (``GF(p).algebraic_closure() is
     GF(p).algebraic_closure()``), and that is the instance Sage's own
-    finite-field constructions resolve to.  Raising the closure through
-    ``AlgebraicClosureFiniteField`` instead would require a generator name, and
-    a name coined by an adapter is never a construction: Sage's constructor
-    takes ``(base_ring, name)``, so the characteristic this function is keyed by
-    does not select any closure there.
+    finite-field constructions resolve to.  A generator name coined here would
+    be the adapter's, not the construction's, so the closure is not raised
+    through a constructor that takes one.
     """
     engine = SageGF(int(characteristic)).algebraic_closure()
     return _OwnedRingParent(
