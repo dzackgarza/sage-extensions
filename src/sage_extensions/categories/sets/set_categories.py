@@ -16,7 +16,6 @@ from sage.categories.sets_cat import Sets as SageSets
 from sage.misc.abstract_method import abstract_method
 from sage.misc.cachefunc import cached_function, cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
-from sage.rings.rational_field import QQ as SageQQ
 from sage.sets.disjoint_set import DisjointSet as SageDisjointSet
 from sage.sets.set import Set as SageSet
 from sage.structure.element import Element
@@ -2650,10 +2649,18 @@ class Sets(CategoryPacketMethods, OwnedCategory):
 
         @cached_method
         def __pow__(self, exponent):
-            r"""Return $X^n$, the product of the constant family over `Sets.Δ[n-1]`."""
-            count = _cardinality_number(
-                exponent, what=f"the power X^n of {self}"
-            )
+            r"""Return $X^n$, the product of the constant family over `Sets.Δ[n-1]`.
+
+            The exponent is a natural number, so it is read where a natural number
+            is read: `NN` decides the admission of the value it is handed and
+            refuses a negative, fractional or foreign one with a `ValueError`.
+            Python's `int` is not that boundary -- it truncates a fraction into a
+            different product, and it refuses an owned number with `TypeError`.
+            `NN` is usable here because its admission is decided from the value
+            itself, not through the owned rings, which are still being built when
+            a module of this tree states a product at import (`tensors/tensor.py`).
+            """
+            count = int(NN(exponent))
             return Sets().product(indexed_family(Sets.Δ[count - 1], lambda index: self))
 
         def subsets_of_size(self, size: int) -> Sets().ObjectType:
@@ -3783,31 +3790,6 @@ def _exponential_of_sets(codomain: Parent, exponent: Parent) -> Sets().ObjectTyp
     return FunctionSets()(codomain, exponent)
 
 
-def _cardinality_number(value, *, what: str) -> int:
-    r"""Read ``value`` as a nonnegative integer at the owned numeral boundary.
-
-    The set constructions share this normalization: a cardinality arrives as a
-    Python numeral or as an owned number, and a fractional one names no
-    cardinality at all.  Python's ``int`` is the wrong boundary on both counts:
-    it truncates \(3/2\) to \(1\), which would silently build a different set,
-    and it raises ``TypeError`` rather than the stated ``ValueError`` when it is
-    handed an owned element.  A Python numeral is answered without the owned
-    rings, which are still being built when this module's own constructions run.
-    """
-    if value in SageZZ:
-        number = int(value)
-    else:
-        from sage_extensions.categories.rings.ring_foundation import _engine_numeral
-
-        number = _engine_numeral(SageQQ, value)
-        if number.denominator() != 1:
-            raise ValueError(f"{what} must be a nonnegative integer, not {value!r}")
-        number = int(number)
-    if number < 0:
-        raise ValueError(f"{what} must be a nonnegative integer, not {value!r}")
-    return number
-
-
 class FixedCardinalitySubsetSets(OwnedCategory):
     r"""The sets \([X]^k\) of subsets of one fixed finite cardinality."""
 
@@ -3824,10 +3806,7 @@ class FixedCardinalitySubsetSets(OwnedCategory):
             raise ValueError(
                 f"fixed-cardinality subsets require a set source, not {source!r}"
             )
-        selected_size = _cardinality_number(
-            subset_cardinality, what="the cardinality of a subset"
-        )
-        subset_cardinality = selected_size
+        subset_cardinality = int(NN(subset_cardinality))
         placements = [
             self,
             _cardinalities().set_subset_category(source, fixed_size=subset_cardinality),
@@ -3846,9 +3825,7 @@ class FixedCardinalitySubsetSets(OwnedCategory):
     class ParentMethods:
         def __init__(self, source: Parent, subset_cardinality: int, **rest) -> None:
             self._source = source
-            self._subset_cardinality = _cardinality_number(
-                subset_cardinality, what="the set of k-element subsets"
-            )
+            self._subset_cardinality = int(subset_cardinality)
             assert self._subset_cardinality >= 0, (
                 f"the set of k-element subsets of {source} needs k >= 0, but k = {subset_cardinality}"
             )
@@ -4072,9 +4049,7 @@ class FixedCardinalityMultisetSets(OwnedCategory):
         r"""Construct the ``multiset_size``-element multisets on ``source``."""
         if source not in Sets():
             raise ValueError(f"multisets require a set source, not {source!r}")
-        selected_size = _cardinality_number(
-            multiset_size, what="the cardinality of a multiset"
-        )
+        selected_size = int(NN(multiset_size))
         return _object_of(
             owned_category_join(
                 (
