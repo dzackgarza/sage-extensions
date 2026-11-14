@@ -984,7 +984,7 @@ class CuspIncidence(SageObject):
 
 
 class ArithmeticCuspIncidence(SageObject):
-    r"""One rank-``(1,2)`` flag orbit in an arithmetic-subgroup quotient building."""
+    r"""One incident pair of cusp orbits, with an actual rank-``(1,2)`` flag certificate."""
 
     def __init__(
         self,

@@ -1,0 +1,55 @@
+provider SHA: 1a59869ba62b9eda408c5e5d062a2a9b240fe899
+Actions port SHA: 54d12c2e9fca069a61d1dd642cf180ee43c7f104
+Actions develop image config created 2026-11-13T17:35:47Z; OCI index sha256:a40632f25536adfced4782cd4775fa1a2b8cb51bfc904ad52df2a75c71355bbe
+Actions sage-categories SHA: 01d1219ca14bedc6ac8ab530eb67b2ad8954cc05
+scratch dependency: pycddlib==3.0.2
+[  145.4s] constructed Gamma_{Co,2}
+[  305.2s] line cusps 4
+[  400.3s] plane cusps 7
+[  452.8s] ambient flags 1
+[  464.2s] second plane row 7
+[  464.2s] registered spans 11
+[  464.2s] plane 0: target lift present
+MISSING plane=0 flag=0: source=MISSING target=present
+  ambient_plane=((2, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+  target_plane=((2, 0, 0, 0, -1, -1, -2, -2, -2, -2, -2), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+[  464.3s] plane 1: target lift present
+MISSING plane=1 flag=0: source=MISSING target=present
+  ambient_plane=((2, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+  target_plane=((4, 49229125768, 6368168358, -39199165599, -56905101192, -77223955497, -115174919134, -88289922286, -76525980623, -47128342507, -23497899252), (0, 270149376743, 34945912332, -215109043506, -312272001226, -423773591832, -632033011727, -484499107155, -419943390208, -258621134501, -128946893529))
+[  464.3s] plane 2: target lift present
+MISSING plane=2 flag=0: source=MISSING target=present
+  ambient_plane=((2, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+  target_plane=((2, 1330382674526899095921, 170516733026196861101, -1050000325845176495414, -1529490483699548300661, -2073542709731905828742, -3086578569676804936328, -2368383399654459386469, -2059501825084418407994, -1271792107843246190543, -636191046995000413779), (0, 3257053280350878834362, 417460400899455803559, -2570619018982403652325, -3744510577733280768215, -5076463497302859509395, -7556585821445388810689, -5798294782902447163814, -5042088493572154701405, -3113611396246013222947, -1557527902474973280224))
+[  464.4s] plane 3: target lift present
+MISSING plane=3 flag=0: source=MISSING target=present
+  ambient_plane=((2, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+  target_plane=((2, 0, 0, 0, -1, -1, -2, -2, -2, -2, -2), (0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0))
+[  464.5s] plane 4: target lift present
+MISSING plane=4 flag=0: source=MISSING target=present
+  ambient_plane=((2, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+  target_plane=((4, 340988092152406010, 43683450199962234, -269200342792493744, -392006042375525062, -531529544239355420, -791127627641175744, -607086867812568695, -527859522225433654, -326033974064959092, -163111435478722599), (0, 2253629360253615736, 288708926186814170, -1779175901650972146, -2590812837239638542, -3512939643078918439, -5228653112505364227, -4012306649451297976, -3488684047198301881, -2154795880861886146, -1078022161030964932))
+[  464.5s] plane 5: target lift present
+MISSING plane=5 flag=0: source=MISSING target=present
+  ambient_plane=((2, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+  target_plane=((2, 0, -2, 0, -1, -1, -2, -2, -2, -2, -2), (0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1))
+[  464.6s] plane 6: target lift present
+MISSING plane=6 flag=0: source=MISSING target=present
+  ambient_plane=((2, 0, 0, 0, -1, -1, 0, 0, 0, 0, 0), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+  target_plane=((2, 58029574762852211180492, 132093641710938176983870, 2508298118433421830862, -138924829096395004746517, -88972850838126457350121, -194019496568952803035120, -198676264898592174301912, -154556334257818333813119, -122447195178014942500266, -80366636795322300581609), (0, 470175400981407095872706, 1070267724903142982506926, 20323086606009403055096, -1125616334319325925198477, -720888374423423116022170, -1572012115724047947275409, -1609742840541754550929360, -1252268118986891370607478, -992108925959706426815904, -651157893801366339743039))
+[  464.6s] missing combinations 7; diagnostic complete without generic plane isometry search
+[peakrss] diagnose391-actions-registry: child waited=0 shell_code=0 samples=237
+[peakrss] peak tree RSS      : 2811 MiB
+[peakrss] low-water MemAvail : 2181 MiB
+[peakrss] peak single VmHWM  : 3240 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      1852 MiB peak
+[peakrss]   python                     1376 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   count                         0 MiB peak
+[peakrss]   t=   394.5s procs=  4 rss=  2811 MiB hwm=  3239 MiB avail=  2465 MiB
+[peakrss]   t=   388.5s procs=  4 rss=  2804 MiB hwm=  3239 MiB avail=  2273 MiB
+[peakrss]   t=   390.5s procs=  4 rss=  2804 MiB hwm=  3239 MiB avail=  2387 MiB
+[peakrss]   t=   392.5s procs=  4 rss=  2804 MiB hwm=  3239 MiB avail=  2464 MiB
+[peakrss]   t=   386.5s procs=  4 rss=  2722 MiB hwm=  3239 MiB avail=  2377 MiB

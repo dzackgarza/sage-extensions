@@ -23,13 +23,18 @@ family is certified complete (`is_parabolic_complete`, #331, #366), so the
 stabilizer never reaches the indefinite port's generic enumeration, which is
 killed at the memory guard on this lattice.  Each orbit's line is mapped to
 its `Gamma`-line orbit by the line row's own cusps, and each edge joins the
-line it retains to the plane it lies in.
+line it retains to the plane it lies in.  A line orbit and a plane orbit are
+incident as soon as one such flag exists; several flag orbits over the same
+pair do not create several edges.  The call therefore retains one flag
+certificate per cusp pair.
 
 **What is asserted.**  The construction guarantees, for every output of the
 incidence call on any lattice whose plane rows return through this route:
 
-* each edge joins a line that lies in its plane -- the edge's line term is
-  contained in its plane term;
+* each edge joins a line that lies in its plane -- one subgroup element carries
+  the selected line cusp representative into the selected plane cusp
+  representative, and the retained flag certificate agrees;
+* no two edges have the same line and plane cusp endpoints;
 * every line orbit and every plane orbit has an edge -- each cusp of the line
   row and of the plane row appears as a vertex of some edge.
 
@@ -43,8 +48,11 @@ now fit the runtime's 6144 MiB guard (3718 MiB peak tree RSS for both rows),
 but the dedicated CI job `coble-gamma-co-2-incidence-rows` runs the two rows
 in one process so their shared subgroup/orbit/cusp cache is not rebuilt.  Its
 entry point is `tests/coble_gamma_co_2_incidence_rows.py`; the counts it prints
-are the numbers the commit body records.  No lattice-database card holds a
-`T_Co` value (lattice-database#7), so no count is typed here.
+are the numbers the commit body records.  The decided relation has 13 edges
+over 4 line cusps and 7 plane cusps.  The card has no `T_Co` value
+(lattice-database#7); this is the acceptance value
+checked against representatives from both the pinned and the image's
+indefinite-port checkouts, not a number imported from a card.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -80,6 +88,16 @@ def _assert_line_in_plane(line, plane) -> None:
     assert plane.inclusion().is_in_image(line.inclusion()(domain.module_generator(label)))
 
 
+def _assert_orbit_incidence(incidence) -> None:
+    r"""One subgroup element carries the selected line representative into the selected plane representative."""
+    witness = incidence.plane_transporter() * ~incidence.line_transporter()
+    assert witness in incidence.subgroup()
+    moved_line = witness.transport_isotropic_object(
+        incidence.line_cusp().representative()
+    )
+    _assert_line_in_plane(moved_line, incidence.plane_cusp().representative())
+
+
 def test_the_coble_gamma_co_2_incidence_joins_lines_to_their_planes() -> None:
     r"""Each edge of the Gamma_{Co,2} incidence joins a line that lies in its plane."""
     lattice = NamedLattices.Tco
@@ -90,10 +108,18 @@ def test_the_coble_gamma_co_2_incidence_joins_lines_to_their_planes() -> None:
 
     lines = subgroup.cusps(1)
     planes = subgroup.cusps(2)
-    for incidence in tuple(incidences):
+    assert lines.cardinality() == cardinal(4)
+    assert planes.cardinality() == cardinal(7)
+    assert incidences.cardinality() == cardinal(13)
+    retained = tuple(incidences)
+    for incidence in retained:
         _assert_line_in_plane(incidence.line(), incidence.plane())
+        _assert_orbit_incidence(incidence)
         assert incidence.line_cusp() in lines
         assert incidence.plane_cusp() in planes
+    for position, first in enumerate(retained):
+        for second in retained[position + 1:]:
+            assert first.line_cusp() is not second.line_cusp() or first.plane_cusp() is not second.plane_cusp()
     line_vertices = {incidence.line_cusp() for incidence in tuple(incidences)}
     plane_vertices = {incidence.plane_cusp() for incidence in tuple(incidences)}
     for cusp in tuple(lines):

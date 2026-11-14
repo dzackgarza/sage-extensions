@@ -1,0 +1,21 @@
+provider SHA: 1a59869ba62b9eda408c5e5d062a2a9b240fe899
+command: just test -o addopts= --durations=0
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+Killed
+error: recipe `test` failed on line 154 with exit code 137
+[peakrss] run: child waited=137 shell_code=137 samples=137
+[peakrss] peak tree RSS      : 3940 MiB
+[peakrss] low-water MemAvail : 918 MiB
+[peakrss] peak single VmHWM  : 3956 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     3939 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=   224.5s procs=  5 rss=  3940 MiB hwm=  3954 MiB avail=   977 MiB
+[peakrss]   t=   226.5s procs=  5 rss=  3939 MiB hwm=  3956 MiB avail=   932 MiB
+[peakrss]   t=   230.5s procs=  5 rss=  3939 MiB hwm=  3956 MiB avail=   925 MiB
+[peakrss]   t=   232.5s procs=  5 rss=  3939 MiB hwm=  3956 MiB avail=   930 MiB
+[peakrss]   t=   238.6s procs=  5 rss=  3939 MiB hwm=  3956 MiB avail=   930 MiB

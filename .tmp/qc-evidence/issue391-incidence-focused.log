@@ -1,0 +1,38 @@
+provider SHA: 1a59869ba62b9eda408c5e5d062a2a9b240fe899
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint --durations=0 tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.45 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collected 2 items
+
+tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage .. [100%]
+
+========================== test-call performance gate ==========================
+tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage::test_the_coble_gamma_co_2_incidence_joins_lines_to_their_planes: 2341.32 s > 20 s
+tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage::test_the_coble_ambient_incidence_has_one_edge: 25.56 s > 20 s
+============================== slowest durations ===============================
+2341.32s call     tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage::test_the_coble_gamma_co_2_incidence_joins_lines_to_their_planes
+25.56s call     tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage::test_the_coble_ambient_incidence_has_one_edge
+
+(4 durations < 0.005s hidden.  Use -vv to show these durations.)
+======================== 2 passed in 2367.28s (0:39:27) ========================
+[peakrss] run: child waited=0 shell_code=0 samples=1195
+[peakrss] peak tree RSS      : 3591 MiB
+[peakrss] low-water MemAvail : 929 MiB
+[peakrss] peak single VmHWM  : 3608 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2065 MiB peak
+[peakrss]   python                     1526 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   count                         5 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   614.7s procs=  6 rss=  3591 MiB hwm=  3602 MiB avail=  7363 MiB
+[peakrss]   t=   616.7s procs=  6 rss=  3591 MiB hwm=  3602 MiB avail=  7404 MiB
+[peakrss]   t=   612.7s procs=  6 rss=  3581 MiB hwm=  3592 MiB avail=  7503 MiB
+[peakrss]   t=   610.7s procs=  6 rss=  3577 MiB hwm=  3588 MiB avail=  7522 MiB
+[peakrss]   t=   608.7s procs=  6 rss=  3572 MiB hwm=  3582 MiB avail=  7494 MiB

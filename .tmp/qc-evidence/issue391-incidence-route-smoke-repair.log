@@ -1,0 +1,28 @@
+provider base SHA: 1a59869ba62b9eda408c5e5d062a2a9b240fe899
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+[   1.7s] imports done
+small lattice labels: (0, 1, 2, 3, 4)
+point order: 4 of |A| 8
+[  43.5s] line row: 2
+[  43.5s] line separation agrees with the exact route
+[  74.8s] plane row: 1
+[  74.8s] plane separation agrees with the exact route
+[ 106.4s] new route: 2 edges (31.6s)
+[ 106.5s] every cusp carries an edge
+[ 132.3s] flag row: 2 edges (25.8s)
+the two routes agree
+DONE
+[peakrss] incidence-smoke391: child waited=0 shell_code=0 samples=71
+[peakrss] peak tree RSS      : 2375 MiB
+[peakrss] low-water MemAvail : 2056 MiB
+[peakrss] peak single VmHWM  : 2459 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      1863 MiB peak
+[peakrss]   python                      587 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    78.1s procs=  4 rss=  2375 MiB hwm=  2393 MiB avail=  3827 MiB
+[peakrss]   t=    76.1s procs=  4 rss=  2371 MiB hwm=  2393 MiB avail=  3913 MiB
+[peakrss]   t=    80.1s procs=  4 rss=  2371 MiB hwm=  2393 MiB avail=  3766 MiB
+[peakrss]   t=    82.1s procs=  4 rss=  2360 MiB hwm=  2393 MiB avail=  3713 MiB
+[peakrss]   t=    84.1s procs=  4 rss=  2352 MiB hwm=  2393 MiB avail=  3649 MiB

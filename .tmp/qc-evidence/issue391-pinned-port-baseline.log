@@ -1,0 +1,236 @@
+provider SHA: 1a59869ba62b9eda408c5e5d062a2a9b240fe899
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+[     1.8s] Sage 11.0.beta5; PYTHONHASHSEED=None
+Timeout (0:02:00)!
+Thread 0x00007af83c712780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2652 in stabilizer_of_classes
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3750 in discriminant_point_stabilizer
+  File "/probe.py", line 42 in <module>
+[   156.3s] constructed Gamma_{Co,2}
+Timeout (0:02:00)!
+Thread 0x00007af83c712780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line ??? in __hash__
+  <invalid frame>
+Timeout (0:02:00)!
+Thread 0x00007af83c712780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1942 in _splitting_isometries_in_im_rho_from_image
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1532 in splitting_isometries_from_line_class
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3448 in _subgroup_isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 517 in isotropic_orbit_representatives
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 695 in cusps
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 727 in tits_building_incidence
+  File "/probe.py", line 46 in <module>
+Timeout (0:02:00)!
+Thread 0x00007af5ce7ff6c0 [Thread-1 (_drai] (most recent call first):
+  File "/repos/sage-julia-bridge/src/sage_julia_bridge/interface.py", line 279 in _drain_stderr
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007af83c712780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 810 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py", line ??? in __call__
+  <invalid frame>
+Timeout (0:02:00)!
+Thread 0x00007af5ce7ff6c0 [Thread-1 (_drai] (most recent call first):
+  File "/repos/sage-julia-bridge/src/sage_julia_bridge/interface.py", line 279 in _drain_stderr
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007af83c712780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 190 in letters_of_permutation
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3404 in _plane_parabolic_incidence_flags
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 778 in tits_building_incidence
+  File "/probe.py", line 46 in <module>
+Timeout (0:02:00)!
+Thread 0x00007af5ce7ff6c0 [Thread-1 (_drai] (most recent call first):
+  File "/repos/sage-julia-bridge/src/sage_julia_bridge/interface.py", line 279 in _drain_stderr
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007af83c712780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 225 in _double_coset_adjustment
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2289 in adjust_witness_into_subgroup
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3518 in _subgroup_isotropic_equivalence_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 680 in isotropic_equivalence_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 882 in transporter_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 735 in matching_cusps
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 791 in tits_building_incidence
+  File "/probe.py", line 46 in <module>
+Timeout (0:02:00)!
+Thread 0x00007af5ce7ff6c0 [Thread-1 (_drai] (most recent call first):
+  File "/repos/sage-julia-bridge/src/sage_julia_bridge/interface.py", line 279 in _drain_stderr
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007af83c712780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 225 in _double_coset_adjustment
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2289 in adjust_witness_into_subgroup
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3518 in _subgroup_isotropic_equivalence_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 680 in isotropic_equivalence_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 882 in transporter_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 735 in matching_cusps
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 791 in tits_building_incidence
+  File "/probe.py", line 46 in <module>
+Timeout (0:02:00)!
+Thread 0x00007af5ce7ff6c0 [Thread-1 (_drai] (most recent call first):
+  File "/repos/sage-julia-bridge/src/sage_julia_bridge/interface.py", line 279 in _drain_stderr
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007af83c712780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 244 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 243 in _is_group_algebra
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 408 in __classcall__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 1869 in module_category
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 1878 in module_generating_set
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 113 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 7114 in matrix_entry
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 7119 in __getitem__
+  File "/repos/sage-extensions/src/sage_extensions/tensors/tensor.py", line 2691 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/tensors/tensor.py", line 2690 in from_matrix
+  File "/repos/sage-extensions/src/sage_extensions/tensors/tensor.py", line 2703 in from_morphism
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 461 in _tensor_view
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 1336 in _coordinate_tensor
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 1956 in __hash__
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 351 in _on_points
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 310 in _call_
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py", line 592 in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py", line 839 in finite_ordered_set
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 2126 in _engine_subgroup
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 6367 in subgroup
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1049 in isotropic_stabilizer_action
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 302 in _stabilizer_generators
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 310 in line_automorphism_generators
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 116 in automorphism_group_generators
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 1663 in _isotropic_stabilizer_generators
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 5058 in isotropic_stabilizer_generators
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1568 in exact_isotropic_stabilizer_generators
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3517 in _subgroup_isotropic_equivalence_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 680 in isotropic_equivalence_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 882 in transporter_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 735 in matching_cusps
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 791 in tits_building_incidence
+  File "/probe.py", line 46 in <module>
+Timeout (0:02:00)!
+Thread 0x00007af5ce7ff6c0 [Thread-1 (_drai] (most recent call first):
+  File "/repos/sage-julia-bridge/src/sage_julia_bridge/interface.py", line 279 in _drain_stderr
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007af83c712780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 225 in _double_coset_adjustment
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2289 in adjust_witness_into_subgroup
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3518 in _subgroup_isotropic_equivalence_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 680 in isotropic_equivalence_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 882 in transporter_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 735 in matching_cusps
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 791 in tits_building_incidence
+  File "/probe.py", line 46 in <module>
+Timeout (0:02:00)!
+Thread 0x00007af5ce7ff6c0 [Thread-1 (_drai] (most recent call first):
+  File "/repos/sage-julia-bridge/src/sage_julia_bridge/interface.py", line 279 in _drain_stderr
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007af83c712780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 225 in _double_coset_adjustment
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2289 in adjust_witness_into_subgroup
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3518 in _subgroup_isotropic_equivalence_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 680 in isotropic_equivalence_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 882 in transporter_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 735 in matching_cusps
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 791 in tits_building_incidence
+  File "/probe.py", line 46 in <module>
+Timeout (0:02:00)!
+Thread 0x00007af5ce7ff6c0 [Thread-1 (_drai] (most recent call first):
+  File "/repos/sage-julia-bridge/src/sage_julia_bridge/interface.py", line 279 in _drain_stderr
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007af83c712780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 225 in _double_coset_adjustment
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2289 in adjust_witness_into_subgroup
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3518 in _subgroup_isotropic_equivalence_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 680 in isotropic_equivalence_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 882 in transporter_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 735 in matching_cusps
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 791 in tits_building_incidence
+  File "/probe.py", line 46 in <module>
+Timeout (0:02:00)!
+Thread 0x00007af5ce7ff6c0 [Thread-1 (_drai] (most recent call first):
+  File "/repos/sage-julia-bridge/src/sage_julia_bridge/interface.py", line 279 in _drain_stderr
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007af83c712780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 244 in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 243 in _is_group_algebra
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 416 in __classcall__
+  <invalid frame>
+Timeout (0:02:00)!
+Thread 0x00007af5ce7ff6c0 [Thread-1 (_drai] (most recent call first):
+  File "/repos/sage-julia-bridge/src/sage_julia_bridge/interface.py", line 279 in _drain_stderr
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1025 in run
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1083 in _bootstrap_inner
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/threading.py", line 1045 in _bootstrap
+
+Thread 0x00007af83c712780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 225 in _double_coset_adjustment
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 2289 in adjust_witness_into_subgroup
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3518 in _subgroup_isotropic_equivalence_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 680 in isotropic_equivalence_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 882 in transporter_witness
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 735 in matching_cusps
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 791 in tits_building_incidence
+  File "/probe.py", line 46 in <module>
+[  1599.2s] returned 13 flag records over 4 lines and 7 planes
+LINE 0: ((0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),)
+LINE 1: ((2, 0, 0, 0, 0, -1, -1, 0, 0, 0, -1),)
+LINE 2: ((2, 1, 0, 0, 0, 0, 0, 1, 0, 0, -1),)
+LINE 3: ((0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1),)
+PLANE 0: ((2, 0, 0, 0, -1, -1, -2, -2, -2, -2, -2), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+PLANE 1: ((2, 35897, 13724, -16620, -32588, -30124, -35201, -26760, -21481, -5143, -14654), (0, 190880, 72972, -88375, -173282, -160180, -187175, -142295, -114220, -27344, -77914))
+PLANE 2: ((2, 999981741, 3542399045, 501392275, 1722268783, 952476708, 1415890980, 620792273, -159691856, 1548745422, 786885840), (0, 3649042855, 12926601954, 1829635304, 6284747348, 3475691786, 5166741199, 2265338966, -582733069, 5651541607, 2871432586))
+PLANE 3: ((2, 0, 0, 0, 0, -1, -1, 0, 0, 0, -1), (0, 2, 2, 0, -1, -2, -3, -4, -2, -2, -1))
+PLANE 4: ((2, 177266979, 70205945, 148451513, 225594984, 240462288, 439272275, 440172568, 289833763, 199791398, 117240736), (0, 516789771, 204672715, 432783498, 657681316, 701024248, 1280618756, 1283243395, 844957841, 582455634, 341794134))
+PLANE 5: ((2, 0, -2, 0, -1, -1, -2, -2, -2, -2, -2), (0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1))
+PLANE 6: ((6, 9892234066280185950907818, 16315187699960478404398832, 2314341237937423482825605, 8530149986286948603237383, 11486709486888314825669473, 17190169117363337046725047, 22868610784011858451464298, 25852207703296422682113683, 21626878111444070596965310, 16088426256315779761173984), (0, 10355519880403836502958494, 17079281530081367055735622, 2422729439974878955985771, 8929644928937435489292131, 12024669822296757667328261, 17995241201293072393857664, 23939622943040945644537503, 27062951506209603771826832, 22639735850725301214662502, 16841900103192550445711173))
+EDGE 0: L0 P0; line=((0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),); plane=((2, 0, 0, 0, -1, -1, -2, -2, -2, -2, -2), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+EDGE 1: L2 P0; line=((2, 1, 0, 0, -1, -1, -2, -2, -2, -2, -2),); plane=((2, 0, 0, 0, -1, -1, -2, -2, -2, -2, -2), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+EDGE 2: L1 P0; line=((2, 0, 0, 0, -1, -1, -2, -2, -2, -2, -2),); plane=((2, 0, 0, 0, -1, -1, -2, -2, -2, -2, -2), (0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+EDGE 3: L2 P1; line=((1298, 9793, 4292, -4630, -9208, -8516, -10099, -7250, -6329, -1839, -4938),); plane=((2, 35897, 13724, -16620, -32588, -30124, -35201, -26760, -21481, -5143, -14654), (0, 190880, 72972, -88375, -173282, -160180, -187175, -142295, -114220, -27344, -77914))
+EDGE 4: L1 P1; line=((-1564, -12094, -5284, 5715, 11362, 10508, 12457, 8955, 7802, 2258, 6070),); plane=((2, 35897, 13724, -16620, -32588, -30124, -35201, -26760, -21481, -5143, -14654), (0, 190880, 72972, -88375, -173282, -160180, -187175, -142295, -114220, -27344, -77914))
+EDGE 5: L2 P2; line=((-59380156, -12743483, -25137148, -22271538, -39828030, -32785366, -55109093, -49032896, -20245689, -26744345, 25444738),); plane=((2, 999981741, 3542399045, 501392275, 1722268783, 952476708, 1415890980, 620792273, -159691856, 1548745422, 786885840), (0, 3649042855, 12926601954, 1829635304, 6284747348, 3475691786, 5166741199, 2265338966, -582733069, 5651541607, 2871432586))
+EDGE 6: L3 P2; line=((49086186, 10534433, 20779881, 18410671, 32923771, 27101908, 45555716, 40532773, 16735936, 22108214, -21033616),); plane=((2, 999981741, 3542399045, 501392275, 1722268783, 952476708, 1415890980, 620792273, -159691856, 1548745422, 786885840), (0, 3649042855, 12926601954, 1829635304, 6284747348, 3475691786, 5166741199, 2265338966, -582733069, 5651541607, 2871432586))
+EDGE 7: L1 P3; line=((2, 0, 0, 0, 0, -1, -1, 0, 0, 0, -1),); plane=((2, 0, 0, 0, 0, -1, -1, 0, 0, 0, -1), (0, 2, 2, 0, -1, -2, -3, -4, -2, -2, -1))
+EDGE 8: L3 P4; line=((152740984, 9858391, 49355293, -7705633, -100610, -1808640, -505965, 72014414, 5772285, -9855446, -89388226),); plane=((2, 2153093219, 12858439871, 2316858184, -894353110, 774951636, -2277555270, -1210938923, -3470059731, 2102601212, 252688540), (0, 69315380877, 413956836279, 74587531121, -28792263110, 24948324272, -73322236875, -38984235330, -111713004257, 67689871750, 8134902066))
+EDGE 9: L1 P4; line=((4491054026, 289867880, 1451202614, -226568299, -2958620, -53179244, -14877885, 2117444431, 169721444, -289779494, -2628288266),); plane=((2, 2153093219, 12858439871, 2316858184, -894353110, 774951636, -2277555270, -1210938923, -3470059731, 2102601212, 252688540), (0, 69315380877, 413956836279, 74587531121, -28792263110, 24948324272, -73322236875, -38984235330, -111713004257, 67689871750, 8134902066))
+EDGE 10: L3 P5; line=((0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1),); plane=((2, 0, -2, 0, -1, -1, -2, -2, -2, -2, -2), (0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1))
+EDGE 11: L1 P5; line=((2, 0, -2, 0, -1, -1, -2, -2, -2, -2, -2),); plane=((2, 0, -2, 0, -1, -1, -2, -2, -2, -2, -2), (0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1))
+EDGE 12: L1 P6; line=((16211397149777234, -6795306539288356, -1387385352518988, -5032134374893639, -2694322842571639, -3350431866103325, -4767345378201521, -3221543263656316, -4687917498407343, -4285335448774192, -13295998517835234),); plane=((2, 930661792312119803324952, 1533474059887069885970820, 217913607255955533199261, 802613496421023842388475, 1080993590763030559303009, 1617614713782739988623698, 2151290883550073733600777, 2431694505448342288124678, 2034217628609915031013054, 1512968051543979848867661), (0, 2800538689470078781672180, 4614515680656861088393296, 655743572072657523099332, 2415216964944548657334398, 3252915719769607612376946, 4867710942930084584678009, 6473644240533835937429575, 7317432175399735726873583, 6121348505745413459684570, 4552809193718413681314597))
+[  1599.3s] unique line/plane orbit pairs: 13; duplicates: 0
+EDGE SET: ((0, 0), (1, 0), (1, 1), (1, 3), (1, 4), (1, 5), (1, 6), (2, 0), (2, 1), (2, 2), (3, 2), (3, 4), (3, 5))
+[  1599.3s] all representative-independent incidence assertions passed
+[peakrss] diagnose391: child waited=0 shell_code=0 samples=806
+[peakrss] peak tree RSS      : 3531 MiB
+[peakrss] low-water MemAvail : 3787 MiB
+[peakrss] peak single VmHWM  : 3614 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2065 MiB peak
+[peakrss]   python                     1538 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   434.3s procs=  4 rss=  3531 MiB hwm=  3614 MiB avail=  8806 MiB
+[peakrss]   t=   398.3s procs=  4 rss=  3529 MiB hwm=  3529 MiB avail=  9903 MiB
+[peakrss]   t=   432.3s procs=  4 rss=  3526 MiB hwm=  3609 MiB avail=  8879 MiB
+[peakrss]   t=   430.3s procs=  4 rss=  3525 MiB hwm=  3608 MiB avail=  8934 MiB
+[peakrss]   t=   428.3s procs=  4 rss=  3523 MiB hwm=  3606 MiB avail=  8999 MiB
