@@ -1,0 +1,34 @@
+provider SHA: 6a93efed4ffbf912d123552b5c2aece15b97b612
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: python -m pytest -p qc_sage_session -o addopts= -v --tb=line tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collecting ... collected 1 item
+
+tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so FAILED [100%]
+
+=================================== FAILURES ===================================
+E   ArithmeticError: the stabilizer of Integral lattice of rank 1 and signature (0, 0) in Orthogonal group O(Integral lattice of rank 2 and signature (1, 1)) has character image of order at least 1, and the stabilizer of its divided discriminant data has order 2; no exhibited stabilizer element closes the index 2, so the exact image chi(Stab) is not certified
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:722 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py:1445: ArithmeticError: the stabilizer of Integral lattice of rank 1 and signature (0, 0) in Orthogonal group O(Integral lattice of rank 2 and signature (1, 1)) has character image of order at least 1, and the stabilizer of its divided discriminant data has order 2; no exhibited stabilizer element closes the index 2, so the exact image chi(Stab) is not certified
+=========================== short test summary info ============================
+FAILED tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so
+============================== 1 failed in 3.22s ===============================
+[peakrss] p6a93efe: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 453 MiB
+[peakrss] low-water MemAvail : 4085 MiB
+[peakrss] peak single VmHWM  : 453 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      442 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   453 MiB hwm=   453 MiB avail=  4085 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   295 MiB hwm=   295 MiB avail=  4284 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  4550 MiB
+launcher exit: 1

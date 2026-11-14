@@ -1,0 +1,83 @@
+provider SHA: c8a3cedb1ba27919c416101e98cdc7d36256415e
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: python -m pytest -p qc_sage_session -o addopts= -v --tb=line tests/lattices/test_definite.sage::test_square_lattice_minimum_theta_and_packing_radius tests/lattices/test_definite.sage::test_exact_cvp_babai_minima_and_voronoi_geometry_on_square_lattice tests/lattices/test_definite.sage::test_definite_target_embedding_mor_enumerates_all_a1_into_a2_roots tests/lattices/test_definite.sage::test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6 tests/lattices/test_definite.sage::test_discriminant_group_of_a1_plus_a2_is_cyclic_of_order_6 tests/lattices/test_definite.sage::test_a_hyperbolic_isometry_of_x2_minus_2y2_has_infinite_order tests/lattices/test_definite.sage::test_norm_one_vectors_of_x2_minus_2y2_form_one_orbit tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so tests/lattices/test_definite.sage::test_definite_complement_extensions_exhaust_the_u_vector_cosets tests/lattices/test_definite_metric_invariants_archive.sage::test_square_lattice_metric_invariants_are_exact tests/lattices/test_definite_metric_invariants_archive.sage::test_a2_invariants_see_the_nonorthogonal_hexagonal_geometry
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collecting ... collected 11 items
+
+tests/lattices/test_definite.sage::test_square_lattice_minimum_theta_and_packing_radius FAILED [  9%]
+tests/lattices/test_definite.sage::test_exact_cvp_babai_minima_and_voronoi_geometry_on_square_lattice FAILED [ 18%]
+tests/lattices/test_definite.sage::test_definite_target_embedding_mor_enumerates_all_a1_into_a2_roots FAILED [ 27%]
+tests/lattices/test_definite.sage::test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6 FAILED [ 36%]
+tests/lattices/test_definite.sage::test_discriminant_group_of_a1_plus_a2_is_cyclic_of_order_6 FAILED [ 45%]
+tests/lattices/test_definite.sage::test_a_hyperbolic_isometry_of_x2_minus_2y2_has_infinite_order FAILED [ 54%]
+tests/lattices/test_definite.sage::test_norm_one_vectors_of_x2_minus_2y2_form_one_orbit FAILED [ 63%]
+tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so FAILED [ 72%]
+tests/lattices/test_definite.sage::test_definite_complement_extensions_exhaust_the_u_vector_cosets FAILED [ 81%]
+tests/lattices/test_definite_metric_invariants_archive.sage::test_square_lattice_metric_invariants_are_exact FAILED [ 90%]
+tests/lattices/test_definite_metric_invariants_archive.sage::test_a2_invariants_see_the_nonorthogonal_hexagonal_geometry FAILED [100%]
+
+=================================== FAILURES ===================================
+E   RecursionError: maximum recursion depth exceeded
+!!! Recursion detected (same locals & position)
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:709: RecursionError: maximum recursion depth exceeded
+E   RecursionError: maximum recursion depth exceeded
+!!! Recursion detected (same locals & position)
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:709: RecursionError: maximum recursion depth exceeded
+E   AssertionError: cannot compute the cardinality of Emb(Integral lattice of rank 1 and signature (0, 1), Integral lattice of rank 2 and signature (0, 2)): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of homsets of sets and Category of sets)
+/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:2503: AssertionError: cannot compute the cardinality of Emb(Integral lattice of rank 1 and signature (0, 1), Integral lattice of rank 2 and signature (0, 2)): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of homsets of sets and Category of sets)
+E   AssertionError: cannot compute the cardinality of Subset of Orthogonal group O(Integral lattice of rank 2 and signature (0, 2)) cut out by <function test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6.<locals>.<lambda> at 0x7d58c6556e50>: its construction supplies no exact value or decided finite enumeration (it is in Join of Category of finite sets and Category of facade sets and Category of finite countable sets)
+/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:2503: AssertionError: cannot compute the cardinality of Subset of Orthogonal group O(Integral lattice of rank 2 and signature (0, 2)) cut out by <function test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6.<locals>.<lambda> at 0x7d58c6556e50>: its construction supplies no exact value or decided finite enumeration (it is in Join of Category of finite sets and Category of facade sets and Category of finite countable sets)
+E   KeyError: 'is_cyclic'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'OwnedJoinCategory.parent_class[_PresentedModule].ObjectType' object has no attribute 'is_cyclic'
+sage/cpython/getattr.pyx:362: AttributeError: 'OwnedJoinCategory.parent_class[_PresentedModule].ObjectType' object has no attribute 'is_cyclic'
+E   AssertionError: the cardinality of <Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1)> <= Orthogonal group O(Integral lattice of rank 2 and signature (1, 1)) is the order of Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1), but no order algorithm or finite ambient enumeration is supplied
+/repos/sage-extensions/src/sage_extensions/categories/group/cyclic_subgroups.py:122: AssertionError: the cardinality of <Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1)> <= Orthogonal group O(Integral lattice of rank 2 and signature (1, 1)) is the order of Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1), but no order algorithm or finite ambient enumeration is supplied
+E   IndexError: index out of range.
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+sage/libs/gap/element.pyx:3170: IndexError: index out of range.
+E   IndexError: index out of range.
+sage/libs/gap/element.pyx:3170: IndexError: index out of range.
+E   AttributeError: 'tuple' object has no attribute 'cardinality'
+/repos/sage-extensions/tests/lattices/test_definite.sage:403: AttributeError: 'tuple' object has no attribute 'cardinality'
+E   RecursionError: maximum recursion depth exceeded
+!!! Recursion detected (same locals & position)
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:709: RecursionError: maximum recursion depth exceeded
+E   RecursionError: maximum recursion depth exceeded
+!!! Recursion detected (same locals & position)
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:709: RecursionError: maximum recursion depth exceeded
+=========================== short test summary info ============================
+FAILED tests/lattices/test_definite.sage::test_square_lattice_minimum_theta_and_packing_radius
+FAILED tests/lattices/test_definite.sage::test_exact_cvp_babai_minima_and_voronoi_geometry_on_square_lattice
+FAILED tests/lattices/test_definite.sage::test_definite_target_embedding_mor_enumerates_all_a1_into_a2_roots
+FAILED tests/lattices/test_definite.sage::test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6
+FAILED tests/lattices/test_definite.sage::test_discriminant_group_of_a1_plus_a2_is_cyclic_of_order_6
+FAILED tests/lattices/test_definite.sage::test_a_hyperbolic_isometry_of_x2_minus_2y2_has_infinite_order
+FAILED tests/lattices/test_definite.sage::test_norm_one_vectors_of_x2_minus_2y2_form_one_orbit
+FAILED tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so
+FAILED tests/lattices/test_definite.sage::test_definite_complement_extensions_exhaust_the_u_vector_cosets
+FAILED tests/lattices/test_definite_metric_invariants_archive.sage::test_square_lattice_metric_invariants_are_exact
+FAILED tests/lattices/test_definite_metric_invariants_archive.sage::test_a2_invariants_see_the_nonorthogonal_hexagonal_geometry
+============================== 11 failed in 9.82s ==============================
+[peakrss] pnewmain: child waited=1 shell_code=1 samples=8
+[peakrss] peak tree RSS      : 388 MiB
+[peakrss] low-water MemAvail : 1745 MiB
+[peakrss] peak single VmHWM  : 395 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      384 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   388 MiB hwm=   395 MiB avail=  1745 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   371 MiB hwm=   378 MiB avail=  1836 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   356 MiB hwm=   362 MiB avail=  2011 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   246 MiB hwm=   260 MiB avail=  2143 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   206 MiB hwm=   209 MiB avail=  2352 MiB
+launcher exit: 1

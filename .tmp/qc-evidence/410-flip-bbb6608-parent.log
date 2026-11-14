@@ -1,0 +1,28 @@
+provider SHA: 686a72a20a8426d7177713e75931542637c1bf08
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: python -m pytest -p qc_sage_session -o addopts= -v --tb=line tests/lattices/test_definite.sage::test_norm_one_vectors_of_x2_minus_2y2_form_one_orbit
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collecting ... collected 1 item
+
+tests/lattices/test_definite.sage::test_norm_one_vectors_of_x2_minus_2y2_form_one_orbit PASSED [100%]
+
+============================== 1 passed in 6.08s ===============================
+[peakrss] pbbb6608pre: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 448 MiB
+[peakrss] low-water MemAvail : 4691 MiB
+[peakrss] peak single VmHWM  : 448 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      437 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   448 MiB hwm=   448 MiB avail=  4691 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   330 MiB hwm=   330 MiB avail=  4945 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   303 MiB hwm=   303 MiB avail=  4864 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   191 MiB hwm=   191 MiB avail=  5289 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  5588 MiB
+launcher exit: 0

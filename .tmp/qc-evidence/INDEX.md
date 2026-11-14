@@ -914,3 +914,31 @@ file is one cause: the first line is the issue title, the rest is the body, whic
 the failing tests with the error each reports, the defective call, the commit that
 introduced the cause and the scope. They are not logs. The run that produced them is
 recorded in `results/issue408-triage.md`, whose cause ids these bodies carry.
+
+## #410 — the definite-lattice slice triaged, two causes repaired
+
+The slice is the five files the issue names. At `c8a3cedb` they collect **37** tests
+(25 + 2 + 5 + 2 + 3), not the 76 the issue body quotes; the neighbouring `definite`-named files
+add 17 and the `indefinite`-named ones 23, so no reading of "the definite-lattice test files"
+gives 76 either. **11 of the 37 fail**, in eight causes; each cause's paste-ready issue body is
+under `triage/410-cause-*.md`. Two of the eight are repaired on `main` in this push (causes A and
+B) and the other six are filed for the orchestrator.
+
+Every command is `python -m pytest -p qc_sage_session -o addopts=` inside the adopted image with
+this project's checkout bound at `/repos/sage-extensions` and the port at `/work`, because this
+venv has no `pytest-timeout` and no `pytest-reportlog`, so the repository's own `addopts` cannot
+be used; `-p sage_extensions.testing.suite_budget --no-time-gates` where the count is the point.
+One pytest process per file and per probe, never the suite.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `410-baseline-11-ids-at-c8a3cedb.log` | `c8a3cedb` (current `main`) | the 11 red ids, `-v --tb=line`: **11 failed in 9.82 s**, one error line each |
+| `410-baseline-slice-driver-at-9b29712.log` | `9b29712` (the `main` the triage started on) | the five-file slice one process per file: **9 failed, 16 passed** in `test_definite`, **2 failed** in the metric archive, and the other three files green (2, 5, 3 passed) |
+| `410-repaired-slice-driver.log` | the tree of this push | the same five files after causes A and B: **2 passed** metric archive, 5 passed isometry witnesses, 3 passed root groups, and `test_definite` with 7 red left; its 593 s is contention with the other triage chats on this VM |
+| `410-repaired-slice-test_definite.log` | the tree of this push | the residual: the six filed causes plus `test_nikulin_even_unimodular_embedding_existence_controls_embedding_mor`, which passed at 319.62 s in the baseline run of the same command and here died with `sage_julia_bridge.errors.JuliaWorkerError: Julia bridge process exited unexpectedly` — the Julia bridge under two 5 GiB Julia processes on a 15 GiB VM, not a code failure |
+| `410-repair-a-and-b-targeted-at-c8a3cedb.log` | the tree of this push | the four cause-A ids, the cause-B id and the #150 division contract at `c8a3cedb`: **6 passed in 2.85 s** |
+| `410-flip-e4bd95d-parent.log`, `410-flip-e4bd95d.log` | cause A | `test_square_lattice_minimum_theta_and_packing_radius`: **passed** at `e4bd95d^`, **RecursionError** at `e4bd95d` |
+| `410-flip-bbb6608-parent.log`, `410-flip-bbb6608.log`, `410-flip-bbb6608-isotropic-id.log` | cause B | `test_norm_one_vectors_of_x2_minus_2y2_form_one_orbit`: **passed** at `bbb6608^`, **IndexError** at `bbb6608`; the isotropic-lines id went from its own `ArithmeticError` at `bbb6608^` to the same **IndexError** at `bbb6608` |
+| `410-flip-6a93efe-parent.log`, `410-flip-6a93efe.log` | cause H | `test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so`: **passed** at `6a93efe^`, **ArithmeticError** at `6a93efe` |
+| `410-masked-d26db5d-parent.log`, `410-masked-d26db5d.log` | cause D | the `condition_set` guard's commit `d26db5d7` and its parent: the id **fails at both** with `TypeError: CategoricalIsomorphism.__init__() missing 1 required positional argument: 'inverse_computation'`, so the guard has no observable pass-to-fail flip |
+| `410-sample-02d9657.log`, `410-sample-441519c.log` | causes C, E, F, G | the four "never implemented" causes show the same error at both commits: the `Emb` cardinality assertion, `is_cyclic`, the `cyclic_subgroup` refusal (masked at `02d9657` by `_form_module_morphism`) and the bare tuple |

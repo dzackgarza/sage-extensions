@@ -1,0 +1,20 @@
+provider SHA: 9b297125b3726d6e6b5f548f2ad3ef01c7933029
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=long tests/lattices/test_definite_isometry_witnesses.sage
+.....                                                                    [100%]
+5 passed in 5.35s
+[peakrss] wt410: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 499 MiB
+[peakrss] low-water MemAvail : 5883 MiB
+[peakrss] peak single VmHWM  : 499 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      488 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        0 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   499 MiB hwm=   499 MiB avail=  6024 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   493 MiB hwm=   493 MiB avail=  6258 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   475 MiB hwm=   475 MiB avail=  6111 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   295 MiB hwm=   295 MiB avail=  5989 MiB
+[peakrss]   t=     0.0s procs=  2 rss=     8 MiB hwm=     8 MiB avail=  5883 MiB
+launcher exit: 0

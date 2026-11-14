@@ -1,0 +1,72 @@
+provider SHA: 02d96570c988c0e7192c4d7a58c14f4c79fdec7c
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: python -m pytest -p qc_sage_session -o addopts= -v --tb=line tests/lattices/test_definite.sage::test_square_lattice_minimum_theta_and_packing_radius tests/lattices/test_definite.sage::test_exact_cvp_babai_minima_and_voronoi_geometry_on_square_lattice tests/lattices/test_definite.sage::test_definite_target_embedding_mor_enumerates_all_a1_into_a2_roots tests/lattices/test_definite.sage::test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6 tests/lattices/test_definite.sage::test_discriminant_group_of_a1_plus_a2_is_cyclic_of_order_6 tests/lattices/test_definite.sage::test_a_hyperbolic_isometry_of_x2_minus_2y2_has_infinite_order tests/lattices/test_definite.sage::test_norm_one_vectors_of_x2_minus_2y2_form_one_orbit tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so tests/lattices/test_definite.sage::test_definite_complement_extensions_exhaust_the_u_vector_cosets tests/lattices/test_definite_metric_invariants_archive.sage::test_square_lattice_metric_invariants_are_exact tests/lattices/test_definite_metric_invariants_archive.sage::test_a2_invariants_see_the_nonorthogonal_hexagonal_geometry
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collecting ... collected 11 items
+
+tests/lattices/test_definite.sage::test_square_lattice_minimum_theta_and_packing_radius PASSED [  9%]
+tests/lattices/test_definite.sage::test_exact_cvp_babai_minima_and_voronoi_geometry_on_square_lattice FAILED [ 18%]
+tests/lattices/test_definite.sage::test_definite_target_embedding_mor_enumerates_all_a1_into_a2_roots FAILED [ 27%]
+tests/lattices/test_definite.sage::test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6 FAILED [ 36%]
+tests/lattices/test_definite.sage::test_discriminant_group_of_a1_plus_a2_is_cyclic_of_order_6 FAILED [ 45%]
+tests/lattices/test_definite.sage::test_a_hyperbolic_isometry_of_x2_minus_2y2_has_infinite_order FAILED [ 54%]
+tests/lattices/test_definite.sage::test_norm_one_vectors_of_x2_minus_2y2_form_one_orbit FAILED [ 63%]
+tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so FAILED [ 72%]
+tests/lattices/test_definite.sage::test_definite_complement_extensions_exhaust_the_u_vector_cosets FAILED [ 81%]
+tests/lattices/test_definite_metric_invariants_archive.sage::test_square_lattice_metric_invariants_are_exact FAILED [ 90%]
+tests/lattices/test_definite_metric_invariants_archive.sage::test_a2_invariants_see_the_nonorthogonal_hexagonal_geometry PASSED [100%]
+
+=================================== FAILURES ===================================
+E   TypeError: '>' not supported between instances of 'OwnedJoinCategory.element_class' and 'OwnedJoinCategory.element_class'
+/repos/sage-extensions/src/sage_extensions/categories/definite_lattices.py:1095: TypeError: '>' not supported between instances of 'OwnedJoinCategory.element_class' and 'OwnedJoinCategory.element_class'
+E   AssertionError: cannot compute the cardinality of Emb(Integral lattice of rank 1 and signature (0, 1), Integral lattice of rank 2 and signature (0, 2)): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of homsets of sets and Category of sets)
+/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:2357: AssertionError: cannot compute the cardinality of Emb(Integral lattice of rank 1 and signature (0, 1), Integral lattice of rank 2 and signature (0, 2)): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of homsets of sets and Category of sets)
+E   AttributeError: 'OwnedLatticeIsometryMor_with_category_with_category.ArrowType' object has no attribute '_form_module_morphism'. Did you mean: 'module_morphism'?
+sage/cpython/getattr.pyx:362: AttributeError: 'OwnedLatticeIsometryMor_with_category_with_category.ArrowType' object has no attribute '_form_module_morphism'. Did you mean: 'module_morphism'?
+E   KeyError: 'is_cyclic'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'OwnedJoinCategory.parent_class[_PresentedModule].ObjectType' object has no attribute 'is_cyclic'
+sage/cpython/getattr.pyx:362: AttributeError: 'OwnedJoinCategory.parent_class[_PresentedModule].ObjectType' object has no attribute 'is_cyclic'
+E   AttributeError: 'OwnedLatticeIsometryMor_with_category_with_category.ArrowType' object has no attribute '_form_module_morphism'. Did you mean: 'module_morphism'?
+sage/cpython/getattr.pyx:362: AttributeError: 'OwnedLatticeIsometryMor_with_category_with_category.ArrowType' object has no attribute '_form_module_morphism'. Did you mean: 'module_morphism'?
+E   ImportError: cannot import name 'GObjects' from 'sage_extensions.all' (/repos/sage-extensions/src/sage_extensions/all.py)
+/work/src/sage_indefinite_port/indefinite/recursive.py:25: ImportError: cannot import name 'GObjects' from 'sage_extensions.all' (/repos/sage-extensions/src/sage_extensions/all.py)
+E   AttributeError: 'OwnedLatticeIsometryMor_with_category_with_category.ArrowType' object has no attribute '_form_module_morphism'. Did you mean: 'module_morphism'?
+sage/cpython/getattr.pyx:362: AttributeError: 'OwnedLatticeIsometryMor_with_category_with_category.ArrowType' object has no attribute '_form_module_morphism'. Did you mean: 'module_morphism'?
+E   AttributeError: 'tuple' object has no attribute 'cardinality'
+/repos/sage-extensions/tests/lattices/test_definite.sage:403: AttributeError: 'tuple' object has no attribute 'cardinality'
+E   TypeError: '>' not supported between instances of 'OwnedJoinCategory.element_class' and 'OwnedJoinCategory.element_class'
+/repos/sage-extensions/src/sage_extensions/categories/definite_lattices.py:1095: TypeError: '>' not supported between instances of 'OwnedJoinCategory.element_class' and 'OwnedJoinCategory.element_class'
+=========================== short test summary info ============================
+FAILED tests/lattices/test_definite.sage::test_exact_cvp_babai_minima_and_voronoi_geometry_on_square_lattice
+FAILED tests/lattices/test_definite.sage::test_definite_target_embedding_mor_enumerates_all_a1_into_a2_roots
+FAILED tests/lattices/test_definite.sage::test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6
+FAILED tests/lattices/test_definite.sage::test_discriminant_group_of_a1_plus_a2_is_cyclic_of_order_6
+FAILED tests/lattices/test_definite.sage::test_a_hyperbolic_isometry_of_x2_minus_2y2_has_infinite_order
+FAILED tests/lattices/test_definite.sage::test_norm_one_vectors_of_x2_minus_2y2_form_one_orbit
+FAILED tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so
+FAILED tests/lattices/test_definite.sage::test_definite_complement_extensions_exhaust_the_u_vector_cosets
+FAILED tests/lattices/test_definite_metric_invariants_archive.sage::test_square_lattice_metric_invariants_are_exact
+=================== 9 failed, 2 passed in 265.74s (0:04:25) ====================
+[peakrss] p02d9657: child waited=1 shell_code=1 samples=136
+[peakrss] peak tree RSS      : 3325 MiB
+[peakrss] low-water MemAvail : 1207 MiB
+[peakrss] peak single VmHWM  : 3332 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2943 MiB peak
+[peakrss]   python                      380 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   run.sh                        7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   268.8s procs=  4 rss=  3325 MiB hwm=  3332 MiB avail=  5841 MiB
+[peakrss]   t=   266.8s procs=  4 rss=  3193 MiB hwm=  3202 MiB avail=  5332 MiB
+[peakrss]   t=   264.8s procs=  4 rss=  3011 MiB hwm=  3099 MiB avail=  5823 MiB
+[peakrss]   t=   262.8s procs=  4 rss=  2966 MiB hwm=  3053 MiB avail=  6244 MiB
+[peakrss]   t=   174.7s procs=  4 rss=  2934 MiB hwm=  3021 MiB avail=  7603 MiB
+launcher exit: 1

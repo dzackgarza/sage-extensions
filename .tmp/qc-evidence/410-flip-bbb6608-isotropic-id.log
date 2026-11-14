@@ -1,0 +1,34 @@
+provider SHA: bbb66089c45f17f16b9bf4776f2a56da2157ae58
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: python -m pytest -p qc_sage_session -o addopts= -v --tb=line tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collecting ... collected 1 item
+
+tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so FAILED [100%]
+
+=================================== FAILURES ===================================
+E   IndexError: index out of range.
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+sage/libs/gap/element.pyx:3170: IndexError: index out of range.
+=========================== short test summary info ============================
+FAILED tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so
+============================== 1 failed in 2.60s ===============================
+[peakrss] pbbb6608b: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 443 MiB
+[peakrss] low-water MemAvail : 3361 MiB
+[peakrss] peak single VmHWM  : 443 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      432 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   443 MiB hwm=   443 MiB avail=  3947 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   247 MiB hwm=   247 MiB avail=  3361 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  3458 MiB
+launcher exit: 1
