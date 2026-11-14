@@ -1,0 +1,56 @@
+provider SHA: 1a59869ba62b9eda408c5e5d062a2a9b240fe899
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --durations=0 -k not every_cusp_chamber tests/lattices/test_the_isotropic_reduction_image.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.43 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collected 9 items / 1 deselected / 8 selected
+
+tests/lattices/test_the_isotropic_reduction_image.sage ........          [100%]
+
+=============================== warnings summary ===============================
+tests/lattices/test_the_isotropic_reduction_image.sage: 78 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/lattices/test_the_isotropic_reduction_image.sage: 78 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================== test-call performance gate ==========================
+tests/lattices/test_the_isotropic_reduction_image.sage::test_each_cusp_reduces_to_a_hyperbolic_rank_ten_lattice: 25.02 s > 20 s
+tests/lattices/test_the_isotropic_reduction_image.sage::test_sterks_published_cusp_roots_are_reflections_of_the_stabilizer_image: 84.82 s > 20 s
+tests/lattices/test_the_isotropic_reduction_image.sage::test_the_first_cusp_writes_down_no_candidate_outside_its_layer: 38.24 s > 20 s
+tests/lattices/test_the_isotropic_reduction_image.sage::test_the_fourth_cusps_layers_are_enumerated_in_the_coordinates_of_its_cell: 464.40 s > 20 s
+============================== slowest durations ===============================
+464.40s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_the_fourth_cusps_layers_are_enumerated_in_the_coordinates_of_its_cell
+84.82s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_sterks_published_cusp_roots_are_reflections_of_the_stabilizer_image
+38.24s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_the_first_cusp_writes_down_no_candidate_outside_its_layer
+25.02s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_each_cusp_reduces_to_a_hyperbolic_rank_ten_lattice
+4.86s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_the_lift_criterion_agrees_with_the_levi_route_at_the_first_cusp
+4.39s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_the_kernel_of_the_levi_map_acts_trivially_on_the_discriminant_group
+1.61s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_the_membership_questions_at_the_first_cusp_are_one_sift_per_root
+0.03s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_the_five_cusps_are_the_chamber_rows_of_card_029j
+
+(16 durations < 0.005s hidden.  Use -vv to show these durations.)
+========== 8 passed, 1 deselected, 156 warnings in 623.89s (0:10:23) ===========
+[peakrss] run: child waited=0 shell_code=0 samples=316
+[peakrss] peak tree RSS      : 2932 MiB
+[peakrss] low-water MemAvail : 5215 MiB
+[peakrss] peak single VmHWM  : 2932 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     2915 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=   492.3s procs=  5 rss=  2932 MiB hwm=  2932 MiB avail=  5999 MiB
+[peakrss]   t=   494.3s procs=  5 rss=  2932 MiB hwm=  2932 MiB avail=  5996 MiB
+[peakrss]   t=   496.3s procs=  5 rss=  2932 MiB hwm=  2932 MiB avail=  5995 MiB
+[peakrss]   t=   498.3s procs=  5 rss=  2932 MiB hwm=  2932 MiB avail=  5989 MiB
+[peakrss]   t=   500.3s procs=  5 rss=  2932 MiB hwm=  2932 MiB avail=  5989 MiB
+launcher exit: 0

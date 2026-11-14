@@ -130,3 +130,11 @@ cited but not implemented, and no run of the five-row test, `just test`, or a
 push of a repaired engine is reported here.  The evidence of this document is
 the group identification and the exactness proof, both measured on main at
 `118a910` by the probes registered below.
+
+Repair 1 of section 4 is delivered by #400: the layer enumeration at a
+lineality cell (`hyperbolic_lattices.py`, `_FilteredVinAl.cell` and
+`Roots_decomposed_into`) writes each vector of `v_0^\perp` in the coordinates
+of the cell normals, the lineality direction and the coset representatives of
+their span, and the walk at this controlling vector enumerates its layers
+through it.  Repair 2, the wall count on the extreme rays of the cone the
+sequence generates, remains open, so the row is still not green.

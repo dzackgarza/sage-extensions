@@ -503,256 +503,341 @@ def _vinal_parallelepiped_points(inserted):
     return points
 
 
-def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions, admits_root=None):
-    r"""Run Vinberg's algorithm on a Gram matrix of signature \((n,1)\).
+def _filtered_vinal_class():
+    r"""Return the engine's ``VinAl`` subclass that walks one reflection subgroup.
 
-    Returns the completeness flag of the search and the coordinate rows of the
-    accepted roots.  ``vinal`` is Bogachev and Perepechko's implementation of
-    the algorithm; ``FindRoots`` reports whether the fundamental polyhedron was
-    established, which is the algorithm's own termination criterion.
-
-    ``admits_root`` restricts the algorithm to a reflection subgroup: a candidate
-    root is accepted only when its coordinate row is admitted, and the same test
-    filters the roots of the initial cone at the controlling vector.  A finite
-    index reflection subgroup of \(O(L)\) has its own polyhedron and not the
-    full group's, so the restriction is part of the algorithm and not a filter
-    of its output (#297).
+    The class carries the library's repairs of the engine's walk: the
+    polynomial-time coset representatives of the constructor, the candidate
+    tests of #312, and the layer enumeration in the coordinates of the cell at
+    the controlling vector (#285, #400).  It is built by a factory and not at
+    the module's top level because ``vinal`` is imported here, so that
+    importing this module does not pay for the engine's own imports; and it is
+    a factory rather than a class defined inside :func:`_vinal_vinberg_roots`
+    so that a probe can hold the walk object itself and read its restricted
+    layer enumeration against the engine's whole-lattice one, layer by layer
+    (#400).
     """
     from vinal import NegativeVector, VinAl
 
-    if admits_root is None:
-        algorithm = VinAl(gram, controlling_vector, False, None)
-    else:
-        class _FilteredVinAl(VinAl):
-            r"""Vinberg's algorithm over one lattice, restricted to a reflection subgroup.
+    class _FilteredVinAl(VinAl):
+        r"""Vinberg's algorithm over one lattice, restricted to a reflection subgroup.
 
-            ``VinAl`` enumerates the roots of the whole lattice and accepts a
-            candidate when it is a root and lies beyond the walls already found
-            (its ``IsRoot`` and ``IsNewRoot``).  A reflection subgroup of
-            finite index has a different polyhedron -- the intersection of the
-            half-spaces of its own root system -- so a candidate must also have
-            its reflection in the subgroup.  This class adds exactly that test,
-            by ``IsRoot``, which both the initial cusp cone and the candidate
-            enumeration go through.
+        ``VinAl`` enumerates the roots of the whole lattice and accepts a
+        candidate when it is a root and lies beyond the walls already found
+        (its ``IsRoot`` and ``IsNewRoot``).  A reflection subgroup of
+        finite index has a different polyhedron -- the intersection of the
+        half-spaces of its own root system -- so a candidate must also have
+        its reflection in the subgroup.  This class adds exactly that test,
+        by ``IsRoot``, which both the initial cusp cone and the candidate
+        enumeration go through.
 
-            The candidate enumeration asks the test in
-            :meth:`IsNewRoot` *last*.  ``VinAl.IsNewRoot`` is the conjunction
-            "not a repeat, a root, beyond every accepted wall", and the
-            subgroup test belongs to that conjunction; its position among the
-            conjuncts is free, and it is the only conjunct whose cost is a sift
-            through a stabilizer chain rather than a handful of rank-ten
-            integer inner products.  Asked first, it answers for every root of
-            the lattice the enumeration reaches, most of which point away from
-            the chamber being built and are rejected by the wall condition
-            whatever the subgroup says; asked last, it answers only for the
-            candidates inside that chamber.  The accepted set is the same
-            either way, because the conjunction is.
+        The candidate enumeration asks the test in
+        :meth:`IsNewRoot` *last*.  ``VinAl.IsNewRoot`` is the conjunction
+        "not a repeat, a root, beyond every accepted wall", and the
+        subgroup test belongs to that conjunction; its position among the
+        conjuncts is free, and it is the only conjunct whose cost is a sift
+        through a stabilizer chain rather than a handful of rank-ten
+        integer inner products.  Asked first, it answers for every root of
+        the lattice the enumeration reaches, most of which point away from
+        the chamber being built and are rejected by the wall condition
+        whatever the subgroup says; asked last, it answers only for the
+        candidates inside that chamber.  The accepted set is the same
+        either way, because the conjunction is.
+        """
+
+        def __init__(
+            self, M, v0=None, use_coxiter=False, output=None, *, admits_root
+        ) -> None:
+            r"""Mirror ``VinAl.__init__`` with the library's own ``W``.
+
+            The engine's constructor finds the coset representatives of the
+            row lattice of the inserted matrix by enumerating a coordinate
+            bounding box, which at the fourth Enriques cusp has about
+            `1.3 \cdot 10^{14}` points for a two-element ``W`` and does not
+            return; :func:`_vinal_parallelepiped_points` returns the same
+            points in polynomial time, and the rest of the construction is
+            ``VinAl``'s own, attribute for attribute.  The controlling
+            vector may be omitted, in which case the engine's own
+            ``NegativeVector`` picks one.
             """
+            self._admits_root = admits_root
+            self._cell = _NO_CELL
+            self.output = output
+            self.use_coxiter = use_coxiter
+            self.M = M
+            self.n = M.ncols()
+            self.V = SageFreeModule(SageZZ, self.n, inner_product_matrix=M)
+            self.v0 = NegativeVector(self.V) if v0 is None else self.V(v0)
+            kernel_matrix = engine_matrix(
+                [self.v0.dot_product(column) for column in M.columns()]
+            )
+            self.V1 = self.V.submodule(kernel_matrix.right_kernel())
+            self.M1 = self.V1.gram_matrix()
+            inserted = self.V1.matrix().insert_row(self.n - 1, self.v0)
+            self.W = [self.V(w) for w in _vinal_parallelepiped_points(inserted)]
+            self.W.sort(key=lambda entry: -self.v0.inner_product(entry))
+            self.En = abs(self.M.det() / GCD_list(self.M.adjugate().list()))
+            self.root_lengths = [
+                k
+                for k in range(1, 2 * int(self.En) + 1)
+                if ((2 * int(self.En)) % k == 0)
+            ]
+            self.roots = []
+            self.check_validity()
 
-            def __init__(self, M, v0=None, use_coxiter=False, output=None) -> None:
-                r"""Mirror ``VinAl.__init__`` with the library's own ``W``.
+        def _in_the_subgroup(self, vector) -> bool:
+            return bool(
+                self._admits_root(tuple(int(entry) for entry in vector))
+            )
 
-                The engine's constructor finds the coset representatives of the
-                row lattice of the inserted matrix by enumerating a coordinate
-                bounding box, which at the fourth Enriques cusp has about
-                `1.3 \cdot 10^{14}` points for a two-element ``W`` and does not
-                return; :func:`_vinal_parallelepiped_points` returns the same
-                points in polynomial time, and the rest of the construction is
-                ``VinAl``'s own, attribute for attribute.  The controlling
-                vector may be omitted, in which case the engine's own
-                ``NegativeVector`` picks one.
-                """
-                self._admits_root = admits_root
-                self._cell = _NO_CELL
-                self.output = output
-                self.use_coxiter = use_coxiter
-                self.M = M
-                self.n = M.ncols()
-                self.V = SageFreeModule(SageZZ, self.n, inner_product_matrix=M)
-                self.v0 = NegativeVector(self.V) if v0 is None else self.V(v0)
-                kernel_matrix = engine_matrix(
-                    [self.v0.dot_product(column) for column in M.columns()]
-                )
-                self.V1 = self.V.submodule(kernel_matrix.right_kernel())
-                self.M1 = self.V1.gram_matrix()
-                inserted = self.V1.matrix().insert_row(self.n - 1, self.v0)
-                self.W = [self.V(w) for w in _vinal_parallelepiped_points(inserted)]
-                self.W.sort(key=lambda entry: -self.v0.inner_product(entry))
-                self.En = abs(self.M.det() / GCD_list(self.M.adjugate().list()))
-                self.root_lengths = [
-                    k
-                    for k in range(1, 2 * int(self.En) + 1)
-                    if ((2 * int(self.En)) % k == 0)
-                ]
-                self.roots = []
-                self.check_validity()
+        def IsRoot(self, vector):
+            r"""Vinberg's root test with the subgroup test, for the initial cone.
 
-            def _in_the_subgroup(self, vector) -> bool:
-                return bool(
-                    self._admits_root(tuple(int(entry) for entry in vector))
-                )
+            The initial cone is cut by the roots orthogonal to the
+            controlling vector, and those are candidates with no wall
+            condition to satisfy first: every one of them is asked.
+            """
+            return super().IsRoot(vector) and self._in_the_subgroup(vector)
 
-            def IsRoot(self, vector):
-                r"""Vinberg's root test with the subgroup test, for the initial cone.
+        def IsNewRoot(self, vector):
+            r"""``VinAl.IsNewRoot`` with the subgroup test asked after the wall condition.
 
-                The initial cone is cut by the roots orthogonal to the
-                controlling vector, and those are candidates with no wall
-                condition to satisfy first: every one of them is asked.
-                """
-                return super().IsRoot(vector) and self._in_the_subgroup(vector)
+            Two of the conjuncts are answered here by their exact
+            equivalents rather than the engine's spells, because the
+            engine's spells cost a Sage matrix routine per candidate and
+            the candidates number in the millions (measured at Sterk's
+            first cusp: 1,855,003 candidates, of which the engine's root
+            test took 337.8 s and its dependence check 92.9 s, against
+            72.4 s for the whole layer enumeration):
 
-            def IsNewRoot(self, vector):
-                r"""``VinAl.IsNewRoot`` with the subgroup test asked after the wall condition.
+            - the repeat check asks whether the candidate is at distance
+              zero from the controlling vector, that is one inner product
+              \(b(\text{candidate}, v_0)=0\).  ``VinAl`` instead asks
+              whether the candidate lies in the span of the first
+              \(n-1\) accepted roots, which is the same question when
+              those roots span \(v_0^\perp\) and is not when they do not:
+              at the fourth Enriques cusp the distance-zero admitted roots
+              span rank eight of the rank nine, the engine's span is a
+              foreign rank-nine subspace, and the walls it wrongly refuses
+              are the ones the chamber needs to close.  Every root at
+              distance zero was already decided by ``FundCone``, whose
+              walls are exactly the cell at \(v_0\): a chamber coincides
+              with that cell near \(v_0\) (Vinberg 1972, §3.2, the
+              construction after Proposition 3, p. 27), so no further
+              distance-zero mirror bounds it, and each such candidate is
+              refused whatever the span is;
+            - the root test asks whether the candidate's reflection
+              preserves the lattice, i.e. whether its square divides twice
+              each of its pairings with the framing generators; the
+              pairings are one contraction of the candidate against the
+              engine's Gram matrix, and the divisibility is ten modular
+              checks on the result.
 
-                Two of the conjuncts are answered here by their exact
-                equivalents rather than the engine's spells, because the
-                engine's spells cost a Sage matrix routine per candidate and
-                the candidates number in the millions (measured at Sterk's
-                first cusp: 1,855,003 candidates, of which the engine's root
-                test took 337.8 s and its dependence check 92.9 s, against
-                72.4 s for the whole layer enumeration):
+            Both equivalents answer the same question the engine's spell
+            answers; the accepted set is the same, and only the cost of
+            asking changes.
+            """
+            if vector.inner_product(self.v0) == 0:
+                return False
+            pairings = vector * self.M
+            square = vector.inner_product(vector)
+            if any((2 * pairing) % square != 0 for pairing in pairings):
+                return False
+            if not all(vector.inner_product(root) <= 0 for root in self.roots):
+                return False
+            return self._in_the_subgroup(vector)
 
-                - the repeat check asks whether the candidate is at distance
-                  zero from the controlling vector, that is one inner product
-                  \(b(\text{candidate}, v_0)=0\).  ``VinAl`` instead asks
-                  whether the candidate lies in the span of the first
-                  \(n-1\) accepted roots, which is the same question when
-                  those roots span \(v_0^\perp\) and is not when they do not:
-                  at the fourth Enriques cusp the distance-zero admitted roots
-                  span rank eight of the rank nine, the engine's span is a
-                  foreign rank-nine subspace, and the walls it wrongly refuses
-                  are the ones the chamber needs to close.  Every root at
-                  distance zero was already decided by ``FundCone``, whose
-                  walls are exactly the cell at \(v_0\): a chamber coincides
-                  with that cell near \(v_0\) (Vinberg 1972, §3.2, the
-                  construction after Proposition 3, p. 27), so no further
-                  distance-zero mirror bounds it, and each such candidate is
-                  refused whatever the span is;
-                - the root test asks whether the candidate's reflection
-                  preserves the lattice, i.e. whether its square divides twice
-                  each of its pairings with the framing generators; the
-                  pairings are one contraction of the candidate against the
-                  engine's Gram matrix, and the divisibility is ten modular
-                  checks on the result.
+        def NextRoot(self, max_decompositions=None, progress=None):
+            r"""Yield the engine's new roots, re-checked against the accepted ones.
 
-                Both equivalents answer the same question the engine's spell
-                answers; the accepted set is the same, and only the cost of
-                asking changes.
-                """
-                if vector.inner_product(self.v0) == 0:
-                    return False
-                pairings = vector * self.M
-                square = vector.inner_product(vector)
-                if any((2 * pairing) % square != 0 for pairing in pairings):
-                    return False
-                if not all(vector.inner_product(root) <= 0 for root in self.roots):
-                    return False
-                return self._in_the_subgroup(vector)
+            ``VinAl.NextRoot`` filters a whole layer against the roots
+            accepted when the layer starts and then yields every survivor,
+            so two candidates of one layer that pair positively both become
+            walls, and a candidate the layer solver lists twice is appended
+            twice -- at the fourth Enriques cusp the same wall appeared
+            twice in the accepted list.  Vinberg's sequence (38) asks the
+            wall condition of every root as it is written down (1972,
+            §4.1, p. 30), so each root is yielded only after it still
+            pairs nonpositively with everything accepted so far and is not
+            already among them.
+            """
+            for root in super().NextRoot(max_decompositions, progress):
+                if root in self.roots:
+                    continue
+                if any(root.inner_product(other) > 0 for other in self.roots):
+                    continue
+                yield root
 
-            def NextRoot(self, max_decompositions=None, progress=None):
-                r"""Yield the engine's new roots, re-checked against the accepted ones.
+        def cell(self):
+            r"""Return the cell at the controlling vector, or ``None`` when it does not span.
 
-                ``VinAl.NextRoot`` filters a whole layer against the roots
-                accepted when the layer starts and then yields every survivor,
-                so two candidates of one layer that pair positively both become
-                walls, and a candidate the layer solver lists twice is appended
-                twice -- at the fourth Enriques cusp the same wall appeared
-                twice in the accepted list.  Vinberg's sequence (38) asks the
-                wall condition of every root as it is written down (1972,
-                §4.1, p. 30), so each root is yielded only after it still
-                pairs nonpositively with everything accepted so far and is not
-                already among them.
-                """
-                for root in super().NextRoot(max_decompositions, progress):
-                    if root in self.roots:
-                        continue
-                    if any(root.inner_product(other) > 0 for other in self.roots):
-                        continue
-                    yield root
+            Vinberg 1972, §3.2, rule 1 and (39) (p. 27): before the sequence
+            (38) starts, the normals are the roots whose mirrors pass through
+            the point \(p_0\), and they cut the cell \(P_0\) at it.  Those are
+            the roots orthogonal to ``v0``, which is what ``FundCone``
+            returns and what ``roots`` holds when the candidate enumeration
+            begins.
 
-            def cell(self):
-                r"""Return the cell at the controlling vector, or ``None`` when it is not a basis.
+            For the layer enumeration of §4.1 (p. 30) the normals of \(P_0\)
+            are useful only when they span \(v_0^\perp\) up to one
+            lineality direction integrally, so the cell is returned with its
+            Gram matrix and a factor \(R\) with \(R^tR=G\), and ``None``
+            when the count of normals is neither the rank nor one less than
+            it, when the Gram has a positive entry off the diagonal (a cell
+            of an acute-angled polyhedron has \(g_{ij}\le0\)), or when the
+            normals do not span \(v_0^\perp\) integrally in that form.  The
+            Gram of such a cell is a Stieltjes matrix, so its inverse has
+            no negative entry, and that is what makes the cone of (58) sit
+            inside the orthant of the coefficients: see
+            :meth:`Roots_decomposed_into`.
 
-                Vinberg 1972, §3.2, rule 1 and (39) (p. 27): before the sequence
-                (38) starts, the normals are the roots whose mirrors pass through
-                the point \(p_0\), and they cut the cell \(P_0\) at it.  Those are
-                the roots orthogonal to ``v0``, which is what ``FundCone``
-                returns and what ``roots`` holds when the candidate enumeration
-                begins.
-
-                For the layer enumeration of §4.1 (p. 30) the normals of \(P_0\)
-                are useful only when they generate the lattice \(v_0^\perp\)
-                integrally, so the cell is returned with its Gram matrix and a
-                factor \(R\) with \(R^tR=G\), and ``None`` when the count of
-                normals is not the rank, when the Gram has a positive entry off
-                the diagonal (a cell of an acute-angled polyhedron has
-                \(g_{ij}\le0\)), or when the normals span a proper sublattice.
-                The Gram of such a cell is a Stieltjes matrix, so its inverse has
-                no negative entry, and that is what makes the cone of (58) the
-                orthant of the coefficients: see :meth:`Roots_decomposed_into`.
-                """
-                if self._cell is not _NO_CELL:
-                    return self._cell
-                roots = getattr(self, "roots", None)
-                if not roots:
-                    # ``FundCone`` is cutting the cell itself and asks the layer
-                    # enumeration on the way; there is nothing to cache yet.
-                    return None
-                self._cell = None
-                normals = tuple(root for root in roots if self.v0.inner_product(root) == 0)
-                rank = int(self.n) - 1
-                if len(normals) == rank:
-                    _g = engine_matrix([[int(u.inner_product(v)) for v in normals] for u in normals])
-                if len(normals) != rank:
-                    return None
-                gram = engine_matrix([[int(u.inner_product(v)) for v in normals] for u in normals])
-                if any(gram[i, j] > 0 for i in range(rank) for j in range(rank) if i != j):
-                    return None
+            A cell of \(\operatorname{rank}(v_0^\perp)-1\) normals -- a cusp
+            cell, whose cone has one lineality direction (#387,
+            ``results/issue387-the-group-of-the-card-chamber.md`` §4) -- is
+            returned with that direction: the cell's fourth entry is the
+            primitive vector \(m\) of \(v_0^\perp\) orthogonal to every
+            normal, its square, the inverse of the frame
+            \((w_1,\dots,w_r,m,v_0)\), and the representatives of the cosets
+            of the lattice \(\langle w_1,\dots,w_r,m\rangle\) in
+            \(v_0^\perp\).  At the fourth Enriques cusp that lattice has
+            index two, so half of \(v_0^\perp\) lies outside the coordinates
+            of the normals and \(m\) alone, and a vector of \(v_0^\perp\)
+            is written in those coordinates only after its coset
+            representative is added; the basis case is the same structure
+            with the single trivial coset.
+            """
+            if self._cell is not _NO_CELL:
+                return self._cell
+            roots = getattr(self, "roots", None)
+            if not roots:
+                # ``FundCone`` is cutting the cell itself and asks the layer
+                # enumeration on the way; there is nothing to cache yet.
+                return None
+            self._cell = None
+            normals = tuple(root for root in roots if self.v0.inner_product(root) == 0)
+            rank = int(self.n) - 1
+            if len(normals) not in (rank, rank - 1):
+                return None
+            gram = engine_matrix([[int(u.inner_product(v)) for v in normals] for u in normals])
+            if any(
+                gram[i, j] > 0
+                for i in range(len(normals))
+                for j in range(len(normals))
+                if i != j
+            ):
+                return None
+            factor = _ldl_factorisation(gram)
+            if factor is None:
+                return None
+            if len(normals) == rank:
                 if int(abs(gram.det())) != int(abs(self.M1.det())):
                     return None
-                factor = _ldl_factorisation(gram)
-                if factor is None:
-                    return None
-                self._cell = (normals, gram.change_ring(SageQQ), factor)
+                self._cell = (normals, gram.change_ring(SageQQ), factor, None)
                 return self._cell
+            # One lineality direction: the primitive vector of v0^perp
+            # orthogonal to every normal.  The normals are independent,
+            # because their Gram factored, so together with v0 they have
+            # rank n-1 and the kernel below is a line; its primitive
+            # generator is integral, orthogonal to the normals and to v0,
+            # and of positive square, because it lies in the positive
+            # definite v0^perp.
+            rows = engine_matrix([list(normal) for normal in normals] + [list(self.v0)])
+            generator = (rows * self.M).right_kernel().basis()[0]
+            entries = [int(entry) for entry in generator]
+            leading = next(entry for entry in entries if entry)
+            if leading < 0:
+                entries = [-entry for entry in entries]
+            m = self.V(entries)
+            m_square = int(m.inner_product(m))
+            # The frame of the normals and m generates v0^perp up to a
+            # finite index, and the index is paid in coset
+            # representatives: a vector of v0^perp is written in the
+            # frame's coordinates only after its representative is added.
+            # The representatives are the integer points of the
+            # parallelepiped of the frame's coordinates in a basis of
+            # v0^perp, the same construction as the engine's own W.
+            basis = self.V1.matrix()
+            inserted = basis.insert_row(int(self.n) - 1, self.v0)
+            coordinates = (
+                engine_matrix([list(normal) for normal in normals] + [entries])
+                * inserted.change_ring(SageQQ).inverse()
+            ).matrix_from_columns(range(len(normals) + 1))
+            if any(value not in SageZZ for value in coordinates.list()):
+                # The frame lies in v0^perp, so its coordinates in a basis of
+                # v0^perp are integral; a fractional entry means the frame is
+                # not what the construction above says it is.
+                return None
+            cosets = tuple(
+                self.V(list(engine_vector(SageZZ, point) * basis))
+                for point in _vinal_parallelepiped_points(coordinates.change_ring(SageZZ))
+            )
+            frame = engine_matrix([list(normal) for normal in normals] + [entries, list(self.v0)])
+            self._cell = (
+                normals,
+                gram.change_ring(SageQQ),
+                factor,
+                (m, m_square, frame.change_ring(SageQQ).inverse(), cosets),
+            )
+            return self._cell
 
-            def Roots_decomposed_into(self, a, k):
-                r"""Return the candidates of one layer that satisfy conditions (58).
+        def Roots_decomposed_into(self, a, k):
+            r"""Return the candidates of one layer whose normal coordinates are nonpositive.
 
-                Vinberg, *On the groups of unit elements of certain quadratic
-                forms*, Math. USSR Sb. 16 (1972), §4.1, p. 30: "Construction of
-                the sequence (38) thus reduces to writing down those solutions of
-                the Diophantine equation (57) that satisfy conditions (58) in
-                increasing order of the quantity (59), and in checking conditions
-                (49) for each solution as it is written down."  Conditions (58)
-                are the inequalities \(b_0\le0,\dots,b_n\le0\) against the normals
-                already accepted — the cone conditions — and (49) is the height
-                comparison, which :meth:`IsNewRoot` makes of every solution.
+            Vinberg, *On the groups of unit elements of certain quadratic
+            forms*, Math. USSR Sb. 16 (1972), §4.1, p. 30: "Construction of
+            the sequence (38) thus reduces to writing down those solutions of
+            the Diophantine equation (57) that satisfy conditions (58) in
+            increasing order of the quantity (59), and in checking conditions
+            (49) for each solution as it is written down."  Conditions (58)
+            are the inequalities \(b_0\le0,\dots,b_n\le0\) against the normals
+            already accepted — the cone conditions — and (49) is the height
+            comparison, which :meth:`IsNewRoot` makes of every solution.
 
-                This method writes down only the solutions of (58) against the
-                normals of the cell at the controlling vector, and never a
-                solution outside that cone.  With \(v_1\) in the layer's
-                \(v_0^\perp\) and \(w_1,\dots,w_{n-1}\) those normals,
-                \(v_1=\sum c_iw_i\) and \(b(v_1,w_i)=\sum_jg_{ij}c_j\), so
-                (58) says \(Gc\le0\), and for a Stieltjes \(G\) that is exactly
-                \(c\le0\): \(G^{-1}\) has no negative entry, so \(c=G^{-1}(Gc)\)
-                is non-positive whenever \(Gc\) is, and conversely.  Writing
-                \(d=-c\ge0\), the layer's norm equation (57),
-                \(q(a+v_1)=k\), becomes \(d^tGd=k-q(a)\) with \(d\) in the
-                orthant, which is enumerated by completion of squares along the
-                factor \(R\): the down-set of every partial choice bounds the next
-                coefficient, and every coefficient is non-negative, so nothing
-                outside the cone is written down and nothing inside it is
-                skipped.
+            This method writes down the solutions of the layer's equation
+            (57) whose coordinates along the cell normals are nonpositive,
+            and never a solution outside that orthant.  The candidate is
+            \(v=a+v_1\) with \(v_1\) in \(v_0^\perp\), the normals of the
+            cell at the controlling vector are \(w_1,\dots,w_r\), and
+            \(u\), the coordinates of \(v\) along the normals, pair as
+            \(b(v,w_i)=\sum_jg_{ij}u_j\), so (58) says \(Gu\le0\).  The
+            Gram of a cell is a Stieltjes matrix, so \(G^{-1}\) has no
+            negative entry and \(u=G^{-1}(Gu)\) is non-positive whenever
+            \(Gu\) is: every solution of (58) has nonpositive normal
+            coordinates, the orthant is a superset of the cone, and the
+            walls, which :meth:`IsNewRoot` takes out of it, are never
+            skipped.  Writing \(a'\) for the offset \(a\) with its normal
+            coordinates cancelled and \(d=-u\), the norm equation (57)
+            becomes \(d^tGd=k-q(a')\) with \(d\ge0\) in the orthant and
+            \(d\) in the coset of the offset's own coordinates: that is
+            enumerated by completion of squares along the factor \(R\),
+            every coefficient respecting the same lower bound, so nothing
+            outside the orthant is written down.
 
-                Layers whose cone is not available — the initial cone's own
-                enumeration, and a controlling vector whose cell is not a basis —
-                keep ``VinAl``'s enumeration of the whole layer.
-                """
-                cell = self.cell()
-                if cell is None:
-                    return super().Roots_decomposed_into(a, k)
-                normals, gram, factor = cell
+            A cell with one lineality direction (#400) enumerates the layer
+            in the same coordinates with the lineality coordinate added.
+            Every vector of \(v_0^\perp\) is, for exactly one coset
+            representative \(s\) of \(\langle w_1,\dots,w_r,m\rangle\) in
+            \(v_0^\perp\), the vector \(s-\sum d_iw_i+tm\) with
+            \(d\in\mathbf Z^r\) and \(t\in\mathbf Z\); the frame
+            \((w_1,\dots,w_r,m,v_0)\) has block-diagonal Gram, because
+            \(m\) is orthogonal to the normals and to \(v_0\), so with
+            \(a+s=\sum x_iw_i+\alpha m+\gamma v_0\) the norm equation (57)
+            reads \(d^tGd+q(m)(\alpha+t)^2=k-\gamma^2q(v_0)\): the integer
+            \(t\) is bounded on both sides by that equation,
+            \(q(m)(\alpha+t)^2\le k-\gamma^2q(v_0)\), and each bounded
+            \(t\) leaves the same positive-definite equation in
+            \(d\ge0\).
+
+            Layers whose cell is not available — the initial cone's own
+            enumeration, and a controlling vector whose cell spans
+            \(v_0^\perp\) integrally in neither form — keep ``VinAl``'s
+            enumeration of the whole layer.
+            """
+            cell = self.cell()
+            if cell is None:
+                return super().Roots_decomposed_into(a, k)
+            normals, gram, factor, lineality = cell
+            if lineality is None:
                 squares, triangular = factor
                 beta = [Fraction(int(a.inner_product(normal))) for normal in normals]
                 center = [
@@ -768,7 +853,7 @@ def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions
                 )
                 if remaining < 0:
                     return []
-                candidates = self._cone_combinations(normals, factor, offsets, remaining)
+                candidates = self._cone_combinations(normals, factor, offsets, remaining, center)
                 found = [a + vector for vector in candidates]
                 for candidate in found:
                     if int(candidate.inner_product(candidate)) != int(k):
@@ -777,63 +862,160 @@ def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions
                             f"{candidate.inner_product(candidate)}, not the layer's {k}"
                         )
                 return found
+            m, m_square, frame_inverse, cosets = lineality
+            v0_square = Fraction(int(self.v0.inner_product(self.v0)))
+            m_square_fraction = Fraction(m_square)
+            found = []
+            for coset in cosets:
+                offset = a + coset
+                coordinates = (
+                    engine_vector(SageQQ, [int(entry) for entry in offset]) * frame_inverse
+                )
+                x = [
+                    Fraction(int(value.numerator()), int(value.denominator()))
+                    for value in coordinates[: len(normals)]
+                ]
+                alpha = Fraction(
+                    int(coordinates[len(normals)].numerator()),
+                    int(coordinates[len(normals)].denominator()),
+                )
+                gamma = Fraction(
+                    int(coordinates[len(normals) + 1].numerator()),
+                    int(coordinates[len(normals) + 1].denominator()),
+                )
+                remaining = Fraction(int(k)) - gamma * gamma * v0_square
+                if remaining < 0:
+                    continue
+                triangular = factor[1]
+                offsets = [
+                    sum((triangular[j][i] * x[j] for j in range(len(normals))), Fraction(0))
+                    for i in range(len(normals))
+                ]
+                # The integers t with q(m)(alpha + t)^2 <= remaining: the
+                # square-root bound is a floor of the real root, so each
+                # end is extended while the exact inequality still holds.
+                bound = _square_root_bound(remaining / m_square_fraction)
+                high = int((bound - alpha).__floor__())
+                while m_square_fraction * (alpha + high + 1) ** 2 <= remaining:
+                    high += 1
+                low = int((-bound - alpha).__ceil__())
+                while m_square_fraction * (alpha + low - 1) ** 2 <= remaining:
+                    low -= 1
+                for t in range(low, high + 1):
+                    square = remaining - m_square_fraction * (alpha + t) ** 2
+                    for combination in self._cone_combinations(
+                        normals, factor, offsets, square, x
+                    ):
+                        found.append(offset + combination + t * m)
+            for candidate in found:
+                if int(candidate.inner_product(candidate)) != int(k):
+                    raise ArithmeticError(
+                        f"the cone enumeration of the layer at {a} returned {candidate}, whose square is "
+                        f"{candidate.inner_product(candidate)}, not the layer's {k}"
+                    )
+            return found
 
-            @staticmethod
-            def _cone_combinations(normals, factor, offsets, square):
-                r"""Return \(-d_1w_1-\dots-d_nw_n\) for \(d\ge0\) integral with \(d^tGd=\) ``square``.
+        @staticmethod
+        def _cone_combinations(normals, factor, offsets, square, floors=None):
+            r"""Return \(-d_1w_1-\dots-d_nw_n\) for \(d\ge\text{floors}\) integral with \(d^tGd=\) ``square``.
 
-                ``factor`` is the pair \((D,L)\) of :func:`_ldl_factorisation`, so
-                \(d^tGd=\sum_iD_i(L^td)_i^2\) and the \(i\)-th entry
-                \((L^td)_i=d_i+\sum_{j>i}L_{ji}d_j\) depends on \(d_i,\dots,d_n\)
-                only.  Descending from \(d_n\), the value
-                \(s-\sum_{j>i}D_j(L^td)_j^2\) bounds \(d_i\) from both sides, and the
-                last coefficient is pinned to an exact square.  Every coefficient is
-                non-negative: that is conditions (58).
-                """
-                size = len(normals)
-                squares, triangular = factor
-                coefficients = [0] * size
-                found = []
+            ``factor`` is the pair \((D,L)\) of :func:`_ldl_factorisation`, so
+            \(d^tGd=\sum_iD_i(L^td)_i^2\) and the \(i\)-th entry
+            \((L^td)_i=d_i+\sum_{j>i}L_{ji}d_j\) depends on \(d_i,\dots,d_n\)
+            only.  Descending from \(d_n\), the value
+            \(s-\sum_{j>i}D_j(L^td)_j^2\) bounds \(d_i\) from both sides, and the
+            last coefficient is pinned to an exact square.
 
-                def descend(level, remaining):
-                    shift = sum(
-                        (triangular[j][level] * coefficients[j] for j in range(level + 1, size)),
-                        Fraction(0),
-                    ) - offsets[level]
-                    if level == 0:
-                        root = _exact_square_root(remaining / squares[0])
-                        if root is None:
-                            return
-                        for sign in ((1,) if root == 0 else (1, -1)):
-                            value = sign * root - shift
-                            if value.denominator != 1 or value < 0:
-                                continue
-                            coefficients[0] = int(value)
-                            combination = [0] * int(normals[0].degree())
-                            for position, coefficient in enumerate(coefficients):
-                                if coefficient:
-                                    combination = [
-                                        entry - coefficient * int(other)
-                                        for entry, other in zip(combination, normals[position])
-                                    ]
-                            found.append(normals[0].parent()(combination))
-                        coefficients[0] = 0
+            The coefficients are those of the candidate written in the
+            cell's frame, so the orthant \(u\le0\) of conditions (58)
+            (\(u\) the candidate's normal coordinates) is a lower bound on
+            them: ``floors`` is that bound, the normal coordinates of the
+            layer's offset, and it is zero only when the offset has no
+            component along the normals — the whole-lattice offset of the
+            fourth Enriques cusp has negative ones.  Each level's range is
+            the integers that satisfy both the bound and the exact residual
+            inequality \(D_i(L^td)_i^2\le s\): the square-root bound is a
+            floor, so each end of the range is extended while the exact
+            inequality still holds.
+            """
+            size = len(normals)
+            squares, triangular = factor
+            bounds = (
+                [Fraction(0)] * size
+                if floors is None
+                else [Fraction(value) for value in floors]
+            )
+            coefficients = [0] * size
+            found = []
+
+            def descend(level, remaining):
+                shift = sum(
+                    (triangular[j][level] * coefficients[j] for j in range(level + 1, size)),
+                    Fraction(0),
+                ) - offsets[level]
+                if level == 0:
+                    root = _exact_square_root(remaining / squares[0])
+                    if root is None:
                         return
-                    bound = _square_root_bound(remaining / squares[level])
-                    if bound is None:
-                        return
-                    low = int((-bound - shift).__floor__())
-                    high = int((bound - shift).__floor__())
-                    for value in range(max(0, low), high + 1):
-                        coefficients[level] = value
-                        entry = value + shift
-                        descend(level - 1, remaining - squares[level] * entry * entry)
-                    coefficients[level] = 0
+                    for sign in ((1,) if root == 0 else (1, -1)):
+                        value = sign * root - shift
+                        if value.denominator != 1 or value < bounds[0]:
+                            continue
+                        coefficients[0] = int(value)
+                        combination = [0] * int(normals[0].degree())
+                        for position, coefficient in enumerate(coefficients):
+                            if coefficient:
+                                combination = [
+                                    entry - coefficient * int(other)
+                                    for entry, other in zip(combination, normals[position])
+                                ]
+                        found.append(normals[0].parent()(combination))
+                    coefficients[0] = 0
+                    return
+                bound = _square_root_bound(remaining / squares[level])
+                if bound is None:
+                    return
+                high = int((bound - shift).__floor__())
+                while squares[level] * (high + 1 + shift) ** 2 <= remaining:
+                    high += 1
+                low = int((-bound - shift).__ceil__())
+                while squares[level] * (low - 1 + shift) ** 2 <= remaining:
+                    low -= 1
+                for value in range(max(bounds[level].__ceil__(), low), high + 1):
+                    coefficients[level] = value
+                    entry = value + shift
+                    descend(level - 1, remaining - squares[level] * entry * entry)
+                coefficients[level] = 0
 
-                descend(size - 1, Fraction(square))
-                return found
+            descend(size - 1, Fraction(square))
+            return found
 
-        algorithm = _FilteredVinAl(gram, controlling_vector, False, None)
+    return _FilteredVinAl
+
+
+def _vinal_vinberg_roots(gram, controlling_vector, max_roots, max_decompositions, admits_root=None):
+    r"""Run Vinberg's algorithm on a Gram matrix of signature \((n,1)\).
+
+    Returns the completeness flag of the search and the coordinate rows of the
+    accepted roots.  ``vinal`` is Bogachev and Perepechko's implementation of
+    the algorithm; ``FindRoots`` reports whether the fundamental polyhedron was
+    established, which is the algorithm's own termination criterion.
+
+    ``admits_root`` restricts the algorithm to a reflection subgroup: a candidate
+    root is accepted only when its coordinate row is admitted, and the same test
+    filters the roots of the initial cone at the controlling vector.  A finite
+    index reflection subgroup of \(O(L)\) has its own polyhedron and not the
+    full group's, so the restriction is part of the algorithm and not a filter
+    of its output (#297).
+    """
+    if admits_root is None:
+        from vinal import VinAl
+
+        algorithm = VinAl(gram, controlling_vector, False, None)
+    else:
+        algorithm = _filtered_vinal_class()(
+            gram, controlling_vector, False, None, admits_root=admits_root
+        )
     complete = algorithm.FindRoots(max_roots=max_roots, max_decompositions=max_decompositions)
     return bool(complete), tuple(tuple(root) for root in algorithm.roots)
 
