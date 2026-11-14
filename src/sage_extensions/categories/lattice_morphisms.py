@@ -5407,6 +5407,12 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
 
         # The represented U + U + K decompositions, with the two hyperbolic
         # planes first and the even unimodular definite complement last.
+        # A lattice not constructed as a biproduct has no represented
+        # decomposition, so the pair is outside this route's scope.
+        from sage_extensions.categories.modules.pure.modules import BiproductModules
+
+        if domain not in BiproductModules(domain.base_ring()) or codomain not in BiproductModules(codomain.base_ring()):
+            return None
         try:
             domain_planes = (domain.biproduct_factor(0), domain.biproduct_factor(1))
             codomain_planes = (codomain.biproduct_factor(0), codomain.biproduct_factor(1))
