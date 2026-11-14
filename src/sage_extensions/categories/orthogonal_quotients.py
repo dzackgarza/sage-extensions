@@ -2061,17 +2061,19 @@ class OrthogonalCharacterQuotient:
                 lattice, witness.transport_isotropic_object(left)
             )
             return str(target) not in self.isotropic_class_orbit(source)
-        if rank == 2 and left.is_parabolic_complete() is True:
+        if rank == 2:
             from sage_extensions.categories.group.groups import (
                 _element_to_engine,
                 _gap_model,
             )
 
+            stabilizer_image = self.parabolic_image_subgroup(left)
+            if stabilizer_image is None:
+                return False
             witness_image = _element_to_engine(
                 self._discriminant_group, self.image(witness)["discriminant"]
             )
             engine = _gap_model(self._discriminant_group)
-            stabilizer_image = self.parabolic_image_subgroup(left)
             return not bool(
                 witness_image
                 in libgap.DoubleCoset(
@@ -2155,17 +2157,31 @@ class OrthogonalCharacterQuotient:
             return False
         return str(target) not in self.isotropic_class_orbit(source)
 
-    def register_isotropic_lift(self, plane, lift):
-        r"""Record the parabolic split's lift of one plane representative.
+    def register_isotropic_lift(self, plane, lift, parabolic_generators):
+        r"""Record one representative of the parabolic split and its certified data.
 
-        The plane-orbit split transports the ambient representative to each
-        orbit's representative by one lift; the registry retains the pair, so
-        the composite of two registered lifts is an ambient isometry between
-        the two representatives that no isometry search has to find (#391:
-        the search itself is what reaches the port's generic enumeration on
-        this lattice).  The registry retains its keys.
+        ``lift`` carries the source plane, whose complete parabolic is generated
+        by ``parabolic_generators``, to ``plane``.  Conjugating that family by
+        the lift therefore generates the target plane's complete parabolic.
+        Retaining both data lets every consumer use the split's own witness and
+        certificate instead of repeating an integral isometry or parabolic
+        completeness computation (#391/#396).
         """
-        self.__dict__.setdefault("_isotropic_lift_registry", {})[plane] = lift
+        self.__dict__.setdefault("_isotropic_lift_registry", {})[plane] = (
+            lift,
+            tuple(parabolic_generators),
+        )
+
+    def _registered_isotropic_split(self, plane):
+        r"""The registered ``(lift, source parabolic generators)`` for ``plane``."""
+        from sage_extensions.categories.isotropic_orbits import _same_subobject
+
+        for registered, record in self.__dict__.get(
+            "_isotropic_lift_registry", {}
+        ).items():
+            if _same_subobject(registered, plane):
+                return record
+        return None
 
     def isotropic_lift_of(self, plane):
         r"""The registered lift of a plane, matched by span equality.
@@ -2176,27 +2192,40 @@ class OrthogonalCharacterQuotient:
         matching is by span equality, so an equal-but-distinct object finds
         its lift too.
         """
-        from sage_extensions.categories.isotropic_orbits import _same_subobject
+        record = self._registered_isotropic_split(plane)
+        return None if record is None else record[0]
 
-        for registered, lift in self.__dict__.get(
-            "_isotropic_lift_registry", {}
-        ).items():
-            if _same_subobject(registered, plane):
-                return lift
-        return None
+    @cached_method
+    def certified_parabolic_generators(self, plane):
+        r"""Generators certified to be the whole parabolic at ``plane``, or ``None``.
+
+        A representative produced by the parabolic split inherits the source
+        family's completeness by conjugation: if `sP_0=P` and the `g_i`
+        generate `Stab(P_0)`, then the `s g_i s^{-1}` generate
+        `Stab(P)=s Stab(P_0) s^{-1}`.  In particular no new completeness
+        decision, and no automorphism group of a transported Levi quotient, is
+        needed (#391: that recomputation reaches PARI `qfauto` on `T_Co`).
+        An unregistered plane uses its own block-construction certificate.
+        """
+        record = self._registered_isotropic_split(plane)
+        if record is not None:
+            lift, source_family = record
+            return tuple(lift * generator * ~lift for generator in source_family)
+        if plane.is_parabolic_complete() is not True:
+            return None
+        return tuple(plane.parabolic_stabilizer_generators())
 
     @cached_method
     def parabolic_image_subgroup(self, plane):
         r"""The discriminant image of a complete plane's parabolic, as a GAP subgroup of ``O(A_L)``.
 
-        The family of :meth:`plane.parabolic_stabilizer_generators` generates
-        the plane's stabilizer exactly when :meth:`is_parabolic_complete`
-        holds, and the image of a generated group is the group generated by
-        the images, so the subgroup returned here *is*
-        ``rho(Stab_{O(L)}(plane))`` in that case -- the right-hand group the
-        double-coset decisions of :meth:`separates_witness_orbits` and the
-        plane-orbit split need.  The family is the plane's own cached one, so
-        the images are computed once per plane, not once per pair.
+        The family of :meth:`certified_parabolic_generators` generates the
+        plane's stabilizer, so the image of that generated group is the group
+        generated by its images: the subgroup returned here *is*
+        ``rho(Stab_{O(L)}(plane))`` -- the right-hand group the double-coset
+        decisions of :meth:`separates_witness_orbits` and the plane-orbit
+        split need.  The certified family is cached once per plane, not
+        recomputed once per pair.
         """
         from sage.libs.gap.libgap import libgap
         from sage_extensions.categories.group.groups import (
@@ -2204,13 +2233,16 @@ class OrthogonalCharacterQuotient:
             _gap_model,
         )
 
+        family = self.certified_parabolic_generators(plane)
+        if family is None:
+            return None
         rho = self.lattice.discriminant_representation()
         engine = _gap_model(self._discriminant_group)
         return libgap.Subgroup(
             engine,
             [
                 _element_to_engine(self._discriminant_group, rho(generator))
-                for generator in plane.parabolic_stabilizer_generators()
+                for generator in family
             ],
         )
 
@@ -3193,15 +3225,18 @@ def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
         return None
     quotient = subgroup.finite_character_quotient()
     splittings = tuple(quotient.splitting_isometries(family))
-    # The split's own lifts are retained with the representatives they
-    # produced: they are ambient isometries between the representatives, so
-    # the consumers of the row never search for one (#391 -- the search is
-    # what reaches the port's generic enumeration on this lattice).
-    quotient.register_isotropic_lift(representative, quotient.supergroup.one())
+    # The split's own lifts and complete source family are retained with the
+    # representatives they produced: the consumers of the row never search
+    # for a witness or re-certify a transported parabolic (#391 -- the search
+    # reaches the port's generic enumeration, and the recomputation reaches
+    # PARI's qfauto overflow on this lattice).
+    quotient.register_isotropic_lift(
+        representative, quotient.supergroup.one(), family
+    )
     representatives = []
     for splitting in splittings:
         transported = splitting.transport_isotropic_object(representative)
-        quotient.register_isotropic_lift(transported, splitting)
+        quotient.register_isotropic_lift(transported, splitting, family)
         representatives.append(transported)
     return tuple(representatives)
 
@@ -3300,12 +3335,10 @@ def _plane_parabolic_incidence_flags(subgroup, plane, flag):
     preimage, ``None`` is returned and the caller keeps its own route.
     """
     lattice = subgroup.supergroup().domain()
-    if plane.is_parabolic_complete() is not True:
-        return None
-    family = tuple(plane.parabolic_stabilizer_generators())
+    quotient = subgroup.finite_character_quotient()
+    family = quotient.certified_parabolic_generators(plane)
     if not family:
         return None
-    quotient = subgroup.finite_character_quotient()
     if not quotient._has_discriminant or quotient.determinant_kernel or quotient.spinor_kernel:
         # The reduction below needs ker rho inside Gamma: a subgroup cut out
         # by a sign character alone does not contain it, and its stabilizer
@@ -3467,6 +3500,15 @@ def _subgroup_isotropic_equivalence_witness(subgroup, left, right, *, flag=False
         return None
     if witness in subgroup:
         return witness
+    if left_lift is not None and right_lift is not None:
+        # These are two representatives of the parabolic split itself.  Its
+        # double cosets already decide their subgroup orbits: a witness in the
+        # subgroup was returned above, and otherwise the representatives are
+        # in distinct orbits by construction (DSH Lemma 3.6, printed p. 22).
+        # A second membership test in rho(Gamma) rho(Stab) is therefore not
+        # merely redundant: GAP's DoubleCoset membership is the memory wall
+        # measured while deduplicating the T_Co plane cusps (#391/#396).
+        return None
     _assert_isotropic_splitting_has_character_data(subgroup)
     if quotient is None:
         quotient = subgroup.finite_character_quotient()

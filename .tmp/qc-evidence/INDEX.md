@@ -666,3 +666,12 @@ needed by the Γ_{Co,2} plane row of #391.
 | --- | --- | --- |
 | `issue397-transport-regression.log` | the tree of this push | **1 passed in 1.90 s**, transported primitive isotropic plane retains `is_parabolic_complete` and its exact inclusion in both directions |
 | `issue397-transport-lint.log` | the tree of this push | **1 test collected, no lint findings** |
+
+## #391 — the two T_Co incidence rows through the plane's parabolic
+
+The command is the image Python with `PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work:/repos/sage-extensions/src` and the 6144 MiB `peakrss.py` guard.  No number is an expected oracle: the test checks containment of each edge's line in its plane and incidence of every line and plane cusp.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue391-gamma-co2-staged.log` | the tree of this push | Γ_{Co,2}: subgroup 96.1 s; **4 line cusps at 328.4 s; 7 plane cusps at 391.8 s; 13 edges at 1382.6 s; assertions passed at 1388.1 s**; peak tree RSS 3710 MiB |
+| `issue391-incidence-rows.log` | the tree of this push | unchanged `tests/coble_gamma_co_2_incidence_rows.py --cap 2400 --budget 2500`: **O(T_Co) 1 edge over 1/1 cusps in 112.9 s; Γ_{Co,2} 13 edges over 4/7 cusps in 1374.2 s; exit 0, peak tree RSS 3718 MiB** |
