@@ -745,3 +745,22 @@ The literal `just test` stops at pytest usage because this image lacks the confi
 | `issue391-just-test-base-1a59869.log` | clean base `1a59869ba6` | same 3915 collected, **same collection error in 298.04 s** |
 | `issue391-push-repair.log` | the tree of this push | `just test-push`: **7 files checked, no errors** (syntax check, not a suite claim) |
 | `issue400-tests-agreement.log` | #400 | the per-layer agreement regression on the #400 tree: `tests/lattices/test_the_isotropic_reduction_image.sage` with `-k "not every_cusp_chamber"` — **9 passed, 1 deselected in 780.56 s** with `--no-time-gates`; the new layer-agreement test 57.73 s (initial cone plus four layers, duals verified then both enumerations compared), the walk-progress regression 542.26 s, both over the 20 s ceiling (recorded, not hidden) |
+## #401 — the Vinberg call returns the facets of the polyhedron it cuts out
+
+The gate pair runs at the base `1edc223` and on this tree, in two worktrees of the same checkout.  The probes and the wall dumps ran at `cf656f8` and on an intermediate rebase; they depend on `hyperbolic_lattices.py` alone, and `issue401-failed-sets.txt` records that file's sha256 on each tree so the correspondence is checkable.  The probes run under `peakrss.py` with the 6144 MiB guard; the pytest runs use `just test -o addopts= -p sage_extensions.testing.suite_budget --no-time-gates` with `PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work:/repos/sage-extensions/src` from `/repos/sage-extensions` and the port bound at `/work`.  The literal recipe does not run here at all — its addopts name `--timeout` and `--report-log`, and pytest-timeout and pytest-reportlog are absent from the image's venv — so every run names `-o addopts=` and its plugins.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue401-facets-survey.log` | the tree of this push | accepted roots against facets of the intersection: \(U\oplus A_1\) **3/3**, \(U\oplus E_8\) **10/10**, \(U\oplus E_8\oplus E_8\) **19/19**, \(U\oplus E_8(-2)\) **10/10**; no completed chamber carries a non-facet root |
+| `issue401-bounded-prefixes.log` | the tree of this push | the same on bounded prefixes, `max_roots` 1..12 and `max_decompositions` 2..20: **accepted = facets** at every bound, including the two truncations that return 9 roots |
+| `issue401-small-lattices.log` | the tree of this push | eight small hyperbolic lattices (3, 4, 5, 4, 6, 5, 6 and 12 accepted): **accepted = facets** in each |
+| `issue401-redundant-root-specimen.log` | the tree of this push | \(U\oplus A_1\oplus A_1\): four walls, each cutting a face of dimension 3; \(a_1+a_2\) primitive of square \(-4\); the cone with it as a fifth wall has **4 facets** and cuts a dimension-**2** face on it |
+| `issue401-cusp-walls-base.log` | `cf656f8` | the public `cusp_chamber` wall sets at Sterk's cusps 1, 2 and 3: **12, 10, 12**, with coordinates |
+| `issue401-cusp-walls-mine.log` | `c15b432`, same `hyperbolic_lattices.py` as this push | the same three, **byte-identical** to the base dump |
+| `issue401-cusp-5-walls.log` | `c15b432`, same file as this push | cusp 5's public chamber: **complete, 14 walls** — against card `029J` row 4.3.9's thirteen, so the extra wall is irredundant and not a redundancy artefact; cusp 4 does not return (a 19-minute run stopped inside it), which is #400's walk and not this call |
+| `issue401-facet-tests.log` | `1edc223` + this commit | the new module alone: **5 passed in 11.68 s** |
+| `issue401-gate-base.log` | `1edc223` | the 25 suite files that name a changed operation, `--continue-on-collection-errors -q --deselect ...test_every_cusp_chamber_has_the_wall_count_of_its_card_row`: **41 failed, 149 passed, 1 deselected in 3329.47 s** |
+| `issue401-gate-mine.log` | the tree of this push | the same 25 files: **41 failed, 149 passed, 1 deselected in 3386.93 s** |
+| `issue401-failed-sets.txt` | both trees | **the FAILED id sets are identical, 41 ids: nothing new, nothing repaired**; the full command; why the one test is deselected; the source checksums of the two trees |
+| `issue401-whole-suite-base.log` | `cf656f8` | the whole suite over `tests`: `collected 3916 items / 1 error`, killed by the OOM killer at 15% (exit 137) |
+| `issue401-whole-suite-mine.log` | `c15b432`, same file as this push | `collected 3921 items` — the five new tests — killed by the OOM killer at 15% (exit 137); the suite's 4 GiB-per-process rows do not fit beside the other sessions' runs on this VM, at either tree |

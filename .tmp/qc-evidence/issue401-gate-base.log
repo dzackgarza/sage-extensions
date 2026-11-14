@@ -1,0 +1,2362 @@
+worktree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt401base4
+tree SHA: 1edc2237bbad22bcc47679900bed7ec90b2cfdc9
+files: 25
+started: 2026-11-14T07:57:55+00:00
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+...........................F....FFFFFFF................................. [ 37%]
+.......FFFFFFFFFFFFFFF....FF..........F.FF.............................. [ 75%]
+...............F.......FFFFF..FFFF....FFF.....                           [100%]
+=================================== FAILURES ===================================
+___ test_the_two_labellings_of_the_rank_three_double_bond_present_one_group ____
+
+>   return self._cached_methods[name]
+E   KeyError: 'is_isomorphic'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_two_labellings_of_the_rank_three_double_bond_present_one_group() -> None:
+        r"""\([4,3]\) and \([3,4]\) differ as labelled diagrams and present one group of order \(48\), Schlaeflian \(2\)."""
+        first = bracket(4, 3)
+        second = bracket(3, 4)
+    
+        assert first.coxeter_matrix() != second.coxeter_matrix()
+        assert first.coxeter_group().cardinality() == 48
+>       assert first.coxeter_group().is_isomorphic(second.coxeter_group())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_GroupEngine].ObjectType' object has no attribute 'is_isomorphic'. Did you mean: 'is_isomorphic_to'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+________ test_the_coxeter_group_of_type_a_is_the_symmetric_group[rank0] ________
+
+>   return self._cached_methods[name]
+E   KeyError: 'is_isomorphic'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+rank = 1
+
+    @pytest.mark.parametrize("rank", [1, 2, 3, 4])
+    def test_the_coxeter_group_of_type_a_is_the_symmetric_group(rank) -> None:
+        r"""\(W(A_n)\cong S_{n+1}\), of order \((n+1)!\) (Humphreys 1.1)."""
+        group = CoxeterDiagrams()(
+            coxeter_matrix(rank, {(i, i + 1): 3 for i in range(rank - 1)})
+        ).coxeter_group()
+    
+        assert group.cardinality() == factorial(rank + 1)
+>       assert group.is_isomorphic(Groups.S(rank + 1))
+               ^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'is_isomorphic_to'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+________ test_the_coxeter_group_of_type_a_is_the_symmetric_group[rank1] ________
+
+>   return self._cached_methods[name]
+E   KeyError: 'is_isomorphic'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+rank = 2
+
+    @pytest.mark.parametrize("rank", [1, 2, 3, 4])
+    def test_the_coxeter_group_of_type_a_is_the_symmetric_group(rank) -> None:
+        r"""\(W(A_n)\cong S_{n+1}\), of order \((n+1)!\) (Humphreys 1.1)."""
+        group = CoxeterDiagrams()(
+            coxeter_matrix(rank, {(i, i + 1): 3 for i in range(rank - 1)})
+        ).coxeter_group()
+    
+        assert group.cardinality() == factorial(rank + 1)
+>       assert group.is_isomorphic(Groups.S(rank + 1))
+               ^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'is_isomorphic_to'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+________ test_the_coxeter_group_of_type_a_is_the_symmetric_group[rank2] ________
+
+>   return self._cached_methods[name]
+E   KeyError: 'is_isomorphic'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+rank = 3
+
+    @pytest.mark.parametrize("rank", [1, 2, 3, 4])
+    def test_the_coxeter_group_of_type_a_is_the_symmetric_group(rank) -> None:
+        r"""\(W(A_n)\cong S_{n+1}\), of order \((n+1)!\) (Humphreys 1.1)."""
+        group = CoxeterDiagrams()(
+            coxeter_matrix(rank, {(i, i + 1): 3 for i in range(rank - 1)})
+        ).coxeter_group()
+    
+        assert group.cardinality() == factorial(rank + 1)
+>       assert group.is_isomorphic(Groups.S(rank + 1))
+               ^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'is_isomorphic_to'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+________ test_the_coxeter_group_of_type_a_is_the_symmetric_group[rank3] ________
+
+>   return self._cached_methods[name]
+E   KeyError: 'is_isomorphic'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+rank = 4
+
+    @pytest.mark.parametrize("rank", [1, 2, 3, 4])
+    def test_the_coxeter_group_of_type_a_is_the_symmetric_group(rank) -> None:
+        r"""\(W(A_n)\cong S_{n+1}\), of order \((n+1)!\) (Humphreys 1.1)."""
+        group = CoxeterDiagrams()(
+            coxeter_matrix(rank, {(i, i + 1): 3 for i in range(rank - 1)})
+        ).coxeter_group()
+    
+        assert group.cardinality() == factorial(rank + 1)
+>       assert group.is_isomorphic(Groups.S(rank + 1))
+               ^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'is_isomorphic_to'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+____________ test_the_weyl_groups_of_types_b_and_c_coincide[rank0] _____________
+
+>   return self._cached_methods[name]
+E   KeyError: 'is_isomorphic'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+rank = 2
+
+    @pytest.mark.parametrize("rank", [2, 3, 4])
+    def test_the_weyl_groups_of_types_b_and_c_coincide(rank) -> None:
+        r"""\(W(B_n)\cong W(C_n)\), of order \(2^n n!\) (Humphreys 1.1, 2.4).
+    
+        The root systems differ -- \(B_n\) has one short simple root, \(C_n\) one
+        long one -- but their mirrors generate isomorphic reflection groups.
+        """
+        b_group = CoxeterDiagrams()(Lattices(ZZ)(type_b_root_gram(rank)).module_generators()).coxeter_group()
+        c_group = CoxeterDiagrams()(Lattices(ZZ)(type_c_root_gram(rank)).module_generators()).coxeter_group()
+    
+        assert b_group.cardinality() == 2**rank * factorial(rank)
+>       assert b_group.is_isomorphic(c_group)
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:169: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'is_isomorphic_to'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+____________ test_the_weyl_groups_of_types_b_and_c_coincide[rank1] _____________
+
+>   return self._cached_methods[name]
+E   KeyError: 'is_isomorphic'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+rank = 3
+
+    @pytest.mark.parametrize("rank", [2, 3, 4])
+    def test_the_weyl_groups_of_types_b_and_c_coincide(rank) -> None:
+        r"""\(W(B_n)\cong W(C_n)\), of order \(2^n n!\) (Humphreys 1.1, 2.4).
+    
+        The root systems differ -- \(B_n\) has one short simple root, \(C_n\) one
+        long one -- but their mirrors generate isomorphic reflection groups.
+        """
+        b_group = CoxeterDiagrams()(Lattices(ZZ)(type_b_root_gram(rank)).module_generators()).coxeter_group()
+        c_group = CoxeterDiagrams()(Lattices(ZZ)(type_c_root_gram(rank)).module_generators()).coxeter_group()
+    
+        assert b_group.cardinality() == 2**rank * factorial(rank)
+>       assert b_group.is_isomorphic(c_group)
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:169: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'is_isomorphic_to'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+____________ test_the_weyl_groups_of_types_b_and_c_coincide[rank2] _____________
+
+>   return self._cached_methods[name]
+E   KeyError: 'is_isomorphic'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+rank = 4
+
+    @pytest.mark.parametrize("rank", [2, 3, 4])
+    def test_the_weyl_groups_of_types_b_and_c_coincide(rank) -> None:
+        r"""\(W(B_n)\cong W(C_n)\), of order \(2^n n!\) (Humphreys 1.1, 2.4).
+    
+        The root systems differ -- \(B_n\) has one short simple root, \(C_n\) one
+        long one -- but their mirrors generate isomorphic reflection groups.
+        """
+        b_group = CoxeterDiagrams()(Lattices(ZZ)(type_b_root_gram(rank)).module_generators()).coxeter_group()
+        c_group = CoxeterDiagrams()(Lattices(ZZ)(type_c_root_gram(rank)).module_generators()).coxeter_group()
+    
+        assert b_group.cardinality() == 2**rank * factorial(rank)
+>       assert b_group.is_isomorphic(c_group)
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:169: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'is_isomorphic_to'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+_______ test_icosahedral_root_lattices_live_over_the_golden_integer_ring _______
+
+>   return self.cache[k]
+E   KeyError: ((Coxeter matrix: [(1, 1) ↦ 1, (1, 2) ↦ 3, (1, 3) ↦ 2, (2, 1) ↦ 3, (2, 2) ↦ 1, (2, 3) ↦ 5, (3, 1) ↦ 2, (3, 2) ↦ 5, (3, 3) ↦ 1], Free module on {1, sqrt5} over Fraction Field of Integer Ring), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+
+sage/misc/cachefunc.pyx:1024: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise KeyError(k)
+E   KeyError: ((<class 'sage.groups.matrix_gps.coxeter_group.CoxeterMatrixGroup'>, [1 3 2]
+E   [3 1 5]
+E   [2 5 1], Number Field in sqrt5 with defining polynomial sqrt5^2 - 5, (1, 2, 3)), ())
+
+sage/misc/weak_dict.pyx:699: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_icosahedral_root_lattices_live_over_the_golden_integer_ring() -> None:
+        r"""The \(H_3\), \(H_4\) root systems have \(30\), \(120\) roots and Coxeter numbers \(10\), \(30\) (Humphreys 2.4).
+    
+        Their roots lie over \(\mathbb Z[(1+\sqrt5)/2]\), whose fraction field
+        \(\mathbb Q(\sqrt5)\) has discriminant \(5\).
+        """
+        h3 = Lattices.root_lattice("H", 3)
+        h4 = Lattices.root_lattice("H", 4)
+    
+        assert h3.base_ring().fraction_field().degree() == 2
+        assert h3.base_ring().fraction_field().discriminant() == 5
+        assert h3.module_rank() == 3
+        assert h4.module_rank() == 4
+>       assert h3.roots().cardinality() == 30
+               ^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:271: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/lattices.py:12755: in roots
+    coxeter = Groups.Coxeter(
+src/sage_extensions/categories/group/groups.py:2778: in _coxeter_catalogue
+    return _coxeter_group(_coxeter_matrix_datum(data), base_ring=base_ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/group/groups.py:2763: in _coxeter_group
+    CoxeterMatrixGroup(engine_matrix, scalar_ring, None),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/classcall_metaclass.pyx:328: in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/groups/matrix_gps/coxeter_group.py:234: in __classcall_private__
+    return super().__classcall__(cls, data, base_ring, data.index_set())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/structure/unique_representation.py:1207: in __classcall__
+    return super().__classcall__(cls, *args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/structure/unique_representation.py:609: in __classcall__
+    instance = typecall(cls, *args, **options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/classcall_metaclass.pyx:477: in sage.misc.classcall_metaclass.typecall
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/groups/matrix_gps/coxeter_group.py:311: in __init__
+    gens = [one + MS([SparseEntry(i, j, val(coxeter_matrix[index_set[i], index_set[j]]))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/groups/matrix_gps/coxeter_group.py:297: in val
+    return base_ring((E(2 * x) + ~E(2 * x)).to_cyclotomic_field())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/parent.pyx:899: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/coerce_maps.pyx:92: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+sage/structure/coerce_maps.pyx:87: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/rings/number_field/number_field.py:1700: in _element_constructor_
+    return self._coerce_from_other_number_field(x)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Number Field in sqrt5 with defining polynomial sqrt5^2 - 5
+x = -zeta5^3 - zeta5^2
+
+    def _coerce_from_other_number_field(self, x):
+        r"""
+        Coerce a number field element x into this number field.
+    
+        Unless `x` is in ``QQ``, this requires ``x.parent()`` and
+        ``self`` to have compatible embeddings: either they both embed
+        in a common field, or there is an embedding of ``x.parent()``
+        into ``self`` or the other way around.  If no compatible
+        embeddings are found and `x` is not in ``QQ``, then raise
+        :exc:`TypeError`.  This guarantees that these conversions respect
+        the field operations and conversions between several fields
+        commute.
+    
+        REMARK:
+    
+        The name of this method was chosen for historical reasons.
+        In fact, what it does is not a coercion but a conversion.
+    
+        INPUT:
+    
+        - ``x`` -- an element of some number field
+    
+        OUTPUT: an element of ``self`` corresponding to ``x``
+    
+        EXAMPLES::
+    
+            sage: x = polygen(QQ, 'x')
+            sage: K.<a> = NumberField(x^3 + 2)
+            sage: L.<b> = NumberField(x^2 + 1)
+            sage: K._coerce_from_other_number_field(L(2/3))
+            2/3
+            sage: L._coerce_from_other_number_field(K(0))
+            0
+            sage: K._coerce_from_other_number_field(b)
+            Traceback (most recent call last):
+            ...
+            TypeError: No compatible natural embeddings found for
+            Number Field in a with defining polynomial x^3 + 2 and
+            Number Field in b with defining polynomial x^2 + 1
+    
+        Two number fields both containing `i`::
+    
+            sage: K.<a> = NumberField(x^4 + 6*x^2 + 1, embedding=CC(-2.4*I))
+            sage: L.<b> = NumberField(x^4 + 8*x^2 + 4, embedding=CC(2.7*I))
+            sage: Ki = 1/2*a^3 + 5/2*a; Ki.minpoly()
+            x^2 + 1
+            sage: L(Ki)
+            -1/4*b^3 - 3/2*b
+            sage: K(L(Ki)) == Ki
+            True
+            sage: Q.<i> = QuadraticField(-1)
+            sage: Q(Ki)
+            i
+            sage: Q(L(Ki))
+            i
+            sage: L((Ki+2)^1000)
+            737533628...075020804*b^3 + 442520177...450124824*b + 793311113...453515313
+    
+        This fails if we don't specify the embeddings::
+    
+            sage: K.<a> = NumberField(x^4 + 6*x^2 + 1)
+            sage: L.<b> = NumberField(x^4 + 8*x^2 + 4)
+            sage: L(1/2*a^3 + 5/2*a)
+            Traceback (most recent call last):
+            ...
+            TypeError: No compatible natural embeddings found for
+            Number Field in b with defining polynomial x^4 + 8*x^2 + 4 and
+            Number Field in a with defining polynomial x^4 + 6*x^2 + 1
+    
+        Embeddings can also be `p`-adic::
+    
+            sage: F = Qp(73)
+            sage: K.<a> = NumberField(x^4 + 6*x^2 + 1,
+            ....:                     embedding=F(1290990671961076190983179596556712119))
+            sage: L.<b> = NumberField(x^4 + 8*x^2 + 4,
+            ....:                     embedding=F(1773398470280167815153042237103591466))
+            sage: L(2*a^3 + 10*a + 3)
+            b^3 + 6*b + 3
+    
+        If we take the same non-Galois number field with two different
+        embeddings, conversion fails::
+    
+            sage: K.<a> = NumberField(x^3 - 4*x + 1, embedding=0.254)
+            sage: L.<b> = NumberField(x^3 - 4*x + 1, embedding=1.86)
+            sage: L(a)
+            Traceback (most recent call last):
+            ...
+            ValueError: cannot convert a to Number Field in b with defining polynomial x^3 - 4*x + 1
+            with b = 1.860805853111704? (using the specified embeddings)
+    
+        Subfields automatically come with an embedding::
+    
+            sage: K.<a> = NumberField(x^2 - 5)
+            sage: L.<b>, phi = K.subfield(-a)
+            sage: phi(b)
+            -a
+            sage: K(b)
+            -a
+            sage: L(a)
+            -b
+    
+        Below we create two subfields of `K` which both contain `i`.
+        Since `L2` and `L3` both embed in `K`, conversion works::
+    
+            sage: K.<z> = NumberField(x^8 - x^4 + 1)
+            sage: i = (x^2 + 1).roots(ring=K)[0][0]
+            sage: r2 = (x^2 - 2).roots(ring=K)[0][0]
+            sage: r3 = (x^2 - 3).roots(ring=K)[0][0]
+            sage: L2.<a2>, phi2 = K.subfield(r2 + i)
+            sage: L3.<a3>, phi3 = K.subfield(r3 + i)
+            sage: i_in_L2 = L2(i); i_in_L2
+            1/6*a2^3 + 1/6*a2
+            sage: i_in_L3 = L3(i); i_in_L3
+            1/8*a3^3
+            sage: L2(i_in_L3) == i_in_L2
+            True
+            sage: L3(i_in_L2) == i_in_L3
+            True
+    
+        TESTS:
+    
+        The following was fixed in :issue:`8800`::
+    
+            sage: P.<x> = QQ[]
+            sage: K.<a> = NumberField(x^3 - 5, embedding=0)
+            sage: L.<b> = K.extension(x^2 + a)
+            sage: F,R = L.construction()
+            sage: F(R) == L   #indirect doctest
+            True
+    
+        AUTHORS:
+    
+        - Jeroen Demeyer (2011-09-30): :issue:`11869`
+        """
+        # Special case for x in QQ.  This is common, so should be fast.
+        xpol = x.polynomial()
+        if xpol.degree() <= 0:
+            return self._element_class(self, xpol[0])
+        # Convert from L to K
+        K = self
+        L = x.parent()
+        # Find embeddings for K and L.  If no embedding is given, simply
+        # take the identity map as "embedding".  This handles the case
+        # where one field is created as subfield of the other.
+        Kgen = K.gen_embedding()
+        if Kgen is None:
+            Kgen = K.gen()
+        KF = Kgen.parent()
+        Lgen = L.gen_embedding()
+        if Lgen is None:
+            Lgen = L.gen()
+        LF = Lgen.parent()
+    
+        # Do not use CDF or RDF because of constraints on the
+        # exponent of floating-point numbers
+        from sage.rings.complex_mpfr import ComplexField
+        from sage.rings.real_mpfr import RealField
+        CC = ComplexField(53)
+        RR = RealField(53)
+    
+        # Find a common field F into which KF and LF both embed.
+        if CC.has_coerce_map_from(KF) and CC.has_coerce_map_from(LF):
+            # We postpone converting Kgen and Lgen to F until we know the
+            # floating-point precision required.
+            F = CC
+        elif KF is LF:
+            F = KF
+        elif KF.has_coerce_map_from(LF):
+            F = KF
+            Lgen = F(Lgen)
+        elif LF.has_coerce_map_from(KF):
+            F = LF
+            Kgen = F(Kgen)
+        else:
+>           raise TypeError("No compatible natural embeddings found for %s and %s" % (KF, LF))
+E           TypeError: No compatible natural embeddings found for Number Field in sqrt5 with defining polynomial sqrt5^2 - 5 and Complex Lazy Field
+
+/sage/.venv/lib/python3.14/site-packages/sage/rings/number_field/number_field.py:8383: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:722 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+_ test_the_group_order_is_the_product_of_the_invariant_degrees[E6-order0-coxeter_number0] _
+
+>   return self._cached_methods[name]
+E   KeyError: 'degrees'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+name = 'E6', order = 51840, coxeter_number = 12
+
+    @pytest.mark.parametrize(
+        "name,order,coxeter_number",
+        [("E6", 51840, 12), ("E7", 2903040, 18), ("E8", 696729600, 30), ("F4", 1152, 12), ("H4", 14400, 30)],
+    )
+    def test_the_group_order_is_the_product_of_the_invariant_degrees(name, order, coxeter_number) -> None:
+        r"""\(|W| = \prod d_i\) and \(h = \max d_i\) (Humphreys 3.9, 3.19, Table 3.1)."""
+>       degrees = FINITE[name]().coxeter_group().degrees()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:283: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'
+
+sage/cpython/getattr.pyx:362: AttributeError
+_ test_the_group_order_is_the_product_of_the_invariant_degrees[E7-order1-coxeter_number1] _
+
+>   return self._cached_methods[name]
+E   KeyError: 'degrees'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+name = 'E7', order = 2903040, coxeter_number = 18
+
+    @pytest.mark.parametrize(
+        "name,order,coxeter_number",
+        [("E6", 51840, 12), ("E7", 2903040, 18), ("E8", 696729600, 30), ("F4", 1152, 12), ("H4", 14400, 30)],
+    )
+    def test_the_group_order_is_the_product_of_the_invariant_degrees(name, order, coxeter_number) -> None:
+        r"""\(|W| = \prod d_i\) and \(h = \max d_i\) (Humphreys 3.9, 3.19, Table 3.1)."""
+>       degrees = FINITE[name]().coxeter_group().degrees()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:283: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'
+
+sage/cpython/getattr.pyx:362: AttributeError
+_ test_the_group_order_is_the_product_of_the_invariant_degrees[E8-order2-coxeter_number2] _
+
+>   return self._cached_methods[name]
+E   KeyError: 'degrees'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+name = 'E8', order = 696729600, coxeter_number = 30
+
+    @pytest.mark.parametrize(
+        "name,order,coxeter_number",
+        [("E6", 51840, 12), ("E7", 2903040, 18), ("E8", 696729600, 30), ("F4", 1152, 12), ("H4", 14400, 30)],
+    )
+    def test_the_group_order_is_the_product_of_the_invariant_degrees(name, order, coxeter_number) -> None:
+        r"""\(|W| = \prod d_i\) and \(h = \max d_i\) (Humphreys 3.9, 3.19, Table 3.1)."""
+>       degrees = FINITE[name]().coxeter_group().degrees()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:283: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'
+
+sage/cpython/getattr.pyx:362: AttributeError
+_ test_the_group_order_is_the_product_of_the_invariant_degrees[F4-order3-coxeter_number3] _
+
+>   return self._cached_methods[name]
+E   KeyError: 'degrees'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+name = 'F4', order = 1152, coxeter_number = 12
+
+    @pytest.mark.parametrize(
+        "name,order,coxeter_number",
+        [("E6", 51840, 12), ("E7", 2903040, 18), ("E8", 696729600, 30), ("F4", 1152, 12), ("H4", 14400, 30)],
+    )
+    def test_the_group_order_is_the_product_of_the_invariant_degrees(name, order, coxeter_number) -> None:
+        r"""\(|W| = \prod d_i\) and \(h = \max d_i\) (Humphreys 3.9, 3.19, Table 3.1)."""
+>       degrees = FINITE[name]().coxeter_group().degrees()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:283: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'
+
+sage/cpython/getattr.pyx:362: AttributeError
+_ test_the_group_order_is_the_product_of_the_invariant_degrees[H4-order4-coxeter_number4] _
+
+>   return self._cached_methods[name]
+E   KeyError: 'degrees'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+name = 'H4', order = 14400, coxeter_number = 30
+
+    @pytest.mark.parametrize(
+        "name,order,coxeter_number",
+        [("E6", 51840, 12), ("E7", 2903040, 18), ("E8", 696729600, 30), ("F4", 1152, 12), ("H4", 14400, 30)],
+    )
+    def test_the_group_order_is_the_product_of_the_invariant_degrees(name, order, coxeter_number) -> None:
+        r"""\(|W| = \prod d_i\) and \(h = \max d_i\) (Humphreys 3.9, 3.19, Table 3.1)."""
+>       degrees = FINITE[name]().coxeter_group().degrees()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:283: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'
+
+sage/cpython/getattr.pyx:362: AttributeError
+_____ test_the_longest_element_has_one_step_per_positive_root[A3-length0] ______
+
+>   return self._cached_methods[name]
+E   KeyError: 'long_element'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+name = 'A3', length = 6
+
+    @pytest.mark.parametrize(
+        "name,length",
+        [("A3", 6), ("B3", 9), ("D4", 12), ("G2", 6), ("H3", 15), ("H2", 5)],
+    )
+    def test_the_longest_element_has_one_step_per_positive_root(name, length) -> None:
+        r"""\(\ell(w_0) = |\Phi^+|\): \(A_3\) \(6\), \(B_3\) \(9\), \(D_4\) \(12\), \(G_2\) \(6\), \(H_3\) \(15\), \(I_2(5)\) \(5\) (Humphreys 1.8)."""
+>       assert FINITE[name]().coxeter_group().long_element().length() == length
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:298: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'an_element'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+_____ test_the_longest_element_has_one_step_per_positive_root[B3-length1] ______
+
+>   return self._cached_methods[name]
+E   KeyError: 'long_element'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+name = 'B3', length = 9
+
+    @pytest.mark.parametrize(
+        "name,length",
+        [("A3", 6), ("B3", 9), ("D4", 12), ("G2", 6), ("H3", 15), ("H2", 5)],
+    )
+    def test_the_longest_element_has_one_step_per_positive_root(name, length) -> None:
+        r"""\(\ell(w_0) = |\Phi^+|\): \(A_3\) \(6\), \(B_3\) \(9\), \(D_4\) \(12\), \(G_2\) \(6\), \(H_3\) \(15\), \(I_2(5)\) \(5\) (Humphreys 1.8)."""
+>       assert FINITE[name]().coxeter_group().long_element().length() == length
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:298: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'an_element'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+_____ test_the_longest_element_has_one_step_per_positive_root[D4-length2] ______
+
+>   return self._cached_methods[name]
+E   KeyError: 'long_element'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+name = 'D4', length = 12
+
+    @pytest.mark.parametrize(
+        "name,length",
+        [("A3", 6), ("B3", 9), ("D4", 12), ("G2", 6), ("H3", 15), ("H2", 5)],
+    )
+    def test_the_longest_element_has_one_step_per_positive_root(name, length) -> None:
+        r"""\(\ell(w_0) = |\Phi^+|\): \(A_3\) \(6\), \(B_3\) \(9\), \(D_4\) \(12\), \(G_2\) \(6\), \(H_3\) \(15\), \(I_2(5)\) \(5\) (Humphreys 1.8)."""
+>       assert FINITE[name]().coxeter_group().long_element().length() == length
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:298: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'an_element'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+_____ test_the_longest_element_has_one_step_per_positive_root[G2-length3] ______
+
+>   return self._cached_methods[name]
+E   KeyError: 'long_element'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+name = 'G2', length = 6
+
+    @pytest.mark.parametrize(
+        "name,length",
+        [("A3", 6), ("B3", 9), ("D4", 12), ("G2", 6), ("H3", 15), ("H2", 5)],
+    )
+    def test_the_longest_element_has_one_step_per_positive_root(name, length) -> None:
+        r"""\(\ell(w_0) = |\Phi^+|\): \(A_3\) \(6\), \(B_3\) \(9\), \(D_4\) \(12\), \(G_2\) \(6\), \(H_3\) \(15\), \(I_2(5)\) \(5\) (Humphreys 1.8)."""
+>       assert FINITE[name]().coxeter_group().long_element().length() == length
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:298: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'an_element'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+_____ test_the_longest_element_has_one_step_per_positive_root[H3-length4] ______
+
+>   return self._cached_methods[name]
+E   KeyError: 'long_element'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+name = 'H3', length = 15
+
+    @pytest.mark.parametrize(
+        "name,length",
+        [("A3", 6), ("B3", 9), ("D4", 12), ("G2", 6), ("H3", 15), ("H2", 5)],
+    )
+    def test_the_longest_element_has_one_step_per_positive_root(name, length) -> None:
+        r"""\(\ell(w_0) = |\Phi^+|\): \(A_3\) \(6\), \(B_3\) \(9\), \(D_4\) \(12\), \(G_2\) \(6\), \(H_3\) \(15\), \(I_2(5)\) \(5\) (Humphreys 1.8)."""
+>       assert FINITE[name]().coxeter_group().long_element().length() == length
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:298: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'an_element'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+_____ test_the_longest_element_has_one_step_per_positive_root[H2-length5] ______
+
+>   return self._cached_methods[name]
+E   KeyError: 'long_element'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+name = 'H2', length = 5
+
+    @pytest.mark.parametrize(
+        "name,length",
+        [("A3", 6), ("B3", 9), ("D4", 12), ("G2", 6), ("H3", 15), ("H2", 5)],
+    )
+    def test_the_longest_element_has_one_step_per_positive_root(name, length) -> None:
+        r"""\(\ell(w_0) = |\Phi^+|\): \(A_3\) \(6\), \(B_3\) \(9\), \(D_4\) \(12\), \(G_2\) \(6\), \(H_3\) \(15\), \(I_2(5)\) \(5\) (Humphreys 1.8)."""
+>       assert FINITE[name]().coxeter_group().long_element().length() == length
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:298: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: '_OwnedRingParent_with_category.element_class' object has no attribute '_SageObject__custom_name'. Did you mean: 'an_element'?
+
+sage/cpython/getattr.pyx:362: AttributeError
+_ test_root_counts_positive_roots_and_highest_root_heights[A3-root_count0-coxeter_number0] _
+
+name = 'A3', root_count = 12, coxeter_number = 4
+
+    @pytest.mark.parametrize(
+        "name,root_count,coxeter_number", [("A3", 12, 4), ("D4", 24, 6), ("E6", 72, 12)]
+    )
+    def test_root_counts_positive_roots_and_highest_root_heights(name, root_count, coxeter_number) -> None:
+        r"""\(|\Phi| = nh\), half of it positive, and the highest root has height \(h-1\) (Bourbaki VI, 1.11)."""
+        lattice = Lattices(ZZ)(name)
+        roots = lattice.roots()
+        positive = roots.condition_set(lambda root: root.is_positive_root())
+    
+        assert roots.cardinality() == root_count
+>       assert positive.cardinality() == root_count // 2
+               ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:311: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Subset of Ordered subset of Integral lattice of rank 3 and signature (0, 3) cut out by <function test_root_counts_positive_roots_and_highest_root_heights.<locals>.<lambda> at 0x7288f40c3cc0>
+
+    def cardinality(self) -> Cardinalities.ObjectType:
+        r"""The cardinality ``|X|``, an object of ``Card``.
+    
+        Cardinality is total on sets (`CAT-01`), and this is its one
+        owner: no set construction restates it.  It is an isomorphism
+        invariant, so it is read off what the construction of ``X``
+        determines, by placement:
+    
+        - the finite ordinal ``n`` has the cardinality of its order
+          type ``n``;
+        - a set with a chosen enumeration from an index set is in
+          bijection with that index set;
+        - ``|P(X)| = 2^|X|``, since ``P(X)`` is in bijection with the
+          characteristic maps ``X -> 2``;
+        - ``|Y^X| = |Y|^|X|``, the definition of cardinal exponentiation;
+        - the ``k``-element subsets of ``X`` number ``binomial(|X|, k)``
+          for finite ``X``, one for ``k = 0``, and ``|X|`` for infinite
+          ``X`` and ``k >= 1``;
+        - the finite subsets of ``X`` number ``2^|X|`` for finite ``X``
+          and ``|X|`` for infinite ``X``;
+        - ``|prod_i X_i| = prod_i |X_i|`` and ``|coprod_i X_i| =
+          sum_i |X_i|``, the definitions of cardinal product and sum;
+        - any other finite set with a chosen enumeration is counted
+          through that enumeration, and any
+          other countably infinite set has cardinality ``aleph_0``.
+    
+        A realization whose construction determines a cardinality these
+        standard set cases do not reach supplies that theorem through the
+        protected ``_cardinality_decision`` hook.  The public operation
+        remains here.  A represented set outside all of these routes has a
+        cardinality that no exact computation here reaches, and the
+        assertion says so.
+        """
+        construction_cardinality = self._cardinality_decision()
+>       assert construction_cardinality is not None, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"cannot compute the cardinality of {self}: its construction supplies no exact value "
+            f"or decided finite enumeration (it is in {self.category()})"
+        )
+E       AssertionError: cannot compute the cardinality of Subset of Ordered subset of Integral lattice of rank 3 and signature (0, 3) cut out by <function test_root_counts_positive_roots_and_highest_root_heights.<locals>.<lambda> at 0x7288f40c3cc0>: its construction supplies no exact value or decided finite enumeration (it is in Join of Category of finite sets and Category of facade sets and Category of finite countable sets)
+
+src/sage_extensions/categories/sets/set_categories.py:2497: AssertionError
+_ test_root_counts_positive_roots_and_highest_root_heights[D4-root_count1-coxeter_number1] _
+
+name = 'D4', root_count = 24, coxeter_number = 6
+
+    @pytest.mark.parametrize(
+        "name,root_count,coxeter_number", [("A3", 12, 4), ("D4", 24, 6), ("E6", 72, 12)]
+    )
+    def test_root_counts_positive_roots_and_highest_root_heights(name, root_count, coxeter_number) -> None:
+        r"""\(|\Phi| = nh\), half of it positive, and the highest root has height \(h-1\) (Bourbaki VI, 1.11)."""
+        lattice = Lattices(ZZ)(name)
+        roots = lattice.roots()
+        positive = roots.condition_set(lambda root: root.is_positive_root())
+    
+        assert roots.cardinality() == root_count
+>       assert positive.cardinality() == root_count // 2
+               ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:311: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Subset of Ordered subset of Integral lattice of rank 4 and signature (0, 4) cut out by <function test_root_counts_positive_roots_and_highest_root_heights.<locals>.<lambda> at 0x7288f40c2c40>
+
+    def cardinality(self) -> Cardinalities.ObjectType:
+        r"""The cardinality ``|X|``, an object of ``Card``.
+    
+        Cardinality is total on sets (`CAT-01`), and this is its one
+        owner: no set construction restates it.  It is an isomorphism
+        invariant, so it is read off what the construction of ``X``
+        determines, by placement:
+    
+        - the finite ordinal ``n`` has the cardinality of its order
+          type ``n``;
+        - a set with a chosen enumeration from an index set is in
+          bijection with that index set;
+        - ``|P(X)| = 2^|X|``, since ``P(X)`` is in bijection with the
+          characteristic maps ``X -> 2``;
+        - ``|Y^X| = |Y|^|X|``, the definition of cardinal exponentiation;
+        - the ``k``-element subsets of ``X`` number ``binomial(|X|, k)``
+          for finite ``X``, one for ``k = 0``, and ``|X|`` for infinite
+          ``X`` and ``k >= 1``;
+        - the finite subsets of ``X`` number ``2^|X|`` for finite ``X``
+          and ``|X|`` for infinite ``X``;
+        - ``|prod_i X_i| = prod_i |X_i|`` and ``|coprod_i X_i| =
+          sum_i |X_i|``, the definitions of cardinal product and sum;
+        - any other finite set with a chosen enumeration is counted
+          through that enumeration, and any
+          other countably infinite set has cardinality ``aleph_0``.
+    
+        A realization whose construction determines a cardinality these
+        standard set cases do not reach supplies that theorem through the
+        protected ``_cardinality_decision`` hook.  The public operation
+        remains here.  A represented set outside all of these routes has a
+        cardinality that no exact computation here reaches, and the
+        assertion says so.
+        """
+        construction_cardinality = self._cardinality_decision()
+>       assert construction_cardinality is not None, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"cannot compute the cardinality of {self}: its construction supplies no exact value "
+            f"or decided finite enumeration (it is in {self.category()})"
+        )
+E       AssertionError: cannot compute the cardinality of Subset of Ordered subset of Integral lattice of rank 4 and signature (0, 4) cut out by <function test_root_counts_positive_roots_and_highest_root_heights.<locals>.<lambda> at 0x7288f40c2c40>: its construction supplies no exact value or decided finite enumeration (it is in Join of Category of finite sets and Category of facade sets and Category of finite countable sets)
+
+src/sage_extensions/categories/sets/set_categories.py:2497: AssertionError
+_ test_root_counts_positive_roots_and_highest_root_heights[E6-root_count2-coxeter_number2] _
+
+name = 'E6', root_count = 72, coxeter_number = 12
+
+    @pytest.mark.parametrize(
+        "name,root_count,coxeter_number", [("A3", 12, 4), ("D4", 24, 6), ("E6", 72, 12)]
+    )
+    def test_root_counts_positive_roots_and_highest_root_heights(name, root_count, coxeter_number) -> None:
+        r"""\(|\Phi| = nh\), half of it positive, and the highest root has height \(h-1\) (Bourbaki VI, 1.11)."""
+        lattice = Lattices(ZZ)(name)
+        roots = lattice.roots()
+        positive = roots.condition_set(lambda root: root.is_positive_root())
+    
+        assert roots.cardinality() == root_count
+>       assert positive.cardinality() == root_count // 2
+               ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_coxeter_literature.sage:311: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Subset of Ordered subset of Integral lattice of rank 6 and signature (0, 6) cut out by <function test_root_counts_positive_roots_and_highest_root_heights.<locals>.<lambda> at 0x7288f40c2cf0>
+
+    def cardinality(self) -> Cardinalities.ObjectType:
+        r"""The cardinality ``|X|``, an object of ``Card``.
+    
+        Cardinality is total on sets (`CAT-01`), and this is its one
+        owner: no set construction restates it.  It is an isomorphism
+        invariant, so it is read off what the construction of ``X``
+        determines, by placement:
+    
+        - the finite ordinal ``n`` has the cardinality of its order
+          type ``n``;
+        - a set with a chosen enumeration from an index set is in
+          bijection with that index set;
+        - ``|P(X)| = 2^|X|``, since ``P(X)`` is in bijection with the
+          characteristic maps ``X -> 2``;
+        - ``|Y^X| = |Y|^|X|``, the definition of cardinal exponentiation;
+        - the ``k``-element subsets of ``X`` number ``binomial(|X|, k)``
+          for finite ``X``, one for ``k = 0``, and ``|X|`` for infinite
+          ``X`` and ``k >= 1``;
+        - the finite subsets of ``X`` number ``2^|X|`` for finite ``X``
+          and ``|X|`` for infinite ``X``;
+        - ``|prod_i X_i| = prod_i |X_i|`` and ``|coprod_i X_i| =
+          sum_i |X_i|``, the definitions of cardinal product and sum;
+        - any other finite set with a chosen enumeration is counted
+          through that enumeration, and any
+          other countably infinite set has cardinality ``aleph_0``.
+    
+        A realization whose construction determines a cardinality these
+        standard set cases do not reach supplies that theorem through the
+        protected ``_cardinality_decision`` hook.  The public operation
+        remains here.  A represented set outside all of these routes has a
+        cardinality that no exact computation here reaches, and the
+        assertion says so.
+        """
+        construction_cardinality = self._cardinality_decision()
+>       assert construction_cardinality is not None, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"cannot compute the cardinality of {self}: its construction supplies no exact value "
+            f"or decided finite enumeration (it is in {self.category()})"
+        )
+E       AssertionError: cannot compute the cardinality of Subset of Ordered subset of Integral lattice of rank 6 and signature (0, 6) cut out by <function test_root_counts_positive_roots_and_highest_root_heights.<locals>.<lambda> at 0x7288f40c2cf0>: its construction supplies no exact value or decided finite enumeration (it is in Join of Category of finite sets and Category of facade sets and Category of finite countable sets)
+
+src/sage_extensions/categories/sets/set_categories.py:2497: AssertionError
+_________________ test_a4_discriminant_image_is_negation_on_c5 _________________
+
+    def test_a4_discriminant_image_is_negation_on_c5() -> None:
+>       lattice = Lattices.A4
+                  ^^^^^^^^^^^
+E       AttributeError: type object 'Lattices' has no attribute 'A4'. Did you mean: 'A1'?
+
+tests/lattices/test_discriminant_actions_archive.sage:12: AttributeError
+_ test_the_weyl_group_of_D4_acts_trivially_on_its_glue_and_triality_permutes_the_three_nonzero_classes _
+
+>   return self._cached_methods[name]
+E   KeyError: 'weyl_group'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_weyl_group_of_D4_acts_trivially_on_its_glue_and_triality_permutes_the_three_nonzero_classes() -> None:
+        r"""|Aut(D4)| = |W(F4)| = 1152, |W(D4)| = 2^3 * 4! = 192, and
+        Aut(D4) / W(D4) = S3 maps isomorphically onto O(q_{D4}) = GL_2(F_2)
+        (Conway--Sloane, SPLAG, ch. 4)."""
+        lattice = Lattices.D4
+        automorphisms = lattice.Aut()
+>       weyl = lattice.weyl_group()
+               ^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_discriminant_actions_archive.sage:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'weyl_group'
+
+sage/cpython/getattr.pyx:362: AttributeError
+_____ test_vinberg_algorithm_on_u_plus_a1_finds_the_2_3_infinity_triangle ______
+
+>   return self._cached_methods[name]
+E   KeyError: 'vinberg_simple_roots'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_vinberg_algorithm_on_u_plus_a1_finds_the_2_3_infinity_triangle() -> None:
+        r"""On ``U + A1`` (basis ``e, f, a``; ``b(e,f) = 1``, ``a^2 = -2``) with
+        controlling vector ``e + f``, the roots orthogonal to it are ``a`` and
+        ``e - f``, and the next root is ``f - a``.  The three simple roots have norm
+        ``-2`` and pairwise products ``0, 1, 2`` up to sign, i.e. the angles
+        ``pi/2, pi/3, 0``: the ``(2, 3, infinity)`` triangle.  Derived by hand; the
+        normalized Gram determinant ``-1/4`` confirms hyperbolic finite volume.
+        """
+        lattice = Lattices(ZZ)("U") + Lattices(ZZ)("A1")
+>       roots = lattice.vinberg_simple_roots()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_hyperbolic_archive_reconciliation.sage:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'vinberg_simple_roots'
+
+sage/cpython/getattr.pyx:362: AttributeError
+______ test_hilbert_basis_of_a_nonunimodular_plane_cone_exceeds_its_rays _______
+
+    def test_hilbert_basis_of_a_nonunimodular_plane_cone_exceeds_its_rays() -> None:
+        r"""The cone in ``ZZ^2`` spanned by ``(1,0)`` and ``(1,2)`` has index ``2``,
+        so its Hilbert basis is ``(1,0), (1,1), (1,2)``: three elements against two
+        primitive rays and two facets.  Derived by hand from the fundamental
+        parallelogram, whose only interior lattice point is ``(1,1)``.
+        """
+        lattice = Lattices(ZZ)([[1, 0], [0, 1]])
+        first, second = lattice.dual_module().module_generators()
+    
+        cone = lattice.rational_polyhedral_cone((first, first + 2 * second))
+        assert cone.is_pointed()
+        assert cone.primitive_rays().cardinality() == 2
+        assert cone.facet_covectors().cardinality() == 2
+        assert cone.hilbert_basis().cardinality() == 3
+>       assert first + second in cone.hilbert_basis()
+E       assert (Generic morphism:\n  From: Integral lattice of rank 2 and signature (2, 0)\n  To:   Integer Ring + Generic morphism:\n  From: Integral lattice of rank 2 and signature (2, 0)\n  To:   Integer Ring) in {e_1, 2*e_0 - e_1, e_0}
+E        +  where {e_1, 2*e_0 - e_1, e_0} = hilbert_basis()
+E        +    where hilbert_basis = Rational polyhedral cone in Integral lattice of rank 2 and signature (2, 0) cut out by 2 half-spaces.hilbert_basis
+
+tests/lattices/test_hyperbolic_chambers.sage:37: AssertionError
+_ test_lorentz_plane_has_one_reflective_wall_and_orthogonal_group_of_order_four _
+
+>   return self._cached_methods[name]
+E   KeyError: 'weyl_group'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_lorentz_plane_has_one_reflective_wall_and_orthogonal_group_of_order_four() -> None:
+        r"""On ``<2> + <-2>`` (basis ``a, b``) the only roots are ``+-b``, since
+        ``x^2 - y^2 = -1`` forces ``x = 0``; and ``x^2 - y^2 = 1`` forces ``y = 0``,
+        so ``O(L) = {+-1} x {+-1}`` has order ``4`` and the Weyl group is
+        ``<s_b>`` of order ``2``.  The fundamental chamber has the single wall
+        ``b^perp``.  Derived by hand.
+        """
+        lattice = Lattices(ZZ)([[2, 0], [0, -2]])
+        a, b = lattice.module_generators()
+    
+        assert lattice.O().cardinality() == 4
+>       assert lattice.weyl_group().cardinality() == 2
+               ^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_hyperbolic_chambers.sage:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'weyl_group'
+
+sage/cpython/getattr.pyx:362: AttributeError
+______ test_cos_pi_over_n_are_the_reflection_cosines_and_one_third_is_not ______
+
+>   mor = <map.Map> self._convert_from_hash.get(R)
+
+sage/structure/parent.pyx:893: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise KeyError(k)
+E   KeyError: Real Algebraic Field
+
+sage/structure/coerce_dict.pyx:649: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._convert_from_hash.get(S)
+
+sage/structure/parent.pyx:2487: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise KeyError(k)
+E   KeyError: Real Algebraic Field
+
+sage/structure/coerce_dict.pyx:649: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_cos_pi_over_n_are_the_reflection_cosines_and_one_third_is_not() -> None:
+        r"""\(1/2 = \cos(\pi/3)\), \((1+\sqrt5)/4 = \cos(\pi/5)\), \(0 = \cos(\pi/2)\);
+        \(1/3\) is not \(\cos(\pi/n)\) since \(1/3 + i\sqrt{8}/3\) is not a root of unity
+        (its minimal polynomial \(3x^2 - 2x + 3\) is not monic over \(\mathbb Z\))."""
+        cosines = reflection_cosines()
+    
+>       assert AA(1) / 2 in cosines
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_vinberg_invariants.sage:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/sets/finite_ordered_sets.py:205: in __contains__
+    decision = self._contains_function(element)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/vinberg_invariants.py:159: in <lambda>
+    contains=lambda value: _reflection_cosine_index(value) is not None,
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/vinberg_invariants.py:119: in _reflection_cosine_index
+    value = QQbar(cosine)
+            ^^^^^^^^^^^^^
+sage/structure/parent.pyx:895: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/parent.pyx:2489: in sage.structure.parent.Parent._internal_convert_map_from
+    ???
+sage/structure/parent.pyx:2528: in sage.structure.parent.Parent.discover_convert_map_from
+    ???
+sage/structure/parent.pyx:1963: in sage.structure.parent.Parent._generic_convert_map
+    ???
+sage/structure/coerce_maps.pyx:57: in sage.structure.coerce_maps.DefaultConvertMap_unique.__init__
+    ???
+sage/structure/parent.pyx:1338: in sage.structure.parent.Parent.Hom
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+X = Real Algebraic Field, Y = Algebraic Field
+category = Category of sets with partial maps, check = True
+
+    def Hom[DomainElementT: Parent, CodomainElementT: Parent](
+        X: DomainElementT,
+        Y: CodomainElementT,
+        category: Category | None = None,
+        check: bool = True,
+    ) -> Homset[DomainElementT, CodomainElementT]:
+        """
+        Create the space of homomorphisms from X to Y in the category ``category``.
+    
+        INPUT:
+    
+        - ``X`` -- an object of a category
+    
+        - ``Y`` -- an object of a category
+    
+        - ``category`` -- a category in which the morphisms must be
+          (default: the meet of the categories of ``X`` and ``Y``);
+          both ``X`` and ``Y`` must belong to that category
+    
+        - ``check`` -- boolean (default: ``True``); whether to check the
+          input, and in particular that ``X`` and ``Y`` belong to
+          ``category``.
+    
+        OUTPUT: a homset in category
+    
+        EXAMPLES::
+    
+            sage: V = VectorSpace(QQ, 3)                                                    # needs sage.modules
+            sage: Hom(V, V)                                                                 # needs sage.modules
+            Set of Morphisms (Linear Transformations) from
+            Vector space of dimension 3 over Rational Field to
+            Vector space of dimension 3 over Rational Field
+            sage: G = AlternatingGroup(3)                                                   # needs sage.groups
+            sage: Hom(G, G)                                                                 # needs sage.groups
+            Set of Morphisms
+             from Alternating group of order 3!/2 as a permutation group
+               to Alternating group of order 3!/2 as a permutation group
+               in Category of finite enumerated permutation groups
+            sage: Hom(ZZ, QQ, Sets())
+            Set of Morphisms from Integer Ring to Rational Field in Category of sets
+    
+            sage: Hom(FreeModule(ZZ, 1), FreeModule(QQ, 1))                                 # needs sage.modules
+            Set of Morphisms
+             from Ambient free module of rank 1 over the principal ideal domain Integer Ring
+               to Vector space of dimension 1 over Rational Field
+               in Category of commutative additive groups
+            sage: Hom(FreeModule(QQ, 1), FreeModule(ZZ, 1))                                 # needs sage.modules
+            Set of Morphisms
+             from Vector space of dimension 1 over Rational Field
+               to Ambient free module of rank 1 over the principal ideal domain Integer Ring
+               in Category of commutative additive groups
+    
+        Here, we test against a memory leak that has been fixed at :issue:`11521` by
+        using a weak cache::
+    
+            sage: # needs sage.libs.pari
+            sage: for p in prime_range(10^3):
+            ....:  K = GF(p)
+            ....:  a = K(0)
+            sage: import gc
+            sage: gc.collect()       # random
+            624
+            sage: from sage.rings.finite_rings.finite_field_prime_modn import FiniteField_prime_modn as FF
+            sage: L = [x for x in gc.get_objects() if isinstance(x, FF)]
+            sage: len(L), L[0]
+            (1, Finite Field of size 997)
+    
+        To illustrate the choice of the category, we consider the
+        following parents as running examples::
+    
+            sage: X = ZZ; X
+            Integer Ring
+            sage: Y = SymmetricGroup(3); Y                                                  # needs sage.groups
+            Symmetric group of order 3! as a permutation group
+    
+        By default, the smallest category containing both ``X`` and ``Y``,
+        is used::
+    
+            sage: Hom(X, Y)                                                                 # needs sage.groups
+            Set of Morphisms from Integer Ring
+             to Symmetric group of order 3! as a permutation group
+             in Category of enumerated monoids
+    
+        Otherwise, if ``category`` is specified, then ``category`` is used,
+        after checking that ``X`` and ``Y`` are indeed in ``category``::
+    
+            sage: Hom(X, Y, Magmas())                                                       # needs sage.groups
+            Set of Morphisms
+             from Integer Ring
+             to Symmetric group of order 3! as a permutation group
+             in Category of magmas
+    
+            sage: Hom(X, Y, Groups())                                                       # needs sage.groups
+            Traceback (most recent call last):
+            ...
+            ValueError: Integer Ring is not in Category of groups
+    
+        A parent (or a parent class of a category) may specify how to
+        construct certain homsets by implementing a method ``_Hom_(self,
+        codomain, category)``. This method should either construct the
+        requested homset or raise a :exc:`TypeError`. This hook is currently
+        mostly used to create homsets in some specific subclass of
+        :class:`Homset` (e.g.
+        :class:`~sage.rings.homset.RingHomset_generic`)::
+    
+            sage: Hom(QQ,QQ).__class__
+            <class 'sage.rings.homset.RingHomset_generic_with_category'>
+    
+        Do not call this hook directly to create homsets, as it does not
+        handle unique representation::
+    
+            sage: Hom(QQ,QQ) == QQ._Hom_(QQ, category=QQ.category())
+            True
+            sage: Hom(QQ,QQ) is QQ._Hom_(QQ, category=QQ.category())
+            False
+    
+        TESTS:
+    
+        Homset are unique parents::
+    
+            sage: k = GF(5)
+            sage: H1 = Hom(k, k)
+            sage: H2 = Hom(k, k)
+            sage: H1 is H2
+            True
+    
+        Moreover, if no category is provided, then the result is identical
+        with the result for the meet of the categories of the domain and
+        the codomain::
+    
+            sage: Hom(QQ, ZZ) is Hom(QQ,ZZ, Category.meet([QQ.category(), ZZ.category()]))
+            True
+    
+        Some doc tests in ``sage.rings`` (need to) break the unique
+        parent assumption. But if domain or codomain are not unique
+        parents, then the homset will not fit. That is to say, the hom set
+        found in the cache will have a (co)domain that is equal to, but
+        not identical with, the given (co)domain.
+    
+        By :issue:`9138`, we abandon the uniqueness of homsets, if the
+        domain or codomain break uniqueness::
+    
+            sage: from sage.rings.polynomial.multi_polynomial_ring import MPolynomialRing_polydict_domain
+            sage: P.<x,y,z>=MPolynomialRing_polydict_domain(QQ, 3, order='degrevlex')
+            sage: Q.<x,y,z>=MPolynomialRing_polydict_domain(QQ, 3, order='degrevlex')
+            sage: P == Q
+            True
+            sage: P is Q
+            False
+    
+        Hence, ``P`` and ``Q`` are not unique parents. By consequence, the
+        following homsets aren't either::
+    
+            sage: H1 = Hom(QQ,P)
+            sage: H2 = Hom(QQ,Q)
+            sage: H1 == H2
+            True
+            sage: H1 is H2
+            False
+    
+        It is always the most recently constructed homset that remains in
+        the cache::
+    
+            sage: H2 is Hom(QQ,Q)
+            True
+    
+        Variation on the theme::
+    
+            sage: # needs sage.modules
+            sage: U1 = FreeModule(ZZ, 2)
+            sage: U2 = FreeModule(ZZ, 2, inner_product_matrix=matrix([[1,0], [0,-1]]))
+            sage: U1 == U2, U1 is U2
+            (False, False)
+            sage: V = ZZ^3
+            sage: H1 = Hom(U1, V); H2 = Hom(U2, V)
+            sage: H1 == H2, H1 is H2
+            (False, False)
+            sage: H1 = Hom(V, U1); H2 = Hom(V, U2)
+            sage: H1 == H2, H1 is H2
+            (False, False)
+    
+        Since :issue:`11900`, the meet of the categories of the given arguments is
+        used to determine the default category of the homset. This can also be a
+        join category, as in the following example::
+    
+            sage: PA = Parent(category=Algebras(QQ))
+            sage: PJ = Parent(category=Rings() & Modules(QQ))
+            sage: Hom(PA, PJ)
+            Set of Homomorphisms
+             from <sage.structure.parent.Parent object at ...>
+               to <sage.structure.parent.Parent object at ...>
+            sage: Hom(PA, PJ).category()
+            Category of homsets of
+             unital magmas and right modules over Rational Field
+              and left modules over Rational Field
+            sage: Hom(PA, PJ, Rngs())
+            Set of Morphisms
+             from <sage.structure.parent.Parent object at ...>
+               to <sage.structure.parent.Parent object at ...> in Category of rngs
+    
+        .. TODO::
+    
+            - Design decision: how much of the homset comes from the
+              category of ``X`` and ``Y``, and how much from the specific
+              ``X`` and ``Y``.  In particular, do we need several parent
+              classes depending on ``X`` and ``Y``, or does the difference
+              only lie in the elements (i.e.  the morphism), and of course
+              how the parent calls their constructors.
+            - Specify the protocol for the ``_Hom_`` hook in case of ambiguity
+              (e.g. if both a parent and some category thereof provide one).
+    
+        TESTS:
+    
+        Facade parents over plain Python types are supported::
+    
+            sage: from sage.sets.pythonclass import Set_PythonType
+            sage: R = Set_PythonType(int)
+            sage: S = Set_PythonType(float)
+            sage: Hom(R, S)
+            Set of Morphisms from Set of Python objects of class 'int'
+             to Set of Python objects of class 'float' in Category of infinite sets
+    
+        Checks that the domain and codomain are in the specified
+        category. Case of a non parent::
+    
+            sage: # needs sage.graphs
+            sage: S = SimplicialComplex([[1,2], [1,4]]); S.rename('S')
+            sage: Hom(S, S, SimplicialComplexes())
+            Set of Morphisms from S to S in Category of finite simplicial complexes
+            sage: Hom(Set(), S, Sets())
+            Set of Morphisms from {} to S in Category of sets
+            sage: Hom(S, Set(), Sets())
+            Set of Morphisms from S to {} in Category of sets
+            sage: H = Hom(S, S, ChainComplexes(QQ))
+            Traceback (most recent call last):
+            ...
+            ValueError: S is not in Category of chain complexes over Rational Field
+    
+        Those checks are done with the natural idiom ``X in category``,
+        and not ``X.category().is_subcategory(category)`` as it used to be
+        before :issue:`16275` (see :issue:`15801` for a real use case)::
+    
+            sage: # needs sage.graphs
+            sage: class PermissiveCategory(Category):
+            ....:     def super_categories(self): return [Objects()]
+            ....:     def __contains__(self, X): return True
+            sage: C = PermissiveCategory(); C.rename('Permissive category')
+            sage: S.category().is_subcategory(C)
+            False
+            sage: S in C
+            True
+            sage: Hom(S, S, C)
+            Set of Morphisms from S to S in Permissive category
+    
+        With ``check=False``, uninitialized parents, as can appear upon
+        unpickling, are supported. Case of a parent::
+    
+            sage: cls = type(Set())
+            sage: S = unpickle_newobj(cls, ())  # A non parent
+            sage: H = Hom(S, S, SimplicialComplexes(), check=False)
+            sage: H = Hom(S, S, Sets(),                check=False)
+            sage: H = Hom(S, S, ChainComplexes(QQ),    check=False)
+    
+        Case of a non parent::
+    
+            sage: # needs sage.graphs
+            sage: cls = type(SimplicialComplex([[1,2], [1,4]]))
+            sage: S = unpickle_newobj(cls, ())
+            sage: H = Hom(S, S, Sets(),                check=False)
+            sage: H = Hom(S, S, Groups(),              check=False)
+            sage: H = Hom(S, S, SimplicialComplexes(), check=False)
+    
+        Typical example where unpickling involves calling Hom on an
+        uninitialized parent::
+    
+            sage: P.<x,y> = QQ['x,y']
+            sage: Q = P.quotient([x^2 - 1, y^2 - 1])
+            sage: q = Q.an_element()                                                        # needs sage.libs.singular
+            sage: explain_pickle(dumps(Q))                                                  # needs sage.libs.singular
+            pg_...
+            ... = pg_dynamic_class('QuotientRing_generic_with_category', (pg_QuotientRing_generic, pg_getattr(..., 'parent_class')), None, None, pg_QuotientRing_generic)
+            si... = unpickle_newobj(..., ())
+            ...
+            si... = pg_unpickle_MPolynomialRing_libsingular(..., ('x', 'y'), ...)
+            si... = ... pg_Hom(si..., si..., ...) ...
+            sage: Q == loads(dumps(Q))
+            True
+    
+        Check that the ``_Hom_`` method of the ``category`` input is used::
+    
+            sage: from sage.categories.category_types import Category_over_base_ring
+            sage: class ModulesWithHom(Category_over_base_ring):
+            ....:     def super_categories(self):
+            ....:         return [Modules(self.base_ring())]
+            ....:     class ParentMethods:
+            ....:         def _Hom_(self, Y, category=None):
+            ....:             print("Modules")
+            ....:             raise TypeError
+            sage: class AlgebrasWithHom(Category_over_base_ring):
+            ....:     def super_categories(self):
+            ....:         return [Algebras(self.base_ring()), ModulesWithHom(self.base_ring())]
+            ....:     class ParentMethods:
+            ....:         def _Hom_(self, Y, category=None):
+            ....:             R = self.base_ring()
+            ....:             if category is not None and category.is_subcategory(Algebras(R)):
+            ....:                 print("Algebras")
+            ....:             raise TypeError
+            sage: from sage.structure.element import Element
+            sage: class Foo(Parent):
+            ....:     def _coerce_map_from_base_ring(self):
+            ....:         return self._generic_coerce_map(self.base_ring())
+            ....:     class Element(Element):
+            ....:         pass
+            sage: X = Foo(base=QQ, category=AlgebrasWithHom(QQ))
+            sage: H = Hom(X, X, ModulesWithHom(QQ))
+            Modules
+        """
+        # This should use cache_function instead
+        # However some special handling is currently needed for
+        # domains/codomains that break the unique parent condition. Also,
+        # at some point, it somehow broke the coercion (see e.g. sage -t
+        # sage.rings.real_mpfr). To be investigated.
+        key = (X, Y, category)
+        try:
+            H = _cache[key]
+        except KeyError:
+            H = None
+        if H is not None:
+            # Return H unless the domain or codomain breaks the unique parent condition
+            if H.domain() is X and H.codomain() is Y:
+                return H
+    
+        # Determines the category
+        if category is None:
+            category = X.category()._meet_(Y.category())
+            # Recurse to make sure that Hom(X, Y) and Hom(X, Y, category) are identical
+            # No need to check the input again
+            H = Hom(X, Y, category, check=False)
+        else:
+            if check:
+                if not isinstance(category, Category):
+                    raise TypeError("Argument category (= {}) must be a category.".format(category))
+                for O in [X, Y]:
+                    try:
+                        category_mismatch = O not in category
+                    except Exception:
+                        # An error should not happen, this here is just to be on
+                        # the safe side.
+                        category_mismatch = True
+                    # A category mismatch does not necessarily mean that an error
+                    # should be raised. Instead, it could be the case that we are
+                    # unpickling an old pickle (that doesn't set the "check"
+                    # argument to False). In this case, it could be that the
+                    # (co)domain is not properly initialised, which we are
+                    # checking now. See trac #16275 and #14793.
+                    if category_mismatch and O._is_category_initialized():
+                        # At this point, we can be rather sure that O is properly
+                        # initialised, and thus its string representation is
+                        # available for the following error message. It simply
+                        # belongs to the wrong category.
+>                       raise ValueError("{} is not in {}".format(O, category))
+E                       ValueError: Real Algebraic Field is not in Category of sets with partial maps
+
+/sage/.venv/lib/python3.14/site-packages/sage/categories/homset.py:449: ValueError
+_ test_vinberg_on_the_belolipetsky_lattice_over_the_golden_integers_finds_four_simple_roots _
+
+    def test_vinberg_on_the_belolipetsky_lattice_over_the_golden_integers_finds_four_simple_roots() -> None:
+        r"""Over \(\mathcal O = \mathbb Z[\varphi]\), \(\varphi = (1+\sqrt5)/2\), the chain Gram
+        with off-diagonal entries \(-1, -\varphi, -1\) is the \([3,5,3]\) diagram: signature
+        \((3,1)\) at \(\sqrt5 \mapsto +\sqrt5\) and positive definite at the conjugate place.
+        The simple roots are \(-e_1, -e_2, -e_3\) and
+        \(v = ((s+3)/2,\ s+3,\ 3(s+1)/2,\ (s-1)/2)\), \(b(v,v) = 3 - \sqrt5\), pairing
+        nonpositively with the others (direct computation of the Gram values).
+        """
+        field = QuadraticField(5, "s")
+        s = field.primitive_element()
+        order = field.maximal_order()
+        phi = (1 + s) / 2
+        lattice = Lattices(order)(
+            [
+                [2, -1, 0, 0],
+                [-1, 2, -phi, 0],
+                [0, -phi, 2, -1],
+                [0, 0, -1, 2],
+            ]
+        )
+>       place = next(p for p in field.embeddings(AA) if p(s) > 0)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_vinberg_number_fields.sage:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/lattices/test_vinberg_number_fields.sage:26: in <genexpr>
+    place = next(p for p in field.embeddings(AA) if p(s) > 0)
+                            ^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/finite_ordered_sets.py:177: in <genexpr>
+    return (element_at(index) for index in indices)
+            ^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/number_fields.py:555: in embedding_at
+    return self.Mor(target)(
+src/sage_extensions/categories/rings/ring_foundation.py:927: in __call__
+    return CategoricalMor.__call__(self, datum)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:996: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:933: in _element_constructor_
+    return _ringlike_mor_element(self, datum, RingMorphism)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+parent = Mor_Ring(Free module on {1, s} over Fraction Field of Integer Ring, Real Algebraic Field)
+datum = Ring morphism:
+  From: Number Field in s with defining polynomial s^2 - 5
+  To:   Algebraic Real Field
+  Defn: s |--> -2.236067977499790?
+provider_type = <class 'sage_extensions.categories.rings.ring_foundation.RingMorphism'>
+
+    def _ringlike_mor_element(parent, datum, provider_type):
+        r"""Admit one rng/ring arrow at its fixed-Mor owner."""
+        if isinstance(datum, provider_type):
+            if datum.domain() is not parent.domain() or datum.codomain() is not parent.codomain():
+                raise ValueError(
+                    f"cannot view {datum} as an element of Mor({parent.domain()}, {parent.codomain()}): it is a "
+                    f"morphism {datum.domain()} -> {datum.codomain()}"
+                )
+            if datum.parent() is parent:
+                return datum
+            raise TypeError(f"{datum} belongs to another ring Mor; apply the functor between the categories")
+        if isinstance(datum, Mapping):
+            from sage_extensions.categories.algebras.algebras import (
+                _engine_algebra_morphism_from_generator_images,
+            )
+    
+            engine_morphism = _engine_algebra_morphism_from_generator_images(
+                parent.domain(),
+                parent.codomain(),
+                datum,
+            )
+            return _ringlike_mor_from_engine(parent, engine_morphism)
+        if isinstance(datum, Map):
+>           raise TypeError(f"{datum} is an arrow of another Mor; native ring computations use the protected engine crossing")
+E           TypeError: Ring morphism:
+E             From: Number Field in s with defining polynomial s^2 - 5
+E             To:   Algebraic Real Field
+E             Defn: s |--> -2.236067977499790? is an arrow of another Mor; native ring computations use the protected engine crossing
+
+src/sage_extensions/categories/rings/ring_foundation.py:562: TypeError
+___ test_the_reflection_in_the_wall_root_carries_the_chamber_across_the_wall ___
+
+>   return self._cached_methods[name]
+E   KeyError: 'fundamental_chamber'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_reflection_in_the_wall_root_carries_the_chamber_across_the_wall() -> None:
+        r"""\(s_r\) sends the chamber \(\{b(r,-)\ge 0\}\) to \(\{b(-r,-)\ge 0\}\) and fixes the
+        timelike \(e_0\), which spans the shared wall \(r^\perp\)."""
+        lattice = Lattices(ZZ)([[2, 0], [0, -2]])
+        timelike, spacelike = lattice.module_generators()
+>       chamber = lattice.fundamental_chamber()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_weyl_chamber_complex.sage:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'fundamental_chamber'
+
+sage/cpython/getattr.pyx:362: AttributeError
+______________ test_crossing_the_same_wall_twice_is_the_identity _______________
+
+>   return self._cached_methods[name]
+E   KeyError: 'fundamental_chamber'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_crossing_the_same_wall_twice_is_the_identity() -> None:
+        r"""\(s_r^2 = 1\)."""
+        lattice = Lattices(ZZ)([[2, 0], [0, -2]])
+>       chamber = lattice.fundamental_chamber()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_weyl_chamber_complex.sage:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'fundamental_chamber'
+
+sage/cpython/getattr.pyx:362: AttributeError
+________________ test_the_automorphisms_of_a_three_element_set _________________
+
+>   return self._cached_methods[name]
+E   KeyError: 'is_isomorphic_to'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_automorphisms_of_a_three_element_set() -> None:
+        r"""$S_3 = \operatorname{Aut}_{\mathbf{Set}}(\{0, 1, 2\})$."""
+>       assert Sets.Δ[2].Aut().is_isomorphic_to(s3())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/objects/test_symmetric_group_s3.sage:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'FixedIsoCategory_with_category' object has no attribute 'is_isomorphic_to'
+
+sage/cpython/getattr.pyx:362: AttributeError
+_______________ test_the_set_category_automorphism_group_agrees ________________
+
+    def test_the_set_category_automorphism_group_agrees() -> None:
+>       assert Sets().Aut(Sets.Δ[2]) == Sets.Δ[2].Aut()
+E       assert Aut_Category ...ets({0,...,2}) == Aut_Category ...ets({0,...,2})
+E         
+E         Use -v to get more diff
+
+tests/objects/test_symmetric_group_s3.sage:14: AssertionError
+________________________ test_the_coxeter_presentation _________________________
+
+    def test_the_coxeter_presentation() -> None:
+        r"""$\langle a, b \mid a^2, b^3, (ab)^2\rangle \cong S_3$."""
+        free = Groups.Free(2)
+        a, b = free.group_generators()
+        presented = free.quotient_by_relators([a ^ 2, b ^ 3, (a * b) ^ 2])
+>       assert presented.order() == 6
+               ^^^^^^^^^^^^^^^^^
+
+tests/objects/test_symmetric_group_s3.sage:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/groups.py:6119: in order
+    size = cardinal(self.cardinality())
+                    ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:2496: in cardinality
+    construction_cardinality = self._cardinality_decision()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:6115: in _cardinality_decision
+    return _group_cardinality(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+group = Group generated by Group generators: [0 ↦ g_1, 1 ↦ g_2]
+
+    def _group_cardinality(group):
+        r"""``|G|`` from the placement of the group ``G``.
+    
+        Protected computation of the groups owner (``OWN-05``).  Callers: the
+        default of ``OwnedGroups.ParentMethods._cardinality_decision``, and a
+        realization of that hook which decides only a case of its own and
+        leaves every other group to this computation (``CoreMor``, which counts
+        the bijections of finite sets).  A realization hook replaces the default
+        body, so such a realization reaches the group cases only through here.
+    
+        A finite group is counted by its engine.  A free group on a basis ``S``
+        is trivial for empty ``S`` and otherwise has ``max(aleph_0, |S|)``
+        elements, its reduced words.  An infinite finitely generated group is a
+        quotient of a free group of finite rank, so it is countably infinite.  A
+        subcategory whose datum determines more supplies its own answer.
+        """
+        match group:
+            case _ if group in OwnedFiniteGroups():
+                return cardinal(_finite_order(group))
+            case _ if group in GroupsWithChosenFreeBasis():
+                basis_cardinality = group.free_basis().cardinality()
+                if basis_cardinality == cardinal(0):
+                    return cardinal(1)
+                return Cardinalities().supremum(aleph(0), basis_cardinality)
+            case _ if group in OwnedInfiniteGroups() and group in OwnedGroups().FinitelyGeneratedAsMagma():
+                return aleph(0)
+            case _:
+                # The group's own finiteness decision is the answer to "is this
+                # group finite"; asking it here is what makes the count independent
+                # of the order in which the question was reached.  The decision is
+                # the group's exact engine answer, and it is asked only after the
+                # placement and free-basis cases have declined.
+                decision = group.is_finite()
+                match decision:
+                    case True:
+                        return cardinal(_finite_order(group))
+                    case False if group in OwnedGroups().FinitelyGeneratedAsMagma():
+                        return aleph(0)
+                    case _:
+>                       assert False, (
+                               ^^^^^
+                            f"cannot compute the cardinality of the group {group}: its finiteness is "
+                            f"{decision}, it has no chosen free basis, and it is not known to be infinite "
+                            f"and finitely generated (it is in {group.category()})"
+                        )
+E                       AssertionError: cannot compute the cardinality of the group Group generated by Group generators: [0 ↦ g_1, 1 ↦ g_2]: its finiteness is is_finite(Group generated by Group generators: [0 ↦ g_1, 1 ↦ g_2]), it has no chosen free basis, and it is not known to be infinite and finitely generated (it is in Join of Category of groups with chosen finite presentation and Category of presented groups)
+
+src/sage_extensions/categories/group/groups.py:459: AssertionError
+__________________________ test_the_categories_of_s3 ___________________________
+
+    def test_the_categories_of_s3() -> None:
+        group = s3()
+        assert group in Groups()
+>       assert group in FiniteGroups()
+E       assert Symmetric group S_3 in Category of finite groups
+E        +  where Category of finite groups = FiniteGroups()
+
+tests/objects/test_symmetric_group_s3.sage:37: AssertionError
+__________________________ test_the_invariants_of_s3 ___________________________
+
+>   return self._cached_methods[name]
+E   KeyError: 'cardinality'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_invariants_of_s3() -> None:
+        group = s3()
+        assert group.order() == 6
+        assert group.cardinality() == 6
+        assert not group.is_abelian()
+        assert group.center().order() == 1
+        assert group.commutator_subgroup().order() == 3
+        assert group.conjugacy_classes_representatives().cardinality() == 3
+>       assert Groups().Subobjects(group).cardinality() == 6
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/objects/test_symmetric_group_s3.sage:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'SubobjectCategory_with_category' object has no attribute 'cardinality'
+
+sage/cpython/getattr.pyx:362: AttributeError
+________________________ test_the_abelianization_of_s3 _________________________
+
+    def test_the_abelianization_of_s3() -> None:
+        r"""$[S_3, S_3] = A_3$, so $S_3^{ab} = \mathbb Z/2$."""
+>       assert Groups().abelianization()(s3()).order() == 2
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/objects/test_symmetric_group_s3.sage:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/functors/core.py:322: in __call__
+    return self.object_image(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/functors/core.py:224: in object_image
+    image = self._apply_object(obj)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/functors/abelianization.py:50: in _apply_object
+    quotient_projection = group.Mor(quotient)(projection)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:996: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Mor(Symmetric group S_3, Group of order 2 generated by Group generators: [1 ↦ 1, group element of order 2 ↦ group element of order 2])
+images = [ (1,2,3), (1,2) ] -> [ <identity> of ..., f1 ], check = False
+_options = {}
+
+    def _element_constructor_(self, images, *, check=False, **_options):
+        match images:
+            case dict():
+                morphism = self._from_group_generator_images(images)
+                # Generator-image data need to kill all defining relations
+                # before they describe any morphism G -> H. Unlike a
+                # pointwise callable, an invalid generator assignment is
+                # not even a map on the presented quotient. Enforce this
+                # regardless of the optional check flag.
+                morphism.validate_homomorphism(check=True)
+            case GapElement():
+>               raise TypeError("a GAP whole group map is private engine output; give generator images")
+E               TypeError: a GAP whole group map is private engine output; give generator images
+
+src/sage_extensions/categories/group/groups.py:4571: TypeError
+____________ test_triangle_with_vertices_0_0_0_3_6_0_satisfies_pick ____________
+
+    def test_triangle_with_vertices_0_0_0_3_6_0_satisfies_pick() -> None:
+        r"""Area 9; boundary points `\gcd(0,3) + \gcd(6,3) + \gcd(6,0) = 3 + 3 + 6 = 12`;
+        Pick's theorem `9 = I + 12/2 - 1` gives 4 interior points, 16 in all."""
+        lattice = ZZ.free_module(2)
+        triangle = ConvexPolytopes(lattice)(((0, 0), (0, 3), (6, 0)))
+    
+        assert triangle.dimension() == 2
+        assert triangle.volume() == 9
+        assert triangle.normalized_volume() == 18
+        assert triangle.n_integral_points() == 16
+        assert triangle.n_interior_points() == 4
+        assert triangle.n_boundary_points() == 12
+>       assert triangle.interior_contains_point((1, 1))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_polytopes.sage:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/schemes/polytopes.py:942: in interior_contains_point
+    self._engine_coordinates(point)
+src/sage_extensions/categories/schemes/polytopes.py:700: in _engine_coordinates
+    point = self.rational_point(point)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Lattice Polygon of dimension 2 with 3 vertices, point = (1, 1)
+
+    def rational_point(self, point):
+        r"""Return ``point`` of ``M`` or ``M_QQ`` as a point of ``M_QQ = M tensor QQ``.
+    
+        ``M`` includes into ``M_QQ`` by ``m |-> m tensor 1``, which keeps
+        the coordinates of ``m`` in the shared frame.
+        """
+        ambient = self.ambient_space()
+        lattice = self.ambient_lattice()
+>       match point.parent():
+              ^^^^^^^^^^^^
+            case parent if parent is lattice:
+E           AttributeError: 'tuple' object has no attribute 'parent'
+
+src/sage_extensions/categories/schemes/polytopes.py:684: AttributeError
+____ test_square_has_ehrhart_polynomial_2t_plus_1_squared_and_h_star_1_6_1 _____
+
+    def test_square_has_ehrhart_polynomial_2t_plus_1_squared_and_h_star_1_6_1() -> None:
+        r"""`t[-1,1]^2` has `(2t+1)^2` lattice points; `h^* = (1, L(1) - 3, I) = (1, 6, 1)`,
+        summing to the normalized volume 8.  It is reflexive; its polar dual is the
+        reflexive diamond `\operatorname{conv}\{\pm e_1, \pm e_2\}`, whose polar dual is
+        the square again."""
+        lattice = ZZ.free_module(2)
+        square = ConvexPolytopes(lattice)(((-1, -1), (-1, 1), (1, 1), (1, -1)))
+        polynomial = square.ehrhart_polynomial()
+        t = polynomial.parent().algebra_generator("t")
+        polar = square.polar_dual()
+    
+        assert polynomial == 4 * t**2 + 4 * t + 1
+        assert tuple(square.h_star_vector()) == (1, 6, 1)
+        assert square.is_reflexive()
+        assert polar.is_reflexive()
+        assert polar.n_integral_points() == 5
+        assert polar.volume() == 2
+>       assert polar.polar_dual() == square
+
+tests/schemes/test_polytopes.sage:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices) and is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices)
+
+    def __bool__(self):
+>       raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E       TypeError: the proposition is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices) and is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+
+src/sage_extensions/logic.py:44: TypeError
+___ test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120 ___
+
+>   return self._cached_methods[name]
+E   KeyError: 'f_vector'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120() -> None:
+        r"""The dodecahedron `\{5, 3\}` has 20 vertices, 30 edges, 12 faces, and full
+        symmetry group the Coxeter group `H_3` of order 120 (Coxeter, *Regular
+        Polytopes*, Table I)."""
+        dodecahedron = RegularPolytopes().from_schlafli_symbol("{5,3}")
+        diagram = dodecahedron.symmetry_coxeter_diagram()
+        first, second, third = diagram.vertices()
+    
+        assert dodecahedron.dimension() == 3
+>       assert tuple(dodecahedron.f_vector()) == (1, 20, 30, 12, 1)
+                     ^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_polytopes.sage:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'RegularPolytopes.parent_class' object has no attribute 'f_vector'
+
+sage/cpython/getattr.pyx:357: AttributeError
+=============================== warnings summary ===============================
+tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage: 18 warnings
+tests/lattices/test_reflection_hyperbolic.sage: 30 warnings
+tests/lattices/test_the_chamber_vertex_squares_and_cocompactness.sage: 66 warnings
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage: 24 warnings
+tests/lattices/test_the_isotropic_reduction_image.sage: 120 warnings
+tests/lattices/test_the_subgroup_cusp_chamber.sage: 102 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage: 18 warnings
+tests/lattices/test_reflection_hyperbolic.sage: 30 warnings
+tests/lattices/test_the_chamber_vertex_squares_and_cocompactness.sage: 66 warnings
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage: 24 warnings
+tests/lattices/test_the_isotropic_reduction_image.sage: 120 warnings
+tests/lattices/test_the_subgroup_cusp_chamber.sage: 102 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+tests/schemes/test_polytopes.sage::test_triangle_with_vertices_0_0_0_3_6_0_satisfies_pick
+  /workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/pty.py:66: DeprecationWarning: This process (pid=665078) is multi-threaded, use of forkpty() may lead to deadlocks in the child.
+    pid, fd = os.forkpty()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================== test-call performance gate ==========================
+tests/lattices/test_coxeter_affine_unions.sage::test_maximality_is_decided_before_the_rank_cap: 87.23 s > 20 s
+tests/lattices/test_coxeter_affine_unions.sage::test_the_five_sterk_diagrams_have_their_type_two_inventory: 69.03 s > 20 s
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_the_cards_class_count: 87.05 s > 20 s
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_has_the_cards_class_count: 26.61 s > 20 s
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_the_printed_cusp_walls_are_distinct_classes_of_the_boundary_lattice: 31.36 s > 20 s
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_the_cusps_four_and_five_have_their_root_class_orbits_in_the_boundary_lattice: 159.18 s > 20 s
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_the_coble_cusps_three_four_and_five_have_their_root_class_orbits: 363.43 s > 20 s
+tests/lattices/test_the_isotropic_reduction_image.sage::test_the_first_cusp_writes_down_no_candidate_outside_its_layer: 45.65 s > 20 s
+tests/lattices/test_the_isotropic_reduction_image.sage::test_the_fourth_cusps_layers_are_enumerated_in_the_coordinates_of_its_cell: 525.96 s > 20 s
+tests/lattices/test_the_isotropic_reduction_image.sage::test_each_of_the_fourth_cusps_first_layers_agrees_with_the_whole_lattice_in_the_cell: 66.92 s > 20 s
+tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_orbits_partition_the_maximal_elliptic_subdiagrams: 350.75 s > 20 s
+tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_orbits_partition_the_maximal_parabolic_subdiagrams: 31.80 s > 20 s
+tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_each_maximal_elliptic_orbit_is_one_automorphism_orbit: 711.54 s > 20 s
+tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_rank_of_a_subdiagram_is_its_rank_in_the_induced_enumeration: 109.60 s > 20 s
+tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_a_vertex_relabelling_leaves_the_orbit_counts_unchanged: 362.69 s > 20 s
+tests/lattices/test_the_subgroup_cusp_chamber.sage::test_the_subgroup_cusp_chamber_at_the_first_cusp_has_the_card_wall_count: 179.67 s > 20 s
+============================== slowest durations ===============================
+711.54s call     tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_each_maximal_elliptic_orbit_is_one_automorphism_orbit
+525.96s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_the_fourth_cusps_layers_are_enumerated_in_the_coordinates_of_its_cell
+363.43s call     tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_the_coble_cusps_three_four_and_five_have_their_root_class_orbits
+362.69s call     tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_a_vertex_relabelling_leaves_the_orbit_counts_unchanged
+350.75s call     tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_orbits_partition_the_maximal_elliptic_subdiagrams
+179.67s call     tests/lattices/test_the_subgroup_cusp_chamber.sage::test_the_subgroup_cusp_chamber_at_the_first_cusp_has_the_card_wall_count
+159.18s call     tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_the_cusps_four_and_five_have_their_root_class_orbits_in_the_boundary_lattice
+109.60s call     tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_rank_of_a_subdiagram_is_its_rank_in_the_induced_enumeration
+87.23s call     tests/lattices/test_coxeter_affine_unions.sage::test_maximality_is_decided_before_the_rank_cap
+87.05s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_the_cards_class_count
+69.03s call     tests/lattices/test_coxeter_affine_unions.sage::test_the_five_sterk_diagrams_have_their_type_two_inventory
+66.92s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_each_of_the_fourth_cusps_first_layers_agrees_with_the_whole_lattice_in_the_cell
+45.65s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_the_first_cusp_writes_down_no_candidate_outside_its_layer
+31.80s call     tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_orbits_partition_the_maximal_parabolic_subdiagrams
+31.36s call     tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_the_printed_cusp_walls_are_distinct_classes_of_the_boundary_lattice
+26.61s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_has_the_cards_class_count
+19.54s call     tests/lattices/test_coxeter_literature.sage::test_root_counts_positive_roots_and_highest_root_heights[E6-root_count2-coxeter_number2]
+15.36s call     tests/lattices/test_coxeter_affine_unions.sage::test_the_form_rank_cap_is_geometric_not_the_vertex_count
+8.81s call     tests/lattices/test_the_rank_n_minus_one_parabolic_count_on_the_we_chamber.sage::test_the_rank_n_minus_one_parabolic_count_equals_the_ideal_vertex_count
+8.03s call     tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_each_maximal_parabolic_orbit_is_one_automorphism_orbit
+5.42s call     tests/lattices/test_coxeter_affine_unions.sage::test_maximality_is_global_across_the_componentwise_affine_family
+5.06s call     tests/lattices/test_the_chamber_vertex_squares_and_cocompactness.sage::test_the_chamber_rays_of_the_two_cusp_lattices_square_into_one_component
+5.06s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_sterks_published_cusp_roots_are_reflections_of_the_stabilizer_image
+4.81s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_the_kernel_of_the_levi_map_acts_trivially_on_the_discriminant_group
+3.48s call     tests/lattices/test_the_subgroup_cusp_chamber.sage::test_the_root_filter_removes_a_wall_whose_reflection_it_refuses
+2.96s call     tests/lattices/test_the_subgroup_cusp_chamber.sage::test_the_full_chamber_of_the_cusp_lattice_completes
+2.82s call     tests/lattices/test_vinberg_invariants.sage::test_the_two_three_infinity_triangle_is_a_quasi_lanner_diagram
+2.80s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_the_lift_criterion_agrees_with_the_levi_route_at_the_first_cusp
+2.43s call     tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_a_wall_that_is_not_a_root_is_refused_and_a_root_round_trips
+2.23s call     tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage::test_vinberg_finds_the_ten_walls_of_ii_9_1
+2.20s call     tests/lattices/test_coxeter_affine_unions.sage::test_the_maximal_affine_union_of_a_pure_union_is_the_diagram_itself
+2.06s call     tests/groups/test_weyl_orders_archive.sage::test_finite_weyl_group_orders_match_humphreys
+1.79s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_through_the_unimodular_complement
+1.74s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_the_membership_questions_at_the_first_cusp_are_one_sift_per_root
+1.49s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_through_the_unimodular_complement
+1.16s call     tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_maximal_orbit_sets_feed_the_subdiagram_orbit_poset
+1.07s call     tests/lattices/test_edgewalk_fundamental_domain.sage::test_the_walk_returns_the_reflective_verdict_card_0026_certifies
+1.02s call     tests/lattices/test_discriminant_actions_archive.sage::test_d4_triality_fuses_the_three_order_two_glue_subgroups
+0.99s call     tests/lattices/test_reflection_hyperbolic.sage::test_the_edgewalk_and_vinbergs_algorithm_agree_that_u_plus_a1_is_reflective
+0.70s call     tests/lattices/test_coxeter_affine_unions.sage::test_a_union_of_affine_components_is_a_different_predicate_from_nullity_one
+0.67s call     tests/groups/test_orthogonal_reduction_image_orders.sage::test_the_generated_reduction_has_its_actual_orthogonal_image_order[case_index0-prime0-expected0]
+0.62s call     tests/lattices/test_coxeter_maximal_subdiagram_audit.sage::test_every_maximal_elliptic_survivor_admits_no_further_vertex
+0.62s call     tests/groups/test_orthogonal_reduction_image_orders.sage::test_the_generated_reduction_has_its_actual_orthogonal_image_order[case_index1-prime1-expected1]
+0.59s call     tests/lattices/test_coxeter_affine_unions.sage::test_finite_components_are_excluded_from_the_affine_union_contract
+0.53s call     tests/lattices/test_the_chamber_vertex_squares_and_cocompactness.sage::test_cocompactness_is_the_decision_on_those_rays
+0.52s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_each_cusp_reduces_to_a_hyperbolic_rank_ten_lattice
+0.43s call     tests/lattices/test_coxeter_affine_unions.sage::test_componentwise_affine_excludes_finite_components
+0.41s call     tests/schemes/test_polytopes.sage::test_triangle_with_vertices_0_0_0_3_6_0_satisfies_pick
+0.41s call     tests/groups/test_orthogonal_reduction_image_orders.sage::test_the_generated_reduction_has_its_actual_orthogonal_image_order[case_index2-prime2-expected2]
+0.40s call     tests/lattices/test_vinberg_invariants.sage::test_the_two_three_seven_triangle_is_a_lanner_diagram
+0.32s call     tests/lattices/test_reflection_hyperbolic.sage::test_vinbergs_criterion_bounds_the_root_lengths_of_the_bogachev_kolpakov_lattices
+0.29s call     tests/lattices/test_coxeter_literature.sage::test_icosahedral_root_lattices_live_over_the_golden_integer_ring
+0.29s call     tests/lattices/test_coxeter_maximal_subdiagram_audit.sage::test_the_maximal_elliptic_family_agrees_with_an_exhaustive_enumeration
+0.22s call     tests/lattices/test_coxeter_affine_unions.sage::test_a_single_affine_component_satisfies_the_componentwise_contract
+0.20s call     tests/groups/test_orthogonal_reduction_image_orders.sage::test_the_five_dimensional_reflection_group_has_the_full_orthogonal_order
+0.19s call     tests/lattices/test_coxeter_literature.sage::test_diagram_automorphism_groups_match_the_literature[A4-vertices0-edges0-automorphisms0]
+0.15s call     tests/lattices/test_coxeter_maximal_subdiagram_audit.sage::test_both_caps_are_applied_after_maximality_for_the_elliptic_query
+0.13s call     tests/lattices/test_vinberg_number_fields.sage::test_vinberg_on_the_belolipetsky_lattice_over_the_golden_integers_finds_four_simple_roots
+0.13s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_a_definite_genus_with_two_spinor_genera_keeps_its_split
+0.12s call     tests/lattices/test_reflection_hyperbolic.sage::test_vinberg_enumeration_closes_the_polyhedron_of_u_plus_a1
+0.12s call     tests/groups/test_orthogonal_reduction_image_orders.sage::test_the_scalar_subgroup_has_the_order_of_sign_reversal[prime1-expected1]
+0.11s call     tests/schemes/test_polytopes.sage::test_square_has_ehrhart_polynomial_2t_plus_1_squared_and_h_star_1_6_1
+0.11s call     tests/groups/test_orthogonal_reduction_image_orders.sage::test_the_scalar_subgroup_has_the_order_of_sign_reversal[prime0-expected0]
+0.10s call     tests/lattices/test_coxeter_literature.sage::test_the_weyl_groups_of_types_b_and_c_coincide[rank2]
+0.09s call     tests/lattices/test_coxeter_literature.sage::test_the_group_order_is_the_product_of_the_invariant_degrees[E8-order2-coxeter_number2]
+0.09s call     tests/lattices/test_coxeter_literature.sage::test_an_affine_diagram_is_parabolic_with_vanishing_schlaeflian[E8~]
+0.09s call     tests/lattices/test_vinberg_invariants.sage::test_the_invariant_matrix_with_t_equal_one_everywhere_is_the_affine_A2_triangle
+0.09s call     tests/lattices/test_coxeter_affine_unions.sage::test_a_single_affine_component_keeps_the_nullity_one_predicate
+0.09s call     tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage::test_the_possible_root_lengths_divide_twice_the_discriminant_exponent
+0.08s call     tests/lattices/test_coxeter_literature.sage::test_the_weyl_groups_of_types_b_and_c_coincide[rank1]
+0.08s call     tests/lattices/test_vinberg_invariants.sage::test_the_invariant_of_a_root_pair_gives_back_the_coxeter_bond
+0.08s call     tests/lattices/test_coxeter_literature.sage::test_diagram_automorphism_groups_match_the_literature[E8-vertices2-edges2-automorphisms2]
+0.07s call     tests/lattices/test_coxeter_literature.sage::test_the_group_order_is_the_product_of_the_invariant_degrees[E7-order1-coxeter_number1]
+0.07s call     tests/lattices/test_coxeter_literature.sage::test_an_affine_diagram_is_parabolic_with_vanishing_schlaeflian[E7~]
+0.07s call     tests/lattices/test_coxeter_literature.sage::test_an_exceptional_finite_type_is_elliptic_of_the_tabulated_schlaeflian[E8-schlaeflian2]
+0.06s call     tests/lattices/test_coxeter_literature.sage::test_an_exceptional_finite_group_has_the_tabulated_order[F4-order0]
+0.06s call     tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_is_the_rank_seventeen_lattice
+0.06s call     tests/lattices/test_coxeter_literature.sage::test_the_longest_element_has_one_step_per_positive_root[D4-length2]
+0.06s call     tests/lattices/test_coxeter_literature.sage::test_the_group_order_is_the_product_of_the_invariant_degrees[E6-order0-coxeter_number0]
+0.06s call     tests/lattices/test_coxeter_literature.sage::test_an_affine_diagram_is_parabolic_with_vanishing_schlaeflian[E6~]
+0.05s call     tests/lattices/test_coxeter_literature.sage::test_an_exceptional_finite_type_is_elliptic_of_the_tabulated_schlaeflian[E7-schlaeflian1]
+0.05s call     tests/lattices/test_coxeter_literature.sage::test_a_bracket_symbol_names_an_elliptic_diagram_of_the_tabulated_order[bonds6-order6]
+0.05s call     tests/lattices/test_coxeter_affine_unions.sage::test_the_generic_query_passes_labels_not_positions
+0.05s call     tests/lattices/test_vinberg_invariants.sage::test_the_invariant_separates_parallel_mirrors_from_divergent_ones
+0.05s call     tests/lattices/test_coxeter_literature.sage::test_the_group_order_is_the_product_of_the_invariant_degrees[H4-order4-coxeter_number4]
+0.05s call     tests/lattices/test_coxeter_literature.sage::test_a_bracket_symbol_names_an_elliptic_diagram_of_the_tabulated_order[bonds1-order1]
+0.05s call     tests/lattices/test_coxeter_literature.sage::test_a_classical_finite_type_is_elliptic_of_the_tabulated_schlaeflian[B-6-schlaeflian10]
+0.04s call     tests/schemes/test_regular_polytope_symmetry.sage::test_the_twenty_four_cell_has_the_f4_diagram
+0.04s call     tests/lattices/test_coxeter_affine_unions.sage::test_the_generic_maximal_subdiagram_query_takes_a_vertex_decision
+0.04s call     tests/lattices/test_coxeter_literature.sage::test_a_classical_finite_type_is_elliptic_of_the_tabulated_schlaeflian[A-6-schlaeflian5]
+0.04s call     tests/lattices/test_coxeter_literature.sage::test_a_classical_finite_type_is_elliptic_of_the_tabulated_schlaeflian[D-6-schlaeflian13]
+0.04s call     tests/lattices/test_coxeter_literature.sage::test_an_exceptional_finite_type_is_elliptic_of_the_tabulated_schlaeflian[E6-schlaeflian0]
+0.04s call     tests/lattices/test_vinberg_invariants.sage::test_the_crystallographic_and_simply_laced_conditions_read_the_bonds
+0.04s call     tests/lattices/test_coxeter_literature.sage::test_a_bracket_symbol_names_an_elliptic_diagram_of_the_tabulated_order[bonds5-order5]
+0.04s call     tests/lattices/test_rational_polyhedral_cones.sage::test_orthants_sharing_a_facet_are_adjacent_and_opposite_orthants_are_not
+0.04s call     tests/groups/test_orthogonal_reduction_image_orders.sage::test_the_scalar_subgroup_has_the_order_of_sign_reversal[prime2-expected2]
+0.04s call     tests/lattices/test_coxeter_literature.sage::test_a_bracket_symbol_names_an_elliptic_diagram_of_the_tabulated_order[bonds3-order3]
+0.04s call     tests/lattices/test_rational_polyhedral_cones.sage::test_the_positive_orthant_of_z3
+0.04s call     tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage::test_the_isotropic_vectors_of_u_of_height_at_most_one
+0.04s call     tests/lattices/test_coxeter_literature.sage::test_the_coxeter_group_of_type_a_is_the_symmetric_group[rank3]
+0.04s call     tests/lattices/test_rational_polyhedral_cones.sage::test_the_faces_of_the_positive_orthant_by_dimension
+0.03s call     tests/lattices/test_the_isotropic_reduction_image.sage::test_the_five_cusps_are_the_chamber_rows_of_card_029j
+0.03s call     tests/lattices/test_coxeter_literature.sage::test_the_two_labellings_of_the_rank_three_double_bond_present_one_group
+0.03s call     tests/lattices/test_coxeter_maximal_subdiagram_audit.sage::test_the_generic_predicate_receives_every_subset_as_labels
+0.03s call     tests/objects/test_symmetric_group_s3.sage::test_the_homomorphisms_out_of_and_into_s3
+0.03s call     tests/lattices/test_coxeter_literature.sage::test_the_group_order_is_the_product_of_the_invariant_degrees[F4-order3-coxeter_number3]
+0.03s call     tests/schemes/test_regular_polytope_symmetry.sage::test_the_cube_has_the_linear_coxeter_diagram_4_3
+0.03s setup    tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_each_maximal_elliptic_orbit_is_one_automorphism_orbit
+0.03s call     tests/lattices/test_coxeter_literature.sage::test_an_affine_diagram_is_parabolic_with_vanishing_schlaeflian[C3~]
+0.03s call     tests/lattices/test_coxeter_literature.sage::test_the_coxeter_presentation_has_one_generator_per_mirror[A2-rank0-order0]
+0.03s call     tests/lattices/test_coxeter_literature.sage::test_a_bracket_symbol_names_an_elliptic_diagram_of_the_tabulated_order[bonds0-order0]
+0.03s call     tests/objects/test_symmetric_group_s3.sage::test_the_natural_action_on_three_points
+0.03s call     tests/lattices/test_coxeter_literature.sage::test_a_bracket_symbol_names_an_elliptic_diagram_of_the_tabulated_order[bonds4-order4]
+0.03s call     tests/lattices/test_coxeter_literature.sage::test_an_affine_diagram_is_parabolic_with_vanishing_schlaeflian[F4~]
+0.03s call     tests/lattices/test_coxeter_literature.sage::test_an_affine_diagram_is_parabolic_with_vanishing_schlaeflian[B3~]
+0.03s call     tests/lattices/test_vinberg_invariants.sage::test_the_invariant_does_not_move_when_the_mirrors_normals_are_rescaled
+0.03s call     tests/lattices/test_coxeter_literature.sage::test_a_bracket_symbol_names_an_elliptic_diagram_of_the_tabulated_order[bonds2-order2]
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_the_coxeter_presentation_has_one_generator_per_mirror[H3-rank3-order3]
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_the_weyl_groups_of_types_b_and_c_coincide[rank0]
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_an_exceptional_finite_type_is_elliptic_of_the_tabulated_schlaeflian[F4-schlaeflian3]
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_a_classical_finite_type_is_elliptic_of_the_tabulated_schlaeflian[B-5-schlaeflian9]
+0.02s call     tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage::test_hyperbolic_refinement_preserves_both_signature_conventions
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_a_classical_finite_type_is_elliptic_of_the_tabulated_schlaeflian[B-4-schlaeflian8]
+0.02s teardown tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_orbits_partition_the_maximal_parabolic_subdiagrams
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_an_affine_diagram_is_parabolic_with_vanishing_schlaeflian[D4~]
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_diagram_automorphism_groups_match_the_literature[D4-vertices1-edges1-automorphisms1]
+0.02s call     tests/lattices/test_rational_polyhedral_cones.sage::test_the_rays_of_a_quadrant_in_the_hyperbolic_plane_are_ideal
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_a_classical_finite_type_is_elliptic_of_the_tabulated_schlaeflian[B-3-schlaeflian7]
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_a_classical_finite_type_is_elliptic_of_the_tabulated_schlaeflian[D-5-schlaeflian12]
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_a_classical_finite_type_is_elliptic_of_the_tabulated_schlaeflian[A-5-schlaeflian4]
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_a_classical_finite_type_is_elliptic_of_the_tabulated_schlaeflian[A-4-schlaeflian3]
+0.02s call     tests/schemes/test_regular_polytope_symmetry.sage::test_the_symmetry_group_of_the_cube_has_order_48
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_a_classical_finite_type_is_elliptic_of_the_tabulated_schlaeflian[D-4-schlaeflian11]
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_an_affine_diagram_is_parabolic_with_vanishing_schlaeflian[G2~]
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_root_counts_positive_roots_and_highest_root_heights[A3-root_count0-coxeter_number0]
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_an_exceptional_finite_type_is_elliptic_of_the_tabulated_schlaeflian[H4-None]
+0.02s call     tests/schemes/test_polytopes.sage::test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_an_exceptional_finite_group_has_the_tabulated_order[H3-order2]
+0.02s call     tests/lattices/test_rational_polyhedral_cones.sage::test_a_quadrant_with_one_timelike_ray
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_the_longest_element_has_one_step_per_positive_root[H3-length4]
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_the_coxeter_group_of_type_a_is_the_symmetric_group[rank0]
+0.02s call     tests/schemes/test_regular_polytope_symmetry.sage::test_the_pentagon_has_the_dihedral_diagram_i2_5
+0.02s call     tests/lattices/test_hyperbolic_chambers.sage::test_hilbert_basis_of_a_nonunimodular_plane_cone_exceeds_its_rays
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_the_coxeter_presentation_has_one_generator_per_mirror[G2-rank2-order2]
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_root_counts_positive_roots_and_highest_root_heights[D4-root_count1-coxeter_number1]
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_the_longest_element_has_one_step_per_positive_root[B3-length1]
+0.02s call     tests/lattices/test_hyperbolic_chambers.sage::test_the_isotropic_cone_of_the_lorentz_plane_has_two_ideal_rays
+0.02s call     tests/lattices/test_coxeter_literature.sage::test_an_exceptional_finite_type_is_elliptic_of_the_tabulated_schlaeflian[H3-None]
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_a_classical_finite_type_is_elliptic_of_the_tabulated_schlaeflian[B-2-schlaeflian6]
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_the_coxeter_group_of_type_a_is_the_symmetric_group[rank2]
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_the_longest_element_has_one_step_per_positive_root[A3-length0]
+0.01s call     tests/schemes/test_regular_polytope_symmetry.sage::test_the_cube_is_three_dimensional
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_an_affine_diagram_is_parabolic_with_vanishing_schlaeflian[A2~]
+0.01s call     tests/objects/test_symmetric_group_s3.sage::test_the_coxeter_presentation
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_the_coxeter_presentation_has_one_generator_per_mirror[B2-rank1-order1]
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_an_exceptional_finite_type_is_elliptic_of_the_tabulated_schlaeflian[G2-schlaeflian4]
+0.01s setup    tests/lattices/test_the_maximal_subdiagram_orbits.sage::test_the_orbits_partition_the_maximal_parabolic_subdiagrams
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_a_classical_finite_type_is_elliptic_of_the_tabulated_schlaeflian[A-3-schlaeflian2]
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_the_rank_two_schlaeflian_of_the_pentagon_is_five_minus_root_five_over_two
+0.01s call     tests/objects/test_symmetric_group_s3.sage::test_the_dihedral_group_of_the_triangle
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_an_exceptional_finite_group_has_the_tabulated_order[G2-order1]
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_the_longest_element_has_one_step_per_positive_root[G2-length3]
+0.01s call     tests/lattices/test_rational_polyhedral_cones.sage::test_a_wedge_containing_a_line_is_not_pointed
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_the_rank_two_schlaeflian_is_four_sine_squared[bond1-schlaeflian1]
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_the_longest_element_has_one_step_per_positive_root[H2-length5]
+0.01s call     tests/lattices/test_hyperbolic_chambers.sage::test_lorentz_plane_has_one_reflective_wall_and_orthogonal_group_of_order_four
+0.01s call     tests/lattices/test_rational_polyhedral_cones.sage::test_the_lattice_of_rank_three_is_the_standard_cubic_lattice
+0.01s call     tests/lattices/test_rational_polyhedral_cones.sage::test_the_primitive_rays_of_a_nonunimodular_plane_cone
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_the_rank_two_schlaeflian_is_four_sine_squared[bond2-schlaeflian2]
+0.01s call     tests/objects/test_symmetric_group_s3.sage::test_the_invariants_of_s3
+0.01s call     tests/lattices/test_rational_polyhedral_cones.sage::test_the_positive_orthant_has_three_rays_three_facets_and_no_lineality
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_the_coxeter_group_of_type_a_is_the_symmetric_group[rank1]
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_a_classical_finite_type_is_elliptic_of_the_tabulated_schlaeflian[A-2-schlaeflian1]
+0.01s call     tests/objects/test_symmetric_group_s3.sage::test_the_abelianization_of_s3
+0.01s call     tests/lattices/test_coxeter_literature.sage::test_the_rank_two_schlaeflian_is_four_sine_squared[bond0-schlaeflian0]
+0.01s call     tests/lattices/test_hyperbolic_archive_reconciliation.sage::test_vinberg_algorithm_on_u_plus_a1_finds_the_2_3_infinity_triangle
+
+(394 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_two_labellings_of_the_rank_three_double_bond_present_one_group
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_coxeter_group_of_type_a_is_the_symmetric_group[rank0]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_coxeter_group_of_type_a_is_the_symmetric_group[rank1]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_coxeter_group_of_type_a_is_the_symmetric_group[rank2]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_coxeter_group_of_type_a_is_the_symmetric_group[rank3]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_weyl_groups_of_types_b_and_c_coincide[rank0]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_weyl_groups_of_types_b_and_c_coincide[rank1]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_weyl_groups_of_types_b_and_c_coincide[rank2]
+FAILED tests/lattices/test_coxeter_literature.sage::test_icosahedral_root_lattices_live_over_the_golden_integer_ring
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_group_order_is_the_product_of_the_invariant_degrees[E6-order0-coxeter_number0]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_group_order_is_the_product_of_the_invariant_degrees[E7-order1-coxeter_number1]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_group_order_is_the_product_of_the_invariant_degrees[E8-order2-coxeter_number2]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_group_order_is_the_product_of_the_invariant_degrees[F4-order3-coxeter_number3]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_group_order_is_the_product_of_the_invariant_degrees[H4-order4-coxeter_number4]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_longest_element_has_one_step_per_positive_root[A3-length0]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_longest_element_has_one_step_per_positive_root[B3-length1]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_longest_element_has_one_step_per_positive_root[D4-length2]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_longest_element_has_one_step_per_positive_root[G2-length3]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_longest_element_has_one_step_per_positive_root[H3-length4]
+FAILED tests/lattices/test_coxeter_literature.sage::test_the_longest_element_has_one_step_per_positive_root[H2-length5]
+FAILED tests/lattices/test_coxeter_literature.sage::test_root_counts_positive_roots_and_highest_root_heights[A3-root_count0-coxeter_number0]
+FAILED tests/lattices/test_coxeter_literature.sage::test_root_counts_positive_roots_and_highest_root_heights[D4-root_count1-coxeter_number1]
+FAILED tests/lattices/test_coxeter_literature.sage::test_root_counts_positive_roots_and_highest_root_heights[E6-root_count2-coxeter_number2]
+FAILED tests/lattices/test_discriminant_actions_archive.sage::test_a4_discriminant_image_is_negation_on_c5
+FAILED tests/lattices/test_discriminant_actions_archive.sage::test_the_weyl_group_of_D4_acts_trivially_on_its_glue_and_triality_permutes_the_three_nonzero_classes
+FAILED tests/lattices/test_hyperbolic_archive_reconciliation.sage::test_vinberg_algorithm_on_u_plus_a1_finds_the_2_3_infinity_triangle
+FAILED tests/lattices/test_hyperbolic_chambers.sage::test_hilbert_basis_of_a_nonunimodular_plane_cone_exceeds_its_rays
+FAILED tests/lattices/test_hyperbolic_chambers.sage::test_lorentz_plane_has_one_reflective_wall_and_orthogonal_group_of_order_four
+FAILED tests/lattices/test_vinberg_invariants.sage::test_cos_pi_over_n_are_the_reflection_cosines_and_one_third_is_not
+FAILED tests/lattices/test_vinberg_number_fields.sage::test_vinberg_on_the_belolipetsky_lattice_over_the_golden_integers_finds_four_simple_roots
+FAILED tests/lattices/test_weyl_chamber_complex.sage::test_the_reflection_in_the_wall_root_carries_the_chamber_across_the_wall
+FAILED tests/lattices/test_weyl_chamber_complex.sage::test_crossing_the_same_wall_twice_is_the_identity
+FAILED tests/objects/test_symmetric_group_s3.sage::test_the_automorphisms_of_a_three_element_set
+FAILED tests/objects/test_symmetric_group_s3.sage::test_the_set_category_automorphism_group_agrees
+FAILED tests/objects/test_symmetric_group_s3.sage::test_the_coxeter_presentation
+FAILED tests/objects/test_symmetric_group_s3.sage::test_the_categories_of_s3
+FAILED tests/objects/test_symmetric_group_s3.sage::test_the_invariants_of_s3
+FAILED tests/objects/test_symmetric_group_s3.sage::test_the_abelianization_of_s3
+FAILED tests/schemes/test_polytopes.sage::test_triangle_with_vertices_0_0_0_3_6_0_satisfies_pick
+FAILED tests/schemes/test_polytopes.sage::test_square_has_ehrhart_polynomial_2t_plus_1_squared_and_h_star_1_6_1
+FAILED tests/schemes/test_polytopes.sage::test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120
+41 failed, 149 passed, 1 deselected, 721 warnings in 3329.47s (0:55:29)
+error: recipe `test` failed on line 154 with exit code 1

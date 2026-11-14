@@ -406,6 +406,21 @@ class NumberFieldVinbergLattice(SageObject):
 _NO_CELL = object()
 
 
+def _primitive_covector(coordinates):
+    r"""Return the primitive integral covector on the ray of ``coordinates``, with its sign.
+
+    A homogeneous half-space ``a(x) >= 0`` is unchanged by a positive rescaling
+    of ``a``, so a half-space is named by the primitive integral covector on its
+    ray.  The sign is part of that name: ``a(x) >= 0`` and ``-a(x) >= 0`` are two
+    half-spaces, and one family of walls can hold both.
+    """
+    from sage_extensions.categories.polyhedral_cones import (
+        _primitive_integral_coordinates,
+    )
+
+    return tuple(int(entry) for entry in _primitive_integral_coordinates(tuple(coordinates)))
+
+
 def _square_root_bound(value):
     r"""Return a rational bound of \(\sqrt{\text{value}}\), or ``None`` below zero.
 
@@ -1183,16 +1198,73 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             roots = tuple(self(tuple(int(entry) for entry in row)) for row in rows)
             return complete, tuple(-root for root in roots) if negated else roots
 
-        def vinberg_simple_roots(self, controlling_vector=None, *, max_roots=None, max_decompositions=None, admits_root=None):
-            r"""Return the roots Vinberg's algorithm accepted.
+        def _facet_roots(self, roots):
+            r"""Return the roots of ``roots`` whose half-spaces are the facets of their intersection.
 
-            The accepted roots are the outward normals of the walls of a
-            fundamental polyhedron for \(W(L)\), taken in the order the
-            algorithm's height function on the controlling vector produces
-            them.  A search that ran to completion returns the whole wall set;
-            a search stopped by ``max_roots`` or ``max_decompositions`` returns
-            what it had, and :meth:`is_reflective` is then the proposition
-            ``is_reflective(L)``.
+            Vinberg's algorithm writes down a sequence of normals (38), and
+            E. B. Vinberg, *On the groups of unit elements of certain quadratic
+            forms*, Math. USSR Sb. 16 (1972), Proposition 4 (p. 28), states of it
+            only that the polyhedron \(P\) is the intersection of the half-spaces
+            of *all* the roots of that sequence.  The proposition does not state
+            that each root of the sequence is a facet of \(P\), and in general it
+            is not: a root whose half-space is implied by the others cuts nothing,
+            and dropping it leaves the same intersection.  What is returned here
+            are the roots whose half-space the intersection actually needs, in the
+            order the sequence has them.
+
+            The test is exact and is made in the owned cone: the half-spaces are
+            the correlated covectors \(b(r,-)\geq 0\), the intersection is that
+            cone, and a half-space is irredundant in it exactly when it is one of
+            the cone's ``facet_covectors`` -- the half-spaces its own
+            H-representation needs.  A root is matched to a facet by the ray of
+            its covector, so the result is one root per facet ray.  The
+            correlation is injective, so two distinct roots have distinct
+            covectors; they name one half-space only by lying on one ray, and
+            then the first of them in the sequence is the one returned.
+
+            A search stopped by a bound is pruned the same way: the facets
+            returned are the facets of the polyhedron the prefix has cut out so
+            far, and not those of a polyhedron the search never reached.
+            """
+            roots = tuple(roots)
+            if not roots:
+                return roots
+            labels = tuple(self.module_generating_set())
+            correlation = self.algebraic_correlation_morphism()
+            covectors = tuple(correlation(root) for root in roots)
+
+            def direction(covector):
+                coordinates = covector.to_vector()
+                return _primitive_covector(
+                    tuple(int(coordinates(label)) for label in labels)
+                )
+
+            needed = {
+                direction(covector)
+                for covector in self.rational_polyhedral_cone(covectors).facet_covectors()
+            }
+            return tuple(
+                root
+                for root, covector in zip(roots, covectors, strict=True)
+                if direction(covector) in needed
+            )
+
+        def vinberg_simple_roots(self, controlling_vector=None, *, max_roots=None, max_decompositions=None, admits_root=None):
+            r"""Return the facets of the polyhedron Vinberg's algorithm cuts out.
+
+            Vinberg's algorithm writes down a sequence of normals (38), and
+            E. B. Vinberg, *On the groups of unit elements of certain quadratic
+            forms*, Math. USSR Sb. 16 (1972), Proposition 4 (p. 28) states that
+            the polyhedron \(P\) is the intersection of their half-spaces, and
+            Proposition 5 (p. 29) that the sequence breaks off once \(P\) has
+            finite volume.  The returned roots are the facets of \(P\): the roots
+            of that sequence whose half-spaces are irredundant in the
+            intersection, which :meth:`_facet_roots` decides exactly.  A search
+            that ran to completion has \(P\) of finite volume, so its facets are
+            the walls of the fundamental polyhedron of \(W(L)\); a search
+            stopped by ``max_roots`` or ``max_decompositions`` returns the facets
+            of the polyhedron the prefix cut out, and :meth:`is_reflective` is
+            then the proposition ``is_reflective(L)``.
 
             The controlling vector is the point of the hyperbolic space the
             enumeration measures height from.  Omitted, the engine picks one of
@@ -1201,10 +1273,10 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             _complete, roots = self._vinberg_search(
                 controlling_vector, max_roots, max_decompositions, admits_root=admits_root
             )
-            return finite_ordered_set(roots)
+            return finite_ordered_set(self._facet_roots(roots))
 
         def vinberg_algorithm(self, controlling_vector=None, *, max_roots=None, max_decompositions=None):
-            r"""Return the roots accepted by Vinberg's algorithm.
+            r"""Return the facets of the polyhedron Vinberg's algorithm cuts out.
 
             This is the archived public mathematical name for the same owned
             root family exposed by :meth:`vinberg_simple_roots`.  Historical
@@ -1290,10 +1362,10 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
         def reflection_coxeter_diagram(self, controlling_vector=None, *, max_roots=None, max_decompositions=None):
             r"""Return the Coxeter diagram of the fundamental polyhedron.
 
-            One vertex per wall, rooted in the accepted roots, so the diagram
-            carries the exact pairings and separates parallel walls from
-            divergent ones.  It is the diagram of \(W(L)\) as a Coxeter group
-            when the search completed.
+            One vertex per facet, rooted in the roots :meth:`vinberg_simple_roots`
+            returns, so the diagram carries the exact pairings and separates
+            parallel walls from divergent ones.  It is the diagram of \(W(L)\) as
+            a Coxeter group when the search completed.
             """
             from sage_extensions.categories.coxeter_diagrams import (
                 CoxeterDiagrams,
@@ -1446,10 +1518,20 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
         def fundamental_chamber(self, controlling_vector=None, *, max_roots=None, max_decompositions=None, admits_root=None):
             r"""Return the exact root-half-space cone cut out by Vinberg's walls.
 
-            The chamber is ``{x : b(r,x) >= 0 for every accepted wall r}``.
-            It retains those roots and their actual correlation covectors; the
-            completion flag records whether the Vinberg search established the
-            full wall set or only a bounded exploration prefix.
+            The chamber is ``{x : b(r,x) >= 0 for every wall r}``, and it retains
+            those roots and their actual correlation covectors; the completion
+            flag records whether the Vinberg search established the full wall set
+            or only a bounded exploration prefix.
+
+            The roots it retains are the *facets* of that intersection, which is
+            what :meth:`_facet_roots` decides: Vinberg's Proposition 4 states
+            only that \(P\) is the intersection of the half-spaces of the whole
+            sequence (38) of normals, not that every member of the sequence is a
+            facet, and a root the sequence carries whose half-space the
+            intersection does not need is not a wall of the chamber and is
+            dropped here.  The polyhedron is unchanged either way — that is what
+            redundancy means — so the completion flag, the vertex squares and
+            the Coxeter diagram are read off the same polyhedron as before.
 
             ``admits_root`` restricts the algorithm to a reflection subgroup: a
             root is a wall only when ``admits_root(root)`` holds, which for a
@@ -1462,10 +1544,11 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             complete, roots = self._vinberg_search(
                 controlling_vector, max_roots, max_decompositions, admits_root=admits_root
             )
+            facets = self._facet_roots(roots)
             correlation = self.algebraic_correlation_morphism()
             return self.rational_polyhedral_cone(
-                tuple(correlation(root) for root in roots),
-                wall_roots=roots,
+                tuple(correlation(root) for root in facets),
+                wall_roots=facets,
                 complete=complete,
             )
 
