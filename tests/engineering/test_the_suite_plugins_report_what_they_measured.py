@@ -6,29 +6,26 @@ the run from its own hook, before the first selected test ran: a collection
 over its ceiling, or one lint finding anywhere in the tree, produced a run that
 reported that and none of the tests those commands had selected.  These ask for
 the counts a reader wants instead.
+
+The ceilings are ini settings, so the gate here is breached by stating a
+ceiling of zero seconds in the probe's own configuration, not by making a
+collection slow: the illustration holds whatever the host's speed.
 """
 
 
 def test_a_collection_over_its_ceiling_still_runs_the_selected_tests():
-    tree = {
-        "test_the_first_probe.py": "def test_the_first_probe():\n    assert 1 + 1 == 2\n",
-        # Six seconds of module-level work: with the session import the
-        # collection is over the published six-second ceiling, which measures
-        # the whole selection's collection.
-        "test_the_slow_probe.py": (
-            "import time\n\ntime.sleep(6)\n\n\ndef test_the_slow_probe():\n    assert 2 + 2 == 4\n"
-        ),
-    }
+    tree = {"test_the_first_probe.py": "def test_the_first_probe():\n    assert 1 + 1 == 2\n"}
 
-    run = probe_run(tree, "-p", "sage_extensions.testing.suite_budget")
+    run = probe_run(
+        tree,
+        "-p", "sage_extensions.testing.suite_budget",
+        "-o", "time_gate_collection_ceiling=0",
+    )
 
-    assert run.outcomes == {
-        "test_the_first_probe.py::test_the_first_probe": "passed",
-        "test_the_slow_probe.py::test_the_slow_probe": "passed",
-    }
+    assert run.outcomes == {"test_the_first_probe.py::test_the_first_probe": "passed"}
     assert run.exit_status == 1
     assert "collection took" in run.transcript
-    assert "the measured ceiling is 6 s" in run.transcript
+    assert "the measured ceiling is 0 s" in run.transcript
 
 
 def test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it():

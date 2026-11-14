@@ -988,3 +988,5 @@ Follow-up in the same session, after the two repairs:
 | `issue398-division-after.log` | this slice's one-formula division | the division probe of the same shape as the before-row | `RR(1)/RR(2)` = `1/2`, `RR(1)/(sqrt2-1)` and `~x` = `1/(sqrt(2) - 1)`; `ZZ(1)/ZZ(2)` = `1/2`, `~ZZ(2)` and `e/2` still refuse |
 
 | `issue406-plugins-after-rewrite.log` | the plugin repairs, with the finding grouping rewritten as `itertools.groupby` | `tests/engineering/test_the_suite_plugins_report_what_they_measured.py -q` under the repository addopts | **2 passed in 13.30 s**, exit 0 |
+
+| `issue406-plugins-after-review.log` | the plugin repairs with the four review notes applied (ini ceilings, session-scoped conftest binding, unconditional cleanup, docstring stating what the module does) | `tests/engineering/test_the_suite_plugins_report_what_they_measured.py -q` under the repository addopts | **2 passed in 16.39 s**, exit 0; calls 8.60 s and 7.71 s, `setup` 0.00 s |

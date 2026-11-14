@@ -6,8 +6,11 @@ The docstring also states the invariant the gates enforce: "A test's execution r
 
 Since the #406 repair, a breach no longer ends the run and the run ends red instead, so this shows up as a permanent red on every full-tree run and in the end-of-run `time-gate report`.
 
+The ceilings are ini settings since the #406 repair (`time_gate_star_import_ceiling`, `time_gate_collection_ceiling`, `time_gate_call_ceiling`), so a run states what it enforces without editing the plugin, but the defaults are still the 26-test measurements.
+
 Acceptance, one of:
-* the collection and star-import ceilings are re-measured on a named commit of this tree and the measurement with its headroom recorded in the docstring, as the present text records its own; or
-* collection and the session import stop being gated, and the docstring says which workloads the gates cover.
+* the default collection and star-import ceilings are re-measured on a named commit of this tree, with the measurement and its headroom recorded in the docstring as the present text records its own; or
+* collection and the session import stop being gated, and the docstring says which workloads the gates cover; or
+* the defaults say they are one tree's baseline and every full-tree run states its own ceiling through the ini settings.
 
 Measured: `.tmp/qc-evidence/issue406-suite-collection-stop.log`, `issue406-suite-lint-stop.log`, `issue406-repair-full-run.log` (the run that reports `collection took 625.38 s; the measured ceiling is 6 s`).

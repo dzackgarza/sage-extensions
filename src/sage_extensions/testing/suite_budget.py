@@ -5,24 +5,28 @@ The gates measure three separate workloads: importing the session after
 test.  A test's execution result depends only on its own duration; selecting
 additional tests cannot increase its allowance.
 
-The ceilings are based on fresh-process measurements on this host at
+The default ceilings are fresh-process measurements on this host at
 ``1e36cc7e03`` (2026-10-19):
 
 * session import: 1.989, 1.397, 1.420, 1.337, 1.391 seconds;
-* collection of the current 26-test default tree: 3.81, 2.91, 2.69 seconds;
-* slowest call in the default tree: 15.80 seconds (the complete run took
-  44.16 seconds).
+* collection of the 26-test default tree then: 3.81, 2.91, 2.69 seconds;
+* slowest call in that tree: 15.80 seconds (the complete run took 44.16
+  seconds).
 
-The rounded ceilings leave about fifty percent headroom over the largest
+The rounded defaults leave about fifty percent headroom over the largest
 startup measurements and about twenty-five percent over the slowest test call.
 The independent 60-second pytest-timeout limit remains the hang bound.
 
-A measurement over its ceiling is reported at the end of the run, against the
-workload it measured, and makes that run red; it is not a reason to end the run
-where it was taken.  Ending the run there printed one measured workload and
-nothing about the tests the run had selected, so the counts a reader asks for --
-how many of the selected tests pass -- were never produced, and the tested
-work, which had already been paid for, was thrown away.
+Each ceiling is an ini setting -- ``time_gate_star_import_ceiling``,
+``time_gate_collection_ceiling``, ``time_gate_call_ceiling`` -- whose default is
+the measurement above, so a run states the ceilings it enforces and a host or a
+probe measures against its own without editing this module.
+
+A measurement over its ceiling is recorded with the workload it measured,
+printed in the end-of-run summary, and makes the run red at session finish.
+The run then executes every test it selected: the report of the selected tests
+is what the ceilings are for, and a measurement taken is not a reason to skip
+it.  ``--no-time-gates`` lifts what makes the run red, not what it measured.
 
 The workloads differ in what a ceiling can mean.  A test's call phase is one
 test's own duration, so its ceiling holds for any selection.  Collection and
@@ -51,18 +55,35 @@ def pytest_addoption(parser: pytest.Parser) -> None:
         action="store_true",
         help="one-off measurement run: report timings without enforcing performance ceilings",
     )
+    parser.addini(
+        "time_gate_star_import_ceiling",
+        "seconds allowed for importing the session after sage.all",
+        default=str(STAR_IMPORT_CEILING),
+    )
+    parser.addini(
+        "time_gate_collection_ceiling",
+        "seconds allowed for collecting the selected tests",
+        default=str(COLLECTION_CEILING),
+    )
+    parser.addini(
+        "time_gate_call_ceiling",
+        "seconds allowed for one test's call phase",
+        default=str(TEST_CALL_CEILING),
+    )
 
 
 def _gated(config: pytest.Config) -> bool:
     return not config.getoption("no_time_gates")
 
 
-def _measured(config: pytest.Config, workload: str, seconds: float, ceiling: float) -> None:
-    r"""Record a workload over its ceiling, for the end-of-run report.
+def _ceiling(config: pytest.Config, setting: str) -> float:
+    r"""The ceiling this run enforces for one workload."""
+    return float(config.getini(setting))
 
-    Recorded whether or not the gates are enforced: ``--no-time-gates`` lifts
-    what makes the run red, not what the run measured.
-    """
+
+def _measured(config: pytest.Config, workload: str, seconds: float, setting: str) -> None:
+    r"""Record a workload over the ceiling this run enforces for it."""
+    ceiling = _ceiling(config, setting)
     if seconds > ceiling:
         config.stash[_OVER_CEILING].append(
             f"{workload} took {seconds:.2f} s; the measured ceiling is {ceiling:.0f} s"
@@ -86,7 +107,7 @@ def pytest_sessionstart(session: pytest.Session) -> None:
         session.config,
         "session star import",
         session.config.stash[_STAR_IMPORT_SECONDS],
-        STAR_IMPORT_CEILING,
+        "time_gate_star_import_ceiling",
     )
     session.config.stash[_COLLECTION_START] = time.perf_counter()
 
@@ -97,7 +118,7 @@ def pytest_collection_finish(session: pytest.Session) -> None:
         session.config,
         "collection",
         time.perf_counter() - session.config.stash[_COLLECTION_START],
-        COLLECTION_CEILING,
+        "time_gate_collection_ceiling",
     )
 
 
@@ -105,7 +126,7 @@ def pytest_collection_finish(session: pytest.Session) -> None:
 def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo):
     outcome = yield
     report = outcome.get_result()
-    if report.when == "call" and report.duration > TEST_CALL_CEILING:
+    if report.when == "call" and report.duration > _ceiling(item.config, "time_gate_call_ceiling"):
         item.config.stash[_SLOW_CALLS].append((item.nodeid, report.duration))
     if not _gated(item.config):
         return
@@ -132,17 +153,17 @@ def pytest_terminal_summary(terminalreporter) -> None:
     slow = terminalreporter.config.stash[_SLOW_CALLS]
     if not slow:
         return
+    ceiling = _ceiling(terminalreporter.config, "time_gate_call_ceiling")
     terminalreporter.write_sep("=", "test-call performance gate")
     for nodeid, duration in slow:
-        terminalreporter.write_line(
-            f"{nodeid}: {duration:.2f} s > {TEST_CALL_CEILING:.0f} s"
-        )
+        terminalreporter.write_line(f"{nodeid}: {duration:.2f} s > {ceiling:.0f} s")
 
 
 def pytest_report_header(config: pytest.Config) -> str:
     gates = "on" if _gated(config) else "OFF (--no-time-gates)"
     return (
         f"time gates {gates}: star import {config.stash[_STAR_IMPORT_SECONDS]:.2f} s "
-        f"(ceiling {STAR_IMPORT_CEILING:.0f} s), collection ceiling "
-        f"{COLLECTION_CEILING:.0f} s, each test call ceiling {TEST_CALL_CEILING:.0f} s"
+        f"(ceiling {_ceiling(config, 'time_gate_star_import_ceiling'):.0f} s), collection ceiling "
+        f"{_ceiling(config, 'time_gate_collection_ceiling'):.0f} s, each test call ceiling "
+        f"{_ceiling(config, 'time_gate_call_ceiling'):.0f} s"
     )
