@@ -1,0 +1,27 @@
+[11:30:50 +    0.0s] building the subgroup and the reduction image
+Traceback (most recent call last):
+  File "/probe.py", line 84, in <module>
+    card.append(tuple(int(entry) for entry in reduction.projection()(element).to_vector()))
+                                              ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 809, in __call__
+    point = source(element)
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 333, in __call__
+    return self._element_constructor_(value)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py", line 398, in _element_constructor_
+    raise TypeError(f"{value!r} does not describe an element of {self}")
+TypeError: e_5 does not describe an element of Integral lattice of rank 11 and signature (1, 9)
+[peakrss] issue387: child waited=1 shell_code=1 samples=13
+[peakrss] peak tree RSS      : 480 MiB
+[peakrss] low-water MemAvail : 11180 MiB
+[peakrss] peak single VmHWM  : 480 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      469 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    24.0s procs=  3 rss=   480 MiB hwm=   480 MiB avail= 11180 MiB
+[peakrss]   t=    22.0s procs=  3 rss=   467 MiB hwm=   467 MiB avail= 11195 MiB
+[peakrss]   t=    20.0s procs=  3 rss=   463 MiB hwm=   463 MiB avail= 11190 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   451 MiB hwm=   451 MiB avail= 11198 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   323 MiB hwm=   323 MiB avail= 11323 MiB
+launcher exit: 1
