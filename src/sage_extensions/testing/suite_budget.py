@@ -16,6 +16,19 @@ The ceilings are based on fresh-process measurements on this host at
 The rounded ceilings leave about fifty percent headroom over the largest
 startup measurements and about twenty-five percent over the slowest test call.
 The independent 60-second pytest-timeout limit remains the hang bound.
+
+A measurement over its ceiling is reported at the end of the run, against the
+workload it measured, and makes that run red; it is not a reason to end the run
+where it was taken.  Ending the run there printed one measured workload and
+nothing about the tests the run had selected, so the counts a reader asks for --
+how many of the selected tests pass -- were never produced, and the tested
+work, which had already been paid for, was thrown away.
+
+The workloads differ in what a ceiling can mean.  A test's call phase is one
+test's own duration, so its ceiling holds for any selection.  Collection and
+the session import are properties of the whole selection: collecting 879 files
+has no reason to finish in the time 26 took, so their ceilings are baselines of
+a whole tree, not allowances a selection cannot raise.
 """
 
 import time
@@ -29,6 +42,7 @@ TEST_CALL_CEILING = 20.0
 _STAR_IMPORT_SECONDS = pytest.StashKey[float]()
 _COLLECTION_START = pytest.StashKey[float]()
 _SLOW_CALLS = pytest.StashKey[list[tuple[str, float]]]()
+_OVER_CEILING = pytest.StashKey[list[str]]()
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -43,6 +57,18 @@ def _gated(config: pytest.Config) -> bool:
     return not config.getoption("no_time_gates")
 
 
+def _measured(config: pytest.Config, workload: str, seconds: float, ceiling: float) -> None:
+    r"""Record a workload over its ceiling, for the end-of-run report.
+
+    Recorded whether or not the gates are enforced: ``--no-time-gates`` lifts
+    what makes the run red, not what the run measured.
+    """
+    if seconds > ceiling:
+        config.stash[_OVER_CEILING].append(
+            f"{workload} took {seconds:.2f} s; the measured ceiling is {ceiling:.0f} s"
+        )
+
+
 @pytest.hookimpl(tryfirst=True)
 def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
     import sage.all  # noqa: F401  (Sage's own load is outside the measured workload)
@@ -54,26 +80,25 @@ def pytest_load_initial_conftests(early_config: pytest.Config) -> None:
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
-    star_import = session.config.stash[_STAR_IMPORT_SECONDS]
-    if _gated(session.config) and star_import > STAR_IMPORT_CEILING:
-        pytest.exit(
-            f"session star import took {star_import:.2f} s; "
-            f"the measured ceiling is {STAR_IMPORT_CEILING:.0f} s",
-            returncode=pytest.ExitCode.TESTS_FAILED,
-        )
-    session.config.stash[_COLLECTION_START] = time.perf_counter()
+    session.config.stash[_OVER_CEILING] = []
     session.config.stash[_SLOW_CALLS] = []
+    _measured(
+        session.config,
+        "session star import",
+        session.config.stash[_STAR_IMPORT_SECONDS],
+        STAR_IMPORT_CEILING,
+    )
+    session.config.stash[_COLLECTION_START] = time.perf_counter()
 
 
 @pytest.hookimpl(trylast=True)
 def pytest_collection_finish(session: pytest.Session) -> None:
-    collection = time.perf_counter() - session.config.stash[_COLLECTION_START]
-    if _gated(session.config) and collection > COLLECTION_CEILING:
-        pytest.exit(
-            f"collection took {collection:.2f} s; "
-            f"the measured ceiling is {COLLECTION_CEILING:.0f} s",
-            returncode=pytest.ExitCode.TESTS_FAILED,
-        )
+    _measured(
+        session.config,
+        "collection",
+        time.perf_counter() - session.config.stash[_COLLECTION_START],
+        COLLECTION_CEILING,
+    )
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -86,17 +111,24 @@ def pytest_runtest_makereport(item: pytest.Item, call: pytest.CallInfo):
         return
     if call.excinfo is not None and call.excinfo.errisinstance(pytest.fail.Exception):
         message = str(call.excinfo.value)
-        if message.startswith("Timeout (>") and message.endswith("from pytest-timeout."):
+        if message.startswith('Timeout (>') and message.endswith("from pytest-timeout."):
             pytest.exit(f"{item.nodeid}: {message}", returncode=pytest.ExitCode.TESTS_FAILED)
 
 
 def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
     del exitstatus
-    if _gated(session.config) and session.config.stash[_SLOW_CALLS]:
+    if not _gated(session.config):
+        return
+    if session.config.stash[_SLOW_CALLS] or session.config.stash[_OVER_CEILING]:
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
 
 
 def pytest_terminal_summary(terminalreporter) -> None:
+    over = terminalreporter.config.stash[_OVER_CEILING]
+    if over:
+        terminalreporter.write_sep("=", "time-gate report")
+        for line in over:
+            terminalreporter.write_line(line)
     slow = terminalreporter.config.stash[_SLOW_CALLS]
     if not slow:
         return
