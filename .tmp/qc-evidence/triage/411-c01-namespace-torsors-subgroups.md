@@ -2,7 +2,7 @@ C01: The session namespace does not publish the subgroup constructors the suite 
 
 A user who writes the session-standard import cannot name a subgroup category at all: `Subgroups(G)`, `GeneratedSubgroups(G)` and `Torsors(G, action)` raise `NameError`, so every question about a subgroup, a generating family or a torsor has to reach into a private module.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_g_sets_torsor_archive.sage::test_the_transporter_of_the_regular_c3_torsor_from_x_to_gx_is_g`
   `NameError: name 'Torsors' is not defined`

@@ -2,7 +2,7 @@ C05: The conjugation morphism hands a GAP whole-group map to the element constru
 
 `G.conjugation_morphism()`, the map that sends an element to its inner automorphism, raises `TypeError: a GAP whole group map is private engine output; give generator images`, so `Aut(G)` cannot be reached from `G` and no inner-automorphism subgroup, kernel or index can be computed.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_group_automorphisms_archive.sage::test_conjugation_realizes_all_automorphisms_of_s3`
   `TypeError: a GAP whole group map is private engine output; give generator images`

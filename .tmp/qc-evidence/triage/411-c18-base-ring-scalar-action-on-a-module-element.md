@@ -2,7 +2,7 @@ C18: The base ring's scalar action on a group-algebra module element is refused
 
 `QQ(2)/QQ(3) * total`, scaling a module element by a base-ring element, raises `TypeError: unsupported operand parent(s) for *: 'Fraction Field of Integer Ring' and 'Module over Group algebra of Symmetric group S_3 ...'`, so a linear combination with rational coefficients cannot be written.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_restricted_actions.sage::test_reflection_in_the_trivial_line_is_plus_one_on_standard_and_minus_one_on_invariants`
   `TypeError: unsupported operand parent(s) for *: 'Fraction Field of Integer Ring' and 'Module over Group algebra of Symmetric group S_3 over Fraction Field of Integer Ring on Free module on {[0], [1], [2]} over Fraction Field of Integer Ring'`

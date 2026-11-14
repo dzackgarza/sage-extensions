@@ -2,7 +2,7 @@ C20: The session's `matrix` takes one row family, not a ring and a row family
 
 `matrix(ZZ, [[0,-1],[1,0]])`, Sage's own spelling for a matrix, raises `TypeError: matrix() takes 1 positional argument but 2 were given`; the session's `matrix` reads the coefficient ring from the entries only. And the one-argument form answers an engine matrix-space element, not the owned matrix-Mor its docstring states, which a preamble group then refuses.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_sl2z_serre_archive.sage::test_sl2z_is_generated_by_elements_of_orders_four_and_six_amalgamated_over_minus_one`
   `TypeError: matrix() takes 1 positional argument but 2 were given`

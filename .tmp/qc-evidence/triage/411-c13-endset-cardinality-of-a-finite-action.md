@@ -2,7 +2,7 @@ C13: The endset of a finite group action has no cardinality
 
 `Mor_G(X, X).cardinality()` for a finite `G`-set raises `AssertionError: cannot compute the cardinality of Mor_Cyclic group C_3 of order 3(...)`: the equivariant self-maps of a finite action are finite and computable, and their number cannot be read.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_g_sets_torsor_archive.sage::test_the_equivariant_self_maps_of_the_regular_c3_set_are_its_three_translations`
   `AssertionError: cannot compute the cardinality of Mor_Cyclic group C_3 of order 3({1, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action, {1, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of endsets and Category of homsets of sets and Category of sets)`

@@ -2,7 +2,7 @@ C12: `Groups().product` and `Groups().coproduct` answer the generic limit object
 
 `Groups().product((C_2, C_3))` answers `Product of the family over {0,...,1}`, which is not an object of `Groups()` (and the same for `coproduct`), so the category-level product of groups cannot be asked its order or compared with `C_6`.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_groups_archive.sage::test_finite_group_product_retains_group_structure_and_order`
   `assert Product of the family over {0,...,1} in Category of groups`

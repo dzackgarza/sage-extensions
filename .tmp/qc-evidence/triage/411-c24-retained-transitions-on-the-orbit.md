@@ -2,7 +2,7 @@ C24: The retained sweep is stored on the orbit object it describes
 
 After an orbit search, the orbit object carries `_retained_transitions` in its `__dict__`, so state that belongs to the family's sweep is attached to a single orbit and answers a later question with a stale table; a caller that inspects the orbit sees an undocumented attribute.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage::test_a_point_not_covered_by_the_retained_sweep_searches_as_before`
   `+  where {'_point_set': {5}, '_permutation_representation': Generic morphism:\n  From: Cyclic group C_3 of order 3\n  To:   Symme...s.ParentMethods.act of {1, 5, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action>, '_cache__action_of': {}, ...} = {5} with Cyclic group C_3 of order 3-action.__dict__`

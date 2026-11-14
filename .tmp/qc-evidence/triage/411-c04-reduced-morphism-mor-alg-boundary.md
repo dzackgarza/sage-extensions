@@ -2,7 +2,7 @@ C04: A reduced acted module cannot build the morphism that restricts it
 
 `representation.restrict_action_to(sub.inclusion())` raises `TypeError: ... belongs to Free module on Product of the family over {0,...,1} ..., not to Mor_Alg(...); apply the functor between the categories instead of constructing an arrow from another arrow (CON-17)`, so an isotypic component or an invariant submodule of a group representation cannot be produced with its restricted action.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_restricted_actions.sage::test_the_standard_isotypic_component_is_the_standard_representation`
   `TypeError: Generic morphism: From: Free module on {[0], [1], [2]} over Fraction Field of Integer Ring To: Group algebra of Symmetric group S_3 over Fraction Field of Integer Ring belongs to Free module on Product of the family over {0,...,1} over Fraction Field of Integer Ring, not to Mor_Alg(Free module on {[0], [1], [2]} over Fraction Field of Integer Ring, Group algebra of Symmetric group S_3 over Fraction Field of Integer Ring); apply the functor between the categories instead of constructing an arrow from another arrow (CON-17)`

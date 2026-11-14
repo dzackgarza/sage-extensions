@@ -2,7 +2,7 @@ C22: Applying the identity endomorphism of a subobject set rebuilds the object
 
 `action(identity)(subgroup)` on the stabilizer action of a subgroup set answers a *new* subgroup object rather than the subgroup, so `assert ... is subgroup` fails: the identity arrow of the classifying category does not act as the identity on the objects, and no equivariance can be stated.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_predicate_kernel_and_stabilizer_subgroups_of_s4.sage::test_normalizer_retains_its_conjugation_action_functor`
   `assert Subgroup of Symmetric group S_3 is Subgroup of Symmetric group S_3`

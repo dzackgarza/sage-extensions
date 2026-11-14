@@ -2,7 +2,7 @@ C09: The abelian coproduct refuses its own abelian factors
 
 `AbelianGroups().coproduct_construction((C_2, C_2))` raises `TypeError: the coproduct of ... cannot be formed in Category of abelian groups: some factor is not an object of Category of abelian groups`, although both factors are cyclic; the coproduct of abelian groups, which is their direct sum, cannot be formed.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_abelian_coproduct_of_two_cyclic_groups_is_product_not_free_product`
   `TypeError: the coproduct of Group coproduct factors: [0 ↦ Cyclic group C_2 of order 2, 1 ↦ Cyclic group C_2 of order 2] cannot be formed in Category of abelian groups: some factor is not an object of Category of abelian groups`

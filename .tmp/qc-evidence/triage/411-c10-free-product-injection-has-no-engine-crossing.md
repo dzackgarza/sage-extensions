@@ -2,7 +2,7 @@ C10: The free-product injection has no engine crossing
 
 Taking a factor injection out of a free product raises `AttributeError: 'OwnedIndexedFreeGroupMor_with_category_with_category' object has no attribute '_from_engine_morphism'` (after `KeyError: <id>`), so a free product's structure morphisms, and every cocone factorization through them, cannot be produced.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_group_products_and_coproducts_of_presentations.sage::test_free_product_of_infinite_free_and_finite_cyclic_groups`
   `AttributeError: 'OwnedIndexedFreeGroupMor_with_category_with_category' object has no attribute '_from_engine_morphism'`

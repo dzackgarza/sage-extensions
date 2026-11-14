@@ -2,7 +2,7 @@ C17: A raw Sage integer is refused at the owned integer ring
 
 `TypeError: cannot convert 3 into Integer Ring: it is a raw Sage element of Integer Ring; construct it from a ring of this session`, raised while the mod-3 cyclotomic character of `Gal(F_5bar/F_5)` is evaluated: an engine integer produced inside the computation cannot be used as an exponent in the owned ring.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_profinite_character_mor_archive.sage::test_mod_three_cyclotomic_character_of_f5_has_kernel_of_index_two`
   `TypeError: cannot convert 3 into Integer Ring: it is a raw Sage element of Integer Ring; construct it from a ring of this session`

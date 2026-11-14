@@ -2,7 +2,7 @@ C07: An acted group module is not placed in its character-representation categor
 
 `Modules(R[G])(M, action).character()` and `.brauer_character()` raise `AttributeError: 'GeneralModules.parent_class[_CoefficientModuleEngine].ObjectType' object has no attribute 'character'`; the ordinary and Brauer character surfaces exist, but the module the user builds is never placed in the category that carries them.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_group_law.sage::test_the_natural_permutation_module_of_s3_has_character_3_1_0`
   `AttributeError: 'GeneralModules.parent_class[_CoefficientModuleEngine].ObjectType' object has no attribute 'character'`

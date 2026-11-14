@@ -2,7 +2,7 @@ C14: `Subgroups(G)` has no cardinality
 
 `Subgroups(C_6).cardinality()` raises `AssertionError: cannot compute the cardinality of Subgroups of Cyclic group C_6 of order 6`: the number of subgroups of a finite group is finite and computable, and cannot be read.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_groups_archive.sage::test_finite_group_subgroups_are_owned_and_keep_the_ambient_group`
   `AssertionError: cannot compute the cardinality of Subgroups of Cyclic group C_6 of order 6: its construction supplies no exact value or decided finite enumeration (it is in Join of Category of finite sets and Category of facade sets and Category of finite countable sets)`

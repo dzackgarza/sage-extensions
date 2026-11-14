@@ -2,7 +2,7 @@ C23: A character is not a member of the set of irreducible characters
 
 `group.trivial_character() in group.irreducible_characters()` is false, printing the trivial character as a member of a three-element set that contains a character of the same degree: the equality (or the hash) of two `Character` objects does not decide membership.
 
-Failing tests on main `c8a3ced` (2026-11-14), one file per run in the published image:
+Failing tests on main `36e5eac` (2026-11-14), one file per run in the published image:
 
 - `tests/groups/test_groups_archive.sage::test_archived_finite_group_character_surface_is_live_on_the_owned_group`
   `assert Character of degree 1 of Symmetric group S_3 in {Character of degree 1 of Symmetric group S_3, Character of degree 2 of Symmetric group S_3, Character of degree 1 of Symmetric group S_3}`
