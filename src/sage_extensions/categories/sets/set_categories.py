@@ -807,7 +807,13 @@ class OwnedSetMorphism:
             point = source._normalize_admitted_element(element)
         if point is None:
             point = source(element)
-        return self.codomain()(function(point, *args, **kwargs))
+        image = function(point, *args, **kwargs)
+        target = self.codomain()
+        if isinstance(target, OwnedParent) and target.category().is_subcategory(Sets()):
+            admitted = target._normalize_admitted_element(image)
+            if admitted is not None:
+                return admitted
+        return target(image)
 
     def selected_integer_translation_step(self):
         r"""The stated integer translation displacement, or ``None``.
@@ -2229,11 +2235,11 @@ class Sets(CategoryPacketMethods, OwnedCategory):
     class ParentMethods:
         @RealizationHook
         def _normalize_admitted_element(self, element):
-            r"""Normalize an admitted source point for evaluation of an actual set arrow.
+            r"""Normalize an admitted endpoint point during set-arrow evaluation.
 
             Protected caller: OwnedSetMorphism. None leaves ordinary constructor
             ingress to that caller. A realization with an actual facade datum may
-            preserve that arrow's source premise through its existing ambient
+            preserve that arrow's source or range premise through its existing ambient
             normalization; this does not admit a fresh member or decide a
             predicate. Public set construction and membership are unchanged.
             """

@@ -4270,7 +4270,8 @@ class _GroupMorRealizationMixin:
         r"""Normalize a group-arrow point through its declared facade ambient.
 
         Protected evaluation contract (OWN-05), shared by GroupMorphism
-        and the defining subgroup inclusion. The point is already admitted
+        and the defining subgroup inclusion, and exposed to OwnedSetMorphism
+        by OwnedGroups' endpoint-normalization hook. The point is already admitted
         in the source, or its membership is supplied by the defining map's
         range law. This is not a constructor for new subgroup members.
         A point already parented by the current endpoint is retained before
@@ -5739,6 +5740,16 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 f"computation with {self} through a group engine requires a selected realization; "
                 "this group supplies none"
             )
+
+        def _normalize_admitted_element(self, element):
+            r"""Preserve a set arrow's admitted point in this group's ambient.
+
+            Protected caller: OwnedSetMorphism, for source and range points
+            of a declared set map. The group-map normalization contract owns
+            the actual subgroup ambient; explicit construction and membership
+            still decide admission independently.
+            """
+            return _GroupMorRealizationMixin._normalize_admitted_element(self, element)
 
         def semidirect_product(self, action):
             r"""Return ``self ⋊ G`` from a homomorphism ``G -> Aut(self)``.
