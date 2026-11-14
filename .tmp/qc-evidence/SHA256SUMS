@@ -301,3 +301,5 @@ c6bc96d6e2a7a6ace5593ee340cc9fa1348c0e9cac432fbbe70ab469e9e4e32a  .tmp/qc-eviden
 d87e786fe2258105c33b727aaf645539e41a8f68da6e66da6a4e7fd4da789442  .tmp/qc-evidence/issue387-cusp4-facets.log
 78ee12c05af42b55b0fd79fb83e658f16d40dc4bbbccf84fabb95374f91916d7  .tmp/qc-evidence/issue387-cusp4-liftshape.py
 486035590aec3dc9a3360e963bdc776f594e1db81005d543b670e5542c9bc704  .tmp/qc-evidence/issue387-cusp4-liftshape.log
+0b205845986033e6bf59eacdc100765986479fecc4f6f75ad61f42b784cb5115  .tmp/qc-evidence/issue387-cusp4-redundancy.py
+d2ee19d0c1d5ae7f793636f3b26363154d07ce13d5ec25c7253131875cba77ba  .tmp/qc-evidence/issue387-cusp4-redundancy.log

@@ -75,22 +75,15 @@ printed = tuple(Sterk.cusp_roots_in_TEn("Sterk_4"))
 printed_covectors = [covector(wall) for wall in printed]
 say(f"printed walls={len(printed)}")
 
-frame = image.reduction().coordinate_frame()
-frame_labels = tuple(image.reduction().module_generating_set())
-
-
 def lift_of(reduction_element):
-    total = [0] * len(labels)
-    coefficients = [int(entry) for entry in reduction_element.to_vector()]
-    for position, label in enumerate(frame_labels):
-        coefficient = coefficients[position]
-        if not coefficient:
-            continue
-        piece = frame[label]
-        piece = piece.to_vector() if hasattr(piece, "to_vector") else piece
-        piece = [int(entry) for entry in piece]
-        total = [entry + coefficient * other for entry, other in zip(total, piece)]
-    return tuple(total)
+    r"""Return the T_En coordinates of the class lift, through ``class_lift``.
+
+    The reduction's ``coordinate_frame`` elements carry eleven coordinates in
+    the perpendicular's frame, not twelve in ``T_En``'s
+    (``issue387-cusp4-liftshape.log``), so the lift is taken from
+    ``class_lift``, which includes the perpendicular into ``T_En``.
+    """
+    return tuple(int(entry) for entry in image.class_lift(reduction_element).to_vector())
 
 
 carrier = Cone(printed_covectors)
