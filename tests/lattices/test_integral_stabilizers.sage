@@ -61,3 +61,23 @@ def test_the_swap_stabilizes_the_standard_lattice_but_not_a_commensurable_one() 
 
     assert swap in IntegralStructureAction(group, standard.inclusion()).stabilizer()
     assert swap not in IntegralStructureAction(group, finer.inclusion()).stabilizer()
+
+
+def test_a_set_map_into_a_generated_subgroup_keeps_its_range_law() -> None:
+    r"""Squaring ``<g> -> <g^2>`` for ``g = diag(2, 1/2)`` lands every power in ``<g^2>``.
+
+    The range premise of the stated set map admits ``g^6``; no word witness is
+    asked of the infinite subgroup ``<g^2>``.
+    """
+    plane, space, basis, orthogonal_group = _rational_hyperbolic_plane()
+    half = QQ(1) / QQ(2)
+    scaling = orthogonal_group(
+        lambda label: 2 * basis[int(label)] if int(label) == 0 else half * basis[int(label)]
+    )
+    cyclic = orthogonal_group.subgroup((scaling,))
+    squares = orthogonal_group.subgroup((scaling * scaling,))
+    squaring = Sets().Mor(cyclic, squares)(lambda element: element * element)
+    generator = next(iter(cyclic.group_generators()))
+    for power in (generator, generator**-1, generator**3):
+        image = squaring(power)
+        assert image == power * power
