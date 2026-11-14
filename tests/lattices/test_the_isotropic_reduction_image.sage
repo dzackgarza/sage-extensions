@@ -367,3 +367,58 @@ def test_the_fourth_cusps_layers_are_enumerated_in_the_coordinates_of_its_cell()
     assert all(image.admits_root(root) for root in walls)
     assert all(root.q() in (ZZ(-2), ZZ(-4)) for root in walls)
     assert cardinal(sum(1 for _ in walls)) > cardinal(16)
+
+
+def test_each_of_the_fourth_cusps_first_layers_agrees_with_the_whole_lattice_in_the_cell() -> None:
+    r"""The cell enumeration of a layer is exactly that layer's whole-lattice solutions in the cell.
+
+    The walk at the fourth cusp enumerates its layers in the coordinates of
+    the cell at the controlling vector (#400): the cone coordinates
+    nonnegative, the lineality coordinate an integer bounded on both sides
+    by the layer's norm equation.  Its candidates are then exactly the
+    solutions of the layer's equation (57) that lie in the cell — E. B.
+    Vinberg, *On the groups of unit elements of certain quadratic forms*,
+    Math. USSR Sb. 16 (1972), §4.1, the equation (57) with the conditions
+    (58), p. 30 — the vectors whose coordinates in the cell normals are
+    nonpositive, which is to pair nonpositively with every adjugate dual
+    normal of the cell.  The engine's whole-lattice enumeration returns
+    every solution of the same equation with no restriction, so the two
+    sets agree on each layer both searches reach; the first four are
+    compared here, layer by layer, with the layer named on failure — the
+    probe ``issue400-probe-b.log`` compared the first thirteen the same way
+    before the whole-lattice search itself runs out of memory at the
+    fourteenth.
+
+    The dual normals are verified before use: each pairs zero with every
+    normal but its own, and positively with its own, so each is a positive
+    multiple of the dual basis vector of the cell normals, and pairing
+    nonpositively with every dual is the nonpositive orthant of the normal
+    coordinates and not some other cone.
+    """
+    image = _cusp_images()["Sterk_4"]
+    reduction = image.reduction()
+
+    def coordinates_of(candidate):
+        return tuple(int(entry) for entry in candidate.to_vector())
+
+    for layer in image.cusp_layer_enumerations(layers=4):
+        normals = layer.cell_normals()
+        duals = layer.cell_dual_normals()
+        for i, normal in enumerate(normals):
+            for j, dual in enumerate(duals):
+                pairing = reduction.b(normal, dual)
+                if i == j:
+                    assert pairing > 0
+                else:
+                    assert pairing == 0
+        in_the_cell = [
+            candidate
+            for candidate in layer.whole_lattice_candidates()
+            if all(reduction.b(candidate, dual) <= 0 for dual in duals)
+        ]
+        assert {coordinates_of(candidate) for candidate in layer.cell_candidates()} == {
+            coordinates_of(candidate) for candidate in in_the_cell
+        }, (
+            f"layer {layer.layer_number()} of square {layer.square()} at offset "
+            f"{layer.offset()} disagrees with its whole-lattice solutions in the cell"
+        )
