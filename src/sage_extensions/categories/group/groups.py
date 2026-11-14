@@ -7569,8 +7569,14 @@ class SymmetricGroups(OwnedCategory):
             ranking, point_at_position = self._natural_point_ranking_and_inverse()
             size = int(self.natural_points().cardinality().finite_value())
             table = tuple(point_at_position(position) for position in range(size))
+            # Integer points are keyed by their engine integers, so a Python
+            # or Sage integer is looked up by C comparison instead of an
+            # owned-ring equality per probe.
             try:
-                return table, {point: position for position, point in enumerate(table)}
+                return table, {
+                    _integer_engine_point(point): position
+                    for position, point in enumerate(table)
+                }
             except TypeError:
                 return None
 
@@ -7580,6 +7586,8 @@ class SymmetricGroups(OwnedCategory):
             if table is not None:
                 points, positions = table
                 position = positions.get(point)
+                if position is None:
+                    position = positions.get(_integer_engine_point(point))
                 if position is None:
                     raise ValueError(
                         f"{point} is outside the selected permutation domain {self.natural_points()}"

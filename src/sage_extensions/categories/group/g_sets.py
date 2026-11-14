@@ -8,6 +8,7 @@ standard finite free/cofree constructions.
 """
 
 from sage.categories.category import Category
+from sage.libs.gap.libgap import libgap
 from sage.misc.cachefunc import cached_function, cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import Element, parent as element_parent
@@ -28,6 +29,7 @@ from sage_extensions.categories.group.groups import (
     PermutationGroups,
     SymmetricGroups,
     _GroupMorRealizationMixin,
+    _encodes_elements_in_gap,
     _engine_group,
     _engine_left_coset_positions,
     _engine_point,
@@ -880,6 +882,49 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             if target not in orbit:
                 return None
             return augmentation(words[int(orbit.ranking_map()(orbit(target)))])
+
+        def _named_stabilizer(self, point):
+            r"""Protected value hook: ``G_point`` by GAP when ``G`` is a finite group of GAP elements.
+
+            The stabilizer is the preimage of the point stabilizer of the
+            image of ``G`` in ``Sym(X)`` under the action homomorphism,
+            ``PreImage(rho, Stabilizer(rho(G), x))``; GAP computes it by a
+            stabilizer chain (Seress, *Permutation Group Algorithms*,
+            section 4.1). The generators are those of GAP's small generating
+            set, not the ``|orbit| * |letters|`` Schreier generators of the
+            orbit search.
+            """
+            group = self.acting_group()
+            if not (
+                group.has_selected_group_resolution()
+                and group.is_finite() is True
+                and _encodes_elements_in_gap(_engine_group(group))
+            ):
+                return None
+            generators = tuple(group.group_generators())
+            representation = self.permutation_representation()
+            symmetric = representation.codomain()
+            engine_generators = libgap([libgap(group._to_engine(generator)) for generator in generators])
+            images = libgap([
+                libgap(symmetric._to_engine(representation(generator)))
+                for generator in generators
+            ])
+            homomorphism = libgap.GroupHomomorphismByImagesNC(
+                libgap.Group(engine_generators, libgap.Identity(engine_generators[0])),
+                libgap.SymmetricGroup(int(self.point_set().cardinality())),
+                engine_generators,
+                images,
+            )
+            position = int(self.ranking_map()(point)) + 1
+            stabilizer = libgap.PreImage(
+                homomorphism,
+                libgap.Stabilizer(libgap.Image(homomorphism), position),
+            )
+            engine = _engine_group(group)
+            return group.subgroup(tuple(
+                group._from_engine(engine(element))
+                for element in libgap.SmallGeneratingSet(stabilizer)
+            ) or (group.one(),))
 
         def _stabilizer_generating_morphism(self, point):
             r"""Protected value hook: the Schreier morphism ``E -> G`` onto ``G_point``.
