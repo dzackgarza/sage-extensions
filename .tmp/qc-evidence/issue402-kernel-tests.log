@@ -1,0 +1,14 @@
+Running 5 items in this shard
+.....                                                                    [100%]
+==================================== PASSES ====================================
+___________ test_each_cusp_reduces_to_a_hyperbolic_rank_ten_lattice ____________
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:722 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_each_cusp_reduces_to_a_hyperbolic_rank_ten_lattice
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_two_lifts_of_a_wall_reflection_differ_by_the_kernel_and_get_one_answer
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_the_membership_questions_at_the_first_cusp_are_one_sift_per_root
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_the_lift_criterion_agrees_with_the_levi_route_at_the_first_cusp
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_every_wall_of_the_fourth_cusp_chamber_is_a_reflection_of_the_stabilizer_image
+5 passed, 6 deselected in 1054.96s (0:17:34)

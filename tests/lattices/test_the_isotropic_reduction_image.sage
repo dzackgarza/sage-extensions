@@ -18,8 +18,8 @@ many lifts in ``P_v`` and two differ by an element of the kernel ``K_v``, so
 membership is decided on the discriminant image: ``\sigma`` is in the image when
 ``\rho`` of one lift lies in ``\rho(K_v)\rho(\Gamma)``.  ``K_v`` contains the
 Eichler transvections ``t(v, a)``, ``a \perp v`` (Gritsenko--Hulek--Sankaran,
-arXiv:0810.1614, §3.1, equation (4)); their image ``\rho(K_v)`` is an output of
-the call, and at all five cusps here it is trivial.
+arXiv:0810.1614, §3.1, equation (4)), with a rational parameter when ``v`` has
+divisibility two; their image ``\rho(K_v)`` is an output of the call.
 
 The wall counts Sterk publishes for the cusp diagrams (4.3.5--4.3.9) are the
 sizes of ``Sterk.sterk_roots()``: twelve, ten, twelve, eleven and fourteen roots
@@ -107,24 +107,26 @@ def test_each_cusp_reduces_to_a_hyperbolic_rank_ten_lattice() -> None:
         assert image.vector().is_primitive() is True
 
 
-def test_the_kernel_of_the_levi_map_acts_trivially_on_the_discriminant_group() -> None:
-    r"""``\rho(K_v)`` is trivial at every cusp, so one lift does decide membership there.
+def test_two_lifts_of_a_wall_reflection_differ_by_the_kernel_and_get_one_answer() -> None:
+    r"""``s_{a+v} s_a`` lies in ``K_v``, and the criterion answers ``s_a`` and ``s_{a+v}`` alike.
 
-    ``K_v`` contains one Eichler transvection per basis vector of ``v^\perp``,
-    eleven of them at each cusp (``v^\perp`` has rank eleven), and each is
-    returned only after being checked to fix ``v`` and to act trivially on
-    ``N``.  Their discriminant images generate ``\rho(K_v)``
-    (Gritsenko--Hulek--Sankaran, arXiv:0810.1614, §3.1, equation (4)--(5)), and
-    here that image is the trivial group, which is the output the membership
-    criterion needs and is not assumed.
+    For a printed wall ``a`` of card ``029J``'s row 4.3.8 (Sterk, Math. Z. 207
+    (1991), (4.3.8) with Fig. 10, p. 23), ``a`` and ``a + v`` lie in
+    ``v^\perp``, both reflections are integral and fix ``v``, and both induce
+    the reflection of ``N`` in the class of ``a``; their quotient therefore
+    fixes ``v`` and acts trivially on ``N``, which is the kernel ``K_v`` of the
+    Levi map.  The criterion ``\rho(g) \in \rho(K_v)\rho(\Gamma)`` decides a
+    class of ``N``, so it gives the two lifts one answer.
     """
-    for name, image in _cusp_images().items():
-        transvections = image.kernel_transvections()
-        assert cardinal(sum(1 for _ in transvections)) == cardinal(11)
-        for transvection in transvections:
-            assert transvection(image.vector()) == image.vector()
-        assert image.kernel_discriminant_image_is_trivial() is True
-        assert image.kernel_discriminant_image().cardinality() == cardinal(1)
+    image, walls, _row = _fourth_chamber()
+    vector = image.vector()
+    for wall in walls:
+        first = image.root_reflection(wall)
+        second = image.root_reflection(wall + vector)
+        quotient = second * first
+        assert quotient(vector) == vector
+        assert image.line().acts_trivially_on_isotropic_reduction(quotient) is True
+        assert image.contains_lift(first) == image.contains_lift(second)
 
 
 def test_sterks_published_cusp_roots_are_reflections_of_the_stabilizer_image() -> None:

@@ -323,3 +323,8 @@ c993cc700e9c4a3e216d04ec25c2caa737afa98b3914a8e0d992f0d8d1a684a6  .tmp/qc-eviden
 9f591994ea5798109bea0e24b8ecd8739642f9d6b1d0d4f512614aa71cd0777d  .tmp/qc-evidence/issue402-lift-dependence.log
 8d52673536aa3c19e4d258d419d915933040966fa7383b2b0a1e5376a179cfe7  .tmp/qc-evidence/issue402-cusp4-polyhedron.py
 6e72eab5bf876b6a872f746df6185e80edd3b69f3ab6dd242d21d7d60c7c8992  .tmp/qc-evidence/issue402-cusp4-polyhedron.log
+4b75dfa302b82f18346e102ee86cad81f91718310f37f1ce0229cc9f4100323a  .tmp/qc-evidence/issue402-kernel-repair.py
+4b2bbd7a8e6201aaefe9cc6277eb03076557a879bdba98849f24fa24c88f91e2  .tmp/qc-evidence/issue402-kernel-repair.log
+d47f788a75c570809d663df4d7e6a4d61f0e034e675370d49f6da2954687a2c3  .tmp/qc-evidence/issue402-kernel-tests.log
+b3d00ebe307071c5a8dbe6fdee95893525b71de49f93c5fa0ec3348513ffc4e1  .tmp/qc-evidence/issue402-locus-classes.py
+af6164efd7d708a9788fbabe51e17e3c755cafe3a6c8534873a39044f1d4468e  .tmp/qc-evidence/issue402-locus-classes.log

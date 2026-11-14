@@ -1,0 +1,15 @@
+[  216.4s] building kernel generators
+[  228.0s] kernel generators 20
+[  237.6s] rho(K_v) order 256
+[  713.0s] a2 class admitted: True
+[  714.8s] a3 class admitted: True
+[  716.3s] a4 class admitted: True
+[  717.6s] a5 class admitted: True
+[  719.0s] a6 class admitted: True
+[  720.3s] a7 class admitted: True
+[  722.0s] a8 class admitted: True
+[  723.5s] a9 class admitted: True
+[  794.8s] a10 class admitted: True
+[  796.2s] a11 class admitted: True
+[  797.6s] a12 class admitted: True
+[  797.6s] done
