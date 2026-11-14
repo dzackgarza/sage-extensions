@@ -59,27 +59,35 @@ pair has never been green on this repository.
 The three `CoxeterGroups` failures are the same defect as the five `NameError` ones: one file,
 one missing export list, one repair.
 
-## Repaired by
+## Scope: filed, not patched
 
-The next commit on `main`: the six names are exported from `sage_extensions.all`. Eight of the
-tests below turn green, at their first attempt, with no regression in the files re-run
-(`.tmp/qc-evidence/issue407-repair1-summary.log`); the rest reach further defects, filed
-separately.
+The repair this cause needs is not local to it, and adding the six names would be the wrong
+one.  Each area package already declares its own public surface:
+`sage_extensions/groups/__init__.py` states 65 names in `__all__` (including `Subgroups`,
+`SymmetricGroups`, `GeneralLinearGroups`, `FreeGroupQuotients`, `CoxeterGroups`, `Torsors`),
+`sage_extensions/rings/__init__.py` 81, `sage_extensions/categories/modules/__init__.py` 82,
+`.../categories/sets/__init__.py` 50, `.../categories/algebras/__init__.py` 53,
+`.../categories/abstract_categories/__init__.py` 39, `.../schemes/__init__.py` 86.  The
+hand-written import list in `sage_extensions/all.py` is a second copy of those declarations,
+and the copy has drifted.  Adding the six names the failing tests happen to use leaves the
+mechanism -- two lists, one authority -- in place, and hands the next failing test the same
+drift.
 
-## The rule this repairs
+The correct repair is that `sage_extensions.all` publishes the owners' declared surfaces
+instead of restating them: the area packages' `__all__` lists, the import order `all.py`'s
+own note protects ("the catalogue constructs named lattices at import time, so it is
+imported last"), and every test in the tree that resolves names through the session.  That
+reaches the whole session namespace, so this cause is filed with that scope and not patched
+here.
 
-The repository states the requirement itself: `sage_extensions.testing.test_lint`'s `TL13`
-ends a test run red on *"a name that is neither bound in the file, a session name, nor an
-allowed builtin: the test reaches outside the session"*, and `_session_names()` is "Sage's
-script namespace, then the session star import".  At `14b9cc1` the lint reports, on three of
-the files below, `TL13 Subgroups` (1), `TL13 Torsors` (1), `TL13 SymmetricGroups` (17),
-`TL13 GeneralLinearGroups` (17), `TL13 FreeGroupQuotients` (14) -- together with
-`TL13 OwnedGroups` (45) and `TL13 FiniteGSets` (3), which later commits had already added, so
-this cause is one name-list being restored at its owner, not a special case for one test
-(`.tmp/qc-evidence/issue407-lint-names-before.log`).  On the tree that repairs it the same
-three files carry 0 `TL13` findings and their other findings unchanged
-(`.tmp/qc-evidence/issue407-lint-names-after.log`).
+The same conclusion was reached on `main` the same day from the other direction: `50a83cb`
+(#408) reverted a change that had added nineteen names to `all.py`, chosen by the failing
+tests, for exactly this reason; this triage reverts its own six-name version (`eb203aa`) to
+match.
 
-`CoxeterGroups` is the name the lint cannot catch, because Sage has a category of that name
-and `sage.all_cmdline` is in a `.sage` test's builtins; that is exactly why its three tests
-died with `NotImplementedError` instead of `NameError`.
+One consequence worth carrying: `CoxeterGroups` cannot be caught by the lint, because Sage
+has a category of that name and `sage.all_cmdline` is in a `.sage` test's builtins, so a
+`.sage` test resolving it silently gets Sage's category -- `NotImplementedError` out of
+Sage's `Category._call_` instead of `W(A_2)`.  A namespace that publishes each area's
+declared surface binds the library's name in the test module's own globals, where it wins
+over the builtin.

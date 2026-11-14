@@ -418,3 +418,6 @@ af872c2d99bb13b55c14885f81a4ec53b81990ad089c03638c30f1e1e9ee8b26  issue398-divis
 8f28fa7dd159b9bf13614bb1a200a54f25426c8d4e68e3a7c3da510f0e13883c  issue398-green-three-files.log
 f4e71291acf5de872bcac54b973a192fda2c6aa68959138d9781d61b1221252d  issue398-regression-fixed.log
 ec2f24bd1b150cd0dd67ac6fb7d7656b74c5433ce1933ba617c313350da5224e  issue406-plugins-after-rewrite.log
+e913e40112925d13a8212e3ae45f959c1c5a04a07def808ef1a3573720c73cde  .tmp/qc-evidence/triage/407-session-namespace-omits-the-owned-group-categories.md
+c02219eff47dadd249ce7b1c5b7f3aaa71f09966a6bf15876597dbb15c641449  .tmp/qc-evidence/triage/407-owned-algebraic-closure-is-built-without-its-base-field.md
+8d59f1bc9370415b9d35e77243d65fc49b4312971d43e4fb05bb84d0f1f33077  .tmp/qc-evidence/triage/407-triage-index.md

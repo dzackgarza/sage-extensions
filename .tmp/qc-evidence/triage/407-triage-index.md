@@ -17,12 +17,12 @@ in the file that does not.  Each failed test below is in exactly one cause.
 
 | # | issue body | failing tests | state on `main` |
 | --- | --- | --- | --- |
-| A | `triage/407-owned-algebraic-closure-is-built-without-its-base-field.md` | 14 | `4706e99` and its replacement `525dd1b` (no test flips; the next defect on the path is B) |
+| A | `triage/407-owned-algebraic-closure-is-built-without-its-base-field.md` | 14 | repaired on main by `23ae718` (#408), the same construction this workstream reached; no test flips, the next defect on the path is B |
 | B | `triage/407-engine-identity-asks-a-coercion-map.md` | 4 | `fa7553e` and its replacement `c17910a` (3 tests green, nothing new red) |
 | C | `triage/407-modules-of-a-bare-set.md` | 4 |  |
 | D1 | `triage/407-conjugation-morphism-supplies-a-gap-whole-group-map.md` | 2 |  |
 | D2 | `triage/407-abelianization-supplies-a-gap-whole-group-map.md` | 4 |  |
-| E | `triage/407-session-namespace-omits-the-owned-group-categories.md` | 17 | `eb203aa` (8 tests green, nothing new red) |
+| E | `triage/407-session-namespace-omits-the-owned-group-categories.md` | 17 | filed, not patched: publishing the owners' `__all__` surfaces reaches the whole namespace |
 | G | `triage/407-sets-parameterized-by-a-group.md` | 2 |  |
 | H | `triage/407-group-algebra-functor-hands-a-module-arrow-to-the-algebra-mor.md` | 1 |  |
 | I | `triage/407-the-regular-representation-asserts-a-rank-it-does-not-have.md` | 1 |  |
@@ -62,9 +62,9 @@ commit rather than by the imports: `O` (`fd5ab11`, 2026-11-02) and the file of c
 
 | commit | cause | what it does |
 | --- | --- | --- |
-| `eb203aa` | E | binds the six owned group categories in `sage_extensions.all` |
-| `4706e99`, replaced by `525dd1b` | A | builds the closure as `GF(p).algebraic_closure()` |
 | `fa7553e`, replaced by `c17910a` | B | decides an engine identity by its two ends, and only then asks the engine |
+| `eb203aa`, reverted here | E | bound six names in `sage_extensions.all`; reverted, because the repair is the namespace publishing the area packages' `__all__` surfaces, which is tree-wide |
+| `4706e99`, replaced by `525dd1b` | A | built the closure as `GF(p).algebraic_closure()`; `main`'s `23ae718` (#408) states the same construction, and the merge keeps main's wording |
 
 Each repair is the owner's operation, not a guard:
 

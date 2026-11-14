@@ -62,8 +62,16 @@ already the first failure of `test_galois_quotient_archive.sage`
 
 ## Repaired by
 
-The next commit on `main`: the closure is built as
-`AlgebraicClosureFiniteField(SageGF(p), f"z{p}")`, one owned object per characteristic. No
-test in this list flips green with that commit alone --- with the closure constructible the
-same calls reach the next defect on the same path (`RingMorphism._engine_is_identity` asking a
-coercion map for `is_identity`, filed separately), and that is where they now stop.
+`main`'s `23ae718` (#408, *State why the closure is raised through the field, not the
+constructor*): the closure is `SageGF(p).algebraic_closure()`, the field's own operation,
+which is also what this workstream's `4706e99` and its replacement `525dd1b` reached; the
+merge of `8755b95` keeps main's wording of the reason and this branch's other repair.  The
+raw constructor is no longer called at all, so the one-argument call this cause names is
+gone from the tree.
+
+No test in this list flips on that repair alone, and that is not hidden: with the closure
+constructible the same calls reach the next defect on the same path,
+`RingMorphism._engine_is_identity` asking a coercion map for `is_identity`
+(`.tmp/qc-evidence/triage/407-engine-identity-asks-a-coercion-map.md`, repaired by
+`fa7553e`/`c17910a` in this workstream), and that is where they now stop.  The run that
+shows both: `issue407-repair6.log`.
