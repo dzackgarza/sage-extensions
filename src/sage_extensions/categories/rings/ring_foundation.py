@@ -7616,18 +7616,20 @@ def _owned_real_algebraic_numbers() -> _OwnedRingParent:
 def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
     r"""The algebraic closure of a finite prime field, keyed by characteristic.
 
-    ``AlgebraicClosureFiniteField(base_ring, name)`` takes both the field it
-    closes and the name of its primitive elements.  Sage's algebraic closures
-    of finite fields are not a unique-representation class -- non-identical
-    instances never compare equal -- so the one owned closure of each
-    characteristic is the one built here, with that fixed name
-    (``sage.rings.algebraic_closure_finite_field.AlgebraicClosureFiniteField``,
-    whose docstring says the same).
-    """
-    from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    The closure is ``GF(p).algebraic_closure()``, the field's own maintained operation
+    (`sage.rings.finite_rings.finite_field_base.FiniteField.algebraic_closure`, which the
+    `AlgebraicClosureFiniteField` docstring recommends over the raw constructor).  Its base
+    is Sage's prime field `GF(p)` and not the owned prime field `Z/p`: the pseudo-Conway
+    closure is implemented for prime *fields* only, and `Zmod(p)` is not one -- on this
+    runtime `AlgebraicClosureFiniteField(Zmod(3), "z3")` raises `NotImplementedError:
+    algebraic closures of finite fields are only implemented for prime fields`, while the
+    same call on `GF(3)` answers the closure.
 
-    prime = int(characteristic)
-    engine = AlgebraicClosureFiniteField(SageGF(prime), f"z{prime}")
+    Sage's algebraic closures of finite fields are not a unique-representation class
+    -- non-identical instances never compare equal -- so one owned closure per
+    characteristic is fixed here, and every request for that characteristic answers it.
+    """
+    engine = SageGF(int(characteristic)).algebraic_closure()
     return _OwnedRingParent(
         engine,
         named_placement=_algebraic_closure_finite_field_placements,
