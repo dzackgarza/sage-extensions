@@ -1,0 +1,34 @@
+[0.1s] lattice Integral lattice of rank 11 and signature (2, 9) rank 11 rss 264 MiB
+[63.5s] ambient plane row: 1 in 59.8s
+[103.7s] is_parabolic_complete: True in 40.3s
+[103.7s] parabolic family: 113 generators
+[109.0s] formula check 6JRS [Otilde]: formula 1 (|chi(G)|=1, |rho(H)|=1, s=1), row 1
+[111.2s] formula check 6JRS [Otilde+]: formula 1 (|chi(G)|=2, |rho(H)|=1, s=2), row 1
+[130.4s] formula check U+U(2)+<-2> [Otilde]: formula 2 (|chi(G)|=2, |rho(H)|=1, s=1), row 2
+[141.4s] formula check U+U(2)+<-2> [Otilde+]: formula 2 (|chi(G)|=4, |rho(H)|=1, s=2), row 2
+[141.4s] formula validation on the small lattices done in 37.6s
+[266.4s] Otilde expected count: 189720 (|im rho|=46998591897600, |rho(H)|=247726080) in 125.0s
+[290.7s] Otilde+ expected count: 189720 (|chi(G)|=93997183795200, |rho(H)|=247726080, s=2) in 24.3s
+[291.3s] Otilde+ single-generator sign flip test: True in 0.6s
+[380.3s] Gamma_{Co,2} independent double-coset count: 7 in 2.0s
+[380.3s] ambient family: 330 generators
+[403.9s] per-plane memory: 6.0 KiB -> 189720 planes project to 1.08 GiB above the walk's footprint
+[531.6s] GAMMA_CO_2 ROW: 7 planes in 127.7s, rss 1883 MiB
+[531.6s] GAMMA_CO_2 ROW: count matches the independent enumeration; sample planes primitive isotropic: OK
+[531.6s] peak rss 1883 MiB
+[531.6s] PROBE B DONE
+[peakrss] probe390b: child waited=0 shell_code=0 samples=270
+[peakrss] peak tree RSS      : 3860 MiB
+[peakrss] low-water MemAvail : 11550 MiB
+[peakrss] peak single VmHWM  : 3948 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2054 MiB peak
+[peakrss]   python                     1883 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   532.2s procs=  4 rss=  3860 MiB hwm=  3929 MiB avail= 11947 MiB
+[peakrss]   t=   534.2s procs=  4 rss=  3785 MiB hwm=  3948 MiB avail= 11937 MiB
+[peakrss]   t=   406.2s procs=  4 rss=  3730 MiB hwm=  3800 MiB avail= 12077 MiB
+[peakrss]   t=   408.2s procs=  4 rss=  3730 MiB hwm=  3800 MiB avail= 12080 MiB
+[peakrss]   t=   410.2s procs=  4 rss=  3730 MiB hwm=  3800 MiB avail= 12080 MiB
+launcher exit: 0

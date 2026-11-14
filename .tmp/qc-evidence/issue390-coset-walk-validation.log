@@ -1,0 +1,49 @@
+[0.1s] === 6JRS U+U+<-2> ===
+[2.0s] ambient classes: 1
+[23.9s] [Otilde] row 1 in 21.8s, independent 1
+[23.9s] [Otilde] pairwise Gamma-equivalent distinct planes: 0 (0 expected)
+[26.2s] [Otilde+] row 1 in 2.3s, independent 1
+[26.2s] [Otilde+] pairwise Gamma-equivalent distinct planes: 0 (0 expected)
+[26.2s] [point-stabilizer] row 1 in 0.0s, independent 1
+[26.2s] [point-stabilizer] pairwise Gamma-equivalent distinct planes: 0 (0 expected)
+[26.2s] === U+U ===
+[26.8s] ambient classes: 1
+[29.5s] [Otilde] row 1 in 2.4s, independent 1
+[29.5s] [Otilde] pairwise Gamma-equivalent distinct planes: 0 (0 expected)
+[31.0s] [Otilde+] row 1 in 1.6s, independent 1
+[31.0s] [Otilde+] pairwise Gamma-equivalent distinct planes: 0 (0 expected)
+[31.1s] [point-stabilizer] row 1 in 0.0s, independent 1
+[31.1s] [point-stabilizer] pairwise Gamma-equivalent distinct planes: 0 (0 expected)
+[31.1s] === U+U(2)+<-2> ===
+[36.2s] ambient classes: 1
+[51.9s] [Otilde] row 2 in 15.7s, independent 2
+[71.4s] [Otilde] pairwise Gamma-equivalent distinct planes: 0 (0 expected)
+[84.1s] [Otilde+] row 2 in 12.7s, independent 2
+[105.8s] [Otilde+] pairwise Gamma-equivalent distinct planes: 0 (0 expected)
+[106.0s] [point-stabilizer] row 1 in 0.2s, independent 1
+[106.0s] [point-stabilizer] pairwise Gamma-equivalent distinct planes: 0 (0 expected)
+[106.0s] === U(2)+U(2)+<-2> ===
+[110.8s] ambient classes: 1
+[123.8s] [Otilde] row 6 in 12.8s, independent 6
+[221.6s] [Otilde] pairwise Gamma-equivalent distinct planes: 0 (0 expected)
+[235.4s] [Otilde+] row 6 in 13.8s, independent 6
+[348.2s] [Otilde+] pairwise Gamma-equivalent distinct planes: 0 (0 expected)
+[348.5s] [point-stabilizer] row 2 in 0.2s, independent 2
+[353.1s] [point-stabilizer] pairwise Gamma-equivalent distinct planes: 0 (0 expected)
+[353.1s] results: True True True True
+[353.1s] PROBE G DONE
+[peakrss] probe390g: child waited=0 shell_code=0 samples=183
+[peakrss] peak tree RSS      : 3377 MiB
+[peakrss] low-water MemAvail : 11539 MiB
+[peakrss] peak single VmHWM  : 3377 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2018 MiB peak
+[peakrss]   python                     1351 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   354.2s procs=  4 rss=  3377 MiB hwm=  3377 MiB avail= 11819 MiB
+[peakrss]   t=   352.2s procs=  4 rss=  3370 MiB hwm=  3370 MiB avail= 11827 MiB
+[peakrss]   t=   350.2s procs=  4 rss=  3366 MiB hwm=  3366 MiB avail= 11827 MiB
+[peakrss]   t=   348.2s procs=  4 rss=  3361 MiB hwm=  3361 MiB avail= 11835 MiB
+[peakrss]   t=   346.2s procs=  4 rss=  3356 MiB hwm=  3356 MiB avail= 11843 MiB
+launcher exit: 0

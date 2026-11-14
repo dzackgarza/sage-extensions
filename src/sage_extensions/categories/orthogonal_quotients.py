@@ -1714,6 +1714,12 @@ class OrthogonalCharacterQuotient:
 
     def _splitting_isometries_in_im_rho(self, stabilizer_generators):
         r"""Double cosets computed inside ``im rho``: from retained integral generators."""
+        return finite_ordered_set(
+            tuple(self._iter_splitting_isometries_in_im_rho(stabilizer_generators))
+        )
+
+    def _iter_splitting_isometries_in_im_rho(self, stabilizer_generators):
+        r"""Yield the lifts of :meth:`_splitting_isometries_in_im_rho` one at a time."""
         from sage_extensions.categories.group.groups import _element_to_engine
 
         rho = self.lattice.discriminant_representation()
@@ -1721,7 +1727,7 @@ class OrthogonalCharacterQuotient:
             _element_to_engine(self._discriminant_group, rho(s))
             for s in stabilizer_generators
         )
-        return self._splitting_isometries_in_im_rho_from_image(
+        return self._iter_splitting_isometries_in_im_rho_from_image(
             discriminant_image_generators, self._stabilizer_sign_flips(stabilizer_generators)
         )
 
@@ -1812,10 +1818,30 @@ class OrthogonalCharacterQuotient:
         return None
 
     def _splitting_isometries_in_im_rho_from_image(
-        self, discriminant_image_generators, stab_sign_flip, *, right=None, point=None,
+        self, discriminant_image_generators, stab_sign_flip, *, point=None,
     ):
         r"""Splitting lifts computed inside ``im rho`` (the ``O(A_L)`` engine); see
         :meth:`splitting_isometries` for the exact sign bookkeeping.
+
+        This is :meth:`_iter_splitting_isometries_in_im_rho_from_image`
+        materialized: every lift is retained.  Callers that transport each
+        lift as it arrives -- the kernel plane rows, whose 189720 lifts and
+        189720 transported planes would otherwise be held at once -- consume
+        the iterator directly.
+        """
+        return finite_ordered_set(
+            tuple(
+                self._iter_splitting_isometries_in_im_rho_from_image(
+                    discriminant_image_generators, stab_sign_flip, point=point
+                )
+            )
+        )
+
+    def _iter_splitting_isometries_in_im_rho_from_image(
+        self, discriminant_image_generators, stab_sign_flip, *, point=None,
+    ):
+        r"""Yield the splitting lifts of
+        :meth:`_splitting_isometries_in_im_rho_from_image` one at a time.
 
         ``discriminant_image_generators`` are *already lowered* to the engine by the
         caller (``_splitting_isometries_in_im_rho`` applies ``rho`` and the crossing
@@ -1867,16 +1893,11 @@ class OrthogonalCharacterQuotient:
                     f"kernel element with nontrivial {sign_labels[0]} is available to lift it: "
                     "a plain sign predicate is not a substitute for a ker(rho) witness"
                 )
-        representatives = []
-        # Words in the rho-images of the ambient generators, via the
-        # epimorphism F(S) ->> im rho: PreImagesRepresentative reuses the
-        # parent chain, and the letters index the ambient O(L) generators.
+        # Words in the rho-images of the ambient generators: the letters index
+        # the ambient O(L) generators, and the orbit walk below records them
+        # itself, so no free-group epimorphism is scheduled on this route.
         from sage_extensions.categories.group.groups import _law_reversed
 
-        free = libgap.FreeGroup(len(rho_images))
-        epi = libgap.GroupHomomorphismByImagesNC(
-            free, im_rho, list(free.GeneratorsOfGroup()), rho_images
-        )
         if point is not None:
             # The orbit route: the double cosets as the rho(Gamma)-orbits on the
             # im rho-orbit of the point, walked breadth-first with the im
@@ -1938,6 +1959,10 @@ class OrthogonalCharacterQuotient:
                             following.append(target)
                     walk = following
                 unvisited = [index for index in unvisited if index not in component]
+            free = libgap.FreeGroup(len(rho_images))
+            epi = libgap.GroupHomomorphismByImagesNC(
+                free, im_rho, list(free.GeneratorsOfGroup()), rho_images
+            )
             for element in representative_elements:
                 word = libgap.PreImagesRepresentative(epi, element)
                 letters = tuple(int(x) for x in libgap.LetterRepAssocWord(word))
@@ -1956,52 +1981,204 @@ class OrthogonalCharacterQuotient:
                         raise ArithmeticError(
                             "splitting lift's discriminant image disagrees with the word section"
                         )
-                    representatives.append(lift)
-            return finite_ordered_set(tuple(representatives))
-        # The double-coset route: retained for callers that hold the integral
-        # stabilizer generators and no point of the finite set.
+                    yield lift
+            return
+        # The coset-walk route, for callers that hold the integral stabilizer
+        # generators (or their images) and no point of the finite set.  The
+        # realization walks the right-coset action of im rho on
+        # im rho / rho(Stab): the double cosets rho(Gamma) \ im rho / rho(Stab)
+        # are the rho(Gamma)-orbits on that coset space (the orbit--coset
+        # bijection above, with the reduction to the finite image from
+        # Dutour Sikiric--Hulek, Lemma 3.6, printed p. 22), and the action is
+        # GAP's own FactorCosetAction -- the native chain-based coset action,
+        # the same machinery the double-coset enumeration rides (the whole
+        # Coble index in 137 s), where the generic action on external coset
+        # objects did not return inside an hour (the #390 probes).
         to_perm = libgap.IsomorphismPermGroup(im_rho)
         im_rho_perm = libgap.Range(to_perm)
-        left = libgap.Image(to_perm, self._joint_discriminant_image_gap())
-        right = (
-            libgap.Subgroup(
-                im_rho,
-                list(discriminant_image_generators),
-            )
-            if right is None
-            else right
-        )
+        right = libgap.Subgroup(im_rho, list(discriminant_image_generators))
         right_perm = libgap.Image(to_perm, right)
-        _dcs = libgap.AsList(libgap.DoubleCosets(im_rho_perm, left, right_perm))
-        for _n, double_coset in enumerate(_dcs):
-            owned = self._owned_coset_representative(libgap.Representative(double_coset))
-            element = libgap.PreImagesRepresentative(to_perm, owned)
-            word = libgap.PreImagesRepresentative(epi, element)
-            letters = tuple(int(x) for x in libgap.LetterRepAssocWord(word))
-            if _law_reversed(self._discriminant_group):
-                letters = letters[::-1]
-            value = self.supergroup.one()
-            for index in letters:
-                value = value * (ambient[index - 1] if index > 0 else ~ambient[-index - 1])
-            lifts = [value]
-            if j >= 1 and len(sign_labels) == 1 and not stab_sign_flip and flip_element is not None:
-                lifts.append(flip_element * value)
-            # The lift's discriminant image is the double-coset representative
-            # by the homomorphism property of the discriminant representation
-            # (Disc(gh) = Disc(g) * Disc(h), the functoriality of the induced
-            # map on the cokernel of L in L^#): the word is a preimage of the
-            # representative under the epimorphism F(S) ->> im rho that maps
-            # each free generator to the engine image of rho(ambient_i), and
-            # the letters spell that word in the ambient generating family,
-            # so the product they evaluate maps to the representative.  The
-            # per-lift recomputation of the discriminant morphism verified
-            # this same fact at a cost no budget for the double cosets of a
-            # kernel row carries; the family-level sweep
-            # `ambient_discriminant_images` retains the warrant that each
-            # generator's image is right, and the homomorphism property
-            # carries it to every word-spelled product.
-            representatives.extend(lifts)
-        return finite_ordered_set(tuple(representatives))
+        action = libgap.FactorCosetAction(im_rho_perm, right_perm)
+        degree = int(libgap.Index(im_rho_perm, right_perm))
+        # The base point of the action is the trivial coset: every generator
+        # of the stabilizer image fixes it, and a walk that started elsewhere
+        # would spell words for the wrong cosets.
+        base = 1
+        for generator in libgap.GeneratorsOfGroup(right_perm):
+            if int(base ** libgap.Image(action, generator)) != base:
+                raise ArithmeticError(
+                    "the trivial coset is not the base point of the right-coset "
+                    "action of im rho: the splitting walk cannot start there"
+                )
+        # A breadth-first walk over the action, on a small generating subset
+        # of the rho-images: a lift to O(L) of an element of rho(O(L))
+        # written as a word in the images of the ambient generators is the
+        # same word in those generators (the homomorphism property of the
+        # discriminant representation, rho(gh) = rho(g) rho(h)), and the walk
+        # records, for every coset it reaches, the last generator image that
+        # carried its parent there -- so each lift is spelled by one owned
+        # product per coset along the walk's own tree, not by a per-coset
+        # word problem (whose 102 ms per double coset made the Coble kernel
+        # rows -- 189720 double cosets each -- hours, the #390 profile on
+        # main) and not by a factorization whose chain-with-words was
+        # measured past this VM's memory guard.
+        perm_images = [libgap.Image(to_perm, image) for image in rho_images]
+        small_indices = []
+        closure = libgap.TrivialSubgroup(im_rho_perm)
+        for index, image in enumerate(perm_images):
+            if not bool(image in closure):
+                small_indices.append(index)
+                closure = libgap.ClosureGroup(closure, image)
+        if int(libgap.Order(closure)) != int(libgap.Order(im_rho_perm)):
+            raise ArithmeticError(
+                "the rho-images of the ambient generators do not generate im rho: the "
+                "word section of the splitting cannot be built"
+            )
+        edges = [libgap.Image(action, perm_images[index]) for index in small_indices]
+        coset_walk = libgap.function_factory(
+            """
+function(edges, degree, base)
+  local parents, edgenumbers, queue, head, p, i, q;
+  parents := List([1..degree], i -> 0);
+  edgenumbers := List([1..degree], i -> 0);
+  queue := [base];
+  head := 1;
+  while head <= Length(queue) do
+    p := queue[head];
+    head := head + 1;
+    for i in [1..Length(edges)] do
+      q := p ^ edges[i];
+      if q <> base and parents[q] = 0 then
+        parents[q] := p;
+        edgenumbers[q] := i;
+        Add(queue, q);
+      fi;
+    od;
+  od;
+  if Length(queue) <> degree then
+    Error("the coset walk did not reach every point of the coset action");
+  fi;
+  return [parents, edgenumbers, queue];
+end
+"""
+        )
+        walk_data = [entry for entry in coset_walk(edges, degree, base)]
+        parents = [int(entry) for entry in walk_data[0]]
+        edge_numbers = [int(entry) for entry in walk_data[1]]
+        queue = [int(entry) for entry in walk_data[2]]
+        # The rho(Gamma)-orbits on the coset space: the double cosets.  A
+        # trivial left group -- the kernel rows, where rho(ker rho) and
+        # rho(ker(rho, sn)) are both trivial -- leaves every coset its own
+        # orbit, and an index-one left group is all of im rho, one orbit;
+        # both are read rather than walked.  Otherwise GAP's Orbits
+        # partitions the degree-many points under the left group's action
+        # images.
+        left = self._joint_discriminant_image_gap()
+        if int(libgap.Order(left)) == 1 or int(
+            libgap.Index(im_rho_perm, libgap.Image(to_perm, left))
+        ) == 1:
+            representative_points = queue
+        else:
+            orbit_reps = libgap.function_factory(
+                """
+function(action, to_perm, leftgens, degree)
+  local edges;
+  edges := List(leftgens, g -> Image(action, Image(to_perm, g)));
+  return List(Orbits(Group(edges), [1..degree]), Representative);
+end
+"""
+            )
+            representative_points = [
+                int(entry)
+                for entry in orbit_reps(
+                    action, to_perm, list(libgap.GeneratorsOfGroup(left)), degree
+                )
+            ]
+        # The walk's own records are Python integers now; the GAP-side
+        # action, its image group and the walk lists are released before the
+        # lifts are spelled, so the row's footprint is the lifts and the
+        # planes it returns, not the machinery that reached them.
+        del walk_data, coset_walk, action, perm_images, closure, right_perm
+        # Each representative's lift is spelled along the walk's own tree:
+        # the value of a reached point is the generator image of its last
+        # edge composed with the value of its parent, on the side the
+        # engine's law dictates for owned elements -- the same letter
+        # reversal the free-group route applies.  A point whose children
+        # have all been spelled releases its value, so the tree the kernel
+        # rows spell holds only the open frontier, not every lift at once.
+        reversed_law = _law_reversed(self._discriminant_group)
+        ambient_subset = [ambient[index] for index in small_indices]
+        values = [None] * (degree + 1)
+        values[base] = self.supergroup.one()
+        remaining_children = [0] * (degree + 1)
+        for point in queue:
+            remaining_children[parents[point - 1]] += 1
+        first_lift = None
+        first_point = None
+        for point in representative_points:
+            chain = []
+            walker = point
+            while values[walker] is None:
+                chain.append(walker)
+                walker = parents[walker - 1]
+            for reached in reversed(chain):
+                if reversed_law:
+                    values[reached] = (
+                        ambient_subset[edge_numbers[reached - 1] - 1]
+                        * values[parents[reached - 1]]
+                    )
+                else:
+                    values[reached] = (
+                        values[parents[reached - 1]]
+                        * ambient_subset[edge_numbers[reached - 1] - 1]
+                    )
+            value = values[point]
+            flipped = (
+                flip_element * value
+                if j >= 1
+                and len(sign_labels) == 1
+                and not stab_sign_flip
+                and flip_element is not None
+                else None
+            )
+            if first_lift is None:
+                first_lift = value
+                first_point = point
+            yield value
+            if flipped is not None:
+                yield flipped
+            parent = parents[point - 1]
+            if parent:
+                remaining_children[parent] -= 1
+                if not remaining_children[parent]:
+                    values[parent] = None
+        if first_lift is not None:
+            # The homomorphism property of the discriminant representation
+            # (rho(gh) = rho(g) rho(h), the functoriality of the induced map
+            # on the cokernel of L in L^#) warrants every tree-spelled lift:
+            # the family-level sweep `ambient_discriminant_images` computes
+            # each generator's image, and the product along the tree maps to
+            # the product of the images.  The first lift is still checked
+            # against the character map -- one evaluation, not one per coset
+            # -- against the engine element its word names, so a
+            # parent-keeping error of the walk is loud.
+            word = []
+            walker = first_point
+            while walker != base:
+                word.append(edge_numbers[walker - 1])
+                walker = parents[walker - 1]
+            perm_product = libgap.One(im_rho_perm)
+            for letter in reversed(word):
+                perm_product = perm_product * edges[letter - 1]
+            key_disc = self._discriminant_group._from_engine(
+                libgap.PreImagesRepresentative(to_perm, perm_product)
+            )
+            if self.image(first_lift)["discriminant"] != key_disc:
+                raise ArithmeticError(
+                    "the first tree-spelled lift's discriminant image disagrees with "
+                    "the engine element its word names: the walk's parent bookkeeping "
+                    "is inconsistent with the discriminant representation"
+                )
 
     def witness_meets_subgroup(self, witness, stabilizer_generators) -> bool:
         return self.adjust_witness_into_subgroup(witness, stabilizer_generators) is not None
@@ -3212,11 +3389,22 @@ def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
     Each returned representative is the transported plane of one double
     coset, so the count of the row is the count of the double cosets
     themselves -- computed by
-    :meth:`...OrthogonalCharacterQuotient.splitting_isometries`, which walks
-    `rho(Gamma)`-orbits on the coset space, not the group.  Nothing here
-    enumerated a stabilizer's generating family of the ambient orthogonal
-    group, and no isometry is guessed: every lift is checked against the
-    character map before it transports.
+    :meth:`...OrthogonalCharacterQuotient._splitting_isometries_in_im_rho`
+    as ``rho(Gamma)``-orbits on the right-coset action of ``im rho`` on
+    ``im rho / rho(Stab)``, a walk that carries the word of every
+    representative it reaches, not a per-coset word problem.  Where the
+    subgroup cuts a sign character as well, the kernel-sign witness machinery
+    of that walk lifts the sign sheet -- the same machinery the
+    ``ker(rho, sn)`` line rows run on.  The walk is the method: a row whose
+    sign sheet it cannot lift raises (``_kernel_sign_flip`` names the missing
+    ker(rho) witness), and two sign kernels cut at once raise too, because the
+    single-flip machinery covers one coset only -- neither falls back to the
+    joint-character enumeration, whose per-coset word problem is the cost this
+    route exists to avoid.  Nothing here enumerated a stabilizer's generating
+    family of the ambient orthogonal group, and no isometry is guessed: the
+    parabolic family is certified complete before it is used, and every lift
+    is a word in the ambient generating family spelled by the walk that
+    reached its double coset.
     """
     if representative.is_parabolic_complete() is not True:
         return None
@@ -3224,46 +3412,42 @@ def _plane_orbit_from_parabolic_stabilizer(subgroup, representative):
     if not family:
         return None
     quotient = subgroup.finite_character_quotient()
-    splittings = tuple(quotient.splitting_isometries(family))
-    # The split's own lifts and complete source family are retained with the
-    # representatives they produced: the consumers of the row never search
-    # for a witness or re-certify a transported parabolic (#391 -- the search
-    # reaches the port's generic enumeration, and the recomputation reaches
-    # PARI's qfauto overflow on this lattice).
+    if quotient.index() == 1:
+        # ``Gamma`` is all of ``O(L)`` (a character-kernel subgroup of index
+        # one is the whole group), so ``Gamma g Stab = O(L)`` for every ``g``:
+        # the double-coset space is the single point the identity names, read
+        # rather than walked.  This is the full-group plane row of the Scattone
+        # cards, and the walk would re-derive the same one orbit.
+        quotient.register_isotropic_lift(
+            representative, quotient.supergroup.one(), family
+        )
+        return (representative,)
+    if not quotient._has_discriminant or (
+        quotient.determinant_kernel and quotient.spinor_kernel
+    ):
+        raise ValueError(
+            f"the plane row of {representative!r} under {subgroup} cannot be computed by "
+            "the coset walk of the discriminant image: the subgroup cuts no discriminant "
+            "condition, or both a determinant and a spinor kernel at once, and the "
+            "walk's kernel-sign witness machinery lifts one sign coset only"
+        )
+    # The lifts are consumed as they arrive: a kernel row numbers 189720 of
+    # them, and holding every lift beside every transported plane doubles the
+    # row's footprint for no mathematical content.  The split's own lifts and
+    # complete source family are retained with the representatives they
+    # produced: the consumers of the row never search for a witness or
+    # re-certify a transported parabolic (#391 -- the search reaches the
+    # port's generic enumeration, and the recomputation reaches PARI's
+    # qfauto overflow on this lattice).
     quotient.register_isotropic_lift(
         representative, quotient.supergroup.one(), family
     )
     representatives = []
-    for splitting in splittings:
+    for splitting in quotient._iter_splitting_isometries_in_im_rho(family):
         transported = splitting.transport_isotropic_object(representative)
         quotient.register_isotropic_lift(transported, splitting, family)
         representatives.append(transported)
     return tuple(representatives)
-
-
-def _isotropic_line_class_points(lattice, line):
-    r"""The engine set of the divided classes ``{c, -c}`` of a primitive isotropic line.
-
-    The line's generator ``v`` has a divisibility ``div(v)`` and a divided
-    class ``[v / div(v)]`` in ``A_L``; an unoriented line is the *set*
-    ``{v, -v}``, so the class datum of the line is the set ``{c, -c}`` -- the
-    same set :meth:`OrthogonalCharacterQuotient.isotropic_line_stabilizer_image`
-    builds for its stabilizer, read here for the equivariance alone.
-    """
-    from sage.libs.gap.libgap import libgap
-
-    inclusion = line.inclusion()
-    domain = inclusion.domain()
-    label = next(iter(domain.module_generating_set()))
-    vector = inclusion(domain.module_generator(label))
-    discriminant_class = lattice.divided_discriminant_class(vector)
-    finite_orthogonal = lattice.discriminant_group().orthogonal_group()
-    return libgap.Set(
-        [
-            finite_orthogonal._engine_abelian_element(discriminant_class),
-            finite_orthogonal._engine_abelian_element(-discriminant_class),
-        ]
-    )
 
 
 def _line_generator_in_plane(plane, line):

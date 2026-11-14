@@ -1,0 +1,34 @@
+[96.0s] ambient plane row: 1
+[137.3s] is_parabolic_complete: True
+[137.3s] parabolic family: 113 generators
+[262.6s] im_rho sweep done, ambient gens 335, |im_rho| 46998591897600
+[269.8s] |right| 247726080, index 189720
+[278.4s] double cosets: 189720
+[278.4s] law reversed: True
+[287.7s] breakdown over 60 cosets (s each):
+[287.7s]   Representative: 0.000 total, 0.0 ms per coset
+[287.7s]   image_once: 0.050 total, 0.8 ms per coset
+[287.7s]   letters: 0.002 total, 0.0 ms per coset
+[287.7s]   owned_coset_rep: 0.002 total, 0.0 ms per coset
+[287.7s]   preimage_perm: 0.099 total, 1.7 ms per coset
+[287.7s]   preimage_word: 6.108 total, 101.8 ms per coset
+[287.7s]   rho_once: 0.000 total, 0.0 ms per coset
+[287.7s]   spell: 2.878 total, 48.0 ms per coset
+[287.7s]   transport: 0.088 total, 1.5 ms per coset
+[287.7s] grand total per coset: 154 ms -> full row 29187 s
+[287.7s] DONE
+[peakrss] probe390c: child waited=0 shell_code=0 samples=147
+[peakrss] peak tree RSS      : 4700 MiB
+[peakrss] low-water MemAvail : 9468 MiB
+[peakrss] peak single VmHWM  : 4782 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     2712 MiB peak
+[peakrss]   julia                      2061 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   288.1s procs=  4 rss=  4700 MiB hwm=  4782 MiB avail=  9488 MiB
+[peakrss]   t=   284.1s procs=  4 rss=  4699 MiB hwm=  4781 MiB avail=  9468 MiB
+[peakrss]   t=   286.1s procs=  4 rss=  4699 MiB hwm=  4782 MiB avail=  9478 MiB
+[peakrss]   t=   280.1s procs=  4 rss=  4480 MiB hwm=  4562 MiB avail=  9687 MiB
+[peakrss]   t=   282.1s procs=  4 rss=  4480 MiB hwm=  4562 MiB avail=  9686 MiB
+launcher exit: 0

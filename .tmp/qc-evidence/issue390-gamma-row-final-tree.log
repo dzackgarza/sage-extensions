@@ -1,0 +1,20 @@
+[86.9s] ambient plane row: 1 in 82.7s
+[124.8s] is_parabolic_complete: True in 37.9s
+[124.8s] parabolic family: 113 in 0.0s
+[510.8s] GAMMA ROW: 7 planes in 278.3s
+[510.8s] PROBE H2 DONE
+[peakrss] probe390h: child waited=0 shell_code=0 samples=260
+[peakrss] peak tree RSS      : 3329 MiB
+[peakrss] low-water MemAvail : 10157 MiB
+[peakrss] peak single VmHWM  : 3568 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2064 MiB peak
+[peakrss]   python                     1493 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   514.3s procs=  4 rss=  3329 MiB hwm=  3568 MiB avail= 12181 MiB
+[peakrss]   t=   512.3s procs=  4 rss=  3237 MiB hwm=  3476 MiB avail= 12282 MiB
+[peakrss]   t=   362.2s procs=  4 rss=  3202 MiB hwm=  3440 MiB avail= 11795 MiB
+[peakrss]   t=   364.2s procs=  4 rss=  3202 MiB hwm=  3440 MiB avail= 12348 MiB
+[peakrss]   t=   366.2s procs=  4 rss=  3202 MiB hwm=  3440 MiB avail= 12348 MiB
+launcher exit: 0
