@@ -190,11 +190,14 @@ from sage_extensions.categories.rings.ring_foundation import (
     _engine_element,
     _engine_ring,
     _own_ring,
+    _engine_ring_value,
     _owned_engine_element,
     _OwnedRingParent,
     _owned_integers,
     _owned_rationals,
 )
+from sage.modules.free_module_element import vector as engine_vector
+
 from sage_extensions.categories.sets.cardinals import Cardinal, cardinal
 from sage_extensions.categories.sets.finite_families import finite_family
 from sage_extensions.categories.sets.finite_ordered_sets import (
@@ -5787,16 +5790,25 @@ class Lattices(OwnedCategoryOverBaseRing):
             """
             return self._preamble_gram_tensor
 
+        @cached_method
+        def _engine_gram(self):
+            r"""The retained finite Gram as one engine matrix, with its ring and framing labels."""
+            gram = self.gram_tensor()
+            return gram.base_ring(), tuple(self.module_generating_set()), _engine_component_matrix(gram)
+
         def _evaluate_gram(self, left, right):
-            r"""Contract the retained finite Gram in its selected lattice framing."""
-            labels = tuple(self.module_generating_set())
+            r"""Contract the retained finite Gram in its selected lattice framing.
+
+            The contraction ``x^T G y`` is one engine matrix-vector product on
+            the framing coordinates; its value is raised into the Gram's ring.
+            """
+            ring, labels, gram = self._engine_gram()
+            engine = gram.base_ring()
             left_coordinates = left.to_vector()
             right_coordinates = right.to_vector()
-            ring = self.base_ring()
-            return self.gram_tensor().contract(
-                tensor.vector(ring, tuple(left_coordinates(label) for label in labels)),
-                tensor.vector(ring, tuple(right_coordinates(label) for label in labels)),
-            )
+            left_row = engine_vector(engine, [_engine_ring_value(ring, left_coordinates(label)) for label in labels])
+            right_row = engine_vector(engine, [_engine_ring_value(ring, right_coordinates(label)) for label in labels])
+            return _owned_engine_element(ring, left_row * gram * right_row)
 
         def b(self, left, right):
             r"""Evaluate the finite lattice pairing from its retained Gram."""
