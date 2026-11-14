@@ -1,0 +1,44 @@
+provider SHA: 7817e8757ab7040538d698a01aba0eacd6015550
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/sets/test_power_sets.sage tests/sets/test_subsets_and_multisets_of_fixed_size.sage tests/sets/test_injections_surjections_and_subsets_of_finite_sets.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+...F......F......FF                                                      [100%]
+=================================== FAILURES ===================================
+E   TypeError: the proposition not not is_member(0, Image of Subobject of {0,...,5} defined by Ordered subset of {0,...,5} under Generic morphism:
+      From: {0,...,5}
+      To:   {0,...,2}) and not not is_member(1, Image of Subobject of {0,...,5} defined by Ordered subset of {0,...,5} under Generic morphism:
+      From: {0,...,5}
+      To:   {0,...,2}) and not is_member(2, Image of Subobject of {0,...,5} defined by Ordered subset of {0,...,5} under Generic morphism:
+      From: {0,...,5}
+      To:   {0,...,2}) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+/repos/sage-extensions/src/sage_extensions/logic.py:44: TypeError: the proposition not not is_member(0, Image of Subobject of {0,...,5} defined by Ordered subset of {0,...,5} under Generic morphism:
+E   Failed: DID NOT RAISE ValueError
+/repos/sage-extensions/tests/sets/test_injections_surjections_and_subsets_of_finite_sets.sage:31: Failed: DID NOT RAISE ValueError
+E   NotImplementedError: <abstract method ranking_map at 0x76256f1d2cf0>
+/sage/.venv/lib/python3.14/site-packages/sage/misc/abstract_method.py:218: NotImplementedError: <abstract method ranking_map at 0x76256f1d2cf0>
+E   assert {2, 3} == {2, 3}
+      
+      Use -v to get more diff
+/repos/sage-extensions/tests/sets/test_injections_surjections_and_subsets_of_finite_sets.sage:123: assert {2, 3} == {2, 3}
+=========================== short test summary info ============================
+FAILED tests/sets/test_power_sets.sage::test_inverse_and_direct_image_form_the_set_subobject_galois_connection
+FAILED tests/sets/test_injections_surjections_and_subsets_of_finite_sets.sage::test_injections_compose_and_the_constant_map_is_not_one
+FAILED tests/sets/test_injections_surjections_and_subsets_of_finite_sets.sage::test_the_two_element_subsets_of_four_points_number_six
+FAILED tests/sets/test_injections_surjections_and_subsets_of_finite_sets.sage::test_the_points_of_zero_to_three_greater_than_one_are_two_and_three
+4 failed, 15 passed in 1.44s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=5
+[peakrss] peak tree RSS      : 325 MiB
+[peakrss] low-water MemAvail : 7530 MiB
+[peakrss] peak single VmHWM  : 325 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      308 MiB peak
+[peakrss]   sage                        177 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  5 rss=   325 MiB hwm=   325 MiB avail=  7530 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   309 MiB hwm=   309 MiB avail=  7799 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   203 MiB hwm=   203 MiB avail=  8155 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   101 MiB hwm=   101 MiB avail=  8013 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  8363 MiB

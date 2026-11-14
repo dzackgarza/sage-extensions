@@ -1,0 +1,62 @@
+provider SHA: 415c2b44c173f482506a568d20c93eb683bc3924
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_regular_module_of_c2.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FFF.F.F.                                                                 [100%]
+=================================== FAILURES ===================================
+E   KeyError: 'is_isomorphic_to'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'GeneralModules.parent_class[_CoefficientModuleEngine].ObjectType' object has no attribute 'is_isomorphic_to'
+sage/cpython/getattr.pyx:362: AttributeError: 'GeneralModules.parent_class[_CoefficientModuleEngine].ObjectType' object has no attribute 'is_isomorphic_to'
+E   KeyError: 'is_isomorphic_to'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'GeneralModules.parent_class[_CoefficientModuleEngine].ObjectType' object has no attribute 'is_isomorphic_to'
+sage/cpython/getattr.pyx:362: AttributeError: 'GeneralModules.parent_class[_CoefficientModuleEngine].ObjectType' object has no attribute 'is_isomorphic_to'
+E   KeyError: 'extension_of_scalars'
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'Modules_with_category' object has no attribute 'extension_of_scalars'. Did you mean: 'coextension_of_scalars'?
+sage/cpython/getattr.pyx:362: AttributeError: 'Modules_with_category' object has no attribute '_structured_category'. Did you mean: 'coextension_of_scalars'?
+E   assert [0] == [0]
+     +  where [0] = Generic endomorphism of Free module on {[0], [1]} over Integer Ring([0])
+     +    where Generic endomorphism of Free module on {[0], [1]} over Integer Ring = Cached version of <function ModulesOverGroupAlgebra.ParentMethods.action_of at 0x75d9d4ccba00>(1)
+     +      where Cached version of <function ModulesOverGroupAlgebra.ParentMethods.action_of at 0x75d9d4ccba00> = Module over Group algebra of Cyclic group C_2 of order 2 over Integer Ring on Free module on {[0], [1]} over Integer Ring.action_of
+     +      and   1 = one()
+     +        where one = Cyclic group C_2 of order 2.one
+     +          where Cyclic group C_2 of order 2 = group()
+/repos/sage-extensions/tests/objects/test_regular_module_of_c2.sage:50: assert [0] == [0]
+E   KeyError: ((Generic morphism:
+      From: Integer Ring
+      To:   Group algebra of Cyclic group C_2 of order 2 over Integer Ring,), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: (129578433962512, 129578439532496, (21217856, 21217856, 21217856, 21217856, 21309184, 21217856))
+
+During handling of the above exception, another exception occurred:
+E   AssertionError: base category class for <class 'sage_extensions.categories.modules.pure.modules.Modules.FinitelyGenerated'> mismatch; expected <class 'sage_extensions.categories.modules.pure.modules.Modules'>, got <class 'sage_extensions.categories.modules.group_modules.group_modules.ModulesOverGroupAlgebra'>
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category_with_axiom.py:2076: AssertionError: base category class for <class 'sage_extensions.categories.modules.pure.modules.Modules.FinitelyGenerated'> mismatch; expected <class 'sage_extensions.categories.modules.pure.modules.Modules'>, got <class 'sage_extensions.categories.modules.group_modules.group_modules.ModulesOverGroupAlgebra'>
+=========================== short test summary info ============================
+FAILED tests/objects/test_regular_module_of_c2.sage::test_the_permutation_module_is_the_regular_module
+FAILED tests/objects/test_regular_module_of_c2.sage::test_the_coinduced_module_is_the_regular_module
+FAILED tests/objects/test_regular_module_of_c2.sage::test_the_induced_module_is_the_regular_module
+FAILED tests/objects/test_regular_module_of_c2.sage::test_the_action_on_the_permutation_module
+FAILED tests/objects/test_regular_module_of_c2.sage::test_the_underlying_integral_module
+5 failed, 3 passed in 0.94s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=6
+[peakrss] peak tree RSS      : 434 MiB
+[peakrss] low-water MemAvail : 2807 MiB
+[peakrss] peak single VmHWM  : 434 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      416 MiB peak
+[peakrss]   sage                        223 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   run.sh                        5 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=    10.0s procs=  5 rss=   434 MiB hwm=   434 MiB avail=  2820 MiB
+[peakrss]   t=     8.0s procs=  5 rss=   288 MiB hwm=   288 MiB avail=  2807 MiB
+[peakrss]   t=     4.0s procs=  7 rss=   249 MiB hwm=   249 MiB avail=  3267 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   162 MiB hwm=   162 MiB avail=  3504 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   122 MiB hwm=   122 MiB avail=  2998 MiB

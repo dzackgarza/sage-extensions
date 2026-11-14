@@ -1,0 +1,43 @@
+provider SHA: 415c2b44c173f482506a568d20c93eb683bc3924
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_polynomial_ring_qq_x.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+........F.                                                               [100%]
+=================================== FAILURES ===================================
+E   KeyError: (125617135293008, 0)
+
+During handling of the above exception, another exception occurred:
+E   AssertionError: cannot compute the kernel of Free module on {[0]} over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring restricted to Fraction Field of Integer Ring along Generic morphism:
+      From: Fraction Field of Integer Ring
+      To:   Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring -> Free module on {[('d', 'x')]} over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring restricted to Fraction Field of Integer Ring along Generic morphism:
+      From: Fraction Field of Integer Ring
+      To:   Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring: no algorithm is available for these modules (domain in Join of Category of restricted-scalars modules over Fraction Field of Integer Ring and Category of vector spaces over Fraction Field of Integer Ring, codomain in Join of Category of restricted-scalars modules over Fraction Field of Integer Ring and Category of vector spaces over Fraction Field of Integer Ring)
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Direct sum over Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Lambda(Free module on {[('d', 'x')]} over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring) accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Lambda(Free module on {[('d', 'x')]} over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring) over Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+/repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1481: AssertionError: cannot compute the kernel of Free module on {[0]} over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring restricted to Fraction Field of Integer Ring along Generic morphism:
+=========================== short test summary info ============================
+FAILED tests/objects/test_polynomial_ring_qq_x.sage::test_the_de_rham_cohomology_of_the_affine_line
+1 failed, 9 passed in 1.58s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=8
+[peakrss] peak tree RSS      : 315 MiB
+[peakrss] low-water MemAvail : 4211 MiB
+[peakrss] peak single VmHWM  : 315 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      298 MiB peak
+[peakrss]   sage                        203 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=    14.0s procs=  5 rss=   315 MiB hwm=   315 MiB avail=  4688 MiB
+[peakrss]   t=    12.0s procs=  5 rss=   297 MiB hwm=   297 MiB avail=  4437 MiB
+[peakrss]   t=    10.0s procs=  5 rss=   238 MiB hwm=   238 MiB avail=  4211 MiB
+[peakrss]   t=     4.0s procs=  7 rss=   229 MiB hwm=   229 MiB avail=  4681 MiB
+[peakrss]   t=     8.0s procs=  5 rss=   175 MiB hwm=   175 MiB avail=  4364 MiB

@@ -1,0 +1,36 @@
+provider SHA: 7817e8757ab7040538d698a01aba0eacd6015550
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_symmetric_algebra_of_qq2.sage::test_the_categories_of_the_symmetric_algebra tests/objects/test_tensor_algebra_of_qq2.sage::test_the_categories_of_the_tensor_algebra
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+E   KeyError: ((<class 'sage.categories.magmatic_algebras.MagmaticAlgebras'>, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   ValueError: base must be a ring or a subcategory of Rings()
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category_types.py:360: ValueError: base must be a ring or a subcategory of Rings()
+E   KeyError: ((<class 'sage.categories.magmatic_algebras.MagmaticAlgebras'>, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   ValueError: base must be a ring or a subcategory of Rings()
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category_types.py:360: ValueError: base must be a ring or a subcategory of Rings()
+=========================== short test summary info ============================
+FAILED tests/objects/test_symmetric_algebra_of_qq2.sage::test_the_categories_of_the_symmetric_algebra
+FAILED tests/objects/test_tensor_algebra_of_qq2.sage::test_the_categories_of_the_tensor_algebra
+2 failed in 1.47s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=8
+[peakrss] peak tree RSS      : 248 MiB
+[peakrss] low-water MemAvail : 1764 MiB
+[peakrss] peak single VmHWM  : 248 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   sage                        223 MiB peak
+[peakrss]   python                      212 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=     4.0s procs=  7 rss=   248 MiB hwm=   248 MiB avail=  2591 MiB
+[peakrss]   t=    14.0s procs=  5 rss=   216 MiB hwm=   229 MiB avail=  1764 MiB
+[peakrss]   t=    12.0s procs=  5 rss=   209 MiB hwm=   220 MiB avail=  1964 MiB
+[peakrss]   t=    10.0s procs=  5 rss=   168 MiB hwm=   179 MiB avail=  2096 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   164 MiB hwm=   164 MiB avail=  2522 MiB

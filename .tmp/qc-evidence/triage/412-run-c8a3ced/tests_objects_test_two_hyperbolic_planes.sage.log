@@ -1,0 +1,47 @@
+provider SHA: c8a3cedb1ba27919c416101e98cdc7d36256415e
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_two_hyperbolic_planes.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+.FF.F.FF.                                                                [100%]
+=================================== FAILURES ===================================
+E   assert Integral latt...gnature (2, 2) == Integral latt...gnature (2, 2)
+      
+      Use -v to get more diff
+/repos/sage-extensions/tests/objects/test_two_hyperbolic_planes.sage:14: assert Integral latt...gnature (2, 2) == Integral latt...gnature (2, 2)
+E   assert Integral lattice of rank 4 and signature (2, 2) in Category of objects of lattices with a chosen direct-sum decomposition
+     +  where Category of objects of lattices with a chosen direct-sum decomposition = DirectSumObjects(Lattices(Integer Ring))
+     +    where Lattices(Integer Ring) = Lattices(ZZ)
+/repos/sage-extensions/tests/objects/test_two_hyperbolic_planes.sage:21: assert Integral lattice of rank 4 and signature (2, 2) in Category of objects of lattices with a chosen direct-sum decomposition
+E   TypeError: the proposition is_finite(Orthogonal group O(Integral lattice of rank 4 and signature (2, 2))) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+/repos/sage-extensions/src/sage_extensions/logic.py:44: TypeError: the proposition is_finite(Orthogonal group O(Integral lattice of rank 4 and signature (2, 2))) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+E   TypeError: the proposition is_finite({g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g(im(Generic morphism:
+      From: Integral lattice of rank 2 and signature (0, 0)
+      To:   Integral lattice of rank 4 and signature (2, 2)))=im(Generic morphism:
+      From: Integral lattice of rank 2 and signature (0, 0)
+      To:   Integral lattice of rank 4 and signature (2, 2))}) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+/repos/sage-extensions/src/sage_extensions/logic.py:44: TypeError: the proposition is_finite({g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g(im(Generic morphism:
+E   TypeError: the proposition is_finite({g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g lies in every selected subgroup}) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+/repos/sage-extensions/src/sage_extensions/logic.py:44: TypeError: the proposition is_finite({g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g lies in every selected subgroup}) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+=========================== short test summary info ============================
+FAILED tests/objects/test_two_hyperbolic_planes.sage::test_the_sum_and_the_block_gram_agree
+FAILED tests/objects/test_two_hyperbolic_planes.sage::test_the_categories_of_u_plus_u
+FAILED tests/objects/test_two_hyperbolic_planes.sage::test_the_orthogonal_group_is_infinite
+FAILED tests/objects/test_two_hyperbolic_planes.sage::test_an_isotropic_plane_and_its_stabilizer
+FAILED tests/objects/test_two_hyperbolic_planes.sage::test_an_isotropic_flag_and_its_stabilizer
+5 failed, 4 passed in 2.29s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=6
+[peakrss] peak tree RSS      : 443 MiB
+[peakrss] low-water MemAvail : 7219 MiB
+[peakrss] peak single VmHWM  : 443 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      425 MiB peak
+[peakrss]   sage                        178 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=    10.0s procs=  5 rss=   443 MiB hwm=   443 MiB avail=  7219 MiB
+[peakrss]   t=     8.0s procs=  5 rss=   327 MiB hwm=   327 MiB avail=  7608 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   258 MiB hwm=   258 MiB avail=  7673 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   204 MiB hwm=   204 MiB avail=  7732 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   122 MiB hwm=   122 MiB avail=  7764 MiB

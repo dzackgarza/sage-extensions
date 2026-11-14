@@ -1,0 +1,30 @@
+provider SHA: 4a17b1e90b82f4ae24e66b97c4b3b694cb895085
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_tensor_algebra_of_qq2.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+.F..F.                                                                   [100%]
+=================================== FAILURES ===================================
+E   KeyError: ((<class 'sage.categories.magmatic_algebras.MagmaticAlgebras'>, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   ValueError: base must be a ring or a subcategory of Rings()
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category_types.py:360: ValueError: base must be a ring or a subcategory of Rings()
+E   AssertionError: the rank of Fraction Field of Integer Ring over Integer Ring is computed over a finite field for a finite module, or from a chosen basis or presentation, and Fraction Field of Integer Ring supplies none of these
+/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:2473: AssertionError: the rank of Fraction Field of Integer Ring over Integer Ring is computed over a finite field for a finite module, or from a chosen basis or presentation, and Fraction Field of Integer Ring supplies none of these
+=========================== short test summary info ============================
+FAILED tests/objects/test_tensor_algebra_of_qq2.sage::test_the_categories_of_the_tensor_algebra
+FAILED tests/objects/test_tensor_algebra_of_qq2.sage::test_the_centre_of_the_tensor_algebra
+2 failed, 4 passed in 0.42s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 308 MiB
+[peakrss] low-water MemAvail : 8490 MiB
+[peakrss] peak single VmHWM  : 308 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      291 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   308 MiB hwm=   308 MiB avail=  8490 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   213 MiB hwm=   213 MiB avail=  8613 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     6 MiB hwm=     6 MiB avail=  8718 MiB

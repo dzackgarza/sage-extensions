@@ -1,0 +1,33 @@
+provider SHA: c8a3cedb1ba27919c416101e98cdc7d36256415e
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_trivial_connection_on_the_affine_line.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+.FFF                                                                     [100%]
+=================================== FAILURES ===================================
+E   NameError: name 'ModulesWithConnection' is not defined
+/repos/sage-extensions/tests/objects/test_trivial_connection_on_the_affine_line.sage:17: NameError: name 'ModulesWithConnection' is not defined
+E   NameError: name 'ModulesWithConnection' is not defined
+/repos/sage-extensions/tests/objects/test_trivial_connection_on_the_affine_line.sage:17: NameError: name 'ModulesWithConnection' is not defined
+E   NameError: name 'ModulesWithConnection' is not defined
+/repos/sage-extensions/tests/objects/test_trivial_connection_on_the_affine_line.sage:17: NameError: name 'ModulesWithConnection' is not defined
+=========================== short test summary info ============================
+FAILED tests/objects/test_trivial_connection_on_the_affine_line.sage::test_the_categories_of_the_module_with_connection
+FAILED tests/objects/test_trivial_connection_on_the_affine_line.sage::test_every_connection_on_a_line_over_a_curve_is_flat
+FAILED tests/objects/test_trivial_connection_on_the_affine_line.sage::test_the_module_with_connection_has_one_endomorphism_category
+3 failed, 1 passed in 0.76s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=5
+[peakrss] peak tree RSS      : 309 MiB
+[peakrss] low-water MemAvail : 7523 MiB
+[peakrss] peak single VmHWM  : 309 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      291 MiB peak
+[peakrss]   sage                        223 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=     8.0s procs=  5 rss=   309 MiB hwm=   309 MiB avail=  7861 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   269 MiB hwm=   269 MiB avail=  7681 MiB
+[peakrss]   t=     4.0s procs=  7 rss=   249 MiB hwm=   249 MiB avail=  7523 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   167 MiB hwm=   167 MiB avail=  7900 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail=  8210 MiB

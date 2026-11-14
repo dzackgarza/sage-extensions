@@ -1,0 +1,34 @@
+provider SHA: 415c2b44c173f482506a568d20c93eb683bc3924
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_orthogonal_group_of_a2.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+.F.F...F...                                                              [100%]
+=================================== FAILURES ===================================
+E   assert Orthogonal group O(Integral lattice of rank 2 and signature (0, 2)) in Category of finite groups
+     +  where Category of finite groups = FiniteGroups()
+/repos/sage-extensions/tests/objects/test_orthogonal_group_of_a2.sage:19: assert Orthogonal group O(Integral lattice of rank 2 and signature (0, 2)) in Category of finite groups
+E   AssertionError: the preimage {g in Orthogonal group O(Integral lattice of rank 2 and signature (0, 2)) : sn(g) = 1} needs Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 cap Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 generated through the finite coset space Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2/Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2, but Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 is not known to have finite index in Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2: realize Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2/Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 as a finite Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2-set and select it with Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2.select_left_cosets(...)
+/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py:1181: AssertionError: the preimage {g in Orthogonal group O(Integral lattice of rank 2 and signature (0, 2)) : sn(g) = 1} needs Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 cap Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 generated through the finite coset space Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2/Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2, but Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 is not known to have finite index in Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2: realize Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2/Subgroup of Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2 as a finite Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2-set and select it with Fraction Field of Integer Ring^× / (Fraction Field of Integer Ring^×)^2.select_left_cosets(...)
+E   AttributeError: 'OwnedJoinCategory.element_class[_GeneralPresentedElement]' object has no attribute 'inclusion'
+sage/cpython/getattr.pyx:362: AttributeError: 'OwnedJoinCategory.element_class[_GeneralPresentedElement]' object has no attribute 'category_for'
+=========================== short test summary info ============================
+FAILED tests/objects/test_orthogonal_group_of_a2.sage::test_o_a2_is_the_dihedral_group_of_order_twelve
+FAILED tests/objects/test_orthogonal_group_of_a2.sage::test_the_spinor_kernel_of_a2
+FAILED tests/objects/test_orthogonal_group_of_a2.sage::test_the_stabilizer_of_a_discriminant_class
+3 failed, 8 passed in 4.51s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=9
+[peakrss] peak tree RSS      : 449 MiB
+[peakrss] low-water MemAvail : 5174 MiB
+[peakrss] peak single VmHWM  : 449 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      432 MiB peak
+[peakrss]   sage                        217 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=    16.1s procs=  5 rss=   449 MiB hwm=   449 MiB avail=  5174 MiB
+[peakrss]   t=    14.0s procs=  5 rss=   448 MiB hwm=   448 MiB avail=  5271 MiB
+[peakrss]   t=    12.0s procs=  5 rss=   438 MiB hwm=   438 MiB avail=  5491 MiB
+[peakrss]   t=    10.0s procs=  5 rss=   344 MiB hwm=   344 MiB avail=  5440 MiB
+[peakrss]   t=     4.0s procs=  7 rss=   242 MiB hwm=   242 MiB avail=  5836 MiB

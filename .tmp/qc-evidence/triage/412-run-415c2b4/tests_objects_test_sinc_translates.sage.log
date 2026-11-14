@@ -1,0 +1,51 @@
+provider SHA: 415c2b44c173f482506a568d20c93eb683bc3924
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_sinc_translates.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+E   KeyError: ((), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((Symbolic Ring,), ())
+
+During handling of the above exception, another exception occurred:
+E   TypeError: cannot raise Symbolic Ring through an owned ring constructor: no constructor for this native ring family has been selected
+/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:7534: TypeError: cannot raise Symbolic Ring through an owned ring constructor: no constructor for this native ring family has been selected
+E   KeyError: ((), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((Symbolic Ring,), ())
+
+During handling of the above exception, another exception occurred:
+E   TypeError: cannot raise Symbolic Ring through an owned ring constructor: no constructor for this native ring family has been selected
+/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:7534: TypeError: cannot raise Symbolic Ring through an owned ring constructor: no constructor for this native ring family has been selected
+E   KeyError: ((), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((Symbolic Ring,), ())
+
+During handling of the above exception, another exception occurred:
+E   TypeError: cannot raise Symbolic Ring through an owned ring constructor: no constructor for this native ring family has been selected
+/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:7534: TypeError: cannot raise Symbolic Ring through an owned ring constructor: no constructor for this native ring family has been selected
+=========================== short test summary info ============================
+FAILED tests/objects/test_sinc_translates.sage::test_the_translates_are_indexed_by_the_integers
+FAILED tests/objects/test_sinc_translates.sage::test_the_categories_of_the_sinc_translates
+FAILED tests/objects/test_sinc_translates.sage::test_the_translates_are_countably_many_and_distinct
+3 failed in 0.84s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=6
+[peakrss] peak tree RSS      : 303 MiB
+[peakrss] low-water MemAvail : 6898 MiB
+[peakrss] peak single VmHWM  : 303 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      285 MiB peak
+[peakrss]   sage                        223 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=    10.0s procs=  5 rss=   303 MiB hwm=   303 MiB avail=  7097 MiB
+[peakrss]   t=     4.0s procs=  7 rss=   249 MiB hwm=   249 MiB avail=  7109 MiB
+[peakrss]   t=     8.0s procs=  5 rss=   233 MiB hwm=   233 MiB avail=  6898 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   165 MiB hwm=   165 MiB avail=  7272 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   122 MiB hwm=   122 MiB avail=  7074 MiB

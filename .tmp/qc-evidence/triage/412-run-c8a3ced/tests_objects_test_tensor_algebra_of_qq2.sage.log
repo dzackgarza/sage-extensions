@@ -1,0 +1,29 @@
+provider SHA: c8a3cedb1ba27919c416101e98cdc7d36256415e
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_tensor_algebra_of_qq2.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+.F..F.                                                                   [100%]
+=================================== FAILURES ===================================
+E   NameError: name 'TensorAlgebras' is not defined
+/repos/sage-extensions/tests/objects/test_tensor_algebra_of_qq2.sage:20: NameError: name 'TensorAlgebras' is not defined
+E   AssertionError: the rank of Fraction Field of Integer Ring over Integer Ring is computed over a finite field for a finite module, or from a chosen basis or presentation, and Fraction Field of Integer Ring supplies none of these
+/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:2466: AssertionError: the rank of Fraction Field of Integer Ring over Integer Ring is computed over a finite field for a finite module, or from a chosen basis or presentation, and Fraction Field of Integer Ring supplies none of these
+=========================== short test summary info ============================
+FAILED tests/objects/test_tensor_algebra_of_qq2.sage::test_the_categories_of_the_tensor_algebra
+FAILED tests/objects/test_tensor_algebra_of_qq2.sage::test_the_centre_of_the_tensor_algebra
+2 failed, 4 passed in 0.58s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=4
+[peakrss] peak tree RSS      : 307 MiB
+[peakrss] low-water MemAvail : 8775 MiB
+[peakrss] peak single VmHWM  : 307 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      289 MiB peak
+[peakrss]   sage                        213 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=     6.0s procs=  5 rss=   307 MiB hwm=   307 MiB avail=  8826 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   240 MiB hwm=   240 MiB avail=  8775 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   156 MiB hwm=   156 MiB avail=  9025 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail=  9035 MiB

@@ -1066,3 +1066,28 @@ VM; no test of this file causes it.
 second move of `main` (to `eb07c43`, #409): `test_galois_extension_coset_archive.sage` green,
 the normalizer and quotient files at one and two reds, `test_absolute_galois.sage` at five --
 the state the identity repair leaves behind, unchanged by the merge.
+
+# The tests/objects triage slices, 2026-11-14 (#408, #412)
+
+The second half of `tests/objects` (#412) is recorded under `triage/`: the slice run on
+`c8a3ced`, every failing test of it again at the suite's import commit `14b9cc1`, the
+bisect of each cause whose failure is not that import failure, the slice re-run on the
+rebased main with the workstream's one repair, and that repair's red test, its neighbours
+and the neighbour run without it. The 37 paste-ready cause bodies are beside them, one per
+defect, each stating its failing tests with the error each reports.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `triage/412-run-c8a3ced/` (25 files) | `c8a3ced` | the slice, one file per process: **75 failed, 99 passed** in 24 of the 25 files |
+| `triage/412-base-14b9cc1.txt` | `14b9cc1` | each failing test again at the import: 73 of the 75 fail there, 2 passed |
+| `triage/412-bisect.txt` | `14b9cc1..c8a3ced` | one bisect per cause whose signature is absent at the import |
+| `triage/412-run-415c2b4/` (25 files) | `415c2b4` | the slice re-run on the rebased main with the repair: **69 failed, 105 passed** |
+| `triage/412-c11-red-at-415c2b4.log` | `415c2b4` | the repair's red test: **1 failed, 9 passed** (the one red is C10) |
+| `triage/412-c11-neighbours-at-415c2b4.log` | `415c2b4` | `tests/sets` neighbours: **4 failed, 15 passed** |
+| `triage/412-c11-neighbours-clean.log` | `7817e87` | the same without the repair: **4 failed, 15 passed**, the same four ids |
+| `triage/412-c33-closed-7817e87.log` | `7817e87` | C33's five tests: **6 passed** (green on main via `d38845a`) |
+| `triage/412-c37-clean-7817e87.log` | `7817e87` | C37's two tests on a clean main: **2 failed**, the base-ring refusal |
+
+`triage/412-index.md` is the record #412 is accepted against: the cause table, the state of
+each repair, the acceptance count (75 failing tests, 75 assigned, none twice) and what the
+triage does not do.

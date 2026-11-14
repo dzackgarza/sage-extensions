@@ -1,0 +1,34 @@
+provider SHA: 4a17b1e90b82f4ae24e66b97c4b3b694cb895085
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line tests/objects/test_positive_integers.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+E   assert Subset of Integer Ring cut out by <function positive.<locals>.<lambda> at 0x7bd511d3f7f0> in Category of infinite countable sets
+     +  where Subset of Integer Ring cut out by <function positive.<locals>.<lambda> at 0x7bd511d3f7f0> = positive()
+     +  and   Category of infinite countable sets = CountablyInfiniteSets()
+/repos/sage-extensions/tests/objects/test_positive_integers.sage:10: assert Subset of Integer Ring cut out by <function positive.<locals>.<lambda> at 0x7bd511d3f7f0> in Category of infinite countable sets
+E   AssertionError: cannot compute the cardinality of Subset of Integer Ring cut out by <function positive.<locals>.<lambda> at 0x7bd511d3f8a0>: its construction supplies no exact value or decided finite enumeration (it is in Join of Category of facade sets and Category of sets)
+/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:2504: AssertionError: cannot compute the cardinality of Subset of Integer Ring cut out by <function positive.<locals>.<lambda> at 0x7bd511d3f8a0>: its construction supplies no exact value or decided finite enumeration (it is in Join of Category of facade sets and Category of sets)
+E   AssertionError: Mor(Subset of Integer Ring cut out by <function positive.<locals>.<lambda> at 0x7bd511d3f270>, Subset of Integer Ring cut out by <function positive.<locals>.<lambda> at 0x7bd511d3f270>) has no ambient category: no category above the ambient category Category of sets of Subset of Integer Ring cut out by <function positive.<locals>.<lambda> at 0x7bd511d3f270>, short of sets, contains Subset of Integer Ring cut out by <function positive.<locals>.<lambda> at 0x7bd511d3f270> (it lies in Join of Category of facade sets and Category of sets); name the category whose arrows are meant
+/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:2587: AssertionError: Mor(Subset of Integer Ring cut out by <function positive.<locals>.<lambda> at 0x7bd511d3f270>, Subset of Integer Ring cut out by <function positive.<locals>.<lambda> at 0x7bd511d3f270>) has no ambient category: no category above the ambient category Category of sets of Subset of Integer Ring cut out by <function positive.<locals>.<lambda> at 0x7bd511d3f270>, short of sets, contains Subset of Integer Ring cut out by <function positive.<locals>.<lambda> at 0x7bd511d3f270> (it lies in Join of Category of facade sets and Category of sets); name the category whose arrows are meant
+=========================== short test summary info ============================
+FAILED tests/objects/test_positive_integers.sage::test_the_categories_of_the_positive_integers
+FAILED tests/objects/test_positive_integers.sage::test_membership_and_cardinality
+FAILED tests/objects/test_positive_integers.sage::test_the_positive_integers_have_one_endomorphism_category
+3 failed in 0.45s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=4
+[peakrss] peak tree RSS      : 299 MiB
+[peakrss] low-water MemAvail : 8525 MiB
+[peakrss] peak single VmHWM  : 299 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      281 MiB peak
+[peakrss]   sage                        198 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=     6.0s procs=  5 rss=   299 MiB hwm=   299 MiB avail=  8542 MiB
+[peakrss]   t=     2.0s procs=  7 rss=   224 MiB hwm=   224 MiB avail=  8525 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   190 MiB hwm=   190 MiB avail=  8656 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  8635 MiB
