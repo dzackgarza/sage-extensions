@@ -165,7 +165,7 @@ Failing tests (1, 1 file: `test_absolute_galois_group_of_f5.sage`):
 
 - Defective call: `src/sage_extensions/categories/rings/ring_foundation.py:7608`.
 - Introduced by: main's root commit `c731175` (2026-10-26, Zack Garza <dzackgarza@gmail.com>): the file was run there and the same failure appears.
-- Repair: repaired in `dda0328`, docstring in `526c985`. In the image, `GF(5).absolute_galois_group()` raises `TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'` at ring_foundation.py:7608 on main `c8a3ced`, and returns an `AbsoluteGaloisGroupsOfFiniteFields` object with the repair. No failing test of the slice changes colour: its only test, `test_absolute_galois_group_of_f5.sage::test_the_field_construction_agrees`, reaches the call through the file's `galois()` helper, which names `AbsoluteGaloisGroup` -- C01 -- so it stays red until C01 is repaired.
+- Repair: repaired in `?`, docstring in `23ae718`. In the image, `GF(5).absolute_galois_group()` raises `TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'` at ring_foundation.py:7608 on main `c8a3ced`, and returns an `AbsoluteGaloisGroupsOfFiniteFields` object with the repair. No failing test of the slice changes colour: its only test, `test_absolute_galois_group_of_f5.sage::test_the_field_construction_agrees`, reaches the call through the file's `galois()` helper, which names `AbsoluteGaloisGroup` -- C01 -- so it stays red until C01 is repaired.
 
 ### C04 — The owned parent and element classes do not carry `is_isomorphic_to`
 
@@ -671,9 +671,9 @@ Two commits were made as repairs and both were then re-read against `CONTRIBUTIN
 2. **All but one cause is unrepaired.** Every cause but C03 is filed with its evidence.
    C03's repair is at its owner and is verified at the call, but its only red test is
    blocked by C01, so no failing test of the slice changes colour yet (see Repairs).
-3. **C01 is filed with the scope of the whole session namespace.** On the tree as it
-   stands, `python -m sage_extensions.testing.test_lint` over the 930 test files reports
-   117 TL13 findings over 41 distinct names -- names of owned categories and
+3. **C01 is filed with the scope of the whole session namespace.** On the tree this
+   record was measured from, `python -m sage_extensions.testing.test_lint` over the 930
+   test files reports 117 TL13 findings over 41 distinct names -- names of owned
    constructors, the slice's own 18 among them (`AbsoluteGaloisGroup`,
    `FinitelyPresentedModules`, `FractionalIdeals`, `ModulesWithConnection`, ...). The
    repair is the mechanism, not the names, so this count is the evidence for the cause
