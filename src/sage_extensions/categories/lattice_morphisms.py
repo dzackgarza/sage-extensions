@@ -1510,7 +1510,6 @@ class LatticeIsometryMethods:
             ModulesOverIntegralDomains(ring)(target).generic_fibre_map()
         ) is not None
 
-    @cached_method
     def witt_extension_locus(self, source_inclusion, target_inclusion):
         r"""The full locus of ambient isometries extending this partial isometry."""
         from sage_extensions.categories.sets.set_categories import Sets
@@ -1595,8 +1594,11 @@ class LatticeIsometryMethods:
             extension = source.Isom(target)._isometry_from_column_matrix(
                 _engine_column_matrix_from_row_action(coisotropic)
             )
+            # The engine solution satisfies the pairing equations with the
+            # partial isometry exactly, so it is a point of the locus by
+            # construction; ``extension in points`` remains the explicit check.
             points = locus.object()
-            return points.inclusion()(points(extension))
+            return points.inclusion()(points._retain_admitted_member(extension))
         for inclusion in (source_inclusion, target_inclusion):
             if inclusion.domain().module_rank() + 1 != inclusion.codomain().module_rank():
                 raise ValueError("the specified subspaces must be coisotropic in nondegenerate spaces or have codimension one")
@@ -5098,8 +5100,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         r"""The isometry whose \(j\)-th generator image has the \(j\)-th column of ``transformation`` as coordinates."""
         domain = self.domain()
         codomain = self.codomain()
-        codomain_generators = tuple(codomain.module_generators())
-        ring = codomain.base_ring()
         domain_rank = int(domain.module_rank())
         codomain_rank = int(codomain.module_rank())
         if transformation.nrows() != codomain_rank or transformation.ncols() != domain_rank:
@@ -5114,38 +5114,18 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
                 f"{domain_rank} and {codomain_rank} differ"
             )
 
-        inverse_transformation = transformation.inverse()
-        domain_generators = tuple(domain.module_generators())
+        from sage_extensions.categories.modules.pure.modules import _linear_arrow_from_engine_matrix
+        from sage_extensions.categories.rings.ring_foundation import _linear_algebra_ring
 
-        forward = domain.module_category().Mor(domain, codomain)(
-            tuple(
-                sum(
-                    (
-                        codomain.scalar_multiple(_owned_engine_element(ring, coefficient), generator)
-                        for coefficient, generator in zip(column, codomain_generators, strict=True)
-                    ),
-                    codomain.zero(),
-                )
-                for column in transformation.columns()
-            )
-        )
-        inverse_ring = domain.base_ring()
-        inverse = codomain.module_category().Mor(codomain, domain)(
-            tuple(
-                sum(
-                    (
-                        domain.scalar_multiple(
-                            _owned_engine_element(inverse_ring, coefficient), generator
-                        )
-                        for coefficient, generator in zip(
-                            column, domain_generators, strict=True
-                        )
-                    ),
-                    domain.zero(),
-                )
-                for column in inverse_transformation.columns()
-            )
-        )
+        # Columns are generator images of a free module, so their linear
+        # extensions are linear: no relation is checked.
+        def framed(mor, matrix):
+            snapshot = matrix.change_ring(_linear_algebra_ring(mor.base_ring()))
+            snapshot.set_immutable()
+            return _linear_arrow_from_engine_matrix(mor, snapshot)
+
+        forward = framed(domain.module_category().Mor(domain, codomain), transformation)
+        inverse = framed(codomain.module_category().Mor(codomain, domain), transformation.inverse())
         module_isomorphism = domain.module_category().Core().Mor(domain, codomain)(
             forward,
             inverse,
