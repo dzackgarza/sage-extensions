@@ -1,0 +1,255 @@
+provider SHA: 14b9cc16ec98b2608bf458f77013ba621f30c6f0
+inner script: .scratch/qc/lint_names.sh
+inner args: 
+##### tests/groups/test_arithmetic_finite_generation_archive.sage
+tests/groups/test_arithmetic_finite_generation_archive.sage:15: TL13 Subgroups is not a session name
+tests/groups/test_arithmetic_finite_generation_archive.sage:16: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_arithmetic_finite_generation_archive.sage:18: TL13 OwnedGroups is not a session name
+1 files, 3 findings (TL13)
+exit=1
+##### tests/groups/test_free_and_catalogued_groups.sage
+tests/groups/test_free_and_catalogued_groups.sage:49: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:49: TL02 imports the private name _engine_generator_epimorphism
+tests/groups/test_free_and_catalogued_groups.sage:53: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:56: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:56: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:58: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:62: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:62: TL02 imports the private name _gap_model
+tests/groups/test_free_and_catalogued_groups.sage:67: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_free_and_catalogued_groups.sage:68: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:71: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:71: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:73: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:74: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:75: TL02 private attribute ._from_engine_generator_images
+tests/groups/test_free_and_catalogued_groups.sage:79: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:79: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:81: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:86: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:86: TL02 imports the private name _element_to_engine
+tests/groups/test_free_and_catalogued_groups.sage:90: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:91: TL02 private attribute ._from_engine_generator_images
+tests/groups/test_free_and_catalogued_groups.sage:96: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:96: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:98: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:102: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:105: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:105: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:107: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:111: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:111: TL02 imports the private name _gap_model
+tests/groups/test_free_and_catalogued_groups.sage:112: TL01 from sage.libs.gap.libgap import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:117: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:120: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:120: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:122: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:135: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:138: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:138: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:140: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:154: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:155: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:156: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:158: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:159: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:159: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:164: TL01 from sage_extensions.categories.group.g_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:164: TL02 imports the private name _permutation_from_point_map
+tests/groups/test_free_and_catalogued_groups.sage:166: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:169: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:169: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:171: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:175: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:179: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:180: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:182: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:182: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:184: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:185: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:188: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:188: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:190: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:192: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:193: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:207: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:210: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:210: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:212: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:234: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:237: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:238: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:239: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:240: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:249: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:251: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:252: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:256: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:257: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:259: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:259: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:261: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:272: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:274: TL13 FreeGroupQuotients is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:275: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:284: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:350: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:362: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:378: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:379: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:380: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:381: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:382: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:385: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:386: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:390: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:391: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:398: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:399: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:400: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:407: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:408: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:409: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:413: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:420: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:421: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:428: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:436: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:438: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:440: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:441: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:445: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:446: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:447: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:448: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:465: TL13 FreeGroupQuotients is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:466: TL13 FreeGroupQuotients is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:467: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:480: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:496: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:502: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:502: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:504: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:505: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:508: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:508: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:510: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:511: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:516: TL13 FreeGroupQuotients is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:518: TL13 FreeGroupQuotients is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:566: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:569: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:569: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:571: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:572: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:579: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:591: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:594: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:594: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:596: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:598: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:601: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:601: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:603: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:609: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:610: TL13 FreeGroupQuotients is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:612: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:612: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:614: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:622: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:623: TL13 FreeGroupQuotients is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:625: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:625: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:627: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:630: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:631: TL13 FreeGroupQuotients is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:633: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:633: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:635: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:639: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:640: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:642: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:643: TL13 FreeGroupQuotients is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:645: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:645: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:647: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:660: TL13 FreeGroupQuotients is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:662: TL13 FreeGroupQuotients is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:667: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:668: TL13 FreeGroupQuotients is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:670: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:670: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:672: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:678: TL13 FreeGroupQuotients is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:695: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:698: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:698: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:700: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:708: TL13 FreeGroupQuotients is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:740: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:741: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:742: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:744: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:748: TL13 SymmetricGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:752: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:759: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:759: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:760: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:760: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:761: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:761: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:762: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:762: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:763: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:763: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:764: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:764: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:765: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:765: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:766: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:766: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:767: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:767: TL13 OwnedGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:777: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:778: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:779: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:780: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:788: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:789: TL13 GeneralLinearGroups is not a session name
+tests/groups/test_free_and_catalogued_groups.sage:791: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:791: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:793: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:809: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:812: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:812: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:814: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:819: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:822: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:822: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:824: TL09 an assertion that holds of anything
+1 files, 219 findings (TL01, TL02, TL04, TL07, TL08, TL09, TL11, TL13)
+exit=1
+##### tests/groups/test_g_sets_torsor_archive.sage
+tests/groups/test_g_sets_torsor_archive.sage:9: TL13 FiniteGSets is not a session name
+tests/groups/test_g_sets_torsor_archive.sage:10: TL13 FiniteGSets is not a session name
+tests/groups/test_g_sets_torsor_archive.sage:20: TL13 FiniteGSets is not a session name
+tests/groups/test_g_sets_torsor_archive.sage:20: TL13 Torsors is not a session name
+1 files, 4 findings (TL13)
+exit=1
+[peakrss] run: child waited=0 shell_code=0 samples=39
+[peakrss] peak tree RSS      : 214 MiB
+[peakrss] low-water MemAvail : 911 MiB
+[peakrss] peak single VmHWM  : 217 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      209 MiB peak
+[peakrss]   timeout                       4 MiB peak
+[peakrss]   run.sh                        4 MiB peak
+[peakrss]   dirname                       4 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   proot-x86_64                  2 MiB peak
+[peakrss]   t=    77.7s procs=  4 rss=   214 MiB hwm=   217 MiB avail=  1343 MiB
+[peakrss]   t=    75.7s procs=  4 rss=   197 MiB hwm=   200 MiB avail=  1150 MiB
+[peakrss]   t=    61.6s procs=  4 rss=   192 MiB hwm=   199 MiB avail=  1256 MiB
+[peakrss]   t=    93.7s procs=  4 rss=   191 MiB hwm=   199 MiB avail=  1303 MiB
+[peakrss]   t=    73.6s procs=  4 rss=   183 MiB hwm=   188 MiB avail=  1274 MiB
+launcher exit: 0

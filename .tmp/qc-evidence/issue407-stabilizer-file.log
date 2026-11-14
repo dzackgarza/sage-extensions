@@ -1,0 +1,34 @@
+provider SHA: 9b297125b3726d6e6b5f548f2ad3ef01c7933029
+inner script: .scratch/qc/slow_stab.sh
+inner args: 
+start 2026-11-14T20:21:00Z
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+time gates OFF (--no-time-gates): star import 0.78 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collecting ... collected 3 items
+
+tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage::test_a_generated_groups_line_stabilizer_generates_a_subgroup PASSED [ 33%]
+tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage::test_the_enriques_orthogonal_groups_line_stabilizer_generates_a_subgroup Killed
+exit=137 2026-11-14T21:01:00Z
+[peakrss] run: child waited=0 shell_code=0 samples=1189
+[peakrss] peak tree RSS      : 1304 MiB
+[peakrss] low-water MemAvail : 919 MiB
+[peakrss] peak single VmHWM  : 1319 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1299 MiB peak
+[peakrss]   sage                        151 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          3 MiB peak
+[peakrss]   t=  2392.5s procs=  7 rss=  1304 MiB hwm=  1319 MiB avail=  4962 MiB
+[peakrss]   t=  2394.5s procs=  7 rss=  1304 MiB hwm=  1319 MiB avail=  4937 MiB
+[peakrss]   t=  2396.5s procs=  7 rss=  1304 MiB hwm=  1319 MiB avail=  4883 MiB
+[peakrss]   t=  2398.5s procs=  7 rss=  1304 MiB hwm=  1319 MiB avail=  4611 MiB
+[peakrss]   t=  2386.5s procs=  7 rss=  1303 MiB hwm=  1318 MiB avail=  4788 MiB
+launcher exit: 0

@@ -827,3 +827,38 @@ count handed to `check_row_count`.
 | `issue404-gate.log` | the tree of this push | the gate on the file that gates the same contract, `tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage`: **3 passed in 61.06 s**, `--no-time-gates`, two calls over the 20 s gate (25.51 s on `6JRS`, 31.16 s on `U + U(2) + <-2>`) |
 | `issue402-cusp4-chamber-at-vertex.py` / `issue402-cusp4-chamber-at-vertex.log` | the tree of this push | the public `cusp_chamber(p_0)` at card `029J` row 4.3.8's cusp, `p_0` the vertex of square 2 of the card's polyhedron (nine printed walls through it): **complete, 11 walls**, the nine through `p_0` printed, two more of squares `-4` and `-2`; 245 filter questions, 116 admitted |
 | `issue402-cusp4-chamber-gram.py` / `issue402-cusp4-chamber-gram.log` | the tree of this push | the eleven walls of that chamber and card `029J`'s eleven printed walls, in `N`: **the two Gram matrices are equal entry by entry**, and both polyhedra have 26 rays of squares `0..12`. The returned chamber contains `p_0` on the side where the two closing walls pair `-2` with it, the card's on the side where they pair `+2` |
+
+## #407 — the triage of `tests/groups`, and three repairs
+
+The triage of the slice `tests/groups` up to `test_group_adjunctions.sage` on `main` at
+`9b29712`: 39 files, 156 tests, 62 of them red, each in exactly one of the 17 causes whose
+paste-ready issue bodies are `triage/407-*.md`; `triage/407-triage-index.md` is the table.
+Two of the 62 are #399's; #384 owns none of them.
+
+Every log is the redirected output of the command that produced it, one file at a time
+with the repository's own invocation and its addopts blanked for the two plugins this venv
+lacks (`pytest-timeout`, `pytest-reportlog`):
+
+```
+just test -o addopts= -p sage_extensions.testing.suite_budget \
+    -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint <file>
+```
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue407-sweep-tests-groups.log` | `9b29712` | the 77-file sweep of the whole directory: exit status, file, wall time for each |
+| `issue407-failing-tests-slice.log` | `9b29712` | the 60 failing tests of the 38 finished files with the last error line of each, derived from that run's per-file junit xml |
+| `issue407-legacy-14b9cc1.log` | `14b9cc1` | the same files at the commit that brought them: 83 of 83 tests red, which is why no bisect on `main` has a green boundary |
+| `issue407-stabilizer-file.log` | `9b29712` | the file that does not finish: 1 of 3 passed, the second `Killed` at 2400 s, peak tree 1304 MiB, exit 137 |
+| `issue407-probe-stabilizer-steps.py` / `.log` | `fa7553e`'s tree | the file's own steps timed: `O()` 1.9 s, the isotropic subobject 2.2 s, the stabilizer 2.2 s, then `group_generators()` with no return |
+| `issue407-probe-stabilizer-section.py` / `.log` | `fa7553e`'s tree | `_GapWordSection.__init__`, `.permutation_group` and `.gap_group` instrumented: the section is never constructed before the hang, so the hang is not #384's `permutation_group` cost |
+| `issue407-lint-names-before.log` | `14b9cc1` | `sage_extensions.testing.test_lint` on three group tests: `TL13 Subgroups`, `TL13 Torsors`, `TL13 SymmetricGroups` (17), `TL13 GeneralLinearGroups` (17), `TL13 FreeGroupQuotients` (14), `TL13 OwnedGroups` (45), `TL13 FiniteGSets` (3) |
+| `issue407-lint-names-after.log` | this push's tree | the same three files: 0 `TL13` findings, their other findings unchanged |
+| `issue407-repair-namespace.log` | `eb203aa` | 10 files re-run on that commit's tree: 8 tests green, none new red |
+| `issue407-repair-closure.log` | `4706e99` | 11 files re-run: `AlgebraicClosureFiniteField() missing` gone from all of them, no test flipping |
+| `issue407-repair-engine-identity.log` | `fa7553e` | 12 files re-run: 3 tests green, none new red, two green-on-main guards held |
+| `issue407-probe-closure.py` / `.log` | `525dd1b`'s tree | `AlgebraicClosureFiniteField(Zmod(3), "z3")` raises `NotImplementedError: ... only implemented for prime fields`; the same call on `GF(3)` answers -- the reason the closure's base is `GF(p)` |
+| `issue407-repair6.log` | `c17910a` | 12 files re-run on the pushed tree: the same 3 tests green, nothing new red, and no `AlgebraicClosureFiniteField() missing` in the 11 closure files |
+
+`issue407-repair1.log` and `issue407-repair2.log` were superseded by
+`issue407-repair6.log` and the two replacement commits and are not kept.

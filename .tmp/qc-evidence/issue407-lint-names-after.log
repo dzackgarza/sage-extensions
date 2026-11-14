@@ -1,0 +1,244 @@
+provider SHA: fa7553e2a62ee730355be4fb44ab565af636af80
+inner script: .scratch/qc/lint_names.sh
+inner args: 
+##### tests/groups/test_arithmetic_finite_generation_archive.sage
+tests/groups/test_arithmetic_finite_generation_archive.sage:18: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+1 files, 1 findings (TL08)
+exit=1
+##### tests/groups/test_free_and_catalogued_groups.sage
+tests/groups/test_free_and_catalogued_groups.sage:49: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:49: TL02 imports the private name _engine_generator_epimorphism
+tests/groups/test_free_and_catalogued_groups.sage:53: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:56: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:56: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:58: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:62: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:62: TL02 imports the private name _gap_model
+tests/groups/test_free_and_catalogued_groups.sage:67: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_free_and_catalogued_groups.sage:68: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:71: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:71: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:73: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:74: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:75: TL02 private attribute ._from_engine_generator_images
+tests/groups/test_free_and_catalogued_groups.sage:79: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:79: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:81: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:86: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:86: TL02 imports the private name _element_to_engine
+tests/groups/test_free_and_catalogued_groups.sage:90: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:91: TL02 private attribute ._from_engine_generator_images
+tests/groups/test_free_and_catalogued_groups.sage:96: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:96: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:98: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:102: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:105: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:105: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:107: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:111: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:111: TL02 imports the private name _gap_model
+tests/groups/test_free_and_catalogued_groups.sage:112: TL01 from sage.libs.gap.libgap import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:117: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:120: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:120: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:122: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:135: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:138: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:138: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:140: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:170: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:171: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:173: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:174: TL03 type(): introspection is not mathematics
+tests/groups/test_free_and_catalogued_groups.sage:175: TL02 private attribute ._repr_
+tests/groups/test_free_and_catalogued_groups.sage:180: TL02 private attribute ._repr_
+tests/groups/test_free_and_catalogued_groups.sage:181: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:183: TL02 private attribute ._description
+tests/groups/test_free_and_catalogued_groups.sage:184: TL07 repr(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:185: TL02 private attribute ._latex_
+tests/groups/test_free_and_catalogued_groups.sage:187: TL02 private attribute ._repr_
+tests/groups/test_free_and_catalogued_groups.sage:200: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:201: TL02 private attribute ._description
+tests/groups/test_free_and_catalogued_groups.sage:202: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:202: TL07 repr(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:203: TL02 private attribute ._latex_
+tests/groups/test_free_and_catalogued_groups.sage:203: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:226: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:227: TL01 from sage_extensions.categories.group.g_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:227: TL02 imports the private name _permutation_from_point_map
+tests/groups/test_free_and_catalogued_groups.sage:228: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:232: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:236: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:238: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:242: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:247: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:248: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:251: TL01 from sage.groups.perm_gps.permgroup_named import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:253: TL02 private attribute ._engine
+tests/groups/test_free_and_catalogued_groups.sage:253: TL03 isinstance(): introspection is not mathematics
+tests/groups/test_free_and_catalogued_groups.sage:254: TL02 private attribute ._engine
+tests/groups/test_free_and_catalogued_groups.sage:254: TL03 isinstance(): introspection is not mathematics
+tests/groups/test_free_and_catalogued_groups.sage:255: TL02 private attribute ._engine
+tests/groups/test_free_and_catalogued_groups.sage:285: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:288: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:288: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:290: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:291: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:294: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:294: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:296: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:300: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:305: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:310: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:329: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:331: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:332: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:337: TL01 from sage_extensions.categories.group.g_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:337: TL02 imports the private name _permutation_from_point_map
+tests/groups/test_free_and_catalogued_groups.sage:339: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:342: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:342: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:344: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:348: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:352: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:353: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:355: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:355: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:357: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:358: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:361: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:361: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:363: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:365: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:380: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:383: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:383: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:385: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:407: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:410: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:429: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:432: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:432: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:434: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:445: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:448: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:551: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:552: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:553: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:554: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:555: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:558: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:559: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:563: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:564: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:571: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:572: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:573: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:580: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:581: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:582: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:586: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:593: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:594: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:601: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:609: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:611: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:613: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:614: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:618: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:619: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:620: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:621: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:640: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:669: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:675: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:675: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:677: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:678: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:681: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:681: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:683: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:739: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:742: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:742: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:744: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:745: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:752: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:764: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:767: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:767: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:769: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:771: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:774: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:774: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:776: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:782: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:785: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:785: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:787: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:795: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:798: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:798: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:800: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:803: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:806: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:806: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:808: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:812: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:813: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:815: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:818: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:818: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:820: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:840: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:843: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:843: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:845: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:868: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:871: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:871: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:873: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:915: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:917: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:932: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:933: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:934: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:935: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:936: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:937: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:938: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:939: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:940: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:952: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:961: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:964: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:964: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:966: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:982: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:985: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:985: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:987: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:992: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:995: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:995: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:997: TL09 an assertion that holds of anything
+1 files, 216 findings (TL01, TL02, TL03, TL04, TL07, TL08, TL09, TL11)
+exit=1
+##### tests/groups/test_g_sets_torsor_archive.sage
+1 files, 0 findings
+exit=0
+[peakrss] run: child waited=0 shell_code=0 samples=12
+[peakrss] peak tree RSS      : 290 MiB
+[peakrss] low-water MemAvail : 2392 MiB
+[peakrss] peak single VmHWM  : 292 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      279 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=    14.0s procs=  4 rss=   290 MiB hwm=   292 MiB avail=  3034 MiB
+[peakrss]   t=     8.0s procs=  4 rss=   284 MiB hwm=   284 MiB avail=  3216 MiB
+[peakrss]   t=    12.0s procs=  4 rss=   279 MiB hwm=   279 MiB avail=  3306 MiB
+[peakrss]   t=    22.1s procs=  4 rss=   274 MiB hwm=   274 MiB avail=  2392 MiB
+[peakrss]   t=     6.0s procs=  4 rss=   242 MiB hwm=   242 MiB avail=  3269 MiB
+launcher exit: 0

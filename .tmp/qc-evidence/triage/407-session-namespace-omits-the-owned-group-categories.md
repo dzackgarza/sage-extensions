@@ -65,3 +65,21 @@ The next commit on `main`: the six names are exported from `sage_extensions.all`
 tests below turn green, at their first attempt, with no regression in the files re-run
 (`.tmp/qc-evidence/issue407-repair1-summary.log`); the rest reach further defects, filed
 separately.
+
+## The rule this repairs
+
+The repository states the requirement itself: `sage_extensions.testing.test_lint`'s `TL13`
+ends a test run red on *"a name that is neither bound in the file, a session name, nor an
+allowed builtin: the test reaches outside the session"*, and `_session_names()` is "Sage's
+script namespace, then the session star import".  At `14b9cc1` the lint reports, on three of
+the files below, `TL13 Subgroups` (1), `TL13 Torsors` (1), `TL13 SymmetricGroups` (17),
+`TL13 GeneralLinearGroups` (17), `TL13 FreeGroupQuotients` (14) -- together with
+`TL13 OwnedGroups` (45) and `TL13 FiniteGSets` (3), which later commits had already added, so
+this cause is one name-list being restored at its owner, not a special case for one test
+(`.tmp/qc-evidence/issue407-lint-names-before.log`).  On the tree that repairs it the same
+three files carry 0 `TL13` findings and their other findings unchanged
+(`.tmp/qc-evidence/issue407-lint-names-after.log`).
+
+`CoxeterGroups` is the name the lint cannot catch, because Sage has a category of that name
+and `sage.all_cmdline` is in a `.sage` test's builtins; that is exactly why its three tests
+died with `NotImplementedError` instead of `NameError`.

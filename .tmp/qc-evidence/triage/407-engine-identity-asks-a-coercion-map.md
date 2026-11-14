@@ -38,3 +38,15 @@ and at that commit the same `AttributeError` is the first failure of
 `test_galois_normalizer_archive.sage`
 (`.tmp/qc-evidence/issue407-legacy-14b9cc1-summary.log`), so no commit on `main` carries
 these tests green.
+
+## Repaired by
+
+The next commit on `main`: an engine map that offers no identity test is not treated as
+the identity, so the composition happens instead of being elided (`__mul__` composes and
+the composed map is the same map). Three of the four tests below turn green with nothing
+new red --- `test_the_real_cube_root_of_two_has_no_nontrivial_automorphisms`,
+`test_the_automorphisms_of_q_zeta_12_act_on_i_and_root_three_by_their_embeddings` and
+`test_complex_conjugation_of_q_i_extends_to_sigma_7_and_sigma_11` --- and the fourth,
+`test_the_core_of_the_subgroup_fixing_the_real_cube_root_of_two_has_index_six`, gets past
+this defect and stops at the next one on its path
+(`.tmp/qc-evidence/issue407-repair-engine-identity.log`).

@@ -1,0 +1,4 @@
+provider SHA: fa7553e2a62ee730355be4fb44ab565af636af80
+inner script: .scratch/qc/probe_section.sh
+inner args: 
+[     4.3s] stabilizer built; calling group_generators()
