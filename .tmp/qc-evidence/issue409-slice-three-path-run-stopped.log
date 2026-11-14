@@ -1,0 +1,4 @@
+provider SHA: 9b297125b3726d6e6b5f548f2ad3ef01c7933029
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q -rf --tb=short --junit-xml=.tmp/junit409.xml tests/groups tests/objects tests/test_finite_cosets.py
+....

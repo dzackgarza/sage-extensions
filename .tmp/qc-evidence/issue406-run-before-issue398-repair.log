@@ -1,0 +1,41 @@
+
+==================================== ERRORS ====================================
+_________ ERROR collecting tests/functions/test_young_convolution.sage _________
+tests/functions/test_young_convolution.sage:16: in <module>
+    (RR(sqrt(2)), RR(sqrt(2)), 1 / (RR(sqrt(2)) - 1)),
+                                                 ^^^^^^
+sage/structure/element.pyx:1726: in sage.structure.element.Element.__truediv__
+    ???
+sage/structure/coerce.pyx:1253: in sage.structure.coerce.CoercionModel.bin_op
+    ???
+src/sage_extensions/categories/modules/pure/modules.py:1704: in __truediv__
+    return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:1704: in __truediv__
+    return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   RecursionError: maximum recursion depth exceeded
+!!! Recursion detected (same locals & position)
+-------------- generated report log file: tests/.report/run.jsonl --------------
+=============================== time-gate report ===============================
+collection took 625.38 s; the measured ceiling is 6 s
+=========================== short test summary info ============================
+ERROR tests/functions/test_young_convolution.sage - RecursionError: maximum r...
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+3930 deselected, 1 error in 625.52s (0:10:25)
+EXIT=1
+[peakrss] p406-repair-full: child waited=0 shell_code=0 samples=315
+[peakrss] peak tree RSS      : 3726 MiB
+[peakrss] low-water MemAvail : 953 MiB
+[peakrss] peak single VmHWM  : 3733 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     3721 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=   667.7s procs=  4 rss=  3726 MiB hwm=  3733 MiB avail=  4739 MiB
+[peakrss]   t=   669.7s procs=  4 rss=  3726 MiB hwm=  3733 MiB avail=  4408 MiB
+[peakrss]   t=   671.7s procs=  4 rss=  3726 MiB hwm=  3733 MiB avail=  4206 MiB
+[peakrss]   t=   673.7s procs=  4 rss=  3726 MiB hwm=  3733 MiB avail=  4271 MiB
+[peakrss]   t=   675.7s procs=  4 rss=  3726 MiB hwm=  3733 MiB avail=  4301 MiB
+launcher exit: 0

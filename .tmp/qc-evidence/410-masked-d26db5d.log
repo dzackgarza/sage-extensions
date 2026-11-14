@@ -1,0 +1,34 @@
+provider SHA: d26db5d7a3f13c9e8b6501bba706ac62d46d7cb5
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: python -m pytest -p qc_sage_session -o addopts= -v --tb=line tests/lattices/test_definite.sage::test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collecting ... collected 1 item
+
+tests/lattices/test_definite.sage::test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6 FAILED [100%]
+
+=================================== FAILURES ===================================
+E   TypeError: CategoricalIsomorphism.__init__() missing 1 required positional argument: 'inverse_computation'
+/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:914: TypeError: CategoricalIsomorphism.__init__() missing 1 required positional argument: 'inverse_computation'
+=========================== short test summary info ============================
+FAILED tests/lattices/test_definite.sage::test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6
+======================== 1 failed in 101.89s (0:01:41) =========================
+[peakrss] pd26db5d: child waited=1 shell_code=1 samples=53
+[peakrss] peak tree RSS      : 3665 MiB
+[peakrss] low-water MemAvail : 6969 MiB
+[peakrss] peak single VmHWM  : 3743 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      3313 MiB peak
+[peakrss]   python                      418 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   104.2s procs=  4 rss=  3665 MiB hwm=  3743 MiB avail=  7035 MiB
+[peakrss]   t=   102.2s procs=  4 rss=  3519 MiB hwm=  3519 MiB avail=  7061 MiB
+[peakrss]   t=   100.2s procs=  4 rss=  3467 MiB hwm=  3477 MiB avail=  7080 MiB
+[peakrss]   t=    70.1s procs=  4 rss=  3462 MiB hwm=  3477 MiB avail=  6969 MiB
+[peakrss]   t=    72.1s procs=  4 rss=  3462 MiB hwm=  3477 MiB avail=  7022 MiB
+launcher exit: 1

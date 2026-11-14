@@ -1,0 +1,32 @@
+ZZ(1)/ZZ(2) -> (1)/(2)
+ZZ(1)/2  -> (1)/(2)
+QQ(1)/QQ(2) -> (1)/(2)
+RR(1)/RR(2) -> RecursionError
+RR(1)/x -> RecursionError
+~x -> RecursionError
+x**-1 -> 1/(sqrt(2) - 1)
+_divide_by_nonzero(RR(1),x) -> 1/(sqrt(2) - 1)
+RR(1)*~x -> RecursionError
+~ZZ(2) -> TypeError no conversion of this rational to integer
+e/2 (lattice vector) -> TypeError no conversion of this rational to integer
+e/ZZ(2) -> TypeError no conversion of this rational to integer
+Traceback (most recent call last):
+  File "/probe.py", line 31, in <module>
+    print("scalar_multiple(QQ(1/2), e):", L.scalar_multiple(QQ(1) / QQ(2), e))
+                                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py", line 3014, in scalar_multiple
+    return self(self.scalar_action()(self.base_ring()(scalar))(underlying))
+                                     ~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 6475, in __call__
+    return self._element_constructor_(value)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 6507, in _element_constructor_
+    self._engine(_rational_engine_value(self._engine, _engine_element(parent, value)))
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "sage/structure/parent.pyx", line 899, in sage.structure.parent.Parent.__call__
+    return mor._call_(x)
+  File "sage/rings/rational.pyx", line 4190, in sage.rings.rational.Q_to_Z._call_
+    raise TypeError("no conversion of this rational to integer")
+TypeError: no conversion of this rational to integer
+EXIT=1
+launcher exit: 0

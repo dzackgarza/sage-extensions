@@ -1,0 +1,40 @@
+provider SHA: e4bd95d9751b95cb7238dd03556216d3df31be21
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: python -m pytest -p qc_sage_session -o addopts= -v --tb=line tests/lattices/test_definite.sage::test_square_lattice_minimum_theta_and_packing_radius tests/lattices/test_definite_metric_invariants_archive.sage::test_square_lattice_metric_invariants_are_exact
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collecting ... collected 2 items
+
+tests/lattices/test_definite.sage::test_square_lattice_minimum_theta_and_packing_radius FAILED [ 50%]
+tests/lattices/test_definite_metric_invariants_archive.sage::test_square_lattice_metric_invariants_are_exact FAILED [100%]
+
+=================================== FAILURES ===================================
+E   RecursionError: maximum recursion depth exceeded
+!!! Recursion detected (same locals & position)
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:709: RecursionError: maximum recursion depth exceeded
+E   RecursionError: maximum recursion depth exceeded
+!!! Recursion detected (same locals & position)
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:709: RecursionError: maximum recursion depth exceeded
+=========================== short test summary info ============================
+FAILED tests/lattices/test_definite.sage::test_square_lattice_minimum_theta_and_packing_radius
+FAILED tests/lattices/test_definite_metric_invariants_archive.sage::test_square_lattice_metric_invariants_are_exact
+========================= 2 failed in 67.99s (0:01:07) =========================
+[peakrss] pe4bd95d: child waited=1 shell_code=1 samples=38
+[peakrss] peak tree RSS      : 2267 MiB
+[peakrss] low-water MemAvail : 6393 MiB
+[peakrss] peak single VmHWM  : 2297 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      1968 MiB peak
+[peakrss]   python                      318 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    70.2s procs=  4 rss=  2267 MiB hwm=  2278 MiB avail=  6719 MiB
+[peakrss]   t=    60.2s procs=  4 rss=  2257 MiB hwm=  2257 MiB avail=  6669 MiB
+[peakrss]   t=    72.2s procs=  4 rss=  2255 MiB hwm=  2297 MiB avail=  6421 MiB
+[peakrss]   t=    68.2s procs=  4 rss=  2224 MiB hwm=  2265 MiB avail=  6715 MiB
+[peakrss]   t=    66.2s procs=  4 rss=  2214 MiB hwm=  2258 MiB avail=  6768 MiB
+launcher exit: 1

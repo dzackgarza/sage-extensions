@@ -1,0 +1,33 @@
+provider SHA: c8a3cedb1ba27919c416101e98cdc7d36256415e
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget --no-time-gates -v --tb=short tests/lattices/test_definite.sage::test_square_lattice_minimum_theta_and_packing_radius tests/lattices/test_definite.sage::test_exact_cvp_babai_minima_and_voronoi_geometry_on_square_lattice tests/lattices/test_definite_metric_invariants_archive.sage::test_square_lattice_metric_invariants_are_exact tests/lattices/test_definite_metric_invariants_archive.sage::test_a2_invariants_see_the_nonorthogonal_hexagonal_geometry tests/lattices/test_definite.sage::test_norm_one_vectors_of_x2_minus_2y2_form_one_orbit tests/lattices/test_rational_scalars_on_a_base_changed_lattice.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+time gates OFF (--no-time-gates): star import 0.74 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collecting ... collected 6 items
+
+tests/lattices/test_definite.sage::test_square_lattice_minimum_theta_and_packing_radius PASSED [ 16%]
+tests/lattices/test_definite.sage::test_exact_cvp_babai_minima_and_voronoi_geometry_on_square_lattice PASSED [ 33%]
+tests/lattices/test_definite_metric_invariants_archive.sage::test_square_lattice_metric_invariants_are_exact PASSED [ 50%]
+tests/lattices/test_definite_metric_invariants_archive.sage::test_a2_invariants_see_the_nonorthogonal_hexagonal_geometry PASSED [ 66%]
+tests/lattices/test_definite.sage::test_norm_one_vectors_of_x2_minus_2y2_form_one_orbit PASSED [ 83%]
+tests/lattices/test_rational_scalars_on_a_base_changed_lattice.sage::test_left_right_and_division_by_a_rational_agree PASSED [100%]
+
+============================== 6 passed in 2.85s ===============================
+[peakrss] wt410: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 459 MiB
+[peakrss] low-water MemAvail : 9366 MiB
+[peakrss] peak single VmHWM  : 459 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      448 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   459 MiB hwm=   459 MiB avail=  9366 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   301 MiB hwm=   301 MiB avail=  9543 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   230 MiB hwm=   230 MiB avail=  9665 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  9740 MiB
+launcher exit: 0

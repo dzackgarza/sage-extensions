@@ -1,0 +1,26 @@
+provider SHA: 9b297125b3726d6e6b5f548f2ad3ef01c7933029
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint -q -rf --tb=short --durations=0 tests/test_finite_cosets.py
+....                                                                     [100%]
+============================== slowest durations ===============================
+6.68s call     tests/test_finite_cosets.py::test_split_four_dimensional_form_cosets_are_its_nonzero_singular_vectors
+1.64s call     tests/test_finite_cosets.py::test_anisotropic_ternary_plane_cosets_are_its_unit_vectors
+0.30s call     tests/test_finite_cosets.py::test_a_transposition_of_s3_has_three_left_and_three_right_cosets
+0.06s call     tests/test_finite_cosets.py::test_the_preimage_of_c2_in_c4_has_a_schreier_cover_of_order_two
+
+(8 durations < 0.005s hidden.  Use -vv to show these durations.)
+4 passed in 9.11s
+[peakrss] run409-1147689: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 439 MiB
+[peakrss] low-water MemAvail : 7151 MiB
+[peakrss] peak single VmHWM  : 439 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      428 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.0s procs=  3 rss=   439 MiB hwm=   439 MiB avail=  9540 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   438 MiB hwm=   438 MiB avail=  8578 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   435 MiB hwm=   435 MiB avail=  8673 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   434 MiB hwm=   434 MiB avail=  7151 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   434 MiB hwm=   434 MiB avail=  8511 MiB
+launcher exit: 0

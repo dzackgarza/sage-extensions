@@ -55,6 +55,14 @@ group; where it is not, the group is repaired" — is settled in the direction
 
 ## 3. `contains_lift` is exact for this group
 
+**Corrected by #402 (5af2f0b).** The measurement `|ρ(K_v)| = 1` below read
+`ρ(K_v)` from the Eichler transvections of a basis of `v^⊥`, which do not
+generate `K_v` at this cusp: `b(v, T_En) = 2Z`, and `t(v, a/2) = s_(a+v) s_a`
+for a printed `(-4)`-wall `a` lies in `K_v` with a nontrivial discriminant
+image. With all of `K_v`, `|ρ(K_v)| = 256` at the 4.3.8 cusp, every printed
+wall is admitted, and the public `cusp_chamber()` returns the card's eleven
+walls (`.tmp/qc-evidence/issue402-*`).
+
 The mathematics the issue asks for in its second item, proved:
 
 Sterk's Proposition 2.7 makes `Γ` a **discriminant-characterized** group:

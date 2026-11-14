@@ -7615,18 +7615,15 @@ def _owned_real_algebraic_numbers() -> _OwnedRingParent:
 def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
     r"""The algebraic closure of a finite prime field, keyed by characteristic.
 
-    The closure is ``GF(p).algebraic_closure()``, the field's own maintained operation
-    (`sage.rings.finite_rings.finite_field_base.FiniteField.algebraic_closure`, which the
-    `AlgebraicClosureFiniteField` docstring recommends over the raw constructor).  Its base
-    is Sage's prime field `GF(p)` and not the owned prime field `Z/p`: the pseudo-Conway
-    closure is implemented for prime *fields* only, and `Zmod(p)` is not one -- on this
-    runtime `AlgebraicClosureFiniteField(Zmod(3), "z3")` raises `NotImplementedError:
-    algebraic closures of finite fields are only implemented for prime fields`, while the
-    same call on `GF(3)` answers the closure.
-
-    Sage's algebraic closures of finite fields are not a unique-representation class
-    -- non-identical instances never compare equal -- so one owned closure per
-    characteristic is fixed here, and every request for that characteristic answers it.
+    The operation belongs to the finite field, so the closure is raised through
+    ``FiniteField.algebraic_closure``, which returns one cached pseudo-Conway
+    closure per characteristic (``GF(p).algebraic_closure() is
+    GF(p).algebraic_closure()``), and that is the instance Sage's own
+    finite-field constructions resolve to.  Raising the closure through
+    ``AlgebraicClosureFiniteField`` instead would require a generator name, and
+    a name coined by an adapter is never a construction: Sage's constructor
+    takes ``(base_ring, name)``, so the characteristic this function is keyed by
+    does not select any closure there.
     """
     engine = SageGF(int(characteristic)).algebraic_closure()
     return _OwnedRingParent(

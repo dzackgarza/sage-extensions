@@ -1,0 +1,26 @@
+# Three runs of tests/test_finite_cosets.py at commits of main before the observation,
+# concatenated in this order. Each block is one whole launcher log, unedited.
+
+########## bbb6608 ##########
+provider SHA: bbb66089c45f17f16b9bf4776f2a56da2157ae58
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q -rf --tb=short tests/test_finite_cosets.py
+....                                                                     [100%]
+4 passed in 7.51s
+launcher exit: 0
+
+########## 484e4c5 ##########
+provider SHA: 484e4c5261738980b831e791705904c2cc37de51
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q -rf --tb=short tests/test_finite_cosets.py
+....                                                                     [100%]
+4 passed in 7.87s
+launcher exit: 0
+
+########## 0ee5ad5 ##########
+provider SHA: 0ee5ad5dcb940ffb03a3b3b1c4db1a7ba5f25d20
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q -rf --tb=short tests/test_finite_cosets.py
+....                                                                     [100%]
+4 passed in 7.91s
+launcher exit: 0

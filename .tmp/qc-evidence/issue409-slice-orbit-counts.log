@@ -1,0 +1,4 @@
+provider SHA: fba2e712d02df2f3f9064324c56daf6eb72f3c60
+command: /sage/.venv/bin/python -u .tmp/probe_orbits.py
+split: |orbit| = 9 |G| = 72 |Stab| = 8
+ternary: |orbit| = 4 |G| = 8 |Stab| = 2

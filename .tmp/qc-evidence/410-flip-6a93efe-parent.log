@@ -1,0 +1,26 @@
+provider SHA: 4ffa184ae6f71b8e456697e62344457d2c7206f2
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: python -m pytest -p qc_sage_session -o addopts= -v --tb=line tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collecting ... collected 1 item
+
+tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so PASSED [100%]
+
+============================== 1 passed in 4.09s ===============================
+[peakrss] p6a93efepre: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 444 MiB
+[peakrss] low-water MemAvail : 4278 MiB
+[peakrss] peak single VmHWM  : 444 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      433 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   444 MiB hwm=   444 MiB avail=  4278 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   286 MiB hwm=   286 MiB avail=  4420 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  4627 MiB
+launcher exit: 0

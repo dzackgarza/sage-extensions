@@ -37,7 +37,8 @@ text. Rules, each with a code:
 
 Run ``python -m sage_extensions.testing.test_lint [paths]``, or ``just
 test-lint``. As a pytest plugin (loaded from ``pyproject.toml``) it lints the
-collected files once collection is final and ends the run red on any finding;
+collected files once collection is final, reports each finding as the failure
+of the tests in the file that holds it, and ends the run red on any finding;
 ``--no-test-lint`` lifts it for a one-off triage run.
 """
 
@@ -49,6 +50,7 @@ import runpy
 import sys
 import tomllib
 from dataclasses import dataclass
+from itertools import groupby
 from pathlib import Path
 
 import pytest
@@ -397,23 +399,62 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
 
 
+_FINDINGS = pytest.StashKey[dict[Path, list[Finding]]]()
+
+
+def _finding_key(path: Path, rootpath: Path) -> Path:
+    r"""The path a collected item and a finding share."""
+    return (path if path.is_absolute() else rootpath / path).resolve()
+
+
 @pytest.hookimpl(trylast=True)
 def pytest_collection_finish(session: pytest.Session) -> None:
+    r"""Lint the collected files and file each finding under the file that holds it.
+
+    A finding is reported as the failure of every test in its file, at that
+    test's setup: the report names the tests the finding concerns and every
+    other file's tests still run.  ``pytest_sessionfinish`` ends the run red
+    even when no collected test is in the file.
+    """
+    rootpath = session.config.rootpath
+    session.config.stash[_FINDINGS] = {}
     if session.config.getoption("no_test_lint"):
         return
     files = sorted({
-        Path(item.path).relative_to(session.config.rootpath)
+        Path(item.path).relative_to(rootpath)
         for item in session.items
         if Path(item.path).suffix in {".py", ".sage"}
     })
-    findings = lint([file for file in files])
+    by_file = groupby(
+        lint([file for file in files]),
+        key=lambda finding: _finding_key(Path(finding.path), rootpath),
+    )
+    session.config.stash[_FINDINGS] = {path: list(findings) for path, findings in by_file}
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_runtest_setup(item: pytest.Item) -> None:
+    findings = item.config.stash[_FINDINGS].get(item.path.resolve())
     if findings:
-        shown = "\n".join(str(finding) for finding in findings[:50])
-        more = f"\n... and {len(findings) - 50} more" if len(findings) > 50 else ""
-        pytest.exit(
-            f"test lint: {len(findings)} findings (run just test-lint for all)\n{shown}{more}",
-            returncode=pytest.ExitCode.TESTS_FAILED,
-        )
+        pytest.fail("\n".join(map(str, findings)), pytrace=False)
+
+
+def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
+    del exitstatus
+    if session.config.stash.get(_FINDINGS, None):
+        session.exitstatus = pytest.ExitCode.TESTS_FAILED
+
+
+def pytest_terminal_summary(terminalreporter) -> None:
+    findings = terminalreporter.config.stash.get(_FINDINGS, None)
+    if not findings:
+        return
+    every = [finding for file_findings in findings.values() for finding in file_findings]
+    terminalreporter.write_sep("=", f"test lint: {len(every)} findings in {len(findings)} files")
+    for finding in every[:50]:
+        terminalreporter.write_line(str(finding))
+    if len(every) > 50:
+        terminalreporter.write_line(f"... and {len(every) - 50} more (just test-lint lists them)")
 
 
 if __name__ == "__main__":

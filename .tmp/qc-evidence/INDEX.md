@@ -806,6 +806,10 @@ carrying the ambient generator image that carried its parent there.
 | `issue402-kernel-repair.py` / `issue402-kernel-repair.log` | the tree of this push | `kernel_generators()` at card `029J` row 4.3.8's cusp: **20 generators** (the transvections of a basis of `v^perp` and of nine generators of the parameter classes `B / v^perp`), `rho(K_v)` of **order 256**, and `admits_root` **True for all eleven** printed walls' classes |
 | `issue402-kernel-tests.log` | the tree of this push | `tests/lattices/test_the_isotropic_reduction_image.sage -k "every_wall_of_the_fourth or two_lifts or one_sift_per_root or agrees_with_the_levi or reduces_to"`: **5 passed in 1054.96 s** -- the red test of `a33dae4` is green, and `rho(K_v)` is still trivial at `Sterk_1` |
 | `issue402-locus-classes.py` / `issue402-locus-classes.log` | `b77de81` | the owner of the integral lift locus, unchanged: for the identity marking of the reduction at the same line, class 64 of `integral_parameter_classes()` is in the locus and the lift at its `residue.preimage` is **not integral**, so the locus is not the set of residues of integral lifts there |
+| `issue402-cusp4-chamber-at-vertex.py` / `issue402-cusp4-chamber-at-vertex.log` | the tree of this push | the public `cusp_chamber(p_0)` at card `029J` row 4.3.8's cusp, `p_0` the vertex of square 2 of the card's polyhedron (nine printed walls through it): **complete, 11 walls**, the nine through `p_0` printed, two more of squares `-4` and `-2`; 245 filter questions, 116 admitted |
+| `issue402-cusp4-chamber-gram.py` / `issue402-cusp4-chamber-gram.log` | the tree of this push | the eleven walls of that chamber and card `029J`'s eleven printed walls, in `N`: **the two Gram matrices are equal entry by entry**, and both polyhedra have 26 rays of squares `0..12`. The returned chamber contains `p_0` on the side where the two closing walls pair `-2` with it, the card's on the side where they pair `+2` |
+| `issue402-reduction-image-file.log` | `484e4c5` | the whole `tests/lattices/test_the_isotropic_reduction_image.sage`: **10 passed, 1 failed in 5143.46 s**. `test_every_cusp_chamber_has_the_wall_count_of_its_card_row` **passed**: the public `cusp_chamber()`, with no bound and no point, returns complete chambers with card `029J`'s wall counts at all five cusps, Sterk_4 included. The failure is `test_the_fourth_cusps_layers_are_enumerated_in_the_coordinates_of_its_cell`, which asserted the stalled walk (`is_complete_wall_set() is False`, more than sixteen walls); with the repaired filter the bounded walk completes |
+| `issue402-cusp4-walk-test.log` | the tree of this push | that test, rewritten as `test_the_fourth_cusps_walk_stops_within_twenty_decompositions_at_the_card_chamber`: **1 passed in 982.48 s** -- complete, every wall admitted, the card's 4.3.8 wall count |
 
 ## #404 — the kernel plane rows driver's row step, restored
 
@@ -825,6 +829,121 @@ count handed to `check_row_count`.
 | `issue404-row-step-probe.py` | the tree of this push | the probe: `tests/coble_kernel_plane_rows.py` loaded as a module (not run as a script) and its own `run_row` and `check_row_count` called on the gate lattice `U + U(2) + <-2>`, so the restored row step is exercised without running the Coble rows on the VM |
 | `issue404-row-step-probe.log` | the tree of this push | on `U + U(2) + <-2>` (rank 5, 1 ambient `O(L)`-class): `Otilde` **2 planes in 36.6 s**, `check_row_count` true against 2 double cosets; `Otilde+` **2 planes in 10.2 s**, true against 2; `Otilde+ >= Otilde`; peak tree 2570 MiB, exit 0 (`PROBE404 OK`) |
 | `issue404-gate.log` | the tree of this push | the gate on the file that gates the same contract, `tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage`: **3 passed in 61.06 s**, `--no-time-gates`, two calls over the 20 s gate (25.51 s on `6JRS`, 31.16 s on `U + U(2) + <-2>`) |
+
+## #409 — the finite-coset slice's only red is the file's own session standard
+
+`tests/test_finite_cosets.py` holds four tests. Under the flags the issue's
+observation used, `--no-time-gates --no-test-lint`, all four pass on `main` at
+`9b29712`, alone and in session behind sibling files that drive the same
+coset, transport and stabiliser machinery, and they pass at `bbb6608`,
+`484e4c5` and `0ee5ad5`; the slice contributes no failing test id to the 238
+of 633, and the three paths still collect exactly 633 tests here. Its one red
+is the collection the repository's own invocation performs: the file imported
+`sage.all` and five `sage_extensions` modules directly, imported the private
+`_owned_integers` and called `len()` twice, so with the session-standard lint
+on, `pytest` exited 1 with `no tests ran` and nine findings before any of the
+four tests ran. The file entered that way at `178bec4` (2026-10-26, added with
+the coset machinery) and never ran under `just test` since. `fba2e71` repairs
+it: the names come from `from sage_extensions.all import *`, and the two length
+assertions are replaced by the statement they were numbering, the coset
+section carrying the cosets onto the orbit of the distinguished vector, whose
+9 and 4 are derived (72/8 and 8/2, printed with `|G|` and `|Stab|` beside
+`|orbit|`) rather than typed.
+
+Two limits of this host are recorded, not worked around. The image's Sage
+environment has neither `pytest-timeout` nor `pytest-reportlog`, so `just test`
+verbatim dies on its own `addopts` (`unrecognized arguments: --timeout=60
+--timeout-method=signal --report-log=...`) and the observation's 60 s cap
+cannot be reproduced as failures; per-test durations are recorded instead, and
+the slowest of the four is 11.7 s. And the three-path run cannot be bounded
+here: `tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage::
+test_the_enriques_orthogonal_groups_line_stabilizer_generates_a_subgroup` ran
+past eleven minutes with nothing to stop it, which the observation's
+`--timeout=60` would have turned into a failure; the run was stopped after the
+first four tests of `tests/groups`, so the split by file for the other two
+paths is not in these logs.
+
+Paste-ready body for the one cause this slice owns (this connection reads and
+pushes, it cannot create issues):
+
+```
+tests/test_finite_cosets.py runs under no invocation of just test
+
+Under the repository's own invocation the session-standard lint ends the run
+red at collection, so the file's four tests have never run:
+
+  $ just test tests/test_finite_cosets.py -o addopts= -p \
+      sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint
+  no tests ran in 2.26s
+  ! _pytest.outcomes.Exit: test lint: 9 findings (run just test-lint for all)
+  tests/test_finite_cosets.py:3: TL01 import sage.all
+  ... five TL01, one TL02 (_owned_integers), two TL10 (len at :63, :85)
+  exit 1
+
+Introduced by 178bec4 ("Carry exact coset transversals and pairing-map graph
+construction", 2026-10-26), which added the file outside the session standard;
+D. Zack Garza. The eight top-level .py tests share the finding pattern (41
+findings over five of them, `python -m sage_extensions.testing.test_lint
+tests/test_*.py`), so the repair of the others belongs to whoever owns them.
+
+When this closes a user of the library gets `tests/test_finite_cosets.py` as a
+suite that actually runs: the four coset, section and Schreier assertions are
+executed by `just test` instead of being skipped by a collection error.
+
+Repaired on main in fba2e71.
+```
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue409-just-test-addopts-unavailable.log` | `9b29712` | the repository's `addopts` under this host's image: `unrecognized arguments: --timeout=60 --timeout-method=signal --report-log=tests/.report/run.jsonl`, exit 4, nothing collected — the reason the runs below pass `-o addopts=` with the two gate plugins named explicitly |
+| `issue409-slice-collection-count.log` | `9b29712` | `tests/groups tests/objects tests/test_finite_cosets.py` collect **633** tests (302 / 327 / 4), the issue's denominator |
+| `issue409-slice-main-run.log` | `9b29712` | `tests/test_finite_cosets.py` under `--no-time-gates --no-test-lint`: **4 passed in 3.81 s**, slowest call 3.07 s |
+| `issue409-slice-earlier-commits.log` | `bbb6608`, `484e4c5`, `0ee5ad5` | the same four tests at each commit: **4 passed** in 7.51 s, 7.87 s, 7.91 s — no commit of that day carries a red here |
+| `issue409-slice-three-path-run-stopped.log` | `9b29712` | the three-path run, stopped by me after 11 min: four tests done, no failure, blocked in `test_the_enriques_orthogonal_groups_line_stabilizer_generates_a_subgroup` |
+| `issue409-slice-default-invocation-red.log` | `9b29712` | the red: gates and lint on, `tests/test_finite_cosets.py` alone — **no tests ran**, `Exit: test lint: 9 findings`, exit 1 |
+| `issue409-slice-after-fix-default.log` | `fba2e71` | the same invocation on the repaired tree: **4 passed in 9.11 s**, 0 findings |
+| `issue409-slice-after-fix-context.log` | `fba2e71` | the repaired file behind seven sibling files (four `tests/groups` coset tests, `test_symmetric_group_s3.sage`, `test_orthogonal_group_of_a2.sage`): **36 passed, 9 failed**, all nine in the two sibling files, none here |
+| `issue409-slice-orbit-counts.py` / `.log` | `fba2e71` | the numbers the replaced `len()` calls carried: split four-dimensional form `|orbit| = 9`, `|G| = 72`, `|Stab| = 8`; anisotropic ternary plane `|orbit| = 4`, `|G| = 8`, `|Stab| = 2` |
+
+## Triage of the failing tests of `tests/objects` (#408)
+
+`triage/408-*.md` are the paste-ready issue bodies for the causes the #408 triage found
+in its slice (the 26 files of `tests/objects` up to
+`test_isomorphisms_of_a_two_element_set.sage`; the rest of the directory is #412). Each
+file is one cause: the first line is the issue title, the rest is the body, which names
+the failing tests with the error each reports, the defective call, the commit that
+introduced the cause and the scope. They are not logs. The run that produced them is
+recorded in `results/issue408-triage.md`, whose cause ids these bodies carry.
+
+## #410 — the definite-lattice slice triaged, two causes repaired
+
+The slice is the five files the issue names. At `c8a3cedb` they collect **37** tests
+(25 + 2 + 5 + 2 + 3), not the 76 the issue body quotes; the neighbouring `definite`-named files
+add 17 and the `indefinite`-named ones 23, so no reading of "the definite-lattice test files"
+gives 76 either. **11 of the 37 fail**, in eight causes; each cause's paste-ready issue body is
+under `triage/410-cause-*.md`. Two of the eight are repaired on `main` in this push (causes A and
+B) and the other six are filed for the orchestrator.
+
+Every command is `python -m pytest -p qc_sage_session -o addopts=` inside the adopted image with
+this project's checkout bound at `/repos/sage-extensions` and the port at `/work`, because this
+venv has no `pytest-timeout` and no `pytest-reportlog`, so the repository's own `addopts` cannot
+be used; `-p sage_extensions.testing.suite_budget --no-time-gates` where the count is the point.
+One pytest process per file and per probe, never the suite.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `410-baseline-11-ids-at-c8a3cedb.log` | `c8a3cedb` (current `main`) | the 11 red ids, `-v --tb=line`: **11 failed in 9.82 s**, one error line each |
+| `410-baseline-slice-driver-at-9b29712.log` | `9b29712` (the `main` the triage started on) | the five-file slice one process per file: **9 failed, 16 passed** in `test_definite`, **2 failed** in the metric archive, and the other three files green (2, 5, 3 passed) |
+| `410-repaired-slice-driver.log` | the tree of this push | the same five files after causes A and B: **2 passed** metric archive, 5 passed isometry witnesses, 3 passed root groups, and `test_definite` with 7 red left; its 593 s is contention with the other triage chats on this VM |
+| `410-repaired-slice-test_definite.log` | the tree of this push | the residual: the six filed causes plus `test_nikulin_even_unimodular_embedding_existence_controls_embedding_mor`, which passed at 319.62 s in the baseline run of the same command and here died with `sage_julia_bridge.errors.JuliaWorkerError: Julia bridge process exited unexpectedly` — the Julia bridge under two 5 GiB Julia processes on a 15 GiB VM, not a code failure |
+| `410-repair-a-and-b-targeted-at-c8a3cedb.log` | the tree of this push | the four cause-A ids, the cause-B id and the #150 division contract at `c8a3cedb`: **6 passed in 2.85 s** |
+| `410-flip-e4bd95d-parent.log`, `410-flip-e4bd95d.log` | cause A | `test_square_lattice_minimum_theta_and_packing_radius`: **passed** at `e4bd95d^`, **RecursionError** at `e4bd95d` |
+| `410-flip-bbb6608-parent.log`, `410-flip-bbb6608.log`, `410-flip-bbb6608-isotropic-id.log` | cause B | `test_norm_one_vectors_of_x2_minus_2y2_form_one_orbit`: **passed** at `bbb6608^`, **IndexError** at `bbb6608`; the isotropic-lines id went from its own `ArithmeticError` at `bbb6608^` to the same **IndexError** at `bbb6608` |
+| `410-flip-6a93efe-parent.log`, `410-flip-6a93efe.log` | cause H | `test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so`: **passed** at `6a93efe^`, **ArithmeticError** at `6a93efe` |
+| `410-masked-d26db5d-parent.log`, `410-masked-d26db5d.log` | cause D | the `condition_set` guard's commit `d26db5d7` and its parent: the id **fails at both** with `TypeError: CategoricalIsomorphism.__init__() missing 1 required positional argument: 'inverse_computation'`, so the guard has no observable pass-to-fail flip |
+| `410-sample-02d9657.log`, `410-sample-441519c.log` | causes C, E, F, G | the four "never implemented" causes show the same error at both commits: the `Emb` cardinality assertion, `is_cyclic`, the `cyclic_subgroup` refusal (masked at `02d9657` by `_form_module_morphism`) and the bare tuple |
+| `410-baseline-11-ids-at-5f5fc25.log` | `5f5fc25` (the `main` this push is rebased onto) | the same 11 ids, `-v --tb=line`: **11 failed in 11.17 s** — the #408 push that moved `main` under this triage changed no definite-lattice test |
+| `410-repair-a-and-b-targeted-on-the-push-tree.log` | `3cb0d5e` (the tree of this push, rebased) | the four cause-A ids, the cause-B id and test_rational_scalars_on_a_base_changed_lattice.sage on the rebased tree: **6 passed in 3.88 s** |
 | `issue402-cusp4-chamber-at-vertex.py` / `issue402-cusp4-chamber-at-vertex.log` | the tree of this push | the public `cusp_chamber(p_0)` at card `029J` row 4.3.8's cusp, `p_0` the vertex of square 2 of the card's polyhedron (nine printed walls through it): **complete, 11 walls**, the nine through `p_0` printed, two more of squares `-4` and `-2`; 245 filter questions, 116 admitted |
 | `issue402-cusp4-chamber-gram.py` / `issue402-cusp4-chamber-gram.log` | the tree of this push | the eleven walls of that chamber and card `029J`'s eleven printed walls, in `N`: **the two Gram matrices are equal entry by entry**, and both polyhedra have 26 rays of squares `0..12`. The returned chamber contains `p_0` on the side where the two closing walls pair `-2` with it, the card's on the side where they pair `+2` |
 
@@ -862,3 +981,44 @@ just test -o addopts= -p sage_extensions.testing.suite_budget \
 
 `issue407-repair1.log` and `issue407-repair2.log` were superseded by
 `issue407-repair6.log` and the two replacement commits and are not kept.
+## #406: the suite stopped before its first test (2026-11-14, `main` `9b297125`)
+
+The repository's own `addopts` in force (`suite_budget`, `test_lint`,
+`--timeout=60 --timeout-method=signal`, junit, report log), with
+`pytest-timeout` and `pytest-reportlog` supplied at `.scratch/wt406/.pydeps`
+because this venv carries `pytest` only.  Every run is
+`/sage/.venv/bin/python -m pytest -p qc_sage_session` inside the adopted image
+with the tree bound at `/repos/sage-extensions`, `PYTHONPATH` carrying
+`/ci/tool-artifacts/pytest_plugins`, the port's `src`, the tree's `src` and the
+`.pydeps` path.
+
+| log | tree | command shape | result |
+| --- | --- | --- | --- |
+| `issue406-suite-collection-stop.log` | `9b297125` | `--collect-only` | 3930 collected, **0 run**; `! _pytest.outcomes.Exit: collection took 232.90 s; the measured ceiling is 6 s !`; exit 1; peak RSS 3763 MiB |
+| `issue406-suite-lint-stop.log` | `9b297125` | `--collect-only -q --no-time-gates` | 3930 collected, **0 run**; `! _pytest.outcomes.Exit: test lint: 1514 findings (run just test-lint for all) !`; exit 1; collection 471.88 s |
+| `issue406-bisect-good-fca190e.log` | `fca190e` (`14b9cc16^`) | `--collect-only` | collection completed with no ceiling message: the good side of the bisect |
+| `issue406-red-tests-on-main.log` | `9b297125` | `tests/engineering/test_the_suite_plugins_report_what_they_measured.py -q` | **2 failed in 18.03 s**, exit 1 |
+| `issue406-green-tests-on-repair.log` | the #406 repair | same | **2 passed in 22.44 s**, exit 0; calls 11.63 s and 10.72 s, `setup` 0.00 s |
+| `issue406-repair-full-run.log` | the #406 repair | `-q -k plugins_report_what_they_measured` | the whole tree collected, the collection ceiling reported, the two selected tests ran |
+
+The bad side of the bisect is measured at the tip in the first row only:
+collecting `14b9cc16`'s 1437-file tree held 6.4 GiB after nine minutes and the
+run was stopped to keep the shared VM's memory.  That measurement is unrun, not
+passing; `14b9cc16` is the commit that introduced the three `pytest.exit` calls
+(`git blame`), and it has no earlier history for
+`src/sage_extensions/testing/suite_budget.py`.
+
+Follow-up in the same session, after the two repairs:
+
+| log | tree | command shape | result |
+| --- | --- | --- | --- |
+| `issue406-run-before-issue398-repair.log` | `9b297125` plus this slice's plugin repair, before #398's repair (which #410 landed as `e9b6c2c`) | `-q -k plugins_report_what_they_measured` | the gate is reported (`collection took 625.38 s; the measured ceiling is 6 s`) and the run then ends at `Interrupted: 1 error during collection` — #398's RecursionError, 0 tests run |
+| `issue406-final-full-run.log` | `main` with this slice's repairs, #410's included | same | the gate is reported (`collection took 224.19 s; the measured ceiling is 6 s`), the two selected tests **run and pass**: `2 passed, 3939 deselected in 241.97 s`, exit 1 on the gate report, peak RSS 3945 MiB |
+| `issue398-red-rational-exact-reals.log` | `9b297125` | `tests/rings/test_rational_exact_reals.sage` | **1 failed in 5.32 s** (`RecursionError`) |
+| `issue398-green-three-files.log` | `main` with this slice's one-formula division and its test | `tests/rings/test_exact_real_division.sage`, `test_rational_exact_reals.sage`, `tests/functions/test_young_convolution.sage` and `tests/lattices/test_rational_scalars_on_a_base_changed_lattice.sage` (#150's contract) | **3 failed, 8 passed in 6.24 s**: both #150's contract and the new file pass, the rational exact reals pass, and the convolution file collects and runs, reporting three defects of its own |
+| `issue398-regression-base.log` | `9b297125` | 8 files over rings, lattices and modules | **8 failed, 22 passed in 5.57 s** |
+| `issue398-regression-fixed.log` | this slice's one-formula division | same | **7 failed, 23 passed in 4.51 s**; the one difference is `test_a_product_of_distinct_square_roots_that_is_rational_converts_to_qq`, the other seven FAILED ids identical |
+| `issue398-division-before.log` | `9b297125` | division probe with the session imported | `RR(1)/RR(2)`, `RR(1)/(sqrt2-1)` and `~RR(2)` are `RecursionError`; `ZZ(1)/ZZ(2)` is `1/2` |
+| `issue398-division-after.log` | this slice's one-formula division | the division probe of the same shape as the before-row | `RR(1)/RR(2)` = `1/2`, `RR(1)/(sqrt2-1)` and `~x` = `1/(sqrt(2) - 1)`; `ZZ(1)/ZZ(2)` = `1/2`, `~ZZ(2)` and `e/2` still refuse |
+
+| `issue406-plugins-after-rewrite.log` | the plugin repairs, with the finding grouping rewritten as `itertools.groupby` | `tests/engineering/test_the_suite_plugins_report_what_they_measured.py -q` under the repository addopts | **2 passed in 13.30 s**, exit 0 |

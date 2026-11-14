@@ -1,14 +1,6 @@
 """Exact finite coset actions, sections and Schreier images."""
 
-import sage.all
-
-from sage_extensions.categories.group.groups import Groups
-from sage_extensions.categories.group.g_sets import FiniteGSets
-from sage_extensions.categories.lattices import Lattices
-from sage_extensions.categories.rings.ring_foundation import _owned_integers
-from sage_extensions.categories.sets.cardinals import cardinal
-
-ZZ = _owned_integers()
+from sage_extensions.all import *  # noqa: F401,F403
 
 
 def test_a_transposition_of_s3_has_three_left_and_three_right_cosets() -> None:
@@ -60,7 +52,9 @@ def test_split_four_dimensional_form_cosets_are_its_nonzero_singular_vectors() -
 
     assert stabilizer.cardinality() == 8
     assert cosets.cardinality() == 9
-    assert len({section(point)(vector) for point in cosets}) == 9
+    # One coset per singular vector: the section carries the cosets onto the
+    # orbit of the distinguished vector, so its images are distinct.
+    assert set(section(point)(vector) for point in cosets) == set(group.orbit_of_element(vector))
     for point in cosets:
         assert cosets.coset_of(section(point)) == point
         for generator in group.group_generators():
@@ -82,7 +76,8 @@ def test_anisotropic_ternary_plane_cosets_are_its_unit_vectors() -> None:
     assert group.cardinality() == 8
     assert stabilizer.cardinality() == 2
     assert cosets.cardinality() == 4
-    assert len({section(point)(vector) for point in cosets}) == 4
+    # One coset per unit vector: the section carries the cosets onto the orbit.
+    assert set(section(point)(vector) for point in cosets) == set(group.orbit_of_element(vector))
     for point in cosets:
         assert cosets.coset_of(section(point)) == point
         for generator in group.group_generators():

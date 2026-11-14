@@ -1,0 +1,37 @@
+Running 11 items in this shard
+........F..                                                              [100%]
+=================================== FAILURES ===================================
+__ test_the_fourth_cusps_layers_are_enumerated_in_the_coordinates_of_its_cell __
+tests/lattices/test_the_isotropic_reduction_image.sage:368: in test_the_fourth_cusps_layers_are_enumerated_in_the_coordinates_of_its_cell
+    assert chamber.is_complete_wall_set() is False
+E   assert True is False
+E    +  where True = is_complete_wall_set()
+E    +    where is_complete_wall_set = Rational polyhedral cone in Integral lattice of rank 10 and signature (1, 9) cut out by 11 half-spaces.is_complete_wall_set
+=============================== warnings summary ===============================
+tests/lattices/test_the_isotropic_reduction_image.sage: 396 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/lattices/test_the_isotropic_reduction_image.sage: 396 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+___________ test_each_cusp_reduces_to_a_hyperbolic_rank_ten_lattice ____________
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_each_cusp_reduces_to_a_hyperbolic_rank_ten_lattice
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_two_lifts_of_a_wall_reflection_differ_by_the_kernel_and_get_one_answer
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_sterks_published_cusp_roots_are_reflections_of_the_stabilizer_image
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_the_membership_questions_at_the_first_cusp_are_one_sift_per_root
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_the_lift_criterion_agrees_with_the_levi_route_at_the_first_cusp
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_the_five_cusps_are_the_chamber_rows_of_card_029j
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_every_cusp_chamber_has_the_wall_count_of_its_card_row
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_the_first_cusp_writes_down_no_candidate_outside_its_layer
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_each_of_the_fourth_cusps_first_layers_agrees_with_the_whole_lattice_in_the_cell
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_every_wall_of_the_fourth_cusp_chamber_is_a_reflection_of_the_stabilizer_image
+FAILED tests/lattices/test_the_isotropic_reduction_image.sage::test_the_fourth_cusps_layers_are_enumerated_in_the_coordinates_of_its_cell
+1 failed, 10 passed, 792 warnings in 5143.46s (1:25:43)

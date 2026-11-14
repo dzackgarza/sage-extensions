@@ -1,0 +1,28 @@
+provider SHA: 9b297125b3726d6e6b5f548f2ad3ef01c7933029
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint -q -rf --tb=line tests/test_finite_cosets.py
+
+no tests ran in 2.26s
+! _pytest.outcomes.Exit: test lint: 9 findings (run just test-lint for all)
+tests/test_finite_cosets.py:3: TL01 import sage.all: take every name from the session
+tests/test_finite_cosets.py:5: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/test_finite_cosets.py:6: TL01 from sage_extensions.categories.group.g_sets import ...: take every name from the session
+tests/test_finite_cosets.py:7: TL01 from sage_extensions.categories.lattices import ...: take every name from the session
+tests/test_finite_cosets.py:8: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/test_finite_cosets.py:8: TL02 imports the private name _owned_integers
+tests/test_finite_cosets.py:9: TL01 from sage_extensions.categories.sets.cardinals import ...: take every name from the session
+tests/test_finite_cosets.py:63: TL10 len(): ask for a cardinality
+tests/test_finite_cosets.py:85: TL10 len(): ask for a cardinality !
+[peakrss] run409-1142940: child waited=1 shell_code=1 samples=8
+[peakrss] peak tree RSS      : 210 MiB
+[peakrss] low-water MemAvail : 1279 MiB
+[peakrss] peak single VmHWM  : 226 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      216 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.1s procs=  3 rss=   210 MiB hwm=   226 MiB avail=  2190 MiB
+[peakrss]   t=    14.1s procs=  3 rss=   209 MiB hwm=   226 MiB avail=  2693 MiB
+[peakrss]   t=    10.1s procs=  3 rss=   170 MiB hwm=   183 MiB avail=  2629 MiB
+[peakrss]   t=     8.1s procs=  3 rss=   154 MiB hwm=   160 MiB avail=  2620 MiB
+[peakrss]   t=     6.0s procs=  3 rss=    87 MiB hwm=    92 MiB avail=  2743 MiB

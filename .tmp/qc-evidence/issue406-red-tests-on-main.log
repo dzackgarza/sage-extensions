@@ -1,0 +1,83 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_a_collection_over_its_ceiling_still_runs_the_selected_tests _______
+
+    def test_a_collection_over_its_ceiling_still_runs_the_selected_tests():
+        tree = {
+            "test_the_first_probe.py": "def test_the_first_probe():\n    assert 1 + 1 == 2\n",
+            # Six seconds of module-level work: with the session import the
+            # collection is over the published six-second ceiling, which measures
+            # the whole selection's collection.
+            "test_the_slow_probe.py": (
+                "import time\n\ntime.sleep(6)\n\n\ndef test_the_slow_probe():\n    assert 2 + 2 == 4\n"
+            ),
+        }
+    
+        run = probe_run(tree, "-p", "sage_extensions.testing.suite_budget")
+    
+>       assert run.outcomes == {
+            "test_the_first_probe.py::test_the_first_probe": "passed",
+            "test_the_slow_probe.py::test_the_slow_probe": "passed",
+        }
+E       AssertionError: assert {} == {'test_the_fi...be': 'passed'}
+E         
+E         Right contains 2 more items:
+E         {'test_the_first_probe.py::test_the_first_probe': 'passed',
+E          'test_the_slow_probe.py::test_the_slow_probe': 'passed'}
+E         Use -v to get more diff
+
+tests/engineering/test_the_suite_plugins_report_what_they_measured.py:25: AssertionError
+________ test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it _________
+
+    def test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it():
+        tree = {
+            "test_a_probe_that_keeps_the_standard.py": (
+                "def test_a_probe_that_keeps_the_standard():\n    assert 1 + 1 == 2\n"
+            ),
+            "test_a_probe_that_ignores_the_standard.py": (
+                "def test_a_probe_that_ignores_the_standard():\n    assert True\n"
+            ),
+        }
+    
+        run = probe_run(tree, "-p", "sage_extensions.testing.test_lint")
+    
+>       assert run.outcomes == {
+            "test_a_probe_that_keeps_the_standard.py::test_a_probe_that_keeps_the_standard": "passed",
+            "test_a_probe_that_ignores_the_standard.py::test_a_probe_that_ignores_the_standard": "failed",
+        }
+E       AssertionError: assert {} == {'test_a_prob...rd': 'failed'}
+E         
+E         Right contains 2 more items:
+E         {'test_a_probe_that_ignores_the_standard.py::test_a_probe_that_ignores_the_standard': 'failed',
+E          'test_a_probe_that_keeps_the_standard.py::test_a_probe_that_keeps_the_standard': 'passed'}
+E         Use -v to get more diff
+
+tests/engineering/test_the_suite_plugins_report_what_they_measured.py:46: AssertionError
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+10.34s call     tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_collection_over_its_ceiling_still_runs_the_selected_tests
+7.25s call     tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it
+0.00s teardown tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it
+0.00s teardown tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_collection_over_its_ceiling_still_runs_the_selected_tests
+0.00s setup    tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_collection_over_its_ceiling_still_runs_the_selected_tests
+0.00s setup    tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it
+=========================== short test summary info ============================
+FAILED tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_collection_over_its_ceiling_still_runs_the_selected_tests
+FAILED tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it
+2 failed in 18.03s
+EXIT=1
+[peakrss] p406-red-addopts: child waited=0 shell_code=0 samples=12
+[peakrss] peak tree RSS      : 571 MiB
+[peakrss] low-water MemAvail : 7934 MiB
+[peakrss] peak single VmHWM  : 571 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      284 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=    20.0s procs=  5 rss=   571 MiB hwm=   571 MiB avail=  8295 MiB
+[peakrss]   t=    12.0s procs=  5 rss=   562 MiB hwm=   562 MiB avail=  7934 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   559 MiB hwm=   559 MiB avail=  8771 MiB
+[peakrss]   t=     8.0s procs=  5 rss=   559 MiB hwm=   559 MiB avail=  8351 MiB
+[peakrss]   t=    10.0s procs=  5 rss=   559 MiB hwm=   559 MiB avail=  8255 MiB
+launcher exit: 0
