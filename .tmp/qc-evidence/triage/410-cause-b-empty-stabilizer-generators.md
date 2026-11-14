@@ -1,5 +1,9 @@
 A finite G-set stabilizer over a trivially generated group raises IndexError
 
+Status: repaired on `main` at `852a901` (`libgap.Group(engine_generators,
+libgap.Identity(<engine image of group.one()>))`, which accepts an empty generating
+family).  This body is the record of the defect and its red test and is not to be filed.
+
 When this closes, asking for the stabilizer of a point of a `G`-set whose acting group has an
 empty generating family returns the trivial subgroup, so every stabilizer query that bottoms out
 at a trivial acting group answers instead of raising `IndexError: index out of range`. A user who

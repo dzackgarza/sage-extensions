@@ -85,30 +85,52 @@ cause" are not in bijection at a single commit:
 
 ## Repaired on main
 
-Two commits, each with the failing ids as its regression:
+* **A**, four ids, the division of an owned ring element. Repaired through `e9b6c2c`, replaced by
+  `4c09c87` (one formula, no branch) and by `4b958ef`, and finally placed at the ring: `b3c7ca3`
+  states `x / y = x y^{-1}` beside the `_div_` that owns it in the two owned fields, so a ring
+  element divides in its own ring while `Modules.ElementMethods.__truediv__` keeps `v / r =
+  r^{-1} v` for the modules whose elements are not ring elements. **The division repairs are
+  superseded by #500, which another chat takes; no further change to module or ring division was
+  made here.**
+* **B**, one id, the GAP stabilizer. Repaired at `852a901`: `libgap.Group(engine_generators,
+  libgap.Identity(<engine image of group.one()>))`, which accepts an empty generating family, so
+  the path is total and the guard of `6e85b07` is gone.
 
-* **A** — `src/sage_extensions/categories/modules/pure/modules.py`: an element whose parent *is* its
-  base ring divides by the ring's own `_div_`; the `scalar_multiple` route is kept for a genuine
-  scalar action. Four ids green.
-* **B** — `src/sage_extensions/categories/group/g_sets.py`: `_named_stabilizer` returns the trivial
-  subgroup when the acting group has an empty generating family. One id green.
-
-The gate on the repaired tree at `5f5fc25` — the four cause-A ids, the cause-B id and the #150
-division contract `tests/lattices/test_rational_scalars_on_a_base_changed_lattice.sage` — is
-**6 passed in 3.88 s**. The full five-file slice on the repaired tree leaves the six filed causes
-red, and one extra: `test_nikulin_even_unimodular_embedding_existence_controls_embedding_mor`,
-which passed at 319.62 s in the baseline run and in the repaired run died with
+The gate on the pushed tree — the four cause-A ids, the cause-B id and the #150 division contract
+`tests/lattices/test_rational_scalars_on_a_base_changed_lattice.sage` — is **6 passed in 2.21 s**,
+re-run after each rebase. On the way, one run of the five-file slice left
+`test_nikulin_even_unimodular_embedding_existence_controls_embedding_mor` red with
 `sage_julia_bridge.errors.JuliaWorkerError: Julia bridge process exited unexpectedly` while two
-other Julia processes held 5 GiB each of this 15 GiB VM. That is the Julia bridge under memory
-pressure, not a defect of the tree, and it is not assigned a cause.
+other Julia processes held 5 GiB each of this 15 GiB VM; it passed at 319.62 s in the baseline run
+of the same command, so it is the Julia bridge under memory pressure, not a defect of the tree, and
+no cause is assigned to it.
+
+## The slice on the main it lands on
+
+Re-run on `51310d6`, one pytest process per file: **6 failed, 31 passed**. The six are exactly causes
+C, D, E, F, G and H; `test_definite_metric_invariants_archive.sage` is 2 passed (cause A),
+`test_definite_genus_mass_archive.sage` 2, `test_definite_isometry_witnesses.sage` 5 and
+`test_full_definite_root_lattice_groups.sage` 3. `410-triage-index.md` under
+`.tmp/qc-evidence/triage/` names the owner of each of the eleven ids, which is what this issue's
+acceptance asks for.
 
 ## Filed, not repaired
 
-Six causes, each with its own paste-ready body under `.tmp/qc-evidence/triage/`:
-`410-cause-c-embedding-mor-cardinality.md`, `410-cause-d-predicate-subset-cardinality.md`,
-`410-cause-e-module-cyclicity.md`, `410-cause-f-infinite-order-isometry.md`,
-`410-cause-g-definite-complement-tuple.md`, `410-cause-h-index-two-character-image.md`. Two of them
-(C, E) need an owner that is broader than this slice — the `Emb` cardinality decision and the
-module cyclicity operation — and D's repair is in the `Sets` owner, so their bodies state that
-scope. This connection cannot create issues, so the bodies are committed for the orchestrator to
-file rather than filed.
+Six causes carry the six remaining red ids, and `410-triage-index.md` in the same directory gives
+the id-by-id owner:
+
+* `410-cause-d-predicate-subset-cardinality.md` — a predicate subset of a **finite group** has no
+  cardinality decision (`412-C07` owns the same construction for an infinite subset of `ZZ`);
+* `410-cause-e-module-cyclicity.md` — no module states `is_cyclic`;
+* `410-cause-f-infinite-order-isometry.md` — no element-order decision for a lattice isometry;
+* `410-cause-g-definite-complement-tuple.md` — `definite_complement_extensions` returns a bare tuple;
+* `410-cause-h-index-two-character-image.md` — the special orthogonal isotropic route refuses an
+  index-2 character image it cannot certify;
+* cause C's id is not a seventh issue: `Emb(L, M).cardinality()` is `412-C08-homset-cardinality.md`
+  (also `408-cardinality-refuses-for-the-embedding-set-emb-l-l.md`), and
+  `410-cause-c-embedding-mor-cardinality.md` is that one defect's definite-lattice witness.
+
+Three of those bodies state a scope broader than this slice — the `Sets` owner for D, the module
+catalogue for E, the element-order decision for F — because that is where the operation lives.
+Causes A and B keep their bodies as the record of the defect and the red tests, marked repaired and
+not to be filed.

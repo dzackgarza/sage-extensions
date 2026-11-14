@@ -1,5 +1,10 @@
 The embedding set Emb(L, M) has no cardinality decision
 
+Status: the same defect as `412-C08-homset-cardinality.md` (and
+`408-cardinality-refuses-for-the-embedding-set-emb-l-l.md`), which own it.  This body is the
+definite-lattice witness of that one defect — the failing test above — and is not a second
+issue to file.
+
 When this closes, `L.Emb(M).cardinality()` counts the lattice embeddings a user asks for, so
 `A1.Emb(A2).cardinality()` is 6 — one per primitive image of the generator, the six roots of A2
 — instead of an assertion that the construction supplies no value. The sibling `Isom(L, M)` set

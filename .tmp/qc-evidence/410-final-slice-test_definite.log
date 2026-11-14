@@ -1,0 +1,485 @@
+provider SHA: 51310d613cd8c27860c70ff2f3370fedc6a18f21
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=long tests/lattices/test_definite.sage
+........F...FF..F.F.....F                                                [100%]
+=================================== FAILURES ===================================
+______ test_definite_target_embedding_mor_enumerates_all_a1_into_a2_roots ______
+
+    def test_definite_target_embedding_mor_enumerates_all_a1_into_a2_roots() -> None:
+        source = Lattices(ZZ)("A1")
+        target = Lattices(ZZ)("A2")
+        mor = source.Emb(target)
+        embeddings = mor
+    
+>       assert mor.cardinality() == 6
+               ^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_definite.sage:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Emb(Integral lattice of rank 1 and signature (0, 1), Integral lattice of rank 2 and signature (0, 2))
+
+    def cardinality(self) -> Cardinalities.ObjectType:
+        r"""The cardinality ``|X|``, an object of ``Card``.
+    
+        Cardinality is total on sets (`CAT-01`), and this is its one
+        owner: no set construction restates it.  It is an isomorphism
+        invariant, so it is read off what the construction of ``X``
+        determines, by placement:
+    
+        - the finite ordinal ``n`` has the cardinality of its order
+          type ``n``;
+        - a set with a chosen enumeration from an index set is in
+          bijection with that index set;
+        - ``|P(X)| = 2^|X|``, since ``P(X)`` is in bijection with the
+          characteristic maps ``X -> 2``;
+        - ``|Y^X| = |Y|^|X|``, the definition of cardinal exponentiation;
+        - the ``k``-element subsets of ``X`` number ``binomial(|X|, k)``
+          for finite ``X``, one for ``k = 0``, and ``|X|`` for infinite
+          ``X`` and ``k >= 1``;
+        - the finite subsets of ``X`` number ``2^|X|`` for finite ``X``
+          and ``|X|`` for infinite ``X``;
+        - ``|prod_i X_i| = prod_i |X_i|`` and ``|coprod_i X_i| =
+          sum_i |X_i|``, the definitions of cardinal product and sum;
+        - any other finite set with a chosen enumeration is counted
+          through that enumeration, and any
+          other countably infinite set has cardinality ``aleph_0``.
+    
+        A realization whose construction determines a cardinality these
+        standard set cases do not reach supplies that theorem through the
+        protected ``_cardinality_decision`` hook.  The public operation
+        remains here.  A represented set outside all of these routes has a
+        cardinality that no exact computation here reaches, and the
+        assertion says so.
+        """
+        construction_cardinality = self._cardinality_decision()
+>       assert construction_cardinality is not None, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"cannot compute the cardinality of {self}: its construction supplies no exact value "
+            f"or decided finite enumeration (it is in {self.category()})"
+        )
+E       AssertionError: cannot compute the cardinality of Emb(Integral lattice of rank 1 and signature (0, 1), Integral lattice of rank 2 and signature (0, 2)): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of homsets of sets and Category of sets)
+
+src/sage_extensions/categories/sets/set_categories.py:2503: AssertionError
+_ test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6 __
+
+    def test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6() -> None:
+        r"""\(D(A_2)\cong\mathbf Z/3\), \(O(q_{A_2})=\{\pm1\}\), and \(-1\in O(A_2)\) maps onto \(-1\).
+    
+        \(SO(A_2)\) is the rotation group of the hexagon, of order 6.
+        """
+        lattice = Lattices(ZZ)("A2")
+        automorphisms = lattice.Aut()
+        discriminant = lattice.discriminant_group()
+        representation = lattice.discriminant_representation()
+    
+        for automorphism in automorphisms.group_generators():
+            induced = automorphism.discriminant_isometry()
+            for generator in discriminant.module_generators():
+                assert representation(automorphism)(generator) == induced(generator)
+    
+        image = lattice.discriminant_image()
+        assert image.cardinality() == discriminant.O().cardinality() == 2
+        assert lattice.discriminant_representation_is_surjective()
+    
+        stable = lattice.stable_orthogonal_group()
+        assert all(
+            representation(automorphism) == discriminant.O().one()
+            for automorphism in automorphisms
+            if automorphism in stable
+        )
+    
+        special = lattice.SO()
+        determinant_one = automorphisms.condition_set(lambda automorphism: automorphism.determinant() == 1)
+>       assert determinant_one.cardinality() == 6
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_definite.sage:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Subset of Orthogonal group O(Integral lattice of rank 2 and signature (0, 2)) cut out by <function test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6.<locals>.<lambda> at 0x7943b8676980>
+
+    def cardinality(self) -> Cardinalities.ObjectType:
+        r"""The cardinality ``|X|``, an object of ``Card``.
+    
+        Cardinality is total on sets (`CAT-01`), and this is its one
+        owner: no set construction restates it.  It is an isomorphism
+        invariant, so it is read off what the construction of ``X``
+        determines, by placement:
+    
+        - the finite ordinal ``n`` has the cardinality of its order
+          type ``n``;
+        - a set with a chosen enumeration from an index set is in
+          bijection with that index set;
+        - ``|P(X)| = 2^|X|``, since ``P(X)`` is in bijection with the
+          characteristic maps ``X -> 2``;
+        - ``|Y^X| = |Y|^|X|``, the definition of cardinal exponentiation;
+        - the ``k``-element subsets of ``X`` number ``binomial(|X|, k)``
+          for finite ``X``, one for ``k = 0``, and ``|X|`` for infinite
+          ``X`` and ``k >= 1``;
+        - the finite subsets of ``X`` number ``2^|X|`` for finite ``X``
+          and ``|X|`` for infinite ``X``;
+        - ``|prod_i X_i| = prod_i |X_i|`` and ``|coprod_i X_i| =
+          sum_i |X_i|``, the definitions of cardinal product and sum;
+        - any other finite set with a chosen enumeration is counted
+          through that enumeration, and any
+          other countably infinite set has cardinality ``aleph_0``.
+    
+        A realization whose construction determines a cardinality these
+        standard set cases do not reach supplies that theorem through the
+        protected ``_cardinality_decision`` hook.  The public operation
+        remains here.  A represented set outside all of these routes has a
+        cardinality that no exact computation here reaches, and the
+        assertion says so.
+        """
+        construction_cardinality = self._cardinality_decision()
+>       assert construction_cardinality is not None, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"cannot compute the cardinality of {self}: its construction supplies no exact value "
+            f"or decided finite enumeration (it is in {self.category()})"
+        )
+E       AssertionError: cannot compute the cardinality of Subset of Orthogonal group O(Integral lattice of rank 2 and signature (0, 2)) cut out by <function test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6.<locals>.<lambda> at 0x7943b8676980>: its construction supplies no exact value or decided finite enumeration (it is in Join of Category of finite sets and Category of facade sets and Category of finite countable sets)
+
+src/sage_extensions/categories/sets/set_categories.py:2503: AssertionError
+__________ test_discriminant_group_of_a1_plus_a2_is_cyclic_of_order_6 __________
+
+>   return self._cached_methods[name]
+E   KeyError: 'is_cyclic'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_discriminant_group_of_a1_plus_a2_is_cyclic_of_order_6() -> None:
+        r"""\(D(L\oplus M)=D(L)\oplus D(M)\), so \(D(A_1\oplus A_2)=\mathbf Z/2\oplus\mathbf Z/3\cong\mathbf Z/6\)."""
+        ambient = Lattices(ZZ)("A1") + Lattices(ZZ)("A2")
+        discriminant = ambient.discriminant_group()
+    
+        assert discriminant.cardinality() == 6
+>       assert discriminant.is_cyclic()
+               ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_definite.sage:218: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+
+sage/structure/category_object.pyx:852: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+
+sage/structure/category_object.pyx:867: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_PresentedModule].ObjectType' object has no attribute 'is_cyclic'
+
+sage/cpython/getattr.pyx:362: AttributeError
+________ test_a_hyperbolic_isometry_of_x2_minus_2y2_has_infinite_order _________
+
+    def test_a_hyperbolic_isometry_of_x2_minus_2y2_has_infinite_order() -> None:
+        r"""On \(\langle1\rangle\oplus\langle-2\rangle\), \(e\mapsto3e+2f\), \(f\mapsto4e+3f\) is an isometry
+        (\(9-8=1\), \(16-18=-2\), \(12-12=0\)) of trace 6 > 2, so it has infinite order:
+        it is multiplication by the unit \(3+2\sqrt2\) of \(\mathbf Z[\sqrt2]\).
+        """
+        lattice = Lattices(ZZ)([[1, 0], [0, -2]])
+        e, f = lattice.module_generators()
+        isometry = lattice.Aut()((3 * e + 2 * f, 4 * e + 3 * f))
+    
+        assert isometry.determinant() == 1
+>       assert isometry.cyclic_subgroup().cardinality() == aleph0
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_definite.sage:258: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1)> <= Orthogonal group O(Integral lattice of rank 2 and signature (1, 1))
+
+    def cardinality(self) -> Cardinalities.ObjectType:
+        r"""The cardinality ``|X|``, an object of ``Card``.
+    
+        Cardinality is total on sets (`CAT-01`), and this is its one
+        owner: no set construction restates it.  It is an isomorphism
+        invariant, so it is read off what the construction of ``X``
+        determines, by placement:
+    
+        - the finite ordinal ``n`` has the cardinality of its order
+          type ``n``;
+        - a set with a chosen enumeration from an index set is in
+          bijection with that index set;
+        - ``|P(X)| = 2^|X|``, since ``P(X)`` is in bijection with the
+          characteristic maps ``X -> 2``;
+        - ``|Y^X| = |Y|^|X|``, the definition of cardinal exponentiation;
+        - the ``k``-element subsets of ``X`` number ``binomial(|X|, k)``
+          for finite ``X``, one for ``k = 0``, and ``|X|`` for infinite
+          ``X`` and ``k >= 1``;
+        - the finite subsets of ``X`` number ``2^|X|`` for finite ``X``
+          and ``|X|`` for infinite ``X``;
+        - ``|prod_i X_i| = prod_i |X_i|`` and ``|coprod_i X_i| =
+          sum_i |X_i|``, the definitions of cardinal product and sum;
+        - any other finite set with a chosen enumeration is counted
+          through that enumeration, and any
+          other countably infinite set has cardinality ``aleph_0``.
+    
+        A realization whose construction determines a cardinality these
+        standard set cases do not reach supplies that theorem through the
+        protected ``_cardinality_decision`` hook.  The public operation
+        remains here.  A represented set outside all of these routes has a
+        cardinality that no exact computation here reaches, and the
+        assertion says so.
+        """
+>       construction_cardinality = self._cardinality_decision()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src/sage_extensions/categories/sets/set_categories.py:2502: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1)> <= Orthogonal group O(Integral lattice of rank 2 and signature (1, 1))
+
+    def _cardinality_decision(self):
+        r"""``|<g>|`` is the order of ``g``: finite, or ``aleph_0`` when ``<g> = ZZ``."""
+        if (self.group_generator() == self.one()) is True:
+            return cardinal(1)
+        generator_order = self.group_generator()._cyclic_subgroup_cardinality_decision()
+        if generator_order is not None:
+            return generator_order
+        if self.supergroup() in FiniteGroups():
+            engine_subgroup = self._cyclic_engine_subgroup()
+            if engine_subgroup is not None:
+                return cardinal(engine_subgroup.order())
+            return cardinal(len(self._finite_elements()))
+>       assert False, (
+               ^^^^^
+            f"the cardinality of {self} is the order of {self.group_generator()}, but no "
+            "order algorithm or finite ambient enumeration is supplied"
+        )
+E       AssertionError: the cardinality of <Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1)> <= Orthogonal group O(Integral lattice of rank 2 and signature (1, 1)) is the order of Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1), but no order algorithm or finite ambient enumeration is supplied
+
+src/sage_extensions/categories/group/cyclic_subgroups.py:122: AssertionError
+______ test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so _______
+
+    def test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so() -> None:
+        r"""\(O(U)=\{\pm1,\pm\sigma\}\) with \(\sigma\) the swap \(e\leftrightarrow f\) (\(\det\sigma=-1\)), so
+        \(SO(U)=\{\pm1\}\).  The primitive isotropic lines are \(\mathbf Ze\) and \(\mathbf Zf\):
+        exchanged by \(\sigma\), each fixed by \(\pm1\).
+        """
+        lattice = Lattices(ZZ)("U")
+    
+        assert lattice.O().order() == 4
+        assert lattice.SO().order() == 2
+        assert lattice.O().isotropic_orbit_representatives(1).cardinality() == 1
+>       special_representatives = lattice.SO().isotropic_orbit_representatives(1)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_definite.sage:287: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = {g in Orthogonal group O(Integral lattice of rank 2 and signature (1, 1)) : det(g)=1}
+rank = 1, flag = False
+
+    def isotropic_orbit_representatives(self, rank, *, flag=False):
+        r"""Return subgroup null orbits; ``flag=True`` accepts a ``FlagType`` or complete-flag rank."""
+>       return _subgroup_isotropic_orbit_representatives(
+            self, rank, flag=flag
+        )
+
+src/sage_extensions/categories/group/predicate_subgroups.py:517: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+subgroup = {g in Orthogonal group O(Integral lattice of rank 2 and signature (1, 1)) : det(g)=1}
+rank = 1, flag = False
+
+    def _subgroup_isotropic_orbit_representatives(subgroup, rank, *, flag=False):
+        if not flag and index(rank) == 0:
+            return subgroup.supergroup().isotropic_orbit_representatives(0)
+        _assert_isotropic_splitting_has_character_data(subgroup)
+        quotient = subgroup.finite_character_quotient()
+        orthogonal_group = subgroup.supergroup()
+        representatives = []
+        # The ambient classes always come from the port's classification: the
+        # in-repo discriminant-class route exhibits its representatives by an
+        # integral-point enumeration that does not return on the Enriques lattice
+        # (its Normaliz walk is measured at over twenty minutes before failing),
+        # while the port's line route answers the same classes in tens of seconds.
+        sourced = orthogonal_group.isotropic_orbit_representatives(rank, flag=flag)
+        for representative in sourced:
+            line_image = (
+                quotient.isotropic_line_stabilizer_image(representative)
+                if not flag and rank == 1
+                else None
+            )
+            if line_image == "NOSPLIT":
+                # The sign witness (or trivial quotient) proves G_0 = G Stab(x) for its index.
+                representatives.append(representative)
+                continue
+            if line_image is not None:
+                representatives.extend(
+                    splitting.transport_isotropic_object(representative)
+                    for splitting in quotient.splitting_isometries_from_line_class(*line_image)
+                )
+                continue
+            if not flag and index(rank) == 1:
+                from_divided_classes = _line_orbit_from_divided_classes(subgroup, representative)
+                if from_divided_classes is not None:
+                    representatives.extend(from_divided_classes)
+                    continue
+            if not flag and rank == 2:
+                from_planes = _plane_orbit_from_odd_stabilizer(subgroup, representative)
+                if from_planes is not None:
+                    representatives.extend(from_planes)
+                    continue
+            if not flag and rank == 2:
+                from_parabolic = _plane_orbit_from_parabolic_stabilizer(subgroup, representative)
+                if from_parabolic is not None:
+                    representatives.extend(from_parabolic)
+                    continue
+>           stabilizer = quotient.exact_isotropic_stabilizer_generators(
+                representative, flag=flag
+            )
+
+src/sage_extensions/categories/orthogonal_quotients.py:3671: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sage_extensions.categories.orthogonal_quotients.OrthogonalCharacterQuotient object at 0x7943b68bb0e0>
+representative = Integral lattice of rank 1 and signature (0, 0), flag = False
+
+    def exact_isotropic_stabilizer_generators(self, representative, *, flag=False):
+        r"""Return elements of ``H = Stab_{O(L)}(representative)`` whose image ``chi(H)`` is exact.
+    
+        The double-coset split of :meth:`splitting_isometries` is
+        ``chi(Gamma) \ Q / chi(H)`` with ``Q = chi(O(L))``, so it needs the finite
+        image ``chi(H)`` exactly; generators of a proper subgroup of ``H`` with a
+        smaller image split one ``Gamma``-orbit into several.  The ambient
+        family ``isotropic_stabilizer_generators`` need not generate ``H``: the
+        plane-parabolic family is complete only when the lattice splits along the
+        plane (``is_parabolic_complete``), which fails on ``U(2) + U(2) + A_2``.
+    
+        **Upper bound.**  Every term ``W`` of the representative (the subobject
+        itself, or each term of a flag) has the divided class set
+        ``D(W) = {[u/div(u)] : u primitive in W}`` in ``A_L``
+        (:func:`_isotropic_divided_class_set`).  An element of ``H`` carries each
+        term onto itself and primitive vectors to primitive vectors of the same
+        divisibility, so ``rho(h)`` preserves every ``D(W)``.  Hence
+        ``chi(H) <= U = {q in Q : pi_disc(q) D(W) = D(W) for every term W}``,
+        and ``|U| = |Q| / |orbit of the data|`` by orbit--stabilizer.
+    
+        **Lower bound and closure.**  ``chi`` of the ambient family generates
+        ``V <= chi(H)``.  While ``V != U``, each right-coset representative ``r``
+        of ``V`` in ``U`` is lifted to ``g`` in ``O(L)`` by the word section
+        (checked against the character map); ``g`` carries the representative to
+        an object with the same divided data, and the ambient equivalence
+        witness ``k`` with ``k(g x) = x`` gives ``k g`` in ``H``.  Its image is
+        added to ``V``.  The loop ends when ``|V| = |U|``, which proves
+        ``chi(H) = U`` with every generator an exhibited element of ``H``.  A
+        pass that adds nothing certifies nothing, and raises: the divided data
+        need not be a complete invariant, and no smaller image is guessed.
+        """
+        ambient = self.supergroup
+        generators = list(ambient.isotropic_stabilizer_generators(representative, flag=flag))
+        _section_generators, _images, section = self._image_section()
+        image = self._gap_image()
+        factors, product, _embeddings, projections = self._gap_product()
+        if self._has_discriminant:
+            position = next(
+                index for index, (label, _group) in enumerate(factors) if label == "discriminant"
+            )
+            projection = libgap.RestrictedMapping(projections[position], image)
+            discriminant_image = libgap.Image(projection)
+            terms = tuple(representative.terms()) if flag else (representative,)
+            finite_orthogonal = self._discriminant_group
+            data = libgap(
+                [
+                    libgap.Set(
+                        [
+                            finite_orthogonal._engine_abelian_element(divided_class)
+                            for divided_class in _isotropic_divided_class_set(self.lattice, term)
+                        ]
+                    )
+                    for term in terms
+                ]
+            )
+            termwise_action = libgap.function_factory(
+                "function(x, g) return List(x, part -> Set(List(part, y -> ImageElm(g, y)))); end"
+            )
+            upper = libgap.PreImages(
+                projection, libgap.Stabilizer(discriminant_image, data, termwise_action)
+            )
+        else:
+            upper = image
+        lower = libgap.Subgroup(
+            product, [self._gap_of_key(self.image(generator)) for generator in generators]
+        )
+        if not bool(libgap.IsSubset(upper, lower)):
+            raise ArithmeticError(
+                f"an ambient stabilizer generator of {representative} moves its divided "
+                f"discriminant data: it does not stabilize {representative}"
+            )
+        target = int(libgap.Size(upper))
+        while int(libgap.Size(lower)) < target:
+            before = int(libgap.Size(lower))
+            for coset in libgap.AsList(libgap.RightTransversal(upper, lower)):
+                lift = self._checked_lift(self._key_of_gap(coset), section.letters_of(coset))
+                moved = lift.transport_isotropic_object(representative)
+                witness = ambient.isotropic_equivalence_witness(moved, representative, flag=flag)
+                if witness is None:
+                    raise ArithmeticError(
+                        f"{lift} is an element of {ambient}, yet {ambient} does not carry "
+                        f"{moved} back to {representative}"
+                    )
+                element = witness * lift
+                key = self._gap_of_key(self.image(element))
+                closed = libgap.ClosureGroup(lower, key)
+                if int(libgap.Size(closed)) > int(libgap.Size(lower)):
+                    generators.append(element)
+                    lower = closed
+            if int(libgap.Size(lower)) == before:
+>               raise ArithmeticError(
+                    f"the stabilizer of {representative} in {ambient} has character image of "
+                    f"order at least {before}, and the stabilizer of its divided discriminant "
+                    f"data has order {target}; no exhibited stabilizer element closes the index "
+                    f"{target // before}, so the exact image chi(Stab) is not certified"
+                )
+E               ArithmeticError: the stabilizer of Integral lattice of rank 1 and signature (0, 0) in Orthogonal group O(Integral lattice of rank 2 and signature (1, 1)) has character image of order at least 1, and the stabilizer of its divided discriminant data has order 2; no exhibited stabilizer element closes the index 2, so the exact image chi(Stab) is not certified
+
+src/sage_extensions/categories/orthogonal_quotients.py:1626: ArithmeticError
+_______ test_definite_complement_extensions_exhaust_the_u_vector_cosets ________
+
+    def test_definite_complement_extensions_exhaust_the_u_vector_cosets() -> None:
+        lattice = Lattices(ZZ)("U")
+        e, f = lattice.module_generators()
+        vector = e + f
+    
+        stabilizer = lattice.definite_complement_extensions(vector, vector)
+        opposite_coset = lattice.definite_complement_extensions(vector, -vector)
+    
+>       assert stabilizer.cardinality() == 2
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'tuple' object has no attribute 'cardinality'
+
+tests/lattices/test_definite.sage:403: AttributeError
+========================== test-call performance gate ==========================
+tests/lattices/test_definite.sage::test_nikulin_even_unimodular_embedding_existence_controls_embedding_mor: 293.29 s > 20 s
+=========================== short test summary info ============================
+FAILED tests/lattices/test_definite.sage::test_definite_target_embedding_mor_enumerates_all_a1_into_a2_roots
+FAILED tests/lattices/test_definite.sage::test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6
+FAILED tests/lattices/test_definite.sage::test_discriminant_group_of_a1_plus_a2_is_cyclic_of_order_6
+FAILED tests/lattices/test_definite.sage::test_a_hyperbolic_isometry_of_x2_minus_2y2_has_infinite_order
+FAILED tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so
+FAILED tests/lattices/test_definite.sage::test_definite_complement_extensions_exhaust_the_u_vector_cosets
+6 failed, 19 passed in 302.22s (0:05:02)
+[peakrss] wt410: child waited=1 shell_code=1 samples=155
+[peakrss] peak tree RSS      : 6075 MiB
+[peakrss] low-water MemAvail : 959 MiB
+[peakrss] peak single VmHWM  : 6098 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      5566 MiB peak
+[peakrss]   python                      521 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   124.1s procs=  4 rss=  6075 MiB hwm=  6098 MiB avail=  2269 MiB
+[peakrss]   t=   120.1s procs=  4 rss=  6073 MiB hwm=  6087 MiB avail=  2379 MiB
+[peakrss]   t=   122.1s procs=  4 rss=  6073 MiB hwm=  6087 MiB avail=  2347 MiB
+[peakrss]   t=   112.1s procs=  4 rss=  6072 MiB hwm=  6087 MiB avail=  2367 MiB
+[peakrss]   t=   114.1s procs=  4 rss=  6072 MiB hwm=  6087 MiB avail=  2368 MiB
+launcher exit: 1

@@ -1191,3 +1191,14 @@ whose elements are not ring elements.
 | `410-ringdiv.log` | the tree of this push | the two resolution rows above and every statement in the table, including `RR(2) * ~RR(2) = 1`, `~RR(0)`, `CC(3)/2`, and `packing_radius() = 1/2` with `center_density() = 1/4` |
 | `410-ring-division-gate.log` | the tree of this push | the four cause-A ids, the cause-B id and #150's contract: **6 passed in 2.43 s** |
 | `410-ring-division-regression.log` | the tree of this push against clean `8755b95` | thirteen files, one pytest process per file per tree, FAILED ids not counts: an empty only-on-this-tree set and an empty fixed set row by row; `tests/rings` **77 failed, 251 passed on both**; `test_a_stabilizers_generators_generate_a_subgroup` reached its cap on both trees and is not claimed |
+
+### #410 — the slice closed out on the main it lands on
+
+The five files hold 37 tests; six were red at the base and are red on `51310d6`, each with a named
+owner in `triage/410-triage-index.md`. Causes A (division, four ids) and B (the GAP stabilizer, one
+id) are repaired on main; the division's further work is #500.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `410-final-slice-driver.log` | `51310d6` | the five files, one pytest process per file: `test_definite.sage` **6 failed, 19 passed in 302.22 s**, the metric archive **2 passed**, genus mass 2 passed, isometry witnesses 5 passed, root groups 3 passed |
+| `410-final-slice-test_definite.log` | `51310d6` | the six red ids, which are C, D, E, F, G and H and nothing else: the `Emb` cardinality, the predicate subset, `is_cyclic`, the infinite-order isometry, the bare tuple and the index-2 character image |
