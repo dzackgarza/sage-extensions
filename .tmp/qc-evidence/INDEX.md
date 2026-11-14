@@ -1091,3 +1091,32 @@ defect, each stating its failing tests with the error each reports.
 `triage/412-index.md` is the record #412 is accepted against: the cause table, the state of
 each repair, the acceptance count (75 failing tests, 75 assigned, none twice) and what the
 triage does not do.
+
+### #409, third review — every expected value in the file is counted from its construction
+
+`eb07c43` met the orbit-order finding but left the expected values themselves
+(72, 9, 8, and 8, 2, 4) typed, which `AGENTS.md:1405` does not allow: each is
+cited from a source or proved, independently of the implementation. Each is now
+counted in the test's own docstring from the two constructions the test builds.
+The split four-dimensional form: determinant $-4$ per copy gives four vectors a
+copy and $4 \cdot 4 = 16$ in all; $q = x_1x_2 + x_3x_4$ vanishes on
+$3 \cdot 3 + 1 \cdot 1 = 10$ vectors, leaving nine nonzero singular; the images
+of a hyperbolic basis number $9 \cdot 4 \cdot 2 \cdot 1 = 72$ (four because
+$v \mapsto v + u$ pairs the eight $v$ with $B(u,v) = 1$, exchanging $q = 0$ with
+$q = 1$; two because the orthogonal complement of a hyperbolic pair is
+hyperbolic, both Arf invariants being $0$; one because the fourth is then
+forced); and orbit-stabilizer gives $72/9 = 8$. The anisotropic ternary plane:
+determinant $9$ gives the nine vectors of $(Z/3)^2$; $q$ takes $1/3$ on the four
+vectors $\pm e_1, \pm e_2$ and $2/3$ on the other four, so an isometry carries
+those four among themselves ($4$ choices), and the image of $e_2$ must be
+orthogonal to that image, which $B(x,y) = (x_1y_1+x_2y_2)/3$ leaves to the
+other pair ($2$), so $|G| = 8$, the orbit is the four unit vectors, and the
+stabilizer is the sign change of the second coordinate, of order $2$, with
+$8/2 = 4$ cosets. Both tests also assert the form's own cardinality ($16$ and
+$9$), so the first clause of each count is a checked statement rather than
+prose. The ternary form is bilinear, which is why that proof uses $B$ directly
+and not $q(x+y) - q(x) - q(y)$, the doubled pairing there.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue409-slice-derived-values-gate.log` | `4a94605`'s tree with this commit's change to `tests/test_finite_cosets.py` | gates and lint on: **4 passed in 8.81 s**, slowest call 7.22 s under the 20 s ceiling, exit 0 |
