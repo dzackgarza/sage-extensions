@@ -7559,7 +7559,32 @@ class SymmetricGroups(OwnedCategory):
             ranking = finite_ordered_set(self.natural_points()).ranking_map()
             return ranking, ranking.inverse()
 
+        @cached_method
+        def _natural_point_table(self):
+            r"""The selected points in their ranking order, and the position of each.
+
+            ``None`` when the points are not hashable; the ranking map is then
+            the lookup.
+            """
+            ranking, point_at_position = self._natural_point_ranking_and_inverse()
+            size = int(self.natural_points().cardinality().finite_value())
+            table = tuple(point_at_position(position) for position in range(size))
+            try:
+                return table, {point: position for position, point in enumerate(table)}
+            except TypeError:
+                return None
+
         def _permutation_point_action(self, backend_element, point):
+            r"""Apply the permutation to a selected point: two array lookups around the engine image."""
+            table = self._natural_point_table()
+            if table is not None:
+                points, positions = table
+                position = positions.get(point)
+                if position is None:
+                    raise ValueError(
+                        f"{point} is outside the selected permutation domain {self.natural_points()}"
+                    )
+                return points[int(backend_element(position + 1)) - 1]
             points = self.natural_points()
             if point not in points:
                 raise ValueError(

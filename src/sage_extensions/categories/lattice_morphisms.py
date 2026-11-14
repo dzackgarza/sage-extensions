@@ -3284,6 +3284,75 @@ def _orthogonal_group_is_finite_by_theorem(lattice) -> bool:
     return lattice.is_definite()
 
 
+
+@cached_function
+def _definite_isometry_matrix(domain_gram, codomain_gram, sign):
+    r"""The column-action isometry ``W`` with ``W~ codomain W == domain``, or ``False``.
+
+    The search depends only on the two immutable Gram matrices, so it is run
+    once per pair for every lattice object carrying them.
+    """
+    from sage.quadratic_forms.quadratic_form import QuadraticForm
+
+    # The isometry search runs on LLL-reduced grams: PARI's qfisom
+    # enumerates the vectors of norm up to the maximal diagonal
+    # entry of the form it is given (The PARI Group, *PARI/GP*,
+    # qfisominit), so a search on reduced grams keeps that
+    # enumeration small; the reduction of each gram is PARI's
+    # qflllgram (The PARI Group, *PARI/GP*, qflllgram: the
+    # unimodular transformation matrix T with x*T an LLL-reduced
+    # basis for the gram
+    # G = x~*x).  When the two reduced grams coincide no search is
+    # needed at all: the equation
+    # Ts~ source Ts == Tt~ target Tt solves for the column action
+    # W = Tt Ts^-1, which satisfies W~ target W == source.  When
+    # they differ, the search runs on the reduced grams as well:
+    # the equation
+    # U~ Tt~ target Tt U == Ts~ source Ts solves for the column
+    # action U on the reduced pair, and the conjugation
+    # W = Tt U Ts^-1 carries it back, still satisfying
+    # W~ target W == source.
+    from sage.libs.pari import pari
+
+    source_pari = pari(2 * sign * domain_gram)
+    target_pari = pari(2 * sign * codomain_gram)
+    source_transformation = source_pari.qflllgram()
+    target_transformation = target_pari.qflllgram()
+    reduced_source = (source_transformation.mattranspose() * source_pari * source_transformation).sage()
+    reduced_target = (target_transformation.mattranspose() * target_pari * target_transformation).sage()
+    if reduced_source == reduced_target:
+        transformation = target_transformation.sage() * source_transformation.sage().inverse()
+    else:
+        reduced_source_form = QuadraticForm(SageZZ, reduced_source)
+        reduced_target_form = QuadraticForm(SageZZ, reduced_target)
+        transformation = reduced_target_form.is_globally_equivalent_to(reduced_source_form, return_matrix=True)
+        if transformation is not False:
+            transformation = target_transformation.sage() * transformation * source_transformation.sage().inverse()
+    if transformation is False:
+        return False
+    if abs(transformation.det()) != 1 or transformation.transpose() * codomain_gram * transformation != domain_gram:
+        raise ArithmeticError("the definite-isometry witness fails the integral form equation")
+    transformation.set_immutable()
+    return transformation
+
+
+@cached_function
+def _definite_automorphisms(gram):
+    r"""``|O(L)|`` and row-action generators for the positive definite integral Gram ``gram``.
+
+    One PARI ``qfauto`` call (PARI 2.17 manual, ``qfauto``) returns the order
+    and generators acting on columns; they are transposed to row actions.
+    The group depends only on the Gram matrix, so it is computed once per
+    Gram for every lattice object carrying it.
+    """
+    from sage.libs.pari import pari
+
+    order_and_generators = pari(gram).qfauto()
+    return SageZZ(order_and_generators[0]), tuple(
+        engine_matrix(SageZZ, generator.sage()).transpose()
+        for generator in order_and_generators[1]
+    )
+
 class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
     r"""``Isom(L, M)``: the core Mor of ``Lattices(R)``, its isomorphisms being the isometries.
 
@@ -4326,7 +4395,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             return MatrixGroup(tuple(engine_matrix(ring, [[solution]]) for solution in solutions if solution != ring.one()))
         self._assert_definite_over_integers("compute")
         from sage.modules.free_quadratic_module_integer_symmetric import IntegralLattice
-        from sage.quadratic_forms.quadratic_form import QuadraticForm
 
         gram = _engine_component_matrix(lattice.gram_tensor()).change_ring(SageZZ)
         signature = lattice.signature_pair()
@@ -4336,12 +4404,10 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         # computation and transposes its column-action generators. Retain
         # PARI's full order as well as the generators in the private engine.
         # https://doc.sagemath.org/html/en/reference/modules/sage/modules/free_quadratic_module_integer_symmetric.html
-        quadratic = QuadraticForm(SageZZ, 2 * gram)
-        order = SageZZ(quadratic.number_of_automorphisms())
-        generators = tuple(
-            generator.matrix().transpose().change_ring(SageZZ)
-            for generator in quadratic.automorphism_group().gens()
-        )
+        # One PARI qfauto call returns |O(L)| and generators acting on
+        # columns (PARI 2.17 manual, qfauto); transpose them to row actions.
+        gram.set_immutable()
+        order, generators = _definite_automorphisms(gram)
         engine = IntegralLattice(gram).orthogonal_group(gens=list(generators), is_finite=True)
         engine.gap().SetSize(order)
         return engine
@@ -5224,8 +5290,6 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
             return (True, None)
         if domain.discriminant() != codomain.discriminant():
             return (True, None)
-        if domain.discriminant_module().invariant_factors() != codomain.discriminant_module().invariant_factors():
-            return (True, None)
 
         if domain.genus() != codomain.genus():
             return (True, None)
@@ -5275,48 +5339,9 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         positive, negative = signature.first(), signature.second()
         if positive == 0 or negative == 0:
             if self.domain().base_ring() is _owned_integers() and self.codomain().base_ring() is _owned_integers():
-                from sage.quadratic_forms.quadratic_form import QuadraticForm
-
-                sign = -1 if positive == 0 else 1
-                # The isometry search runs on LLL-reduced grams: PARI's qfisom
-                # enumerates the vectors of norm up to the maximal diagonal
-                # entry of the form it is given (The PARI Group, *PARI/GP*,
-                # qfisominit), so a search on reduced grams keeps that
-                # enumeration small; the reduction of each gram is PARI's
-                # qflllgram (The PARI Group, *PARI/GP*, qflllgram: the
-                # unimodular transformation matrix T with x*T an LLL-reduced
-                # basis for the gram
-                # G = x~*x).  When the two reduced grams coincide no search is
-                # needed at all: the equation
-                # Ts~ source Ts == Tt~ target Tt solves for the column action
-                # W = Tt Ts^-1, which satisfies W~ target W == source.  When
-                # they differ, the search runs on the reduced grams as well:
-                # the equation
-                # U~ Tt~ target Tt U == Ts~ source Ts solves for the column
-                # action U on the reduced pair, and the conjugation
-                # W = Tt U Ts^-1 carries it back, still satisfying
-                # W~ target W == source.
-                from sage.libs.pari import pari
-
-                source_pari = pari(2 * sign * domain_gram)
-                target_pari = pari(2 * sign * codomain_gram)
-                source_transformation = source_pari.qflllgram()
-                target_transformation = target_pari.qflllgram()
-                reduced_source = (source_transformation.mattranspose() * source_pari * source_transformation).sage()
-                reduced_target = (target_transformation.mattranspose() * target_pari * target_transformation).sage()
-                if reduced_source == reduced_target:
-                    transformation = target_transformation.sage() * source_transformation.sage().inverse()
-                else:
-                    reduced_source_form = QuadraticForm(SageZZ, reduced_source)
-                    reduced_target_form = QuadraticForm(SageZZ, reduced_target)
-                    transformation = reduced_target_form.is_globally_equivalent_to(reduced_source_form, return_matrix=True)
-                    if transformation is not False:
-                        transformation = target_transformation.sage() * transformation * source_transformation.sage().inverse()
-                if transformation is False:
-                    return False
-                if abs(transformation.det()) != 1 or transformation.transpose() * codomain_gram * transformation != domain_gram:
-                    raise ArithmeticError("the definite-isometry witness fails the integral form equation")
-                return transformation
+                domain_gram.set_immutable()
+                codomain_gram.set_immutable()
+                return _definite_isometry_matrix(domain_gram, codomain_gram, -1 if positive == 0 else 1)
             from sage_extensions.categories.lattice_engines import _oscar_lattices
 
             return _oscar_lattices.definite_isometry(
