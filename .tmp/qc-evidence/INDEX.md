@@ -990,3 +990,5 @@ Follow-up in the same session, after the two repairs:
 | `issue406-plugins-after-rewrite.log` | the plugin repairs, with the finding grouping rewritten as `itertools.groupby` | `tests/engineering/test_the_suite_plugins_report_what_they_measured.py -q` under the repository addopts | **2 passed in 13.30 s**, exit 0 |
 
 | `issue406-plugins-after-review.log` | the plugin repairs with the four review notes applied (ini ceilings, session-scoped conftest binding, unconditional cleanup, docstring stating what the module does) | `tests/engineering/test_the_suite_plugins_report_what_they_measured.py -q` under the repository addopts | **2 passed in 16.39 s**, exit 0; calls 8.60 s and 7.71 s, `setup` 0.00 s |
+
+| `issue406-plugins-on-the-pushed-tree.log` | the pushed tree (`b6b63d0`), whose parent is the #408 evidence commit it was rebased onto | `tests/engineering/test_the_suite_plugins_report_what_they_measured.py tests/rings/test_exact_real_division.sage -q` under the repository addopts | **4 passed in 19.56 s**, exit 0 |
