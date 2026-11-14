@@ -5,7 +5,7 @@ carrying `v` to `w`, so a user can ask it for its cardinality: the stabilizer of
 has two members, and the opposite coset two. Today the call returns a Python tuple, which has no
 `cardinality`, so the count its own docstring describes is not reachable.
 
-## Failing tests (red at `c8a3cedb`, the current `main`)
+## Failing tests (red at `5f5fc25`, the current `main`)
 
 ```
 tests/lattices/test_definite.sage::test_definite_complement_extensions_exhaust_the_u_vector_cosets

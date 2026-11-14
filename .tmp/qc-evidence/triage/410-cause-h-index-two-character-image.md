@@ -7,7 +7,7 @@ stabilizer's character has order at least 1 while the stabilizer of its divided 
 has order 2, and no exhibited stabilizer element closes the index, so the route cannot certify the
 image it computes. A user gets an `ArithmeticError` naming the index instead of the orbits.
 
-## Failing tests (red at `c8a3cedb`, the current `main`)
+## Failing tests (red at `5f5fc25`, the current `main`)
 
 ```
 tests/lattices/test_definite.sage::test_isotropic_lines_of_u_form_one_orbit_under_o_and_two_under_so

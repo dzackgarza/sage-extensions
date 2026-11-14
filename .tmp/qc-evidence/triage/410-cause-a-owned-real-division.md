@@ -7,7 +7,7 @@ reals, and `RR(1) / RR(2)` is the field division it is named after instead of a
 overflow out of `Modules.ElementMethods.__truediv__`; afterwards they get `1/2` as an exact
 owned real.
 
-## Failing tests (red at `c8a3cedb`, the current `main`)
+## Failing tests (red at `5f5fc25`, the current `main`)
 
 ```
 tests/lattices/test_definite.sage::test_square_lattice_minimum_theta_and_packing_radius

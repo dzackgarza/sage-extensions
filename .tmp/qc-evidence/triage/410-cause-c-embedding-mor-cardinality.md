@@ -5,7 +5,7 @@ When this closes, `L.Emb(M).cardinality()` counts the lattice embeddings a user 
 — instead of an assertion that the construction supplies no value. The sibling `Isom(L, M)` set
 already supplies its count through `_cardinality_decision`; `Emb` has no such decision.
 
-## Failing tests (red at `c8a3cedb`, the current `main`)
+## Failing tests (red at `5f5fc25`, the current `main`)
 
 ```
 tests/lattices/test_definite.sage::test_definite_target_embedding_mor_enumerates_all_a1_into_a2_roots
@@ -26,7 +26,7 @@ E   AssertionError: cannot compute the cardinality of Emb(Integral lattice of ra
 The assertion landed with the test suite in `14b9cc1` (Zack Garza, 2026-10-26, "Move the session
 namespace and the mathematics test suite from research"). No commit on `main` ever gave `Emb` a
 cardinality decision: the same assertion with the same text is the failure at `02d9657`
-(2026-10-28), `441519c` (2026-10-30), `a0d9ad37` (2026-11-11) and `c8a3cedb`. `Isom`'s decision
+(2026-10-28), `441519c` (2026-10-30), `a0d9ad37` (2026-11-11), `c8a3cedb` and `5f5fc25`. `Isom`'s decision
 sits at `lattice_morphisms.py:3660`; the `Emb` class defines none. This is a decision that was
 never written, not a regression, and there is no pass-to-fail commit to bisect to.
 

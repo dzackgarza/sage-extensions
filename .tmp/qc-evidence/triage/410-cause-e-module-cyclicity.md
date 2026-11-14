@@ -6,7 +6,7 @@ group off a lattice gets its structure instead of an `AttributeError`. The opera
 by this test and by `tests/rings/test_unit_group_functor.sage`; today the name occurs nowhere in
 `src/`.
 
-## Failing tests (red at `c8a3cedb`, the current `main`)
+## Failing tests (red at `5f5fc25`, the current `main`)
 
 ```
 tests/lattices/test_definite.sage::test_discriminant_group_of_a1_plus_a2_is_cyclic_of_order_6

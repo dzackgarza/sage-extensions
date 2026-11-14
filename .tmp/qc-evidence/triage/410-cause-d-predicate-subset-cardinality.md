@@ -6,7 +6,7 @@ of the hexagon — instead of an assertion that the construction supplies no val
 `condition_set`, `Subset` and the other predicate slices of a finite set get a count rather than a
 refusal.
 
-## Failing tests (red at `c8a3cedb`, the current `main`)
+## Failing tests (red at `5f5fc25`, the current `main`)
 
 ```
 tests/lattices/test_definite.sage::test_a2_discriminant_representation_is_onto_order_two_and_so_a2_has_order_6
@@ -36,7 +36,7 @@ universe in EnumeratedSets()` guard to `Sets().condition_set`; before it the cal
 (`TypeError: CategoricalIsomorphism.__init__() missing 1 required positional argument:
 'inverse_computation'` at `lattice_morphisms.py:914`, checked in the image at both commits), and the
 cardinality refusal only becomes the visible failure once that is repaired. The guard's commit is
-named from the code history, and the failure it produces is verified at `c8a3cedb`.
+named from the code history, and the failure it produces is verified at `5f5fc25`.
 
 ## Scope
 

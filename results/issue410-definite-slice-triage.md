@@ -42,8 +42,10 @@ cd /repos/sage-extensions
 
 At `9b29712` the five files gave **11 failed, 26 passed**: 9 failed of 25 in `test_definite.sage`,
 2 failed of 2 in `test_definite_metric_invariants_archive.sage`, and 2 + 5 + 3 passed in the other
-three files. At `c8a3cedb` the same 11 ids fail, so nothing on `main` between the two commits
-changed the slice.
+three files. At `c8a3cedb` the same 11 ids fail, and at `5f5fc25` — the `main` this triage is
+rebased onto, five commits further on from the #408 slice — they still fail, so nothing that landed
+between those commits changed the slice. The repaired tree is rebased onto `5f5fc25` and its gate
+re-run there.
 
 ## The 11 failures, by cause
 
@@ -91,9 +93,9 @@ Two commits, each with the failing ids as its regression:
 * **B** — `src/sage_extensions/categories/group/g_sets.py`: `_named_stabilizer` returns the trivial
   subgroup when the acting group has an empty generating family. One id green.
 
-The gate on the repaired tree at `c8a3cedb` — the four cause-A ids, the cause-B id and the #150
+The gate on the repaired tree at `5f5fc25` — the four cause-A ids, the cause-B id and the #150
 division contract `tests/lattices/test_rational_scalars_on_a_base_changed_lattice.sage` — is
-**6 passed in 2.85 s**. The full five-file slice on the repaired tree leaves the six filed causes
+**6 passed in 3.88 s**. The full five-file slice on the repaired tree leaves the six filed causes
 red, and one extra: `test_nikulin_even_unimodular_embedding_existence_controls_embedding_mor`,
 which passed at 319.62 s in the baseline run and in the repaired run died with
 `sage_julia_bridge.errors.JuliaWorkerError: Julia bridge process exited unexpectedly` while two

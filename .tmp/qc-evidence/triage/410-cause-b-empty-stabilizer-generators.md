@@ -6,7 +6,7 @@ at a trivial acting group answers instead of raising `IndexError: index out of r
 asks `O(<1> + <-2>).vector_stabilizer_generators(e)` today gets an `IndexError` from the GAP
 plumbing; afterwards they get the stabilizer they asked for.
 
-## Failing tests (red at `c8a3cedb`, the current `main`)
+## Failing tests (red at `5f5fc25`, the current `main`)
 
 ```
 tests/lattices/test_definite.sage::test_norm_one_vectors_of_x2_minus_2y2_form_one_orbit
