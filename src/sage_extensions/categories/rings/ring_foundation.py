@@ -7602,10 +7602,15 @@ def _owned_real_algebraic_numbers() -> _OwnedRingParent:
 
 @cached_function(key=lambda characteristic: int(characteristic))
 def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
-    r"""The algebraic closure of a finite prime field, keyed by characteristic."""
-    from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    r"""The algebraic closure of a finite prime field, keyed by characteristic.
 
-    engine = AlgebraicClosureFiniteField(int(characteristic))
+    The closure is raised through the finite field's own closure method
+    (``FiniteField.algebraic_closure``), which is the published route and the
+    one instance Sage's finite-field constructions resolve to.  Sage's
+    constructor named here takes the field and a generator name, not a
+    characteristic, so calling it with the characteristic selects no closure.
+    """
+    engine = SageGF(int(characteristic)).algebraic_closure()
     return _OwnedRingParent(
         engine,
         named_placement=_algebraic_closure_finite_field_placements,
