@@ -1,0 +1,15 @@
+branch: 10 failed, 78 passed in 1853.78s (22 route-related modules)
+clean main 118a910bcf: same failing modules: 10 failed, 15 passed in 28.89s
+new failing test IDs relative to clean main: []
+failing IDs absent from the branch but present in clean main: []
+identical inherited failure IDs:
+tests/groups/test_finite_index_closure_401.sage::test_finite_image_bound_is_not_truncated
+tests/groups/test_finite_index_closure_401.sage::test_indefinite_predicate_image_with_supplied_ambient_generators
+tests/groups/test_finite_index_closure_401.sage::test_mod_two_kernel_of_sl2z_has_index_six_and_schreier_generators
+tests/groups/test_finite_index_closure_401.sage::test_unresolved_predicate_image_names_missing_inverse_algorithm
+tests/lattices/test_complete_isotropic_flag_orbits.sage::test_complete_null_flag_orbits_and_transporters_in_split_unimodular_lattices[rank_three]
+tests/lattices/test_complete_isotropic_flag_orbits.sage::test_complete_rank_three_flag_stabilizer_preserves_every_term
+tests/lattices/test_complete_isotropic_flag_orbits.sage::test_two_hyperbolic_planes_have_no_rank_three_isotropic_flag
+tests/lattices/test_isotropic_parabolic_restriction.sage::test_null_plane_restriction_kernel_is_the_integral_skew_shear_group
+tests/lattices/test_partial_isotropic_flag_orbits.sage::test_special_orthogonal_partial_null_flag_orbits[dimensions0]
+tests/lattices/test_partial_isotropic_flag_orbits.sage::test_special_orthogonal_partial_null_flag_orbits[dimensions1]

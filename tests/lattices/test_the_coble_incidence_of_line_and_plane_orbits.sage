@@ -38,14 +38,13 @@ group is the whole of `O(T_Co)`, so the left group of every double-coset
 computation is the parabolic's own image and each plane contributes its one
 transitive orbit of lines.  That is the value `main` held at `85284b8d18`.
 
-**Where the run lives.**  The row is minutes of computation and its setup
-(the subgroup, the line row, the plane row) does not fit this VM's memory
-guard, so the run that decides it is the CI job
-`coble-gamma-co-2-incidence-rows` (`tests/coble_gamma_co_2_incidence_rows.py`),
-whose workflow file is delivered under `results/` for the orchestrator to
-file; the counts it prints are the numbers the commit body records.  No
-lattice-database card holds a `T_Co` value (lattice-database#7), so no count
-is typed here.
+**Where the run lives.**  The Coble rows are minutes of computation.  They
+now fit the runtime's 6144 MiB guard (3718 MiB peak tree RSS for both rows),
+but the dedicated CI job `coble-gamma-co-2-incidence-rows` runs the two rows
+in one process so their shared subgroup/orbit/cusp cache is not rebuilt.  Its
+entry point is `tests/coble_gamma_co_2_incidence_rows.py`; the counts it prints
+are the numbers the commit body records.  No lattice-database card holds a
+`T_Co` value (lattice-database#7), so no count is typed here.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403

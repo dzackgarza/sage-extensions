@@ -3,11 +3,11 @@ r"""The Tits-building incidence rows on the Coble lattice, through the public ca
 This is the acceptance entry point of #391: the incidence between the
 ``Gamma_{Co,2}``-orbits of primitive isotropic lines and planes of ``T_Co``,
 and the ``O(T_Co)`` incidence through the same route.  It is not collected by
-pytest (its file name does not begin with ``test_``), because the setup --
-the subgroup, the line row and the plane row -- does not fit this VM's memory
-guard (the #391 probes: three runs killed at the 6144 MiB guard before the
-incidence call ran); the rows belong in the CI job that reports later, not in
-the per-test gate.
+pytest (its file name does not begin with ``test_``), because these two rows
+are measured in minutes and share one subgroup/orbit/cusp cache; they belong
+in the dedicated CI job, not repeated throughout the per-test gate.  The final
+route fits the runtime's 6144 MiB guard: the measured two-row run peaked at
+3718 MiB tree RSS.
 
 ``T_Co = <2> + U(2) + E8(-2)`` is the Coble period lattice, D. Dolgachev and
 S. Kondo, *Enriques surfaces and Borel--Weil--Bott type duality*, Izv. Math.

@@ -675,3 +675,16 @@ The command is the image Python with `PYTHONPATH=/ci/tool-artifacts/pytest_plugi
 | --- | --- | --- |
 | `issue391-gamma-co2-staged.log` | the tree of this push | Γ_{Co,2}: subgroup 96.1 s; **4 line cusps at 328.4 s; 7 plane cusps at 391.8 s; 13 edges at 1382.6 s; assertions passed at 1388.1 s**; peak tree RSS 3710 MiB |
 | `issue391-incidence-rows.log` | the tree of this push | unchanged `tests/coble_gamma_co_2_incidence_rows.py --cap 2400 --budget 2500`: **O(T_Co) 1 edge over 1/1 cusps in 112.9 s; Γ_{Co,2} 13 edges over 4/7 cusps in 1374.2 s; exit 0, peak tree RSS 3718 MiB** |
+
+## #391 — test gate, the inherited collection blocker, and the branch/base comparison
+
+The exact `just test` command first fails usage because the image's Python does not have the `--timeout` or `--report-log` plugins.  `-o addopts=` is therefore used with `--durations=0`; measurements name every override.  `--no-time-gates` lifts only per-call performance ceilings, and `--no-test-lint` is used for the old modules with their recorded findings.  The newly added #397 module has its own clean lint log.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue391-just-test.log` | `a226af6af2` (#391) | 3915 items, **1 collection error in 198.20 s**: `tests/functions/test_young_convolution.sage`, integer-one divided by a real element recursively calls `modules.py:1704`; global lint adds 1514 pre-existing findings |
+| `issue391-just-test-base.log` | `118a910bcf` | **same collection error in 190.27 s** on the unmodified base |
+| `issue391-focused-runtime.log` | the tree of this push | 22 route-related modules: **78 passed, 10 failed in 1853.78 s**, including the Γ_{Co,2} incidence test **passed in 1071.52 s**; the time ceilings were disabled for these minutes-long rows |
+| `issue391-failing-modules-base.log` | `118a910bcf` | exactly the same failing modules: **15 passed, 10 failed in 28.89 s** |
+| `issue391-failure-comparison.log` | the tree of this push | **zero new failing test IDs**; all ten baseline failures are identical |
+| `issue391-push-gate.log` | `a226af6af2` | `just test-push`: **7 files checked, no errors** (syntax only, not the suite) |
