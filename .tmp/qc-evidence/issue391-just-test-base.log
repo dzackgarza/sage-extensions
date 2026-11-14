@@ -1,0 +1,54 @@
+provider SHA: 118a910bcfd2d08315e5d5d6766ccfb2c3567608
+command: just test -o addopts= --durations=0
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+testpaths: tests
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collected 3914 items / 1 error
+
+==================================== ERRORS ====================================
+_________ ERROR collecting tests/functions/test_young_convolution.sage _________
+tests/functions/test_young_convolution.sage:16: in <module>
+    (RR(sqrt(2)), RR(sqrt(2)), 1 / (RR(sqrt(2)) - 1)),
+                                                 ^^^^^^
+sage/structure/element.pyx:1726: in sage.structure.element.Element.__truediv__
+    ???
+sage/structure/coerce.pyx:1253: in sage.structure.coerce.CoercionModel.bin_op
+    ???
+src/sage_extensions/categories/modules/pure/modules.py:1704: in __truediv__
+    return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:1704: in __truediv__
+    return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   RecursionError: maximum recursion depth exceeded
+!!! Recursion detected (same locals & position)
+=============================== warnings summary ===============================
+tests/groups/test_discriminant_lifts_of_o_plus_8_2.sage:16
+  /repos/sage-extensions/tests/groups/test_discriminant_lifts_of_o_plus_8_2.sage:16: PytestUnknownMarkWarning: Unknown pytest.mark.timeout - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.timeout(300)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/functions/test_young_convolution.sage - RecursionError: maximum r...
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=================== 1 warning, 1 error in 190.27s (0:03:10) ====================
+error: recipe `test` failed on line 154 with exit code 2
+[peakrss] run: child waited=2 shell_code=2 samples=118
+[peakrss] peak tree RSS      : 4380 MiB
+[peakrss] low-water MemAvail : 6781 MiB
+[peakrss] peak single VmHWM  : 4388 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     4371 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=   228.1s procs=  5 rss=  4380 MiB hwm=  4388 MiB avail=  6843 MiB
+[peakrss]   t=   230.1s procs=  5 rss=  4380 MiB hwm=  4388 MiB avail=  6840 MiB
+[peakrss]   t=   232.1s procs=  5 rss=  4380 MiB hwm=  4388 MiB avail=  6794 MiB
+[peakrss]   t=   234.1s procs=  5 rss=  4380 MiB hwm=  4388 MiB avail=  6781 MiB
+[peakrss]   t=   220.1s procs=  5 rss=  4379 MiB hwm=  4387 MiB avail=  6864 MiB

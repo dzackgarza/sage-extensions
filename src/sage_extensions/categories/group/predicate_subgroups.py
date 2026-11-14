@@ -699,13 +699,29 @@ class PredicateSubgroups(OwnedParameterizedCategory):
         def tits_building_incidence(self):
             r"""Return this subgroup's line/plane quotient-building incidence.
 
-            Rank-two flags are split under the same finite-character quotient
-            as the line and plane orbits, so each edge retains actual subgroup
+            A line cusp meets a plane cusp when some element of this subgroup
+            carries a line of the first into a plane of the second.  At one
+            plane ``P`` these pairs are covered by the ``Stab_Gamma(P)``-orbits
+            of the isotropic lines of ``P``: the lines of a totally isotropic
+            plane are isotropic, and two flags over the same plane are
+            ``Gamma``-equivalent exactly when their lines lie in one
+            ``Stab_Gamma(P)``-orbit.  Where the plane's parabolic is complete
+            a covering of those orbits is supplied by it, so the incidence
+            never reaches the indefinite port's generic stabilizer enumeration
+            (:func:`...orthogonal_quotients._plane_parabolic_incidence_flags`,
+            #391); where it is not, the flag row keeps its own route.  Distinct
+            flag orbits may have the same two cusp endpoints, so the returned
+            relation retains one certificate per endpoint pair, not one edge
+            per flag orbit.  Each certificate retains actual subgroup
             transporters to its two cusp vertices rather than transporters
             inherited from the full orthogonal group.
             """
             from sage_extensions.categories.isotropic_orbits import (
                 ArithmeticCuspIncidence,
+                IsotropicFlag,
+            )
+            from sage_extensions.categories.orthogonal_quotients import (
+                _plane_parabolic_incidence_flags,
             )
             from sage_extensions.categories.sets.finite_ordered_sets import (
                 finite_ordered_set,
@@ -725,8 +741,89 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         matches.append((cusp, witness))
                 return matches
 
-            incidences = []
-            for flag in self.isotropic_orbit_representatives(2, flag=True):
+            # A covering of the incidence by flags: at each plane
+            # representative cover the Stab_Gamma(P)-orbits of the lines of P
+            # from the plane's own parabolic, and use the flag row wherever
+            # that route does not apply.  The lines of P need not form one orbit of the
+            # parabolic -- the divisibility of a line of P is an invariant the
+            # parabolic preserves -- so the Stab_Gamma(P)-orbits are computed
+            # per orbit of the parabolic on the lines of P, and those orbits
+            # are the ambient flag orbits read at this plane: the ambient
+            # flags whose plane term is carried to P by an ambient isometry,
+            # transported by it.
+            orthogonal_group = self.supergroup()
+            ambient_flags = tuple(orthogonal_group.isotropic_orbit_representatives(2, flag=True))
+            quotient = self.finite_character_quotient()
+            # The ambient flag row need not choose the ambient plane row's
+            # representative.  In that case there is no registered source lift
+            # for its plane.  Normalize each such flag once to a registered
+            # ambient representative, rather than starting a fresh isometry
+            # search against every much larger transported target plane.  The
+            # third component is that source normalization, when one is needed.
+            ambient_sources = []
+            ambient_plane_representatives = None
+            for ambient_flag in ambient_flags:
+                _ambient_line, ambient_plane = ambient_flag.terms()
+                source_lift = quotient.isotropic_lift_of(ambient_plane)
+                if source_lift is not None:
+                    ambient_sources.append((ambient_flag, source_lift, None))
+                    continue
+                if ambient_plane_representatives is None:
+                    ambient_plane_representatives = tuple(
+                        orthogonal_group.isotropic_orbit_representatives(2)
+                    )
+                for source_plane in ambient_plane_representatives:
+                    source_lift = quotient.isotropic_lift_of(source_plane)
+                    if source_lift is None:
+                        continue
+                    source_witness = orthogonal_group.isotropic_equivalence_witness(
+                        ambient_plane, source_plane
+                    )
+                    if source_witness is not None:
+                        ambient_sources.append(
+                            (ambient_flag, source_lift, source_witness)
+                        )
+                        break
+                else:
+                    ambient_sources.append((ambient_flag, None, None))
+            sourced_flags = []
+            parabolic_routed = True
+            for plane in self.isotropic_orbit_representatives(2):
+                plane_orbit_flags = []
+                for ambient_flag, source_lift, source_witness in ambient_sources:
+                    _ambient_line, ambient_plane = ambient_flag.terms()
+                    # The source row now meets the source lift at one registered
+                    # plane.  Composing that normalization with the row's own
+                    # lifts gives an exact ambient witness to each target plane,
+                    # without an isometry search against the transported target.
+                    target_lift = quotient.isotropic_lift_of(plane)
+                    if source_lift is not None and target_lift is not None:
+                        witness = target_lift * ~source_lift
+                        if source_witness is not None:
+                            witness = witness * source_witness
+                    else:
+                        witness = orthogonal_group.isotropic_equivalence_witness(
+                            ambient_plane, plane
+                        )
+                    if witness is None:
+                        continue
+                    plane_orbit_flags.append(witness.transport_isotropic_object(ambient_flag))
+                if not plane_orbit_flags:
+                    parabolic_routed = False
+                    break
+                for orbit_flag in plane_orbit_flags:
+                    from_parabolic = _plane_parabolic_incidence_flags(self, plane, orbit_flag)
+                    if from_parabolic is None:
+                        parabolic_routed = False
+                        break
+                    sourced_flags.extend(from_parabolic)
+                if not parabolic_routed:
+                    break
+            if not parabolic_routed:
+                sourced_flags = list(self.isotropic_orbit_representatives(2, flag=True))
+
+            candidate_incidences = []
+            for flag in sourced_flags:
                 line, plane = flag.terms()
                 line_vertices = matching_cusps(line, line_cusps)
                 plane_vertices = matching_cusps(plane, plane_cusps)
@@ -744,7 +841,7 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         f"{line_cusp} and {plane_cusp} of {self}, but no element of {self} "
                         f"carries the cusp representatives to its terms"
                     )
-                incidences.append(
+                candidate_incidences.append(
                     ArithmeticCuspIncidence(
                         self,
                         flag,
@@ -754,26 +851,44 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         plane_transporter,
                     )
                 )
-            if any(incidence.lattice() is not lattice for incidence in incidences):
+            if any(incidence.lattice() is not lattice for incidence in candidate_incidences):
                 raise ArithmeticError(
                     f"the Tits building incidence of {self} has a cusp incidence in a lattice "
                     f"other than {lattice}, the lattice {self.supergroup()} acts on"
                 )
-            # Two flag records over one (line cusp, plane cusp) pair are a multiple
-            # edge.  Each record must be a distinct Gamma-orbit of flags, so a pair
-            # of records whose flags are Gamma-equivalent is an over-split orbit,
-            # never an edge of the building.
-            for position, first in enumerate(incidences):
-                for second in incidences[position + 1:]:
-                    if first.line_cusp() is not second.line_cusp() or first.plane_cusp() is not second.plane_cusp():
-                        continue
-                    if self.isotropic_equivalence_witness(first.flag(), second.flag(), flag=True) is not None:
-                        raise ArithmeticError(
-                            f"the flags {first.flag()} and {second.flag()} of {lattice} are "
-                            f"equivalent under {self}, yet they are recorded as two flag orbits "
-                            f"over the line cusp {first.line_cusp()} and the plane cusp "
-                            f"{first.plane_cusp()}: the flag orbits are over-split"
-                        )
+            # In the fallback, two candidate records whose flags are equivalent
+            # expose an over-split flag row.  The parabolic covering needs no
+            # such check: distinct double cosets over the selected line-fixing
+            # subgroup may map to one K-orbit, by the covering argument above.
+            if not parabolic_routed:
+                for position, first in enumerate(candidate_incidences):
+                    for second in candidate_incidences[position + 1:]:
+                        if first.line_cusp() is not second.line_cusp() or first.plane_cusp() is not second.plane_cusp():
+                            continue
+                        if self.isotropic_equivalence_witness(first.flag(), second.flag(), flag=True) is not None:
+                            raise ArithmeticError(
+                                f"the flags {first.flag()} and {second.flag()} of {lattice} are "
+                                f"equivalent under {self}, yet they are recorded as two flag orbits "
+                                f"over the line cusp {first.line_cusp()} and the plane cusp "
+                                f"{first.plane_cusp()}: the flag orbits are over-split"
+                            )
+            # The building incidence is a relation between two orbit vertices,
+            # not the quotient's set of flag orbits.  Several flags can witness
+            # the same relation, and the parabolic covering can repeat one of
+            # its K-orbits when the selected line-fixing generators are a proper
+            # subgroup of the full line stabilizer.  Retain one actual flag
+            # certificate for each endpoint pair.  Identity is intentional:
+            # every match is one of the retained objects of the two cusp rows,
+            # and comparing distinct cusps would start another orbit search.
+            incidences = []
+            for candidate in candidate_incidences:
+                if any(
+                    incidence.line_cusp() is candidate.line_cusp()
+                    and incidence.plane_cusp() is candidate.plane_cusp()
+                    for incidence in incidences
+                ):
+                    continue
+                incidences.append(candidate)
             return finite_ordered_set(tuple(incidences))
 
         def _repr_(self):

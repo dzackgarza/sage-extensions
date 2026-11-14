@@ -28,14 +28,14 @@ rows).  The assertion is what the cited construction guarantees for every
 output: each representative is a primitive totally isotropic plane of
 `T_Co`.
 
-**What does not return, and why.**  The `Otilde(T_Co)` and `Otilde+(T_Co)`
-plane rows and the Tits-building incidence are measured, not asserted here:
-the two kernel rows' double cosets number `189720` each and the representative
-realization at the measured rate of about one second per double coset is
-beyond the test budget, and the incidence's flag route reaches the indefinite
-port's generic stabilizer enumeration, which is killed at the memory guard on
-this lattice.  The three counts and the obstruction are recorded in the
-commit body of the push that lands this file.
+**The other rows, and a measurement boundary.**  The `Otilde(T_Co)` and
+`Otilde+(T_Co)` plane rows are not asserted here: their double cosets number
+`189720` each, and representative realization remains beyond the test budget.
+The `Gamma_{Co,2}` plane row and building incidence do return through the plane's
+own parabolic double cosets; the generic flag-stabilizer route is only the
+fallback when the parabolic is not certified complete.  The full two-row
+acceptance run, with its peak tree RSS of 3718 MiB under the 6144 MiB guard,
+is recorded in `.tmp/qc-evidence/issue391-incidence-rows.log`.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403

@@ -1,0 +1,23 @@
+worktree SHA: c15b43275fcfd56fbb29882ba663da52d3d30f40
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt401/.scratch/probe401_small.py
+U+A1 {'max_decompositions': 200}: complete=True accepted=3 facets=3 dropped=0 (0.4s)
+U+A1+A1 {'max_decompositions': 200}: complete=True accepted=4 facets=4 dropped=0 (0.1s)
+U+A1+A1+A1 {'max_decompositions': 200}: complete=True accepted=5 facets=5 dropped=0 (0.2s)
+U+A2 {'max_decompositions': 200}: complete=True accepted=4 facets=4 dropped=0 (0.1s)
+U+A2+A1 {'max_decompositions': 200}: complete=True accepted=6 facets=6 dropped=0 (0.2s)
+U+A3 {'max_decompositions': 200}: complete=True accepted=5 facets=5 dropped=0 (0.3s)
+U+D4 {'max_decompositions': 200}: complete=True accepted=6 facets=6 dropped=0 (0.4s)
+U+A1+E8 {'max_decompositions': 200}: complete=True accepted=12 facets=12 dropped=0 (4.5s)
+[peakrss] probe401: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 327 MiB
+[peakrss] low-water MemAvail : 13066 MiB
+[peakrss] peak single VmHWM  : 327 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      316 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   327 MiB hwm=   327 MiB avail= 13067 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   327 MiB hwm=   327 MiB avail= 13068 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   322 MiB hwm=   322 MiB avail= 13066 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13275 MiB
+launcher exit: 0

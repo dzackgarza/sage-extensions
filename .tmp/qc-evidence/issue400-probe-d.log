@@ -1,0 +1,34 @@
+[04:05:21] importing
+[04:05:23] imported in 1.6 s
+[04:05:46] subgroup built in 25.1 s
+[04:05:47] cusp images built in 25.8 s
+[04:05:47] cusp images built in 25.9 s
+[04:05:47] Sterk_1 controlling vector (the class of x = e' + f'): (1, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+[04:07:49] Sterk_1: basis cell, 9 normals of rank 9
+[04:07:49] Sterk_1 layer 1: k=4 whole=480 restricted=120 region=120 cone=1 | region-match=True subset=True cone-covered=True layer-ok=True | whole=0.07 s restricted=0.01 s
+[04:07:49] Sterk_1 layer 2: k=2 whole=0 restricted=0 region=0 cone=0 | region-match=True subset=True cone-covered=True layer-ok=True | whole=0.03 s restricted=0.00 s
+[04:07:49] Sterk_1 layer 3: k=1 whole=0 restricted=0 region=0 cone=0 | region-match=True subset=True cone-covered=True layer-ok=True | whole=0.01 s restricted=0.00 s
+[04:07:50] Sterk_1 layer 4: k=4 whole=2640 restricted=1065 region=1065 cone=2 | region-match=True subset=True cone-covered=True layer-ok=True | whole=0.34 s restricted=0.04 s
+[04:07:50] Sterk_1 layer 5: k=2 whole=0 restricted=0 region=0 cone=0 | region-match=True subset=True cone-covered=True layer-ok=True | whole=0.09 s restricted=0.01 s
+[04:07:53] Sterk_1 layer 6: k=4 whole=13920 restricted=2885 region=2885 cone=2 | region-match=True subset=True cone-covered=True layer-ok=True | whole=1.24 s restricted=0.80 s
+[04:07:53] Sterk_1 layer 7: k=1 whole=0 restricted=0 region=0 cone=0 | region-match=True subset=True cone-covered=True layer-ok=True | whole=0.05 s restricted=0.00 s
+[04:08:01] Sterk_1 layer 8: k=4 whole=65760 restricted=18780 region=18780 cone=4 | region-match=True subset=True cone-covered=True layer-ok=True | whole=5.12 s restricted=0.59 s
+[04:08:02] Sterk_1 layer 9: k=2 whole=0 restricted=0 region=0 cone=0 | region-match=True subset=True cone-covered=True layer-ok=True | whole=0.54 s restricted=0.03 s
+[04:08:31] Sterk_1 layer 10: k=4 whole=226080 restricted=42732 region=42732 cone=4 | region-match=True subset=True cone-covered=True layer-ok=True | whole=17.17 s restricted=1.41 s
+[04:08:31] Sterk_1: 10 layers compared, 0 failures
+[04:08:31] probe complete in 189.7 s, 0 failures
+[peakrss] issue400: child waited=0 shell_code=0 samples=97
+[peakrss] peak tree RSS      : 892 MiB
+[peakrss] low-water MemAvail : 6974 MiB
+[peakrss] peak single VmHWM  : 892 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      881 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=   186.1s procs=  3 rss=   892 MiB hwm=   892 MiB avail=  7019 MiB
+[peakrss]   t=   188.1s procs=  3 rss=   892 MiB hwm=   892 MiB avail=  7019 MiB
+[peakrss]   t=   184.1s procs=  3 rss=   890 MiB hwm=   890 MiB avail=  7021 MiB
+[peakrss]   t=   182.1s procs=  3 rss=   886 MiB hwm=   886 MiB avail=  7024 MiB
+[peakrss]   t=   180.1s procs=  3 rss=   884 MiB hwm=   884 MiB avail=  7021 MiB
+launcher exit: 0

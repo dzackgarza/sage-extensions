@@ -1,0 +1,20 @@
+provider SHA: e38c37f993cae540cf1b93075861cf748b9bd92d
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+the Coble period lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+[O(T_Co)] 1 edges over 1 line cusps and 1 plane cusps in 112.9 s
+[Gamma_{Co,2}] 13 edges over 4 line cusps and 7 plane cusps in 1374.2 s
+the O(T_Co) incidence has 1 edge; the Gamma_{Co,2} incidence has 13 edges over 4 line orbits and 7 plane orbits
+[peakrss] test391-acceptance: child waited=0 shell_code=0 samples=803
+[peakrss] peak tree RSS      : 3718 MiB
+[peakrss] low-water MemAvail : 5554 MiB
+[peakrss] peak single VmHWM  : 3800 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2068 MiB peak
+[peakrss]   python                     1720 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   570.2s procs=  4 rss=  3718 MiB hwm=  3800 MiB avail= 11281 MiB
+[peakrss]   t=   572.2s procs=  4 rss=  3718 MiB hwm=  3800 MiB avail= 11290 MiB
+[peakrss]   t=   574.2s procs=  4 rss=  3718 MiB hwm=  3800 MiB avail= 11297 MiB
+[peakrss]   t=   576.2s procs=  4 rss=  3718 MiB hwm=  3800 MiB avail= 11300 MiB
+[peakrss]   t=   578.3s procs=  4 rss=  3718 MiB hwm=  3800 MiB avail= 11273 MiB

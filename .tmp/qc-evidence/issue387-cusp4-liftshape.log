@@ -1,0 +1,22 @@
+[10:06:18 +   21.2s] cusp vector: 12 coordinates in Integral lattice of rank 12 and signature (2, 10)
+[10:06:18 +   21.2s] coordinate_frame: <class 'sage_extensions.categories.sets.indexed_families.Objects.parent_class[IndexedFamily].ObjectType'> with 10 entries
+[10:06:18 +   21.2s]   frame[0]: type=OwnedJoinCategory.element_class[_SparseFreeModuleElement] coordinates=11 first=[0, 0, 0, 1]
+[10:06:18 +   21.2s]   frame[1]: type=OwnedJoinCategory.element_class[_SparseFreeModuleElement] coordinates=11 first=[0, 0, 0, 0]
+[10:06:18 +   21.2s] orthogonal_complement: Integral lattice of rank 11 and signature (1, 9)
+[10:06:18 +   21.2s]   inclusion of the first frame lift: type=OwnedJoinCategory.element_class[_SparseFreeModuleElement] coordinates=12 first=[0, 0, 0, 1]
+[10:06:18 +   21.3s]   class_lift of a reduction vector: type=OwnedJoinCategory.element_class[_SparseFreeModuleElement] coordinates=12 first=[0, 0, 0, 1]
+[10:06:18 +   21.3s] done
+[peakrss] issue387: child waited=0 shell_code=0 samples=12
+[peakrss] peak tree RSS      : 475 MiB
+[peakrss] low-water MemAvail : 14098 MiB
+[peakrss] peak single VmHWM  : 475 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      464 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    22.0s procs=  3 rss=   475 MiB hwm=   475 MiB avail= 14098 MiB
+[peakrss]   t=    20.0s procs=  3 rss=   465 MiB hwm=   465 MiB avail= 14106 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   458 MiB hwm=   458 MiB avail= 14109 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   446 MiB hwm=   446 MiB avail= 14124 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   320 MiB hwm=   320 MiB avail= 14242 MiB
+launcher exit: 0

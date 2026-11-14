@@ -1,0 +1,60 @@
+name: Coble Gamma_{Co,2} incidence rows (#391)
+## The Tits-building incidence rows of #391: the incidence between the
+## Gamma_{Co,2}-orbits of primitive isotropic lines and planes of T_Co, and
+## the O(T_Co) incidence through the same route.  The setup (the subgroup,
+## the line row, the plane row) does not fit the VM's 6144 MiB guard (the
+## #391 probes: three runs killed in the setup before the incidence call
+## ran), so the rows live in this one job that reports later rather than in
+## the per-test gate.
+##
+## Install (one command, from the repository root):
+##   mkdir -p .github/workflows && cp results/coble-gamma-co-2-incidence-rows.yml .github/workflows/
+## Then dispatch from the Actions tab (the "Coble Gamma_{Co,2} incidence rows (#391)" workflow).
+##
+## The job reports every row it decided and names every row that did not
+## return inside its per-call cap or inside the job's budget; it is red in
+## both cases.
+on:
+  workflow_dispatch:
+    inputs:
+      cap:
+        description: "seconds one row call may take before its row is undecided"
+        required: false
+        default: "10800"
+        type: string
+      budget:
+        description: "seconds for the whole run, 0 for no budget"
+        required: false
+        default: "28800"
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: coble-gamma-co-2-incidence-rows
+  cancel-in-progress: false
+jobs:
+  incidence-rows:
+    name: Each incidence row against the public orbit call
+    runs-on: ubuntu-latest
+    container: ghcr.io/dzackgarza/sage:develop
+    timeout-minutes: 350
+    steps:
+      - name: Check out the commit under test
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Mark the checkout as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Run the incidence rows
+        env:
+          PYTHONPATH: src
+          COBLE_CALL_CAP: ${{ inputs.cap || '10800' }}
+          COBLE_ROW_BUDGET: ${{ inputs.budget || '28800' }}
+        run: |
+          set -o pipefail
+          "$SAGE_BIN" --version
+          git rev-parse HEAD
+          sage_python="$("$SAGE_BIN" -c "import sys; print(sys.executable)")"
+          "$sage_python" tests/coble_gamma_co_2_incidence_rows.py \
+            --cap "$COBLE_CALL_CAP" --budget "$COBLE_ROW_BUDGET"
+        shell: bash

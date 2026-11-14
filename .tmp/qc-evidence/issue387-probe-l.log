@@ -1,0 +1,43 @@
+[01:27:37] importing
+[01:27:40] imported in 3.1 s
+[01:29:20] |A| = 1024, |A_B| = 4, |A_E8| = 256
+[01:29:51] sanity in_B: [True, True, True, True]
+[01:29:53] sanity in_B([a1*]) = False
+[01:30:31] subgroup built in 173.9 s
+[01:32:47] |rho(Gamma_library)| = 696729600
+[01:32:47] type(generator(c_ep)) = <class 'sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules.OwnedJoinCategory.element_class[_GeneralPresentedElement]'>
+[01:32:47] moved = [3]
+[01:32:47] moved.parent() = Finitely presented module on 12 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]
+[01:32:47] moved in A: False
+[01:32:47] === robust decomposition test on all generators ===
+[01:32:47] generator 0: image [3] not even in A
+[01:32:47] generator 0: image [2] not even in A
+[01:32:47] generator 0: images in A_B? ['not-in-A', 'not-in-A']
+[01:32:47] generator 1: image [2] not even in A
+[01:32:47] generator 1: image [3] not even in A
+[01:32:47] generator 1: images in A_B? ['not-in-A', 'not-in-A']
+[01:32:47] generator 2: image [2] not even in A
+[01:32:47] generator 2: image [3] not even in A
+[01:32:47] generator 2: images in A_B? ['not-in-A', 'not-in-A']
+[01:32:47] generator 3: image [2] not even in A
+[01:32:47] generator 3: image [3] not even in A
+[01:32:47] generator 3: images in A_B? ['not-in-A', 'not-in-A']
+[01:32:47] generator 4: image [2] not even in A
+[01:32:47] generator 4: image [3] not even in A
+[01:32:47] generator 4: images in A_B? ['not-in-A', 'not-in-A']
+[01:32:47] violating generators: 5 of 5
+[01:32:47] probe complete in 309.7 s
+[peakrss] issue387: child waited=0 shell_code=0 samples=159
+[peakrss] peak tree RSS      : 804 MiB
+[peakrss] low-water MemAvail : 10027 MiB
+[peakrss] peak single VmHWM  : 804 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      793 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   312.4s procs=  3 rss=   804 MiB hwm=   804 MiB avail= 10687 MiB
+[peakrss]   t=   314.4s procs=  3 rss=   804 MiB hwm=   804 MiB avail= 10488 MiB
+[peakrss]   t=   316.4s procs=  3 rss=   804 MiB hwm=   804 MiB avail= 10392 MiB
+[peakrss]   t=   310.4s procs=  3 rss=   803 MiB hwm=   803 MiB avail= 10746 MiB
+[peakrss]   t=   308.4s procs=  3 rss=   801 MiB hwm=   801 MiB avail= 10763 MiB
+launcher exit: 0

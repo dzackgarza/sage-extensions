@@ -1,0 +1,33 @@
+[03:32:00] importing
+[03:32:01] imported in 1.6 s
+[03:32:27] subgroup built in 27.4 s
+[03:32:28] cusp images built in 28.2 s
+[03:34:40] Sterk_4 controlling vector: (7, -17, -34, -51, -68, -85, -60, 21, 4, 4)
+[03:35:12] Sterk_4: lineality cell, 8 normals of rank 9, m=(1, -1, -2, -3, -4, -5, -4, 1, 0, 0) q(m)=4, 2 cosets
+[03:35:13] Sterk_4 layer 1: k=4 whole=736 restricted=252 region=252 cone=4 | region-match=True subset=True cone-covered=True layer-ok=True | whole=0.75 s restricted=0.03 s
+[03:35:13] Sterk_4 layer 2: k=2 whole=32 restricted=16 region=16 cone=2 | region-match=True subset=True cone-covered=True layer-ok=True | whole=0.29 s restricted=0.01 s
+[03:35:13] Sterk_4 layer 3: k=1 whole=0 restricted=0 region=0 cone=0 | region-match=True subset=True cone-covered=True layer-ok=True | whole=0.11 s restricted=0.00 s
+[03:35:16] Sterk_4 layer 4: k=4 whole=3920 restricted=1184 region=1184 cone=7 | region-match=True subset=True cone-covered=True layer-ok=True | whole=2.31 s restricted=0.05 s
+[03:35:17] Sterk_4 layer 5: k=2 whole=480 restricted=184 region=184 cone=3 | region-match=True subset=True cone-covered=True layer-ok=True | whole=1.00 s restricted=0.02 s
+[03:35:29] Sterk_4 layer 6: k=4 whole=21344 restricted=5796 region=5796 cone=10 | region-match=True subset=True cone-covered=True layer-ok=True | whole=9.72 s restricted=0.30 s
+[03:35:29] Sterk_4 layer 7: k=1 whole=0 restricted=0 region=0 cone=0 | region-match=True subset=True cone-covered=True layer-ok=True | whole=0.59 s restricted=0.02 s
+[03:36:17] Sterk_4 layer 8: k=4 whole=98528 restricted=25315 region=25315 cone=19 | region-match=True subset=True cone-covered=True layer-ok=True | whole=36.71 s restricted=1.33 s
+[03:36:22] Sterk_4 layer 9: k=2 whole=4064 restricted=1304 region=1304 cone=6 | region-match=True subset=True cone-covered=True layer-ok=True | whole=4.84 s restricted=0.21 s
+[03:38:51] Sterk_4 layer 10: k=4 whole=346656 restricted=84922 region=84922 cone=30 | region-match=True subset=True cone-covered=True layer-ok=True | whole=112.72 s restricted=4.53 s
+[03:39:14] Sterk_4 layer 11: k=2 whole=23152 restricted=6772 region=6772 cone=9 | region-match=True subset=True cone-covered=True layer-ok=True | whole=20.73 s restricted=0.56 s
+[03:39:17] Sterk_4 layer 12: k=1 whole=0 restricted=0 region=0 cone=0 | region-match=True subset=True cone-covered=True layer-ok=True | whole=3.38 s restricted=0.05 s
+[03:45:31] Sterk_4 layer 13: k=4 whole=1137376 restricted=269218 region=269218 cone=43 | region-match=True subset=True cone-covered=True layer-ok=True | whole=291.11 s restricted=10.54 s
+[peakrss] issue400: child waited=0 shell_code=0 samples=692
+[peakrss] peak tree RSS      : 3010 MiB
+[peakrss] low-water MemAvail : 944 MiB
+[peakrss] peak single VmHWM  : 3018 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     3008 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  1379.9s procs=  3 rss=  3010 MiB hwm=  3018 MiB avail=   944 MiB
+[peakrss]   t=  1382.0s procs=  3 rss=  3010 MiB hwm=  3018 MiB avail=   946 MiB
+[peakrss]   t=  1377.9s procs=  3 rss=  3008 MiB hwm=  3014 MiB avail=   958 MiB
+[peakrss]   t=  1375.9s procs=  3 rss=  3001 MiB hwm=  3008 MiB avail=   962 MiB
+[peakrss]   t=  1373.9s procs=  3 rss=  2995 MiB hwm=  3001 MiB avail=   952 MiB
+launcher exit: 0

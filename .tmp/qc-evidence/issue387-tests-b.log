@@ -1,0 +1,97 @@
+.FFFF..............                                                      [100%]
+=================================== FAILURES ===================================
+______ test_hilbert_basis_of_a_nonunimodular_plane_cone_exceeds_its_rays _______
+tests/lattices/test_hyperbolic_chambers.sage:37: in test_hilbert_basis_of_a_nonunimodular_plane_cone_exceeds_its_rays
+    assert first + second in cone.hilbert_basis()
+E   assert (Generic morphism:\n  From: Integral lattice of rank 2 and signature (2, 0)\n  To:   Integer Ring + Generic morphism:\n  From: Integral lattice of rank 2 and signature (2, 0)\n  To:   Integer Ring) in {e_1, 2*e_0 - e_1, e_0}
+E    +  where {e_1, 2*e_0 - e_1, e_0} = hilbert_basis()
+E    +    where hilbert_basis = Rational polyhedral cone in Integral lattice of rank 2 and signature (2, 0) cut out by 2 half-spaces.hilbert_basis
+_ test_lorentz_plane_has_one_reflective_wall_and_orthogonal_group_of_order_four _
+sage/structure/category_object.pyx:858: in sage.structure.category_object.CategoryObject.getattr_from_category
+    return self._cached_methods[name]
+E   KeyError: 'weyl_group'
+
+During handling of the above exception, another exception occurred:
+tests/lattices/test_hyperbolic_chambers.sage:51: in test_lorentz_plane_has_one_reflective_wall_and_orthogonal_group_of_order_four
+    assert lattice.weyl_group().cardinality() == 2
+           ^^^^^^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+sage/cpython/getattr.pyx:362: in sage.cpython.getattr.getattr_from_other_class
+    ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'weyl_group'
+___ test_the_reflection_in_the_wall_root_carries_the_chamber_across_the_wall ___
+sage/structure/category_object.pyx:858: in sage.structure.category_object.CategoryObject.getattr_from_category
+    return self._cached_methods[name]
+E   KeyError: 'fundamental_chamber'
+
+During handling of the above exception, another exception occurred:
+tests/lattices/test_weyl_chamber_complex.sage:16: in test_the_reflection_in_the_wall_root_carries_the_chamber_across_the_wall
+    chamber = lattice.fundamental_chamber()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+sage/cpython/getattr.pyx:362: in sage.cpython.getattr.getattr_from_other_class
+    ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'fundamental_chamber'
+______________ test_crossing_the_same_wall_twice_is_the_identity _______________
+sage/structure/category_object.pyx:858: in sage.structure.category_object.CategoryObject.getattr_from_category
+    return self._cached_methods[name]
+E   KeyError: 'fundamental_chamber'
+
+During handling of the above exception, another exception occurred:
+tests/lattices/test_weyl_chamber_complex.sage:38: in test_crossing_the_same_wall_twice_is_the_identity
+    chamber = lattice.fundamental_chamber()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+sage/cpython/getattr.pyx:362: in sage.cpython.getattr.getattr_from_other_class
+    ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'fundamental_chamber'
+=============================== warnings summary ===============================
+tests/lattices/test_genus_of_the_scattone_summands.sage: 18 warnings
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage: 24 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/lattices/test_genus_of_the_scattone_summands.sage: 18 warnings
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage: 24 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================== test-call performance gate ==========================
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_the_cards_class_count: 81.28 s > 20 s
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_four_summand_genus_has_the_cards_class_count: 25.25 s > 20 s
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_the_printed_cusp_walls_are_distinct_classes_of_the_boundary_lattice: 30.08 s > 20 s
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_the_cusps_four_and_five_have_their_root_class_orbits_in_the_boundary_lattice: 142.09 s > 20 s
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_the_coble_cusps_three_four_and_five_have_their_root_class_orbits: 309.74 s > 20 s
+=========================== short test summary info ============================
+FAILED tests/lattices/test_hyperbolic_chambers.sage::test_hilbert_basis_of_a_nonunimodular_plane_cone_exceeds_its_rays
+FAILED tests/lattices/test_hyperbolic_chambers.sage::test_lorentz_plane_has_one_reflective_wall_and_orthogonal_group_of_order_four
+FAILED tests/lattices/test_weyl_chamber_complex.sage::test_the_reflection_in_the_wall_root_carries_the_chamber_across_the_wall
+FAILED tests/lattices/test_weyl_chamber_complex.sage::test_crossing_the_same_wall_twice_is_the_identity
+4 failed, 15 passed, 84 warnings in 602.21s (0:10:02)
+[peakrss] issue387: child waited=1 shell_code=1 samples=306
+[peakrss] peak tree RSS      : 2117 MiB
+[peakrss] low-water MemAvail : 6787 MiB
+[peakrss] peak single VmHWM  : 2117 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     2106 MiB peak
+[peakrss]   cc1                          12 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   ccache                        5 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   cc                            2 MiB peak
+[peakrss]   t=   608.2s procs=  3 rss=  2117 MiB hwm=  2117 MiB avail= 11642 MiB
+[peakrss]   t=   602.2s procs=  3 rss=  2116 MiB hwm=  2116 MiB avail= 11649 MiB
+[peakrss]   t=   604.2s procs=  3 rss=  2116 MiB hwm=  2116 MiB avail= 11649 MiB
+[peakrss]   t=   606.2s procs=  3 rss=  2116 MiB hwm=  2116 MiB avail= 11649 MiB
+[peakrss]   t=   610.2s procs=  3 rss=  2116 MiB hwm=  2117 MiB avail= 11639 MiB
+### exit=1

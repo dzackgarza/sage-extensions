@@ -324,3 +324,101 @@ def test_the_first_cusp_writes_down_no_candidate_outside_its_layer() -> None:
     assert all(root.q() in (ZZ(-2), ZZ(-4)) for root in walls)
     assert all(image.admits_root(root) for root in walls)
     assert all(reduction.b(root, root) == root.q() for root in walls)
+
+
+def test_the_fourth_cusps_layers_are_enumerated_in_the_coordinates_of_its_cell() -> None:
+    r"""The cusp-4 walk enumerates its layers through the lineality of its cell (#400).
+
+    The controlling vector the call computes at ``Sterk_4`` has a cell with
+    lineality: its eight cell normals span rank eight of the nine-dimensional
+    ``v_0^\perp`` (#387, ``results/issue387-the-group-of-the-card-chamber.md``
+    §4), so the cone of that cell has one lineality direction and the layer
+    enumeration of #285, written for cells whose normals are a basis of
+    ``v_0^\perp``, does not reach it.  The walk then enumerated every layer by
+    the engine's whole-lattice search and gained no wall in thirty minutes
+    after its eighth acceptance (probe ``issue387-probe-j2.log``).
+
+    The layers are now enumerated in the coordinates of the cell itself.
+    Every vector of ``v_0^\perp`` is, for exactly one coset representative
+    ``s`` of the lattice spanned by the normals and the lineality vector
+    ``m``, the vector ``s - sum(d_i w_i) + t m``, with the cone coordinates
+    ``d`` nonnegative and the lineality coordinate ``t`` an integer bounded
+    on both sides by the layer's norm equation — E. B. Vinberg, *On the
+    groups of unit elements of certain quadratic forms*, Math. USSR Sb. 16
+    (1972), §4.1, the equation (57) with the conditions (58), p. 30 — and
+    the engine's whole-lattice search returns exactly the solutions of the
+    same layers, restricted to none of them: the two agree on every layer
+    both reach (probe ``issue400-probe-b.log``).  What is asserted here is
+    the walk's own progress through that enumeration: bounded to twenty
+    decompositions past the controlling vector, it accepts more walls than
+    the sixteen the stalled walk had reached — its eight cell walls and its
+    eight additions, the last at height ``4 sqrt(2)`` — because the layers
+    beyond the stall carry walls again, at height ``6 sqrt(2)``.  The wall count of
+    the completed
+    chamber is the card's row and not this bounded prefix's: Vinberg's
+    sequence (38) legitimately contains positive roots, whose halfspaces
+    bound the polyhedron without being its walls.
+    """
+    image = _cusp_images()["Sterk_4"]
+    chamber = image.cusp_chamber(max_decompositions=20)
+    walls = tuple(chamber.wall_roots())
+
+    assert chamber.is_complete_wall_set() is False
+    assert all(image.admits_root(root) for root in walls)
+    assert all(root.q() in (ZZ(-2), ZZ(-4)) for root in walls)
+    assert cardinal(sum(1 for _ in walls)) > cardinal(16)
+
+
+def test_each_of_the_fourth_cusps_first_layers_agrees_with_the_whole_lattice_in_the_cell() -> None:
+    r"""The cell enumeration of a layer is exactly that layer's whole-lattice solutions in the cell.
+
+    The walk at the fourth cusp enumerates its layers in the coordinates of
+    the cell at the controlling vector (#400): the cone coordinates
+    nonnegative, the lineality coordinate an integer bounded on both sides
+    by the layer's norm equation.  Its candidates are then exactly the
+    solutions of the layer's equation (57) that lie in the cell — E. B.
+    Vinberg, *On the groups of unit elements of certain quadratic forms*,
+    Math. USSR Sb. 16 (1972), §4.1, the equation (57) with the conditions
+    (58), p. 30 — the vectors whose coordinates in the cell normals are
+    nonpositive, which is to pair nonpositively with every adjugate dual
+    normal of the cell.  The engine's whole-lattice enumeration returns
+    every solution of the same equation with no restriction, so the two
+    sets agree on each layer both searches reach; the first four are
+    compared here, layer by layer, with the layer named on failure — the
+    probe ``issue400-probe-b.log`` compared the first thirteen the same way
+    before the whole-lattice search itself runs out of memory at the
+    fourteenth.
+
+    The dual normals are verified before use: each pairs zero with every
+    normal but its own, and positively with its own, so each is a positive
+    multiple of the dual basis vector of the cell normals, and pairing
+    nonpositively with every dual is the nonpositive orthant of the normal
+    coordinates and not some other cone.
+    """
+    image = _cusp_images()["Sterk_4"]
+    reduction = image.reduction()
+
+    def coordinates_of(candidate):
+        return tuple(int(entry) for entry in candidate.to_vector())
+
+    for layer in image.cusp_layer_enumerations(layers=4):
+        normals = layer.cell_normals()
+        duals = layer.cell_dual_normals()
+        for i, normal in enumerate(normals):
+            for j, dual in enumerate(duals):
+                pairing = reduction.b(normal, dual)
+                if i == j:
+                    assert pairing > 0
+                else:
+                    assert pairing == 0
+        in_the_cell = [
+            candidate
+            for candidate in layer.whole_lattice_candidates()
+            if all(reduction.b(candidate, dual) <= 0 for dual in duals)
+        ]
+        assert {coordinates_of(candidate) for candidate in layer.cell_candidates()} == {
+            coordinates_of(candidate) for candidate in in_the_cell
+        }, (
+            f"layer {layer.layer_number()} of square {layer.square()} at offset "
+            f"{layer.offset()} disagrees with its whole-lattice solutions in the cell"
+        )

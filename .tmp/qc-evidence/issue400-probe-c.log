@@ -1,0 +1,38 @@
+[04:24:37] importing
+[04:24:39] imported in 1.6 s
+[04:25:02] subgroup built in 24.9 s
+[04:26:38] controlling vector: (7, -17, -34, -51, -68, -85, -60, 21, 4, 4)
+[04:34:44] walk: complete=False walls=18 layers=21 in 486.3 s
+[04:34:44]   wall (-2, 5, 10, 15, 20, 25, 18, -6, 0, -2) engine-sq=4 height=0.0000
+[04:34:44]   wall (0, -1, 0, 0, 0, 0, 0, 0, 0, 0) engine-sq=4 height=0.0000
+[04:34:44]   wall (0, 0, -1, 0, 0, 0, 0, 0, 0, 0) engine-sq=4 height=0.0000
+[04:34:44]   wall (0, 0, 0, -1, 0, 0, 0, 0, 0, 0) engine-sq=4 height=0.0000
+[04:34:44]   wall (0, 0, 0, 0, -1, 0, 0, 0, 0, 0) engine-sq=4 height=0.0000
+[04:34:44]   wall (0, 0, 0, 0, 0, -1, 0, 0, 0, 0) engine-sq=4 height=0.0000
+[04:34:44]   wall (0, 0, 0, 0, 0, 0, -1, 0, 0, 0) engine-sq=4 height=0.0000
+[04:34:44]   wall (0, 0, 0, 0, 0, 0, 0, 0, -1, 1) engine-sq=2 height=0.0000
+[04:34:44]   wall (5, -12, -25, -38, -51, -64, -45, 16, 3, 3) engine-sq=2 height=1.4142
+[04:34:44]   wall (6, -13, -27, -41, -55, -69, -49, 17, 3, 3) engine-sq=2 height=1.4142
+[04:34:44]   wall (13, -31, -62, -93, -125, -157, -111, 39, 7, 7) engine-sq=2 height=2.8284
+[04:34:44]   wall (30, -72, -145, -218, -291, -364, -257, 90, 16, 16) engine-sq=4 height=4.0000
+[04:34:44]   wall (20, -49, -98, -147, -196, -245, -173, 61, 11, 11) engine-sq=2 height=4.2426
+[04:34:44]   wall (21, -50, -100, -150, -200, -250, -177, 62, 11, 11) engine-sq=2 height=4.2426
+[04:34:44]   wall (27, -67, -134, -201, -268, -335, -236, 83, 15, 15) engine-sq=2 height=5.6569
+[04:34:44]   wall (29, -69, -138, -207, -276, -345, -244, 85, 15, 15) engine-sq=2 height=5.6569
+[04:34:44]   wall (40, -98, -196, -294, -393, -492, -347, 122, 23, 21) engine-sq=2 height=8.4853
+[04:34:44]   wall (42, -100, -200, -300, -401, -502, -355, 124, 23, 21) engine-sq=2 height=8.4853
+[04:34:44] probe complete in 607.3 s
+[peakrss] issue400: child waited=0 shell_code=0 samples=306
+[peakrss] peak tree RSS      : 2577 MiB
+[peakrss] low-water MemAvail : 3750 MiB
+[peakrss] peak single VmHWM  : 2580 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     2569 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   462.3s procs=  3 rss=  2577 MiB hwm=  2580 MiB avail=  4979 MiB
+[peakrss]   t=   464.3s procs=  3 rss=  2577 MiB hwm=  2580 MiB avail=  4980 MiB
+[peakrss]   t=   466.3s procs=  3 rss=  2577 MiB hwm=  2580 MiB avail=  4981 MiB
+[peakrss]   t=   468.3s procs=  3 rss=  2577 MiB hwm=  2580 MiB avail=  4982 MiB
+[peakrss]   t=   470.3s procs=  3 rss=  2577 MiB hwm=  2580 MiB avail=  4984 MiB
+launcher exit: 0

@@ -1,0 +1,15 @@
+provider SHA: 1da602e46cc7cf74da5a3218f172662c028a04a1
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests/lattices/test_isotropic_transport_retains_parabolic_structure.sage::test_null_plane_transport_retains_its_split_parabolic
+
+1 test collected in 1.59s
+[peakrss] run: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 286 MiB
+[peakrss] low-water MemAvail : 12851 MiB
+[peakrss] peak single VmHWM  : 286 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      274 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   286 MiB hwm=   286 MiB avail= 12851 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail= 13067 MiB

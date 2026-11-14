@@ -1,0 +1,164 @@
+provider SHA: 1a59869ba62b9eda408c5e5d062a2a9b240fe899
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint --durations=0 tests/lattices/test_special_orthogonal_split_building.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.48 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collected 1 item
+
+tests/lattices/test_special_orthogonal_split_building.sage F             [100%]
+
+=================================== FAILURES ===================================
+_ test_special_orthogonal_split_building_retains_exact_flag_incidence_and_transporters _
+
+    def test_special_orthogonal_split_building_retains_exact_flag_incidence_and_transporters():
+        hyperbolic = Lattices(ZZ)("U")
+        lattice = hyperbolic + hyperbolic
+        group = lattice.SO()
+        lines, planes = group.cusps(1), group.cusps(2)
+>       incidences = group.tits_building_incidence()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_special_orthogonal_split_building.sage:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/predicate_subgroups.py:790: in tits_building_incidence
+    sourced_flags = list(self.isotropic_orbit_representatives(2, flag=True))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:517: in isotropic_orbit_representatives
+    return _subgroup_isotropic_orbit_representatives(
+src/sage_extensions/categories/orthogonal_quotients.py:3467: in _subgroup_isotropic_orbit_representatives
+    stabilizer = quotient.exact_isotropic_stabilizer_generators(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sage_extensions.categories.orthogonal_quotients.OrthogonalCharacterQuotient object at 0x74f88ac2a270>
+representative = Primitive totally isotropic flag of length 2 in Integral lattice of rank 4 and signature (2, 2)
+flag = True
+
+    def exact_isotropic_stabilizer_generators(self, representative, *, flag=False):
+        r"""Return elements of ``H = Stab_{O(L)}(representative)`` whose image ``chi(H)`` is exact.
+    
+        The double-coset split of :meth:`splitting_isometries` is
+        ``chi(Gamma) \ Q / chi(H)`` with ``Q = chi(O(L))``, so it needs the finite
+        image ``chi(H)`` exactly; generators of a proper subgroup of ``H`` with a
+        smaller image split one ``Gamma``-orbit into several.  The ambient
+        family ``isotropic_stabilizer_generators`` need not generate ``H``: the
+        plane-parabolic family is complete only when the lattice splits along the
+        plane (``is_parabolic_complete``), which fails on ``U(2) + U(2) + A_2``.
+    
+        **Upper bound.**  Every term ``W`` of the representative (the subobject
+        itself, or each term of a flag) has the divided class set
+        ``D(W) = {[u/div(u)] : u primitive in W}`` in ``A_L``
+        (:func:`_isotropic_divided_class_set`).  An element of ``H`` carries each
+        term onto itself and primitive vectors to primitive vectors of the same
+        divisibility, so ``rho(h)`` preserves every ``D(W)``.  Hence
+        ``chi(H) <= U = {q in Q : pi_disc(q) D(W) = D(W) for every term W}``,
+        and ``|U| = |Q| / |orbit of the data|`` by orbit--stabilizer.
+    
+        **Lower bound and closure.**  ``chi`` of the ambient family generates
+        ``V <= chi(H)``.  While ``V != U``, each right-coset representative ``r``
+        of ``V`` in ``U`` is lifted to ``g`` in ``O(L)`` by the word section
+        (checked against the character map); ``g`` carries the representative to
+        an object with the same divided data, and the ambient equivalence
+        witness ``k`` with ``k(g x) = x`` gives ``k g`` in ``H``.  Its image is
+        added to ``V``.  The loop ends when ``|V| = |U|``, which proves
+        ``chi(H) = U`` with every generator an exhibited element of ``H``.  A
+        pass that adds nothing certifies nothing, and raises: the divided data
+        need not be a complete invariant, and no smaller image is guessed.
+        """
+        ambient = self.supergroup
+        generators = list(ambient.isotropic_stabilizer_generators(representative, flag=flag))
+        _section_generators, _images, section = self._image_section()
+        image = self._gap_image()
+        factors, product, _embeddings, projections = self._gap_product()
+        if self._has_discriminant:
+            position = next(
+                index for index, (label, _group) in enumerate(factors) if label == "discriminant"
+            )
+            projection = libgap.RestrictedMapping(projections[position], image)
+            discriminant_image = libgap.Image(projection)
+            terms = tuple(representative.terms()) if flag else (representative,)
+            finite_orthogonal = self._discriminant_group
+            data = libgap(
+                [
+                    libgap.Set(
+                        [
+                            finite_orthogonal._engine_abelian_element(divided_class)
+                            for divided_class in _isotropic_divided_class_set(self.lattice, term)
+                        ]
+                    )
+                    for term in terms
+                ]
+            )
+            termwise_action = libgap.function_factory(
+                "function(x, g) return List(x, part -> Set(List(part, y -> ImageElm(g, y)))); end"
+            )
+            upper = libgap.PreImages(
+                projection, libgap.Stabilizer(discriminant_image, data, termwise_action)
+            )
+        else:
+            upper = image
+        lower = libgap.Subgroup(
+            product, [self._gap_of_key(self.image(generator)) for generator in generators]
+        )
+        if not bool(libgap.IsSubset(upper, lower)):
+            raise ArithmeticError(
+                f"an ambient stabilizer generator of {representative} moves its divided "
+                f"discriminant data: it does not stabilize {representative}"
+            )
+        target = int(libgap.Size(upper))
+        while int(libgap.Size(lower)) < target:
+            before = int(libgap.Size(lower))
+            for coset in libgap.AsList(libgap.RightTransversal(upper, lower)):
+                lift = self._checked_lift(self._key_of_gap(coset), section.letters_of(coset))
+                moved = lift.transport_isotropic_object(representative)
+                witness = ambient.isotropic_equivalence_witness(moved, representative, flag=flag)
+                if witness is None:
+                    raise ArithmeticError(
+                        f"{lift} is an element of {ambient}, yet {ambient} does not carry "
+                        f"{moved} back to {representative}"
+                    )
+                element = witness * lift
+                key = self._gap_of_key(self.image(element))
+                closed = libgap.ClosureGroup(lower, key)
+                if int(libgap.Size(closed)) > int(libgap.Size(lower)):
+                    generators.append(element)
+                    lower = closed
+            if int(libgap.Size(lower)) == before:
+>               raise ArithmeticError(
+                    f"the stabilizer of {representative} in {ambient} has character image of "
+                    f"order at least {before}, and the stabilizer of its divided discriminant "
+                    f"data has order {target}; no exhibited stabilizer element closes the index "
+                    f"{target // before}, so the exact image chi(Stab) is not certified"
+                )
+E               ArithmeticError: the stabilizer of Primitive totally isotropic flag of length 2 in Integral lattice of rank 4 and signature (2, 2) in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) has character image of order at least 1, and the stabilizer of its divided discriminant data has order 2; no exhibited stabilizer element closes the index 2, so the exact image chi(Stab) is not certified
+
+src/sage_extensions/categories/orthogonal_quotients.py:1626: ArithmeticError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:722 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+============================== slowest durations ===============================
+7.58s call     tests/lattices/test_special_orthogonal_split_building.sage::test_special_orthogonal_split_building_retains_exact_flag_incidence_and_transporters
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_special_orthogonal_split_building.sage::test_special_orthogonal_split_building_retains_exact_flag_incidence_and_transporters
+============================== 1 failed in 8.26s ===============================
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=7
+[peakrss] peak tree RSS      : 536 MiB
+[peakrss] low-water MemAvail : 7555 MiB
+[peakrss] peak single VmHWM  : 536 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      518 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=    12.0s procs=  5 rss=   536 MiB hwm=   536 MiB avail=  7555 MiB
+[peakrss]   t=    10.0s procs=  5 rss=   513 MiB hwm=   513 MiB avail=  7705 MiB
+[peakrss]   t=     8.0s procs=  5 rss=   497 MiB hwm=   497 MiB avail=  7866 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   452 MiB hwm=   452 MiB avail=  8084 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   322 MiB hwm=   322 MiB avail=  8415 MiB

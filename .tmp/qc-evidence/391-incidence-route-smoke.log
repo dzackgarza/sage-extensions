@@ -1,0 +1,25 @@
+[   1.1s] imports done
+small lattice labels: (0, 1, 2, 3, 4)
+point order: 4 of |A| 8
+[  52.3s] 0: new route 2 edges over 2 line and 1 plane cusps
+[  11.7s] 0: flag row 2 edges
+0: the two routes agree
+[   7.7s] 0: new route 2 edges over 2 line and 1 plane cusps
+[  11.7s] 0: flag row 2 edges
+0: the two routes agree
+DONE
+[peakrss] probe391c: child waited=0 shell_code=0 samples=45
+[peakrss] peak tree RSS      : 2800 MiB
+[peakrss] low-water MemAvail : 11607 MiB
+[peakrss] peak single VmHWM  : 2800 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2056 MiB peak
+[peakrss]   python                      733 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    86.0s procs=  4 rss=  2800 MiB hwm=  2800 MiB avail= 11607 MiB
+[peakrss]   t=    84.0s procs=  4 rss=  2764 MiB hwm=  2764 MiB avail= 11655 MiB
+[peakrss]   t=    82.0s procs=  4 rss=  2760 MiB hwm=  2760 MiB avail= 11650 MiB
+[peakrss]   t=    80.0s procs=  4 rss=  2754 MiB hwm=  2754 MiB avail= 11664 MiB
+[peakrss]   t=    78.0s procs=  4 rss=  2749 MiB hwm=  2749 MiB avail= 11690 MiB
+launcher exit: 0

@@ -1,0 +1,35 @@
+tree SHA: e79631d4467fd1f801eed3d579c196db1e1fafcf
+selection: tests/lattices/test_the_vinberg_call_returns_the_facets.sage
+started: 2026-11-14T07:57:37+00:00
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.37 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collected 5 items
+
+tests/lattices/test_the_vinberg_call_returns_the_facets.sage .....       [100%]
+
+=============================== warnings summary ===============================
+tests/lattices/test_the_vinberg_call_returns_the_facets.sage: 114 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/lattices/test_the_vinberg_call_returns_the_facets.sage: 114 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================== slowest durations ===============================
+3.59s call     tests/lattices/test_the_vinberg_call_returns_the_facets.sage::test_the_walls_of_u_plus_e8_minus_2_are_its_facets
+3.55s call     tests/lattices/test_the_vinberg_call_returns_the_facets.sage::test_the_walls_of_u_plus_e8_are_its_facets
+3.54s call     tests/lattices/test_the_vinberg_call_returns_the_facets.sage::test_the_walls_of_u_2_plus_e8_minus_2_are_its_facets
+0.48s call     tests/lattices/test_the_vinberg_call_returns_the_facets.sage::test_the_walls_of_u_plus_a1_are_its_facets
+0.22s call     tests/lattices/test_the_vinberg_call_returns_the_facets.sage::test_a_half_space_the_other_walls_imply_is_not_a_facet
+
+(10 durations < 0.005s hidden.  Use -vv to show these durations.)
+======================= 5 passed, 228 warnings in 11.68s =======================
+exit: 0
+finished: 2026-11-14T07:57:51+00:00

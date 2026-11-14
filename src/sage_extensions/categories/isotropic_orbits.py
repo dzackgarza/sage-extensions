@@ -984,7 +984,7 @@ class CuspIncidence(SageObject):
 
 
 class ArithmeticCuspIncidence(SageObject):
-    r"""One rank-``(1,2)`` flag orbit in an arithmetic-subgroup quotient building."""
+    r"""One incident pair of cusp orbits, with an actual rank-``(1,2)`` flag certificate."""
 
     def __init__(
         self,
@@ -2228,6 +2228,83 @@ def _divided_class_isotropic_plane_orbits(subgroup, representatives, stabilizer_
     return _DividedClassPlaneOrbitDecomposition(subgroup, representatives, stabilizer_generators).orbits()
 
 
+class CuspLayerEnumeration(SageObject):
+    r"""One layer of the cusp chamber walk, enumerated both ways (#400).
+
+    The layer is a pair (offset, square) of Vinberg's decomposition of the
+    lattice over ``v_0^\perp`` and ``\mathbf Z v_0`` (E. B. Vinberg, *On the
+    groups of unit elements of certain quadratic forms*, Math. USSR Sb. 16
+    (1972), §4.1, the equation (57), p. 30): its candidates are the lattice
+    vectors ``offset + v_1`` with ``v_1`` in ``v_0^\perp`` and the layer's
+    square.  The record carries those candidates twice — as the walk's own
+    enumeration returns them, written in the coordinates of the cell at the
+    controlling vector (#400), and as the engine's whole-lattice
+    enumeration of the same Diophantine equation returns them — as elements
+    of the reduction, together with the layer's offset, the normals of that
+    cell, and the adjugate duals of those normals.
+
+    The duals are the integer vectors
+    \(\tilde w_i=\sum_j\operatorname{adj}(G)_{ij}w_j\) for the Gram \(G\) of
+    the normals, and every vector \(x\) pairs with them as
+    \(b(x,\tilde w_i)=\det(G)\,u_i(x)\), where \(u(x)\) are the coordinates
+    of \(x\) in the normals.  The Gram of a cell is definite and
+    \(\det(G)>0\), so a candidate lies in the cell — its normal coordinates
+    are nonpositive, the region the walk's enumeration covers — exactly when
+    it pairs nonpositively with every dual normal.  The enumeration of a
+    layer is correct when its candidates are exactly the whole-lattice
+    candidates that lie in the cell.
+    """
+
+    def __init__(
+        self,
+        number,
+        square,
+        offset,
+        normals,
+        duals,
+        cell_candidates,
+        whole_lattice_candidates,
+    ) -> None:
+        self._number = number
+        self._square = square
+        self._offset = offset
+        self._normals = tuple(normals)
+        self._duals = tuple(duals)
+        self._cell_candidates = tuple(cell_candidates)
+        self._whole_lattice_candidates = tuple(whole_lattice_candidates)
+
+    def layer_number(self):
+        r"""Return the layer's position in the walk's height order, Vinberg's (59)."""
+        return self._number
+
+    def square(self):
+        r"""Return the common square of the layer's candidates, as elements of the reduction."""
+        return self._square
+
+    def offset(self):
+        r"""Return the layer's offset, the non-\(v_0^\perp\) part of the decomposition."""
+        return self._offset
+
+    def cell_normals(self):
+        r"""Return the roots of the cell at the controlling vector, as elements of the reduction."""
+        return self._normals
+
+    def cell_dual_normals(self):
+        r"""Return the adjugate duals of the cell normals, as elements of the reduction."""
+        return self._duals
+
+    def cell_candidates(self):
+        r"""Return the candidates the walk's enumeration of this layer returns."""
+        return self._cell_candidates
+
+    def whole_lattice_candidates(self):
+        r"""Return the candidates of the engine's whole-lattice enumeration of this layer."""
+        return self._whole_lattice_candidates
+
+    def __repr__(self) -> str:
+        return f"layer {self._number} of the cusp chamber walk"
+
+
 class IsotropicVectorReductionImage(SageObject):
     r"""The group that ``Stab_\Gamma(v)`` induces on \(v^\perp/\mathbf Z v\), with its kernel.
 
@@ -2697,6 +2774,114 @@ class IsotropicVectorReductionImage(SageObject):
             max_roots=max_roots,
             max_decompositions=max_decompositions,
         )
+
+    def cusp_layer_enumerations(self, controlling_vector=None, *, layers):
+        r"""Return the first layers of the cusp chamber walk, each enumerated both ways (#400).
+
+        The walk of :meth:`cusp_chamber` enumerates every layer of roots in
+        the coordinates of the cell at the controlling vector — the normals,
+        the lineality direction and the coset representatives of their span,
+        with the cone coordinates nonnegative and the lineality coordinate
+        an integer bounded on both sides by the layer's norm equation (E. B.
+        Vinberg, *On the groups of unit elements of certain quadratic
+        forms*, Math. USSR Sb. 16 (1972), §4.1, the equation (57) with the
+        conditions (58), p. 30; #400).  That enumeration is correct when the
+        candidates it returns are exactly the layer's whole-lattice
+        solutions that lie in the cell, and this method exposes both sides
+        of that statement for a caller to compare: it returns
+        :class:`CuspLayerEnumeration` records, the first ``layers`` of the
+        walk's height order, each with the candidates of the walk's own
+        enumeration and the candidates of the engine's whole-lattice
+        enumeration of the same layer, as elements of the reduction, with
+        the cell's normals and their adjugate duals — a candidate lies in
+        the cell exactly when it pairs nonpositively with every dual.
+
+        ``controlling_vector`` is the point of the hyperbolic space the
+        enumeration measures height from, read as :meth:`cusp_chamber` reads
+        it; omitted, the call computes its own, and the chamber does not
+        depend on the choice (Vinberg 1972, §3.2, the construction after
+        Proposition 3, p. 27, with Propositions 4 and 5, pp. 28--29).
+
+        The initial cone at the controlling vector is enumerated by the
+        engine's whole-lattice search on the way (the cell is cut by that
+        very enumeration), so the cost of this call is one initial cone plus
+        the bounded prefix of layers.
+        """
+        from sage_extensions.categories.hyperbolic_lattices import (
+            HyperbolicLattices,
+            _filtered_vinal_class,
+            _framing_coordinates,
+        )
+        from vinal import VinAl
+
+        reduction = HyperbolicLattices(self._lattice.base_ring())(self._reduction)
+        control = (
+            self._computed_controlling_vector()
+            if controlling_vector is None
+            else self._class_of_the_controlling_vector(controlling_vector)
+        )
+        engine_gram, negated = reduction._engine_gram_of_signature_n_1()
+        coordinates = list(_framing_coordinates(control))
+
+        def element(row):
+            converted = reduction(tuple(int(entry) for entry in row))
+            return -converted if negated else converted
+
+        decided = {}
+
+        def admits_element(root):
+            key = tuple(int(entry) for entry in root.to_vector())
+            if key not in decided:
+                decided[key] = self.admits_root(root)
+            return decided[key]
+
+        def row_filter(row):
+            return bool(admits_element(element(row)))
+
+        walk = _filtered_vinal_class()(engine_gram, coordinates, admits_root=row_filter)
+        walk.roots = walk.FundCone()
+        engine_normals = tuple(
+            root for root in walk.roots if walk.v0.inner_product(root) == 0
+        )
+        gram = matrix(
+            [
+                [int(one.inner_product(other)) for other in engine_normals]
+                for one in engine_normals
+            ]
+        )
+        if engine_normals and int(gram.det()) == 0:
+            raise ValueError(
+                f"the cell at the controlling vector of {self._reduction} has linearly "
+                f"dependent normals, so its layers have no cell coordinates to be "
+                f"enumerated in"
+            )
+        # The adjugate dual of the normals, in engine coordinates, with the
+        # sign that makes the public pairing the positive multiple det(G)*u
+        # of the candidate's normal coordinates.
+        dual_rows = (gram.adjugate() * matrix([list(normal) for normal in engine_normals])).rows()
+        duals = tuple(element(-row if negated else row) for row in dual_rows)
+        normals = tuple(element(normal) for normal in engine_normals)
+        records = []
+        examined = 0
+        for offset, engine_square in walk.IterateRootDecompositions():
+            examined += 1
+            if examined > layers:
+                break
+            records.append(
+                CuspLayerEnumeration(
+                    examined,
+                    -engine_square if negated else engine_square,
+                    element(offset),
+                    normals,
+                    duals,
+                    (element(candidate) for candidate in walk.Roots_decomposed_into(offset, engine_square)),
+                    (
+                        element(candidate)
+                        for candidate in VinAl.Roots_decomposed_into(walk, offset, engine_square)
+                    ),
+                )
+            )
+        return tuple(records)
 
     def _computed_controlling_vector(self):
         r"""Return the class in ``N`` computed as the point of the hyperbolic space.

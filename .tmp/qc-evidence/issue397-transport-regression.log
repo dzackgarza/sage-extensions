@@ -1,0 +1,26 @@
+provider SHA: 1da602e46cc7cf74da5a3218f172662c028a04a1
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collected 1 item
+
+tests/lattices/test_isotropic_transport_retains_parabolic_structure.sage . [100%]
+
+============================== slowest durations ===============================
+0.36s call     tests/lattices/test_isotropic_transport_retains_parabolic_structure.sage::test_null_plane_transport_retains_its_split_parabolic
+
+(2 durations < 0.005s hidden.  Use -vv to show these durations.)
+============================== 1 passed in 1.90s ===============================
+[peakrss] run: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 286 MiB
+[peakrss] low-water MemAvail : 13264 MiB
+[peakrss] peak single VmHWM  : 286 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      275 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   286 MiB hwm=   286 MiB avail= 13264 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13511 MiB

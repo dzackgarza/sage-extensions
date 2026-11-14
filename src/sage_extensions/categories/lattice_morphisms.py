@@ -1984,7 +1984,20 @@ class LatticeIsometryMethods:
 
         match obj in ModuleSubobjects(self.codomain().base_ring()):
             case True:
-                return (self * obj.inclusion()).image()
+                image = (self * obj.inclusion()).image()
+                # The image of a primitive isotropic subobject under an
+                # isometry is again one -- the admission checks of
+                # primitive_isotropic_subobject re-verify both facts -- so the
+                # transported subobject is placed in the category that owns
+                # the parabolic and reduction methods, not left as a bare
+                # module image (#391: the transported representatives of the
+                # Coble plane row are consumed by exactly those methods).
+                domain = image.inclusion().domain()
+                basis = tuple(
+                    image.inclusion()(domain.module_generator(label))
+                    for label in domain.module_generating_set()
+                )
+                return self.codomain().primitive_isotropic_subobject(*basis)
             case False:
                 return IsotropicFlag(
                     self.codomain(),
@@ -5407,6 +5420,12 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
 
         # The represented U + U + K decompositions, with the two hyperbolic
         # planes first and the even unimodular definite complement last.
+        # A lattice not constructed as a biproduct has no represented
+        # decomposition, so the pair is outside this route's scope.
+        from sage_extensions.categories.modules.pure.modules import BiproductModules
+
+        if domain not in BiproductModules(domain.base_ring()) or codomain not in BiproductModules(codomain.base_ring()):
+            return None
         try:
             domain_planes = (domain.biproduct_factor(0), domain.biproduct_factor(1))
             codomain_planes = (codomain.biproduct_factor(0), codomain.biproduct_factor(1))

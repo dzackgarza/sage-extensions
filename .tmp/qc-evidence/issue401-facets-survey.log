@@ -1,0 +1,26 @@
+worktree SHA: c15b43275fcfd56fbb29882ba663da52d3d30f40
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt401/.scratch/probe401_redundancy.py
+[U + A1] search 0.47s complete=True
+U + A1: rank=3 complete=True roots=3 facets=3 kept=3 dropped=0 (0.07s)
+[E10 = U + E8] search 2.32s complete=True
+E10 = U + E8: rank=10 complete=True roots=10 facets=10 kept=10 dropped=0 (0.13s)
+[U + E8 + E8 (II_1_17)] search 71.56s complete=True
+U + E8 + E8 (II_1_17): rank=18 complete=True roots=19 facets=19 kept=19 dropped=0 (1.00s)
+[U + E8(-2)] search 2.34s complete=True
+U + E8(-2): rank=10 complete=True roots=10 facets=10 kept=10 dropped=0 (0.13s)
+[T_En = U + U(2) + E8(-2)] FAILED: AssertionError: Integral lattice of rank 12 and signature (2, 10) is not a hyperbolic lattice: a hyperbolic lattice has signature (1, n) or (n, 1), but Integral lattice of rank 12 and signature (2, 10) has signature (2, 10)
+[T_Co] FAILED: AssertionError: Integral lattice of rank 11 and signature (2, 9) is not a hyperbolic lattice: a hyperbolic lattice has signature (1, n) or (n, 1), but Integral lattice of rank 11 and signature (2, 9) has signature (2, 9)
+[peakrss] probe401: child waited=0 shell_code=0 samples=41
+[peakrss] peak tree RSS      : 331 MiB
+[peakrss] low-water MemAvail : 13402 MiB
+[peakrss] peak single VmHWM  : 331 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      320 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    78.0s procs=  3 rss=   331 MiB hwm=   331 MiB avail= 13408 MiB
+[peakrss]   t=    80.0s procs=  3 rss=   331 MiB hwm=   331 MiB avail= 13402 MiB
+[peakrss]   t=    76.0s procs=  3 rss=   330 MiB hwm=   330 MiB avail= 13421 MiB
+[peakrss]   t=    74.0s procs=  3 rss=   329 MiB hwm=   329 MiB avail= 13425 MiB
+[peakrss]   t=    72.0s procs=  3 rss=   328 MiB hwm=   328 MiB avail= 13435 MiB
+launcher exit: 0
