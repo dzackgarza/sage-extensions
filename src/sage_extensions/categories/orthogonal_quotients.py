@@ -2624,6 +2624,26 @@ class DiscriminantImageMembership:
     def __contains__(self, isometry) -> bool:
         return self.contains(isometry)
 
+    def engine_elements(self, isometries):
+        r"""Return the ``O(A_L)`` engine elements of a family of isometries, for :meth:`meets_translates`."""
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        return tuple(
+            _element_to_engine(self._discriminant_group, isometry) for isometry in isometries
+        )
+
+    def meets_translates(self, factors, isometry) -> bool:
+        r"""Whether ``f`` times the isometry lies in ``\rho(\Gamma)`` for some ``f`` of ``factors``.
+
+        ``factors`` are engine elements (:meth:`engine_elements`), converted once
+        by the caller, so each question converts one isometry and sifts each
+        product through the chain.
+        """
+        from sage_extensions.categories.group.groups import _element_to_engine
+
+        target = _element_to_engine(self._discriminant_group, isometry)
+        return any(factor * target in self._image for factor in factors)
+
 
 _MISSING_ARITHMETIC_GENERATING_SET = (
     "Over an indefinite lattice L, O(L) is an infinite arithmetic group and no "

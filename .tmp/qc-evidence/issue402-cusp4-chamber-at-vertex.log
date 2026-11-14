@@ -1,0 +1,19 @@
+[  207.1s] p_0 in N (0, 0, 0, 0, 0, 0, 0, 0, 1, 1) square 2 printed walls through it 9
+[  831.7s] rho(K_v) coset representatives 256
+[  909.5s] admits_root asked 100 admitted 65
+[  996.0s] admits_root asked 200 admitted 100
+[ 1054.8s] admits_root asked 245 admitted 116
+[ 1054.8s] complete True walls 11
+[ 1054.8s]   wall (1, -2, -4, -6, -8, -10, -7, 2, 0, 0) square -4 printed True
+[ 1054.8s]   wall (1, -4, -7, -10, -13, -16, -11, 4, 0, 0) square -4 printed True
+[ 1054.8s]   wall (0, 1, 0, 0, 0, 0, 0, 0, 0, 0) square -4 printed True
+[ 1054.8s]   wall (0, 0, 1, 0, 0, 0, 0, 0, 0, 0) square -4 printed True
+[ 1054.8s]   wall (0, 0, 0, 1, 0, 0, 0, 0, 0, 0) square -4 printed True
+[ 1054.8s]   wall (0, 0, 0, 0, 1, 0, 0, 0, 0, 0) square -4 printed True
+[ 1054.8s]   wall (0, 0, 0, 0, 0, 1, 0, 0, 0, 0) square -4 printed True
+[ 1054.8s]   wall (0, 0, 0, 0, 0, 0, 1, 0, 0, 0) square -4 printed True
+[ 1054.8s]   wall (0, 0, 0, 0, 0, 0, 0, 0, 1, -1) square -2 printed True
+[ 1054.8s]   wall (-2, 4, 9, 14, 19, 24, 17, -6, -2, 0) square -4 printed False
+[ 1054.8s]   wall (-2, 4, 8, 12, 16, 20, 14, -5, -1, -1) square -2 printed False
+[ 1054.8s] returned walls equal the printed walls as a set: False
+[ 1054.8s] done

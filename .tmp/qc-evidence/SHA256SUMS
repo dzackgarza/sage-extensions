@@ -331,3 +331,7 @@ af6164efd7d708a9788fbabe51e17e3c755cafe3a6c8534873a39044f1d4468e  .tmp/qc-eviden
 dc5a12556101a6814de23fb5bd5adca42f88974cda2a0d2f2039421be2c941f7  .tmp/qc-evidence/issue404-row-step-probe.py
 a3f8fa98f4195255dc102b22078d8a4f245a8bb008880227283e02055954fda4  .tmp/qc-evidence/issue404-row-step-probe.log
 a5328e6b9598aa12e12314189ad7d003a594ed868612fc190eeae38028ac823c  .tmp/qc-evidence/issue404-gate.log
+6c8bc6542f6fdb3083ca37f46ab38260ee36fc107adc95a5336a1943cf11b148  .tmp/qc-evidence/issue402-cusp4-chamber-at-vertex.py
+9bebba8e62342feb12bc9033f1fff58003ffb40b99a5e95dabc94b6fcf89e7ec  .tmp/qc-evidence/issue402-cusp4-chamber-at-vertex.log
+3a6df8b1fd932315563447acbdea8a9bd2052cb4eff97817622155489fca69d9  .tmp/qc-evidence/issue402-cusp4-chamber-gram.py
+85993388e997333238d67da3bd1d92fd1227981b6b66324539018ebce434f12d  .tmp/qc-evidence/issue402-cusp4-chamber-gram.log

@@ -2623,18 +2623,48 @@ class IsotropicVectorReductionImage(SageObject):
         """
         return self._subgroup.finite_character_quotient().discriminant_image_membership()
 
-    def _coset_meets_the_subgroup(self, image) -> bool:
-        r"""Whether ``image . \rho(K_v)`` meets ``\rho(\Gamma)``.
+    @cached_method
+    def _kernel_coset_representatives(self):
+        r"""Representatives of the right cosets of ``\rho(K_v) \cap \rho(\Gamma)`` in ``\rho(K_v)``.
 
-        ``\rho(\Gamma)`` is decided by sifting its one stabilizer chain
-        (:meth:`discriminant_image_membership`), and ``\rho(K_v)`` is the finite
-        subgroup :meth:`kernel_discriminant_image` computes, with one sift per
-        element of it.
+        ``e \cdot g`` lies in ``\rho(\Gamma)`` exactly when ``h e \cdot g`` does,
+        for ``h`` in ``\rho(K_v) \cap \rho(\Gamma)``, so the criterion needs one
+        element of each right coset of that intersection.  The intersection is
+        read off by one sift per element of the finite group ``\rho(K_v)``, and
+        the cosets are its translates.
         """
         membership = self.discriminant_image_membership()
-        return any(
-            membership.contains(element * image)
-            for element in self.kernel_discriminant_image()
+        elements = tuple(self.kernel_discriminant_image())
+        intersection = tuple(element for element in elements if membership.contains(element))
+        remaining = set(elements)
+        representatives = []
+        for element in elements:
+            if element not in remaining:
+                continue
+            representatives.append(element)
+            remaining.difference_update(common * element for common in intersection)
+        return tuple(representatives)
+
+    @cached_method
+    def _kernel_coset_engine_elements(self):
+        return self.discriminant_image_membership().engine_elements(
+            self._kernel_coset_representatives()
+        )
+
+    def _coset_meets_the_subgroup(self, image) -> bool:
+        r"""Whether ``\rho(K_v) \cdot image`` meets ``\rho(\Gamma)``.
+
+        ``\rho(\Gamma)`` is decided by sifting its one stabilizer chain
+        (:meth:`discriminant_image_membership`), once per right coset of
+        ``\rho(K_v) \cap \rho(\Gamma)`` in the finite subgroup ``\rho(K_v)`` that
+        :meth:`kernel_discriminant_image` computes
+        (:meth:`_kernel_coset_representatives`), with the representatives
+        converted to the chain's engine once.  The product is taken in the
+        engine's order; for a lift ``g`` in ``P_v`` the order does not matter,
+        because ``K_v`` is normal in ``P_v`` and ``\rho(K_v) \rho(g) = \rho(g) \rho(K_v)``.
+        """
+        return self.discriminant_image_membership().meets_translates(
+            self._kernel_coset_engine_elements(), image
         )
 
     def contains(self, isometry, *, lift=None) -> bool:
