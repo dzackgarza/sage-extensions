@@ -63,8 +63,13 @@ class IdealMetricDuals(OwnedCategoryOverBaseRing):
             from sage_extensions.categories.modules.framed.formed.form_modules import FormModules
 
             source = self.source_module()
+            from sage_extensions.categories.lattices import Lattices
+            from sage_extensions.categories.rings.ring_foundation import _owned_integers
+
             if self._ideal_dual_modulus == self.base_ring().zero():
                 kernel = source.algebraic_correlation_morphism().kernel()
+            elif self.base_ring() is _owned_integers() and source in Lattices(self.base_ring()) and source.module_rank().is_finite():
+                kernel = source.subobject_on(_divisible_generators(source, self._ideal_dual_modulus))
             else:
                 kernel = (self.defining_morphism() * ModulesOverIntegralDomains(self.base_ring())(source).generic_fibre_map()).kernel()
             restricted = source.pullback_form(kernel.inclusion())
@@ -82,7 +87,6 @@ class IdealMetricDuals(OwnedCategoryOverBaseRing):
 
             categories = [IdealDualPullbacks(self.base_ring())]
             data = {"ideal_dual": self}
-            from sage_extensions.categories.lattices import Lattices
 
             if source in Lattices(self.base_ring()):
                 categories.append(Lattices(self.base_ring()))
@@ -120,3 +124,31 @@ class IdealDualPullbacks(OwnedCategoryOverBaseRing):
                     rational_inclusion(self.inclusion()(self.module_generator(label)))
                 )
             )
+
+
+def _divisible_generators(lattice, modulus):
+    r"""Generators of ``{x in L : b(x, L) subset dZ}`` for a finite-rank lattice over ``ZZ``.
+
+    With ``G`` the Gram matrix of the chosen basis, scaled by its denominator
+    ``D``, the vectors are the ``x`` with ``D G x in dD Z^n``: the projection to
+    ``x`` of the integral kernel of ``[DG | dD I]``. This is polyhedral_common
+    ``ComputeLattice_LN`` (edgewalk.h:107-113, ``IntersectionLattice(I, (N/2) G^-1)``)
+    as one integral kernel, in place of the generator evaluation into ``K/dR``.
+    """
+    from sage.matrix.constructor import identity_matrix
+    from sage.rings.integer_ring import ZZ as EngineZZ
+
+    from sage_extensions.tensors.tensor import _engine_component_matrix
+
+    gram = _engine_component_matrix(lattice.gram_tensor())
+    denominator = gram.denominator()
+    rank = gram.nrows()
+    divisor = EngineZZ(int(modulus)) * denominator
+    system = (denominator * gram).change_ring(EngineZZ).augment(divisor * identity_matrix(EngineZZ, rank))
+    basis = system.right_kernel_matrix().matrix_from_columns(range(rank)).hermite_form(include_zero_rows=False)
+    ring = lattice.base_ring()
+    labels = tuple(lattice.module_generating_set())
+    return tuple(
+        lattice.linear_combination({label: ring(int(entry)) for label, entry in zip(labels, row, strict=True) if entry})
+        for row in basis.rows()
+    )
