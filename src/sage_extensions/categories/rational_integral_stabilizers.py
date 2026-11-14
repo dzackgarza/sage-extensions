@@ -102,6 +102,7 @@ from sage_extensions.categories.modules.pure.modules import (
     Modules,
     RestrictedScalarsModules,
 )
+from sage_extensions.categories.modules.orbit_spans import OrbitSpanConstructions
 from sage_extensions.categories.rings.ring_foundation import (
     _own_ring,
     _owned_integers,
@@ -547,6 +548,26 @@ class IntegralStructureAction(SageObject):
 
     def stable_containing_bound(self):
         return self._stable_containing_bound
+
+    def with_invariant_module_construction(self, construction):
+        r"""Retain a completed orbit span for this action and lattice inclusion.
+
+        An orbit-span construction retains its action, seed and computed
+        least stable module. Its inclusion is a justified stable containing
+        bound, while the construction itself already answers the invariant
+        module question. Check the retained data before reusing that answer.
+        """
+        ring = self.lattice_inclusion().domain().base_ring()
+        if construction not in OrbitSpanConstructions(ring):
+            raise TypeError("an invariant module requires an owned orbit-span construction")
+        if construction.ambient_action() is not self.ambient_action_functor():
+            raise ValueError("the orbit span must retain this integral-structure action")
+        if construction.seed() is not self.lattice_inclusion():
+            raise ValueError("the orbit span must start at this lattice inclusion")
+        result = self.with_stable_containing_bound(construction.inclusion())
+        result.ambient_action_functor.set_cache(construction.ambient_action())
+        result.invariant_module_construction.set_cache(construction)
+        return result
 
     def _group_generators(self):
         group = self.rational_group()
