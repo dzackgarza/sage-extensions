@@ -1,0 +1,2453 @@
+########## test_absolute_galois.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FFFF.F                                                                   [100%]
+=================================== FAILURES ===================================
+_______ test_the_frobenius_of_f9_raises_to_the_ninth_power_and_fixes_f9 ________
+
+>   return self.cache[k]
+E   KeyError: 128141572875056
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ((Algebraic closure of Finite Field of size 3,), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: 3
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_frobenius_of_f9_raises_to_the_ninth_power_and_fixes_f9() -> None:
+        r"""The arithmetic Frobenius of $G_{\mathbb{F}_9}$ is $x \mapsto x^9$, not $x \mapsto x^3$.
+    
+        On $\alpha$ generating $\mathbb{F}_{9^4}$, $\alpha^9 \ne \alpha^3$; on
+        $\mathbb{F}_9$ it is the identity.
+        """
+        field = GF(9, "u")
+>       group = field.absolute_galois_group()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois.sage:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:3320: in absolute_galois_group
+    return AbsoluteGaloisGroup(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:920: in AbsoluteGaloisGroup
+    return _canonical_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:908: in _canonical_absolute_galois_group
+    return _realized_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:890: in _realized_absolute_galois_group
+    closure = _own_ring(closure)
+              ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:7555: in _own_ring
+    return _owned_engine_ring(ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/rings/ring_foundation.py:7394: in _owned_engine_ring
+    return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+characteristic = 3
+
+    @cached_function(key=lambda characteristic: int(characteristic))
+    def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+        r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+        from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    
+>       engine = AlgebraicClosureFiniteField(int(characteristic))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'
+
+src/sage_extensions/categories/rings/ring_foundation.py:7608: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (3) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (3) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (3) of Integer Ring on Integer Ring / Ideal (3) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+___ test_the_frobenius_of_f625_restricts_to_that_of_f25_with_two_extensions ____
+
+>   return self.cache[k]
+E   KeyError: 128141572879024
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ((Algebraic closure of Finite Field of size 5,), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: 5
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_frobenius_of_f625_restricts_to_that_of_f25_with_two_extensions() -> None:
+        r"""$G_{\mathbb{F}_5} \to \operatorname{Gal}(\mathbb{F}_{5^4}/\mathbb{F}_5) \cong \mathbb{Z}/4$.
+    
+        Its kernel is normal of index $4$, contains $\mathrm{Frob}^4$ and not
+        $\mathrm{Frob}$; the Frobenius of $\mathbb{F}_{25}$ has exactly
+        $[\mathbb{F}_{625} : \mathbb{F}_{25}] = 2$ extensions to $\mathbb{F}_{625}$,
+        namely $\sigma$ and $\sigma^3$.  Source: Lang, *Algebra*, V §5.
+        """
+>       group = GF(5).absolute_galois_group()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois.sage:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:3320: in absolute_galois_group
+    return AbsoluteGaloisGroup(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:920: in AbsoluteGaloisGroup
+    return _canonical_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:908: in _canonical_absolute_galois_group
+    return _realized_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:890: in _realized_absolute_galois_group
+    closure = _own_ring(closure)
+              ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:7555: in _own_ring
+    return _owned_engine_ring(ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/ring_foundation.py:7394: in _owned_engine_ring
+    return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+characteristic = 5
+
+    @cached_function(key=lambda characteristic: int(characteristic))
+    def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+        r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+        from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    
+>       engine = AlgebraicClosureFiniteField(int(characteristic))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'
+
+src/sage_extensions/categories/rings/ring_foundation.py:7608: TypeError
+__ test_open_subgroups_of_the_absolute_galois_group_of_f5_follow_the_degrees ___
+
+>   return self.cache[k]
+E   KeyError: 128141572879024
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ((Algebraic closure of Finite Field of size 5,), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: 5
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_open_subgroups_of_the_absolute_galois_group_of_f5_follow_the_degrees() -> None:
+        r"""$G_{\mathbb{F}_{25}}$ has index $2$, its Frobenius is $\mathrm{Frob}_5^2$, and $G_{\mathbb{F}_{25}} \cap G_{\mathbb{F}_{125}} = G_{\mathbb{F}_{5^6}}$ has index $6$."""
+>       group = GF(5).absolute_galois_group()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois.sage:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:3320: in absolute_galois_group
+    return AbsoluteGaloisGroup(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:920: in AbsoluteGaloisGroup
+    return _canonical_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:908: in _canonical_absolute_galois_group
+    return _realized_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:890: in _realized_absolute_galois_group
+    closure = _own_ring(closure)
+              ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:7555: in _own_ring
+    return _owned_engine_ring(ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/ring_foundation.py:7394: in _owned_engine_ring
+    return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+characteristic = 5
+
+    @cached_function(key=lambda characteristic: int(characteristic))
+    def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+        r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+        from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    
+>       engine = AlgebraicClosureFiniteField(int(characteristic))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'
+
+src/sage_extensions/categories/rings/ring_foundation.py:7608: TypeError
+_ test_the_core_of_the_subgroup_fixing_the_real_cube_root_of_two_has_index_six _
+
+    def test_the_core_of_the_subgroup_fixing_the_real_cube_root_of_two_has_index_six() -> None:
+        r"""$G_{\mathbb{Q}(\sqrt[3]{2})}$ has index $3$ and is not normal; its core fixes the splitting field of $x^3 - 2$, of degree $6$."""
+        group = QQ.absolute_galois_group()
+>       subgroup = group.open_subgroup(_cubic_field(2))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois.sage:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:839: in open_subgroup
+    stage = self.extension_data(extension, embedding=embedding)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:737: in extension_data
+    if candidate_closure * candidate_base == self._embedding
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:173: in __mul__
+    other._engine_morphism is not None and other._engine_is_identity()
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:241: in _engine_is_identity
+    return bool(self._engine_morphism.is_identity())
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/element.pyx:494: in sage.structure.element.Element.__getattr__
+    ???
+sage/structure/element.pyx:507: in sage.structure.element.Element.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'sage.structure.coerce_maps.DefaultConvertMap_unique' object has no attribute 'is_identity'
+
+sage/cpython/getattr.pyx:362: AttributeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Algebraic Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Real Algebraic Field on Classes in the multilinear tensor presentation -> Module over Real Algebraic Field on Algebraic Closure of Rational Field accepted without exhaustive linearity verification; the source is not represented as finite
+_ test_cyclotomic_and_kummer_characters_of_finite_fields_take_their_frobenius_values _
+
+>   return self.cache[k]
+E   KeyError: 128141572879024
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ((Algebraic closure of Finite Field of size 5,), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: 5
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_cyclotomic_and_kummer_characters_of_finite_fields_take_their_frobenius_values() -> None:
+        r"""On $G_{\mathbb{F}_5}$: $\chi_3(\mathrm{Frob}) = 5 \equiv -1 \bmod 3$ and $\mathrm{Frob}(\sqrt2)/\sqrt2 = (2/5) = -1$.
+    
+        Both characters factor through $\mathbb{F}_{25}$ and have kernel of index
+        $2$.  On $G_{\mathbb{F}_9}$, $\chi_5(\mathrm{Frob}) = 9 \equiv 4 \bmod 5$.
+        """
+>       group = GF(5).absolute_galois_group()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois.sage:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:3320: in absolute_galois_group
+    return AbsoluteGaloisGroup(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:920: in AbsoluteGaloisGroup
+    return _canonical_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:908: in _canonical_absolute_galois_group
+    return _realized_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:890: in _realized_absolute_galois_group
+    closure = _own_ring(closure)
+              ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:7555: in _own_ring
+    return _owned_engine_ring(ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/ring_foundation.py:7394: in _owned_engine_ring
+    return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+characteristic = 5
+
+    @cached_function(key=lambda characteristic: int(characteristic))
+    def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+        r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+        from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    
+>       engine = AlgebraicClosureFiniteField(int(characteristic))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'
+
+src/sage_extensions/categories/rings/ring_foundation.py:7608: TypeError
+=========================== short test summary info ============================
+FAILED tests/groups/test_absolute_galois.sage::test_the_frobenius_of_f9_raises_to_the_ninth_power_and_fixes_f9
+FAILED tests/groups/test_absolute_galois.sage::test_the_frobenius_of_f625_restricts_to_that_of_f25_with_two_extensions
+FAILED tests/groups/test_absolute_galois.sage::test_open_subgroups_of_the_absolute_galois_group_of_f5_follow_the_degrees
+FAILED tests/groups/test_absolute_galois.sage::test_the_core_of_the_subgroup_fixing_the_real_cube_root_of_two_has_index_six
+FAILED tests/groups/test_absolute_galois.sage::test_cyclotomic_and_kummer_characters_of_finite_fields_take_their_frobenius_values
+5 failed, 1 passed in 3.95s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_absolute_galois_category_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__________ test_the_frobenius_of_f25_is_the_25th_power_not_the_fifth ___________
+
+>   return self.cache[k]
+E   KeyError: 124933263906704
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ((Algebraic closure of Finite Field of size 5,), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: 5
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_frobenius_of_f25_is_the_25th_power_not_the_fifth() -> None:
+        r"""For $q = 25$, $\mathrm{Frob}(x) = x^{25}$; on a generator $g$ of $\mathbb{F}_{25}^\times$ (order $24$), $g^{25} = g \ne g^5$."""
+        field = GF(25, "a")
+>       group = field.absolute_galois_group()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois_category_archive.sage:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:3320: in absolute_galois_group
+    return AbsoluteGaloisGroup(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:920: in AbsoluteGaloisGroup
+    return _canonical_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:908: in _canonical_absolute_galois_group
+    return _realized_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:890: in _realized_absolute_galois_group
+    closure = _own_ring(closure)
+              ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:7555: in _own_ring
+    return _owned_engine_ring(ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/rings/ring_foundation.py:7394: in _owned_engine_ring
+    return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+characteristic = 5
+
+    @cached_function(key=lambda characteristic: int(characteristic))
+    def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+        r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+        from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    
+>       engine = AlgebraicClosureFiniteField(int(characteristic))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'
+
+src/sage_extensions/categories/rings/ring_foundation.py:7608: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (5) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (5) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (5) of Integer Ring on Integer Ring / Ideal (5) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+_ test_every_finite_quotient_of_the_galois_group_of_f5_is_cyclic_generated_by_frobenius _
+
+>   return self.cache[k]
+E   KeyError: 124933282514512
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ((Algebraic closure of Finite Field of size 5,), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: 5
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_every_finite_quotient_of_the_galois_group_of_f5_is_cyclic_generated_by_frobenius() -> None:
+        r"""$G_{\mathbb{F}_5} \cong \widehat{\mathbb{Z}}$: infinite, abelian, and $\operatorname{Gal}(\mathbb{F}_{5^n}/\mathbb{F}_5)$ is cyclic of order $n$ generated by the image of Frobenius.
+    
+        Source: Serre, *Local Fields*, XIII §1.
+        """
+>       group = GF(5).absolute_galois_group()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois_category_archive.sage:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:3320: in absolute_galois_group
+    return AbsoluteGaloisGroup(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:920: in AbsoluteGaloisGroup
+    return _canonical_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:908: in _canonical_absolute_galois_group
+    return _realized_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:890: in _realized_absolute_galois_group
+    closure = _own_ring(closure)
+              ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:7555: in _own_ring
+    return _owned_engine_ring(ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/ring_foundation.py:7394: in _owned_engine_ring
+    return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+characteristic = 5
+
+    @cached_function(key=lambda characteristic: int(characteristic))
+    def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+        r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+        from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    
+>       engine = AlgebraicClosureFiniteField(int(characteristic))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'
+
+src/sage_extensions/categories/rings/ring_foundation.py:7608: TypeError
+=========================== short test summary info ============================
+FAILED tests/groups/test_absolute_galois_category_archive.sage::test_the_frobenius_of_f25_is_the_25th_power_not_the_fifth
+FAILED tests/groups/test_absolute_galois_category_archive.sage::test_every_finite_quotient_of_the_galois_group_of_f5_is_cyclic_generated_by_frobenius
+2 failed in 2.01s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_absolute_galois_element_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_frobenius_restricts_to_the_generator_of_gal_f25_over_f5 _________
+
+>   return self.cache[k]
+E   KeyError: 127444562277456
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ((Algebraic closure of Finite Field of size 5,), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: 5
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_frobenius_restricts_to_the_generator_of_gal_f25_over_f5() -> None:
+        r"""$\mathrm{Frob}|_{\mathbb{F}_{25}}$ is $x \mapsto x^5$, of order $2$; the Frobenius class of the abelian group $G_{\mathbb{F}_5}$ is $\{\mathrm{Frob}\}$, so it excludes $\mathrm{Frob}^2$."""
+>       group = GF(5).absolute_galois_group()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois_element_archive.sage:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:3320: in absolute_galois_group
+    return AbsoluteGaloisGroup(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:920: in AbsoluteGaloisGroup
+    return _canonical_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:908: in _canonical_absolute_galois_group
+    return _realized_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:890: in _realized_absolute_galois_group
+    closure = _own_ring(closure)
+              ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:7555: in _own_ring
+    return _owned_engine_ring(ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/rings/ring_foundation.py:7394: in _owned_engine_ring
+    return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+characteristic = 5
+
+    @cached_function(key=lambda characteristic: int(characteristic))
+    def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+        r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+        from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    
+>       engine = AlgebraicClosureFiniteField(int(characteristic))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'
+
+src/sage_extensions/categories/rings/ring_foundation.py:7608: TypeError
+=========================== short test summary info ============================
+FAILED tests/groups/test_absolute_galois_element_archive.sage::test_frobenius_restricts_to_the_generator_of_gal_f25_over_f5
+1 failed in 2.45s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_absolute_galois_subgroups_elements_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_the_subgroup_fixing_f25_is_normal_of_index_two ______________
+
+>   return self.cache[k]
+E   KeyError: 140303449355344
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ((Algebraic closure of Finite Field of size 5,), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: 5
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_subgroup_fixing_f25_is_normal_of_index_two() -> None:
+        r"""$G_{\mathbb{F}_{25}} \trianglelefteq G_{\mathbb{F}_5}$ has index $2$, excludes $\mathrm{Frob}_5$, and its own Frobenius is $\mathrm{Frob}_5^2$."""
+>       group = GF(5).absolute_galois_group()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois_subgroups_elements_archive.sage:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:3320: in absolute_galois_group
+    return AbsoluteGaloisGroup(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:920: in AbsoluteGaloisGroup
+    return _canonical_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:908: in _canonical_absolute_galois_group
+    return _realized_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:890: in _realized_absolute_galois_group
+    closure = _own_ring(closure)
+              ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:7555: in _own_ring
+    return _owned_engine_ring(ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/rings/ring_foundation.py:7394: in _owned_engine_ring
+    return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+characteristic = 5
+
+    @cached_function(key=lambda characteristic: int(characteristic))
+    def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+        r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+        from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    
+>       engine = AlgebraicClosureFiniteField(int(characteristic))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'
+
+src/sage_extensions/categories/rings/ring_foundation.py:7608: TypeError
+___________ test_the_subgroups_fixing_f25_and_f125_meet_in_index_six ___________
+
+>   return self.cache[k]
+E   KeyError: 140303449355344
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ((Algebraic closure of Finite Field of size 5,), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: 5
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_subgroups_fixing_f25_and_f125_meet_in_index_six() -> None:
+        r"""$G_{\mathbb{F}_{25}} \cap G_{\mathbb{F}_{125}} = G_{\mathbb{F}_{5^6}}$ has index $\operatorname{lcm}(2, 3) = 6$."""
+>       group = GF(5).absolute_galois_group()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_absolute_galois_subgroups_elements_archive.sage:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:3320: in absolute_galois_group
+    return AbsoluteGaloisGroup(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:920: in AbsoluteGaloisGroup
+    return _canonical_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:908: in _canonical_absolute_galois_group
+    return _realized_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:890: in _realized_absolute_galois_group
+    closure = _own_ring(closure)
+              ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:7555: in _own_ring
+    return _owned_engine_ring(ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/ring_foundation.py:7394: in _owned_engine_ring
+    return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+characteristic = 5
+
+    @cached_function(key=lambda characteristic: int(characteristic))
+    def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+        r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+        from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    
+>       engine = AlgebraicClosureFiniteField(int(characteristic))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'
+
+src/sage_extensions/categories/rings/ring_foundation.py:7608: TypeError
+=========================== short test summary info ============================
+FAILED tests/groups/test_absolute_galois_subgroups_elements_archive.sage::test_the_subgroup_fixing_f25_is_normal_of_index_two
+FAILED tests/groups/test_absolute_galois_subgroups_elements_archive.sage::test_the_subgroups_fixing_f25_and_f125_meet_in_index_six
+2 failed in 1.69s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_arithmetic_finite_generation_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______ test_the_generators_s_and_t_of_sl2z_satisfy_the_modular_relations _______
+
+>   mor = <map.Map> self._convert_from_hash.get(R)
+
+sage/structure/parent.pyx:893: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise KeyError(k)
+E   KeyError: Integer Ring
+
+sage/structure/coerce_dict.pyx:649: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._convert_from_hash.get(S)
+
+sage/structure/parent.pyx:2487: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   raise KeyError(k)
+E   KeyError: Integer Ring
+
+sage/structure/coerce_dict.pyx:649: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_generators_s_and_t_of_sl2z_satisfy_the_modular_relations() -> None:
+        r"""$S = \begin{psmallmatrix}0&-1\\1&0\end{psmallmatrix}$ has order $4$, $ST$ has order $6$, and $S^2 = (ST)^3 = -I$.
+    
+        $S$ and $T$ generate $SL_2(\mathbb{Z})$, so it is finitely generated.
+        Source: Serre, *A Course in Arithmetic*, VII.1, Theorem 2.
+        """
+        group = Groups.SL(2, ZZ)
+        # Arithmeticity is a property of SL_2(ZZ) as a subgroup of GL_2(QQ)
+        # (Mathlib Subgroup.IsArithmetic), placed there by its construction.
+        assert group in Subgroups(group.supergroup())
+        assert group.supergroup() in GeneralLinearGroups()
+        assert group.is_arithmetic_group() is True
+        assert group in OwnedGroups().FinitelyGeneratedAsMagma()
+>       S = group([[0, -1], [1, 0]])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_arithmetic_finite_generation_archive.sage:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/groups.py:1578: in __call__
+    return self._element_constructor_(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:1589: in _element_constructor_
+    element = supergroup(value)
+              ^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:1578: in __call__
+    return self._element_constructor_(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:1599: in _element_constructor_
+    return self._from_engine(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:1553: in _from_engine
+    return self.element_class(self, self._engine(engine_element))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/parent.pyx:899: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/coerce_maps.pyx:92: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+sage/structure/coerce_maps.pyx:87: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/categories/sets_cat.py:1012: in _element_constructor_from_element_class
+    return self.element_class(self, *args, **keywords)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/groups/matrix_gps/group_element.pyx:155: in sage.groups.matrix_gps.group_element.MatrixGroupElement_generic.__init__
+    ???
+sage/structure/parent.pyx:899: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/coerce_maps.pyx:92: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+sage/structure/coerce_maps.pyx:87: in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/matrix/matrix_space.py:1194: in _element_constructor_
+    return self.element_class(self, entries, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/matrix/matrix_rational_dense.pyx:203: in sage.matrix.matrix_rational_dense.Matrix_rational_dense.__init__
+    ???
+sage/matrix/args.pyx:598: in iter
+    ???
+sage/structure/parent.pyx:895: in sage.structure.parent.Parent.__call__
+    ???
+sage/structure/parent.pyx:2489: in sage.structure.parent.Parent._internal_convert_map_from
+    ???
+sage/structure/parent.pyx:2528: in sage.structure.parent.Parent.discover_convert_map_from
+    ???
+sage/structure/parent.pyx:1963: in sage.structure.parent.Parent._generic_convert_map
+    ???
+sage/structure/coerce_maps.pyx:57: in sage.structure.coerce_maps.DefaultConvertMap_unique.__init__
+    ???
+sage/structure/parent.pyx:1338: in sage.structure.parent.Parent.Hom
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+X = Integer Ring, Y = Rational Field
+category = Category of sets with partial maps, check = True
+
+    def Hom[DomainElementT: Parent, CodomainElementT: Parent](
+        X: DomainElementT,
+        Y: CodomainElementT,
+        category: Category | None = None,
+        check: bool = True,
+    ) -> Homset[DomainElementT, CodomainElementT]:
+        """
+        Create the space of homomorphisms from X to Y in the category ``category``.
+    
+        INPUT:
+    
+        - ``X`` -- an object of a category
+    
+        - ``Y`` -- an object of a category
+    
+        - ``category`` -- a category in which the morphisms must be
+          (default: the meet of the categories of ``X`` and ``Y``);
+          both ``X`` and ``Y`` must belong to that category
+    
+        - ``check`` -- boolean (default: ``True``); whether to check the
+          input, and in particular that ``X`` and ``Y`` belong to
+          ``category``.
+    
+        OUTPUT: a homset in category
+    
+        EXAMPLES::
+    
+            sage: V = VectorSpace(QQ, 3)                                                    # needs sage.modules
+            sage: Hom(V, V)                                                                 # needs sage.modules
+            Set of Morphisms (Linear Transformations) from
+            Vector space of dimension 3 over Rational Field to
+            Vector space of dimension 3 over Rational Field
+            sage: G = AlternatingGroup(3)                                                   # needs sage.groups
+            sage: Hom(G, G)                                                                 # needs sage.groups
+            Set of Morphisms
+             from Alternating group of order 3!/2 as a permutation group
+               to Alternating group of order 3!/2 as a permutation group
+               in Category of finite enumerated permutation groups
+            sage: Hom(ZZ, QQ, Sets())
+            Set of Morphisms from Integer Ring to Rational Field in Category of sets
+    
+            sage: Hom(FreeModule(ZZ, 1), FreeModule(QQ, 1))                                 # needs sage.modules
+            Set of Morphisms
+             from Ambient free module of rank 1 over the principal ideal domain Integer Ring
+               to Vector space of dimension 1 over Rational Field
+               in Category of commutative additive groups
+            sage: Hom(FreeModule(QQ, 1), FreeModule(ZZ, 1))                                 # needs sage.modules
+            Set of Morphisms
+             from Vector space of dimension 1 over Rational Field
+               to Ambient free module of rank 1 over the principal ideal domain Integer Ring
+               in Category of commutative additive groups
+    
+        Here, we test against a memory leak that has been fixed at :issue:`11521` by
+        using a weak cache::
+    
+            sage: # needs sage.libs.pari
+            sage: for p in prime_range(10^3):
+            ....:  K = GF(p)
+            ....:  a = K(0)
+            sage: import gc
+            sage: gc.collect()       # random
+            624
+            sage: from sage.rings.finite_rings.finite_field_prime_modn import FiniteField_prime_modn as FF
+            sage: L = [x for x in gc.get_objects() if isinstance(x, FF)]
+            sage: len(L), L[0]
+            (1, Finite Field of size 997)
+    
+        To illustrate the choice of the category, we consider the
+        following parents as running examples::
+    
+            sage: X = ZZ; X
+            Integer Ring
+            sage: Y = SymmetricGroup(3); Y                                                  # needs sage.groups
+            Symmetric group of order 3! as a permutation group
+    
+        By default, the smallest category containing both ``X`` and ``Y``,
+        is used::
+    
+            sage: Hom(X, Y)                                                                 # needs sage.groups
+            Set of Morphisms from Integer Ring
+             to Symmetric group of order 3! as a permutation group
+             in Category of enumerated monoids
+    
+        Otherwise, if ``category`` is specified, then ``category`` is used,
+        after checking that ``X`` and ``Y`` are indeed in ``category``::
+    
+            sage: Hom(X, Y, Magmas())                                                       # needs sage.groups
+            Set of Morphisms
+             from Integer Ring
+             to Symmetric group of order 3! as a permutation group
+             in Category of magmas
+    
+            sage: Hom(X, Y, Groups())                                                       # needs sage.groups
+            Traceback (most recent call last):
+            ...
+            ValueError: Integer Ring is not in Category of groups
+    
+        A parent (or a parent class of a category) may specify how to
+        construct certain homsets by implementing a method ``_Hom_(self,
+        codomain, category)``. This method should either construct the
+        requested homset or raise a :exc:`TypeError`. This hook is currently
+        mostly used to create homsets in some specific subclass of
+        :class:`Homset` (e.g.
+        :class:`~sage.rings.homset.RingHomset_generic`)::
+    
+            sage: Hom(QQ,QQ).__class__
+            <class 'sage.rings.homset.RingHomset_generic_with_category'>
+    
+        Do not call this hook directly to create homsets, as it does not
+        handle unique representation::
+    
+            sage: Hom(QQ,QQ) == QQ._Hom_(QQ, category=QQ.category())
+            True
+            sage: Hom(QQ,QQ) is QQ._Hom_(QQ, category=QQ.category())
+            False
+    
+        TESTS:
+    
+        Homset are unique parents::
+    
+            sage: k = GF(5)
+            sage: H1 = Hom(k, k)
+            sage: H2 = Hom(k, k)
+            sage: H1 is H2
+            True
+    
+        Moreover, if no category is provided, then the result is identical
+        with the result for the meet of the categories of the domain and
+        the codomain::
+    
+            sage: Hom(QQ, ZZ) is Hom(QQ,ZZ, Category.meet([QQ.category(), ZZ.category()]))
+            True
+    
+        Some doc tests in ``sage.rings`` (need to) break the unique
+        parent assumption. But if domain or codomain are not unique
+        parents, then the homset will not fit. That is to say, the hom set
+        found in the cache will have a (co)domain that is equal to, but
+        not identical with, the given (co)domain.
+    
+        By :issue:`9138`, we abandon the uniqueness of homsets, if the
+        domain or codomain break uniqueness::
+    
+            sage: from sage.rings.polynomial.multi_polynomial_ring import MPolynomialRing_polydict_domain
+            sage: P.<x,y,z>=MPolynomialRing_polydict_domain(QQ, 3, order='degrevlex')
+            sage: Q.<x,y,z>=MPolynomialRing_polydict_domain(QQ, 3, order='degrevlex')
+            sage: P == Q
+            True
+            sage: P is Q
+            False
+    
+        Hence, ``P`` and ``Q`` are not unique parents. By consequence, the
+        following homsets aren't either::
+    
+            sage: H1 = Hom(QQ,P)
+            sage: H2 = Hom(QQ,Q)
+            sage: H1 == H2
+            True
+            sage: H1 is H2
+            False
+    
+        It is always the most recently constructed homset that remains in
+        the cache::
+    
+            sage: H2 is Hom(QQ,Q)
+            True
+    
+        Variation on the theme::
+    
+            sage: # needs sage.modules
+            sage: U1 = FreeModule(ZZ, 2)
+            sage: U2 = FreeModule(ZZ, 2, inner_product_matrix=matrix([[1,0], [0,-1]]))
+            sage: U1 == U2, U1 is U2
+            (False, False)
+            sage: V = ZZ^3
+            sage: H1 = Hom(U1, V); H2 = Hom(U2, V)
+            sage: H1 == H2, H1 is H2
+            (False, False)
+            sage: H1 = Hom(V, U1); H2 = Hom(V, U2)
+            sage: H1 == H2, H1 is H2
+            (False, False)
+    
+        Since :issue:`11900`, the meet of the categories of the given arguments is
+        used to determine the default category of the homset. This can also be a
+        join category, as in the following example::
+    
+            sage: PA = Parent(category=Algebras(QQ))
+            sage: PJ = Parent(category=Rings() & Modules(QQ))
+            sage: Hom(PA, PJ)
+            Set of Homomorphisms
+             from <sage.structure.parent.Parent object at ...>
+               to <sage.structure.parent.Parent object at ...>
+            sage: Hom(PA, PJ).category()
+            Category of homsets of
+             unital magmas and right modules over Rational Field
+              and left modules over Rational Field
+            sage: Hom(PA, PJ, Rngs())
+            Set of Morphisms
+             from <sage.structure.parent.Parent object at ...>
+               to <sage.structure.parent.Parent object at ...> in Category of rngs
+    
+        .. TODO::
+    
+            - Design decision: how much of the homset comes from the
+              category of ``X`` and ``Y``, and how much from the specific
+              ``X`` and ``Y``.  In particular, do we need several parent
+              classes depending on ``X`` and ``Y``, or does the difference
+              only lie in the elements (i.e.  the morphism), and of course
+              how the parent calls their constructors.
+            - Specify the protocol for the ``_Hom_`` hook in case of ambiguity
+              (e.g. if both a parent and some category thereof provide one).
+    
+        TESTS:
+    
+        Facade parents over plain Python types are supported::
+    
+            sage: from sage.sets.pythonclass import Set_PythonType
+            sage: R = Set_PythonType(int)
+            sage: S = Set_PythonType(float)
+            sage: Hom(R, S)
+            Set of Morphisms from Set of Python objects of class 'int'
+             to Set of Python objects of class 'float' in Category of infinite sets
+    
+        Checks that the domain and codomain are in the specified
+        category. Case of a non parent::
+    
+            sage: # needs sage.graphs
+            sage: S = SimplicialComplex([[1,2], [1,4]]); S.rename('S')
+            sage: Hom(S, S, SimplicialComplexes())
+            Set of Morphisms from S to S in Category of finite simplicial complexes
+            sage: Hom(Set(), S, Sets())
+            Set of Morphisms from {} to S in Category of sets
+            sage: Hom(S, Set(), Sets())
+            Set of Morphisms from S to {} in Category of sets
+            sage: H = Hom(S, S, ChainComplexes(QQ))
+            Traceback (most recent call last):
+            ...
+            ValueError: S is not in Category of chain complexes over Rational Field
+    
+        Those checks are done with the natural idiom ``X in category``,
+        and not ``X.category().is_subcategory(category)`` as it used to be
+        before :issue:`16275` (see :issue:`15801` for a real use case)::
+    
+            sage: # needs sage.graphs
+            sage: class PermissiveCategory(Category):
+            ....:     def super_categories(self): return [Objects()]
+            ....:     def __contains__(self, X): return True
+            sage: C = PermissiveCategory(); C.rename('Permissive category')
+            sage: S.category().is_subcategory(C)
+            False
+            sage: S in C
+            True
+            sage: Hom(S, S, C)
+            Set of Morphisms from S to S in Permissive category
+    
+        With ``check=False``, uninitialized parents, as can appear upon
+        unpickling, are supported. Case of a parent::
+    
+            sage: cls = type(Set())
+            sage: S = unpickle_newobj(cls, ())  # A non parent
+            sage: H = Hom(S, S, SimplicialComplexes(), check=False)
+            sage: H = Hom(S, S, Sets(),                check=False)
+            sage: H = Hom(S, S, ChainComplexes(QQ),    check=False)
+    
+        Case of a non parent::
+    
+            sage: # needs sage.graphs
+            sage: cls = type(SimplicialComplex([[1,2], [1,4]]))
+            sage: S = unpickle_newobj(cls, ())
+            sage: H = Hom(S, S, Sets(),                check=False)
+            sage: H = Hom(S, S, Groups(),              check=False)
+            sage: H = Hom(S, S, SimplicialComplexes(), check=False)
+    
+        Typical example where unpickling involves calling Hom on an
+        uninitialized parent::
+    
+            sage: P.<x,y> = QQ['x,y']
+            sage: Q = P.quotient([x^2 - 1, y^2 - 1])
+            sage: q = Q.an_element()                                                        # needs sage.libs.singular
+            sage: explain_pickle(dumps(Q))                                                  # needs sage.libs.singular
+            pg_...
+            ... = pg_dynamic_class('QuotientRing_generic_with_category', (pg_QuotientRing_generic, pg_getattr(..., 'parent_class')), None, None, pg_QuotientRing_generic)
+            si... = unpickle_newobj(..., ())
+            ...
+            si... = pg_unpickle_MPolynomialRing_libsingular(..., ('x', 'y'), ...)
+            si... = ... pg_Hom(si..., si..., ...) ...
+            sage: Q == loads(dumps(Q))
+            True
+    
+        Check that the ``_Hom_`` method of the ``category`` input is used::
+    
+            sage: from sage.categories.category_types import Category_over_base_ring
+            sage: class ModulesWithHom(Category_over_base_ring):
+            ....:     def super_categories(self):
+            ....:         return [Modules(self.base_ring())]
+            ....:     class ParentMethods:
+            ....:         def _Hom_(self, Y, category=None):
+            ....:             print("Modules")
+            ....:             raise TypeError
+            sage: class AlgebrasWithHom(Category_over_base_ring):
+            ....:     def super_categories(self):
+            ....:         return [Algebras(self.base_ring()), ModulesWithHom(self.base_ring())]
+            ....:     class ParentMethods:
+            ....:         def _Hom_(self, Y, category=None):
+            ....:             R = self.base_ring()
+            ....:             if category is not None and category.is_subcategory(Algebras(R)):
+            ....:                 print("Algebras")
+            ....:             raise TypeError
+            sage: from sage.structure.element import Element
+            sage: class Foo(Parent):
+            ....:     def _coerce_map_from_base_ring(self):
+            ....:         return self._generic_coerce_map(self.base_ring())
+            ....:     class Element(Element):
+            ....:         pass
+            sage: X = Foo(base=QQ, category=AlgebrasWithHom(QQ))
+            sage: H = Hom(X, X, ModulesWithHom(QQ))
+            Modules
+        """
+        # This should use cache_function instead
+        # However some special handling is currently needed for
+        # domains/codomains that break the unique parent condition. Also,
+        # at some point, it somehow broke the coercion (see e.g. sage -t
+        # sage.rings.real_mpfr). To be investigated.
+        key = (X, Y, category)
+        try:
+            H = _cache[key]
+        except KeyError:
+            H = None
+        if H is not None:
+            # Return H unless the domain or codomain breaks the unique parent condition
+            if H.domain() is X and H.codomain() is Y:
+                return H
+    
+        # Determines the category
+        if category is None:
+            category = X.category()._meet_(Y.category())
+            # Recurse to make sure that Hom(X, Y) and Hom(X, Y, category) are identical
+            # No need to check the input again
+            H = Hom(X, Y, category, check=False)
+        else:
+            if check:
+                if not isinstance(category, Category):
+                    raise TypeError("Argument category (= {}) must be a category.".format(category))
+                for O in [X, Y]:
+                    try:
+                        category_mismatch = O not in category
+                    except Exception:
+                        # An error should not happen, this here is just to be on
+                        # the safe side.
+                        category_mismatch = True
+                    # A category mismatch does not necessarily mean that an error
+                    # should be raised. Instead, it could be the case that we are
+                    # unpickling an old pickle (that doesn't set the "check"
+                    # argument to False). In this case, it could be that the
+                    # (co)domain is not properly initialised, which we are
+                    # checking now. See trac #16275 and #14793.
+                    if category_mismatch and O._is_category_initialized():
+                        # At this point, we can be rather sure that O is properly
+                        # initialised, and thus its string representation is
+                        # available for the following error message. It simply
+                        # belongs to the wrong category.
+>                       raise ValueError("{} is not in {}".format(O, category))
+E                       ValueError: Integer Ring is not in Category of sets with partial maps
+
+/sage/.venv/lib/python3.14/site-packages/sage/categories/homset.py:449: ValueError
+=========================== short test summary info ============================
+FAILED tests/groups/test_arithmetic_finite_generation_archive.sage::test_the_generators_s_and_t_of_sl2z_satisfy_the_modular_relations
+1 failed in 2.77s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_field_absolute_galois_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_the_frobenius_of_f7_generates_every_finite_quotient ___________
+
+>   return self.cache[k]
+E   KeyError: 133157559055440
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ((Algebraic closure of Finite Field of size 7,), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: 7
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_frobenius_of_f7_generates_every_finite_quotient() -> None:
+        r"""$\operatorname{Gal}(\mathbb{F}_{7^n}/\mathbb{F}_7)$ is cyclic of order $n$, generated by $x \mapsto x^7$; so $G_{\mathbb{F}_7}$ is abelian and one element topologically generates it."""
+>       group = GF(7).absolute_galois_group()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_field_absolute_galois_archive.sage:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:3320: in absolute_galois_group
+    return AbsoluteGaloisGroup(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:920: in AbsoluteGaloisGroup
+    return _canonical_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:908: in _canonical_absolute_galois_group
+    return _realized_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:890: in _realized_absolute_galois_group
+    closure = _own_ring(closure)
+              ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:7555: in _own_ring
+    return _owned_engine_ring(ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/rings/ring_foundation.py:7394: in _owned_engine_ring
+    return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+characteristic = 7
+
+    @cached_function(key=lambda characteristic: int(characteristic))
+    def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+        r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+        from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    
+>       engine = AlgebraicClosureFiniteField(int(characteristic))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'
+
+src/sage_extensions/categories/rings/ring_foundation.py:7608: TypeError
+=========================== short test summary info ============================
+FAILED tests/groups/test_field_absolute_galois_archive.sage::test_the_frobenius_of_f7_generates_every_finite_quotient
+1 failed in 2.00s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_free_and_catalogued_groups.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+.F..F...F...F..F..FFFFF....F                                             [100%]
+=================================== FAILURES ===================================
+_ test_a_morphism_out_of_the_free_group_is_given_by_the_images_of_its_letters __
+
+    def test_a_morphism_out_of_the_free_group_is_given_by_the_images_of_its_letters() -> None:
+        r"""$a \mapsto (1\,2)$, $b \mapsto (1\,2\,3)$ is onto $S_3$ and sends $a b$ to $(1\,2)(1\,2\,3)$."""
+        free = Groups.Free(2)
+        a, b = free.group_generators()
+        symmetric = Groups.S(3)
+>       morphism = free.Mor(symmetric)({a: symmetric((1, 2)), b: symmetric((1, 2, 3))})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_free_and_catalogued_groups.sage:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Mor(Group generated by Group generators: [0 ↦ g_0, 1 ↦ g_1], Symmetric group S_3)
+images = {g_0: (1 2), g_1: (1 2 3)}, _options = {}
+
+    def _element_constructor_(self, images, **_options):
+        r"""The morphism ``F(S) -> H`` determined by the images of the basis ``S``.
+    
+        The images are a set morphism ``S -> H``, a function on ``S``, or, for
+        a finite ``S``, a dictionary naming every basis point.
+        """
+        indices = self.domain().free_basis()
+        match images:
+            case SetMorphism() | OwnedSetMorphism():
+                assert images.domain() is indices and images.codomain() is self.codomain(), (
+                    f"{images} cannot define a homomorphism {self.domain()} -> {self.codomain()}: a homomorphism out of a "
+                    f"free group is a map from the free basis {indices} to {self.codomain()}, but {images} is a map "
+                    f"{images.domain()} -> {images.codomain()}"
+                )
+                generator_morphism = images
+            case dict():
+                assert indices in FiniteSets(), (
+                    f"a dictionary cannot define a homomorphism out of {self.domain()}: its free basis {indices} is not "
+                    f"known to be finite; give a map from {indices} to {self.codomain()} instead"
+                )
+>               assert all(index in images for index in indices), (
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    f"the dictionary does not define a homomorphism out of {self.domain()}: it must give an image for every "
+                    f"element of the free basis {indices}, but it has keys {tuple(images)}"
+                )
+E               AssertionError: the dictionary does not define a homomorphism out of Group generated by Group generators: [0 ↦ g_0, 1 ↦ g_1]: it must give an image for every element of the free basis {0,...,1}, but it has keys (g_0, g_1)
+
+src/sage_extensions/categories/group/groups.py:4470: AssertionError
+___________ test_gap_group_morphism_requires_its_selected_endpoints ____________
+
+    def test_gap_group_morphism_requires_its_selected_endpoints() -> None:
+        from sage_extensions.categories.group.groups import _gap_model
+        from sage.libs.gap.libgap import libgap
+    
+        two = Groups.C(2)
+        three = Groups.C(3)
+        identity_of_two = libgap.IdentityMapping(_gap_model(two))
+        try:
+>           three.Mor(three)(identity_of_two)
+
+tests/groups/test_free_and_catalogued_groups.sage:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Mor(Cyclic group C_3 of order 3, Cyclic group C_3 of order 3)
+images = IdentityMapping( Group([ (1,2) ]) ), check = False, _options = {}
+
+    def _element_constructor_(self, images, *, check=False, **_options):
+        match images:
+            case dict():
+                morphism = self._from_group_generator_images(images)
+                # Generator-image data need to kill all defining relations
+                # before they describe any morphism G -> H. Unlike a
+                # pointwise callable, an invalid generator assignment is
+                # not even a map on the presented quotient. Enforce this
+                # regardless of the optional check flag.
+                morphism.validate_homomorphism(check=True)
+            case GapElement():
+>               raise TypeError("a GAP whole group map is private engine output; give generator images")
+E               TypeError: a GAP whole group map is private engine output; give generator images
+
+src/sage_extensions/categories/group/groups.py:4572: TypeError
+_________ test_symmetric_group_retains_its_chosen_point_set_and_action _________
+
+>   return cache[k]
+E   KeyError: (({1, 2, 3, 4},), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_symmetric_group_retains_its_chosen_point_set_and_action() -> None:
+        points = Sets.Δ[2]
+        group = SymmetricGroups()(points)
+        assert group in SymmetricGroups()
+        assert group.ambient_category() is OwnedGroups()
+        assert group is Groups.S(points)
+        assert group not in OwnedGroups().Commutative()
+        assert SymmetricGroups()(Sets.Δ[1]) in OwnedGroups().Commutative()
+        assert group.order() == 6
+        assert group.natural_points() is points
+        action = group.natural_g_set()
+        assert action.point_set() is points
+        from sage_extensions.categories.group.g_sets import _permutation_from_point_map
+    
+        try:
+            _permutation_from_point_map(group, points, lambda _point: points(0))
+        except ValueError as error:
+            assert "not represented by a permutation" in str(error)
+        else:
+            assert False, "a constant point map was accepted as a permutation"
+        identity = group.one()
+        for point in points:
+            assert action.act(identity, point) == point
+        from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+        # The common PermutationGroups owner must not silently extend an
+        # unlabelled permutation's action beyond its represented domain.
+        unlabelled = Groups.S(3)
+        try:
+>           unlabelled.action_on(finite_ordered_set((1, 2, 3, 4)))
+
+tests/groups/test_free_and_catalogued_groups.sage:353: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Symmetric group S_3, points = {1, 2, 3, 4}
+
+    @cached_method
+    def action_on(self, points):
+        r"""The selected permutation action is on its actual point set.
+    
+        A different set needs a separately specified action morphism;
+        applying the Sage ordinal permutation directly to its labels
+        is not a group action on those labels.
+        """
+>       assert points is self.natural_points(), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            "the full symmetric group's selected action is on its defining "
+            "point set; specify a group action to act on another set"
+        )
+E       AssertionError: the full symmetric group's selected action is on its defining point set; specify a group action to act on another set
+
+src/sage_extensions/categories/group/groups.py:7619: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+    def test_symmetric_group_retains_its_chosen_point_set_and_action() -> None:
+        points = Sets.Δ[2]
+        group = SymmetricGroups()(points)
+        assert group in SymmetricGroups()
+        assert group.ambient_category() is OwnedGroups()
+        assert group is Groups.S(points)
+        assert group not in OwnedGroups().Commutative()
+        assert SymmetricGroups()(Sets.Δ[1]) in OwnedGroups().Commutative()
+        assert group.order() == 6
+        assert group.natural_points() is points
+        action = group.natural_g_set()
+        assert action.point_set() is points
+        from sage_extensions.categories.group.g_sets import _permutation_from_point_map
+    
+        try:
+            _permutation_from_point_map(group, points, lambda _point: points(0))
+        except ValueError as error:
+            assert "not represented by a permutation" in str(error)
+        else:
+            assert False, "a constant point map was accepted as a permutation"
+        identity = group.one()
+        for point in points:
+            assert action.act(identity, point) == point
+        from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+        # The common PermutationGroups owner must not silently extend an
+        # unlabelled permutation's action beyond its represented domain.
+        unlabelled = Groups.S(3)
+        try:
+            unlabelled.action_on(finite_ordered_set((1, 2, 3, 4)))
+        except AssertionError as error:
+>           assert "selected domain" in str(error)
+E           assert 'selected domain' in "the full symmetric group's selected action is on its defining point set; specify a group action to act on another set"
+E            +  where "the full symmetric group's selected action is on its defining point set; specify a group action to act on another set" = str(AssertionError("the full symmetric group's selected action is on its defining point set; specify a group action to act on another set"))
+
+tests/groups/test_free_and_catalogued_groups.sage:355: AssertionError
+___________ test_coxeter_group_retains_its_matrix_and_type_a2_order ____________
+
+    def test_coxeter_group_retains_its_matrix_and_type_a2_order() -> None:
+        matrix = [[1, 3], [3, 1]]
+        group = CoxeterGroups()(matrix)
+        assert group in OwnedGroups().Finite()
+        assert group in CoxeterGroups()
+        assert group in FreeGroupQuotients()
+        assert group.ambient_category() is OwnedGroups()
+        assert group is Groups.Coxeter([[1, 3], [3, 1]])
+        retained = group.coxeter_matrix()
+        assert group.coxeter_matrix() is retained
+        assert group.order() == 6
+        # A2 has simple reflections s,t with (st)^3=1 and s,t distinct, so
+        # its Coxeter group is S3 and is not abelian. Construction must not
+        # eagerly require Sage's unavailable generic is_abelian() engine query.
+        assert not group.is_abelian()
+        assert group.is_isomorphic_to(SymmetricGroups()(Sets.Δ[2]))
+        # The Coxeter realization is not Sage's FinitelyPresentedGroup; its
+        # canonical reduced words must nevertheless lift through the selected
+        # Coxeter presentation when adjoining a normal relator.
+        first_reflection = tuple(group.group_generators())[0]
+        collapsed, collapse_map = group.quotient_by_relators(
+            (first_reflection,), return_projection=True
+        )
+>       assert collapsed.order() == 1
+               ^^^^^^^^^^^^^^^^^
+
+tests/groups/test_free_and_catalogued_groups.sage:465: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/groups.py:6130: in order
+    size = cardinal(self.cardinality())
+                    ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:2502: in cardinality
+    construction_cardinality = self._cardinality_decision()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:6126: in _cardinality_decision
+    return _group_cardinality(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+group = Group generated by Group generators: [0 ↦ 1, 1 ↦ 1]
+
+    def _group_cardinality(group):
+        r"""``|G|`` from the placement of the group ``G``.
+    
+        Protected computation of the groups owner (``OWN-05``).  Callers: the
+        default of ``OwnedGroups.ParentMethods._cardinality_decision``, and a
+        realization of that hook which decides only a case of its own and
+        leaves every other group to this computation (``CoreMor``, which counts
+        the bijections of finite sets).  A realization hook replaces the default
+        body, so such a realization reaches the group cases only through here.
+    
+        A finite group is counted by its engine.  A free group on a basis ``S``
+        is trivial for empty ``S`` and otherwise has ``max(aleph_0, |S|)``
+        elements, its reduced words.  An infinite finitely generated group is a
+        quotient of a free group of finite rank, so it is countably infinite.  A
+        subcategory whose datum determines more supplies its own answer.
+        """
+        match group:
+            case _ if group in OwnedFiniteGroups():
+                return cardinal(_finite_order(group))
+            case _ if group in GroupsWithChosenFreeBasis():
+                basis_cardinality = group.free_basis().cardinality()
+                if basis_cardinality == cardinal(0):
+                    return cardinal(1)
+                return Cardinalities().supremum(aleph(0), basis_cardinality)
+            case _ if group in OwnedInfiniteGroups() and group in OwnedGroups().FinitelyGeneratedAsMagma():
+                return aleph(0)
+            case _:
+                # The group's own finiteness decision is the answer to "is this
+                # group finite"; asking it here is what makes the count independent
+                # of the order in which the question was reached.  The decision is
+                # the group's exact engine answer, and it is asked only after the
+                # placement and free-basis cases have declined.
+                decision = group.is_finite()
+                match decision:
+                    case True:
+                        return cardinal(_finite_order(group))
+                    case False if group in OwnedGroups().FinitelyGeneratedAsMagma():
+                        return aleph(0)
+                    case _:
+>                       assert False, (
+                               ^^^^^
+                            f"cannot compute the cardinality of the group {group}: its finiteness is "
+                            f"{decision}, it has no chosen free basis, and it is not known to be infinite "
+                            f"and finitely generated (it is in {group.category()})"
+                        )
+E                       AssertionError: cannot compute the cardinality of the group Group generated by Group generators: [0 ↦ 1, 1 ↦ 1]: its finiteness is is_finite(Group generated by Group generators: [0 ↦ 1, 1 ↦ 1]), it has no chosen free basis, and it is not known to be infinite and finitely generated (it is in Category of groups with chosen finite presentation)
+
+src/sage_extensions/categories/group/groups.py:459: AssertionError
+________ test_free_group_quotient_retains_source_and_dihedral_relations ________
+
+    def test_free_group_quotient_retains_source_and_dihedral_relations() -> None:
+        free = Groups.Free(2)
+        a, b = tuple(free.group_generators())
+        relators = (a**2, b**3, (a*b)**2)
+        quotient = FreeGroupQuotients()(free, relators)
+        assert quotient in FreeGroupQuotients()
+        assert quotient.ambient_category() is OwnedGroups()
+>       assert quotient.order() == 6
+               ^^^^^^^^^^^^^^^^
+
+tests/groups/test_free_and_catalogued_groups.sage:641: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/groups.py:6130: in order
+    size = cardinal(self.cardinality())
+                    ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:2502: in cardinality
+    construction_cardinality = self._cardinality_decision()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:6126: in _cardinality_decision
+    return _group_cardinality(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+group = Group generated by Group generators: [0 ↦ g_1, 1 ↦ g_2]
+
+    def _group_cardinality(group):
+        r"""``|G|`` from the placement of the group ``G``.
+    
+        Protected computation of the groups owner (``OWN-05``).  Callers: the
+        default of ``OwnedGroups.ParentMethods._cardinality_decision``, and a
+        realization of that hook which decides only a case of its own and
+        leaves every other group to this computation (``CoreMor``, which counts
+        the bijections of finite sets).  A realization hook replaces the default
+        body, so such a realization reaches the group cases only through here.
+    
+        A finite group is counted by its engine.  A free group on a basis ``S``
+        is trivial for empty ``S`` and otherwise has ``max(aleph_0, |S|)``
+        elements, its reduced words.  An infinite finitely generated group is a
+        quotient of a free group of finite rank, so it is countably infinite.  A
+        subcategory whose datum determines more supplies its own answer.
+        """
+        match group:
+            case _ if group in OwnedFiniteGroups():
+                return cardinal(_finite_order(group))
+            case _ if group in GroupsWithChosenFreeBasis():
+                basis_cardinality = group.free_basis().cardinality()
+                if basis_cardinality == cardinal(0):
+                    return cardinal(1)
+                return Cardinalities().supremum(aleph(0), basis_cardinality)
+            case _ if group in OwnedInfiniteGroups() and group in OwnedGroups().FinitelyGeneratedAsMagma():
+                return aleph(0)
+            case _:
+                # The group's own finiteness decision is the answer to "is this
+                # group finite"; asking it here is what makes the count independent
+                # of the order in which the question was reached.  The decision is
+                # the group's exact engine answer, and it is asked only after the
+                # placement and free-basis cases have declined.
+                decision = group.is_finite()
+                match decision:
+                    case True:
+                        return cardinal(_finite_order(group))
+                    case False if group in OwnedGroups().FinitelyGeneratedAsMagma():
+                        return aleph(0)
+                    case _:
+>                       assert False, (
+                               ^^^^^
+                            f"cannot compute the cardinality of the group {group}: its finiteness is "
+                            f"{decision}, it has no chosen free basis, and it is not known to be infinite "
+                            f"and finitely generated (it is in {group.category()})"
+                        )
+E                       AssertionError: cannot compute the cardinality of the group Group generated by Group generators: [0 ↦ g_1, 1 ↦ g_2]: its finiteness is is_finite(Group generated by Group generators: [0 ↦ g_1, 1 ↦ g_2]), it has no chosen free basis, and it is not known to be infinite and finitely generated (it is in Join of Category of presented groups and Category of groups with chosen finite presentation)
+
+src/sage_extensions/categories/group/groups.py:459: AssertionError
+_______ test_presented_group_arrows_are_induced_by_maps_of_presentations _______
+
+    def test_presented_group_arrows_are_induced_by_maps_of_presentations() -> None:
+        r"""An arrow of ``FreeGroupQuotients()`` is induced by ``f: F -> F'`` with ``f(R) subset R'``.
+    
+        Mathlib ``PresentedGroup.map``.  On ``F(a, b)``, the swap ``a <-> b``
+        sends ``{a^2, b^2, (ab)^3}`` into itself, so it induces an automorphism
+        of ``<a, b | a^2, b^2, (ab)^3> = S_3``, exchanging the two generators.
+        """
+        free = Groups.Free(2)
+        a, b = tuple(free.group_generators())
+        relators = (a**2, b**2, (a*b)**3)
+        quotient = FreeGroupQuotients()(free, relators)
+>       swap = free.Mor(free)({a: b, b: a})
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_free_and_catalogued_groups.sage:834: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Mor(Group generated by Group generators: [0 ↦ g_0, 1 ↦ g_1], Group generated by Group generators: [0 ↦ g_0, 1 ↦ g_1])
+images = {g_0: g_1, g_1: g_0}, _options = {}
+
+    def _element_constructor_(self, images, **_options):
+        r"""The morphism ``F(S) -> H`` determined by the images of the basis ``S``.
+    
+        The images are a set morphism ``S -> H``, a function on ``S``, or, for
+        a finite ``S``, a dictionary naming every basis point.
+        """
+        indices = self.domain().free_basis()
+        match images:
+            case SetMorphism() | OwnedSetMorphism():
+                assert images.domain() is indices and images.codomain() is self.codomain(), (
+                    f"{images} cannot define a homomorphism {self.domain()} -> {self.codomain()}: a homomorphism out of a "
+                    f"free group is a map from the free basis {indices} to {self.codomain()}, but {images} is a map "
+                    f"{images.domain()} -> {images.codomain()}"
+                )
+                generator_morphism = images
+            case dict():
+                assert indices in FiniteSets(), (
+                    f"a dictionary cannot define a homomorphism out of {self.domain()}: its free basis {indices} is not "
+                    f"known to be finite; give a map from {indices} to {self.codomain()} instead"
+                )
+>               assert all(index in images for index in indices), (
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    f"the dictionary does not define a homomorphism out of {self.domain()}: it must give an image for every "
+                    f"element of the free basis {indices}, but it has keys {tuple(images)}"
+                )
+E               AssertionError: the dictionary does not define a homomorphism out of Group generated by Group generators: [0 ↦ g_0, 1 ↦ g_1]: it must give an image for every element of the free basis {0,...,1}, but it has keys (g_0, g_1)
+
+src/sage_extensions/categories/group/groups.py:4470: AssertionError
+_________ test_quotient_descent_with_identified_presenting_generators __________
+
+    def test_quotient_descent_with_identified_presenting_generators() -> None:
+        free = Groups.Free(2)
+        a, b = tuple(free.group_generators())
+        quotient = FreeGroupQuotients()(free, (a * ~b, a**2))
+        projection = quotient.quotient_projection()
+        assert projection(a) == projection(b)
+    
+        cyclic = Groups.C(2)
+        involution = cyclic.group_generators()[0]
+>       compatible = free.Mor(cyclic)({a: involution, b: involution})
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_free_and_catalogued_groups.sage:857: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1014: in __call__
+    return OwnedMor.__call__(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:61: in __call__
+    return self._element_constructor_(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Mor(Group generated by Group generators: [0 ↦ g_0, 1 ↦ g_1], Cyclic group C_2 of order 2)
+images = {g_0: (1 2), g_1: (1 2)}, _options = {}
+
+    def _element_constructor_(self, images, **_options):
+        r"""The morphism ``F(S) -> H`` determined by the images of the basis ``S``.
+    
+        The images are a set morphism ``S -> H``, a function on ``S``, or, for
+        a finite ``S``, a dictionary naming every basis point.
+        """
+        indices = self.domain().free_basis()
+        match images:
+            case SetMorphism() | OwnedSetMorphism():
+                assert images.domain() is indices and images.codomain() is self.codomain(), (
+                    f"{images} cannot define a homomorphism {self.domain()} -> {self.codomain()}: a homomorphism out of a "
+                    f"free group is a map from the free basis {indices} to {self.codomain()}, but {images} is a map "
+                    f"{images.domain()} -> {images.codomain()}"
+                )
+                generator_morphism = images
+            case dict():
+                assert indices in FiniteSets(), (
+                    f"a dictionary cannot define a homomorphism out of {self.domain()}: its free basis {indices} is not "
+                    f"known to be finite; give a map from {indices} to {self.codomain()} instead"
+                )
+>               assert all(index in images for index in indices), (
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    f"the dictionary does not define a homomorphism out of {self.domain()}: it must give an image for every "
+                    f"element of the free basis {indices}, but it has keys {tuple(images)}"
+                )
+E               AssertionError: the dictionary does not define a homomorphism out of Group generated by Group generators: [0 ↦ g_0, 1 ↦ g_1]: it must give an image for every element of the free basis {0,...,1}, but it has keys (g_0, g_1)
+
+src/sage_extensions/categories/group/groups.py:4470: AssertionError
+________ test_quotient_descent_respects_the_selected_free_basis_labels _________
+
+>   return self.cache[k]
+E   KeyError: ((Group generated by Group generators: [0 ↦ g_0, 1 ↦ g_1], frozenset({g_0^2, g_1^3, g_0 g_1 g_0 g_1})), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_quotient_descent_respects_the_selected_free_basis_labels() -> None:
+        labels = Sets.Δ[1]
+        free = Groups.Free(index_set=labels)
+        a = free.free_generator(labels(0))
+        b = free.free_generator(labels(1))
+>       quotient = FreeGroupQuotients()(free, (a**2, b**3, (a*b)**2))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_free_and_catalogued_groups.sage:881: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:7940: in _call_
+    return _free_group_quotient(free_group, relators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:7894: in _free_group_quotient
+    return _presented_group(free_group, frozenset(free_group(relator) for relator in relators))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/group/groups.py:7905: in _presented_group
+    return _engine_quotient_by_relators(free_group, tuple(relator_set))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+group = Group generated by Group generators: [0 ↦ g_0, 1 ↦ g_1]
+relators = (g_0^2, g_1^3, g_0 g_1 g_0 g_1)
+
+    def _engine_quotient_by_relators(group, relators):
+        r"""Return ``G / <<relators>>`` with its actual quotient presentation.
+    
+        A quotient of a free group ``F`` is ``F/<<R>>`` with its presentation
+        ``(F, R)``, an object of :class:`FreeGroupQuotients` whose ambient
+        category is the groups.
+        """
+        # The normal closure is taken inside this group, not in an unrelated
+        # group whose elements happen to admit backend coercion to words.
+        relators = tuple(relators)
+        if any(relator not in group for relator in relators):
+            raise ValueError("quotient relators must be elements of the group being quotiented")
+        engine = _engine_group(group)
+        match engine:
+            case FreeGroup_class():
+                quotient = engine.quotient([group._to_engine(group(relator)) for relator in relators])
+                return _own_group(
+                    quotient,
+                    refinements=(
+                        FreeGroupQuotients(),
+                        *((OwnedAbelianGroups(),) if group in OwnedAbelianGroups() else ()),
+                    ),
+                    chosen_presentation=(group, tuple(group(relator) for relator in relators)),
+                    constructing_category=OwnedGroups(),
+                )
+            case FinitelyPresentedGroup():
+                # G = F/R and G/<<S>> = F/<<R, S>>, with S lifted to words in F.
+                free = engine.free_group()
+                relations = list(engine.relations()) + [free(group._to_engine(group(relator)).Tietze()) for relator in relators]
+                # This quotient is not isomorphic to G in general. The
+                # presentation_source_group slot certifies an isomorphic model
+                # (presentation_isomorphism), not a quotient ancestor.
+                return _own_group(
+                    free.quotient(relations),
+                    refinements=(OwnedAbelianGroups(),) if group in OwnedAbelianGroups() else (),
+                )
+            case CoxeterMatrixGroup():
+                # A Coxeter group has a canonical free presentation on its
+                # simple reflections. Lift each additional normal relator by
+                # its reduced Coxeter word; do not coerce matrix elements into
+                # an unrelated finitely presented GAP parent.
+                matrix = engine.coxeter_matrix()
+                free, defining_relations = _coxeter_presentation(matrix)
+                positions = {label: position + 1 for position, label in enumerate(matrix.index_set())}
+                lifted = []
+                for relation in relators:
+                    word = group._to_engine(group(relation)).reduced_word()
+                    # Coxeter matrix elements multiply in the ordinary matrix
+                    # order, while the owned free/presented word law reverses
+                    # Sage's multiplication. Reverse the word when transporting
+                    # it between these representations.
+                    lifted.append(free([positions[label] for label in reversed(word)]))
+                return _own_group(
+                    free.quotient(tuple(defining_relations) + tuple(lifted)),
+                    refinements=(OwnedAbelianGroups(),) if group in OwnedAbelianGroups() else (),
+                )
+            case _:
+>               assert False, f"the quotient of {group} by the normal closure of {relators} cannot be computed: this is available only for free groups and finitely presented groups"
+                       ^^^^^
+E               AssertionError: the quotient of Group generated by Group generators: [0 ↦ g_0, 1 ↦ g_1] by the normal closure of (g_0^2, g_1^3, g_0 g_1 g_0 g_1) cannot be computed: this is available only for free groups and finitely presented groups
+
+src/sage_extensions/categories/group/groups.py:1386: AssertionError
+_______________ test_general_linear_group_retains_ring_and_rank ________________
+
+    def test_general_linear_group_retains_ring_and_rank() -> None:
+>       group = GeneralLinearGroups()(GF(2), 2)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_free_and_catalogued_groups.sage:913: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:7736: in _call_
+    return _general_linear_group(ring, degree)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ring = Integer Ring / Ideal (2) of Integer Ring, degree = 2, var = 'a'
+
+    def _general_linear_group(ring, degree, var="a"):
+        r"""``GL_n(R)`` from its defining data, cached on ``(R, n)``; see :func:`_general_linear_group_of`."""
+>       assert degree in ZZ and degree == ZZ(degree) and degree >= 0, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"GL_n(R) needs a rank n that is an integer n >= 0, but got {degree!r}"
+        )
+E       AssertionError: GL_n(R) needs a rank n that is an integer n >= 0, but got 2
+
+src/sage_extensions/categories/group/groups.py:2445: AssertionError
+_____________ test_general_linear_arrows_are_induced_by_ring_maps ______________
+
+    def test_general_linear_arrows_are_induced_by_ring_maps() -> None:
+        r"""An arrow of ``GeneralLinearGroups()`` is ``GL_n(phi)``, ``phi`` applied entrywise.
+    
+        Mathlib ``Matrix.GeneralLinearGroup.map``.  Reduction ``ZZ -> GF(2)``
+        sends the unipotent ``[[1, 1], [0, 1]]`` of infinite order to the
+        transvection ``[[1, 1], [0, 1]]`` of order two.
+        """
+>       integral = GeneralLinearGroups()(ZZ, 2)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_free_and_catalogued_groups.sage:950: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:7736: in _call_
+    return _general_linear_group(ring, degree)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ring = Integer Ring, degree = 2, var = 'a'
+
+    def _general_linear_group(ring, degree, var="a"):
+        r"""``GL_n(R)`` from its defining data, cached on ``(R, n)``; see :func:`_general_linear_group_of`."""
+>       assert degree in ZZ and degree == ZZ(degree) and degree >= 0, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"GL_n(R) needs a rank n that is an integer n >= 0, but got {degree!r}"
+        )
+E       AssertionError: GL_n(R) needs a rank n that is an integer n >= 0, but got 2
+
+src/sage_extensions/categories/group/groups.py:2445: AssertionError
+___________ test_named_matrix_group_families_require_integral_degree ___________
+
+    def test_named_matrix_group_families_require_integral_degree() -> None:
+        for constructor in (Groups.GL, Groups.Sp, Groups.SO):
+            try:
+>               constructor(QQ(5) / 2, ZZ)
+
+tests/groups/test_free_and_catalogued_groups.sage:993: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/groups.py:2496: in _GL
+    return _general_linear_group(ring, degree, var=var)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ring = Integer Ring, degree = (5)/(2), var = 'a'
+
+    def _general_linear_group(ring, degree, var="a"):
+        r"""``GL_n(R)`` from its defining data, cached on ``(R, n)``; see :func:`_general_linear_group_of`."""
+>       assert degree in ZZ and degree == ZZ(degree) and degree >= 0, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"GL_n(R) needs a rank n that is an integer n >= 0, but got {degree!r}"
+        )
+E       AssertionError: GL_n(R) needs a rank n that is an integer n >= 0, but got (5)/(2)
+
+src/sage_extensions/categories/group/groups.py:2445: AssertionError
+=========================== short test summary info ============================
+FAILED tests/groups/test_free_and_catalogued_groups.sage::test_a_morphism_out_of_the_free_group_is_given_by_the_images_of_its_letters
+FAILED tests/groups/test_free_and_catalogued_groups.sage::test_gap_group_morphism_requires_its_selected_endpoints
+FAILED tests/groups/test_free_and_catalogued_groups.sage::test_symmetric_group_retains_its_chosen_point_set_and_action
+FAILED tests/groups/test_free_and_catalogued_groups.sage::test_coxeter_group_retains_its_matrix_and_type_a2_order
+FAILED tests/groups/test_free_and_catalogued_groups.sage::test_free_group_quotient_retains_source_and_dihedral_relations
+FAILED tests/groups/test_free_and_catalogued_groups.sage::test_presented_group_arrows_are_induced_by_maps_of_presentations
+FAILED tests/groups/test_free_and_catalogued_groups.sage::test_quotient_descent_with_identified_presenting_generators
+FAILED tests/groups/test_free_and_catalogued_groups.sage::test_quotient_descent_respects_the_selected_free_basis_labels
+FAILED tests/groups/test_free_and_catalogued_groups.sage::test_general_linear_group_retains_ring_and_rank
+FAILED tests/groups/test_free_and_catalogued_groups.sage::test_general_linear_arrows_are_induced_by_ring_maps
+FAILED tests/groups/test_free_and_catalogued_groups.sage::test_named_matrix_group_families_require_integral_degree
+11 failed, 17 passed in 6.31s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_g_sets_torsor_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_the_equivariant_self_maps_of_the_regular_c3_set_are_its_three_translations _
+
+    def test_the_equivariant_self_maps_of_the_regular_c3_set_are_its_three_translations() -> None:
+        r"""$\operatorname{Hom}_G(G, X) \cong X$ (Yoneda), so $|\operatorname{End}_{C_3}(C_3)| = 3$; on the trivial $C_3$-set of 3 points every one of the $3^3 = 27$ maps is equivariant."""
+        group = Groups.C(3)
+        regular = FiniteGSets(group)(tuple(group), lambda g, x: g * x)
+        trivial = FiniteGSets(group).trivial((1, 2, 3))
+    
+>       assert regular.Mor(regular).cardinality() == 3
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_g_sets_torsor_archive.sage:12: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Mor_Cyclic group C_3 of order 3({1, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action, {1, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action)
+
+    def cardinality(self) -> Cardinalities.ObjectType:
+        r"""The cardinality ``|X|``, an object of ``Card``.
+    
+        Cardinality is total on sets (`CAT-01`), and this is its one
+        owner: no set construction restates it.  It is an isomorphism
+        invariant, so it is read off what the construction of ``X``
+        determines, by placement:
+    
+        - the finite ordinal ``n`` has the cardinality of its order
+          type ``n``;
+        - a set with a chosen enumeration from an index set is in
+          bijection with that index set;
+        - ``|P(X)| = 2^|X|``, since ``P(X)`` is in bijection with the
+          characteristic maps ``X -> 2``;
+        - ``|Y^X| = |Y|^|X|``, the definition of cardinal exponentiation;
+        - the ``k``-element subsets of ``X`` number ``binomial(|X|, k)``
+          for finite ``X``, one for ``k = 0``, and ``|X|`` for infinite
+          ``X`` and ``k >= 1``;
+        - the finite subsets of ``X`` number ``2^|X|`` for finite ``X``
+          and ``|X|`` for infinite ``X``;
+        - ``|prod_i X_i| = prod_i |X_i|`` and ``|coprod_i X_i| =
+          sum_i |X_i|``, the definitions of cardinal product and sum;
+        - any other finite set with a chosen enumeration is counted
+          through that enumeration, and any
+          other countably infinite set has cardinality ``aleph_0``.
+    
+        A realization whose construction determines a cardinality these
+        standard set cases do not reach supplies that theorem through the
+        protected ``_cardinality_decision`` hook.  The public operation
+        remains here.  A represented set outside all of these routes has a
+        cardinality that no exact computation here reaches, and the
+        assertion says so.
+        """
+        construction_cardinality = self._cardinality_decision()
+>       assert construction_cardinality is not None, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"cannot compute the cardinality of {self}: its construction supplies no exact value "
+            f"or decided finite enumeration (it is in {self.category()})"
+        )
+E       AssertionError: cannot compute the cardinality of Mor_Cyclic group C_3 of order 3({1, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action, {1, (1 2 3), (1 3 2)} with Cyclic group C_3 of order 3-action): its construction supplies no exact value or decided finite enumeration (it is in Join of Category of endsets and Category of homsets of sets and Category of sets)
+
+src/sage_extensions/categories/sets/set_categories.py:2503: AssertionError
+=========================== short test summary info ============================
+FAILED tests/groups/test_g_sets_torsor_archive.sage::test_the_equivariant_self_maps_of_the_regular_c3_set_are_its_three_translations
+1 failed, 1 passed in 2.67s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_galois_characters_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+______ test_the_mod_three_cyclotomic_character_of_f5_factors_through_f25 _______
+
+>   return self.cache[k]
+E   KeyError: 131665216747088
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ((Algebraic closure of Finite Field of size 5,), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: 5
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_mod_three_cyclotomic_character_of_f5_factors_through_f25() -> None:
+        r"""$\chi_3(\mathrm{Frob}) = 5 \equiv 2 \bmod 3$ has order $2$, so $\chi_3$ factors through $\mathbb{F}_5(\mu_3) = \mathbb{F}_{25}$ and is multiplicative."""
+>       group = GF(5).absolute_galois_group()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_galois_characters_archive.sage:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:3320: in absolute_galois_group
+    return AbsoluteGaloisGroup(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:920: in AbsoluteGaloisGroup
+    return _canonical_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:908: in _canonical_absolute_galois_group
+    return _realized_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:890: in _realized_absolute_galois_group
+    closure = _own_ring(closure)
+              ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:7555: in _own_ring
+    return _owned_engine_ring(ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/rings/ring_foundation.py:7394: in _owned_engine_ring
+    return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+characteristic = 5
+
+    @cached_function(key=lambda characteristic: int(characteristic))
+    def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+        r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+        from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    
+>       engine = AlgebraicClosureFiniteField(int(characteristic))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'
+
+src/sage_extensions/categories/rings/ring_foundation.py:7608: TypeError
+_____ test_the_quadratic_character_of_two_over_f5_has_kernel_of_index_two ______
+
+>   return self.cache[k]
+E   KeyError: 131665216747088
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ((Algebraic closure of Finite Field of size 5,), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: 5
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_quadratic_character_of_two_over_f5_has_kernel_of_index_two() -> None:
+        r"""$2$ is not a square mod $5$, so $\mathrm{Frob}(\sqrt2) = -\sqrt2$.
+    
+        The kernel fixes $\mathbb{F}_{25}$: index $2$, excluding $\mathrm{Frob}$
+        and containing $\mathrm{Frob}^2$; the character restricted to its kernel
+        is trivial.
+        """
+>       group = GF(5).absolute_galois_group()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_galois_characters_archive.sage:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:3320: in absolute_galois_group
+    return AbsoluteGaloisGroup(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:920: in AbsoluteGaloisGroup
+    return _canonical_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:908: in _canonical_absolute_galois_group
+    return _realized_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:890: in _realized_absolute_galois_group
+    closure = _own_ring(closure)
+              ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:7555: in _own_ring
+    return _owned_engine_ring(ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/ring_foundation.py:7394: in _owned_engine_ring
+    return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+characteristic = 5
+
+    @cached_function(key=lambda characteristic: int(characteristic))
+    def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+        r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+        from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    
+>       engine = AlgebraicClosureFiniteField(int(characteristic))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'
+
+src/sage_extensions/categories/rings/ring_foundation.py:7608: TypeError
+=========================== short test summary info ============================
+FAILED tests/groups/test_galois_characters_archive.sage::test_the_mod_three_cyclotomic_character_of_f5_factors_through_f25
+FAILED tests/groups/test_galois_characters_archive.sage::test_the_quadratic_character_of_two_over_f5_has_kernel_of_index_two
+2 failed in 2.49s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_galois_quotient_archive.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_restriction_to_f625_has_kernel_of_index_four_containing_frobenius_to_the_fourth _
+
+>   return self.cache[k]
+E   KeyError: 137404962911824
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ((Algebraic closure of Finite Field of size 5,), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: 5
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_restriction_to_f625_has_kernel_of_index_four_containing_frobenius_to_the_fourth() -> None:
+        r"""$G_{\mathbb{F}_5} \to \operatorname{Gal}(\mathbb{F}_{5^4}/\mathbb{F}_5) \cong \mathbb{Z}/4$ is surjective; $\mathrm{Frob} \notin \ker$, $\mathrm{Frob}^4 \in \ker$."""
+>       group = GF(5).absolute_galois_group()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_galois_quotient_archive.sage:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:3320: in absolute_galois_group
+    return AbsoluteGaloisGroup(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:920: in AbsoluteGaloisGroup
+    return _canonical_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:908: in _canonical_absolute_galois_group
+    return _realized_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:890: in _realized_absolute_galois_group
+    closure = _own_ring(closure)
+              ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:7555: in _own_ring
+    return _owned_engine_ring(ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/rings/ring_foundation.py:7394: in _owned_engine_ring
+    return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+characteristic = 5
+
+    @cached_function(key=lambda characteristic: int(characteristic))
+    def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+        r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+        from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    
+>       engine = AlgebraicClosureFiniteField(int(characteristic))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'
+
+src/sage_extensions/categories/rings/ring_foundation.py:7608: TypeError
+_________ test_the_frobenius_of_f25_has_exactly_two_extensions_to_f625 _________
+
+>   return self.cache[k]
+E   KeyError: 137404962911824
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ((Algebraic closure of Finite Field of size 5,), ())
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: 5
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_frobenius_of_f25_has_exactly_two_extensions_to_f625() -> None:
+        r"""The fibre of $\operatorname{Gal}(\mathbb{F}_{625}/\mathbb{F}_5) \to \operatorname{Gal}(\mathbb{F}_{25}/\mathbb{F}_5)$ over $\mathrm{Frob}$ has $[\mathbb{F}_{625}:\mathbb{F}_{25}] = 2$ elements, $\sigma$ and $\sigma^3$."""
+>       group = GF(5).absolute_galois_group()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_galois_quotient_archive.sage:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:3320: in absolute_galois_group
+    return AbsoluteGaloisGroup(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:920: in AbsoluteGaloisGroup
+    return _canonical_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:908: in _canonical_absolute_galois_group
+    return _realized_absolute_galois_group(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:890: in _realized_absolute_galois_group
+    closure = _own_ring(closure)
+              ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:7555: in _own_ring
+    return _owned_engine_ring(ring)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/rings/ring_foundation.py:7394: in _owned_engine_ring
+    return _owned_algebraic_closure_finite_field(int(engine.characteristic()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+characteristic = 5
+
+    @cached_function(key=lambda characteristic: int(characteristic))
+    def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
+        r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+        from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
+    
+>       engine = AlgebraicClosureFiniteField(int(characteristic))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: AlgebraicClosureFiniteField() missing 1 required positional argument: 'name'
+
+src/sage_extensions/categories/rings/ring_foundation.py:7608: TypeError
+_ test_the_automorphisms_of_q_zeta_12_act_on_i_and_root_three_by_their_exponent _
+
+    def test_the_automorphisms_of_q_zeta_12_act_on_i_and_root_three_by_their_exponent() -> None:
+        r"""With $i = \zeta^3$ and $\sqrt3 = \zeta + \zeta^{-1}$ in $\mathbb{Q}(\zeta_{12})$:
+    
+        $\sigma_5$ fixes $i$ and negates $\sqrt3$; $\sigma_7$ negates both;
+        $\sigma_{11}$ negates $i$ and fixes $\sqrt3$ (it is complex conjugation).
+        """
+        x = QQ.polynomial_ring("x").algebra_generator("x")
+        cyclotomic = (x**4 - x**2 + 1).number_field("z")
+        zeta = cyclotomic.primitive_element()
+        i = zeta**3
+        root_three = zeta + zeta**-1
+        group = QQ.absolute_galois_group()
+>       quotient = group.finite_quotient(group.extension_data(cyclotomic))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_galois_quotient_archive.sage:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/profinite/absolute_galois_group.py:737: in extension_data
+    if candidate_closure * candidate_base == self._embedding
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:173: in __mul__
+    other._engine_morphism is not None and other._engine_is_identity()
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:241: in _engine_is_identity
+    return bool(self._engine_morphism.is_identity())
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/structure/element.pyx:494: in sage.structure.element.Element.__getattr__
+    ???
+sage/structure/element.pyx:507: in sage.structure.element.Element.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'sage.structure.coerce_maps.DefaultConvertMap_unique' object has no attribute 'is_identity'
+
+sage/cpython/getattr.pyx:362: AttributeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Algebraic Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Real Algebraic Field on Classes in the multilinear tensor presentation -> Module over Real Algebraic Field on Algebraic Closure of Rational Field accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+FAILED tests/groups/test_galois_quotient_archive.sage::test_restriction_to_f625_has_kernel_of_index_four_containing_frobenius_to_the_fourth
+FAILED tests/groups/test_galois_quotient_archive.sage::test_the_frobenius_of_f25_has_exactly_two_extensions_to_f625
+FAILED tests/groups/test_galois_quotient_archive.sage::test_the_automorphisms_of_q_zeta_12_act_on_i_and_root_three_by_their_exponent
+3 failed in 2.57s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_group_law.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+.F..                                                                     [100%]
+=================================== FAILURES ===================================
+________ test_the_natural_permutation_module_of_s3_has_character_3_1_0 _________
+
+>   return self._cached_methods[name]
+E   KeyError: 'character'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_natural_permutation_module_of_s3_has_character_3_1_0() -> None:
+        r"""$\chi(g)$ counts the fixed points of $g$ on $\{1,2,3\}$, and $\mathbb{Q}^3$ has invariants $\mathbb{Q}(1,1,1)$ (Serre, *Linear representations of finite groups*, 2.3)."""
+        group = Groups.S(3)
+        module = Modules(QQ)(QQ**3)
+    
+        def act(g, vector):
+            return module.Mor(module)(
+                {i: module.module_generator(int(g(i + 1)) - 1) for i in range(3)}
+            )(vector)
+    
+        permutation = Modules(QQ[group])(module, act)
+>       character = permutation.character()
+                    ^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_group_law.sage:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'GeneralModules.parent_class[_CoefficientModuleEngine].ObjectType' object has no attribute 'character'
+
+sage/cpython/getattr.pyx:362: AttributeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+FAILED tests/groups/test_group_law.sage::test_the_natural_permutation_module_of_s3_has_character_3_1_0
+1 failed, 3 passed in 2.94s
+error: recipe `test` failed on line 154 with exit code 1
+########## test_owned_groups.sage.log
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+F.F..                                                                    [100%]
+=================================== FAILURES ===================================
+______________ test_sl2_f3_is_sp2_f3_and_modulo_its_centre_is_a4 _______________
+
+    def test_sl2_f3_is_sp2_f3_and_modulo_its_centre_is_a4() -> None:
+        r"""$|\operatorname{GL}_2(\mathbb{F}_3)| = (9-1)(9-3) = 48$, $\operatorname{SL}_2 = \operatorname{Sp}_2$, $Z(\operatorname{SL}_2(\mathbb{F}_3)) = \{\pm 1\}$ and $\operatorname{PSL}_2(\mathbb{F}_3) \cong A_4$ (Dummit--Foote 4.5, Exercise)."""
+        special = Groups.SL(2, GF(3))
+        centre = special.center()
+    
+>       assert Groups.GL(2, GF(3)).order() == 48
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_owned_groups.sage:11: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/groups.py:2496: in _GL
+    return _general_linear_group(ring, degree, var=var)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ring = Integer Ring / Ideal (3) of Integer Ring, degree = 2, var = 'a'
+
+    def _general_linear_group(ring, degree, var="a"):
+        r"""``GL_n(R)`` from its defining data, cached on ``(R, n)``; see :func:`_general_linear_group_of`."""
+>       assert degree in ZZ and degree == ZZ(degree) and degree >= 0, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"GL_n(R) needs a rank n that is an integer n >= 0, but got {degree!r}"
+        )
+E       AssertionError: GL_n(R) needs a rank n that is an integer n >= 0, but got 2
+
+src/sage_extensions/categories/group/groups.py:2445: AssertionError
+________ test_the_abelianization_of_the_free_product_of_c2_and_c3_is_c6 ________
+
+>   return self._cached_methods[name]
+E   KeyError: 'abelianization'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_abelianization_of_the_free_product_of_c2_and_c3_is_c6() -> None:
+        r"""$\langle a, b \mid a^2, b^3 \rangle = C_2 * C_3 \cong \operatorname{PSL}_2(\mathbb{Z})$ has abelianization $C_2 \times C_3 \cong C_6$."""
+        free = Groups.Free(2)
+        a, b = free.group_generators()
+        presented = free.quotient_by_relators((a**2, b**3))
+    
+>       assert presented.abelianization().is_isomorphic_to(Groups.C(6))
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/groups/test_owned_groups.sage:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class[_GroupEngine].ObjectType' object has no attribute 'abelianization'
+
+sage/cpython/getattr.pyx:362: AttributeError
+=========================== short test summary info ============================
+FAILED tests/groups/test_owned_groups.sage::test_sl2_f3_is_sp2_f3_and_modulo_its_centre_is_a4
+FAILED tests/groups/test_owned_groups.sage::test_the_abelianization_of_the_free_product_of_c2_and_c3_is_c6
+2 failed, 3 passed in 2.58s
+error: recipe `test` failed on line 154 with exit code 1

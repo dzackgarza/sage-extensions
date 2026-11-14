@@ -137,15 +137,21 @@ from sage_extensions.categories.group.g_objects import (  # noqa: F401
 )
 from sage_extensions.categories.group.g_sets import (  # noqa: F401
     FiniteGSets,
+    Torsors,
 )
 from sage_extensions.categories.group.groups import (  # noqa: F401
     AbelianGroups,
+    CoxeterGroups,
     FiniteAbelianGroups,
+    FreeGroupQuotients,
+    GeneralLinearGroups,
     Groups,
     LieGroups,
     OwnedAbelianGroups,
     OwnedFiniteAbelianGroups,
     OwnedGroups,
+    Subgroups,
+    SymmetricGroups,
     TopologicalGroups,
 )
 from sage_extensions.categories.group.magmas import (  # noqa: F401
