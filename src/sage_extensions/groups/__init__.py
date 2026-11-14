@@ -54,7 +54,6 @@ from sage_extensions.categories.group.predicate_subgroups import PredicateSubgro
 
 from sage_extensions.categories.group.profinite import (
     AbsoluteDecompositionGroup,
-    AbsoluteGaloisGroup,
     AbsoluteGaloisGroupElement,
     AbsoluteGaloisGroups,
     AbsoluteGaloisGroupsOfFiniteFields,
@@ -87,7 +86,6 @@ __all__ = [
     'FreeGroupQuotients',
     'CoxeterGroups',
     'AbsoluteDecompositionGroup',
-    'AbsoluteGaloisGroup',
     'AbsoluteGaloisGroupElement',
     'AbsoluteGaloisGroups',
     'AbsoluteGaloisGroupsOfFiniteFields',

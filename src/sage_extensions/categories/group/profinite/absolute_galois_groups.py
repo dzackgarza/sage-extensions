@@ -32,12 +32,9 @@ from sage_extensions.logic import ask
 
 def _finite_field_absolute_galois_group():
     r"""Return the selected finite-field specimen used by these categories."""
-    from sage_extensions.categories.group.profinite.absolute_galois_group import (
-        AbsoluteGaloisGroup,
-    )
     from sage_extensions.categories.rings.ring_foundation import GF
 
-    return AbsoluteGaloisGroup(GF(2))
+    return GF(2).absolute_galois_group()
 
 
 class AbsoluteGaloisGroups(OwnedCategory):

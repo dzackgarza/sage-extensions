@@ -1,7 +1,6 @@
 'Owned profinite and Galois vocabulary.'
 
 from sage_extensions.categories.group.profinite.absolute_galois_group import (
-    AbsoluteGaloisGroup,
     AbsoluteGaloisGroupElement,
     ElementConjugacyClass,
     FrobeniusElement,
@@ -44,7 +43,6 @@ from sage_extensions.categories.group.profinite.profinite_groups import Profinit
 
 __all__ = [
     'AbsoluteDecompositionGroup',
-    'AbsoluteGaloisGroup',
     'AbsoluteGaloisGroupElement',
     'AbsoluteGaloisGroups',
     'AbsoluteGaloisGroupsOfFiniteFields',
