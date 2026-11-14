@@ -2067,14 +2067,7 @@ class ModuleMorphismMethods:
         )
 
         if not _has_finite_free_framing(extension):
-            from sage_extensions.categories.modules.pure.modules import Modules
-
-            # A presentation's generators are not independent coordinates.
-            # Over the fraction field its invariant-factor trivialization
-            # removes the relations before the integral coordinate solve.
-            coordinates = extension.finite_free_trivialization().forward()
-            restricted = Modules(fractions).restriction_of_scalars(codomain.ring_map())(coordinates)
-            return (restricted * self)._preimage_or_none(restricted(codomain(element)))
+            return self._presented_extension_solver()(element)
 
         if element.parent() is not codomain:
             element = codomain(element)
@@ -2091,6 +2084,77 @@ class ModuleMorphismMethods:
             label: ring(coefficient) for label, coefficient in coefficients.items()
         })
         return cleared_span._preimage_or_none(target)
+
+    @cached_method
+    def _presented_extension_solver(self):
+        r"""Solve integral preimages into ``Res(W)`` for a presented ``Frac(R)``-module ``W``.
+
+        ``W = F_0 / im(F_1)`` over ``K = Frac(R)``. A matrix ``P`` whose rows
+        span the annihilator of the relation columns maps ``F_0`` onto
+        ``K^k`` with kernel exactly the relations, so ``x`` lifts ``t``
+        precisely when ``P G x = P t`` for the coordinate columns ``G`` of
+        the generator images. Clearing one denominator gives an integral
+        system, solved by its Smith form ``D = U A V``: ``x = V y`` with
+        ``D y = U b`` (Cohen, *A Course in Computational Algebraic Number
+        Theory*, Algorithm 2.4.14 and Section 2.4.3). Relation matrix,
+        projection and Smith data are fixed by this arrow; a query changes
+        only the right-hand side.
+        """
+        from sage.matrix.constructor import matrix as sage_matrix
+        from sage.modules.free_module_element import vector as sage_vector
+        from sage.rings.integer_ring import ZZ as SageZZ
+        from sage_extensions.categories.modules.pure.modules import _engine_matrix
+
+        domain, codomain = self.domain(), self.codomain()
+        ring = domain.base_ring()
+        fractions = codomain.extension_ring()
+        extension = codomain.module_over_extension()
+        presentation = extension.presentation()
+        framing = extension.framing_morphism()
+        labels = tuple(presentation.codomain().module_generating_set())
+        field = _linear_algebra_ring(fractions)
+
+        def coordinates(value):
+            lifted = framing.lift(value).to_vector()
+            return sage_vector(field, [_linear_algebra_element(fractions, lifted(label)) for label in labels])
+
+        relations = _engine_matrix(presentation).change_ring(field)
+        projection = relations.transpose().right_kernel_matrix()
+        source_labels = tuple(domain.module_generating_set())
+        images = sage_matrix(
+            field,
+            [projection * coordinates(self(domain.module_generator(label)).underlying_element()) for label in source_labels],
+        ).transpose()
+        denominator = images.denominator()
+        integral = (denominator * images).change_ring(SageZZ)
+        diagonal, left, right = integral.smith_form()
+        width = integral.ncols()
+
+        def solve(element):
+            if element.parent() is not codomain:
+                element = codomain(element)
+            target = denominator * (projection * coordinates(element.underlying_element()))
+            if target.denominator() != 1:
+                return None
+            shifted = left * target.change_ring(SageZZ)
+            solution = [SageZZ(0)] * width
+            for index, value in enumerate(shifted):
+                divisor = diagonal[index, index] if index < width else SageZZ(0)
+                if divisor == 0:
+                    if value != 0:
+                        return None
+                    continue
+                if value % divisor != 0:
+                    return None
+                solution[index] = value // divisor
+            lifted = right * sage_vector(SageZZ, solution)
+            return domain.linear_combination({
+                label: _owned_engine_element(ring, coefficient)
+                for label, coefficient in zip(source_labels, lifted, strict=True)
+                if coefficient
+            })
+
+        return solve
 
     @cached_method
     def _integral_extension_coordinate_span(self):
