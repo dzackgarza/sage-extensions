@@ -1,0 +1,30 @@
+[  233.7s] Gram of N in its frame, determinant -256
+[  243.5s] alpha_2 (1, -2, -4, -6, -8, -10, -7, 2, 0, 0) square -4
+[  243.5s] alpha_3 (0, 0, 0, 0, 0, 0, 1, 0, 0, 0) square -4
+[  243.5s] alpha_4 (0, 0, 0, 0, 0, 1, 0, 0, 0, 0) square -4
+[  243.5s] alpha_5 (0, 0, 0, 0, 1, 0, 0, 0, 0, 0) square -4
+[  243.5s] alpha_6 (0, 0, 0, 1, 0, 0, 0, 0, 0, 0) square -4
+[  243.5s] alpha_7 (0, 0, 1, 0, 0, 0, 0, 0, 0, 0) square -4
+[  243.5s] alpha_8 (0, 1, 0, 0, 0, 0, 0, 0, 0, 0) square -4
+[  243.5s] alpha_9 (0, 0, 0, 0, 0, 0, 0, 0, 1, -1) square -2
+[  243.5s] alpha_10 (1, -4, -7, -10, -13, -16, -11, 4, 0, 0) square -4
+[  243.5s] alpha_11 (-2, 4, 8, 12, 16, 20, 14, -5, 1, 1) square -2
+[  243.5s] alpha_12 (-2, 4, 9, 14, 19, 24, 17, -6, 0, 2) square -4
+[  243.6s] P: rays 26 lines 0 ray squares [0, 2, 4, 6, 8, 10, 12]
+[  243.6s] walk wall 0 (2, -5, -10, -15, -20, -25, -18, 6, 0, 2) square -4 implied 
+[  243.6s] walk wall 1 (0, 1, 0, 0, 0, 0, 0, 0, 0, 0) square -4 implied printed
+[  243.6s] walk wall 2 (0, 0, 1, 0, 0, 0, 0, 0, 0, 0) square -4 implied printed
+[  243.6s] walk wall 3 (0, 0, 0, 1, 0, 0, 0, 0, 0, 0) square -4 implied printed
+[  243.6s] walk wall 4 (0, 0, 0, 0, 1, 0, 0, 0, 0, 0) square -4 implied printed
+[  243.6s] walk wall 5 (0, 0, 0, 0, 0, 1, 0, 0, 0, 0) square -4 implied printed
+[  243.6s] walk wall 6 (0, 0, 0, 0, 0, 0, 1, 0, 0, 0) square -4 implied printed
+[  243.6s] walk wall 7 (0, 0, 0, 0, 0, 0, 0, 0, 1, -1) square -2 implied printed
+[  243.6s] walk wall 8 (-5, 12, 25, 38, 51, 64, 45, -16, -3, -3) square -2 opposite 
+[  243.6s] walk wall 9 (-6, 13, 27, 41, 55, 69, 49, -17, -3, -3) square -2 opposite 
+[  243.6s] walk wall 10 (-13, 31, 62, 93, 125, 157, 111, -39, -7, -7) square -2 opposite 
+[  243.6s] walk wall 11 (-30, 72, 145, 218, 291, 364, 257, -90, -16, -16) square -4 opposite 
+[  243.6s] walk wall 12 (-20, 49, 98, 147, 196, 245, 173, -61, -11, -11) square -2 opposite 
+[  243.6s] walk wall 13 (-21, 50, 100, 150, 200, 250, 177, -62, -11, -11) square -2 opposite 
+[  243.6s] walk wall 14 (-27, 67, 134, 201, 268, 335, 236, -83, -15, -15) square -2 opposite 
+[  243.6s] walk wall 15 (-29, 69, 138, 207, 276, 345, 244, -85, -15, -15) square -2 opposite 
+[  243.6s] done
