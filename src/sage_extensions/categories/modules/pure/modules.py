@@ -1700,16 +1700,23 @@ class Modules(OwnedCategoryOverBaseRing):
             ``QQ``-module through its image in ``QQ``.  A scalar that is not a
             unit there is refused by the ring's own unit division.
 
-            The inverse is the scalar's own inversion, not the quotient
-            ``1 / r``.  ``v / r = r^{-1} v`` is one operation for every module,
-            including a ring over itself: its element class then carries this
-            method, and ``ring.one() / r`` would ask this method for ``1 / r``
-            again with the same operands.  The exact real field reached that
-            fixpoint and raised ``RecursionError`` on every division (#398);
-            a ring's own ``v / r`` is its own division, not a scalar action.
+            The inverse is the ring's own unit inverse,
+            ``Monoids.ElementMethods.inverse_of_unit``, whose computation hook
+            ``_unit_inverse_decision`` the ring's element realization supplies.
+            A scalar that is not a unit is refused there, in the ring, rather
+            than inverted into a larger ring: ``1 / r`` would also re-enter
+            this method for a ring over itself, whose scalar action *is* this
+            inverse, which is the ``RecursionError`` of #398 and of #410's
+            cause A.
+
+            ``v / r = r^{-1} v`` is one formula for every module, and a ring is
+            a module over itself without being a separate case: its scalar
+            action is its product, so ``r^{-1} v`` is its division by the unit
+            ``r`` (Bourbaki, *Algebra I*, Ch. II, §1.1: ``(rs)v = r(sv)`` makes
+            ``r^{-1} v`` the unique solution of ``r w = v``).
             """
             ring = self.parent().base_ring()
-            return self.parent().scalar_multiple(ring(scalar) ** -1, self)
+            return self.parent().scalar_multiple(ring(scalar).inverse_of_unit(), self)
 
     class ParentMethods:
         # The ring acting on this module: the datum this level introduces.

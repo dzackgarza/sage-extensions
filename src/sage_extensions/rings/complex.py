@@ -370,11 +370,18 @@ class ExactComplexNumber(FieldElement):
         return self.parent().element_class(self.parent(), -self._expression, _julia().call("-", self._calcium_()))
 
     def __invert__(self):
-        return self.parent().one() / self
+        r"""``z^{-1}``: the reciprocal is this field's unit inverse, not a division syntax."""
+        return self.inverse_of_unit()
 
     def _unit_inverse_decision(self):
-        r"""``z^{-1}``: every nonzero complex number is a unit."""
-        return ~self
+        r"""``z^{-1}``: every nonzero complex number is a unit.
+
+        The reciprocal is the field's own division of one by ``z``, which is
+        where the zero and the undecided-nonzero cases are decided.  Written as
+        ``one() / z`` it would be division on the ring regarded as a module over
+        itself, whose scalar action is this very inverse.
+        """
+        return self.parent().one()._div_(self)
 
     def __pow__(self, exponent, modulus=None):
         r"""The principal power \(z^w = \exp(w \log z)\); an integer power is the iterated product."""
