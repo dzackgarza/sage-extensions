@@ -1061,3 +1061,8 @@ VM; no test of this file causes it.
 | log | commit cited | result |
 | --- | --- | --- |
 | `issue409-slice-orbit-count-gate.log` | `b6b63d0`'s tree with this commit's change to `tests/test_finite_cosets.py` | gates and lint on, `tests/test_finite_cosets.py`: **4 passed in 22.18 s**, slowest call 13.02 s under the 20 s ceiling, star import under its 3 s ceiling, exit 0 |
+
+`issue407-repair8-second-merge.log` is the same check on the tree that is pushed after the
+second move of `main` (to `eb07c43`, #409): `test_galois_extension_coset_archive.sage` green,
+the normalizer and quotient files at one and two reds, `test_absolute_galois.sage` at five --
+the state the identity repair leaves behind, unchanged by the merge.
