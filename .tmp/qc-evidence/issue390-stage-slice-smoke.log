@@ -1,0 +1,79 @@
+[0.0s] probe J: the Otilde row, sliced by stage (#390) -- smoke run on U + U(2) + <-2>, whose Otilde row walks two cosets: the check that the slicing sees the walk, the transport and the registration, not a measurement of anything
+[0.0s] cap 5400 s, python 3.14.10
+[0.0s] lattice Integral lattice of rank 5 and signature (2, 3) of rank 5
+[0.4s] Otilde(T_Co) = lattice.stable_orthogonal_group()
+[0.4s] calling stable.isotropic_orbit_representatives(2)
+[17.7s] the first 20 planes primitive: True in 0.0 s
+[17.7s] 
+[17.7s] === stage table ===
+[17.7s] stage                                                            calls     seconds    share  peak MiB
+[17.7s] quotient.image_order                                                 1        10.4    60.3%       497
+[17.7s] ambient O(L) plane row                                               1         4.5    25.8%       454
+[17.7s] quotientambient_discriminant_images                                  1         1.8    10.2%       507
+[17.7s] stable orthogonal group                                              1         0.3     2.0%       286
+[17.7s] parabolic family                                                     1         0.3     1.7%       nan
+[17.7s] walk setup: coset action, closure, GAP breadth-first walk            1         0.3     1.6%       nan
+[17.7s] lattice construction                                                 1         0.0     0.2%       nan
+[17.7s] lift spelling: one tree product per coset                            2         0.0     0.1%       nan
+[17.7s] transport                                                            2         0.0     0.1%       nan
+[17.7s] plane admission (primitive_isotropic_subobject)                      1         0.0     0.1%       nan
+[17.7s] quotient_im_rho_engine_and_section                                   1         0.0     0.0%       nan
+[17.7s] is_parabolic_complete                                                1         0.0     0.0%       nan
+[17.7s] quotient.subgroup_image_order                                        1         0.0     0.0%       nan
+[17.7s] registration                                                         3         0.0     0.0%       nan
+[17.7s] row assembly: deduplicate the returned planes                        3         0.0     0.0%       nan
+[17.7s] quotient_sign_descent_rank                                           1         0.0     0.0%       nan
+[17.7s] quotient.index                                                       1         0.0     0.0%       nan
+[17.7s] residual (row time not inside an accounted stage)                              0.0     0.0%
+[17.7s] 
+[17.7s] === the walk's own setup, by GAP primitive ===
+[17.7s]   Image                                184 calls       0.001 s
+[17.7s]   IsomorphismPermGroup                   1 calls       0.001 s
+[17.7s]   FactorCosetAction                      1 calls       0.001 s
+[17.7s]   Subgroup                               2 calls       0.000 s
+[17.7s]   ClosureGroup                           1 calls       0.000 s
+[17.7s]   function_factory                       1 calls       0.000 s
+[17.7s]   Order                                  3 calls       0.000 s
+[17.7s]   Index                                  1 calls       0.000 s
+[17.7s]   TrivialSubgroup                        1 calls       0.000 s
+[17.7s]   GeneratorsOfGroup                      1 calls       0.000 s
+[17.7s]   Range                                  1 calls       0.000 s
+[17.7s]   the breadth-first walk itself (not proxied)                    0.277 s
+[17.7s]   walk setup, exclusive                                 0.281 s
+[17.7s] 
+[17.7s] walk started at 17.36785788999987 s, ended at 17.65398831400671 s
+[17.7s] (the first point's spelling is inside the walk setup, not in the per-lift list)
+[17.7s] cosets of the coset action (degree): 2
+[17.7s] lifts produced: 2, planes transported: 2
+[17.7s] per-lift spelling: n=1 total=0.0 s min=1.328 ms median=1.328 ms mean=1.328 ms max=1.328 ms
+[17.7s] 
+[17.7s] === per-call cost by quarter of the calls (is the cost growing?) ===
+[17.7s] lift rate over the sampled window (lifts/s):
+[17.7s]          0 s ->        4 s: 0 -> 0 lifts, 0.00/s
+[17.7s]          4 s ->        9 s: 0 -> 0 lifts, 0.00/s
+[17.7s]          9 s ->       13 s: 0 -> 0 lifts, 0.00/s
+[17.7s]         13 s ->       17 s: 0 -> 0 lifts, 0.00/s
+[17.7s] 
+[17.7s] the stabilizer shim answered 0 trivial-group questions
+[17.7s] row wall time: 17.3 s, decided: True
+[17.7s] peak VmRSS (python, sampled): 507 MiB, VmHWM now 510 MiB
+[17.7s] the row returned 2 planes
+[17.7s]   peak in 'quotientambient_discriminant_images': 507 MiB
+[17.7s]   peak in 'quotient.image_order': 497 MiB
+[17.7s]   peak in 'ambient O(L) plane row': 454 MiB
+[17.7s]   peak in 'stable orthogonal group': 286 MiB
+[17.7s] PROBE J DONE
+[peakrss] probe390jsmoke: child waited=0 shell_code=0 samples=11
+[peakrss] peak tree RSS      : 522 MiB
+[peakrss] low-water MemAvail : 12139 MiB
+[peakrss] peak single VmHWM  : 522 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      511 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    20.0s procs=  3 rss=   522 MiB hwm=   522 MiB avail= 12139 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   517 MiB hwm=   517 MiB avail= 12141 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   507 MiB hwm=   507 MiB avail= 12158 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   502 MiB hwm=   502 MiB avail= 12164 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   499 MiB hwm=   499 MiB avail= 12187 MiB
+launcher exit: 0

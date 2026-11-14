@@ -335,6 +335,7 @@ a5328e6b9598aa12e12314189ad7d003a594ed868612fc190eeae38028ac823c  .tmp/qc-eviden
 9bebba8e62342feb12bc9033f1fff58003ffb40b99a5e95dabc94b6fcf89e7ec  .tmp/qc-evidence/issue402-cusp4-chamber-at-vertex.log
 3a6df8b1fd932315563447acbdea8a9bd2052cb4eff97817622155489fca69d9  .tmp/qc-evidence/issue402-cusp4-chamber-gram.py
 85993388e997333238d67da3bd1d92fd1227981b6b66324539018ebce434f12d  .tmp/qc-evidence/issue402-cusp4-chamber-gram.log
+<<<<<<< HEAD
 044f341fb713ab370aac0699a4fa443e7dc8c2271e0c8b2a2d200884ac55fb4b  .tmp/qc-evidence/issue407-failing-tests-slice.log
 5e1505e6a45f3e7acb65a3c0149d5ba47de90bbaa579e7b2effbf3ae3bf2802c  .tmp/qc-evidence/issue407-legacy-14b9cc1.log
 a7c9ae9d06cb6828be34b20176421cd05e8c03061ef6963a5c3e8d294d24647b  .tmp/qc-evidence/issue407-lint-names-after.log
@@ -727,3 +728,10 @@ b519d7562e4f857b449ec217134eb14440b2cfa8089b216074e3da3fc5cbeab5  .tmp/qc-eviden
 f8b82def9d32c666e02a39c8a7fea0779b81760786e7db4d37564725489a4d58  .tmp/qc-evidence/issue468-star-runs/repair/tests_objects_test_tensor_product_of_zz2_and_zz3.sage.log
 6735380666db3b2b4541f2a721be2e7dc39db5fa44f0fd78017d6c9f9c40bb9f  .tmp/qc-evidence/issue468-star-runs/repair/tests_objects_test_trivial_connection_on_the_affine_line.sage.log
 c82390bc3c69186ba9f134d569aa2f135746d611d33b103518676024d654f2c2  .tmp/qc-evidence/issue468-star-runs/repair/tests_objects_test_two_hyperbolic_planes.sage.log
+=======
+b269266d4ca9d16c564af4414301bf066ae19299e8ab51063ce478452df2e768  issue390-stage-slice.py
+672ac88274b1d903cde745e00921c6a16b534d002bf8ecb4480208e766a1a079  issue390-stage-slice.log
+dc830e52de5d88a98b51c34e24a180aef1f12ffce510738d56bd2b905a28736a  issue390-stage-slice-prefix.log
+ba37a4ca3004618c5585d08cb3d812257540a076eae70c09a3e3615c8ebdb128  issue390-stage-slice-main-blocked.log
+04acb1334ed3e750a0f19d859b98f2714ad6f2760db4b4762741ee83daebdc19  issue390-stage-slice-smoke.log
+>>>>>>> 28aae3b (evidence: The #390 plane row's time is the per-plane transport, measured stage by stage (#390))

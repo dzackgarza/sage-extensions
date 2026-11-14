@@ -1,0 +1,256 @@
+[0.0s] probe J: the Otilde row, sliced by stage (#390)
+[0.0s] cap 5400 s, python 3.14.10
+[0.2s] lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+[6.0s] Otilde(T_Co) = lattice.stable_orthogonal_group()
+[6.0s] calling stable.isotropic_orbit_representatives(2)
+[36.0s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=428 MiB
+[66.1s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=494 MiB
+[96.1s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=515 MiB
+[126.1s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=537 MiB
+[156.1s] progress stage='parabolic family' lifts=0 planes=0 rate=0.0/s rss=583 MiB
+[186.1s] progress stage='parabolic family' lifts=0 planes=0 rate=0.0/s rss=587 MiB
+[216.1s] progress stage='quotient.image_order' lifts=0 planes=0 rate=0.0/s rss=598 MiB
+[247.0s] progress stage='quotient.image_order' lifts=0 planes=0 rate=0.0/s rss=621 MiB
+[277.0s] progress stage='quotient.image_order' lifts=0 planes=0 rate=0.0/s rss=646 MiB
+[307.4s] progress stage='quotient.image_order' lifts=0 planes=0 rate=0.0/s rss=670 MiB
+[337.4s] progress stage='quotient.image_order' lifts=0 planes=0 rate=0.0/s rss=687 MiB
+[367.5s] progress stage='quotient.image_order' lifts=0 planes=0 rate=0.0/s rss=734 MiB
+[379.4s] the stabilizer shim answered a trivial acting group: Symmetric group on 1 points on {0}
+[397.5s] progress stage='quotientambient_discriminant_images' lifts=0 planes=0 rate=0.0/s rss=774 MiB
+[427.5s] progress stage='walk setup: coset action, closure, GAP breadth-first walk' lifts=0 planes=0 rate=0.0/s rss=787 MiB
+[632.3s] progress stage='walk setup: coset action, closure, GAP breadth-first walk' lifts=0 planes=0 rate=0.0/s rss=1410 MiB
+[662.3s] progress stage='transport' lifts=371 planes=370 rate=10.4/s rss=1485 MiB
+[692.3s] progress stage='transport' lifts=610 planes=609 rate=8.0/s rss=1523 MiB
+[722.3s] progress stage='transport' lifts=799 planes=798 rate=6.3/s rss=1552 MiB
+[752.4s] progress stage='transport' lifts=974 planes=973 rate=5.8/s rss=1580 MiB
+[782.4s] progress stage='transport' lifts=1135 planes=1134 rate=5.4/s rss=1607 MiB
+[812.4s] progress stage='transport' lifts=1206 planes=1205 rate=2.4/s rss=1410 MiB
+[842.4s] progress stage='transport' lifts=1293 planes=1292 rate=2.9/s rss=1370 MiB
+[875.5s] progress stage='transport' lifts=1386 planes=1385 rate=2.8/s rss=1385 MiB
+[905.5s] progress stage='transport' lifts=1445 planes=1444 rate=2.0/s rss=1392 MiB
+[935.5s] progress stage='transport' lifts=1506 planes=1505 rate=2.0/s rss=1401 MiB
+[965.5s] progress stage='transport' lifts=1586 planes=1585 rate=2.7/s rss=1414 MiB
+[995.6s] progress stage='transport' lifts=1690 planes=1689 rate=3.5/s rss=1430 MiB
+[1025.6s] progress stage='transport' lifts=1793 planes=1792 rate=3.4/s rss=1447 MiB
+[1055.6s] progress stage='transport' lifts=1873 planes=1872 rate=2.7/s rss=1459 MiB
+[1085.6s] progress stage='transport' lifts=1946 planes=1945 rate=2.4/s rss=1471 MiB
+[1115.7s] progress stage='transport' lifts=2007 planes=2006 rate=2.0/s rss=1481 MiB
+[1145.7s] progress stage='transport' lifts=2066 planes=2065 rate=2.0/s rss=1491 MiB
+[1175.7s] progress stage='transport' lifts=2122 planes=2121 rate=1.9/s rss=1500 MiB
+[1205.7s] progress stage='transport' lifts=2181 planes=2180 rate=2.0/s rss=1509 MiB
+[1235.7s] progress stage='transport' lifts=2245 planes=2244 rate=2.1/s rss=1520 MiB
+[1265.8s] progress stage='transport' lifts=2295 planes=2294 rate=1.7/s rss=1526 MiB
+[1295.8s] progress stage='transport' lifts=2341 planes=2340 rate=1.5/s rss=1533 MiB
+[1325.8s] progress stage='transport' lifts=2392 planes=2391 rate=1.7/s rss=1541 MiB
+[1355.8s] progress stage='transport' lifts=2437 planes=2436 rate=1.5/s rss=1548 MiB
+[1385.8s] progress stage='transport' lifts=2494 planes=2493 rate=1.9/s rss=1558 MiB
+[1415.8s] progress stage='transport' lifts=2538 planes=2537 rate=1.5/s rss=1565 MiB
+[1445.8s] progress stage='transport' lifts=2574 planes=2573 rate=1.2/s rss=1572 MiB
+[1475.9s] progress stage='transport' lifts=2617 planes=2616 rate=1.4/s rss=1579 MiB
+[1505.9s] progress stage='transport' lifts=2663 planes=2662 rate=1.5/s rss=1588 MiB
+[1535.9s] progress stage='transport' lifts=2710 planes=2709 rate=1.6/s rss=1596 MiB
+[1566.0s] progress stage='transport' lifts=2755 planes=2754 rate=1.5/s rss=1604 MiB
+[1596.0s] progress stage='transport' lifts=2798 planes=2797 rate=1.4/s rss=1611 MiB
+[1626.0s] progress stage='transport' lifts=2838 planes=2837 rate=1.3/s rss=1617 MiB
+[1656.0s] progress stage='transport' lifts=2871 planes=2870 rate=1.1/s rss=1622 MiB
+[1686.1s] progress stage='transport' lifts=2906 planes=2905 rate=1.2/s rss=1628 MiB
+[1716.1s] progress stage='transport' lifts=2940 planes=2939 rate=1.1/s rss=1633 MiB
+[1746.1s] progress stage='transport' lifts=2980 planes=2979 rate=1.3/s rss=1640 MiB
+[1776.1s] progress stage='transport' lifts=3030 planes=3029 rate=1.7/s rss=1648 MiB
+[1806.1s] progress stage='transport' lifts=3094 planes=3093 rate=2.1/s rss=1658 MiB
+[1836.2s] progress stage='transport' lifts=3157 planes=3156 rate=2.1/s rss=1668 MiB
+[1866.2s] progress stage='transport' lifts=3218 planes=3217 rate=2.0/s rss=1678 MiB
+[1896.2s] progress stage='transport' lifts=3279 planes=3278 rate=2.0/s rss=1688 MiB
+[1926.2s] progress stage='transport' lifts=3335 planes=3334 rate=1.9/s rss=1695 MiB
+[1956.2s] progress stage='transport' lifts=3394 planes=3393 rate=2.0/s rss=1704 MiB
+[1986.3s] progress stage='transport' lifts=3453 planes=3452 rate=2.0/s rss=1713 MiB
+[2016.3s] progress stage='transport' lifts=3510 planes=3509 rate=1.9/s rss=1722 MiB
+[2046.3s] progress stage='transport' lifts=3565 planes=3564 rate=1.8/s rss=1731 MiB
+[2076.3s] progress stage='transport' lifts=3621 planes=3620 rate=1.9/s rss=1740 MiB
+[2106.4s] progress stage='transport' lifts=3677 planes=3676 rate=1.9/s rss=1749 MiB
+[2136.4s] progress stage='transport' lifts=3730 planes=3729 rate=1.8/s rss=1758 MiB
+[2166.4s] progress stage='transport' lifts=3758 planes=3757 rate=0.9/s rss=1745 MiB
+[2196.4s] progress stage='transport' lifts=3799 planes=3798 rate=1.4/s rss=1752 MiB
+[2226.4s] progress stage='transport' lifts=3828 planes=3827 rate=1.0/s rss=1754 MiB
+[2256.5s] progress stage='transport' lifts=3857 planes=3856 rate=1.0/s rss=1750 MiB
+[2286.5s] progress stage='transport' lifts=3904 planes=3903 rate=1.6/s rss=1758 MiB
+[2316.5s] progress stage='transport' lifts=3956 planes=3955 rate=1.7/s rss=1766 MiB
+[2346.5s] progress stage='transport' lifts=4005 planes=4004 rate=1.6/s rss=1774 MiB
+[2376.5s] progress stage='transport' lifts=4056 planes=4055 rate=1.7/s rss=1782 MiB
+[2406.6s] progress stage='transport' lifts=4105 planes=4104 rate=1.6/s rss=1790 MiB
+[2436.6s] progress stage='transport' lifts=4154 planes=4153 rate=1.6/s rss=1798 MiB
+[2466.6s] progress stage='transport' lifts=4204 planes=4203 rate=1.7/s rss=1806 MiB
+[2496.7s] progress stage='transport' lifts=4253 planes=4252 rate=1.6/s rss=1814 MiB
+[2526.7s] progress stage='transport' lifts=4302 planes=4301 rate=1.6/s rss=1822 MiB
+[2556.7s] progress stage='transport' lifts=4349 planes=4348 rate=1.6/s rss=1829 MiB
+[2586.7s] progress stage='transport' lifts=4396 planes=4395 rate=1.6/s rss=1837 MiB
+[2616.8s] progress stage='transport' lifts=4444 planes=4443 rate=1.6/s rss=1844 MiB
+[2646.8s] progress stage='transport' lifts=4491 planes=4490 rate=1.6/s rss=1852 MiB
+[2676.8s] progress stage='transport' lifts=4537 planes=4536 rate=1.5/s rss=1860 MiB
+[2706.9s] progress stage='transport' lifts=4583 planes=4582 rate=1.5/s rss=1867 MiB
+[2736.9s] progress stage='transport' lifts=4628 planes=4627 rate=1.5/s rss=1874 MiB
+[2766.9s] progress stage='transport' lifts=4670 planes=4669 rate=1.4/s rss=1879 MiB
+[2797.0s] progress stage='transport' lifts=4716 planes=4715 rate=1.5/s rss=1886 MiB
+[2827.0s] progress stage='transport' lifts=4761 planes=4760 rate=1.5/s rss=1893 MiB
+[2857.0s] progress stage='transport' lifts=4805 planes=4804 rate=1.5/s rss=1900 MiB
+[2887.1s] progress stage='transport' lifts=4841 planes=4840 rate=1.2/s rss=1906 MiB
+[2917.1s] progress stage='transport' lifts=4861 planes=4860 rate=0.7/s rss=1909 MiB
+[2947.1s] progress stage='transport' lifts=4889 planes=4888 rate=0.9/s rss=1914 MiB
+[2977.1s] progress stage='transport' lifts=4922 planes=4921 rate=1.1/s rss=1919 MiB
+[3007.2s] progress stage='transport' lifts=4950 planes=4949 rate=0.9/s rss=1924 MiB
+[3037.2s] progress stage='transport' lifts=4986 planes=4985 rate=1.2/s rss=1929 MiB
+[3067.2s] progress stage='transport' lifts=5027 planes=5026 rate=1.4/s rss=1936 MiB
+[3097.3s] progress stage='transport' lifts=5060 planes=5059 rate=1.1/s rss=1942 MiB
+[3127.3s] progress stage='transport' lifts=5093 planes=5092 rate=1.1/s rss=1947 MiB
+[3157.3s] progress stage='transport' lifts=5125 planes=5124 rate=1.1/s rss=1952 MiB
+[3187.3s] progress stage='transport' lifts=5160 planes=5159 rate=1.2/s rss=1957 MiB
+[3217.3s] progress stage='transport' lifts=5196 planes=5195 rate=1.2/s rss=1877 MiB
+[3247.4s] progress stage='transport' lifts=5212 planes=5211 rate=0.5/s rss=1874 MiB
+[3277.5s] progress stage='transport' lifts=5221 planes=5220 rate=0.3/s rss=1890 MiB
+[3307.5s] progress stage='transport' lifts=5256 planes=5255 rate=1.2/s rss=1895 MiB
+[3337.5s] progress stage='transport' lifts=5288 planes=5287 rate=1.1/s rss=1900 MiB
+[3367.6s] progress stage='transport' lifts=5322 planes=5321 rate=1.1/s rss=1908 MiB
+[3397.6s] progress stage='transport' lifts=5360 planes=5359 rate=1.3/s rss=1915 MiB
+[3427.6s] progress stage='transport' lifts=5400 planes=5399 rate=1.3/s rss=1924 MiB
+[3457.6s] progress stage='transport' lifts=5441 planes=5440 rate=1.4/s rss=1932 MiB
+[3487.7s] progress stage='transport' lifts=5482 planes=5481 rate=1.4/s rss=1939 MiB
+[3517.7s] progress stage='transport' lifts=5523 planes=5522 rate=1.4/s rss=1945 MiB
+[3547.7s] progress stage='transport' lifts=5564 planes=5563 rate=1.4/s rss=1952 MiB
+[3577.7s] progress stage='transport' lifts=5603 planes=5602 rate=1.3/s rss=1958 MiB
+[3607.8s] progress stage='transport' lifts=5636 planes=5635 rate=1.1/s rss=1963 MiB
+[3637.8s] progress stage='transport' lifts=5667 planes=5666 rate=1.0/s rss=1968 MiB
+[3667.8s] progress stage='transport' lifts=5690 planes=5689 rate=0.8/s rss=1972 MiB
+[3697.8s] progress stage='transport' lifts=5711 planes=5710 rate=0.7/s rss=1975 MiB
+[3727.8s] progress stage='lift spelling: one tree product per coset' lifts=5733 planes=5733 rate=0.7/s rss=1979 MiB
+[3757.9s] progress stage='transport' lifts=5755 planes=5754 rate=0.7/s rss=1983 MiB
+[3787.9s] progress stage='transport' lifts=5779 planes=5778 rate=0.8/s rss=1986 MiB
+[3817.9s] progress stage='transport' lifts=5799 planes=5798 rate=0.7/s rss=1990 MiB
+[3847.9s] progress stage='transport' lifts=5816 planes=5815 rate=0.6/s rss=1992 MiB
+[3877.9s] progress stage='transport' lifts=5833 planes=5832 rate=0.6/s rss=1995 MiB
+[3908.0s] progress stage='transport' lifts=5859 planes=5858 rate=0.9/s rss=1999 MiB
+[3938.0s] progress stage='transport' lifts=5884 planes=5883 rate=0.8/s rss=2003 MiB
+[3968.0s] progress stage='transport' lifts=5910 planes=5909 rate=0.9/s rss=2007 MiB
+[3998.0s] progress stage='transport' lifts=5939 planes=5938 rate=1.0/s rss=2012 MiB
+[4028.0s] progress stage='transport' lifts=5968 planes=5967 rate=1.0/s rss=2017 MiB
+[4058.0s] progress stage='transport' lifts=6000 planes=5999 rate=1.1/s rss=2022 MiB
+[4088.1s] progress stage='transport' lifts=6035 planes=6034 rate=1.2/s rss=2027 MiB
+[4118.1s] progress stage='transport' lifts=6060 planes=6059 rate=0.8/s rss=2031 MiB
+[4148.1s] progress stage='transport' lifts=6089 planes=6088 rate=1.0/s rss=2036 MiB
+[4178.1s] progress stage='transport' lifts=6122 planes=6121 rate=1.1/s rss=2041 MiB
+[4208.2s] progress stage='transport' lifts=6157 planes=6156 rate=1.2/s rss=2047 MiB
+[4238.2s] progress stage='transport' lifts=6193 planes=6192 rate=1.2/s rss=2053 MiB
+[4268.2s] progress stage='transport' lifts=6229 planes=6228 rate=1.2/s rss=2058 MiB
+[4298.2s] progress stage='transport' lifts=6265 planes=6264 rate=1.2/s rss=2064 MiB
+[4328.3s] progress stage='transport' lifts=6297 planes=6296 rate=1.1/s rss=2072 MiB
+[4358.3s] progress stage='transport' lifts=6332 planes=6331 rate=1.2/s rss=2076 MiB
+[4388.3s] progress stage='transport' lifts=6367 planes=6366 rate=1.2/s rss=2081 MiB
+[4418.3s] progress stage='transport' lifts=6402 planes=6401 rate=1.2/s rss=2087 MiB
+[4448.4s] progress stage='transport' lifts=6437 planes=6436 rate=1.2/s rss=2092 MiB
+[4478.4s] progress stage='transport' lifts=6469 planes=6468 rate=1.1/s rss=2097 MiB
+[4508.4s] progress stage='transport' lifts=6504 planes=6503 rate=1.2/s rss=2103 MiB
+[4538.4s] progress stage='transport' lifts=6538 planes=6537 rate=1.1/s rss=2108 MiB
+[4568.5s] progress stage='transport' lifts=6573 planes=6572 rate=1.2/s rss=2114 MiB
+[4598.5s] progress stage='transport' lifts=6606 planes=6605 rate=1.1/s rss=2119 MiB
+[4628.5s] progress stage='transport' lifts=6640 planes=6639 rate=1.1/s rss=2125 MiB
+[4658.5s] progress stage='transport' lifts=6674 planes=6673 rate=1.1/s rss=2130 MiB
+[4688.5s] progress stage='transport' lifts=6705 planes=6704 rate=1.0/s rss=2135 MiB
+[4718.6s] progress stage='transport' lifts=6737 planes=6736 rate=1.1/s rss=2140 MiB
+[4748.6s] progress stage='transport' lifts=6769 planes=6768 rate=1.1/s rss=2145 MiB
+[4778.6s] progress stage='transport' lifts=6801 planes=6800 rate=1.1/s rss=2150 MiB
+[4808.6s] progress stage='transport' lifts=6833 planes=6832 rate=1.1/s rss=2155 MiB
+[4838.6s] progress stage='transport' lifts=6866 planes=6865 rate=1.1/s rss=2161 MiB
+[4868.6s] progress stage='transport' lifts=6899 planes=6898 rate=1.1/s rss=2166 MiB
+[4898.7s] progress stage='transport' lifts=6933 planes=6932 rate=1.1/s rss=2171 MiB
+[4928.7s] progress stage='transport' lifts=6966 planes=6965 rate=1.1/s rss=2177 MiB
+[4958.7s] progress stage='transport' lifts=6997 planes=6996 rate=1.0/s rss=2182 MiB
+[4988.7s] progress stage='transport' lifts=7028 planes=7027 rate=1.0/s rss=2187 MiB
+[5018.7s] progress stage='transport' lifts=7058 planes=7057 rate=1.0/s rss=2192 MiB
+[5048.7s] progress stage='transport' lifts=7088 planes=7087 rate=1.0/s rss=2196 MiB
+[5078.8s] progress stage='transport' lifts=7119 planes=7118 rate=1.0/s rss=2201 MiB
+[5108.8s] progress stage='transport' lifts=7150 planes=7149 rate=1.0/s rss=2206 MiB
+[5138.8s] progress stage='transport' lifts=7182 planes=7181 rate=1.1/s rss=2212 MiB
+[5168.8s] progress stage='transport' lifts=7213 planes=7212 rate=1.0/s rss=2217 MiB
+[5198.8s] progress stage='transport' lifts=7244 planes=7243 rate=1.0/s rss=2222 MiB
+[5228.8s] progress stage='transport' lifts=7275 planes=7274 rate=1.0/s rss=2227 MiB
+[5258.8s] progress stage='transport' lifts=7304 planes=7303 rate=1.0/s rss=2231 MiB
+[5288.8s] progress stage='transport' lifts=7335 planes=7334 rate=1.0/s rss=2236 MiB
+[5318.8s] progress stage='transport' lifts=7366 planes=7365 rate=1.0/s rss=2241 MiB
+[5348.8s] progress stage='transport' lifts=7397 planes=7396 rate=1.0/s rss=2246 MiB
+[5378.8s] progress stage='transport' lifts=7428 planes=7427 rate=1.0/s rss=2251 MiB
+[5406.0s] the row did not return inside its 5400 s cap
+[5406.0s] 
+[5406.0s] === stage table ===
+[5406.0s] stage                                                            calls     seconds    share  peak MiB
+[5406.0s] transport                                                         7456      4749.9    88.0%      2256
+[5406.0s] walk setup: coset action, closure, GAP breadth-first walk            1       207.8     3.8%      1425
+[5406.0s] quotient.image_order                                                 1       182.0     3.4%       772
+[5406.0s] ambient O(L) plane row                                               1       138.5     2.6%       577
+[5406.0s] parabolic family                                                     1        48.8     0.9%       591
+[5406.0s] quotientambient_discriminant_images                                  1        32.8     0.6%       786
+[5406.0s] is_parabolic_complete                                                1        18.1     0.3%       592
+[5406.0s] lift spelling: one tree product per coset                         7455        11.4     0.2%      2021
+[5406.0s] registration                                                      7456        10.3     0.2%      1937
+[5406.0s] stable orthogonal group                                              1         5.8     0.1%       288
+[5406.0s] lattice construction                                                 1         0.1     0.0%       nan
+[5406.0s] quotient.subgroup_image_order                                        1         0.1     0.0%       nan
+[5406.0s] quotient_im_rho_engine_and_section                                   1         0.0     0.0%       nan
+[5406.0s] row assembly: deduplicate the returned planes                        2         0.0     0.0%       nan
+[5406.0s] quotient_sign_descent_rank                                           1         0.0     0.0%       nan
+[5406.0s] quotient.index                                                       1         0.0     0.0%       nan
+[5406.0s] residual (row time not inside an accounted stage)                              0.2     0.0%
+[5406.0s] 
+[5406.0s] === the walk's own setup, by GAP primitive ===
+[5406.0s]   FactorCosetAction                      1 calls     191.212 s
+[5406.0s]   Image                                449 calls       7.273 s
+[5406.0s]   IsomorphismPermGroup                   1 calls       1.103 s
+[5406.0s]   ClosureGroup                           8 calls       0.048 s
+[5406.0s]   Subgroup                               2 calls       0.042 s
+[5406.0s]   function_factory                       1 calls       0.000 s
+[5406.0s]   TrivialSubgroup                        1 calls       0.000 s
+[5406.0s]   Order                                  3 calls       0.000 s
+[5406.0s]   Index                                  1 calls       0.000 s
+[5406.0s]   Range                                  1 calls       0.000 s
+[5406.0s]   GeneratorsOfGroup                      1 calls       0.000 s
+[5406.0s]   the breadth-first walk itself (not proxied)                    8.131 s
+[5406.0s]   walk setup, exclusive                               207.809 s
+[5406.0s] 
+[5406.0s] walk started at 426.3094149170065 s, ended at 634.1607791880087 s
+[5406.0s] (the first point's spelling is inside the walk setup, not in the per-lift list)
+[5406.0s] cosets of the coset action (degree): 189720
+[5406.0s] lifts produced: 7456, planes transported: 7455
+[5406.0s] per-lift spelling: n=7455 total=11.4 s min=0.891 ms median=1.187 ms mean=1.532 ms max=213.010 ms
+[5406.0s] 
+[5406.0s] === per-call cost by quarter of the calls (is the cost growing?) ===
+[5406.0s]   transport                                    n=   7455 quarters (ms):    221.01    577.84    765.71    983.32
+[5406.0s]   lift spelling: one tree product per coset    n=   7455 quarters (ms):      1.72      1.83      1.42      1.15
+[5406.0s]   registration                                 n=   7456 quarters (ms):      1.28      1.43      1.90      0.96
+[5406.0s] lift rate over the sampled window (lifts/s):
+[5406.0s]          6 s ->     1505 s: 0 -> 2662 lifts, 1.78/s
+[5406.0s]       1505 s ->     2807 s: 2662 -> 4732 lifts, 1.59/s
+[5406.0s]       2807 s ->     4108 s: 4732 -> 6053 lifts, 1.02/s
+[5406.0s]       4108 s ->     5404 s: 6053 -> 7454 lifts, 1.08/s
+[5406.0s] 
+[5406.0s] the stabilizer shim answered 1 trivial-group questions
+[5406.0s] row wall time: 5400.0 s, decided: False
+[5406.0s] peak VmRSS (python, sampled): 2256 MiB, VmHWM now 2256 MiB
+[5406.0s]   peak in 'transport': 2256 MiB
+[5406.0s]   peak in 'lift spelling: one tree product per coset': 2021 MiB
+[5406.0s]   peak in 'registration': 1937 MiB
+[5406.0s]   peak in 'walk setup: coset action, closure, GAP breadth-first walk': 1425 MiB
+[5406.0s]   peak in 'quotientambient_discriminant_images': 786 MiB
+[5406.0s]   peak in 'quotient.image_order': 772 MiB
+[5406.0s] PROBE J DONE
+[peakrss] probe390j: child waited=2 shell_code=2 samples=2711
+[peakrss] peak tree RSS      : 3884 MiB
+[peakrss] low-water MemAvail : 966 MiB
+[peakrss] peak single VmHWM  : 4234 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     2255 MiB peak
+[peakrss]   julia                      1967 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  5412.3s procs=  4 rss=  3884 MiB hwm=  4234 MiB avail= 10300 MiB
+[peakrss]   t=  5410.3s procs=  4 rss=  3682 MiB hwm=  4234 MiB avail= 10207 MiB
+[peakrss]   t=  5406.3s procs=  4 rss=  3681 MiB hwm=  4233 MiB avail= 10201 MiB
+[peakrss]   t=  5408.3s procs=  4 rss=  3681 MiB hwm=  4234 MiB avail= 10209 MiB
+[peakrss]   t=  5398.3s procs=  4 rss=  3680 MiB hwm=  4232 MiB avail= 10172 MiB

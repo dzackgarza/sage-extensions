@@ -1,0 +1,152 @@
+[0.0s] probe J: the Otilde row, sliced by stage (#390)
+[0.0s] cap 5400 s, python 3.14.10
+[0.0s] lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+[2.1s] Otilde(T_Co) = lattice.stable_orthogonal_group()
+[2.1s] calling stable.isotropic_orbit_representatives(2)
+[32.1s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=502 MiB
+[62.1s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=527 MiB
+[92.1s] progress stage='ambient O(L) plane row' lifts=0 planes=0 rate=0.0/s rss=550 MiB
+[122.2s] progress stage='parabolic family' lifts=0 planes=0 rate=0.0/s rss=599 MiB
+[152.2s] progress stage='quotient.image_order' lifts=0 planes=0 rate=0.0/s rss=609 MiB
+[182.2s] progress stage='quotient.image_order' lifts=0 planes=0 rate=0.0/s rss=681 MiB
+[212.2s] progress stage='quotient.image_order' lifts=0 planes=0 rate=0.0/s rss=740 MiB
+[225.4s] the row raised:
+Traceback (most recent call last):
+  File "/probe.py", line 581, in main
+    planes = tuple(stable.isotropic_orbit_representatives(2))
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 517, in isotropic_orbit_representatives
+    return _subgroup_isotropic_orbit_representatives(
+        self, rank, flag=flag
+    )
+  File "/probe.py", line 399, in subgroup_row
+    return original(subgroup, rank, flag=flag)
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3667, in _subgroup_isotropic_orbit_representatives
+    from_parabolic = _plane_orbit_from_parabolic_stabilizer(subgroup, representative)
+  File "/probe.py", line 332, in plane_row
+    return original_planes(subgroup, representative)
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 3435, in _plane_orbit_from_parabolic_stabilizer
+    if quotient.index() == 1:
+       ~~~~~~~~~~~~~~^^
+  File "/probe.py", line 249, in timed
+    outcome = function(*args, **kwargs)
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 854, in index
+    image_order = self.image_order()
+  File "/probe.py", line 249, in timed
+    outcome = function(*args, **kwargs)
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 709, in image_order
+    ambient = self._ambient_generators()
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 578, in _ambient_generators
+    and ambient.has_selected_finite_group_generating_set()
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 5803, in has_selected_finite_group_generating_set
+    self.selected_group_resolution()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 5814, in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 383, in selected_resolution
+    resolution = selected.realize()
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 116, in realize
+    return self._resolution_factory()
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 1193, in selected_resolution
+    generators = generating_set()
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/arrow_categories.py", line 2390, in <lambda>
+    lambda: self.core_category().base_category()._core_automorphism_generators(self)
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 2719, in _core_automorphism_generators
+    return core_mor._computed_group_generators()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "sage/misc/cachefunc.pyx", line 2328, in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 4544, in _computed_group_generators
+    for generator in automorphism_group_generators(category, lattice)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 111, in automorphism_group_generators
+    generators = RECURSION.orthogonal_group_generators(marked)
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 834, in orthogonal_group_generators
+    generators = self._generation_step(profile.signed_view)
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 852, in _generation_step
+    return model.approximate_generators() + self.pointed_automorphism_generators(vector) + transporters
+                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 1570, in pointed_automorphism_generators
+    return tuple(lattice.integral_isometry(generator) for generator in action.stabilizer().group_generators())
+                                                                       ~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/rational_integral_stabilizers.py", line 762, in stabilizer
+    return self.finite_representation().lattice_stabilizer()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "sage/misc/cachefunc.pyx", line 2328, in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+  File "/repos/sage-extensions/src/sage_extensions/categories/rational_integral_stabilizers.py", line 504, in lattice_stabilizer
+    self.finite_stabilizer(),
+    ~~~~~~~~~~~~~~~~~~~~~~^^
+  File "sage/misc/cachefunc.pyx", line 2328, in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+  File "/repos/sage-extensions/src/sage_extensions/categories/rational_integral_stabilizers.py", line 482, in finite_stabilizer
+    return self.permutation_representation().codomain().stabilizer(self._selected_point())
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 7411, in stabilizer
+    return self.natural_g_set().stabilizer(point)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/g_objects.py", line 1715, in stabilizer
+    named = self._named_stabilizer(point)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/g_sets.py", line 913, in _named_stabilizer
+    libgap.Group(engine_generators, libgap.Identity(engine_generators[0])),
+                                                    ~~~~~~~~~~~~~~~~~^^^
+  File "sage/libs/gap/element.pyx", line 3170, in sage.libs.gap.element.GapElement_List.__getitem__
+    raise IndexError('index out of range.')
+IndexError: index out of range.
+[225.4s] 
+[225.4s] === stage table ===
+[225.4s] stage                                                            calls     seconds    share  peak MiB
+[225.4s] ambient O(L) plane row                                               1       105.9    47.4%       582
+[225.4s] quotient.image_order                                                 1        77.1    34.5%       761
+[225.4s] parabolic family                                                     1        27.8    12.4%       602
+[225.4s] is_parabolic_complete                                                1        12.5     5.6%       603
+[225.4s] stable orthogonal group                                              1         2.0     0.9%       288
+[225.4s] lattice construction                                                 1         0.0     0.0%       nan
+[225.4s] plane admission (primitive_isotropic_subobject)                      1         0.0     0.0%       nan
+[225.4s] row assembly: deduplicate the returned planes                        2         0.0     0.0%       nan
+[225.4s] quotient.index                                                       1         0.0     0.0%       nan
+[225.4s] residual (row time not inside an accounted stage)                              0.0     0.0%
+[225.4s] 
+[225.4s] === the walk's own setup, by GAP primitive ===
+[225.4s]   the breadth-first walk itself (not proxied)                    0.000 s
+[225.4s]   walk setup, exclusive                                 0.000 s
+[225.4s] 
+[225.4s] walk started at None s, ended at None s
+[225.4s] (the first point's spelling is inside the walk setup, not in the per-lift list)
+[225.4s] cosets of the coset action (degree): 0
+[225.4s] lifts produced: 0, planes transported: 0
+[225.4s] 
+[225.4s] === per-call cost by quarter of the calls (is the cost growing?) ===
+[225.4s] lift rate over the sampled window (lifts/s):
+[225.4s]          2 s ->       57 s: 0 -> 0 lifts, 0.00/s
+[225.4s]         57 s ->      113 s: 0 -> 0 lifts, 0.00/s
+[225.4s]        113 s ->      170 s: 0 -> 0 lifts, 0.00/s
+[225.4s]        170 s ->      224 s: 0 -> 0 lifts, 0.00/s
+[225.4s] 
+[225.4s] the stabilizer shim answered 0 trivial-group questions
+[225.4s] row wall time: 223.4 s, decided: False
+[225.4s] peak VmRSS (python, sampled): 761 MiB, VmHWM now 767 MiB
+[225.4s]   peak in 'quotient.image_order': 761 MiB
+[225.4s]   peak in 'is_parabolic_complete': 603 MiB
+[225.4s]   peak in 'parabolic family': 602 MiB
+[225.4s]   peak in 'ambient O(L) plane row': 582 MiB
+[225.4s]   peak in 'stable orthogonal group': 288 MiB
+[225.4s] PROBE J DONE
+[peakrss] probe390jnoshim: child waited=2 shell_code=2 samples=116
+[peakrss] peak tree RSS      : 2720 MiB
+[peakrss] low-water MemAvail : 7218 MiB
+[peakrss] peak single VmHWM  : 2777 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2005 MiB peak
+[peakrss]   python                      767 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   226.2s procs=  4 rss=  2720 MiB hwm=  2777 MiB avail= 10887 MiB
+[peakrss]   t=   224.2s procs=  4 rss=  2715 MiB hwm=  2772 MiB avail= 10887 MiB
+[peakrss]   t=   222.2s procs=  4 rss=  2710 MiB hwm=  2768 MiB avail= 10877 MiB
+[peakrss]   t=   220.2s procs=  4 rss=  2707 MiB hwm=  2765 MiB avail= 10872 MiB
+[peakrss]   t=   218.2s procs=  4 rss=  2705 MiB hwm=  2762 MiB avail= 10860 MiB
