@@ -50,6 +50,7 @@ import runpy
 import sys
 import tomllib
 from dataclasses import dataclass
+from itertools import groupby
 from pathlib import Path
 
 import pytest
@@ -424,10 +425,11 @@ def pytest_collection_finish(session: pytest.Session) -> None:
         for item in session.items
         if Path(item.path).suffix in {".py", ".sage"}
     })
-    for finding in lint([file for file in files]):
-        session.config.stash[_FINDINGS].setdefault(
-            _finding_key(Path(finding.path), rootpath), []
-        ).append(finding)
+    by_file = groupby(
+        lint([file for file in files]),
+        key=lambda finding: _finding_key(Path(finding.path), rootpath),
+    )
+    session.config.stash[_FINDINGS] = {path: list(findings) for path, findings in by_file}
 
 
 @pytest.hookimpl(tryfirst=True)

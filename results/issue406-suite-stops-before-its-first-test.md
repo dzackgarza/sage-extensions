@@ -99,9 +99,9 @@ red even for a file with no collected test.  `just test-lint` is unchanged.
 
 The recursion is `Modules.ElementMethods.__truediv__`
 (`src/sage_extensions/categories/modules/pure/modules.py`), added by
-`e4bd95d` (#150): it implemented a module element's division as the scalar
-action of `ring.one() / ring(scalar)`.  A ring is a module over itself, so its
-element class can carry that method, and for the exact real field
+`e4bd95d` (#150): it stated `v / r = r^{-1} v` and implemented the inverse as
+the quotient `ring.one() / ring(scalar)`.  A ring is a module over itself, so
+its element class carries that method, and for the exact real field
 `RR.one() / x` asks the same method for `1 / x` again, with the same operands.
 Measured at `9b297125` with the session imported:
 
@@ -115,31 +115,61 @@ RR(1) / (RR(2).sqrt() - 1) -> RecursionError
 ~RR(2)                     -> RecursionError
 ```
 
-That repair landed on `main` as `e9b6c2c` (#410) while this slice was running:
-a ring element whose parent is its base ring divides through the ring's own
-`_div_`.  This slice adds the test that states #398's acceptance at that owner,
-`tests/rings/test_exact_real_division.sage`, and the measurements that located
-the cause; it does not carry a second implementation of the same repair.
+The operation is one formula — division by a scalar is the scalar action of its
+inverse, and a ring element dividing in its own ring is the same operation, not
+a second one — so the repair is that formula, and the quotient that re-entered
+the method is gone:
+
+```python
+ring = self.parent().base_ring()
+return self.parent().scalar_multiple(ring(scalar) ** -1, self)
+```
+
+`AGENTS.md` §6 ("do not add a special case for this object; strengthen the
+general interface so the special case disappears") and the `STY-*` one-shot
+table's "structural predicate implemented by ..." rows are what rules out the
+alternative repair, which dispatched on `self.parent() is ring` and took the
+ring's own `_div_` in that branch: the branch is a case split for the object
+the failure was found on, and the remaining branch computed the inverse as
+`ring.one() / ring(scalar)`, the same circular quotient.  That branch landed on
+`main` as `e9b6c2c` (#410) while this slice was running; this slice replaces it
+with the single formula and adds the test that states the acceptance.
+
+What the formula keeps, measured on this tree
+(`.tmp/qc-evidence/issue398-division-after.log`):
 
 ```
-tests/rings/test_exact_real_division.sage   2 passed in 0.25 s, lint clean
-    at 9b297125: 1 / (RR(2).sqrt() - 1) raised RecursionError
+ZZ(1) / ZZ(2)   -> 1/2                       (unchanged: not this method)
+QQ(1) / QQ(2)   -> 1/2                       (unchanged)
+RR(1) / RR(2)   -> 1/2                       (was RecursionError)
+RR(1) / (RR(2).sqrt() - 1), ~x -> 1/(sqrt(2) - 1)
+ZZ(2) inverted, a ZZ-module vector divided by ZZ(2) -> refused, as before
+```
+
+Files, `-o addopts= -q --tb=no -rA`
+(`.tmp/qc-evidence/issue398-green-three-files.log`):
+
+```
+PASSED tests/lattices/test_rational_scalars_on_a_base_changed_lattice.sage  (#150's contract)
+PASSED tests/rings/test_exact_real_division.sage  (2 tests, red at 9b297125)
+PASSED tests/rings/test_rational_exact_reals.sage (1 failed at 9b297125)
+tests/functions/test_young_convolution.sage: collects and runs (ERROR collecting at 9b297125)
+3 failed, 8 passed in 6.24 s
 ```
 
 `tests/rings/test_rational_exact_reals.sage` was `1 failed in 5.32 s`
-(`RecursionError`) on `main` and passes on this tree;
-`tests/functions/test_young_convolution.sage` could not be collected at all and
-now collects and runs.  The three failures it now reports are its own, newly
-visible: `KeyError: (('finite', 2), 93168848, 93168848)` in the `Lp`
-construction, a `NotImplementedError`, and `TypeError: unsupported operand
-parent(s) for ^: 'Symbolic Ring' and 'Integer Ring'` in the Gaussian test.
-None of them touches division.
+(`RecursionError`) on `main`; `tests/functions/test_young_convolution.sage`
+could not be collected at all and now does.  The three failures it reports are
+its own and newly visible: `KeyError: (('finite', 2), 93168848, 93168848)` in
+the `Lp` construction, a `NotImplementedError`, and `TypeError: unsupported
+operand parent(s) for ^: 'Symbolic Ring' and 'Integer Ring'` in the Gaussian
+test.  None of them touches division.
 
 Regression set, 8 files over rings, lattices and modules, `-o addopts= -q`:
 
 ```
 9b297125:  8 failed, 22 passed in 5.57 s
-this tree: 7 failed, 23 passed in 7.32 s
+this tree: 7 failed, 23 passed in 4.51 s
 ```
 
 `diff` of the two FAILED lists shows exactly one line: the rational exact reals
@@ -181,5 +211,6 @@ that run reported: on the old plugins each probe run reported no tests at all.
 * `406-image-lacks-declared-pytest-plugins.md` — open; the image does not carry
   `pytest-timeout` or `pytest-reportlog`, so the declared `addopts` do not
   parse.
-* The collection error is #398, filed, and repaired on main by `e9b6c2c` (#410);
-  this slice adds its red test and the measurements.
+* The collection error is #398, filed; `e9b6c2c` (#410) first repaired it with a
+  branch, and this slice replaces that branch with the one-formula division and
+  adds its red test.

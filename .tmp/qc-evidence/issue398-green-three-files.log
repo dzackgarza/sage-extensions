@@ -1,9 +1,9 @@
-....FF...F                                                               [100%]
+....FF...F.                                                              [100%]
 =================================== FAILURES ===================================
 _____________ test_convolution_of_lp_and_lq_lands_in_lr[p1-q1-r1] ______________
 
 >   return self.cache[k]
-E   KeyError: (('finite', 2), 93594704, 93594704)
+E   KeyError: (('finite', 2), 93093408, 93093408)
 
 sage/misc/cachefunc.pyx:1024: KeyError
 
@@ -74,7 +74,7 @@ DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:mo
 _____________ test_convolution_of_lp_and_lq_lands_in_lr[p2-q2-r2] ______________
 
 >   return self.cache[k]
-E   KeyError: (('finite', 2), 93594704, 93594704)
+E   KeyError: (('finite', 2), 93093408, 93093408)
 
 sage/misc/cachefunc.pyx:1024: KeyError
 
@@ -192,23 +192,24 @@ PASSED tests/functions/test_young_convolution.sage::test_convolution_of_lp_and_l
 PASSED tests/functions/test_young_convolution.sage::test_convolution_of_lp_and_lq_lands_in_lr[p3-q3-r3]
 PASSED tests/functions/test_young_convolution.sage::test_convolution_of_lp_and_lq_lands_in_lr[p4-q4-r4]
 PASSED tests/functions/test_young_convolution.sage::test_convolution_of_lp_and_lq_lands_in_lr[p5-q5-r5]
+PASSED tests/lattices/test_rational_scalars_on_a_base_changed_lattice.sage::test_left_right_and_division_by_a_rational_agree
 FAILED tests/functions/test_young_convolution.sage::test_convolution_of_lp_and_lq_lands_in_lr[p1-q1-r1]
 FAILED tests/functions/test_young_convolution.sage::test_convolution_of_lp_and_lq_lands_in_lr[p2-q2-r2]
 FAILED tests/functions/test_young_convolution.sage::test_the_gaussian_convolved_with_one_is_root_pi_on_every_representative
-3 failed, 7 passed in 6.35s
+3 failed, 8 passed in 6.24s
 EXIT=1
-[peakrss] p398-green-rebased: child waited=0 shell_code=0 samples=5
-[peakrss] peak tree RSS      : 361 MiB
-[peakrss] low-water MemAvail : 8552 MiB
-[peakrss] peak single VmHWM  : 361 MiB
+[peakrss] principled-files: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 367 MiB
+[peakrss] low-water MemAvail : 4858 MiB
+[peakrss] peak single VmHWM  : 367 MiB
 [peakrss] peak VmHWM by executable (this is the per-process attribution):
-[peakrss]   python                      348 MiB peak
+[peakrss]   python                      354 MiB peak
 [peakrss]   timeout                       7 MiB peak
 [peakrss]   proot-x86_64                  3 MiB peak
 [peakrss]   sh                            1 MiB peak
-[peakrss]   t=     8.0s procs=  4 rss=   361 MiB hwm=   361 MiB avail=  8620 MiB
-[peakrss]   t=     6.0s procs=  4 rss=   355 MiB hwm=   355 MiB avail=  8552 MiB
-[peakrss]   t=     4.0s procs=  4 rss=   290 MiB hwm=   290 MiB avail=  8575 MiB
-[peakrss]   t=     2.0s procs=  4 rss=   160 MiB hwm=   160 MiB avail=  8667 MiB
-[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail=  8767 MiB
+[peakrss]   t=     8.0s procs=  4 rss=   367 MiB hwm=   367 MiB avail=  4858 MiB
+[peakrss]   t=     6.0s procs=  4 rss=   335 MiB hwm=   335 MiB avail=  5069 MiB
+[peakrss]   t=     4.0s procs=  4 rss=   288 MiB hwm=   288 MiB avail=  5233 MiB
+[peakrss]   t=     2.0s procs=  4 rss=   177 MiB hwm=   177 MiB avail=  5558 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail=  5447 MiB
 launcher exit: 0

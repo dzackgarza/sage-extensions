@@ -77,9 +77,7 @@ def probe_run(tree: dict[str, str], *arguments: str) -> ProbeRun:
             exit_status=completed.returncode,
             outcomes=_outcomes(records),
             messages=tuple(
-                message
-                for message in (_failure_message(record) for record in records)
-                if message
+                message for message in map(_failure_message, records) if message
             ),
             transcript=completed.stdout + completed.stderr,
         )

@@ -1700,15 +1700,16 @@ class Modules(OwnedCategoryOverBaseRing):
             ``QQ``-module through its image in ``QQ``.  A scalar that is not a
             unit there is refused by the ring's own unit division.
 
-            A ring is a module over itself, and its elements are the elements
-            of that module.  There ``self.parent() is ring`` and the division
-            is the ring's own: computing ``ring.one() / ring(scalar)`` here
-            would re-enter this method on the same parent and not terminate.
+            The inverse is the scalar's own inversion, not the quotient
+            ``1 / r``.  ``v / r = r^{-1} v`` is one operation for every module,
+            including a ring over itself: its element class then carries this
+            method, and ``ring.one() / r`` would ask this method for ``1 / r``
+            again with the same operands.  The exact real field reached that
+            fixpoint and raised ``RecursionError`` on every division (#398);
+            a ring's own ``v / r`` is its own division, not a scalar action.
             """
             ring = self.parent().base_ring()
-            if self.parent() is ring:
-                return self._div_(ring(scalar))
-            return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
+            return self.parent().scalar_multiple(ring(scalar) ** -1, self)
 
     class ParentMethods:
         # The ring acting on this module: the datum this level introduces.
