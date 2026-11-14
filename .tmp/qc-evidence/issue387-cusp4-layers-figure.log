@@ -1,0 +1,42 @@
+[09:36:03 +    0.0s] building the subgroup
+[09:36:26 +   22.9s] subgroup built in 22.9 s
+[09:36:26 +   22.9s] cusp representative: figure (0, 0, 2, 1, -4, -5, -7, -10, -8, -6, -4, -2)
+[09:36:28 +   24.2s] printed walls through this cusp: 11 of 11
+[09:36:28 +   24.2s] printed walls of 4.3.8: 11 vectors of Integral lattice of rank 12 and signature (2, 10)
+[09:36:28 +   24.7s] walk instrumented; running the public cusp_chamber at Sterk_4
+[09:36:28 +   24.7s] bound: max_decompositions=40
+[09:37:58 +  114.5s] layer 1: distance=0.0000 k=1 candidates=0 time=0.0 s peakrss=641 MiB
+[09:37:58 +  114.5s] layer 2: distance=0.0000 k=2 candidates=23 time=0.1 s peakrss=641 MiB
+[09:38:01 +  117.1s] layer 3: distance=0.0000 k=4 candidates=528 time=0.3 s peakrss=641 MiB
+[09:38:18 +  134.5s] layer 4: distance=1.0000 k=4 candidates=252 time=0.0 s peakrss=641 MiB
+[09:38:18 +  134.8s] layer 5: distance=1.4142 k=2 candidates=16 time=0.0 s peakrss=641 MiB
+[09:38:19 +  135.1s]   accept #1 on layer 5 (distance=1.4142, k=2): q=2 square=-2 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=9
+[09:38:19 +  135.1s]     root=(5, -12, -25, -38, -51, -64, -45, 16, 3, 3)
+[09:38:19 +  135.1s]   accept #2 on layer 5 (distance=1.4142, k=2): q=2 square=-2 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=10
+[09:38:19 +  135.1s]     root=(6, -13, -27, -41, -55, -69, -49, 17, 3, 3)
+[09:38:19 +  135.1s] layer 6: distance=2.0000 k=1 candidates=0 time=0.0 s peakrss=641 MiB
+[09:38:19 +  135.1s] layer 7: distance=2.0000 k=4 candidates=1184 time=0.0 s peakrss=641 MiB
+[09:38:19 +  135.3s] layer 8: distance=2.8284 k=2 candidates=184 time=0.0 s peakrss=641 MiB
+[09:38:19 +  135.5s]   accept #3 on layer 8 (distance=2.8284, k=2): q=2 square=-2 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=11
+[09:38:19 +  135.5s]     root=(13, -31, -62, -93, -125, -157, -111, 39, 7, 7)
+[09:38:19 +  135.7s] layer 9: distance=3.0000 k=4 candidates=5796 time=0.2 s peakrss=644 MiB
+[09:38:20 +  136.2s] layer 10: distance=4.0000 k=1 candidates=0 time=0.0 s peakrss=644 MiB
+[09:38:20 +  137.0s] layer 11: distance=4.0000 k=4 candidates=25315 time=0.8 s peakrss=657 MiB
+[09:38:22 +  138.1s]   accept #4 on layer 11 (distance=4.0000, k=4): q=4 square=-4 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=12
+[09:38:22 +  138.1s]     root=(30, -72, -145, -218, -291, -364, -257, 90, 16, 16)
+[09:38:22 +  138.2s] layer 12: distance=4.2426 k=2 candidates=1304 time=0.1 s peakrss=657 MiB
+[09:38:22 +  138.6s]   accept #5 on layer 12 (distance=4.2426, k=2): q=2 square=-2 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=13
+[09:38:22 +  138.6s]     root=(20, -49, -98, -147, -196, -245, -173, 61, 11, 11)
+[09:38:22 +  138.6s]   accept #6 on layer 12 (distance=4.2426, k=2): q=2 square=-2 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=14
+[09:38:22 +  138.6s]     root=(21, -50, -100, -150, -200, -250, -177, 62, 11, 11)
+[09:38:25 +  141.4s] layer 13: distance=5.0000 k=4 candidates=84922 time=2.8 s peakrss=716 MiB
+[09:38:27 +  144.0s] layer 14: distance=5.6569 k=2 candidates=6772 time=0.4 s peakrss=716 MiB
+[09:38:28 +  144.6s]   accept #7 on layer 14 (distance=5.6569, k=2): q=2 square=-2 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=15
+[09:38:28 +  144.6s]     root=(27, -67, -134, -201, -268, -335, -236, 83, 15, 15)
+[09:38:28 +  144.6s]   accept #8 on layer 14 (distance=5.6569, k=2): q=2 square=-2 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=16
+[09:38:28 +  144.6s]     root=(29, -69, -138, -207, -276, -345, -244, 85, 15, 15)
+[09:38:28 +  144.7s] layer 15: distance=6.0000 k=1 candidates=0 time=0.0 s peakrss=716 MiB
+[09:38:38 +  154.4s] layer 16: distance=6.0000 k=4 candidates=269218 time=9.8 s peakrss=886 MiB
+[09:39:11 +  187.1s] layer 17: distance=7.0000 k=4 candidates=659684 time=25.3 s peakrss=1081 MiB
+[09:39:29 +  205.9s] layer 18: distance=7.0711 k=2 candidates=25428 time=1.6 s peakrss=1081 MiB
+[09:39:31 +  207.2s] layer 19: distance=8.0000 k=1 candidates=0 time=0.3 s peakrss=1081 MiB

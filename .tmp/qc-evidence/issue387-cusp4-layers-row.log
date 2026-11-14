@@ -1,0 +1,69 @@
+[09:25:42 +    0.0s] building the subgroup
+[09:26:04 +   22.8s] subgroup built in 22.8 s
+[09:26:06 +   24.0s] printed walls of 4.3.8: 11 vectors of Integral lattice of rank 12 and signature (2, 10)
+[09:26:06 +   24.4s] walk instrumented; running the public cusp_chamber at Sterk_4
+[09:26:06 +   24.4s] bound: max_decompositions=12
+[09:27:40 +  117.8s] layer 1: distance=0.0000 k=1 candidates=0 time=0.0 s peakrss=640 MiB
+[09:27:40 +  117.9s] layer 2: distance=0.0000 k=2 candidates=23 time=0.1 s peakrss=640 MiB
+[09:27:42 +  120.6s] layer 3: distance=0.0000 k=4 candidates=528 time=0.3 s peakrss=640 MiB
+[09:28:01 +  139.2s] layer 4: distance=1.0000 k=4 candidates=252 time=0.0 s peakrss=640 MiB
+[09:28:01 +  139.5s] layer 5: distance=1.4142 k=2 candidates=16 time=0.0 s peakrss=640 MiB
+[09:28:02 +  139.8s]   accept #1 on layer 5 (distance=1.4142, k=2): q=2 square=-2 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=9
+[09:28:02 +  139.8s]     root=(5, -12, -25, -38, -51, -64, -45, 16, 3, 3)
+[09:28:02 +  139.8s]   accept #2 on layer 5 (distance=1.4142, k=2): q=2 square=-2 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=10
+[09:28:02 +  139.8s]     root=(6, -13, -27, -41, -55, -69, -49, 17, 3, 3)
+[09:28:02 +  139.8s] layer 6: distance=2.0000 k=1 candidates=0 time=0.0 s peakrss=640 MiB
+[09:28:02 +  139.9s] layer 7: distance=2.0000 k=4 candidates=1184 time=0.0 s peakrss=640 MiB
+[09:28:02 +  140.1s] layer 8: distance=2.8284 k=2 candidates=184 time=0.0 s peakrss=640 MiB
+[09:28:02 +  140.3s]   accept #3 on layer 8 (distance=2.8284, k=2): q=2 square=-2 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=11
+[09:28:02 +  140.3s]     root=(13, -31, -62, -93, -125, -157, -111, 39, 7, 7)
+[09:28:02 +  140.5s] layer 9: distance=3.0000 k=4 candidates=5796 time=0.2 s peakrss=643 MiB
+[09:28:03 +  141.0s] layer 10: distance=4.0000 k=1 candidates=0 time=0.0 s peakrss=643 MiB
+[09:28:04 +  141.9s] layer 11: distance=4.0000 k=4 candidates=25315 time=0.9 s peakrss=656 MiB
+[09:28:05 +  143.1s]   accept #4 on layer 11 (distance=4.0000, k=4): q=4 square=-4 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=12
+[09:28:05 +  143.1s]     root=(30, -72, -145, -218, -291, -364, -257, 90, 16, 16)
+[09:28:05 +  143.2s] layer 12: distance=4.2426 k=2 candidates=1304 time=0.1 s peakrss=656 MiB
+[09:28:05 +  143.6s]   accept #5 on layer 12 (distance=4.2426, k=2): q=2 square=-2 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=13
+[09:28:05 +  143.6s]     root=(20, -49, -98, -147, -196, -245, -173, 61, 11, 11)
+[09:28:05 +  143.6s]   accept #6 on layer 12 (distance=4.2426, k=2): q=2 square=-2 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=14
+[09:28:05 +  143.6s]     root=(21, -50, -100, -150, -200, -250, -177, 62, 11, 11)
+[09:28:08 +  146.7s] layer 13: distance=5.0000 k=4 candidates=84922 time=3.1 s peakrss=715 MiB
+[09:28:11 +  149.5s] layer 14: distance=5.6569 k=2 candidates=6772 time=0.4 s peakrss=715 MiB
+[09:28:12 +  150.5s]   accept #7 on layer 14 (distance=5.6569, k=2): q=2 square=-2 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=15
+[09:28:12 +  150.5s]     root=(27, -67, -134, -201, -268, -335, -236, 83, 15, 15)
+[09:28:12 +  150.5s]   accept #8 on layer 14 (distance=5.6569, k=2): q=2 square=-2 wall-of-4.3.8=no printed-covered=0/11 fundpoly=False fundpoly-time=0.0 s roots=16
+[09:28:12 +  150.5s]     root=(29, -69, -138, -207, -276, -345, -244, 85, 15, 15)
+[09:28:12 +  150.6s] layer 15: distance=6.0000 k=1 candidates=0 time=0.1 s peakrss=715 MiB
+[09:28:14 +  152.6s] cusp_chamber returned in 128.1 s
+[09:28:14 +  152.6s] walls=16 complete=False
+[09:28:14 +  152.6s]     wall q=-4 (2, -5, -10, -15, -20, -25, -18, 6, 0, 2)
+[09:28:14 +  152.6s]     wall q=-4 (0, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+[09:28:14 +  152.6s]     wall q=-4 (0, 0, 1, 0, 0, 0, 0, 0, 0, 0)
+[09:28:14 +  152.6s]     wall q=-4 (0, 0, 0, 1, 0, 0, 0, 0, 0, 0)
+[09:28:14 +  152.6s]     wall q=-4 (0, 0, 0, 0, 1, 0, 0, 0, 0, 0)
+[09:28:14 +  152.6s]     wall q=-4 (0, 0, 0, 0, 0, 1, 0, 0, 0, 0)
+[09:28:14 +  152.6s]     wall q=-4 (0, 0, 0, 0, 0, 0, 1, 0, 0, 0)
+[09:28:14 +  152.6s]     wall q=-2 (0, 0, 0, 0, 0, 0, 0, 0, 1, -1)
+[09:28:14 +  152.6s]     wall q=-2 (-5, 12, 25, 38, 51, 64, 45, -16, -3, -3)
+[09:28:14 +  152.6s]     wall q=-2 (-6, 13, 27, 41, 55, 69, 49, -17, -3, -3)
+[09:28:14 +  152.6s]     wall q=-2 (-13, 31, 62, 93, 125, 157, 111, -39, -7, -7)
+[09:28:14 +  152.6s]     wall q=-4 (-30, 72, 145, 218, 291, 364, 257, -90, -16, -16)
+[09:28:14 +  152.6s]     wall q=-2 (-20, 49, 98, 147, 196, 245, 173, -61, -11, -11)
+[09:28:14 +  152.6s]     wall q=-2 (-21, 50, 100, 150, 200, 250, 177, -62, -11, -11)
+[09:28:14 +  152.6s]     wall q=-2 (-27, 67, 134, 201, 268, 335, 236, -83, -15, -15)
+[09:28:14 +  152.6s]     wall q=-2 (-29, 69, 138, 207, 276, 345, 244, -85, -15, -15)
+[09:28:14 +  152.6s] done
+[peakrss] issue387: child waited=0 shell_code=0 samples=79
+[peakrss] peak tree RSS      : 726 MiB
+[peakrss] low-water MemAvail : 2953 MiB
+[peakrss] peak single VmHWM  : 726 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      715 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   148.1s procs=  3 rss=   726 MiB hwm=   726 MiB avail=  3245 MiB
+[peakrss]   t=   150.1s procs=  3 rss=   726 MiB hwm=   726 MiB avail=  3239 MiB
+[peakrss]   t=   152.1s procs=  3 rss=   726 MiB hwm=   726 MiB avail=  3169 MiB
+[peakrss]   t=   154.1s procs=  3 rss=   721 MiB hwm=   725 MiB avail=  2953 MiB
+[peakrss]   t=   156.1s procs=  3 rss=   721 MiB hwm=   725 MiB avail=  3240 MiB
+launcher exit: 0
