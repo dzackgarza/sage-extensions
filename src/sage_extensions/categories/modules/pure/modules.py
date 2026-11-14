@@ -1699,8 +1699,15 @@ class Modules(OwnedCategoryOverBaseRing):
             module's scalar ring, so an integer divides a vector of a
             ``QQ``-module through its image in ``QQ``.  A scalar that is not a
             unit there is refused by the ring's own unit division.
+
+            A ring is a module over itself, and its elements are the elements
+            of that module.  There ``self.parent() is ring`` and the division
+            is the ring's own: computing ``ring.one() / ring(scalar)`` here
+            would re-enter this method on the same parent and not terminate.
             """
             ring = self.parent().base_ring()
+            if self.parent() is ring:
+                return self._div_(ring(scalar))
             return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
 
     class ParentMethods:
