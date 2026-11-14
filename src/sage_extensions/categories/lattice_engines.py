@@ -1070,11 +1070,6 @@ function _number_field_matrix(K, a, entries)
     )
 end
 
-function definite_minimum(gram_entries)
-    lattice = integer_lattice(; gram=change_base_ring(QQ, _zz_matrix(gram_entries)))
-    return ZZ(Oscar.Hecke.minimum(lattice))
-end
-
 function definite_isometry(source_entries, target_entries)
     source = integer_lattice(; gram=change_base_ring(QQ, _zz_matrix(source_entries)))
     target = integer_lattice(; gram=change_base_ring(QQ, _zz_matrix(target_entries)))
@@ -1261,13 +1256,6 @@ class _OscarLatticeAdapter:
         if not module_loaded:
             julia.eval(_OSCAR_LATTICE_ADAPTER_SOURCE)
         return julia
-
-    def definite_minimum(self, gram):
-        r"""Return the positive minimum of a positive definite integral form."""
-        return SageZZ(self._bridge().call(
-            "DzackResearchOscarLatticeAdapter.definite_minimum",
-            _integer_engine_matrix(gram),
-        ))
 
     def definite_isometry(self, source_gram, target_gram):
         r"""Return an exact column-image witness, or False for non-isometric forms.

@@ -586,19 +586,20 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
                         f"cannot compute the orbits of {self}: the acting group {group} "
                         f"has no chosen group generators and is not known to be finite"
                     )
-            ranking = self.ranking_map()
             representation = self.permutation_representation()
             image_group = representation.codomain().subgroup(
                 tuple(representation(generator) for generator in action_generators)
             )
             image_engine = _engine_group(image_group)
+            # One GAP Orbits call on the full permutation domain 1..|X|.
             labels = {}
-            for point in self:
-                ranks = tuple(
-                    int(image) - 1
-                    for image in image_engine.orbit(int(ranking(point)) + 1)
-                )
-                labels[int(ranking(point))] = min(ranks)
+            for orbit in image_engine.orbits():
+                first = min(int(image) for image in orbit) - 1
+                for image in orbit:
+                    labels[int(image) - 1] = first
+            assert len(labels) == int(self.cardinality().finite_value()), (
+                f"the orbits of {image_group} do not cover the {self.cardinality()} points of {self}"
+            )
             return labels
 
         def _orbit_relation_decision(self, source, target) -> bool:
@@ -1299,6 +1300,15 @@ class _OrbitSet:
         assert g_set in FiniteSets(), (
             f"the orbits of {g_set} are listed only when it is a finite set"
         )
+        if g_set in FiniteGSets(g_set.acting_group()):
+            # A finite G-set lists its orbits by their first points.
+            labels = g_set._orbit_labels()
+            ranking = g_set.ranking_map()
+            return tuple(
+                self.orbit_of(point)
+                for point in g_set
+                if labels[int(ranking(point))] == int(ranking(point))
+            )
         found = []
         for point in g_set:
             orbit = self.orbit_of(point)

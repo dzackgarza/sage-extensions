@@ -6874,20 +6874,16 @@ class Lattices(OwnedCategoryOverBaseRing):
             # the selected R-basis by stating the bilinear evaluation in the
             # actual R-module Hom parent.
             labels = tuple(self.module_generating_set())
+            # x^T G^{-1} y is one engine product on the lowered inverse Gram.
+            engine_dual_gram = _engine_component_matrix(dual_gram)
+            engine = engine_dual_gram.base_ring()
 
             def rational_pairing(left, right):
                 left_coordinates = left.to_vector()
                 right_coordinates = right.to_vector()
-                value = sum(
-                    (
-                        fraction_field(left_coordinates(left_label))
-                        * dual_gram[row, column]
-                        * fraction_field(right_coordinates(right_label))
-                        for row, left_label in enumerate(labels)
-                        for column, right_label in enumerate(labels)
-                    ),
-                    fraction_field.zero(),
-                )
+                left_row = engine_vector(engine, [_engine_ring_value(ring, left_coordinates(label)) for label in labels])
+                right_row = engine_vector(engine, [_engine_ring_value(ring, right_coordinates(label)) for label in labels])
+                value = _owned_engine_element(fraction_field, left_row * engine_dual_gram * right_row)
                 return value_module.wrap(scalars.scalar_multiple(value, scalar_generator))
 
             rational = dual_module.bilinear_hom_space(value_module)._from_bilinear_evaluation(
@@ -6957,8 +6953,12 @@ class Lattices(OwnedCategoryOverBaseRing):
             return self.correlation_morphism()
 
         @cached_method
+        @cached_method
         def discriminant_module(self):
-            r"""Return ``A_L = coker(L -> L^#)`` with the selected dual-basis presentation."""
+            r"""Return ``A_L = coker(L -> L^#)`` with the selected dual-basis presentation.
+
+            It is a fixed construction on the lattice, so it is built once.
+            """
 
             return _discriminant_module(self)
 

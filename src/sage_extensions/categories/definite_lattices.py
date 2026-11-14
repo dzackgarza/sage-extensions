@@ -264,11 +264,15 @@ def _minimum(lattice):
     sign, positive_gram = _positive_gram(lattice)
     if positive_gram.tensor_shape()[0] == 0:
         raise ValueError("the zero lattice has no nonzero vector and no minimum")
-    from sage_extensions.categories.lattice_engines import _oscar_lattices
+    # PARI qfminim with no bound and no requested vectors returns the exact
+    # minimum of a positive definite integral form by Fincke--Pohst
+    # enumeration (PARI 2.17 manual, qfminim, flag 0).
+    from sage.libs.pari import pari
 
+    form = _engine_component_matrix(positive_gram).change_ring(SageZZ)
     minimum_value = _owned_engine_element(
         lattice.base_ring(),
-        _oscar_lattices.definite_minimum(positive_gram),
+        SageZZ(pari(form).qfminim(None, 0)[1]),
     )
     return sign * minimum_value
 
