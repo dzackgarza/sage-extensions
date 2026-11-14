@@ -1,0 +1,21 @@
+provider SHA: fd0f1c0d65d936ff3a341d807dedf7a6e2febd6a
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt452/.tmp/probe452j.py
+[    0.1s] T_Co rank 11 labels (0, 1, 2, 3, 4, 5)
+[    0.2s] isotropic primitive basis vectors: 2
+[    1.2s] T_Co line 0 div 2 m 4 rank 9 smith [1, 1, 1, 1, 1, 1, 1, 1, 1]
+[    1.2s] T_Co line 0 steps (2, 2, 2, 2, 2, 2, 2, 2, 2) coset_steps (2, 2, 2, 2, 2, 2, 2, 2, 2)
+[    1.2s] T_Co line 0 |P/mP| = 262144 #lift tests = 512 |K| = 512
+[    1.9s] T_Co line 1 div 2 m 4 rank 9 smith [1, 1, 1, 1, 1, 1, 1, 1, 1]
+[    1.9s] T_Co line 1 steps (2, 2, 2, 2, 2, 2, 2, 2, 2) coset_steps (2, 2, 2, 2, 2, 2, 2, 2, 2)
+[    1.9s] T_Co line 1 |P/mP| = 262144 #lift tests = 512 |K| = 512
+[    1.9s] done
+[peakrss] run: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 304 MiB
+[peakrss] low-water MemAvail : 13461 MiB
+[peakrss] peak single VmHWM  : 304 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      293 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   304 MiB hwm=   304 MiB avail= 13461 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13710 MiB

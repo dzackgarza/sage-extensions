@@ -74,8 +74,18 @@ The class docstring's sign was wrong and is corrected: `s_{a+v}s_a = E(v, a/2)`,
 
 ## Not verified here
 
-* No `T_Co` row was run.  The family's size is the index of `K` in the locus (275 at this
-  line), so that index, not the locus' size, is what a `T_Co` measurement has to bound.
+* No `T_Co` row was run.  What such a run would pay is now counted rather than guessed: at a
+  `T_Co = <2> + (U + E8(-1))(2)` line of divisibility two the locus tests **512** coset
+  representatives (period 4, rank 9, nine Smith invariants one, `|K| = 512`,
+  `|P/mP| = 262144`), one `integral_restriction` each
+  (`.tmp/qc-evidence/issue452-tco-coset-count.log`), and the kernel family there has one
+  member per representative plus the generators — not the 131072 classes the old union
+  listed.  Whether that is under the row's budget is unmeasured.
+* The speed the coordinate product gave (#361) is gone with it.  The correct version of that
+  step is a coordinate matrix of the section *morphism*, which the module layer does not
+  expose: `Morphism` has `preimage`, `is_in_image`, `denominator_ideal` and `kernel`, but no
+  owned lowering to its matrix, so the locus assembles the matrix from
+  `rational_coordinates` calls.  That missing operation is the follow-up.
 * The repository's CI diagnostics have never run on this repository (ai-review-ci#491), and
   `just tensor-boundary`, `just test-ci` and the mypy tier were not run here.
 * `Lattices.ParentMethods.eichler_transvection_matrix` and `rational_gram_matrix` now have no
