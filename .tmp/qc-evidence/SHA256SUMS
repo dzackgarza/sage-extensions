@@ -311,3 +311,5 @@ ca7058afb94d72dda0cfe1e8d661406dfe820ee249eb781c1582b113faad05e8  .tmp/qc-eviden
 177332512ac3d009355c541389505cc7e4a60d049e4584ab1d94b710285eb531  .tmp/qc-evidence/issue387-cusp4-lifts.log
 c993cc700e9c4a3e216d04ec25c2caa737afa98b3914a8e0d992f0d8d1a684a6  .tmp/qc-evidence/issue387-cusp4-span-attempt.py
 83b8bc49ae6916357add3dc01a950dbd6b6d0b948ee33af2aa5f25abbff6b401  .tmp/qc-evidence/issue387-cusp4-span-attempt.log
+14f6733c70c306534c055f7f5f212efcbce4eb17f4fb6ec33234f8cdb1b1bfc3  .tmp/qc-evidence/issue387-cusp4-span.py
+843138023721b33735f5ae805099f128ba17f153ad469a84f7c9a67988cfece6  .tmp/qc-evidence/issue387-cusp4-span.log
