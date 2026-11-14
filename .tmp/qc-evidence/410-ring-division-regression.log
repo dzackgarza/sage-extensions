@@ -1,0 +1,20 @@
+=== gate: four cause-A ids, the cause-B id, #150's contract
+=== 13 files, mine against the clean-base logs already in reg3-base-*
+test_exact_real_division                             mine[2 passed in 0.27s] base[2 passed in 0.30s] only-mine[] fixed[]
+test_rational_exact_reals                            mine[1 passed in 0.30s] base[1 passed in 0.28s] only-mine[] fixed[]
+test_young_convolution                               mine[3 failed, 4 passed in 1.05s] base[3 failed, 4 passed in 0.74s] only-mine[] fixed[]
+test_lebesgue_spaces_on_the_line                     mine[9 failed, 5 passed in 2.06s] base[9 failed, 5 passed in 2.19s] only-mine[] fixed[]
+test_fraction_field_base_change_archive              mine[2 failed in 0.45s] base[2 failed in 0.50s] only-mine[] fixed[]
+test_finite_cokernel_constructor                     mine[1 failed in 0.40s] base[1 failed in 0.53s] only-mine[] fixed[]
+test_predicate_kernel_and_stabilizer_subgroups_of_s4 mine[1 failed, 4 passed in 0.54s] base[1 failed, 4 passed in 1.39s] only-mine[] fixed[]
+test_structured_subgroups                            mine[1 passed in 0.97s] base[1 passed in 2.27s] only-mine[] fixed[]
+test_group_law                                       mine[1 failed, 3 passed in 0.92s] base[1 failed, 3 passed in 2.43s] only-mine[] fixed[]
+test_integral_stabilizers                            mine[4 passed in 1.21s] base[4 passed in 2.70s] only-mine[] fixed[]
+test_vector_family_stabilizers                       mine[10 passed in 1.56s] base[10 passed in 3.01s] only-mine[] fixed[]
+test_rational_scalars_on_a_base_changed_lattice      mine[1 passed in 0.41s] base[1 passed in 0.83s] only-mine[] fixed[]
+test_definite_metric_invariants_archive              mine[2 passed in 0.57s] base[2 passed in 1.44s] only-mine[] fixed[]
+=== tests/rings, both trees
+  mine: 77 failed, 251 passed in 21.06s
+  base: 77 failed, 251 passed in 21.84s
+  only-mine:
+REGRESS4 DONE

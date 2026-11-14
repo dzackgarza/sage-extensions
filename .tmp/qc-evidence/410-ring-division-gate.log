@@ -1,0 +1,29 @@
+provider SHA: 8971654b156384dbf4a351ef0292835ef72f5841
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+command: python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget --no-time-gates -q --tb=line -v tests/lattices/test_definite.sage::test_square_lattice_minimum_theta_and_packing_radius tests/lattices/test_definite.sage::test_exact_cvp_babai_minima_and_voronoi_geometry_on_square_lattice tests/lattices/test_definite_metric_invariants_archive.sage tests/lattices/test_definite.sage::test_norm_one_vectors_of_x2_minus_2y2_form_one_orbit tests/lattices/test_rational_scalars_on_a_base_changed_lattice.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.34 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collected 6 items
+
+tests/lattices/test_definite.sage ..                                     [ 33%]
+tests/lattices/test_definite_metric_invariants_archive.sage ..           [ 66%]
+tests/lattices/test_definite.sage .                                      [ 83%]
+tests/lattices/test_rational_scalars_on_a_base_changed_lattice.sage .    [100%]
+
+============================== 6 passed in 2.43s ===============================
+[peakrss] gate4: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 345 MiB
+[peakrss] low-water MemAvail : 10433 MiB
+[peakrss] peak single VmHWM  : 345 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      334 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   345 MiB hwm=   345 MiB avail= 10434 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   270 MiB hwm=   270 MiB avail= 10479 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail= 10433 MiB
+launcher exit: 0

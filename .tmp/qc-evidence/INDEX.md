@@ -1170,3 +1170,24 @@ Two limits of this host, recorded rather than hidden: the image's venv has no
 and the two gate plugins named by hand (`--no-time-gates --no-test-lint` for the
 sweeps), and every run is a single file in its own process because other chats use the
 same VM.
+### #410 — the ring's division placed at the ring, the module formula left to modules
+
+The placement of `4b958ef`/`852a901` still sent a ring element's `/` through `Modules.ElementMethods`,
+the module's scalar action; that is the ring quotient only for a commutative ring. The two owned
+fields now state their division beside their `_div_`, and the module formula is left to modules
+whose elements are not ring elements.
+
+| row | before | the tree of this push |
+| --- | --- | --- |
+| `RR`'s `__truediv__` resolves from | `Modules.ElementMethods` (index 13 of the element class) | `sage_extensions.rings.real.ExactRealNumber` (index 0) |
+| `CC`'s `__truediv__` resolves from | `Modules.ElementMethods` (index 12) | `sage_extensions.rings.complex.ExactComplexNumber` (index 0) |
+| an engine-backed owned ring's | `_OwnedRingElement.__truediv__`, index 2, unchanged | the same |
+| `RR(3)/2`, `RR(3)/ZZ(3)`, `CC(3)/2` | by the module formula | `3/2`, `1`, `3/2` |
+| a QQ-module vector `/ 2`, `/ ZZ(3)`, `/ (1/2)` | the module formula | `(1)/(2)*e_0`, `(1)/(3)*e_0`, `2*e_0` |
+| a ZZ-module vector `/ ZZ(2)` | refused | `ZeroDivisionError: 2 is not a unit` |
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `410-ringdiv.log` | the tree of this push | the two resolution rows above and every statement in the table, including `RR(2) * ~RR(2) = 1`, `~RR(0)`, `CC(3)/2`, and `packing_radius() = 1/2` with `center_density() = 1/4` |
+| `410-ring-division-gate.log` | the tree of this push | the four cause-A ids, the cause-B id and #150's contract: **6 passed in 2.43 s** |
+| `410-ring-division-regression.log` | the tree of this push against clean `8755b95` | thirteen files, one pytest process per file per tree, FAILED ids not counts: an empty only-on-this-tree set and an empty fixed set row by row; `tests/rings` **77 failed, 251 passed on both**; `test_a_stabilizers_generators_generate_a_subgroup` reached its cap on both trees and is not claimed |
