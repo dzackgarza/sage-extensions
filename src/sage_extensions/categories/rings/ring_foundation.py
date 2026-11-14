@@ -7602,10 +7602,20 @@ def _owned_real_algebraic_numbers() -> _OwnedRingParent:
 
 @cached_function(key=lambda characteristic: int(characteristic))
 def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
-    r"""The algebraic closure of a finite prime field, keyed by characteristic."""
+    r"""The algebraic closure of a finite prime field, keyed by characteristic.
+
+    ``AlgebraicClosureFiniteField(base_ring, name)`` takes both the field it
+    closes and the name of its primitive elements.  Sage's algebraic closures
+    of finite fields are not a unique-representation class -- non-identical
+    instances never compare equal -- so the one owned closure of each
+    characteristic is the one built here, with that fixed name
+    (``sage.rings.algebraic_closure_finite_field.AlgebraicClosureFiniteField``,
+    whose docstring says the same).
+    """
     from sage.rings.algebraic_closure_finite_field import AlgebraicClosureFiniteField
 
-    engine = AlgebraicClosureFiniteField(int(characteristic))
+    prime = int(characteristic)
+    engine = AlgebraicClosureFiniteField(SageGF(prime), f"z{prime}")
     return _OwnedRingParent(
         engine,
         named_placement=_algebraic_closure_finite_field_placements,
