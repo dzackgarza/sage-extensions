@@ -902,6 +902,12 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             ):
                 return None
             generators = tuple(group.group_generators())
+            if not generators:
+                # A group presented by no generators is the trivial group, so
+                # every point stabilizer is trivial and there is no image
+                # element to build from.  GAP's GroupByGenerators needs an
+                # identity element, which an empty family does not supply.
+                return group.subgroup((group.one(),))
             representation = self.permutation_representation()
             symmetric = representation.codomain()
             engine_generators = libgap([libgap(group._to_engine(generator)) for generator in generators])
