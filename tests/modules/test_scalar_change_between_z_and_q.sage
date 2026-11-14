@@ -9,6 +9,8 @@ rank $2$; $\operatorname{Res}_\iota \mathbb Q^2$ is a torsion-free, countably in
 flat since $\mathbb Q$ is a localization of $\mathbb Z$.  Values from the definitions.
 """
 
+import pytest
+
 from sage_extensions.all import *  # noqa: F401,F403
 
 
@@ -73,3 +75,34 @@ def test_restriction_to_the_integers_has_a_right_adjoint() -> None:
     adjunction = Modules(QQ).restriction_coextension_adjunction(inclusion())
 
     assert adjunction.left_adjoint()(QQ ^ 2).base_ring() is ZZ
+
+
+def test_a_form_over_a_restricted_ring_reads_the_ring_s_regular_module() -> None:
+    r"""A pairing's values are module elements, so the A2 form over $\mathbb Q$ is integral.
+
+    $\operatorname{Res}_\iota \mathbb Q$ keeps the field as its extension, and that
+    view is the contract ``test_restricted_scalars_action.sage`` states.  A pairing
+    whose values are stated by that view has to read them through the field's own
+    rank-one module: restricting the ring object instead gave a form that answered
+    ``is_base_ring_valued()`` False on the integral A2 Gram -- the reading
+    lattice-database recorded for every card (#293) -- and whose numerical entry
+    raised ``(0, 0) is not an element of {0,...,3}``.
+    """
+    restriction = Modules(QQ).restriction_of_scalars(ZZ.fraction_field_map())
+    view = restriction(QQ)
+    assert view.module_over_extension() is QQ
+
+    lattice = Lattices(ZZ)([[2, -1], [-1, 2]])
+    from_the_ring = FormModules(ZZ)(
+        ZZ.free_module(2).bilinear_hom_space(view)(lattice.gram_tensor())
+    )
+    from_the_module = FormModules(ZZ)(
+        ZZ.free_module(2).bilinear_hom_space(restriction(QQ.regular_module()))(
+            lattice.gram_tensor()
+        )
+    )
+    assert int(from_the_ring.base_ring().one()) == int(from_the_module.base_ring().one())
+    assert from_the_ring.is_base_ring_valued() is True
+    assert from_the_module.is_base_ring_valued() is True
+    first = ZZ.free_module(2).module_generator(0)
+    assert from_the_ring.form()(first, first) == from_the_module.form()(first, first)

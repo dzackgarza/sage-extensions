@@ -287,7 +287,16 @@ class _FramedDirectSumOfModules(_DirectSumOfModules):
                 return super()._element_constructor_(value)
 
     def _module_with_structure(self, categories, construction_data):
-        return super()._module_with_structure(categories, construction_data)
+        # The summand family and each summand's chosen frame are unchanged by
+        # adding structure, so the reconstructed object states the framing fact
+        # again: over an infinite grading set nothing can visit the summands,
+        # and a caller that does not state it gets the unframed realization.
+        return _direct_sum_of_modules(
+            self.base_ring(), self.grading_index_set(), self._summand_family,
+            extra_categories=categories, construction_data=construction_data,
+            _realization=self._direct_sum_realization(),
+            componentwise_framing=True,
+        )
 
     def _direct_sum_realization(self):
         return _FramedDirectSumOfModules, GradedDirectSumElement

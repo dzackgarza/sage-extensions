@@ -45,3 +45,16 @@ def test_ordinal_powers_have_ordinal_not_cardinal_exponentiation_size() -> None:
     assert Ordinals()(2).ordinal_power(omega(0)).cardinality() == aleph0
     assert omega(0).ordinal_power(omega(0)).cardinality() == aleph0
     assert Ordinals()(2).ordinal_power(omega(1)).cardinality() == aleph(1)
+
+
+def test_an_integer_literal_to_an_infinite_cardinal_is_the_cardinal_power() -> None:
+    r"""``2 ** aleph0``: the session's own integer literal defers to the cardinal.
+
+    A preparsed integer literal is a session integer, whose ``__pow__`` reads an
+    integer exponent through ``__index__``.  An infinite cardinal refuses that
+    conversion on purpose, and the reflected ``Cardinal.__rpow__`` is the
+    maintained ``2**aleph0 = continuum``; the ring power must therefore return
+    ``NotImplemented`` instead of letting the refusal escape.
+    """
+    assert 2 ** aleph0 == continuum
+    assert cardinal(2) ** aleph0 == continuum

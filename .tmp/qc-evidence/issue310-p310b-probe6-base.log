@@ -1,0 +1,6 @@
+--- base-commit controls (worktree at 8d44136)
+U(2) row: ValueError @ 2.5 s: no primitive isotropic vector of Integral lattice of rank 2 and signature (1, 1) has divisor 2 and divided class [0]: the residue loop is exhausted -- every one of the 4 residues of L/2L was tried, each with its 1 translations k in K/2K and every divisor pair of q(w)/(2h) in the residue classes of a
+LK3.is_decomposable(): True
+raw [[2,1],[1,0]].hyperbolic_plane_summand_count(): 1
+done
+launcher exit: 0

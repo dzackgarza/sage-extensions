@@ -203,15 +203,24 @@ def _number_field_from_engine(engine):
     return _number_field_extension(base, polynomial)
 
 
-def _order_placements(*, dedekind=False):
+def _order_placements(*, dedekind=False, principal=False):
     r"""Place an order by its defining lattice, adding Dedekind for the integral closure.
 
     The order is also a Noetherian domain, free of finite rank over ``ZZ``,
     countably infinite, and carries the integral basis selected by its
-    construction (``OrdersWithChosenIntegralBasis``). A maximal order is
-    Dedekind; no class-number computation participates in this placement.
+    construction (``OrdersWithChosenIntegralBasis``).  A maximal order is
+    Dedekind, and a maximal order is a principal ideal domain exactly when the
+    class number of its field is one: the ring of integers of a number field is
+    a PID iff ``h = 1`` (Neukirch I.6, the ideal class group is the Picard
+    group).  ``principal`` carries that exact owned decision, computed once by
+    :func:`_order_in` from ``K.class_number()``; it is never inferred from the
+    Dedekind placement, and it is not claimed for a non-maximal order, where
+    ``h = 1`` alone does not make the order a PID.
     """
-    from sage_extensions.categories.rings.ring_foundation import OwnedIntegralDomains
+    from sage_extensions.categories.rings.ring_foundation import (
+        OwnedIntegralDomains,
+        OwnedPrincipalIdealDomains,
+    )
     from sage_extensions.categories.sets.set_categories import CountablyInfiniteSets
 
     placements = (
@@ -224,6 +233,7 @@ def _order_placements(*, dedekind=False):
     return (
         *placements,
         *((OwnedRings().Commutative().DedekindDomains(),) if dedekind else ()),
+        *((OwnedPrincipalIdealDomains(),) if principal else ()),
     )
 
 
@@ -288,9 +298,16 @@ def _order_in(field, engine_order):
     assert _power_basis_lattice(canonical_order) == lattice_rows, (
         f"reconstructing the canonical lattice rows changed the order lattice of {engine_order}"
     )
+    # A maximal order is a PID exactly when its field has class number one;
+    # the decision is the owned exact one, taken here so the placement states a
+    # theorem rather than a guess.  Non-maximal orders are left unplaced: h = 1
+    # does not make an arbitrary order a PID.
+    principal_ideal_domain = bool(dedekind and field.class_number() == 1)
     return _OwnedRingParent(
         canonical_order,
-        named_placement=lambda: _order_placements(dedekind=dedekind),
+        named_placement=lambda: _order_placements(
+            dedekind=dedekind, principal=principal_ideal_domain
+        ),
         order_basis=tuple(canonical_order.basis()),
     )
 
@@ -895,6 +912,23 @@ class NumberFieldsWithChosenPrimitiveElement(OwnedCategory):
             parent = self.algebra_framing_source()
             return _owned_engine_element(parent, polynomial)
 
+        def quotient_map(self):
+            r"""Return the class map ``R[t] -> R[t]/(f) = K``, ``t |-> theta``.
+
+            The quotient this field *is* was part of its construction
+            (``_number_field_of``: "the quotient map is part of this
+            construction, so the field is constructed with it as its chosen
+            degree-zero algebra resolution").  That resolution keeps the map on
+            the *labelled* generators, which is not the ring map a consumer
+            needing ``R[t] -> K`` can compose with.  This accessor states the
+            same quotient map on the polynomial ring, under the name the
+            quotient owner uses: the class of ``t`` is the selected primitive
+            element, and the polynomial variable's image is exactly that.
+            """
+            ring = self.defining_polynomial().parent()
+            (label,) = ring.variable_names()
+            return ring.Mor(self)({label: self.algebra_generator(label)})
+
         def embedding_images(self, target):
             r"""Return the images of the selected primitive element under ``K -> target``."""
 
@@ -929,6 +963,30 @@ class OrdersWithChosenIntegralBasis(OwnedCategory):
         ]
 
     class ParentMethods:
+        def index_in(self, other):
+            r"""Return \([\\mathrm{other} : \\mathrm{self}]\), the index of this order in ``other``.
+
+            Both orders are full \(\\mathbb Z\)-lattices in one number field, so
+            the index is the absolute determinant of the change-of-basis matrix
+            between their selected integral bases (Neukirch, *Algebraic Number
+            Theory*, I.2.10); \([\\mathcal O_K : \\mathbb Z[\\sqrt d]] = 2\) for
+            \(d \\equiv 1 \\pmod 4\), for instance.  The retained realizations
+            answer that determinant exactly, and the result is an owned integer.
+            """
+            if other not in OrdersWithChosenIntegralBasis():
+                raise TypeError(
+                    f"an index needs another order carrying its integral basis, but {other} is not one"
+                )
+            if self.fraction_field() is not other.fraction_field():
+                raise ValueError(
+                    f"the index of {self} in {other} needs both orders in one number field, "
+                    f"but they lie in {self.fraction_field()} and {other.fraction_field()}"
+                )
+            return _owned_engine_element(
+                _owned_integers(),
+                SageZZ(_engine_ring(self).index_in(_engine_ring(other))),
+            )
+
         def _repr_(self):
             r"""Represent an order without recursively printing its framed basis.
 

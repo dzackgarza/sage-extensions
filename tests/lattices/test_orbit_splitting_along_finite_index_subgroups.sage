@@ -131,3 +131,26 @@ def test_a_subgroup_given_by_generators_has_no_character_quotient_to_split_along
 
     with pytest.raises(AssertionError):
         group.split_orbit(marked, group.subgroup((swap,)))
+
+
+@pytest.mark.parametrize("rank", (2, 3, 4), ids=("two-terms", "three-terms", "four-terms"))
+def test_a_coordinate_flag_has_one_orbit_under_its_whole_orthogonal_group(rank) -> None:
+    r"""The G-orbit of any flag is a single G-orbit, for every flag length."""
+    lattice = Lattices(ZZ)([[int(i == j) for j in range(rank)] for i in range(rank)])
+    category = Cat().Mor(FiniteOrdinalCategory(rank + 1), Lattices(ZZ))
+    basis = tuple(lattice.module_generators())
+    inclusion = lattice.subobject_on(basis).inclusion()
+    transitions = [inclusion]
+    for size in reversed(range(1, rank)):
+        term = inclusion.domain().subobject_on(
+            tuple(inclusion.lift(point) for point in basis[:size])
+        )
+        transitions.insert(0, term.inclusion())
+        inclusion = inclusion * term.inclusion()
+    marked = category(tuple(transitions))
+    group = lattice.O()
+
+    representatives = tuple(group.split_orbit(marked, group))
+
+    assert representatives == (marked,)
+    assert all(representative in category for representative in representatives)

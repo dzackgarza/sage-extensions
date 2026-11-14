@@ -1,0 +1,70 @@
+[10:41:22 +    0.0s] building the subgroup
+[10:41:44 +   21.7s] subgroup built; the cusp vector has 12 coordinates in Integral lattice of rank 12 and signature (2, 10)
+[10:41:44 +   21.7s] discriminant representation: Generic morphism:
+  From: Orthogonal group O(Integral lattice of rank 12 and signature (2, 10))
+  To:   Orthogonal group of Finitely presented module on 12 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]
+[10:43:00 +   98.2s] allowed image from discriminant_image(): Subgroup of Orthogonal group of Finitely presented module on 12 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]
+[10:43:00 +   98.2s] wall 0 q=-4 implied=False lift q=-4 b(lift,v)=0
+[10:43:01 +   99.0s]   wall 0: [(-2, 'sn_R=2', True, True), (-1, 'sn_R=2,discriminant-outside', False, False), (0, 'sn_R=2', True, True), (1, 'sn_R=2,discriminant-outside', False, False), (2, 'sn_R=2', True, True)]
+[10:43:01 +   99.0s] wall 1 q=-4 implied=True lift q=-4 b(lift,v)=0
+[10:43:02 +   99.7s]   wall 1: [(-2, 'sn_R=2', True, True), (-1, 'sn_R=2,discriminant-outside', False, False), (0, 'sn_R=2', True, True), (1, 'sn_R=2,discriminant-outside', False, False), (2, 'sn_R=2', True, True)]
+[10:43:02 +   99.7s] wall 2 q=-4 implied=True lift q=-4 b(lift,v)=0
+[10:43:02 +  100.4s]   wall 2: [(-2, 'sn_R=2', True, True), (-1, 'sn_R=2,discriminant-outside', False, False), (0, 'sn_R=2', True, True), (1, 'sn_R=2,discriminant-outside', False, False), (2, 'sn_R=2', True, True)]
+[10:43:02 +  100.4s] wall 3 q=-4 implied=True lift q=-4 b(lift,v)=0
+[10:43:03 +  101.2s]   wall 3: [(-2, 'sn_R=2', True, True), (-1, 'sn_R=2,discriminant-outside', False, False), (0, 'sn_R=2', True, True), (1, 'sn_R=2,discriminant-outside', False, False), (2, 'sn_R=2', True, True)]
+[10:43:03 +  101.2s] wall 4 q=-4 implied=True lift q=-4 b(lift,v)=0
+[10:43:04 +  101.9s]   wall 4: [(-2, 'sn_R=2', True, True), (-1, 'sn_R=2,discriminant-outside', False, False), (0, 'sn_R=2', True, True), (1, 'sn_R=2,discriminant-outside', False, False), (2, 'sn_R=2', True, True)]
+[10:43:04 +  101.9s] wall 5 q=-4 implied=True lift q=-4 b(lift,v)=0
+[10:43:05 +  102.6s]   wall 5: [(-2, 'sn_R=2', True, True), (-1, 'sn_R=2,discriminant-outside', False, False), (0, 'sn_R=2', True, True), (1, 'sn_R=2,discriminant-outside', False, False), (2, 'sn_R=2', True, True)]
+[10:43:05 +  102.6s] wall 6 q=-4 implied=True lift q=-4 b(lift,v)=0
+[10:43:05 +  103.3s]   wall 6: [(-2, 'sn_R=2', True, True), (-1, 'sn_R=2,discriminant-outside', False, False), (0, 'sn_R=2', True, True), (1, 'sn_R=2,discriminant-outside', False, False), (2, 'sn_R=2', True, True)]
+[10:43:05 +  103.3s] wall 7 q=-2 implied=True lift q=-2 b(lift,v)=0
+[10:43:06 +  104.0s]   wall 7: [(-2, 'ok', True, True), (-1, 'ok', True, True), (0, 'ok', True, True), (1, 'ok', True, True), (2, 'ok', True, True)]
+[10:43:06 +  104.0s] wall 8 q=-2 implied=False lift q=-2 b(lift,v)=0
+[10:43:07 +  104.8s]   wall 8: [(-2, 'ok', True, True), (-1, 'ok', True, True), (0, 'ok', True, True), (1, 'ok', True, True), (2, 'ok', True, True)]
+[10:43:07 +  104.8s] wall 9 q=-2 implied=False lift q=-2 b(lift,v)=0
+[10:43:08 +  105.6s]   wall 9: [(-2, 'ok', True, True), (-1, 'ok', True, True), (0, 'ok', True, True), (1, 'ok', True, True), (2, 'ok', True, True)]
+[10:43:08 +  105.6s] wall 10 q=-2 implied=False lift q=-2 b(lift,v)=0
+[10:43:08 +  106.3s]   wall 10: [(-2, 'ok', True, True), (-1, 'ok', True, True), (0, 'ok', True, True), (1, 'ok', True, True), (2, 'ok', True, True)]
+[10:43:08 +  106.3s] wall 11 q=-4 implied=False lift q=-4 b(lift,v)=0
+[10:43:09 +  107.1s]   wall 11: [(-2, 'sn_R=2', True, True), (-1, 'sn_R=2,discriminant-outside', False, False), (0, 'sn_R=2', True, True), (1, 'sn_R=2,discriminant-outside', False, False), (2, 'sn_R=2', True, True)]
+[10:43:09 +  107.1s] wall 12 q=-2 implied=False lift q=-2 b(lift,v)=0
+[10:43:10 +  107.9s]   wall 12: [(-2, 'ok', True, True), (-1, 'ok', True, True), (0, 'ok', True, True), (1, 'ok', True, True), (2, 'ok', True, True)]
+[10:43:10 +  107.9s] wall 13 q=-2 implied=False lift q=-2 b(lift,v)=0
+[10:43:11 +  108.6s]   wall 13: [(-2, 'ok', True, True), (-1, 'ok', True, True), (0, 'ok', True, True), (1, 'ok', True, True), (2, 'ok', True, True)]
+[10:43:11 +  108.6s] wall 14 q=-2 implied=False lift q=-2 b(lift,v)=0
+[10:43:11 +  109.4s]   wall 14: [(-2, 'ok', True, True), (-1, 'ok', True, True), (0, 'ok', True, True), (1, 'ok', True, True), (2, 'ok', True, True)]
+[10:43:11 +  109.4s] wall 15 q=-2 implied=False lift q=-2 b(lift,v)=0
+[10:43:12 +  110.1s]   wall 15: [(-2, 'ok', True, True), (-1, 'ok', True, True), (0, 'ok', True, True), (1, 'ok', True, True), (2, 'ok', True, True)]
+[10:43:12 +  110.1s] === summary ===
+[10:43:12 +  110.1s] wall 0 q=-4 implied=False all-three=[] discriminant-in-image=[-2, 0, 2]
+[10:43:12 +  110.1s] wall 1 q=-4 implied=True all-three=[] discriminant-in-image=[-2, 0, 2]
+[10:43:12 +  110.1s] wall 2 q=-4 implied=True all-three=[] discriminant-in-image=[-2, 0, 2]
+[10:43:12 +  110.1s] wall 3 q=-4 implied=True all-three=[] discriminant-in-image=[-2, 0, 2]
+[10:43:12 +  110.1s] wall 4 q=-4 implied=True all-three=[] discriminant-in-image=[-2, 0, 2]
+[10:43:12 +  110.1s] wall 5 q=-4 implied=True all-three=[] discriminant-in-image=[-2, 0, 2]
+[10:43:12 +  110.1s] wall 6 q=-4 implied=True all-three=[] discriminant-in-image=[-2, 0, 2]
+[10:43:12 +  110.1s] wall 7 q=-2 implied=True all-three=[-2, -1, 0, 1, 2] discriminant-in-image=[-2, -1, 0, 1, 2]
+[10:43:12 +  110.1s] wall 8 q=-2 implied=False all-three=[-2, -1, 0, 1, 2] discriminant-in-image=[-2, -1, 0, 1, 2]
+[10:43:12 +  110.1s] wall 9 q=-2 implied=False all-three=[-2, -1, 0, 1, 2] discriminant-in-image=[-2, -1, 0, 1, 2]
+[10:43:12 +  110.1s] wall 10 q=-2 implied=False all-three=[-2, -1, 0, 1, 2] discriminant-in-image=[-2, -1, 0, 1, 2]
+[10:43:12 +  110.1s] wall 11 q=-4 implied=False all-three=[] discriminant-in-image=[-2, 0, 2]
+[10:43:12 +  110.1s] wall 12 q=-2 implied=False all-three=[-2, -1, 0, 1, 2] discriminant-in-image=[-2, -1, 0, 1, 2]
+[10:43:12 +  110.1s] wall 13 q=-2 implied=False all-three=[-2, -1, 0, 1, 2] discriminant-in-image=[-2, -1, 0, 1, 2]
+[10:43:12 +  110.1s] wall 14 q=-2 implied=False all-three=[-2, -1, 0, 1, 2] discriminant-in-image=[-2, -1, 0, 1, 2]
+[10:43:12 +  110.1s] wall 15 q=-2 implied=False all-three=[-2, -1, 0, 1, 2] discriminant-in-image=[-2, -1, 0, 1, 2]
+[10:43:12 +  110.1s] done
+[peakrss] issue387: child waited=0 shell_code=0 samples=57
+[peakrss] peak tree RSS      : 652 MiB
+[peakrss] low-water MemAvail : 11734 MiB
+[peakrss] peak single VmHWM  : 652 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      640 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   112.0s procs=  3 rss=   652 MiB hwm=   652 MiB avail= 11734 MiB
+[peakrss]   t=   100.0s procs=  3 rss=   651 MiB hwm=   651 MiB avail= 11770 MiB
+[peakrss]   t=   102.0s procs=  3 rss=   651 MiB hwm=   651 MiB avail= 11762 MiB
+[peakrss]   t=   104.0s procs=  3 rss=   651 MiB hwm=   651 MiB avail= 11755 MiB
+[peakrss]   t=   106.0s procs=  3 rss=   651 MiB hwm=   651 MiB avail= 11755 MiB
+launcher exit: 0

@@ -1,0 +1,5 @@
+### pytest (repo configuration) -o addopts= -p sage_extensions.testing.test_lint tests/lattices/test_vectors_of_square_with_complement.sage at 2026-11-06T16:30:49Z
+..                                                                       [100%]
+2 passed in 147.91s (0:02:27)
+### exit=0
+2026-11-06T16:33:19Z

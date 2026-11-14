@@ -1,0 +1,3 @@
+provider SHA: 1a59869ba62b9eda408c5e5d062a2a9b240fe899
+command: just test-push
+Push syntax: 7 file(s) checked; no errors.

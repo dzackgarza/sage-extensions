@@ -120,6 +120,55 @@ def _power_module_basis(coefficient_ring, degree, power, coordinates):
     )
 
 
+class _RegularModuleGenerator:
+    r"""The single generator of a ring read as the regular module over itself.
+
+    A module parent retains its basis maps, so the maps are module-level objects
+    rather than closures (issue #20).  This one carries the presentation, whose
+    unit is the generator.
+    """
+
+    def __init__(self, presentation) -> None:
+        self._presentation = presentation
+
+    def __call__(self, position):
+        return self._presentation.unit()
+
+    def __repr__(self) -> str:
+        return "regular module generator"
+
+
+class _RegularModuleCoordinates:
+    r"""The coordinates of an element of a ring in its own regular basis ``{1}``."""
+
+    def __init__(self, module, label) -> None:
+        self._module = module
+        self._label = label
+
+    def __call__(self, value):
+        return {self._label: self._module(value)}
+
+    def __repr__(self) -> str:
+        return "regular module coordinates"
+
+
+class _ConstantComputation:
+    r"""A deferred computation that always returns the same retained value.
+
+    Used where a construction retains "how to obtain this source" rather than the
+    source itself; a closure there would make the parent unpicklable (issue #20).
+    """
+
+    def __init__(self, value) -> None:
+        self._value = value
+
+    def __call__(self):
+        return self._value
+
+    def __repr__(self) -> str:
+        return "retained source"
+
+
 class _RingModulePresentation:
     r"""The native additive-group realization and its specified scalar action.
 
@@ -177,7 +226,11 @@ class _RingModulePresentation:
             )
             free = self.base_ring().free_module(1)
             label = next(iter(free.module_generating_set()))
-            self._basis = _NativeModuleBasis(free, lambda _: self.unit(), lambda value: {label: module(value)})
+            self._basis = _NativeModuleBasis(
+                free,
+                _RegularModuleGenerator(self),
+                _RegularModuleCoordinates(module, label),
+            )
         free_placement = None
         if self._basis is not None:
             source = self._basis.source()
@@ -191,7 +244,7 @@ class _RingModulePresentation:
                 self.base_ring(),
                 labels,
                 self._basis.image,
-                lambda: source,
+                _ConstantComputation(source),
             )
             match self._basis.is_basis():
                 case True:

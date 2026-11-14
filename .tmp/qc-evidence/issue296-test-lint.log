@@ -1,0 +1,18 @@
+tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage::test_the_small_specimen_checks_the_orbit_stabilizer_identity
+tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage::test_the_tco_plane_gives_an_isotropic_subobject_with_orbit_and_stabilizer
+tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage::test_the_action_factors_compose_to_its_stabilizer_family
+tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage::test_the_natural_g_set_factors_compose_to_its_stabilizer_family
+
+4 tests collected in 3.46s
+[peakrss] issue296-lint: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 267 MiB
+[peakrss] low-water MemAvail : 4783 MiB
+[peakrss] peak single VmHWM  : 267 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      256 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   267 MiB hwm=   267 MiB avail=  4783 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   137 MiB hwm=   137 MiB avail=  4929 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail=  4924 MiB
+launcher exit: 0

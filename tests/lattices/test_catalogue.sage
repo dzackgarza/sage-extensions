@@ -24,7 +24,20 @@ def test_tdp_metric_dual_is_the_formed_linear_dual() -> None:
 
     assert identification.domain() is metric_dual
     assert identification.codomain() is linear_dual
-    assert metric_dual.value_module() is QQ
+    # The metric dual is K-valued through the restricted regular module: the
+    # value module is ``Res_{R -> K}(K^1)`` (CONTRIBUTING.md:5613, owner ruling
+    # 2026-10-16), and ``regular_module_identification()`` is the actual Mor
+    # carrying it to K.  Identity with K is explicitly *not* claimed: the two
+    # scalar structures are not collapsed.
+    restricted_regular = (
+        Modules(QQ)
+        .restriction_of_scalars(ZZ.fraction_field_map())
+        .__call__(QQ.regular_module())
+    )
+    assert metric_dual.value_module() is restricted_regular
+    value_identification = metric_dual.value_module().regular_module_identification()
+    assert value_identification.domain() is metric_dual.value_module()
+    assert value_identification.codomain() is QQ
     assert value_module.base_ring() is ZZ
     assert value_module.module_over_extension() is QQ
     assert value_module.ring_map().domain() is ZZ

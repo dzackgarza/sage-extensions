@@ -50,6 +50,7 @@ from sage_extensions.categories.sets.set_categories import (
     EnumeratedSets,
     FiniteSets,
     Sets,
+    arrow_hash,
 )
 from sage_extensions.logic import AtomicProposition, conjunction, negation
 from sage_extensions.validation import validator
@@ -143,6 +144,7 @@ def _integral_preimage_solver(morphism, ring):
             return morphism.domain().linear_combination({
                 label: _owned_engine_element(ring, coefficient)
                 for label, coefficient in zip(source_labels, solution, strict=True)
+                if coefficient
             })
 
         return solve_field
@@ -236,7 +238,7 @@ def _represented_real_preimage_solver(morphism):
 
 def _integral_preimage_positional_solver(morphism, ring):
     r"""Factor ``f`` once and return its positional integral preimage solver."""
-    element_solver = _integral_preimage_solver(morphism, ring)
+    element_solver = morphism._integral_preimage_element_solver(ring)
 
     def solve(target):
         original_solution = element_solver(target)
@@ -305,12 +307,14 @@ class ModuleMorphismMethods:
     supply the family; the public constructors take none.
     """
 
+    _engine_matrix_cache = None
     _scalar_extension_of = None
     _scalar_extension_functor = None
     _lift_function = None
     _linearity_premises = None
     _projective_section_restriction_data = None
     _surjectivity_premise = None
+    _injectivity_premise = None
 
     def _initialize_lower_arrow(self, parent) -> None:
         domain = parent.domain()
@@ -779,7 +783,11 @@ class ModuleMorphismMethods:
         if not domain.has_selected_module_resolution():
             return None
         label_set = domain.module_generating_set()
-        if not label_set.cardinality().is_finite():
+        size = label_set.cardinality()
+        if not size.expression().is_normal_form() or not size.is_finite():
+            # A framing whose cardinality is an unevaluated sum over an
+            # infinite index set is not a finite basis, so there is no finite
+            # enumeration to verify against.
             return None
         labels = tuple(label_set)
         if not labels:
@@ -1016,8 +1024,11 @@ class ModuleMorphismMethods:
 
     def __hash__(self) -> int:
         # Equality is decided within one Mor, whatever class realizes each
-        # arrow, so equal arrows share the hash of their Mor.
-        return hash(id(self.parent()))
+        # arrow, by the arrows' values on the domain.  Hash those values on the
+        # domain's canonical finite probe, so distinct arrows -- in particular
+        # the points of a dual module -- are distributed instead of collapsed
+        # into one bucket; ``arrow_hash`` keeps the endpoint fallback.
+        return arrow_hash(self)
 
     def __rmul__(self, actor):
         derivation = getattr(self, "_originating_derivation", None)
@@ -1072,6 +1083,11 @@ class ModuleMorphismMethods:
         codomain = self.codomain()
         ring = codomain.base_ring()
         coefficients = coordinates.parent()._selected_module_coefficients(coordinates)
+        if len(coefficients) == 1:
+            ((source_label, coefficient),) = coefficients.items()
+            if (ring(coefficient) == ring.one()) is True:
+                # The defining equation of linear extension is f(e_s)=y_s.
+                return codomain(self._generator_image(source_label))
         return sum(
             (
                 codomain.scalar_multiple(
@@ -1089,9 +1105,25 @@ class ModuleMorphismMethods:
         if self._element_function is not None:
             image = self._element_function(element)
             return image if image.parent() is self.codomain() else self.codomain()(image)
-        return self._linear_combination_of_generator_images(
-            self.domain()._framing_lift(element)
-        )
+        coordinates = self.domain()._framing_lift(element)
+        backend = self._engine_matrix_cache
+        if backend is not None and backend.base_ring().is_exact() is True:
+            from sage.matrix.constructor import matrix as sage_matrix
+
+            # For left modules, row coefficients act by x*A^t. This
+            # retains coefficient order over noncommutative rings too.
+            ring = self.codomain().base_ring()
+            positions = {label: index for index, label in enumerate(self.parent().column_index_set())}
+            coefficients = coordinates.parent()._selected_module_coefficients(coordinates)
+            values = [backend.base_ring().zero()] * backend.ncols()
+            for label, coefficient in coefficients.items():
+                values[positions[label]] = _linear_algebra_element(ring, coefficient)
+            image = sage_matrix(backend.base_ring(), 1, backend.ncols(), values) * backend.transpose()
+            return self.codomain().linear_combination({
+                label: _owned_engine_element(ring, image[0, index])
+                for index, label in enumerate(self.parent().row_index_set())
+            })
+        return self._linear_combination_of_generator_images(coordinates)
 
     def alternating_extension(self):
         r"""Extend this linear map through the exterior-algebra universal property."""
@@ -1533,6 +1565,16 @@ class ModuleMorphismMethods:
         return AffineModuleFibres(ring)(linear, target_inclusion, offset)
 
     @cached_method
+    def _integral_preimage_element_solver(self, ring):
+        r"""Retain the exact solver for this fixed finite free arrow and ring.
+
+        Successive right-hand sides share the same backend matrix, rank,
+        selected label order and Smith data. The native solver still decides
+        each target's membership and supplies its original coordinate lift.
+        """
+        return _integral_preimage_solver(self, ring)
+
+    @cached_method
     def _framed_coordinate_morphism(self):
         r"""Realize this linear arrow in the matrix Mor of its selected framings.
 
@@ -1609,9 +1651,27 @@ class ModuleMorphismMethods:
         return preimage
 
     def is_injective(self) -> bool:
-        r"""Return whether ``ker(self)=0`` when the kernel is computable."""
+        r"""Return whether ``ker(self)=0`` when the kernel is computable.
+
+        A construction that establishes injectivity retains it as
+        ``_injectivity_premise`` on the arrow, which is then read here without a
+        kernel computation; the arrow keeps the one linear Hom parent.
+        """
+        premise = vars(self).get("_injectivity_premise")
+        if premise is not None:
+            return premise
         self._require_established_linearity("injectivity")
         return self.kernel().is_zero()
+
+    def non_surjectivity_witness(self):
+        r"""Return the codomain element the construction exhibits outside the image, or ``None``.
+
+        A construction that knows an element of the codomain is not a finite
+        linear combination of the morphism's generator images retains that
+        element.  Its presence refutes surjectivity without a cokernel, and it
+        is readable so the refutation can be checked rather than trusted.
+        """
+        return vars(self).get("_preamble_non_surjectivity_witness")
 
     def is_surjective(self) -> bool:
         r"""Return whether ``coker(self)=0`` when the cokernel is computable."""
@@ -1786,13 +1846,7 @@ class ModuleMorphismMethods:
         coordinates = element.to_vector()
         target = [coordinates(label) for label in codomain_labels]
         coordinate_map = self._framed_coordinate_morphism()
-        solution = _solve_preimage_integrally(coordinate_map, target, ring)
-        if solution is None:
-            return None
-        return self.domain().linear_combination({
-            label: coefficient
-            for label, coefficient in zip(self.domain().module_generating_set(), solution, strict=True)
-        })
+        return coordinate_map._integral_preimage_element_solver(ring)(target)
 
     def lift(self, element):
         r"""Return a selected preimage of ``element``; reject an element outside the image with ``ValueError``.
@@ -1927,8 +1981,9 @@ class ModuleMorphismMethods:
             cover_map,
         )
 
-    def _preimage_through_the_codomain_presentation(self, element):
-        r"""Return a preimage of ``element`` through the codomain's chosen presentation, or ``None``.
+    @cached_method
+    def _codomain_presentation_preimage_maps(self):
+        r"""Retain the fixed cover equation and projection for preimages through this map.
 
         Let ``r : F_1 -> F_0`` be the chosen presentation of the codomain
         ``M``, with ``pi : F_0 ->> M``, and let ``p : F(S) ->> D`` be the
@@ -1939,14 +1994,13 @@ class ModuleMorphismMethods:
         ``h`` has a preimage under the map ``F(S) + F_1 -> F_0`` with legs
         ``g`` and ``r``.  That map is between finite free modules, so its
         preimage is a coordinate solve.  The ``F(S)``-component ``c`` of a
-        solution gives the preimage ``x = p(c)``.  No element of ``D`` is
-        enumerated.
+        solution gives the preimage ``x = p(c)``. These two maps depend on
+        ``f`` and its endpoint presentations, so their Smith data serve all
+        right-hand sides of this same equation.
         """
         from sage_extensions.categories.modules.pure.modules import Modules
 
         domain, codomain = self.domain(), self.codomain()
-        if element.parent() is not codomain:
-            element = codomain(element)
         presentation = codomain.presentation()
         cover = presentation.codomain()
         codomain_framing = codomain.framing_morphism()
@@ -1965,10 +2019,21 @@ class ModuleMorphismMethods:
             }
         )
         cover_sum = Modules(domain.base_ring()).biproduct((generator_cover, presentation.domain()))
-        solution = cover_sum.from_summands(generator_lift, presentation)._preimage_or_none(lift_to_cover(element))
+        equation = cover_sum.from_summands(generator_lift, presentation)
+        projection = domain_framing * cover_sum.projection(0)
+        return equation, projection
+
+    def _preimage_through_the_codomain_presentation(self, element):
+        r"""Solve the retained cover equation for one target, or return ``None``."""
+        codomain = self.codomain()
+        coordinates = codomain.framing_morphism().lift(codomain(element))
+        cover = codomain.presentation().codomain()
+        target = cover.linear_combination(coordinates.parent()._selected_module_coefficients(coordinates))
+        equation, projection = self._codomain_presentation_preimage_maps()
+        solution = equation._preimage_or_none(target)
         if solution is None:
             return None
-        return domain_framing(cover_sum.projection(0)(solution))
+        return projection(solution)
 
     def _preimage_through_the_extension_framing(self, element):
         r"""Return the preimage of ``element`` in a restriction of scalars to ``R``, or ``None``.
@@ -2265,17 +2330,20 @@ class ModuleMorphismMethods:
         r"""Return ``self . other`` for a composable arrow, or ``other * self`` for a scalar."""
         match other:
             case _ if _precomposable(self, other):
-                if other.parent() is self.parent() and self.domain() is self.codomain():
-                    return self.parent()._compose_endomorphisms(self, other)
-                source = other.domain()
-                target = self.codomain()
                 # The identity is a two-sided unit.  That is a theorem, so the
                 # composite is the other factor itself rather than a fresh
-                # morphism that would then have to be compared with it.
+                # morphism that would then have to be compared with it.  This
+                # comes before the endomorphism specialization below, or
+                # ``id * id`` would be rebuilt as a new endomorphism whose
+                # equality with ``id`` is not decided by any selected data.
                 if self._is_the_identity() is True:
                     return other
                 if other._is_the_identity() is True:
                     return self
+                if other.parent() is self.parent() and self.domain() is self.codomain():
+                    return self.parent()._compose_endomorphisms(self, other)
+                source = other.domain()
+                target = self.codomain()
                 # Keep the Mor theory in which both arrows were admitted.
                 # Redispatching Modules(R) from the source's scalar ring can
                 # select a stricter chosen-action category on a group algebra,
@@ -2410,6 +2478,8 @@ class ModuleMorphismMethods:
         construction and is never returned here.
         """
         self._require_established_linearity("module-morphism inversion")
+        if self.domain() is self.codomain() and _has_finite_free_framing(self.domain()) and self.domain().base_ring().is_integral_domain() is False:
+            return self._inverse_over_a_ring_with_zero_divisors()
         assert self.is_injective(), (
             f"{self.domain()} -> {self.codomain()} has no inverse: it is not injective"
         )
@@ -2421,6 +2491,23 @@ class ModuleMorphismMethods:
         return codomain.module_category().Mor(codomain, self.domain())(
             lambda label: inverse_image(codomain.module_generator(label))
         )
+
+    def _inverse_over_a_ring_with_zero_divisors(self):
+        r"""The inverse of a framed endomorphism from its unit determinant.
+
+        Kernels are unavailable over a ring such as ``ZZ/6``. A free
+        endomorphism is invertible exactly when its determinant is a unit.
+        """
+        from sage_extensions.tensors.tensor import _engine_row_action_matrix
+
+        module = self.domain()
+        ring = module.base_ring()
+        inverted = ~_engine_row_action_matrix(self)
+        labels = tuple(module.module_generating_set())
+        return module.module_category().Mor(module, module)({
+            label: module.linear_combination({other: ring(int(inverted[position, column])) for column, other in enumerate(labels)})
+            for position, label in enumerate(labels)
+        })
 
     def as_automorphism(self):
         r"""Return this invertible endomorphism as an element of ``Aut_R(M)``.
@@ -2725,6 +2812,7 @@ def _initialize_module_mor_parent(
         MatrixSpaces,
         _fix_selected_module_resolution,
         _matrix_unit,
+        _matrix_functional,
     )
 
     # Fix the choice of every selected resolution before the Mor is
@@ -2734,14 +2822,30 @@ def _initialize_module_mor_parent(
     match placement:
         case _ if ring in OwnedRings().Commutative() and placement.is_subcategory(MatrixSpaces(ring)):
             # ``Hom_R(F_R(S), F_R(T))`` is free on the matrix units ``T x S``.
-            labels = codomain.module_generating_set().product_with(domain.module_generating_set())
-            _fix_selected_module_resolution(
-                parent,
-                ring,
-                labels,
-                lambda label: _matrix_unit(parent, label),
-                lambda: ring._fresh_free_module_on(labels),
-            )
+            match codomain is ring.regular_module():
+                case True:
+                    # ``Hom_R(M,R)`` is the linear dual of ``M``: its matrix has
+                    # one row, so its units are indexed by ``S`` itself and
+                    # ``e_s^*`` is the functional sending ``e_s`` to ``1``.
+                    labels = domain.module_generating_set()
+                    _fix_selected_module_resolution(
+                        parent,
+                        ring,
+                        labels,
+                        lambda label: _matrix_functional(parent, label),
+                        lambda: ring._fresh_free_module_on(labels),
+                    )
+                case False:
+                    labels = codomain.module_generating_set().product_with(
+                        domain.module_generating_set()
+                    )
+                    _fix_selected_module_resolution(
+                        parent,
+                        ring,
+                        labels,
+                        lambda label: _matrix_unit(parent, label),
+                        lambda: ring._fresh_free_module_on(labels),
+                    )
         case _ if placement.is_subcategory(_SelectedFinitePresentationModules(ring)):
             def selected_presentation_data():
                 from sage_extensions.categories.modules.internal_mor import (
@@ -3218,6 +3322,7 @@ class TensorProductModuleMorphismMethods:
         lift=None,
         linearity_premises=None,
         bilinear_evaluation=None,
+        surjectivity_premise=None,
     ) -> None:
         self._bilinear_evaluation = bilinear_evaluation
         super().__init__(
@@ -3228,6 +3333,7 @@ class TensorProductModuleMorphismMethods:
             scalar_extension_functor=scalar_extension_functor,
             lift=lift,
             linearity_premises=linearity_premises,
+            surjectivity_premise=surjectivity_premise,
         )
 
     def _generator_image_linearity_derivation(self):
@@ -3346,23 +3452,19 @@ class TensorProductModuleMorphismMethods:
                     morphism = ordinary._from_constructed_element_map(morphism, premises=(morphism,))
                 return original.pullback(morphism)
         if self.codomain() not in OwnedRings():
-            from sage_extensions.categories.modules.pure.modules import RestrictedScalarsModules
+            from sage_extensions.categories.modules.pure.modules import (
+                _scalar_value_identification,
+            )
 
             values = self.codomain()
-            if (
-                values in RestrictedScalarsModules(left.base_ring())
-                or (
-                    hasattr(values, "module_over_extension")
-                    and values.base_ring() is left.base_ring()
-                )
-            ):
-                try:
-                    scalar_identification = values.regular_module_identification()
-                except AssertionError:
-                    # A restriction of S^n for n>1 remains genuinely
-                    # S^n-valued. Do not project it to one coordinate or
-                    # pretend it is a scalar tensor.
-                    return self.coordinate_values()
+            # One reading of the values as scalars, taken at its owner: a value
+            # object that is a ring's regular module, or a restriction of
+            # scalars from one, has the ring as its scalar ring, and its
+            # identification is that datum, not a second reading (#307, #320).
+            scalar_identification = _scalar_value_identification(
+                values, left.base_ring()
+            )
+            if scalar_identification is not None:
                 scalar_ring = scalar_identification.codomain()
                 if scalar_ring in OwnedRings():
                     return tensor(
@@ -3490,15 +3592,25 @@ class ModuleAutomorphismMethods:
 
     def __init__(self, parent, forward, inverse_computation) -> None:
         module = parent.domain()
-        self._inverse_computation = inverse_computation
+        # The automorphism stores its own inverse computation; the isomorphism
+        # contract below keeps the module inverse it produces.
+        self._automorphism_inverse_computation = inverse_computation
         self._forward_module_morphism = module.module_category().Mor(module, module)(forward)
-        super().__init__(parent, self._forward_module_morphism)
+        super().__init__(
+            parent,
+            self._forward_module_morphism,
+            lambda: module.module_category().Mor(module, module)(
+                self._automorphism_inverse_computation()
+            ),
+        )
 
     @cached_method
     def _inverse_morphism(self):
         r"""The inverse module map, computed once."""
         module = self.domain()
-        return module.module_category().Mor(module, module)(self._inverse_computation())
+        return module.module_category().Mor(module, module)(
+            self._automorphism_inverse_computation()
+        )
 
     def forward(self):
         return self._forward_module_morphism
@@ -3953,6 +4065,9 @@ class ModuleAutomorphismGroup(CoreMor):
         """
         match self.module().is_finite():
             case True:
+                from sage_extensions.categories.group.groups import _place_decided_finiteness
+
+                _place_decided_finiteness(self, True)
                 return True
             case _:
                 return AtomicProposition("is_finite", self)

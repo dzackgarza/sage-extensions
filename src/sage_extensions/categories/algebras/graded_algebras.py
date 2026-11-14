@@ -229,6 +229,12 @@ class GradedAlgebraMorphism:
         composite = MultiplicativeAlgebraMorphism.__mul__(self, other)
         if composite is NotImplemented:
             return NotImplemented
+        # The identity is a two-sided unit, and the shared composition already
+        # answers with the other factor itself.  Re-lifting that answer would
+        # wrap the unit in a fresh graded morphism whose equality with ``id``
+        # nothing decides; only a genuine composite is lifted.
+        if composite is self or composite is other:
+            return composite
         return mor._from_degree_preserving_underlying_morphism(
             composite,
             degree_preservation_premises=(self, other),
@@ -283,10 +289,17 @@ class GradedAlgebraMor(CategoricalMor):
         degree preservation. Composition retains its actual two input maps;
         arbitrary ingress uses the ordinary constructor and diagnostic.
         """
-        return self.element_class(
+        lifted = self.element_class(
             self, morphism,
             degree_preservation_premises=tuple(degree_preservation_premises),
         )
+        # Lifting preserves the identity: ``id`` is a two-sided unit in every
+        # category it lives in, and composition reads that law off this mark.
+        # An unmarked lift would be a fresh morphism whose equality with ``id``
+        # no selected data decides -- which is what ``id * id`` used to be.
+        if getattr(morphism, "_preamble_is_identity", False):
+            lifted._preamble_is_identity = True
+        return lifted
 
     @object_level
     @cached_method

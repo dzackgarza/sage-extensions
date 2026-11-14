@@ -1,6 +1,7 @@
 r"""Families, fibres, pushouts and tensor products of presented commutative algebras."""
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_special_fiber_of_xy_equals_t_is_the_node() -> None:
@@ -11,7 +12,7 @@ def test_special_fiber_of_xy_equals_t_is_the_node() -> None:
     t = parameter.gen()
     presentation = parameter["x,y"]
     x, y = presentation.algebra_generator("x"), presentation.algebra_generator("y")
-    family = presentation.quotient(presentation.ideal([x * y - t]))
+    family = presentation.quotient_ring(presentation.ideal([x * y - t]))
 
     assert family(t) == family(x) * family(y)
     assert family(t) != family.zero()

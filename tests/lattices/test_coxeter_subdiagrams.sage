@@ -44,9 +44,14 @@ def test_the_maximal_elliptic_subdiagrams_of_affine_a2_are_its_three_edges() -> 
 def test_the_automorphism_group_of_affine_a2_is_s3_with_three_elliptic_orbits() -> None:
     r"""\(\operatorname{Aut}(\tilde A_2)\cong S_3\); the elliptic orbits are empty, vertices, edges."""
     diagram = affine_a2()
+    automorphisms = diagram.Aut()
 
-    assert diagram.Aut().cardinality() == 6
-    assert diagram.Aut().is_isomorphic(Groups.S(3))
+    assert automorphisms.cardinality() == 6
+    # The group owner names the isomorphism decision ``is_isomorphic_to``; the
+    # negative case keeps the positive one from being a predicate that always
+    # holds.
+    assert automorphisms.is_isomorphic_to(Groups.S(3))
+    assert not automorphisms.is_isomorphic_to(Groups.C(6))
     assert diagram.elliptic_subdiagram_orbits().cardinality() == 3
     assert diagram.parabolic_subdiagram_orbits().cardinality() == 1
 

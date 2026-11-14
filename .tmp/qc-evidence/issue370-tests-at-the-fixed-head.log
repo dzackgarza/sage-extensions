@@ -1,0 +1,22 @@
+........                                                                 [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_the_printed_cusp_walls_are_distinct_classes_of_the_boundary_lattice: 213.60 s > 20 s
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_the_coble_cusp_three_has_one_root_class_and_its_orbit_is_its_transporter: 359.16 s > 20 s
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_the_cusps_four_and_five_have_their_root_class_orbits_in_the_boundary_lattice: 243.86 s > 20 s
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_the_coble_cusp_five_has_its_root_class_orbits_in_the_boundary_lattice_of_t_co: 61.73 s > 20 s
+tests/lattices/test_the_isometry_matrix_between_isometric_lattices.sage::test_the_indefinite_rank_eleven_pair_has_its_isometry_matrix: 23.91 s > 20 s
+8 passed in 906.94s (0:15:06)
+[peakrss] p370test5: child waited=0 shell_code=0 samples=464
+[peakrss] peak tree RSS      : 2058 MiB
+[peakrss] low-water MemAvail : 7287 MiB
+[peakrss] peak single VmHWM  : 2058 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     2047 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   917.0s procs=  3 rss=  2058 MiB hwm=  2058 MiB avail=  7588 MiB
+[peakrss]   t=   919.0s procs=  3 rss=  2058 MiB hwm=  2058 MiB avail=  7588 MiB
+[peakrss]   t=   921.0s procs=  3 rss=  2058 MiB hwm=  2058 MiB avail=  7588 MiB
+[peakrss]   t=   923.0s procs=  3 rss=  2058 MiB hwm=  2058 MiB avail=  7588 MiB
+[peakrss]   t=   925.0s procs=  3 rss=  2058 MiB hwm=  2058 MiB avail=  7589 MiB
+launcher exit: 0

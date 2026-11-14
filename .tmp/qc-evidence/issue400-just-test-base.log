@@ -1,0 +1,107 @@
+provider SHA: 1a59869ba62b9eda408c5e5d062a2a9b240fe899
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --durations=0
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 1.12 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+testpaths: tests
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collected 3915 items / 1 error
+
+==================================== ERRORS ====================================
+_________ ERROR collecting tests/functions/test_young_convolution.sage _________
+tests/functions/test_young_convolution.sage:16: in <module>
+    (RR(sqrt(2)), RR(sqrt(2)), 1 / (RR(sqrt(2)) - 1)),
+                                                 ^^^^^^
+sage/structure/element.pyx:1726: in sage.structure.element.Element.__truediv__
+    ???
+sage/structure/coerce.pyx:1253: in sage.structure.coerce.CoercionModel.bin_op
+    ???
+src/sage_extensions/categories/modules/pure/modules.py:1704: in __truediv__
+    return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:1704: in __truediv__
+    return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   RecursionError: maximum recursion depth exceeded
+!!! Recursion detected (same locals & position)
+=============================== warnings summary ===============================
+tests/groups/test_discriminant_lifts_of_o_plus_8_2.sage:16
+  /repos/sage-extensions/tests/groups/test_discriminant_lifts_of_o_plus_8_2.sage:16: PytestUnknownMarkWarning: Unknown pytest.mark.timeout - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.timeout(300)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/functions/test_young_convolution.sage - RecursionError: maximum r...
+=================== 1 warning, 1 error in 213.34s (0:03:33) ====================
+! _pytest.outcomes.Exit: test lint: 1514 findings (run just test-lint for all)
+tests/algebras/test_a_presented_algebra_element_displays_through_its_presentation.sage:18: TL07 compares a rendering: assert the mathematical object, not its display
+tests/algebras/test_a_presented_algebra_element_displays_through_its_presentation.sage:18: TL07 str(): a representation, not a mathematical value
+tests/algebras/test_affine_semigroup_algebras.sage:8: TL01 from sage_extensions.categories.algebras.semigroup_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:9: TL01 from sage_extensions.categories.algebras.free_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:10: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:10: TL02 imports the private name _owned_integers
+tests/algebras/test_affine_semigroup_algebras.sage:19: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_affine_semigroup_algebras.sage:38: TL01 from sage_extensions.categories.algebras.semigroup_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:39: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:39: TL02 imports the private name _owned_integers
+tests/algebras/test_algebra_base_change_archive.sage:10: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_algebra_preservation.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_cohomology_commutativity_boundary.sage:11: TL13 DifferentialGradedAlgebras is not a session name
+tests/algebras/test_cohomology_commutativity_boundary.sage:34: TL13 DifferentialGradedAlgebras is not a session name
+tests/algebras/test_cohomology_commutativity_boundary.sage:50: TL13 DifferentialGradedAlgebras is not a session name
+tests/algebras/test_commutative_algebras_are_reachable.sage:12: TL01 import the complete session with from sage_extensions.all import *
+tests/algebras/test_commutative_algebras_are_reachable.sage:22: TL07 compares a rendering: assert the mathematical object, not its display
+tests/algebras/test_commutative_algebras_are_reachable.sage:22: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_commutative_algebras_are_reachable.sage:32: TL07 compares a rendering: assert the mathematical object, not its display
+tests/algebras/test_commutative_algebras_are_reachable.sage:32: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_commutative_algebras_are_reachable.sage:33: TL07 compares a rendering: assert the mathematical object, not its display
+tests/algebras/test_commutative_algebras_are_reachable.sage:33: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_commutative_algebras_are_reachable.sage:34: TL07 compares a rendering: assert the mathematical object, not its display
+tests/algebras/test_commutative_algebras_are_reachable.sage:34: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_commutative_algebras_are_reachable.sage:40: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_coproduct_quotient_relation_transport.sage:8: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_de_rham.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_degree_zero_charts.sage:27: TL13 CommutativeGradedIntegralDomains is not a session name
+tests/algebras/test_degree_zero_charts.sage:38: TL13 CommutativeGradedIntegralDomains is not a session name
+tests/algebras/test_degree_zero_charts.sage:48: TL13 CommutativeGradedIntegralDomains is not a session name
+tests/algebras/test_finite_presentations_of_commutative_algebras.sage:85: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/algebras/test_finite_presentations_of_commutative_algebras.sage:90: TL03 isinstance(): introspection is not mathematics
+tests/algebras/test_free_algebra_generators.sage:20: TL10 len(): ask for a cardinality
+tests/algebras/test_free_algebra_generators.sage:23: TL11 .gens: write group_generators, module_generators or algebra_generators
+tests/algebras/test_free_algebra_generators.sage:30: TL10 len(): ask for a cardinality
+tests/algebras/test_free_algebra_generators.sage:33: TL11 .gens: write group_generators, module_generators or algebra_generators
+tests/algebras/test_functor_adjunctions.sage:2: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_general_algebra_structure.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_group_algebra_functor_archive.sage:12: TL02 private attribute ._augmentation
+tests/algebras/test_group_algebras.sage:11: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_group_algebras.sage:18: TL08 OwnedCategoryOverBaseRing: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/algebras/test_group_algebras.sage:22: TL01 from sage_extensions.categories.modules.framed.framed_free_modules import ...: take every name from the session
+tests/algebras/test_group_algebras.sage:27: TL02 private attribute ._selected_relation_morphism
+tests/algebras/test_isometry_commutant.sage:23: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:24: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:25: TL01 from sage.matrix.special import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:26: TL01 from sage.modules.free_module_element import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:27: TL01 from sage.rings.infinity import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:28: TL01 from sage.rings.number_field.number_field import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:29: TL01 from sage.rings.polynomial.polynomial_ring_constructor import ...: take every name from the session
+... and 1464 more !
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=133
+[peakrss] peak tree RSS      : 4389 MiB
+[peakrss] low-water MemAvail : 3349 MiB
+[peakrss] peak single VmHWM  : 4400 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     4383 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=   258.2s procs=  5 rss=  4389 MiB hwm=  4400 MiB avail=  3438 MiB
+[peakrss]   t=   260.2s procs=  5 rss=  4389 MiB hwm=  4400 MiB avail=  3418 MiB
+[peakrss]   t=   262.2s procs=  5 rss=  4389 MiB hwm=  4400 MiB avail=  3349 MiB
+[peakrss]   t=   264.2s procs=  5 rss=  4389 MiB hwm=  4400 MiB avail=  3349 MiB
+[peakrss]   t=   248.2s procs=  5 rss=  4388 MiB hwm=  4399 MiB avail=  3438 MiB
+launcher exit: 1

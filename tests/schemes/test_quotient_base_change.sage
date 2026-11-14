@@ -1,6 +1,7 @@
 r"""Invariant maps factor through the quotient of the affine plane by the coordinate swap."""
 
 from sage_extensions.all import *
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_the_swap_invariant_map_x_plus_y_factors_through_the_quotient() -> None:

@@ -272,6 +272,119 @@ def _action_with_canonical_endomorphism_parent(base_ring, additive_group, action
     )
 
 
+def _regular_module_reading(value_module):
+    r"""Read the *restriction of a ring* stated as a value object through that ring's module.
+
+    The restricted-scalars view of a ring keeps the ring as its extension
+    (``test_restricted_scalars_action.sage`` states that contract), so a pairing can be
+    handed a value object whose elements are the ring's scalars rather than module
+    elements.  The form then reads its own Gram through the wrong element structure: on
+    the A2 lattice an integral Gram answers ``is_base_ring_valued()`` False, and the
+    numerical reading raises ``(0, 0) is not an element of {0,...,3}`` (#293,
+    lattice-database #9).  The module such a caller means is the ring's regular module,
+    restricted along the same map.
+
+    A bare ring is also read this way, through its *own* regular module.  A ring is
+    that module over itself, and its ``rho`` there has the ring as its domain, so a
+    pairing with values in a ring is linear over the whole ring.  Reading the ring
+    object instead left the scalar action over the ring's *base* -- its domain is
+    ``base_ring()``, ``ZZ`` for ``QQ`` -- so a rational scalar had no action at all
+    (#307).  What the readers want is the scalars, and the ring owner supplies them
+    through ``regular_module_isomorphism()``, so the value object is the module and
+    the identification is the ring's, not a second action written here.
+    """
+    if value_module in OwnedRings():
+        return value_module.regular_module()
+    if value_module in RestrictedScalarsModules(value_module.base_ring()):
+        extension = value_module.module_over_extension()
+        if extension in OwnedRings() and extension is not extension.regular_module():
+            return extension.regular_module().restrict_scalars(value_module.ring_map())
+    return value_module
+
+
+def _regular_module_scalar_identification(value_module):
+    r"""Return the ring isomorphism reading ``value_module``'s elements as scalars, or ``None``.
+
+    A value object that *is* its base ring's own regular module carries that ring as
+    its scalar ring, so its elements are the ring's scalars read through the ring
+    owner's ``regular_module_isomorphism()`` -- the exact additive construction
+    ``{}_R R -> R``, ``r e_0 |-> r``, not a coordinate projection and not a coercion
+    test.  Every other value object answers ``None`` and keeps its own reading: this
+    recognises a stated construction, so no scalar action is inferred from whether a
+    particular scalar happens to lie in some image.
+    """
+    ring = value_module.base_ring()
+    if ring not in OwnedRings():
+        return None
+    if value_module is not ring.regular_module():
+        return None
+    return ring.regular_module_isomorphism()
+
+
+def _scalar_value_identification(value_module, base_ring=None):
+    r"""Return the ring isomorphism reading ``value_module``'s elements as scalars, or ``None``.
+
+    Two stated constructions supply that reading, and both are the same datum: a
+    value object that *is* a ring's own regular module
+    (``_regular_module_scalar_identification``), and a restriction of scalars
+    whose extension is one -- the module structure such a restriction was formed
+    with already has the extension ring as its domain, so its
+    ``regular_module_identification`` reads the scalars rather than adding a
+    second action (#307).
+
+    ``base_ring`` is the ring the pairing is taken over, when the caller has it;
+    it defaults to the value object's own base ring.
+
+    A restriction of ``S^n`` for ``n > 1`` is genuinely ``S^n``-valued and
+    asserts when asked for a scalar reading; it answers ``None`` here rather than
+    projecting to one coordinate or pretending to be a scalar tensor.
+    """
+    identification = _regular_module_scalar_identification(value_module)
+    if identification is not None:
+        return identification
+    ring = value_module.base_ring() if base_ring is None else base_ring
+    if value_module in RestrictedScalarsModules(ring) or (
+        hasattr(value_module, "module_over_extension")
+        and value_module.base_ring() is ring
+    ):
+        try:
+            return value_module.regular_module_identification()
+        except AssertionError:
+            return None
+    return None
+
+
+def _canonical_scalar_structure_map(ring_map):
+    r"""Return the algebra's own structure morphism when ``ring_map`` states it.
+
+    ``restriction_of_scalars`` interns one functor per ring map, and ring maps that
+    agree pointwise are equal, so the first restriction along *any* copy of a scalar
+    structure answers every later restriction along that structure.  The module such
+    a functor builds identifies itself with its scalars through
+    ``regular_module_identification``, which asserts that its ``ring_map`` is
+    ``S.algebra_structure_morphism()``: interning along a copy therefore makes that
+    identification refuse the very module the algebra's structure asked for, and the
+    answer depends on which copy a session saw first.
+
+    Answering with the algebra's own map keeps the asserted identity true for every
+    consumer without weakening it.  A map that states anything else -- a different
+    source, a non-algebra codomain, or a value the structure morphism does not have --
+    is returned unchanged.
+    """
+    from sage_extensions.categories.algebras.algebras import Algebras
+
+    codomain = _owned_ring(ring_map.codomain())
+    if codomain not in OwnedRings().Commutative():
+        return ring_map
+    domain = _owned_ring(ring_map.domain())
+    if codomain not in Algebras(domain):
+        return ring_map
+    structure = codomain.algebra_structure_morphism()
+    if structure.domain() is not domain or structure.codomain() is not codomain:
+        return ring_map
+    return structure if ring_map == structure else ring_map
+
+
 class Modules(OwnedCategoryOverBaseRing):
     r"""Modules over a ring, on the owned additive and scalar spines."""
 
@@ -364,6 +477,21 @@ class Modules(OwnedCategoryOverBaseRing):
                 f"{datum} already determines its scalar action, so the separate scalar action {scalar_action} is not accepted"
             )
             return datum.construct(self)
+        from sage.rings.integer import Integer as SageInteger
+        from sage.structure.element import parent as _element_parent
+        from sage_extensions.categories.rings.ring_foundation import _owned_integers
+
+        integer_like = (
+            not isinstance(datum, bool)
+            and (
+                isinstance(datum, (int, SageInteger))
+                or _element_parent(datum) is _owned_integers()
+            )
+        )
+        if scalar_action is None and integer_like and int(datum) >= 0:
+            # ``Modules(R)(n)`` is the standard free module of rank ``n`` over
+            # ``R``, as ``Lattices(R)(n)`` is the standard lattice of that rank.
+            return self.base_ring().free_module(int(datum))
         if scalar_action is None:
             scalar_action = datum
             module = scalar_action.codomain().domain()
@@ -416,7 +544,10 @@ class Modules(OwnedCategoryOverBaseRing):
         Along the augmentation ``R[G] -> R`` this is the trivial action.
         One functor per ring map (the cache key is the ring map itself), so
         the forward image ``Res_f(M)`` of a module is one object, cached by
-        that functor.
+        that functor.  Two maps that agree pointwise are one map, so the functor
+        of any copy of a scalar structure is the functor of that structure; see
+        :func:`_canonical_scalar_structure_map` for why the copy is answered with
+        the algebra's own map.
         """
         from sage_extensions.categories.functors.group_actions import (
             _TrivialActionFunctor,
@@ -426,6 +557,7 @@ class Modules(OwnedCategoryOverBaseRing):
         )
 
         assert _owned_ring(ring_map.codomain()) is self.base_ring()
+        ring_map = _canonical_scalar_structure_map(ring_map)
         match ring_map:
             case _ if (
                 ring_map.is_group_algebra_augmentation()
@@ -501,6 +633,17 @@ class Modules(OwnedCategoryOverBaseRing):
         def FinitelyPresented(self):
             r"""Return this category with the axiom that its objects are finitely presented."""
             return self._with_axiom("FinitelyPresented")
+
+        def direct_sum_of_cyclics(self, orders):
+            r"""Return ``\bigoplus_i R/(a_i)``, the direct sum of the cyclic modules.
+
+            A direct sum of cyclic modules is a finitely presented torsion
+            module, and its diagonal presentation is stated once, by
+            ``Modules(R).FinitelyPresented().Torsion()``.  This accessor states
+            the same construction where a caller naming a module *by its orders*
+            asks for it, and delegates rather than restating the presentation.
+            """
+            return self.FinitelyPresented().Torsion().direct_sum_of_cyclics(orders)
 
         def Free(self):
             r"""Return this category with the axiom that its objects are free."""
@@ -710,6 +853,31 @@ class Modules(OwnedCategoryOverBaseRing):
             r"""Return $\prod_{i \in I} M_i$, created on underlying sets in general."""
             return self._categorical_product_construction(factors).object()
 
+        def _module_product_diagram_data(self, construction):
+            r"""Return ``(index_set, factor, index_object)`` for a module product.
+
+            A product's factors are read from its diagram.  The discrete diagram
+            of an enumerated family and the constant diagram of one repeated
+            factor present the same index set, and each factor is the diagram's
+            value at that index, so element assembly and projection have one
+            implementation for both.
+            """
+            diagram = construction.diagram()
+            match diagram.codomain() is self:
+                case True:
+                    pass
+                case False:
+                    raise ValueError(
+                        f"the product {construction.object()} is a limit in {diagram.codomain()}, not in {self}"
+                    )
+            index_category = diagram.domain()
+            index_set = index_category.object_set()
+
+            def index_object(index):
+                return index_category.object(index)
+
+            return index_set, lambda index: diagram(index_object(index)), index_object
+
         def product_element(self, construction, components):
             r"""Return the element of a selected module product with these components.
 
@@ -720,30 +888,25 @@ class Modules(OwnedCategoryOverBaseRing):
             operation at the module owner, not a representation choice for
             callers.
             """
-            diagram = construction.diagram()
-            match diagram.codomain() is self:
+            index_set, factor, index_object = self._module_product_diagram_data(
+                construction
+            )
+            match components.index_set() == index_set:
                 case True:
                     pass
                 case False:
                     raise ValueError(
-                        f"the product {construction.object()} is a limit in {diagram.codomain()}, not in {self}"
-                    )
-            factors = diagram.diagram_objects()
-            match components.index_set() == factors.index_set():
-                case True:
-                    pass
-                case False:
-                    raise ValueError(
-                        f"an element of the product of {factors} needs one component for each factor, "
-                        f"but the components are indexed by {components.index_set()}"
+                        f"an element of the product {construction.object()} needs one component for each "
+                        f"factor, but the components are indexed by {components.index_set()}, not by "
+                        f"{index_set}"
                     )
             product = construction.object()
             match product:
                 case _ if product in BiproductModules(self.base_ring()):
                     value = product.zero()
-                    for index in factors.index_set():
-                        value += product.injection(index)(
-                            factors.value(index)(components.value(index))
+                    for index in index_set:
+                        value += product.injection(index_object(index))(
+                            factor(index)(components.value(index))
                         )
                     return value
                 case _:
@@ -758,21 +921,14 @@ class Modules(OwnedCategoryOverBaseRing):
                     underlying = product.underlying_set()
                     return product(
                         underlying(
-                            lambda index: factors.value(index)(components.value(index))
+                            lambda index: factor(index)(components.value(index))
                         )
                     )
 
         def product_component(self, construction, element, index):
             r"""Project an element of a selected module product to one factor."""
-            diagram = construction.diagram()
-            match diagram.codomain() is self:
-                case True:
-                    pass
-                case False:
-                    raise ValueError(
-                        f"the product {construction.object()} is a limit in {diagram.codomain()}, not in {self}"
-                    )
-            return construction.structure_morphism(diagram.domain()(index))(element)
+            _, _, index_object = self._module_product_diagram_data(construction)
+            return construction.structure_morphism(index_object(index))(element)
 
         def equalizer_element(self, construction, ambient_element):
             r"""Lift an ambient element satisfying a selected equalizer relation."""
@@ -1536,6 +1692,17 @@ class Modules(OwnedCategoryOverBaseRing):
                 case _:
                     return self.parent().scalar_multiple(scalar, self)
 
+        def __truediv__(self, scalar):
+            r"""Return ``r^{-1} v``: division by a unit of the scalar ring.
+
+            ``v / r`` is the scalar action of the inverse of ``r`` in the
+            module's scalar ring, so an integer divides a vector of a
+            ``QQ``-module through its image in ``QQ``.  A scalar that is not a
+            unit there is refused by the ring's own unit division.
+            """
+            ring = self.parent().base_ring()
+            return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
+
     class ParentMethods:
         # The ring acting on this module: the datum this level introduces.
         _preamble_base_ring = None
@@ -1644,6 +1811,60 @@ class Modules(OwnedCategoryOverBaseRing):
             """
             return Modules(self.base_ring()).Aut(self)
 
+        def _an_element_(self):
+            r"""Return an element of this module, as Sage's parent protocol asks."""
+            return self.zero()
+
+        def construction(self):
+            r"""Return this module's Sage-style construction, or ``None``.
+
+            The owned presentation carries no factorisation into an engine
+            functor and an engine parent: its construction datum is the retained
+            scalar action and the selected framing, and raising an engine parent
+            here would expose one.  ``None`` is Sage's "no chosen construction",
+            so a pushout that asks for one finds no common factor instead of an
+            engine parent.
+            """
+            return None
+
+        def base(self):
+            r"""Return the base of this module: its scalar ring.
+
+            The host ``Parent`` base is unset for modules whose scalar ring is
+            constructor data (``_preamble_base_ring``), and Sage's coercion
+            machinery reads ``base()`` when it builds a scalar action.  An
+            unset base there makes it attempt a parent pushout instead of the
+            scalar action this module already declares.
+            """
+            base = super().base()
+            return self.base_ring() if base is None else base
+
+        def _get_action_(self, source, op, self_on_left):
+            r"""Return this module's scalar action: the module owner's adapter.
+
+            ``_ModuleScalarAction`` is the owned action adapter for ``r * m``,
+            and for ``m * r`` over a commutative ring; its ``_act_`` calls this
+            module's ``scalar_multiple``, so the arithmetic is the module's own.
+            Handing the coercion machinery a host ``ModuleAction`` instead
+            imposes that class's element-type checks on owned elements and its
+            base extension on owned rings.  Nothing is registered here: the
+            coercion machinery caches the answer to this question.
+            """
+            import operator
+
+            ring = self.base_ring()
+            if op is not operator.mul or source is not ring:
+                return super()._get_action_(source, op, self_on_left)
+            match self_on_left:
+                case True:
+                    match ring in OwnedRings().Commutative():
+                        case True:
+                            return _ModuleScalarAction(ring, self, False)
+                        case _:
+                            return None
+                case _:
+                    return _ModuleScalarAction(ring, self, True)
+
         def module_category(self):
             return Modules(self.base_ring())
 
@@ -1732,6 +1953,36 @@ class Modules(OwnedCategoryOverBaseRing):
         def framing_morphism(self):
             r"""Return the selected degree-zero augmentation."""
             return self.selected_module_resolution().augmentation()
+
+        def rational_coordinates(self, element):
+            r"""Return the exact rational coordinates of ``element`` in the selected framing.
+
+            ``element`` is an element of ``self`` over the fraction field of the base ring --
+            for a lattice, a vector of ``L tensor QQ`` -- and this returns its coordinates in
+            the basis ``module_generating_set()``, as a Sage column matrix over ``QQ``.
+
+            The coefficients are the lift of ``element`` through the selected degree-zero
+            augmentation, ``framing_morphism()``, which is an isomorphism from the free
+            module on the framing onto ``self``; they are therefore unique, and the expansion
+            is exact.  The entries are read off the owned ring through its own lowering
+            ``_engine_element`` and converted to the exact rational field, because the callers
+            of this map compare them with the integers: a vector of an integral framed module
+            has integer coordinates, and a vector of its dual lattings outside it has a
+            non-integer coordinate.  The public object of this module stays in the owned
+            modules; only this private crossing exposes the numbers, and it is the one place
+            that conversion is written.
+            """
+            from sage.all import QQ
+            from sage.matrix.constructor import matrix
+
+            from sage_extensions.categories.rings.ring_foundation import _engine_element
+
+            coordinates = tuple(self.framing_morphism().lift(self(element)))
+            scalars = [
+                QQ(_engine_element(coefficient.parent(), coefficient))
+                for coefficient in coordinates
+            ]
+            return matrix(QQ, len(scalars), 1, scalars)
 
         def framing_object(self):
             r"""Return the selected module augmentation as an arrow object."""
@@ -1856,11 +2107,17 @@ class Modules(OwnedCategoryOverBaseRing):
             r"""Return ``Hom_R(self \otimes_R self, W)``, with ``W`` an R-module.
 
             The Cat-owned Mor constructor, not a form-specific fallback,
-            checks that the tensor product and ``W`` are both R-modules.
+            checks that the tensor product and ``W`` are both R-modules.  A value
+            object that is the *restriction of a ring* is read through that ring's
+            regular module (``_regular_module_reading``): the values of a pairing
+            are module elements, and a form built on the ring's own scalar
+            structure reports an integral Gram as not base-ring valued (#293).  A
+            ring stated bare stays the value object, whose own action on itself is
+            multiplication, so the pairing is linear over the whole ring (#307).
             """
             from sage_extensions.categories.forms.forms import _bilinear_forms
 
-            return _bilinear_forms(self, value_module)
+            return _bilinear_forms(self, _regular_module_reading(value_module))
 
         def quadratic_forms(self, value_module):
             r"""Return quadratic forms ``self -> value_module`` through ``Gamma^2(self)``."""
@@ -2321,7 +2578,28 @@ class Modules(OwnedCategoryOverBaseRing):
             return NotImplemented
 
         def _selected_relation_morphism(self):
-            return None
+            r"""Return the relation morphism ``F_1 -> F_0`` of the selected presentation, or ``None``.
+
+            Read from the retained selected presentation, not from this owner's
+            position in a joined parent's method order.  A module that carries a
+            chosen finite presentation states its relations through
+            :meth:`presentation` — the zero morphism from the empty free module
+            when its framing is a basis — and every other module states none.
+            Answering a static ``None`` here shadowed the specific owners
+            whenever a joined parent resolved this name before theirs (measured:
+            ``QQ[x]/(x)``, whose MRO puts ``Modules`` ahead of the framed-free
+            facet), so the protected contract reported "relations unknown" for an
+            object that had stated them.
+            """
+            if self not in ModulesWithChosenFinitePresentation(self.base_ring()):
+                return None
+            try:
+                return self.presentation()
+            except TypeError:
+                # A resolution truncated in degree zero states generators without
+                # a relation morphism; that is "not known explicitly", not a
+                # second representation of one.
+                return None
 
         def _selected_module_coefficients(self, element):
             r"""Read the coefficients of the chosen preimage of ``element`` under the framing.
@@ -2616,12 +2894,22 @@ class Modules(OwnedCategoryOverBaseRing):
                 source._element_of_unformed_module(element)
             )
 
+        @cached_method(
+            name="_scalar_action_from_module_multiplication",
+            key=lambda self, endomorphisms, additive_group, scalar_multiple: (
+                id(endomorphisms), id(additive_group), scalar_multiple
+            ),
+        )
         def _ring_morphism_defining_module_action(
-            self, endomorphisms, additive_group, scalar_multiple=None
+            self, endomorphisms, additive_group, scalar_multiple
         ):
             r"""Return ``rho_M : R -> End_Ab(U(M))``, ``r |-> (m |-> r m)``, from the scalar multiplication.
 
             A module whose datum is ``rho`` itself states it at its own level.
+            Reuse this construction only for the literal current endpoints
+            and the same supplied multiplication. Category refinement can
+            replace an endomorphism parent, and native module installation
+            can supply a different selected coefficient action.
             """
             ring = self.base_ring()
             assert (
@@ -2631,9 +2919,6 @@ class Modules(OwnedCategoryOverBaseRing):
                 f"the scalar action of {self} can only be represented in "
                 f"End({additive_group}), not {endomorphisms}"
             )
-            if scalar_multiple is None:
-                scalar_multiple = self._owned_scalar_multiple
-
             return ring.Mor(endomorphisms, category=OwnedRings())(
                 lambda scalar: endomorphisms.elementwise(
                     lambda element: scalar_multiple(scalar, element),
@@ -2673,7 +2958,7 @@ class Modules(OwnedCategoryOverBaseRing):
                 self,
                 endomorphisms,
                 additive_group,
-                None if native is None else native.scalar_multiple,
+                self._owned_scalar_multiple if native is None else native.scalar_multiple,
             )
 
         def annihilator(self):
@@ -2728,6 +3013,66 @@ class Modules(OwnedCategoryOverBaseRing):
             underlying = self._underlying_additive_element(element)
             return self(self.scalar_action()(self.base_ring()(scalar))(underlying))
 
+        @cached_method
+        def _dual_product_construction(self):
+            r"""Return the product ``prod_S R`` that is ``Hom_R(R^(S), R)``, or ``None``.
+
+            For an infinite chosen basis ``S`` the algebraic dual of ``R^(S)`` is
+            the product of one copy of ``R`` for each basis label, given by its
+            projections and its universal property; it has no basis, so it is
+            retained as that construction rather than as a free module on the
+            labels.  A finite basis needs no product: there the dual is the
+            free module of the same rank.
+            """
+            if not self.has_selected_module_resolution():
+                return None
+            ring = self.base_ring()
+            if ring not in OwnedRings().Commutative():
+                return None
+            labels = self.module_generating_set()
+            if labels.cardinality().is_finite():
+                return None
+            from sage_extensions.categories.sets.indexed_families import (
+                IndexedFamily,
+            )
+
+            factors = IndexedFamily(labels, ring.regular_module())
+            return Modules(ring)._categorical_product_construction(factors)
+
+        def dual_evaluation(self, functional, vector):
+            r"""Return the pairing ``M^* x M -> R`` evaluated at ``vector``.
+
+            A vector is a finitely supported function on the chosen basis
+            labels, so its value under the functional is the finite sum of its
+            coefficients against the functional's projections.  No basis of the
+            dual is chosen: for an infinite basis the dual is the product, whose
+            projections are its defining data.
+            """
+            ring = self.base_ring()
+            construction = self._dual_product_construction()
+            if construction is None:
+                raise TypeError(
+                    f"cannot evaluate {functional} at {vector}: the algebraic dual of {self} is not a "
+                    f"product (its chosen basis is finite or it has none)"
+                )
+            to_ring = ring.regular_module_isomorphism()
+            coordinates = self.framing_morphism().lift(self(vector))
+            coefficients = coordinates.parent()._selected_module_coefficients(
+                coordinates
+            )
+            return sum(
+                (
+                    ring(coefficient)
+                    * to_ring(
+                        Modules(ring).product_component(
+                            construction, functional, label
+                        )
+                    )
+                    for label, coefficient in coefficients.items()
+                ),
+                ring.zero(),
+            )
+
         def dual_module(self):
             r"""Return the linear dual ``Hom_R(M, R)`` over a commutative ring.
 
@@ -2744,7 +3089,12 @@ class Modules(OwnedCategoryOverBaseRing):
                     f"the dual module Hom_R({self}, R) is a left module only over a commutative ring, "
                     f"and R = {ring} is not known to be commutative"
                 )
-            return self.module_category().Mor(self, ring.regular_module())
+            construction = self._dual_product_construction()
+            match construction:
+                case None:
+                    return self.module_category().Mor(self, ring.regular_module())
+                case _:
+                    return construction.object()
 
         @cached_method
         def projectivization(self):
@@ -3093,7 +3443,19 @@ class Modules(OwnedCategoryOverBaseRing):
                     )
 
                 def __iter__(self):
-                    return iter(self.elements())
+                    r"""Yield finite Smith residues through Sage FGP_Module_class.__iter__."""
+                    assert _engine_ring(self.base_ring()) is SageZZ, (
+                        f"the torsion module {self} is enumerated only over ZZ"
+                    )
+                    if self.is_zero():
+                        yield self.zero()
+                        return
+                    engine = self._smith_engine()
+                    assert engine is not None, (
+                        f"the Smith normal form of the finite torsion module {self} is unavailable"
+                    )
+                    for residue in engine:
+                        yield self._from_smith_engine_element(residue)
 
             def direct_sum_of_cyclics(self, orders):
                 r"""Return ``\bigoplus_i R/(a_i)`` for the selected nonzero scalars.
@@ -4638,7 +5000,15 @@ def _fix_selected_module_resolution(
             lambda label: module(generator_function(label))
         )
         augmentation = _framing_morphism(module, source, generator_morphism)
-        match source is module, labels.cardinality().is_finite():
+        size = labels.cardinality()
+        # The constant presentation is the degree-zero resolution of a module
+        # generated by its own finitely many generators; a framing whose
+        # cardinality is an unevaluated sum over an infinite index set states no
+        # finite generating set, so it takes the general degree-zero resolution.
+        match (
+            source is module,
+            size.expression().is_normal_form() and size.is_finite(),
+        ):
             case (True, True):
                 return (
                     ordinary_modules.FinitelyPresented()
@@ -4853,7 +5223,39 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
 
         def is_zero(self) -> bool:
             r"""Return whether the unchanged underlying additive group is zero."""
-            return self.module_over_extension().is_zero()
+            extension = self.module_over_extension()
+            if extension in OwnedRings() and self.ring_map().codomain() is extension:
+                # The reading is the ring along a map that ends at it: its
+                # additive group is the ring's, which is zero exactly when the
+                # ring is the zero ring, i.e. when its unit is its zero.  An
+                # undecided equality states no zero predicate rather than
+                # answering one.
+                match extension.one() == extension.zero():
+                    case True:
+                        return True
+                    case False:
+                        return False
+                    case _:
+                        return NotImplemented
+            return extension.is_zero()
+
+        def _module_with_structure(self, categories, construction_data):
+            r"""Retain this restriction of scalars and add ``categories`` to it.
+
+            The reading is defined by its pair ``(module_over_extension,
+            ring_map)``, not by its presentation: rebuilding it from the
+            presentation would give a different realization whose elements are
+            coordinates rather than the extension's elements.  So the
+            constructor that made this reading is the one that adds the
+            stronger structure, keeping the retained scalar basis and
+            presentation.
+            """
+            return _restricted_scalars_view(
+                self.module_over_extension(),
+                self.ring_map(),
+                _extra_categories=tuple(categories),
+                _extra_construction_data=construction_data,
+            )
 
         def _finiteness_decision(self):
             r"""``Res_f(M)`` is the set of ``M``, so it is finite exactly when ``M`` is."""
@@ -4946,7 +5348,30 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
             extension = self.module_over_extension()
             return extension._underlying_additive_element(element.underlying_element())
 
+        def _element_from_underlying_set(self, value):
+            r"""Read a datum of the extension's underlying set as this reading's element.
+
+            Restriction of scalars keeps the underlying set — ``|Res_f(M)| =
+            |M|`` — so the datum is read in the extension module and wrapped
+            here.  There are no coordinates and no coefficient computation on
+            this path, which is what makes the reading's elements the
+            extension's elements.
+            """
+            return self.wrap(self.module_over_extension()(value))
+
         @cached_method
+        def scalar_action(self):
+            r"""Return ``rho_M = rho_S compose f``: the restricted scalars' own action.
+
+            The generic module action would rebuild ``rho`` from this module's
+            coordinates over its base ring; here the defining datum is the
+            retained scalar map together with the extension module's action, and
+            the elements are the extension's elements.  Reusing those keeps the
+            extension's arithmetic (a field's, for ``Res_{ZZ -> QQ}(QQ)``) rather
+            than re-deriving it from ``ZZ``-coordinates.
+            """
+            return self._ring_morphism_defining_module_action()
+
         def _ring_morphism_defining_module_action(self):
             r"""Return ``rho_M compose f`` with this module's exact endomorphism parent.
 
@@ -4966,10 +5391,34 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
                 .End(self.underlying_additive_group())
             )
             ring_map = self.ring_map()
+            extension_module = self.module_over_extension()
+            if (
+                extension_module in OwnedRings()
+                and ring_map.codomain() is extension_module
+            ):
+                # The regular reading: the module *is* the extension ring, so the
+                # coefficient ring acts by multiplication by the class the scalar
+                # maps to — not by the extension's own action, which is that
+                # ring's action by its base ring (a different ring here).
+                return ring.Mor(endomorphisms, category=OwnedRings())(
+                    lambda scalar: endomorphisms.elementwise(
+                        lambda element: extension_module(
+                            ring_map(scalar) * element
+                        )
+                    ),
+                )
+            if extension_action.domain() is ring:
+                # The extension's own action already acts by this base ring, on
+                # this same underlying additive group: the restricted action *is*
+                # that action.  Nothing is rebuilt from coordinates, so the
+                # extension's arithmetic (a field's, here) is the arithmetic of
+                # the restricted module.
+                return extension_action
+            # Otherwise the extension is a module over a different ring and the
+            # action is its action at the image of the scalar, re-expressed in
+            # this module's exact endomorphism parent.
             return ring.Mor(endomorphisms, category=OwnedRings())(
-                lambda scalar: endomorphisms.elementwise(
-                    lambda element: extension_action(ring_map(scalar))(element)
-                ),
+                lambda scalar: endomorphisms(extension_action(ring_map(scalar))),
             )
 
         def scalar_multiple(self, scalar, element):
@@ -5021,10 +5470,20 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
             extension_module = self.module_over_extension()
             scalar = self._scalar_basis.image(label.component(0))
             module_generator = extension_module.module_generator(label.component(1))
-            return self.element_class(
-                self,
-                extension_module.scalar_multiple(scalar, module_generator),
-            )
+            if (
+                extension_module in OwnedRings()
+                and self._ring_map.codomain() is extension_module
+            ):
+                # The regular reading: the module is the extension ring itself,
+                # so the action of ``S`` on it is the ring's multiplication.
+                # ``scalar_multiple`` would be the action of ``S``'s *coefficient*
+                # ring on the ring read as a module over it, which is a different
+                # one (``A.scalar_multiple`` over ``P`` here), and it hands a
+                # class to a polynomial constructor.
+                product = extension_module(scalar * module_generator)
+            else:
+                product = extension_module.scalar_multiple(scalar, module_generator)
+            return self.element_class(self, product)
 
         def _selected_module_coefficients(self, element):
             r"""``m = sum_j t_j m_j`` and ``t_j = sum_i c_ij s_i`` give ``m = sum_ij c_ij s_i m_j``."""
@@ -5042,12 +5501,18 @@ class RestrictedScalarsModules(OwnedCategoryOverBaseRing):
                 .lift(element.underlying_element())
             )
             framing = self.module_generating_set()
+            extension_ring = self._ring_map.codomain()
             coefficients = {}
             for module_label, coefficient in (
                 module_coordinates.parent()
                 ._selected_module_coefficients(module_coordinates)
                 .items()
             ):
+                # The frame of the extension is stated over *its* base ring, while
+                # the scalar basis is stated over the extension ring itself; for
+                # the regular reading these differ, and the coefficient is the
+                # class the base coefficient defines.
+                coefficient = extension_ring(coefficient)
                 scalar_coordinates = self._scalar_basis.coordinates(coefficient)
                 for scalar_label, value in scalar_coordinates.items():
                     coefficients[framing((scalar_label, module_label))] = (
@@ -5147,7 +5612,7 @@ def _restricted_scalar_framing_labels(module, scalar_basis):
     )
 
 
-def _restricted_scalar_presentation(module, ring_map, labels, scalar_basis):
+def _restricted_scalar_presentation(module, ring_map, labels, scalar_basis, relations=None):
     r"""Return the relation morphism of ``Res_f(M)`` induced by the one of ``M``.
 
     Suppose ``Res_f(S)`` is finite free over ``R`` on ``(s_i)`` and ``M`` is
@@ -5164,11 +5629,12 @@ def _restricted_scalar_presentation(module, ring_map, labels, scalar_basis):
     ring = _owned_ring(ring_map.domain())
     extension_ring = _owned_ring(module.base_ring())
     scalar_labels = scalar_basis.source().module_generating_set()
-    relations = module._selected_relation_morphism()
-    assert relations is not None, (
-        f"the restriction of scalars of {module} needs the relations of its finite presentation, "
-        f"but {module} has none"
-    )
+    if relations is None:
+        relations = module._selected_relation_morphism()
+        assert relations is not None, (
+            f"the restriction of scalars of {module} needs the relations of its finite presentation, "
+            f"but {module} has none"
+        )
     generators = ring._fresh_free_module_on(labels)
 
     def restricted_relation(relation_label, scalar_label):
@@ -5221,6 +5687,8 @@ def _restricted_scalars_view(
     _subobject_generator_images=None,
     _subobject_lift=None,
     _subobject_inclusion_factory=None,
+    _extra_categories=(),
+    _extra_construction_data=None,
 ):
     r"""Return ``Res_f(M)`` along ``f: R -> S``, placed by what ``M`` and ``S`` already are.
 
@@ -5234,12 +5702,38 @@ def _restricted_scalars_view(
     Along a field-to-field map with a selected finite scalar basis, an
     already represented dimension is multiplied by that basis cardinality.
     This dimension transport does not require or create a finite frame of M.
+
+    ``_extra_categories`` and ``_extra_construction_data`` are what a stronger
+    object on this exact data adds — an algebra structure, for instance — so
+    that the reading keeps its own realization instead of being rebuilt from
+    its presentation.  ``_module_with_structure`` is the caller.
     """
     extension_ring = _owned_ring(module.base_ring())
-    assert _owned_ring(ring_map.codomain()) is extension_ring, (
-        f"{module} cannot be restricted along {ring_map}: the ring morphism must end at the scalar ring "
-        f"{extension_ring} of the module, but its codomain is {ring_map.codomain()}"
+    selected_basis = (
+        module._module_basis_along(ring_map) if module in OwnedRings() else None
     )
+    if _owned_ring(ring_map.codomain()) is not extension_ring:
+        # A ring read as a module over ``R`` along its own structure map has
+        # that ring as its extension: ``Res_f(S)`` where ``f`` is the
+        # structure morphism of the ``R``-algebra ``S`` is ``S`` over ``R``.
+        # A ring that instead selects a finite basis of itself along ``f``
+        # (``_module_basis_along``) is read along exactly that basis too: the
+        # coefficient composite ``R -> P -> R[x]/I`` is such a map, and the
+        # basis it selects is the one the ring states, not one supplied here.
+        assert (
+            module in OwnedRings()
+            and _owned_ring(ring_map.codomain()) is module
+            and (
+                ring_map is module.algebra_structure_morphism()
+                or selected_basis is not None
+            )
+        ), (
+            f"{module} cannot be restricted along {ring_map}: the ring morphism must end at the scalar "
+            f"ring {extension_ring} of the module, or the module must be a ring restricted along its "
+            f"own structure morphism or along a map it selects a basis for, but its codomain is "
+            f"{ring_map.codomain()}"
+        )
+        extension_ring = _owned_ring(module)
     from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import (
         _SelectedFinitePresentationModules,
     )
@@ -5261,7 +5755,16 @@ def _restricted_scalars_view(
         placement.append(VectorSpaces(base_ring))
     data = {"module_over_extension": module, "ring_map": ring_map}
 
-    finitely_framed = (
+    # The reading is the pair (module, ring_map), so a ring read as a module
+    # along a map that ends at it is framed whenever that reading supplies a
+    # basis — here the coefficient composite, whose basis is the retained power
+    # basis.  Asking the ring's own projectivity/placement question instead would
+    # ask it about a different reading: `Modules(self.base_ring())` is the
+    # ring's reading over its cover, not this one.
+    ring_as_module_reading = (
+        module in OwnedRings() and _owned_ring(ring_map.codomain()) is module
+    )
+    finitely_framed = ring_as_module_reading or (
         module.has_selected_module_resolution()
         and module in Modules(extension_ring).FinitelyGenerated()
     )
@@ -5271,15 +5774,31 @@ def _restricted_scalars_view(
         and ring_map.codomain() is extension_ring
     )
     scalar_basis = (
-        extension_ring._module_basis_along(ring_map)
-        if finitely_framed or field_tower
-        else None
+        selected_basis
+        if selected_basis is not None
+        else (
+            extension_ring._module_basis_along(ring_map)
+            if finitely_framed or field_tower
+            else None
+        )
     )
     finite_scalar_basis = (
         scalar_basis is not None
         and scalar_basis.source() in FinitelyGeneratedFreeModules(base_ring)
     )
     framed_over_finite_free_scalars = finitely_framed and finite_scalar_basis
+    regular_relations = None
+    if ring_as_module_reading and framed_over_finite_free_scalars:
+        # The reading is the ring taken along a map into itself, so the module it
+        # reads is the ring over its own regular module: cyclic on the class of
+        # the unit, with no relations.  That is a fact of this reading, not an
+        # inference from the ring's codomain, and the scalar basis above is what
+        # states that the reading is finite over the coefficient ring.
+        relation_source = module.free_module(0)
+        relation_target = module.free_module(1)
+        regular_relations = relation_source.module_category().Mor(
+            relation_source, relation_target
+        )({})
     restriction_data = None
     if not framed_over_finite_free_scalars:
         restriction_data = module._scalar_restriction_data(ring_map)
@@ -5296,13 +5815,17 @@ def _restricted_scalars_view(
     match module:
         case _ if (
             framed_over_finite_free_scalars
-            and module in ModulesWithChosenFinitePresentation(extension_ring)
+            and (
+                module in ModulesWithChosenFinitePresentation(extension_ring)
+                or regular_relations is not None
+            )
         ):
             presentation = _restricted_scalar_presentation(
                 module,
                 ring_map,
                 _restricted_scalar_framing_labels(module, scalar_basis),
                 scalar_basis,
+                relations=regular_relations,
             )
             placement.append(_SelectedFinitePresentationModules(base_ring))
             data.update(
@@ -5334,6 +5857,14 @@ def _restricted_scalars_view(
             subobject_lift=_subobject_lift,
             subobject_inclusion_factory=_subobject_inclusion_factory,
         )
+
+    # A stronger object on this reading's data (``_module_with_structure``)
+    # states its own categories and datum; the realization above stays the
+    # one this constructor selected, so the reading is never rebuilt from its
+    # presentation and loses the restriction that defines it.
+    placement.extend(_extra_categories)
+    if _extra_construction_data is not None:
+        data.update(_extra_construction_data)
 
     from sage_extensions.owned_category import _object_of, owned_category_join
 
@@ -7175,10 +7706,11 @@ def _represented_real_rref(coefficients, column_count, ring):
 def _engine_matrix(morphism):
     r"""Privately materialize the selected framed realization in one engine call.
 
-    Column ``s`` is the coordinate vector of the image of ``e_s``, read once
-    in row-label order; the rows of the engine matrix are read off those
-    columns, so no entry is looked up by its pair of labels.
+    Column ``s`` is the coordinate vector of the image of ``e_s``. The
+    selected framings and generator images are fixed construction data.
+    Retain their immutable matrix; each caller receives its own mutable copy.
     """
+    from copy import copy
     from sage.matrix.constructor import matrix as sage_matrix
 
     morphism = morphism._framed_coordinate_morphism()
@@ -7188,12 +7720,19 @@ def _engine_matrix(morphism):
             f"{morphism} has no matrix: it is a map in {parent}, which is not a space of matrices over "
             f"{parent.base_ring()}"
         )
+    if morphism._engine_matrix_cache is not None:
+        return copy(morphism._engine_matrix_cache)
     ring = parent.base_ring()
-    columns = tuple(
-        tuple(morphism._matrix_column_coordinates(column_label))
+    row_labels = tuple(parent.row_index_set())
+    coordinate_columns = tuple(
+        morphism._matrix_column_coordinates(column_label)
         for column_label in parent.column_index_set()
     )
-    return sage_matrix(
+    columns = tuple(
+        tuple(column(row_label) for row_label in row_labels)
+        for column in coordinate_columns
+    )
+    backend = sage_matrix(
         _linear_algebra_ring(ring),
         parent.nrows(),
         parent.ncols(),
@@ -7203,19 +7742,40 @@ def _engine_matrix(morphism):
             for entry in row
         ],
     )
+    backend.set_immutable()
+    morphism._engine_matrix_cache = backend
+    return copy(backend)
 
 
 def _morphism_from_engine_matrix(mor, backend):
-    r"""Raise one engine matrix into the matrix Mor ``mor``.
+    r"""Raise a selected engine matrix into its actual framed module Mor.
 
-    The raising companion of :func:`_engine_matrix`: entry ``(t, s)`` of
-    ``backend`` is the coefficient of ``e_t`` in the image of ``e_s``.
+    Entry ``(t,s)`` is the coefficient of ``e_t`` in the image of ``e_s``.
+    Retain an immutable snapshot and raise basis images when they are used.
     """
+    from copy import copy
+
     mor = _require_matrix_mor(mor)
     ring = mor.base_ring()
-    return mor.from_rows(
-        (_owned_engine_element(ring, entry) for entry in row) for row in backend.rows()
-    )
+    if backend.nrows() != mor.nrows() or backend.ncols() != mor.ncols():
+        raise ValueError(f"the matrix has shape {backend.dimensions()}, not {mor.matrix_shape()}")
+    snapshot = copy(backend.change_ring(_linear_algebra_ring(ring)))
+    snapshot.set_immutable()
+    row_labels = tuple(mor.row_index_set())
+    column_positions = {label: position for position, label in enumerate(mor.column_index_set())}
+
+    def image(label):
+        column = snapshot.column(column_positions[label])
+        return mor.codomain().linear_combination({
+            row_label: _owned_engine_element(ring, coefficient)
+            for row_label, coefficient in zip(row_labels, column, strict=True)
+        })
+
+    # Construct from the framed matrix datum and check its module relations.
+    morphism = mor.element_class(mor, image)
+    morphism.validate_linearity()
+    morphism._engine_matrix_cache = snapshot
+    return morphism
 
 
 def _matrix_unit(mor, label):
@@ -7235,17 +7795,45 @@ def _matrix_unit(mor, label):
     )
 
 
-def _matrix_coefficients(mor, morphism):
+def _matrix_functional(mor, label):
+    r"""The single-row matrix unit ``e_label^*`` of the linear dual ``Hom_R(M,R)``.
 
+    ``mor`` is ``Hom_R(M, R.regular_module())`` with its selected resolution
+    indexed by the basis labels of ``M``.  The functional sends the basis
+    vector at ``label`` to the regular module's unit and every other basis
+    vector to zero, so it is the coordinate functional ``e_label^*``.
+    """
+    label = mor.module_generating_set()(label)
+    unit = next(iter(mor.codomain().module_generating_set()))
+    return mor(
+        {
+            source_label: (
+                mor.codomain().module_generator(unit)
+                if source_label == label
+                else mor.codomain().zero()
+            )
+            for source_label in mor.column_index_set()
+        }
+    )
+
+
+def _matrix_coefficients(mor, morphism):
     morphism = mor(morphism)
     labels = mor.module_generating_set()
+    # ``Hom_R(M,R)`` has one row, so its coefficients are indexed by the
+    # domain's labels: the entry at ``s`` is ``e_s^*(f) = f(e_s)``, read in the
+    # regular module's unit coordinate.  A map between free modules of any rank
+    # is indexed by the matrix units ``T x S`` instead.
+    dual = mor.codomain() is mor.base_ring().regular_module()
     coefficients = {}
     for column_label in mor.column_index_set():
         column = morphism._matrix_column_coordinates(column_label)
         for row_label, coefficient in (
             column.parent()._selected_module_coefficients(column).items()
         ):
-            coefficients[labels((row_label, column_label))] = coefficient
+            coefficients[
+                labels(column_label) if dual else labels((row_label, column_label))
+            ] = coefficient
     return coefficients
 
 
@@ -7271,16 +7859,19 @@ def _coordinate_framed_free_module(module, ring) -> bool:
 
     Freeness of the underlying module does not say that an arbitrary chosen
     generating family is a basis.  ``FramedFreeModules`` supplies that stronger
-    datum; finite cardinality supplies the finite matrix calculation.
+    datum; finite cardinality supplies the finite matrix calculation.  A
+    framing whose cardinality is an unevaluated sum over an infinite index set
+    has supplied no finite basis, so it answers ``False`` here rather than
+    asking a decision procedure for a question its cardinality does not settle.
     """
     from sage_extensions.categories.modules.framed.framed_free_modules import (
         FramedFreeModules,
     )
 
-    return (
-        module in FramedFreeModules(ring)
-        and module.module_generating_set().cardinality().is_finite()
-    )
+    if module not in FramedFreeModules(ring):
+        return False
+    size = module.module_generating_set().cardinality()
+    return size.expression().is_normal_form() and size.is_finite()
 
 
 def _coordinate_images(morphism):

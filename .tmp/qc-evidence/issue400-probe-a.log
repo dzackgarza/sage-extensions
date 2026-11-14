@@ -1,0 +1,59 @@
+[02:47:37] importing
+[02:47:40] imported in 2.6 s
+[02:48:06] subgroup built in 28.7 s
+[02:50:14] controlling vector: (7, -17, -34, -51, -68, -85, -60, 21, 4, 4)
+[02:50:14] q(v0) = -4
+[02:50:14] |W| = 2, (v0,w) values: [-2, 0]
+[02:50:14]   W rep: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+[02:50:14]   W rep: (4, -8, -17, -25, -34, -42, -30, 11, 2, 2)
+[02:50:14] constructed; En 2, root_lengths [1, 2, 4]
+[02:50:44] FundCone in 29.4 s: 8 roots
+[02:50:44]   root (-2, 5, 10, 15, 20, 25, 18, -6, 0, -2) sq=4 b(v0)=0
+[02:50:44]   root (0, -1, 0, 0, 0, 0, 0, 0, 0, 0) sq=4 b(v0)=0
+[02:50:44]   root (0, 0, -1, 0, 0, 0, 0, 0, 0, 0) sq=4 b(v0)=0
+[02:50:44]   root (0, 0, 0, -1, 0, 0, 0, 0, 0, 0) sq=4 b(v0)=0
+[02:50:44]   root (0, 0, 0, 0, -1, 0, 0, 0, 0, 0) sq=4 b(v0)=0
+[02:50:44]   root (0, 0, 0, 0, 0, -1, 0, 0, 0, 0) sq=4 b(v0)=0
+[02:50:44]   root (0, 0, 0, 0, 0, 0, -1, 0, 0, 0) sq=4 b(v0)=0
+[02:50:44]   root (0, 0, 0, 0, 0, 0, 0, 0, -1, 1) sq=2 b(v0)=0
+[02:50:44] distance-zero normals: 8 of rank 9
+[02:50:44] Gram of normals: rank 8, det 256
+[02:50:44] det M1: 256
+[02:50:44] off-diagonal entries of G: min -2, max 0
+[02:50:44] lineality kernel rank: 1
+[02:50:44] lineality m: (1, -1, -2, -3, -4, -5, -4, 1, 0, 0) q(m)=4 content 1
+[02:50:44] frame gram det: 1024 (det M1 256)
+[02:50:44] b(m, w_i) values: [0, 0, 0, 0, 0, 0, 0, 0]
+[02:50:44] b(m, v0) = 0
+[02:50:44] W rep (0, 0, 0, 0, 0, 0, 0, 0, 0, 0): x=[0, 0, 0, 0, 0, 0, 0, 0] alpha=0 gamma=0
+[02:50:44]    beta=[0, 0, 0, 0, 0, 0, 0, 0] center(G^-1 beta)=[0, 0, 0, 0, 0, 0, 0, 0]
+[02:50:44] W rep (4, -8, -17, -25, -34, -42, -30, 11, 2, 2): x=[0, -1, -1, -2, -2, -3, -2, 0] alpha=1/2 gamma=1/2
+[02:50:44]    beta=[4, -2, 2, -2, 2, -4, -2, 0] center(G^-1 beta)=[0, -1, -1, -2, -2, -3, -2, 0]
+[02:50:44] === first layers in the engine's height order (whole-lattice qsolve) ===
+[02:50:44] layer 1: a=(4, -8, -17, -25, -34, -42, -30, 11, 2, 2) k=4 height=1.0000 solutions=1060 in-cone=5 whole-lattice=0.53 s
+[02:50:44] layer 2: a=(4, -8, -17, -25, -34, -42, -30, 11, 2, 2) k=2 height=1.4142 solutions=42 in-cone=2 whole-lattice=0.15 s
+[02:50:44] layer 3: a=(4, -8, -17, -25, -34, -42, -30, 11, 2, 2) k=1 height=2.0000 solutions=0 in-cone=0 whole-lattice=0.05 s
+[02:50:47] layer 4: a=(7, -17, -34, -51, -68, -85, -60, 21, 4, 4) k=4 height=2.0000 solutions=5647 in-cone=8 whole-lattice=2.40 s
+[02:50:48] layer 5: a=(7, -17, -34, -51, -68, -85, -60, 21, 4, 4) k=2 height=2.8284 solutions=690 in-cone=4 whole-lattice=0.91 s
+[02:50:58] layer 6: a=(11, -25, -51, -76, -102, -127, -90, 32, 6, 6) k=4 height=3.0000 solutions=31092 in-cone=12 whole-lattice=9.00 s
+[02:50:58] layer 7: a=(7, -17, -34, -51, -68, -85, -60, 21, 4, 4) k=1 height=4.0000 solutions=0 in-cone=0 whole-lattice=0.64 s
+[02:51:41] layer 8: a=(14, -34, -68, -102, -136, -170, -120, 42, 8, 8) k=4 height=4.0000 solutions=143716 in-cone=22 whole-lattice=38.76 s
+[02:51:47] layer 9: a=(11, -25, -51, -76, -102, -127, -90, 32, 6, 6) k=2 height=4.2426 solutions=5954 in-cone=7 whole-lattice=5.80 s
+[02:53:53] layer 10: a=(18, -42, -85, -127, -170, -212, -150, 53, 10, 10) k=4 height=5.0000 solutions=500666 in-cone=33 whole-lattice=113.58 s
+[02:54:15] layer 11: a=(14, -34, -68, -102, -136, -170, -120, 42, 8, 8) k=2 height=5.6569 solutions=33767 in-cone=11 whole-lattice=21.00 s
+[02:54:19] layer 12: a=(11, -25, -51, -76, -102, -127, -90, 32, 6, 6) k=1 height=6.0000 solutions=0 in-cone=0 whole-lattice=3.43 s
+[03:00:29] layer 13: a=(21, -51, -102, -153, -204, -255, -180, 63, 12, 12) k=4 height=6.0000 solutions=1609482 in-cone=46 whole-lattice=332.67 s
+[peakrss] issue400: child waited=124 shell_code=124 samples=600
+[peakrss] peak tree RSS      : 1996 MiB
+[peakrss] low-water MemAvail : 3785 MiB
+[peakrss] peak single VmHWM  : 2002 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1991 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  1183.3s procs=  3 rss=  1996 MiB hwm=  2002 MiB avail=  5368 MiB
+[peakrss]   t=  1185.3s procs=  3 rss=  1996 MiB hwm=  2002 MiB avail=  5347 MiB
+[peakrss]   t=  1187.3s procs=  3 rss=  1996 MiB hwm=  2002 MiB avail=  5288 MiB
+[peakrss]   t=  1189.3s procs=  3 rss=  1996 MiB hwm=  2002 MiB avail=  5160 MiB
+[peakrss]   t=  1191.3s procs=  3 rss=  1996 MiB hwm=  2002 MiB avail=  5106 MiB
+launcher exit: 124

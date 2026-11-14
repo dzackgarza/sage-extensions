@@ -1,0 +1,64 @@
+[11:21:37 +    0.0s] building the subgroup and the reduction image
+[11:22:00 +   23.1s] the Gram matrix of Integral lattice of rank 12 and signature (2, 10) in coordinate order, from its own pairing
+[11:22:00 +   23.1s]   [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[11:22:00 +   23.1s]   [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[11:22:00 +   23.1s]   [0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0]
+[11:22:00 +   23.1s]   [0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[11:22:00 +   23.1s]   [0, 0, 0, 0, -4, 0, 2, 0, 0, 0, 0, 0]
+[11:22:00 +   23.1s]   [0, 0, 0, 0, 0, -4, 0, 2, 0, 0, 0, 0]
+[11:22:00 +   23.1s]   [0, 0, 0, 0, 2, 0, -4, 2, 0, 0, 0, 0]
+[11:22:00 +   23.1s]   [0, 0, 0, 0, 0, 2, 2, -4, 2, 0, 0, 0]
+[11:22:00 +   23.1s]   [0, 0, 0, 0, 0, 0, 0, 2, -4, 2, 0, 0]
+[11:22:00 +   23.1s]   [0, 0, 0, 0, 0, 0, 0, 0, 2, -4, 2, 0]
+[11:22:00 +   23.1s]   [0, 0, 0, 0, 0, 0, 0, 0, 0, 2, -4, 2]
+[11:22:00 +   23.1s]   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, -4]
+[11:22:00 +   23.1s] lattice rank 12, Gram 12x12
+[11:22:00 +   23.1s] v = (0, 0, 2, 1, -4, -5, -7, -10, -8, -6, -4, -2), v^2 = 0
+[11:22:00 +   23.1s] h = e' + f' = (0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0), h^2 = 4, b(h,v) = 6
+[11:22:00 +   23.1s] b(h, alpha_9=f-e) = 0
+[11:22:00 +   23.1s] === 1. the seven (-2) walls of the walk: lift, integrality, square, b(lift,v), b(lift,h) ===
+[11:22:00 +   23.1s] walk wall 7: lift=(-1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) integral=True square=-2 b(lift,v)=0 b(lift,h)=0
+[11:22:00 +   23.1s] walk wall 8: lift=(-3, -3, -16, -5, 26, 32, 45, 64, 51, 38, 25, 12) integral=True square=-2 b(lift,v)=0 b(lift,h)=-42
+[11:22:00 +   23.1s] walk wall 9: lift=(-3, -3, -17, -6, 29, 34, 49, 69, 55, 41, 27, 13) integral=True square=-2 b(lift,v)=0 b(lift,h)=-46
+[11:22:00 +   23.1s] walk wall 10: lift=(-7, -7, -39, -13, 65, 78, 111, 157, 125, 93, 62, 31) integral=True square=-2 b(lift,v)=0 b(lift,h)=-104
+[11:22:00 +   23.1s] walk wall 12: lift=(-11, -11, -61, -20, 101, 122, 173, 245, 196, 147, 98, 49) integral=True square=-2 b(lift,v)=0 b(lift,h)=-162
+[11:22:00 +   23.1s] walk wall 13: lift=(-11, -11, -62, -21, 104, 124, 177, 250, 200, 150, 100, 50) integral=True square=-2 b(lift,v)=0 b(lift,h)=-166
+[11:22:00 +   23.1s] walk wall 14: lift=(-15, -15, -83, -27, 137, 166, 236, 335, 268, 201, 134, 67) integral=True square=-2 b(lift,v)=0 b(lift,h)=-220
+[11:22:00 +   23.1s] walk wall 15: lift=(-15, -15, -85, -29, 143, 170, 244, 345, 276, 207, 138, 69) integral=True square=-2 b(lift,v)=0 b(lift,h)=-228
+[11:22:00 +   23.1s] === 3. the card's eleven, same three checks, same coordinates ===
+[11:22:00 +   23.9s] card wall (0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0) square=-4 b(wall,v)=0 b(wall,h)=0
+[11:22:00 +   23.9s] card wall (0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0) square=-4 b(wall,v)=0 b(wall,h)=0
+[11:22:00 +   23.9s] card wall (0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0) square=-4 b(wall,v)=0 b(wall,h)=0
+[11:22:00 +   23.9s] card wall (0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0) square=-4 b(wall,v)=0 b(wall,h)=0
+[11:22:00 +   23.9s] card wall (0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0) square=-4 b(wall,v)=0 b(wall,h)=0
+[11:22:00 +   23.9s] card wall (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0) square=-4 b(wall,v)=0 b(wall,h)=0
+[11:22:00 +   23.9s] card wall (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1) square=-4 b(wall,v)=0 b(wall,h)=0
+[11:22:00 +   23.9s] card wall (-1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) square=-2 b(wall,v)=0 b(wall,h)=0
+[11:22:00 +   23.9s] card wall (0, 0, 2, 0, -2, -3, -4, -6, -5, -4, -3, -2) square=-4 b(wall,v)=0 b(wall,h)=4
+[11:22:00 +   23.9s] card wall (1, 1, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0) square=-2 b(wall,v)=0 b(wall,h)=-2
+[11:22:00 +   23.9s] card wall (2, 0, -2, 0, 2, 2, 3, 4, 3, 2, 1, 0) square=-4 b(wall,v)=0 b(wall,h)=-4
+[11:22:00 +   23.9s] === 2. the nine witnesses: x^2 and the cone side ===
+[11:22:00 +   23.9s] witness for wall 0: x^2 = 44 spacelike=True b(x,v) = -10 b(x,h) = -22
+[11:22:00 +   23.9s] witness for wall 8: x^2 = 44 spacelike=True b(x,v) = -14 b(x,h) = -26
+[11:22:00 +   23.9s] witness for wall 9: x^2 = 44 spacelike=True b(x,v) = -14 b(x,h) = -26
+[11:22:00 +   23.9s] witness for wall 10: x^2 = 44 spacelike=True b(x,v) = -14 b(x,h) = -26
+[11:22:00 +   23.9s] witness for wall 11: x^2 = 44 spacelike=True b(x,v) = -14 b(x,h) = -26
+[11:22:00 +   23.9s] witness for wall 12: x^2 = 44 spacelike=True b(x,v) = -14 b(x,h) = -26
+[11:22:00 +   23.9s] witness for wall 13: x^2 = 44 spacelike=True b(x,v) = -14 b(x,h) = -26
+[11:22:00 +   23.9s] witness for wall 14: x^2 = 44 spacelike=True b(x,v) = -14 b(x,h) = -26
+[11:22:00 +   23.9s] witness for wall 15: x^2 = 44 spacelike=True b(x,v) = -12 b(x,h) = -24
+[11:22:00 +   23.9s] done
+[peakrss] issue387: child waited=0 shell_code=0 samples=14
+[peakrss] peak tree RSS      : 485 MiB
+[peakrss] low-water MemAvail : 11542 MiB
+[peakrss] peak single VmHWM  : 485 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      474 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    26.0s procs=  3 rss=   485 MiB hwm=   485 MiB avail= 11728 MiB
+[peakrss]   t=    24.0s procs=  3 rss=   477 MiB hwm=   477 MiB avail= 11736 MiB
+[peakrss]   t=    22.0s procs=  3 rss=   466 MiB hwm=   466 MiB avail= 11747 MiB
+[peakrss]   t=    20.0s procs=  3 rss=   462 MiB hwm=   462 MiB avail= 11742 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   449 MiB hwm=   449 MiB avail= 11758 MiB
+launcher exit: 0

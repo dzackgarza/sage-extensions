@@ -1,0 +1,80 @@
+=== the pieces ===
+E8 Gram, as the catalogue spells it:
+    [-2, 1, 0, 0, 0, 0, 0, 0]
+    [1, -2, 1, 0, 0, 0, 0, 0]
+    [0, 1, -2, 1, 0, 0, 0, 1]
+    [0, 0, 1, -2, 1, 0, 0, 0]
+    [0, 0, 0, 1, -2, 1, 0, 0]
+    [0, 0, 0, 0, 1, -2, 1, 0]
+    [0, 0, 0, 0, 0, 1, -2, 0]
+    [0, 0, 1, 0, 0, 0, 0, -2]
+E8  [catalogue name]
+    signature_pair() = (0, 8)
+    gram eigenvalues: (t+, t-, t0) = (0, 8, 0), min -3.9890 max -0.0110
+    rank 8  det 1  even True  unimodular True
+E8.twist(-1)
+    signature_pair() = (8, 0)
+    gram eigenvalues: (t+, t-, t0) = (8, 0, 0), min 0.0110 max 3.9890
+    rank 8  det 1  even True  unimodular True
+D16+ Gram, as the test spells it:
+    [4, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+    [-2, 2, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    [0, -1, 2, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    [0, 0, -1, 2, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, -1, 2, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, -1, 2, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, -1, 2, -1, 0, 0, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, -1, 2, -1, 0, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 0, -1, 2, -1, 0, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 0, 0, -1, 2, -1, 0, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 2, -1, 0, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 2, -1, 0, 0, 0]
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 2, -1, 0, 0]
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 2, -1, 0]
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 2, 0]
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4]
+D16+  [the test's _d16_plus_gram()]
+    signature_pair() = (16, 0)
+    gram eigenvalues: (t+, t-, t0) = (16, 0, 0), min 0.0009 max 5.7365
+    rank 16  det 1  even True  unimodular True
+D16+.twist(-1)
+    signature_pair() = (0, 16)
+    gram eigenvalues: (t+, t-, t0) = (0, 16, 0), min -5.7365 max -0.0009
+    rank 16  det 1  even True  unimodular True
+
+=== the test's two lattices, as written ===
+e8_squared = E8.twist(-1) + E8.twist(-1)
+    signature_pair() = (16, 0)
+    gram eigenvalues: (t+, t-, t0) = (16, 0, 0), min 0.0110 max 3.9890
+    rank 16  det 1  even True  unimodular True
+d16_plus = _d16_plus_gram().twist(-1)
+    signature_pair() = (0, 16)
+    gram eigenvalues: (t+, t-, t0) = (0, 16, 0), min -5.7365 max -0.0009
+    rank 16  det 1  even True  unimodular True
+
+=== the two Eichler models ===
+source = e8_squared.two_u_eichler_model().lattice()
+    signature_pair() = (18, 2)
+    gram eigenvalues: (t+, t-, t0) = (18, 2, 0), min -1.0000 max 3.9890
+    rank 20  det 1  even True  unimodular True
+target = d16_plus.two_u_eichler_model().lattice()
+    signature_pair() = (2, 18)
+    gram eigenvalues: (t+, t-, t0) = (2, 18, 0), min -5.7365 max 1.0000
+    rank 20  det 1  even True  unimodular True
+source biproduct factor signatures: [(1, 1), (1, 1), (16, 0)]
+target biproduct factor signatures: [(1, 1), (1, 1), (0, 16)]
+
+=== the decisions, as the test asks them today ===
+e8_squared vs d16_plus (complements): is_isometric_to -> False  [0.0 s]
+source vs target: is_isometric_to -> False  [0.0 s]
+[peakrss] 376sign: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 273 MiB
+[peakrss] low-water MemAvail : 8933 MiB
+[peakrss] peak single VmHWM  : 273 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      262 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   273 MiB hwm=   273 MiB avail=  8933 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail=  9105 MiB
+launcher exit: 0

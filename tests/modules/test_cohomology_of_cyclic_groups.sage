@@ -10,6 +10,7 @@ the definitions.  Here $n = 3$.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.modules.cochain_complexes import CochainComplexes
 
 
 def periodic_cochains(order):

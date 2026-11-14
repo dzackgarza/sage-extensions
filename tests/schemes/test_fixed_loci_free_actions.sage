@@ -61,7 +61,7 @@ def test_the_scheme_theoretic_fixed_locus_of_x_to_x_plus_e_squared_is_nonreduced
     ``Spec GF(2)[x, e]/(e^2)``, in which ``e != 0`` and ``e^2 = 0``.
     """
     P = GF(2)['x,e']
-    A = P.quotient(P.ideal(P.algebra_generator("e") ** 3))
+    A = P.quotient_ring(P.ideal(P.algebra_generator("e") ** 3))
     x, e = A(P.algebra_generator("x")), A(P.algebra_generator("e"))
     X, sigma = _automorphism(A, {x: x + e**2, e: e})
     fixed = X.fixed_locus(sigma)

@@ -1,0 +1,91 @@
+====================== U + U(2)
+  stabilizer in 0.0 s
+  13 generators in 3.7 s
+  on the lattice itself: 13 of 13
+[     4.3] U + U(2) generators
+  rho on all 13 in 0.9 s
+[     5.5] U+U(2) rho
+  #321 call with setwise generators: 2 plane orbits
+[    20.5] U+U(2) orbits
+====================== T_En
+  stabilizer in 0.0 s
+Traceback (most recent call last):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/misc/sageinspect.py", line 2493, in sage_getsourcelines
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/inspect.py", line 1151, in getsourcelines
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/inspect.py", line 986, in findsource
+OSError: could not get source code
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/misc/sageinspect.py", line 2493, in sage_getsourcelines
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/inspect.py", line 1151, in getsourcelines
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/inspect.py", line 966, in findsource
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/inspect.py", line 870, in getsourcefile
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/inspect.py", line 839, in getfile
+TypeError: <class 'function'> is a built-in class
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/probe.py", line 44, in <module>
+  File "/probe.py", line 18, in measure
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 5661, in group_generators
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 5639, in selected_group_resolution
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 383, in selected_resolution
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 116, in realize
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 1174, in selected_resolution
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3760, in <lambda>
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 4093, in _marking_stabilizer_generators
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 1841, in _marked_automorphism_generators
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 118, in automorphism_group_generators
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 316, in plane_automorphism_generators
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 304, in _stabilizer_generators
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 304, in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 215, in <genexpr>
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 118, in _value_at_normalized_index
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/resolutions.py", line 951, in generator
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 795, in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 758, in <lambda>
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 3164, in __call__
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 4096, in _evaluate_reduced_word
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/predicate_subgroups.py", line 414, in one
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 1604, in one
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3158, in one
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py", line 405, in __get__
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/functools.py", line 52, in update_wrapper
+  File "sage/misc/instancedoc.pyx", line 212, in sage.misc.instancedoc.InstanceDocDescriptor.__get__
+  File "sage/misc/cachefunc.pyx", line 919, in sage.misc.cachefunc.CachedFunction._instancedoc_
+  File "/sage/.venv/lib/python3.14/site-packages/sage/misc/sageinspect.py", line 2507, in sage_getsourcelines
+  File "/sage/.venv/lib/python3.14/site-packages/sage/misc/sageinspect.py", line 2505, in sage_getsourcelines
+  File "/sage/.venv/lib/python3.14/site-packages/sage/misc/sageinspect.py", line 2508, in sage_getsourcelines
+  File "/sage/.venv/lib/python3.14/site-packages/sage/misc/sageinspect.py", line 2493, in sage_getsourcelines
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/inspect.py", line 1151, in getsourcelines
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/inspect.py", line 966, in findsource
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/inspect.py", line 870, in getsourcefile
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/inspect.py", line 839, in getfile
+TypeError: <class 'object'> is a built-in class
+Exception ignored in atexit callback <function <lambda> at 0x7b73a9158930>:
+Traceback (most recent call last):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/misc/temporary_file.py", line 37, in <lambda>
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/tempfile.py", line 1055, in cleanup
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/tempfile.py", line 1035, in _rmtree
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/shutil.py", line 859, in rmtree
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/shutil.py", line 721, in _rmtree_safe_fd
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/shutil.py", line 803, in _rmtree_safe_fd_step
+  File "/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/shutil.py", line 761, in _rmtree_safe_fd_step
+OSError: [Errno 38] Function not implemented: '/tmp/sage_t1hndtlo'
+[peakrss] issue275: child waited=124 shell_code=124 samples=450
+[peakrss] peak tree RSS      : 866 MiB
+[peakrss] low-water MemAvail : 768 MiB
+[peakrss] peak single VmHWM  : 872 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      862 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   899.8s procs=  3 rss=   866 MiB hwm=   872 MiB avail=  8980 MiB
+[peakrss]   t=   897.8s procs=  3 rss=   865 MiB hwm=   871 MiB avail=  8759 MiB
+[peakrss]   t=   895.8s procs=  3 rss=   864 MiB hwm=   870 MiB avail=  9008 MiB
+[peakrss]   t=   893.7s procs=  3 rss=   863 MiB hwm=   869 MiB avail=  9140 MiB
+[peakrss]   t=   891.7s procs=  3 rss=   862 MiB hwm=   868 MiB avail=  8656 MiB
+launcher exit: 124

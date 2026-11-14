@@ -198,7 +198,7 @@ present the correct object while a requested decision procedure is unavailable
 or undecidable. Do not confuse that with nonexistence of the object.
 
 When this comparison exposes an actual gap, record it in the
-[native issue tree](https://github.com/dzackgarza/research/issues/46) under `DEV-59`. Explain the missing mathematics
+[issue tree](https://github.com/dzackgarza/sage-extensions/issues/14) under `DEV-59`. Explain the missing mathematics
 and the dependency path that exposed it, not only the failing method. Search
 broadly enough to distinguish absent machinery from undiscovered machinery;
 record the inspected boundary and unresolved questions honestly. For missing
@@ -1054,7 +1054,7 @@ Distinguishing specimens include a diagram with parallel arrows, both an empty
 limit and empty colimit, a directed index with incomparable elements, an inverse
 system with non-surjective transitions, and a direct system with non-injective
 transitions. Select specimens for the contract being delivered, preserve broader
-unfinished cases in TODO, and follow terminal T for execution (`DEV-58`). Record
+unfinished cases in TODO, and run them (`DEV-58`). Record
 observed missing foundations in the native issue tree, with the `lean-categories` request
 for missing mathematics, not invented failures inferred merely from the breadth
 of this specification.
@@ -1121,8 +1121,8 @@ of this specification.
   Establish architectural reuse by reading the implementation and upstream
   contract. Research's specimens exercise observable behavior; do not turn
   them into source scanners or mock expectations that a particular helper was
-  called. Respect the protected expectation subtrees and `DEV-58`: written
-  specimens remain unverified until the authorized execution phase. A policy
+  called. Respect the protected expectation subtrees and run the specimens
+  (`DEV-58`). A policy
   edit specifies the architecture; it does not establish code conformance.
 - **Rationale:** Numerical agreement alone rewards a shortcut that leaves the
   construction and its future consumers structurally wrong.

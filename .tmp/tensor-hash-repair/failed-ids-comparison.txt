@@ -1,0 +1,14 @@
+Focused failed-ID comparison for the tensor-hash repair (c2c81a3) and its test-file correction.
+
+Command (both trees): .scratch/proot-run .scratch/one.sh tests/tensors/test_tensors.sage tests/lattices/test_isometry_hash_consistency.sage tests/lattices/test_torsion_form_automorphism_hashing.sage tests/lattices/test_integral_stabilizers.sage tests/groups/test_free_and_catalogued_groups.sage tests/groups/test_finite_group_subgroups_and_quotients.sage
+
+baseline tree: e609d03 content of src/sage_extensions/tensors/tensor.py and tests/lattices/test_isometry_hash_consistency.sage, everything else at c62c79c.
+changed tree: c2c81a3 fix plus the corrected isometry-hash test file (working tree).
+
+diff of the two lists (only the pytest summary/timing line differs; every FAILED id is byte-identical):
+29c29
+< 28 failed, 31 passed in 71.27s (0:01:11)
+---
+> 28 failed, 33 passed in 69.11s (0:01:09)
+
+The passing set grows by exactly the two new tests: 28F/31P -> 28F/33P. No FAILED id is added, removed, or renamed.

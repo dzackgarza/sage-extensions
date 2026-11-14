@@ -1,0 +1,20 @@
+group built in 53.0 s, h^2 = 4
+lines (card says 5): did not return in 300 s (alarm, stage aborted)
+planes (card says 9): did not return in 300 s (alarm, stage aborted)
+flags (card says 18): did not return in 300 s (alarm, stage aborted)
+done
+[peakrss] issue275: child waited=0 shell_code=0 samples=483
+[peakrss] peak tree RSS      : 1174 MiB
+[peakrss] low-water MemAvail : 745 MiB
+[peakrss] peak single VmHWM  : 1179 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1169 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=   973.4s procs=  3 rss=  1174 MiB hwm=  1179 MiB avail=  4689 MiB
+[peakrss]   t=   975.4s procs=  3 rss=  1174 MiB hwm=  1179 MiB avail=  4886 MiB
+[peakrss]   t=   969.4s procs=  3 rss=  1173 MiB hwm=  1179 MiB avail=  4716 MiB
+[peakrss]   t=   971.4s procs=  3 rss=  1173 MiB hwm=  1179 MiB avail=  4781 MiB
+[peakrss]   t=   959.3s procs=  3 rss=  1172 MiB hwm=  1178 MiB avail=  4927 MiB
+launcher exit: 0

@@ -7,6 +7,7 @@ implementations composed with each other.
 """
 
 from sage_extensions.all import *
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 

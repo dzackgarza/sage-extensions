@@ -1,0 +1,21 @@
+value module: Fraction Field of Integer Ring / (2)Integer Ring
+values(1) -> [1] in Fraction Field of Integer Ring / (2)Integer Ring
+values(ZZ(1)) -> [1] in Fraction Field of Integer Ring / (2)Integer Ring
+values(QQ(1)) -> [1] in Fraction Field of Integer Ring / (2)Integer Ring
+values.zero() -> [0] in Fraction Field of Integer Ring / (2)Integer Ring
+one_of_ring:
+point with q == values(1): [9] | q: [1] in Fraction Field of Integer Ring / (2)Integer Ring
+[peakrss] issue273: child waited=0 shell_code=0 samples=10
+[peakrss] peak tree RSS      : 288 MiB
+[peakrss] low-water MemAvail : 13196 MiB
+[peakrss] peak single VmHWM  : 288 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      277 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   288 MiB hwm=   288 MiB avail= 13215 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   288 MiB hwm=   288 MiB avail= 13231 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   288 MiB hwm=   288 MiB avail= 13223 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   288 MiB hwm=   288 MiB avail= 13228 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   287 MiB hwm=   287 MiB avail= 13244 MiB
+launcher exit: 0

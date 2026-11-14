@@ -1,0 +1,29 @@
+....                                                                     [100%]
+============================== slowest durations ===============================
+1.80s call     tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage::test_the_action_factors_compose_to_its_stabilizer_family
+0.66s call     tests/lattices/test_integral_stabilizers.sage::test_the_swap_stabilizes_the_standard_lattice_but_not_a_commensurable_one
+0.10s call     tests/lattices/test_integral_stabilizers.sage::test_diag_two_half_maps_an_isotropic_line_properly_into_itself_and_leaves_its_stabilizer
+0.08s call     tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage::test_the_natural_g_set_factors_compose_to_its_stabilizer_family
+0.00s setup    tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage::test_the_action_factors_compose_to_its_stabilizer_family
+0.00s teardown tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage::test_the_natural_g_set_factors_compose_to_its_stabilizer_family
+0.00s teardown tests/lattices/test_integral_stabilizers.sage::test_diag_two_half_maps_an_isotropic_line_properly_into_itself_and_leaves_its_stabilizer
+0.00s setup    tests/lattices/test_integral_stabilizers.sage::test_the_swap_stabilizes_the_standard_lattice_but_not_a_commensurable_one
+0.00s teardown tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage::test_the_action_factors_compose_to_its_stabilizer_family
+0.00s setup    tests/lattices/test_schreier_factors_rebuild_the_stabilizer_family.sage::test_the_natural_g_set_factors_compose_to_its_stabilizer_family
+0.00s setup    tests/lattices/test_integral_stabilizers.sage::test_diag_two_half_maps_an_isotropic_line_properly_into_itself_and_leaves_its_stabilizer
+0.00s teardown tests/lattices/test_integral_stabilizers.sage::test_the_swap_stabilizes_the_standard_lattice_but_not_a_commensurable_one
+4 passed in 7.61s
+[peakrss] issue296-sf-regression: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 404 MiB
+[peakrss] low-water MemAvail : 3832 MiB
+[peakrss] peak single VmHWM  : 406 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      396 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   404 MiB hwm=   406 MiB avail=  4116 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   392 MiB hwm=   394 MiB avail=  3832 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   263 MiB hwm=   281 MiB avail=  3965 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   229 MiB hwm=   230 MiB avail=  4286 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   125 MiB hwm=   125 MiB avail=  4553 MiB
+launcher exit: 0

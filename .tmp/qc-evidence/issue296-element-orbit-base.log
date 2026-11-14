@@ -1,0 +1,147 @@
+.F.....FF.                                                               [100%]
+=================================== FAILURES ===================================
+____ test_the_discriminant_quadratic_form_of_two_plus_one_is_one_half_on_z2 ____
+tests/forms/test_torsion_forms.sage:23: in test_the_discriminant_quadratic_form_of_two_plus_one_is_one_half_on_z2
+    form = Lattices(ZZ)([[2, 0], [0, 1]]).discriminant_quadratic_form()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/lattices.py:6366: in discriminant_quadratic_form
+    raise ValueError(
+E   ValueError: Integral lattice of rank 2 and signature (2, 0) has no discriminant quadratic form: q_L: A_L -> Q/2Z is defined only for an even lattice, and Integral lattice of rank 2 and signature (2, 0) is odd; use discriminant_bilinear_form
+_ test_the_bilinear_discriminant_form_of_u2_is_metabolic_with_orthogonal_group_s3 _
+sage/misc/cachefunc.pyx:1024: in sage.misc.cachefunc.CachedFunction.__call__
+    return self.cache[k]
+E   KeyError: (({Free module on {} over Integer Ring, Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2], Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2], Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2]},), ())
+
+During handling of the above exception, another exception occurred:
+tests/forms/test_torsion_forms.sage:112: in test_the_bilinear_discriminant_form_of_u2_is_metabolic_with_orthogonal_group_s3
+    assert sorted(orbit.cardinality() for orbit in form.orbits_on_isotropic_subobjects()) == [1, 3]
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:2774: in orbits_on_isotropic_subobjects
+    return _finite_form_subobject_orbits(
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:3006: in _finite_form_subobject_orbits
+    return _torsion_form_subobject_orbits(form, subobjects, acting)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py:775: in _torsion_form_subobject_orbits
+    action = _torsion_form_subobject_action(form, family, acting)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py:770: in _torsion_form_subobject_action
+    return FiniteGSets(acting)(points, act)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/g_sets.py:147: in _call_
+    return _finite_g_set_from_action(
+src/sage_extensions/categories/group/g_sets.py:1383: in _finite_g_set_from_action
+    permutations = SymmetricGroups()(point_set)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:7228: in _call_
+    return _symmetric_group(points)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/group/groups.py:2213: in _symmetric_group
+    standard = points == _standard_symmetric_points(int(size))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/finite_ordered_sets.py:588: in __eq__
+    return conjunction(
+src/sage_extensions/logic.py:160: in conjunction
+    for statement in statements:
+                     ^^^^^^^^^^
+src/sage_extensions/categories/sets/finite_ordered_sets.py:589: in <genexpr>
+    point_equality(left, right)
+src/sage_extensions/categories/sets/finite_ordered_sets.py:570: in point_equality
+    equal = True if left is right else left == right
+                                       ^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:5635: in __eq__
+    other = self._operator_operand(other)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:5522: in _operator_operand
+    return _operand_in_ring(self.parent(), value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:5491: in _operand_in_ring
+    and other_parent in OwnedRings()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:172: in __contains__
+    return super().__contains__(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:706: in __contains__
+    c = x.category()
+        ^^^^^^^^^^^^
+E   TypeError: category() needs an argument
+_______________ test_u2_bilinear_orthogonal_group_element_orbit ________________
+tests/forms/test_torsion_forms.sage:125: in test_u2_bilinear_orthogonal_group_element_orbit
+    assert group.orbit(element).cardinality() == 3
+           ^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py:2407: in orbit
+    image = self._subobject_image(current, generator)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py:2383: in _subobject_image
+    tuple(generator(element) for element in _embedded_elements(subgroup))
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py:622: in _embedded_elements
+    inclusion = subobject.inclusion()
+                ^^^^^^^^^^^^^^^^^^^
+sage/structure/element.pyx:494: in sage.structure.element.Element.__getattr__
+    ???
+sage/structure/element.pyx:507: in sage.structure.element.Element.getattr_from_category
+    ???
+sage/cpython/getattr.pyx:362: in sage.cpython.getattr.getattr_from_other_class
+    ???
+E   AttributeError: 'OwnedJoinCategory.element_class[_GeneralPresentedElement]' object has no attribute 'inclusion'
+============================== slowest durations ===============================
+73.00s call     tests/forms/test_torsion_forms.sage::test_the_orthogonal_group_of_the_discriminant_form_of_eight_has_order_two
+8.77s call     tests/forms/test_torsion_forms.sage::test_the_bilinear_discriminant_form_of_u2_is_metabolic_with_orthogonal_group_s3
+1.74s call     tests/forms/test_torsion_forms.sage::test_the_discriminant_bilinear_form_of_two_plus_one_is_cyclic_of_order_two
+1.08s call     tests/forms/test_torsion_forms.sage::test_bilinear_jordan_form_preserves_the_pairing
+0.99s call     tests/forms/test_torsion_forms.sage::test_mixed_prime_jordan_framing_is_distinct_and_has_an_explicit_isometry
+0.30s call     tests/forms/test_torsion_forms.sage::test_the_form_one_third_on_z3_is_anti_isometric_only_to_its_negative
+0.27s call     tests/forms/test_torsion_forms.sage::test_the_bilinear_orthogonal_group_of_z8_is_larger_than_the_quadratic_one
+0.10s call     tests/forms/test_torsion_forms.sage::test_the_discriminant_forms_of_a1_are_one_half_mod_one_and_minus_one_half_mod_two
+0.04s call     tests/forms/test_torsion_forms.sage::test_u2_bilinear_orthogonal_group_element_orbit
+0.00s call     tests/forms/test_torsion_forms.sage::test_the_discriminant_quadratic_form_of_two_plus_one_is_one_half_on_z2
+0.00s teardown tests/forms/test_torsion_forms.sage::test_the_discriminant_quadratic_form_of_two_plus_one_is_one_half_on_z2
+0.00s setup    tests/forms/test_torsion_forms.sage::test_the_discriminant_bilinear_form_of_two_plus_one_is_cyclic_of_order_two
+0.00s teardown tests/forms/test_torsion_forms.sage::test_the_bilinear_discriminant_form_of_u2_is_metabolic_with_orthogonal_group_s3
+0.00s teardown tests/forms/test_torsion_forms.sage::test_u2_bilinear_orthogonal_group_element_orbit
+0.00s teardown tests/forms/test_torsion_forms.sage::test_the_discriminant_bilinear_form_of_two_plus_one_is_cyclic_of_order_two
+0.00s teardown tests/forms/test_torsion_forms.sage::test_the_orthogonal_group_of_the_discriminant_form_of_eight_has_order_two
+0.00s setup    tests/forms/test_torsion_forms.sage::test_the_discriminant_forms_of_a1_are_one_half_mod_one_and_minus_one_half_mod_two
+0.00s teardown tests/forms/test_torsion_forms.sage::test_mixed_prime_jordan_framing_is_distinct_and_has_an_explicit_isometry
+0.00s setup    tests/forms/test_torsion_forms.sage::test_the_discriminant_quadratic_form_of_two_plus_one_is_one_half_on_z2
+0.00s setup    tests/forms/test_torsion_forms.sage::test_mixed_prime_jordan_framing_is_distinct_and_has_an_explicit_isometry
+0.00s setup    tests/forms/test_torsion_forms.sage::test_bilinear_jordan_form_preserves_the_pairing
+0.00s teardown tests/forms/test_torsion_forms.sage::test_bilinear_jordan_form_preserves_the_pairing
+0.00s setup    tests/forms/test_torsion_forms.sage::test_the_bilinear_orthogonal_group_of_z8_is_larger_than_the_quadratic_one
+0.00s setup    tests/forms/test_torsion_forms.sage::test_u2_bilinear_orthogonal_group_element_orbit
+0.00s teardown tests/forms/test_torsion_forms.sage::test_the_bilinear_orthogonal_group_of_z8_is_larger_than_the_quadratic_one
+0.00s teardown tests/forms/test_torsion_forms.sage::test_the_form_one_third_on_z3_is_anti_isometric_only_to_its_negative
+0.00s teardown tests/forms/test_torsion_forms.sage::test_the_discriminant_forms_of_a1_are_one_half_mod_one_and_minus_one_half_mod_two
+0.00s setup    tests/forms/test_torsion_forms.sage::test_the_orthogonal_group_of_the_discriminant_form_of_eight_has_order_two
+0.00s setup    tests/forms/test_torsion_forms.sage::test_the_bilinear_discriminant_form_of_u2_is_metabolic_with_orthogonal_group_s3
+0.00s setup    tests/forms/test_torsion_forms.sage::test_the_form_one_third_on_z3_is_anti_isometric_only_to_its_negative
+=========================== short test summary info ============================
+FAILED tests/forms/test_torsion_forms.sage::test_the_discriminant_quadratic_form_of_two_plus_one_is_one_half_on_z2
+FAILED tests/forms/test_torsion_forms.sage::test_the_bilinear_discriminant_form_of_u2_is_metabolic_with_orthogonal_group_s3
+FAILED tests/forms/test_torsion_forms.sage::test_u2_bilinear_orthogonal_group_element_orbit
+3 failed, 7 passed in 92.43s (0:01:32)
+[peakrss] issue296-base-forms: child waited=1 shell_code=1 samples=50
+[peakrss] peak tree RSS      : 2485 MiB
+[peakrss] low-water MemAvail : 2168 MiB
+[peakrss] peak single VmHWM  : 2746 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2286 MiB peak
+[peakrss]   python                      449 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    76.1s procs=  4 rss=  2485 MiB hwm=  2511 MiB avail=  3665 MiB
+[peakrss]   t=    96.2s procs=  4 rss=  2435 MiB hwm=  2746 MiB avail=  2168 MiB
+[peakrss]   t=    94.2s procs=  4 rss=  2411 MiB hwm=  2746 MiB avail=  2273 MiB
+[peakrss]   t=    82.1s procs=  4 rss=  2384 MiB hwm=  2648 MiB avail=  3012 MiB
+[peakrss]   t=    84.1s procs=  4 rss=  2383 MiB hwm=  2676 MiB avail=  2872 MiB
+launcher exit: 1

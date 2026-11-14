@@ -1,0 +1,9 @@
+Fourth failed-ID comparison: the unimodular-reading correction in lattice_morphisms.integral_restriction.
+Command (changed run adds tests/lattices/test_integral_restriction_unimodular_fast_path.sage and the Schreier contract file, the baseline run has lattice_morphisms.py and the new test stashed): the same seven lattice files plus the Schreier contract file.
+
+3c3
+< 2 failed, 25 passed in 82.27s (0:01:22)
+---
+> 2 failed, 35 passed in 84.04s (0:01:24)
+
+2 FAILED ids byte-identical; passing 25 -> 35 (baseline 6 lattice files; changed run adds the 3 unimodular tests and the 7 Schreier contract tests). No flip.

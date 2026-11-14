@@ -1,0 +1,43 @@
+worktree SHA: c15b43275fcfd56fbb29882ba663da52d3d30f40
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt401/.scratch/probe401_prefixes.py
+U+E8(-2) bounds={}: complete=True accepted=10 facets=10 dropped=0 (4.37s)
+U+E8(-2) bounds={'max_roots': 1}: complete=True accepted=10 facets=10 dropped=0 (2.67s)
+U+E8(-2) bounds={'max_roots': 2}: complete=True accepted=10 facets=10 dropped=0 (2.70s)
+U+E8(-2) bounds={'max_roots': 3}: complete=True accepted=10 facets=10 dropped=0 (2.71s)
+U+E8(-2) bounds={'max_roots': 4}: complete=True accepted=10 facets=10 dropped=0 (2.71s)
+U+E8(-2) bounds={'max_roots': 5}: complete=True accepted=10 facets=10 dropped=0 (2.76s)
+U+E8(-2) bounds={'max_roots': 6}: complete=True accepted=10 facets=10 dropped=0 (2.64s)
+U+E8(-2) bounds={'max_roots': 7}: complete=True accepted=10 facets=10 dropped=0 (2.67s)
+U+E8(-2) bounds={'max_roots': 8}: complete=True accepted=10 facets=10 dropped=0 (3.89s)
+U+E8(-2) bounds={'max_roots': 10}: complete=True accepted=10 facets=10 dropped=0 (2.93s)
+U+E8(-2) bounds={'max_roots': 12}: complete=True accepted=10 facets=10 dropped=0 (2.70s)
+U+E8(-2) bounds={'max_decompositions': 2}: complete=False accepted=9 facets=9 dropped=0 (2.40s)
+U+E8(-2) bounds={'max_decompositions': 3}: complete=False accepted=9 facets=9 dropped=0 (2.56s)
+U+E8(-2) bounds={'max_decompositions': 4}: complete=True accepted=10 facets=10 dropped=0 (2.71s)
+U+E8(-2) bounds={'max_decompositions': 6}: complete=True accepted=10 facets=10 dropped=0 (2.63s)
+U+E8(-2) bounds={'max_decompositions': 8}: complete=True accepted=10 facets=10 dropped=0 (2.61s)
+U+E8(-2) bounds={'max_decompositions': 10}: complete=True accepted=10 facets=10 dropped=0 (2.63s)
+U+E8(-2) bounds={'max_decompositions': 14}: complete=True accepted=10 facets=10 dropped=0 (2.60s)
+U+E8(-2) bounds={'max_decompositions': 20}: complete=True accepted=10 facets=10 dropped=0 (2.61s)
+U+E8 bounds={'max_roots': 2}: complete=True accepted=10 facets=10 dropped=0 (2.60s)
+U+E8 bounds={'max_roots': 3}: complete=True accepted=10 facets=10 dropped=0 (2.46s)
+U+E8 bounds={'max_roots': 4}: complete=True accepted=10 facets=10 dropped=0 (2.48s)
+U+E8 bounds={'max_roots': 5}: complete=True accepted=10 facets=10 dropped=0 (2.46s)
+U+E8 bounds={'max_roots': 6}: complete=True accepted=10 facets=10 dropped=0 (2.47s)
+U+E8 bounds={'max_roots': 8}: complete=True accepted=10 facets=10 dropped=0 (2.49s)
+U+E8 bounds={'max_roots': 10}: complete=True accepted=10 facets=10 dropped=0 (2.45s)
+[peakrss] probe401: child waited=0 shell_code=0 samples=37
+[peakrss] peak tree RSS      : 336 MiB
+[peakrss] low-water MemAvail : 12830 MiB
+[peakrss] peak single VmHWM  : 336 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      325 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=    70.0s procs=  3 rss=   336 MiB hwm=   336 MiB avail= 13158 MiB
+[peakrss]   t=    72.0s procs=  3 rss=   336 MiB hwm=   336 MiB avail= 13070 MiB
+[peakrss]   t=    60.0s procs=  3 rss=   335 MiB hwm=   335 MiB avail= 13307 MiB
+[peakrss]   t=    62.0s procs=  3 rss=   335 MiB hwm=   335 MiB avail= 13269 MiB
+[peakrss]   t=    64.0s procs=  3 rss=   335 MiB hwm=   335 MiB avail= 13235 MiB
+launcher exit: 0

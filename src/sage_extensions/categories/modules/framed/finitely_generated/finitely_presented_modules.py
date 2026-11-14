@@ -33,6 +33,7 @@ from sage_extensions.categories.modules.pure.modules import (
     ModulesWithChosenFinitePresentation,
     VectorSpaces,
     _biproduct_label,
+    _coordinate_framed_free_module,
     _coordinate_images,
     _engine_matrix,
     _morphism_from_engine_matrix,
@@ -666,9 +667,13 @@ class _SelectedFinitePresentationModules(OwnedCategoryOverBaseRing):
             return _selected_presentation_kernel(morphism)
 
         def _represented_cokernel_of_morphism(self, morphism):
-            if morphism.codomain() is not self:
-                return NotImplemented
-            return _presented_module_from_morphism(morphism, _cokernel_morphism=morphism)
+            if morphism.codomain() is self:
+                return _presented_module_from_morphism(
+                    morphism, _cokernel_morphism=morphism
+                )
+            if morphism.domain() is self:
+                return _cokernel_into_a_framed_free_codomain(morphism)
+            return NotImplemented
 
         def _presented_module_from_relation_morphism(
             self,
@@ -1970,9 +1975,68 @@ class _GeneralPresentedModule:
         assert self._relation_submodule is not None, (
             f"{self} has no engine relation module, so its submodules have no engine preimage to compare"
         )
+        from sage.matrix.constructor import matrix
+
         lifts = [self(generator)._representative() for generator in generators]
-        preimage = self._free_module.submodule(lifts + list(self._relation_submodule.basis()))
-        return tuple(tuple(row) for row in preimage.echelonized_basis_matrix().rows())
+        # Sage's integral Hermite form is the canonical echelon basis of the
+        # same preimage row span; the cover admits every lift above and every
+        # retained relation. See matrix_integer_dense.hermite_form.
+        preimage = matrix(SageZZ, lifts + list(self._relation_submodule.basis()))
+        return tuple(tuple(row) for row in preimage.hermite_form(include_zero_rows=False).rows())
+
+    def _submodule_image_key(self, morphism, generators):
+        r"""The canonical preimage key of the image under an admitted endomorphism.
+
+        If A lifts the selected generator images, a cover row v maps to vA
+        modulo the retained relations. Adjoining those relations and taking
+        Sage's integral Hermite form gives exactly the image preimage span.
+        The selected presentation and actual arrow fix A; no freeness of
+        this quotient or enumeration of its elements is used.
+        """
+        assert self.base_ring() is _owned_integers() and self._relation_submodule is not None, (
+            "integral submodule image data require a represented relation module over ZZ"
+        )
+        assert morphism.domain() is self and morphism.codomain() is self, (
+            "a submodule image in this presentation requires its actual endomorphism"
+        )
+        morphism._require_established_linearity("submodule image")
+        from sage.matrix.constructor import matrix
+
+        cache = self.__dict__.setdefault("_submodule_image_lifts", {})
+        cached = cache.get(id(morphism))
+        if cached is None:
+            action = matrix(SageZZ, [
+                morphism(self.module_generator(label))._representative()
+                for label in self.module_generating_set()
+            ])
+            action.set_immutable()
+            cache[id(morphism)] = (morphism, action)
+        else:
+            action = cached[1]
+        lifts = [self(generator)._representative() for generator in generators]
+        rows = matrix(SageZZ, len(lifts), self._free_module.rank(), [entry for row in lifts for entry in row])
+        preimage = (rows * action).stack(self._relation_submodule.basis_matrix())
+        return tuple(tuple(row) for row in preimage.hermite_form(include_zero_rows=False).rows())
+
+    def _submodule_generator_images_from_key(self, key):
+        r"""Read a submodule's canonical preimage basis as nonzero quotient generators.
+
+        ``key`` is the echelonized integral preimage basis returned by
+        ``_submodule_key_from_generators`` for this module. Its classes generate
+        the same submodule by the correspondence theorem. Basis rows lying in
+        the relations have zero class and contribute no generator. A finite
+        orbit can retain these representatives rather than unreduced orbit
+        words in the free cover.
+        """
+        assert self.base_ring() is _owned_integers() and self._relation_submodule is not None, (
+            "integral submodule preimage data require a represented relation module over ZZ"
+        )
+        images = []
+        for row in key:
+            lift = self._free_module(row)
+            if lift not in self._relation_submodule:
+                images.append(self(lift))
+        return tuple(images)
 
     def _cover_coordinates(self, element):
         r"""Coordinates of a representative as an indexed family on the cover basis."""
@@ -1998,6 +2062,19 @@ class _GeneralPresentedModule:
 
     def _selected_module_coefficients(self, element):
         r"""Return a finite containing coordinate family of the selected cover representative."""
+        if self._relation_submodule is not None:
+            representative = self(element)._representative()
+            labels = self.module_generating_set()
+            ring = self.base_ring()
+            zero = ring.zero()
+            selected = {}
+            # Ranked sets iterate in their selected ordinal order, the same
+            # order used by _cover_generator for the engine cover basis.
+            for label, value in zip(labels, representative, strict=True):
+                coefficient = _owned_engine_element(ring, value)
+                if (coefficient == zero) is not True:
+                    selected[label] = coefficient
+            return selected
         coordinates = self._cover_coordinates(element)
         zero = self.base_ring().zero()
         return {
@@ -2353,11 +2430,44 @@ def _relation_morphism(module):
             f"{module} has no relation morphism: it is not a module with chosen finitely many "
             f"generators and relations, but is in {module.category()}"
         )
-    relations = module._selected_relation_morphism()
+    relations = module.presentation()
     if relations is None:
         raise TypeError(f"{module} is finitely presented, but its relations are not known explicitly")
     return relations._framed_coordinate_morphism()
 
+
+def _cokernel_into_a_framed_free_codomain(morphism):
+    r"""Return ``coker(f: M -> N)`` for a presented domain ``M`` and a framed free ``N``.
+
+    The domain states a chosen presentation ``M = coker(r)`` and the codomain's
+    selected framing ``F(N) -> N`` is a *basis*, hence an isomorphism, so the
+    quotient ``N/f(M)`` is the cokernel of the composite ``F(M) -> M -> N``
+    read in coordinates: ``coker(F(M) -> F(N))``.  The framing of ``N`` is
+    never assumed to be a basis — ``_coordinate_framed_free_module`` decides
+    that — and ``M``'s own relations are not needed, because they are killed by
+    any map out of ``M``.  The kernel counterpart is
+    :func:`_selected_presentation_kernel`, which needs the codomain's relations
+    because the preimage of them is what it computes.
+    """
+    domain = morphism.domain()
+    codomain = morphism.codomain()
+    ring = _owned_ring(domain.base_ring())
+    if _owned_ring(codomain.base_ring()) is not ring:
+        return NotImplemented
+    if domain not in ModulesWithChosenFinitePresentation(ring):
+        return NotImplemented
+    if not _coordinate_framed_free_module(codomain, ring):
+        return NotImplemented
+    source = domain.framing_source()
+    target = codomain.framing_source()
+    framing = codomain.framing_morphism()
+    lift = source.module_category().Mor(source, target)(
+        {
+            label: framing.lift(morphism(domain.module_generator(label)))
+            for label in source.module_generating_set()
+        }
+    )
+    return _presented_module_from_morphism(lift)
 
 
 def _selected_presentation_kernel(morphism):
@@ -2390,7 +2500,15 @@ def _selected_presentation_kernel(morphism):
     selected = ModulesWithChosenFinitePresentation(ring)
     if domain not in selected or codomain not in selected:
         return NotImplemented
-    if domain._selected_relation_morphism() is None or codomain._selected_relation_morphism() is None:
+    try:
+        for endpoint in (domain, codomain):
+            _relation_morphism(endpoint)
+    except TypeError:
+        # ``_relation_morphism`` raises exactly when an endpoint does not state
+        # its relations explicitly; that is this adapter's refusal, not an
+        # error.  A framed free endpoint states the zero relation morphism from
+        # ``F(∅)`` — an empty relation family, which is the statement a basis
+        # makes — and the preimage argument below runs with no target relations.
         return NotImplemented
     labels = domain.module_generating_set()
     if labels.cardinality().is_finite() and all(
@@ -3181,17 +3299,19 @@ def _presented_module_from_morphism(
         case True:
             # The cokernel is torsion exactly when the relation morphism
             # becomes surjective over the fraction field.
-            fraction_field_map = base_ring.fraction_field_map()
-            field = fraction_field_map.codomain()
-            from sage_extensions.categories.modules.framed.framed_free_modules import (
-                _fresh_free_module_on,
-            )
+            from sage.matrix.constructor import matrix
 
-            generic_relations = _morphism_on_images(
-                _fresh_free_module_on(_owned_ring(field), Sets.Δ[width - 1]),
-                tuple(tuple(fraction_field_map(coefficient) for coefficient in image) for image in relation_images),
+            field = base_ring.fraction_field_map().codomain()
+            # Scalar extension preserves the rank of this exact relation
+            # matrix. The selected presentation below still owns all labels
+            # and relations; only its rank is computed in the field engine.
+            relations = matrix(
+                engine,
+                len(relation_images),
+                width,
+                [_engine_element(base_ring, coefficient) for image in relation_images for coefficient in image],
             )
-            torsion_decision = int(_engine_matrix(generic_relations).rank()) == width
+            torsion_decision = int(relations.change_ring(_engine_ring(field)).rank()) == width
         case False:
             pass
     match (_require_torsion, torsion_decision):

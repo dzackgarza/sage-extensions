@@ -1,6 +1,7 @@
 r"""Algebras given by a multiplication on a module, and maps between them."""
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_x_to_zero_is_an_algebra_map_from_split_idempotents_to_dual_numbers() -> None:
@@ -10,8 +11,8 @@ def test_x_to_zero_is_an_algebra_map_from_split_idempotents_to_dual_numbers() ->
     the target."""
     polynomials = QQ["x"]
     t = polynomials.gen()
-    split = Algebras(QQ)(polynomials.quotient(polynomials.ideal([t**2 - t])))
-    dual = Algebras(QQ)(polynomials.quotient(polynomials.ideal([t**2])))
+    split = Algebras(QQ)(polynomials.quotient_ring(polynomials.ideal([t**2 - t])))
+    dual = Algebras(QQ)(polynomials.quotient_ring(polynomials.ideal([t**2])))
     x_split, x_dual = split(t), dual(t)
     projection = split.Mor(dual)({x_split: dual.zero()})
 

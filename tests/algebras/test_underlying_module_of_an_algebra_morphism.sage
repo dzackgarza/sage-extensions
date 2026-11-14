@@ -1,15 +1,23 @@
 r"""The linear map underlying the projection of the fat point onto the reduced point."""
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def _fat_point_projection():
-    r"""``QQ[x]/(x^2) -> QQ[x]/(x) = QQ``, the reduction of the fat point."""
+    r"""``QQ[x]/(x^2) -> QQ[x]/(x) = QQ``, the reduction of the fat point.
+
+    Both ends are their coefficient-ring views: the same rings over ``QQ``,
+    retaining the quotient and with it the presentation ``QQ[x]/(x^2)`` that a
+    map of ``QQ``-algebras out of the fat point is read against.
+    """
     line = QQ["x"]
     x = line.gen()
-    fat_point = line.quotient(line.ideal([x**2]))
-    point = line.quotient(line.ideal([x]))
-    projection = fat_point.Mor(point)({fat_point(x): point.zero()})
+    fat_point = line.quotient_ring(line.ideal([x**2])).as_algebra_over(QQ)
+    point = line.quotient_ring(line.ideal([x])).as_algebra_over(QQ)
+    projection = fat_point.Mor(point)(
+        {label: point.zero() for label in fat_point.algebra_generating_set()}
+    )
     return fat_point, point, projection
 
 

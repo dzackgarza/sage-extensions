@@ -1,0 +1,9 @@
+Second failed-ID comparison, covering both the contract tightenings and the preimage dedupe.
+Same command and baseline method as comparison.txt; changed tree adds: seeds materialized once (one-shot safe), the exact sweep augmentation retained, and lattice_stabilizer presenting each distinct Schreier image once.
+
+24c24
+< 23 failed, 29 passed in 55.54s
+---
+> 23 failed, 35 passed in 52.13s
+
+23 FAILED ids byte-identical; passing goes 29 -> 35: the 4 original contract tests plus the one-shot-seeds and dedupe regressions.

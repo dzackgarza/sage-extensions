@@ -1,0 +1,9 @@
+Third failed-ID comparison: after the dedupe-contract completion (helper with stated unhashable fallback) and lattice_stabilizer returning its verbatim Schreier family (the in-line dedupe measured cost-negative on N).
+Same command as comparison.txt; baseline is failed-dedupe-baseline.txt (the contract tightenings and the test file stashed).
+
+24c24
+< 23 failed, 29 passed in 55.54s
+---
+> 23 failed, 36 passed in 48.14s
+
+23 FAILED ids byte-identical; passing 29 -> 36 = baseline plus the 7 contract tests (retained sweep, Schreier A/B, transposition stabilizer, fallback point, one-shot seeds, genuine-duplicates dedupe, unhashable-boundary dedupe).

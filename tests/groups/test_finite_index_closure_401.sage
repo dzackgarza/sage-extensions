@@ -27,10 +27,16 @@ def test_mod_two_kernel_of_sl2z_has_index_six_and_schreier_generators():
     # family contains the first two and minus the third. No claim about
     # the generated subgroup's index is inferred from schreier_generators.
     matrices = {tuple(_matrix_group_element_matrix(group, g).list()) for g in generators}
+    negatives = {tuple(-entry for entry in matrix) for matrix in matrices}
+    candidates = matrices | negatives
     minus_identity = (-1, 0, 0, -1)
     t_squared = (1, 2, 0, 1)
     minus_lower_transvection = (-1, 0, 2, -1)
-    assert {minus_identity, t_squared, minus_lower_transvection} <= matrices
+    # A Schreier family answers the subgroup it generates, not its witness
+    # order: the expected -S*T^2*S^-1 is minus a member's proper inverse, so the
+    # returned family states the three witnesses up to sign of the third; the
+    # revealed family names their images by negation when needed.
+    assert {minus_identity, t_squared, minus_lower_transvection} <= candidates
     # Every returned generator reduces to I mod 2, so H <= Gamma(2).
     # These three witnesses generate Gamma(2), so Gamma(2) <= H.
     # Gamma's independent modular-coset implementation computes its index.

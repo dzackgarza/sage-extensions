@@ -20,6 +20,7 @@ from sage_extensions.categories.modules.pure.modules import (
     RestrictedScalarsModules,
 )
 from sage_extensions.categories.rings.ring_foundation import (
+    OwnedRings,
     _engine_ring,
     _owned_ring,
 )
@@ -190,6 +191,8 @@ class _RestrictionOfScalarsFunctor(Functor):
         return self._target_ring in GroupAlgebras(self._source_ring)
 
     def _apply_object(self, module):
+        from sage_extensions.categories.rings.ring_foundation import OwnedRings
+
         if self.ring_map().is_identity() is True:
             return module
         if self._restricts_group_modules():
@@ -314,7 +317,7 @@ class _CoextensionOfScalarsFunctor(Functor):
         mor = scalars.module_category().Mor(scalars, module)
         identity = module.module_category().Mor(module, module).identity()
         endomorphisms = Modules(self._source_ring).End(mor)
-        action = self._target_ring.Mor(endomorphisms)(
+        action = OwnedRings().Mor(self._target_ring, endomorphisms).elementwise(
             lambda scalar: self._right_multiplication(scalar).internal_mor_map(
                 identity,
                 source_internal_mor=mor,
@@ -445,10 +448,7 @@ class _RestrictionCoextensionAdjunction(Adjunction):
                 coextended,
                 mor(
                     {
-                        label: self.left_adjoint()._restricted_element(
-                            restricted,
-                            module.scalar_multiple(scalars.module_generator(label), element),
-                        )
+                        label: self.left_adjoint()._restricted_element(module, restricted, module.scalar_multiple(scalars.module_generator(label), element))
                         for label in scalars.module_generating_set()
                     }
                 ),
@@ -462,7 +462,7 @@ class _RestrictionCoextensionAdjunction(Adjunction):
         one = self.right_adjoint().scalars_as_module().one()
         return restricted.module_category().Mor(restricted, module)._from_constructed_element_map(
             lambda element: self.right_adjoint()._mor_element(
-                coextended, self.left_adjoint()._extension_element(restricted, element)
+                coextended, self.left_adjoint()._extension_element(coextended, restricted, element)
             )(one),
         )
 

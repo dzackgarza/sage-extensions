@@ -8,7 +8,7 @@ standard finite free/cofree constructions.
 """
 
 from sage.categories.category import Category
-from sage.misc.cachefunc import cached_method
+from sage.misc.cachefunc import cached_function, cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import Element, parent as element_parent
 from sage.structure.parent import Parent
@@ -25,9 +25,11 @@ from sage_extensions.categories.group.g_objects import GObjectMor, GObjects
 from sage_extensions.categories.group.groups import (
     OwnedFiniteGroups,
     OwnedGroups,
+    PermutationGroups,
     SymmetricGroups,
     _GroupMorRealizationMixin,
     _engine_group,
+    _engine_left_coset_positions,
     _engine_point,
     _owned_group,
 )
@@ -57,7 +59,7 @@ class GSetMorCategoryConstruction(MorCategoryConstruction):
         return GSetMor
 
 
-def _orbit_schreier_morphism(orbit, word_section, augmentation):
+def _orbit_schreier_morphism(orbit, word_section, augmentation, *, transitions=None, drop_trivial=False):
     r"""Schreier's lemma on a pointed finite orbit: ``E -> G`` onto the base-point stabilizer.
 
     ``orbit`` is a finite ``G``-set, ``augmentation`` a free cover
@@ -68,15 +70,67 @@ def _orbit_schreier_morphism(orbit, word_section, augmentation):
     from the free group on them to ``G`` has that stabilizer's image as image.
     This is the one Schreier construction; its callers corestrict it to the
     subgroup they present.
+
+    ``transitions``, when the caller retained one, is the position table
+    ``(point position, letter position) -> image position`` of the ONE sweep
+    that already evaluated every ``s.p``: ``s.p`` is then read from the table
+    instead of recomputed by the action.  The words are the same words -- the
+    table selects exactly the images the comprehension would recompute.
+
+    ``drop_trivial`` drops the Schreier generators that are the identity by
+    the sweep's own construction: for the pair whose letter first reached a
+    point, that point's transversal is the pair's word applied to its
+    predecessor's, so the word ``t_(s.p)^-1 s t_p`` is empty
+    (Holt--Eick--O'Brien, *Handbook of Computational Group Theory*,
+    Chapman & Hall/CRC, 2005, Section 4.1, p. 79).  The base point keeps its
+    whole row: its transversal is the identity, so a letter fixing it gives
+    the Schreier generator ``s``, which is not trivial.
     """
     from sage_extensions.categories.sets.set_categories import finite_ordinal_set
 
     free = augmentation.domain()
-    words = tuple(
-        (~word_section(orbit.act(augmentation(generator), point))) * generator * word_section(point)
-        for point in orbit
-        for generator in free.group_generators()
-    )
+    letter_words = tuple(free.group_generators())
+    if transitions is not None:
+        table, letter_count = transitions
+        points = tuple(orbit)
+        sections = tuple(word_section(point) for point in points)
+        assert len(table) == len(points) * len(letter_words) == len(points) * letter_count, (
+            f"the retained transition table of {orbit} covers {len(table)} pairs, but the Schreier "
+            f"family needs {len(points)} points x {len(letter_words)} letters"
+        )
+        pairs = [
+            (position, letter_position)
+            for position in range(len(points))
+            for letter_position in range(len(letter_words))
+        ]
+        if drop_trivial:
+            # Holt--Eick--O'Brien, Handbook of Computational Group Theory,
+            # Chapman & Hall/CRC, 2005, Section 4.1, p. 79: the Schreier
+            # generator of the pair that first reaches a point is trivial by
+            # definition, because that point's transversal is exactly the
+            # pair's word applied to its predecessor's.  The sweep appended a
+            # point at its first reaching pair, so those are the pairs to drop.
+            discovery = {}
+            for pair in pairs:
+                image = table[pair]
+                if image and image not in discovery:
+                    discovery[image] = pair
+            trivial = frozenset(discovery.values())
+            pairs = [pair for pair in pairs if pair not in trivial]
+        words = tuple(
+            (~sections[table[pair]]) * letter_words[pair[1]] * sections[pair[0]]
+            for pair in pairs
+        )
+    else:
+        assert not drop_trivial, (
+            f"the trivial Schreier generators of {orbit} are identified by the orbit sweep's "
+            "transition table, which this construction was not given"
+        )
+        words = tuple(
+            (~word_section(orbit.act(augmentation(generator), point))) * generator * word_section(point)
+            for point in orbit
+            for generator in letter_words
+        )
     labels = finite_ordinal_set(len(words))
     source = OwnedGroups.Free(index_set=labels)
     word_map = source.Mor(free)(
@@ -130,11 +184,33 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             injectivity_decision=injectivity_decision,
         )
 
+    def from_permutation_representation(self, representation):
+        r"""The finite action defined by the supplied ``G -> Perm(X)``.
+
+        The permutation group retains its actual point set. The supplied
+        group morphism is the action datum, including when it has a kernel.
+        """
+        if representation.domain() is not self.group():
+            raise ValueError("the permutation representation must start at the acting group")
+        permutations = representation.codomain()
+        if permutations not in PermutationGroups():
+            raise TypeError("the action morphism must land in a permutation group")
+        if representation not in self.group().Mor(permutations):
+            raise TypeError("a finite action requires a group morphism")
+        points = permutations.natural_points()
+        if points not in FiniteSets():
+            raise ValueError("a finite action requires a finite permutation domain")
+        return _object_of(
+            self,
+            point_set=points,
+            permutation_representation=representation,
+        )
+
     def trivial(self, point_set):
         r"""Equip ``point_set`` with the trivial action of this category's group."""
         return self(point_set, lambda _group_element, point: point)
 
-    def _orbit_words(self, seeds, action, augmentation, *, point_key=None):
+    def _orbit_words(self, seeds, action, augmentation, *, point_key=None, retain_transitions=False, targets=()):
         r"""The one orbit search: the union of the orbits of ``seeds``, each point with a word.
 
         ``augmentation`` is a free cover ``pi: F ->> G``.  Breadth-first search
@@ -142,25 +218,109 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         ``s t_y``.  Points are recorded by rank in a dictionary keyed by the
         point, or by its supplied injective rank key when the points are
         unhashable. The caller supplies an effective action and the
-        hypothesis that these orbits are finite.
+        hypothesis that these orbits are finite.  ``retain_transitions`` also
+        returns the position table ``(point position, letter position) -> image
+        position`` of the sweep itself: the search evaluates every pair
+        exactly once, and callers of the Schreier construction read each
+        ``s.p`` from that table instead of paying the action evaluations
+        again.  The table's letter positions index
+        ``free.group_generators()``. With ``targets``, return the visited
+        prefix on first reaching a target. Transition tables require the
+        complete sweep and cannot be requested with a target.
         """
+        targets = tuple(targets)
+        if targets and retain_transitions:
+            raise ValueError("a complete transition table requires the full finite orbit")
         free = augmentation.domain()
         steps = tuple((word, augmentation(word)) for word in free.group_generators())
         points = list(finite_ordered_set(tuple(seeds)))
         key = (lambda point: point) if point_key is None else point_key
         rank = {key(point): position for position, point in enumerate(points)}
         words = [free.one() for _point in points]
+        target_keys = {key(point) for point in targets}
+        if target_keys.intersection(rank):
+            return points, words
+        transitions = {} if retain_transitions else None
         position = 0
         while position < len(points):
-            for word, element in steps:
+            for letter_position, (word, element) in enumerate(steps):
                 image = action(element, points[position])
                 image_key = key(image)
                 if image_key not in rank:
                     rank[image_key] = len(points)
                     points.append(image)
                     words.append(word * words[position])
+                if transitions is not None:
+                    transitions[(position, letter_position)] = rank[image_key]
+                if image_key in target_keys:
+                    return points, words
             position += 1
+        if retain_transitions:
+            return points, words, transitions
         return points, words
+
+    def transporter_from_finite_orbit(self, source, target, action):
+        r"""Return one element carrying ``source`` to ``target`` in a finite orbit.
+
+        The supplied effective action has hashable points and a finite
+        source orbit. The existing orbit-word search stops on a witness;
+        exhausting the orbit proves that the transporter is empty.
+        """
+        group = self.group()
+        if source == target:
+            return group.one()
+        augmentation = group.selected_group_resolution().augmentation()
+        points, words = self._orbit_words((source,), action, augmentation, targets=(target,))
+        return next((augmentation(word) for point, word in zip(points, words, strict=True) if point == target), None)
+
+    def transporter_on_left_cosets(self, subgroup, source, target, inclusion):
+        r"""Transport source*H to target*H under the supplied group inclusion.
+
+        The finite-index hypothesis comes from a finite ambient group, a
+        selected finite coset action, or the subgroup's finite quotient
+        data. Enumerate only the acting group's source orbit, retaining
+        the actual coset equality and inverse witness.
+        """
+        from sage_extensions.categories.group.predicate_subgroups import PredicateSubgroups
+
+        ambient = subgroup.supergroup()
+        if inclusion.domain() is not self.group() or inclusion.codomain() is not ambient:
+            raise ValueError("the coset action needs an inclusion into the subgroup's ambient group")
+        finite = ambient in OwnedFiniteGroups()
+        if not finite and ambient.has_selected_left_cosets(subgroup):
+            finite = ambient.left_cosets(subgroup) in FiniteGSets(ambient)
+        if not finite and subgroup in PredicateSubgroups(ambient):
+            finite = subgroup.has_finite_coset_space()
+        if not finite:
+            raise ValueError(f"no finite left-coset action is supplied for {subgroup}")
+        points = _LeftCosetPointSet(ambient, subgroup)
+        return self.transporter_from_finite_orbit(
+            points(source), points(target),
+            lambda element, point: points(inclusion(element) * point.representative()),
+        )
+
+    def preimage_coset_space(self, subgroup, morphism, target, augmentation):
+        r"""Return G/f^-1(H) from its orbit in the finite target's cosets.
+
+        Only f(G)'s orbit of H is needed; the ambient target need not be
+        the image of f. The supplied free cover retains the section and
+        the full Schreier generating morphism of the preimage.
+        """
+        if subgroup.supergroup() is not self.group() or morphism.domain() is not self.group():
+            raise ValueError("the finite preimage and its morphism must have this acting group as source")
+        if morphism.codomain() not in OwnedFiniteGroups() or target.supergroup() is not morphism.codomain():
+            raise ValueError("the preimage coset action requires a subgroup of the finite target")
+        points = _LeftCosetPointSet(morphism.codomain(), target)
+
+        @cached_function(key=lambda element: (id(element), element))
+        def image(element):
+            return morphism(element)
+
+        return self.pointed_orbit(
+            subgroup, points(morphism.codomain().one()),
+            lambda element, point: points(image(element) * point.representative()),
+            augmentation,
+        )
 
     def from_finite_orbits(self, seeds, action):
         r"""The union of the finite orbits of supplied points under a given action.
@@ -168,11 +328,71 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         The caller supplies an effective action and the hypothesis that these
         orbits are finite. Enumerating generator images then terminates at
         exactly their union; no search bound is a finiteness certificate.
+        The one breadth-first sweep is retained on the resulting ``G``-set
+        with its point-transition table, so the Schreier and coset operations
+        of THIS action do not evaluate the same pairs a second and third
+        time (``_orbit_of``, ``orbit_schreier_morphism``).  The retained
+        augmentation is the sweep's own: the maintained selection contract
+        (one resolution per object/owner, realized once) already fixes its
+        letter order, and retaining the object makes that binding explicit.
+        The seeds are materialized once, so a one-shot iterable is consumed
+        before, not after, the sweep.
         """
-        points, _words = self._orbit_words(
-            seeds, action, self.group().selected_group_resolution().augmentation()
+        seeds = tuple(seeds)
+        augmentation = self.group().selected_group_resolution().augmentation()
+        points, words, transitions = self._orbit_words(
+            seeds, action, augmentation, retain_transitions=True,
         )
-        return self(finite_ordered_set(tuple(points)), action)
+        g_set = self._from_orbit_sweep(points, action, augmentation, transitions)
+        g_set.__dict__["_retained_orbit_bfs"] = {
+            "seeds": seeds,
+            "augmentation": augmentation,
+            "points": tuple(points),
+            "words": words,
+            "transitions": transitions,
+            "letter_count": len(tuple(augmentation.domain().group_generators())),
+        }
+        return g_set
+
+    def _from_orbit_sweep(self, points, action, augmentation, transitions):
+        r"""Realize the finite action from its complete generator transition table.
+
+        The orbit sweep has evaluated every selected letter on every point.
+        Its columns are the images of those letters under ``G -> Sym(X)``.
+        Retain these finite permutations when admitting the elementwise
+        morphism; other group elements use the supplied defining action.
+        This is the same transition-table realization used by
+        ``orbit_generator_permutations``, with the actual points retained.
+        """
+        point_set = finite_ordered_set(tuple(points))
+        permutations = SymmetricGroups()(point_set)
+        letters = tuple(augmentation.domain().group_generators())
+        assert len(transitions) == len(points) * len(letters)
+        generator_images = {
+            augmentation(letter): permutations([
+                transitions[(position, letter_position)] + 1
+                for position in range(len(points))
+            ])
+            for letter_position, letter in enumerate(letters)
+        }
+
+        def permutation(element):
+            if element in generator_images:
+                return generator_images[element]
+            return _permutation_from_point_map(
+                permutations, point_set, lambda point: action(element, point),
+            )
+
+        representation = self.group().Mor(permutations).elementwise(permutation)
+        g_set = _object_of(
+            self,
+            point_set=point_set,
+            permutation_representation=representation,
+            point_action=action,
+        )
+        g_set.__dict__["_retained_transitions"] = (transitions, len(letters))
+        g_set.__dict__["_retained_transition_augmentation"] = augmentation
+        return g_set
 
     def pointed_orbit(self, subgroup, base, action, augmentation=None):
         r"""``G/H`` realized as the orbit of ``base``, for ``H`` the stabilizer of ``base``.
@@ -187,8 +407,10 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
         """
         if augmentation is None:
             augmentation = self.group().selected_group_resolution().augmentation()
-        points, words = self._orbit_words((base,), action, augmentation)
-        orbit = self(finite_ordered_set(tuple(points)), action)
+        points, words, transitions = self._orbit_words(
+            (base,), action, augmentation, retain_transitions=True,
+        )
+        orbit = self._from_orbit_sweep(points, action, augmentation, transitions)
         return orbit._pointed_coset_space(subgroup, base, words, augmentation)
 
     def underlying_category(self):
@@ -502,13 +724,59 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
 
         @cached_method(key=lambda self, point: self.ranking_map()(point))
         def _orbit_of(self, point):
-            r"""The single orbit datum of ``point``: its orbit ``G``-set and its words, by the selected cover."""
+            r"""The single orbit datum of ``point``: its orbit ``G``-set and its words, by the selected cover.
+
+            A ``G``-set built by ``from_finite_orbits`` retains that one
+            breadth-first sweep; when ``point`` is its first seed and the
+            sweep covers every point of this ``G``-set, the orbit of ``point``
+            IS this set with the retained words and transitions, and searching
+            a second time is refused work, not a construction. Any other
+            point searches as before.
+            """
             augmentation = self.acting_group().selected_group_resolution().augmentation()
             category = FiniteGSets(self.acting_group())
-            points, words = category._orbit_words(
+            retained = self.__dict__.get("_retained_orbit_bfs")
+            if (
+                retained is not None
+                and len(retained["seeds"]) == 1
+                and point == retained["seeds"][0]
+                and len(retained["points"]) == int(self.point_set().cardinality())
+                and retained["augmentation"] is augmentation
+                and retained["letter_count"] == len(tuple(augmentation.domain().group_generators()))
+            ):
+                self.__dict__["_retained_transitions"] = (retained["transitions"], retained["letter_count"])
+                return self, retained["words"], retained["augmentation"]
+            points, words, transitions = category._orbit_words(
                 (point,), self.act, augmentation, point_key=self.ranking_map(),
+                retain_transitions=True,
             )
-            return category(finite_ordered_set(tuple(points)), self.act), words, augmentation
+            orbit = category._from_orbit_sweep(points, self.act, augmentation, transitions)
+            orbit.__dict__["_retained_transitions"] = (
+                transitions, len(tuple(augmentation.domain().group_generators())),
+            )
+            return orbit, words, augmentation
+
+        @cached_method(key=lambda self, point: self.ranking_map()(point))
+        def orbit_generator_permutations(self, point):
+            r"""Return the selected cover's generator actions on the orbit of ``point``.
+
+            The order is that of the letters in ``orbit_schreier_factors``.
+            The orbit search already computed every letter's image of every
+            point. Read those exact transitions to construct the permutations;
+            no rational, module or other supplied action is evaluated again.
+            Their positions are already in the orbit's selected point order.
+            """
+            orbit, _words, _augmentation = self._orbit_of(point)
+            transitions, letter_count = orbit.__dict__["_retained_transitions"]
+            point_set = orbit.point_set()
+            permutations = SymmetricGroups()(point_set)
+            return tuple(
+                permutations([
+                    transitions[(position, letter)] + 1
+                    for position in range(int(point_set.cardinality()))
+                ])
+                for letter in range(letter_count)
+            )
 
         def orbit_schreier_morphism(self, point):
             r"""Schreier's lemma on the orbit of ``point``: ``E -> G`` with image ``G_point``."""
@@ -517,7 +785,69 @@ class FiniteGSets(CategoryPacketMethods, OwnedParameterizedCategory):
             word_section = Sets().Mor(orbit, augmentation.domain())(
                 lambda image: words[int(ranking(image))]
             )
-            return _orbit_schreier_morphism(orbit, word_section, augmentation)
+            return _orbit_schreier_morphism(
+                orbit,
+                word_section,
+                augmentation,
+                transitions=orbit.__dict__.get("_retained_transitions"),
+            )
+
+        def orbit_transversal_words(self, point):
+            r"""Return the orbit of ``point`` and the section ``p |-> t_p`` into the selected free cover.
+
+            The transversal of an orbit point is returned as its *word* in the
+            selected free cover, before it is realized as an element of the acting
+            group.  ``augmentation() * section`` is the transversal map that
+            :meth:`orbit_schreier_factors` materializes; a caller whose group is
+            reached through an engine reads the words and realizes them there, so
+            realizing ``|orbit|`` transversals costs that caller's own products
+            rather than ``|orbit|`` owned word evaluations.
+            """
+            orbit, words, augmentation = self._orbit_of(point)
+            ranking = orbit.ranking_map()
+            section = Sets().Mor(orbit, augmentation.domain())(
+                lambda image: words[int(ranking(image))]
+            )
+            return orbit, section
+
+        def orbit_schreier_factors(self, point):
+            r"""Return the letters and transversals whose composites are the Schreier family.
+
+            :meth:`orbit_schreier_morphism` emits ``t_(s.p)^-1 s t_p`` over the
+            orbit points ``p`` and the cover's letters ``s``, in that order.  The
+            letters and the transversals are returned here separately, so a caller
+            can realize the whole family by reading ``|letters| + |orbit|``
+            elements and composing instead of reading ``|letters| * |orbit|`` of
+            them.  Both are group elements of this G-set's group, in the order the
+            family uses: ``letters[j]`` is the ``j``-th letter and
+            ``transversals[i]`` is ``t_p`` for the ``i``-th orbit point.
+
+            The composite law is the caller's to check: for the ``i``-th orbit
+            point ``p`` and the ``j``-th letter ``s``, the family element is
+            ``~transversals[position of s.p] * letters[j] * transversals[i]``.
+            """
+            orbit, _words, augmentation = self._orbit_of(point)
+            letters = tuple(
+                augmentation(generator)
+                for generator in augmentation.domain().group_generators()
+            )
+            transitions, letter_count = orbit.__dict__["_retained_transitions"]
+            if letter_count != len(letters):
+                raise ArithmeticError("the retained orbit transitions have a different generating cover")
+            transversals = [self.acting_group().one()]
+            # The breadth-first sweep assigns each new point its next rank
+            # and word s*t_p. Its existing transition table therefore gives
+            # the same transversal as the augmentation of that word, using
+            # the already realized parent transversal rather than reading
+            # every word again from the identity.
+            orbit_size = int(orbit.point_set().cardinality())
+            for position in range(orbit_size):
+                for letter_position, letter in enumerate(letters):
+                    if transitions[position, letter_position] == len(transversals):
+                        transversals.append(letter * transversals[position])
+            if len(transversals) != orbit_size:
+                raise ArithmeticError("the retained orbit transitions do not reach every orbit point")
+            return letters, tuple(transversals)
 
         @cached_method(key=lambda self, point: self.ranking_map()(point))
         def orbit_as_coset_space(self, point):
@@ -658,16 +988,34 @@ class LeftCosetGSets(OwnedParameterizedCategory):
             self._coset_augmentation = coset_augmentation
             super().__init__(**rest)
 
-        def schreier_generating_morphism(self):
-            r"""Schreier's lemma: ``E ->> H`` from the section of ``G -> G/H``, corestricted to ``H``."""
+        def schreier_generating_morphism(self, *, drop_trivial=False):
+            r"""Schreier's lemma: ``E ->> H`` from the section of ``G -> G/H``.
+
+            The transversal sends the base point to its selected coset.
+            Thus ``t_(s.p)^-1 s t_p`` fixes the base point, whose stabilizer
+            is the supplied H. This defining range law gives the
+            corestriction of the complete Schreier generating map.
+            ``drop_trivial`` omits the generators that are the identity by the
+            sweep's construction (``_orbit_schreier_morphism``).
+            """
             assert self._coset_word_section is not None, (
                 f"Schreier generators of {self.subgroup()} are read from a pointed coset space "
                 f"with a word section through a free cover, which {self} was not built with"
             )
             schreier = _orbit_schreier_morphism(
-                self, self._coset_word_section, self._coset_augmentation
+                self, self._coset_word_section, self._coset_augmentation,
+                # The coset realization retains the action's literal point
+                # set. Its sweep table therefore has the same point order;
+                # its letters must also belong to this exact free cover.
+                transitions=(
+                    self._coset_action.__dict__.get("_retained_transitions")
+                    if self._coset_action.__dict__.get("_retained_transition_augmentation")
+                    is self._coset_augmentation
+                    else None
+                ),
+                drop_trivial=drop_trivial,
             )
-            return schreier.factor_through(self.subgroup().inclusion())
+            return schreier._corestrict_to_subgroup(self.subgroup())
 
         @cached_method
         def right_coset_projection(self):
@@ -698,8 +1046,8 @@ class LeftCosetGSets(OwnedParameterizedCategory):
                 if left_subgroup is group
                 else left_subgroup.inclusion()
             )
-            acted = FiniteGSets(left_subgroup)(
-                self, lambda element, point: self.act(inclusion(element), point)
+            acted = FiniteGSets(left_subgroup).from_permutation_representation(
+                self.permutation_representation() * inclusion,
             )
             return _double_coset_set(acted, self, _DoubleCosetSet)
 
@@ -1218,8 +1566,8 @@ def _permutation_from_point_map(permutation_group, point_set, mapping):
     # A permutation is a bijection of the backend point domain. Let the
     # permutation engine check that property instead of searching all pairs
     # of points for preimage counts at this owned/engine boundary.
-    ranking = point_set.ranking_map()
-    images = [int(ranking(mapping(point))) + 1 for point in point_set]
+    ranking, _inverse = permutation_group._natural_point_ranking_and_inverse()
+    images = [int(ranking(mapping(point))) + 1 for point in ranking.domain()]
     try:
         return permutation_group(images)
     except (TypeError, ValueError) as error:
@@ -1311,12 +1659,23 @@ class _LeftCosetPoint(Element):
     def __contains__(self, element):
         return self.representative().inverse() * element in self.parent().subgroup()
 
+    @cached_method
+    def _canonical_key(self):
+        r"""The canonical transversal position of ``gH`` (see ``_LeftCosetPointSet._coset_key``), else ``None``."""
+        key = self.parent()._coset_key()
+        return None if key is None else key(self.representative())
+
     def __eq__(self, other):
-        return (isinstance(other, _LeftCosetPoint) and other.parent() is self.parent()
-                and self.representative().inverse() * other.representative() in self.parent().subgroup())
+        if not (isinstance(other, _LeftCosetPoint) and other.parent() is self.parent()):
+            return False
+        key = self._canonical_key()
+        if key is not None:
+            return key == other._canonical_key()
+        return self.representative().inverse() * other.representative() in self.parent().subgroup()
 
     def __hash__(self):
-        return hash(id(self.parent()))
+        r"""Hash by the canonical coset key, so orbit searches look cosets up instead of comparing pairwise."""
+        return hash((id(self.parent()), self._canonical_key()))
 
     def _repr_(self):
         return f"{self.representative()} * {self.parent().subgroup()}"
@@ -1337,6 +1696,30 @@ class _LeftCosetPointSet(Parent):
 
     def subgroup(self):
         return self._subgroup
+
+    @cached_method
+    def _coset_key(self):
+        r"""A map ``g |-> key(gH)`` with equal keys exactly for equal cosets, or ``None``.
+
+        For finite GAP-encoded ``G`` the key is the position of ``g`` in
+        GAP's transversal of ``H``.  For a preimage ``H = f^-1(K)`` along
+        ``f: G -> Q`` into a finite GAP-encoded ``Q``, ``gH = g'H`` exactly
+        when ``f(g)K = f(g')K``, so the key is the transversal position of
+        ``f(g)`` in ``Q/K``.  Otherwise no canonical form is available.
+        """
+        from sage_extensions.categories.group.predicate_subgroups import PreimageSubgroups
+
+        if self._subgroup in PreimageSubgroups(self._group) and self._subgroup.supergroup() is self._group:
+            morphism = self._subgroup.preimage_morphism()
+            image_positions = _engine_left_coset_positions(
+                morphism.codomain(), self._subgroup.target_subgroup()
+            )
+            if image_positions is not None:
+                return lambda element: image_positions.position_of(morphism(element))
+        positions = _engine_left_coset_positions(self._group, self._subgroup)
+        if positions is not None:
+            return positions.position_of
+        return None
 
     def _element_constructor_(self, representative):
         if isinstance(representative, _LeftCosetPoint) and representative.parent() is self:

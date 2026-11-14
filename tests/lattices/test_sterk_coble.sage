@@ -37,3 +37,17 @@ def test_sterk_alternative_realizations_reproduce_the_archived_root_data() -> No
         "Sterk_3": 12,
     }
     assert all(root.q() in (-2, -4) for roots in alternatives.values() for root in roots)
+
+
+def test_the_base_root_family_and_its_isotropic_vector_are_read_by_the_lattice_labels() -> None:
+    r"""Regression for sage-extensions#141: the families read labels ``TdP`` has.
+
+    A root of an even lattice has square ``-2`` or ``-4`` here, and the sum
+    ``v21 + v22`` is isotropic (Sterk, Compactifications of the period space of
+    Enriques surfaces I, Math. Z. 207 (1991), Section 4).
+    """
+    roots = Sterk.roots_18_2_0()
+    assert all(root.parent() is NamedLattices.TdP for root in roots.values())
+    assert all(root.q() in (-2, -4) for root in roots.values())
+    vectors = Sterk.isotropic_vectors()
+    assert all(vector.q() == 0 and vector != vector.parent().zero() for vector in vectors.values())

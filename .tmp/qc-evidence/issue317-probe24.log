@@ -1,0 +1,23 @@
+PARI stack size set to 2147483648 bytes, maximum size set to 8589934592
+D_17 roots 544, in the genus True; mass 642332179/18881368343036559360000
+    NEW class 1: |Aut| 1941728542064640000, roots 480, mass 1/1941728542064640000 / 642332179/18881368343036559360000 equal False
+    NEW class 2: |Aut| 49662885888000, roots 204, mass 430091/21359013962711040000 / 642332179/18881368343036559360000 equal False
+    NEW class 3: |Aut| 809053559193600, roots 264, mass 65213/3051287708958720000 / 642332179/18881368343036559360000 equal False
+    NEW class 4: |Aut| 106542032486400, roots 224, mass 328483/10679506981355520000 / 642332179/18881368343036559360000 equal False
+    NEW class 5: |Aut| 1371195958099968000, roots 480, mass 17081521/555334363030487040000 / 642332179/18881368343036559360000 equal False
+[   954.9s] done: 7 u, 565 planes, 5 classes, mass 17081521/555334363030487040000 vs 642332179/18881368343036559360000: equal False
+DONE
+[peakrss] issue286: child waited=0 shell_code=0 samples=480
+[peakrss] peak tree RSS      : 615 MiB
+[peakrss] low-water MemAvail : 2616 MiB
+[peakrss] peak single VmHWM  : 620 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      609 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    48.0s procs=  3 rss=   615 MiB hwm=   620 MiB avail= 10519 MiB
+[peakrss]   t=    50.0s procs=  3 rss=   615 MiB hwm=   620 MiB avail= 10527 MiB
+[peakrss]   t=    52.0s procs=  3 rss=   615 MiB hwm=   620 MiB avail= 10415 MiB
+[peakrss]   t=    54.1s procs=  3 rss=   615 MiB hwm=   620 MiB avail= 10367 MiB
+[peakrss]   t=    56.1s procs=  3 rss=   615 MiB hwm=   620 MiB avail= 10379 MiB
+launcher exit: 0

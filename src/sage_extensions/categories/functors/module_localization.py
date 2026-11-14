@@ -117,7 +117,13 @@ class ModuleLocalizationFunctor(_ScalarExtensionFunctor):
         # Flatness preserves a selected monomorphism.  Read its mathematical
         # Mor placement, not its concrete morphism implementation.
         source_mor = morphism.parent().mor_category()
-        monomorphisms = morphism.domain().module_category().Mono()
+        # The packet's ``Mono`` is asked for the monomorphisms *into the
+        # morphism's codomain*; without that argument it is the packet operation
+        # itself, which needs a codomain and raised
+        # "Mono() missing 1 required positional argument: 'codomain'".
+        monomorphisms = morphism.domain().module_category().Mono(
+            morphism.domain(), morphism.codomain()
+        )
         match source_mor.is_subcategory(monomorphisms):
             case True:
                 return source.Mono(target)._from_constructed_embedding(
@@ -210,6 +216,16 @@ def _localization_cokernel_comparison(functor, morphism):
             for label in codomain_labels
         }
     )
+    # Each arrow is half of a known inverse pair, so it is injective and
+    # surjective by construction.  That theorem is kept as the arrow's premise
+    # (``is_injective``/``is_surjective`` read it without a kernel computation)
+    # instead of being decided by a Smith form over this localization's
+    # coefficient ring, which is not a Noetherian integral domain:
+    # "Smith form only defined over Noetherian integral domains".
+    forward._injectivity_premise = True
+    forward._surjectivity_premise = True
+    inverse._injectivity_premise = True
+    inverse._surjectivity_premise = True
     return _isomorphism_from_known_inverse_pair(forward, inverse)
 
 

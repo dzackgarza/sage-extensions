@@ -54,7 +54,8 @@ from sage_extensions.categories.abstract_categories.functors import (  # noqa: F
     DiscreteCategory,
     ObjectSetFunctor,
 )
-from sage_extensions.categories.algebras.algebras import (
+from sage_extensions.categories.algebras.algebras import (  # noqa: F401
+    Algebras,
     MatrixAlgebras as MatrixAlgebras,
 )
 from sage_extensions.categories.cell_complexes import (  # noqa: F401
@@ -131,9 +132,24 @@ from sage_extensions.categories.graph_categories import (  # noqa: F401
     LabelledDigraphs,
     LabelledGraphs,
 )
+from sage_extensions.categories.group.g_objects import (  # noqa: F401
+    GObjects,
+)
+from sage_extensions.categories.group.g_sets import (  # noqa: F401
+    FiniteGSets,
+)
 from sage_extensions.categories.group.groups import (  # noqa: F401
+    AbelianGroups,
+    FiniteAbelianGroups,
+    Groups,
     LieGroups,
+    OwnedAbelianGroups,
+    OwnedFiniteAbelianGroups,
+    OwnedGroups,
     TopologicalGroups,
+)
+from sage_extensions.categories.group.magmas import (  # noqa: F401
+    AdditiveGroups,
 )
 from sage_extensions.categories.holomorphic_atlases import (  # noqa: F401
     HolomorphicAtlases,
@@ -167,9 +183,18 @@ from sage_extensions.categories.integral_affine_stratified_atlases import (  # n
 from sage_extensions.categories.isotropic_orbits import (  # noqa: F401
     FlagType,
     IsotropicFlag,
+    OrientedIsotropicFlag,
+    RationalIsotropicFlagComplex,
 )
 from sage_extensions.categories.isotropic_parabolics import (  # noqa: F401
+    LeviQuotientLiftAbsent,
     PrimitiveIsotropicSubobjects,
+)
+from sage_extensions.lattice_database import (  # noqa: F401
+    card_line_orbit_lengths,
+    card_line_orbit_row,
+    card_plane_orbit_lengths,
+    card_plane_orbit_row,
 )
 from sage_extensions.categories.lattice_centralizers import (  # noqa: F401
     IsometryPrimitiveExtension,
@@ -187,6 +212,7 @@ from sage_extensions.categories.lattices import (  # noqa: F401  # noqa: F401
     FiniteRankLattices,
     IsotropicReductions,
     Lattices,
+    OrientedIsotropicFlags,
     NoncrystallographicRootLattices,
     NondegenerateLattices,
     NotPrimitiveError,
@@ -224,9 +250,19 @@ from sage_extensions.categories.modules.hodge_structures import (  # noqa: F401
     MixedHodgeStructures,
     PolarizedHodgeStructures,
 )
+from sage_extensions.categories.modules.framed.formed.form_modules import (  # noqa: F401
+    BilinearFormModules,
+    FormModules,
+)
+from sage_extensions.categories.modules.framed.fraction_field_quotients import (  # noqa: F401
+    FractionFieldQuotients,
+)
 from sage_extensions.categories.modules.pure.modules import (  # noqa: F401
+    FinitelyPresentedTorsionModules,
+    FreeModules,
     MatrixEndomorphismSpaces,
     MatrixSpaces,
+    Modules,
 )
 from sage_extensions.categories.orbifolds import (  # noqa: F401
     ComplexOrbifolds,
@@ -365,6 +401,12 @@ _lazy_import(
     "sage_extensions.categories.schemes.cyclic_covers",
     "CyclicCovers",
 )
+from sage_extensions.categories.algebras.subalgebras import (  # noqa: F401
+    GeneratedSubalgebras,
+)
+from sage_extensions.categories.algebras.algebra_ideals import (  # noqa: F401
+    GeneratedAlgebraIdeals,
+)
 from sage_extensions.categories.algebras.graded_lie_algebras import (  # noqa: F401
     GradedLieAlgebras,
 )
@@ -395,6 +437,7 @@ from sage_extensions.categories.sets import (  # noqa: F401
     EnumeratedByNaturals,
     EnumeratedSets,
     FinitelySupportedFunctionSets,
+    FunctionSets,
     FinitePowerSets,
     FiniteSets,
     FourierCharacters,

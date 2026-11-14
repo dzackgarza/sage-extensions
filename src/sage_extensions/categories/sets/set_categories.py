@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
-from itertools import count, product
+from itertools import count, islice, product
 from math import comb
 from operator import index as integer_index
 from typing import TYPE_CHECKING, Any, Self, SupportsIndex, TypeVar
@@ -349,7 +349,7 @@ class EnumeratedSets(OwnedCategory):
                         int(cardinal(counting_order.cardinality()).finite_value())
                     )
                 case False:
-                    assert counting_order in CountablyInfiniteSets(), (
+                    assert counting_order.cardinality().is_countably_infinite() is True, (
                         f"the ranking map of {self} has codomain {counting_order}, not a finite or countably infinite "
                         "standard well-order"
                     )
@@ -415,6 +415,44 @@ class EnumeratedSets(OwnedCategory):
             return self.fixed_size_selections(size, repetition=True)
 
 
+class _OrdinalPointAtPosition:
+    r"""The point at a position in the finite ordinal ``[n]``.
+
+    ``[n]`` retains its enumeration on the parent, and a parent must survive a
+    pickle round trip, so the map is a module-level object rather than a closure
+    (issue #20).  It carries no state: position ``k`` is the point ``k``.
+    """
+
+    def __call__(self, position):
+        return NN(int(position))
+
+    def __repr__(self) -> str:
+        return "point at position"
+
+
+class _OrdinalIndexOfPoint:
+    r"""The position of a point of the ordinal ``ordinal``, or ``None`` outside it.
+
+    The ordinal is retained so the question "is this point one of mine" is asked
+    of the ordinal itself, exactly as the closure it replaces asked it.  Holding
+    the ordinal is what makes this picklable where a closure was not: a class
+    instance pickles by reference plus its state, and its state is a parent that
+    is being pickled anyway.
+    """
+
+    def __init__(self, ordinal) -> None:
+        self._ordinal = ordinal
+
+    def __call__(self, point):
+        return int(point) if point in self._ordinal else None
+
+    def __repr__(self) -> str:
+        return "index of point"
+
+
+_ORDINAL_POINT_AT_POSITION = _OrdinalPointAtPosition()
+
+
 class AugmentedSimplexCategory(OwnedCategory):
     r"""The standard finite linear orders \([n] = \{0 < \dots < n-1\}\).
 
@@ -456,8 +494,8 @@ class AugmentedSimplexCategory(OwnedCategory):
             # point at position k is k.
             super().__init__(
                 index_set=self,
-                element_at=lambda position: NN(int(position)),
-                index_of=lambda point: int(point) if point in self else None,
+                element_at=_ORDINAL_POINT_AT_POSITION,
+                index_of=_OrdinalIndexOfPoint(self),
                 contains=self.__contains__,
                 **rest,
             )
@@ -586,6 +624,107 @@ class _IntegerTranslationOnZZ:
 
     def displacement(self):
         return self._displacement
+
+
+_ARROW_HASH_PROBE_SIZE = 8
+
+
+def arrow_probe(domain):
+    r"""Return one canonical finite probe of ``domain``, or ``None``.
+
+    An arrow's hash must read the arrow, not its presentation: two arrows of one
+    hom-set are equal exactly when they agree on the domain, so a hash of values
+    on a family determined by the *domain* alone keeps "equal implies equal
+    hash" for every way of naming the same arrow.  The family is the domain's
+    chosen finite module generating set when it has one, and otherwise its
+    elements when it is a finite enumerated set.  Both arrow classes read the
+    same probe for the same domain, so a set map and a module map with the same
+    endpoints agree in hash exactly when they agree in values.
+
+    At most ``_ARROW_HASH_PROBE_SIZE`` points are read, from the front of the
+    canonical order.  A prefix is still sound -- equal arrows agree on it -- and
+    it bounds the work hashing does, which matters because hashing happens once
+    per dictionary insertion while the collisions it prevents cost one arrow
+    comparison each.  Reading a whole large family to hash one arrow would trade
+    that saving away, so the prefix is taken by greedy iteration and not by
+    materializing the family first: a finite family may be enormous, and hashing
+    must cost at most the bound whatever the domain's cardinality.
+
+    A domain with no such finite family supplies ``None``: there the arrow hash
+    states only its endpoints, which is sound -- equal arrows still share it --
+    and cannot distinguish arrows that the domain does not separate.
+    """
+    try:
+        generating_set = domain.module_generating_set()
+    except (AttributeError, TypeError, ValueError, NotImplementedError):
+        generating_set = None
+    if generating_set is not None and _probe_is_finite(generating_set):
+        return tuple(
+            domain.module_generator(label) for label in _probe_prefix(generating_set)
+        )
+    if Sets().is_provably_finite(domain) and domain in EnumeratedSets():
+        return _probe_prefix(domain)
+    return None
+
+
+def _probe_prefix(family):
+    r"""Return at most ``_ARROW_HASH_PROBE_SIZE`` elements of ``family``, lazily.
+
+    ``islice`` reads the prefix and stops, so the cost is the bound and not the
+    family's size.  Materializing a finite family first -- ``tuple(family)[:n]``
+    -- would make one hash cost the whole domain, which for a finite enumerated
+    set of a million elements, or a frame with a thousand labels, is the
+    difference between a hash and a computation.  Reading lazily also means a
+    family that is finite only by its own claim cannot make hashing hang.
+
+    Both probe branches read the prefix through this one function, so the bound
+    is a property of the probe and not of a branch.
+    """
+    return tuple(islice(family, _ARROW_HASH_PROBE_SIZE))
+
+
+def _probe_is_finite(family) -> bool:
+    r"""Whether a candidate probe family is a finite set that can be iterated."""
+    try:
+        return family.is_finite() is True
+    except (AttributeError, TypeError, ValueError, NotImplementedError):
+        return False
+
+
+def arrow_hash(arrow) -> int:
+    r"""Hash an arrow by its values on the domain's canonical finite probe.
+
+    Equality of arrows is extensional, within one Mor or across a stronger Mor
+    with the same endpoints, so this hash may not depend on the arrow's parent,
+    on how it was constructed, or on a defining datum all arrows share.  It
+    reads the values instead, which is what equality reads:
+
+    * equal arrows have equal values on the probe, so they share this hash;
+    * arrows that the probe separates -- the points of a dual module, for
+      instance, which are separated by their values on the module generators --
+      no longer collide.
+
+    Hashing only the endpoints, as this definition once did, made every point of
+    a dual module collide: ``dict.fromkeys`` over 64 distinct points of a rank-6
+    standard lattice collapsed to one bucket, so each insertion compared the new
+    point with every extant key by arrow equality (measured at ~17 ms each, 22.9 s
+    for 64 points, and minutes at the few hundred a polyhedral cone carries).
+
+    A probe that cannot be evaluated, or whose values are unhashable, leaves the
+    endpoint hash in force rather than raising: an arrow of an arbitrary map may
+    have a partial domain, and hashing is not the place to decide that.
+    """
+    domain = arrow.domain()
+    codomain = arrow.codomain()
+    endpoints = (id(domain), id(codomain))
+    probe = arrow_probe(domain)
+    if probe is None:
+        return hash(endpoints)
+    try:
+        values = tuple(arrow(element) for element in probe)
+        return hash((*endpoints, values))
+    except (TypeError, ValueError, ArithmeticError, AttributeError, NotImplementedError):
+        return hash(endpoints)
 
 
 class OwnedSetMorphism:
@@ -735,10 +874,11 @@ class OwnedSetMorphism:
 
     def __hash__(self) -> int:
         # Equality is extensional, within one Mor or across a stronger Mor
-        # with the same endpoints.  An identity-based hash of the function
-        # would give equal maps different hashes; hashing only the endpoints
-        # also works when points of either endpoint are unhashable.
-        return hash((id(self.domain()), id(self.codomain())))
+        # with the same endpoints, so this hash reads the arrow on the domain,
+        # not on its presentation.  ``arrow_hash`` supplies the values on one
+        # canonical finite probe of the domain when there is one, and falls back
+        # to the endpoints when there is not.
+        return arrow_hash(self)
 
     def is_identity(self) -> bool | Predicate:
         r"""Decide identity on a finite enumeration; return the proposition otherwise.
@@ -2368,6 +2508,19 @@ class Sets(CategoryPacketMethods, OwnedCategory):
             r"""All finite multisets in this alphabet, including the empty multiset."""
             return _finite_words(self, commutative=True)
 
+        def multisets_of_size(self, size):
+            r"""The ``size``-element multisets on this set.
+
+            An enumerated set ranks them by its combinadic selections; a set
+            that states no enumeration names each multiset by the multiplicity
+            of every point it uses (``FixedCardinalityMultisetSets``).
+            """
+            match self in EnumeratedSets():
+                case True:
+                    return self.fixed_size_selections(size, repetition=True)
+                case False:
+                    return _multisets_of_size(self, size)
+
         # Recorded by the construction that builds the object (``_object_of``
         # through the root ``OwnedParent``, or the ring route); ``None`` for an
         # object no category's constructor built.
@@ -2732,6 +2885,32 @@ class _FiniteLiteralSet(Sets().ObjectType):
 
     def __ne__(self, other) -> bool:
         return not self == other
+
+    def __le__(self, other) -> bool:
+        r"""Subset decision over the retained finite points of two literal sets.
+
+        ``A <= B`` iff every retained point of A is a point of B; the
+        presented states alone decide it, no ambient search or claimed
+        enumeration between the two objects.
+        """
+        if not isinstance(other, _FiniteLiteralSet):
+            return NotImplemented
+        return self._points.issubset(other._points)
+
+    def __lt__(self, other) -> bool:
+        if not isinstance(other, _FiniteLiteralSet):
+            return NotImplemented
+        return self <= other and self != other
+
+    def __ge__(self, other) -> bool:
+        if not isinstance(other, _FiniteLiteralSet):
+            return NotImplemented
+        return other <= self
+
+    def __gt__(self, other) -> bool:
+        if not isinstance(other, _FiniteLiteralSet):
+            return NotImplemented
+        return other < self
 
     def __hash__(self) -> int:
         return hash(self._points)
@@ -3348,14 +3527,27 @@ class PowerSets(OwnedCategory):
             if candidate is self.base_set():
                 return self.top()
             if candidate in Sets():
-                assert (
-                    Sets().is_provably_finite(candidate)
-                    and candidate in EnumeratedSets()
-                ), (
+                assert Sets().is_provably_finite(candidate), (
                     f"cannot read {candidate} as a subset of {self.base_set()}: a set is read as a subset here only "
-                    "through its elements, which needs it finite and enumerated"
+                    "through its elements, which needs it finite"
                 )
-                return self._from_finite_members(candidate)
+                if candidate in EnumeratedSets():
+                    return self._from_finite_members(candidate)
+                # A finite set whose points are presented without an owned
+                # ranking is still read through them: a Sage enumerated set is
+                # finite and iterable but carries no ranking map onto the
+                # standard well-order, so requiring ``EnumeratedSets()`` here
+                # rejected the very points the ``Iterable`` branch below
+                # accepts from a tuple.  Only an unenumerable finite set is
+                # refused, and the refusal says so.
+                try:
+                    members = tuple(candidate)
+                except TypeError:
+                    raise ValueError(
+                        f"cannot read {candidate} as a subset of {self.base_set()}: it is provably finite but "
+                        "presents no enumeration of its elements"
+                    ) from None
+                return self._from_finite_members(members)
             if isinstance(candidate, Iterable):
                 return self._from_finite_members(candidate)
             raise TypeError(
@@ -3819,6 +4011,211 @@ def _finite_subsets(source: Parent) -> Sets().ObjectType:
     return FinitePowerSets()(source)
 
 
+class FixedCardinalityMultisetSets(OwnedCategory):
+    r"""The sets ``Mult_k(X)`` of \(k\)-element multisets on a set \(X\).
+
+    A \(k\)-element multiset on \(X\) is a function \(X \to \mathbb{N}\) of finite
+    support whose values total \(k\), so one multiset *is* its multiplicity map
+    and stating it needs no enumeration of \(X\).  That is the construction this
+    category states, and it is the one an unenumerated alphabet requires: the
+    componentwise framing of a graded sum is a disjoint union, and a symmetric
+    algebra on it has multisets of those labels for its monomials.  An
+    enumerated alphabet ranks its multisets by the combinadic selections
+    (``EnumeratedSets.multisets_of_size``); the two constructions name the same
+    multisets, each in the datum its own representation carries.
+    """
+
+    def an_object(self) -> ObjectOfCategory:
+        r"""The two-element multisets on \(\{0, 1\}\): ``00``, ``01``, ``11``.
+
+        Constructed through this category rather than through
+        ``multisets_of_size``, which ranks them by their combinadic selections
+        because \(\{0,1\}\) is enumerated; these are the same three multisets,
+        stated by their multiplicities.
+        """
+        return _multisets_of_size(Sets.Δ[1], 2)
+
+    def super_categories(self):
+        return [Sets()]
+
+    def _call_(self, source, multiset_size):
+        r"""Construct the ``multiset_size``-element multisets on ``source``."""
+        if source not in Sets():
+            raise ValueError(f"multisets require a set source, not {source!r}")
+        selected_size = int(multiset_size)
+        if selected_size < 0 or multiset_size != selected_size:
+            raise ValueError(
+                f"the cardinality of a multiset must be a nonnegative integer, not {multiset_size!r}"
+            )
+        return _object_of(
+            owned_category_join(
+                (
+                    self,
+                    _cardinalities().set_multiset_category(
+                        source, fixed_size=selected_size
+                    ),
+                )
+            ),
+            source=source,
+            multiset_size=selected_size,
+        )
+
+    class ElementMethods(Element):
+        r"""One multiset, retained as the multiplicity of each of its points.
+
+        Its points are the source points it uses, so ``support`` and
+        ``multiplicity`` read the retained map; nothing ranks the source.
+        """
+
+        def __init__(self, parent, multiplicities) -> None:
+            Element.__init__(self, parent)
+            source = parent.source()
+            retained = {}
+            for label, multiplicity in multiplicities.items():
+                count = int(multiplicity)
+                assert count >= 0 and multiplicity == count, (
+                    f"the multiplicity of {label} in a multiset on {source} is a natural "
+                    f"number, but {multiplicity!r} is not"
+                )
+                if count == 0:
+                    continue
+                membership = source.__contains__(label)
+                assert membership is True, (
+                    f"the points of a multiset on {source} are points of {source}, and "
+                    f"{label} is not decided to be one"
+                )
+                retained[label] = count
+            total = sum(retained.values())
+            assert total == parent.multiset_size(), (
+                f"a multiset of {parent} has {parent.multiset_size()} points, but the "
+                f"multiplicities {multiplicities} have total {total}"
+            )
+            self._multiplicities = retained
+
+        def multiplicities(self):
+            r"""The retained multiplicity of each used point, as a mapping."""
+            return dict(self._multiplicities)
+
+        def support(self):
+            r"""The set of points occurring in this multiset, each at least once."""
+            from sage_extensions.categories.sets.finite_ordered_sets import (
+                finite_ordered_set,
+            )
+
+            return finite_ordered_set(tuple(self._multiplicities))
+
+        def multiplicity(self, label) -> int:
+            r"""How many times ``label`` occurs here; zero when it does not."""
+            return self._multiplicities.get(label, 0)
+
+        def degree(self) -> int:
+            return sum(self._multiplicities.values())
+
+        def __eq__(self, other) -> bool:
+            return (
+                element_parent(other) is self.parent()
+                and other.multiplicities() == self._multiplicities
+            )
+
+        def __ne__(self, other) -> bool:
+            return not self == other
+
+        def __hash__(self) -> int:
+            return hash((id(self.parent()), frozenset(self._multiplicities.items())))
+
+        def _repr_(self) -> str:
+            if not self._multiplicities:
+                return "1"
+            return " ".join(
+                repr(label)
+                if count == 1
+                else f"{label!r}^{count}"
+                for label, count in self._multiplicities.items()
+            )
+
+    class ParentMethods:
+        def __init__(self, source: Parent, multiset_size: int, **rest) -> None:
+            self._source = source
+            self._multiset_size = int(multiset_size)
+            assert self._multiset_size >= 0, (
+                f"the multisets on {source} have a natural number of points, but "
+                f"{multiset_size!r} is not one"
+            )
+            super().__init__(**rest)
+
+        def source(self) -> Sets().ObjectType:
+            return self._source
+
+        def multiset_size(self) -> int:
+            return self._multiset_size
+
+        def __call__(self, *args, **kwargs):
+            r"""Construct through the owned set representation directly."""
+            return self._element_constructor_(*args, **kwargs)
+
+        def _element_constructor_(self, multiplicities):
+            source = element_parent(multiplicities)
+            match source:
+                case _ if source is self:
+                    return multiplicities
+                case _ if source is not None and source in FixedCardinalityMultisetSets():
+                    raise ValueError(
+                        f"{multiplicities} is a multiset of {source}, not of {self}: its "
+                        f"points are points of the wrong set"
+                    )
+                case _:
+                    return self.element_class(self, multiplicities)
+
+        def from_multiplicities(self, multiplicities):
+            r"""The multiset whose multiplicity of ``label`` is ``multiplicities[label]``.
+
+            This is the constructor the word and free-algebra constructions call
+            when they add two multisets point by point.
+            """
+            return self.element_class(self, multiplicities)
+
+        def an_element(self):
+            r"""``k`` copies of a chosen point of the source."""
+            return self.element_class(
+                self, {self.source().an_element(): self.multiset_size()}
+            )
+
+        def __contains__(self, candidate):
+            return element_parent(candidate) is self
+
+        is_parent_of = __contains__
+
+        def _cardinality_decision(self):
+            r"""\(|\mathrm{Mult}_k(X)|\): one for \(k = 0\), \(\binom{|X|+k-1}{k}\)
+            for finite \(X\), and \(|X|\) for infinite \(X\).
+
+            The last two agree with the count of \(k\)-element selections on
+            \(X\), which is the count of the stateable case; an undecided source
+            cardinality leaves this undecided.
+            """
+            size = self.multiset_size()
+            if size == 0:
+                return cardinal(1)
+            source_size = self.source()._cardinality_decision()
+            if source_size is None:
+                return None
+            source_size = cardinal(source_size)
+            if not source_size.expression().is_normal_form():
+                return None
+            if source_size.is_finite():
+                return cardinal(comb(int(source_size.finite_value()) + size - 1, size))
+            return source_size
+
+        def _repr_(self) -> str:
+            return f"Multisets of {self.source()} of size {self.multiset_size()}"
+
+
+@cached_function(key=lambda source, multiset_size: (id(source), int(multiset_size)))
+def _multisets_of_size(source: Parent, multiset_size: int) -> Sets().ObjectType:
+    r"""The ``multiset_size``-element multisets on ``source``, by multiplicity."""
+    return FixedCardinalityMultisetSets()(source, multiset_size)
+
+
 def _condition_set(
     universe: Parent, predicate: Callable[[SourcePointT], bool | Predicate]
 ) -> Sets().ObjectType:
@@ -3895,9 +4292,23 @@ class _ConditionSetEngine:
         without asking the predicate again (which may be undecided on it).
         It is keyed by the point's identity and holds the point, so the key
         cannot be reused by another object while the record stands.
+
+        The supplied element is recorded before it is coerced into the universe,
+        and it is not coerced at all when it already holds the representation the
+        universe uses: a subgroup's elements keep their ambient representative
+        rather than being reparented, so a point whose parent is the universe's
+        ambient group *is* the point, and coercing it would ask the subgroup's
+        own membership question -- the question this record or the subgroup's
+        mark answers, which for an infinite generated subgroup is otherwise an
+        unevaluated proposition.
         """
-        point = self.universe()(element)
-        self._admitted_members.setdefault(id(point), point)
+        retained = self._admitted_members
+        retained.setdefault(id(element), element)
+        universe = self.universe()
+        ambient = getattr(universe, "supergroup", None)
+        owner = universe if ambient is None or ambient() is universe else ambient()
+        point = element if element.parent() is owner else universe(element)
+        retained.setdefault(id(point), point)
         return point
 
     def _an_element_(self):
@@ -4661,6 +5072,18 @@ class CartesianProductsOfSets(OwnedCategory):
         def has_finite_index_set(self) -> bool:
             index = self.index_set()
             return Sets().is_provably_finite(index)
+
+        def __iter__(self):
+            r"""Enumerate the selected ranking or the finite factor iterators."""
+            if self in EnumeratedSets():
+                return EnumeratedSets.ParentMethods.__iter__(self)
+            if not self.has_finite_index_set() or self.index_set() not in EnumeratedSets():
+                raise TypeError("product iteration requires a finite enumerated index set")
+            factors = tuple(self.factor(index) for index in self.index_set())
+            if not all(Sets().is_provably_finite(factor) for factor in factors):
+                raise TypeError("unranked product iteration requires finite factors")
+            # itertools.product uses the supplied complete finite iterators.
+            return (self(values) for values in product(*factors))
 
         def factor(self, index: IndexT) -> Sets().ObjectType:
             normalized = self.index_set()(index)

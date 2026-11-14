@@ -13,3 +13,6 @@ jobs:
       profile: 'sage'
       infra_ref: 'main'
       setup_recipe: '_ci-tensor-tools'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true

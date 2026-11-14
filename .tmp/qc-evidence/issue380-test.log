@@ -1,0 +1,20 @@
+source SHA: 4f7fad73d7fcba6c09997ed92f9e6361beb84d1b
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+...                                                                      [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_two_u_recursive_isometry.sage::test_2U_plus_E8_squared_is_isometric_to_2U_plus_D16_plus_with_nonisometric_complements: 422.68 s > 20 s
+3 passed in 423.56s (0:07:03)
+[peakrss] issue380-test: child waited=0 shell_code=0 samples=223
+[peakrss] peak tree RSS      : 611 MiB
+[peakrss] low-water MemAvail : 7059 MiB
+[peakrss] peak single VmHWM  : 611 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      600 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   443.4s procs=  3 rss=   611 MiB hwm=   611 MiB avail=  8158 MiB
+[peakrss]   t=   445.4s procs=  3 rss=   611 MiB hwm=   611 MiB avail=  8132 MiB
+[peakrss]   t=   343.0s procs=  3 rss=   609 MiB hwm=   609 MiB avail=  9873 MiB
+[peakrss]   t=   345.0s procs=  3 rss=   609 MiB hwm=   609 MiB avail= 10034 MiB
+[peakrss]   t=   347.0s procs=  3 rss=   609 MiB hwm=   609 MiB avail=  9621 MiB
+launcher exit: 0

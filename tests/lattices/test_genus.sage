@@ -77,10 +77,25 @@ def test_indefinite_isotropic_genus_has_complete_spinor_seed_enumeration() -> No
 
 
 def test_published_four_spinor_genus_is_counted_from_all_generators() -> None:
-    r"""Benham--Hsia, *On spinor exceptional representations*, Nagoya Math. J.
-    87 (1982), §2.3, p. 252, identify ``diag(1, 20, 400)`` as a genus with four
-    spinor genera and twelve classes.  This checks the public consumer of Sage's
-    spinor-generator list against the independent four-way partition.
+    r"""``diag(1, 20, 400)`` is a genus with four spinor genera and twelve classes.
+
+    The published statement is Benham--Hsia, *On spinor exceptional
+    representations*, Nagoya Math. J. 87 (1982), §2.3, p. 252.  **That paper is
+    not on this machine and has not been read here**, so the expected four is
+    not a page anyone in this repository has checked; what the test also
+    asserts is the computed corroboration of it, and that is what the number
+    rests on here:
+
+    * the public genus enumeration partitions the genus's twelve classes as
+      (3, 3, 3, 3), one group per spinor genus, with three classes in each;
+    * the automorphism orders of those twelve classes sum to the genus mass
+      3/2.
+
+    Both are computed by ``p``-neighbour walks and by automorphism orders, not
+    by the count formula under test, so neither presupposes the number four.
+    The count itself is the index of the spinor-norm image in the convention of
+    Cassels, *Rational Quadratic Forms*, Ch. 11, §3, Theorem 3.1, p. 211, and
+    Conway--Sloane, Ch. 15, §9.3, p. 390.
     """
     lattice = Lattices(ZZ)([[1, 0, 0], [0, 20, 0], [0, 0, 400]])
     genus = lattice.genus()

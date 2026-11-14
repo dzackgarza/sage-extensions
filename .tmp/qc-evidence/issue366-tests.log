@@ -1,0 +1,22 @@
+................                                                         [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_stabilizer_generators_carry_the_radical.sage::test_the_stabilizer_generators_carry_a_generating_family_of_the_radical: 164.32 s > 20 s
+tests/lattices/test_the_parabolic_completeness_of_an_enriques_plane.sage::test_the_split_plane_action_has_index_three: 49.82 s > 20 s
+16 passed in 253.60s (0:04:13)
+[peakrss] issue353: child waited=0 shell_code=0 samples=134
+[peakrss] peak tree RSS      : 1930 MiB
+[peakrss] low-water MemAvail : 1589 MiB
+[peakrss] peak single VmHWM  : 2032 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      1619 MiB peak
+[peakrss]   python                      402 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   4ti2int64                     1 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=   262.5s procs=  4 rss=  1930 MiB hwm=  2032 MiB avail=  3908 MiB
+[peakrss]   t=   138.3s procs=  4 rss=  1819 MiB hwm=  1945 MiB avail=  3366 MiB
+[peakrss]   t=   224.5s procs=  4 rss=  1779 MiB hwm=  2032 MiB avail=  4163 MiB
+[peakrss]   t=   228.5s procs=  4 rss=  1776 MiB hwm=  2032 MiB avail=  4114 MiB
+[peakrss]   t=   174.4s procs=  4 rss=  1774 MiB hwm=  2030 MiB avail=  2594 MiB
+launcher exit: 0

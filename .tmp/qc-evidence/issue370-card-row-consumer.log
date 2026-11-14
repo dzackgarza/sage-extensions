@@ -1,0 +1,18 @@
+.                                                                        [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_isotropic_reduction_image.sage::test_the_five_cusps_are_the_chamber_rows_of_card_029j: 94.38 s > 20 s
+1 passed, 18 deselected in 98.65s (0:01:38)
+[peakrss] p370ccons2: child waited=0 shell_code=0 samples=57
+[peakrss] peak tree RSS      : 516 MiB
+[peakrss] low-water MemAvail : 7136 MiB
+[peakrss] peak single VmHWM  : 516 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      505 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   110.2s procs=  3 rss=   516 MiB hwm=   516 MiB avail=  7139 MiB
+[peakrss]   t=   112.2s procs=  3 rss=   516 MiB hwm=   516 MiB avail=  7136 MiB
+[peakrss]   t=   108.2s procs=  3 rss=   515 MiB hwm=   515 MiB avail=  7151 MiB
+[peakrss]   t=   106.2s procs=  3 rss=   512 MiB hwm=   512 MiB avail=  7177 MiB
+[peakrss]   t=   104.2s procs=  3 rss=   509 MiB hwm=   509 MiB avail=  7184 MiB
+launcher exit: 0

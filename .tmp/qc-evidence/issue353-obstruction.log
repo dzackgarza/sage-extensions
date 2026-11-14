@@ -1,0 +1,28 @@
+[    0.5s] plane Integral lattice of rank 2 and signature (0, 0)
+[    1.2s] splitting complement: None
+[    1.4s] rank U = 17
+[    1.6s] rank Z = 1
+[    3.6s] translation rank (returned family) = (12, 16)
+[    3.6s] |unipotent_radical_generators| = 14
+[    3.6s] unipotent_radical_index() = ℵ_0
+[    3.6s] is_parabolic_complete() = False
+[    3.6s] 
+[    3.6s] parabolic_obstruction() =
+[   97.0s] no cited statement shows that the generators of the parabolic at Integral lattice of rank 2 and signature (0, 0) generate the setwise stabilizer: Dutour Sikirić--Hulek Theorem 4.9 (arXiv:2302.01679v2, printed p. 22) solves the block equations and their Alg 1 (same paper, section 'Integral group algorithms') computes the integral points of a rational group, but neither names a generating set of the parabolic. The plane action is decided: levi_plane_action_index() gives the index of the returned plane actions in GL_2(ZZ) by the Gamma(2) certificate (1 at Sterk's P_2 of T_En, where det J = 4 makes J a scalar and imposes no congruence). The quotient factor is decided: levi_quotient_image_index() gives [10321920 : 10321920] = 1 for the image H_0 of the returned generators in O(I^perp/I), so the image of the whole setwise stabilizer there is H_0, i.e. all of O(I^perp/I). Decided, and negative: the radical U_I is not generated. All 14 returned unipotent transvections lie in it (each fixes the plane pointwise and acts trivially on I^perp/I, measured), and 28 of the 122 generators of this family do; but U_I has rank 17 = 2 rank(I^perp/I) + 1 by the block form (unipotent_radical_rank()), of which 1 is fixed by the translation map (unipotent_translation_kernel_rank()) and 16 are translations, while the translations of the returned family have rank 12 and those of the 28 radical members of this family have rank 14. Both families therefore generate subgroups of infinite index, and unipotent_radical_index() returns aleph_0. A cited generation statement is missing for the same reason it was missing before: Scattone, Mem. Amer. Math. Soc. 374, section 3.7, Proposition 3.7.3, generates the radical by Eichler transvections only over two orthogonal hyperbolic planes, which T_En does not have.
+[   97.0s] 
+[   97.0s] done
+[peakrss] issue353: child waited=0 shell_code=0 samples=52
+[peakrss] peak tree RSS      : 2428 MiB
+[peakrss] low-water MemAvail : 6012 MiB
+[peakrss] peak single VmHWM  : 2428 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      1974 MiB peak
+[peakrss]   python                      443 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   100.1s procs=  4 rss=  2428 MiB hwm=  2428 MiB avail=  6033 MiB
+[peakrss]   t=    96.1s procs=  4 rss=  2409 MiB hwm=  2409 MiB avail=  6074 MiB
+[peakrss]   t=    98.1s procs=  4 rss=  2409 MiB hwm=  2409 MiB avail=  6102 MiB
+[peakrss]   t=    92.1s procs=  4 rss=  2408 MiB hwm=  2408 MiB avail=  6069 MiB
+[peakrss]   t=    94.1s procs=  4 rss=  2408 MiB hwm=  2408 MiB avail=  6076 MiB
+launcher exit: 0

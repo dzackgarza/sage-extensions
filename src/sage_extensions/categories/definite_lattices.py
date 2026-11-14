@@ -311,7 +311,7 @@ def _square_shell(positive_gram, target, reflective):
     shell = []
     for row in representatives.rows():
         vector = engine_vector(SageZZ, row)
-        if reflective and any(entry % target for entry in 2 * form * vector):
+        if reflective and any(entry % engine_target for entry in 2 * form * vector):
             continue
         shell.extend((vector, -vector))
     return tuple(shell)
@@ -364,7 +364,11 @@ def _roots_of_square(lattice, square):
     if lattice.module_rank() == 0:
         return finite_ordered_set(())
     sign, positive_gram = _positive_gram(lattice)
-    target = int(sign * square)
+    # ``square`` is the lattice ring's element, so its image under the sign is one
+    # too: the shell's target is an exact integer of that ring, and the enumeration
+    # below reads its parent to cross into the engine.  A Python ``int`` here lost
+    # that ring and the crossing raised (#291).
+    target = sign * square
     if target <= 0:
         return finite_ordered_set(())
     return _shell(lattice, square, _square_shell(positive_gram, target, True))
@@ -622,13 +626,27 @@ class _ExactCVPEngine:
             centered.__pari__().Col(),
             positive_bound + SageQQ(1) / 2,
         )
-        for column in engine_matrix(SageQQ, raw_coordinates).columns():
-            displacement = column - centered
-            positive_square = (
-                displacement * self.engine_gram_q * displacement
+        # PARI qfcvp returns lattice vectors in ZZ^rank. Keep that complete
+        # candidate matrix integral; the bounded distance blocks use QQ.
+        # https://pari.math.u-bordeaux.fr/dochtml/html-stable/Vectors__matrices__linear_algebra_and_sets.html#qfcvp
+        coordinates = engine_matrix(SageZZ, raw_coordinates)
+        center_column = centered.column()
+        weights = engine_vector(SageQQ, [1] * self.rank)
+        block_size = max(1, 4096 // max(1, self.rank))
+        for start in range(0, coordinates.ncols(), block_size):
+            stop = min(start + block_size, coordinates.ncols())
+            block = coordinates.matrix_from_columns(range(start, stop))
+            displacements = block - center_column * engine_matrix(
+                SageQQ, 1, stop - start, [1] * (stop - start)
             )
-            if positive_square <= positive_bound:
-                yield column, positive_square
+            # Sage's Matrix.elementwise_product is the Hadamard product.
+            # Column sums of this Hadamard product are exact squared distances.
+            squares = weights * displacements.elementwise_product(
+                self.engine_gram_q * displacements
+            )
+            for index, positive_square in enumerate(squares):
+                if positive_square <= positive_bound:
+                    yield block.column(index), positive_square
 
     def has_close_vector(self, target, square_bound) -> bool:
         _point, _translation, centered = self._center(target)
@@ -1149,9 +1167,19 @@ def _theta_series(lattice, precision=20, variable="q"):
     backend_series = quadratic_form.theta_series(
         int(precision), var_str=variable
     )
-    series_ring = lattice.base_ring().power_series_ring(variable)
+    series_ring = lattice.base_ring().power_series_ring(
+        variable, default_prec=int(precision)
+    )
     engine = _engine_ring(series_ring)
     return _owned_engine_element(series_ring, engine(backend_series))
+
+
+def _covolume(lattice):
+    from sage.symbolic.ring import SR
+
+    _definite_sign(lattice)
+    determinant = _engine_element(lattice.base_ring(), abs(lattice.determinant()))
+    return _owned_real_from_engine_expression(SR(determinant).sqrt())
 
 
 def _hermite_invariant(lattice):

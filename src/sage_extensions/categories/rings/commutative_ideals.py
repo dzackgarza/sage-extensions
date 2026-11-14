@@ -438,7 +438,15 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
                     # quotient has Krull dimension zero.
                     return bool(selected.is_prime() and selected.dimension() == 0)
                 case _:
-                    return bool(selected.is_maximal())
+                    try:
+                        return bool(selected.is_maximal())
+                    except NotImplementedError:
+                        # The engine's answer routes through its Krull
+                        # dimension, which a quotient engine declines
+                        # ("NotImplementedError").  An unavailable computation
+                        # states the proposition this predicate is, not a Python
+                        # exception.
+                        return AtomicProposition("is_maximal_ideal", self)
 
         def _ideal_primality_engine(self):
             r"""Ideal in the ring where primality and maximality are decided."""
@@ -568,6 +576,30 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
                 return None
             if _realized_as_quotient(ring):
                 return self._binary_cover_ideal_result(other, "colon")
+            # A ring whose engine is a quotient ``P/K`` of a polynomial ring,
+            # without the ``QuotientRings`` placement the branch above requires:
+            # a word-framed presented algebra realizes its ideals as ideals of
+            # that engine quotient.  The colon is the preimage construction this
+            # owner's docstring already states -- ``(I : J)~ = (I~ : J~)`` with
+            # ``I~ = (lifts of generators) + K`` -- computed in the cover, where
+            # the ideals are ordinary polynomial ideals, and mapped back.
+            engine = self._selected_engine_ideal.ring()
+            if isinstance(engine, QuotientRing_generic):
+                cover = engine.cover_ring()
+                defining_generators = tuple(engine.defining_ideal().gens())
+
+                def preimage(engine_ideal):
+                    return cover.ideal(
+                        tuple(generator.lift() for generator in engine_ideal.gens())
+                        + defining_generators
+                    )
+
+                lifted_left = preimage(self._selected_engine_ideal)
+                lifted_right = preimage(other._selected_engine_ideal)
+                quotient = _cover_colon(cover, lifted_left, lifted_right)
+                return _from_engine_ideal(
+                    ring, engine.ideal(tuple(engine(generator) for generator in quotient.gens()))
+                )
             if ring in OwnedRings().Commutative().DedekindDomains():
                 match other.is_zero():
                     case True:
@@ -671,6 +703,30 @@ class CommutativeIdeals(OwnedCategoryOverBaseRing):
                 return None
             if _realized_as_quotient(ring):
                 return self._binary_cover_ideal_result(other, "saturation")
+            # Same preimage construction as the colon, one power up: over a
+            # quotient ``P/K`` the saturation is ``(I~ : J~^infinity)`` mapped
+            # back, and the engine ideals of a quotient ring decline it
+            # themselves.  See ``_colon_decision`` for the branch and why a
+            # presented algebra's ideals reach it.
+            engine = self._selected_engine_ideal.ring()
+            if isinstance(engine, QuotientRing_generic):
+                cover = engine.cover_ring()
+                defining_generators = tuple(engine.defining_ideal().gens())
+
+                def preimage(engine_ideal):
+                    return cover.ideal(
+                        tuple(generator.lift() for generator in engine_ideal.gens())
+                        + defining_generators
+                    )
+
+                # Sage answers the saturation together with the exponent that
+                # reached it; the exponent is a fact about the computation.
+                saturated, _exponent = preimage(self._selected_engine_ideal).saturation(
+                    preimage(other._selected_engine_ideal)
+                )
+                return _from_engine_ideal(
+                    ring, engine.ideal(tuple(engine(generator) for generator in saturated.gens()))
+                )
             if ring in OwnedRings().Commutative().DedekindDomains():
                 match other.is_zero():
                     case True:
@@ -1383,17 +1439,79 @@ def _descend_cover_ideal(ring, cover_ideal):
     return source.ideal(*(descended or (source.zero(),)))
 
 
+def _cover_colon(cover, left, right):
+    r"""Return ``(left : right)`` in a cover ring, by that ring's own colon.
+
+    A multivariate polynomial ring's ideals answer ``quotient`` themselves.  A
+    *univariate* one is a PID whose Sage ideal class does not, and there the
+    colon is the PID rule this owner already applies to an owned principal ideal
+    domain: with ``left = (g)`` and ``right = (h)``, ``a h in (g)`` exactly when
+    ``g | a h``, that is when ``g/gcd(g, h) | a``, so ``(g : h) = (g/gcd(g,h))``.
+    Stated here once for the cover, in the same terms as that branch.
+    """
+    from sage.rings.polynomial.multi_polynomial import MPolynomial
+
+    match left:
+        case _ if hasattr(left, "quotient"):
+            try:
+                return left.quotient(right)
+            except (AttributeError, TypeError, NotImplementedError):
+                pass
+    generator = left.gen()
+    other_generator = right.gen() if not right.is_zero() else cover.zero()
+    if other_generator == cover.zero():
+        return cover.ideal(cover.one())
+    common = generator.gcd(other_generator)
+    return cover.ideal(generator // common)
+
+
 def _polynomial_syzygy_rows(ideal):
     r"""Rows of the syzygy module of a polynomial-ring ideal's generators.
 
     Sage's ``syzygy_module`` requires a coefficient field; over ``ZZ``
     Singular's ``syz`` computes the same module (TRAPS.md).
     """
+    from sage.categories.principal_ideal_domains import (
+        PrincipalIdealDomains as _SagePrincipalIdealDomains,
+    )
+
+    from sage_extensions.categories.rings.ring_foundation import PrincipalIdealDomains
+
+    ring = ideal.ring()
+    # The kernel below is Sage's, over a Sage ring: the generators of a cover's
+    # ideal live in one, while an owned ideal's live in an owned ring, where
+    # ``ring ** n`` is the ring's own power and not a free module.  The
+    # realization that is its own engine is the Sage one, which is the library's
+    # usual test for exactly this boundary.
+    pid_host = (
+        _engine_ring(ring) is ring
+        and ring in _SagePrincipalIdealDomains()
+    )
     match ideal:
         case _ if _is_integral_multivariate_ideal(ideal):
             from sage.libs.singular.function import singular_function
 
             return tuple(tuple(row) for row in singular_function("syz")(ideal))
+        case _ if pid_host:
+            # Over a PID Sage owns this: the syzygy module of (a_1, ..., a_n) is
+            # the kernel of the map (x_1, ..., x_n) |-> sum x_i a_i, and the
+            # finitely generated module over a PID computes that kernel from the
+            # one-column matrix of the generators.  Reused rather than restated:
+            # over a univariate polynomial ring over a field the ideal class
+            # itself has no ``syzygy_module`` ("'Ideal_1poly_field' object has no
+            # attribute 'syzygy_module'"), and a Hermite or Smith form here would
+            # be a second algorithm for what this kernel already is.
+            from sage.modules.free_module import (
+                FreeModule as _SageFreeModule,
+            )
+
+            generators = tuple(ideal.gens()) or (ring.zero(),)
+            source = _SageFreeModule(ring, len(generators))
+            target = _SageFreeModule(ring, 1)
+            morphism = source.hom(
+                matrix(ring, len(generators), 1, list(generators)), target
+            )
+            return tuple(tuple(row) for row in morphism.kernel().gens())
         case _:
             syzygies = ideal.syzygy_module()
             return tuple(
@@ -1766,8 +1884,14 @@ def _commutative_ideal(source, generators):
     and ``(0)`` is prime because ``ZZ`` is a domain (``Ideal.isPrime_bot``,
     ``Mathlib/RingTheory/Ideal/Maximal.lean``); the integers' ideals are routed
     by these theorems, asking ``|n|.is_prime()`` (``CON-07``).  Other ideals of
-    ``ZZ`` are placed only as ideals.  No other ring's ideal is placed by a
-    computation.
+    ``ZZ`` are placed only as ideals.
+
+    The same theorem holds one variable up: for a field ``k`` and ``0 != f`` in
+    ``k[t]``, ``(f)`` is maximal exactly when ``f`` is irreducible, because
+    ``k[t]`` is a PID and ``k[t]/(f)`` is a field exactly for a prime ``(f)``.
+    ``k[t]`` is factorial, so the placement reads the *one* generator the ideal
+    has -- its normalized gcd -- and asks whether it is irreducible; anything
+    else is placed only as an ideal.
     """
     from sage_extensions.categories.rings.ring_foundation import _owned_integers
 
@@ -1780,7 +1904,45 @@ def _commutative_ideal(source, generators):
             placement = CommutativeIdeals(source).PrimeAsIdeal()
         elif SageZZ(generator).abs().is_prime():
             placement = CommutativeIdeals(source).Maximal()
+    else:
+        placement = _univariate_polynomial_ideal_placement(source, generators)
     return _placed_commutative_ideal(source, generators, placement)
+
+
+def _univariate_polynomial_ideal_placement(source, generators):
+    r"""Place ``(f)`` in ``k[t]`` as maximal when ``f`` is irreducible, else nothing.
+
+    ``k[t]`` is a PID, so ``k[t]/(f)`` is a field exactly when ``(f)`` is prime,
+    and that holds exactly at the irreducible ``f``.  The ring is factorial, so
+    the ideal's own generator is the normalized gcd of the written family and
+    the question is asked of that one element.  Undecided irreducibility leaves
+    the ideal unplaced rather than guessing, and a ring that is not a
+    one-variable polynomial ring over a field supplies no such theorem here.
+    """
+    from sage_extensions.categories.algebras.free_algebras import SymmetricAlgebras
+    from sage_extensions.categories.rings.ring_foundation import (
+        _engine_ring,
+        _engine_ring_value,
+        OwnedFields,
+    )
+
+    # The coefficient field is asked first: a ring that is not a polynomial ring
+    # over a field must not be asked for variable names at all.
+    base = source.base_ring() if hasattr(source, "base_ring") else None
+    if base is None or base not in OwnedFields():
+        return None
+    if source not in SymmetricAlgebras(base) or len(source.variable_names()) != 1:
+        return None
+    engine = _engine_ring(source)
+    values = tuple(_engine_ring_value(source, generator) for generator in generators)
+    if not values:
+        return None
+    generator = engine.ideal(values).gen()
+    if generator == engine.zero():
+        return None
+    if generator.is_irreducible() is True:
+        return CommutativeIdeals(source).Maximal()
+    return None
 
 
 @cached_function(

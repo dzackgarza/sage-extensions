@@ -1,0 +1,47 @@
+the eleven printed walls of Fig. 10, in T_En coordinates
+  [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0] square -4
+  [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0] square -4
+  [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0] square -4
+  [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0] square -4
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0] square -4
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0] square -4
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1] square -4
+  [-1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] square -2
+  [0, 0, 2, 0, -2, -3, -4, -6, -5, -4, -3, -2] square -4
+  [1, 1, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0] square -2
+  [2, 0, -2, 0, 2, 2, 3, 4, 3, 2, 1, 0] square -4
+the cusp vector of (4.3.8): [0, 0, 2, 1, -4, -5, -7, -10, -8, -6, -4, -2] square 0
+(4.2.3)'s vector for the same cusp: [0, 0, 1, 2, -4, -5, -7, -10, -8, -6, -4, -2]
+[  137.67s] Gamma_Co,2 built in 133.6s
+[  138.35s] cusp 4: K_I rank 9 det 512 signature (1, 8)
+printed walls 11 in T_Co 9
+   class [1, -2, -4, -6, -8, -10, -7, 2, 0] square -4
+   class [0, 0, 0, 0, 0, 0, 1, 0, 0] square -4
+   class [0, 0, 0, 0, 0, 1, 0, 0, 0] square -4
+   class [0, 0, 0, 0, 1, 0, 0, 0, 0] square -4
+   class [0, 0, 0, 1, 0, 0, 0, 0, 0] square -4
+   class [0, 0, 1, 0, 0, 0, 0, 0, 0] square -4
+   class [0, 1, 0, 0, 0, 0, 0, 0, 0] square -4
+   class [1, -4, -7, -10, -13, -16, -11, 4, 0] square -4
+   class [-2, 4, 8, 12, 16, 20, 14, -5, 1] square -2
+roots of K_I 1
+[  162.81s] line stabilizer: 37 generators in 24.4s
+PARI stack size set to 6000000000 bytes, maximum size set to 6000001024
+[  501.65s] root_class_orbits: 1 orbits in 338.8s
+  orbit 0: 1 classes [[-2, 4, 8, 12, 16, 20, 14, -5, 1]]
+    transporter of [-2, 4, 8, 12, 16, 20, 14, -5, 1] carries the representative to [-2, 4, 8, 12, 16, 20, 14, -5, 1]
+[  501.67s] done
+[peakrss] p370cDet2: child waited=0 shell_code=0 samples=253
+[peakrss] peak tree RSS      : 1359 MiB
+[peakrss] low-water MemAvail : 11492 MiB
+[peakrss] peak single VmHWM  : 1359 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1348 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   502.9s procs=  3 rss=  1359 MiB hwm=  1359 MiB avail= 12292 MiB
+[peakrss]   t=   504.9s procs=  3 rss=  1359 MiB hwm=  1359 MiB avail= 12327 MiB
+[peakrss]   t=   500.9s procs=  3 rss=  1358 MiB hwm=  1358 MiB avail= 12285 MiB
+[peakrss]   t=   492.9s procs=  3 rss=  1357 MiB hwm=  1357 MiB avail= 12310 MiB
+[peakrss]   t=   494.9s procs=  3 rss=  1357 MiB hwm=  1357 MiB avail= 12371 MiB
+launcher exit: 0

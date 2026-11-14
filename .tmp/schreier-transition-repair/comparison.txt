@@ -1,0 +1,14 @@
+Focused failed-ID comparison for the retained-transition Schreier repair in g_sets.py.
+
+Command (both runs): .scratch/proot-run .scratch/one.sh tests/groups/test_g_sets_torsor_archive.sage tests/groups/test_a_subgroup_acts_through_its_inclusion.sage tests/groups/test_finite_group_subgroups_and_quotients.sage tests/groups/test_free_and_catalogued_groups.sage tests/test_finite_cosets.py tests/lattices/test_integral_stabilizers.sage tests/lattices/test_pairing_form_relabelling_orbits.sage
+The changed run additionally includes tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage (4 tests, all pass).
+
+baseline tree: g_sets.py and the new test stashed. changed tree: the retained-transition repair.
+
+diff (only the pytest summary line differs; every FAILED id is byte-identical):
+24c24
+< 23 failed, 29 passed in 44.43s
+---
+> 23 failed, 33 passed in 45.37s
+
+23 FAILED ids unchanged before and after; the passing set grows by exactly the 4 new tests (23F/29P -> 23F/33P). No FAILED id added, removed, or renamed; no pass->fail flip.

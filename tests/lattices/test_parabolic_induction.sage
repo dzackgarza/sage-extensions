@@ -30,9 +30,13 @@ def test_primitive_isotropic_refinement_selects_the_line_eichler_operation() -> 
     family = line.unipotent_group_generators()
 
     assert transvection(isotropic) == isotropic
-    assert tuple(family.index_set()) == tuple(
-        line.isotropic_perpendicular().module_generating_set()
-    )
+    reduction = line.isotropic_reduction()
+    perpendicular = line.isotropic_perpendicular().inclusion()
+    projection = reduction.projection()
+    partner = module_generators[1]
+    shifts = tuple(projection(perpendicular.lift(generator(partner)-partner)) for generator in family)
+    assert reduction.subobject_on(shifts).inclusion().cokernel().cardinality() == cardinal(1)
+    assert all(generator(isotropic) == isotropic for generator in family)
 
 
 def test_the_isotropic_line_of_E10_reduces_to_E8() -> None:
@@ -87,7 +91,7 @@ def test_the_eichler_transvections_of_a_line_form_an_abelian_group() -> None:
     assert line.eichler_transvection(lattice.zero()) == lattice.Aut().identity()
 
     family = line.unipotent_group_generators()
-    assert family.index_set() is line.isotropic_perpendicular().module_generating_set()
+    assert all((~generator)(generator(point)) == point for generator in family for point in module_generators)
     assert all(transvection in line.unipotent_radical() for transvection in family)
 
 

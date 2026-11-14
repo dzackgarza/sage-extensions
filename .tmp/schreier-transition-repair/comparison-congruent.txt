@@ -1,0 +1,8 @@
+Sixth failed-ID comparison: the genuine-congruence differing-frame fixture and the known-old-failure label on the GF(5) branch (provider 17a863d and before it). Same command and baseline as comparison-unimodular.txt.
+
+3c3
+< 2 failed, 25 passed in 82.27s (0:01:22)
+---
+> 2 failed, 38 passed in 82.68s (0:01:22)
+
+2 FAILED ids byte-identical; passing 25 -> 38.

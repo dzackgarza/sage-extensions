@@ -26,7 +26,10 @@ from sage_extensions.categories.abstract_categories.mor_categories import (
 )
 from sage_extensions.categories.functors.core import Functor
 from sage_extensions.categories.group.g_sets import FiniteGSets
-from sage_extensions.tensors._finite_form_engine import _engine_odd_orthogonal_generators
+from sage_extensions.tensors._finite_form_engine import (
+    _engine_elementary_two_orthogonal_generators,
+    _engine_odd_orthogonal_generators,
+)
 from sage_extensions.categories.group.groups import (
     OwnedFiniteGroups,
     OwnedGroups,
@@ -52,6 +55,7 @@ from sage_extensions.categories.rings.ring_foundation import (
     _engine_ring,
     _own_ring,
     _owned_integers,
+    _owned_ring,
 )
 from sage_extensions.categories.sets.finite_ordered_sets import (
     FiniteOrderedSets,
@@ -222,6 +226,16 @@ class TorsionFormIsometry(CategoricalIsomorphism):
         r"""Return ``True``: membership in this Core Mor carries the inverse pair."""
         return True
 
+    def _is_the_identity(self) -> bool:
+        r"""Whether the forward map fixes every selected generator.
+
+        Protected module-arrow predicate: composition asks it of a factor
+        before rebuilding a composite, and a typed isometry is a legitimate
+        factor.  It is the identity exactly when its forward map is, its inverse
+        then being the same map.
+        """
+        return self.forward()._is_the_identity()
+
     def inverse_morphism(self):
         r"""Return the underlying inverse module morphism."""
         return self._inverse_morphism()
@@ -274,8 +288,23 @@ class TorsionFormIsometryMor(CoreMor):
         return self._from_known_inverse_pair(forward, inverse_computation())
 
 
-def _torsion_form_isometry(forward, inverse, *, quadratic: bool):
-    r"""Return the form isometry represented by mutually inverse module maps."""
+def _torsion_form_isometry(forward, inverse, *, quadratic: bool, check: bool = False):
+    r"""Return the form isometry represented by mutually inverse module maps.
+
+    Between two distinct forms the element is built in the typed isometry family
+    (:class:`TorsionFormIsometryMor`), whose element class carries the
+    form-preservation and inverse-pair validators, and ``check=True`` runs them.
+
+    On the diagonal the Iso family is :class:`TorsionFormOrthogonalGroup`, and that
+    group's element construction normalizes through the engine's normal form.  The
+    engine states only *nondegenerate* polar forms, so for a form with a radical
+    there is no group element to build and this returns the core arrow, which is a
+    checked isomorphism of the underlying modules but carries no form validators.
+    That is a stated limitation of the automorphism route on degenerate forms, not
+    a second contract: the constructor's pair contract
+    ``(forward, inverse=None, *, check=False)`` is the same on both families, and a
+    caller that needs the group calls it.
+    """
     from sage_extensions.categories.modules.framed.formed.form_modules import (
         FormedModuleMorphism,
         _represented_value_module,
@@ -288,8 +317,17 @@ def _torsion_form_isometry(forward, inverse, *, quadratic: bool):
     value_identity = values.module_category().Mor(values, values).identity()
     forward_component = forward.module_morphism() if isinstance(forward, FormedModuleMorphism) else forward
     inverse_component = inverse.module_morphism() if isinstance(inverse, FormedModuleMorphism) else inverse
+    # The module Mor constructor already returns an arrow unchanged when it
+    # has this exact parent.  Keep that constructor as the ownership boundary;
+    # its existing-parent branch is constant-time and does not rebuild a
+    # finite presentation.
     formed_forward = category.Mor(source, target)((forward_component, value_identity))
     formed_inverse = category.Mor(target, source)((inverse_component, value_identity))
+    family = category.Iso(source, target)
+    if isinstance(family, TorsionFormIsometryMor):
+        return family(formed_forward, formed_inverse, check=check)
+    # The diagonal family is the orthogonal group; see the docstring for why a
+    # degenerate form has to stop at the core arrow here.
     return category.Core().Mor(source, target)._from_known_inverse_pair(
         formed_forward,
         formed_inverse,
@@ -344,11 +382,21 @@ def _engine_torsion_form(normalized_form, *, quadratic: bool):
         TorsionQuadraticModule,
     )
 
-    engine = TorsionQuadraticForm(
-        _engine_component_matrix(
-            _representative_gram(normalized_form, quadratic=quadratic)
-        )
+    gram = _engine_component_matrix(
+        _representative_gram(normalized_form, quadratic=quadratic)
     )
+    if not _polar_form_is_nondegenerate(normalized_form, quadratic=quadratic):
+        # Sage's adapter builds the finite module from the Smith form of the
+        # Gram matrix, which states a *non-degenerate* polar form: its module is
+        # the cokernel of that matrix.  A form whose polar form has a radical is
+        # a legitimate object (a subform, for instance) but not one this adapter
+        # represents, and the matrix it would build has the wrong order.
+        raise TypeError(
+            f"the normal-form engine represents only non-degenerate polar forms, but the polar form "
+            f"of {normalized_form} has a radical: on its invariant-factor framing the correlation "
+            f"map is not injective"
+        )
+    engine = TorsionQuadraticForm(gram)
     if int(engine.cardinality()) != int(normalized_form.cardinality()):
         raise ArithmeticError(
             f"the finite quadratic module built from the Gram matrix of {normalized_form} has order "
@@ -491,7 +539,16 @@ def _torsion_form_modules(base_ring, *, quadratic: bool):
 
 
 def _torsion_form_subobject_on(form, generators, *, quadratic: bool):
-    r"""Return the finite torsion submodule spanned by ``generators`` with restricted form."""
+    r"""Return the finite torsion submodule spanned by ``generators`` with restricted form.
+
+    Equal generating data returns a single object.  Two calls that span the same
+    submodule build the same embedded element set in the ambient form, and the
+    subobject is cached on the form under that set, so the two are *the same*
+    subobject -- equal and with equal hashes -- rather than two objects that
+    happen to describe one.  Without this a subobject never equals one built the
+    same way, so an orbit closure over subobjects never recognises a point it has
+    already seen and the point stabilizer refuses the point it was built from.
+    """
 
     generators = tuple(form(generator) for generator in generators)
     unformed = form.unformed_module()
@@ -532,7 +589,7 @@ def _torsion_form_subobject_on(form, generators, *, quadratic: bool):
                 )
         return source(lifted)
 
-    return category.from_module(
+    result = category.from_module(
         underlying_subobject,
         gram,
         form.value_module(),
@@ -541,6 +598,13 @@ def _torsion_form_subobject_on(form, generators, *, quadratic: bool):
         _subobject_lift=lift_from_ambient,
         _subobject_inclusion_factory=inclusion_factory,
     )
+    selected_key = (quadratic, frozenset(_embedded_elements(result)))
+    registry = form.__dict__.setdefault("_torsion_form_subobject_registry", {})
+    existing = registry.get(selected_key)
+    if existing is not None:
+        return existing
+    registry[selected_key] = result
+    return result
 
 
 def _torsion_form_primary_part(form, prime, *, quadratic: bool):
@@ -560,6 +624,29 @@ def _torsion_form_primary_part(form, prime, *, quadratic: bool):
 def _embedded_elements(subobject):
     inclusion = subobject.inclusion()
     return frozenset(inclusion(element) for element in subobject.elements())
+
+
+class _FormElementPermutation(dict):
+    r"""The permutation of a finite form's elements one automorphism induces, read by rank.
+
+    A key that is read for the first time is the one computation: the owned
+    automorphism is applied to the element at that rank and the rank of the image is
+    retained.  This is a memo of the group's own action on the form's elements, not
+    a second description of it: every value is ``automorphism(element)`` and every
+    element image is computed once, however many orbit points contain it.
+    """
+
+    def __init__(self, ranking, representatives, automorphism) -> None:
+        super().__init__()
+        self._ranking = ranking
+        self._representatives = representatives
+        self._automorphism = automorphism
+
+    def __missing__(self, rank):
+        image = self._automorphism(self._representatives[rank])
+        rank_of_image = int(self._ranking(image))
+        self[rank] = rank_of_image
+        return rank_of_image
 
 
 def _torsion_form_isotropic_subobjects(form, *, quadratic: bool):
@@ -643,14 +730,10 @@ def _torsion_form_orthogonal_subobject(form, subobject, *, quadratic: bool):
             f"the orthogonal complement in {form} is taken of a submodule of {form}, but {subobject} "
             f"is a submodule of {inclusion.codomain()}"
         )
-    generators = tuple(subobject.embedded_module_generators())
-    zero = form.associated_bilinear_form().value_module().zero() if quadratic else form.value_module().zero()
-    selected = tuple(
-        element
-        for element in form.elements()
-        if all(form.b(element, generator) == zero for generator in generators)
+    generators = tuple(
+        inclusion(generator) for generator in subobject.module_generators()
     )
-    return _torsion_form_subobject_on(form, selected, quadratic=quadratic)
+    return _torsion_form_orthogonal_kernel(form, generators, quadratic=quadratic)
 
 
 def _torsion_form_lagrangian_subobjects(form, *, quadratic: bool):
@@ -832,6 +915,544 @@ def _regenerate_form_on_generators(form, generators, *, quadratic: bool):
         )
     forward = form.module_category().Mor(form, regenerated)(forward_images)
     return _torsion_form_isometry(forward, inverse, quadratic=quadratic)
+
+
+def _torsion_form_orthogonal_kernel(form, pairing_generators, *, quadratic: bool):
+    r"""Return ``{x : b(x, g) = 0 for every g in pairing_generators}`` as a subobject.
+
+    On the invariant-factor framing this is the kernel of the homomorphism
+    ``M -> (Z/N)^k`` carrying ``x`` to the pairings ``b(x, g_j)``, with ``N``
+    clearing the Gram's denominators times the value modulus.  It is built through
+    the module's own kernel owner rather than by enumerating the module, so the
+    radical (the pairing family is the form's own generators) and an orthogonal
+    complement (the family is a subobject's generators) are one computation.
+    """
+    from sage_extensions.categories.modules.framed.formed.form_modules import (
+        _relation_morphism,
+    )
+
+    pairing_generators = tuple(pairing_generators)
+    module = _underlying_presented_module(form)
+    ring = _owned_ring(module.base_ring())
+    # The map is determined by its values on the form's chosen generators, however
+    # many of them there are; a presented subquotient may carry a redundant
+    # generating family, so the generator count is the matrix width and the Mor
+    # constructor is what checks well-definedness on the relations.
+    generators = tuple(form.module_generators())
+    rank = len(generators)
+    pairing_count = len(pairing_generators)
+    if pairing_count == 0:
+        return form.subobject_generated_by(generators)
+
+    def lifted_pairing(left, right):
+        value = form.b(left, right).lift()
+        return value.parent()._engine_element(value)
+
+    pairing = _engine_matrix(
+        SageQQ,
+        pairing_count,
+        rank,
+        [
+            lifted_pairing(generator, pairing_generator)
+            for pairing_generator in pairing_generators
+            for generator in generators
+        ],
+    )
+    if quadratic:
+        value_modulus = SageQQ(1)
+    else:
+        value_modulus = SageQQ(
+            form.value_module().modulus().parent()._engine_element(
+                form.value_module().modulus()
+            )
+        )
+    integral, denominator = pairing._clear_denom()
+    modulus = SageZZ(denominator) * SageZZ(value_modulus)
+    target = Modules(ring).FinitelyPresented().Torsion()(
+        _relation_morphism(
+            ring,
+            [
+                [int(modulus) if row == column else 0 for column in range(pairing_count)]
+                for row in range(pairing_count)
+            ],
+        )
+    )
+    labels = tuple(target.module_generating_set())
+    images = {
+        module.module_generating_set()[column]: target.linear_combination(
+            {
+                labels[row]: ring(int(integral[row, column]))
+                for row in range(pairing_count)
+                if int(integral[row, column]) % int(modulus)
+            }
+        )
+        for column in range(rank)
+    }
+    kernel = module.module_category().Mor(module, target)(images).kernel()
+    # The kernel is its own presented module: its generators enter the ambient
+    # module through the kernel's inclusion, not by coercing a same-named element.
+    return form.subobject_generated_by(
+        tuple(
+            form(kernel.inclusion()(generator))
+            for generator in kernel.module_generators()
+        )
+    )
+
+
+def _torsion_form_polar_radical(form, *, quadratic: bool):
+    r"""Return the radical of the polar form, as a subobject of ``form``."""
+    return _torsion_form_orthogonal_kernel(
+        form, form.module_generators(), quadratic=quadratic
+    )
+
+
+_AUTOMORPHISM_ORBIT_CANDIDATE_CAP = 256
+
+
+def _automorphism_orbit_steps(invariants):
+    r"""Elementary automorphisms of ``Z^n/D`` as ``(step, inverse)`` matrices.
+
+    Each matrix holds, in column ``j``, the coordinates of the image of the
+    ``j``-th standard generator, with row entries meaningful modulo that row's
+    invariant factor.  These maps — unit rescalings, transpositions of
+    equal-invariant coordinates and the admissible transvections
+    ``e_j |-> e_j + c e_i`` with ``c d_j = 0 mod d_i`` — are the elementary
+    automorphisms of the presentation.  That they generate all of
+    ``Aut(Z^n/D)`` is verified by brute-force closure on the small
+    invariant-factor types recorded in ``TRAPS.md``; it is not assumed as a
+    theorem for an arbitrary actual type, and the caller relies on it nowhere
+    for a negative answer.  ``c = 0`` and the identity rescaling are left out.
+    """
+    rank = len(invariants)
+    steps = []
+    for index in range(rank):
+        invariant = invariants[index]
+        for unit in range(2, invariant):
+            if not _residue_is_unit(unit, invariant):
+                continue
+            step = [
+                [1 if row == column else 0 for column in range(rank)]
+                for row in range(rank)
+            ]
+            step[index][index] = unit
+            inverse = [row[:] for row in step]
+            inverse[index][index] = pow(unit, -1, invariant)
+            steps.append((
+                tuple(tuple(row) for row in step),
+                tuple(tuple(row) for row in inverse),
+            ))
+    for left in range(rank):
+        for right in range(left + 1, rank):
+            if invariants[left] == invariants[right]:
+                step = [
+                    [1 if row == column else 0 for column in range(rank)]
+                    for row in range(rank)
+                ]
+                step[left][left] = step[right][right] = 0
+                step[left][right] = step[right][left] = 1
+                step = tuple(tuple(row) for row in step)
+                steps.append((step, step))
+    for source in range(rank):
+        for target in range(rank):
+            if source == target:
+                continue
+            for multiple in range(1, invariants[source]):
+                # ``e_target |-> e_target + c e_source`` is a module map
+                # exactly when ``c d_target = 0 mod d_source``.
+                if (multiple * invariants[target]) % invariants[source]:
+                    continue
+                step = [
+                    [1 if row == column else 0 for column in range(rank)]
+                    for row in range(rank)
+                ]
+                step[source][target] = multiple
+                inverse = [row[:] for row in step]
+                inverse[source][target] = (-multiple) % invariants[source]
+                steps.append((
+                    tuple(tuple(row) for row in step),
+                    tuple(tuple(row) for row in inverse),
+                ))
+    return steps
+
+
+def _candidate_preserves_form_data(first, second, transported, *, quadratic: bool) -> bool:
+    r"""Whether transported generator images reproduce the form's Gram data.
+
+    A quadratic (resp. bilinear) form on a presented torsion module is
+    determined by its values on the generators and their pairs, so this is
+    exactly the isometry condition on the candidate, evaluated cheaply before
+    the typed constructor is paid for.
+    """
+    for label, image in transported.items():
+        if quadratic:
+            if second.q(image) != first.q(first.module_generator(label)):
+                return False
+        elif second.b(image, image) != first.b(
+            first.module_generator(label), first.module_generator(label)
+        ):
+            return False
+    for left_label, left_image in transported.items():
+        for right_label, right_image in transported.items():
+            if second.b(left_image, right_image) != first.b(
+                first.module_generator(left_label),
+                first.module_generator(right_label),
+            ):
+                return False
+    return True
+
+
+def _radical_isometry_decision(first, second, *, quadratic: bool):
+    r"""Decide isometry for two forms whose polar form has a radical.
+
+    Returns ``False`` when a represented invariant differs, a typed isometry when
+    one is *verified*, and ``NotImplemented`` when neither is established — the
+    engine states only nondegenerate polar forms, so the nondegenerate route is
+    not available here and nothing is inferred from a plausible-looking match.
+
+    The invariants used for ``False`` are those the reduction preserves exactly:
+    the order, the invariant factors of the module, and the order of the polar
+    radical.  An isometry must preserve all three, and it must map the radical
+    onto the radical because it preserves the polar form.
+
+    The three outcomes are separated by proof obligation, and nothing else is
+    ever returned:
+
+    * ``False`` only with a proof, and the proof is always a named necessary
+      invariant that failed: the order, the invariant factors of the module
+      and of the polar radical (an isometry maps the radical onto the radical
+      because it preserves the polar form), the vanishing of the form on the
+      radical, the quotient form when the form descends, or the
+      order-qualified value profile (the multiset of element orders and
+      values, preserved by any bijection that preserves the form).
+    * A typed isometry only with a checked witness: both forms are transported
+      to their invariant-factor framings, a module automorphism of that
+      framing is screened on the Gram data — which determine the form — and
+      the composite is admitted by the typed isometry constructor with
+      ``check``.  A form is never called isometric because its invariants
+      agree, and no classification is claimed.
+    * ``NotImplemented`` otherwise, and never ``False``: when the framings do
+      not share a presentation, when the bounded orbit search spends its
+      candidate budget, or when it empties its queue.  Spending the budget is
+      not exhausting the orbit, and an emptied queue is not documented here as
+      exhausting it either — "the elementary steps generate all of
+      ``Aut(Z^n/D)``" is established only for the small invariant-factor
+      types enumerated in ``TRAPS.md``, not as a cited theorem for the actual
+      type, and an unexamined possibility is not an exclusion.  A constructor
+      or validation failure of a well-formed candidate is likewise refusal,
+      not exclusion: the answer is undecided there too.
+    """
+    if first.base_ring() is not second.base_ring():
+        return False
+    if int(first.cardinality()) != int(second.cardinality()):
+        return False
+    if tuple(first.invariants()) != tuple(second.invariants()):
+        return False
+    first_radical = _torsion_form_polar_radical(first, quadratic=quadratic)
+    second_radical = _torsion_form_polar_radical(second, quadratic=quadratic)
+    if int(first_radical.cardinality()) != int(second_radical.cardinality()):
+        return False
+    # An isometry maps the radical onto the radical, so the two radicals must be
+    # isomorphic groups, not merely of one order.
+    if tuple(first_radical.invariants()) != tuple(second_radical.invariants()):
+        return False
+    # Where the form vanishes on the radical it descends to the quotient, and an
+    # isometry of the forms restricts to one of the quotient forms; that gives a
+    # second necessary condition, and a proof of ``False`` when it fails.
+    # Whether q vanishes on the radical is an isometry invariant (the radical goes
+    # to the radical), so a difference decides against isometry.  For a bilinear
+    # form b vanishes there by definition and the question does not arise.
+    first_vanishes = _torsion_form_vanishes_on_radical(
+        first, first_radical, quadratic=quadratic
+    )
+    second_vanishes = _torsion_form_vanishes_on_radical(
+        second, second_radical, quadratic=quadratic
+    )
+    if quadratic and first_vanishes is not second_vanishes:
+        return False
+    # The reduction's own containment checks enumerate the module, so it is
+    # taken only where that is bounded; past that the quotient form contributes
+    # nothing and the decision falls through to the witness search.
+    if (
+        int(first.cardinality()) <= 256
+        and int(second.cardinality()) <= 256
+        and (first_vanishes or not quadratic)
+        and (second_vanishes or not quadratic)
+    ):
+        try:
+            first_quotient = first.nondegenerate_quotient()
+            second_quotient = second.nondegenerate_quotient()
+            if first_quotient.is_isomorphic(second_quotient) is False:
+                return False
+        except (TypeError, ValueError):
+            pass
+
+    # The order-qualified value profile is preserved by every isometry — an
+    # isometry is a bijection of the module that preserves element orders and
+    # form values — so a difference here is a proof of ``False`` with a named
+    # invariant and with no search.  In particular it separates pairs whose
+    # quotient comparison the cardinality-limited branch above skips, such as
+    # the two diagonal forms on ``(Z/16)^3`` of the published specimens.
+    from collections import Counter
+
+    def _order_value_profile(form):
+        if quadratic:
+            return Counter(
+                (int(element.additive_order()), form.q(element))
+                for element in form.elements()
+            )
+        return Counter(
+            (int(element.additive_order()), form.b(element, element))
+            for element in form.elements()
+        )
+
+    if _order_value_profile(first) != _order_value_profile(second):
+        return False
+
+    first_normalization = first.invariant_factor_form()
+    second_normalization = second.invariant_factor_form()
+    first_frame = first_normalization.codomain()
+    second_frame = second_normalization.codomain()
+    labels = tuple(first_frame.module_generating_set())
+    if labels != tuple(second_frame.module_generating_set()):
+        return NotImplemented
+    invariants = tuple(int(invariant) for invariant in first_frame.invariants())
+    # The witness search walks the orbit of the framing under the elementary
+    # automorphisms of the presented module — unit rescalings, transpositions
+    # of equal-invariant coordinates, and the admissible transvections
+    # ``e_j |-> e_j + c e_i`` with ``c d_j = 0 mod d_i``.  The old candidate
+    # set was monomial (identity, rescalings, transpositions) and provably
+    # cannot see a shear; the orbit search can.  It is breadth-first and
+    # bounded, and a spent budget or an emptied queue both leave the pair
+    # undecided, never ``False``: a negative answer here is only ever a
+    # failed necessary invariant above, because the elementary steps are not
+    # relied on to cover every automorphism of the actual type.
+    rank = len(labels)
+    identity = tuple(
+        tuple(1 if row == column else 0 for column in range(rank))
+        for row in range(rank)
+    )
+
+    def _compose(left, right):
+        return tuple(
+            tuple(
+                sum(left[row][k] * right[k][column] for k in range(rank))
+                % invariants[row]
+                for column in range(rank)
+            )
+            for row in range(rank)
+        )
+
+    def _frame_images(frame, mapping):
+        ring = frame.base_ring()
+        return {
+            labels[column]: frame.linear_combination(
+                {
+                    labels[row]: ring(int(mapping[row][column]))
+                    for row in range(rank)
+                    if mapping[row][column]
+                }
+            )
+            for column in range(rank)
+        }
+
+    steps = _automorphism_orbit_steps(invariants)
+    queue = [(identity, identity)]
+    seen = {identity}
+    tested = 0
+    while queue:
+        mapping, inverse_mapping = queue.pop(0)
+        images = _frame_images(second_frame, mapping)
+        try:
+            bridge = first_frame.module_category().Mor(first_frame, second_frame)(images)
+        except (ValueError, TypeError):
+            # The candidates are well-defined automorphisms by construction,
+            # so a constructor failure is unexplained interference, not the
+            # exclusion of one candidate: the orbit was never examined, and
+            # nothing is proved in either direction.
+            return NotImplemented
+        transported = {
+            label: second_normalization.inverse()(
+                bridge(first_normalization.forward()(first.module_generator(label)))
+            )
+            for label in first.module_generating_set()
+        }
+        # The Gram data of the form determine it, so this screen admits
+        # exactly the candidates the typed constructor would verify; it only
+        # avoids building them for the rest.
+        if _candidate_preserves_form_data(first, second, transported, quadratic=quadratic):
+            inverse_images = _frame_images(first_frame, inverse_mapping)
+            try:
+                inverse_bridge = second_frame.module_category().Mor(second_frame, first_frame)(
+                    inverse_images
+                )
+                inverse = second.module_category().Mor(second, first)(
+                    {
+                        label: first_normalization.inverse()(
+                            inverse_bridge(
+                                second_normalization.forward()(second.module_generator(label))
+                            )
+                        )
+                        for label in second.module_generating_set()
+                    }
+                )
+                forward = first.module_category().Mor(first, second)(transported)
+                return _torsion_form_isometry(
+                    forward, inverse, quadratic=quadratic, check=True
+                )
+            except (ValueError, TypeError):
+                # The screen is exact, so this candidate *is* an isometry; a
+                # validation failure refuses the witness, it does not exclude
+                # the pair.  Undecided, never ``False``.
+                return NotImplemented
+        tested += 1
+        if tested >= _AUTOMORPHISM_ORBIT_CANDIDATE_CAP:
+            # The budget is spent, not the orbit: undecided, never False.
+            return NotImplemented
+        for step, step_inverse in steps:
+            follow = _compose(step, mapping)
+            if follow in seen:
+                continue
+            seen.add(follow)
+            queue.append((follow, _compose(inverse_mapping, step_inverse)))
+    # The queue is empty, but "the elementary steps generate all of
+    # Aut(Z^n/D)" is established here only for the enumerated small
+    # invariant-factor types (TRAPS.md), not as a cited theorem for the
+    # actual type.  An unexamined possibility is not an exclusion, so this is
+    # undecided too — never ``False``.
+    return NotImplemented
+
+
+def _torsion_form_vanishes_on_radical(form, radical, *, quadratic: bool) -> bool:
+    r"""Whether the form vanishes on its polar radical, so that it descends."""
+    embedded = tuple(
+        radical.inclusion()(generator) for generator in radical.module_generators()
+    )
+    return bool(form.form_vanishes_on(embedded))
+
+
+def _residue_is_unit(residue, invariant) -> bool:
+    from sage.arith.misc import gcd as _engine_gcd
+
+    return int(_engine_gcd(int(residue), int(invariant))) == 1
+
+
+def _normal_form_bridge(first_normal, second_normal, *, quadratic: bool):
+    r"""Return the label-preserving isometry between two normalized framings.
+
+    A normal form states the same form on a normalized framing: chosen
+    generators indexed by one finite ordered set, carrying the invariant factors
+    and the Gram data of that framing.  Two isomorphic forms therefore state
+    equal normal data, and the map sending each normal generator to the one with
+    the same label is an isometry.  The data are compared first — invariants and
+    every Gram entry — so a mismatch is reported as an inconsistency rather than
+    bridged by a guess.
+    """
+    first_labels = tuple(first_normal.module_generating_set())
+    second_labels = tuple(second_normal.module_generating_set())
+    if first_labels != second_labels:
+        raise ValueError(
+            f"the normal framings of {first_normal} and {second_normal} are indexed by "
+            f"{first_labels} and {second_labels}; a normal form does not depend on the framing"
+        )
+    if tuple(first_normal.invariants()) != tuple(second_normal.invariants()):
+        raise ValueError(
+            f"the normal framings {first_normal} and {second_normal} have invariants "
+            f"{tuple(first_normal.invariants())} and {tuple(second_normal.invariants())}"
+        )
+    first_generators = tuple(first_normal.module_generators())
+    second_generators = tuple(second_normal.module_generators())
+    if quadratic:
+        mismatch = tuple(
+            position
+            for position, (left, right) in enumerate(
+                zip(first_generators, second_generators, strict=True)
+            )
+            if (first_normal.q(left) == second_normal.q(right)) is not True
+        )
+    else:
+        mismatch = tuple(
+            (left, right)
+            for left in first_labels
+            for right in first_labels
+            if (
+                first_normal.b(
+                    first_normal.module_generator(left),
+                    first_normal.module_generator(right),
+                )
+                == second_normal.b(
+                    second_normal.module_generator(left),
+                    second_normal.module_generator(right),
+                )
+            )
+            is not True
+        )
+    if mismatch:
+        raise ValueError(
+            f"the normal forms {first_normal} and {second_normal} state different form data on their "
+            f"normal framings, so no label-preserving isometry exists between them"
+        )
+    forward = first_normal.module_category().Mor(first_normal, second_normal)(
+        {label: second_normal.module_generator(label) for label in first_labels}
+    )
+    inverse = second_normal.module_category().Mor(second_normal, first_normal)(
+        {label: first_normal.module_generator(label) for label in second_labels}
+    )
+    return forward, inverse
+
+
+def _torsion_form_isometry_between(first, second, *, quadratic: bool):
+    r"""Return a typed isometry ``first -> second``, or ``None`` when there is none.
+
+    This is the supported typed transport: each form's selected normal form is
+    an exact isometry onto its own normalized framing
+    (:func:`_regenerate_form_on_generators`), the two normalized framings are
+    bridged by the label-preserving map once their invariants and Gram data are
+    seen to agree, and the composite is admitted by the typed isometry
+    constructor, which re-validates ``q`` (or ``b``) on the generators.  No
+    abstract group isomorphism and no engine matrix substitutes for that
+    validation.
+    """
+    if first.base_ring() is not second.base_ring():
+        return None
+    if not _forms_are_isomorphic(first, second, quadratic=quadratic):
+        return None
+    try:
+        first_normalization = first.normal_form()
+        second_normalization = second.normal_form()
+    except TypeError:
+        # A radical polar form has no normal form in the engine; the reduction
+        # route either produces a checked witness or states that it is undecided.
+        decision = _radical_isometry_decision(first, second, quadratic=quadratic)
+        if decision is NotImplemented:
+            raise TypeError(
+                f"the isometry {first} -> {second} is undecided: their polar forms have radicals, and no "
+                f"checked witness was found among the transports through the invariant-factor framings"
+            ) from None
+        return None if decision is False else decision
+    bridge, bridge_inverse = _normal_form_bridge(
+        first_normalization.codomain(),
+        second_normalization.codomain(),
+        quadratic=quadratic,
+    )
+    forward = first.module_category().Mor(first, second)(
+        {
+            label: second_normalization.inverse()(
+                bridge(first_normalization.forward()(first.module_generator(label)))
+            )
+            for label in first.module_generating_set()
+        }
+    )
+    inverse = second.module_category().Mor(second, first)(
+        {
+            label: first_normalization.inverse()(
+                bridge_inverse(
+                    second_normalization.forward()(second.module_generator(label))
+                )
+            )
+            for label in second.module_generating_set()
+        }
+    )
+    return _torsion_form_isometry(forward, inverse, quadratic=quadratic, check=True)
 
 
 def _prime_indexed_generators(generators_by_prime):
@@ -1080,6 +1701,81 @@ class TorsionFormTwistFunctor(Functor):
         return f"Twist by {self.scalar()} on {self.domain()}"
 
 
+def _polar_form_is_nondegenerate(form, *, quadratic: bool) -> bool:
+    r"""Decide whether the polar form of ``form`` has zero radical, from retained data.
+
+    The module is read in its invariant-factor framing, ``M = Z^n / D`` with
+    ``D`` the retained invariants, and the polar form takes values in ``Q/mZ``:
+    for a quadratic form its polar form is valued in ``Q/Z`` (``m = 1``), and for
+    a bilinear one in the form's own value module.  ``x`` lies in the radical
+    exactly when ``b(x, g) = 0`` for every generator ``g``, i.e. when the lifted
+    coordinates ``H^T x`` are divisible by ``N m``, where ``H/N`` is the Gram
+    matrix with its denominators cleared and ``x`` is taken modulo ``D``.  So the
+    radical is zero exactly when the image lattice of ``H^T`` together with
+    ``N m Z^n`` already has index ``|M| = det D``: the product of the non-zero
+    Smith invariants of the integer matrix ``[H^T | N m I]``.
+
+    The rational rank of one representative Gram matrix is *not* this criterion.
+    On ``Z/4`` with ``b(x, x) = x^2/2`` the Gram matrix ``(1/2)`` is invertible,
+    yet ``2`` pairs to zero with every generator, so the radical is ``{0, 2}``.
+    The retained presentation ``D`` together with the value group ``m`` decide
+    it, and both are read here; the value module of the *polar* form is used, not
+    the quadratic refinement's.
+    """
+    module = _underlying_presented_module(form)
+    invariants = tuple(int(invariant) for invariant in module.invariants())
+    rank = len(invariants)
+    generators = tuple(form.module_generators())
+    if len(generators) != rank:
+        raise ValueError(
+            f"the invariant-factor framing of {form} has {rank} invariants but "
+            f"{len(generators)} generators; the radical criterion needs one generator per invariant"
+        )
+    def lifted_pairing(left, right):
+        value = form.b(left, right).lift()
+        return value.parent()._engine_element(value)
+
+    gram = _engine_matrix(
+        SageQQ,
+        rank,
+        rank,
+        [lifted_pairing(left, right) for left in generators for right in generators],
+    )
+    if quadratic:
+        value_modulus = SageQQ(1)
+    else:
+        value_modulus = SageQQ(
+            form.value_module().modulus().parent()._engine_element(
+                form.value_module().modulus()
+            )
+        )
+    integral, denominator = gram._clear_denom()
+    modulus = SageZZ(denominator) * SageZZ(value_modulus)
+    # The radical is the kernel of ``psi: (Z/D)^n -> (Z/N)^n``, ``x |-> H^T x``
+    # with ``N = denominator * value_modulus``.  Its order is
+    # ``prod_i D_i / |im psi|``, and in Smith form ``H^T = U S V`` the image is
+    # ``prod_i s_i Z / N Z``, of order ``prod_i N / gcd(s_i, N)``.  So
+    #
+    #     |rad| = prod_i D_i * gcd(s_i, N) / N^n
+    #
+    # and the polar form is nondegenerate exactly when that is 1.  The order of
+    # the Smith invariants is not aligned with the order of the invariants D_i:
+    # a Smith transformation mixes coordinates, so pairing ``D_i`` with ``s_i``
+    # position by position is not invariant and rejects perfect forms — on
+    # ``Z/2 + Z/4`` with the diagonal pairing ``1/2, 1/4`` one has
+    # ``D = (2, 4)``, ``H = diag(2, 1)`` and Smith invariants ``(1, 2)``, a
+    # perfect pairing whose per-position reading fails.  The product identity
+    # above is what the measurement supports.
+    diagonal, _, _ = integral.transpose().smith_form()
+    order = SageZZ(1)
+    for invariant in invariants:
+        order *= SageZZ(invariant)
+    killed = SageZZ(1)
+    for position in range(rank):
+        killed *= SageZZ(diagonal[position, position]).gcd(modulus)
+    return order * killed == modulus**rank
+
+
 def _engine_normal_form_key(form, *, quadratic: bool):
     normalization = form.invariant_factor_form()
     engine = _engine_torsion_form(normalization.codomain(), quadratic=quadratic)
@@ -1094,15 +1790,41 @@ def _engine_normal_form_key(form, *, quadratic: bool):
 
 
 def _forms_are_isomorphic(left, right, *, quadratic: bool) -> bool:
+    r"""Decide isometry of two typed torsion forms.
+
+    The normal-form engine states only nondegenerate polar forms, so a form with a
+    radical takes the reduction route: represented invariants decide ``False``,
+    a checked witness decides ``True``, and anything else is reported as
+    undecided rather than guessed.
+    """
     if left.base_ring() is not right.base_ring():
         return False
-    return _engine_normal_form_key(left, quadratic=quadratic) == _engine_normal_form_key(
-        right, quadratic=quadratic
-    )
+    try:
+        return _engine_normal_form_key(
+            left, quadratic=quadratic
+        ) == _engine_normal_form_key(right, quadratic=quadratic)
+    except TypeError:
+        decision = _radical_isometry_decision(left, right, quadratic=quadratic)
+    if decision is NotImplemented:
+        raise TypeError(
+            f"the isometry of {left} and {right} is undecided: their polar forms have radicals, so the "
+            f"normal-form engine does not apply, the represented invariants (order, invariant factors, "
+            f"radical structure, order-qualified value profile) agree, and no checked witness was found "
+            f"within the candidate budget of the automorphism-orbit transports through the "
+            f"invariant-factor framings"
+        )
+    if decision is False:
+        return False
+    return True
 
 
 class TorsionFormAutomorphism(TorsionFormIsometry):
     r"""A live form-preserving automorphism, parented by its orthogonal group."""
+
+    # The retained hash digest of this element's engine matrix; ``None`` until
+    # it is first hashed.  An automorphism is immutable once constructed, so
+    # one digest serves every hash, and a hash never needs to be computed twice.
+    _hash_digest = None
 
     def __init__(self, parent, forward, inverse, _engine_element) -> None:
         super().__init__(
@@ -1123,7 +1845,14 @@ class TorsionFormAutomorphism(TorsionFormIsometry):
         return self._engine_element
 
     def inverse(self):
-        return self.parent()._from_engine(~self._engine())
+        # The exact inverse map is already owned and was validated when this
+        # isometry was constructed. Do not throw it away and reconstruct both
+        # maps from the inverse engine element.
+        return self.parent()._from_engine(
+            ~self._engine(),
+            forward=self.inverse_morphism(),
+            inverse=self.forward(),
+        )
 
     def __invert__(self):
         return self.inverse()
@@ -1151,12 +1880,26 @@ class TorsionFormAutomorphism(TorsionFormIsometry):
         return not self == other
 
     def __hash__(self) -> int:
-        return hash(
-            (
-                id(self.parent()),
-                tuple(int(entry) for entry in self._engine().matrix().list()),
+        r"""Hash by the engine matrix this automorphism *is*, computed once.
+
+        Equality is the engine element's, so the digest is taken from the same
+        matrix: the coordinate tuple of the engine automorphism, not any
+        derived or approximate invariant.  The element is immutable, so the
+        digest is retained and every later hash reads it; without that, each
+        hash rebuilt the matrix through ``FqfOrthogonalGroup.matrix()``, which
+        crosses into GAP, and a coset action hashes its acting element once per
+        point.
+        """
+        digest = self._hash_digest
+        if digest is None:
+            digest = hash(
+                (
+                    id(self.parent()),
+                    tuple(int(entry) for entry in self._engine().matrix().list()),
+                )
             )
-        )
+            self._hash_digest = digest
+        return digest
 
     def _repr_(self):
         return f"Form automorphism of {self.domain()}"
@@ -1339,9 +2082,20 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
             }
         )
 
-    def _from_engine(self, engine_automorphism):
-        r"""Raise one engine automorphism ``a``; its inverse is the transport of ``a^{-1}``."""
+    def _from_engine(self, engine_automorphism, *, forward=None, inverse=None):
+        r"""Raise one engine automorphism ``a``; its inverse is the transport of ``a^{-1}``.
+
+        A caller that already owns the exact form automorphism represented by
+        ``a`` may supply its forward and inverse maps.  This avoids rebuilding
+        two presented-module morphisms by conjugating the same engine action
+        back through the normalization isometry.  Supplying only one map is an
+        error: the owned group element always carries a certified inverse map.
+        """
         engine_automorphism = self._engine_group()(engine_automorphism)
+        if (forward is None) != (inverse is None):
+            raise ValueError("an owned form automorphism must be raised with both forward and inverse maps")
+        if forward is not None:
+            return self.element_class(self, forward, inverse, engine_automorphism)
         return self.element_class(
             self,
             self._transported_map(engine_automorphism),
@@ -1360,12 +2114,27 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
         r"""Return the group homomorphism from the form Core to this finite realization."""
         return self._normalization_homomorphism()
 
-    def from_morphism(self, morphism):
-        r"""Apply the normalization homomorphism to an automorphism of the formed-module core."""
-        homomorphism = self._normalization_homomorphism()
-        if not homomorphism.domain().accepts(morphism):
-            raise TypeError(f"{morphism} must be an isometry of the formed-module core before normalization")
-        return homomorphism(morphism)
+    def from_morphism(self, morphism, *, check: bool = False):
+        r"""Apply the normalization homomorphism to an automorphism of the formed-module core.
+
+        An element already in this group *is* the normalization image of itself,
+        so it is returned unchanged rather than re-entered through the core: the
+        pair constructors below produce such elements directly, and a caller
+        that has one must not have to know which of the two routes built it.
+        ``check=True`` runs the element's own validators, which is where
+        checking belongs (``OWN-22``): after the object exists, once.
+        """
+        if isinstance(morphism, TorsionFormAutomorphism) and morphism.parent() is self:
+            element = morphism
+        else:
+            homomorphism = self._normalization_homomorphism()
+            if not homomorphism.domain().accepts(morphism):
+                raise TypeError(f"{morphism} must be an isometry of the formed-module core before normalization")
+            element = homomorphism(morphism)
+        if check:
+            element.validate_inverse(check=True)
+            element.validate_form_preservation(check=True)
+        return element
 
     def _normalized_form_automorphism(self, morphism):
         r"""Compute the normalization homomorphism on one admitted form isometry."""
@@ -1403,10 +2172,35 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
             len(labels),
             [entry for row in engine_rows for entry in row],
         )
-        return self._from_engine(self._engine_group()(engine_matrix))
+        engine_automorphism = self._engine_group()(engine_matrix)
+        # The normalization homomorphism admits arrows of the form Core.
+        # Every such arrow carries a forward map and its certified inverse,
+        # including generic CategoricalIsomorphism instances. The matrix above
+        # represents that same arrow, so retain its maps on the original form.
+        return self._from_engine(
+            engine_automorphism,
+            forward=morphism.forward(),
+            inverse=morphism.inverse().forward(),
+        )
 
-    def _element_constructor_(self, datum):
+    def _element_constructor_(self, datum, inverse=None, *, check: bool = False):
+        r"""An automorphism, from an engine datum or from a mutually inverse pair.
 
+        This is one contract with :meth:`TorsionFormIsometryMor._element_constructor_`:
+        ``(forward, inverse=None, *, check=False)``, where a pair of base
+        module morphisms names the automorphism by its action and a single
+        engine datum names it by the normalized matrix.  A pair is crossed by
+        the core's own isomorphism constructor and then normalized by
+        :meth:`from_morphism`, which is the one place that turns a core
+        isometry into a group element; ``check`` reaches the same validators
+        either way.
+        """
+        if inverse is None and isinstance(datum, tuple) and len(datum) == 2:
+            datum, inverse = datum
+        if inverse is not None:
+            category = _torsion_form_modules(self.domain().base_ring(), quadratic=self.is_quadratic())
+            core = category.Core().Mor(self.domain(), self.domain())
+            return self.from_morphism(core._from_known_inverse_pair(datum, inverse), check=check)
         if isinstance(datum, TorsionFormAutomorphism):
             if datum.domain() is not self.domain():
                 raise ValueError(
@@ -1460,8 +2254,14 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
         r"""Return the represented action of this group on the finite form."""
         return _torsion_form_element_action(self.domain(), self)
 
-    def orbit(self, element):
-        r"""Return the orbit of ``element`` through the owned G-set action."""
+    def orbit_of_element(self, element):
+        r"""Return the orbit of ``element`` through the owned G-set action.
+
+        The element orbit is spelled apart from :meth:`orbit`, which is the orbit of
+        a *submodule* (``#296``): one spelling for each of the two acted-on sorts, so
+        neither shadows the other.  ``orbit_cardinality`` and
+        ``stabilizer_generators`` are this action's, as ``stabilizer_of_element`` is.
+        """
         element = self.domain()(element)
         action = self.element_action()
         orbits = action.orbits()
@@ -1486,6 +2286,83 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
         r"""Return the point stabilizer through the represented G-set action."""
         element = self.domain()(element)
         return self.element_action().stabilizer(element)
+
+    @cached_method
+    def _stabilizer_words(self, element):
+        r"""Return the orbit of ``element`` and one transversal word per orbit point.
+
+        Breadth-first over the selected generators only: a point is reached once,
+        by the shortest word that reaches it, so the family is finite for a finite
+        group and nothing here enumerates the group.
+        """
+        letters = tuple(self._computed_group_generators())
+        words = {element: ()}
+        frontier = [element]
+        while frontier:
+            following = []
+            for point in frontier:
+                word = words[point]
+                for index, letter in enumerate(letters):
+                    image = letter(point)
+                    if image not in words:
+                        words[image] = word + (index,)
+                        following.append(image)
+            frontier = following
+        return letters, words
+
+    def orbit_cardinality(self, element):
+        r"""Return ``|G . element|``, computed from the selected generators alone."""
+        _letters, words = self._stabilizer_words(self.domain()(element))
+        return len(words)
+
+    def stabilizer_generators(self, element):
+        r"""Return generators of the stabilizer of ``element``, without enumerating the group.
+
+        This is ``stabilizer_generators(action, point)`` for this action: with the
+        orbit ``G . c`` and one transversal word ``t_y`` per orbit point ``y``,
+        Schreier's lemma gives the stabilizer as the group generated by
+        ``t_y s t_{y s}^-1`` over the orbit points ``y`` and the selected
+        generators ``s``.  The words are evaluated in the engine, and a generator
+        is crossed back to an owned automorphism only when it strictly enlarges
+        the subgroup built so far, so the returned family is small and its order
+        is the order of the stabilizer.
+
+        Two certificates come with the result, and both are readable from it
+        together with :meth:`orbit_cardinality`: every returned generator fixes
+        ``element`` and preserves the form (ask ``validate_form_preservation``),
+        and the subgroup they generate has order ``|G| / |G . element|``, the
+        orbit-stabilizer prediction.  Neither needs the parent's enumeration.
+        """
+        form = self.domain()
+        point = form(element)
+        letters, words = self._stabilizer_words(point)
+        engine_letters = [self._to_engine(letter) for letter in letters]
+        engine = self._engine_group()
+
+        def evaluate(word):
+            value = engine.one()
+            for index in word:
+                value = value * engine_letters[index]
+            return value
+
+        engine_transversals = {orbit_point: evaluate(word) for orbit_point, word in words.items()}
+        identity = engine.one()
+        accepted = []
+        current = engine.subgroup([identity])
+        for orbit_point, word in words.items():
+            prefix = engine_transversals[orbit_point]
+            for index, letter in enumerate(letters):
+                image = letter(orbit_point)
+                candidate = (
+                    prefix
+                    * engine_letters[index]
+                    * engine_transversals[image].inverse()
+                )
+                if candidate == identity or candidate in current:
+                    continue
+                accepted.append(candidate)
+                current = engine.subgroup(accepted)
+        return tuple(self._from_engine(generator) for generator in accepted)
 
     @cached_method
     def subobject_action(self):
@@ -1527,6 +2404,258 @@ class TorsionFormOrthogonalGroup(CategoricalMor):
         return self.subobject_action().stabilizer(self.subobject_point(subgroup))
 
     stabilizer_of_subobject = stabilizer_of_subgroup
+
+    def _element_enumerations(self):
+        r"""The form's element ranking and the element at each rank, built once.
+
+        An orbit point is a set of element *ranks* in the form's own enumeration, so
+        comparing and hashing points costs nothing next to comparing the presented
+        elements themselves.  The ranking is the point set's own enumeration, read
+        as a bijection and used only as a rank key: it is not equivariant and is
+        never read as a coordinate.
+        """
+        retained = self.__dict__.get("_element_enumeration")
+        if retained is None:
+            elements = self.domain().elements()
+            ranking = elements.ranking_map()
+            inverse = ranking.inverse()
+            retained = (
+                ranking,
+                tuple(inverse(index) for index in range(int(elements.cardinality()))),
+            )
+            self.__dict__["_element_enumeration"] = retained
+        return retained
+
+    def _element_permutation(self, automorphism):
+        r"""The permutation of the ambient form's elements induced by one automorphism.
+
+        Rank ``k`` is sent to the rank of ``automorphism(elements[k])``: the action
+        is the owned morphism's own, evaluated when a rank is first read and then
+        retained.  Nothing reads a matrix or a coordinate vector, and no element
+        present in several orbit points is acted on twice.
+        """
+        retained = self.__dict__.setdefault("_element_permutations", {})
+        permutation = retained.get(automorphism)
+        if permutation is None:
+            ranking, elements = self._element_enumerations()
+            permutation = _FormElementPermutation(ranking, elements, automorphism)
+            retained[automorphism] = permutation
+        return permutation
+
+    def _element_point(self, subgroup):
+        r"""The point of a submodule: the ranks of its elements in the form's enumeration."""
+        ranking, _elements = self._element_enumerations()
+        return frozenset(
+            int(ranking(element)) for element in _embedded_elements(subgroup)
+        )
+
+    def _point_of_elements(self, elements):
+        r"""The point named by an embedded element set, for membership in :meth:`orbit_points`."""
+        ranking, _representatives = self._element_enumerations()
+        return frozenset(int(ranking(element)) for element in elements)
+
+    def _point_elements(self, point):
+        r"""The embedded element set a point names."""
+        _ranking, representatives = self._element_enumerations()
+        return frozenset(representatives[rank] for rank in point)
+
+    def _subobject_of_point(self, point):
+        r"""The submodule a point spans, canonical through the form's subobject registry."""
+        _ranking, representatives = self._element_enumerations()
+        return self.domain().subobject_generated_by(
+            tuple(representatives[rank] for rank in point)
+        )
+
+    def _subobject_point_action(self, automorphism, point):
+        r"""The action of ``O(q)`` on element-rank points: one retained element image each."""
+        permutation = self._element_permutation(automorphism)
+        return frozenset(permutation[rank] for rank in point)
+
+    def subobject_orbit_action(self, subgroup):
+        r"""The finite action of ``O(q)`` on the orbit of the submodule ``subgroup``.
+
+        The orbit search is :meth:`FiniteGSets.from_finite_orbits`: the closure of
+        the point of ``subgroup`` under the selected generators, retaining the one
+        walk, its word section and its transition table, so :meth:`orbit`,
+        :meth:`orbit_points` and :meth:`stabilizer` read the same sweep.  The points
+        are sets of element ranks, which is the form's own enumeration read as a
+        rank key.  Nothing enumerates the submodules of the ambient form.
+        """
+        point = self._element_point(subgroup)
+        retained = self.__dict__.setdefault("_subobject_orbit_actions", {})
+        action = retained.get(point)
+        if action is None:
+            action = FiniteGSets(self).from_finite_orbits(
+                (point,), self._subobject_point_action
+            )
+            retained[point] = action
+        return action
+
+    def orbit_points(self, subgroup):
+        r"""Return the orbit of ``subgroup`` as embedded element sets.
+
+        The image of the action's point set under ``p |-> {elements at the ranks of p}``,
+        so the cardinality is the orbit's and the element sets are built only when
+        read.
+        """
+        points = self.subobject_orbit_action(subgroup).point_set()
+        return Sets().image_set(
+            self._point_elements, points, inverse=self._point_of_elements
+        )
+
+    def orbit(self, subgroup):
+        r"""Return the orbit of the submodule ``subgroup`` under ``O(q)``, as submodules.
+
+        The image of :meth:`orbit_points` under the submodule map, so the cardinality
+        is the orbit's and one submodule is built per orbit point only when it is
+        read.  The submodules are the form's, from its registry keyed by element set,
+        and the map is injective on the orbit because a submodule is its element set.
+        """
+        points = self.subobject_orbit_action(subgroup).point_set()
+        return Sets().image_set(
+            self._subobject_of_point, points, inverse=self._element_point
+        )
+
+    def _engine_transversals(self, free, orbit, section, engine_letters, engine):
+        r"""Realize the walk's word section in the engine, one product per orbit point.
+
+        The engine acts on the right (:meth:`TorsionFormAutomorphism.__mul__`), so the
+        engine product ``a * b`` is the automorphism that the owned product ``b * a``
+        names.  The syllables ``s_1 ... s_k`` of a word name the owned product
+        ``s_1 * ... * s_k``, whose engine element is ``s_k * ... * s_1``: every
+        realization below multiplies on the left, which is the whole of the crossing.
+
+        The walk records the word of a point as one letter followed by the word of
+        the point it was reached from, so a word's tail is realized by the time the
+        word is read: each transversal costs one engine product, and the tail is
+        found by its syllable tuple.  A word of any other shape is evaluated syllable
+        by syllable, which is the same value.  No owned automorphism is multiplied
+        here -- a product of two of those rebuilds two presented-module maps through
+        the normalization isometry, which is the cost this avoids.
+        """
+        realized = {}
+        transversals = {}
+        identity = engine.one()
+        for point in orbit:
+            syllables = free.reduced_word_syllables(section(point))
+            value = realized.get(syllables)
+            if value is None:
+                carried = realized.get(syllables[1:]) if syllables else None
+                head = syllables[0] if syllables else None
+                if carried is not None and head[1] == 1:
+                    value = carried * engine_letters[head[0]]
+                else:
+                    value = identity
+                    for label, exponent in syllables:
+                        letter = engine_letters[label]
+                        value = (letter if exponent == 1 else letter**exponent) * value
+                realized[syllables] = value
+            transversals[point] = value
+        return transversals
+
+    def _engine_abelian_element(self, element):
+        r"""Cross one owned element of the normal form into the engine's abelian group.
+
+        The owned element carries no exponent vector: the crossing this class already
+        owns runs engine -> owned (``_normalized_map`` reads ``engine_module(basis) *
+        automorphism`` and ``cover.coordinates``), so the reverse reads the normalized
+        element's framing lift, rebuilds the cover vector from it, and hands the engine
+        module the vector whose smith-form exponents the engine's abelian group indexes.
+        """
+        from sage.libs.gap.libgap import libgap
+
+        normalization = self.normalization_isometry()
+        normalized_form = normalization.codomain()
+        engine_module = self._engine_module()
+        cover = engine_module.V()
+        basis = tuple(cover.basis())
+        labels = tuple(normalized_form.module_generating_set())
+        frame = normalized_form.framing_morphism()
+        normalized = normalization.forward()(element)
+        coordinates = frame.lift(normalized)
+        vector = cover.zero()
+        for position, label in enumerate(labels):
+            coefficient = int(coordinates(label))
+            if coefficient:
+                vector = vector + coefficient * basis[position]
+        exponent_vector = tuple(int(entry) for entry in engine_module(vector).vector())
+        return libgap(self._engine_group()._domain(exponent_vector).gap())
+
+    def stabilizer(self, subgroup):
+        r"""Return the setwise stabilizer of the submodule ``subgroup`` in ``O(q)``.
+
+        The submodule contributes its set of embedded classes
+        (:func:`_embedded_elements`), and the stabilizer of that set is
+        :meth:`stabilizer_of_classes`'s computation: the stabilizer of a
+        submodule and the stabilizer of an arbitrary finite class set are one
+        question, and one body answers both.
+
+        The callers read the subgroup's order and the orbit-stabilizer product
+        off the returned subgroup, which computes
+        ``|Stab(J)| * |orbit(J)|`` and compares it with ``|O(q)|``
+        independently of this construction.
+        """
+        return self.stabilizer_of_classes(frozenset(_embedded_elements(subgroup)))
+
+    @cached_method
+    def stabilizer_of_classes(self, classes):
+        r"""Return the setwise stabilizer of a finite set of classes of the form, with generators.
+
+        ``classes`` is a nonempty finite set of elements of the form ``A``
+        whose stabilizer ``{g in O(q) : g.S = S}`` is asked for.  ``S`` need
+        not be a submodule: a point of a class-set orbit --- the four classes of
+        a two-dimensional nondegenerate subspace, say --- is the case the
+        lattice-side calls hand over.
+
+        **The computation.**  The engine holding ``O(q)`` is an automorphism
+        group of the abelian group ``A``, and its setwise stabilizer of a set of
+        elements of ``A`` is the maintained computation for exactly this
+        question (GAP's ``Stabilizer``, the orbit walk of Holt, Eick and
+        O'Brien, *Handbook of Computational Group Theory*, Chapman & Hall/CRC,
+        2005, Section 4.1, p. 79, with the stabilizer chain it builds).  ``S``
+        crosses into that group by its exponent vectors
+        (``_engine_abelian_element``), the action is the engine's own
+        elementwise image (``x^g``, GAP's ``OnSets`` on it --- not a
+        ``Set(List(...))`` set-image function handed to GAP, which costs 307 s
+        on the specimen below against 87 s for the engine's own action), and
+        the returned generators cross back through ``_from_engine``, so what
+        this returns is a subgroup of THIS group of maps, generated by that
+        stabilizer's family.
+
+        **What is not asserted here.**  Neither the subgroup's order nor the
+        orbit-stabilizer product is computed: a caller that needs the whole
+        setwise stabilizer reads it off the returned subgroup.  The cost is the
+        engine's walk and not one product and one membership test per orbit
+        point: 0.7 s for ``A_{T_Co}``'s 23715-point orbit, and 87 s for its
+        67456-point four-class orbit, whose stabilizer has order 696729600 =
+        ``|O(q_{U(2)})| * |O(q_{E8(-2) + <2>})|``.
+        """
+        from sage.libs.gap.libgap import libgap
+
+        form = self.domain()
+        classes = frozenset(classes)
+        if not classes:
+            raise ValueError(
+                f"the setwise stabilizer of the empty set in {self} is the whole group; "
+                "supply the nonempty class set whose stabilizer is asked for"
+            )
+        for class_ in classes:
+            if class_ not in form:
+                raise ValueError(
+                    f"the setwise stabilizer of a class set in {self} needs classes of {form}, "
+                    f"but {class_!r} is not one"
+                )
+        engine = self._engine_group()
+        engine_set = libgap.Set(
+            [self._engine_abelian_element(element) for element in sorted(classes, key=repr)]
+        )
+        equation = libgap.Stabilizer(engine.gap(), engine_set, libgap.OnSets)
+        return self.subgroup_on(
+            tuple(
+                self._from_engine(engine(generator))
+                for generator in libgap.GeneratorsOfGroup(equation)
+            )
+        )
 
     def _repr_(self):
         return f"Orthogonal group of {self.domain()}"
@@ -1703,14 +2832,18 @@ def _engine_orthogonal_group(T):
     ``p`` odd has ``q`` determined by ``b``, and ``O(T_p)`` is the orthogonal
     group of the Gram matrix of ``p b`` over ``GF(p)``: GAP's
     ``GO(epsilon, n, p)`` conjugated onto that matrix by an explicit isometry
-    of diagonalized forms. The other primary parts use OSCAR's normal-form
-    orthogonal-group algorithm on the same presented quotient, retaining
-    both value moduli and the Smith generator basis. The isometry of diagonalized
-    forms is computed here because GAP's ``forms`` package, which provides
-    ``BaseChangeToCanonical``, is not installed in the engine (TRAPS.md).
+    of diagonalized forms. An integer-valued elementary two-primary part
+    with nonsingular polar form is a quadratic space over GF(2); GAP Forms
+    supplies the exact base change from its full classical orthogonal group.
+    An elementary two-primary part with a half-integral value has an odd
+    number of generators, so its polar form is not alternating and no GF(2)
+    quadratic form carries it; ``_engine_two_primary_odd_orthogonal_generators``
+    splits off the half-integral direction and hands the integral remainder to
+    the same GAP route.
+    The other primary parts use Sage's full finite-form orthogonal group,
+    retaining both value moduli and the Smith generator basis. The odd-primary route
+    retains its explicit isometry of diagonalized forms.
     """
-    from sage_extensions.categories.lattice_engines import _oscar_lattices
-
     exponent = SageZZ(T.annihilator().gen())
     generators = []
     order = SageZZ.one()
@@ -1718,18 +2851,65 @@ def _engine_orthogonal_group(T):
         part = T.primary_part(p)
         gens = part.smith_form_gens()
         n = len(gens)
+        binary_quadratic = None
+        half_integral = (
+            p == 2
+            and all(value == 2 for value in part.invariants())
+            and part._modulus == 1
+            and part._modulus_qf == 2
+            and any(generator.q().lift().denominator() == 2 for generator in gens)
+        )
+        if half_integral:
+            # Two preconditions, both measured on the part: the polar form must
+            # be nondegenerate, and delta = q mod ZZ must satisfy
+            # delta(B^1 delta) = 1, i.e. the B-dual of delta must not be
+            # isotropic.  Without the second one the B-dual lies in ker delta,
+            # the restriction of B to ker delta has a one-dimensional radical,
+            # and the split below does not apply (the two-primary part of
+            # `Lattices(ZZ)([[6, 0], [0, 6]])` is such a part, with q = 3/2 on
+            # both generators); such a part keeps Sage's general route.
+            field = _engine_GF(2)
+            polar = _engine_matrix(field, n, n, [
+                field(SageZZ(2 * gens[i].b(gens[j]).lift())) for i in range(n) for j in range(n)
+            ])
+            delta = _engine_matrix(field, n, 1, [
+                0 if generator.q().lift().denominator() == 1 else 1 for generator in gens
+            ])
+            half_integral = polar.rank() == n and bool(
+                (polar.solve_right(delta).transpose() * delta)[0, 0]
+            )
+        if (
+            p == 2
+            and all(value == 2 for value in part.invariants())
+            and part._modulus == 1
+            and part._modulus_qf == 2
+            and all(generator.q().lift().denominator() == 1 for generator in gens)
+        ):
+            field = _engine_GF(2)
+            quadratic = _engine_matrix(field, n, n, [
+                field(gens[i].q().lift()) if i == j
+                else field(2 * gens[i].b(gens[j]).lift()) if i < j
+                else field.zero()
+                for i in range(n) for j in range(n)
+            ])
+            if (quadratic + quadratic.transpose()).rank() == n:
+                binary_quadratic = quadratic
         if p != 2 and all(x == p for x in part.invariants()):
             field = _engine_GF(p)
             gram = _engine_matrix(field, n, n, [field(p * gens[i].b(gens[j]).lift()) for i in range(n) for j in range(n)])
             matrices, part_order = _engine_odd_orthogonal_generators(gram, p)
+        elif binary_quadratic is not None:
+            matrices, part_order = _engine_elementary_two_orthogonal_generators(binary_quadratic)
+        elif half_integral:
+            matrices, part_order = _engine_two_primary_odd_orthogonal_generators(part, gens)
         else:
-            gram = _engine_matrix(SageQQ, n, n, [
-                gens[i].q().lift() if i == j else gens[i].b(gens[j]).lift()
-                for i in range(n) for j in range(n)
-            ])
-            part_order, matrices = _oscar_lattices.finite_form_isometry_group(
-                gram, part.invariants(), part._modulus, part._modulus_qf
-            )
+            # Sage's TorsionQuadraticModule.orthogonal_group() computes
+            # the complete group when gens is omitted. Its matrices give
+            # row images of the same Smith generators used above.
+            # https://doc.sagemath.org/html/en/reference/modules/sage/modules/torsion_quadratic_module.html#sage.modules.torsion_quadratic_module.TorsionQuadraticModule.orthogonal_group
+            primary_group = part.orthogonal_group()
+            part_order = primary_group.order()
+            matrices = tuple(generator.matrix() for generator in primary_group.gens())
         order *= part_order
         for m in matrices:
             images = [sum((SageZZ(m[i, j]) * gens[j] for j in range(n)), part.zero()) for i in range(n)]
@@ -1737,6 +2917,155 @@ def _engine_orthogonal_group(T):
     group = T.orthogonal_group(gens=generators)
     group.gap().SetSize(order)
     return group
+
+
+def _engine_two_primary_odd_orthogonal_generators(part, gens):
+    r"""Generators of ``O(q)``, and its order, for an odd-rank elementary two-primary part.
+
+    ``part`` is a finite quadratic module over `\ZZ` whose invariants are all
+    `2`, with `b` valued in `\QQ/\ZZ` and `q` in `\QQ/2\ZZ`, and ``gens`` are its
+    Smith generators, so that ``A = part`` has `n` rows in that basis.  This is
+    the case no integral GF(2) quadratic matrix expresses: some `q(g_i)` is a
+    half-integer, hence the reduction `\delta` of `q` modulo `\ZZ` is a nonzero
+    functional on `A`, and the polar form `B(x,y) = 2b(x,y)` is a *symmetric*
+    `\FF_2`-form with `B(x,x) = \delta(x)`, which is not alternating.  This is
+    the odd-rank situation of P. J. Cameron, *Classical Groups*, Chapter 6, §6.2,
+    Theorem 6.1, printed p. 69: an odd rank forces the polar form away from the
+    alternating case, and the isometry group is read off a symplectic group.  The
+    split below is that theorem's, one step over -- Cameron's own odd-rank form is
+    `\FF_2`-valued with a rank-one radical, so all of `Sp(n-1,F)` survives, while
+    here the half-integral direction stands in for the radical and the group that
+    survives on `A_0` is the orthogonal group of its alternating restriction.
+    `GO(\epsilon,n,2)`, which the integral branch of
+    ``_engine_orthogonal_group`` uses, requires an alternating polar form of even
+    rank and cannot be handed this data.
+
+    Reduction, in five steps; every identity below is a two-line consequence of
+    `q(x+y) = q(x)+q(y)+2b(x,y)`, which holds in the module itself:
+
+    * `\delta` is additive: `q(x+y)-q(x)-q(y)` lies in `\ZZ`.  So `\delta` is a
+      linear functional, and `B(x,x) = 2(q(x) \bmod \ZZ) = \delta(x)`.
+    * `B` is nondegenerate and `\delta(B^{-1}\delta) = 1` -- both are the
+      caller's preconditions, checked there before the branch is taken.  So
+      there is one `c` with `B(c,.) = \delta`, `B(c,c) = 1`, and `B(c,w) =
+      \delta(w) = 0` for `w \in \ker\delta`: `A = \langle c\rangle \perp A_0`
+      with `A_0 = \ker\delta` of rank `n-1`, and `n` is odd (an alternating form
+      has even rank, and `B|_{A_0}` is alternating).  With `\delta(B^{-1}\delta)
+      = 0` instead, `c` is isotropic and lies in `A_0`, `B|_{A_0}` has the
+      one-dimensional radical `\langle c\rangle`, and this split does not apply;
+      that part keeps Sage's general route.
+    * `q(x+w) = q(x)+q(w)+B(x,w)` makes `q_0 = q|_{A_0}` integer-valued, with
+      polar form `B|_{A_0}`, nondegenerate.  So `q_0` is an ordinary quadratic
+      form over `\FF_2` in `n-1` even dimensions, which is exactly what the
+      integral branch's GAP route takes.
+    * Every `g \in O(q)` preserves `B`, hence preserves `\delta = B(c,.)`, hence
+      fixes `c` and preserves `A_0`.  Conversely, for `g_0 \in O(q_0)` the map
+      fixing `c` and acting as `g_0` on `A_0` preserves `q`, because
+      `q(\alpha c + w) = \alpha q(c) + q_0(w)` for `w \in A_0`.  So
+      `g \mapsto g|_{A_0}` is a bijection `O(q) \to O(q_0)` and
+      `|O(q)| = |O(q_0)|`.
+    * Cameron, *Classical Groups*, pp. 70-71, for the shape of the data: the
+      quadratic forms polarising to a fixed symplectic form are its translates
+      by the linear functionals, and over `\FF_2` each functional is
+      `x \mapsto B(x,a)`.  Here the functional the extension would have to
+      preserve is `B(c,.)|_{A_0}`, which is zero by the choice of `c`, so the
+      extension is the identity on `\langle c\rangle` and nothing else moves.
+
+    Two boundary cases.  For `n = 1` -- `A = \langle c\rangle` with
+    `q(c) = 1/2 \neq 0` -- the only class of value zero is zero, so the only
+    `q`-preserving linear map is the identity: the empty generating set and order
+    one are returned.  A part whose polar form is degenerate, or whose
+    `\delta(B^{-1}\delta)` is zero, never reaches here: the caller checks both
+    before taking the branch, and such a part keeps Sage's general route.
+
+    The generators are returned in the caller's row convention: the `i`-th one
+    sends `g_i` to `\sum_j m_{ij} g_j`.  Each is checked on the whole of `A`
+    before it is returned.  The check is exact rather than a sample: with `M`
+    the integer matrix `M_{ii} = 2q(g_i)`, `M_{ij} = 2b(g_i,g_j)`, the quadratic
+    polynomial of `A` is `x \mapsto (x M x^t)/2` on `x \in \{0,1\}^n`, so
+    `x \mapsto xG` preserves it exactly when `G M G^t - M` has entries divisible
+    by `4` on the diagonal and by `2` off it -- those entries are the
+    coefficients of the difference polynomial, so the condition is the vanishing
+    of that polynomial on all of `A`, not a check at finitely many points.
+    """
+    n = len(gens)
+    field = _engine_GF(2)
+    values = [generator.q().lift() for generator in gens]
+    assert all(value.denominator() in (1, 2) for value in values), (
+        f"an elementary two-primary part's quadratic values lie in (1/2)Z/2Z, not in {values}"
+    )
+    delta = _engine_matrix(field, 1, n, [0 if value.denominator() == 1 else 1 for value in values])
+    assert delta != 0, "the integral case is the GF(2) quadratic-form branch, not this one"
+    bilinear = _engine_matrix(field, n, n, [
+        field(SageZZ(2 * gens[i].b(gens[j]).lift())) for i in range(n) for j in range(n)
+    ])
+    assert bilinear == bilinear.transpose()
+    assert bilinear.rank() == n, "the polar form of a nondegenerate finite form must be nondegenerate"
+    assert [bilinear[i, i] for i in range(n)] == [delta[0, i] for i in range(n)], (
+        "B(x,x) must be the linear functional q mod ZZ"
+    )
+    solution = bilinear.solve_right(delta.transpose())
+    c = _engine_matrix(field, 1, n, [solution[i, 0] for i in range(n)])
+    assert c * bilinear == delta
+    assert (c * delta.transpose())[0, 0] == 1, (
+        "the caller's second precondition is delta(B^-1 delta) = 1; without it c is isotropic, c lies "
+        "in ker delta, and the restriction of B to ker delta has the one-dimensional radical <c>"
+    )
+    if n == 1:
+        # `A = <c>` with `q(c) = 1/2 \neq 0`: the only class of `q`-value zero is
+        # zero, so the only `q`-preserving linear map is the identity.
+        return [], SageZZ.one()
+    kernel = delta.right_kernel().basis_matrix()
+    assert kernel.nrows() == n - 1 and c * kernel.transpose() == 0, (
+        "the complement of the half-integral direction must be its orthogonal complement"
+    )
+    basis = []
+    for row in kernel.rows():
+        element = part.zero()
+        for index in range(n):
+            if row[index]:
+                element = element + gens[index]
+        basis.append(element)
+    diagonal = []
+    for index, element in enumerate(basis):
+        value = element.q().lift()
+        assert value.denominator() == 1, f"q must be integer-valued off the half-integral direction, not {value}"
+        diagonal.append(field(SageZZ(value)))
+    quadratic = _engine_matrix(field, n - 1, n - 1, [
+        diagonal[i] if i == j
+        else field(SageZZ(2 * basis[i].b(basis[j]).lift())) if i < j
+        else field.zero()
+        for i in range(n - 1) for j in range(n - 1)
+    ])
+    assert (quadratic + quadratic.transpose()).rank() == n - 1
+    integral = _engine_matrix(SageZZ, n, n, [
+        SageZZ(2 * values[i]) if i == j else SageZZ(2 * gens[i].b(gens[j]).lift())
+        for i in range(n) for j in range(n)
+    ])
+    subgenerators, part_order = _engine_elementary_two_orthogonal_generators(quadratic)
+    frame = _engine_matrix(field, n, n, [
+        c[0, j] if i == 0 else kernel[i - 1, j]
+        for i in range(n) for j in range(n)
+    ])
+    assert frame.rank() == n, "the half-integral direction and the integral complement must span A"
+    inverse = frame.inverse()
+    matrices = []
+    for subgenerator in subgenerators:
+        inner = _engine_matrix(field, n, n, [
+            field.one() if i == 0 and j == 0 else subgenerator[i - 1, j - 1] if i > 0 and j > 0 else field.zero()
+            for i in range(n) for j in range(n)
+        ])
+        matrix = inverse * inner * frame
+        moved = _engine_matrix(SageZZ, n, n, [SageZZ(matrix[i, j]) for i in range(n) for j in range(n)])
+        moved = moved * integral * moved.transpose()
+        for i in range(n):
+            for j in range(n):
+                modulus = 4 if i == j else 2
+                assert (moved[i, j] - integral[i, j]) % modulus == 0, (
+                    f"{matrix} does not preserve the quadratic form of {part}"
+                )
+        matrices.append(matrix)
+    return matrices, part_order
 
 
 def _extend(T, part, gens, p, exponent, images):

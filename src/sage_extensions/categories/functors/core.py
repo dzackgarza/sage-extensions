@@ -568,10 +568,19 @@ class _CompositeFunctor(Functor):
     r"""The composite ``second ∘ first`` with the ordinary cached forward action."""
 
     def __init__(self, first: Functor, second: Functor) -> None:
-        if first.codomain() != second.domain():
+        r"""``second ∘ first``, defined when ``first`` lands where ``second`` starts.
+
+        Landing in a *subcategory* of ``second``'s domain is landing in its
+        domain: a supercommutative alternating differential graded algebra is a
+        differential graded algebra, so the cohomology functor applies to every
+        value the de Rham functor takes.  The composite therefore requires
+        containment, not equality, of the two categories; its codomain is
+        ``second``'s own, which contains the subcategory named by ``first``.
+        """
+        if not first.codomain().is_subcategory(second.domain()):
             raise ValueError(
                 f"cannot compose {second} after {first}: {first} ends at {first.codomain()}, but {second} starts "
-                f"at {second.domain()}"
+                f"at {second.domain()}, and the first is not a subcategory of the second"
             )
         self._first = first
         self._second = second

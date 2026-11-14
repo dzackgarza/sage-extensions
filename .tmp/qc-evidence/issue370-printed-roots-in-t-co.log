@@ -1,0 +1,23 @@
+delta square -2 div 1
+Sterk_1: 12 printed roots; in T_Co (delta-orthogonal): 12; outside: 0
+   squares of the inside ones: [-4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4]
+Sterk_2: 10 printed roots; in T_Co (delta-orthogonal): 8; outside: 2
+   squares of the inside ones: [-4, -4, -4, -4, -4, -4, -4, -4]
+   outside root pairs with delta as 2
+   outside root pairs with delta as -2
+Sterk_3: 12 printed roots; in T_Co (delta-orthogonal): 9; outside: 3
+   squares of the inside ones: [-4, -4, -4, -4, -4, -4, -4, -4, -2]
+   outside root pairs with delta as 2
+   outside root pairs with delta as -2
+   outside root pairs with delta as -2
+[peakrss] p370p4: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 281 MiB
+[peakrss] low-water MemAvail : 10805 MiB
+[peakrss] peak single VmHWM  : 281 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      270 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   281 MiB hwm=   281 MiB avail= 10805 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 10999 MiB
+launcher exit: 0

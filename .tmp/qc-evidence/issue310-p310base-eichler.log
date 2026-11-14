@@ -1,0 +1,37 @@
+FF....                                                                   [100%]
+=================================== FAILURES ===================================
+________ test_the_criterion_reads_its_hypothesis_off_the_decomposition _________
+/repos/sage-extensions/tests/lattices/test_eichler_orbits.sage:48: in test_the_criterion_reads_its_hypothesis_off_the_decomposition
+    assert not NamedLattices.LK3.is_decomposable()
+E   assert not True
+E    +  where True = is_decomposable()
+E    +    where is_decomposable = Integral lattice of rank 22 and signature (3, 19).is_decomposable
+E    +      where Integral lattice of rank 22 and signature (3, 19) = NamedLattices.LK3
+________ test_raw_gram_factor_does_not_count_as_a_represented_u_summand ________
+/repos/sage-extensions/tests/lattices/test_eichler_orbits.sage:58: in test_raw_gram_factor_does_not_count_as_a_represented_u_summand
+    assert lattice.hyperbolic_plane_summand_count() == 1
+E   assert 2 == 1
+E    +  where 2 = hyperbolic_plane_summand_count()
+E    +    where hyperbolic_plane_summand_count = Integral lattice of rank 4 and signature (2, 2).hyperbolic_plane_summand_count
+E    +  and   1 = Integer(1)
+========================== test-call performance gate ==========================
+tests/lattices/test_eichler_orbits.sage::test_on_a_unimodular_lattice_the_square_decides: 36.96 s > 20 s
+=========================== short test summary info ============================
+FAILED ../repos/sage-extensions/tests/lattices/test_eichler_orbits.sage::test_the_criterion_reads_its_hypothesis_off_the_decomposition
+FAILED ../repos/sage-extensions/tests/lattices/test_eichler_orbits.sage::test_raw_gram_factor_does_not_count_as_a_represented_u_summand
+2 failed, 4 passed in 51.19s
+[peakrss] p310bt: child waited=1 shell_code=1 samples=28
+[peakrss] peak tree RSS      : 341 MiB
+[peakrss] low-water MemAvail : 9827 MiB
+[peakrss] peak single VmHWM  : 341 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      330 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        1 MiB peak
+[peakrss]   t=    54.1s procs=  3 rss=   341 MiB hwm=   341 MiB avail= 10019 MiB
+[peakrss]   t=    52.1s procs=  3 rss=   339 MiB hwm=   339 MiB avail= 10518 MiB
+[peakrss]   t=    50.0s procs=  3 rss=   333 MiB hwm=   333 MiB avail= 10502 MiB
+[peakrss]   t=    48.0s procs=  3 rss=   330 MiB hwm=   330 MiB avail= 10478 MiB
+[peakrss]   t=    42.0s procs=  3 rss=   327 MiB hwm=   327 MiB avail= 10538 MiB
+launcher exit: 1

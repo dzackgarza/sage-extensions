@@ -1,0 +1,56 @@
+#name: Coble kernel plane rows (#390)
+## The two kernel plane rows of #390: the orbits of primitive isotropic planes
+## of T_Co under Otilde(T_Co) = ker rho and Otilde+(T_Co) = ker(rho, sn_RR),
+## each realizing one plane per double coset (189720 per group, the #381
+## probes).  The rows are hours each, so they live in this one job that
+## reports later rather than in the per-test gate.
+##
+## Install (one command, from the repository root):
+##   mkdir -p .github/workflows && cp results/coble-kernel-plane-rows.yml .github/workflows/
+## Then dispatch from the Actions tab (the "Coble kernel plane rows (#390)" workflow).
+##
+## The job reports every row it decided and names every row that did not
+## return inside its per-call cap or inside the job's budget; it is red in
+## both cases.
+on:
+  workflow_dispatch:
+    inputs:
+      cap:
+        description: "seconds one row call may take before its row is undecided"
+        required: false
+        default: "10800"
+        type: string
+      budget:
+        description: "seconds for the whole run, 0 for no budget"
+        required: false
+        default: "28800"
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: coble-kernel-plane-rows
+  cancel-in-progress: false
+jobs:
+  kernel-plane-rows:
+    name: Each kernel plane row against the public orbit call
+    runs-on: ubuntu-latest
+    container: ghcr.io/dzackgarza/sage:develop
+    timeout-minutes: 350
+    steps:
+      - name: Check out the commit under test
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Mark the checkout as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Run the kernel plane rows
+        env:
+          COBLE_CALL_CAP: ${{ inputs.cap || '10800' }}
+          COBLE_ROW_BUDGET: ${{ inputs.budget || '28800' }}
+        run: |
+          set -o pipefail
+          "$SAGE_BIN" --version
+          git rev-parse HEAD
+          "$SAGE_BIN" -python tests/coble_kernel_plane_rows.py \
+            --cap "$COBLE_CALL_CAP" --budget "$COBLE_ROW_BUDGET"
+        shell: bash

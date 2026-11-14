@@ -1,0 +1,24 @@
+[t=     0.0s] imports
+[t=     0.9s] case_3: order 92897280, L/P/F 5/10/19
+[t=    11.4s] coinvariant_extension_subgroup()
+[se-stage] _marked_automorphism_generators start t=229977.6
+[se-stage] _marked_automorphism_generators done in 123.3s: 24 gens
+[t=   190.5s] G_h built
+[t=   190.5s] isotropic_classes(N, 1)
+[t=   395.7s] 2 O(N)-orbits of lines
+[t=   395.7s] subgroup_classes(G_h, lines)  <- the capped operation, instrumented
+[se-stage] _marked_automorphism_generators start t=230340.9
+[peakrss] enriques-stageD: child waited=124 shell_code=124 samples=1200
+[peakrss] peak tree RSS      : 4917 MiB
+[peakrss] low-water MemAvail : 5019 MiB
+[peakrss] peak single VmHWM  : 5044 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      3392 MiB peak
+[peakrss]   python                     1641 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=  2379.1s procs=  4 rss=  4917 MiB hwm=  5043 MiB avail=  8600 MiB
+[peakrss]   t=  2381.1s procs=  4 rss=  4917 MiB hwm=  5043 MiB avail=  8600 MiB
+[peakrss]   t=  2383.1s procs=  4 rss=  4917 MiB hwm=  5043 MiB avail=  8600 MiB
+[peakrss]   t=  2385.1s procs=  4 rss=  4917 MiB hwm=  5043 MiB avail=  8599 MiB
+[peakrss]   t=  2387.1s procs=  4 rss=  4917 MiB hwm=  5043 MiB avail=  8599 MiB

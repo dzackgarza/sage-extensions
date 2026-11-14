@@ -9,6 +9,7 @@ type, and a subdiagram mixing roots of square \(-2\) and \(-4\) is of type
 \(B_n = C_n\) at scale \(1\).
 """
 
+from collections import Counter
 from fractions import Fraction
 
 from sage_extensions.all import *
@@ -176,18 +177,22 @@ def test_sterk_connected_elliptic_subdiagrams_have_the_recorded_types() -> None:
         if letter == "C" and rank != 2:
             letter = "B"
         scale = -subdiagram.root_scale()
-        # Localization elements deliberately remain unhashable: equivalent
-        # fractions need not share one numerator/denominator representation.
-        # Normalize only the test's multiset key to a canonical exact rational;
-        # the public root_scale result remains an owned QQ element.
+        # Use a canonical rational for the archive's multiset key. The
+        # public root_scale result remains an owned QQ element.
         scale_key = Fraction(int(scale.numerator()), int(scale.denominator()))
         return (rank, letter, scale_key)
 
     for name, expected in _CONNECTED_ELLIPTIC_TYPES.items():
         connected = diagrams[name].elliptic_subdiagrams(connected=True)
-        types = [scaled_type(subdiagram) for subdiagram in connected]
+        types = Counter(scaled_type(subdiagram) for subdiagram in connected)
+        # The recorded tables state the scale as an integer and ``scaled_type``
+        # states it as an exact ``Fraction``; the two are the same rational and
+        # must be compared in one representation, not through an owned set that
+        # decides element identity for a tuple by its entries.  The multiset
+        # comparison is the exact statement: same keys, same multiplicities.
+        recorded = Counter(
+            {(rank, letter, Fraction(int(scale))): count for (rank, letter, scale), count in expected.items()}
+        )
 
         assert connected.cardinality() == sum(expected.values())
-        assert Set(types) == Set(expected)
-        for key, count in expected.items():
-            assert types.count(key) == count
+        assert types == recorded

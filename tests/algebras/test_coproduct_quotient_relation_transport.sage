@@ -5,6 +5,7 @@ QQ[x,y]/(x²,y²-y). The independent relations do not impose xy=0.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_presented_commutative_coproduct_transports_both_relation_ideals():

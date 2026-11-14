@@ -70,7 +70,10 @@ from sage_extensions.categories.rings.ring_foundation import (
 )
 from sage_extensions.categories.sets.cardinals import cardinal
 from sage_extensions.categories.sets.finite_families import finite_family
-from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+from sage_extensions.categories.sets.finite_ordered_sets import (
+    finite_ordered_set,
+    interned_finite_ordered_set,
+)
 from sage_extensions.categories.sets.indexed_families import (
     IndexedFamily,
     indexed_family,
@@ -435,8 +438,14 @@ def _variable_names(labels) -> tuple[str, ...]:
 
 @cached_function(key=lambda names: tuple(name.strip() for name in names))
 def _named_polynomial_variables(names):
-    """Intern a polynomial variable index set by its normalized ordered names."""
-    return finite_ordered_set(tuple(name.strip() for name in names))
+    """Intern a polynomial variable index set by its normalized ordered names.
+
+    This is the same intern the free-module route uses
+    (``sets.finite_ordered_sets.interned_labels``), so ``R[x, y]`` and
+    ``R.free_module(("x", "y")).symmetric_algebra()`` reach one label set and
+    therefore one algebra.
+    """
+    return interned_finite_ordered_set(tuple(name.strip() for name in names))
 
 
 def _polynomial_variables(variables):
@@ -765,6 +774,10 @@ class _PresentedAlgebraParent(_OwnedAlgebraParent):
         finite_free_coordinates=None,
         constructing_category=None,
     ) -> None:
+        # The module placement installed by the lower constructor hashes this
+        # algebra through its repr before the selected presentation exists, so
+        # the defining presentation ring is recorded here, at the first instant.
+        self._preamble_presentation_ring = presentation_ring
         # An auxiliary native polynomial cover retains its actual map from
         # the chosen presentation.  Other realizations have no such cover.
         self._presentation_cover_map = None
@@ -916,12 +929,27 @@ class _PresentedAlgebraParent(_OwnedAlgebraParent):
         )
 
     def _repr_(self):
-        r"""``P/(r_1, ..., r_k)``: the quotient named by its chosen presentation."""
+        r"""``P/(r_1, ..., r_k)``: the quotient named by its chosen presentation.
+
+        The defining presentation ring is kept from the first instant of
+        construction, and the relations are read only once they are installed.
+        Both are needed: the constructor installs this algebra's module
+        placement, that placement builds ``Modules(self)``, the category is keyed
+        by the algebra, and ``CategoryObject.__hash__`` is ``hash(repr(self))`` --
+        so this name is asked for while the object is still half built.  Reading
+        the selected presentation there raises, and reading it again is not
+        required: before it is installed the name states the datum that is
+        already fixed.
+        """
         display = self._preamble_ring_display
         if display is not None:
             return display
-        relations = ", ".join(repr(relation) for relation in self.relations())
-        return f"{self.presentation_ring()}/({relations})"
+        presentation_ring = vars(self).get("_preamble_presentation_ring")
+        try:
+            relations = ", ".join(repr(relation) for relation in self.relations())
+        except (AttributeError, AssertionError):
+            return f"{presentation_ring}/(presented quotient)"
+        return f"{presentation_ring}/({relations})"
 
 
 class _WordFramedPresentedAlgebra(_NativeMonomialEvaluation, _PresentedAlgebraParent):
@@ -1512,6 +1540,42 @@ class FreeAlgebras(OwnedCategoryOverBaseRing):
 
         def is_free(self) -> bool:
             return True
+
+        def gen(self, index=0):
+            r"""Return the ``index``-th selected algebra generator.
+
+            The family is the retained one: :meth:`algebra_generating_set` names
+            the generators, and :meth:`algebra_generator` raises a name to an
+            element of this algebra.  The argument is a position in that ordered
+            family, so a free algebra on one generator answers ``gen()`` and
+            ``gen(0)`` alike, and a polynomial ring on ``x, y`` answers
+            ``gen(0) = x`` and ``gen(1) = y``.  Nothing here consults the
+            underlying computer-algebra model: the generator is the owned
+            element the construction selected.
+
+            EXAMPLES::
+
+                sage: from sage_extensions.all import ZZ
+                sage: ZZ["x"].gen()
+                x
+                sage: ZZ["x,y"].gen(1)
+                y
+            """
+            from operator import index as integer_index
+
+            position = integer_index(index)
+            generators = self.gens()
+            assert 0 <= position < len(generators), (
+                f"{self} has {len(generators)} selected algebra generators, so gen({position}) does not exist"
+            )
+            return generators[position]
+
+        def gens(self):
+            r"""Return the selected algebra generators, in their retained order."""
+            return tuple(
+                self.algebra_generator(label)
+                for label in self.algebra_generating_set()
+            )
 
         def _algebra_mor_class(self):
             return FramedFreeAlgebraMor
@@ -2403,6 +2467,26 @@ class DividedPowerAlgebras(OwnedCategoryOverBaseRing):
 
         gamma = divided_power
 
+        def divided_power_ideal(self, *generators):
+            r"""The divided-power ideal of ``Gamma(M)`` generated in degree one.
+
+            A divided power ``gamma_j(k)`` with ``j >= 2`` is not a polynomial
+            in ``k`` over ``ZZ``, so the ideal a presentation of ``Gamma(M)``
+            states is larger than the ordinary one: in degree ``d`` it also
+            contains ``gamma_j(k) A_{d-j}``.  That is the ideal this names, and
+            it is decided degree by degree through the retained frames.  In
+            ``Gamma(ZZ x)`` the two are told apart by ``2x``: ``gamma_3(2x) =
+            8 gamma_3(x)`` lies in the divided-power ideal and not in the
+            ordinary one, whose degree-three part is ``6 ZZ gamma_3(x)``.
+            """
+            from sage_extensions.categories.algebras.algebra_ideals import (
+                _generated_algebra_ideal,
+            )
+
+            if len(generators) == 1 and isinstance(generators[0], (tuple, list)):
+                generators = tuple(generators[0])
+            return _generated_algebra_ideal(self, generators, divided_powers=True)
+
 
 def _symmetric_generator_images_commute(codomain, images):
     r"""Decide the commuting-image condition for a symmetric extension.
@@ -2426,6 +2510,43 @@ def _symmetric_generator_images_commute(codomain, images):
         for position, left in enumerate(values)
         for right in values[position + 1 :]
     )
+
+
+def _generator_images_by_label(domain, labels, images):
+    r"""Read a dictionary of generator images whose keys may be the generators.
+
+    A map of free algebras is written on the generators themselves --
+    ``x |-> v, y |-> w`` -- while the selected generating family stores a
+    *label* for each generator.  Both name the same datum, and the caller must
+    not have to know which vehicle the chosen family uses: a key that is a
+    label passes through, a key that is the generator ``algebra_generator(label)``
+    is renamed to that label.  Anything else is left for the missing-generator
+    diagnostic to refuse.
+
+    The label case is tested first and costs nothing there; the generator
+    elements are built only for a dictionary that actually names them.
+    """
+    if not isinstance(images, dict):
+        return images
+    if all((key in labels) is True for key in images):
+        return images
+    by_element = {domain.algebra_generator(label): label for label in labels}
+    renamed = {}
+    for key, value in images.items():
+        if (key in labels) is True:
+            label = key
+        elif key in by_element:
+            label = by_element[key]
+        else:
+            renamed[key] = value
+            continue
+        if label in renamed and (renamed[label] == value) is not True:
+            raise ValueError(
+                f"the generator {domain.algebra_generator(label)} of {domain} is given two images, "
+                f"{renamed[label]} and {value}"
+            )
+        renamed[label] = value
+    return renamed
 
 
 class FramedFreeAlgebraMorphism:
@@ -2529,6 +2650,7 @@ class FramedFreeAlgebraMorphism:
                     f"a dictionary of generator images needs finitely many algebra generators of {domain}, but it "
                     f"has {labels.cardinality()}; give a function or an indexed family"
                 )
+            images = _generator_images_by_label(domain, labels, images)
             missing = [label for label in labels if label not in images]
             if missing:
                 raise ValueError(

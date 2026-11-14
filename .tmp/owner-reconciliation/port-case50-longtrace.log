@@ -1,0 +1,558 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_enriques_modular_groups_match_dutour_sikiric_hulek[case_50] _______
+
+>   return cache[k]
+E   KeyError: (({g in Orthogonal group O(Integral lattice of rank 10 and signature (1, 9)) : g fixes -11*e_0 - 21*e_1 + 19*e_2 + 13*e_3 + 20*e_4 + 27*e_5 + 18*e_6 + 9*e_7 + 7*e_8 + 9*e_9},), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+case = {'case': 50, 'S': '$\\overline{\\{1,2,3,7\\}}$', 'walls': [-1, 0, 4, 5, 6, 8], 'subsets_in_class': 3, ...}
+
+    @pytest.mark.parametrize("case", _ENRIQUES, ids=lambda case: f"case_{case['case']}")
+    def test_enriques_modular_groups_match_dutour_sikiric_hulek(case) -> None:
+        require(MARKED_CLASSES, MARKED_AUTOMORPHISMS)
+    
+>       group = _gamma_h(case["face_polarization"])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/test_boundaries.sage:241: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+face_polarization = [-11, -11, -8, 7, 5, -13, ...]
+
+    def _gamma_h(face_polarization):
+        """Gamma_h^+ = O^+(N) cap pi_N^{-1}(pi_M(O(M, h))) for h in M(1/2) = U + E8(-1).
+    
+        The K3 lattice with the Enriques involution carries M = U(2) + E8(-2) as invariant and
+        N as anti-invariant lattice. h is transported from Dutour Sikirić--Hulek's coordinates
+        on U + E8(-1) into M along an isometry (U + E8(-1))(2) -> M.
+    
+        Only the polarization-dependent stages run per case: the involution, its invariant lattice and
+        the transport come from the cached setup above, whose objects are the same on every call.
+        """
+        involution, invariant, transport = _enriques_transport()
+        polarization = invariant.inclusion()(transport(element(transport.domain(), face_polarization)))
+>       anti_invariant_group = involution.polarized(polarization).coinvariant_extension_subgroup()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/test_boundaries.sage:232: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+
+sage/misc/cachefunc.pyx:2328: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Integral lattice of rank 22 and signature (3, 19) equipped with Morphism from Integral lattice of rank 22 and signatur...7*e_9 + 18*e_10 + 9*e_11 + 7*e_12 + 9*e_13 + 19*e_14 + 13*e_15 + 20*e_16 + 27*e_17 + 18*e_18 + 9*e_19 + 7*e_20 + 9*e_21
+
+    @cached_method
+    def coinvariant_extension_subgroup(self):
+        r"""Return coinvariant isometries extending while fixing the polarization.
+    
+        For full discriminant gluing, the permitted invariant discriminant
+        actions are the image of O(L^f, h), transported across the glue.
+        """
+        extension = self.primitive_extension()
+        stabilizer = extension.invariant.O().stabilizer(self.invariant_polarization())
+>       return extension.coinvariant_extension_subgroup(stabilizer)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/repos/sage-extensions/src/sage_extensions/categories/lattice_centralizers.py:852: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+
+sage/misc/cachefunc.pyx:1970: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+
+sage/misc/cachefunc.pyx:1848: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Primitive extension of Integral lattice of rank 22 and signature (3, 19) cut out by Morphism from Integral lattice of rank 22 and signature (3, 19) to Integral lattice of rank 22 and signature (3, 19)
+invariant_subgroup = {g in Orthogonal group O(Integral lattice of rank 10 and signature (1, 9)) : g fixes -11*e_0 - 21*e_1 + 19*e_2 + 13*e_3 + 20*e_4 + 27*e_5 + 18*e_6 + 9*e_7 + 7*e_8 + 9*e_9}
+
+    @cached_method
+    def coinvariant_extension_subgroup(self, invariant_subgroup=None):
+        r"""Return the coinvariant restriction image in the full-glue involution case.
+    
+        Suppose ``f`` is an involution and the primitive extension glues the
+        *entire* discriminant forms of ``L^f`` and ``(L^f)^perp``.  Then every
+        isometry of the coinvariant lattice commutes with ``f|_{L^-}=-1``, and
+        it extends across the primitive gluing exactly when its discriminant
+        action belongs to
+    
+        ``gamma rho(O(L^f)) gamma^-1``.
+    
+        When an invariant subgroup H is supplied, replace O(L^f) by H.
+        The gluing criterion then gives precisely the restrictions of
+        extensions whose invariant action lies in H.
+    
+        The returned group is therefore the actual finite-character preimage
+        in ``O(L^-)``; it is not a separately represented copy of the ambient
+        centralizer.
+        """
+        assert self.acts_as_negation_on_coinvariants(), (
+            f"{self.isometry} does not act as -1 on (L^f)^perp in {self.lattice}: this "
+            f"subgroup of O((L^f)^perp) is computed only when f is an involution"
+        )
+    
+        _glue, invariant_form, coinvariant_form, _glue_source, _glue_target = (
+            self._full_discriminant_glue_data()
+        )
+    
+        invariant_image = (
+            self.invariant.discriminant_image()
+            if invariant_subgroup is None
+>           else invariant_subgroup.image_under(self.invariant.discriminant_representation())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+
+/repos/sage-extensions/src/sage_extensions/categories/lattice_centralizers.py:984: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = {g in Orthogonal group O(Integral lattice of rank 10 and signature (1, 9)) : g fixes -11*e_0 - 21*e_1 + 19*e_2 + 13*e_3 + 20*e_4 + 27*e_5 + 18*e_6 + 9*e_7 + 7*e_8 + 9*e_9}
+morphism = Generic morphism:
+  From: Orthogonal group O(Integral lattice of rank 10 and signature (1, 9))
+  To:   Orthogonal grou... with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]
+index_bound = None, ambient_generators = None
+
+    def image_under(self, morphism, *, index_bound=None, ambient_generators=None):
+        r"""Image subgroup along a map of the specified ambient group.
+    
+        The image is generated by mapped subgroup generators, including
+        Schreier generators of represented finite-index preimages. A
+        general predicate alone does not supply a generating family.
+        An explicit finite-index bound enables the predicate subgroup's
+        coset-enumeration route even without a quotient morphism.
+        ``ambient_generators`` supplies generators of the whole ambient
+        group when its selected resolution is unavailable.
+    
+        EXAMPLES::
+    
+            sage: A, B = Groups.C(4), Groups.C(2)
+            sage: a, b = A.group_generators()[0], B.group_generators()[0]
+            sage: f = A.Mor(B)({a: b})
+            sage: A.subgroup((a*a,)).image_under(f).cardinality() == 1
+            True
+            sage: f.preimage_subgroup(B.subgroup(())).image_under(f).cardinality() == 1
+            True
+            sage: G = Groups.S(3)
+            sage: t = G((1, 2))
+            sage: f = G.Mor(G)({g: g for g in G.group_generators()})
+            sage: P = f.preimage_subgroup(G.subgroup((t,)))
+            sage: P.image_under(f).cardinality() == 2 and t in P.image_under(f)
+            True
+            sage: H = G.subgroup((t,))
+            sage: P = G.predicate_subgroup(lambda g: g in H, "transposition subgroup")
+            sage: P.image_under(f, index_bound=3).cardinality() == 2
+            True
+            sage: F, C = Groups.Free(1), Groups.C(2)
+            sage: h = C.group_generators()[0]
+            sage: reduction = F.Mor(C)({next(iter(F.free_basis())): h})
+            sage: parity = F.predicate_subgroup(lambda g: reduction(g) == C.one(), "parity kernel")
+            sage: parity.image_under(reduction, index_bound=2).cardinality() == 1
+            True
+        """
+        if morphism.domain() is not self.supergroup():
+            raise ValueError("a subgroup image requires a morphism of its containing group")
+        match self:
+            case _ if self in GeneratedSubgroups(self.supergroup()):
+                generators = self.selected_subgroup_generators()
+            case _ if (
+                hasattr(self, "character_data_is_complete")
+                and self.character_data_is_complete()
+                and hasattr(self.supergroup(), "discriminant_representation")
+                and morphism is self.supergroup().discriminant_representation()
+            ):
+                # A subgroup retained as chi^-1(S) by complete character
+                # data knows its discriminant image as a generated
+                # subgroup of O(A_L): the meet of its preimage targets
+                # with the rho-images of the sign kernels it intersects.
+                # Computing it from a generating family of the subgroup is
+                # what this case avoids; it is exact by the character
+                # quotient's construction.
+                return self.discriminant_image()
+            case _ if self.has_selected_group_resolution():
+                generators = self.group_generators()
+            case _ if self in OwnedFiniteGroups():
+                generators = tuple(self)
+            case _ if index_bound is not None and hasattr(self, "finite_index_schreier_generators"):
+                generators = self.finite_index_schreier_generators(index_bound=index_bound, generators=ambient_generators)
+            case _:
+                raise ValueError("the subgroup image needs a generating family or a finite-index Schreier construction")
+        # The image of this subgroup is the image of the restriction of
+        # ``morphism`` to it, so it is finite when this subgroup is.
+>       return _image_subgroup(self, morphism.codomain(), tuple(morphism(g) for g in generators))
+                                                          ^^^^^
+
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:7995: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <generator object IndexedFamily.__iter__.<locals>.<genexpr> at 0x7c2362eb7680>
+
+>   return _image_subgroup(self, morphism.codomain(), tuple(morphism(g) for g in generators))
+                                                            ^^^^^^^^^^^
+
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:7995: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Generic morphism:
+  From: Orthogonal group O(Integral lattice of rank 10 and signature (1, 9))
+  To:   Orthogonal grou... with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]
+element = Morphism from Integral lattice of rank 10 and signature (1, 9) to Integral lattice of rank 10 and signature (1, 9)
+args = (), kwargs = {}
+
+    def __call__(self, element, *args, **kwargs):
+        r"""Evaluate this group map on an admitted point of its source.
+    
+        The fixed source supplies membership, and the homomorphism datum
+        supplies membership of the image. Subgroup and submonoid facades
+        retain their ambient representatives: evaluation normalizes those
+        representatives without asking their defining predicate again.
+        Other endpoints keep their ordinary element-constructor ingress.
+        """
+        normalize = _GroupMorRealizationMixin._normalize_admitted_element
+        point = normalize(self.domain(), element)
+>       return normalize(self.codomain(), self._owned_function(point, *args, **kwargs))
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:3082: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+isometry = Morphism from Integral lattice of rank 10 and signature (1, 9) to Integral lattice of rank 10 and signature (1, 9)
+
+>   return OwnedGroups().Mor(source, target)(lambda isometry: isometry.discriminant_morphism())
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:3221: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+
+sage/misc/cachefunc.pyx:2328: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Morphism from Integral lattice of rank 10 and signature (1, 9) to Integral lattice of rank 10 and signature (1, 9)
+
+    @cached_method
+    def discriminant_morphism(self):
+        r"""Return ``Disc(self)`` parented by ``O(A_L)`` for an automorphism."""
+        if self.domain() is not self.codomain():
+            raise ValueError(
+                f"{self} induces no automorphism of a discriminant form: it is an isometry from {self.domain()} to {self.codomain()}, not an automorphism of one lattice"
+            )
+        form = self.domain().discriminant_group()
+>       return form.orthogonal_group().from_morphism(self.discriminant_isometry())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:1879: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Orthogonal group of Finitely presented module on 10 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]
+morphism = Morphism from Finitely presented module on 10 module generators over Integer Ring with invariant factors Invariant-fac... with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]
+
+    def from_morphism(self, morphism):
+        r"""Apply the normalization homomorphism to an automorphism of the formed-module core."""
+        homomorphism = self._normalization_homomorphism()
+        if not homomorphism.domain().accepts(morphism):
+            raise TypeError(f"{morphism} must be an isometry of the formed-module core before normalization")
+>       return homomorphism(morphism)
+               ^^^^^^^^^^^^^^^^^^^^^^
+
+/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py:2075: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Generic morphism:
+  From: Set of Morphisms from Finitely presented module on 10 module generators over Integer Ring wi... with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]
+element = Morphism from Finitely presented module on 10 module generators over Integer Ring with invariant factors Invariant-fac... with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]
+args = (), kwargs = {}
+
+    def __call__(self, element, *args, **kwargs):
+        r"""Evaluate this group map on an admitted point of its source.
+    
+        The fixed source supplies membership, and the homomorphism datum
+        supplies membership of the image. Subgroup and submonoid facades
+        retain their ambient representatives: evaluation normalizes those
+        representatives without asking their defining predicate again.
+        Other endpoints keep their ordinary element-constructor ingress.
+        """
+        normalize = _GroupMorRealizationMixin._normalize_admitted_element
+        point = normalize(self.domain(), element)
+>       return normalize(self.codomain(), self._owned_function(point, *args, **kwargs))
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/repos/sage-extensions/src/sage_extensions/categories/group/groups.py:3082: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Orthogonal group of Finitely presented module on 10 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]
+morphism = Morphism from Finitely presented module on 10 module generators over Integer Ring with invariant factors Invariant-fac... with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2]
+
+    def _normalized_form_automorphism(self, morphism):
+        r"""Compute the normalization homomorphism on one admitted form isometry."""
+        if morphism.domain() is not self.domain() or morphism.codomain() is not self.domain():
+            raise ValueError(
+                f"{morphism} is not an automorphism of {self.domain()}: it is a morphism "
+                f"{morphism.domain()} -> {morphism.codomain()}"
+            )
+        normalization = self.normalization_isometry()
+        normalized_form = normalization.codomain()
+    
+        original_form = normalization.domain()
+        forward = normalization.forward().module_morphism()
+        inverse = normalization.inverse().forward().module_morphism()
+        from sage.matrix.constructor import matrix as sage_matrix
+    
+        labels = tuple(normalized_form.module_generating_set())
+        engine_rows = []
+        ring = normalized_form.base_ring()
+        for source_label in labels:
+            original = inverse(normalized_form.module_generator(source_label))
+            image = forward(morphism(original))
+            coordinates = normalized_form.framing_morphism().lift(image)
+            engine_rows.append(
+                [
+                    _engine_element(ring, coordinates(target_label))
+                    for target_label in labels
+                ]
+            )
+        # Sage's finite-form engine acts on coordinate rows on the right, so
+        # the generator-image rows above are already in its convention.
+        engine_matrix = sage_matrix(
+            _engine_ring(ring),
+            len(labels),
+            len(labels),
+            [entry for row in engine_rows for entry in row],
+        )
+>       engine_automorphism = self._engine_group()(engine_matrix)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py:2113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+
+sage/structure/parent.pyx:899: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+
+sage/structure/coerce_maps.pyx:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+
+sage/structure/coerce_maps.pyx:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Group of isometries of 
+Finite quadratic module over Integer Ring with invariants (2, 2, 2, 2, 2, 2, 2, 2, 2, 2)
+Gram ... 0   0   0]
+[  0   0   0   0   0   0   0   0   1 1/2]
+[  0   0   0 1/2   0   0 1/2   0 1/2   1]
+generated by 4 elements
+x = [ 1  2  0  1  1  1  1  1  0 -1]
+[ 1  2 -2 -1 -2 -3 -2 -1 -1 -1]
+[ 1  2 -1  0 -1 -2 -1  0 -1 -1]
+[ 0 -1  0  0 -1 -1 -1 ...1  1  2  2  2  2  2  1]
+[ 0 -2  0 -1 -1 -1 -1 -1 -1  0]
+[-1  0  1  1  1  2  2  1  1  1]
+[ 1  1 -1  0  0 -1 -1 -1 -1 -1]
+check = True
+
+    def _element_constructor_(self, x, check=True):
+        r"""
+        Construct an element from ``x`` and handle conversions.
+    
+        INPUT:
+    
+        - ``x`` -- something that converts in can be:
+    
+          * a libgap element
+          * an integer matrix in the covering matrix ring
+          * a class:`sage.modules.fg_pid.fgp_morphism.FGP_Morphism`
+            defining an automorphism -- the domain of ``x`` must have
+            invariants equal to ``self.domain().gens_orders()``
+          * something that acts on the invariant form module
+    
+        EXAMPLES::
+    
+            sage: # needs sage.graphs
+            sage: L = IntegralLattice("A2").twist(2).direct_sum(IntegralLattice("A2"))
+            sage: q = L.discriminant_group()
+            sage: OL = L.orthogonal_group()
+            sage: Oq = q.orthogonal_group()
+            sage: f = matrix(ZZ, 2, [0, 1, -1, -1])
+            sage: f = matrix.block_diagonal([f, f])
+            sage: f = OL(f)
+            sage: fbar = Oq(f)
+            sage: fbar
+            [1 3]
+            [3 4]
+    
+        Note that the following does not work since it may lead to ambiguities, see :issue:`30669`::
+    
+            sage: Oq(f.matrix())                                                        # needs sage.graphs
+            Traceback (most recent call last):
+            ...
+            ValueError: ...
+    
+        But a matrix in the covering works::
+    
+            sage: fbar == Oq(fbar.matrix())                                             # needs sage.graphs
+            True
+    
+        TESTS::
+    
+            sage: # needs sage.graphs
+            sage: all(x*f==x*fbar for x in q.gens())
+            True
+            sage: L = IntegralLattice("A2").twist(3)
+            sage: OL = L.orthogonal_group()
+            sage: assert OL(OL.0.matrix()) == OL.0
+            sage: q = L.discriminant_group()
+            sage: Oq = q.orthogonal_group()
+            sage: assert Oq(Oq.0.matrix()) == Oq.0
+        """
+        from sage.libs.gap.element import GapElement
+        if not isinstance(x, GapElement):
+            try:
+                # if there is an action try that
+                gen = self.invariant_form().smith_form_gens()
+                x = matrix(ZZ, [(g*x).vector() for g in gen])
+            except TypeError:
+                pass
+>       f = AbelianGroupAutomorphismGroup_subgroup._element_constructor_(self, x, check=True)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/sage/.venv/lib/python3.14/site-packages/sage/groups/fqf_orthogonal.py:263: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Group of isometries of 
+Finite quadratic module over Integer Ring with invariants (2, 2, 2, 2, 2, 2, 2, 2, 2, 2)
+Gram ... 0   0   0]
+[  0   0   0   0   0   0   0   0   1 1/2]
+[  0   0   0 1/2   0   0 1/2   0 1/2   1]
+generated by 4 elements
+x = [ f1, f2, f3, f4, f5, f6, f7, f8, f9, f10 ] -> [ f1*f4*f5*f6*f7*f8*f10, f1*f4*f6*f8*f9*f10, f1*f3*f5*f7*f9*f10, f2*f5*f6*f7*f8, f3*f6*f9*f10, f2*f4*f5*f7*f8, f3*f4*f10, f4*f5*f6*f7*f8*f9, f1*f3*f4*f5*f8*f9*f10, f1*f2*f3*f6*f7*f8*f9*f10 ]
+check = True
+
+    def _element_constructor_(self, x, check=True):
+        r"""
+        Construct an element from ``x`` and handle conversions.
+    
+        INPUT:
+    
+        - ``x`` -- something that converts in can be:
+    
+          * a libgap element
+          * an integer matrix in the covering matrix ring
+          * a :class:`sage.modules.fg_pid.fgp_morphism.FGP_Morphism`
+            defining an automorphism -- the domain of ``x`` must have
+            invariants equal to ``self.domain().gens_orders()``
+    
+        EXAMPLES::
+    
+            sage: from sage.groups.abelian_gps.abelian_group_gap import AbelianGroupGap
+            sage: G = AbelianGroupGap([2,3,4,5])
+            sage: aut = G.aut()
+            sage: f = aut.an_element()
+            sage: f == aut(f.matrix())
+            True
+            sage: G = AbelianGroupGap([2,10])
+            sage: aut = G.aut()
+            sage: D = ZZ^2/(ZZ^2).submodule([[10,0],[0,2]])
+            sage: f = D.hom([D.0 + 5*D.1, 3*D.1])
+            sage: f
+            Morphism from module over Integer Ring with invariants (2, 10) to
+             module with invariants (2, 10) that sends the generators to [(1, 5), (0, 3)]
+            sage: aut(f)
+            [ f1, f2 ] -> [ f1*f2*f3^2, f2*f3 ]
+        """
+        if x in self._covering_matrix_ring:
+            dom = self._domain
+            images = [dom(row).gap() for row in x.rows()]
+            x = dom.gap().GroupHomomorphismByImages(dom.gap(), images)
+        from sage.modules.fg_pid.fgp_morphism import FGP_Morphism
+        if isinstance(x, FGP_Morphism):
+            if x.base_ring() != ZZ:
+                raise ValueError("base ring must be ZZ")
+            # generators of fgp_modules are not assumed to be unique
+            # thus we can only use smith_form_gens reliably.
+            # Also conversions between the domains use the smith gens.
+            if x.domain().invariants() != self.domain().gens_orders():
+                raise ValueError("invariants of domains must agree")
+            if not x.domain() == x.codomain():
+                raise ValueError("domain and codomain do not agree")
+            if not x.kernel().invariants() == ():
+                raise ValueError("not an automorphism")
+            dom = self._domain
+            images = [dom(x(a)).gap() for a in x.domain().smith_form_gens()]
+            x = dom.gap().GroupHomomorphismByImages(dom.gap(), images)
+>       return self.element_class(self, x, check)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+/sage/.venv/lib/python3.14/site-packages/sage/groups/abelian_gps/abelian_aut.py:307: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <[AttributeError("'NoneType' object has no attribute '_covering_matrix_ring'") raised in repr()] FqfOrthogonalGroup_with_category.element_class object at 0x7c2361d68d60>
+parent = Group of isometries of 
+Finite quadratic module over Integer Ring with invariants (2, 2, 2, 2, 2, 2, 2, 2, 2, 2)
+Gram ... 0   0   0]
+[  0   0   0   0   0   0   0   0   1 1/2]
+[  0   0   0 1/2   0   0 1/2   0 1/2   1]
+generated by 4 elements
+x = [ f1, f2, f3, f4, f5, f6, f7, f8, f9, f10 ] -> [ f1*f4*f5*f6*f7*f8*f10, f1*f4*f6*f8*f9*f10, f1*f3*f5*f7*f9*f10, f2*f5*f6*f7*f8, f3*f6*f9*f10, f2*f4*f5*f7*f8, f3*f4*f10, f4*f5*f6*f7*f8*f9, f1*f3*f4*f5*f8*f9*f10, f1*f2*f3*f6*f7*f8*f9*f10 ]
+check = True
+
+    def __init__(self, parent, x, check=True):
+        """
+        The Python constructor.
+    
+        TESTS::
+    
+            sage: from sage.groups.abelian_gps.abelian_group_gap import AbelianGroupGap
+            sage: G = AbelianGroupGap([2,3,4,5])
+            sage: f = G.aut().an_element()
+            sage: TestSuite(f).run()
+        """
+        if check:
+            if x not in parent.gap():
+>               raise ValueError("%s is not in the group %s" % (x, parent))
+E               ValueError: Pcgs([ f1, f2, f3, f4, f5, f6, f7, f8, f9, f10 ]) -> [ f1*f4*f5*f6*f7*f8*f10, f1*f4*f6*f8*f9*f10, f1*f3*f5*f7*f9*f10, f2*f5*f6*f7*f8, f3*f6*f9*f10, f2*f4*f5*f7*f8, f3*f4*f10, f4*f5*f6*f7*f8*f9, f1*f3*f4*f5*f8*f9*f10, f1*f2*f3*f6*f7*f8*f9*f10 ] is not in the group Group of isometries of 
+E               Finite quadratic module over Integer Ring with invariants (2, 2, 2, 2, 2, 2, 2, 2, 2, 2)
+E               Gram matrix of the quadratic form with values in Q/2Z:
+E               [  0 1/2   0   0   0   0   0   0   0   0]
+E               [1/2   0   0   0   0   0   0   0   0   0]
+E               [  0   0   0 1/2 1/2   0   0   0   0   0]
+E               [  0   0 1/2   0   0 1/2   0 1/2   0 1/2]
+E               [  0   0 1/2   0   1   0   0   0   0   0]
+E               [  0   0   0 1/2   0   1   0   0   0   0]
+E               [  0   0   0   0   0   0   0 1/2   0 1/2]
+E               [  0   0   0 1/2   0   0 1/2   0   0   0]
+E               [  0   0   0   0   0   0   0   0   1 1/2]
+E               [  0   0   0 1/2   0   0 1/2   0 1/2   1]
+E               generated by 4 elements
+
+/sage/.venv/lib/python3.14/site-packages/sage/groups/abelian_gps/abelian_aut.py:119: ValueError
+=========================== short test summary info ============================
+FAILED tests/acceptance/test_boundaries.sage::test_enriques_modular_groups_match_dutour_sikiric_hulek[case_50]
+1 failed in 253.22s (0:04:13)
+[peakrss] port-case50-longtrace: child waited=1 shell_code=1 samples=131
+[peakrss] peak tree RSS      : 3376 MiB
+[peakrss] low-water MemAvail : 6749 MiB
+[peakrss] peak single VmHWM  : 3524 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      3028 MiB peak
+[peakrss]   python                      485 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   224.3s procs=  4 rss=  3376 MiB hwm=  3511 MiB avail=  7595 MiB
+[peakrss]   t=   226.3s procs=  4 rss=  3375 MiB hwm=  3511 MiB avail=  6875 MiB
+[peakrss]   t=   228.3s procs=  4 rss=  3337 MiB hwm=  3511 MiB avail=  7058 MiB
+[peakrss]   t=   222.3s procs=  4 rss=  3327 MiB hwm=  3389 MiB avail=  7167 MiB
+[peakrss]   t=   254.4s procs=  4 rss=  3313 MiB hwm=  3524 MiB avail=  7424 MiB

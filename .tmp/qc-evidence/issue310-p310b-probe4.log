@@ -1,0 +1,12 @@
+class: [2] div: 2
+lattice labels: (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+dual labels   : (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+lift parent is dual: True
+u = 2*lift, parent: Free module on {[0], [1], [2], [3], [4], [5], [6], [7], [8], [9], [10]} over Integer Ring
+u coords on dual labels: [0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0]
+v coords on labels     : [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+u == v modulo 2L on matched labels: False
+Timeout (0:05:00)!
+Thread 0x0000746b9a6d6780 [python] (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/categories/category_with_axiom.py", line 2068 in __classget__
+  <invalid frame>

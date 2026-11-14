@@ -87,7 +87,7 @@ from sage_extensions.categories.sets.set_categories import (
     OwnedSetMorphism,
     Sets,
 )
-from sage_extensions.logic import AtomicProposition, Propositions, conjunction, negation
+from sage_extensions.logic import AtomicProposition, Propositions, ask, conjunction, negation
 from sage_extensions.owned_category import owned_category_join
 from sage_extensions.owned_category_bases import CategoryWithAxiom
 from sage_extensions.refine import RealizationHook, refine
@@ -471,6 +471,85 @@ class UnitalMultiplicativeAlgebraMorphism:
 class UnitalMultiplicativeAlgebraMor(MultiplicativeAlgebraMor):
     r"""``Mor`` of unital algebras: the multiplicative linear maps preserving the unit."""
 
+    def embeddings(self):
+        r"""The unital algebra maps from the domain into the codomain.
+
+        The ring embeddings ``A -> B`` are enumerated by their one owner, the
+        ring Mor, because a ring map between fields is injective.  Membership
+        here is stricter than being a ring embedding: an arrow of a Mor of
+        algebras over \(R\) is \(R\)-linear, so it intertwines the two retained
+        structure maps,
+
+        \[
+            f \circ \rho_A = \rho_B .
+        \]
+
+        That square is the whole of the extra condition: for a multiplicative
+        \(f\), \(R\)-linearity reads \(f(\rho_A(r)\, a) = \rho_B(r)\, f(a)\), and
+        at \(a = 1\) it is the square, while the square and multiplicativity
+        give it back for every \(a\).  It is tested as an equality of ring
+        arrows \(R \to B\), so it is decided exactly rather than sampled on some
+        chosen generators of \(R\).
+
+        The square is a real condition, and it fails whenever the structure
+        map is not forgetful.  Reading a field \(K\) as a \(K\)-algebra with the
+        identity structure admits only the identity: conjugation is a ring
+        automorphism but \(f(\rho(x) a) = f(x) f(a)\), which is \(x f(a)\) only
+        for \(x\) in the fixed field.  A field presented by generators and
+        relations is the same phenomenon, since its structure map is the
+        quotient map: \(F_4 = F_2[z_2]/(z_2^2 + z_2 + 1)\) records the class of
+        \(z_2\) as a structure-bearing element, so Frobenius, which sends it to
+        \(z_2 + 1\), is not an arrow of that presented algebra.  Both are ring
+        automorphisms of the field, which is why the ring Mor still enumerates
+        them.
+
+        A survivor is an arrow of this Mor by elementwise action on elements,
+        retaining the square and the ring map's own multiplicativity as the
+        sufficient equations for its algebra laws; its linearity is not
+        asserted beyond what those equations give.
+        """
+        from sage_extensions.categories.rings.ring_foundation import OwnedRings
+
+        domain = self.domain()
+        codomain = self.codomain()
+        domain_structure = domain.algebra_structure_morphism()
+        codomain_structure = codomain.algebra_structure_morphism()
+        ring = domain_structure.domain()
+        if codomain_structure.domain() is not ring:
+            raise ValueError(
+                f"an algebra map {domain} -> {codomain} must intertwine structure maps of one "
+                f"base ring, but the two are defined on {ring} and {codomain_structure.domain()}"
+            )
+        ring_embeddings = OwnedRings().Mor(domain, codomain)
+        arrows_into_codomain = OwnedRings().Mor(ring, codomain)
+        structure = arrows_into_codomain(codomain_structure)
+        linear_mor = domain.module_category().Mor(domain, codomain)
+        kept = []
+        for embedding in ring_embeddings.embeddings():
+            if embedding * domain_structure != structure:
+                continue
+            if domain is codomain and embedding == ring_embeddings.identity():
+                # The surviving ring map is the identity function, whose laws
+                # this Mor already states; do not restate it as a proposition.
+                kept.append(self.identity())
+                continue
+            # The square is decided here; with multiplicativity it is what
+            # makes the elementwise formula R-linear, so it is retained as the
+            # construction's first equation rather than as an evaluated claim.
+            kept.append(
+                self.element_class(
+                    self,
+                    linear_mor.elementwise(
+                        lambda element, embedding=embedding: embedding(element)
+                    ),
+                    _construction_premises=(
+                        (),
+                        (True, embedding.is_multiplicative()),
+                    ),
+                )
+            )
+        return finite_ordered_set(tuple(kept))
+
     ElementMethods = UnitalMultiplicativeAlgebraMorphism
 
     def _from_constructed_element_map(
@@ -747,17 +826,32 @@ class _CommutativeUnitalAlgebraParentMethods:
         return KahlerDifferentialModules(self)(self)
 
     def de_rham_algebra(self):
-        r"""Return the algebraic de Rham algebra ``Omega^*_{A/R}``."""
+        r"""Return the algebraic de Rham algebra ``Omega^*_{A/R}``.
+
+        ``R`` is the algebra's coefficient ring.  A polynomial quotient
+        ``R[x]/I`` states the cover as its base ring, so its coefficient ring
+        is read from the presentation it keeps.
+        """
         from sage_extensions.categories.algebras.de_rham_algebras import (
             DeRhamAlgebras,
         )
+        from sage_extensions.categories.algebras.derivations import (
+            _algebra_coefficient_ring,
+        )
 
-        return DeRhamAlgebras(self.base_ring())(self)
+        return DeRhamAlgebras(_algebra_coefficient_ring(self))(self)
 
     def de_rham_cohomology(self, degree):
         r"""``H^degree_dR(A/R)``, the image of this algebra under the de Rham cohomology functor."""
+        from sage_extensions.categories.algebras.derivations import (
+            _algebra_coefficient_ring,
+        )
+
         commutative_algebras = (
-            Algebras(self.base_ring()).Associative().Unital().Commutative()
+            Algebras(_algebra_coefficient_ring(self))
+            .Associative()
+            .Unital()
+            .Commutative()
         )
         return commutative_algebras.de_rham_cohomology(degree)(self)
 
@@ -873,21 +967,28 @@ def _install_selected_algebra_generators(
     match source:
         case None:
             module = algebra.base_ring().free_module(labels)
+            # The free module on a label set is cached by equality of label
+            # sets, and a free algebra states its generator family on the label
+            # set of the module it is built on, so that module supplies the
+            # labels the resolution is stated on.  The free algebra itself is
+            # the resolution's source and is built when the resolution is first
+            # asked for (``_fix_selected_algebra_resolution``): an algebra's
+            # construction must not build a free algebra on its generators,
+            # which for an infinite generating family is the whole word
+            # construction.
+            labels = module.module_generating_set()
             match owner is associative:
                 case True:
-                    source = module.tensor_algebra()
+                    source_factory = module.tensor_algebra
                 case False:
-                    source = module.symmetric_algebra()
-            # The free module on a label set is cached by equality of label
-            # sets, so the free algebra states its maps on its own label set.
-            labels = source.algebra_generating_set()
+                    source_factory = module.symmetric_algebra
         case _:
-            pass
+            source_factory = lambda: source
     generator_morphism = Sets().Mor(labels, algebra)(values.value)
     _fix_selected_algebra_resolution(
         algebra,
         owner,
-        lambda: source,
+        source_factory,
         labels,
         generator_morphism,
         (
@@ -1367,6 +1468,43 @@ class Algebras(OwnedCategoryOverBaseRing):
         return _algebra_on_module(module, multiplication, placement=(self,))
 
     class ElementMethods:
+        def _operator_operand(self, value):
+            r"""``value`` read in this algebra along the canonical map, or ``NotImplemented``.
+
+            Arithmetic on an algebra element is arithmetic in the algebra, and
+            an owned algebra receives its scalars along the canonical maps it
+            retains: its base ring, its source, and everything those receive.  A
+            Python integer is one of those scalars — ``a + 3`` is the class of
+            ``a + 3`` in the algebra, not a Python refusal — which is the rule
+            the native ring elements state at ``_OwnedRingElement``.
+            """
+            from sage_extensions.categories.rings.ring_foundation import (
+                _operand_in_ring,
+            )
+
+            return _operand_in_ring(self.parent(), value)
+
+        def __add__(self, other):
+            other = self._operator_operand(other)
+            if other is NotImplemented:
+                return NotImplemented
+            return self._add_(other)
+
+        __radd__ = __add__
+
+        def __sub__(self, other):
+            other = self._operator_operand(other)
+            if other is NotImplemented:
+                return NotImplemented
+            return self._add_(-other)
+
+        def __rsub__(self, other):
+            other = self._operator_operand(other)
+            if other is NotImplemented:
+                return NotImplemented
+            return other._add_(-self)
+
+        @RealizationHook
         def _mul_(self, other):
             r"""``x * y`` is the multiplication evaluated on ``x (x) y`` in the module it is stated on.
 
@@ -1828,6 +1966,36 @@ class Algebras(OwnedCategoryOverBaseRing):
 
         def is_algebra(self) -> bool:
             return True
+
+        def subalgebra(self, elements):
+            r"""Return the ``R``-subalgebra generated by ``elements`` (``Algebra.adjoin``).
+
+            ``Algebra.adjoin R s`` is the smallest ``R``-subalgebra containing
+            ``s``: the ``R``-span of the words in ``s`` together with ``1``
+            (Mathlib, ``Algebra/Algebra/Subalgebra/Lattice.lean:35``, with the
+            universal property ``Algebra.gc``).  The realization here is the
+            graded one, where the words of one degree are finite and membership
+            in their span is the maintained exact image test of a module
+            morphism; it therefore needs homogeneous generators of positive
+            degree and says so rather than approximating a general set.
+
+            The result is the ambient algebra's predicate subring cut out by
+            generation, over this algebra's own base ring, so its points are
+            ambient elements and its inclusion is the ambient embedding:
+
+                sage: divided = Modules(ZZ).free_module(("x",)).divided_power_algebra()
+                sage: x = divided.degree_one_generator("x")
+                sage: generated = divided.subalgebra([x])
+                sage: x * x in generated
+                True
+                sage: divided.divided_power(x, 2) in generated
+                False
+            """
+            from sage_extensions.categories.algebras.subalgebras import (
+                _generated_subalgebra,
+            )
+
+            return _generated_subalgebra(self, elements)
 
         def algebra_framing_owner(self):
             r"""Return the algebra owner relative to which the chosen resolution is stored."""
@@ -2999,7 +3167,11 @@ class Algebras(OwnedCategoryOverBaseRing):
                     case _ if (
                         source not in Modules(ring)
                         and source in OwnedRings()
-                        and value in ring
+                        # Membership in an owned ring is a proposition, and
+                        # ``in`` would coerce it to a bool before it could be
+                        # asked.  Read the predicate and decide it explicitly;
+                        # an undecided answer does not take this branch.
+                        and ask(ring.is_parent_of(value)) is True
                     ):
                         return self.unit_morphism()(ring(value))
                     case _:
@@ -3445,7 +3617,16 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                 quotient, self.zero_subobject().inclusion()
             )
 
-        def presentation(self):
+        def algebra_presentation(self):
+            r"""Return the selected finite algebra presentation as a labelled family.
+
+            ``presentation()`` is the *module* owner's name — the relation
+            morphism ``F_1 -> F_0`` of a chosen finite module presentation — and
+            an algebra that is also a module with one answers it with that
+            morphism.  The algebra presentation is the free algebra on the
+            algebra generators together with the relations, which is a
+            different datum and is named for the structure it presents here.
+            """
             labels = finite_ordered_set(("presentation_ring", "relations"))
             values = {
                 "presentation_ring": self.presentation_ring(),
@@ -3550,7 +3731,8 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             If ``R`` and ``A`` are domains, torsion-freeness of ``A`` is instead
             equivalent to injectivity of ``R -> A``.  An undecided or refuted
             domain hypothesis proves neither answer, so the general module
-            predicate remains undecided when neither construction applies.
+            predicate remains undecided when neither construction applies,
+            unless a retained relation supplies a verified torsion element.
             """
             from sage_extensions.categories.algebras.free_algebras import (
                 SymmetricAlgebras,
@@ -3574,6 +3756,8 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                 case _ if self.is_integral_domain() is True:
                     return self._represented_structure_morphism_kernel_is_zero()
                 case _:
+                    if self._represented_relation_torsion_witness() is not None:
+                        return False
                     return Modules.ParentMethods._torsion_freeness_decision(self)
 
             assert generating in ModulesWithChosenFinitePresentation(base), (
@@ -3582,6 +3766,50 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                 "a chosen finite module presentation"
             )
             return generating.is_torsion_free()
+
+        def _represented_relation_torsion_witness(self):
+            r"""Return a retained relation's ``(scalar, element)`` torsion pair, or ``None``.
+
+            A defining relation that is one term ``c w`` with ``c`` a nonzero
+            non-unit of the coefficient ring and ``w`` a word whose class in
+            the algebra is nonzero is exactly a torsion element with its
+            annihilator: ``c * (w mod I) = 0`` in ``A`` while neither factor is
+            zero.  So ``Z[t]/(2t)`` is refuted by the relation ``2 t``, in
+            which ``2`` is not a unit and ``t`` is nonzero.
+
+            Both terms are read off the retained presentation: the word and
+            coefficient come from the existing word-framing decode of its
+            presentation ring, and the class of the word from the existing
+            presentation morphism.  No normal form is recomputed and no
+            relation is invented.  A relation with several terms, a unit
+            coefficient, or a word whose class is zero or undecided proves
+            nothing, so the caller states the undecided predicate instead; a
+            one-term relation is the only shape whose terms are separately
+            annihilated here.
+            """
+            presentation = self.presentation_ring()
+            decode = getattr(presentation, "_native_basis_coefficients", None)
+            evaluate = getattr(presentation, "_native_basis_image", None)
+            if decode is None or evaluate is None:
+                return None
+            base = self.base_ring()
+            for relation in self.relations():
+                try:
+                    terms = decode(relation)
+                except (AttributeError, AssertionError, TypeError, ValueError, NotImplementedError):
+                    continue
+                if len(terms) != 1:
+                    continue
+                ((label, scalar),) = terms.items()
+                if (scalar == base.zero()) is not False or scalar.is_unit() is not False:
+                    continue
+                element = self.algebra_presentation_morphism()(evaluate(label))
+                if (element == self.zero()) is not False:
+                    continue
+                if (scalar * element == self.zero()) is not True:
+                    continue
+                return scalar, element
+            return None
 
         def _represented_primitive_hypersurface_relative_dimension(self) -> int:
             r"""Return the pure dimension of every nonempty polynomial fibre.
@@ -4738,6 +4966,27 @@ class _OwnedAlgebraParent(_OwnedRingParent):
         r"""The algebra owner installs its selected resolution before its regular module."""
         return True
 
+    def _rank_decision(self):
+        r"""Return the rank this algebra's own frame states, when it is framed free.
+
+        \(R^{(S)}\) is free on its frame \(S\), so its rank is the cardinality
+        of \(S\) -- the cardinal is the frame's, not a natural number, since a
+        frame may be infinite.  The algebra retains that frame as its module
+        generating set.  This is the realization's answer to the generic
+        ``module_rank``'s hook: on an algebra's class the framed-free category's
+        own ``module_rank`` is answered after the generic module methods, so the
+        construction states the datum here instead.  An algebra stated on a
+        module without a chosen frame has no answer of its own and leaves the
+        generic cases in force.
+        """
+        from sage_extensions.categories.modules.framed.framed_free_modules import (
+            FramedFreeModules,
+        )
+
+        if self in FramedFreeModules(self.base_ring()):
+            return self.module_generating_set().cardinality()
+        return super()._rank_decision()
+
     def _native_scalar_action(self, scalar, element):
         r"""Apply the retained algebra structure map, not the engine's default embedding.
 
@@ -5162,6 +5411,20 @@ class _ScalarAlgebraEngine:
         self._preamble_engine_ring = native_ring._selected_engine_ring()
         super().__init__(**rest)
 
+    def native_ring(self):
+        r"""Return the literal ring this scalar structure is built on.
+
+        The view is one scalar structure on an existing ring: its elements are
+        that ring's elements, read through the module action the structure map
+        supplies (``OWN-06``), and ``_algebra_structure_on`` retains the ring as
+        the view's ``native_ring`` construction datum rather than copying it.
+        Everything the ring's own constructor retains — its presentation, its
+        defining ideal, its quotient map — is therefore reachable here, which is
+        what lets the differential owners compute over the coefficient ring
+        without the view having to state a presentation it does not claim.
+        """
+        return self._native_ring
+
     def _element_constructor_(self, value):
         source = element_parent(value)
         if source is self:
@@ -5298,7 +5561,24 @@ def _algebra_structure_on(
             lambda element: scalar_action(scalar, element)
         )
     )
-    module = Modules(base)(rho)
+    from sage_extensions.categories.modules.pure.modules import (
+        _restricted_scalars_view,
+    )
+
+    if (
+        selected_ring in OwnedRings()
+        and selected_ring._module_basis_along(structure_map) is not None
+    ):
+        # The module this algebra is built on is the ring read as an ``R``-module
+        # along its own structure map, and the ring states a basis for exactly
+        # that reading.  Building it through the restriction-of-scalars
+        # constructor keeps the stated basis, the finite presentation and the
+        # module's own arithmetic; the bare scalar action ``rho`` below states
+        # the same group and action but no basis, and a basis is not invented
+        # here.
+        module = _restricted_scalars_view(selected_ring, structure_map)
+    else:
+        module = Modules(base)(rho)
     tensor = Modules(base).tensor_product((module, module))
     multiplication = tensor.from_bilinear_map(
         module,
@@ -5394,6 +5674,79 @@ def _unit_from_multiplication(multiplication):
                 f"fails on the generator {generator}"
             )
     return unit
+
+
+def _carry_polynomial_presentation(view, ring, base):
+    r"""Give the ``R``-algebra view of a polynomial quotient its presentation.
+
+    A quotient ``A = R[x]/I`` states the cover ``P = R[x]`` as its base ring, so
+    ``A`` itself cannot present itself over ``R``: its one algebra Mor is over
+    ``P``.  Its ``R``-algebra view — ``A.as_algebra_over(R)``, the same ring
+    through the coefficient structure, built on ``A`` and retaining it — can:
+    ``R[x]/I`` *is* the view's presentation as an ``R``-algebra, with the same
+    generators, the same relations and a class lifting through ``A`` to ``P``.
+    The presentation is installed from the ring's own retained data and the view
+    is placed in the presented category, so a map out of the view is read
+    against the ideal's relations.
+
+    Nothing is guessed and nothing is rebuilt: without a source that is a
+    polynomial algebra over exactly ``base``, or with an infinite generator
+    family, there is nothing to install and the view is returned unchanged.
+    """
+    from sage_extensions.categories.algebras.algebras import (
+        Algebras,
+        AlgebrasWithChosenFinitePresentation,
+        _fix_selected_algebra_presentation,
+        _install_selected_algebra_generators,
+    )
+    from sage_extensions.categories.algebras.free_algebras import SymmetricAlgebras
+    from sage_extensions.categories.rings.commutative_algebra import QuotientRings
+    from sage_extensions.categories.sets.indexed_families import indexed_family
+    from sage_extensions.refine import refine
+
+    if view is ring:
+        return view
+    if ring not in QuotientRings():
+        return view
+    presentation = ring.quotient_source()
+    if presentation is ring or presentation.base_ring() is not base:
+        return view
+    if presentation not in SymmetricAlgebras(base):
+        return view
+    labels = presentation.algebra_generating_set()
+    if labels.cardinality().is_finite() is not True:
+        return view
+    if view in AlgebrasWithChosenFinitePresentation(base):
+        return view
+
+    ideal = ring.defining_ideal()
+    _install_selected_algebra_generators(
+        view,
+        indexed_family(
+            labels,
+            presentation.algebra_generator,
+            name="Coefficient-ring algebra generators",
+        ),
+        source=presentation,
+    )
+    _fix_selected_algebra_presentation(
+        view,
+        presentation,
+        indexed_family(
+            ideal.ideal_generators().index_set(),
+            lambda index: presentation(ideal.ideal_generators().value(index)),
+            name="Defining relation family",
+        ),
+        ideal,
+        lambda element: ring(view(element)).lift(),
+    )
+    refine(view, AlgebrasWithChosenFinitePresentation(base))
+    assert view in AlgebrasWithChosenFinitePresentation(base), (
+        f"the coefficient-ring view {view} must be placed in the algebras with a chosen finite "
+        "presentation over its base once that presentation is installed"
+    )
+    assert view in Algebras(base).Associative().Unital().Commutative()
+    return view
 
 
 def _own_algebra(structure_map):

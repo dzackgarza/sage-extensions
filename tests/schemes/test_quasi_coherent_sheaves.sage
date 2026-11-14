@@ -1,6 +1,7 @@
 r"""Direct and inverse images along the cusp parametrization, and relative Spec under base change."""
 
 from sage_extensions.all import *
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_direct_and_inverse_images_along_the_cusp_parametrization() -> None:

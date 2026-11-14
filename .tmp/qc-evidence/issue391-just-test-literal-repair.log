@@ -1,0 +1,21 @@
+provider SHA: 1a59869ba62b9eda408c5e5d062a2a9b240fe899
+command: just test 
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+ERROR: usage: python -m pytest [options] [file_or_dir] [file_or_dir] [...]
+python -m pytest: error: unrecognized arguments: --timeout=60 --timeout-method=signal --report-log=tests/.report/run.jsonl
+  inifile: /repos/sage-extensions/pyproject.toml
+  rootdir: /repos/sage-extensions
+
+error: recipe `test` failed on line 154 with exit code 4
+[peakrss] run: child waited=4 shell_code=4 samples=2
+[peakrss] peak tree RSS      : 122 MiB
+[peakrss] low-water MemAvail : 6456 MiB
+[peakrss] peak single VmHWM  : 122 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      105 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     2.0s procs=  5 rss=   122 MiB hwm=   122 MiB avail=  6456 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     5 MiB hwm=     5 MiB avail=  6551 MiB

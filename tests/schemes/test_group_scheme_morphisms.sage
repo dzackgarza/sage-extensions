@@ -1,6 +1,7 @@
 r"""Morphisms of the affine group schemes of roots of unity over QQ."""
 
 from sage_extensions.all import *
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_squaring_mu_four_onto_mu_two_is_a_homomorphism_with_kernel_mu_two() -> None:

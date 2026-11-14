@@ -1,0 +1,30 @@
+[19:14:09] importing
+[19:14:10] imported in 0.9 s
+[19:14:31] subgroup built in 21.5 s
+[19:14:31] the v2 image built in 21.9 s
+[19:15:47]   Sterk wall 0: square -4, in v2-perp True, admitted by the v2 filter: True
+[19:15:47]   Sterk wall 1: square -4, in v2-perp True, admitted by the v2 filter: True
+[19:15:47]   Sterk wall 2: square -4, in v2-perp True, admitted by the v2 filter: True
+[19:15:48]   Sterk wall 3: square -4, in v2-perp True, admitted by the v2 filter: True
+[19:15:48]   Sterk wall 4: square -4, in v2-perp True, admitted by the v2 filter: True
+[19:15:48]   Sterk wall 5: square -4, in v2-perp True, admitted by the v2 filter: True
+[19:15:48]   Sterk wall 6: square -4, in v2-perp True, admitted by the v2 filter: True
+[19:15:48]   Sterk wall 7: square -2, in v2-perp True, admitted by the v2 filter: True
+[19:15:48]   Sterk wall 8: square -4, in v2-perp True, admitted by the v2 filter: True
+[19:15:48]   Sterk wall 9: square -2, in v2-perp True, admitted by the v2 filter: True
+[19:15:48]   Sterk wall 10: square -4, in v2-perp True, admitted by the v2 filter: True
+[19:15:48] probe complete in 99.3 s
+[peakrss] issue387: child waited=0 shell_code=0 samples=51
+[peakrss] peak tree RSS      : 657 MiB
+[peakrss] low-water MemAvail : 14094 MiB
+[peakrss] peak single VmHWM  : 657 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      646 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   100.0s procs=  3 rss=   657 MiB hwm=   657 MiB avail= 14094 MiB
+[peakrss]   t=    98.0s procs=  3 rss=   655 MiB hwm=   655 MiB avail= 14102 MiB
+[peakrss]   t=    96.0s procs=  3 rss=   653 MiB hwm=   653 MiB avail= 14102 MiB
+[peakrss]   t=    94.0s procs=  3 rss=   651 MiB hwm=   651 MiB avail= 14102 MiB
+[peakrss]   t=    92.0s procs=  3 rss=   649 MiB hwm=   649 MiB avail= 14113 MiB
+launcher exit: 0

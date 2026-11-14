@@ -1,0 +1,18 @@
+...                                                                      [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_genus_of_the_scattone_summands.sage::test_the_degree_two_summand_genus_has_four_classes_by_the_mass: 56.48 s > 20 s
+3 passed in 57.79s
+[peakrss] issue317base: child waited=0 shell_code=0 samples=33
+[peakrss] peak tree RSS      : 596 MiB
+[peakrss] low-water MemAvail : 4529 MiB
+[peakrss] peak single VmHWM  : 596 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      585 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    40.1s procs=  3 rss=   596 MiB hwm=   596 MiB avail=  5471 MiB
+[peakrss]   t=    42.1s procs=  3 rss=   596 MiB hwm=   596 MiB avail=  5427 MiB
+[peakrss]   t=    44.1s procs=  3 rss=   596 MiB hwm=   596 MiB avail=  5337 MiB
+[peakrss]   t=    46.1s procs=  3 rss=   596 MiB hwm=   596 MiB avail=  5349 MiB
+[peakrss]   t=    48.1s procs=  3 rss=   596 MiB hwm=   596 MiB avail=  5296 MiB
+launcher exit: 0

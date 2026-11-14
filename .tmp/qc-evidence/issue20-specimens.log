@@ -1,0 +1,18 @@
+-- ZZ element: equal True | same parent True | bytes 825
+-- QQ element: RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+-- lattice element: equal True | same parent True | bytes 2108
+-- named lattice U element: equal True | same parent True | bytes 2070
+-- coble torsion form element: RAISED PicklingError: __reduce__ must return a string or tuple, not NoneType
+DONE
+[peakrss] issue275: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 287 MiB
+[peakrss] low-water MemAvail : 13713 MiB
+[peakrss] peak single VmHWM  : 287 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      276 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   287 MiB hwm=   287 MiB avail= 13721 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   282 MiB hwm=   282 MiB avail= 13713 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13896 MiB
+launcher exit: 0

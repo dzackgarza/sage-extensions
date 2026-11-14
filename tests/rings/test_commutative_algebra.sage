@@ -3,6 +3,7 @@ r"""Commutative algebra: spectra, localization, completion, ideals and modules."
 import pytest
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_localizing_a_polynomial_ring_over_a_nondomain_retains_the_inverse_map() -> None:

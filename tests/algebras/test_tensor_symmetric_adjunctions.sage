@@ -3,6 +3,7 @@ r"""Tensor and symmetric algebras of finitely presented abelian groups, and thei
 import pytest
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def _cyclic(order):
@@ -134,7 +135,7 @@ def test_counit_naturality_and_right_triangle_on_dual_numbers_mod_four(flavor) -
     adjunction = _adjunction(flavor)
     polynomials = ZZ["e"]
     e = polynomials.gen()
-    algebra = Algebras(ZZ)(polynomials.quotient(polynomials.ideal([4, e**2])))
+    algebra = Algebras(ZZ)(polynomials.quotient_ring(polynomials.ideal([4, e**2])))
     epsilon = algebra(e)
     involution = algebra.Mor(algebra)({epsilon: -epsilon})
 

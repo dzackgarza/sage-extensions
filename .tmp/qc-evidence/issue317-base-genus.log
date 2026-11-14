@@ -1,0 +1,26 @@
+.......F..                                                               [100%]
+=================================== FAILURES ===================================
+_______ test_published_four_spinor_genus_is_counted_from_all_generators ________
+tests/lattices/test_genus.sage:91: in test_published_four_spinor_genus_is_counted_from_all_generators
+    assert lattice.spinor_genus_count() == 4
+E   assert 2 == 4
+E    +  where 2 = spinor_genus_count()
+E    +    where spinor_genus_count = Integral lattice of rank 3 and signature (3, 0).spinor_genus_count
+E    +  and   4 = Integer(4)
+=========================== short test summary info ============================
+FAILED tests/lattices/test_genus.sage::test_published_four_spinor_genus_is_counted_from_all_generators
+1 failed, 9 passed in 11.61s
+[peakrss] issue317base: child waited=1 shell_code=1 samples=11
+[peakrss] peak tree RSS      : 510 MiB
+[peakrss] low-water MemAvail : 2745 MiB
+[peakrss] peak single VmHWM  : 510 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      499 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    20.0s procs=  3 rss=   510 MiB hwm=   510 MiB avail=  2745 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   507 MiB hwm=   507 MiB avail=  2902 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   505 MiB hwm=   505 MiB avail=  2952 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   392 MiB hwm=   392 MiB avail=  3022 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   383 MiB hwm=   383 MiB avail=  3058 MiB
+launcher exit: 1

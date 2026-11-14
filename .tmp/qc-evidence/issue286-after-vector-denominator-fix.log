@@ -1,0 +1,18 @@
+[     0.0s] port: /work/src/sage_indefinite_port/__init__.py
+[   319.0s] O(T_Co).group_generators(): 438 in 319.0s
+[peakrss] STOPPED_AT_MEMORY_LIMIT: tree RSS 6209 MiB exceeded 6144 MiB
+[peakrss] issue286: child waited=143 shell_code=143 samples=227
+[peakrss] peak tree RSS      : 6209 MiB
+[peakrss] low-water MemAvail : 7191 MiB
+[peakrss] peak single VmHWM  : 6752 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     3620 MiB peak
+[peakrss]   julia                      3121 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   452.2s procs=  4 rss=  6209 MiB hwm=  6752 MiB avail=  7191 MiB
+[peakrss]   t=   450.2s procs=  4 rss=  5827 MiB hwm=  6369 MiB avail=  7576 MiB
+[peakrss]   t=   448.2s procs=  4 rss=  5553 MiB hwm=  6095 MiB avail=  7850 MiB
+[peakrss]   t=   446.2s procs=  4 rss=  5465 MiB hwm=  6008 MiB avail=  7945 MiB
+[peakrss]   t=   444.2s procs=  4 rss=  5036 MiB hwm=  5578 MiB avail=  8542 MiB
+launcher exit: 143

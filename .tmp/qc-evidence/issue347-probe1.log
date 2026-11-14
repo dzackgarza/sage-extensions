@@ -1,0 +1,57 @@
+[     0.0s] built
+Traceback (most recent call last):
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 1658, in source_element
+    native_value = _engine_ring(source)(value)
+  File "sage/structure/parent.pyx", line 899, in sage.structure.parent.Parent.__call__
+    return mor._call_(x)
+  File "sage/structure/coerce_maps.pyx", line 92, in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    raise
+  File "sage/structure/coerce_maps.pyx", line 87, in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    return C._element_constructor(x)
+  File "sage/rings/integer.pyx", line 767, in sage.rings.integer.Integer.__init__
+    raise TypeError("unable to coerce %s to an integer" % type(x))
+TypeError: unable to coerce <class 'fractions.Fraction'> to an integer
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/probe.py", line 20, in <module>
+    print(repr(QQ(Fraction(2, 3))), flush=True)
+               ~~^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 1760, in __call__
+    return self._element_constructor_(value)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 1737, in _element_constructor_
+    return self.fraction(value)
+           ~~~~~~~~~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 1663, in fraction
+    numerator = source_element(numerator)
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 1660, in source_element
+    return source(value)
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 6465, in __call__
+    return self._element_constructor_(value)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py", line 6513, in _element_constructor_
+    return self._from_engine_element(self._engine(value))
+                                     ~~~~~~~~~~~~^^^^^^^
+  File "sage/structure/parent.pyx", line 899, in sage.structure.parent.Parent.__call__
+    return mor._call_(x)
+  File "sage/structure/coerce_maps.pyx", line 92, in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    raise
+  File "sage/structure/coerce_maps.pyx", line 87, in sage.structure.coerce_maps.DefaultConvertMap_unique._call_
+    return C._element_constructor(x)
+  File "sage/rings/integer.pyx", line 767, in sage.rings.integer.Integer.__init__
+    raise TypeError("unable to coerce %s to an integer" % type(x))
+TypeError: unable to coerce <class 'fractions.Fraction'> to an integer
+[peakrss] issue347: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 291 MiB
+[peakrss] low-water MemAvail : 6908 MiB
+[peakrss] peak single VmHWM  : 292 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      281 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   291 MiB hwm=   292 MiB avail=  6908 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   233 MiB hwm=   233 MiB avail=  6994 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     5 MiB hwm=     5 MiB avail=  7173 MiB
+launcher exit: 1

@@ -1,0 +1,5 @@
+.....                                                                    [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_divided_class_construction.sage::test_a_named_class_loop_runs_at_the_one_residue_it_determines: 78.58 s > 20 s
+5 passed in 82.39s (0:01:22)
+launcher exit: 0

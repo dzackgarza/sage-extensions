@@ -1,0 +1,24 @@
+..
+============================== slowest durations ===============================
+164.67s call     tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage::test_the_tco_plane_gives_an_isotropic_subobject_with_orbit_and_stabilizer
+52.90s call     tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage::test_the_small_specimen_checks_the_orbit_stabilizer_identity
+0.00s teardown tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage::test_the_tco_plane_gives_an_isotropic_subobject_with_orbit_and_stabilizer
+0.00s teardown tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage::test_the_small_specimen_checks_the_orbit_stabilizer_identity
+0.00s setup    tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage::test_the_small_specimen_checks_the_orbit_stabilizer_identity
+0.00s setup    tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage::test_the_tco_plane_gives_an_isotropic_subobject_with_orbit_and_stabilizer
+2 passed in 220.32s (0:03:40)
+[peakrss] issue296-full: child waited=0 shell_code=0 samples=114
+[peakrss] peak tree RSS      : 2753 MiB
+[peakrss] low-water MemAvail : 981 MiB
+[peakrss] peak single VmHWM  : 3020 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2413 MiB peak
+[peakrss]   python                      596 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    90.1s procs=  4 rss=  2753 MiB hwm=  2797 MiB avail=  1939 MiB
+[peakrss]   t=    60.1s procs=  4 rss=  2732 MiB hwm=  2784 MiB avail=  2279 MiB
+[peakrss]   t=    62.1s procs=  4 rss=  2732 MiB hwm=  2785 MiB avail=  2304 MiB
+[peakrss]   t=    64.1s procs=  4 rss=  2732 MiB hwm=  2786 MiB avail=  2299 MiB
+[peakrss]   t=    58.1s procs=  4 rss=  2729 MiB hwm=  2781 MiB avail=  2280 MiB
+launcher exit: 0

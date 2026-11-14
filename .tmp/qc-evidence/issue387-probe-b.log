@@ -1,0 +1,99 @@
+[17:55:31] importing
+[17:55:34] imported in 3.3 s
+[17:56:20] subgroup built in 49.3 s
+[17:56:21] Sterk_4 image built in 50.3 s
+[17:58:46] controlling vector: (7, -17, -34, -51, -68, -85, -60, 21, 4, 4)
+[17:58:46] engine gram computed, negated True
+[17:58:46] engine gram:
+[16  0  0  0  0  0  4  6  0  0]
+[ 0  4 -2  0  0  0  0  0  0  0]
+[ 0 -2  4 -2  0  0  0  0  0  0]
+[ 0  0 -2  4 -2  0  0  0  0  0]
+[ 0  0  0 -2  4 -2  0  0  0  0]
+[ 0  0  0  0 -2  4 -2  4  0  0]
+[ 4  0  0  0  0 -2  4  2  0  0]
+[ 6  0  0  0  0  4  2 20  0  0]
+[ 0  0  0  0  0  0  0  0  0 -1]
+[ 0  0  0  0  0  0  0  0 -1  0]
+[17:58:46] En: 2, root_lengths: [1, 2, 4]
+[17:59:09] distance-0 admitted roots: 176 in 22.4 s
+[17:59:09] squares histogram: {2: 23, 4: 153}
+[17:59:09] distinct distance-0 admitted roots: 128
+[17:59:09] the set is closed under negation: True
+[17:59:09] rank of the span of the distance-0 roots: 8
+[17:59:12] FundCone returned 8 roots:
+[17:59:12]   (-2, 5, 10, 15, 20, 25, 18, -6, 0, -2), square 4
+[17:59:12]   (0, -1, 0, 0, 0, 0, 0, 0, 0, 0), square 4
+[17:59:12]   (0, 0, -1, 0, 0, 0, 0, 0, 0, 0), square 4
+[17:59:12]   (0, 0, 0, -1, 0, 0, 0, 0, 0, 0), square 4
+[17:59:12]   (0, 0, 0, 0, -1, 0, 0, 0, 0, 0), square 4
+[17:59:12]   (0, 0, 0, 0, 0, -1, 0, 0, 0, 0), square 4
+[17:59:12]   (0, 0, 0, 0, 0, 0, -1, 0, 0, 0), square 4
+[17:59:12]   (0, 0, 0, 0, 0, 0, 0, 0, -1, 1), square 2
+[17:59:12] roots outside the span of FundCone's roots: 0
+[17:59:12] roots not a same-sign integer combination of FundCone's roots: 0
+[17:59:14] lattice-form greedy chamber built in 1.5 s, 8 wall rays
+[17:59:14] lattice-form walls: 19
+[17:59:14]   wall root (0, 0, 0, 0, 0, 0, 0, 0, -1, 1) (sign 1)
+[17:59:14]   wall root (0, 0, 0, 0, 0, 0, 0, 0, 1, -1) (sign -1)
+[17:59:14]   wall root (0, -1, 0, 0, 0, 0, 0, 0, 0, 0) (sign 1)
+[17:59:14]   wall root (0, 1, 0, 0, 0, 0, 0, 0, 0, 0) (sign -1)
+[17:59:14]   wall root (0, 0, -1, 0, 0, 0, 0, 0, 0, 0) (sign 1)
+[17:59:14]   wall root (0, 0, 1, 0, 0, 0, 0, 0, 0, 0) (sign -1)
+[17:59:14]   wall root (0, 0, 0, -1, 0, 0, 0, 0, 0, 0) (sign 1)
+[17:59:14]   wall root (0, 0, 0, 1, 0, 0, 0, 0, 0, 0) (sign -1)
+[17:59:14]   wall root (0, 0, 0, 0, -1, 0, 0, 0, 0, 0) (sign 1)
+[17:59:14]   wall root (0, 0, 0, 0, 1, 0, 0, 0, 0, 0) (sign -1)
+[17:59:14]   wall root (0, 0, 0, 0, 0, -1, 0, 0, 0, 0) (sign 1)
+[17:59:14]   wall root (0, 0, 0, 0, 0, -1, 0, 0, 0, 0) (sign 1)
+[17:59:14]   wall root (0, 0, 0, 0, 0, 1, 0, 0, 0, 0) (sign -1)
+[17:59:14]   wall root (0, 0, 0, 0, 0, 0, -1, 0, 0, 0) (sign 1)
+[17:59:14]   wall root (0, 0, 0, 0, 0, 0, -1, 0, 0, 0) (sign 1)
+[17:59:14]   wall root (0, 0, 0, 0, 0, 0, 1, 0, 0, 0) (sign -1)
+[17:59:14]   wall root (-2, 5, 10, 15, 20, 25, 18, -6, 0, -2) (sign 1)
+[17:59:14]   wall root (2, -5, -10, -15, -20, -25, -18, 6, 0, 2) (sign -1)
+[17:59:14]   wall root (2, -5, -10, -15, -20, -25, -18, 6, 0, 2) (sign -1)
+[17:59:14] lattice-form walls are FundCone's roots: False
+[17:59:14] the walk's distinct additions (from the #362 heartbeat):
+[17:59:14]   (6, -13, -27, -41, -55, -69, -49, 17, 3, 3): square 2, b(v0, w) = -2, admitted True
+[17:59:14]   (5, -12, -25, -38, -51, -64, -45, 16, 3, 3): square 2, b(v0, w) = -2, admitted True
+[17:59:14]   (13, -31, -62, -93, -125, -157, -111, 39, 7, 7): square 2, b(v0, w) = -4, admitted True
+[17:59:14]   (30, -72, -145, -218, -291, -364, -257, 90, 16, 16): square 4, b(v0, w) = -8, admitted True
+[17:59:15]   (21, -50, -100, -150, -200, -250, -177, 62, 11, 11): square 2, b(v0, w) = -6, admitted True
+[17:59:15]   (20, -49, -98, -147, -196, -245, -173, 61, 11, 11): square 2, b(v0, w) = -6, admitted True
+[17:59:15]   (29, -69, -138, -207, -276, -345, -244, 85, 15, 15): square 2, b(v0, w) = -8, admitted True
+[17:59:15]   (27, -67, -134, -201, -268, -335, -236, 83, 15, 15): square 2, b(v0, w) = -8, admitted True
+[17:59:16] Sterk's cusp-4 roots carried into T_En in 1.0 s: 11
+[17:59:17]   square -4, in the stabilizer image: True
+[17:59:17]   square -4, in the stabilizer image: True
+[17:59:17]   square -4, in the stabilizer image: True
+[17:59:17]   square -4, in the stabilizer image: True
+[17:59:17]   square -4, in the stabilizer image: True
+[17:59:17]   square -4, in the stabilizer image: True
+[17:59:18]   square -4, in the stabilizer image: True
+[17:59:18]   square -2, in the stabilizer image: True
+Traceback (most recent call last):
+  File "/probe.py", line 242, in <module>
+    f"  square {int(root.q())}, in the stabilizer image: {image.contains_root_reflection(root)}"
+                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 2813, in contains_root_reflection
+    reflection = self.root_reflection(root)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 2793, in root_reflection
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: the vector 2*e_2 - 2*e_4 - 3*e_5 - 4*e_6 - 6*e_7 - 5*e_8 - 4*e_9 - 3*e_10 - 2*e_11 does not lie in the perpendicular of e_2 + 2*e_3 - 4*e_4 - 5*e_5 - 7*e_6 - 10*e_7 - 8*e_8 - 6*e_9 - 4*e_10 - 2*e_11, so its reflection moves that vector and induces no isometry of Integral lattice of rank 10 and signature (1, 9)
+[peakrss] issue387: child waited=1 shell_code=1 samples=116
+[peakrss] peak tree RSS      : 667 MiB
+[peakrss] low-water MemAvail : 12373 MiB
+[peakrss] peak single VmHWM  : 667 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      655 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   230.3s procs=  3 rss=   667 MiB hwm=   667 MiB avail= 13682 MiB
+[peakrss]   t=   222.3s procs=  3 rss=   666 MiB hwm=   666 MiB avail= 13681 MiB
+[peakrss]   t=   224.3s procs=  3 rss=   666 MiB hwm=   666 MiB avail= 13691 MiB
+[peakrss]   t=   226.3s procs=  3 rss=   666 MiB hwm=   666 MiB avail= 13673 MiB
+[peakrss]   t=   228.3s procs=  3 rss=   666 MiB hwm=   666 MiB avail= 13689 MiB
+launcher exit: 1

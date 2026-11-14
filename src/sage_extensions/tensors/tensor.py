@@ -58,6 +58,8 @@ from sage_extensions.categories.rings.ring_foundation import (
     _linear_algebra_ring,
     _linear_algebra_element,
     _own_ring,
+    _owned_integers,
+    _owned_rationals,
 )
 from sage_extensions.categories.sets.cardinals import Cardinalities, cardinal
 from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
@@ -413,13 +415,28 @@ class Tensor:
         Equal tensors hash equally, so a tensor may key a cache and may be
         a constructor argument of a unique representation.  At infinite
         rank there is no component list and equality is identity, so the
-        identity hash is the honest one.
+        identity hash is the honest one.  An owned scalar of the component
+        ring need not be hashable (a joined ring element class has
+        ``__hash__ = None``); equality there is still by value, so the hash
+        substitutes the cache-protocol component key for the raw component
+        tuple rather than raising.  Both keys are functions of the same
+        component data, and equal tensors share one element class of their
+        engine base ring, so they take one branch.
         """
         if Infinity in self._index_ranks():
             return object.__hash__(self)
-        return hash(
-            (self.tensor_valence(), self._index_ranks(), tuple(self._flat_components()))
-        )
+        try:
+            return hash(
+                (self.tensor_valence(), self._index_ranks(), tuple(self._flat_components()))
+            )
+        except TypeError:
+            return hash(
+                (
+                    self.tensor_valence(),
+                    self._index_ranks(),
+                    cache_key(tuple(self._flat_components())),
+                )
+            )
 
     def _cache_key(self):
         r"""Key a finite presentation even when its scalars are unhashable.
@@ -617,9 +634,7 @@ class Tensor:
                     f"covariant tensor contraction takes, in a slot of rank {rank}, "
                     f"a vector of {slot_module}"
                 )
-        # The ubiquitous pairing G(x, y) = x^t G y is evaluated here, at the
-        # tensor owner.  Reading its exact components directly avoids loading
-        # a numerical array stack merely to contract a small exact tensor.
+        # The pairing G(x, y) = x^t G y is evaluated at the tensor owner.
         if len(vectors) == 2:
             left, right = vectors
             left_rank, right_rank = self._lower_index_ranks()
@@ -627,6 +642,13 @@ class Tensor:
                 raise ValueError(
                     f"cannot contract a type-{self.tensor_valence()} tensor with an infinite-rank index by finite component enumeration"
                 )
+            ring = self.base_ring()
+            if ring is _owned_integers() or ring is _owned_rationals():
+                # Sage's exact matrix product and Vector.dot_product retain
+                # arbitrary-size coefficients in both tensor slots.
+                image = _engine_component_matrix(self) * _engine_component_vector(right)
+                value = _engine_component_vector(left).dot_product(image)
+                return _owned_engine_element(ring, value)
             return sum(
                 (
                     left[left_index]
@@ -1871,6 +1893,18 @@ class _CoordinateTensor(ModuleElement, Tensor):
     def __init__(self, parent: Parent, entries: tuple) -> None:
         self._entries = entries
         ModuleElement.__init__(self, parent)
+
+    def entries(self) -> tuple:
+        r"""The components in row-major order, as owned ring elements.
+
+        This is the tensor's stored datum, returned as data rather than as another
+        tensor: a caller that has to persist or rebuild the tensor reads the
+        components here and hands the same tuple back to the tensor module's
+        element constructor (issue #20).  Nothing is recomputed and no coordinate
+        convention is introduced at this boundary -- the array order is the one
+        ``_CoordinateTensor`` was constructed with.
+        """
+        return self._entries
 
     def __call__(self, *args):
         r"""Feed vectors into the covariant slots, from left to right.

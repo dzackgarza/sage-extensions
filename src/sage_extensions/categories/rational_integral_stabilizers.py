@@ -85,6 +85,8 @@ What *is* owned, so a caller does not come here for it:
   commensurability class.
 """
 
+from functools import cache
+
 from sage.misc.cachefunc import cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.sage_object import SageObject
@@ -105,14 +107,59 @@ from sage_extensions.categories.rings.ring_foundation import (
     _owned_integers,
 )
 from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
-from sage_extensions.categories.sets.set_categories import Sets
+from sage_extensions.categories.sets.set_categories import Sets, finite_ordinal_set
 from sage_extensions.logic import ask
 from sage_extensions.validation import validator
+
+def _unique_image_family(images):
+    r"""The distinct members of an image family, each read once, in first-occurrence order.
+
+    Hash and equality decide distinctness; the elements' mathematical hash
+    being total is the tensor repair's standing premise.  Images without a
+    Python hash are not an unexplained failure: the same first-occurrence
+    dedupe is then the stated equality scan, explicit about its quadratic
+    cost in the number of DISTINCT images, so an unhashable supported
+    element meets a stated boundary, never a bare ``TypeError``.
+    """
+    try:
+        return list(dict.fromkeys(images))
+    except TypeError:
+        unique = []
+        for image in images:
+            if all(image != kept for kept in unique):
+                unique.append(image)
+        return unique
+
+
+def _deduplicated_generating_morphism(group, morphism):
+    r"""The image of ``morphism`` in ``group`` presented with each distinct image read once.
+
+    ``morphism`` is a free-group generating datum (for example an orbit
+    Schreier cover).  What is preserved is the presented image family and
+    the subgroup it generates: the first-occurrence subsequence of the
+    images of the free letters, so the generated subgroup is exactly the
+    full family's subgroup and every downstream stage priced by family size
+    (integral restrictions, orbit splits, conversions) pays one element per
+    distinct image.  What is deliberately not preserved is the literal free
+    domain and its enumeration of words: the reduced family is a different
+    free cover of the same image, which is the point of calling it.
+    """
+    letters = tuple(morphism.domain().group_generators())
+    unique = _unique_image_family([morphism(letter) for letter in letters])
+    labels = finite_ordinal_set(len(unique))
+    free = OwnedGroups.Free(index_set=labels)
+    return free.Mor(group)(
+        Sets().Mor(labels, group)(lambda label: unique[int(label)])
+    )
+
 
 class _FiniteIntegralRepresentation(SageObject):
     r"""The finite lattice orbit, retaining its action and free-word maps.
 
-    The module adapter only codes submodules of M/dM by integer positions.
+    The module adapter codes submodules of M/dM by integer positions and
+    retains their canonical nonzero generating images. Closure needs those images and
+    their canonical preimage keys; full submodule presentations are realized
+    by ``orbit_submodules`` when requested.
     FiniteGSets owns orbit closure and transporters; the selected free-group
     augmentation keeps words in the supplied generators before evaluation
     in the rational group. No word-recovery algorithm for that group is used.
@@ -124,9 +171,11 @@ class _FiniteIntegralRepresentation(SageObject):
         assert quotient.cardinality().is_finite() is True, (
             "the residue-action computation requires a represented finite module M/dM"
         )
-        selected = action.selected_submodule()
-        self._submodules = [selected]
-        self._positions = {self._submodule_key(selected): 0}
+        selected_key = action.finite_quotient_action()._intermediate_image_key_or_none(action.lattice_inclusion())
+        if selected_key is None:
+            raise ValueError("the selected lattice is not intermediate between dM and M")
+        self._submodule_generators = [quotient._submodule_generator_images_from_key(selected_key)]
+        self._positions = {selected_key: 0}
         self._registering_orbit = True
         zero = _owned_integers().zero()
         self._g_set = FiniteGSets(action.rational_group()).from_finite_orbits(
@@ -169,32 +218,31 @@ class _FiniteIntegralRepresentation(SageObject):
     def _submodule_key(self, submodule):
         return self._action.finite_module()._submodule_key(submodule)
 
-    def _position_of(self, submodule):
-        r"""The position of ``submodule`` among the orbit submodules found so far, or ``None``."""
-        return self._positions.get(self._submodule_key(submodule))
-
     def _act_on_position(self, group_element, position):
         quotient = self.action().finite_module()
-        submodule = self._submodules[int(position)]
+        generators = self._submodule_generators[int(position)]
+        if not generators:
+            # Every module automorphism fixes the zero submodule.
+            return _owned_integers()(position)
         automorphism = self.action().quotient_automorphism(group_element)
-        inclusion = submodule.inclusion()
-        images = tuple(
-            automorphism(inclusion(submodule.module_generator(label)))
-            for label in submodule.module_generating_set()
-        )
-        image_key = quotient._submodule_key_from_generators(images)
+        image_key = quotient._submodule_image_key(automorphism.forward(), generators)
         image_position = self._positions.get(image_key)
         if image_position is None:
             assert self._registering_orbit, (
                 "the supplied rational action leaves its computed finite lattice orbit"
             )
-            image_position = len(self._submodules)
-            self._submodules.append(quotient.subobject_on(images))
+            image_position = len(self._submodule_generators)
+            self._submodule_generators.append(quotient._submodule_generator_images_from_key(image_key))
             self._positions[image_key] = image_position
         return _owned_integers()(image_position)
 
+    @cached_method
     def orbit_submodules(self):
-        return tuple(self._submodules)
+        r"""Realize each orbit submodule from its retained exact generator images."""
+        quotient = self.action().finite_module()
+        return (self.action().selected_submodule(),) + tuple(
+            quotient.subobject_on(images) for images in self._submodule_generators[1:]
+        )
 
     def orbit_section(self):
         r"""The actual section from lattice-orbit points to G: the section of ``G -> G/G_L``."""
@@ -205,13 +253,221 @@ class _FiniteIntegralRepresentation(SageObject):
         return tuple(section(point) for point in self.g_set())
 
     def transporter_to(self, submodule):
-        position = self._position_of(submodule)
+        return self._transporter_to_key(self._submodule_key(submodule))
+
+    def _transporter_to_key(self, key):
+        position = self._positions.get(key)
         if position is None:
             return None
         return self.orbit_section()(self.g_set().point_set()(_owned_integers()(position)))
 
     def _selected_point(self):
         return self.g_set().point_set()(_owned_integers().zero())
+
+    def stabilizer_schreier_factors(self):
+        r"""Return the letters and transversals of the lattice stabilizer's Schreier family.
+
+        The stabilizer's generating family is Schreier's over this action's lattice
+        orbit, ``t_(s.p)^-1 s t_p``.  Its factors are returned here so a caller can
+        realize the family by reading ``|letters| + |orbit|`` elements and
+        composing, rather than reading every one of the ``|letters| * |orbit|``
+        family elements.  Both tuples are group elements of the rational group, in
+        the order the family uses: ``transversals[i]`` is ``t_p`` for the ``i``-th
+        orbit point and ``letters[j]`` is the ``j``-th letter.
+        """
+        return self.g_set().orbit_schreier_factors(self._selected_point())
+
+    def _lattice_element_of_module_image(self, image_lattice, element):
+        r"""Read an element of a module image as the corresponding element of its lattice.
+
+        The module image of an orbit transporter is a bare module; the orbit
+        lattice is the same underlying module with the induced form.  They share
+        the framing, so the coefficients transfer label for label.
+        """
+        image_labels = tuple(image_lattice.module_generating_set())
+        module_labels = tuple(element.parent().module_generating_set())
+        coordinates = element.to_vector()
+        return image_lattice.linear_combination(
+            {
+                image_label: coordinates(module_label)
+                for image_label, module_label in zip(image_labels, module_labels, strict=True)
+                if coordinates(module_label)
+            }
+        )
+
+    @cached_method
+    def _orbit_lattice_data(self):
+        r"""Return the orbit lattices ``L_p = t_p L`` with their transporters ``t_p: L -> L_p``.
+
+        For each orbit point ``p`` the composite of the lattice inclusion with the
+        transversal ``t_p`` is factored through its image: ``image_factorization``
+        retains the bare module image ``P_p`` together with its inclusion into the
+        rational ambient, and ``pullback_form`` along the inverse of the module
+        image induces the form on ``P_p``.  The image of an integral lattice under
+        an isometry carries an integral induced form even when the ambient and the
+        stable module do not, so ``Lattices(ring)`` accepts that Gram and the
+        transporter is an isometry of lattice objects on its own endpoints.  No
+        hypothesis that the stable module is integral is used.
+        """
+        action = self.action()
+        inclusion = action.lattice_inclusion()
+        lattice = inclusion.domain()
+        space = inclusion.codomain()
+        _letters, transversals = self.stabilizer_schreier_factors()
+        modules = Modules(lattice.base_ring())
+        labels = tuple(lattice.module_generating_set())
+        data = {}
+        for position, transporter in enumerate(transversals):
+            composite = modules.Mor(lattice, space)(
+                {
+                    label: space.wrap(
+                        transporter(
+                            inclusion(lattice.module_generator(label)).underlying_element()
+                        )
+                    )
+                    for label in labels
+                }
+            )
+            epimorphism, image_inclusion = composite.image_factorization()
+            image_module = epimorphism.codomain()
+            image_form = lattice.pullback_form(epimorphism.inverse())
+            image_lattice = Lattices(lattice.base_ring())(image_form.gram_tensor())
+            module_images = tuple(
+                epimorphism(lattice.module_generator(label)) for label in labels
+            )
+            # The transport's domain is the source lattice ``L``, so its images
+            # are keyed by ``L``'s own generator labels.  The value of the
+            # ``i``-th source generator is the transported point read in the
+            # image module's *canonical* basis, which ``image_factorization``
+            # takes from the span's basis and which need not be the image of the
+            # source basis; ``_lattice_element_of_module_image`` performs exactly
+            # that basis change.
+            transport = lattice.Isom(image_lattice)(
+                {
+                    label: self._lattice_element_of_module_image(
+                        image_lattice, module_images[index]
+                    )
+                    for index, label in enumerate(labels)
+                }
+            )
+            data[int(position)] = {
+                "space_inclusion": inclusion,
+                # The Schreier transversals act on the underlying rational vector
+                # space, so the source generators are recorded there.
+                "space_images": tuple(
+                    inclusion(lattice.module_generator(label)).underlying_element()
+                    for label in labels
+                ),
+                "source_labels": labels,
+                "lattice": image_lattice,
+                "module": image_module,
+                "module_labels": tuple(image_module.module_generating_set()),
+                "lattice_labels": tuple(image_lattice.module_generating_set()),
+                "inclusion": image_inclusion,
+                "images": module_images,
+                "transport": transport,
+            }
+        return data
+
+    def orbit_lattice_records(self):
+        r"""Return one record per lattice-orbit point, with its maps (#286).
+
+        Each record states the orbit lattice ``L_p = t_p L``, the module image it
+        was built from together with that module's own generating labels, the
+        inclusion of the module image into the rational ambient, the images of
+        ``L``'s generators, and the transport ``t_p: L -> L_p``.  The module image
+        and the lattice are the same underlying module with different structure,
+        so their label identifications are stated separately rather than assumed
+        equal: ``image_factorization`` presents the image in the span's canonical
+        basis, which is the module's own basis, and the transported source basis
+        is a different tuple of elements that is read once, by the transport.
+        """
+        data = self._orbit_lattice_data()
+        return tuple(data[position] for position in sorted(data))
+
+    def middle_transport(self, position, letter):
+        r"""Return the letter as an isometry ``L_p -> L_(s.p)`` between orbit lattices.
+
+        Its domain is the orbit lattice at ``position``, so its images are read on
+        that lattice's *own* generators -- the module image's canonical basis --
+        and not on the transported source basis, which the transport already
+        carries.
+        """
+        orbit = self._orbit_lattice_data()
+        source = orbit[int(position)]
+        target = orbit[int(self._act_on_position(letter, int(position)))]
+        ambient = self.action().lattice_inclusion().codomain()
+        images = {}
+        for index, label in enumerate(source["lattice_labels"]):
+            basis_element = source["module"].module_generator(source["module_labels"][index])
+            embedded = source["inclusion"](basis_element).underlying_element()
+            moved = ambient.wrap(letter(embedded))
+            images[label] = self._lattice_element_of_module_image(
+                target["lattice"], target["inclusion"].lift(moved)
+            )
+        return source["lattice"].Isom(target["lattice"])(images)
+
+    @cached_method
+    def stabilizer_discriminant_image(self):
+        r"""Return ``rho(G_L) <= O(A_L)`` by the action-groupoid construction.
+
+        ``G_L = <t_(s.p)^-1 s t_p>`` is Schreier's family over the lattice orbit
+        at ``m = exp(M/L)``, each ``t_p`` a transversal and ``s`` a letter of the
+        action groupoid.  Every factor of a family element is an isometry
+        *between* integral lattice objects -- ``t_p: L -> L_p``, ``s: L_p ->
+        L_(s.p)``, ``t_(s.p)^-1: L_(s.p) -> L`` -- so each one has its own
+        ``discriminant_isometry``, and functoriality gives the family element's
+        discriminant automorphism as the composite
+
+            Disc(t_(s.p)^-1) * Disc(s) * Disc(t_p)   in   ``O(A_L)``.
+
+        The returned subgroup is generated by those composites, one per orbit
+        point and letter.  No letter is applied to ``A_L`` on its own, and no
+        hypothesis that a rational transporter preserves ``L`` is used.  The real
+        sign character is a separate datum and is not derived here.
+
+        The composite family is a datum of *this* subobject -- its lattice orbit,
+        the letters, and the discriminants of the transports -- so it is
+        computed once per subobject and cached.  On the ``T_Co`` line it is 26 s
+        (`.tmp/p310b-probe1.log`), an order of magnitude more than the orbit
+        enumeration that consumes it, and the row asked for it once per
+        representative.
+        """
+        action = self.action()
+        inclusion = action.lattice_inclusion()
+        lattice = inclusion.domain()
+        space = inclusion.codomain()
+        letters, _transversals = self.stabilizer_schreier_factors()
+        orbit = self._orbit_lattice_data()
+        orthogonal = lattice.discriminant_group().orthogonal_group()
+
+        generators = []
+        for position in tuple(orbit):
+            source = orbit[position]
+            for letter in letters:
+                target_position = int(self._act_on_position(letter, position))
+                target = orbit[target_position]
+                middle = self.middle_transport(position, letter)
+                # Compose by evaluation: Disc(t_(s.p)^-1) after Disc(s) after
+                # Disc(t_p), read on A_L, and raised as one automorphism of A_L.
+                outer = target["transport"].inverse()
+                inner = source["transport"]
+                from sage_extensions.categories.modules.framed.formed.torsion_form_modules import (
+                    _torsion_form_isometry,
+                )
+
+                def forward(isometry):
+                    return isometry._discriminant_forward_morphism()
+
+                composite = _torsion_form_isometry(
+                    forward(outer) * forward(middle) * forward(inner),
+                    forward(inner.inverse())
+                    * forward(middle.inverse())
+                    * forward(outer.inverse()),
+                    quadratic=lattice.is_even(),
+                )
+                generators.append(orthogonal.from_morphism(composite))
+        return orthogonal.subgroup(tuple(generators))
 
     @cached_method
     def finite_stabilizer(self):
@@ -230,7 +486,13 @@ class _FiniteIntegralRepresentation(SageObject):
 
         The lattice orbit is the coset space ``G/G_L``; its orbit Schreier
         morphism ``E -> G`` (selected cover of ``G``) is the generating datum
-        of the literal preimage.
+        of the literal preimage.  The family is the full Schreier family:
+        presenting the first-occurrence subsequence of its images costs one
+        coordinate-tensor digest per image (measured cost-negative on the
+        rank-12 Enriques line, where this call must complete; the verbatim
+        family completes in ~1900 s), so deduplication is offered by
+        ``_deduplicated_generating_morphism`` to callers whose own stage is
+        priced by family size, not paid from inside this construction.
         """
         group = self.action().rational_group()
         assert group.has_selected_group_resolution() and group.has_selected_finite_group_generating_set(), (
@@ -298,7 +560,8 @@ class IntegralStructureAction(SageObject):
         )
 
     @cached_method
-    def _ambient_group_inclusion(self):
+    def ambient_group_inclusion(self):
+        r"""The supplied subgroup inclusion ``G -> Aut(V)`` into the rational ambient space."""
         group = self.rational_group()
         inclusion = OwnedGroups().Mor(group, group).identity()
         current = group
@@ -324,7 +587,7 @@ class IntegralStructureAction(SageObject):
             )
         ambient = space.module_over_extension()
         restrict = Modules(ambient.base_ring()).restriction_of_scalars(space.ring_map())
-        group_inclusion = self._ambient_group_inclusion()
+        group_inclusion = self.ambient_group_inclusion()
         return GroupActionFunctor(
             self.rational_group(),
             Modules(ring),
@@ -369,7 +632,13 @@ class IntegralStructureAction(SageObject):
     def invariant_module_construction(self):
         group = self.rational_group()
         containing = self.stable_containing_bound()
-        if group.is_finite() is not True and containing is None:
+        # The bound is the premise that decides this branch: with it, the
+        # orbit closure is the bounded ascending chain and the group's order is
+        # never consulted.  Asking first would spend the query -- for an
+        # undecided group, a GAP `IsFinite` over its generators -- on an answer
+        # this conjunction discards.  The predicate is not weakened: without a
+        # bound it still decides between refusing and closing the orbit.
+        if containing is None and group.is_finite() is not True:
             assert False, (
                 f"computing the orbit-generated integral module for {group} requires a known finite group "
                 "or a justified finite stable containing module; supply the latter with "
@@ -430,17 +699,44 @@ class IntegralStructureAction(SageObject):
     def finite_representation(self):
         return _FiniteIntegralRepresentation(self)
 
+    def stabilizer_schreier_factors(self):
+        r"""Return ``(letters, transversals)`` for the lattice stabilizer's Schreier family.
+
+        The stabilizer ``{g in G : g(L) = L}`` is generated by Schreier's family
+        ``t_(s.p)^-1 s t_p`` over the lattice orbit of the selected point.  The
+        factors are returned so a consumer can realize that family by converting
+        ``|letters| + |orbit|`` group elements and composing, instead of
+        converting each of the ``|letters| * |orbit|`` family elements: the
+        composites are products of elements it already holds.
+
+        The certificate the caller checks is the composite law itself: with
+        ``transversals[i]`` the transversal of the ``i``-th orbit point ``p`` and
+        ``letters[j]`` the ``j``-th letter ``s``, the family element is
+        ``~transversals[position of s.p] * letters[j] * transversals[i]``, and the
+        family of those equals ``stabilizer().group_generators()`` element for
+        element.
+        """
+        return self.finite_representation().stabilizer_schreier_factors()
+
     def stabilizer(self):
         r"""Return ``{g in G : g(L)=L}`` for the selected lattice ``L``."""
         rational_group = self.rational_group()
         lattice_inclusion = self.lattice_inclusion()
+        # The composite disjunct is asked first.  When it holds, the condition is
+        # True whatever the group's order is, so the finiteness query below is
+        # dead work -- and for an order the selected decision cannot reach, that
+        # work is a GAP `IsFinite` over the group's generators.  This is an
+        # evaluation-order change only: `A or B` and `B or A` agree, the branch
+        # is the same, and `is_finite()` still runs whenever the composite does
+        # not hold, where it decides between the finite representation and the
+        # predicate route below.
         if (
-            rational_group.is_finite() is True
-            or (
+            (
                 rational_group.has_selected_group_resolution()
                 and rational_group.has_selected_finite_group_generating_set()
                 and self.stable_containing_bound() is not None
             )
+            or rational_group.is_finite() is True
         ):
             return self.finite_representation().lattice_stabilizer()
 
@@ -492,10 +788,30 @@ class IntegralStructureAction(SageObject):
             f"a transporter in {rational_group} requires a finite selected generating family "
             "or a represented finite group"
         )
-        target_submodule = self.finite_quotient_action().intermediate_image_or_none(target_inclusion)
-        if target_submodule is None:
+        quotient_action = self.finite_quotient_action()
+        target_key = quotient_action._intermediate_image_key_or_none(target_inclusion)
+        if target_key is None:
             return None
-        witness = self.finite_representation().transporter_to(target_submodule)
+        source_key = quotient_action._intermediate_image_key_or_none(source_inclusion)
+        if source_key is None:
+            raise ValueError("the selected lattice is not intermediate between dM and M")
+        quotient = self.finite_module()
+        assert quotient.cardinality().is_finite() is True, (
+            "the residue-action computation requires a represented finite module M/dM"
+        )
+
+        @cache
+        def generators(key):
+            return quotient._submodule_generator_images_from_key(key)
+
+        def action(element, key):
+            images = generators(key)
+            if not images:
+                return key
+            automorphism = self.quotient_automorphism(element)
+            return quotient._submodule_image_key(automorphism.forward(), images)
+
+        witness = FiniteGSets(rational_group).transporter_from_finite_orbit(source_key, target_key, action)
         if witness is None:
             return None
         if not self._carries_lattice(witness, source_inclusion, target_inclusion):
@@ -656,13 +972,8 @@ class FiniteCommensurabilityQuotient(SageObject):
             self.quotient_automorphism,
         )
 
-    def intermediate_image_or_none(self, lattice_inclusion):
-        r"""Return ``S_L=L/dM`` inside ``F_M`` for ``dM <= L <= M``.
-
-        Both containments are verified through the actual inclusions in
-        ``Res(V)``.  The returned object is the image of the composite
-        ``L -> M -> M/dM`` and therefore retains its inclusion in ``F_M``.
-        """
+    def _intermediate_projection_or_none(self, lattice_inclusion):
+        r"""The composite ``L -> M -> M/dM``, after checking both containments."""
         if lattice_inclusion.codomain() is not self.ambient_restricted_space():
             raise ValueError(
                 f"{lattice_inclusion.domain()} cannot lie between dM and M for M = "
@@ -675,7 +986,31 @@ class FiniteCommensurabilityQuotient(SageObject):
         scaled_reference = self.reference_inclusion() * self.scaling_morphism()
         if scaled_reference.factor_through_or_none(lattice_inclusion) is None:
             return None
-        return (self.quotient_projection() * into_reference).image()
+        return self.quotient_projection() * into_reference
+
+    def _intermediate_image_key_or_none(self, lattice_inclusion):
+        r"""Read the canonical module key without presenting its image submodule.
+
+        The finite-module owner computes the Hermite preimage key from the
+        same projected generators that define ``intermediate_image_or_none``.
+        Its correspondence theorem includes the quotient relations.
+        """
+        projection = self._intermediate_projection_or_none(lattice_inclusion)
+        if projection is None:
+            return None
+        return self.quotient_module()._submodule_key_from_generators(
+            tuple(projection(generator) for generator in projection.domain().module_generators())
+        )
+
+    def intermediate_image_or_none(self, lattice_inclusion):
+        r"""Return ``S_L=L/dM`` inside ``F_M`` for ``dM <= L <= M``.
+
+        Both containments are verified through the actual inclusions in
+        ``Res(V)``.  The returned object is the image of the composite
+        ``L -> M -> M/dM`` and therefore retains its inclusion in ``F_M``.
+        """
+        projection = self._intermediate_projection_or_none(lattice_inclusion)
+        return None if projection is None else projection.image()
 
     def intermediate_image(self, lattice_inclusion):
         r"""Return ``L/dM`` for a represented intermediate lattice ``dM <= L <= M``."""

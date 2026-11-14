@@ -1,0 +1,21 @@
+PARI stack size set to 2147483648 bytes, maximum size set to 8589934592
+  k = 1: genus mass 2499347/9440684171518279680000, seed |Aut| 1941728542064640000
+[   188.9s]     automorphism_group(): 1941728542064640000 in 186.8s
+[   189.6s]     5 line orbits with q = 0 mod 4 of 131071 lines
+[   189.6s] k = 1: 1 classes, mass 1/1941728542064640000 vs 2499347/9440684171518279680000: equal False
+  k = 2: genus mass 642332179/18881368343036559360000, seed |Aut| 1941728542064640000
+[peakrss] issue286: child waited=124 shell_code=124 samples=1403
+[peakrss] peak tree RSS      : 2210 MiB
+[peakrss] low-water MemAvail : 918 MiB
+[peakrss] peak single VmHWM  : 2212 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     2202 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        0 MiB peak
+[peakrss]   t=   314.3s procs=  3 rss=  2210 MiB hwm=  2212 MiB avail=  8423 MiB
+[peakrss]   t=   316.3s procs=  3 rss=  2210 MiB hwm=  2212 MiB avail=  8287 MiB
+[peakrss]   t=   318.3s procs=  3 rss=  2210 MiB hwm=  2212 MiB avail=  8254 MiB
+[peakrss]   t=   320.3s procs=  3 rss=  2210 MiB hwm=  2212 MiB avail=  8278 MiB
+[peakrss]   t=   322.3s procs=  3 rss=  2210 MiB hwm=  2212 MiB avail=  8273 MiB
+launcher exit: 124

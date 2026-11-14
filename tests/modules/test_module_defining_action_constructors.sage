@@ -12,10 +12,10 @@ def test_a_map_z_plus_z6_to_z_plus_z3_lifts_to_a_map_of_presentations() -> None:
     """
     F = ZZ**2
     x, y = F.module_generator(0), F.module_generator(1)
-    source = F / F.submodule([6 * y])
+    source = F.subobject_on([6 * y]).inclusion().cokernel()
     G = ZZ**2
     u, v = G.module_generator(0), G.module_generator(1)
-    target = G / G.submodule([3 * v])
+    target = G.subobject_on([3 * v]).inclusion().cokernel()
 
     morphism = source.Mor(target)({0: target(u), 1: target(v)})
     assert morphism.kernel().cardinality() == 2
@@ -34,9 +34,9 @@ def test_three_constructions_of_z_mod_6_are_isomorphic() -> None:
     Source: by hand (the relation c kills a free summand).
     """
     F = ZZ**1
-    presented = F / F.submodule([6 * F.module_generator(0)])
+    presented = F.subobject_on([6 * F.module_generator(0)]).inclusion().cokernel()
     G = ZZ**2
-    stabilized = G / G.submodule([6 * G.module_generator(0), G.module_generator(1)])
+    stabilized = G.subobject_on([6 * G.module_generator(0), G.module_generator(1)]).inclusion().cokernel()
     ring_as_module = Modules(ZZ)(ZZ.quotient_ring(ZZ.ideal(6)))
 
     assert presented.is_isomorphic(ring_as_module)

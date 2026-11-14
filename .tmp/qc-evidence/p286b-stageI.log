@@ -1,0 +1,14 @@
+PARI stack size set to 4294967296 bytes, maximum size set to 4294967296
+[19:03:15] PARI stack raised to 4 GiB
+[19:03:16] algorithm=fast raised ValueError after 0.0 s: unknown algorithm
+[peakrss] issue275: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 271 MiB
+[peakrss] low-water MemAvail : 9866 MiB
+[peakrss] peak single VmHWM  : 272 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      261 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   271 MiB hwm=   272 MiB avail=  9866 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 10529 MiB
+launcher exit: 0

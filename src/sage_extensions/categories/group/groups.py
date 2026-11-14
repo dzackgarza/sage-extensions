@@ -171,6 +171,10 @@ def _engine_finiteness(engine, *, compute=False):
     return None
 
 
+_GAP_ELM_LIST = None
+"""GAP's ``ELM_LIST``, read on first use by :func:`_gap_elm_list`."""
+
+
 def _gap_model(group):
     r"""Return the GAP group modelling ``group``."""
     match group:
@@ -178,6 +182,36 @@ def _gap_model(group):
             return group._libgap_()
         case _:
             return _gap_model_of_engine(_engine_group(group))
+
+
+def _gap_elm_list():
+    r"""GAP's ``ELM_LIST`` function, read once per session."""
+    global _GAP_ELM_LIST
+    if _GAP_ELM_LIST is None:
+        _GAP_ELM_LIST = libgap.eval("ELM_LIST")
+    return _GAP_ELM_LIST
+
+
+def _gap_list_entry(list_object, position):
+    r"""The ``position``-th entry (zero-based) of a GAP list, at GAP's own index width.
+
+    ``GapElement_List.__getitem__`` casts its index through ``cdef int``, so
+    any position at or beyond ``2**31`` raises ``OverflowError: value too
+    large to convert to int`` although the position names a real entry --
+    a right transversal of index ``|O(A_L)| = 46998591897600`` is one such
+    list.  GAP's ``ELM_LIST`` takes the index as a GAP integer and answers
+    the same entry (measured on a list of length ``3*10**9``: position
+    ``2**31 + 5`` reads correctly through ``ELM_LIST`` and raises through
+    ``__getitem__``).  For every position a machine int can hold the two
+    agree, so this is one list read at the width its data requires.
+
+    ``position`` is zero-based, as every position this module retains is;
+    GAP's ``ELM_LIST`` is one-based, so the index handed over is
+    ``position + 1``.
+    """
+    if position < 0:
+        raise IndexError(f"{position} is not a position in a GAP list")
+    return _gap_elm_list()(list_object, position + 1)
 
 
 def _gap_model_of_engine(engine):
@@ -363,6 +397,26 @@ def _subgroup_from_gap(group, gap_subgroup):
             assert False, f"{group} does not construct subgroups from GAP data in this engine"
 
 
+def _place_decided_finiteness(group, decision) -> None:
+    r"""Record a decided finiteness answer as the group's placement.
+
+    The answer is the group's own exact engine decision — never the order of an
+    ambient group and never a count of generators — so stating it as a placement
+    is what lets ``_group_cardinality`` count the group: its first case is
+    exactly ``group in OwnedFiniteGroups()``.  An undecided answer places
+    nothing and the refusal stands.
+    """
+    from sage_extensions.refine import refine
+
+    match bool(decision):
+        case True:
+            if group not in OwnedFiniteGroups():
+                refine(group, OwnedFiniteGroups())
+        case False:
+            if group not in OwnedInfiniteGroups():
+                refine(group, OwnedInfiniteGroups())
+
+
 def _group_cardinality(group):
     r"""``|G|`` from the placement of the group ``G``.
 
@@ -390,11 +444,91 @@ def _group_cardinality(group):
         case _ if group in OwnedInfiniteGroups() and group in OwnedGroups().FinitelyGeneratedAsMagma():
             return aleph(0)
         case _:
-            assert False, (
-                f"cannot compute the cardinality of the group {group}: it is not known to be finite, "
-                f"it has no chosen free basis, and it is not known to be infinite and finitely "
-                f"generated (it is in {group.category()})"
-            )
+            # The group's own finiteness decision is the answer to "is this
+            # group finite"; asking it here is what makes the count independent
+            # of the order in which the question was reached.  The decision is
+            # the group's exact engine answer, and it is asked only after the
+            # placement and free-basis cases have declined.
+            decision = group.is_finite()
+            match decision:
+                case True:
+                    return cardinal(_finite_order(group))
+                case False if group in OwnedGroups().FinitelyGeneratedAsMagma():
+                    return aleph(0)
+                case _:
+                    assert False, (
+                        f"cannot compute the cardinality of the group {group}: its finiteness is "
+                        f"{decision}, it has no chosen free basis, and it is not known to be infinite "
+                        f"and finitely generated (it is in {group.category()})"
+                    )
+
+
+@cached_function
+def _gap_orthogonal_order_function():
+    r"""Compose GAP's classical containment and Wall-form computations.
+
+    Private finite-matrix order adapter, called only by ``_finite_order``.
+    ``RecogniseClassical``'s positive ``isOmegaContained`` answer certifies
+    containment (Niemeyer--Praeger, doi:10.1112/S0024611598000422;
+    https://gap-packages.github.io/recog/doc/chap7.html).
+    The joint determinant/spinor kernel is Omega in odd characteristic.
+    Its quotient image therefore gives the order of the supplied subgroup.
+    GAP's Wall form computes the spinor class as in the rational adapter
+    ``lattice_engines._gap_rational_spinor_norm_class`` (Taylor, p. 163).
+    Other matrix groups use GAP's exact Size computation.
+    """
+    libgap.LoadPackage("recog")
+    return libgap.eval(r"""function(G)
+    local F, q, d, B, recognition, generators, characters,
+          g, spinor, character, rank, sign, discriminant;
+    if HasSize(G) then
+        return Size(G);
+    fi;
+    F := FieldOfMatrixGroup(G);
+    q := Size(F);
+    d := Length(One(G));
+    recognition := RecogniseClassical(G);
+    if recognition.isOmegaContained <> true then
+        return Size(G);
+    fi;
+    generators := GeneratorsOfGroup(G);
+    B := MTX.InvariantBilinearForm(GModuleByMats(generators, F));
+    if B = fail or B <> TransposedMat(B) or DeterminantMat(B) = Zero(F) then
+        return Size(G);
+    fi;
+    if not ForAll(generators, g -> g * B * TransposedMat(g) = B) then
+        Error("the invariant bilinear form is not preserved by its group");
+    fi;
+    characters := [];
+    for g in generators do
+        character := [0, 0];
+        if DeterminantMat(g) <> One(F) then
+            character[1] := 1;
+        fi;
+        if not IsOne(g) then
+            spinor := DeterminantMat(WallForm(2 * B, g).form);
+            if spinor = Zero(F) then
+                Error("the Wall form of a nondegenerate isometry is degenerate");
+            fi;
+            if spinor^((q-1)/2) <> One(F) then
+                character[2] := 1;
+            fi;
+        fi;
+        Add(characters, character);
+    od;
+    rank := RankMat(ImmutableMatrix(GF(2), characters));
+    sign := 0;
+    if IsEvenInt(d) then
+        discriminant := (-One(F))^(d/2) * DeterminantMat(B);
+        if discriminant^((q-1)/2) = One(F) then
+            sign := 1;
+        else
+            sign := -1;
+        fi;
+    fi;
+    return Size(Omega(sign, d, q)) * 2^rank;
+end
+""")
 
 
 def _finite_order(group):
@@ -403,7 +537,17 @@ def _finite_order(group):
         case _ if group in GroupAutomorphismGroups():
             backend_order = _gap_model(group).Size().sage()
         case _:
-            backend_order = _engine_group(group).order()
+            engine = _engine_group(group)
+            if (
+                isinstance(engine, FinitelyGeneratedMatrixGroup_gap)
+                and engine.base_ring().is_finite()
+                and engine.base_ring().is_field()
+                and engine.base_ring().characteristic() != 2
+                and engine.degree() >= 5
+            ):
+                backend_order = _gap_orthogonal_order_function()(engine.gap()).sage()
+            else:
+                backend_order = engine.order()
     return _owned_engine_element(ZZ, ZZ(backend_order))
 
 
@@ -483,7 +627,20 @@ class _TransversalCoset(Element):
         return hash((id(self.parent()), self._position))
 
     def _repr_(self):
-        return f"{self.representative()} * {self.parent().subgroup}"
+        r"""Render the coset by its position, never by computing a representative.
+
+        A representative requires ``PreImagesRepresentative`` on the transversal,
+        which is a real computation and, in a coset space whose index exceeds
+        ``2**31``, may raise.  Rendering must not: the previous version printed
+        ``representative()`` and so any error being reported -- including a
+        ``KeyError`` whose message names a coset -- was replaced by whatever the
+        representative computation raised, which is exactly how a ``KeyError``
+        about an intersection subgroup was reported as an ``OverflowError`` in
+        ``repr``.  The position identifies the coset; the subgroup names the
+        space.
+        """
+        parent = self.parent()
+        return f"[coset {self._position} of {parent.subgroup}]"
 
 
 class _TransversalCosets(Parent):
@@ -495,6 +652,16 @@ class _TransversalCosets(Parent):
     When the owned group law reverses the engine law, gH instead maps
     directly to H*engine(g). In either case left translation becomes right
     multiplication in the transversal. No elements of H are enumerated.
+
+    Positions are read through GAP's own ``ELM_LIST``, not through Sage's
+    ``GapElement_List.__getitem__``. The latter binds its index with
+    ``cdef int``, so a transversal whose index exceeds ``2**31`` -- an
+    orthogonal group of the discriminant form of a rank-12 lattice already
+    has order ``46998591897600`` -- raises ``OverflowError: value too large
+    to convert to int`` on a perfectly valid position, while GAP's
+    ``ELM_LIST`` answers the same index exactly. Both agree on every
+    position a machine int could hold, so this is the same list read with
+    the index width the data needs.
     """
 
     def __init__(self, group, subgroup):
@@ -508,7 +675,11 @@ class _TransversalCosets(Parent):
         )
         Parent.__init__(self, category=Sets())
 
-    @cached_method
+    def _entry(self, position):
+        r"""The transversal's ``position``-th entry (zero-based) at full GAP index width."""
+        return _gap_list_entry(self._transversal, position)
+
+    @cached_method(key=lambda self, element: (id(element), element))
     def _multiplier(self, element):
         encoded = self._permutations.Image(_element_to_engine(self.group, element))
         return encoded if self._reversed else encoded.Inverse()
@@ -521,11 +692,11 @@ class _TransversalCosets(Parent):
         return _TransversalCoset(self, position)
 
     def representative(self, position):
-        encoded = self._permutations.PreImagesRepresentative(self._transversal[position])
+        encoded = self._permutations.PreImagesRepresentative(self._entry(position))
         return _element_from_engine(self.group, encoded if self._reversed else encoded.Inverse())
 
     def act(self, element, point):
-        image = self._transversal[point._position] * self._multiplier(element)
+        image = self._entry(point._position) * self._multiplier(element)
         return self.point(int(libgap.PositionCanonical(self._transversal, image)) - 1)
 
 
@@ -542,6 +713,25 @@ def _engine_left_coset_g_set(group, subgroup):
     return FiniteGSets(group).pointed_orbit(
         subgroup, points.point(points.position_of(group.one())), points.act,
     )
+
+
+def _engine_left_coset_positions(group, subgroup):
+    r"""GAP's transversal of ``G/H`` for a finite GAP-encoded ``G``, or ``None``.
+
+    The transversal position of ``g`` is the canonical key of ``gH``:
+    two elements have the same position exactly when they lie in the same
+    left coset (GAP Reference Manual 39.8-1, ``PositionCanonical`` on a
+    ``RightTransversal``). Without a finite GAP encoding of ``G`` there is
+    no canonical form, and the coset is decided by membership in ``H``.
+    Finiteness is read from the placed category before any engine is
+    requested: the engine of an infinite group such as an indefinite
+    ``O(L)`` is not a finite group.
+    """
+    if not group.category().is_subcategory(OwnedFiniteGroups()) or not group._supplies_engine():
+        return None
+    if _encodes_elements_in_gap(_engine_group(group)):
+        return _TransversalCosets(group, subgroup)
+    return None
 
 
 def _engine_cosets(group, subgroup, side):
@@ -617,6 +807,8 @@ def _engine_basis_label(basis, label):
     match basis:
         case _ if basis in FiniteSets():
             assert label in basis, f"{label!r} is not a free generator: it is not an element of the free basis {basis}"
+            if basis in EnumeratedSets():
+                return int(basis.ranking_map()(label))
             return next(position for position, candidate in enumerate(basis) if candidate == label)
         case _ if basis in OwnedRings():
             return _engine_element(basis, label)
@@ -628,6 +820,8 @@ def _owned_basis_label(basis, engine_label):
     r"""Return the point of an owned free basis indexed by the engine label."""
     match basis:
         case _ if basis in FiniteSets():
+            if basis in EnumeratedSets():
+                return basis.ranking_map().inverse()(int(engine_label))
             return next(candidate for position, candidate in enumerate(basis) if position == int(engine_label))
         case _ if basis in OwnedRings():
             return _owned_engine_element(basis, engine_label)
@@ -1845,6 +2039,76 @@ def _generated_subgroup(
     )
 
 
+def _supplied_generator(group, element):
+    r"""Read one supplied generator as an element of ``group``, from the construction that supplied it.
+
+    ``group.subgroup(generators)`` takes a family the caller states generates a subgroup of
+    ``group``.  On an infinite generated group that statement cannot be *checked*:
+    ``GeneratedSubgroups.membership_decision`` answers a general infinite
+    subgroup-membership question with an unevaluated proposition.  So the construction
+    reads a datum instead of asking the question — the datum of the construction that
+    supplied the element, never a premise the caller states about the family.
+
+    That datum is written by the subgroup that supplies the family: reading a group's own
+    selected generators (:meth:`OwnedGroups.ParentMethods.group_generators`) records each
+    of them as a member of the group it acts by, through the element-side mark a free
+    cover's word values get (:meth:`GeneratedSubgroups._mark_admitted`,
+    sage-extensions#287).  A stabilizer ``S = G.stabilizer(x)`` builds its generator family
+    in its own selected resolution, so the family ``S.group_generators()`` hands out
+    carries the mark naming ``S.supergroup() = G``;
+    ``G.subgroup(S.group_generators())`` reads that mark and puts no question to ``G``.
+
+    A family with no such mark is read exactly as before, through ``group(element)``: on a
+    finite group that is the membership decision — ``<-1>.subgroup((swap,))`` in ``O(U)``
+    refuses the swap, which is not in it — and on an infinite generated group it is the
+    present undecided-membership ``TypeError``.
+    """
+    if element_parent(element) is group:
+        return element
+    admits = getattr(group, "_admits_member", None)
+    if admits is not None and admits(element):
+        return element
+    return group(element)
+
+
+def _record_generators_in_supergroup(group, generators):
+    r"""Record each of ``group``'s own selected generators as a member of ``group.supergroup()``.
+
+    ``group_generators`` reads the family that ``group``'s selected resolution states
+    generates ``group``.  ``group`` is a subgroup of ``group.supergroup()`` by the
+    construction that built it, so each of those generators is a member of the supergroup
+    by construction too — and that is the datum the construction supplies when the family
+    is later handed to ``supergroup().subgroup(...)``, where a general membership question
+    about an infinite generated group is undecided (:func:`_supplied_generator`).
+
+    The record is the one a free cover's word values get: the groups whose construction
+    supplied the element, on the element, compared by identity
+    (:meth:`GeneratedSubgroups._mark_admitted`, sage-extensions#287).  It is written only
+    for a proper subgroup whose supergroup keeps that admission, so an ambient group, or a
+    supergroup with no such record, writes nothing and the later question is asked as
+    before.
+
+    The family itself is returned unchanged, the same object the resolution retains: the
+    resolution caches it, and handing back a mapped copy would make two reads of one
+    group's generators different objects.  The mark is on the elements, not a value of the
+    family.
+
+    This is the subgroup construction's own statement about its own generator family, and
+    nothing else: no family a caller merely asserts lies in the supergroup is admitted
+    here, which is the difference sage-extensions#341 draws between this datum and a
+    premise stated about arbitrary elements.
+    """
+    supergroup = group.supergroup()
+    if supergroup is group:
+        return generators
+    mark = getattr(supergroup, "_mark_admitted", None)
+    if mark is None:
+        return generators
+    for generator in generators:
+        mark(generator)
+    return generators
+
+
 def _engine_subgroup(
     group,
     generators,
@@ -1855,9 +2119,11 @@ def _engine_subgroup(
     r"""Return the subgroup of ``group`` generated by ``generators``, named ``description`` when given.
 
     ``refinements`` are placements proved by the calling construction
-    (``_generated_subgroup``).
+    (``_generated_subgroup``).  Each generator is read as an element of ``group`` by
+    :func:`_supplied_generator`, which reads the datum of the construction that supplied it
+    instead of putting a membership question to an infinite group.
     """
-    selected = finite_ordered_set(tuple(group(generator) for generator in generators))
+    selected = finite_ordered_set(tuple(_supplied_generator(group, generator) for generator in generators))
     return _generated_subgroup(
         group,
         selected,
@@ -1870,9 +2136,9 @@ def _engine_subgroup(
 def _image_subgroup(source, codomain, images, *, cardinality_decision=None):
     r"""The image ``f(source) <= codomain``, generated by ``images``, the images of generators of ``source``.
 
-    Every image route of a group morphism constructs through here, so the
-    image is placed finite when ``source`` is (``_finite_if_image_of``),
-    whichever generating family of ``source`` supplied ``images``.
+    The generator-image construction places the image finite when
+    ``source`` is (``_finite_if_image_of``), whichever generating family
+    supplied ``images``.
     """
     return _engine_subgroup(
         codomain,
@@ -2100,8 +2366,16 @@ def _symmetric_group(points):
     ``Omega`` is read through the ranking of ``Omega``.  The cache key is the
     defining datum ``Omega`` under its own equality, so equal point sets give
     one group and the engine is built once per point set.
+
+    The description names the degree and never formats the point set.  A
+    point set's display is not free data: a coset set's ``_repr_`` materializes
+    and validates every representative, so interpolating ``Omega`` here made
+    building ``Sym(Omega)`` cost as much as presenting ``Omega`` -- on the
+    port's Enriques case, 1800 s without returning.  The points themselves are
+    retained as the separately supplied ``symmetric_points``, which
+    ``natural_points()`` returns and which the action and its validation use;
+    only the naming is degree-based.
     """
-    from sage.groups.perm_gps.permgroup import PermutationGroup
     from sage.groups.perm_gps.permgroup_named import SymmetricGroup
 
     assert points in FiniteSets(), (
@@ -2116,21 +2390,20 @@ def _symmetric_group(points):
         *((OwnedGroups().Commutative(),) if size <= 2 else ()),
     )
     degree = int(size)
-    if standard:
-        engine = SymmetricGroup(degree)
-    elif degree <= 1:
-        engine = PermutationGroup(())
-    else:
-        transposition = [2, 1, *range(3, degree + 1)]
-        cycle = [*range(2, degree + 1), 1]
-        engine = PermutationGroup((transposition, cycle))
+    # ``Sym(Omega)`` is the full symmetric group on the ranked degree whatever
+    # the labels are, so the engine is the symmetric-group parent itself.  Its
+    # element constructor knows that every permutation of the degree lies in
+    # it; a generic two-generator permutation group carries the same
+    # generators and the same group but not that knowledge, so admitting an
+    # element ran a GAP membership test on the whole group instead.
+    engine = SymmetricGroup(degree)
     return _own_group(
         engine,
         refinements=refinements,
         description=(
             f"Symmetric group S_{size}"
             if standard
-            else f"Symmetric group on {points}"
+            else f"Symmetric group on {size} points"
         ),
         symmetric_points=points,
         constructing_category=OwnedGroups(),
@@ -2229,8 +2502,15 @@ def _SL(degree, ring, var="a"):
     # Do not allow a nonintegral rank through either the arithmetic witness
     # or the generic engine adapter. This is a defining group parameter,
     # not an approximate numerical argument to be rounded or truncated.
-    if degree not in ZZ or degree != ZZ(degree):
+    # Hosted integer elements are integral by design: their int() is exact,
+    # and a rank that cannot be read as one is the error being guarded.
+    try:
+        rank_int = int(degree)
+    except (TypeError, ValueError):
+        raise ValueError("SL_n(R) requires an integral rank") from None
+    if rank_int != degree:
         raise ValueError("SL_n(R) requires an integral rank")
+    degree = rank_int
     if degree < 1:
         raise ValueError("SL_n(R) requires a positive rank")
     # SL_n(ZZ) is constructed as the integral points of SL_n inside
@@ -3340,6 +3620,7 @@ class GroupMorphism:
         )
 
     _SECTION_ON_IMAGE = "set section on the image"
+    _KERNEL_GENERATORS = "kernel generators"
 
     @cached_method
     def _selected_data_registry(self):
@@ -3380,6 +3661,23 @@ class GroupMorphism:
         self._selected_data_registry()[self._SECTION_ON_IMAGE] = section
         return self
 
+    def select_kernel_generators(self, generators):
+        r"""Choose a lazy generating family of the kernel before constructing it.
+
+        ``generators()`` supplies elements of the source generating the
+        kernel. The kernel constructor retains their free augmentation as
+        its defining generating datum, before choosing generic computations.
+        """
+        assert not self.kernel.is_in_cache(), (
+            "kernel generators must be chosen before constructing the kernel"
+        )
+        registry = self._selected_data_registry()
+        assert self._KERNEL_GENERATORS not in registry, (
+            "kernel generators have already been selected on this morphism"
+        )
+        registry[self._KERNEL_GENERATORS] = generators
+        return self
+
     @cached_method
     def kernel(self):
         r"""``ker(f)``, one subgroup per morphism, so its selected generators persist."""
@@ -3387,14 +3685,17 @@ class GroupMorphism:
             KernelSubgroups,
         )
 
-        return KernelSubgroups(self.domain())(self)
+        generators = self._selected_data_registry().get(self._KERNEL_GENERATORS)
+        augmentation = None if generators is None else lambda kernel: kernel.free_cover(generators())
+        return KernelSubgroups(self.domain())(self, generating_morphism_factory=augmentation)
 
     @cached_method
     def image(self):
         r"""``f(G) <= H`` as a subgroup of the codomain.
 
         A selected finite source generating set determines the image by its
-        mapped generators.  The GAP image computation remains available for
+        mapped generators. A selected section on the image also supplies
+        exact membership through its domain. The GAP image computation remains available for
         other represented source maps.  The image of a morphism out of a
         finite group is placed finite at construction (``_image_subgroup``),
         with no order computed; the GAP route below is reached only by a
@@ -3408,6 +3709,18 @@ class GroupMorphism:
             if self._injectivity_premise is True
             else None
         )
+        if self.has_selected_section():
+            image_locus = self.selected_section().domain()
+            image = self.codomain().predicate_subgroup(
+                lambda element: element in image_locus,
+                f"image of {self}",
+                cardinality_decision=image_cardinality,
+            )
+            for refinement in (*_finite_if_bounded_by(self.codomain()), *_finite_if_image_of(source)):
+                image = refine(image, refinement)
+            return image.select_group_generators(
+                lambda: finite_ordered_set(tuple(image(self(generator)) for generator in source.group_generators()))
+            )
         if image_cardinality is not None and source in OwnedFiniteGroups():
             images_factory = (
                 lambda: tuple(self(generator) for generator in source.group_generators())
@@ -3499,9 +3812,8 @@ class GroupMorphism:
     def image_factorization(self):
         r"""Return ``G ->> im(f) -> H`` with the literal image inclusion.
 
-        The first arrow is induced by ``f`` and the existing inclusion's
-        inverse on its image; it is not an inclusion and need not be
-        injective. Its codomain is the actual represented subgroup, not a
+        The first arrow is the corestriction of ``f`` to its image; it
+        need not be injective. Its codomain is the actual represented subgroup, not a
         fresh group with an isomorphic underlying presentation.
 
         For the quotient ``C4 -> C2``, the first arrow is noninjective,
@@ -3509,14 +3821,21 @@ class GroupMorphism:
         """
         image = self.image()
         inclusion = image.inclusion()
-        return self.factor_through(inclusion), inclusion
+        if self._subgroup_premise:
+            return image.Mor(image).identity(), inclusion
+        return self._corestrict_to_subgroup(image), inclusion
 
     @cached_method
     def image_section(self):
         r"""A selected set section of G ->> im(f), when the image is finite.
 
-        Cayley traversal supplies private preimage witnesses; the returned
-        section is a Sets morphism, not generally a group morphism.
+        The returned section is a Sets morphism, not generally a group
+        morphism. When the image is GAP-encoded and the source has a selected
+        finite generating family, each requested value is lifted on its own:
+        GAP factors it as a word in the generator images, and the word is
+        evaluated in the source generators (``_image_word_lift``). Only the
+        values a consumer asks for are lifted. Otherwise the Cayley traversal
+        of the image supplies a witness above every element.
         """
         from sage_extensions.categories.sets.set_categories import Sets
 
@@ -3527,10 +3846,55 @@ class GroupMorphism:
                 f"a finite-image section of {self} needs its image {image} "
                 "to have a selected finite group realization"
             )
-        section = self.domain().finite_image_section(epic)
-        return Sets().Mor(image, self.domain())(
+        source = self.domain()
+        if (
+            _encodes_elements_in_gap(_engine_group(image))
+            and source.has_selected_group_resolution()
+            and source.has_selected_finite_group_generating_set()
+        ):
+            return Sets().Mor(image, source)(lambda value: self._image_word_lift(image(value)))
+        section = source.finite_image_section(epic)
+        return Sets().Mor(image, source)(
             lambda value: section(section.domain()(image(value)))
         )
+
+    @cached_method
+    def _image_word_section(self):
+        r"""The selected source generators and GAP's word section of their images in ``f(G)``."""
+        from sage_extensions.categories.orthogonal_quotients import _GapWordSection
+
+        epic, inclusion = self.image_factorization()
+        image = inclusion.domain()
+        generators = tuple(self.domain().group_generators())
+        return generators, _GapWordSection(
+            tuple(_element_to_engine(image, epic(generator)) for generator in generators)
+        )
+
+    def _image_word_lift(self, value):
+        r"""One source element above ``value`` of the finite image, by a word in the source generators.
+
+        GAP Reference Manual 39.5-1: ``PreImagesRepresentative`` of the
+        free-group epimorphism onto the generated image returns a word in the
+        supplied generator positions (``_GapWordSection``). The word evaluates
+        in the selected source generators, read in the owned order of the
+        image's law, and the lift is checked once against ``f``, as in
+        ``LatticeIsometryMor.discriminant_lift``.
+        """
+        epic, inclusion = self.image_factorization()
+        image = inclusion.domain()
+        generators, words = self._image_word_section()
+        letters = words.letters_of(_element_to_engine(image, value))
+        if _law_reversed(image):
+            letters = letters[::-1]
+        lift = self.domain().one()
+        for index in letters:
+            lift = lift * (generators[index - 1] if index > 0 else ~generators[-index - 1])
+        if epic(lift) != value:
+            raise ArithmeticError(
+                f"the word lift of {value} along {self} maps to {epic(lift)}: GAP's word section "
+                "is inconsistent with the morphism, so the lift cannot be trusted"
+            )
+        return lift
 
     def _image_model(self):
         r"""The GAP model of ``f(G)`` inside the model of a finite codomain."""
@@ -3616,8 +3980,8 @@ class GroupMorphism:
         Protected image-factorization construction: the input map lands in
         ``subgroup`` by its defining construction, rather than a membership
         algorithm. Subgroup elements keep their ambient representation.
-        Used for a supplied generating map of a predicate subgroup and for
-        restriction to a preimage. This does not admit a foreign whole map
+        Used for the canonical image factorization, a supplied generating
+        map of a predicate subgroup and restriction to a preimage. This does not admit a foreign whole map
         at a public Mor constructor.
         """
         assert subgroup.supergroup() is self.codomain()
@@ -3857,14 +4221,25 @@ class IndexedFreeGroupMorphism(GroupMorphism):
             tuple(self._admitted_generator_image(label) for label in basis),
         )
 
-    @cached_method
+    @cached_method(key=lambda self, index, sign: (id(index), index, sign))
     def _signed_generator_image(self, index, sign):
         r"""The image of one letter of a reduced word, a basis element to the power ``sign``."""
         return self._admitted_generator_image(index) ** sign
 
     def _evaluate_reduced_word(self, element):
+        r"""Evaluate a word by its letters, and retain the value as a member of a subgroup.
+
+        The letters are the images of the selected free basis, so the product of a word
+        is an element of the codomain *by this evaluation*, even when the codomain is an
+        infinite generated subgroup for which a general membership question is
+        undecided.  Retaining the value is the range law of this map: a consumer that
+        later coerces the value back into the codomain — a coset or double-coset
+        section, say — reads that admission instead of asking a solver
+        (``GeneratedSubgroups.membership_decision``).  The inverse is retained with it,
+        because inverting a word reverses it and no solver is needed for that either.
+        """
         codomain = self.codomain()
-        return reduce(
+        value = reduce(
             mul,
             (
                 self._signed_generator_image(index, sign)
@@ -3872,6 +4247,10 @@ class IndexedFreeGroupMorphism(GroupMorphism):
             ),
             codomain.one(),
         )
+        retain = getattr(codomain, "_retain_admitted_member", None)
+        if retain is not None and codomain.supergroup() is not codomain:
+            retain(value)
+        return value
 
     def postcompose(self, morphism):
         assert morphism.domain() is self.codomain(), (
@@ -4750,13 +5129,13 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 raise TypeError(f"the product of {family} cannot be formed in {self}: some factor is not an object of {self}")
             labels = tuple(family.index_set())
             # GAP's DirectProduct serves families of finitely presented
-            # groups, and of finite groups realized as permutation groups,
-            # whose product it returns as a permutation group; every other
+            # groups, and finite groups with native GAP elements, transported
+            # through their permutation isomorphisms; every other
             # family is realized on families of components.
             if labels and not (
                 all(factor in GroupsWithChosenFinitePresentation() for factor in family)
                 or all(
-                    factor in OwnedFiniteGroups() and _encodes_as_permutations(_engine_group(factor))
+                    factor in OwnedFiniteGroups() and _encodes_elements_in_gap(_engine_group(factor))
                     for factor in family
                 )
             ):
@@ -4771,21 +5150,25 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 # factors even when the caller selected Grp rather than Ab.
                 all_abelian = all(family[label] in OwnedAbelianGroups() for label in labels)
                 # GAP's FP direct product is an FP group for FP inputs (49.1-1).
-                # Convert mixed finite factors through their FP isomorphisms,
-                # preserving the comparison maps used below.
+                # Finite native factors use permutation isomorphisms; mixed
+                # FP factors use FP isomorphisms. The comparison maps remain
+                # in every projection and mediating homomorphism below.
                 presentation_isomorphisms = (
                     ()
-                    if all_finite
+                    if all_finite and all(_encodes_as_permutations(_engine_group(family[label])) for label in labels)
                     else tuple(
-                        _gap_model(family[label]).IsomorphismFpGroup()
-                        if family[label] in OwnedFiniteGroups()
-                        else libgap.IdentityMapping(_gap_model(family[label]))
+                        _gap_model(family[label]).IsomorphismPermGroup()
+                        if all_finite else (
+                            _gap_model(family[label]).IsomorphismFpGroup()
+                            if family[label] in OwnedFiniteGroups()
+                            else libgap.IdentityMapping(_gap_model(family[label]))
+                        )
                         for label in labels
                     )
                 )
                 engines = (
                     tuple(_gap_model(family[label]) for label in labels)
-                    if all_finite
+                    if not presentation_isomorphisms
                     else tuple(isomorphism.Image() for isomorphism in presentation_isomorphisms)
                 )
                 product_engine = libgap.DirectProduct(*engines)
@@ -5342,6 +5725,14 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
 
     class ParentMethods:
         @RealizationHook
+        def _supplies_engine(self) -> bool:
+            r"""Whether :meth:`_engine_group` realizes this group, so engine-backed operations may be asked of it.
+
+            A realization whose engine exists only under a hypothesis overrides this with that hypothesis.
+            """
+            return True
+
+        @RealizationHook
         def _engine_group(self):
             r"""The selected group engine, when a realization supplies one (``OWN-05``)."""
             assert False, (
@@ -5394,16 +5785,19 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
 
         def has_selected_finite_group_generating_set(self) -> bool:
             r"""Whether the selected group resolution has finitely many degree-zero generators."""
-            match self.has_selected_group_resolution():
-                case False:
+            if not self.has_selected_group_resolution():
+                return False
+            try:
+                return bool(
+                    self.selected_group_resolution()
+                    .generating_set()
+                    .cardinality()
+                    .is_finite()
+                )
+            except ValueError as e:
+                if "no retained finite generating family" in str(e):
                     return False
-                case True:
-                    return bool(
-                        self.selected_group_resolution()
-                        .generating_set()
-                        .cardinality()
-                        .is_finite()
-                    )
+                raise
 
         def selected_group_resolution(self):
             return self.selected_resolution(OwnedGroups())
@@ -5428,8 +5822,22 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             return next(iter(generators))
 
         def group_generators(self):
-            return self.selected_group_resolution().generators(
-                name="Group generators"
+            r"""The selected generating family of ``self``, recorded in the group it acts by.
+
+            Each of ``self``'s selected generators generates ``self``, so it is a member of
+            ``self.supergroup()`` by the construction that built ``self`` as a subgroup;
+            reading the family here writes that datum on the elements
+            (:func:`_record_generators_in_supergroup`), which is what a later
+            ``supergroup().subgroup(self.group_generators())`` reads instead of asking an
+            infinite generated subgroup a membership question it cannot answer
+            (:func:`_supplied_generator`, sage-extensions#341).  The mark is written on each
+            element as the family is read and asks for no computation of its own, and the
+            returned family is still the resolution's own object, so two reads of one
+            group's generators remain the same objects.
+            """
+            return _record_generators_in_supergroup(
+                self,
+                self.selected_group_resolution().generators(name="Group generators"),
             )
 
         def is_trivial(self):
@@ -5602,6 +6010,7 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 return groups.Mor(self, codomain)
             raise TypeError(f"the homomorphisms {self} -> {codomain} in {category} are not group homomorphisms: {codomain} must be a group and {category} a category of groups")
 
+        @RealizationHook
         def _finiteness_decision(self):
             match self:
                 case _ if self in OwnedFiniteGroups():
@@ -5872,7 +6281,11 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
                 )
                 image_bound = int(codomain.cardinality())
             original_bound = image_bound
-            image_bound = int(image_bound)
+            try:
+                bound_int = image_bound.__index__()
+            except (TypeError, ValueError, AttributeError):
+                raise ValueError("the finite-image cardinality bound must be an integer") from None
+            image_bound = bound_int
             if image_bound != original_bound:
                 raise ValueError("the finite-image cardinality bound must be an integer")
             if image_bound < 1:
@@ -5942,11 +6355,20 @@ class OwnedGroups(CategoryPacketMethods, OwnedCategory):
             )
 
         def subgroup(self, generators, description=None, *, cardinality_decision=None):
-            r"""Return the subgroup of ``self`` generated by ``generators``, named ``description`` when given."""
+            r"""Return the subgroup of ``self`` generated by ``generators``, named ``description`` when given.
+
+            A subgroup ``H <= G`` of a finite group is finite by Lagrange's
+            theorem, ``|G| = |H| [G : H]``, so the subgroup is placed in finite
+            groups at construction when the ambient group is, and no order is
+            computed (``_finite_if_bounded_by``, ``CON-07``).  A generated
+            subgroup of a group that is not known finite makes no finiteness
+            claim here: its own finiteness is decided by its engine when asked.
+            """
             return _engine_subgroup(
                 self,
                 generators,
                 description,
+                refinements=_finite_if_bounded_by(self),
                 cardinality_decision=cardinality_decision,
             )
 
@@ -6882,6 +7304,17 @@ class GroupsWithChosenFreeBasis(OwnedCategory):
             r"""Return the reduced word as an owned finite family of signed generators."""
             return _reduced_word(self, element)
 
+        def reduced_word_syllables(self, element):
+            r"""Return the reduced word of ``element`` as ``(basis point, exponent)`` syllables.
+
+            This is the decomposition a caller needs in order to realize a word of
+            this free group in another engine: each syllable names one point of the
+            free basis and a nonzero exponent, and consecutive letters on one basis
+            point are merged, so the same element has the same syllables whichever
+            free-group engine computed it.
+            """
+            return _reduced_word_syllables(self, element)
+
         def _conjugacy_decision(self, source, target) -> bool:
             r"""Conjugacy in a free group is decided by cyclic reduction of reduced words."""
             return _free_group_conjugacy(self, source, target)
@@ -7109,18 +7542,24 @@ class SymmetricGroups(OwnedCategory):
             self._symmetric_points = symmetric_points
             super().__init__(**rest)
 
+        @cached_method
+        def _natural_point_ranking_and_inverse(self):
+            r"""The ranking and inverse fixed by this group's selected point set."""
+            ranking = finite_ordered_set(self.natural_points()).ranking_map()
+            return ranking, ranking.inverse()
+
         def _permutation_point_action(self, backend_element, point):
             points = self.natural_points()
             if point not in points:
                 raise ValueError(
                     f"{point} is outside the selected permutation domain {points}"
                 )
-            ranking = points.ranking_map()
+            ranking, point_at_position = self._natural_point_ranking_and_inverse()
             position = int(ranking(points(point))) + 1
             # The inverse of the selected ranking map is the mathematical
             # unranking operation, even when the enumeration is not stored
             # as a Python tuple or has a nontrivial selected order.
-            return ranking.inverse()(int(backend_element(position)) - 1)
+            return point_at_position(int(backend_element(position)) - 1)
 
         def natural_points(self):
             return self._symmetric_points
@@ -7845,6 +8284,20 @@ class Subgroups(OwnedParameterizedCategory):
             match self:
                 case _ if self in GeneratedSubgroups(self.supergroup()):
                     generators = self.selected_subgroup_generators()
+                case _ if (
+                    hasattr(self, "character_data_is_complete")
+                    and self.character_data_is_complete()
+                    and hasattr(self.supergroup(), "discriminant_representation")
+                    and morphism is self.supergroup().discriminant_representation()
+                ):
+                    # A subgroup retained as chi^-1(S) by complete character
+                    # data knows its discriminant image as a generated
+                    # subgroup of O(A_L): the meet of its preimage targets
+                    # with the rho-images of the sign kernels it intersects.
+                    # Computing it from a generating family of the subgroup is
+                    # what this case avoids; it is exact by the character
+                    # quotient's construction.
+                    return self.discriminant_image()
                 case _ if self.has_selected_group_resolution():
                     generators = self.group_generators()
                 case _ if self in OwnedFiniteGroups():
@@ -7916,6 +8369,48 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
                 self._selected_subgroup_generators = self.group_generators()
             return self._selected_subgroup_generators
 
+        def _retain_admitted_member(self, element):
+            r"""Mark an element this subgroup's own construction supplied, on the element.
+
+            Protected ingress contract, the group's form of
+            ``_ConditionSetEngine._retain_admitted_member`` (``OWN-05``): the caller is a
+            realisation whose range is this subgroup *by construction* — here the free
+            cover's word evaluation, whose letters are the selected generators — so the
+            value's membership is supplied, not solved.  A general membership question
+            about an infinite generated subgroup stays undecided
+            (:meth:`membership_decision`); this mark is not an answer to it, only the
+            statement that this element arrived through a map into this subgroup.
+
+            The mark is a tuple of the groups on the element itself, compared by
+            identity, so it lives exactly as long as the element does.  A record on the
+            subgroup instead would retain one entry per value of the cover's word
+            evaluation, which is one entry per word: that grows without bound in the
+            subgroup for exactly the walks this admission exists to serve
+            (sage-extensions#292 is the same shape one call away).  Elements of this
+            library are not reliably equatable — ``hash`` is the parent's for some owned
+            families, and on the #287 specimen an isometry satisfies
+            ``value == ~value`` — so the marks are compared by identity, not by value.
+
+            The inverse is marked with the value: ``k^-1`` for a word ``k`` is that word
+            reversed, which needs no solver and no further construction.
+            """
+            self._mark_admitted(element)
+            self._mark_admitted(~element)
+            return element
+
+        def _mark_admitted(self, element):
+            r"""Record this subgroup on ``element`` as one of the maps into it that supplied it."""
+            admitted = getattr(element, "_admitted_subgroups", ())
+            if not any(group is self for group in admitted):
+                element._admitted_subgroups = (*admitted, self)
+            return element
+
+        def _admits_member(self, candidate) -> bool:
+            r"""Whether ``candidate`` is an element this subgroup's own constructions supplied."""
+            return any(
+                group is self for group in getattr(candidate, "_admitted_subgroups", ())
+            )
+
         def _cardinality_decision(self):
             if self._selected_cardinality_decision is not None:
                 return cardinal(self._selected_cardinality_decision())
@@ -7926,25 +8421,43 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
             r"""Decide a supplied rational matrix subgroup with its selected engine.
 
             Finiteness of a subgroup is independent of whether its ambient
-            group is finite. Engine computation occurs only when asked,
-            never while constructing or placing the generated subgroup.
+            group is finite, and no ambient order is read here.  Engine
+            computation occurs only when asked, never while constructing or
+            placing the generated subgroup; the answer it gives is then stated
+            as the subgroup's placement, so that ``cardinality()`` and every
+            other consumer read the decision instead of re-deriving it.
             """
             if self in OwnedFiniteGroups():
                 return True
             if self in OwnedInfiniteGroups():
                 return False
             decision = _engine_finiteness(_engine_group(self), compute=True)
-            return AtomicProposition("is_finite", self) if decision is None else decision
+            if decision is None:
+                return AtomicProposition("is_finite", self)
+            _place_decided_finiteness(self, decision)
+            return decision
 
         def membership_decision(self, candidate, *, word=None):
             r"""Membership certified by a word in the selected free generators.
 
             When no word is supplied, a general infinite matrix-subgroup
-            membership question remains an unevaluated proposition.
+            membership question remains an unevaluated proposition — unless this
+            subgroup's own constructions supplied the element: a value of the selected
+            free cover's word evaluation is a member by that map's range law
+            (:meth:`_retain_admitted_member`), and reading that admission is a
+            certificate, not a search.
             """
             ambient = self.supergroup()
             if candidate not in ambient:
                 return False
+            if self._admits_member(candidate):
+                return True
+            generators = self.selected_subgroup_generators()
+            if word is None and generators.is_empty() is True:
+                # The empty family generates {1}; its membership question is
+                # exactly equality with the ambient identity, including when
+                # that equality is an owned proposition.
+                return candidate == ambient.one()
             if word is not None:
                 free = self.selected_group_resolution().level(0)
                 labels = self.selected_subgroup_generators()
@@ -7957,9 +8470,19 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
                 if ambient.is_finite() is True:
                     return _engine_subgroup_admits(self, candidate)
                 return AtomicProposition("is_member", candidate, self)
-            if candidate == ambient.one() or any(
+            if candidate == ambient.one():
+                return True
+            if self in OwnedFiniteGroups():
+                return _engine_subgroup_admits(self, candidate)
+            # A selected generator or its inverse has a one-letter word
+            # certificate, decided by the supplied set's membership operation.
+            if generators.is_parent_of(candidate) is True:
+                return True
+            if generators.is_parent_of(~candidate) is True:
+                return True
+            if any(
                 candidate == generator or candidate == ~generator
-                for generator in self.selected_subgroup_generators()
+                for generator in generators
             ):
                 return True
             if self.is_finite() is True:

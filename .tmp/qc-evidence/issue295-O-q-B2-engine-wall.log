@@ -1,0 +1,43 @@
+T_Co: Integral lattice of rank 11 and signature (2, 9) even: True det: -2048
+A: Finitely presented module on 11 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]
+  cardinality: 2048
+[     6.7] A
+  generators: 11
+   q(g) = [0] in Fraction Field of Integer Ring / (2)Integer Ring  b(g,g) = [0] in Fraction Field of Integer Ring / (1)Integer Ring
+   q(g) = [0] in Fraction Field of Integer Ring / (2)Integer Ring  b(g,g) = [0] in Fraction Field of Integer Ring / (1)Integer Ring
+   q(g) = [0] in Fraction Field of Integer Ring / (2)Integer Ring  b(g,g) = [0] in Fraction Field of Integer Ring / (1)Integer Ring
+[     7.0] q values
+  A._quadratic RAISED AttributeError 'OwnedJoinCategory.parent_class[_PresentedModule].ObjectType' object has no attribute '_quadratic'
+  A._modulus RAISED AttributeError 'OwnedJoinCategory.parent_class[_PresentedModule].ObjectType' object has no attribute '_modulus'
+  A._modulus_qf RAISED AttributeError 'OwnedJoinCategory.parent_class[_PresentedModule].ObjectType' object has no attribute '_modulus_qf'
+[     7.0] attributes
+  A.unformed_module(): Finitely presented module on 11 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]
+  smith engine: True
+[     7.0] smith engine
+Timeout (0:03:00)!
+Thread 0x00007a0d5d600780 [python] (most recent call first):
+  File "/sage/.venv/lib/python3.14/site-packages/sage/groups/fqf_orthogonal.py", line 533 in orbits
+  File "/sage/.venv/lib/python3.14/site-packages/sage/groups/fqf_orthogonal.py", line 563 in _isom_fqf
+  File "/sage/.venv/lib/python3.14/site-packages/sage/modules/torsion_quadratic_module.py", line 875 in orthogonal_group
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2839 in _engine_orthogonal_group
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2004 in _engine_group
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 155 in _engine_group
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 540 in _finite_order
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 438 in _group_cardinality
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 5937 in _cardinality_decision
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 2496 in cardinality
+  File "/probe.py", line 47 in <module>
+[peakrss] issue275: child waited=124 shell_code=124 samples=70
+[peakrss] peak tree RSS      : 540 MiB
+[peakrss] low-water MemAvail : 707 MiB
+[peakrss] peak single VmHWM  : 547 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      536 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   154.3s procs=  3 rss=   540 MiB hwm=   547 MiB avail=   707 MiB
+[peakrss]   t=   292.3s procs=  3 rss=   540 MiB hwm=   547 MiB avail=   727 MiB
+[peakrss]   t=   298.9s procs=  3 rss=   540 MiB hwm=   547 MiB avail=  5319 MiB
+[peakrss]   t=   101.2s procs=  3 rss=   539 MiB hwm=   546 MiB avail=   738 MiB
+[peakrss]   t=   137.0s procs=  3 rss=   539 MiB hwm=   546 MiB avail=   730 MiB
+launcher exit: 124

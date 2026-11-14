@@ -1,0 +1,88 @@
+card 029J Otilde+ lines: 528
+build Otilde+(T_En): 5.51s
+Traceback (most recent call last):
+  File "/probe.py", line 16, in <module>
+    print("sign descent:", q._sign_descent_rank(), flush=True)
+                           ~~~~~~~~~~~~~~~~~~~~^^
+  File "sage/misc/cachefunc.pyx", line 2328, in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1065, in _sign_descent_rank
+    _engine, im_rho, _section, ambient = self._im_rho_engine_and_section()
+                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "sage/misc/cachefunc.pyx", line 2328, in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 1008, in _im_rho_engine_and_section
+    ambient = self._ambient_generators()
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 489, in _ambient_generators
+    and ambient.has_selected_finite_group_generating_set()
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 5643, in has_selected_finite_group_generating_set
+    self.selected_group_resolution()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 5654, in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 383, in selected_resolution
+    resolution = selected.realize()
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py", line 116, in realize
+    return self._resolution_factory()
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 1174, in selected_resolution
+    generators = generating_set()
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/arrow_categories.py", line 2390, in <lambda>
+    lambda: self.core_category().base_category()._core_automorphism_generators(self)
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 2267, in _core_automorphism_generators
+    return core_mor._computed_group_generators()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "sage/misc/cachefunc.pyx", line 2328, in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3998, in _computed_group_generators
+    for generator in automorphism_group_generators(category, lattice)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/marked_lattices.py", line 111, in automorphism_group_generators
+    generators = RECURSION.orthogonal_group_generators(marked)
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 834, in orthogonal_group_generators
+    generators = self._generation_step(profile.signed_view)
+  File "/work/src/sage_indefinite_port/indefinite/recursive.py", line 852, in _generation_step
+    return model.approximate_generators() + self.pointed_automorphism_generators(vector) + transporters
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/work/src/sage_indefinite_port/indefinite/eichler.py", line 901, in approximate_generators
+    for generator in envelope.stabilizer_of_lattice().stabilizer().group_generators():
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 215, in <genexpr>
+    self._value_at_normalized_index(index)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/indexed_families.py", line 118, in _value_at_normalized_index
+    self._rank_value_cache[rank] = self._value_function(normalized)
+                                   ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/resolutions.py", line 951, in generator
+    return self.generator_morphism()(labels(label))
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 795, in __call__
+    return function(element, *args, **kwargs)
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 758, in <lambda>
+    function = lambda point, *args, **kwargs: left(
+                                              ~~~~^
+        right(point), *args, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 3164, in __call__
+    return normalize(self.codomain(), self._owned_function(point, *args, **kwargs))
+                                      ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 4111, in _evaluate_reduced_word
+    retain(value)
+    ~~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py", line 4296, in _retain_admitted_member
+    point = self.universe()(element)
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 1559, in __call__
+    return self._element_constructor_(value)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 1571, in _element_constructor_
+    if element not in self:
+       ^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/group/groups.py", line 1594, in __contains__
+    raise TypeError(f"membership of {value} in {self} is undecided; supply a word witness to membership_decision")
+TypeError: membership of Morphism from Lattice of rank 12 and signature (2, 10) to Lattice of rank 12 and signature (2, 10) in Subgroup of Orthogonal group O(Lattice of rank 12 and signature (2, 10)) is undecided; supply a word witness to membership_decision
+launcher exit: 1

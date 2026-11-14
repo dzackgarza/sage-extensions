@@ -36,6 +36,19 @@ def test_the_preimage_of_e0_under_a_determinant_one_map_is_e0_minus_e1() -> None
     assert f.preimage(x) == x - y
 
 
+def test_the_image_of_a_rational_line_in_the_plane_has_no_transverse_preimage() -> None:
+    r"""For e -> x, the image is QQ*x: multiples of x lift and y does not."""
+    line, plane = QQ**1, QQ**2
+    e = line.module_generator(0)
+    x, y = plane.module_generator(0), plane.module_generator(1)
+    inclusion = line.Mor(plane)({0: x})
+
+    assert inclusion.preimage(x) == e
+    assert inclusion.is_in_image(y) is False
+    assert inclusion.preimage(3 * x) == 3 * e
+    assert inclusion.is_in_image(x + y) is False
+
+
 def test_the_swap_of_the_rational_plane_is_an_involution_in_its_automorphism_group() -> None:
     r"""$\sigma: e_0 \leftrightarrow e_1$ has $\sigma^2 = 1$ and $(\sigma + f)(e_0) = 2e_0 + 2e_1$."""
     plane = QQ ^ 2

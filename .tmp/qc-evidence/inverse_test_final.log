@@ -1,0 +1,5 @@
+### pytest (repo configuration) -o addopts= -p sage_extensions.testing.test_lint tests/lattices/test_integral_restriction_stores_a_true_inverse.sage at 2026-11-05T22:14:42Z
+...                                                                      [100%]
+3 passed in 9.74s
+### exit=0
+2026-11-05T22:15:00Z

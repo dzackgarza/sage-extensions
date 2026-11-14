@@ -1,0 +1,39 @@
+cusp 1: library eta e,f = 1, 0; q 0; pairing with the card's vector 1
+  card vector in T_En [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  library eta in T_En [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  equal up to sign: False
+cusp 2: library eta e,f = 0, 0; q 0; pairing with the card's vector 0
+  card vector in T_En [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  library eta in T_En [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  equal up to sign: True
+cusp 3: library eta e,f = 0, 0; q 0; pairing with the card's vector 0
+  card vector in T_En [0, 0, 1, 1, -2, -3, -4, -6, -5, -4, -3, -2]
+  library eta in T_En [0, 0, 1, 1, -2, -3, -4, -6, -5, -4, -3, -2]
+  equal up to sign: True
+cusp 4: library eta e,f = 0, 0; q 0; pairing with the card's vector 2
+  card vector in T_En [0, 0, 2, 1, -4, -5, -7, -10, -8, -6, -4, -2]
+  library eta in T_En [0, 0, 1, 2, -4, -5, -7, -10, -8, -6, -4, -2]
+  equal up to sign: False
+cusp 5: library eta e,f = 2, 2; q 0; pairing with the card's vector 0
+  card vector in T_En [2, 2, 0, 0, -4, -5, -7, -10, -8, -6, -4, -2]
+  library eta in T_En [2, 2, 0, 0, -4, -5, -7, -10, -8, -6, -4, -2]
+  equal up to sign: True
+cusp 4: pairings of the 11 printed roots with the card's line [-6, 14, -8, 14, 6, 8, 12, 0, -6, -6, -12]
+  with the library's line [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+cusp 5: pairings of the 14 printed roots with the card's line [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  with the library's line [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[  200.39s] done
+[peakrss] p298h: child waited=0 shell_code=0 samples=103
+[peakrss] peak tree RSS      : 746 MiB
+[peakrss] low-water MemAvail : 8601 MiB
+[peakrss] peak single VmHWM  : 746 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      736 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   202.2s procs=  3 rss=   746 MiB hwm=   746 MiB avail= 10490 MiB
+[peakrss]   t=   204.2s procs=  3 rss=   746 MiB hwm=   746 MiB avail= 10208 MiB
+[peakrss]   t=   200.2s procs=  3 rss=   745 MiB hwm=   745 MiB avail= 10568 MiB
+[peakrss]   t=   198.2s procs=  3 rss=   744 MiB hwm=   744 MiB avail= 10568 MiB
+[peakrss]   t=   196.2s procs=  3 rss=   740 MiB hwm=   740 MiB avail= 10577 MiB
+launcher exit: 0

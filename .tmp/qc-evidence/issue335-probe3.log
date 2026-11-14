@@ -1,0 +1,8 @@
+PARI stack size set to 2147483648 bytes, maximum size set to 8589934592
+
+===== k = 2 =====
+[     0.1s] card lattice: rank 21 det -4 signature (2, 19)
+[   125.8s] card lattice: 1 O(L) line classes
+[   125.8s]   line 0: split certified
+[   125.8s]     the hyperbolic span has determinant -1
+[   126.9s]     K_v: rank 19 det 4 signature (1, 18)

@@ -1,0 +1,65 @@
+source SHA: 4f7fad73d7fcba6c09997ed92f9e6361beb84d1b
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+[     0.7s] lattices built
+[     0.7s] E8(-1)^2 gram is block-diagonal with two equal E8(-1) blocks
+[     0.9s] E8(-1) shell sizes up to 4: [1, 240, 2160, 6720]
+[     0.9s] roots at index 1, norm-(-4) shell at index 2
+[     1.3s] norm-(-4) vectors of one E8(-1) summand: 2160
+[     7.1s] |O(E8(-1)^2)| = 970864271032320000
+[     7.1s] |O(D16+(-1))| = 685597979049984000
+[    10.8s] candidate 0: square -8, divisibility 1, neighbour det 1, class D16+(-1) (|O| = 685597979049984000)
+[    10.8s] GOOD: this diagonal has neighbour in the class of D16+(-1)
+[    10.8s] chosen v (one E8(-1) summand): [3, 6, 9, 8, 6, 4, 2, 4]
+[    10.8s] chosen w = v + v (E8(-1)^2 coordinates): [3, 6, 9, 8, 6, 4, 2, 4, 3, 6, 9, 8, 6, 4, 2, 4]
+[    10.8s] K' gram:
+[-8 -1  0 -2  4 -2  0  0  0  0  0  0  0  0  0  0]
+[-1 -2  1 -1  1  0  0  0  0 -1  1 -1  1  0  0  0]
+[ 0  1 -2  1  0  0  0  0  0  0  0  0  0  0  0  0]
+[-2 -1  1 -2  1  0  0  0  1  0  0  0  0  0  0  0]
+[ 4  1  0  1 -4  1  0  0  2  0  0  1 -2  0  0  0]
+[-2  0  0  0  1 -2  1  0  0  0  0  0  0  0  0  0]
+[ 0  0  0  0  0  1 -2  1  0  0  0  0  0  0  0  0]
+[ 0  0  0  0  0  0  1 -2  0  0  0  0  0  0  0  0]
+[ 0  0  0  1  2  0  0  0 -4  0  0 -1  2  0  0  0]
+[ 0 -1  0  0  0  0  0  0  0 -2  1  0  0  0  0  0]
+[ 0  1  0  0  0  0  0  0  0  1 -2  1  0  0  0  0]
+[ 0 -1  0  0  1  0  0  0 -1  0  1 -2  2  0  0  0]
+[ 0  1  0  0 -2  0  0  0  2  0  0  2 -4  1  0  0]
+[ 0  0  0  0  0  0  0  0  0  0  0  0  1 -2  1  0]
+[ 0  0  0  0  0  0  0  0  0  0  0  0  0  1 -2  1]
+[ 0  0  0  0  0  0  0  0  0  0  0  0  0  0  1 -2]
+[    10.9s] L1 = U + E8(-1)^2 gram has the hyperbolic plane first
+[    10.9s] u = 2f + w + 2e is isotropic of divisibility one
+[    10.9s] z = z0 - (z0^2/2)u with z0^2 = -2: u.z = 1, z^2 = 0
+[    13.7s] (u^perp cap z^perp) class: D16+(-1) (|O| = 685597979049984000)
+[    13.7s] M1 gram:
+[-8 -7  0  0  0  4  0  0  0 -4  0  0  0  2  0  0]
+[-7 -8  0  0  0  4  0  0  0 -4  0  0  0  2  0  0]
+[ 0  0 -2  1  0  0  0  0  0  0  0  0  0  0  0  0]
+[ 0  0  1 -2  1  0  0  0  0  0  0  0  0  0  0  0]
+[ 0  0  0  1 -2  1  0  0  0  1  0  0  0  0  0  0]
+[ 4  4  0  0  1 -4  1  0  0  2  0  0  0 -1  0  0]
+[ 0  0  0  0  0  1 -2  1  0  0  0  0  0  0  0  0]
+[ 0  0  0  0  0  0  1 -2  1  0  0  0  0  0  0  0]
+[ 0  0  0  0  0  0  0  1 -2  0  0  0  0  0  0  0]
+[-4 -4  0  0  1  2  0  0  0 -4  0  0  0  1  0  0]
+[ 0  0  0  0  0  0  0  0  0  0 -2  1  0  0  0  0]
+[ 0  0  0  0  0  0  0  0  0  0  1 -2  2  0  0  0]
+[ 0  0  0  0  0  0  0  0  0  0  0  2 -4  1  0  0]
+[ 2  2  0  0  0 -1  0  0  0  1  0  0  1 -2  1  0]
+[ 0  0  0  0  0  0  0  0  0  0  0  0  0  1 -2  1]
+[ 0  0  0  0  0  0  0  0  0  0  0  0  0  0  1 -2]
+[peakrss] issue380-kneser: child waited=0 shell_code=0 samples=13
+[peakrss] peak tree RSS      : 408 MiB
+[peakrss] low-water MemAvail : 3342 MiB
+[peakrss] peak single VmHWM  : 408 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      397 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    24.1s procs=  3 rss=   408 MiB hwm=   408 MiB avail=  3342 MiB
+[peakrss]   t=    20.1s procs=  3 rss=   407 MiB hwm=   407 MiB avail=  3390 MiB
+[peakrss]   t=    22.1s procs=  3 rss=   407 MiB hwm=   407 MiB avail=  3404 MiB
+[peakrss]   t=    18.1s procs=  3 rss=   401 MiB hwm=   401 MiB avail=  3394 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   396 MiB hwm=   396 MiB avail=  3420 MiB
+launcher exit: 0

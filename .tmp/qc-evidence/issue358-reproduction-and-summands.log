@@ -1,0 +1,51 @@
+[    1.52s] imported
+rank 11
+gram [[2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0], [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, -4, 0, 2, 0, 0, 0, 0, 0], [0, 0, 0, 0, -4, 0, 2, 0, 0, 0, 0], [0, 0, 0, 2, 0, -4, 2, 0, 0, 0, 0], [0, 0, 0, 0, 2, 2, -4, 2, 0, 0, 0], [0, 0, 0, 0, 0, 0, 2, -4, 2, 0, 0], [0, 0, 0, 0, 0, 0, 0, 2, -4, 2, 0], [0, 0, 0, 0, 0, 0, 0, 0, 2, -4, 2], [0, 0, 0, 0, 0, 0, 0, 0, 0, 2, -4]]
+det -2048
+generators {'h', 'ep', 'fp', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8'}
+|A| 2048
+[    6.01s] A built
+|O(q)| = 46998591897600 in 4.0 s
+[   10.02s] |O(q)| done
+engine type GapElement
+GAP HasSize True
+labels ('h', 'ep', 'fp', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8')
+[h/2] = [h] q = [(1)/(2)] in Fraction Field of Integer Ring / (2)Integer Ring b(self,self) = [(1)/(2)] in Fraction Field of Integer Ring / (1)Integer Ring
+[   10.10s] classes built
+|A_U2| 4 |A_E8| 256 |A_h| 2
+A_U2 q values ['[0] in Fraction Field of Integer Ring / (2)Integer Ring', '[1] in Fraction Field of Integer Ring / (2)Integer Ring']
+A_U2 b(c_ep,c_fp) [(1)/(2)] in Fraction Field of Integer Ring / (1)Integer Ring
+point size 4
+A_U2 + A_E8 + A_h has order 2048 equals A: True
+|[h/2]^perp| 1024
+[h/2]^perp == A_U2 + A_E8: True
+radical of [h/2]^perp 1 is <[h/2]>: False 75.91 s
+radical^perp cap [h/2]^perp == A_U2 + A_E8: True
+[  188.28s] summands verified
+|O(q_{U(2)})| = 2 0.27 s
+E8_2 + Z_2 rank 9
+|O(q_{E8(-2) + <2>})| = 348364800 4.87 s
+product 696729600 |O(q)| / product = 67456 remainder 0
+O(q) generator count from the owned group 4 0.34 s
+permutations built in 19.34 s
+|G| = 46998591897600 == |O(q)|: True 0.01 s
+orbit size of A_U2 under O(q): 67456 0.36 s
+|Stab_{O(q)}(A_U2)| = 696729600 0.08 s
+orbit * stabilizer == |O(q)|: True
+product * orbit == |O(q)|: True
+stabilizer == product: True
+[  213.59s] done
+[peakrss] p358p1: child waited=0 shell_code=0 samples=110
+[peakrss] peak tree RSS      : 692 MiB
+[peakrss] low-water MemAvail : 8006 MiB
+[peakrss] peak single VmHWM  : 693 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      682 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   216.2s procs=  3 rss=   692 MiB hwm=   693 MiB avail= 10070 MiB
+[peakrss]   t=   218.2s procs=  3 rss=   692 MiB hwm=   693 MiB avail= 10039 MiB
+[peakrss]   t=   196.2s procs=  3 rss=   686 MiB hwm=   687 MiB avail=  9407 MiB
+[peakrss]   t=   198.2s procs=  3 rss=   686 MiB hwm=   687 MiB avail=  9346 MiB
+[peakrss]   t=   200.2s procs=  3 rss=   686 MiB hwm=   687 MiB avail=  9397 MiB
+launcher exit: 0

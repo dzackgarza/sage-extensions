@@ -1,0 +1,45 @@
+[   18.36s] T_Co rank 11, |A| 2048, |O(q)| 46998591897600
+|P| = 2 * 348364800 = 696729600
+[   24.02s] summand orders
+[  184.34s] O(T_Co) generators: 329 in 160.3s
+Timeout (0:04:00)!
+Thread 0x000073d7b294a780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/torsion_form_modules.py", line 2652 in stabilizer_of_classes
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3685 in discriminant_point_stabilizer
+  File "/probes/p358_p9.py", line 41 in <module>
+[  406.01s] preimage constructed in 221.7s
+[  439.09s] image order 46998591897600
+[  439.45s] subgroup image order 696729600 (== |P|: True)
+[  439.60s] index 67456 (index * |P| == |O(q)|: True)
+P's generator count 3
+Timeout (0:04:00)!
+Thread 0x000073d7b294a780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 143 in permutation_group
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 150 in _to_permutation
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 158 in letters_of
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3456 in discriminant_lift
+  File "/probes/p358_p9.py", line 54 in <genexpr>
+  File "/probes/p358_p9.py", line 54 in <module>
+Timeout (0:04:00)!
+Thread 0x000073d7b294a780 [python] (most recent call first):
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 143 in permutation_group
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 150 in _to_permutation
+  File "/repos/sage-extensions/src/sage_extensions/categories/orthogonal_quotients.py", line 158 in letters_of
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 3456 in discriminant_lift
+  File "/probes/p358_p9.py", line 54 in <genexpr>
+  File "/probes/p358_p9.py", line 54 in <module>
+[peakrss] STOPPED_AT_MEMORY_LIMIT: tree RSS 6254 MiB exceeded 6144 MiB
+[peakrss] p358row9: child waited=143 shell_code=143 samples=401
+[peakrss] peak tree RSS      : 6254 MiB
+[peakrss] low-water MemAvail : 2000 MiB
+[peakrss] peak single VmHWM  : 6261 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     6250 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   801.1s procs=  3 rss=  6254 MiB hwm=  6261 MiB avail=  2000 MiB
+[peakrss]   t=   735.0s procs=  3 rss=  6115 MiB hwm=  6121 MiB avail=  3617 MiB
+[peakrss]   t=   737.0s procs=  3 rss=  6115 MiB hwm=  6121 MiB avail=  3567 MiB
+[peakrss]   t=   739.0s procs=  3 rss=  6115 MiB hwm=  6121 MiB avail=  3542 MiB
+[peakrss]   t=   741.0s procs=  3 rss=  6115 MiB hwm=  6121 MiB avail=  3445 MiB
+launcher exit: 143

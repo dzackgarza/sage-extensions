@@ -1,0 +1,3875 @@
+{
+ "_provenance": {
+  "cards": {
+   "arithmetic_group": "arithmetic-groups/{slug}.md",
+   "lattice": "lattices/{tag}.md"
+  },
+  "generated_by": "tests/cards/refresh_lattice_database_enriques.py",
+  "ref": "1e1cadcfdca4dba2c0084a0bdc095b2d691126a8",
+  "repository": "dzackgarza/lattice-database",
+  "rows": {
+   "arithmetic_group": [
+    "data.cardinality",
+    "data.abstract_structure",
+    "data.line_orbits",
+    "data.plane_orbits",
+    "data.flag_orbits",
+    "data.reference.citation",
+    "latex",
+    "lattice",
+    "parent_group"
+   ],
+   "cusp_chambers": "integral.cusp_chambers.{subgroup}.{cusp,statement,wall_count,printed_page,figure},certifications.integral.cusp_chambers",
+   "cusp_diagrams": "integral.cusp_chambers.{subgroup}.{statement,cusp,walls,wall_count,wall_vectors,diagram,printed_page,figure},certifications.integral.cusp_chambers",
+   "discriminant_form": "integral.discriminant_form.{orthogonal_group_order,isotropic_classes,isotropic_orbits},certifications.integral.discriminant_form",
+   "hyperbolic_reflectivity": "gram_tensor,hyperbolic.reflective,certifications.hyperbolic.reflective,references",
+   "lattice": "integral.polarization_counts.{degree}.{#h,#Γ̄_h,reference.citation}",
+   "parabolic_subdiagrams": "gram_tensor,integral.cusp_chambers.{subgroup}.{walls,parabolic_orbits,statement,wall_count,printed_page,figure},certifications.integral.cusp_chambers",
+   "plane_orbits": "integral.primitive_orbits.{group}.planes and .orbit_lengths(per-orbit sizes) and .constant(the line count),reference.citation",
+   "primitive_orbit_series": "gram_tensor,integral.primitive_orbits.{subgroup}.{constant,z,w},certifications.integral.primitive_orbits"
+  }
+ },
+ "arithmetic_groups": {
+  "gamma-h-1": {
+   "abstract_structure": "the group Gamma_h of case 1, represented by the subset S = \\overline{\\{0\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 696729600,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 1 with S = \\overline{\\{0\\}}, #I_1 = 5, #I_2 = 9, #I_12 = 18 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 18,
+   "latex": "\\overline{\\Gamma}_{h,1}(\\overline{\\{0\\}})",
+   "lattice": "029J",
+   "line_orbits": 5,
+   "name": "Gamma_h,1",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-1.md",
+   "plane_orbits": 9,
+   "tag": "gamma-h-1"
+  },
+  "gamma-h-10": {
+   "abstract_structure": "the group Gamma_h of case 10, represented by the subset S = \\overline{\\{7,8\\}} of the Coxeter diagram (3 subsets give this class)",
+   "cardinality": 362880,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 10 with S = \\overline{\\{7,8\\}}, #I_1 = 11, #I_2 = 31, #I_12 = 74 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 74,
+   "latex": "\\overline{\\Gamma}_{h,10}(\\overline{\\{7,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 11,
+   "name": "Gamma_h,10",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-10.md",
+   "plane_orbits": 31,
+   "tag": "gamma-h-10"
+  },
+  "gamma-h-11": {
+   "abstract_structure": "the group Gamma_h of case 11, represented by the subset S = \\overline{\\{6\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 725760,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 11 with S = \\overline{\\{6\\}}, #I_1 = 8, #I_2 = 22, #I_12 = 49 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 49,
+   "latex": "\\overline{\\Gamma}_{h,11}(\\overline{\\{6\\}})",
+   "lattice": "029J",
+   "line_orbits": 8,
+   "name": "Gamma_h,11",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-11.md",
+   "plane_orbits": 22,
+   "tag": "gamma-h-11"
+  },
+  "gamma-h-12": {
+   "abstract_structure": "the group Gamma_h of case 12, represented by the subset S = \\overline{\\{1,2\\}} of the Coxeter diagram (2 subsets give this class)",
+   "cardinality": 311040,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 12 with S = \\overline{\\{1,2\\}}, #I_1 = 12, #I_2 = 38, #I_12 = 89 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 89,
+   "latex": "\\overline{\\Gamma}_{h,12}(\\overline{\\{1,2\\}})",
+   "lattice": "029J",
+   "line_orbits": 12,
+   "name": "Gamma_h,12",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-12.md",
+   "plane_orbits": 38,
+   "tag": "gamma-h-12"
+  },
+  "gamma-h-13": {
+   "abstract_structure": "the group Gamma_h of case 13, represented by the subset S = \\overline{\\{-1,0,7\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 322560,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 13 with S = \\overline{\\{-1,0,7\\}}, #I_1 = 15, #I_2 = 48, #I_12 = 116 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 116,
+   "latex": "\\overline{\\Gamma}_{h,13}(\\overline{\\{-1,0,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 15,
+   "name": "Gamma_h,13",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-13.md",
+   "plane_orbits": 48,
+   "tag": "gamma-h-13"
+  },
+  "gamma-h-14": {
+   "abstract_structure": "the group Gamma_h of case 14, represented by the subset S = \\overline{\\{3\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 230400,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 14 with S = \\overline{\\{3\\}}, #I_1 = 10, #I_2 = 34, #I_12 = 76 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 76,
+   "latex": "\\overline{\\Gamma}_{h,14}(\\overline{\\{3\\}})",
+   "lattice": "029J",
+   "line_orbits": 10,
+   "name": "Gamma_h,14",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-14.md",
+   "plane_orbits": 34,
+   "tag": "gamma-h-14"
+  },
+  "gamma-h-15": {
+   "abstract_structure": "the group Gamma_h of case 15, represented by the subset S = \\overline{\\{-1,0,1\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 2903040,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 15 with S = \\overline{\\{-1,0,1\\}}, #I_1 = 12, #I_2 = 32, #I_12 = 76 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 76,
+   "latex": "\\overline{\\Gamma}_{h,15}(\\overline{\\{-1,0,1\\}})",
+   "lattice": "029J",
+   "line_orbits": 12,
+   "name": "Gamma_h,15",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-15.md",
+   "plane_orbits": 32,
+   "tag": "gamma-h-15"
+  },
+  "gamma-h-16": {
+   "abstract_structure": "the group Gamma_h of case 16, represented by the subset S = \\overline{\\{1,7\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 138240,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 16 with S = \\overline{\\{1,7\\}}, #I_1 = 13, #I_2 = 49, #I_12 = 113 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 113,
+   "latex": "\\overline{\\Gamma}_{h,16}(\\overline{\\{1,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 13,
+   "name": "Gamma_h,16",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-16.md",
+   "plane_orbits": 49,
+   "tag": "gamma-h-16"
+  },
+  "gamma-h-17": {
+   "abstract_structure": "the group Gamma_h of case 17, represented by the subset S = \\overline{\\{0,8\\}} of the Coxeter diagram (3 subsets give this class)",
+   "cardinality": 80640,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 17 with S = \\overline{\\{0,8\\}}, #I_1 = 14, #I_2 = 51, #I_12 = 125 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 125,
+   "latex": "\\overline{\\Gamma}_{h,17}(\\overline{\\{0,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 14,
+   "name": "Gamma_h,17",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-17.md",
+   "plane_orbits": 51,
+   "tag": "gamma-h-17"
+  },
+  "gamma-h-18": {
+   "abstract_structure": "the group Gamma_h of case 18, represented by the subset S = \\overline{\\{0,2\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 207360,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 18 with S = \\overline{\\{0,2\\}}, #I_1 = 13, #I_2 = 46, #I_12 = 108 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 108,
+   "latex": "\\overline{\\Gamma}_{h,18}(\\overline{\\{0,2\\}})",
+   "lattice": "029J",
+   "line_orbits": 13,
+   "name": "Gamma_h,18",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-18.md",
+   "plane_orbits": 46,
+   "tag": "gamma-h-18"
+  },
+  "gamma-h-19": {
+   "abstract_structure": "the group Gamma_h of case 19, represented by the subset S = \\overline{\\{2,7\\}} of the Coxeter diagram (3 subsets give this class)",
+   "cardinality": 46080,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 19 with S = \\overline{\\{2,7\\}}, #I_1 = 16, #I_2 = 67, #I_12 = 162 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 162,
+   "latex": "\\overline{\\Gamma}_{h,19}(\\overline{\\{2,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 16,
+   "name": "Gamma_h,19",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-19.md",
+   "plane_orbits": 67,
+   "tag": "gamma-h-19"
+  },
+  "gamma-h-2": {
+   "abstract_structure": "the group Gamma_h of case 2, represented by the subset S = \\overline{\\{-1,0\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 348364800,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 2 with S = \\overline{\\{-1,0\\}}, #I_1 = 7, #I_2 = 13, #I_12 = 28 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 28,
+   "latex": "\\overline{\\Gamma}_{h,2}(\\overline{\\{-1,0\\}})",
+   "lattice": "029J",
+   "line_orbits": 7,
+   "name": "Gamma_h,2",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-2.md",
+   "plane_orbits": 13,
+   "tag": "gamma-h-2"
+  },
+  "gamma-h-20": {
+   "abstract_structure": "the group Gamma_h of case 20, represented by the subset S = \\overline{\\{4\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 86400,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 20 with S = \\overline{\\{4\\}}, #I_1 = 11, #I_2 = 41, #I_12 = 96 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 96,
+   "latex": "\\overline{\\Gamma}_{h,20}(\\overline{\\{4\\}})",
+   "lattice": "029J",
+   "line_orbits": 11,
+   "name": "Gamma_h,20",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-20.md",
+   "plane_orbits": 41,
+   "tag": "gamma-h-20"
+  },
+  "gamma-h-21": {
+   "abstract_structure": "the group Gamma_h of case 21, represented by the subset S = \\overline{\\{0,1,7\\}} of the Coxeter diagram (2 subsets give this class)",
+   "cardinality": 46080,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 21 with S = \\overline{\\{0,1,7\\}}, #I_1 = 19, #I_2 = 83, #I_12 = 204 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 204,
+   "latex": "\\overline{\\Gamma}_{h,21}(\\overline{\\{0,1,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 19,
+   "name": "Gamma_h,21",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-21.md",
+   "plane_orbits": 83,
+   "tag": "gamma-h-21"
+  },
+  "gamma-h-22": {
+   "abstract_structure": "the group Gamma_h of case 22, represented by the subset S = \\overline{\\{-1,0,8\\}} of the Coxeter diagram (4 subsets give this class)",
+   "cardinality": 40320,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 22 with S = \\overline{\\{-1,0,8\\}}, #I_1 = 19, #I_2 = 74, #I_12 = 191 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 191,
+   "latex": "\\overline{\\Gamma}_{h,22}(\\overline{\\{-1,0,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 19,
+   "name": "Gamma_h,22",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-22.md",
+   "plane_orbits": 74,
+   "tag": "gamma-h-22"
+  },
+  "gamma-h-23": {
+   "abstract_structure": "the group Gamma_h of case 23, represented by the subset S = \\overline{\\{0,1,2\\}} of the Coxeter diagram (3 subsets give this class)",
+   "cardinality": 103680,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 23 with S = \\overline{\\{0,1,2\\}}, #I_1 = 17, #I_2 = 64, #I_12 = 159 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 159,
+   "latex": "\\overline{\\Gamma}_{h,23}(\\overline{\\{0,1,2\\}})",
+   "lattice": "029J",
+   "line_orbits": 17,
+   "name": "Gamma_h,23",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-23.md",
+   "plane_orbits": 64,
+   "tag": "gamma-h-23"
+  },
+  "gamma-h-24": {
+   "abstract_structure": "the group Gamma_h of case 24, represented by the subset S = \\overline{\\{5,8\\}} of the Coxeter diagram (2 subsets give this class)",
+   "cardinality": 30240,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 24 with S = \\overline{\\{5,8\\}}, #I_1 = 16, #I_2 = 68, #I_12 = 171 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 171,
+   "latex": "\\overline{\\Gamma}_{h,24}(\\overline{\\{5,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 16,
+   "name": "Gamma_h,24",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-24.md",
+   "plane_orbits": 68,
+   "tag": "gamma-h-24"
+  },
+  "gamma-h-25": {
+   "abstract_structure": "the group Gamma_h of case 25, represented by the subset S = \\overline{\\{5,7\\}} of the Coxeter diagram (3 subsets give this class)",
+   "cardinality": 20160,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 25 with S = \\overline{\\{5,7\\}}, #I_1 = 18, #I_2 = 85, #I_12 = 213 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 213,
+   "latex": "\\overline{\\Gamma}_{h,25}(\\overline{\\{5,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 18,
+   "name": "Gamma_h,25",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-25.md",
+   "plane_orbits": 85,
+   "tag": "gamma-h-25"
+  },
+  "gamma-h-26": {
+   "abstract_structure": "the group Gamma_h of case 26, represented by the subset S = \\overline{\\{0,3\\}} of the Coxeter diagram (2 subsets give this class)",
+   "cardinality": 23040,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 26 with S = \\overline{\\{0,3\\}}, #I_1 = 18, #I_2 = 87, #I_12 = 213 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 213,
+   "latex": "\\overline{\\Gamma}_{h,26}(\\overline{\\{0,3\\}})",
+   "lattice": "029J",
+   "line_orbits": 18,
+   "name": "Gamma_h,26",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-26.md",
+   "plane_orbits": 87,
+   "tag": "gamma-h-26"
+  },
+  "gamma-h-27": {
+   "abstract_structure": "the group Gamma_h of case 27, represented by the subset S = \\overline{\\{3,8\\}} of the Coxeter diagram (3 subsets give this class)",
+   "cardinality": 14400,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 27 with S = \\overline{\\{3,8\\}}, #I_1 = 19, #I_2 = 91, #I_12 = 233 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 233,
+   "latex": "\\overline{\\Gamma}_{h,27}(\\overline{\\{3,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 19,
+   "name": "Gamma_h,27",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-27.md",
+   "plane_orbits": 91,
+   "tag": "gamma-h-27"
+  },
+  "gamma-h-28": {
+   "abstract_structure": "the group Gamma_h of case 28, represented by the subset S = \\overline{\\{5\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 60480,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 28 with S = \\overline{\\{5\\}}, #I_1 = 12, #I_2 = 49, #I_12 = 115 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 115,
+   "latex": "\\overline{\\Gamma}_{h,28}(\\overline{\\{5\\}})",
+   "lattice": "029J",
+   "line_orbits": 12,
+   "name": "Gamma_h,28",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-28.md",
+   "plane_orbits": 49,
+   "tag": "gamma-h-28"
+  },
+  "gamma-h-29": {
+   "abstract_structure": "the group Gamma_h of case 29, represented by the subset S = \\overline{\\{1,2,7\\}} of the Coxeter diagram (5 subsets give this class)",
+   "cardinality": 11520,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 29 with S = \\overline{\\{1,2,7\\}}, #I_1 = 24, #I_2 = 124, #I_12 = 320 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 320,
+   "latex": "\\overline{\\Gamma}_{h,29}(\\overline{\\{1,2,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 24,
+   "name": "Gamma_h,29",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-29.md",
+   "plane_orbits": 124,
+   "tag": "gamma-h-29"
+  },
+  "gamma-h-3": {
+   "abstract_structure": "the group Gamma_h of case 3, represented by the subset S = \\overline{\\{7\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 92897280,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 3 with S = \\overline{\\{7\\}}, #I_1 = 5, #I_2 = 10, #I_12 = 19 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 19,
+   "latex": "\\overline{\\Gamma}_{h,3}(\\overline{\\{7\\}})",
+   "lattice": "029J",
+   "line_orbits": 5,
+   "name": "Gamma_h,3",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-3.md",
+   "plane_orbits": 10,
+   "tag": "gamma-h-3"
+  },
+  "gamma-h-30": {
+   "abstract_structure": "the group Gamma_h of case 30, represented by the subset S = \\overline{\\{3,7\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 23040,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 30 with S = \\overline{\\{3,7\\}}, #I_1 = 18, #I_2 = 85, #I_12 = 208 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 208,
+   "latex": "\\overline{\\Gamma}_{h,30}(\\overline{\\{3,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 18,
+   "name": "Gamma_h,30",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-30.md",
+   "plane_orbits": 85,
+   "tag": "gamma-h-30"
+  },
+  "gamma-h-31": {
+   "abstract_structure": "the group Gamma_h of case 31, represented by the subset S = \\overline{\\{0,1,8\\}} of the Coxeter diagram (9 subsets give this class)",
+   "cardinality": 10080,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 31 with S = \\overline{\\{0,1,8\\}}, #I_1 = 24, #I_2 = 122, #I_12 = 322 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 322,
+   "latex": "\\overline{\\Gamma}_{h,31}(\\overline{\\{0,1,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 24,
+   "name": "Gamma_h,31",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-31.md",
+   "plane_orbits": 122,
+   "tag": "gamma-h-31"
+  },
+  "gamma-h-32": {
+   "abstract_structure": "the group Gamma_h of case 32, represented by the subset S = \\overline{\\{2,8\\}} of the Coxeter diagram (3 subsets give this class)",
+   "cardinality": 17280,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 32 with S = \\overline{\\{2,8\\}}, #I_1 = 18, #I_2 = 85, #I_12 = 215 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 215,
+   "latex": "\\overline{\\Gamma}_{h,32}(\\overline{\\{2,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 18,
+   "name": "Gamma_h,32",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-32.md",
+   "plane_orbits": 85,
+   "tag": "gamma-h-32"
+  },
+  "gamma-h-33": {
+   "abstract_structure": "the group Gamma_h of case 33, represented by the subset S = \\overline{\\{-1,5\\}} of the Coxeter diagram (4 subsets give this class)",
+   "cardinality": 8640,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 33 with S = \\overline{\\{-1,5\\}}, #I_1 = 21, #I_2 = 115, #I_12 = 294 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 294,
+   "latex": "\\overline{\\Gamma}_{h,33}(\\overline{\\{-1,5\\}})",
+   "lattice": "029J",
+   "line_orbits": 21,
+   "name": "Gamma_h,33",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-33.md",
+   "plane_orbits": 115,
+   "tag": "gamma-h-33"
+  },
+  "gamma-h-34": {
+   "abstract_structure": "the group Gamma_h of case 34, represented by the subset S = \\overline{\\{-1,0,1,7\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 23040,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 34 with S = \\overline{\\{-1,0,1,7\\}}, #I_1 = 25, #I_2 = 118, #I_12 = 305 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 305,
+   "latex": "\\overline{\\Gamma}_{h,34}(\\overline{\\{-1,0,1,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 25,
+   "name": "Gamma_h,34",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-34.md",
+   "plane_orbits": 118,
+   "tag": "gamma-h-34"
+  },
+  "gamma-h-35": {
+   "abstract_structure": "the group Gamma_h of case 35, represented by the subset S = \\overline{\\{2,6\\}} of the Coxeter diagram (4 subsets give this class)",
+   "cardinality": 5760,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 35 with S = \\overline{\\{2,6\\}}, #I_1 = 23, #I_2 = 136, #I_12 = 351 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 351,
+   "latex": "\\overline{\\Gamma}_{h,35}(\\overline{\\{2,6\\}})",
+   "lattice": "029J",
+   "line_orbits": 23,
+   "name": "Gamma_h,35",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-35.md",
+   "plane_orbits": 136,
+   "tag": "gamma-h-35"
+  },
+  "gamma-h-36": {
+   "abstract_structure": "the group Gamma_h of case 36, represented by the subset S = \\overline{\\{0,2,7\\}} of the Coxeter diagram (4 subsets give this class)",
+   "cardinality": 7680,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 36 with S = \\overline{\\{0,2,7\\}}, #I_1 = 26, #I_2 = 151, #I_12 = 388 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 388,
+   "latex": "\\overline{\\Gamma}_{h,36}(\\overline{\\{0,2,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 26,
+   "name": "Gamma_h,36",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-36.md",
+   "plane_orbits": 151,
+   "tag": "gamma-h-36"
+  },
+  "gamma-h-37": {
+   "abstract_structure": "the group Gamma_h of case 37, represented by the subset S = \\overline{\\{2,3,7\\}} of the Coxeter diagram (2 subsets give this class)",
+   "cardinality": 4608,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 37 with S = \\overline{\\{2,3,7\\}}, #I_1 = 29, #I_2 = 179, #I_12 = 466 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 466,
+   "latex": "\\overline{\\Gamma}_{h,37}(\\overline{\\{2,3,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 29,
+   "name": "Gamma_h,37",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-37.md",
+   "plane_orbits": 179,
+   "tag": "gamma-h-37"
+  },
+  "gamma-h-38": {
+   "abstract_structure": "the group Gamma_h of case 38, represented by the subset S = \\overline{\\{1,2,8\\}} of the Coxeter diagram (8 subsets give this class)",
+   "cardinality": 4320,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 38 with S = \\overline{\\{1,2,8\\}}, #I_1 = 28, #I_2 = 167, #I_12 = 448 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 448,
+   "latex": "\\overline{\\Gamma}_{h,38}(\\overline{\\{1,2,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 28,
+   "name": "Gamma_h,38",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-38.md",
+   "plane_orbits": 167,
+   "tag": "gamma-h-38"
+  },
+  "gamma-h-39": {
+   "abstract_structure": "the group Gamma_h of case 39, represented by the subset S = \\overline{\\{0,2,8\\}} of the Coxeter diagram (9 subsets give this class)",
+   "cardinality": 2880,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 39 with S = \\overline{\\{0,2,8\\}}, #I_1 = 31, #I_2 = 207, #I_12 = 553 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 553,
+   "latex": "\\overline{\\Gamma}_{h,39}(\\overline{\\{0,2,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 31,
+   "name": "Gamma_h,39",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-39.md",
+   "plane_orbits": 207,
+   "tag": "gamma-h-39"
+  },
+  "gamma-h-4": {
+   "abstract_structure": "the group Gamma_h of case 4, represented by the subset S = \\overline{\\{1\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 17418240,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 4 with S = \\overline{\\{1\\}}, #I_1 = 6, #I_2 = 14, #I_12 = 28 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 28,
+   "latex": "\\overline{\\Gamma}_{h,4}(\\overline{\\{1\\}})",
+   "lattice": "029J",
+   "line_orbits": 6,
+   "name": "Gamma_h,4",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-4.md",
+   "plane_orbits": 14,
+   "tag": "gamma-h-4"
+  },
+  "gamma-h-40": {
+   "abstract_structure": "the group Gamma_h of case 40, represented by the subset S = \\overline{\\{-1,0,1,8\\}} of the Coxeter diagram (5 subsets give this class)",
+   "cardinality": 5040,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 40 with S = \\overline{\\{-1,0,1,8\\}}, #I_1 = 32, #I_2 = 181, #I_12 = 495 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 495,
+   "latex": "\\overline{\\Gamma}_{h,40}(\\overline{\\{-1,0,1,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 32,
+   "name": "Gamma_h,40",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-40.md",
+   "plane_orbits": 181,
+   "tag": "gamma-h-40"
+  },
+  "gamma-h-41": {
+   "abstract_structure": "the group Gamma_h of case 41, represented by the subset S = \\overline{\\{2,7,8\\}} of the Coxeter diagram (13 subsets give this class)",
+   "cardinality": 2880,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 41 with S = \\overline{\\{2,7,8\\}}, #I_1 = 31, #I_2 = 200, #I_12 = 540 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 540,
+   "latex": "\\overline{\\Gamma}_{h,41}(\\overline{\\{2,7,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 31,
+   "name": "Gamma_h,41",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-41.md",
+   "plane_orbits": 200,
+   "tag": "gamma-h-41"
+  },
+  "gamma-h-42": {
+   "abstract_structure": "the group Gamma_h of case 42, represented by the subset S = \\overline{\\{1,4\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 4320,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 42 with S = \\overline{\\{1,4\\}}, #I_1 = 24, #I_2 = 149, #I_12 = 389 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 389,
+   "latex": "\\overline{\\Gamma}_{h,42}(\\overline{\\{1,4\\}})",
+   "lattice": "029J",
+   "line_orbits": 24,
+   "name": "Gamma_h,42",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-42.md",
+   "plane_orbits": 149,
+   "tag": "gamma-h-42"
+  },
+  "gamma-h-43": {
+   "abstract_structure": "the group Gamma_h of case 43, represented by the subset S = \\overline{\\{0,1,2,7\\}} of the Coxeter diagram (7 subsets give this class)",
+   "cardinality": 3840,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 43 with S = \\overline{\\{0,1,2,7\\}}, #I_1 = 34, #I_2 = 219, #I_12 = 585 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 585,
+   "latex": "\\overline{\\Gamma}_{h,43}(\\overline{\\{0,1,2,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 34,
+   "name": "Gamma_h,43",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-43.md",
+   "plane_orbits": 219,
+   "tag": "gamma-h-43"
+  },
+  "gamma-h-44": {
+   "abstract_structure": "the group Gamma_h of case 44, represented by the subset S = \\overline{\\{0,5\\}} of the Coxeter diagram (2 subsets give this class)",
+   "cardinality": 2880,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 44 with S = \\overline{\\{0,5\\}}, #I_1 = 27, #I_2 = 187, #I_12 = 487 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 487,
+   "latex": "\\overline{\\Gamma}_{h,44}(\\overline{\\{0,5\\}})",
+   "lattice": "029J",
+   "line_orbits": 27,
+   "name": "Gamma_h,44",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-44.md",
+   "plane_orbits": 187,
+   "tag": "gamma-h-44"
+  },
+  "gamma-h-45": {
+   "abstract_structure": "the group Gamma_h of case 45, represented by the subset S = \\overline{\\{-1,0,1,2\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 51840,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 45 with S = \\overline{\\{-1,0,1,2\\}}, #I_1 = 22, #I_2 = 92, #I_12 = 238 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 238,
+   "latex": "\\overline{\\Gamma}_{h,45}(\\overline{\\{-1,0,1,2\\}})",
+   "lattice": "029J",
+   "line_orbits": 22,
+   "name": "Gamma_h,45",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-45.md",
+   "plane_orbits": 92,
+   "tag": "gamma-h-45"
+  },
+  "gamma-h-46": {
+   "abstract_structure": "the group Gamma_h of case 46, represented by the subset S = \\overline{\\{0,3,7\\}} of the Coxeter diagram (2 subsets give this class)",
+   "cardinality": 2304,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 46 with S = \\overline{\\{0,3,7\\}}, #I_1 = 33, #I_2 = 239, #I_12 = 629 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 629,
+   "latex": "\\overline{\\Gamma}_{h,46}(\\overline{\\{0,3,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 33,
+   "name": "Gamma_h,46",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-46.md",
+   "plane_orbits": 239,
+   "tag": "gamma-h-46"
+  },
+  "gamma-h-47": {
+   "abstract_structure": "the group Gamma_h of case 47, represented by the subset S = \\overline{\\{0,5,8\\}} of the Coxeter diagram (19 subsets give this class)",
+   "cardinality": 1440,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 47 with S = \\overline{\\{0,5,8\\}}, #I_1 = 36, #I_2 = 274, #I_12 = 746 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 746,
+   "latex": "\\overline{\\Gamma}_{h,47}(\\overline{\\{0,5,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 36,
+   "name": "Gamma_h,47",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-47.md",
+   "plane_orbits": 274,
+   "tag": "gamma-h-47"
+  },
+  "gamma-h-48": {
+   "abstract_structure": "the group Gamma_h of case 48, represented by the subset S = \\overline{\\{0,1,2,8\\}} of the Coxeter diagram (17 subsets give this class)",
+   "cardinality": 1440,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 48 with S = \\overline{\\{0,1,2,8\\}}, #I_1 = 41, #I_2 = 307, #I_12 = 849 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 849,
+   "latex": "\\overline{\\Gamma}_{h,48}(\\overline{\\{0,1,2,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 41,
+   "name": "Gamma_h,48",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-48.md",
+   "plane_orbits": 307,
+   "tag": "gamma-h-48"
+  },
+  "gamma-h-49": {
+   "abstract_structure": "the group Gamma_h of case 49, represented by the subset S = \\overline{\\{1,5\\}} of the Coxeter diagram (2 subsets give this class)",
+   "cardinality": 1728,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 49 with S = \\overline{\\{1,5\\}}, #I_1 = 30, #I_2 = 231, #I_12 = 608 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 608,
+   "latex": "\\overline{\\Gamma}_{h,49}(\\overline{\\{1,5\\}})",
+   "lattice": "029J",
+   "line_orbits": 30,
+   "name": "Gamma_h,49",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-49.md",
+   "plane_orbits": 231,
+   "tag": "gamma-h-49"
+  },
+  "gamma-h-5": {
+   "abstract_structure": "the group Gamma_h of case 5, represented by the subset S = \\overline{\\{-1,7\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 5160960,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 5 with S = \\overline{\\{-1,7\\}}, #I_1 = 9, #I_2 = 23, #I_12 = 49 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 49,
+   "latex": "\\overline{\\Gamma}_{h,5}(\\overline{\\{-1,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 9,
+   "name": "Gamma_h,5",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-5.md",
+   "plane_orbits": 23,
+   "tag": "gamma-h-5"
+  },
+  "gamma-h-50": {
+   "abstract_structure": "the group Gamma_h of case 50, represented by the subset S = \\overline{\\{1,2,3,7\\}} of the Coxeter diagram (3 subsets give this class)",
+   "cardinality": 1152,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 50 with S = \\overline{\\{1,2,3,7\\}}, #I_1 = 44, #I_2 = 354, #I_12 = 967 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 967,
+   "latex": "\\overline{\\Gamma}_{h,50}(\\overline{\\{1,2,3,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 44,
+   "name": "Gamma_h,50",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-50.md",
+   "plane_orbits": 354,
+   "tag": "gamma-h-50"
+  },
+  "gamma-h-51": {
+   "abstract_structure": "the group Gamma_h of case 51, represented by the subset S = \\overline{\\{2,6,8\\}} of the Coxeter diagram (7 subsets give this class)",
+   "cardinality": 1152,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 51 with S = \\overline{\\{2,6,8\\}}, #I_1 = 38, #I_2 = 306, #I_12 = 832 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 832,
+   "latex": "\\overline{\\Gamma}_{h,51}(\\overline{\\{2,6,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 38,
+   "name": "Gamma_h,51",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-51.md",
+   "plane_orbits": 306,
+   "tag": "gamma-h-51"
+  },
+  "gamma-h-52": {
+   "abstract_structure": "the group Gamma_h of case 52, represented by the subset S = \\overline{\\{0,5,7\\}} of the Coxeter diagram (6 subsets give this class)",
+   "cardinality": 960,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 52 with S = \\overline{\\{0,5,7\\}}, #I_1 = 40, #I_2 = 342, #I_12 = 927 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 927,
+   "latex": "\\overline{\\Gamma}_{h,52}(\\overline{\\{0,5,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 40,
+   "name": "Gamma_h,52",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-52.md",
+   "plane_orbits": 342,
+   "tag": "gamma-h-52"
+  },
+  "gamma-h-53": {
+   "abstract_structure": "the group Gamma_h of case 53, represented by the subset S = \\overline{\\{1,2,7,8\\}} of the Coxeter diagram (20 subsets give this class)",
+   "cardinality": 720,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 53 with S = \\overline{\\{1,2,7,8\\}}, #I_1 = 48, #I_2 = 413, #I_12 = 1159 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 1159,
+   "latex": "\\overline{\\Gamma}_{h,53}(\\overline{\\{1,2,7,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 48,
+   "name": "Gamma_h,53",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-53.md",
+   "plane_orbits": 413,
+   "tag": "gamma-h-53"
+  },
+  "gamma-h-54": {
+   "abstract_structure": "the group Gamma_h of case 54, represented by the subset S = \\overline{\\{0,1,5\\}} of the Coxeter diagram (14 subsets give this class)",
+   "cardinality": 576,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 54 with S = \\overline{\\{0,1,5\\}}, #I_1 = 45, #I_2 = 429, #I_12 = 1175 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 1175,
+   "latex": "\\overline{\\Gamma}_{h,54}(\\overline{\\{0,1,5\\}})",
+   "lattice": "029J",
+   "line_orbits": 45,
+   "name": "Gamma_h,54",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-54.md",
+   "plane_orbits": 429,
+   "tag": "gamma-h-54"
+  },
+  "gamma-h-55": {
+   "abstract_structure": "the group Gamma_h of case 55, represented by the subset S = \\overline{\\{0,1,3,7\\}} of the Coxeter diagram (3 subsets give this class)",
+   "cardinality": 768,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 55 with S = \\overline{\\{0,1,3,7\\}}, #I_1 = 48, #I_2 = 435, #I_12 = 1184 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 1184,
+   "latex": "\\overline{\\Gamma}_{h,55}(\\overline{\\{0,1,3,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 48,
+   "name": "Gamma_h,55",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-55.md",
+   "plane_orbits": 435,
+   "tag": "gamma-h-55"
+  },
+  "gamma-h-56": {
+   "abstract_structure": "the group Gamma_h of case 56, represented by the subset S = \\overline{\\{2,3,7,8\\}} of the Coxeter diagram (11 subsets give this class)",
+   "cardinality": 576,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 56 with S = \\overline{\\{2,3,7,8\\}}, #I_1 = 51, #I_2 = 463, #I_12 = 1298 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 1298,
+   "latex": "\\overline{\\Gamma}_{h,56}(\\overline{\\{2,3,7,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 51,
+   "name": "Gamma_h,56",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-56.md",
+   "plane_orbits": 463,
+   "tag": "gamma-h-56"
+  },
+  "gamma-h-57": {
+   "abstract_structure": "the group Gamma_h of case 57, represented by the subset S = \\overline{\\{1,5,8\\}} of the Coxeter diagram (4 subsets give this class)",
+   "cardinality": 864,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 57 with S = \\overline{\\{1,5,8\\}}, #I_1 = 40, #I_2 = 341, #I_12 = 937 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 937,
+   "latex": "\\overline{\\Gamma}_{h,57}(\\overline{\\{1,5,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 40,
+   "name": "Gamma_h,57",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-57.md",
+   "plane_orbits": 341,
+   "tag": "gamma-h-57"
+  },
+  "gamma-h-58": {
+   "abstract_structure": "the group Gamma_h of case 58, represented by the subset S = \\overline{\\{0,5,7,8\\}} of the Coxeter diagram (30 subsets give this class)",
+   "cardinality": 480,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 58 with S = \\overline{\\{0,5,7,8\\}}, #I_1 = 53, #I_2 = 512, #I_12 = 1433 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 1433,
+   "latex": "\\overline{\\Gamma}_{h,58}(\\overline{\\{0,5,7,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 53,
+   "name": "Gamma_h,58",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-58.md",
+   "plane_orbits": 512,
+   "tag": "gamma-h-58"
+  },
+  "gamma-h-59": {
+   "abstract_structure": "the group Gamma_h of case 59, represented by the subset S = \\overline{\\{-1,0,1,2,8\\}} of the Coxeter diagram (6 subsets give this class)",
+   "cardinality": 720,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 59 with S = \\overline{\\{-1,0,1,2,8\\}}, #I_1 = 54, #I_2 = 465, #I_12 = 1315 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 1315,
+   "latex": "\\overline{\\Gamma}_{h,59}(\\overline{\\{-1,0,1,2,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 54,
+   "name": "Gamma_h,59",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-59.md",
+   "plane_orbits": 465,
+   "tag": "gamma-h-59"
+  },
+  "gamma-h-6": {
+   "abstract_structure": "the group Gamma_h of case 6, represented by the subset S = \\overline{\\{0,1\\}} of the Coxeter diagram (2 subsets give this class)",
+   "cardinality": 5806080,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 6 with S = \\overline{\\{0,1\\}}, #I_1 = 9, #I_2 = 23, #I_12 = 51 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 51,
+   "latex": "\\overline{\\Gamma}_{h,6}(\\overline{\\{0,1\\}})",
+   "lattice": "029J",
+   "line_orbits": 9,
+   "name": "Gamma_h,6",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-6.md",
+   "plane_orbits": 23,
+   "tag": "gamma-h-6"
+  },
+  "gamma-h-60": {
+   "abstract_structure": "the group Gamma_h of case 60, represented by the subset S = \\overline{\\{-1,0,1,2,7\\}} of the Coxeter diagram (2 subsets give this class)",
+   "cardinality": 1920,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 60 with S = \\overline{\\{-1,0,1,2,7\\}}, #I_1 = 44, #I_2 = 325, #I_12 = 890 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 890,
+   "latex": "\\overline{\\Gamma}_{h,60}(\\overline{\\{-1,0,1,2,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 44,
+   "name": "Gamma_h,60",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-60.md",
+   "plane_orbits": 325,
+   "tag": "gamma-h-60"
+  },
+  "gamma-h-61": {
+   "abstract_structure": "the group Gamma_h of case 61, represented by the subset S = \\overline{\\{1,2,5\\}} of the Coxeter diagram (4 subsets give this class)",
+   "cardinality": 432,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 61 with S = \\overline{\\{1,2,5\\}}, #I_1 = 48, #I_2 = 484, #I_12 = 1339 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 1339,
+   "latex": "\\overline{\\Gamma}_{h,61}(\\overline{\\{1,2,5\\}})",
+   "lattice": "029J",
+   "line_orbits": 48,
+   "name": "Gamma_h,61",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-61.md",
+   "plane_orbits": 484,
+   "tag": "gamma-h-61"
+  },
+  "gamma-h-62": {
+   "abstract_structure": "the group Gamma_h of case 62, represented by the subset S = \\overline{\\{0,1,5,8\\}} of the Coxeter diagram (46 subsets give this class)",
+   "cardinality": 288,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 62 with S = \\overline{\\{0,1,5,8\\}}, #I_1 = 60, #I_2 = 649, #I_12 = 1832 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 1832,
+   "latex": "\\overline{\\Gamma}_{h,62}(\\overline{\\{0,1,5,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 60,
+   "name": "Gamma_h,62",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-62.md",
+   "plane_orbits": 649,
+   "tag": "gamma-h-62"
+  },
+  "gamma-h-63": {
+   "abstract_structure": "the group Gamma_h of case 63, represented by the subset S = \\overline{\\{0,1,2,7,8\\}} of the Coxeter diagram (32 subsets give this class)",
+   "cardinality": 240,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 63 with S = \\overline{\\{0,1,2,7,8\\}}, #I_1 = 70, #I_2 = 782, #I_12 = 2235 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 2235,
+   "latex": "\\overline{\\Gamma}_{h,63}(\\overline{\\{0,1,2,7,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 70,
+   "name": "Gamma_h,63",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-63.md",
+   "plane_orbits": 782,
+   "tag": "gamma-h-63"
+  },
+  "gamma-h-64": {
+   "abstract_structure": "the group Gamma_h of case 64, represented by the subset S = \\overline{\\{0,1,2,3,7\\}} of the Coxeter diagram (4 subsets give this class)",
+   "cardinality": 384,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 64 with S = \\overline{\\{0,1,2,3,7\\}}, #I_1 = 63, #I_2 = 653, #I_12 = 1825 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 1825,
+   "latex": "\\overline{\\Gamma}_{h,64}(\\overline{\\{0,1,2,3,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 63,
+   "name": "Gamma_h,64",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-64.md",
+   "plane_orbits": 653,
+   "tag": "gamma-h-64"
+  },
+  "gamma-h-65": {
+   "abstract_structure": "the group Gamma_h of case 65, represented by the subset S = \\overline{\\{0,2,5\\}} of the Coxeter diagram (3 subsets give this class)",
+   "cardinality": 288,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 65 with S = \\overline{\\{0,2,5\\}}, #I_1 = 54, #I_2 = 611, #I_12 = 1685 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 1685,
+   "latex": "\\overline{\\Gamma}_{h,65}(\\overline{\\{0,2,5\\}})",
+   "lattice": "029J",
+   "line_orbits": 54,
+   "name": "Gamma_h,65",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-65.md",
+   "plane_orbits": 611,
+   "tag": "gamma-h-65"
+  },
+  "gamma-h-66": {
+   "abstract_structure": "the group Gamma_h of case 66, represented by the subset S = \\overline{\\{0,1,5,7\\}} of the Coxeter diagram (20 subsets give this class)",
+   "cardinality": 192,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 66 with S = \\overline{\\{0,1,5,7\\}}, #I_1 = 67, #I_2 = 814, #I_12 = 2291 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 2291,
+   "latex": "\\overline{\\Gamma}_{h,66}(\\overline{\\{0,1,5,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 67,
+   "name": "Gamma_h,66",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-66.md",
+   "plane_orbits": 814,
+   "tag": "gamma-h-66"
+  },
+  "gamma-h-67": {
+   "abstract_structure": "the group Gamma_h of case 67, represented by the subset S = \\overline{\\{1,2,3,7,8\\}} of the Coxeter diagram (30 subsets give this class)",
+   "cardinality": 144,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 67 with S = \\overline{\\{1,2,3,7,8\\}}, #I_1 = 80, #I_2 = 1002, #I_12 = 2884 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 2884,
+   "latex": "\\overline{\\Gamma}_{h,67}(\\overline{\\{1,2,3,7,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 80,
+   "name": "Gamma_h,67",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-67.md",
+   "plane_orbits": 1002,
+   "tag": "gamma-h-67"
+  },
+  "gamma-h-68": {
+   "abstract_structure": "the group Gamma_h of case 68, represented by the subset S = \\overline{\\{0,1,2,5\\}} of the Coxeter diagram (30 subsets give this class)",
+   "cardinality": 144,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 68 with S = \\overline{\\{0,1,2,5\\}}, #I_1 = 72, #I_2 = 929, #I_12 = 2637 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 2637,
+   "latex": "\\overline{\\Gamma}_{h,68}(\\overline{\\{0,1,2,5\\}})",
+   "lattice": "029J",
+   "line_orbits": 72,
+   "name": "Gamma_h,68",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-68.md",
+   "plane_orbits": 929,
+   "tag": "gamma-h-68"
+  },
+  "gamma-h-69": {
+   "abstract_structure": "the group Gamma_h of case 69, represented by the subset S = \\overline{\\{0,1,5,7,8\\}} of the Coxeter diagram (57 subsets give this class)",
+   "cardinality": 96,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 69 with S = \\overline{\\{0,1,5,7,8\\}}, #I_1 = 89, #I_2 = 1252, #I_12 = 3599 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 3599,
+   "latex": "\\overline{\\Gamma}_{h,69}(\\overline{\\{0,1,5,7,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 89,
+   "name": "Gamma_h,69",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-69.md",
+   "plane_orbits": 1252,
+   "tag": "gamma-h-69"
+  },
+  "gamma-h-7": {
+   "abstract_structure": "the group Gamma_h of case 7, represented by the subset S = \\overline{\\{8\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 3628800,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 7 with S = \\overline{\\{8\\}}, #I_1 = 6, #I_2 = 13, #I_12 = 28 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 28,
+   "latex": "\\overline{\\Gamma}_{h,7}(\\overline{\\{8\\}})",
+   "lattice": "029J",
+   "line_orbits": 6,
+   "name": "Gamma_h,7",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-7.md",
+   "plane_orbits": 13,
+   "tag": "gamma-h-7"
+  },
+  "gamma-h-70": {
+   "abstract_structure": "the group Gamma_h of case 70, represented by the subset S = \\overline{\\{1,2,5,8\\}} of the Coxeter diagram (5 subsets give this class)",
+   "cardinality": 216,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 70 with S = \\overline{\\{1,2,5,8\\}}, #I_1 = 64, #I_2 = 737, #I_12 = 2097 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 2097,
+   "latex": "\\overline{\\Gamma}_{h,70}(\\overline{\\{1,2,5,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 64,
+   "name": "Gamma_h,70",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-70.md",
+   "plane_orbits": 737,
+   "tag": "gamma-h-70"
+  },
+  "gamma-h-71": {
+   "abstract_structure": "the group Gamma_h of case 71, represented by the subset S = \\overline{\\{0,2,5,7\\}} of the Coxeter diagram (11 subsets give this class)",
+   "cardinality": 96,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 71 with S = \\overline{\\{0,2,5,7\\}}, #I_1 = 81, #I_2 = 1174, #I_12 = 3323 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 3323,
+   "latex": "\\overline{\\Gamma}_{h,71}(\\overline{\\{0,2,5,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 81,
+   "name": "Gamma_h,71",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-71.md",
+   "plane_orbits": 1174,
+   "tag": "gamma-h-71"
+  },
+  "gamma-h-72": {
+   "abstract_structure": "the group Gamma_h of case 72, represented by the subset S = \\{4,6,3,5\\} of the Coxeter diagram (8 subsets give this class)",
+   "cardinality": 120,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 72 with S = \\{4,6,3,5\\}, #I_1 = 92, #I_2 = 1210, #I_12 = 3503 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 3503,
+   "latex": "\\overline{\\Gamma}_{h,72}(\\{4,6,3,5\\})",
+   "lattice": "029J",
+   "line_orbits": 92,
+   "name": "Gamma_h,72",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-72.md",
+   "plane_orbits": 1210,
+   "tag": "gamma-h-72"
+  },
+  "gamma-h-73": {
+   "abstract_structure": "the group Gamma_h of case 73, represented by the subset S = \\overline{\\{0,1,2,5,8\\}} of the Coxeter diagram (48 subsets give this class)",
+   "cardinality": 72,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 73 with S = \\overline{\\{0,1,2,5,8\\}}, #I_1 = 96, #I_2 = 1440, #I_12 = 4166 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 4166,
+   "latex": "\\overline{\\Gamma}_{h,73}(\\overline{\\{0,1,2,5,8\\}})",
+   "lattice": "029J",
+   "line_orbits": 96,
+   "name": "Gamma_h,73",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-73.md",
+   "plane_orbits": 1440,
+   "tag": "gamma-h-73"
+  },
+  "gamma-h-74": {
+   "abstract_structure": "the group Gamma_h of case 74, represented by the subset S = \\overline{\\{0,1,2,5,7\\}} of the Coxeter diagram (64 subsets give this class)",
+   "cardinality": 48,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 74 with S = \\overline{\\{0,1,2,5,7\\}}, #I_1 = 108, #I_2 = 1818, #I_12 = 5251 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 5251,
+   "latex": "\\overline{\\Gamma}_{h,74}(\\overline{\\{0,1,2,5,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 108,
+   "name": "Gamma_h,74",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-74.md",
+   "plane_orbits": 1818,
+   "tag": "gamma-h-74"
+  },
+  "gamma-h-75": {
+   "abstract_structure": "the group Gamma_h of case 75, represented by the subset S = \\{4,6,-1,5\\} of the Coxeter diagram (44 subsets give this class)",
+   "cardinality": 48,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 75 with S = \\{4,6,-1,5\\}, #I_1 = 118, #I_2 = 1953, #I_12 = 5690 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 5690,
+   "latex": "\\overline{\\Gamma}_{h,75}(\\{4,6,-1,5\\})",
+   "lattice": "029J",
+   "line_orbits": 118,
+   "name": "Gamma_h,75",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-75.md",
+   "plane_orbits": 1953,
+   "tag": "gamma-h-75"
+  },
+  "gamma-h-76": {
+   "abstract_structure": "the group Gamma_h of case 76, represented by the subset S = \\{4,6,8,5\\} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 192,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 76 with S = \\{4,6,8,5\\}, #I_1 = 82, #I_2 = 996, #I_12 = 2829 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 2829,
+   "latex": "\\overline{\\Gamma}_{h,76}(\\{4,6,8,5\\})",
+   "lattice": "029J",
+   "line_orbits": 82,
+   "name": "Gamma_h,76",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-76.md",
+   "plane_orbits": 996,
+   "tag": "gamma-h-76"
+  },
+  "gamma-h-77": {
+   "abstract_structure": "the group Gamma_h of case 77, represented by the subset S = \\{4,6,3,7\\} of the Coxeter diagram (19 subsets give this class)",
+   "cardinality": 36,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 77 with S = \\{4,6,3,7\\}, #I_1 = 128, #I_2 = 2263, #I_12 = 6625 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 6625,
+   "latex": "\\overline{\\Gamma}_{h,77}(\\{4,6,3,7\\})",
+   "lattice": "029J",
+   "line_orbits": 128,
+   "name": "Gamma_h,77",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-77.md",
+   "plane_orbits": 2263,
+   "tag": "gamma-h-77"
+  },
+  "gamma-h-78": {
+   "abstract_structure": "the group Gamma_h of case 78, represented by the subset S = \\overline{\\{0,1,3,5,7\\}} of the Coxeter diagram (9 subsets give this class)",
+   "cardinality": 32,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 78 with S = \\overline{\\{0,1,3,5,7\\}}, #I_1 = 122, #I_2 = 2306, #I_12 = 6647 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 6647,
+   "latex": "\\overline{\\Gamma}_{h,78}(\\overline{\\{0,1,3,5,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 122,
+   "name": "Gamma_h,78",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-78.md",
+   "plane_orbits": 2306,
+   "tag": "gamma-h-78"
+  },
+  "gamma-h-79": {
+   "abstract_structure": "the group Gamma_h of case 79, represented by the subset S = \\{4,6,-1,3\\} of the Coxeter diagram (99 subsets give this class)",
+   "cardinality": 24,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 79 with S = \\{4,6,-1,3\\}, #I_1 = 144, #I_2 = 2856, #I_12 = 8357 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 8357,
+   "latex": "\\overline{\\Gamma}_{h,79}(\\{4,6,-1,3\\})",
+   "lattice": "029J",
+   "line_orbits": 144,
+   "name": "Gamma_h,79",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-79.md",
+   "plane_orbits": 2856,
+   "tag": "gamma-h-79"
+  },
+  "gamma-h-8": {
+   "abstract_structure": "the group Gamma_h of case 8, represented by the subset S = \\overline{\\{2\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 1244160,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 8 with S = \\overline{\\{2\\}}, #I_1 = 8, #I_2 = 22, #I_12 = 47 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 47,
+   "latex": "\\overline{\\Gamma}_{h,8}(\\overline{\\{2\\}})",
+   "lattice": "029J",
+   "line_orbits": 8,
+   "name": "Gamma_h,8",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-8.md",
+   "plane_orbits": 22,
+   "tag": "gamma-h-8"
+  },
+  "gamma-h-80": {
+   "abstract_structure": "the group Gamma_h of case 80, represented by the subset S = \\{4,6,-1,2\\} of the Coxeter diagram (39 subsets give this class)",
+   "cardinality": 16,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 80 with S = \\{4,6,-1,2\\}, #I_1 = 163, #I_2 = 3626, #I_12 = 10599 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 10599,
+   "latex": "\\overline{\\Gamma}_{h,80}(\\{4,6,-1,2\\})",
+   "lattice": "029J",
+   "line_orbits": 163,
+   "name": "Gamma_h,80",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-80.md",
+   "plane_orbits": 3626,
+   "tag": "gamma-h-80"
+  },
+  "gamma-h-81": {
+   "abstract_structure": "the group Gamma_h of case 81, represented by the subset S = \\{4,6,5\\} of the Coxeter diagram (9 subsets give this class)",
+   "cardinality": 24,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 81 with S = \\{4,6,5\\}, #I_1 = 156, #I_2 = 3074, #I_12 = 9031 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 9031,
+   "latex": "\\overline{\\Gamma}_{h,81}(\\{4,6,5\\})",
+   "lattice": "029J",
+   "line_orbits": 156,
+   "name": "Gamma_h,81",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-81.md",
+   "plane_orbits": 3074,
+   "tag": "gamma-h-81"
+  },
+  "gamma-h-82": {
+   "abstract_structure": "the group Gamma_h of case 82, represented by the subset S = \\{4,6,3\\} of the Coxeter diagram (54 subsets give this class)",
+   "cardinality": 12,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 82 with S = \\{4,6,3\\}, #I_1 = 192, #I_2 = 4532, #I_12 = 13369 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 13369,
+   "latex": "\\overline{\\Gamma}_{h,82}(\\{4,6,3\\})",
+   "lattice": "029J",
+   "line_orbits": 192,
+   "name": "Gamma_h,82",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-82.md",
+   "plane_orbits": 4532,
+   "tag": "gamma-h-82"
+  },
+  "gamma-h-83": {
+   "abstract_structure": "the group Gamma_h of case 83, represented by the subset S = \\{4,6,-1\\} of the Coxeter diagram (57 subsets give this class)",
+   "cardinality": 8,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 83 with S = \\{4,6,-1\\}, #I_1 = 218, #I_2 = 5766, #I_12 = 17003 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 17003,
+   "latex": "\\overline{\\Gamma}_{h,83}(\\{4,6,-1\\})",
+   "lattice": "029J",
+   "line_orbits": 218,
+   "name": "Gamma_h,83",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-83.md",
+   "plane_orbits": 5766,
+   "tag": "gamma-h-83"
+  },
+  "gamma-h-84": {
+   "abstract_structure": "the group Gamma_h of case 84, represented by the subset S = \\{4,3\\} of the Coxeter diagram (9 subsets give this class)",
+   "cardinality": 6,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 84 with S = \\{4,3\\}, #I_1 = 256, #I_2 = 7242, #I_12 = 21471 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 21471,
+   "latex": "\\overline{\\Gamma}_{h,84}(\\{4,3\\})",
+   "lattice": "029J",
+   "line_orbits": 256,
+   "name": "Gamma_h,84",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-84.md",
+   "plane_orbits": 7242,
+   "tag": "gamma-h-84"
+  },
+  "gamma-h-85": {
+   "abstract_structure": "the group Gamma_h of case 85, represented by the subset S = \\{4,6\\} of the Coxeter diagram (36 subsets give this class)",
+   "cardinality": 4,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 85 with S = \\{4,6\\}, #I_1 = 292, #I_2 = 9246, #I_12 = 27411 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 27411,
+   "latex": "\\overline{\\Gamma}_{h,85}(\\{4,6\\})",
+   "lattice": "029J",
+   "line_orbits": 292,
+   "name": "Gamma_h,85",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-85.md",
+   "plane_orbits": 9246,
+   "tag": "gamma-h-85"
+  },
+  "gamma-h-86": {
+   "abstract_structure": "the group Gamma_h of case 86, represented by the subset S = \\{4\\} of the Coxeter diagram (10 subsets give this class)",
+   "cardinality": 2,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 86 with S = \\{4\\}, #I_1 = 392, #I_2 = 14926, #I_12 = 44387 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 44387,
+   "latex": "\\overline{\\Gamma}_{h,86}(\\{4\\})",
+   "lattice": "029J",
+   "line_orbits": 392,
+   "name": "Gamma_h,86",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-86.md",
+   "plane_orbits": 14926,
+   "tag": "gamma-h-86"
+  },
+  "gamma-h-87": {
+   "abstract_structure": "the group Gamma_h of case 87, represented by the subset S = \\emptyset of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 1,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 2, p. 14: case 87 with S = \\emptyset, #I_1 = 528, #I_2 = 24242, #I_12 = 72199 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 72199,
+   "latex": "\\overline{\\Gamma}_{h,87}(\\emptyset)",
+   "lattice": "029J",
+   "line_orbits": 528,
+   "name": "Gamma_h,87",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-87.md",
+   "plane_orbits": 24242,
+   "tag": "gamma-h-87"
+  },
+  "gamma-h-9": {
+   "abstract_structure": "the group Gamma_h of case 9, represented by the subset S = \\overline{\\{0,7\\}} of the Coxeter diagram (1 subset gives this class)",
+   "cardinality": 645120,
+   "citation": "D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 9 with S = \\overline{\\{0,7\\}}, #I_1 = 11, #I_2 = 34, #I_12 = 77 — the numbers of orbits of isotropic lines, planes and flags in N.",
+   "flag_orbits": 77,
+   "latex": "\\overline{\\Gamma}_{h,9}(\\overline{\\{0,7\\}})",
+   "lattice": "029J",
+   "line_orbits": 11,
+   "name": "Gamma_h,9",
+   "parent_group": "o-t-en",
+   "path": "arithmetic-groups/gamma-h-9.md",
+   "plane_orbits": 34,
+   "tag": "gamma-h-9"
+  }
+ },
+ "cusp_chambers": {
+  "029J": {
+   "certification": "c67663ee2cb0aade7b4069583e0e73b87f8f86970ddec9f6835e4dfc65c19b34",
+   "latex": "U \\oplus U(2) \\oplus E_{8}(-2)",
+   "name": "U + U(2) + E8(-2)",
+   "path": "lattices/029J.md",
+   "rank": 12,
+   "rows": {
+    "gamma-en-2": [
+     {
+      "cusp": [
+       1,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "figure": 4,
+      "printed_page": 19,
+      "statement": "4.3.5",
+      "walls": 12
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       1,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "figure": 6,
+      "printed_page": 21,
+      "statement": "4.3.6",
+      "walls": 10
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       1,
+       1,
+       -2,
+       -3,
+       -4,
+       -6,
+       -5,
+       -4,
+       -3,
+       -2
+      ],
+      "figure": 8,
+      "printed_page": 22,
+      "statement": "4.3.7",
+      "walls": 12
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       2,
+       1,
+       -4,
+       -5,
+       -7,
+       -10,
+       -8,
+       -6,
+       -4,
+       -2
+      ],
+      "figure": 10,
+      "printed_page": 23,
+      "statement": "4.3.8",
+      "walls": 11
+     },
+     {
+      "cusp": [
+       2,
+       2,
+       0,
+       0,
+       -4,
+       -5,
+       -7,
+       -10,
+       -8,
+       -6,
+       -4,
+       -2
+      ],
+      "figure": 12,
+      "printed_page": 24,
+      "statement": "4.3.9",
+      "walls": 14
+     }
+    ]
+   },
+   "signature": [
+    2,
+    10
+   ],
+   "tag": "029J"
+  }
+ },
+ "cusp_diagrams": {
+  "029J": {
+   "certification": "c67663ee2cb0aade7b4069583e0e73b87f8f86970ddec9f6835e4dfc65c19b34",
+   "latex": "U \\oplus U(2) \\oplus E_{8}(-2)",
+   "name": "U + U(2) + E8(-2)",
+   "path": "lattices/029J.md",
+   "rank": 12,
+   "rows": {
+    "gamma-en-2": [
+     {
+      "cusp": [
+       1,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "edges": [
+       {
+        "left": "\\alpha_1",
+        "order": 3,
+        "right": "\\alpha_3"
+       },
+       {
+        "left": "\\alpha_1",
+        "order": 3,
+        "right": "\\alpha_11"
+       },
+       {
+        "left": "\\alpha_2",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_2",
+        "order": null,
+        "right": "\\alpha_12"
+       },
+       {
+        "left": "\\alpha_3",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_4",
+        "order": 3,
+        "right": "\\alpha_5"
+       },
+       {
+        "left": "\\alpha_5",
+        "order": 3,
+        "right": "\\alpha_6"
+       },
+       {
+        "left": "\\alpha_6",
+        "order": 3,
+        "right": "\\alpha_7"
+       },
+       {
+        "left": "\\alpha_7",
+        "order": 3,
+        "right": "\\alpha_8"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 3,
+        "right": "\\alpha_10"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 3,
+        "right": "\\alpha_11"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": null,
+        "right": "\\alpha_10"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": null,
+        "right": "\\alpha_12"
+       }
+      ],
+      "figure": 4,
+      "printed_page": 19,
+      "statement": "4.3.5",
+      "vertices": [
+       "\\alpha_1",
+       "\\alpha_2",
+       "\\alpha_3",
+       "\\alpha_4",
+       "\\alpha_5",
+       "\\alpha_6",
+       "\\alpha_7",
+       "\\alpha_8",
+       "\\alpha_9",
+       "\\alpha_10",
+       "\\alpha_11",
+       "\\alpha_12"
+      ],
+      "wall_count": 12,
+      "wall_vectors": [
+       [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+       ],
+       [
+        0,
+        0,
+        -1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        2,
+        0,
+        -2,
+        -3,
+        -4,
+        -6,
+        -5,
+        -4,
+        -3,
+        -2
+       ],
+       [
+        0,
+        0,
+        2,
+        2,
+        -6,
+        -8,
+        -11,
+        -16,
+        -13,
+        -10,
+        -7,
+        -4
+       ],
+       [
+        0,
+        0,
+        5,
+        3,
+        -10,
+        -16,
+        -20,
+        -30,
+        -24,
+        -18,
+        -12,
+        -6
+       ]
+      ]
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       1,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "edges": [
+       {
+        "left": "\\alpha_1",
+        "order": 3,
+        "right": "\\alpha_3"
+       },
+       {
+        "left": "\\alpha_2",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_3",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_4",
+        "order": 3,
+        "right": "\\alpha_5"
+       },
+       {
+        "left": "\\alpha_5",
+        "order": 3,
+        "right": "\\alpha_6"
+       },
+       {
+        "left": "\\alpha_6",
+        "order": 3,
+        "right": "\\alpha_7"
+       },
+       {
+        "left": "\\alpha_7",
+        "order": 3,
+        "right": "\\alpha_8"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 3,
+        "right": "\\alpha_9"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": 4,
+        "right": "\\alpha_10"
+       }
+      ],
+      "figure": 6,
+      "printed_page": 21,
+      "statement": "4.3.6",
+      "vertices": [
+       "\\alpha_1",
+       "\\alpha_2",
+       "\\alpha_3",
+       "\\alpha_4",
+       "\\alpha_5",
+       "\\alpha_6",
+       "\\alpha_7",
+       "\\alpha_8",
+       "\\alpha_9",
+       "\\alpha_10"
+      ],
+      "wall_count": 10,
+      "wall_vectors": [
+       [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+       ],
+       [
+        0,
+        2,
+        0,
+        0,
+        -2,
+        -3,
+        -4,
+        -6,
+        -5,
+        -4,
+        -3,
+        -2
+       ],
+       [
+        1,
+        -1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      ]
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       1,
+       1,
+       -2,
+       -3,
+       -4,
+       -6,
+       -5,
+       -4,
+       -3,
+       -2
+      ],
+      "edges": [
+       {
+        "left": "\\alpha_1",
+        "order": 3,
+        "right": "\\alpha_3"
+       },
+       {
+        "left": "\\alpha_1",
+        "order": 3,
+        "right": "\\alpha_12"
+       },
+       {
+        "left": "\\alpha_2",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_3",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_4",
+        "order": 3,
+        "right": "\\alpha_5"
+       },
+       {
+        "left": "\\alpha_5",
+        "order": 3,
+        "right": "\\alpha_6"
+       },
+       {
+        "left": "\\alpha_6",
+        "order": 3,
+        "right": "\\alpha_7"
+       },
+       {
+        "left": "\\alpha_7",
+        "order": 4,
+        "right": "\\alpha_13"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": 4,
+        "right": "\\alpha_11"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": 4,
+        "right": "\\alpha_12"
+       },
+       {
+        "left": "\\alpha_10",
+        "order": null,
+        "right": "\\alpha_11"
+       },
+       {
+        "left": "\\alpha_10",
+        "order": 4,
+        "right": "\\alpha_13"
+       }
+      ],
+      "figure": 8,
+      "printed_page": 22,
+      "statement": "4.3.7",
+      "vertices": [
+       "\\alpha_1",
+       "\\alpha_2",
+       "\\alpha_3",
+       "\\alpha_4",
+       "\\alpha_5",
+       "\\alpha_6",
+       "\\alpha_7",
+       "\\alpha_9",
+       "\\alpha_10",
+       "\\alpha_11",
+       "\\alpha_12",
+       "\\alpha_13"
+      ],
+      "wall_count": 12,
+      "wall_vectors": [
+       [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        -1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        2,
+        -2,
+        -3,
+        -4,
+        -6,
+        -5,
+        -4,
+        -3,
+        -2
+       ],
+       [
+        2,
+        0,
+        0,
+        -2,
+        2,
+        3,
+        4,
+        6,
+        5,
+        4,
+        3,
+        2
+       ],
+       [
+        2,
+        0,
+        0,
+        0,
+        -2,
+        -2,
+        -3,
+        -4,
+        -3,
+        -2,
+        -1,
+        0
+       ],
+       [
+        1,
+        1,
+        0,
+        -1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+       ]
+      ]
+     },
+     {
+      "cusp": [
+       0,
+       0,
+       2,
+       1,
+       -4,
+       -5,
+       -7,
+       -10,
+       -8,
+       -6,
+       -4,
+       -2
+      ],
+      "edges": [
+       {
+        "left": "\\alpha_2",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_3",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_3",
+        "order": 4,
+        "right": "\\alpha_11"
+       },
+       {
+        "left": "\\alpha_4",
+        "order": 3,
+        "right": "\\alpha_5"
+       },
+       {
+        "left": "\\alpha_5",
+        "order": 3,
+        "right": "\\alpha_6"
+       },
+       {
+        "left": "\\alpha_6",
+        "order": 3,
+        "right": "\\alpha_7"
+       },
+       {
+        "left": "\\alpha_7",
+        "order": 3,
+        "right": "\\alpha_8"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 3,
+        "right": "\\alpha_10"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 3,
+        "right": "\\alpha_12"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": 4,
+        "right": "\\alpha_12"
+       }
+      ],
+      "figure": 10,
+      "printed_page": 23,
+      "statement": "4.3.8",
+      "vertices": [
+       "\\alpha_2",
+       "\\alpha_3",
+       "\\alpha_4",
+       "\\alpha_5",
+       "\\alpha_6",
+       "\\alpha_7",
+       "\\alpha_8",
+       "\\alpha_9",
+       "\\alpha_10",
+       "\\alpha_11",
+       "\\alpha_12"
+      ],
+      "wall_count": 11,
+      "wall_vectors": [
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+       ],
+       [
+        -1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        2,
+        0,
+        -2,
+        -3,
+        -4,
+        -6,
+        -5,
+        -4,
+        -3,
+        -2
+       ],
+       [
+        1,
+        1,
+        -1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        2,
+        0,
+        -2,
+        0,
+        2,
+        2,
+        3,
+        4,
+        3,
+        2,
+        1,
+        0
+       ]
+      ]
+     },
+     {
+      "cusp": [
+       2,
+       2,
+       0,
+       0,
+       -4,
+       -5,
+       -7,
+       -10,
+       -8,
+       -6,
+       -4,
+       -2
+      ],
+      "edges": [
+       {
+        "left": "\\widetilde\\alpha_1",
+        "order": null,
+        "right": "\\alpha_9"
+       },
+       {
+        "left": "\\widetilde\\alpha_1",
+        "order": 4,
+        "right": "\\alpha_13"
+       },
+       {
+        "left": "\\widetilde\\alpha_1",
+        "order": 4,
+        "right": "\\alpha_14"
+       },
+       {
+        "left": "\\alpha_2",
+        "order": 3,
+        "right": "\\alpha_4"
+       },
+       {
+        "left": "\\alpha_2",
+        "order": 3,
+        "right": "\\alpha_10"
+       },
+       {
+        "left": "\\alpha_4",
+        "order": 3,
+        "right": "\\alpha_5"
+       },
+       {
+        "left": "\\alpha_4",
+        "order": 4,
+        "right": "\\alpha_14"
+       },
+       {
+        "left": "\\alpha_5",
+        "order": 3,
+        "right": "\\alpha_6"
+       },
+       {
+        "left": "\\alpha_6",
+        "order": 3,
+        "right": "\\alpha_7"
+       },
+       {
+        "left": "\\alpha_6",
+        "order": 4,
+        "right": "\\alpha_12"
+       },
+       {
+        "left": "\\alpha_7",
+        "order": 3,
+        "right": "\\alpha_8"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 3,
+        "right": "\\overline{\\widetilde\\alpha}_8"
+       },
+       {
+        "left": "\\alpha_8",
+        "order": 4,
+        "right": "\\alpha_13"
+       },
+       {
+        "left": "\\overline{\\widetilde\\alpha}_8",
+        "order": 3,
+        "right": "\\alpha_10"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": 4,
+        "right": "\\alpha_11"
+       },
+       {
+        "left": "\\alpha_9",
+        "order": 4,
+        "right": "\\alpha_12"
+       },
+       {
+        "left": "\\alpha_10",
+        "order": 4,
+        "right": "\\alpha_11"
+       }
+      ],
+      "figure": 12,
+      "printed_page": 24,
+      "statement": "4.3.9",
+      "vertices": [
+       "\\widetilde\\alpha_1",
+       "\\alpha_2",
+       "\\alpha_4",
+       "\\alpha_5",
+       "\\alpha_6",
+       "\\alpha_7",
+       "\\alpha_8",
+       "\\overline{\\widetilde\\alpha}_8",
+       "\\alpha_9",
+       "\\alpha_10",
+       "\\alpha_11",
+       "\\alpha_12",
+       "\\alpha_13",
+       "\\alpha_14"
+      ],
+      "wall_count": 14,
+      "wall_vectors": [
+       [
+        0,
+        0,
+        1,
+        -1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+       ],
+       [
+        0,
+        0,
+        -2,
+        -2,
+        0,
+        -3,
+        -4,
+        -6,
+        -5,
+        -4,
+        -3,
+        -2
+       ],
+       [
+        2,
+        0,
+        1,
+        3,
+        -2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        2,
+        0,
+        4,
+        4,
+        -2,
+        2,
+        4,
+        5,
+        4,
+        3,
+        2,
+        1
+       ],
+       [
+        -1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        1,
+        1,
+        3,
+        3,
+        -2,
+        1,
+        2,
+        2,
+        1,
+        0,
+        0,
+        0
+       ],
+       [
+        1,
+        1,
+        3,
+        4,
+        -2,
+        2,
+        3,
+        4,
+        3,
+        2,
+        1,
+        0
+       ],
+       [
+        1,
+        1,
+        2,
+        3,
+        -2,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+       ]
+      ]
+     }
+    ]
+   },
+   "signature": [
+    2,
+    10
+   ],
+   "tag": "029J"
+  }
+ },
+ "discriminant_forms": {
+  "0125": {
+   "certification": "b298f9ee07553d1f6f93710a554da24a7f4bf0cdb2a69e7f03c4142e22dfb839",
+   "determinant": -1024,
+   "isotropic_classes": 528,
+   "isotropic_orbits": 2,
+   "latex": "U(2) \\oplus E_{8}(-2)",
+   "name": "U(2) + E8(-2)",
+   "orthogonal_group_order": 46998591897600,
+   "path": "lattices/0125.md",
+   "rank": 10,
+   "signature": [
+    1,
+    9
+   ],
+   "tag": "0125"
+  },
+  "6JRR": {
+   "certification": "0be391409303d25f25d126795ee881040661b4883ad7473272b34b60b8c414da",
+   "determinant": -2048,
+   "isotropic_classes": 528,
+   "isotropic_orbits": 2,
+   "latex": "T_{\\mathrm{Co}}",
+   "name": "T_Co",
+   "orthogonal_group_order": 46998591897600,
+   "path": "lattices/6JRR.md",
+   "rank": 11,
+   "signature": [
+    2,
+    9
+   ],
+   "tag": "6JRR"
+  }
+ },
+ "hyperbolic_reflectivity": {
+  "0026": {
+   "certification": "cdb2911d3762f8d79e0ef7481321aefd9a4c7c05b6229c955f18514562a2457a",
+   "determinant": 2,
+   "gram": [
+    [
+     0,
+     1,
+     0
+    ],
+    [
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     -2
+    ]
+   ],
+   "latex": "U \\oplus A_{1}(-1)",
+   "name": "U + A1(-1)",
+   "path": "lattices/0026.md",
+   "rank": 3,
+   "references": [
+    {
+     "citation": "V. V. Nikulin, \"Factor groups of groups of automorphisms of hyperbolic forms with respect to subgroups generated by 2-reflections. Algebrogeometric applications\", J. Soviet Math. 22 (1983), 1401-1475, §4, Table 1 and Theorem 4.3.2.",
+     "url": "https://doi.org/10.1007/BF01094757"
+    }
+   ],
+   "reflective": true,
+   "signature": [
+    1,
+    2
+   ],
+   "tag": "0026"
+  }
+ },
+ "parabolic_subdiagrams": {
+  "0125": {
+   "certification": "0430d4dde789760ff670bab6269cf5bf69ae312faa1ff13d935c83c5f5a4fce7",
+   "gram": [
+    [
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     2,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     -4,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     -4,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     2,
+     0,
+     -4,
+     2,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     2,
+     2,
+     -4,
+     2,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     -4,
+     2,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     -4,
+     2,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     -4,
+     2
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     -4
+    ]
+   ],
+   "latex": "U(2) \\oplus E_{8}(-2)",
+   "name": "U(2) + E8(-2)",
+   "path": "lattices/0125.md",
+   "rank": 10,
+   "rows": {
+    "g-e": [
+     {
+      "figure": 4,
+      "parabolic_orbits": [
+       [
+        [
+         "\\alpha_1",
+         "\\alpha_3",
+         "\\alpha_4",
+         "\\alpha_5",
+         "\\alpha_6",
+         "\\alpha_7",
+         "\\alpha_8",
+         "\\alpha_9",
+         "\\alpha_11",
+         "\\alpha_12"
+        ]
+       ],
+       [
+        [
+         "\\alpha_1",
+         "\\alpha_2",
+         "\\alpha_3",
+         "\\alpha_4",
+         "\\alpha_5",
+         "\\alpha_6",
+         "\\alpha_7",
+         "\\alpha_9",
+         "\\alpha_10",
+         "\\alpha_11"
+        ],
+        [
+         "\\alpha_1",
+         "\\alpha_2",
+         "\\alpha_3",
+         "\\alpha_5",
+         "\\alpha_6",
+         "\\alpha_7",
+         "\\alpha_8",
+         "\\alpha_10",
+         "\\alpha_11",
+         "\\alpha_12"
+        ]
+       ],
+       [
+        [
+         "\\alpha_1",
+         "\\alpha_2",
+         "\\alpha_3",
+         "\\alpha_4",
+         "\\alpha_5",
+         "\\alpha_7",
+         "\\alpha_8",
+         "\\alpha_10",
+         "\\alpha_11"
+        ],
+        [
+         "\\alpha_2",
+         "\\alpha_3",
+         "\\alpha_4",
+         "\\alpha_5",
+         "\\alpha_6",
+         "\\alpha_7",
+         "\\alpha_8",
+         "\\alpha_10",
+         "\\alpha_11"
+        ]
+       ],
+       [
+        [
+         "\\alpha_1",
+         "\\alpha_2",
+         "\\alpha_3",
+         "\\alpha_4",
+         "\\alpha_5",
+         "\\alpha_6",
+         "\\alpha_7",
+         "\\alpha_8",
+         "\\alpha_10"
+        ],
+        [
+         "\\alpha_1",
+         "\\alpha_2",
+         "\\alpha_3",
+         "\\alpha_4",
+         "\\alpha_5",
+         "\\alpha_6",
+         "\\alpha_8",
+         "\\alpha_10",
+         "\\alpha_11"
+        ],
+        [
+         "\\alpha_1",
+         "\\alpha_2",
+         "\\alpha_3",
+         "\\alpha_4",
+         "\\alpha_6",
+         "\\alpha_7",
+         "\\alpha_8",
+         "\\alpha_10",
+         "\\alpha_11"
+        ],
+        [
+         "\\alpha_1",
+         "\\alpha_2",
+         "\\alpha_4",
+         "\\alpha_5",
+         "\\alpha_6",
+         "\\alpha_7",
+         "\\alpha_8",
+         "\\alpha_10",
+         "\\alpha_11"
+        ]
+       ]
+      ],
+      "printed_page": 19,
+      "statement": "4.3.5",
+      "wall_count": 12,
+      "walls": [
+       [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+       ],
+       [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+       ],
+       [
+        -1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+       ],
+       [
+        2,
+        0,
+        -2,
+        -3,
+        -4,
+        -6,
+        -5,
+        -4,
+        -3,
+        -2
+       ],
+       [
+        2,
+        2,
+        -6,
+        -8,
+        -11,
+        -16,
+        -13,
+        -10,
+        -7,
+        -4
+       ],
+       [
+        5,
+        3,
+        -10,
+        -16,
+        -20,
+        -30,
+        -24,
+        -18,
+        -12,
+        -6
+       ]
+      ]
+     }
+    ]
+   },
+   "signature": [
+    1,
+    9
+   ],
+   "tag": "0125"
+  }
+ },
+ "plane_orbits": {
+  "029J": {
+   "aliases": [
+    "Enriques period lattice"
+   ],
+   "determinant": 1024,
+   "latex": "U \\oplus U(2) \\oplus E_{8}(-2)",
+   "name": "U + U(2) + E8(-2)",
+   "path": "lattices/029J.md",
+   "rows": {
+    "O": {
+     "citation": "V. Alexeev, P. Engel, D. Z. Garza, L. Schaffler, \"Compact moduli of Enriques surfaces of degree 2\", Nagoya Math. J. 259 (2025), 581–624. Section 2: the unique (-2)-vector and the two (-4)-vectors modulo Gamma_En (from V. V. Nikulin, J. Soviet Math. 22 (1983), Theorems 2.13 and 2.15); the two 0-cusps of F_{(10,10,0)} are the primitive isotropic lines modulo Gamma_En (Section 3.2, p. 589); the two orbits of primitive isotropic lines and the two of primitive isotropic planes modulo O(T_En) are H. Sterk, \"Compactifications of the period space of Enriques surfaces, Part I\", Math. Z. 207 (1991), 1-36, Propositions 4.5 (p. 28) and 4.6 (p. 29). The two O(N)-orbits of isotropic lines are spanned by L_1 = Ze_1 and L_2 = Ze_3, with images of their stabilizers in the discriminant group of index 1 and 527 = 17*31, and the two orbits of isotropic planes are P_1 = Ze_1 + Ze_3 and P_2 = Z(2e_1 + 2e_2 + w) + Ze_3, w a vector of norm 4 in E_8, with images of index 527 and 23715 = 3^2*5*17*31: D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Section 3.6 (The Tits building), p. 22. D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Section 3.6 (The Tits building), p. 22: \"The set of 24242 isotropic planes also has 2 orbits, and these are of length 527 and 23715 respectively.\"",
+     "lines": 2,
+     "orbit_lengths": [
+      527,
+      23715
+     ],
+     "planes": 2
+    },
+    "Otilde+": {
+     "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Section 3.6 (The Tits building), p. 22: the space M~_En = Otilde^+(N)\\D_N, for N = U + U(2) + E_8(-2), has 528 0-dimensional cusps (isotropic lines) and 24242 1-dimensional cusps (isotropic planes); under O^+_10(F_2) the 528 lines fall in two orbits, of lengths 527 and 1, and the 24242 planes in two orbits, of lengths 527 and 23715. D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Section 3.6 (The Tits building), p. 22: \"The set of 24242 isotropic planes also has 2 orbits, and these are of length 527 and 23715 respectively.\"",
+     "lines": 528,
+     "orbit_lengths": [
+      527,
+      23715
+     ],
+     "planes": 24242
+    },
+    "gamma-en-2": {
+     "citation": "H. Sterk, \"Compactifications of the period space of Enriques surfaces, Part I\", Math. Z. 207 (1991), 1-36, Proposition 4.2.3 with Remark 4.2.4, p. 16: the five orbits of primitive isotropic lines of Gamma_En,2, the zero-dimensional boundary components of the Satake-Baily-Borel compactification; V. Alexeev, P. Engel, D. Z. Garza, L. Schaffler, \"Compact moduli of Enriques surfaces of degree 2\", Nagoya Math. J. 259 (2025), 581–624, Section 3.3, p. 590: \"There are five 0-cusps for which we use Sterk's numbering 1, 2, 3, 4, 5. There are also 9 distinct 1-cusps.\"",
+     "lines": 5,
+     "planes": 9
+    }
+   },
+   "signature": [
+    2,
+    10
+   ],
+   "tag": "029J"
+  },
+  "6JRX": {
+   "aliases": [
+    "U + U + E8(-1) + E8(-1) + <-2>"
+   ],
+   "determinant": -2,
+   "latex": "\\Lambda_{2}",
+   "name": "Lambda_2",
+   "path": "lattices/6JRX.md",
+   "rows": {
+    "O": {
+     "citation": "J. Scattone, \"On the compactification of moduli spaces for algebraic K3 surfaces\", Mem. Amer. Math. Soc. 374 (1987): Proposition 5.4.7 with Corollary 5.4.8(2), p. 78 — E -> E^perp/E is a bijection from the O(L_k)-orbits of primitive isotropic planes onto G(k), so there are h(k) of them — with Section 6.2 (Degree two), p. 97, (6.2.1): G(1) consists of four isomorphism classes; hence 4 orbits of primitive isotropic planes of O(Lambda_2), those of the 1-cusps of the Baily-Borel compactification.",
+     "planes": 4
+    },
+    "O+": {
+     "citation": "J. Scattone, \"On the compactification of moduli spaces for algebraic K3 surfaces\", Mem. Amer. Math. Soc. 374 (1987), Section 6, p. 94 — the Baily–Borel compactification of D_k/O_-(L_k) is obtained from D_k/O_-(L_k) by adding one point p and h(k) curves, so one zero-dimensional boundary component and h(1) = 4 one-dimensional ones (Section 6.2, p. 97). Section 3.6, p. 50, defines O_-(L) as the group of isometries of L with spinor norm 1, and Section 1, p. 3, as the index-two subgroup of O(L) that preserves the component D_k of the period domain; that is this card's O+.",
+     "lines": 1,
+     "planes": 4
+    },
+    "Otilde+": {
+     "citation": "J. Scattone, \"On the compactification of moduli spaces for algebraic K3 surfaces\", Mem. Amer. Math. Soc. 374 (1987), Theorem 4.0.1, p. 55 — the Baily–Borel compactification of D_k/Gamma_k has exactly floor((N+2)/2) boundary components of Type III, for k = k~ N^2 with k~ squarefree, which is one in degree 2k = 2 because N = 1. Section 1, p. 4, sets Gamma_k = O~(L_k) intersect O_-(L_k) and notes that it is also written O*(L_k) in Section 3.6, whose p. 51 has O*(L) = O_-(L) intersect O~(L); that is this card's Otilde+.",
+     "lines": 1
+    }
+   },
+   "signature": [
+    2,
+    19
+   ],
+   "tag": "6JRX"
+  },
+  "6JRY": {
+   "aliases": [
+    "U + U + E8(-1) + E8(-1) + <-4>"
+   ],
+   "determinant": -4,
+   "latex": "\\Lambda_{4}",
+   "name": "Lambda_4",
+   "path": "lattices/6JRY.md",
+   "rows": {
+    "O": {
+     "citation": "J. Scattone, \"On the compactification of moduli spaces for algebraic K3 surfaces\", Mem. Amer. Math. Soc. 374 (1987): Proposition 5.4.7 with Corollary 5.4.8(2), p. 78 — E -> E^perp/E is a bijection from the O(L_k)-orbits of primitive isotropic planes onto G(k), so there are h(k) of them — with Section 6.3 (Degree four), p. 100: G(2) consists of nine isomorphism classes; hence 9 orbits of primitive isotropic planes of O(Lambda_4), those of the 1-cusps of the Baily-Borel compactification.",
+     "planes": 9
+    },
+    "O+": {
+     "citation": "J. Scattone, \"On the compactification of moduli spaces for algebraic K3 surfaces\", Mem. Amer. Math. Soc. 374 (1987), Section 6, p. 94 — the Baily–Borel compactification of D_k/O_-(L_k) is obtained from D_k/O_-(L_k) by adding one point p and h(k) curves, so one zero-dimensional boundary component and h(2) = 9 one-dimensional ones (Section 6.3, p. 100). Section 3.6, p. 50, defines O_-(L) as the group of isometries of L with spinor norm 1, and Section 1, p. 3, as the index-two subgroup of O(L) that preserves the component D_k of the period domain; that is this card's O+.",
+     "lines": 1,
+     "planes": 9
+    },
+    "Otilde+": {
+     "citation": "J. Scattone, \"On the compactification of moduli spaces for algebraic K3 surfaces\", Mem. Amer. Math. Soc. 374 (1987), Theorem 4.0.1, p. 55 — the Baily–Borel compactification of D_k/Gamma_k has exactly floor((N+2)/2) boundary components of Type III, for k = k~ N^2 with k~ squarefree, which is one in degree 2k = 4 because N = 1. Section 1, p. 4, sets Gamma_k = O~(L_k) intersect O_-(L_k) and notes that it is also written O*(L_k) in Section 3.6, whose p. 51 has O*(L) = O_-(L) intersect O~(L); that is this card's Otilde+.",
+     "lines": 1
+    }
+   },
+   "signature": [
+    2,
+    19
+   ],
+   "tag": "6JRY"
+  }
+ },
+ "polarization_counts": {
+  "name": "U + E8(-1)",
+  "path": "lattices/0128.md",
+  "rows": {
+   "10": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 10,
+    "group_classes": 3,
+    "primitive_classes": 3,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "12": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 12,
+    "group_classes": 3,
+    "primitive_classes": 4,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "14": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 14,
+    "group_classes": 3,
+    "primitive_classes": 3,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "16": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 16,
+    "group_classes": 4,
+    "primitive_classes": 4,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "18": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 18,
+    "group_classes": 4,
+    "primitive_classes": 4,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "2": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 2,
+    "group_classes": 1,
+    "primitive_classes": 1,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "20": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 20,
+    "group_classes": 4,
+    "primitive_classes": 5,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "22": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 22,
+    "group_classes": 5,
+    "primitive_classes": 5,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "24": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 24,
+    "group_classes": 4,
+    "primitive_classes": 6,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "26": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 26,
+    "group_classes": 5,
+    "primitive_classes": 5,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "28": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 28,
+    "group_classes": 6,
+    "primitive_classes": 8,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "30": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 30,
+    "group_classes": 5,
+    "primitive_classes": 7,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "32": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 32,
+    "group_classes": 6,
+    "primitive_classes": 6,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "34": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 34,
+    "group_classes": 8,
+    "primitive_classes": 8,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "36": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 36,
+    "group_classes": 6,
+    "primitive_classes": 8,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "38": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 38,
+    "group_classes": 7,
+    "primitive_classes": 7,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "4": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 4,
+    "group_classes": 2,
+    "primitive_classes": 2,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "40": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 40,
+    "group_classes": 7,
+    "primitive_classes": 10,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "42": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 42,
+    "group_classes": 7,
+    "primitive_classes": 10,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "44": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 44,
+    "group_classes": 7,
+    "primitive_classes": 10,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "46": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 46,
+    "group_classes": 10,
+    "primitive_classes": 11,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "48": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 48,
+    "group_classes": 7,
+    "primitive_classes": 11,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "50": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 50,
+    "group_classes": 9,
+    "primitive_classes": 9,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "52": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 52,
+    "group_classes": 10,
+    "primitive_classes": 14,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "54": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 54,
+    "group_classes": 11,
+    "primitive_classes": 11,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "56": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 56,
+    "group_classes": 8,
+    "primitive_classes": 12,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "58": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 58,
+    "group_classes": 12,
+    "primitive_classes": 14,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "6": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 6,
+    "group_classes": 2,
+    "primitive_classes": 2,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "60": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 60,
+    "group_classes": 9,
+    "primitive_classes": 16,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "62": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 62,
+    "group_classes": 11,
+    "primitive_classes": 13,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "64": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 64,
+    "group_classes": 14,
+    "primitive_classes": 15,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "66": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 66,
+    "group_classes": 11,
+    "primitive_classes": 16,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "68": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 68,
+    "group_classes": 11,
+    "primitive_classes": 16,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "70": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 70,
+    "group_classes": 12,
+    "primitive_classes": 18,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "72": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 72,
+    "group_classes": 10,
+    "primitive_classes": 16,
+    "url": "https://arxiv.org/abs/2302.01679"
+   },
+   "8": {
+    "citation": "D. Dutour Sikirić, K. Hulek, \"Moduli of polarised Enriques surfaces — computational aspects\", J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 4, p. 17.",
+    "degree": 8,
+    "group_classes": 2,
+    "primitive_classes": 2,
+    "url": "https://arxiv.org/abs/2302.01679"
+   }
+  },
+  "tag": "0128"
+ },
+ "primitive_orbit_series": {
+  "0012": {
+   "certification": "5a4430096eb02533237fe05d0abeb1c97203b4d0fc7f4e828937a335ae18a3d9",
+   "determinant": 3,
+   "gram": [
+    [
+     2,
+     -1
+    ],
+    [
+     -1,
+     2
+    ]
+   ],
+   "latex": "A_{2}",
+   "name": "A2",
+   "path": "lattices/0012.md",
+   "rank": 2,
+   "rows": {
+    "O": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      1,
+      0,
+      0
+     ]
+    },
+    "O+": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      1,
+      0,
+      0
+     ]
+    },
+    "Otilde": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      1,
+      0,
+      0
+     ]
+    },
+    "Otilde+": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      2,
+      0,
+      0
+     ]
+    },
+    "SO": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      1,
+      0,
+      0
+     ]
+    },
+    "SO+": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      1,
+      0,
+      0
+     ]
+    },
+    "SOtilde": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      2,
+      0,
+      0
+     ]
+    },
+    "SOtilde+": {
+     "constant": 0,
+     "w": [
+      0,
+      0,
+      0,
+      0
+     ],
+     "z": [
+      0,
+      2,
+      0,
+      0
+     ]
+    }
+   },
+   "signature": [
+    2,
+    0
+   ],
+   "tag": "0012"
+  },
+  "0016": {
+   "certification": "f7a0c10019c967ac46b34bcf7d6774bce8f7802d5b9bec628092435367e26101",
+   "determinant": -1,
+   "gram": [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     0
+    ]
+   ],
+   "latex": "U",
+   "name": "U",
+   "path": "lattices/0016.md",
+   "rank": 2,
+   "rows": {
+    "O": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "O+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SO": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    },
+    "SO+": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    },
+    "SOtilde": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    },
+    "SOtilde+": {
+     "constant": 2,
+     "w": [],
+     "z": []
+    }
+   },
+   "signature": [
+    1,
+    1
+   ],
+   "tag": "0016"
+  },
+  "026E": {
+   "certification": "71acd10a9086e12004375735a77f3c09cfa35d98687b9746995f994599b427c3",
+   "determinant": 8,
+   "gram": [
+    [
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     -2,
+     1,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     -2,
+     1,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1,
+     -2,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1,
+     0,
+     -2,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     -2
+    ]
+   ],
+   "latex": "U \\oplus D_{4}(-1) \\oplus A_{1}(-1)",
+   "name": "U + D4(-1) + A1(-1)",
+   "path": "lattices/026E.md",
+   "rank": 7,
+   "rows": {
+    "O": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "O+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "Otilde+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SO": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SO+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SOtilde": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    },
+    "SOtilde+": {
+     "constant": 1,
+     "w": [],
+     "z": []
+    }
+   },
+   "signature": [
+    1,
+    6
+   ],
+   "tag": "026E"
+  }
+ }
+}

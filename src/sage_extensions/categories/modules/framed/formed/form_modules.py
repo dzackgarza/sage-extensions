@@ -44,6 +44,7 @@ from sage_extensions.categories.modules.framed.formed.torsion_form_modules impor
     _bilinear_descends,
     _coerced_gram,
     _even_lattice_genus_exists,
+    _form_gram_on,
     _forms_are_isomorphic,
     _invariant_factor_form_isomorphism,
     _p_adic_jordan_decomposition,
@@ -55,10 +56,12 @@ from sage_extensions.categories.modules.framed.formed.torsion_form_modules impor
     _torsion_form_all_subobjects,
     _torsion_form_automorphism_group,
     _torsion_form_element_action,
+    _torsion_form_isometry_between,
     _torsion_form_isotropic_subobjects,
     _torsion_form_lagrangian_subobjects,
     _torsion_form_maximal_isotropic_subobjects,
     _torsion_form_orthogonal_subobject,
+    _torsion_form_polar_radical,
     _torsion_form_primary_part,
     _torsion_form_subobject_on,
     _torsion_form_subobject_orbits,
@@ -87,9 +90,10 @@ from sage_extensions.categories.modules.pure.modules import (
     MatrixSpaces,
     Modules,
     ModulesWithChosenFinitePresentation,
-    RestrictedScalarsModules,
     TensorProductModules,
     VectorSpaces,
+    _regular_module_scalar_identification,
+    _scalar_value_identification,
 )
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
@@ -181,8 +185,8 @@ def _represented_module(value, ring):
     ``R`` is already carrying its canonical self-module structure it is
     returned directly; otherwise ``R.regular_module()`` supplies the canonical
     rank-one realization over itself.  Genuine module values are unchanged.
-    """
 
+    """
     if value is ring:
         return ring.regular_module()
     if value in Modules(ring):
@@ -257,14 +261,21 @@ def _form_square_commutes(
     ``f`` is a map of framed free modules of finite rank, the square is the
     tensor equation ``f^* G_N = G_M``: the Gram tensor of ``N`` pulled back
     along ``f`` is the Gram tensor of ``M``, and :meth:`Tensor.pullback` owns
-    that contraction (``OWN-24``).  Otherwise no Gram tensor states the
-    square, and a selected finite spanning family supplies the equations:
-    a bilinear form is determined by its values on pairs of generators,
-    and a quadratic form ``q`` by ``q(s)`` and ``q(s + t)``.  These finite
-    equations prove the universal equation when both maps are known linear.
-    A failed equation refutes it without that premise.  Missing finite data
-    or unestablished linearity retains the form-square proposition; no
-    infinite generating family or undecided equality is Boolean-coerced.
+    that contraction (``OWN-24``).  That is one comparison of the two Gram
+    tensors, so the decision costs a Gram-matrix read, not one ``b`` evaluation
+    per pair of generators (#320).  The scalars are read by
+    ``_scalar_value_identification``: the value object is a ring or a
+    restriction of scalars from one, and in the second case the Gram tensor's
+    entries are the scalars that restriction reads, not the value object's own
+    elements.
+    Otherwise no Gram tensor states the square, and a selected finite spanning
+    family supplies the equations: a bilinear form is determined by its values
+    on pairs of generators, and a quadratic form ``q`` by ``q(s)`` and
+    ``q(s + t)``.  These finite equations prove the universal equation when
+    both maps are known linear.  A failed equation refutes it without that
+    premise.  Missing finite data or unestablished linearity retains the
+    form-square proposition; no infinite generating family or undecided
+    equality is Boolean-coerced.
     """
     source_form = domain.form()
     target_form = codomain.form()
@@ -315,9 +326,19 @@ def _form_square_commutes(
         and module_morphism.linearity_decision() is True
         and value_morphism.linearity_decision() is True
     )
-    algebra_values = source_form.codomain() in OwnedRings() or (
-        source_form.codomain() in RestrictedScalarsModules(domain.base_ring())
-        and source_form.codomain().module_over_extension() in OwnedRings()
+    # The tensor branch is available exactly when both value objects read their
+    # elements as scalars of one ring: the two Gram tensors are then numerical
+    # over that ring and the square is one comparison of them.  Reading the
+    # extension itself as the ring asked the value object to be that ring, which
+    # a restriction of scalars is not, so a formed submodule over restricted
+    # scalars fell through to one :meth:`b` evaluation per pair of generators
+    # (#320).
+    source_scalars = _scalar_value_identification(source_form.codomain())
+    target_scalars = _scalar_value_identification(target_form.codomain())
+    algebra_values = (
+        source_scalars is not None
+        and target_scalars is not None
+        and source_scalars.codomain() is target_scalars.codomain()
     )
     match kind:
         case True, _ if (
@@ -414,12 +435,12 @@ class FormedModuleMorphism:
         if value_morphism.domain() is not source_values:
             raise ValueError(
                 f"the value map {value_morphism} must start at the value module {source_values} of "
-                f"{self.domain()}, but starts at {value_morphism.domain()}"
+                f"{domain}, but starts at {value_morphism.domain()}"
             )
         if value_morphism.codomain() is not target_values:
             raise ValueError(
                 f"the value map {value_morphism} must end at the value module {target_values} of "
-                f"{self.codomain()}, but ends at {value_morphism.codomain()}"
+                f"{codomain}, but ends at {value_morphism.codomain()}"
             )
         self._form_module_morphism = module_morphism
         self._value_morphism = value_morphism
@@ -1796,9 +1817,26 @@ class FormModules(OwnedCategoryOverBaseRing):
             )
 
         def algebraic_correlation_morphism(self):
-            r"""Return ``b^flat : M -> Hom_R(M,R)`` for this scalar-valued polar pairing."""
-            injective = self in FormModules(self.base_ring()).Nondegenerate()
-            return _algebraic_correlation_morphism(self, injective=injective)
+            r"""Return ``b^flat : M -> Hom_R(M,R)`` for this scalar-valued polar pairing.
+
+            The result is the linear arrow ``M -> M^*``, so it sits in one Mor
+            parent whatever the form's properties are and can be compared with
+            any other arrow between those endpoints — for instance the metric
+            correlation composed with the value identification
+            ``L^# -> L^*``.  That a nondegenerate form makes this arrow
+            injective is decided by ``is_injective()``; the perfect case has its
+            own isomorphism accessor, ``correlation_isomorphism()``.
+            """
+            correlation = _algebraic_correlation_morphism(self, injective=False)
+            match self in FormModules(self.base_ring()).Nondegenerate():
+                case True:
+                    # A nondegenerate form has zero radical, so this arrow is
+                    # injective by construction.  The arrow keeps the linear Hom
+                    # parent and states the injectivity for is_injective().
+                    correlation._injectivity_premise = True
+                case _:
+                    pass
+            return correlation
 
         def is_unimodular(self):
             r"""Whether the polar correlation is an isomorphism.
@@ -2074,23 +2112,30 @@ class FormModules(OwnedCategoryOverBaseRing):
                     f"the form on {self} pairs two of its elements, but {left} or {right} is not in {self}"
                 )
             form = self.form()
-            match _is_quadratic_form(form):
-                case False if form.codomain() in OwnedRings() and _has_finite_framing(
-                    self
-                ):
-                    # This module is constructed on the framing of the form's
-                    # module, so its coordinates are the Gram tensor's indices.
-                    framing = self.framing_morphism()
-                    values = form.codomain()
-                    return form.gram_tensor().contract(
-                        tensor.vector(values, tuple(framing.lift(left))),
-                        tensor.vector(values, tuple(framing.lift(right))),
-                    )
-                case is_quadratic:
-                    module = form.module()
-                    if module is not self:
-                        left, right = module(left), module(right)
-                    return form.b(left, right) if is_quadratic else form(left, right)
+            quadratic = _is_quadratic_form(form)
+            if (
+                quadratic is False
+                and form.codomain() in OwnedRings()
+                and _has_finite_framing(self)
+            ):
+                # This module is constructed on the framing of the form's
+                # module, so its coordinates are the Gram tensor's indices.
+                framing = self.framing_morphism()
+                values = form.codomain()
+                return form.gram_tensor().contract(
+                    tensor.vector(values, tuple(framing.lift(left))),
+                    tensor.vector(values, tuple(framing.lift(right))),
+                )
+            # An infinite framing has no coordinate vector for a Gram
+            # contraction, and a form valued in a module rather than in a ring
+            # has no Gram tensor at all.  The pairing is then the form itself
+            # on the pair, raised to the public value; a represented-module
+            # element is not the value the module's own category publishes.
+            module = form.module()
+            if module is not self:
+                left, right = module(left), module(right)
+            value = form.b(left, right) if quadratic is True else form(left, right)
+            return _value_from_module_element(self, value)
 
         def norm(self, element):
             r"""Return ``q(x)`` for a quadratic form, else ``b(x, x)``."""
@@ -2102,8 +2147,8 @@ class FormModules(OwnedCategoryOverBaseRing):
             if form.module() is not self:
                 element = self.unformed_module()(element)
             if _is_quadratic_form(form):
-                return form(element)
-            return form(element, element)
+                return _value_from_module_element(self, form(element))
+            return _value_from_module_element(self, form(element, element))
 
         def q(self, element):
             r"""Return the selected quadratic/norm value of ``element``."""
@@ -2202,7 +2247,10 @@ class FormModules(OwnedCategoryOverBaseRing):
         def signature_pair(self):
             r"""Return cardinal inertia of the selected norm in its chosen ordering."""
             value_module = self.value_module()
-            if value_module not in OwnedRings():
+            if (
+                value_module not in OwnedRings()
+                and _regular_module_scalar_identification(value_module) is None
+            ):
                 if not hasattr(value_module, "regular_module_identification"):
                     raise TypeError(
                         f"the signature of {self} needs ordered scalar values, not {value_module}"
@@ -2546,6 +2594,33 @@ class FormModules(OwnedCategoryOverBaseRing):
                         quadratic=self._torsion_form_is_quadratic(),
                     )
 
+                def isotropic_subobject(self, generators):
+                    r"""Return the submodule generated by ``generators`` when the form vanishes on it.
+
+                    For the quadratic reading the criterion is ``q = 0`` on the
+                    spanning family, which is the condition every isotropic glue
+                    subgroup is accepted under in this repository; for the
+                    bilinear reading it is the self-pairing.  A family that fails
+                    is refused rather than returned as an isotropic subobject.
+                    """
+                    subobject = self.subobject_generated_by(generators)
+                    embedded = tuple(
+                        subobject.inclusion()(subobject.module_generator(label))
+                        for label in subobject.module_generating_set()
+                    )
+                    if self._torsion_form_is_quadratic():
+                        zero = self.quadratic_value_module().zero()
+                        assert all(self.q(element) == zero for element in embedded), (
+                            f"cannot form an isotropic subobject of {self}: a generator has nonzero q"
+                        )
+                    else:
+                        zero = self.bilinear_value_module().zero()
+                        assert all(self.b(element, element) == zero for element in embedded), (
+                            f"cannot form an isotropic subobject of the bilinear form {self}: a "
+                            f"generator does not pair trivially with itself"
+                        )
+                    return subobject
+
                 def primary_part(self, prime):
                     return _torsion_form_primary_part(
                         self,
@@ -2576,6 +2651,85 @@ class FormModules(OwnedCategoryOverBaseRing):
                         self.b(left, right) == zero
                         for left in elements
                         for right in elements
+                    )
+
+                def polar_radical(self):
+                    r"""Return the radical of the polar form, as a subobject of this form.
+
+                    The radical is ``{x : b(x, y) = 0 for every y}``, the kernel of
+                    ``x |-> b(x, -)``; it is built by the module's own kernel owner
+                    and carries this form, so it can be used wherever a subobject of
+                    this form is expected.
+                    """
+                    return _torsion_form_polar_radical(
+                        self, quadratic=self._torsion_form_is_quadratic()
+                    )
+
+                def nondegenerate_quotient(self):
+                    r"""Return this form reduced by its polar radical.
+
+                    The polar form vanishes on its own radical by definition, so a
+                    *bilinear* form always descends to ``M/R``.  A quadratic form
+                    descends exactly when ``q`` vanishes on the radical, since
+                    ``q(x + r) = q(x) + q(r) + b(x, r) = q(x) + q(r)``; otherwise
+                    the quotient would silently lose the functional ``q|_R``, and
+                    that case is refused.
+
+                    The quotient module is the cokernel of the radical's inclusion,
+                    and the Gram is read on the images of this form's generators —
+                    the same statement as the general subquotient, without its
+                    enumeration of the module (measured: 0.33 s against 10.6 s on
+                    ``(Z/4)^2``).  The subquotient stays the fallback when the
+                    generator counts do not line up.
+                    """
+                    quadratic = self._torsion_form_is_quadratic()
+                    radical = self.polar_radical()
+                    inclusion = radical.inclusion()
+                    if quadratic:
+                        embedded = tuple(
+                            inclusion(generator)
+                            for generator in radical.module_generators()
+                        )
+                        if not self.form_vanishes_on(embedded):
+                            raise ValueError(
+                                f"the form of {self} descends to the quotient by its polar radical only "
+                                f"when it vanishes on that radical, and it does not"
+                            )
+                    quotient_module = inclusion.cokernel()
+                    # The cokernel is presented on the codomain's generators and its
+                    # projection sends each generator to the generator of the same
+                    # name (``ModuleMorphismMethods.cokernel_projection``).  The Gram
+                    # is therefore indexed by that correspondence, read off the
+                    # quotient's own labels, and each image is checked against the
+                    # projection: equal generator counts alone would not establish
+                    # the alignment.
+                    projection = inclusion.cokernel_projection()
+                    source_labels = tuple(self.module_generating_set())
+                    quotient_labels = tuple(quotient_module.module_generating_set())
+                    generators = []
+                    for label in quotient_labels:
+                        if label not in source_labels or projection(
+                            self.module_generator(label)
+                        ) != quotient_module.module_generator(label):
+                            return _torsion_form_subquotient(
+                                self,
+                                radical,
+                                self.subobject_generated_by(
+                                    self.module_generators()
+                                ),
+                                quadratic=quadratic,
+                            )
+                        generators.append(self.module_generator(label))
+                    generators = tuple(generators)
+                    category = (
+                        TorsionQuadraticFormModules(self.base_ring())
+                        if quadratic
+                        else TorsionBilinearFormModules(self.base_ring())
+                    )
+                    return category.from_module(
+                        quotient_module,
+                        _form_gram_on(self, generators, quadratic=quadratic),
+                        self.value_module(),
                     )
 
                 def gram_matrix(self):
@@ -2746,6 +2900,37 @@ class FormModules(OwnedCategoryOverBaseRing):
 
                 is_isometric_to = is_isomorphic
 
+                def isometry_to(self, other):
+                    r"""Return a typed isometry ``self -> other``, or ``None`` when there is none.
+
+                    The witness is a form isometry in the typed sense: a pair of
+                    mutually inverse module maps preserving this form's ``q``
+                    (quadratic) or ``b`` (bilinear) exactly, in the form's own
+                    value module.  It is not an abstract group isomorphism, and
+                    the typed constructor re-validates the form on the
+                    generators.
+
+                    The route is the normal-form transport: :meth:`normal_form`
+                    is an exact isometry onto a normalized framing for each side,
+                    and two isomorphic forms state equal normal data, so the
+                    label-preserving map bridges the two framings.
+                    """
+                    quadratic = self._torsion_form_is_quadratic()
+                    category = (
+                        TorsionQuadraticFormModules(self.base_ring())
+                        if quadratic
+                        else TorsionBilinearFormModules(self.base_ring())
+                    )
+                    if other not in category:
+                        raise TypeError(
+                            f"an isometry of {self} lands in {category}, but {other} is in "
+                            f"{other.category()}"
+                        )
+                    return _torsion_form_isometry_between(
+                        self, other, quadratic=quadratic
+                    )
+
+
                 def is_anti_isometric(self, other) -> bool:
                     quadratic = self._torsion_form_is_quadratic()
                     category = (
@@ -2827,7 +3012,7 @@ def _primary_form_component_family(form):
 
 def _finite_form_orbit(form, element, group=None):
     acting = form.automorphism_group() if group is None else group
-    return acting.orbit(form(element))
+    return acting.orbit_of_element(form(element))
 
 
 def _finite_form_orbits(form, group=None):
@@ -3457,7 +3642,7 @@ class QuadraticFormModules(OwnedCategoryOverBaseRing):
                     _subobject_lift=_subobject_lift,
                     _subobject_inclusion_factory=_subobject_inclusion_factory,
                 )
-                formed.validate_descent(check=False)
+                formed.validate_descent()
                 return formed
 
             def from_relations_and_gram(self, relation_rows, gram, value_module):
@@ -3921,22 +4106,43 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                 return FormBaseChanges(ring_map.codomain())(self, ring_map)
 
             def gram_matrix(self, basis=None):
-                r"""Return the coordinate matrix of the selected finite free form."""
-                if (
-                    basis is None
-                    and _is_bilinear_form(self.form())
-                    and self.value_module() in OwnedRings()
-                ):
-                    size = int(self.module_rank())
+                r"""Return the coordinate matrix of the selected finite free form.
+
+                The entries are the form's values read as scalars of one ring, and
+                that ring supplies the matrix space: either the value object *is* a
+                ring, or it is a restriction of scalars from one, and then its
+                ``_scalar_value_identification`` is the reading of its elements as
+                that ring's scalars.  A restriction of scalars is not a ring and
+                has no ``matrix_space``, so "a matrix over the values" is not a
+                construction; the scalar reading is the same coordinate datum
+                (``#320``).
+
+                On a framed module the form's coordinate Gram tensor already holds
+                every entry, and for a pulled-back form that tensor is the ambient
+                Gram tensor transported along the basis, ``B G B^t``, taken once.
+                Building the matrix from it costs one tensor contraction instead of
+                one :meth:`b` evaluation per entry.
+                """
+                values = self.value_module()
+                if basis is None and _is_bilinear_form(self.form()):
+                    from sage_extensions.tensors.tensor import Tensor
+
                     gram = self.gram_tensor()
-                    return (
-                        self.value_module()
-                        .matrix_space(size, size)
-                        .from_rows(
-                            (gram[row, column] for column in range(size))
-                            for row in range(size)
+                    if isinstance(gram, Tensor):
+                        rows, columns = map(int, gram.tensor_shape())
+                        return (
+                            gram.base_ring()
+                            .matrix_space(rows, columns)
+                            .from_rows(
+                                tuple(
+                                    tuple(
+                                        gram[row, column]
+                                        for column in range(columns)
+                                    )
+                                    for row in range(rows)
+                                )
+                            )
                         )
-                    )
                 selected = (
                     tuple(self.module_generators()) if basis is None else tuple(basis)
                 )
@@ -3945,13 +4151,24 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                         f"a Gram matrix of {self} is taken on elements of {self}, but {basis} contains "
                         "an element of another module"
                     )
+                scalars = _scalar_value_identification(values)
+                if scalars is None:
+                    raise TypeError(
+                        f"a Gram matrix of {self} needs its values read as scalars of one ring, "
+                        f"but {values} is neither a ring nor a restriction of scalars from one"
+                    )
                 size = len(selected)
                 return (
-                    self.value_module()
+                    scalars.codomain()
                     .matrix_space(size, size)
                     .from_rows(
                         tuple(
-                            tuple(self.b(left, right) for right in selected)
+                            tuple(
+                                self.b(left, right)
+                                if values is scalars.codomain()
+                                else scalars(self.b(left, right))
+                                for right in selected
+                            )
                             for left in selected
                         )
                     )
@@ -3959,12 +4176,34 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
 
             @cached_method
             def dual_module(self):
+                r"""Return the linear dual ``Hom_R(M,R)`` of the underlying module.
 
-                return self.base_ring().free_module(self.module_generating_set())
+                The dual is the module of ``R``-valued linear functionals, so an
+                element is a morphism and ``f(v)`` is its evaluation at ``v``.
+                Its selected resolution is indexed by this module's own basis
+                labels, with ``e_l^*`` the functional sending ``e_l`` to ``1``;
+                a second free module of the same rank would carry no pairing and
+                could not express that application.
+                """
+                return self.module_category().Mor(
+                    self, self.base_ring().regular_module()
+                )
 
             @cached_method
             def radical(self):
-                r"""Return the left radical ``ker(M -> Hom_R(M,W))``."""
+                r"""Return the left radical ``ker(M -> Hom_R(M,W))``.
+
+                For an integral lattice the radical is the lattice owner's: the
+                orthogonal complement of the identity morphism, which is the
+                subobject ``{x : b(x, L) = 0}`` with its lattice embedding.  The
+                generic left radical is the formed module's kernel and does not
+                carry that presentation.
+                """
+                from sage_extensions.categories.lattices import Lattices
+
+                ring = self.base_ring()
+                if self in Lattices(ring) and _engine_ring(ring) is SageZZ:
+                    return self.identity_morphism().orthogonal_complement()
                 return self.left_radical()
 
             @cached_method
@@ -3978,6 +4217,26 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                 basis of that quotient, so the returned module need not be the
                 literal cokernel object.
                 """
+                from sage_extensions.categories.lattices import (
+                    IsotropicReductions,
+                    Lattices,
+                )
+
+                ring = self.base_ring()
+                if self in Lattices(ring):
+                    # A lattice quotients by its radical at the lattice owner:
+                    # ``I^perp/I`` is again a lattice over the same ring, with
+                    # the isotropic reduction's inclusion, orthogonal
+                    # complement, ``quotient_lattice`` and parabolic data.  This
+                    # holds over a field as over ``ZZ``: the quotient keeps rank
+                    # ``rank(L) - rank(rad L)`` and the descended form.  The
+                    # generic descent below is for formed modules that are not
+                    # lattices.
+                    # The public ingress, in the lattice owner's own words:
+                    # ``IsotropicReductions(R)(L.radical().inclusion())``.
+                    return IsotropicReductions(ring)(
+                        self.identity_morphism().orthogonal_complement().inclusion()
+                    )
                 radical = self.left_radical().intersection(self.right_radical())
                 inclusion = radical.inclusion()
                 value_module = self.value_module()
@@ -4059,7 +4318,7 @@ class FreeFormModules(OwnedCategoryOverBaseRing):
                             )
                         )
                     )
-                values = self.value_module()
+                values = _represented_value_module(self)
                 value_identity = values.module_category().Mor(values, values).identity()
                 return FormModules(self.base_ring()).Mor(self, quotient)(
                     (projection, value_identity)

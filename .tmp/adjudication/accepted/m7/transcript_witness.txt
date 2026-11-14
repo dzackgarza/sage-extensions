@@ -1,0 +1,19 @@
+e = e2 = (0,0,1,0,0,0)  isotropic: True
+x = e2 + l1 = (0,0,1,0,1,0)  x perp e: True  (x,x) = -4
+E is an isometry of the Q-space: True
+E(M) subset M            : True
+E(N) subset N            : True
+  images of the N-generators: ['(1,0,0,0,0,0)', '(0,1,0,0,0,0)', '(0,0,2,0,0,0)', '(0,0,2,1,1,0)', '(0,0,4,0,1,0)', '(0,0,0,0,0,1)']
+E(x') - x' in M for x' in the dual basis of M (trivial on A_M):
+   y=(1,0,0,0,0,0)                displacement=(0,0,0,0,0,0)            in M: True  (in N: True)
+   y=(0,1,0,0,0,0)                displacement=(0,0,0,0,0,0)            in M: True  (in N: True)
+   y=(0,0,1,0,0,0)                displacement=(0,0,0,0,0,0)            in M: True  (in N: True)
+   y=(0,0,0,1,0,0)                displacement=(0,0,2,0,1,0)            in M: True  (in N: True)
+   y=(0,0,0,0,1,0)                displacement=(0,0,4,0,0,0)            in M: True  (in N: True)
+   y=(0,0,0,0,0,1)                displacement=(0,0,0,0,0,0)            in M: True  (in N: True)
+   y=(0,0,0,0,1/4,0)              displacement=(0,0,1,0,0,0)            in M: True  (in N: False)
+   y=(0,0,0,0,0,1/4)              displacement=(0,0,0,0,0,0)            in M: True  (in N: True)
+   y=(0,0,1/2,0,0,0)              displacement=(0,0,0,0,0,0)            in M: True  (in N: True)
+WITNESS: E(f2/2) - f2/2 = (0,0,1,0,1/2,0)    in N? False   -> NON-trivial on A_N
+         = e2 + l1/2 (mod N), and e2 not in N
+Quadratic check: q(E(f2/2)) = (.,.) mod 2 = 0  q(f2/2) = 0

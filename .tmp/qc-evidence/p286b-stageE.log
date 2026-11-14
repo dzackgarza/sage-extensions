@@ -1,0 +1,34 @@
+[18:51:04] 6JRX: M rank 17 det -2 genus Genus of even integral lattices of signature (0, 17) and determinant -2
+Traceback (most recent call last):
+  File "/probe.py", line 30, in <module>
+    found = neighbor_iteration([form], 3, algorithm="orbits", max_classes=cap)
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__neighbors.py", line 355, in neighbor_iteration
+    for v in p_divisible_vectors(Q, max_neighbors):
+             ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__neighbors.py", line 327, in p_divisible_vectors
+    yield from iter(v.lift() for v in Q.orbits_lines_mod_p(p)
+                                      ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__neighbors.py", line 408, in orbits_lines_mod_p
+    gens = self.automorphism_group().gens()
+           ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__automorphisms.py", line 325, in automorphism_group
+    self._compute_automorphisms()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/quadratic_form__automorphisms.py", line 283, in _compute_automorphisms
+    A = self.__pari__().qfauto()
+  File "cypari2/auto_gen.pxi", line 29608, in cypari2.gen.Gen_base.qfauto
+    sig_on()
+  File "cypari2/handle_error.pyx", line 211, in cypari2.handle_error._pari_err_handle
+cypari2.handle_error.PariError: the PARI stack overflows (current size: 1073741824; maximum size: 1073741824)
+You can use pari.allocatemem() to change the stack size and try again
+[peakrss] issue275: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 255 MiB
+[peakrss] low-water MemAvail : 10441 MiB
+[peakrss] peak single VmHWM  : 255 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      244 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   255 MiB hwm=   255 MiB avail= 10441 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 10618 MiB
+launcher exit: 1

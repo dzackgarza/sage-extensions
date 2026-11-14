@@ -219,12 +219,21 @@ class Cat(CategoryPacketMethods, Category):
         second: Functor,
         first: Functor,
     ) -> Functor:
-        if first.codomain() is not second.domain():
+        r"""``second o first``, defined when ``first`` lands where ``second`` starts.
+
+        The condition is the one the composite itself enforces: the first
+        functor's codomain need only be contained in the second's domain, since
+        every value it takes is then already an object (and every arrow an
+        arrow) of that domain.  The composite's own codomain is ``second``'s.
+        """
+        if not first.codomain().is_subcategory(second.domain()):
             raise ValueError(
                 f"cannot compose the functors {second} o {first}: {first} ends at {first.codomain()}, but "
-                f"{second} starts at {second.domain()}"
+                f"{second} starts at {second.domain()}, and the first is not a subcategory of the second"
             )
-        return second * first
+        from sage_extensions.categories.functors.core import _CompositeFunctor
+
+        return _CompositeFunctor(first, second)
 
     def SliceOver(self, base_object: Category) -> Category:
         r"""Return the slice ``Cat/base_object``."""
@@ -1507,13 +1516,10 @@ class _EvaluationFunctor(Functor):
 
 
 def _apex_isomorphism_in_subgroup(witness, subgroup, stabilizer_generators):
-    r"""An element of ``w S`` in ``H``, using the finite coset action on ``G/H``.
+    r"""An element of witness*S in H through the finite action on G/H.
 
-    Here ``w = witness`` lies in ``G = subgroup.supergroup()``, ``H`` is
-    ``subgroup``, and the supplied generators generate ``S``, the apex
-    image of the source marking's automorphisms.  The functor and coslice
-    categories own those markings and reconstruct the resulting marked
-    isomorphism.  They share this finite-action computation.
+    S is the apex image of the source marking's automorphisms. The
+    marking owner reconstructs the natural isomorphism from its apex.
     """
     from sage_extensions.categories.group.g_sets import FiniteGSets
 
@@ -1522,18 +1528,10 @@ def _apex_isomorphism_in_subgroup(witness, subgroup, stabilizer_generators):
         f"{subgroup} is a subgroup of {group}, but the apex isomorphism "
         f"{witness.domain()} -> {witness.codomain()} does not lie in it"
     )
-    cosets = group.left_cosets(subgroup)
-    assert cosets in FiniteGSets(group), (
-        f"an apex isomorphism in {subgroup} is found in the finite coset space "
-        f"{group}/{subgroup}, which is not realized as a finite {group}-set"
-    )
     stabilizer = group.subgroup(stabilizer_generators)
     inclusion = stabilizer.inclusion()
-    action = FiniteGSets(stabilizer)(
-        cosets, lambda element, point: cosets.act(inclusion(element), point)
-    )
-    transporter = action.transporter_witness(
-        cosets.coset_of(~witness), cosets.base_point()
+    transporter = FiniteGSets(stabilizer).transporter_on_left_cosets(
+        subgroup, ~witness, group.one(), inclusion,
     )
     return None if transporter is None else witness * ~inclusion(transporter)
 
@@ -1735,19 +1733,28 @@ class _FunctorCategory(CategoricalMor):
             )
             for obj in shape.objects()
         }
-        return NaturalTransformation(
-            first, second, lambda obj: components[obj.position()]
+        # The element of the one Mor of [J, D](F, G) that the core groupoid
+        # and _category_mor admit arrows by; it constructs its arrows from
+        # this datum.
+        return self._diagram_mor(source, target)(
+            NaturalTransformation(first, second, lambda obj: components[obj.position()])
         )
+
+    def _diagram_mor(self, source, target):
+        r"""The Mor of ``[J, D]`` holding the natural transformations of the diagrams ``F => G`` (protected contract above).
+
+        A subcategory of ``[J, D]`` whose Mor is a subobject of this one
+        (``CON-17``) states the same Mor of its underlying diagrams.
+        """
+        return _FunctorCategory.Mor(self, source, target)
 
     def _core_isomorphism_from_apex(self, core_mor, apex):
         r"""The isomorphism of ``core_mor`` whose apex component is ``apex`` (protected contract above)."""
         source, target = core_mor.domain(), core_mor.codomain()
-        forward = self.Mor(source, target)(
-            self._natural_transformation_from_apex(source, target, apex)
-        )
-        inverse = self.Mor(target, source)(
-            self._natural_transformation_from_apex(target, source, ~apex)
-        )
+        # Both are already elements of the diagram Mor; core_mor admits them
+        # through _category_mor, the same Mor or its subobject.
+        forward = self._natural_transformation_from_apex(source, target, apex)
+        inverse = self._natural_transformation_from_apex(target, source, ~apex)
         return core_mor(forward, inverse)
 
     def _core_isomorphism_witness(self, core_mor):

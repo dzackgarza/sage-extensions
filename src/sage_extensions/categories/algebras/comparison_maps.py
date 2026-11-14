@@ -22,7 +22,18 @@ def _constructed_algebra_morphism(
             f"a morphism of algebras {domain} -> {codomain} needs one base ring, but they are over "
             f"{domain.algebra_base_ring()} and {codomain.algebra_base_ring()}"
         )
-    mor = Algebras(domain.algebra_base_ring()).Unital().Mor(
+    # A constructed map between associative algebras is a morphism of the
+    # associative family: associativity is a law of the endpoints, so the
+    # stronger placement states what the endpoints are and asks nothing more of
+    # the map.  The weaker family would put the arrow outside the scalar slice
+    # ``AugmentedAlgebras(R)``, whose arrows are the associative unital ones.
+    associative = Algebras(domain.algebra_base_ring()).Associative().Unital()
+    match (domain in associative, codomain in associative):
+        case (True, True):
+            family = associative
+        case _:
+            family = Algebras(domain.algebra_base_ring()).Unital()
+    mor = family.Mor(
         domain,
         codomain,
     )

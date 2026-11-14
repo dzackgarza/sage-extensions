@@ -456,9 +456,8 @@ class RestrictionOfGroupActionFunctor(Functor):
             from sage_extensions.categories.group.g_sets import FiniteGSets
 
             if acted in FiniteGSets(morphism.codomain()):
-                return FiniteGSets(morphism.domain())(
-                    acted.point_set(),
-                    lambda group_element, point: acted.act(morphism(group_element), point),
+                return FiniteGSets(morphism.domain()).from_permutation_representation(
+                    acted.permutation_representation() * morphism,
                 )
 
         # The affine owner retains the coordinate algebra and constructs the

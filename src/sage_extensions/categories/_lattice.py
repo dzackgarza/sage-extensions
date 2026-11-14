@@ -385,6 +385,51 @@ def _gram_axiom_categories(lattices, gram):
     return () if placement is lattices else (placement,)
 
 
+def _rebuild_lattice(ring, rank, entries, names):
+    r"""Rebuild a lattice from its Gram components, through its own constructor.
+
+    ``entries`` are the Gram tensor's components in row-major order, read through
+    the tensor's own accessor.  They are plain owned ring elements, so they
+    persist; the arguments that a direct :func:`_lattice_on_gram` call would need
+    -- the module and the Gram tensor itself -- are lattice-owned and cannot be
+    pickled without re-entering the lattice (issue #20).  Rebuilding through
+    ``Lattices(ring)(rows)`` builds the same interned module and an equal Gram,
+    so the construction cache returns the lattice that was persisted.
+    """
+
+    from sage_extensions.categories.lattices import Lattices
+
+    rows = [
+        [entries[position * rank + offset] for offset in range(rank)]
+        for position in range(rank)
+    ]
+    lattice = Lattices(ring)(rows)
+    if names is not None and tuple(lattice.module_generating_set()) != tuple(names):
+        raise ValueError(
+            f"a lattice persisted with names {names} rebuilt under {tuple(lattice.module_generating_set())}"
+        )
+    return lattice
+
+
+class _DeferredFormOfGram:
+    r"""The bilinear form of a Gram tensor, computed when a lattice first asks for it.
+
+    A lattice parent retains this computation as its defining form datum, and a
+    parent must survive a pickle round trip, so it is a module-level object
+    carrying the module and the Gram rather than a closure over them (issue #20).
+    """
+
+    def __init__(self, module, gram) -> None:
+        self._module = module
+        self._gram = gram
+
+    def __call__(self):
+        return _form_of_gram(self._module, self._gram)
+
+    def __repr__(self) -> str:
+        return "form of the Gram tensor"
+
+
 def _lattice_object(
     category,
     module,
@@ -438,7 +483,7 @@ def _lattice_object(
             }
     return _form_module_from_bilinear_computation(
         module,
-        lambda: _form_of_gram(module, gram),
+        _DeferredFormOfGram(module, gram),
         _extra_categories=(
             lattices,
             *(
@@ -1433,8 +1478,10 @@ def _congruence_diagonal_form(gram: Tensor):
     signs were later checked in RR. Selected exact computation fields
     remain available through the shared linear-algebra scalar choice.
     """
-    ring = gram.base_ring()
-    field = _linear_algebra_ring(ring)
+    # Over a field, Sage's QuadraticForm reads any symmetric matrix as the Hessian
+    # 2Q; over ZZ it rejects an odd diagonal, so an odd lattice is diagonalized
+    # over its fraction field.
+    field = _linear_algebra_ring(gram.base_ring().fraction_field())
     components = _engine_component_matrix(gram).change_ring(field)
     return QuadraticForm(field, components).rational_diagonal_form(return_matrix=True)
 
@@ -1531,7 +1578,13 @@ def _discriminant_of_gram(gram: Tensor):
 
 def _format_disc_latex(disc) -> str:
     r"""Format the discriminant with its prime factorization."""
-    if disc in (-1, 0, 1):
+    from sage_extensions.categories.rings.ring_foundation import OwnedIntegralDomains
+
+    parent = disc.parent()
+    zero, one = parent.zero(), parent.one()
+    if (disc == zero) is True or (disc == one) is True or (disc == -one) is True:
+        return str(disc)
+    if parent not in OwnedIntegralDomains():
         return str(disc)
     # Factorization is the engine's; the owned integer crosses once, here.
     factorization = factor(_engine_element(disc.parent(), disc))
@@ -1555,22 +1608,34 @@ def _lattice_latex(lattice, ring_tex: str) -> str:
     r"""The archived lattice display: $L$ with its invariants, then $G_L$.
 
     The Gram tensor is the form of $L$, not $L$; $G_L$ typesets its components.
+
+    An index of inertia needs an ordering on the fraction field, and this
+    display does not invent one: the signature is computed and shown only when
+    the base field is the rational field, the one ordering the library
+    represents.  A lattice over a number field or a finite field therefore
+    displays its rank and discriminant, and :meth:`signature_pair` itself keeps
+    requiring a chosen ordering.
     """
     rank = lattice.module_rank()
     gram_latex = str(latex(lattice.gram_tensor()))
     gram_latex = re.sub(r"\b0\b", lambda _match: r"\cdot", gram_latex)
-    signature_field = _engine_ring(lattice.base_ring().fraction_field())
-    signature = _signature_pair_of_gram(lattice.gram_tensor())
+    from sage_extensions.categories.rings.ring_foundation import OwnedIntegralDomains
+
+    rational_base = (
+        lattice.base_ring() in OwnedIntegralDomains()
+        and _engine_ring(lattice.base_ring().fraction_field()) is QQ
+    )
+    signature = _signature_pair_of_gram(lattice.gram_tensor()) if rational_base else None
 
     match cardinal(rank).is_finite():
         case False:
-            if signature_field is QQ and signature is not None:
+            if signature is not None:
                 pos, neg = signature.first(), signature.second()
                 invariants = f"L \\in \\mathrm{{Lattices}}({ring_tex}), \\quad \\mathrm{{rk}}(L) = {latex(rank)}, \\quad \\mathrm{{sig}}(L) = ({latex(pos)}, {neg}) \\\\"
             else:
                 invariants = f"L \\in \\mathrm{{Lattices}}({ring_tex}), \\quad \\mathrm{{rk}}(L) = {latex(rank)} \\\\"
         case True:
-            if signature_field is QQ:
+            if signature is not None:
                 pos, neg = signature.first(), signature.second()
                 disc_latex = _format_disc_latex(lattice.discriminant())
                 invariants = (

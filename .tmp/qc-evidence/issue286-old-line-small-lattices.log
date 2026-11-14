@@ -1,0 +1,29 @@
+[     0.0s] == U(2) + A1: rank 3, signature (1, 2), even True
+   |A| = 8, isotropic classes = 3
+[     1.1s]    isotropic_orbit_representatives(1): 1 orbits in 0.71s
+   primitive: True | isotropic: True
+[     1.3s] == U + <2>: rank 3, signature (2, 1), even True
+   |A| = 2, isotropic classes = 1
+[     1.5s]    isotropic_orbit_representatives(1): 1 orbits in 0.16s
+   primitive: True | isotropic: True
+[     1.5s] == U: rank 2, signature (1, 1), even True
+   |A| = 1, isotropic classes = 1
+[     1.6s]    isotropic_orbit_representatives(1): 1 orbits in 0.04s
+   primitive: True | isotropic: True
+[     1.6s] == U + U: rank 4, signature (2, 2), even True
+   |A| = 1, isotropic classes = 1
+[     1.8s]    isotropic_orbit_representatives(1): 1 orbits in 0.13s
+   primitive: True | isotropic: True
+DONE
+[peakrss] issue286: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 460 MiB
+[peakrss] low-water MemAvail : 13294 MiB
+[peakrss] peak single VmHWM  : 460 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      449 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   460 MiB hwm=   460 MiB avail= 13294 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   281 MiB hwm=   281 MiB avail= 13459 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     2 MiB avail= 13664 MiB
+launcher exit: 0

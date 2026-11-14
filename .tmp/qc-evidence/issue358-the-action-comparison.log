@@ -1,0 +1,23 @@
+[   18.76s] |O(q)| = 46998591897600
+class engine element type: GapElement repr head: f3
+generator type: GapElement repr head: [ f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11 ] -> [ f1, f2, f3, f5, f4, f4*f5*f6*f7*f8*f9, f4*f5*f7, f4*f9, f5*f8, f10
+ImageElm works: f3 0.0 s
+x^g works: f3 0.0 s
+Orbit with OnSets: 67456 2.89 s
+Stabilizer with OnSets: 696729600 86.85 s
+generators 3
+[  108.60s] done
+[peakrss] p358p8: child waited=0 shell_code=0 samples=56
+[peakrss] peak tree RSS      : 995 MiB
+[peakrss] low-water MemAvail : 7689 MiB
+[peakrss] peak single VmHWM  : 1001 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      990 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   110.2s procs=  3 rss=   995 MiB hwm=  1001 MiB avail=  9185 MiB
+[peakrss]   t=   100.1s procs=  3 rss=   992 MiB hwm=   999 MiB avail=  9120 MiB
+[peakrss]   t=   102.2s procs=  3 rss=   992 MiB hwm=   999 MiB avail=  9220 MiB
+[peakrss]   t=   104.2s procs=  3 rss=   992 MiB hwm=   999 MiB avail=  9131 MiB
+[peakrss]   t=   106.2s procs=  3 rss=   992 MiB hwm=   999 MiB avail=  9131 MiB
+launcher exit: 0

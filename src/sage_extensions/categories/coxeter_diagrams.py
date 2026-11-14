@@ -6,6 +6,7 @@ from sage.categories.map import Map
 from sage.categories.morphism import Morphism
 from sage.combinat.root_system.cartan_type import CartanType
 from sage.combinat.root_system.coxeter_matrix import CoxeterMatrix
+from sage.arith.misc import binomial
 from sage.graphs.graph import Graph
 from sage.matrix.constructor import matrix as sage_matrix
 from sage.misc.cachefunc import cached_function, cached_method
@@ -323,6 +324,51 @@ class CoxeterDiagramMor(CategoricalMor):
 
 class CoxeterDiagramMorCategoryConstruction(MorCategoryConstruction):
     FixedCategoryClass = CoxeterDiagramMor
+
+
+def _inertia_of_entries(entries):
+    r"""Return \((n_+,n_-,n_0)\) of the symmetric form ``entries``, by Sylvester.
+
+    This is the one inertia computation: it classifies a diagram's Schlaefli
+    form and, applied to a principal submatrix, the form of an induced
+    subdiagram.  The form may be degenerate, so the zero index is part of the
+    answer; it is not a signature pair.
+    """
+    entries = [list(row) for row in entries]
+    positive = negative = zero = 0
+    while entries:
+        n = len(entries)
+        pivot = next((i for i in range(n) if entries[i][i] != 0), None)
+        if pivot is None:
+            off = next(
+                ((i, j) for i in range(n) for j in range(i + 1, n) if entries[i][j] != 0),
+                None,
+            )
+            if off is None:
+                zero += n
+                break
+            i, j = off
+            # A nonzero off-diagonal pairing gives a nonisotropic vector
+            # e_i + e_j; change basis by replacing e_i.
+            for k in range(n):
+                entries[i][k] += entries[j][k]
+            for k in range(n):
+                entries[k][i] += entries[k][j]
+            pivot = i
+        if pivot:
+            entries[0], entries[pivot] = entries[pivot], entries[0]
+            for row in entries:
+                row[0], row[pivot] = row[pivot], row[0]
+        d = entries[0][0]
+        if d > 0:
+            positive += 1
+        else:
+            negative += 1
+        entries = [
+            [entries[i][j] - entries[i][0] * entries[0][j] / d for j in range(1, n)]
+            for i in range(1, n)
+        ]
+    return cardinal(positive), cardinal(negative), cardinal(zero)
 
 
 class CoxeterDiagrams(OwnedCategory):
@@ -827,24 +873,23 @@ class CoxeterDiagrams(OwnedCategory):
             return tensor(real_algebraics, (), (mirrors, mirrors), values)
 
         @cached_method
-        def _inertia_counts(self):
-            r"""Return \((n_+,n_-,n_0)\) of the Schlaefli form, by Sylvester.
+        def _inertia_matrix(self):
+            r"""Return the exact matrix whose inertia classifies the Schlaefli form.
 
-            The Coxeter diagram is classified by the inertia of its Schlaefli
-            form, and that form is allowed to be degenerate, so the zero index
-            \(n_0\) is part of the answer.  This is not a signature *pair*.
+            For a rooted integral diagram the retained root Gram supplies an
+            integral matrix congruent to the Schlaefli form by a positive
+            diagonal scaling; otherwise the normalized Schlaefli tensor does.
+            :meth:`_inertia_counts` and the vertex-subset decision behind
+            :meth:`maximal_elliptic_subdiagrams` read this one matrix, so a
+            subdiagram's inertia is the inertia of its principal submatrix and
+            never requires building the subdiagram.
             """
-
-            # For a rooted integral diagram, the retained root Gram supplies
-            # an integral matrix congruent to the Schlaefli form by a positive
-            # diagonal scaling. Compute inertia from it directly rather than
-            # rebuilding the normalized tensor and lowering every entry.
             if (
                 self._root_gram_engine_matrix is not None
                 and self._root_gram_engine_matrix.base_ring() is SageZZ
             ):
                 gram = self._root_gram_engine_matrix.change_ring(SageZZ)
-                matrix = sage_matrix(
+                return sage_matrix(
                     SageZZ,
                     [
                         [
@@ -854,40 +899,35 @@ class CoxeterDiagrams(OwnedCategory):
                         for i in range(gram.nrows())
                     ],
                 ).change_ring(QQ)
-            else:
-                matrix = _engine_component_matrix(self.schlafli_tensor())
-            entries = [[matrix[i, j] for j in range(matrix.ncols())]
-                       for i in range(matrix.nrows())]
-            positive = negative = zero = 0
-            while entries:
-                n = len(entries)
-                pivot = next((i for i in range(n) if entries[i][i] != 0), None)
-                if pivot is None:
-                    off = next(((i, j) for i in range(n)
-                                for j in range(i + 1, n) if entries[i][j] != 0), None)
-                    if off is None:
-                        zero += n
-                        break
-                    i, j = off
-                    # A nonzero off-diagonal pairing gives a nonisotropic
-                    # vector e_i+e_j; change basis by replacing e_i.
-                    for k in range(n):
-                        entries[i][k] += entries[j][k]
-                    for k in range(n):
-                        entries[k][i] += entries[k][j]
-                    pivot = i
-                if pivot:
-                    entries[0], entries[pivot] = entries[pivot], entries[0]
-                    for row in entries:
-                        row[0], row[pivot] = row[pivot], row[0]
-                d = entries[0][0]
-                if d > 0:
-                    positive += 1
-                else:
-                    negative += 1
-                entries = [[entries[i][j] - entries[i][0] * entries[0][j] / d
-                            for j in range(1, n)] for i in range(1, n)]
-            return cardinal(positive), cardinal(negative), cardinal(zero)
+            return _engine_component_matrix(self.schlafli_tensor())
+
+        def _principal_inertia_counts(self, positions):
+            r"""Return the inertia of the principal submatrix on ``positions``.
+
+            The Schlaefli form of the subdiagram induced on a vertex subset is
+            the principal submatrix of this diagram's Schlaefli form, so this
+            decides ellipticity for the subset without constructing it.
+            """
+            matrix = self._inertia_matrix()
+            return _inertia_of_entries(
+                [[matrix[i, j] for j in positions] for i in positions]
+            )
+
+        def _inertia_counts(self):
+            r"""Return \((n_+,n_-,n_0)\) of the Schlaefli form, by Sylvester.
+
+            The Coxeter diagram is classified by the inertia of its Schlaefli
+            form, and that form is allowed to be degenerate, so the zero index
+            \(n_0\) is part of the answer.  This is not a signature *pair*.
+            """
+            matrix = self._inertia_matrix()
+            return _inertia_of_entries(
+                [
+                    [matrix[i, j] for j in range(matrix.ncols())]
+                    for i in range(matrix.nrows())
+                ]
+            )
+
 
         def positive_inertia_index(self):
             r"""Return \(n_+\), the positive index of inertia of the Schlaefli form."""
@@ -906,6 +946,199 @@ class CoxeterDiagrams(OwnedCategory):
 
         def is_parabolic(self) -> bool:
             return self.negative_inertia_index() == 0 and self.zero_inertia_index() == 1
+
+        def form_rank(self):
+            r"""Return the rank of the Schlaefli form, not the Coxeter generator rank.
+
+            The geometric rank of a diagram is the dimension of the space its
+            form lives on, which is the vertex count less the dimension of the
+            radical.  For a connected elliptic diagram the two coincide, and for
+            a connected affine one the form rank is the vertex count less one;
+            for a union of \(k\) affine components it is the vertex count less
+            \(k\).  Selection by geometry must use this, since a caller that
+            reads the vertex count as the rank undercounts an affine union by
+            one per component.
+            """
+            return cardinal(int(self.cardinality()) - int(self.zero_inertia_index()))
+
+        def _component_positions(self, positions):
+            r"""The connected components of the induced graph on ``positions``, as position tuples.
+
+            The graph is this diagram's Coxeter graph, the same one
+            :meth:`connected_component_vertex_sets` reads.
+            """
+            ranking = self.index_set().ranking_map()
+            vertices = tuple(self.index_set()[position] for position in positions)
+            return tuple(
+                tuple(int(ranking(vertex)) for vertex in component)
+                for component in self._engine_graph().subgraph(vertices).connected_components(sort=True)
+            )
+
+        def _is_componentwise_affine_on(self, positions) -> bool:
+            r"""Decide :meth:`is_componentwise_affine` for a vertex subset, without building it."""
+            components = self._component_positions(positions)
+            if not components:
+                return False
+            for component in components:
+                _positive, negative, zero = self._principal_inertia_counts(component)
+                if negative != 0 or zero != 1:
+                    return False
+            return True
+
+        def _is_parabolic_union_on(self, positions) -> bool:
+            r"""Decide :meth:`is_parabolic_union` for a vertex subset, without building it."""
+            components = self._component_positions(positions)
+            if len(components) < 2:
+                return False
+            return self._is_componentwise_affine_on(positions)
+
+        def is_componentwise_affine(self) -> bool:
+            r"""Whether every connected component of this diagram is affine, and it is nonempty.
+
+            This is the complete nonempty componentwise-affine contract: a
+            single affine component qualifies, as does a disjoint union of any
+            number of them.  Each component is read through
+            :meth:`is_parabolic` on the induced subdiagram, so the classification
+            is the maintained one; :meth:`form_rank` gives the geometric rank of
+            the result.
+
+            :meth:`is_parabolic` keeps its documented total-nullity-one meaning
+            and :meth:`is_parabolic_union` its at-least-two-components meaning;
+            neither is reinterpreted here.
+            """
+            components = tuple(self.connected_component_vertex_sets())
+            if not components:
+                return False
+            return all(
+                self.induced_subdiagram(tuple(component)).is_parabolic()
+                for component in components
+            )
+
+        def is_parabolic_union(self) -> bool:
+            r"""Whether this diagram is a disjoint union of at least two affine components.
+
+            The nullity of a disjoint union is the sum of its components', so
+            affine \(E_7\) together with affine \(A_1\) has radical of
+            dimension two and is not :meth:`is_parabolic`, which keeps its
+            documented total-nullity-one meaning.  This predicate asks for a
+            union of at least two components; a single affine component is
+            excluded here and included by :meth:`is_componentwise_affine`,
+            which is the complete contract.
+            """
+            components = tuple(self.connected_component_vertex_sets())
+            if len(components) < 2:
+                return False
+            return self.is_componentwise_affine()
+
+        def _maximal_vertex_sets(self, subset_predicate, max_rank=None, max_form_rank=None):
+            r"""Vertex sets maximal for inclusion among those ``subset_predicate`` accepts.
+
+            The predicate is decided on a tuple of vertex **positions** (this is
+            internal; the public :meth:`maximal_subdiagrams` passes labels).
+            Enumerated by cardinality and then lexicographically, the order
+            :meth:`induced_subdiagrams` uses.
+
+            ``max_rank`` caps the vertex count and ``max_form_rank`` caps the
+            geometric rank of :meth:`form_rank`; both are applied to the
+            returned subdiagrams only, after maximality is decided over every
+            subset.  A cap can therefore exclude a maximal member but never
+            promote a subdiagram contained in a larger one.
+            """
+            vertices = tuple(self.index_set())
+            accepted = []
+            for size in range(len(vertices) + 1):
+                for subset in combinations(range(len(vertices)), size):
+                    if subset_predicate(subset):
+                        accepted.append(frozenset(subset))
+            maximal = [
+                candidate
+                for candidate in accepted
+                if not any(candidate < other for other in accepted)
+            ]
+            if max_rank is not None:
+                limit = int(max_rank)
+                assert limit >= 0, f"a rank cap must be a cardinal, but {max_rank!r} is negative"
+                maximal = [candidate for candidate in maximal if len(candidate) <= limit]
+            if max_form_rank is not None:
+                limit = int(max_form_rank)
+                assert limit >= 0, (
+                    f"a form-rank cap must be a cardinal, but {max_form_rank!r} is negative"
+                )
+                maximal = [
+                    candidate
+                    for candidate in maximal
+                    if len(candidate)
+                    - int(self._principal_inertia_counts(tuple(sorted(candidate)))[2])
+                    <= limit
+                ]
+            return tuple(
+                tuple(vertices[position] for position in sorted(candidate))
+                for candidate in maximal
+            )
+
+        def maximal_subdiagrams(self, predicate, *, max_rank=None, max_form_rank=None):
+            r"""Induced subdiagrams maximal for inclusion on which ``predicate`` holds.
+
+            ``predicate`` is a decision on a tuple of **vertex labels** — the
+            elements of :meth:`index_set`, which are not necessarily integers —
+            and the owner enumerates subsets, so a caller states its condition
+            on labels and pays no induced-diagram construction for the
+            candidates it rejects.
+
+            ``max_rank`` caps the vertex count and ``max_form_rank`` the
+            geometric rank (:meth:`form_rank`); both are applied after
+            maximality is decided.  The survivors are the induced subdiagrams,
+            with their labels, roots, root Gram and inclusion arrows.
+            """
+            vertices = tuple(self.index_set())
+
+            def on_positions(positions):
+                return predicate(tuple(vertices[position] for position in positions))
+
+            return finite_ordered_set(
+                tuple(
+                    self.induced_subdiagram(vertices_of_set)
+                    for vertices_of_set in self._maximal_vertex_sets(
+                        on_positions, max_rank, max_form_rank
+                    )
+                )
+            )
+
+        def maximal_componentwise_affine_subdiagrams(self, *, max_rank=None, max_form_rank=None):
+            r"""Nonempty componentwise-affine induced subdiagrams, maximal for inclusion.
+
+            The family is every nonempty subdiagram each of whose components is
+            affine — a single affine component included — and maximality is
+            decided across that whole family, so an affine component contained
+            in a larger affine union is not returned.  This is the query a
+            boundary computation needs; :meth:`maximal_parabolic_union_subdiagrams`
+            is the same query restricted to unions of at least two components.
+            """
+            return finite_ordered_set(
+                tuple(
+                    self.induced_subdiagram(vertices)
+                    for vertices in self._maximal_vertex_sets(
+                        self._is_componentwise_affine_on, max_rank, max_form_rank
+                    )
+                )
+            )
+
+        def maximal_parabolic_union_subdiagrams(self, *, max_rank=None, max_form_rank=None):
+            r"""Disjoint unions of at least two affine components, maximal for inclusion.
+
+            An elliptic subdiagram is a single finite component, while a
+            boundary ray of Type II contributes a union of affine components
+            that :meth:`is_parabolic` does not name, since that predicate asks
+            for total nullity one.
+            """
+            return finite_ordered_set(
+                tuple(
+                    self.induced_subdiagram(vertices)
+                    for vertices in self._maximal_vertex_sets(
+                        self._is_parabolic_union_on, max_rank, max_form_rank
+                    )
+                )
+            )
 
         def is_hyperbolic(self) -> bool:
             return self.negative_inertia_index() == 1
@@ -1203,18 +1436,6 @@ class CoxeterDiagrams(OwnedCategory):
             )
             return symmetric.subgroup(automorphisms)
 
-        def _aut_vertex_map(self, automorphism):
-            r"""The permutation of the vertices that the element ``automorphism`` of :meth:`Aut` is.
-
-            Part of the private adapter of :meth:`_bond_preserving_permutation_group`:
-            that group is a subgroup of the symmetric group on the vertex
-            positions numbered from one, and this reads its elements back as
-            maps of vertices.
-            """
-            ranking = self.index_set().ranking_map()
-            vertices = tuple(self.index_set())
-            return lambda vertex: vertices[int(automorphism(int(ranking(vertex)) + 1)) - 1]
-
         def Aut(self):
             r"""Return the group of diagram automorphisms.
 
@@ -1225,38 +1446,167 @@ class CoxeterDiagrams(OwnedCategory):
             """
             return self._bond_preserving_permutation_group()
 
-        @cached_method
-        def _subdiagram_vertex_sets(self):
-            r"""The vertex set of each induced subdiagram, indexed by its rank in :meth:`induced_subdiagrams`."""
-            return tuple(frozenset(diagram.index_set()) for diagram in self.induced_subdiagrams())
+        def _subdiagram_rank_of_positions(self, positions):
+            r"""The rank of the induced subdiagram on the vertex ``positions``, without building it.
 
-        def _subdiagram_g_set(self, predicate, *, connected):
-            r"""The finite :meth:`Aut`-set of the ranks of the induced subdiagrams satisfying ``predicate``.
+            :meth:`induced_subdiagrams` lists the vertex subsets by cardinality and
+            then in the order ``itertools.combinations`` lists them, so a rank is a
+            binomial prefix sum followed by a lexicographic index among the
+            subsets of that size.  Computing it from the subset means a query that
+            already knows which subsets it wants does not build the \(2^n\)
+            diagrams; :meth:`subdiagram_rank` is the same rule for labels.
+            """
+            ordered = tuple(sorted(int(position) for position in positions))
+            total = int(self.cardinality())
+            rank = sum(binomial(total, size) for size in range(len(ordered)))
+            previous = -1
+            for offset, position in enumerate(ordered, start=1):
+                for skipped in range(previous + 1, position):
+                    rank += binomial(total - 1 - skipped, len(ordered) - offset)
+                previous = position
+            return rank
+
+        def subdiagram_rank(self, vertices):
+            r"""The rank of the induced subdiagram on ``vertices`` in :meth:`induced_subdiagrams`.
+
+            The points of the subdiagram orbit sets are these ranks, so this is how
+            a caller reads one back as a subdiagram without enumerating the
+            \(2^n\) of them:
+
+                ``subdiagram_rank(maximal_elliptic_subdiagrams()[0].index_set())``
+
+            gives the rank of an induced subdiagram the public query returned.
+            """
+            vertices = tuple(vertices)
+            index_set = self.index_set()
+            if any(vertex not in index_set for vertex in vertices):
+                raise ValueError(
+                    f"cannot rank the subdiagram of {self} induced on {vertices}: some of them are "
+                    f"not vertices of {self}, whose vertices are {index_set}"
+                )
+            ranking = index_set.ranking_map()
+            return finite_ordinal_set(int(2 ** int(self.cardinality())))(
+                self._subdiagram_rank_of_positions(
+                    tuple(int(ranking(vertex)) for vertex in vertices)
+                )
+            )
+
+        def _subdiagram_positions_of_rank(self, rank):
+            r"""The vertex **positions** of the induced subdiagram of ``rank``, without building it.
+
+            The inverse of :meth:`_subdiagram_rank_of_positions`: the size is the
+            largest \(k\) whose binomial prefix sum the rank meets, and the rest is
+            the lexicographic index of the subset among those of that size.
+            """
+            total = int(self.cardinality())
+            remaining = int(rank)
+            assert 0 <= remaining < 2**total, (
+                f"{rank} is not the rank of an induced subdiagram of {self}, which has "
+                f"{cardinal(2) ** total} of them"
+            )
+            size = 0
+            while remaining >= binomial(total, size):
+                remaining -= binomial(total, size)
+                size += 1
+            positions = []
+            candidate = 0
+            for offset in range(size):
+                while True:
+                    count = binomial(total - 1 - candidate, size - offset - 1)
+                    if remaining < count:
+                        positions.append(candidate)
+                        candidate += 1
+                        break
+                    remaining -= count
+                    candidate += 1
+            return tuple(positions)
+
+        @cached_method
+        def _adjacency_positions(self):
+            r"""The Coxeter-graph adjacency of this diagram, on vertex positions.
+
+            Read once from :meth:`coxeter_entry`, so a decision on a vertex subset
+            (:meth:`_is_connected_on`) walks a list rather than building the
+            induced graph.
+            """
+            total = int(self.cardinality())
+            vertices = tuple(self.index_set())
+            adjacency = [set() for _position in range(total)]
+            for left in range(total):
+                for right in range(left + 1, total):
+                    if self.coxeter_entry(vertices[left], vertices[right]) != 2:
+                        adjacency[left].add(right)
+                        adjacency[right].add(left)
+            return tuple(frozenset(neighbours) for neighbours in adjacency)
+
+        def _is_connected_on(self, positions) -> bool:
+            r"""Decide :meth:`is_connected` for a vertex subset, without building it."""
+            positions = frozenset(int(position) for position in positions)
+            if not positions:
+                return False
+            adjacency = self._adjacency_positions()
+            reached = {min(positions)}
+            frontier = [min(positions)]
+            while frontier:
+                for neighbour in adjacency[frontier.pop()] & positions:
+                    if neighbour not in reached:
+                        reached.add(neighbour)
+                        frontier.append(neighbour)
+            return reached == positions
+
+        def _maximal_subdiagram_positions(self, maximal):
+            r"""The vertex **positions** of each member of the ``maximal`` family of subdiagrams."""
+            ranking = self.index_set().ranking_map()
+            return frozenset(
+                frozenset(int(ranking(vertex)) for vertex in diagram.index_set())
+                for diagram in maximal
+            )
+
+        def _subdiagram_g_set(self, admits, *, connected):
+            r"""The finite :meth:`Aut`-set of the ranks of the induced subdiagrams ``admits`` accepts.
 
             The points are owned ranks: elements of the finite ordinal that
             :meth:`induced_subdiagrams` is enumerated by.  An automorphism
             \(\sigma\) sends the rank of the subdiagram on \(S\) to the rank of
-            the subdiagram on \(\sigma(S)\).  Ellipticity, parabolicity and
-            connectedness are invariants of the subdiagram, so the selected
-            ranks form a stable set.
+            the subdiagram on \(\sigma(S)\).  Ellipticity, parabolicity,
+            connectedness and membership in a family of maximal subdiagrams are
+            invariants of the subdiagram, so the selected ranks form a stable set.
+
+            ``admits`` decides on a tuple of vertex **positions**, so the query
+            pays no induced-diagram construction for the candidates it rejects,
+            and the rank of a surviving subset is computed rather than looked up
+            in an enumeration (``_subdiagram_rank_of_positions``).
             """
             from sage_extensions.categories.group.g_sets import FiniteGSets
 
-            subdiagrams = self.induced_subdiagrams()
-            ordinal = finite_ordinal_set(int(subdiagrams.cardinality()))
-            vertex_sets = self._subdiagram_vertex_sets()
-            rank_of = {vertices: ordinal(position) for position, vertices in enumerate(vertex_sets)}
+            total = int(self.cardinality())
+            admitted = {}
+            for size in range(total + 1):
+                for subset in combinations(range(total), size):
+                    if not admits(subset):
+                        continue
+                    if connected and not self._is_connected_on(subset):
+                        continue
+                    admitted[self._subdiagram_rank_of_positions(subset)] = subset
+            ordinal = finite_ordinal_set(int(2**total))
+            rank_of = {positions: rank for rank, positions in admitted.items()}
             points = finite_ordered_set(
-                tuple(
-                    ordinal(position)
-                    for position, diagram in enumerate(subdiagrams)
-                    if predicate(diagram) and (not connected or diagram.is_connected())
-                )
+                tuple(ordinal(rank) for rank in sorted(admitted))
             )
 
             def act(automorphism, rank):
-                vertex_map = self._aut_vertex_map(automorphism)
-                return rank_of[frozenset(vertex_map(vertex) for vertex in vertex_sets[int(rank)])]
+                image = tuple(
+                    sorted(
+                        int(automorphism(position + 1)) - 1
+                        for position in admitted[int(rank)]
+                    )
+                )
+                assert image in rank_of, (
+                    f"{automorphism} of {self.Aut()} sends the subdiagram on the vertex positions "
+                    f"{admitted[int(rank)]} of {self} outside the family this orbit set is built on, "
+                    f"so that family is not stable under the automorphism group"
+                )
+                return ordinal(rank_of[image])
 
             return FiniteGSets(self.Aut())(points, act)
 
@@ -1264,18 +1614,62 @@ class CoxeterDiagrams(OwnedCategory):
             r"""The orbit set of :meth:`Aut` acting on the ranks of the induced subdiagrams.
 
             A point is the rank of a subdiagram in :meth:`induced_subdiagrams`;
-            ``induced_subdiagrams().ranking_map().inverse()`` reads it as the
-            subdiagram.
+            :meth:`subdiagram_rank` reads a vertex set as that rank, and
+            ``induced_subdiagrams().ranking_map().inverse()`` reads the rank as
+            the subdiagram.
             """
-            return self._subdiagram_g_set(lambda diagram: True, connected=False).orbits()
+            return self._subdiagram_g_set(lambda positions: True, connected=False).orbits()
 
         def elliptic_subdiagram_orbits(self, *, connected=False):
             r"""Return the orbit set of :meth:`Aut` acting on the elliptic induced subdiagrams."""
-            return self._subdiagram_g_set(lambda diagram: diagram.is_elliptic(), connected=connected).orbits()
+            return self._subdiagram_g_set(self._is_elliptic_on, connected=connected).orbits()
 
         def parabolic_subdiagram_orbits(self, *, connected=False):
             r"""Return the orbit set of :meth:`Aut` acting on the parabolic induced subdiagrams."""
-            return self._subdiagram_g_set(lambda diagram: diagram.is_parabolic(), connected=connected).orbits()
+            return self._subdiagram_g_set(self._is_parabolic_on, connected=connected).orbits()
+
+        def maximal_elliptic_subdiagram_orbits(self, *, connected=False):
+            r"""The orbit set of :meth:`Aut` acting on the maximal elliptic induced subdiagrams.
+
+            Maximality is a relation of a subdiagram to this diagram and not a
+            predicate of the subdiagram, so the query is not
+            :meth:`elliptic_subdiagram_orbits` under a filter: the family is
+            :meth:`maximal_elliptic_subdiagrams`, and the orbit set is built on the
+            ranks of its members.  :meth:`Aut` carries an inclusion of vertex sets
+            to an inclusion, so it permutes that family and the ranks form a stable
+            set.
+
+            Its points are ranks in :meth:`induced_subdiagrams` — the same points
+            as the other subdiagram orbit sets — so :meth:`subdiagram_orbit_poset`
+            accepts the result, and :meth:`subdiagram_rank` reads a maximal
+            subdiagram's vertex set as one of its points.
+            """
+            return self._subdiagram_g_set(
+                self._subdiagram_g_set_admits(self.maximal_elliptic_subdiagrams(connected=connected)),
+                connected=False,
+            ).orbits()
+
+        def maximal_parabolic_subdiagram_orbits(self, *, connected=False):
+            r"""The orbit set of :meth:`Aut` acting on the maximal parabolic induced subdiagrams.
+
+            The parabolic counterpart of :meth:`maximal_elliptic_subdiagram_orbits`:
+            the family is :meth:`maximal_parabolic_subdiagrams`, whose members are
+            permuted by :meth:`Aut`.
+            """
+            return self._subdiagram_g_set(
+                self._subdiagram_g_set_admits(self.maximal_parabolic_subdiagrams(connected=connected)),
+                connected=False,
+            ).orbits()
+
+        def _subdiagram_g_set_admits(self, maximal):
+            r"""The position predicate admitting exactly the subdiagrams in the ``maximal`` family."""
+            positions = self._maximal_subdiagram_positions(maximal)
+
+            def admits(candidate):
+                return frozenset(candidate) in positions
+
+            return admits
+
 
         def _maximal_by_vertex_inclusion(self, subdiagrams):
             r"""Return the members maximal for inclusion of vertex sets."""
@@ -1290,17 +1684,151 @@ class CoxeterDiagrams(OwnedCategory):
                 )
             )
 
-        def maximal_elliptic_subdiagrams(self, *, connected=False):
-            r"""Return the elliptic induced subdiagrams maximal for inclusion."""
-            return self._maximal_by_vertex_inclusion(
-                self.elliptic_subdiagrams(connected=connected)
+        def _is_elliptic_on(self, positions) -> bool:
+            r"""Decide :meth:`is_elliptic` for a vertex subset, without building it."""
+            _positive, negative, zero = self._principal_inertia_counts(positions)
+            return negative == 0 and zero == 0
+
+        def _is_parabolic_on(self, positions) -> bool:
+            r"""Decide :meth:`is_parabolic` for a vertex subset, without building it."""
+            _positive, negative, zero = self._principal_inertia_counts(positions)
+            return negative == 0 and zero == 1
+
+        @cached_method
+        def _maximal_elliptic_subdiagram_family(self, connected):
+            r"""The maximal elliptic induced subdiagrams, as a family cached per ``connected``.
+
+            The private owner of the expensive part of
+            :meth:`maximal_elliptic_subdiagrams`: a family is maximality of vertex
+            sets, which does not depend on a rank cap, so the capped query reads
+            this and applies its cap afterwards.
+            """
+            if connected:
+                return tuple(
+                    self._maximal_by_vertex_inclusion(self.elliptic_subdiagrams(connected=True))
+                )
+            return tuple(
+                self.induced_subdiagram(vertices)
+                for vertices in self._maximal_vertex_sets(self._is_elliptic_on)
             )
 
-        def maximal_parabolic_subdiagrams(self, *, connected=False):
-            r"""Return the parabolic induced subdiagrams maximal for inclusion."""
-            return self._maximal_by_vertex_inclusion(
-                self.parabolic_subdiagrams(connected=connected)
+        def maximal_elliptic_subdiagrams(self, *, connected=False, max_rank=None, max_form_rank=None):
+            r"""Return the elliptic induced subdiagrams maximal for inclusion.
+
+            Maximality is a property of vertex sets, and the Schlaefli form of
+            an induced subdiagram is the principal submatrix of this diagram's
+            form on that vertex subset, so both the ellipticity filter and the
+            maximality decision are made on subsets and only the surviving
+            subdiagrams are constructed.  Building every induced subdiagram
+            first costs \(2^n\) rooted diagrams with their root Grams and
+            inclusion arrows -- 85 s for Sterk's ten-root diagram and about
+            twenty minutes for its fourteen-root one -- while the subsets
+            themselves are decided in milliseconds each.
+
+            ``max_rank`` caps the rank of the returned subdiagrams after
+            maximality is decided, so a capped query cannot promote a
+            subdiagram contained in a larger elliptic one.
+            """
+            maximal = tuple(self._maximal_elliptic_subdiagram_family(bool(connected)))
+            if max_rank is not None:
+                limit = int(max_rank)
+                assert limit >= 0, f"a rank cap must be a cardinal, but {max_rank!r} is negative"
+                maximal = tuple(entry for entry in maximal if int(entry.cardinality()) <= limit)
+            if max_form_rank is not None:
+                limit = int(max_form_rank)
+                assert limit >= 0, (
+                    f"a form-rank cap must be a cardinal, but {max_form_rank!r} is negative"
+                )
+                maximal = tuple(entry for entry in maximal if int(entry.form_rank()) <= limit)
+            return finite_ordered_set(maximal)
+
+        def _is_connected_parabolic_on(self, positions) -> bool:
+            r"""Decide :meth:`is_connected` with :meth:`is_parabolic` for a vertex subset."""
+            return self._is_connected_on(positions) and self._is_parabolic_on(positions)
+
+        @cached_method
+        def _maximal_parabolic_subdiagram_family(self, connected):
+            r"""The maximal parabolic induced subdiagrams, as a family cached per ``connected``.
+
+            The private owner of the expensive part of
+            :meth:`maximal_parabolic_subdiagrams`, exactly as
+            :meth:`_maximal_elliptic_subdiagram_family` is for the elliptic query.
+            """
+            predicate = self._is_connected_parabolic_on if connected else self._is_parabolic_on
+            return tuple(
+                self.induced_subdiagram(vertices)
+                for vertices in self._maximal_vertex_sets(predicate)
             )
+
+        def maximal_parabolic_subdiagrams(self, *, connected=False, max_rank=None, max_form_rank=None):
+            r"""Return the parabolic induced subdiagrams maximal for inclusion.
+
+            The parabolic counterpart of :meth:`maximal_elliptic_subdiagrams`, on
+            the same route: the Schlaefli form of an induced subdiagram is the
+            principal submatrix of this diagram's form on that vertex subset, so
+            nullity one and connectedness are decided on subsets and the
+            maximality decision is made over subsets, with only the survivors
+            constructed.  With ``connected=True`` the family is the connected
+            parabolic induced subdiagrams and maximality is decided within it.
+
+            ``max_rank`` caps the rank of the returned subdiagrams after maximality
+            is decided, so a capped query cannot promote a subdiagram contained in
+            a larger parabolic one.
+            """
+            maximal = tuple(self._maximal_parabolic_subdiagram_family(bool(connected)))
+            if max_rank is not None:
+                limit = int(max_rank)
+                assert limit >= 0, f"a rank cap must be a cardinal, but {max_rank!r} is negative"
+                maximal = tuple(entry for entry in maximal if int(entry.cardinality()) <= limit)
+            if max_form_rank is not None:
+                limit = int(max_form_rank)
+                assert limit >= 0, (
+                    f"a form-rank cap must be a cardinal, but {max_form_rank!r} is negative"
+                )
+                maximal = tuple(entry for entry in maximal if int(entry.form_rank()) <= limit)
+            return finite_ordered_set(maximal)
+
+        def parabolic_subdiagrams_of_rank(self, rank):
+            r"""Return the parabolic subdiagrams of the given form rank — Vinberg's criterion's family.
+
+            Vinberg's criterion (E. B. Vinberg, *The groups of units of certain
+            quadratic forms*, Mat. Sb. 87 (129) (1972), the English translation
+            Math. USSR Sb. 16 (1972), No. 1, Proposition 1, printed p. 22): the
+            ideal vertices of a finite-volume chamber in the Lobachevskii space
+            \\(\\Lambda^n\\) are in bijection with the parabolic subdiagrams of
+            rank \\(n - 1\\) — one per vertex at infinity.  In Vinberg's sense a
+            parabolic subdiagram is a disjoint union of connected affine
+            diagrams, and its rank is its vertex count less its component count,
+            which is the rank of its Gram matrix; ``rank`` below is that rank, so
+            for a finite-volume chamber in \\(\\Lambda^n\\) the caller passes
+            \\(n - 1\\) and the returned family is the chamber's ideal vertices.
+
+            Every member is decided by the maintained classification: a single
+            connected affine component is :meth:`is_parabolic`, a union of at
+            least two of them is :meth:`is_parabolic_union`, and the geometric
+            rank of either is :meth:`form_rank`.  The Schlaefli form of an
+            induced subdiagram is the principal submatrix of this diagram's form
+            on that vertex subset, so componentwise affineness and the rank are
+            decided on subsets and only the survivors are constructed.
+            """
+            target = int(rank)
+            vertices = tuple(self.index_set())
+            family = []
+            for size in range(len(vertices) + 1):
+                for subset in combinations(range(len(vertices)), size):
+                    positions = tuple(subset)
+                    if not positions:
+                        continue
+                    if not self._is_componentwise_affine_on(positions):
+                        continue
+                    _positive, _negative, zero = self._principal_inertia_counts(positions)
+                    if len(positions) - int(zero) == target:
+                        family.append(
+                            self.induced_subdiagram(
+                                tuple(vertices[index] for index in positions)
+                            )
+                        )
+            return finite_ordered_set(tuple(family))
 
         def _subdiagram_poset_on(self, subdiagrams):
             r"""The poset of ``subdiagrams`` ordered by inclusion of their vertex sets."""
@@ -1346,17 +1874,25 @@ class CoxeterDiagrams(OwnedCategory):
             of vertices, so two containments force equality and hence one
             orbit.  Transitive, by the same transport of the containment along
             an automorphism.  ``orbits`` is an orbit set returned by
-            :meth:`subdiagram_orbits` or its elliptic and parabolic variants.
+            :meth:`subdiagram_orbits` or its elliptic, parabolic and maximal
+            variants.
+
+            A point is a rank in :meth:`induced_subdiagrams`, and its vertex set is
+            recovered from the rank (``_subdiagram_positions_of_rank``) rather than
+            from an enumeration of the \(2^n\) subdiagrams the order does not need.
             """
             assert all(orbit.acting_group() is self.Aut() for orbit in orbits), (
                 f"{orbits} is not an orbit set of the automorphism group of {self}"
             )
 
-            vertex_sets = self._subdiagram_vertex_sets()
-
             def below(left, right) -> bool:
-                target = vertex_sets[int(right.representative())]
-                return any(vertex_sets[int(rank)] <= target for rank in left.points())
+                target = frozenset(
+                    self._subdiagram_positions_of_rank(int(right.representative()))
+                )
+                return any(
+                    frozenset(self._subdiagram_positions_of_rank(int(rank))) <= target
+                    for rank in left.points()
+                )
 
             return PartiallyOrderedSets()(orbits, below)
 

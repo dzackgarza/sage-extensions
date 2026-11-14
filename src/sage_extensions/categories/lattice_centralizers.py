@@ -357,6 +357,68 @@ def _equivariant_finite_orbit_decomposition(isometry, candidates, action, equali
     )
 
 
+def finite_preimage_generators(generators, image, in_subgroup):
+    r"""Return Schreier generators of ``G cap rho^-1(S)`` for ``G = <generators>``.
+
+    ``image`` is a homomorphism to a finite group and ``in_subgroup`` decides
+    membership in ``S``. Right cosets ``S rho(x)`` are compared by ``rho(x y^-1) in S``.
+    """
+    generators = tuple(generators)
+    one = generators[0] * ~generators[0]
+    transversal = [one]
+    schreier = []
+    position = 0
+
+    def representative(element):
+        for known in transversal:
+            if in_subgroup(image(element * ~known)):
+                return known
+        return None
+
+    while position < len(transversal):
+        current = transversal[position]
+        position += 1
+        for generator in generators:
+            product = current * generator
+            known = representative(product)
+            if known is None:
+                transversal.append(product)
+                continue
+            element = product * ~known
+            if element != one and all(element != seen for seen in schreier):
+                schreier.append(element)
+    return tuple(schreier), len(transversal)
+
+
+def finite_subgroup_normalizer(lattice, generators):
+    r"""Return all elements of ``N_{O(L)}(H)`` and ``C_{O(L)}(H)`` for definite ``L``."""
+    assert lattice.is_definite(), (
+        f"{lattice} is indefinite: its normalizers need the full centralizer of a "
+        f"noncyclic finite subgroup (port #50, #54)"
+    )
+    generators = tuple(generators)
+    one = lattice.O().one()
+    elements = [one]
+    frontier = [one]
+    while frontier:
+        current = frontier.pop()
+        for generator in generators:
+            image = current * generator
+            if all(image != known for known in elements):
+                elements.append(image)
+                frontier.append(image)
+    normalizer = []
+    centralizer = []
+    for candidate in lattice.O():
+        inverse = ~candidate
+        conjugates = tuple(candidate * generator * inverse for generator in generators)
+        if all(any(c == element for element in elements) for c in conjugates):
+            normalizer.append(candidate)
+            if all(c == g for c, g in zip(conjugates, generators, strict=True)):
+                centralizer.append(candidate)
+    return tuple(normalizer), tuple(centralizer)
+
+
 def _isometry_power(isometry, exponent):
     r"""Return an exact nonnegative power of one lattice automorphism."""
     exponent = int(exponent)
@@ -619,6 +681,99 @@ class CyclotomicDecomposition(SageObject):
         if not self._components_commute(components):
             return False
         return self.orthogonal_sum_inclusion().isometry_extends(self._block_sum(components))
+
+    def _twisted_component_transporter(self, divisor, exponent):
+        r"""Return one ``t`` in ``O(L_d)`` with ``t f_d t^-1 = f_d^a``, or ``None``."""
+        summand = self.summand(divisor)
+        restriction = self.component_isometries()[divisor]
+        target = _isometry_power(restriction, exponent)
+        if int(divisor) in (1, 2):
+            return summand.O().one()
+        assert summand.is_definite(), (
+            f"the twisted transporter on the summand of {divisor} needs the semilinear "
+            f"unitary isometries of an indefinite Hermitian lattice (port #51)"
+        )
+        for candidate in summand.O():
+            if candidate * restriction == target * candidate:
+                return candidate
+        return None
+
+    def _centralizer_discriminant_representatives(self, divisor):
+        r"""Return one element of ``Z_{O(L_d)}(f_d)`` for each action on ``A_{L_d}``."""
+        centralizer = self.component_centralizers()[divisor]
+        generators = tuple(centralizer.group_generators())
+        one = self.summand(divisor).O().one()
+        found = [(one.discriminant_morphism(), one)]
+        frontier = [one]
+        while frontier:
+            current = frontier.pop()
+            for generator in generators:
+                image = current * generator
+                action = image.discriminant_morphism()
+                if all(action != known for known, _element in found):
+                    found.append((action, image))
+                    frontier.append(image)
+        return tuple(element for _action, element in found)
+
+    def twisted_transporter(self, exponent):
+        r"""Return ``g`` in ``O(L)`` with ``g f g^-1 = f^a``, or ``None`` if none exists.
+
+        For ``a`` prime to the order, ``ker Phi_d(f^a) = ker Phi_d(f)``, so ``g``
+        restricts to each ``L_d`` with ``g_d f_d g_d^-1 = f_d^a``. Each such ``g_d``
+        is ``t_d c_d`` with ``c_d`` in ``Z_{O(L_d)}(f_d)``. Whether a tuple preserves
+        ``L`` depends only on its action on ``A_M``, so one centralizer element per
+        discriminant action decides existence.
+        """
+        from itertools import product
+
+        from sage.arith.misc import gcd
+
+        exponent = int(exponent)
+        if int(gcd(exponent, self._order)) != 1:
+            raise ValueError(
+                f"{exponent} is not prime to the order {self._order} of {self.isometry()}"
+            )
+        divisors_ = tuple(self.nonzero_divisors())
+        transporters = {}
+        for divisor in divisors_:
+            transporter = self._twisted_component_transporter(divisor, exponent)
+            if transporter is None:
+                return None
+            transporters[divisor] = transporter
+        choices = tuple(
+            tuple(
+                transporters[divisor] * element
+                for element in self._centralizer_discriminant_representatives(divisor)
+            )
+            for divisor in divisors_
+        )
+        inclusion = self.orthogonal_sum_inclusion()
+        for tuple_ in product(*choices):
+            sum_ = self._block_sum(dict(zip(divisors_, tuple_, strict=True)))
+            if inclusion.isometry_extends(sum_):
+                result = inclusion.isometry_extension(sum_)
+                assert result * self.isometry() == _isometry_power(self.isometry(), exponent) * result
+                return result
+        return None
+
+    def cyclic_normalizer(self):
+        r"""Return ``(generators, realized)`` for ``N_{O(L)}(<f>)``.
+
+        ``realized`` maps each ``a`` in the image in ``(Z/n)^x`` to a transporter.
+        The centralizer is the kernel of the map to ``(Z/n)^x``, so its generators
+        and one lift of every realized unit generate the normalizer.
+        """
+        from sage.arith.misc import gcd
+
+        realized = {}
+        for exponent in range(1, max(self._order, 2)):
+            if int(gcd(exponent, self._order)) != 1:
+                continue
+            transporter = self.twisted_transporter(exponent)
+            if transporter is not None:
+                realized[exponent] = transporter
+        generators = tuple(self.centralizer_group().group_generators()) + tuple(realized.values())
+        return generators, realized
 
     def _orthogonal_sum_image(self, divisor, element):
         r"""Return the image of ``element`` of ``L_d`` under ``L_d -> M = sum_e L_e``.
@@ -927,6 +1082,7 @@ class IsometryPrimitiveExtension:
         r"""Return ``rho_L(O(L,f)) <= O(A_L)``, the finite image of the centralizer."""
         return self.isometry.centralizer_discriminant_image()
 
+    @cached_method
     def _full_discriminant_glue_data(self):
         r"""Return the primitive glue data when both discriminant forms are glued in full."""
         glue = self.glue()
@@ -989,6 +1145,65 @@ class IsometryPrimitiveExtension:
         )
         return self.orthogonal_complement.O().discriminant_preimage(allowed_discriminant_image)
 
+    @cached_method
+    def _coinvariant_glue_inverse_maps(self):
+        r"""Materialize the inverse maps for the fixed full-discriminant glue inclusions.
+
+        The full-glue cardinality checks establish that each inclusion is an
+        isomorphism of finite modules.  Build its inverse once from the
+        preimages of the codomain generators; repeated invariant
+        automorphisms then evaluate these explicit maps instead of rebuilding
+        the general framed-codomain preimage solver for every generator
+        image.
+        """
+        glue, invariant_form, coinvariant_form, glue_source, glue_target = (
+            self._full_discriminant_glue_data()
+        )
+        source_inclusion = glue_source.inclusion()
+        target_inclusion = glue_target.inclusion()
+        twisted_coinvariant_form = target_inclusion.codomain()
+
+        source_inverse_images = {
+            label: source_inclusion.lift(invariant_form.module_generator(label))
+            for label in invariant_form.module_generating_set()
+        }
+        source_inverse = invariant_form.module_category().Mor(
+            invariant_form, glue_source
+        )(source_inverse_images)
+        target_inverse_images = {
+            label: target_inclusion.lift(twisted_coinvariant_form.module_generator(label))
+            for label in twisted_coinvariant_form.module_generating_set()
+        }
+        target_inverse = twisted_coinvariant_form.module_category().Mor(
+            twisted_coinvariant_form, glue_target
+        )(target_inverse_images)
+
+        for label in invariant_form.module_generating_set():
+            element = invariant_form.module_generator(label)
+            if source_inclusion(source_inverse(element)) != element:
+                raise ArithmeticError(
+                    "the cached invariant glue-inclusion inverse fails on a module generator"
+                )
+        for label in twisted_coinvariant_form.module_generating_set():
+            element = twisted_coinvariant_form.module_generator(label)
+            if target_inclusion(target_inverse(element)) != element:
+                raise ArithmeticError(
+                    "the cached coinvariant glue-inclusion inverse fails on a module generator"
+                )
+
+        return (
+            glue,
+            invariant_form,
+            coinvariant_form,
+            glue_source,
+            glue_target,
+            source_inclusion,
+            target_inclusion,
+            source_inverse,
+            target_inverse,
+            glue.inverse().forward(),
+        )
+
     def _coinvariant_discriminant_from_invariant(self, invariant_automorphism):
         r"""Conjugate an invariant discriminant action across the primitive glue.
 
@@ -998,44 +1213,121 @@ class IsometryPrimitiveExtension:
         hypothesis is exactly the one required by
         :meth:`coinvariant_extension_subgroup`.
         """
-        glue, invariant_form, coinvariant_form, glue_source, glue_target = (
-            self._full_discriminant_glue_data()
-        )
-        source_inclusion = glue_source.inclusion()
-        target_inclusion = glue_target.inclusion()
+        (
+            glue,
+            invariant_form,
+            coinvariant_form,
+            _glue_source,
+            _glue_target,
+            source_inclusion,
+            target_inclusion,
+            source_inverse,
+            target_inverse,
+            glue_inverse,
+        ) = self._coinvariant_glue_inverse_maps()
         twisted_coinvariant_form = target_inclusion.codomain()
 
         invariant_automorphism = invariant_form.O()(invariant_automorphism)
-        images = {}
-        for label in coinvariant_form.module_generating_set():
-            element = coinvariant_form.module_generator(label)
-            twisted = twisted_coinvariant_form(element)
-            target_element = target_inclusion.lift(twisted)
-            source_element = glue.inverse().forward()(target_element)
-            invariant_class = source_inclusion(source_element)
-            moved_invariant_class = invariant_automorphism(invariant_class)
-            moved_source = source_inclusion.lift(moved_invariant_class)
-            moved_target = glue.forward()(moved_source)
-            moved_twisted = target_inclusion(moved_target)
-            images[label] = coinvariant_form(moved_twisted)
-        morphism = coinvariant_form.module_category().Mor(coinvariant_form, coinvariant_form)(images)
+        inverse_automorphism = invariant_automorphism.inverse()
+        group = coinvariant_form.O()
+        module_mor = coinvariant_form.module_category().Mor(
+            coinvariant_form, coinvariant_form
+        )
+
+        def conjugated_images(action):
+            images = {}
+            for label in coinvariant_form.module_generating_set():
+                element = coinvariant_form.module_generator(label)
+                twisted = twisted_coinvariant_form(element)
+                target_element = target_inverse(twisted)
+                source_element = glue_inverse(target_element)
+                invariant_class = source_inclusion(source_element)
+                moved_invariant_class = action(invariant_class)
+                moved_source = source_inverse(moved_invariant_class)
+                moved_target = glue.forward()(moved_source)
+                moved_twisted = target_inclusion(moved_target)
+                images[label] = coinvariant_form(moved_twisted)
+            return images
+
+        # Conjugation carries the already-certified inverse of the invariant
+        # automorphism to the inverse of the coinvariant action.  Construct
+        # both exact maps on the selected generators; do not solve a generic
+        # module inverse, which reconstructs finite presentations per call.
+        forward = module_mor(conjugated_images(invariant_automorphism))
+        inverse = module_mor(conjugated_images(inverse_automorphism))
         from sage_extensions.categories.modules.framed.formed.torsion_form_modules import (
             _torsion_form_isometry,
         )
 
-        group = coinvariant_form.O()
-        isometry = _torsion_form_isometry(morphism, morphism.inverse(), quadratic=group.is_quadratic())
+        isometry = _torsion_form_isometry(forward, inverse, quadratic=group.is_quadratic())
+        return group.from_morphism(isometry)
+
+    def _coinvariant_discriminant_to_invariant(self, coinvariant_automorphism):
+        r"""Conjugate a coinvariant discriminant action back across the primitive glue.
+
+        The full-discriminant hypothesis makes the conjugation of
+        :meth:`_coinvariant_discriminant_from_invariant` an isomorphism
+        ``O(A_{L^f}) -> O(A_{L^-})``; this is its inverse, written down from
+        the same retained glue maps.  It exists exactly when
+        :meth:`coinvariant_extension_subgroup` does.
+        """
+        (
+            glue,
+            invariant_form,
+            coinvariant_form,
+            _glue_source,
+            _glue_target,
+            source_inclusion,
+            target_inclusion,
+            source_inverse,
+            target_inverse,
+            glue_inverse,
+        ) = self._coinvariant_glue_inverse_maps()
+        twisted_coinvariant_form = target_inclusion.codomain()
+
+        coinvariant_automorphism = coinvariant_form.O()(coinvariant_automorphism)
+        inverse_automorphism = coinvariant_automorphism.inverse()
+        group = invariant_form.O()
+        module_mor = invariant_form.module_category().Mor(
+            invariant_form, invariant_form
+        )
+
+        def conjugated_images(action):
+            images = {}
+            for label in invariant_form.module_generating_set():
+                element = invariant_form.module_generator(label)
+                source_element = source_inverse(element)
+                target_element = glue.forward()(source_element)
+                twisted = target_inclusion(target_element)
+                coinvariant_class = coinvariant_form(twisted)
+                moved_coinvariant_class = action(coinvariant_class)
+                moved_twisted = twisted_coinvariant_form(moved_coinvariant_class)
+                moved_target = target_inverse(moved_twisted)
+                moved_source = glue_inverse(moved_target)
+                images[label] = invariant_form(source_inclusion(moved_source))
+            return images
+
+        forward = module_mor(conjugated_images(coinvariant_automorphism))
+        inverse = module_mor(conjugated_images(inverse_automorphism))
+        from sage_extensions.categories.modules.framed.formed.torsion_form_modules import (
+            _torsion_form_isometry,
+        )
+
+        isometry = _torsion_form_isometry(forward, inverse, quadratic=group.is_quadratic())
         return group.from_morphism(isometry)
 
     def lift_coinvariant_extension_element(self, coinvariant_part):
         r"""Lift ``g_-`` from the anti-invariant extension group to ``O(L,f)``.
 
         The selected ``g_-`` already has discriminant action in the conjugate
-        of the invariant discriminant image.  Enumerate that finite image,
-        choose the matching invariant discriminant action, lift it to an
-        actual isometry of ``L^f``, and assemble the pair through the retained
-        primitive glue.  The result is an ambient centralizer element whose
-        coinvariant restriction is literally ``g_-``.
+        of the invariant discriminant image.  The full glue makes conjugation
+        an isomorphism of the two discriminant orthogonal groups, so the
+        matching invariant action is the inverse conjugate applied, lifted to
+        an actual isometry of ``L^f`` by the generated-image word section
+        (``LatticeIsometryMor.discriminant_lift``); the pair assembles
+        through the retained primitive glue.  Nothing enumerates either
+        discriminant image.  The result is an ambient centralizer element
+        whose coinvariant restriction is literally ``g_-``.
         """
         subgroup = self.coinvariant_extension_subgroup()
         if coinvariant_part not in subgroup:
@@ -1047,15 +1339,14 @@ class IsometryPrimitiveExtension:
         coinvariant_part = self.orthogonal_complement.O()(coinvariant_part)
         target_action = coinvariant_part.discriminant_morphism()
         invariant_group = self.invariant.O()
-        invariant_image = self.invariant.discriminant_image()
 
-        invariant_part = None
-        for invariant_action in invariant_image:
-            if self._coinvariant_discriminant_from_invariant(invariant_action) != target_action:
-                continue
-            invariant_part = invariant_group.discriminant_lift(invariant_action)
-            if invariant_part is not None:
-                break
+        # The glue is full, so conjugation across it is an isomorphism
+        # O(A_{L^f}) -> O(A_{L^-}) with an inverse written down by the same
+        # retained maps; the unique invariant action matching target_action is
+        # that inverse applied, not a search through the invariant image (an
+        # enumeration no listing bound survives).
+        invariant_action = self._coinvariant_discriminant_to_invariant(target_action)
+        invariant_part = invariant_group.discriminant_lift(invariant_action)
         if invariant_part is None:
             raise ArithmeticError(
                 f"{coinvariant_part} preserves the glue, but no isometry of L^f in "
@@ -1319,6 +1610,144 @@ def arithmetic_centralizer(orthogonal_group, isometry):
     return centralizer
 
 
+def _hyperbolic_unitary_generators(group, isometry, divisor):
+    r"""Return ``U(1,1)`` generators when ``(L, f)`` is the trace of the hyperbolic plane over ``Z[zeta_d]``, or ``None``."""
+    from sage.matrix.constructor import matrix
+    from sage.rings.integer_ring import ZZ as SageZZ
+    from sage.rings.number_field.number_field import CyclotomicField
+
+    from sage_extensions.categories.hermitian_lattices import HermitianLattice
+    from sage_indefinite_port.indefinite.binary_hyperbolic_unitary import generators, theta
+
+    d = {4: 1, 3: 3}[divisor]
+    field = CyclotomicField(divisor)
+    zeta = field.gen()
+    hermitian = HermitianLattice((field.one(), zeta), matrix(field, 2, 2, [0, 1, 1, 0]))
+    trace = hermitian.trace_lattice()
+    lattice = group.lattice()
+    frame = tuple(lattice.module_generators())
+    trace_frame = tuple(trace.module_generators())
+    gram = matrix(SageZZ, [[int(lattice.b(x, y)) for y in frame] for x in frame])
+    target = matrix(SageZZ, [[int(trace.b(x, y)) for y in trace_frame] for x in trace_frame])
+    omega = hermitian.unit_isometry(zeta)
+    if gram != target or any(
+        [int(c) for c in isometry(v)] != [int(c) for c in omega(w)] for v, w in zip(frame, trace_frame, strict=True)
+    ):
+        return None
+    source = theta(d).parent()
+    if d == 1:
+        embed = source.hom([zeta])
+    else:
+        embed = source.hom([2 * zeta + 1])
+    labels = tuple(lattice.module_generating_set())
+    result = []
+    for g in generators(d).values():
+        image = hermitian.isometry_from_matrix(matrix(field, 2, 2, [embed(entry) for entry in g.list()]))
+        result.append(
+            group(
+                {
+                    label: sum(
+                        (lattice.scalar_multiple(int(c), f) for c, f in zip(image(w), frame, strict=True)),
+                        lattice.zero(),
+                    )
+                    for label, w in zip(labels, trace_frame, strict=True)
+                }
+            )
+        )
+    return tuple(result)
+
+
+def _eisenstein_act_generators(group, isometry):
+    r"""Return ``Aut E^{4,1}`` generators when ``(L, f)`` is the source trace lattice, or ``None``."""
+    from sage.matrix.constructor import matrix
+    from sage.rings.integer_ring import ZZ as SageZZ
+
+    from sage_indefinite_port.indefinite.act_eisenstein import OMEGA, lattice as act_lattice, trace_generators
+
+    lattice = group.lattice()
+    hermitian = act_lattice()
+    trace = hermitian.trace_lattice()
+    frame = tuple(lattice.module_generators())
+    trace_frame = tuple(trace.module_generators())
+    gram = matrix(SageZZ, [[int(lattice.b(x, y)) for y in frame] for x in frame])
+    target = matrix(SageZZ, [[int(trace.b(x, y)) for y in trace_frame] for x in trace_frame])
+    if gram != target:
+        return None
+    omega = hermitian.unit_isometry(OMEGA)
+    if any([int(c) for c in isometry(v)] != [int(c) for c in omega(w)] for v, w in zip(frame, trace_frame, strict=True)):
+        return None
+    labels = tuple(lattice.module_generating_set())
+    result = []
+    for generator in trace_generators():
+        images = {
+            label: sum(
+                (lattice.scalar_multiple(int(c), g) for c, g in zip(generator(w), frame, strict=True)),
+                lattice.zero(),
+            )
+            for label, w in zip(labels, trace_frame, strict=True)
+        }
+        result.append(group(images))
+    return tuple(result)
+
+
+def _infinite_order_centralizer_generators(group, isometry):
+    r"""Return generators of the centralizer of an infinite-order isometry through its commutant."""
+    from sage.matrix.constructor import matrix
+    from sage.rings.integer_ring import ZZ as SageZZ
+
+    from sage_extensions.algebras.isometry_commutant import IsometryCommutant
+
+    lattice = group.lattice()
+    frame = tuple(lattice.module_generators())
+    gram = matrix(SageZZ, [[int(lattice.b(x, y)) for y in frame] for x in frame])
+    columns = matrix(SageZZ, [[int(c) for c in isometry(v)] for v in frame]).transpose()
+    labels = tuple(lattice.module_generating_set())
+
+    def as_isometry(element):
+        images = {
+            label: sum(
+                (lattice.scalar_multiple(int(c), g) for c, g in zip(element.column(j), frame, strict=True)),
+                lattice.zero(),
+            )
+            for j, label in enumerate(labels)
+        }
+        return group(images)
+
+    return tuple(as_isometry(g) for g in IsometryCommutant(gram, [columns]).centralizer_generators())
+
+
+def infinite_cyclic_normalizer(group, isometry):
+    r"""Return ``(centralizer_generators, inversion)`` for ``N_{O(L)}(<f>)``, ``f`` of infinite order.
+
+    ``Aut(Z) = {+-1}``, so the normalizer is the centralizer, extended by ``inversion`` when
+    some element inverts ``f``. ``inversion`` is ``None`` when none exists.
+    """
+    from sage.matrix.constructor import matrix
+    from sage.rings.integer_ring import ZZ as SageZZ
+
+    from sage_extensions.algebras.isometry_commutant import IsometryCommutant
+
+    lattice = group.lattice()
+    frame = tuple(lattice.module_generators())
+    gram = matrix(SageZZ, [[int(lattice.b(x, y)) for y in frame] for x in frame])
+    columns = matrix(SageZZ, [[int(c) for c in isometry(v)] for v in frame]).transpose()
+    labels = tuple(lattice.module_generating_set())
+    witness = IsometryCommutant(gram, [columns]).inversion_transporter()
+    inversion = None
+    if witness is not None:
+        inversion = group(
+            {
+                label: sum(
+                    (lattice.scalar_multiple(int(c), g) for c, g in zip(witness.column(j), frame, strict=True)),
+                    lattice.zero(),
+                )
+                for j, label in enumerate(labels)
+            }
+        )
+        assert inversion * isometry == ~isometry * inversion
+    return _infinite_order_centralizer_generators(group, isometry), inversion
+
+
 def _arithmetic_centralizer_group_generators(centralizer):
     r"""Compute a generating set of ``Z = Z_{O(L)}(f)`` for ``f`` of finite order.
 
@@ -1335,6 +1764,8 @@ def _arithmetic_centralizer_group_generators(centralizer):
       rank is one, and ``Z`` is generated by ``f`` and ``-id``.  This is the
       rank-one branch of OSCAR ``image_centralizer_in_Oq`` at the pinned
       commit ``d135b70b``, ``lattices_with_isometry.jl:1737-1744``.
+    - ``f`` of infinite order: the commutant algebra of ``f``, through
+      :class:`~sage_extensions.algebras.isometry_commutant.IsometryCommutant`.
     - One summand with ``d > 2`` of larger hermitian rank in an indefinite
       ``L``: no route computes generators of its unitary group (port #18,
       2026-10-15).  That frontier asserts.
@@ -1354,11 +1785,10 @@ def _arithmetic_centralizer_group_generators(centralizer):
     ):
         return finite_ordered_set(tuple(group.group_generators()))
     order = isometry.module_morphism().multiplicative_order()
-    assert order != Infinity, (
-        f"the centralizer of {isometry} in {group} has group generators computed here only "
-        f"for an isometry of finite order, through the cyclotomic summands ker Phi_d(f); "
-        f"{isometry} has infinite order"
-    )
+    if order == Infinity:
+        return finite_ordered_set(
+            tuple(centralizer(element) for element in _infinite_order_centralizer_generators(group, isometry))
+        )
     decomposition = isometry.cyclotomic_decomposition(order)
     nonzero_divisors = tuple(int(divisor) for divisor in decomposition.nonzero_divisors())
     match nonzero_divisors:
@@ -1381,6 +1811,14 @@ def _arithmetic_centralizer_group_generators(centralizer):
             # and both act integrally as -id and f on this very lattice.
             negation = group(lambda label: -lattice.module_generator(label))
             generators = (isometry, negation)
+        case (3,) if int(lattice.module_rank()) == 10 and (
+            eisenstein := _eisenstein_act_generators(group, isometry)
+        ) is not None:
+            generators = eisenstein
+        case (divisor,) if divisor in (3, 4) and int(lattice.module_rank()) == 4 and (
+            hyperbolic := _hyperbolic_unitary_generators(group, isometry, divisor)
+        ) is not None:
+            generators = hyperbolic
         case (divisor,):
             assert False, (
                 f"the centralizer of {isometry} in {group} is the unitary group of {lattice} "
@@ -1393,6 +1831,9 @@ def _arithmetic_centralizer_group_generators(centralizer):
 
 __all__ = [
     "CyclotomicDecomposition",
+    "finite_preimage_generators",
+    "infinite_cyclic_normalizer",
+    "finite_subgroup_normalizer",
     "IsometryPrimitiveExtension",
     "PolarizedEquivariantLattice",
 ]

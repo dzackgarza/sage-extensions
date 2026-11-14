@@ -1,0 +1,49 @@
+==================== U + <-1> vs I_(1,2)
+  rank 3 det 1 signature (1, 2) even False
+  rank 3 det 1 signature (1, 2) even False
+[    2.23s]   is_empty -> False in 0.43s
+[    3.00s]   an_element in 0.77s
+  column matrix [1 1 1]
+[0 1 1]
+[1 0 1]
+  M^T G_target M == G_source: True
+  M^-T G_source M^-1 == G_target: True
+  det 1 integral inverse True
+  is_isometric_to source->target True target->source True
+==================== U + U + <-1>^7 vs U + I_(1,8)
+  rank 11 det -1 signature (2, 9) even False
+  rank 11 det -1 signature (2, 9) even False
+[    3.14s]   is_empty -> False in 0.12s
+[   29.64s]   an_element in 26.5s
+  column matrix [-2 -1  2  2 -3  0 -1  0 -1  0  1]
+[-5 -3 -1 -3 -2  3  2  4  1  1 -1]
+[-6 -4 -4 -6 -1  5  4  6  2  2 -3]
+[-3 -2 -1 -2 -1  2  1  3  0  1 -1]
+[-3 -2  0 -1 -2  2  1  2  0  0  0]
+[-2 -1  0 -1 -1  1  1  1  0  1  0]
+[-2 -1  1  0 -2  0  0  1  0  0  0]
+[-3 -2 -2 -2 -1  2  2  3  1  1 -1]
+[ 2  2  1  2  1 -2 -1 -2 -1 -1  1]
+[ 1  0 -1 -1  1  0  1  0  0  0 -1]
+[-4 -2 -2 -3 -1  3  2  3  1  1 -2]
+  M^T G_target M == G_source: True
+  M^-T G_source M^-1 == G_target: True
+  det -1 integral inverse True
+  is_isometric_to source->target True target->source True
+==================== non-isometric control
+  is_isometric_to False in 0.0 s
+[   29.67s] done
+[peakrss] p298b: child waited=0 shell_code=0 samples=16
+[peakrss] peak tree RSS      : 514 MiB
+[peakrss] low-water MemAvail : 8759 MiB
+[peakrss] peak single VmHWM  : 514 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      503 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    30.0s procs=  3 rss=   514 MiB hwm=   514 MiB avail=  8772 MiB
+[peakrss]   t=    28.0s procs=  3 rss=   506 MiB hwm=   506 MiB avail=  8780 MiB
+[peakrss]   t=    26.0s procs=  3 rss=   490 MiB hwm=   490 MiB avail=  8788 MiB
+[peakrss]   t=    24.0s procs=  3 rss=   487 MiB hwm=   487 MiB avail=  8799 MiB
+[peakrss]   t=    22.0s procs=  3 rss=   480 MiB hwm=   480 MiB avail=  8797 MiB
+launcher exit: 0

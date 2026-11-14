@@ -8,6 +8,7 @@ closure, with Galois group of order two.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_q_root_five_is_the_rational_algebra_q_a_mod_a_squared_minus_five() -> None:

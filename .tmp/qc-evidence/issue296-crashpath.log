@@ -1,0 +1,25 @@
+[    66.3s] specimen built: |A| = 2048, letters = 4
+[    66.3s] 20 engine products: 0.002 s
+[    66.4s] first owned product (gen * gen): 0.06 s
+[    66.4s] second owned product: 0.07 s
+[    66.7s] 50 image applications, |orbit| >= 33, 0.2 s
+[    66.9s] 100 image applications, |orbit| >= 66, 0.5 s
+[    67.2s] 150 image applications, |orbit| >= 101, 0.8 s
+[    67.5s] 200 image applications, |orbit| >= 134, 1.1 s
+[    67.5s] 360-degree check: 200 images, |orbit| >= 134 in 1.1 s
+[    67.5s] DONE without a crash
+[peakrss] issue296-crashpath: child waited=0 shell_code=0 samples=37
+[peakrss] peak tree RSS      : 2653 MiB
+[peakrss] low-water MemAvail : 3106 MiB
+[peakrss] peak single VmHWM  : 2659 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2307 MiB peak
+[peakrss]   python                      349 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    70.1s procs=  4 rss=  2653 MiB hwm=  2659 MiB avail=  5552 MiB
+[peakrss]   t=    68.1s procs=  4 rss=  2606 MiB hwm=  2613 MiB avail=  5651 MiB
+[peakrss]   t=    66.1s procs=  4 rss=  2430 MiB hwm=  2533 MiB avail=  5680 MiB
+[peakrss]   t=    54.1s procs=  4 rss=  2414 MiB hwm=  2516 MiB avail=  5725 MiB
+[peakrss]   t=    56.1s procs=  4 rss=  2414 MiB hwm=  2516 MiB avail=  5763 MiB
+launcher exit: 0

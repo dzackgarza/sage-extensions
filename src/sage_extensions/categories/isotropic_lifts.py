@@ -23,7 +23,14 @@ def _vector_denominator(vector, integral_module):
     r"""The denominator ideal of the map taking 1 to this vector."""
     ring = integral_module.base_ring()
     field_map = ring.fraction_field_map()
-    line = ring.regular_module()
+    # The source model is the rank-one *lattice*, not the bare regular module:
+    # ``denominator_ideal`` requires the rational map to join
+    # ``source.base_change(field_map)`` and ``target.base_change(field_map)``, and
+    # the regular module's base change is a restriction of scalars rather than a
+    # lattice over the fraction field, so a map out of it is semilinear over the
+    # wrong ring.  A rank-one lattice with the unit form is the same free module
+    # with the same single generator, and its base change is of the right shape.
+    line = Lattices(ring)([[1]])
     arrow = Modules(field_map.codomain()).Mor(line.base_change(field_map), vector.parent())(
         lambda label: vector
     )
@@ -356,36 +363,365 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             )
             (section_denominator,) = tuple(section.denominator_ideal(parameter_lattice, target).ideal_generators())
             isotropic_denominator = _vector_denominator(witt.isotropic_vector(), target)
-            period = ring(2) * isotropic_denominator * section_denominator
+            period = self.integral_parameter_period()
             multiplication = Modules(ring).Mor(parameter_lattice, parameter_lattice)(
                 lambda label: parameter_lattice.scalar_multiple(period, parameter_lattice.module_generator(label))
             )
             return multiplication.cokernel_projection()
 
         @cached_method
-        def integral_parameter_classes(self):
-            r"""The complete finite residue locus for integral isometry lifts."""
-            quotient = self.integral_parameter_quotient()
-            lattice = quotient.domain()
+        def integral_parameter_period(self):
+            r"""Return ``m``, the period of the integral parameter quotient.
+
+            Write ``x = base^-1(f_target)`` and choose ``D`` with ``Dx`` integral.  Every
+            integral lift has its parameter in ``P = projection(E)/D``.  If ``e`` has
+            denominator ``A`` and the section of ``P`` has denominator ``B``, then
+            ``m = 2AB`` makes the section of ``mP`` lie in ``2A*E``, and the Eichler
+            formula and its inverse are integral for those parameters
+            (:meth:`integral_parameter_quotient`).
+            """
             source = self.source_reduction().isotropic_embedding().codomain()
             target = self.target_reduction().isotropic_embedding().codomain()
-
-            def integral(residue):
-                parameter = lattice.inclusion()(quotient.preimage(residue)).underlying_element()
-                lift = self.parameterization()(parameter)
-                return lift.integral_restriction(source, target) is not None
-
-            return quotient.codomain().elements().condition_set(integral)
+            ring = source.base_ring()
+            field_map = ring.fraction_field_map()
+            field = field_map.codomain()
+            parameters = self.parameter_space()
+            restricted_parameters = parameters.restrict_scalars(field_map)
+            witt = self._target_witt
+            rational_target = witt.rational_lattice()
+            source_vector = self.base_point().inverse()(witt.dual_isotropic_vector())
+            denominator = _vector_denominator(source_vector, source)
+            projection = self.target_splitting().codomain().projection(1) * self.target_splitting()
+            rationalize = ModulesOverIntegralDomains(target.base_ring())(target).generic_fibre_map()
+            parameter_lattice = restricted_parameters.subobject_on(tuple(
+                restricted_parameters(parameters.scalar_multiple(
+                    field.one() / field_map(denominator),
+                    projection(rationalize(vector).underlying_element()),
+                )) for vector in target.module_generators()
+            ))
+            section = Modules(field).Mor(parameter_lattice.base_change(field_map), rational_target)(
+                lambda label: self._target_section(
+                    parameter_lattice.inclusion()(parameter_lattice.module_generator(label)).underlying_element()
+                )
+            )
+            (section_denominator,) = tuple(section.denominator_ideal(parameter_lattice, target).ideal_generators())
+            isotropic_denominator = _vector_denominator(witt.isotropic_vector(), target)
+            return ring(2) * isotropic_denominator * section_denominator
 
         @cached_method
-        def _integral_base_point_or_none(self):
+        def integral_parameter_classes(self):
+            r"""The integral residue locus, as a union of cosets of the transvection kernel.
+
+            Write ``f`` for the target's marked isotropic vector, ``phi: P -> T`` for the
+            parameterization (:meth:`parameterization`), ``s`` for the target section and
+            ``L'`` for the target lattice.  Eichler's transvection formula
+            (Gritsenko--Hulek--Sankaran, arXiv:0810.1614, section 3.1, (4)--(5), cited in
+            this module's docstring; the owner of the formula here is
+            ``Lattices.ParentMethods.eichler_transvection``)
+
+                ``E_{f,x}(y) = y + b(y,x) f - (q(x)/2) b(y,f) f - b(y,f) x``
+
+            is integral for ``x`` in ``L'``: each term is then integral, ``q(x)/2`` because
+            ``L'`` is even.  A primitive isotropic ``f`` does **not** make that an exact
+            criterion, because the converse needs a ``y`` with ``b(y,f) = 1`` and a primitive
+            isotropic vector only gives ``b(f, L') = d Z`` for the divisibility ``d = div(f)``,
+            which may exceed one.  On a lattice of divisibility ``d = 2`` the parameter
+            ``x = f/2`` has ``b(y,x) = b(y,f)/2`` and ``q(x) = 0``, so ``E_{f,f/2}`` is the
+            identity: an integral isometry whose parameter is not a lattice vector.  The
+            integral parameters are therefore not the parameters that lie in ``L'``, and a
+            locus computed as ``{a : s(a) in L'}`` loses exactly those lifts.
+
+            What holds for every base point and every divisibility is that the locus is a
+            union of cosets of
+
+                ``K = {a in P/mP : s(a) in L'}``,
+
+            the kernel of ``a + mP |-> s(a) + L'`` in ``L'^vee/L' = A_{L'}``.  The
+            section lands in the perpendicular of the marked isotropic vector, so the
+            transvections ``E_{f,s(a)}`` and ``E_{f,s(k)}`` commute and compose to the
+            transvection of the sum, and ``phi(a) = E_{f,s(a)} phi(0)`` is how
+            :meth:`parameterization` defines these coordinates.  Hence
+
+                ``phi(a + k) = E_{f,s(k)} phi(a)``
+
+            for every ``k`` in ``K``.  Both ``E_{f,s(k)}`` and its inverse
+            ``E_{f,-s(k)}`` are integral, because ``s(k)`` and ``-s(k)`` lie in ``L'`` and
+            ``L'`` is even.  Multiplying by an integral isometry whose inverse is integral
+            preserves integrality, so ``phi(a + k)`` is integral exactly when ``phi(a)`` is:
+            the locus is a union of ``K``-cosets, integral base point or not.
+
+            The locus is computed here from the parameter module's structure, never by
+            listing its elements: ``K`` from one integer Smith form of the coordinates of
+            ``s`` on a basis of ``P`` (:meth:`integral_parameter_quotient`,
+            ``Modules.ParentMethods.rational_coordinates``); one representative of each
+            coset of ``P/mP`` modulo ``K``, which is ``|P/mP| / |K| = prod_i step_i`` of
+            them; the lift ``phi`` of that parameter, asked for its integral restriction --
+            the lift test itself, not a criterion for it; and the union of the cosets that
+            pass, presented as the image of the passing representatives and the kernel
+            under the coset addition, with the inverse naming both components of the pair,
+            so the union itself is never listed as one set.  A coset whose representative
+            fails contributes nothing, and its representative's lift is the only lift
+            built for it.
+            """
+            from sage.all import QQ, ZZ, gcd, lcm
+            from sage.matrix.constructor import matrix
+
+            from sage_extensions.categories.rings.ring_foundation import _engine_element
+
+            source = self.source_reduction().isotropic_embedding().codomain()
+            target = self.target_reduction().isotropic_embedding().codomain()
+            assert target.is_even() is True, (
+                f"the integral lift locus of {self.reduction_isometry()!r} is computed as a "
+                f"union of cosets of the transvection kernel only on an even lattice: on "
+                f"{target!r} the transvection of a kernel class need not be integral, so "
+                f"integrality is not constant on those cosets"
+            )
+            quotient = self.integral_parameter_quotient()
+            parameter_lattice = quotient.domain()
+            classes_module = quotient.codomain()
+            period = self.integral_parameter_period()
+            period_scalar = ZZ(_engine_element(period.parent(), period))
+            labels = tuple(parameter_lattice.module_generating_set())
+            parameter_rank = int(parameter_lattice.module_rank())
+            assert len(labels) == parameter_rank, (
+                f"the parameter lattice {parameter_lattice} must be free on its selected "
+                f"generators for the class map to be read off them, but it has rank "
+                f"{parameter_rank} and {len(labels)} generators"
+            )
+            rational_target = self._target_witt.rational_lattice()
+            inclusion = parameter_lattice.inclusion()
+            # s(a_i) in a basis of L', as one rational column per parameter generator.
+            columns = [
+                rational_target.rational_coordinates(
+                    self._target_section(
+                        inclusion(parameter_lattice.module_generator(label)).underlying_element()
+                    )
+                )
+                for label in labels
+            ]
+            ambient_rank = int(target.module_rank())
+            coordinates = matrix(QQ, ambient_rank, parameter_rank, [
+                entry for column in columns for entry in column.list()
+            ])
+            denominator = ZZ(1)
+            for entry in coordinates.list():
+                denominator = lcm(denominator, ZZ(entry.denominator()))
+            integral_coordinates = matrix(ZZ, ambient_rank, parameter_rank, [
+                ZZ((entry * denominator).numerator()) for entry in coordinates.list()
+            ])
+            # B = U D V with U, V unimodular: B a = U D V a, and U and V preserve the
+            # integrality of a vector up to unimodular change, so B a is in
+            # denominator * Z^ambient_rank exactly when (D V a)_i is in denominator * Z
+            # for every i, that is when (V a)_i is a multiple of
+            # denominator / gcd(D_ii, denominator).
+            smith, _left, right = integral_coordinates.smith_form()
+            steps = tuple(
+                denominator // gcd(abs(smith[index, index]), denominator)
+                for index in range(parameter_rank)
+            )
+            # In the coordinates w = V a of P/mP = (Z/m)^r the kernel condition
+            # (V a)_i in step_i Z is the condition w_i in gcd(step_i, m) Z, so
+            # gcd(step_i, m) indexes the cosets in that coordinate and
+            # m / gcd(step_i, m) counts the kernel's classes there.
+            coset_steps = tuple(gcd(step, period_scalar) for step in steps)
+            counts = tuple(period_scalar // step for step in coset_steps)
+            images = tuple(
+                classes_module(quotient(parameter_lattice.module_generator(label)))
+                for label in labels
+            )
+            zero = classes_module.zero()
+
+            def class_of(coefficients):
+                return sum(
+                    (
+                        classes_module.scalar_multiple(
+                            classes_module.base_ring()(coefficient), image
+                        )
+                        for coefficient, image in zip(coefficients, images)
+                        if coefficient % period_scalar != 0
+                    ),
+                    zero,
+                )
+
+            def parameters(moduli):
+                r"""The index vectors ``indices`` with ``0 <= indices[i] < moduli[i]``."""
+                indices = [0] * parameter_rank
+                while True:
+                    yield tuple(indices)
+                    position = 0
+                    while position < parameter_rank:
+                        indices[position] += 1
+                        if ZZ(indices[position]) < ZZ(moduli[position]):
+                            break
+                        indices[position] = 0
+                        position += 1
+                    if position == parameter_rank:
+                        return
+
+            inverse_right = right.inverse()
+
+            def coefficients_at(indices):
+                r"""The coordinates ``V^-1 indices`` of one class of ``P/mP``."""
+                column = inverse_right * matrix(
+                    ZZ, parameter_rank, 1, [ZZ(index) for index in indices]
+                )
+                return tuple(int(entry) % int(period_scalar) for entry in column.list())
+
+            def parameter_class(indices):
+                r"""The class of the parameter ``V^-1 indices`` in ``P/mP``."""
+                return class_of(coefficients_at(indices))
+
+            def parameter_at(indices):
+                r"""The parameter of the class :func:`parameter_class` gives for ``indices``.
+
+                The class's coordinates name a parameter of it, namely the linear
+                combination of ``P``'s generators with those coefficients, so the
+                parameter is read off rather than solved for.  Solving instead -- the
+                quotient's ``preimage`` -- was 64% of one locus's time on `T_Co`: it
+                rebuilds an element of the quotient and inverts the projection per class
+                (#361).
+                """
+                coefficients = coefficients_at(indices)
+                parameter_ring = parameter_lattice.base_ring()
+                return inclusion(
+                    parameter_lattice.linear_combination(
+                        {
+                            label: parameter_ring(coefficient)
+                            for label, coefficient in zip(labels, coefficients)
+                        }
+                    )
+                ).underlying_element()
+
+            # K itself, as the classes of P/mP with w = V a a multiple of the steps.
+            transvection_kernel = tuple(
+                parameter_class(
+                    tuple(ZZ(index) * step for index, step in zip(indices, coset_steps))
+                )
+                for indices in parameters(counts)
+            )
+            # The lift at a parameter is ``phi(a) = t(f, s(a)) * base``
+            # (:meth:`parameterization`): the Eichler transvection of the section
+            # composed with the base point.  Its images of the source basis are
+            # therefore the transvection's matrix times the base point's coordinate
+            # matrix, and the lift is integral exactly when those images are integral
+            # combinations of the target's generators with a unimodular coordinate
+            # matrix -- the reading
+            # :meth:`...LatticeIsometryMethods.integral_restriction` makes on its
+            # integral branch.  The one product is formed per class: composing the two
+            # isometries and asking the composed object answers the same question
+            # through three constructions per class -- the transvection, the
+            # composition, and the torsor's membership check of the composition --
+            # which were 581 of the `T_Co` line row's 637 seconds (#361).
+            ring = source.base_ring()
+            assert ring is target.base_ring(), (
+                f"the integral lift locus of {self.reduction_isometry()!r} is read in "
+                f"the target's coordinates only when both endpoints are lattices over "
+                f"one ring, but the source is over {ring} and the target over "
+                f"{target.base_ring()}"
+            )
+            base = self.base_point()
+            rational_source = base.domain()
+            rational_target = base.codomain()
+            isotropic_vector = self._target_witt.isotropic_vector()
+            source_labels = tuple(source.module_generating_set())
+            target_labels = tuple(target.module_generating_set())
+            assert (
+                tuple(rational_target.module_generating_set()) == target_labels
+                and isotropic_vector.parent() is rational_target
+            ), (
+                f"the integral lift locus of {self.reduction_isometry()!r} is read in "
+                f"the target's own coordinates only when its rationalization carries "
+                f"the target's generators and the marked isotropic vector: "
+                f"{rational_target!r} is indexed by "
+                f"{tuple(rational_target.module_generating_set())} against the target's "
+                f"{target_labels}, and the marked vector lies in "
+                f"{isotropic_vector.parent()!r}"
+            )
+            # The base point's images of the source generators, one rational column
+            # each, so a class's lift is one matrix product away.
+            base_images = matrix(
+                QQ,
+                len(target_labels),
+                len(source_labels),
+                [
+                    entry
+                    for label in source_labels
+                    for entry in rational_target.rational_coordinates(
+                        base(rational_source.module_generator(label))
+                    ).list()
+                ],
+            )
+
+            def lifts_integrally(parameter):
+                r"""Whether the lift at ``parameter`` restricts to an isometry of ``L'``.
+
+                The lift is ``phi(a) = t(f, s(a)) * base``, so its images of the source
+                generators are the transvection's matrix times the base point's, and it
+                restricts to an isometry of ``L'`` exactly when every coordinate of
+                every image in the target's basis lies in the common base ring and the
+                coordinate matrix has determinant ``+-1``.
+                """
+                section = self._target_section(parameter)
+                images = (
+                    rational_target.eichler_transvection_matrix(
+                        isotropic_vector, section
+                    )
+                    * base_images
+                )
+                for entry in images.list():
+                    if entry.denominator() != 1:
+                        return False
+                return int(matrix(ZZ, [[int(entry) for entry in row] for row in images.rows()]).determinant()) in (1, -1)
+
+            passing = tuple(
+                residue
+                for residue, parameter in (
+                    (parameter_class(indices), parameter_at(indices))
+                    for indices in parameters(coset_steps)
+                )
+                if lifts_integrally(parameter)
+            )
+            # The locus is the union of the cosets that pass, each translated
+            # from its own tested representative by the transvection kernel.
+            # That union is presented as the image of the passing
+            # representatives and the kernel under the coset addition, with the
+            # inverse naming both components of the pair, so the union itself
+            # is never listed as one set: on ``T_Co`` it has 131072 classes
+            # and it is built once per candidate the port tests, so its
+            # listing was the row's own cost.
+            passing_residues = finite_ordered_set(passing)
+            kernel = finite_ordered_set(transvection_kernel)
+            cosets = passing_residues.product_with(kernel)
+            residue_projection, kernel_projection = (
+                cosets.projection(index) for index in cosets.index_set()
+            )
+
+            def sum_of(pair):
+                return residue_projection(pair) + kernel_projection(pair)
+
+            def pair_of(value):
+                r"""The unique representative and kernel class summing to this class, or ``None``."""
+                for residue in passing:
+                    shift = value - residue
+                    if shift in kernel:
+                        return cosets((residue, shift))
+                return None
+
+            return Sets().image_set(
+                Sets().Mor(cosets, classes_module)(sum_of), cosets, inverse=pair_of
+            )
+
+        @cached_method
+        def integral_base_point_or_none(self):
             r"""Decide existence and retain one integral lift, or ``None``.
 
-            Private witness contract used by the selected Levi section and
-            its image predicate. An integral rational base point proves
-            nonemptiness immediately. A nonintegral base point proves
-            nothing; only exhaustion of the complete residue locus proves
-            emptiness.
+            An integral rational base point proves nonemptiness immediately.
+            Otherwise the integral residue locus decides it: its classes are the
+            cosets of the transvection kernel whose representative lifts
+            integrally (:meth:`integral_parameter_classes`), so the first of
+            them supplies a lift and an empty locus proves emptiness without
+            listing ``P/mP``.  The lift is asked for its integral restriction
+            once more, on that class alone, rather than assumed.
             """
             source = self.source_reduction().isotropic_embedding().codomain()
             target = self.target_reduction().isotropic_embedding().codomain()
@@ -393,15 +729,18 @@ class IsotropicReductionLiftTorsors(OwnedCategoryOverBaseRing):
             if base.integral_restriction(source, target) is not None:
                 return base
             quotient = self.integral_parameter_quotient()
+            inclusion = quotient.domain().inclusion()
             for residue in self.integral_parameter_classes():
-                parameter = quotient.domain().inclusion()(quotient.preimage(residue)).underlying_element()
-                return self.parameterization()(parameter)
+                parameter = inclusion(quotient.preimage(residue)).underlying_element()
+                lift = self.parameterization()(parameter)
+                if lift.integral_restriction(source, target) is not None:
+                    return lift
             return None
 
         @cached_method
         def integral_base_point(self):
             r"""Select an integral lift, or raise when the integral lift locus is empty."""
-            point = self._integral_base_point_or_none()
+            point = self.integral_base_point_or_none()
             if point is not None:
                 return point
             raise ValueError("the integral reduction-lift locus is empty")

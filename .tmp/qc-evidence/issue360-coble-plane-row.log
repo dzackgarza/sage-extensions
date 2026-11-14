@@ -1,0 +1,52 @@
+T_Co rank 11 signature (2, 9) det -2048 classes 2048 |O(q)| 46998591897600
+[23:08:27] setup: 15.8 s
+[23:08:27] isotropic_orbit_representatives(2) ...
+Traceback (most recent call last):
+  File "/probe.py", line 28, in <module>
+    planes = stage("isotropic_orbit_representatives(2)", lambda: group.isotropic_orbit_representatives(2))
+  File "/probe.py", line 14, in stage
+    value = function()
+  File "/probe.py", line 28, in <lambda>
+    planes = stage("isotropic_orbit_representatives(2)", lambda: group.isotropic_orbit_representatives(2))
+                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py", line 4871, in isotropic_orbit_representatives
+    return _isotropic_orbit_representatives(self, rank, flag=flag)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 1600, in _isotropic_orbit_representatives
+    planes = _isotropic_plane_orbit_representatives(orthogonal_group)
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 1416, in _isotropic_plane_orbit_representatives
+    candidates.extend(_planes_through_line(orthogonal_group, line, completion))
+                      ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py", line 1393, in _planes_through_line
+    for isotropic in INDUCTION.isotropic_vector_classes(quotient)
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 75, in isotropic_vector_classes
+    self._line_classes[id(lattice)] = (lattice, self._computed_isotropic_vector_classes(lattice))
+                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/work/src/sage_indefinite_port/indefinite/isotropic_induction.py", line 84, in _computed_isotropic_vector_classes
+    if not lattice.is_isotropic():
+           ~~~~~~~~~~~~~~~~~~~~^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattices.py", line 4687, in is_isotropic
+    return lattice_engines._isotropic_vector_witness(self) is not None
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/repos/sage-extensions/src/sage_extensions/categories/lattice_engines.py", line 496, in _isotropic_vector_witness
+    solution = qfsolve(_engine_component_matrix(lattice.gram_tensor()).change_ring(SageQQ))
+  File "/sage/.venv/lib/python3.14/site-packages/sage/quadratic_forms/qfsolve.py", line 85, in qfsolve
+    ret = G.__pari__().qfsolve()
+  File "cypari2/auto_gen.pxi", line 30828, in cypari2.gen.Gen_base.qfsolve
+    sig_on()
+  File "cypari2/handle_error.pyx", line 211, in cypari2.handle_error._pari_err_handle
+cypari2.handle_error.PariError: sorry, qfsolve, dim >= 10 is not yet implemented
+[peakrss] p360run: child waited=1 shell_code=1 samples=198
+[peakrss] peak tree RSS      : 512 MiB
+[peakrss] low-water MemAvail : 4651 MiB
+[peakrss] peak single VmHWM  : 514 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      504 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    82.1s procs=  3 rss=   512 MiB hwm=   514 MiB avail=  5918 MiB
+[peakrss]   t=    80.1s procs=  3 rss=   511 MiB hwm=   514 MiB avail=  5971 MiB
+[peakrss]   t=    78.1s procs=  3 rss=   510 MiB hwm=   513 MiB avail=  5977 MiB
+[peakrss]   t=    84.1s procs=  3 rss=   510 MiB hwm=   514 MiB avail=  5823 MiB
+[peakrss]   t=    86.1s procs=  3 rss=   510 MiB hwm=   514 MiB avail=  5780 MiB
+launcher exit: 1

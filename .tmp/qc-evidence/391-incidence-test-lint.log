@@ -1,0 +1,9 @@
+1 files, 0 findings
+[peakrss] lint391b: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 3 MiB
+[peakrss] low-water MemAvail : 13628 MiB
+[peakrss] peak single VmHWM  : 3 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       3 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail= 13628 MiB
+launcher exit: 0

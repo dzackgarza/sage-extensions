@@ -7,13 +7,16 @@ exactly on $V(\operatorname{Fitt}_{d-1} M)$ (Eisenbud, *Commutative Algebra*, 20
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.abstract_categories.mor_categories import (
+    CategoricalIsomorphism,
+)
 
 
 def torsion_plus_free():
     R = QQ["x"]
     x = R.gen()
     F = R**2
-    M = F / F.submodule([x * F.module_generator(0)])
+    M = F.subobject_on([x * F.module_generator(0)]).inclusion().cokernel()
     spectrum = R.spectrum()
     return R, x, M, spectrum.generic_point(), spectrum(R.ideal(x))
 
@@ -48,7 +51,7 @@ def test_the_local_trivialization_at_the_generic_point_has_rank_one() -> None:
     R, x, M, generic, origin = torsion_plus_free()
     trivialization = M.local_free_trivialization_at(generic)
     assert trivialization.domain().module_rank() == 1
-    assert trivialization.is_isomorphism()
+    assert isinstance(trivialization, CategoricalIsomorphism)
 
 
 def test_the_annihilator_of_q_x_y_mod_x_plus_q_x_y_mod_y_is_xy() -> None:
@@ -59,6 +62,6 @@ def test_the_annihilator_of_q_x_y_mod_x_plus_q_x_y_mod_y_is_xy() -> None:
     R = QQ["x,y"]
     x, y = R.algebra_generator("x"), R.algebra_generator("y")
     F = R**2
-    M = F / F.submodule([x * F.module_generator(0), y * F.module_generator(1)])
+    M = F.subobject_on([x * F.module_generator(0), y * F.module_generator(1)]).inclusion().cokernel()
     assert M.annihilator() == R.ideal(x * y)
     assert M.annihilator() != R.ideal(x)

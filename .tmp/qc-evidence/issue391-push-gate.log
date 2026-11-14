@@ -1,0 +1,10 @@
+provider SHA: a226af6af21786bda65a997396ea1f8c57fd968b
+command: just test-push (staged files only)
+Push syntax: 7 file(s) checked; no errors.
+[peakrss] run: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 2 MiB
+[peakrss] low-water MemAvail : 11287 MiB
+[peakrss] peak single VmHWM  : 2 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       2 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 11287 MiB

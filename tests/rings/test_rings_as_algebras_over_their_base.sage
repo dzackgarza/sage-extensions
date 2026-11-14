@@ -10,6 +10,7 @@ is not a ``Q``-algebra.
 import pytest
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_z_mod_six_is_a_z_algebra() -> None:

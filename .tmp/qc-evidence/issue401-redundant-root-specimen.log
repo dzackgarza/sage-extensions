@@ -1,0 +1,31 @@
+worktree SHA: c15b43275fcfd56fbb29882ba663da52d3d30f40
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt401/.scratch/probe401_a1a1.py
+labels: (0, 1, 2, 3)
+   0 (1, 0, 0, 0) q= 0
+   1 (0, 1, 0, 0) q= 0
+   2 (0, 0, 1, 0) q= -2
+   3 (0, 0, 0, 1) q= -2
+complete: True walls: 4
+   wall (0, 0, 1, 0) q= -2
+   wall (0, 0, -1, 1) q= -4
+   wall (-1, 1, 0, 0) q= -2
+   wall (0, -1, 0, -1) q= -2
+facet_covectors: 4
+dimension: 4
+   face dim on wall (0, 0, 1, 0) -> 3 [0, 0, -2, 0]
+   face dim on wall (0, 0, -1, 1) -> 3 [0, 0, 2, -2]
+   face dim on wall (-1, 1, 0, 0) -> 3 [1, -1, 0, 0]
+   face dim on wall (0, -1, 0, -1) -> 3 [-1, 0, 0, 2]
+a1+a2: (0, 0, 1, 1) q= -4 primitive: True
+extended cone: facets 4 walls 5 face dim on the sum 2
+[peakrss] probe401: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 306 MiB
+[peakrss] low-water MemAvail : 13060 MiB
+[peakrss] peak single VmHWM  : 306 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      295 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   306 MiB hwm=   306 MiB avail= 13060 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13225 MiB
+launcher exit: 0

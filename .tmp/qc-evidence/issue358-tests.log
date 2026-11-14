@@ -1,0 +1,19 @@
+..                                                                       [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_coble_gamma_co_2_line_row_returns_generators.sage::test_the_coble_gamma_co_2_line_row_returns_its_stabilizer_image: 391.07 s > 20 s
+tests/lattices/test_the_decomposition_preimage_returns_generators.sage::test_the_decomposition_preimage_returns_generators: 150.14 s > 20 s
+2 passed in 541.79s (0:09:01)
+[peakrss] p358tests: child waited=0 shell_code=0 samples=281
+[peakrss] peak tree RSS      : 4381 MiB
+[peakrss] low-water MemAvail : 4464 MiB
+[peakrss] peak single VmHWM  : 4472 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     4461 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   544.4s procs=  3 rss=  4381 MiB hwm=  4472 MiB avail=  8075 MiB
+[peakrss]   t=   546.4s procs=  3 rss=  4381 MiB hwm=  4472 MiB avail=  8085 MiB
+[peakrss]   t=   542.4s procs=  3 rss=  4339 MiB hwm=  4339 MiB avail=  8117 MiB
+[peakrss]   t=   550.4s procs=  3 rss=  4195 MiB hwm=  4472 MiB avail=  8126 MiB
+[peakrss]   t=   552.4s procs=  3 rss=  4195 MiB hwm=  4472 MiB avail=  8143 MiB
+launcher exit: 0

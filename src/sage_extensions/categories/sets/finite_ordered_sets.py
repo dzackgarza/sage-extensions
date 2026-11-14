@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Hashable, Iterable
 from itertools import chain, islice
 from typing import TYPE_CHECKING, TypeVar
 
 from sage.categories.category import Category
-from sage.misc.cachefunc import cached_method
+from sage.misc.cachefunc import cached_function, cached_method
 from sage.misc.prandom import randrange
 from sage.structure.parent import Parent
 
@@ -30,6 +30,24 @@ if TYPE_CHECKING:
 
 IndexT = TypeVar("IndexT")
 PointT = TypeVar("PointT")
+
+
+class _PointsAreEqual:
+    r"""The default equivalence of an ordered set: two points are equivalent when they are equal.
+
+    An ordered set retains its equivalence on the parent, and a parent must survive
+    a pickle round trip, so the default is a module-level object rather than a
+    closure (issue #20).  It carries no state.
+    """
+
+    def __call__(self, left, right):
+        return left == right
+
+    def __repr__(self) -> str:
+        return "point equality"
+
+
+_DEFAULT_EQUIVALENCE = _PointsAreEqual()
 
 
 class OrderedEnumeratedSets(OwnedCategory):
@@ -116,7 +134,7 @@ class OrderedEnumeratedSets(OwnedCategory):
             self._element_at_function = element_at
             self._index_of_function = index_of
             self._contains_function = contains
-            self._equivalent_function = equivalent or (lambda left, right: left == right)
+            self._equivalent_function = equivalent or _DEFAULT_EQUIVALENCE
             self._name = name
             super().__init__(facade=True, **rest)
 
@@ -377,6 +395,9 @@ class FiniteOrderedSets(OwnedCategory):
         if index_of is None:
             indices = tuple(index_set)
             points = tuple(element_at(index) for index in indices)
+            # These retained objects already satisfy the chosen enumeration.
+            # Their admission does not need equality with other points.
+            identity_indices = {id(point): index for point, index in zip(points, indices, strict=True)}
             # The finite presentation has already selected its points. Keep
             # these exact objects as the forward enumeration instead of
             # re-running an arbitrary defining callback during membership,
@@ -397,6 +418,9 @@ class FiniteOrderedSets(OwnedCategory):
                         if equal is not False:
                             raise ValueError("distinctness of the enumerated points is undecided")
                 def index_of(point):
+                    retained = identity_indices.get(id(point))
+                    if retained is not None:
+                        return retained
                     for index, present in zip(indices, points, strict=True):
                         equal = True if point is present else point == present
                         if equal is True:
@@ -410,6 +434,8 @@ class FiniteOrderedSets(OwnedCategory):
                     def contains(point):
                         from sage_extensions.logic import conjunction, negation
 
+                        if id(point) in identity_indices:
+                            return True
                         return negation(conjunction(
                             negation(True if point is present else point == present)
                             for present in points
@@ -418,6 +444,9 @@ class FiniteOrderedSets(OwnedCategory):
                 if len(lookup) != len(points):
                     raise ValueError("an enumeration must select distinct points at distinct indices")
                 def index_of(point):
+                    retained = identity_indices.get(id(point))
+                    if retained is not None:
+                        return retained
                     try:
                         return lookup.get(point)
                     except (TypeError, ValueError):
@@ -431,6 +460,8 @@ class FiniteOrderedSets(OwnedCategory):
                     def contains(point):
                         from sage_extensions.logic import conjunction, negation
 
+                        if id(point) in identity_indices:
+                            return True
                         try:
                             position = lookup.get(point)
                         except (TypeError, ValueError):
@@ -806,3 +837,34 @@ def finite_ordered_set[PointT](
 ) -> FiniteOrderedSets().ObjectType:
     r"""The finite ordered set a finite set or finitely many points present."""
     return FiniteOrderedSets()(elements)
+
+
+@cached_function(key=lambda labels: labels)
+def interned_finite_ordered_set(labels):
+    r"""The one finite ordered set an ordered tuple of labels names.
+
+    A free module's framing records the *actual* label set it was constructed
+    on, so two separately built sets of the same labels give two modules and
+    therefore two algebras out of one datum: ``R[x, y]``,
+    ``R.free_module(("x", "y")).symmetric_algebra()`` and ``R["x,y"]`` are one
+    object only if they reach one label set (``OWN-02``).  Interning the set
+    constructor is where that identity belongs: the datum is the ordered
+    labels, not the Python object that carried them in.
+
+    Only hashable labels can be interned by value; a family of unhashable
+    points keeps its own identity, as it must.
+    """
+    return finite_ordered_set(labels)
+
+
+def interned_labels(labels):
+    r"""``interned_finite_ordered_set`` when the labels are hashable, else a fresh set.
+
+    Interning is by value, so it needs labels that are values; a family of
+    unhashable points is presented data that cannot be named twice, and it
+    keeps its own identity.
+    """
+    labels = tuple(labels)
+    if all(isinstance(label, Hashable) for label in labels):
+        return interned_finite_ordered_set(labels)
+    return finite_ordered_set(labels)

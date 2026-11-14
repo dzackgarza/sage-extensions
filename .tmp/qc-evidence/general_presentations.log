@@ -1,0 +1,30 @@
+### sage_categories consumer tests/algebra/test_general_module_presentations.sage at 2026-11-06T08:19:58Z
+
+==================================== ERRORS ====================================
+____ ERROR collecting tests/algebra/test_general_module_presentations.sage _____
+tests/algebra/test_general_module_presentations.sage:112: in <module>
+    test_noncommutative_relation_retains_exact_module_coequalizer_and_factor()
+tests/algebra/test_general_module_presentations.sage:66: in test_noncommutative_relation_retains_exact_module_coequalizer_and_factor
+    relation = presented_module_relation(modules, quotient)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_categories/algebra/presented_modules.py:180: in presented_module_relation
+    diagram = presented_module_diagram(modules, module)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_categories/algebra/presented_modules.py:160: in presented_module_diagram
+    assert len(diagrams) == 1, f"{module!r} has {len(diagrams)} retained module coequalizer presentations"
+           ^^^^^^^^^^^^^^^^^^
+E   AssertionError: family in Limit(Functor(L(2, 2) -> Cat)).point of Cat().point of Cat().Colimits().point of Cat.op().Limits(WalkingParallelPair.op()).op()() has 2 retained module coequalizer presentations
+------------------------------- Captured stdout --------------------------------
+Detected IPython. Loading juliacall extension. See https://juliapy.github.io/PythonCall.jl/stable/compat/#IPython
+=============================== warnings summary ===============================
+../../sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:1612
+../../sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:1612
+  /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:1612: UserWarning: _RuntimeImplementationCategory.ParentMethods should not have a super class
+    warn("%s.%s should not have a super class" % (cls.__name__, method_provider))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/algebra/test_general_module_presentations.sage - AssertionError: ...
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+2 warnings, 1 error in 30.98s
+### exit=2

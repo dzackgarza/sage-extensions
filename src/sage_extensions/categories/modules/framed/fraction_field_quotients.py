@@ -165,6 +165,17 @@ class FractionFieldQuotients(OwnedCategoryOverBaseRing):
         r"""``Frac(R)/R``."""
         return self()
 
+    def __call__(self, modulus=None):
+        r"""Return ``Frac(R) / modulus*R``, with ``modulus`` defaulting to ``R``.
+
+        ``an_object`` states the object ``Frac(R)/R`` as ``self()``, and a
+        reader of the docstring writes the same; ``Category.__call__`` requires
+        its argument, so the default stated by ``_call_`` was unreachable and
+        ``FractionFieldQuotients(ZZ)()`` raised ``TypeError`` instead of
+        returning ``QQ/ZZ``.
+        """
+        return super().__call__(1 if modulus is None else modulus)
+
     def _call_(self, modulus=1):
         r"""Return ``Frac(R) / modulus*R``."""
         base_ring = self.base_ring()

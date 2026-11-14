@@ -62,20 +62,46 @@ def _Ug():
     return NamedLattices.U.gram_tensor()
 
 
+def _E8g_owned_order():
+    r"""The E8 Gram tensor in the owned Cartan basis order.
+
+    This is the root-lattice recipe's own numbering, ``Lattices(ZZ)("E8")``, not
+    the order the catalogue's named roots are stated in.
+    """
+    return Lattices(ZZ)("E8").gram_tensor()
+
+
+# The owned E8 Cartan construction numbers its chain from the opposite end of
+# Sage's ``IntegralLattice('E8')`` basis: position ``i`` of the Sage order is
+# position ``_SAGE_E8_BASIS_ORDER[i]`` of the owned order.
+_SAGE_E8_BASIS_ORDER = (0, 7, 1, 2, 3, 4, 5, 6)
+# The inverse: the position a named generator of an owned-order E8 block takes
+# in a block named in Sage's order.
+_SAGE_E8_POSITION = tuple(
+    _SAGE_E8_BASIS_ORDER.index(owned) for owned in range(len(_SAGE_E8_BASIS_ORDER))
+)
+
+
 def _E8g():
-    return NamedLattices.E8.gram_tensor()
+    r"""The E8 Gram tensor in Sage's integral-lattice basis order.
+
+    Every named construction in this catalogue states its roots in Sage's
+    order — that of ``IntegralLattice('E8')``, which is also the order the
+    archived catalogue and notebook use — so this is the order of the
+    catalogue's E8, its twists, and the E8 blocks of the named lattices.
+    """
+    gram = _E8g_owned_order()
+    order = _SAGE_E8_BASIS_ORDER
+    return tensor(ZZ, (), (8, 8), [[gram[i, j] for j in order] for i in order])
 
 
 def _E8g_sage_basis_order():
-    r"""Return the E8 Gram tensor in Sage's integral-lattice basis order.
+    r"""The E8 Gram tensor in Sage's integral-lattice basis order.
 
-    The owned E8 Cartan construction numbers its chain from the opposite end
-    of Sage's ``IntegralLattice('E8')`` basis.  The permutation below changes
-    only the basis order, not the isometry class or the form.
+    The named catalogue has one E8 order, so this is the same tensor as
+    ``_E8g()``; the name records why that order was chosen.
     """
-    gram = _E8g()
-    order = (0, 7, 1, 2, 3, 4, 5, 6)
-    return tensor(ZZ, (), (8, 8), [[gram[i, j] for j in order] for i in order])
+    return _E8g()
 
 
 class NamedLattices:
@@ -145,7 +171,14 @@ class NamedLattices:
 
     @lazy_class_attribute
     def E8(cls):
-        return _C("E8")
+        r"""E8 with its simple roots in Sage's integral-lattice basis order.
+
+        That is the order the archived catalogue and notebook name the roots in,
+        and the order of every named lattice here that carries an E8 block.  The
+        root-lattice recipe ``Lattices(ZZ)("E8")`` keeps the owned Cartan
+        numbering.
+        """
+        return _C(_E8g())
 
     @lazy_class_attribute
     def E8_2(cls):
@@ -169,6 +202,20 @@ class NamedLattices:
 
     @lazy_class_attribute
     def Tco(cls):
+        r"""``T_Co = <2> + E(2)`` with ``E = E8 + U``: the Coble lattice of the source.
+
+        D. Dolgachev and S. Kondo, *Enriques surfaces and Borel--Weil--Bott type
+        duality*, Izv. Math. 77:3 (2013), section 3, equation (3.6), printed
+        p. 513: the lattice is ``N = <2> + E(2)`` with ``E = E8 + U``.  ``E8`` is
+        the negative definite one, ``E8(-1)``, and that is forced by the source's
+        own signature ``(2, 9)``: ``<2>`` contributes one positive square, while
+        ``(E8(-1) + U)(2)`` has signature ``(1, 9)`` -- with a positive definite
+        ``E8`` the sum would be ``(10, 1)``.  The blocks stand here in the
+        source's order, ``<2>``, ``U(2)``, ``E8(-2)``, with the ``E8`` block in
+        this catalogue's Sage basis order, so the named module generators are
+        ``h`` for the ``<2>`` line, ``ep`` and ``fp`` for ``U(2)``, and ``a1`` to
+        ``a8`` for ``E8(-2)``.
+        """
         return _C(
             _block_gram(_rank_one_2, 2 * _Ug(), 2 * _E8g_sage_basis_order()),
             names="h,ep,fp,a1,a2,a3,a4,a5,a6,a7,a8",
@@ -1088,8 +1135,15 @@ class Involutions:
 class Embeddings:
     @lazy_class_attribute
     def E8_2_into_TdP(cls):
+        r"""``E8(2) -> 2U + 2E8``: ``a_i`` to the two E8 blocks' own ``a_i``.
+
+        Both sides name their E8 roots in Sage's order, so the images are
+        positional.
+        """
         tdp = _generators(NamedLattices.TdP)
-        return NamedLattices.E8_2.Emb(NamedLattices.TdP)(tuple(tdp[4 + index] + tdp[12 + index] for index in range(8)))
+        return NamedLattices.E8_2.Emb(NamedLattices.TdP)(
+            tuple(tdp[4 + index] + tdp[12 + index] for index in range(8))
+        )
 
     @lazy_class_attribute
     def TCo_into_TEn(cls):
@@ -1111,6 +1165,11 @@ class Embeddings:
 
     @lazy_class_attribute
     def TdP_into_LK3(cls):
+        r"""The inclusion ``2U + 2E8 -> 3U + 2E8``.
+
+        Every named lattice here names its E8 roots in Sage's order, so the
+        images are positional.
+        """
         lk3 = _generators(NamedLattices.LK3)
         return NamedLattices.TdP.Emb(NamedLattices.LK3)(
             (
@@ -1129,6 +1188,19 @@ class Embeddings:
 
     @lazy_class_attribute
     def U_E8_2_into_TEn(cls):
+        r"""``U + E8(2) -> U + U(2) + E8(2)``, the Isometry Searching adapted basis.
+
+        The archived catalogue (``archives/preamble/catalogue.sage`` at
+        ``24dc7a61``) states this arrow as the adapted basis
+
+            e~ = e + e' + f' - a1,   f~ = f + e' + f' - a1,
+            a1~ = e' - f',           a3~ = f' + a3,   a_i~ = a_i otherwise,
+
+        whose Gram is exactly ``U + E8(2)`` inside ``T_En`` and whose coordinate
+        matrix has a unimodular 10x10 minor, so the embedding is primitive.  It
+        is what makes Sterk 5's fourteen roots in the standalone ``U + E8(2)``
+        the same configuration as their ``T_En`` presentation.
+        """
         ten = _generators(NamedLattices.TEn)
         return NamedLattices.U_E8_2.Emb(NamedLattices.TEn)(
             (

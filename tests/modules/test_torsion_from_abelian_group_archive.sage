@@ -16,7 +16,7 @@ def test_g2_and_g3_generate_the_cyclic_group_of_order_6() -> None:
 
     M = Modules(ZZ)(ZZ.quotient_ring(ZZ.ideal(6)))
     e = M.module_generator(0)
-    generated = M.submodule([2 * e, 3 * e])
+    generated = M.subobject_on([2 * e, 3 * e])
     assert generated.cardinality() == 6
     assert tuple(generated.invariant_factors()) == (6,)
 
@@ -28,7 +28,7 @@ def test_z_mod_2_plus_z_mod_3_is_cyclic_of_order_6() -> None:
     Source: Lang, Algebra, I.8 and III.7.
     """
     F = ZZ**2
-    M = F / F.submodule([2 * F.module_generator(0), 3 * F.module_generator(1)])
+    M = F.subobject_on([2 * F.module_generator(0), 3 * F.module_generator(1)]).inclusion().cokernel()
     assert M.cardinality() == 6
     assert tuple(M.invariant_factors()) == (6,)
     assert M.is_isomorphic(Modules(ZZ)(ZZ.quotient_ring(ZZ.ideal(6))))

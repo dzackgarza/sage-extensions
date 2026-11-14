@@ -1,0 +1,68 @@
+[11:01:38 +    0.0s] building the subgroup and the reduction image
+[11:02:01 +   22.7s] printed walls=11
+[11:02:01 +   22.7s] cone of the eleven: dimension 10, rays 11
+[11:02:01 +   22.7s] === 1. does each mirror meet the interior of the card's polyhedron? ===
+[11:02:02 +   23.4s] wall 0 q=-4 implied-card=False r-in-cone=False minus-r-in-cone=False mirror-meets-interior=True interior-point-on-mirror=(Fraction(8, 1), Fraction(7, 1), Fraction(-47, 4), Fraction(1, 4), Fraction(6, 1), Fraction(9, 4), Fraction(21, 4), Fraction(5, 1), Fraction(3, 1), Fraction(3, 2), Fraction(1, 2), Fraction(0, 1)) certified: min pairing with the eleven = 1, mirror pairing = 0
+[11:02:02 +   23.4s] wall 1 q=-4 implied-card=True r-in-cone=True minus-r-in-cone=False mirror-meets-interior=False interior-point-on-mirror=None
+[11:02:02 +   23.4s] wall 2 q=-4 implied-card=True r-in-cone=True minus-r-in-cone=False mirror-meets-interior=False interior-point-on-mirror=None
+[11:02:02 +   23.4s] wall 3 q=-4 implied-card=True r-in-cone=True minus-r-in-cone=False mirror-meets-interior=False interior-point-on-mirror=None
+[11:02:02 +   23.4s] wall 4 q=-4 implied-card=True r-in-cone=True minus-r-in-cone=False mirror-meets-interior=False interior-point-on-mirror=None
+[11:02:02 +   23.4s] wall 5 q=-4 implied-card=True r-in-cone=True minus-r-in-cone=False mirror-meets-interior=False interior-point-on-mirror=None
+[11:02:02 +   23.4s] wall 6 q=-4 implied-card=True r-in-cone=True minus-r-in-cone=False mirror-meets-interior=False interior-point-on-mirror=None
+[11:02:02 +   23.4s] wall 7 q=-2 implied-card=True r-in-cone=True minus-r-in-cone=False mirror-meets-interior=False interior-point-on-mirror=None
+[11:02:02 +   23.5s] wall 8 q=-2 implied-card=False r-in-cone=False minus-r-in-cone=False mirror-meets-interior=True interior-point-on-mirror=(Fraction(8, 1), Fraction(7, 1), Fraction(-137, 10), Fraction(1, 4), Fraction(6, 1), Fraction(9, 4), Fraction(21, 4), Fraction(5, 1), Fraction(3, 1), Fraction(3, 2), Fraction(1, 2), Fraction(0, 1)) certified: min pairing with the eleven = 1, mirror pairing = 0
+[11:02:02 +   23.5s] wall 9 q=-2 implied-card=False r-in-cone=False minus-r-in-cone=False mirror-meets-interior=True interior-point-on-mirror=(Fraction(8, 1), Fraction(7, 1), Fraction(-157, 12), Fraction(1, 4), Fraction(6, 1), Fraction(9, 4), Fraction(21, 4), Fraction(5, 1), Fraction(3, 1), Fraction(3, 2), Fraction(1, 2), Fraction(0, 1)) certified: min pairing with the eleven = 1, mirror pairing = 0
+[11:02:02 +   23.6s] wall 10 q=-2 implied-card=False r-in-cone=False minus-r-in-cone=False mirror-meets-interior=True interior-point-on-mirror=(Fraction(8, 1), Fraction(7, 1), Fraction(-345, 26), Fraction(1, 4), Fraction(6, 1), Fraction(9, 4), Fraction(21, 4), Fraction(5, 1), Fraction(3, 1), Fraction(3, 2), Fraction(1, 2), Fraction(0, 1)) certified: min pairing with the eleven = 1, mirror pairing = 0
+[11:02:02 +   23.6s] wall 11 q=-4 implied-card=False r-in-cone=False minus-r-in-cone=False mirror-meets-interior=True interior-point-on-mirror=(Fraction(8, 1), Fraction(7, 1), Fraction(-261, 20), Fraction(1, 4), Fraction(6, 1), Fraction(9, 4), Fraction(21, 4), Fraction(5, 1), Fraction(3, 1), Fraction(3, 2), Fraction(1, 2), Fraction(0, 1)) certified: min pairing with the eleven = 1, mirror pairing = 0
+[11:02:02 +   23.7s] wall 12 q=-2 implied-card=False r-in-cone=False minus-r-in-cone=False mirror-meets-interior=True interior-point-on-mirror=(Fraction(8, 1), Fraction(7, 1), Fraction(-529, 40), Fraction(1, 4), Fraction(6, 1), Fraction(9, 4), Fraction(21, 4), Fraction(5, 1), Fraction(3, 1), Fraction(3, 2), Fraction(1, 2), Fraction(0, 1)) certified: min pairing with the eleven = 1, mirror pairing = 0
+[11:02:02 +   23.7s] wall 13 q=-2 implied-card=False r-in-cone=False minus-r-in-cone=False mirror-meets-interior=True interior-point-on-mirror=(Fraction(8, 1), Fraction(7, 1), Fraction(-183, 14), Fraction(1, 4), Fraction(6, 1), Fraction(9, 4), Fraction(21, 4), Fraction(5, 1), Fraction(3, 1), Fraction(3, 2), Fraction(1, 2), Fraction(0, 1)) certified: min pairing with the eleven = 1, mirror pairing = 0
+[11:02:02 +   23.8s] wall 14 q=-2 implied-card=False r-in-cone=False minus-r-in-cone=False mirror-meets-interior=True interior-point-on-mirror=(Fraction(8, 1), Fraction(7, 1), Fraction(-709, 54), Fraction(1, 4), Fraction(6, 1), Fraction(9, 4), Fraction(21, 4), Fraction(5, 1), Fraction(3, 1), Fraction(3, 2), Fraction(1, 2), Fraction(0, 1)) certified: min pairing with the eleven = 1, mirror pairing = 0
+[11:02:02 +   23.8s] wall 15 q=-2 implied-card=False r-in-cone=False minus-r-in-cone=False mirror-meets-interior=True interior-point-on-mirror=(Fraction(8, 1), Fraction(7, 1), Fraction(-749, 58), Fraction(1, 4), Fraction(6, 1), Fraction(9, 4), Fraction(21, 4), Fraction(5, 1), Fraction(3, 1), Fraction(3, 2), Fraction(1, 2), Fraction(0, 1)) certified: min pairing with the eleven = 1, mirror pairing = 0
+[11:02:02 +   23.8s] walls whose mirror meets the interior: [0, 8, 9, 10, 11, 12, 13, 14, 15]
+[11:02:02 +   23.8s] === 2. card 029J row 4.3.8 against the figure ===
+[11:02:02 +   23.8s] card row: figure=10 printed_page=23 wall_count=11 vertices=['\\alpha_2', '\\alpha_3', '\\alpha_4', '\\alpha_5', '\\alpha_6', '\\alpha_7', '\\alpha_8', '\\alpha_9', '\\alpha_10', '\\alpha_11', '\\alpha_12']
+[11:02:02 +   23.8s] card cusp vector    (0, 0, 2, 1, -4, -5, -7, -10, -8, -6, -4, -2)
+[11:02:02 +   23.8s] library cusp vector (0, 0, 2, 1, -4, -5, -7, -10, -8, -6, -4, -2)
+[11:02:02 +   23.8s] they agree: True
+[11:02:02 +   23.8s] their pairing: 0
+[11:02:02 +   23.8s] card walls=11 library walls=11
+[11:02:02 +   23.8s]   vertex \alpha_2: card=(0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0) library=(0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0) agree=True
+[11:02:02 +   23.8s]   vertex \alpha_3: card=(0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0) library=(0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0) agree=True
+[11:02:02 +   23.8s]   vertex \alpha_4: card=(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0) library=(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0) agree=True
+[11:02:02 +   23.8s]   vertex \alpha_5: card=(0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0) library=(0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0) agree=True
+[11:02:02 +   23.8s]   vertex \alpha_6: card=(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0) library=(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0) agree=True
+[11:02:02 +   23.8s]   vertex \alpha_7: card=(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0) library=(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0) agree=True
+[11:02:02 +   23.8s]   vertex \alpha_8: card=(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1) library=(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1) agree=True
+[11:02:02 +   23.8s]   vertex \alpha_9: card=(-1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) library=(-1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) agree=True
+[11:02:02 +   23.8s]   vertex \alpha_10: card=(0, 0, 2, 0, -2, -3, -4, -6, -5, -4, -3, -2) library=(0, 0, 2, 0, -2, -3, -4, -6, -5, -4, -3, -2) agree=True
+[11:02:02 +   23.8s]   vertex \alpha_11: card=(1, 1, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0) library=(1, 1, -1, 0, 1, 0, 0, 0, 0, 0, 0, 0) agree=True
+[11:02:02 +   23.8s]   vertex \alpha_12: card=(2, 0, -2, 0, 2, 2, 3, 4, 3, 2, 1, 0) library=(2, 0, -2, 0, 2, 2, 3, 4, 3, 2, 1, 0) agree=True
+[11:02:02 +   23.8s] as sets they agree: True
+[11:02:02 +   23.8s] card edge orders against the computed Gram matrix of the eleven
+[11:02:02 +   24.0s] computed Gram: [[-4, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0], [0, -4, 2, 0, 0, 0, 0, 0, 0, 2, 0], [2, 2, -4, 2, 0, 0, 0, 0, 0, 0, 0], [0, 0, 2, -4, 2, 0, 0, 0, 0, 0, 0], [0, 0, 0, 2, -4, 2, 0, 0, 0, 0, 0], [0, 0, 0, 0, 2, -4, 2, 0, 0, 0, 0], [0, 0, 0, 0, 0, 2, -4, 0, 2, 0, 2], [0, 0, 0, 0, 0, 0, 0, -2, 0, 0, 2], [0, 0, 0, 0, 0, 0, 2, 0, -4, 0, 0], [0, 2, 0, 0, 0, 0, 0, 0, 0, -2, 0], [0, 0, 0, 0, 0, 0, 2, 2, 0, 0, -4]]
+[11:02:02 +   24.0s]   edge \alpha_2--\alpha_4 order 3: gram=2 squares=(-4,-4) agrees=True
+[11:02:02 +   24.0s]   edge \alpha_3--\alpha_4 order 3: gram=2 squares=(-4,-4) agrees=True
+[11:02:02 +   24.0s]   edge \alpha_3--\alpha_11 order 4: gram=2 squares=(-4,-2) agrees=True
+[11:02:02 +   24.0s]   edge \alpha_4--\alpha_5 order 3: gram=2 squares=(-4,-4) agrees=True
+[11:02:02 +   24.0s]   edge \alpha_5--\alpha_6 order 3: gram=2 squares=(-4,-4) agrees=True
+[11:02:02 +   24.0s]   edge \alpha_6--\alpha_7 order 3: gram=2 squares=(-4,-4) agrees=True
+[11:02:02 +   24.0s]   edge \alpha_7--\alpha_8 order 3: gram=2 squares=(-4,-4) agrees=True
+[11:02:02 +   24.0s]   edge \alpha_8--\alpha_10 order 3: gram=2 squares=(-4,-4) agrees=True
+[11:02:02 +   24.0s]   edge \alpha_8--\alpha_12 order 3: gram=2 squares=(-4,-4) agrees=True
+[11:02:02 +   24.0s]   edge \alpha_9--\alpha_12 order 4: gram=2 squares=(-2,-4) agrees=True
+[11:02:02 +   24.0s] edge entries in the card's row: 10; negative Gram entries away from the diagonal: 0; mismatches: 0
+[11:02:02 +   24.0s] done
+[peakrss] issue387: child waited=0 shell_code=0 samples=14
+[peakrss] peak tree RSS      : 533 MiB
+[peakrss] low-water MemAvail : 7067 MiB
+[peakrss] peak single VmHWM  : 533 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      522 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    26.0s procs=  3 rss=   533 MiB hwm=   533 MiB avail=  7067 MiB
+[peakrss]   t=    24.0s procs=  3 rss=   484 MiB hwm=   484 MiB avail=  7096 MiB
+[peakrss]   t=    22.0s procs=  3 rss=   472 MiB hwm=   472 MiB avail=  7119 MiB
+[peakrss]   t=    20.0s procs=  3 rss=   464 MiB hwm=   464 MiB avail=  7129 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   454 MiB hwm=   454 MiB avail=  7147 MiB
+launcher exit: 0

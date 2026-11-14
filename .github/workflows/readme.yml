@@ -1,0 +1,39 @@
+name: README example
+# The README example is the smallest acceptance: it runs as a doctest on
+# every push, inside the shared Sage image.
+on:
+  push: {}
+  workflow_dispatch: {}
+permissions:
+  contents: read
+  packages: read
+jobs:
+  readme:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    container:
+      image: ghcr.io/dzackgarza/sage:develop
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+      options: --user root
+    env:
+      SAGE_BIN: /sage/.venv/bin/sage
+    steps:
+      - uses: actions/checkout@v4
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Install the checkout into the image's Sage environment
+        # The image owns every dependency except the Julia bridge. Install the
+        # checkout without dependency resolution, as the consumers do, so the
+        # image's dependency graph is not re-resolved.
+        run: |
+          sage_python="$("$SAGE_BIN" -c 'import sys; print(sys.executable)')"
+          uv pip install --quiet --python "$sage_python" "sage-julia-bridge @ git+https://github.com/dzackgarza/sage-julia-bridge"
+          uv pip install --quiet --python "$sage_python" --no-deps -e .
+      - name: Run the README example
+        run: |
+          sage_python="$("$SAGE_BIN" -c 'import sys; print(sys.executable)')"
+          "$sage_python" -m doctest README.md
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true

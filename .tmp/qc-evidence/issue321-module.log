@@ -1,0 +1,28 @@
+.......                                                                  [100%]
+-------------- generated report log file: tests/.report/run.jsonl --------------
+========================== test-call performance gate ==========================
+tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_gamma_en_2_plane_row_is_nine: 158.16 s > 20 s
+tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_otilde_plus_plane_row_is_24242: 68.91 s > 20 s
+============================== slowest durations ===============================
+158.16s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_gamma_en_2_plane_row_is_nine
+68.91s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_otilde_plus_plane_row_is_24242
+8.82s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_two_representatives_are_primitive_isotropic_planes_with_different_classes
+8.18s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_a_lattice_whose_published_indices_do_not_apply_refuses
+5.73s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_a_trivial_discriminant_image_establishes_the_equality_vacuously
+3.46s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_a_split_orbit_realizes_its_plane
+2.47s call     tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_supplied_stabilizer_generators_establish_the_equality
+0.00s teardown tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_gamma_en_2_plane_row_is_nine
+0.00s setup    tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_two_representatives_are_primitive_isotropic_planes_with_different_classes
+0.00s setup    tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_a_split_orbit_realizes_its_plane
+0.00s teardown tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_otilde_plus_plane_row_is_24242
+0.00s setup    tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_gamma_en_2_plane_row_is_nine
+0.00s teardown tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_a_lattice_whose_published_indices_do_not_apply_refuses
+0.00s teardown tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_two_representatives_are_primitive_isotropic_planes_with_different_classes
+0.00s teardown tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_a_trivial_discriminant_image_establishes_the_equality_vacuously
+0.00s setup    tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_the_otilde_plus_plane_row_is_24242
+0.00s teardown tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_a_split_orbit_realizes_its_plane
+0.00s teardown tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_supplied_stabilizer_generators_establish_the_equality
+0.00s setup    tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_a_lattice_whose_published_indices_do_not_apply_refuses
+0.00s setup    tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_supplied_stabilizer_generators_establish_the_equality
+0.00s setup    tests/lattices/test_enriques_plane_orbits_by_divided_classes.sage::test_a_trivial_discriminant_image_establishes_the_equality_vacuously
+7 passed in 256.15s (0:04:16)

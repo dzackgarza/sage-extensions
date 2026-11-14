@@ -1,0 +1,19 @@
+N rank 12 signature (2, 10)
+discriminant_image built in 436.2s
+|im rho(O(N))| = 46998591897600 in 0.1s
+|O(A_N)| = 46998591897600
+IMAGE_OK
+[peakrss] issue17-image-size: child waited=0 shell_code=0 samples=223
+[peakrss] peak tree RSS      : 3550 MiB
+[peakrss] low-water MemAvail : 4571 MiB
+[peakrss] peak single VmHWM  : 3904 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      3157 MiB peak
+[peakrss]   python                      774 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    68.0s procs=  4 rss=  3550 MiB hwm=  3573 MiB avail=  9037 MiB
+[peakrss]   t=    70.0s procs=  4 rss=  3550 MiB hwm=  3573 MiB avail=  9039 MiB
+[peakrss]   t=    72.0s procs=  4 rss=  3550 MiB hwm=  3573 MiB avail=  8913 MiB
+[peakrss]   t=    74.0s procs=  4 rss=  3550 MiB hwm=  3573 MiB avail=  8657 MiB
+[peakrss]   t=    76.0s procs=  4 rss=  3550 MiB hwm=  3573 MiB avail=  8395 MiB

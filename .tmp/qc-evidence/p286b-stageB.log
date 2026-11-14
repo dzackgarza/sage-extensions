@@ -1,0 +1,12 @@
+[18:40:43] 6JRX: Lambda rank 21 det -2; v = e_0, q(v) 0 (0.3 s)
+[18:40:43] 6JRX: K rank 19 det 2
+[18:40:43] 6JRX: 17 candidate types
+[18:41:19]   (t=0, q1=0, q2=-2, ab=1): M_e det -2 rank 17 build 35.5 s tests 0.0 s -> NEW
+[18:41:54]   (t=0, q1=0, q2=-4, ab=2): M_e det -2 rank 17 build 1.7 s tests 33.7 s -> class 0
+[18:42:09]   (t=0, q1=-2, q2=0, ab=1): M_e det -2 rank 17 build 1.1 s tests 14.3 s -> class 0
+[18:42:24]   (t=0, q1=-2, q2=-2, ab=2): M_e det -2 rank 17 build 0.9 s tests 14.0 s -> class 0
+[18:42:40]   (t=0, q1=-2, q2=-4, ab=3): M_e det -2 rank 17 build 1.1 s tests 14.1 s -> class 0
+[18:42:55]   (t=0, q1=-4, q2=0, ab=2): M_e det -2 rank 17 build 1.0 s tests 14.6 s -> class 0
+[18:43:14]   (t=0, q1=-4, q2=-2, ab=3): M_e det -2 rank 17 build 1.1 s tests 17.7 s -> class 0
+[18:43:29]   (t=0, q1=-4, q2=-4, ab=4): M_e det -2 rank 17 build 1.0 s tests 14.6 s -> class 0
+[18:43:44]   (t=1, q1=0, q2=0, ab=1): M_e det -2 rank 17 build 0.9 s tests 13.5 s -> class 0

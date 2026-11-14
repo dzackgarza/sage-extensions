@@ -276,24 +276,82 @@ def _algebraic_correlation_morphism(metric, *, injective=False):
 
             return correlation_from_generator_images(finite_generator_image)
         case False:
-            from sage_extensions.categories.modules.framed.formed.form_modules import (
-                _as_module_element,
+            from sage_extensions.categories.modules.pure.modules import (
+                Modules as ModuleCategory,
             )
+            from sage_extensions.categories.sets.indexed_families import IndexedFamily
+
+            construction = metric._dual_product_construction()
+            assert construction is not None and dual is construction.object(), (
+                f"the algebraic dual of {metric} over the infinite basis {source_labels} must be the "
+                f"product of one copy of {ring} per basis label, but it is {dual}"
+            )
+            factor = ring.regular_module()
 
             def infinite_generator_image(source_label):
+                # ``b(v,-)`` on the basis: one component per basis label, read
+                # through the product's projections rather than a basis the
+                # product does not have.
                 source_generator = metric.module_generator(source_label)
-                return dual(
-                    lambda target_label: _as_module_element(
-                        ring,
-                        ring,
+                components = IndexedFamily(
+                    source_labels,
+                    lambda target_label: factor(
                         metric.b(
                             source_generator,
                             metric.module_generator(source_labels(target_label)),
                         )
-                    )
+                    ),
                 )
+                return ModuleCategory(ring).product_element(construction, components)
 
-            return correlation_from_generator_images(infinite_generator_image)
+            correlation = correlation_from_generator_images(infinite_generator_image)
+            _attach_diagonal_correlation_witness(metric, correlation, construction)
+            return correlation
+
+
+def _attach_diagonal_correlation_witness(metric, correlation, construction):
+    r"""Retain the non-image witness for a correlation whose rows are singletons.
+
+    The correlation sends the basis vector ``e_s`` to the functional
+    ``b(e_s, -)``, whose value at ``t`` is the Gram entry ``b(e_s, e_t)``.  Its
+    image therefore consists of finite linear combinations of the rows, so it is
+    contained in the finitely supported product elements exactly when each row
+    is finitely supported.  That premise is a fact about the form's construction,
+    not about the index set: a diagonal Gram ``b(e_i, e_j) = delta_ij d_i``
+    states it, because every row is supported on its own index.  A form given
+    only by an evaluation, such as the symmetric ``b(e_i, e_j) = 1`` for every
+    pair, has infinite rows, and then the constant family *is* an image and this
+    refutation would be false.
+
+    So the witness is attached only for a retained diagonal Gram, with a
+    nonzero ring and an infinite basis.  Otherwise nothing is retained and
+    surjectivity stays undecided rather than wrongly refuted.
+    """
+    from sage_extensions.categories._lattice import _DiagonalGram
+    from sage_extensions.categories.modules.pure.modules import Modules
+    from sage_extensions.categories.sets.indexed_families import IndexedFamily
+
+    ring = metric.base_ring()
+    labels = metric.module_generating_set()
+    if labels.cardinality().is_finite() is not False:
+        return
+    try:
+        gram = metric.gram_tensor()
+    except (TypeError, ValueError, NotImplementedError):
+        return
+    if not isinstance(gram, _DiagonalGram):
+        return
+    nonzero = ring.one()
+    if (nonzero == ring.zero()) is not False:
+        return
+    factor = ring.regular_module()
+    if (factor(nonzero) == factor(ring.zero())) is not False:
+        return
+    witness = Modules(ring).product_element(
+        construction, IndexedFamily(labels, lambda _label: factor(nonzero))
+    )
+    correlation._preamble_non_surjectivity_witness = witness
+    correlation._surjectivity_premise = False
 
 
 def _correlation_isomorphism(metric):
@@ -316,7 +374,9 @@ def _correlation_isomorphism(metric):
             assert False, (
                 f"the selected correlation-inverse computation cannot decide whether the scalar pairing on {metric} is perfect"
             )
-    forward = metric.algebraic_correlation_morphism()
+    # The perfect correlation is an embedding: build it as one, since the
+    # public correlation is the plain linear arrow.
+    forward = _algebraic_correlation_morphism(metric, injective=True)
     dual = forward.codomain()
     inverse = dual.module_category().Mor(dual, metric)(
         {

@@ -1,0 +1,28 @@
+The 25 test files in tests/ that name a changed operation, run at the base
+commit 1edc223 and on this tree, same command, same layout, one after the other:
+
+  base 1edc223: 41 failed, 149 passed, 1 deselected in 3329.47 s (0:55:29)
+  this tree   : 41 failed, 149 passed, 1 deselected in 3386.93 s (0:56:26)
+
+The FAILED id sets are identical, 41 ids: nothing new and nothing repaired.
+The same 41 ids are the set an earlier pair of runs produced at cf656f8.
+
+Command: just test -o addopts= -p sage_extensions.testing.suite_budget
+--no-time-gates --continue-on-collection-errors --durations=0 -q
+--deselect tests/lattices/test_the_isotropic_reduction_image.sage::test_every_cusp_chamber_has_the_wall_count_of_its_card_row
+<the 25 files>
+
+Deselected: test_every_cusp_chamber_has_the_wall_count_of_its_card_row.
+It walks all five Enriques cusps and does not return: a dedicated run of it at
+each of two trees was stopped after 27 minutes without reaching its end, and a
+19-minute cusp-4 run at this tree stopped inside the cusp-4 walk.  Cusp 4 is
+#400's walk, not this call.  The three cusps whose rows are green are covered
+directly instead, by the public chamber's wall sets (issue401-cusp-walls-base.log
+against issue401-cusp-walls-mine.log, byte-identical at 12, 10 and 12 walls);
+cusp 5 is in issue401-cusp-5-walls.log at 14.
+
+The runs loaded different trees.  hyperbolic_lattices.py is the file this commit
+changes and the only one the probes and the wall dumps depend on:
+
+  base (1edc223, and cf656f8)  sha256 08bea3a78c12d49fabd2ee2b1c0d783b02d295094ab6394453a7a64f62000a58
+  this tree (e79631d, and the c15b432 the wall dumps ran on)  sha256 15c907640022c8f55aea0f2f815b38d0ed91ddcdf5e834aa79d82f304ebea3cd

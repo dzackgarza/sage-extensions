@@ -1,0 +1,19 @@
+.......                                                                  [100%]
+7 passed in 187.09s (0:03:07)
+[peakrss] issue353: child waited=0 shell_code=0 samples=97
+[peakrss] peak tree RSS      : 1970 MiB
+[peakrss] low-water MemAvail : 4182 MiB
+[peakrss] peak single VmHWM  : 2123 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      1661 MiB peak
+[peakrss]   python                      451 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   groebner                      1 MiB peak
+[peakrss]   t=   192.4s procs=  4 rss=  1970 MiB hwm=  2123 MiB avail=  5705 MiB
+[peakrss]   t=   118.3s procs=  4 rss=  1944 MiB hwm=  2109 MiB avail=  4284 MiB
+[peakrss]   t=   120.3s procs=  4 rss=  1861 MiB hwm=  2109 MiB avail=  4328 MiB
+[peakrss]   t=   190.4s procs=  4 rss=  1860 MiB hwm=  2109 MiB avail=  5681 MiB
+[peakrss]   t=   122.3s procs=  4 rss=  1822 MiB hwm=  2109 MiB avail=  4241 MiB
+launcher exit: 0

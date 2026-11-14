@@ -1,0 +1,37 @@
+PARI stack size set to 2147483648 bytes, maximum size set to 8589934592
+    NEW class 2 at attempt 1 (p=2): |Aut| 1371195958099968000, roots 480, mass 691/555334363030487040000 / 642332179/18881368343036559360000 equal False
+    NEW class 3 at attempt 2 (p=2): |Aut| 106542032486400, roots 224, mass 5213041/555334363030487040000 / 642332179/18881368343036559360000 equal False
+    NEW class 4 at attempt 3 (p=2): |Aut| 809053559193600, roots 264, mass 5899441/555334363030487040000 / 642332179/18881368343036559360000 equal False
+    NEW class 5 at attempt 7 (p=5): |Aut| 3767021862912000, roots 304, mass 6046861/555334363030487040000 / 642332179/18881368343036559360000 equal False
+    NEW class 6 at attempt 9 (p=5): |Aut| 49662885888000, roots 204, mass 17228941/555334363030487040000 / 642332179/18881368343036559360000 equal False
+    NEW class 7 at attempt 11 (p=7): |Aut| 334764638208000, roots 244, mass 18887821/555334363030487040000 / 642332179/18881368343036559360000 equal False
+[    31.1s]   round 1: 45 attempts, 7 classes, mass ratio 0.99977229
+    NEW class 8 at attempt 227 (p=2): |Aut| 129448569470976000, roots 384, mass 2698873/79333480432926720000 / 642332179/18881368343036559360000 equal False
+[   142.5s]   round 2: 360 attempts, 8 classes, mass ratio 0.99999937
+[   332.4s]   round 3: 720 attempts, 8 classes, mass ratio 0.99999937
+[   452.6s]   round 4: 1080 attempts, 8 classes, mass ratio 0.99999937
+[   577.2s]   round 5: 1440 attempts, 8 classes, mass ratio 0.99999937
+[   577.2s] k = 2: 1440 attempts, 8 classes, mass 2698873/79333480432926720000 vs 642332179/18881368343036559360000: equal False
+    class |Aut| 1941728542064640000 roots 480
+    class |Aut| 1371195958099968000 roots 480
+    class |Aut| 106542032486400 roots 224
+    class |Aut| 809053559193600 roots 264
+    class |Aut| 3767021862912000 roots 304
+    class |Aut| 49662885888000 roots 204
+    class |Aut| 334764638208000 roots 244
+    class |Aut| 129448569470976000 roots 384
+DONE
+[peakrss] issue286: child waited=0 shell_code=0 samples=290
+[peakrss] peak tree RSS      : 618 MiB
+[peakrss] low-water MemAvail : 6525 MiB
+[peakrss] peak single VmHWM  : 622 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      611 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    50.1s procs=  3 rss=   618 MiB hwm=   622 MiB avail=  8183 MiB
+[peakrss]   t=    52.1s procs=  3 rss=   618 MiB hwm=   622 MiB avail=  8157 MiB
+[peakrss]   t=    54.1s procs=  3 rss=   618 MiB hwm=   622 MiB avail=  7905 MiB
+[peakrss]   t=    56.1s procs=  3 rss=   618 MiB hwm=   622 MiB avail=  7805 MiB
+[peakrss]   t=    58.1s procs=  3 rss=   618 MiB hwm=   622 MiB avail=  7806 MiB
+launcher exit: 0

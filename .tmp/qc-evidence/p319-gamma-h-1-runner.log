@@ -1,0 +1,31 @@
+cards: dzackgarza/lattice-database at 587d56febe5856d54c6bc9fc023fa5a425f76bfb
+replica of the paper read: arXiv:2302.01679v2 (26 Sep 2023), Tables 1 and 2 pp. 13-14, Table 4 p. 17
+per-call cap 120 s, budget unbounded s
+lattice 029J is T_En: rank 12, determinant 1024
+
+ROW gamma-h-1  (Gamma_h,1)
+  citation: D. Dutour Sikirić, K. Hulek, Moduli of polarised Enriques surfaces — computational aspects, J. London Math. Soc. 110 (2024), arXiv:2302.01679, Table 1, p. 13: case 1 with S = \overline{\{0\}}, #I_1 = 5, #I_2 = 9, #I_12 = 18 — the numbers of orbits of isotropic lines, planes and flags in N.
+  group: S = overline{0}, h = sum of g_{2}, |Gamma-bar_h| = 696729600
+  UNDECIDED: lines: the public call did not return inside 120 s (120 s elapsed) (after 185 s)
+
+SUMMARY
+  pass: 0
+  fail: 0
+  undecided: 1
+    gamma-h-1
+  notreached: 0
+exit status 1
+[peakrss] issue275: child waited=0 shell_code=0 samples=106
+[peakrss] peak tree RSS      : 668 MiB
+[peakrss] low-water MemAvail : 5662 MiB
+[peakrss] peak single VmHWM  : 668 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      657 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   208.4s procs=  3 rss=   668 MiB hwm=   668 MiB avail=  8882 MiB
+[peakrss]   t=   210.4s procs=  3 rss=   668 MiB hwm=   668 MiB avail=  8724 MiB
+[peakrss]   t=   206.4s procs=  3 rss=   666 MiB hwm=   666 MiB avail=  9124 MiB
+[peakrss]   t=   204.4s procs=  3 rss=   664 MiB hwm=   664 MiB avail=  9283 MiB
+[peakrss]   t=   202.4s procs=  3 rss=   663 MiB hwm=   663 MiB avail=  9410 MiB
+launcher exit: 0

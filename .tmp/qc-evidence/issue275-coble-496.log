@@ -1,0 +1,19 @@
+[    18.6s] g-set built
+[    18.6s] point with q(c)=1 found
+[   325.3s] |letters|=4 |orbit|=496
+[   439.2s] schreier morphism family size: 1984
+[peakrss] issue275: child waited=124 shell_code=124 samples=900
+[peakrss] peak tree RSS      : 2834 MiB
+[peakrss] low-water MemAvail : 2252 MiB
+[peakrss] peak single VmHWM  : 2967 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2495 MiB peak
+[peakrss]   python                      461 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   664.3s procs=  4 rss=  2834 MiB hwm=  2966 MiB avail=  3915 MiB
+[peakrss]   t=   666.3s procs=  4 rss=  2834 MiB hwm=  2966 MiB avail=  3872 MiB
+[peakrss]   t=   668.3s procs=  4 rss=  2834 MiB hwm=  2967 MiB avail=  3880 MiB
+[peakrss]   t=   670.3s procs=  4 rss=  2834 MiB hwm=  2967 MiB avail=  3781 MiB
+[peakrss]   t=   672.3s procs=  4 rss=  2834 MiB hwm=  2967 MiB avail=  3577 MiB
+launcher exit: 124

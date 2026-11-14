@@ -149,6 +149,179 @@ def test_the_cyclic_subgroups_of_c4_have_orders_four_and_two() -> None:
     assert (generator**2).cyclic_subgroup().order() == 2
 
 
+def test_a_symmetric_group_is_named_by_its_degree_and_never_presents_its_point_set() -> None:
+    r"""``Sym(\Omega)`` is named by ``|\Omega|``, so neither building nor displaying
+    it presents ``\Omega``.
+
+    A point set's presentation is not free data: a coset set's ``_repr_``
+    materializes and validates every representative, so interpolating the point
+    set into this group's description made *constructing* the group cost as much
+    as presenting the set.
+
+    The two operations are poisoned separately, so each assertion is the one it
+    states.  ``_repr_`` is replaced before construction: building the group and
+    rendering it must both leave the point set unrendered.  ``__iter__`` is
+    replaced only *after* construction, so the later assertions prove that
+    *display* does not enumerate the points; they are not a claim that
+    construction never iterates, and legitimate normalization of the point set
+    during construction remains allowed.  ``natural_points`` and the exact
+    action are untouched throughout.
+    """
+    from sage_extensions.categories.group.groups import SymmetricGroups
+    from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+
+    points = finite_ordered_set(("w", "x", "y", "z"))
+    point_set_class = type(points)
+    original_repr = point_set_class._repr_
+
+    def forbidden_repr(self):
+        raise AssertionError("Sym(Omega) rendered its point set")
+
+    point_set_class._repr_ = forbidden_repr
+    try:
+        group = SymmetricGroups()(points)
+        description = group._description
+        displayed = repr(group)
+        latex = group._latex_()
+    finally:
+        point_set_class._repr_ = original_repr
+
+    assert group.natural_points() is points
+    assert description == "Symmetric group on 4 points"
+    assert "4 points" in displayed
+    assert "4 points" in latex
+
+    original_iter = point_set_class.__iter__
+
+    def forbidden_iter(self):
+        raise AssertionError("Sym(Omega) iterated its point set to describe itself")
+
+    point_set_class.__iter__ = forbidden_iter
+    try:
+        assert group._description == description
+        assert repr(group) == displayed
+        assert group._latex_() == latex
+    finally:
+        point_set_class.__iter__ = original_iter
+
+    assert group.order() == 24
+    assert group((1, 2))(points("w")) == points("x")
+    assert group.natural_g_set().act(group((1, 2)), points("x")) == points("w")
+
+
+def test_a_symmetric_group_engine_is_the_symmetric_group_at_every_degree() -> None:
+    r"""``Sym(\Omega)`` is the full symmetric group on the ranked degree, whatever
+    the labels, so its engine is the symmetric-group parent and not a generic
+    two-generator permutation group.
+
+    The two generate the same group, but only the symmetric-group parent knows
+    that every permutation of the degree lies in it.  A generic group instead
+    answers admission with a GAP membership test over the whole group, which on
+    ``|\Omega| = 2048`` did not return in 360 s, so the last block admits a
+    permutation of degree 2048 through the ingress the orbit computation uses.
+
+    Labels stay owned data: two same-size labelled point sets give two groups
+    with their own points, and an element of one refuses a point of the other.
+    """
+    from sage_extensions.categories.group.groups import SymmetricGroups
+    from sage_extensions.categories.group.g_sets import _permutation_from_point_map
+    from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+
+    # Degrees 0 and 1: the trivial group, still commutative and still named by
+    # its retained points.
+    empty_points = finite_ordered_set(())
+    empty = SymmetricGroups()(empty_points)
+    assert empty.natural_points() is empty_points
+    assert empty.order() == 1
+    assert empty in OwnedGroups().Commutative()
+
+    one_point = finite_ordered_set(("only",))
+    degenerate = SymmetricGroups()(one_point)
+    assert degenerate.natural_points() is one_point
+    assert degenerate.order() == 1
+    assert degenerate in OwnedGroups().Commutative()
+    assert degenerate.natural_g_set().act(degenerate.one(), one_point("only")) == one_point("only")
+
+    # Two distinct labelled point sets of the same size: distinct groups, one
+    # shared symmetric-group engine, each keeping its own points and action.
+    first_points = finite_ordered_set(("s1", "s2", "s3", "s4"))
+    second_points = finite_ordered_set(("t1", "t2", "t3", "t4"))
+    first = SymmetricGroups()(first_points)
+    second = SymmetricGroups()(second_points)
+    from sage.groups.perm_gps.permgroup_named import SymmetricGroup
+
+    assert isinstance(first._engine, SymmetricGroup)
+    assert isinstance(second._engine, SymmetricGroup)
+    assert first._engine is second._engine
+    assert first is not second
+    assert first.natural_points() == first_points
+    assert second.natural_points() == second_points
+    assert first.natural_points()(("s1", "s2", "s3", "s4")[0]) in first_points
+    assert second.natural_points()("t3") in second_points
+    assert first.order() == 24 and second.order() == 24
+
+    # Products and inverses are retained elements and act exactly.
+    transposition = first((1, 2))
+    adjacent = first((2, 3))
+    product = transposition * adjacent
+    assert product(first_points("s1")) == transposition(adjacent(first_points("s1")))
+    assert (product * ~product) == first.one()
+    assert (~transposition * transposition) == first.one()
+    assert first.natural_g_set().act(product, first_points("s1")) == product(first_points("s1"))
+    assert (~product)(product(first_points("s4"))) == first_points("s4")
+
+    # The retained contract: the same point set gives the same group, and the
+    # engine's labels are the point ranks raised by one, so an engine
+    # permutation and the labelled action agree.
+    assert SymmetricGroups()(first_points) is first
+    ranking = first_points.ranking_map()
+    engine_labels = tuple(int(ranking(first_points(label))) + 1 for label in ("s1", "s2", "s3", "s4"))
+    assert engine_labels == (1, 2, 3, 4)
+    assert first((1, 2))(first_points("s1")) == first_points("s2")
+    assert first((1, 2))(first_points("s2")) == first_points("s1")
+
+    # Rejections at small degree are unchanged: a map that is not a bijection,
+    # and a point outside the selected domain.
+    try:
+        _permutation_from_point_map(first, first_points, lambda _point: first_points("s1"))
+    except ValueError as error:
+        assert "not represented by a permutation" in str(error)
+    else:
+        assert False, "a constant point map was accepted as a permutation"
+    try:
+        transposition(second_points("t1"))
+    except ValueError as error:
+        assert "outside the selected permutation domain" in str(error)
+    else:
+        assert False, "an element acted on a point outside its own point set"
+
+    # A permutation that is not of this degree is refused, not truncated to it.
+    for outside_the_degree in ((1, 2, 3, 4, 5), (0, 1)):
+        try:
+            first(outside_the_degree)
+        except ValueError:
+            pass
+        else:
+            assert False, f"the permutation {outside_the_degree} was admitted by a degree-4 group"
+
+    # Large degree: construction and ingress of an explicit permutation, which
+    # is what the orbit computation's permutation representation performs.
+    degree = 2048
+    large_points = finite_ordered_set(tuple(f"p{index}" for index in range(degree)))
+    large = SymmetricGroups()(large_points)
+    assert large.natural_points() == large_points
+    assert large_points("p0") in large.natural_points()
+    ranking = large_points.ranking_map()
+    shifted = _permutation_from_point_map(
+        large,
+        large_points,
+        lambda point: large_points(f"p{(int(ranking(point)) + 1) % degree}"),
+    )
+    assert shifted(large_points("p0")) == large_points("p1")
+    assert shifted(large_points(f"p{degree - 1}")) == large_points("p0")
+    assert (shifted ** degree) == large.one()
+
+
 def test_symmetric_group_retains_its_chosen_point_set_and_action() -> None:
     points = Sets.Δ[2]
     group = SymmetricGroups()(points)

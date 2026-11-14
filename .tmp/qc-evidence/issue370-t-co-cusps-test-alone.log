@@ -1,0 +1,18 @@
+.                                                                        [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_coble_root_orbits_at_a_marked_cusp.sage::test_the_coble_cusps_three_four_and_five_have_their_root_class_orbits: 408.27 s > 20 s
+1 passed, 3 deselected in 408.73s (0:06:48)
+[peakrss] p370ct4b: child waited=0 shell_code=0 samples=210
+[peakrss] peak tree RSS      : 1458 MiB
+[peakrss] low-water MemAvail : 8659 MiB
+[peakrss] peak single VmHWM  : 1458 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1447 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   414.4s procs=  3 rss=  1458 MiB hwm=  1458 MiB avail=  8659 MiB
+[peakrss]   t=   416.4s procs=  3 rss=  1458 MiB hwm=  1458 MiB avail=  8676 MiB
+[peakrss]   t=   400.4s procs=  3 rss=  1457 MiB hwm=  1457 MiB avail=  8952 MiB
+[peakrss]   t=   402.4s procs=  3 rss=  1457 MiB hwm=  1457 MiB avail=  8849 MiB
+[peakrss]   t=   404.4s procs=  3 rss=  1457 MiB hwm=  1457 MiB avail=  8760 MiB
+launcher exit: 0

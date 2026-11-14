@@ -1,0 +1,32 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_the_tco_plane_gives_an_isotropic_subobject_with_orbit_and_stabilizer ___
+tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage:142: in test_the_tco_plane_gives_an_isotropic_subobject_with_orbit_and_stabilizer
+    assert image(element) == element
+E   assert [3] == [1]
+E    +  where [3] = Form automorphism of Finitely presented module on 11 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]([1])
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:720 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+============================== slowest durations ===============================
+318.97s call     tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage::test_the_tco_plane_gives_an_isotropic_subobject_with_orbit_and_stabilizer
+0.00s teardown tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage::test_the_tco_plane_gives_an_isotropic_subobject_with_orbit_and_stabilizer
+0.00s setup    tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage::test_the_tco_plane_gives_an_isotropic_subobject_with_orbit_and_stabilizer
+=========================== short test summary info ============================
+FAILED tests/lattices/test_isotropic_subobjects_of_finite_quadratic_modules.sage::test_the_tco_plane_gives_an_isotropic_subobject_with_orbit_and_stabilizer
+1 failed, 1 deselected in 322.74s (0:05:22)
+[peakrss] issue296-tco2: child waited=1 shell_code=1 samples=167
+[peakrss] peak tree RSS      : 2897 MiB
+[peakrss] low-water MemAvail : 2892 MiB
+[peakrss] peak single VmHWM  : 3216 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2484 MiB peak
+[peakrss]   python                      721 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    96.1s procs=  4 rss=  2897 MiB hwm=  3046 MiB avail=  4751 MiB
+[peakrss]   t=    98.1s procs=  4 rss=  2896 MiB hwm=  3048 MiB avail=  4571 MiB
+[peakrss]   t=    94.1s procs=  4 rss=  2895 MiB hwm=  3044 MiB avail=  5144 MiB
+[peakrss]   t=   326.3s procs=  4 rss=  2893 MiB hwm=  3216 MiB avail=  2894 MiB
+[peakrss]   t=    92.1s procs=  4 rss=  2887 MiB hwm=  3036 MiB avail=  5336 MiB
+launcher exit: 1

@@ -1,0 +1,23 @@
+============================= test session starts ==============================
+collected 1 item
+
+tests/lattices/test_the_rank_n_minus_one_parabolic_count_on_the_we_chamber.sage . [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/lattices/test_the_rank_n_minus_one_parabolic_count_on_the_we_chamber.sage::test_the_rank_n_minus_one_parabolic_count_equals_the_ideal_vertex_count
+============================== 1 passed in 22.37s ==============================
+[peakrss] issue355btest: child waited=0 shell_code=0 samples=14
+[peakrss] peak tree RSS      : 306 MiB
+[peakrss] low-water MemAvail : 7480 MiB
+[peakrss] peak single VmHWM  : 317 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      305 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=    22.1s procs=  4 rss=   306 MiB hwm=   306 MiB avail=  7564 MiB
+[peakrss]   t=    20.0s procs=  4 rss=   305 MiB hwm=   305 MiB avail=  7576 MiB
+[peakrss]   t=     8.0s procs=  4 rss=   304 MiB hwm=   304 MiB avail=  7733 MiB
+[peakrss]   t=    10.0s procs=  4 rss=   304 MiB hwm=   304 MiB avail=  7721 MiB
+[peakrss]   t=    12.0s procs=  4 rss=   304 MiB hwm=   304 MiB avail=  7697 MiB

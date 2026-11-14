@@ -431,8 +431,22 @@ class _ColouredFamilyRealization:
         r"""A section ``L tensor Q -> F_Q(I)`` of the surjective rational family, solved once on the framing."""
         family = self.rational_family()
         rational = self.rational_space()
+        # Fundamental.g:378-425 FindTransformation selects an independent
+        # subfamily before solving. If j:Q^B -> Q^I includes its indices,
+        # then j*(family*j)^-1 is a right inverse of the whole family.
+        # Keep the original free-module endpoint and solve only the basis
+        # family, rather than extract all redundant columns for each cell.
+        indices = tuple(self.indices())
+        basis_indices = finite_ordered_set(tuple(
+            indices[position] for position in self._coordinate_basis_data()[0]
+        ))
+        basis_positions = rational.base_ring().free_module(basis_indices)
+        inclusion = Modules(rational.base_ring()).Mor(basis_positions, family.domain())(
+            lambda index: family.domain().module_generator(index)
+        )
+        basis_family = family * inclusion
         return Modules(rational.base_ring()).Mor(rational, family.domain())({
-            label: family.lift(rational.module_generator(label))
+            label: inclusion(basis_family.lift(rational.module_generator(label)))
             for label in rational.module_generating_set()
         })
 
@@ -475,6 +489,25 @@ class _ColouredFamilyRealization:
         r"""The rational isometry induced by a pairing-graph automorphism."""
         graph = self.pairing_graph()
         rational = self.rational_space()
+        if self.spans_rational_space():
+            # Fundamental.g:378-425 FindTransformation uses the selected
+            # independent rows. Reuse that exact coordinate computation
+            # before constructing the owned isometry on its framing.
+            permutation = tuple(
+                graph._vertex(generator(graph._position(vertex)))
+                for vertex in range(graph._size())
+            )
+            transformation = self._coordinate_automorphism(permutation)
+            labels = tuple(rational.module_generating_set())
+            ring = rational.base_ring()
+            return rational.O()({
+                label: rational.linear_combination({
+                    target_label: _owned_engine_element(ring, coefficient)
+                    for target_label, coefficient in zip(labels, row, strict=True)
+                    if coefficient
+                })
+                for label, row in zip(labels, transformation.rows(), strict=True)
+            })
         isometry = self.rational_transformation(self, graph.position_permutation(generator))
         return rational.O()({
             label: isometry(rational.module_generator(label))

@@ -1,6 +1,7 @@
 r"""Cokernels of Lie algebra maps are quotients by the generated Lie ideal."""
 
 from sage_extensions.all import *  # noqa: F401,F403
+from sage_extensions.categories.algebras.algebras import Algebras
 
 
 def test_cartan_inclusion_into_sl2_has_zero_lie_cokernel_but_module_cokernel_of_rank_two() -> None:

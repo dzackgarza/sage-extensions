@@ -1,0 +1,20 @@
+(1, 9, 16) spinor genus class numbers (2, 2)
+(1, 16, 9) spinor genus class numbers (2, 2)
+(1, 16, 17) spinor genus class numbers (4, 4)
+(1, 16, 20) spinor genus class numbers (3, 3)
+hits: [((1, 9, 16), (2, 2)), ((1, 16, 9), (2, 2)), ((1, 16, 17), (4, 4)), ((1, 16, 20), (3, 3))]
+DONE
+[peakrss] issue286: child waited=0 shell_code=0 samples=7
+[peakrss] peak tree RSS      : 412 MiB
+[peakrss] low-water MemAvail : 1658 MiB
+[peakrss] peak single VmHWM  : 418 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      408 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   412 MiB hwm=   418 MiB avail= 10726 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   411 MiB hwm=   417 MiB avail= 10389 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   407 MiB hwm=   413 MiB avail=  8460 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   392 MiB hwm=   398 MiB avail=  5932 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   318 MiB hwm=   324 MiB avail=  3402 MiB
+launcher exit: 0

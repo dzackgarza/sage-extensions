@@ -1,0 +1,52 @@
+[18:55:17] importing
+[18:55:18] imported in 1.0 s
+[18:55:38] subgroup built in 21.6 s
+[18:55:39] Sterk_4 image built in 22.0 s
+[18:57:23] the walk's wall family: 16 roots
+[18:57:23] their span has rank 10
+[18:57:23] the span computation failed: 'OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType' object has no attribute 'span'
+[18:57:23]   walk wall lift: 2*e_0 + 2*e_2 + 6*e_3 - 10*e_4 - 12*e_5 - 18*e_6 - 25*e_7 - 20*e_8 - 15*e_9 - 10*e_10 - 5*e_11
+[18:57:23]   walk wall lift: e_11
+[18:57:23]   walk wall lift: e_10
+[18:57:23]   walk wall lift: e_9
+[18:57:23]   walk wall lift: e_8
+[18:57:23]   walk wall lift: e_7
+[18:57:23]   walk wall lift: e_6
+[18:57:23]   walk wall lift: -e_0 + e_1
+[18:57:23]   walk wall lift: -3*e_0 - 3*e_1 - 6*e_2 - 17*e_3 + 29*e_4 + 34*e_5 + 49*e_6 + 69*e_7 + 55*e_8 + 41*e_9 + 27*e_10 + 13*e_11
+[18:57:23]   walk wall lift: -3*e_0 - 3*e_1 - 5*e_2 - 16*e_3 + 26*e_4 + 32*e_5 + 45*e_6 + 64*e_7 + 51*e_8 + 38*e_9 + 25*e_10 + 12*e_11
+[18:57:23]   walk wall lift: -7*e_0 - 7*e_1 - 13*e_2 - 39*e_3 + 65*e_4 + 78*e_5 + 111*e_6 + 157*e_7 + 125*e_8 + 93*e_9 + 62*e_10 + 31*e_11
+[18:57:23]   walk wall lift: -16*e_0 - 16*e_1 - 30*e_2 - 90*e_3 + 150*e_4 + 180*e_5 + 257*e_6 + 364*e_7 + 291*e_8 + 218*e_9 + 145*e_10 + 72*e_11
+[18:57:23]   walk wall lift: -11*e_0 - 11*e_1 - 21*e_2 - 62*e_3 + 104*e_4 + 124*e_5 + 177*e_6 + 250*e_7 + 200*e_8 + 150*e_9 + 100*e_10 + 50*e_11
+[18:57:23]   walk wall lift: -11*e_0 - 11*e_1 - 20*e_2 - 61*e_3 + 101*e_4 + 122*e_5 + 173*e_6 + 245*e_7 + 196*e_8 + 147*e_9 + 98*e_10 + 49*e_11
+[18:57:23]   walk wall lift: -15*e_0 - 15*e_1 - 29*e_2 - 85*e_3 + 143*e_4 + 170*e_5 + 244*e_6 + 345*e_7 + 276*e_8 + 207*e_9 + 138*e_10 + 69*e_11
+[18:57:23]   walk wall lift: -15*e_0 - 15*e_1 - 27*e_2 - 83*e_3 + 137*e_4 + 166*e_5 + 236*e_6 + 335*e_7 + 268*e_8 + 201*e_9 + 134*e_10 + 67*e_11
+[18:57:24] Sterk's printed walls: 11
+[18:57:24]   Sterk wall 0: e_a2, square -4, in v1-perp True
+[18:57:24]     admitted by the filter: True
+Traceback (most recent call last):
+  File "/probe.py", line 221, in <module>
+    if (sign := matches(lift, printed)) != 0
+                ~~~~~~~^^^^^^^^^^^^^^^
+  File "/probe.py", line 195, in matches
+    difference = left + sign * right
+                 ~~~~~^~~~~~~~~~~~~~
+  File "sage/structure/element.pyx", line 1217, in sage.structure.element.Element.__add__
+    return coercion_model.bin_op(left, right, add)
+  File "sage/structure/coerce.pyx", line 1297, in sage.structure.coerce.CoercionModel.bin_op
+    raise bin_op_exception(op, x, y)
+TypeError: unsupported operand parent(s) for +: 'Integral lattice of rank 12 and signature (2, 10)' and 'Integral lattice of rank 12 and signature (2, 10)'
+[peakrss] issue387: child waited=1 shell_code=1 samples=65
+[peakrss] peak tree RSS      : 661 MiB
+[peakrss] low-water MemAvail : 14229 MiB
+[peakrss] peak single VmHWM  : 661 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      650 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   128.1s procs=  3 rss=   661 MiB hwm=   661 MiB avail= 14229 MiB
+[peakrss]   t=   100.0s procs=  3 rss=   660 MiB hwm=   660 MiB avail= 14230 MiB
+[peakrss]   t=   102.0s procs=  3 rss=   660 MiB hwm=   660 MiB avail= 14229 MiB
+[peakrss]   t=   104.0s procs=  3 rss=   660 MiB hwm=   660 MiB avail= 14229 MiB
+[peakrss]   t=   106.0s procs=  3 rss=   660 MiB hwm=   660 MiB avail= 14229 MiB
+launcher exit: 1

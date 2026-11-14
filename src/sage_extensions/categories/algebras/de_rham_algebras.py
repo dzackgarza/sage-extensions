@@ -16,9 +16,20 @@ from sage_extensions.categories.rings.ring_foundation import OwnedCategoryOverBa
 class _DeRhamAlgebra:
     r"""The differential on the constructed restricted exterior algebra."""
 
-    def __init__(self, de_rham_source_algebra, kahler_differentials, **rest) -> None:
+    def __init__(
+        self,
+        de_rham_source_algebra,
+        kahler_differentials,
+        coefficient_algebra=None,
+        **rest,
+    ) -> None:
         self._de_rham_source_algebra = de_rham_source_algebra
         self._kahler_differentials = kahler_differentials
+        self._coefficient_algebra = (
+            de_rham_source_algebra
+            if coefficient_algebra is None
+            else coefficient_algebra
+        )
         super().__init__(**rest)
         exterior = self.extension_algebra()
         omega = self.kahler_differentials()
@@ -68,12 +79,23 @@ class DeRhamAlgebras(OwnedCategoryOverBaseRing):
 
         The source algebra is the defining datum.  This category constructor
         owns the Kähler-differential/exterior-algebra realization and identity
-        cache; ``A.de_rham_algebra()`` is the algebra's spelling of it.
+        cache; ``A.de_rham_algebra()`` is the algebra's spelling of it.  An
+        algebra presented as a polynomial quotient ``R[x]/I`` states the cover
+        as its base ring, so the coefficient ring is read from the presentation:
+        the calculus is ``Omega^*_{A/R}``, not ``Omega^*_{A/R[x]}``.
         """
-        if algebra not in Algebras(self.base_ring()).Associative().Unital().Commutative():
+        from sage_extensions.categories.algebras.derivations import (
+            _algebra_coefficient_ring,
+        )
+
+        base = self.base_ring()
+        coefficient_ring = _algebra_coefficient_ring(algebra)
+        if coefficient_ring is not base or algebra not in Algebras(
+            algebra.base_ring()
+        ).Associative().Unital().Commutative():
             raise TypeError(
-                f"the de Rham algebra over {self.base_ring()} is built from a commutative algebra over "
-                f"{self.base_ring()}, but {algebra} is not one"
+                f"the de Rham algebra over {base} is built from a commutative algebra over "
+                f"{base}, but {algebra} is an algebra over {coefficient_ring}"
             )
         return _de_rham_algebra_from_source(algebra)
 
@@ -86,6 +108,18 @@ class DeRhamAlgebras(OwnedCategoryOverBaseRing):
     class ParentMethods(_DeRhamAlgebra):
         def de_rham_source_algebra(self):
             return self._de_rham_source_algebra
+
+        def coefficient_algebra(self):
+            r"""Return the algebra this complex is built on, over the base ring.
+
+            For an algebra that states its own coefficient ring this is the
+            source algebra.  For a polynomial quotient ``R[x]/I`` the calculus
+            is taken over ``R`` on the quotient's ``R``-algebra view — the same
+            ring through the coefficient structure, retaining the ring and with
+            it the presentation — and that view is what the graded pieces, the
+            differential and the base change are built on.
+            """
+            return self._coefficient_algebra
 
         def kahler_differentials(self):
             return self._kahler_differentials
@@ -188,15 +222,41 @@ def _de_rham_differential_on_extension(exterior_algebra, omega, universal_deriva
 
 
 
+def _coefficient_algebra(algebra, base):
+    r"""``algebra`` read as an algebra over its coefficient ring ``base``.
+
+    An algebra that already states ``base`` is that algebra.  A polynomial
+    quotient ``R[x]/I`` states the cover instead; its ``R``-algebra view —
+    ``A.as_algebra_over(R)``, the same ring through the coefficient structure,
+    retaining the ring itself — is what the graded construction and the de Rham
+    functor need.  Nothing is rebuilt: the view is the documented reading of the
+    same ring, and the differential calculus reads the presentation through it.
+    """
+    if algebra.base_ring() is base:
+        return algebra
+    return algebra.as_algebra_over(base)
+
+
 @cached_function(key=lambda algebra: id(algebra))
 def _de_rham_algebra_from_source(algebra):
-    omega = algebra.kahler_differentials()
+    from sage_extensions.categories.algebras.derivations import (
+        _algebra_coefficient_ring,
+    )
+
+    base = _algebra_coefficient_ring(algebra)
+    source = _coefficient_algebra(algebra, base)
+    omega = source.kahler_differentials()
     exterior = omega.exterior_algebra()
-    ring_map = algebra.algebra_structure_morphism()
+    ring_map = source.algebra_structure_morphism()
+    assert ring_map.domain() is base and ring_map.codomain() is source, (
+        f"the structure map of {source} must be {base} -> {source}, but it is "
+        f"{ring_map.domain()} -> {ring_map.codomain()}"
+    )
     return _restricted_graded_algebra(
-        exterior, ring_map, extra_categories=(DeRhamAlgebras(algebra.base_ring()),),
+        exterior, ring_map, extra_categories=(DeRhamAlgebras(base),),
         construction_data={
-            "de_rham_source_algebra": algebra,
+            "de_rham_source_algebra": source,
+            "coefficient_algebra": source,
             "kahler_differentials": omega,
         },
     )

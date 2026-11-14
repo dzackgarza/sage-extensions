@@ -55,6 +55,41 @@ def test_z_t_mod_two_t_has_two_torsion() -> None:
     assert not algebra.is_torsion_free()
 
 
+def test_a_relation_whose_word_is_the_unit_still_gives_torsion() -> None:
+    r"""``Z[t]/(2)`` has ``2 * 1 = 0``, so the coefficient ring's ``2`` kills the unit."""
+    algebra = ZZ["t"].quotient_by_relations([ZZ["t"].one() * 2])
+
+    assert 2 * algebra.one() == algebra.zero()
+    assert algebra.one() != algebra.zero()
+    assert not algebra.is_torsion_free()
+
+
+def test_a_nonzero_product_annihilated_by_two_is_torsion() -> None:
+    r"""``Z[x,y]/(2xy)``: the relation ``2xy`` kills the nonzero class ``xy``."""
+    plane = ZZ["x, y"]
+    x = plane.algebra_generator("x")
+    y = plane.algebra_generator("y")
+    algebra = plane.quotient_by_relations([2 * x * y])
+    xbar = algebra.algebra_generator("x")
+    ybar = algebra.algebra_generator("y")
+
+    assert 2 * (xbar * ybar) == algebra.zero()
+    assert xbar * ybar != algebra.zero()
+    assert not algebra.is_torsion_free()
+
+
+def test_a_two_term_relation_states_no_torsion_answer() -> None:
+    r"""``Z[t]/(2t - 2)`` is not torsion-free, but ``2(t - 1) = 0`` is not a
+    one-term relation, so the relation witness proves nothing here and the
+    decision stays the undecided predicate rather than asserting either answer."""
+    from sage_extensions.logic import AtomicProposition
+
+    t = ZZ["t"].algebra_generator("t")
+    algebra = ZZ["t"].quotient_by_relations([2 * t - 2])
+
+    assert isinstance(algebra.is_torsion_free(), AtomicProposition)
+
+
 def test_the_presentation_ideal_of_the_cusp_contains_its_relation() -> None:
     plane = QQ["x, y"]
     x = plane.algebra_generator("x")

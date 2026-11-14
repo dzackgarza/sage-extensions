@@ -1,0 +1,26 @@
+PARI stack size set to 2147483648 bytes, maximum size set to 8589934592
+  k = 2: genus mass 642332179/18881368343036559360000, |Aut(seed)| 1941728542064640000
+    NEW class 2 at attempt 1 (p=2): |Aut| 809053559193600, roots 264, mass 49/39627113103360000 / 642332179/18881368343036559360000 equal False
+    NEW class 3 at attempt 2 (p=2): |Aut| 1371195958099968000, roots 480, mass 687091/555334363030487040000 / 642332179/18881368343036559360000 equal False
+    NEW class 4 at attempt 3 (p=2): |Aut| 106542032486400, roots 224, mass 5899441/555334363030487040000 / 642332179/18881368343036559360000 equal False
+    NEW class 5 at attempt 27 (p=3): |Aut| 49662885888000, roots 204, mass 17081521/555334363030487040000 / 642332179/18881368343036559360000 equal False
+    NEW class 6 at attempt 66 (p=5): |Aut| 334764638208000, roots 244, mass 18740401/555334363030487040000 / 642332179/18881368343036559360000 equal False
+[   291.6s]   round 1: 100 attempts, 6 classes, mass ratio 0.99196904
+    NEW class 7 at attempt 212 (p=2): |Aut| 3767021862912000, roots 304, mass 18887821/555334363030487040000 / 642332179/18881368343036559360000 equal False
+[   814.4s]   round 2: 328 attempts, 7 classes, mass ratio 0.99977229
+[   814.4s] k = 2: 328 attempts, 7 classes, mass 18887821/555334363030487040000 vs 642332179/18881368343036559360000: equal False
+DONE
+[peakrss] issue286: child waited=0 shell_code=0 samples=409
+[peakrss] peak tree RSS      : 653 MiB
+[peakrss] low-water MemAvail : 4355 MiB
+[peakrss] peak single VmHWM  : 653 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      642 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    36.0s procs=  3 rss=   653 MiB hwm=   653 MiB avail=  9405 MiB
+[peakrss]   t=    38.0s procs=  3 rss=   653 MiB hwm=   653 MiB avail=  9397 MiB
+[peakrss]   t=    40.0s procs=  3 rss=   653 MiB hwm=   653 MiB avail=  9397 MiB
+[peakrss]   t=    42.0s procs=  3 rss=   653 MiB hwm=   653 MiB avail=  9389 MiB
+[peakrss]   t=    44.0s procs=  3 rss=   653 MiB hwm=   653 MiB avail=  9389 MiB
+launcher exit: 0

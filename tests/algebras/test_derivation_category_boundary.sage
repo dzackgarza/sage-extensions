@@ -9,7 +9,7 @@ def test_weight_derivation_of_the_axes_satisfies_leibniz_and_factors_through_ome
     ``D(fg) = f D(g) + g D(f)``, ``D(x^2 y^3) = -x^2 y^3 = 0`` in ``A``, and
     factors through the universal derivation ``d : A -> Ω_A``."""
     plane = QQ["x,y"]
-    axes = plane.quotient(plane.ideal([plane.gen(0) * plane.gen(1)]))
+    axes = plane.quotient_ring(plane.ideal([plane.gen(0) * plane.gen(1)]))
     x, y = axes(plane.gen(0)), axes(plane.gen(1))
     derivation = axes.derivations()({x: x, y: -y})
 

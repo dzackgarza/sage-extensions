@@ -1,0 +1,55 @@
+[22:48:54] T_En P1 block basis (rows, |det|) ...
+[22:48:55] T_En P1 block basis (rows, |det|) = (12, 1): 1.1 s
+[22:48:55] T_En P2 block basis (rows, |det|) ...
+[22:48:56] T_En P2 block basis (rows, |det|) = (12, 1): 0.9 s
+[22:48:56] T_En: 2.4 s
+plane primitive True
+[22:48:56] T_Co block basis (rows, |det|) ...
+[22:48:57] T_Co block basis (rows, |det|) = (11, 1): 1.0 s
+[22:48:57] T_Co splitting_complement ...
+[22:48:57] T_Co splitting_complement = None: 0.2 s
+[22:48:57] T_Co plane_block_gram ...
+[22:48:57] T_Co plane_block_gram = ([ 0  0  0  0  0  0  1  0  0  0  0]
+[ 0  0  0  0  0  0  1  0  0  1  1]
+[ 2  0  0 -1 -1 -2 -2 -2 -2 -2  0]
+[ 0  1  1 -1 -1 -1 -1 -1 -1 -1 -1]
+[ 0  0 -1  1  1  1  1  1  1  0  0]
+[ 0  0  0  1  0  0  0  0  0 -1 -1]
+[ 0  0  0  0  0  0  0  0  1  0  0]
+[ 0  0  0  0  0  0  0  1  0  0  0]
+[ 0  0  0  0  0  0  2  0  0  3  2]
+[ 0  0  0  0  0  1  1  0  0  1  1]
+[-1  0  0  0  0  0  0  0  0  1  0], [ 0 -2  0  0  ...: 0.1 s
+[22:48:57] T_Co unipotent_radical_index ...
+[22:49:04] T_Co unipotent_radical_index = 1: 6.4 s
+[22:49:04] T_Co levi_plane_action_index(trivial_on_quotient=True) ...
+[22:49:45] T_Co levi_plane_action_index(trivial_on_quotient=True) = 1: 41.0 s
+[22:49:45] T_Co levi_quotient_image_index(trivial_on_plane=True) ...
+[22:49:50] T_Co levi_quotient_image_index(trivial_on_plane=True) = 1: 4.9 s
+[22:49:50] T_Co parabolic_completeness_decision ...
+[22:49:53] T_Co parabolic_completeness_decision = (True, None): 2.7 s
+COMPLETE: True
+OBSTRUCTION: None
+[22:49:53] T_Co stabilizer_discriminant_image_orders ...
+[22:51:12] T_Co stabilizer_discriminant_image_orders = (1981808640, 247726080): 79.7 s
+[22:51:12] T_Co stabilizer_discriminant_image_index ...
+[22:51:12] T_Co stabilizer_discriminant_image_index = 8: 0.2 s
+[22:51:12] T_Co number of parabolic stabilizer generators ...
+[22:51:12] T_Co number of parabolic stabilizer generators = 105: 0.0 s
+O(q) order 46998591897600
+[22:51:12] whole probe: 136.4 s
+[peakrss] p360probe3: child waited=0 shell_code=0 samples=73
+[peakrss] peak tree RSS      : 2415 MiB
+[peakrss] low-water MemAvail : 7688 MiB
+[peakrss] peak single VmHWM  : 2423 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      1961 MiB peak
+[peakrss]   python                      452 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    78.1s procs=  4 rss=  2415 MiB hwm=  2422 MiB avail=  8462 MiB
+[peakrss]   t=    80.1s procs=  4 rss=  2415 MiB hwm=  2422 MiB avail=  8513 MiB
+[peakrss]   t=    82.1s procs=  4 rss=  2415 MiB hwm=  2422 MiB avail=  8427 MiB
+[peakrss]   t=    72.1s procs=  4 rss=  2414 MiB hwm=  2421 MiB avail=  8640 MiB
+[peakrss]   t=    74.1s procs=  4 rss=  2414 MiB hwm=  2421 MiB avail=  8653 MiB
+launcher exit: 0

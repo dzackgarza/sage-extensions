@@ -13,7 +13,7 @@ def test_x_dx_is_a_nonzero_de_rham_class_of_gf2_dual_numbers_with_zero_square() 
     """
     polynomials = GF(2)["x"]
     x = polynomials.gen()
-    algebra = polynomials.quotient(polynomials.ideal([x**2]))
+    algebra = polynomials.quotient_ring(polynomials.ideal([x**2]))
     xbar = algebra(x)
     de_rham = algebra.de_rham_algebra()
     d = de_rham.differential()

@@ -125,3 +125,42 @@ def test_affine_quadric_zeta_factorization_is_owned_by_the_lattice() -> None:
     factorization = lattice.quadratic_hypersurface_zeta_factorization(cone=True)
     assert [(factor.shift, factor.character.coefficient) for factor in factorization.numerator] == [(1, 1), (1, -3)]
     assert [(factor.shift, factor.character.coefficient) for factor in factorization.denominator] == [(0, -3)]
+
+
+def _two_u_minus_2d(d):
+    r"""``U ⊕ U ⊕ ⟨-2d⟩``, rank five and signature ``(2, 3)``."""
+    return Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[-2 * ZZ(d)]])
+
+
+def test_primitive_orbit_series_counts_primitive_isotropic_lines() -> None:
+    r"""The ``constant`` term is a line count, and ``L_9`` shows the two readings differ.
+
+    A card field with one name cannot carry both readings.  The 0-cusp a
+    Baily–Borel boundary is made of is a Γ-orbit of primitive isotropic *lines*
+    (rank-one isotropic sublattices), so the series' ``constant`` term is that
+    number.  On ``L_9`` the readings separate: with ``U = ⟨e, f⟩`` and ``g`` the
+    generator of ``⟨-18⟩``, ``v = 3e + 3f + g`` and ``-v`` have square zero and
+    divisibility three with division classes 6 and 12 of ``Z/18``, and ``-id``
+    is not in ``Õ(L_9)`` because its discriminant action is ``-1``, so they are
+    two vector orbits inside one line orbit.  The series returns 2, not 3.
+    """
+    lattice = _two_u_minus_2d(9)
+    series = lattice.primitive_orbit_series()
+    assert series["Otilde"]["constant"] == 2
+
+    labels = tuple(lattice.module_generating_set())
+    e, f = lattice.module_generator(labels[0]), lattice.module_generator(labels[1])
+    g = lattice.module_generator(labels[4])
+    vector = 3 * e + 3 * f + g
+
+    assert vector.q() == ZZ(0)
+    assert lattice.div(vector) == ZZ(3)
+    assert lattice.divided_discriminant_class(vector) != lattice.divided_discriminant_class(-vector)
+    assert int(lattice.divided_discriminant_class(vector).additive_order()) == 3
+    assert rho_action_is_trivial(lattice, -1) is False
+
+
+def rho_action_is_trivial(lattice, scalar):
+    r"""Whether the scalar automorphism acts trivially on ``A_L``."""
+    rho = lattice.discriminant_representation()
+    return rho(lattice.Aut()(scalar)) == rho.codomain().one()

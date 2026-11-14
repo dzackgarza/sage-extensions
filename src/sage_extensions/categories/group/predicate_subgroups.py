@@ -33,7 +33,7 @@ def _retains_group_resolution(group) -> bool:
     return group.has_selected_resolution(OwnedGroups())
 
 
-def _fix_selected_generating_morphism(subgroup, generating_morphism) -> None:
+def _fix_selected_generating_morphism(subgroup, generating_morphism, *, replace=False) -> None:
     r"""Retain ``E ->> H`` from a free group as ``H``'s selected resolution, realized at first read.
 
     ``generating_morphism`` computes, from the constructed subgroup, a group
@@ -41,6 +41,12 @@ def _fix_selected_generating_morphism(subgroup, generating_morphism) -> None:
     computes nothing (``OWN-22``): the morphism, and the degree-zero
     resolution read off its free basis, are built when the generators are
     first requested and cached by the resolution registry.
+
+    ``replace`` lets the constructing owner supersede a family a coarser rule
+    selected at construction --- the preimage construction selects Schreier's
+    family over the cosets of a finite target group, and an owner that reads
+    the acted-on point itself (``LatticeIsometryMethods.discriminant_preimage``)
+    supplies the same subgroup's family from that point's orbit instead.
     """
 
     def resolution():
@@ -53,7 +59,7 @@ def _fix_selected_generating_morphism(subgroup, generating_morphism) -> None:
             augmentation * free.group_generator_morphism(),
         )
 
-    _fix_selected_resolution(subgroup, OwnedGroups(), resolution)
+    _fix_selected_resolution(subgroup, OwnedGroups(), resolution, replace=replace)
 
 
 def _free_cover(ambient, generators):
@@ -64,23 +70,11 @@ def _free_cover(ambient, generators):
 
 
 def _preimage_coset_space(subgroup, morphism, target, generators):
-    r"""``G/P`` for ``P = f^-1(K)``, ``f: G -> Q`` finite: the orbit of ``K`` in ``Q/K``.
-
-    ``G`` acts on ``Q/K`` through ``f``; the stabilizer of the base point
-    ``K`` is ``f^-1(K) = P``.  The finiteness used is that of ``Q``.
-    """
+    r"""G/f^-1(H) as the image's orbit of H in the finite target's cosets."""
     from sage_extensions.categories.group.g_sets import FiniteGSets
 
-    assert morphism.codomain() in OwnedFiniteGroups(), (
-        f"the cosets of {subgroup} are realized through the finite group {morphism.codomain()}, "
-        f"but it is not known to be finite"
-    )
-    image_cosets = morphism.codomain().left_cosets(target)
-    return FiniteGSets(subgroup.supergroup()).pointed_orbit(
-        subgroup,
-        image_cosets.base_point(),
-        lambda element, point: image_cosets.act(morphism(element), point),
-        _free_cover(subgroup.supergroup(), generators),
+    return FiniteGSets(subgroup.supergroup()).preimage_coset_space(
+        subgroup, morphism, target, _free_cover(subgroup.supergroup(), generators),
     )
 
 
@@ -388,8 +382,8 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             supergroup_cardinality = self.supergroup().cardinality()
             if self.contains_character_kernel():
                 quotient = self.finite_character_quotient()
-                image_size = int(quotient.image_keys().cardinality())
-                subgroup_image_size = int(quotient.subgroup_image_keys().cardinality())
+                image_size = quotient.image_order()
+                subgroup_image_size = quotient.subgroup_image_order()
                 if supergroup_cardinality.is_finite():
                     order = int(supergroup_cardinality.finite_value())
                     return cardinal(order * subgroup_image_size // image_size)
@@ -401,6 +395,10 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 f"and the subgroup is not known as the preimage of a subgroup of a finite quotient"
             )
             return cardinal(sum(1 for _element in self))
+
+        def _supplies_engine(self) -> bool:
+            r"""A predicate subgroup is realized inside its supergroup's engine, so it has one exactly when the supergroup does."""
+            return self.supergroup()._supplies_engine()
 
         @cached_method
         def _engine_group(self):
@@ -436,30 +434,10 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             return self.intersection(self.supergroup().stabilizer(target, action=action))
 
         def intersection(self, other):
-            if other.supergroup() is not self.supergroup():
-                raise ValueError(
-                    f"cannot intersect {self} and {other}: they are subgroups of different "
-                    f"groups, {self.supergroup()} and {other.supergroup()}"
-                )
-            left = self._character_data_snapshot()
-            right = other._character_data_snapshot()
-            data = {
-                "determinant_kernel": bool(left.get("determinant_kernel", False))
-                or bool(right.get("determinant_kernel", False)),
-                "spinor_kernel": bool(left.get("spinor_kernel", False))
-                or bool(right.get("spinor_kernel", False)),
-                "discriminant_preimages": tuple(left.get("discriminant_preimages", ()))
-                + tuple(right.get("discriminant_preimages", ())),
-            }
-            return IntersectionSubgroups(self.supergroup())(
-                (self, other),
-                character_data=data,
-                character_data_complete=(
-                    self.character_data_is_complete()
-                    and other.character_data_is_complete()
-                ),
-            )
+            r"""Intersect subgroups through their common owning construction."""
+            return IntersectionSubgroups(self.supergroup())((self, other))
 
+        @cached_method
         def finite_character_quotient(self):
             if not self.character_data_is_complete():
                 raise ValueError(
@@ -468,6 +446,32 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                     f"determinant, spinor norm and discriminant characters"
                 )
             return OrthogonalCharacterQuotient(self)
+
+        @cached_method
+        def discriminant_image(self):
+            r"""``rho(self)`` in ``O(A_L)``, exactly, from the retained character data.
+
+            This subgroup is ``chi^-1(S)`` for the joint character map
+            ``chi = (rho, det, sn)``; its discriminant image is the meet of
+            the retained discriminant-preimage targets with the rho-images of
+            the sign kernels it intersects, a finitely generated subgroup of
+            ``O(A_L)`` computed without any generating family of this
+            subgroup itself (``OrthogonalCharacterQuotient.discriminant_image``).
+            Incomplete character data makes the image uncharacterized, and
+            the quotient's ``ValueError`` propagates.
+            """
+            return self.finite_character_quotient().discriminant_image()
+
+        def discriminant_generator_lifts(self):
+            r"""Live isometries of this subgroup whose discriminant images generate ``rho(self)``.
+
+            One lift per selected group generator of :meth:`discriminant_image`; each returned
+            lift is checked against the character map and admitted by this subgroup's
+            defining predicate, and the subgroup generated by their discriminant morphisms
+            is asserted to equal the discriminant image itself, as a subgroup of the same
+            ``O(A_L)`` (``OrthogonalCharacterQuotient.subgroup_generator_lifts``).
+            """
+            return self.finite_character_quotient().subgroup_generator_lifts()
 
         def has_finite_coset_space(self) -> bool:
             r"""Whether complete finite characters realize ``G/self`` as a finite ``G``-set."""
@@ -485,21 +489,12 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             Schreier morphism, including when several character conditions
             were intersected and no single preimage presentation remains.
             """
-            from sage_extensions.categories.group.g_sets import (
-                FiniteGSets,
-                _LeftCosetPointSet,
-            )
-
             assert self.contains_character_kernel(), (
                 f"{self} has no complete finite-character condition realizing its coset space"
             )
-            group = self.supergroup()
-            points = _LeftCosetPointSet(group, self)
-            return FiniteGSets(group).pointed_orbit(
-                self,
-                points(group.one()),
-                lambda element, coset: points(element * coset.representative()),
-                _free_cover(group, generators),
+            quotient = self.finite_character_quotient()
+            return _preimage_coset_space(
+                self, quotient.character_representation(), quotient._character_target(), generators,
             )
 
         def vector_orbit_representatives(self, square):
@@ -518,10 +513,160 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             return _subgroup_vector_equivalence_witness(self, left, right)
 
         def isotropic_orbit_representatives(self, rank, *, flag=False):
-
+            r"""Return subgroup null orbits; ``flag=True`` accepts a ``FlagType`` or complete-flag rank."""
             return _subgroup_isotropic_orbit_representatives(
                 self, rank, flag=flag
             )
+
+        def isotropic_vector_reduction_image(self, representative):
+            r"""Return the group that ``Stab_Gamma(v)`` induces on ``v^perp/<v>`` (#312).
+
+            ``v`` is a primitive isotropic vector of the ambient lattice and
+            ``Gamma = self`` is a subgroup of its orthogonal group cut out by a
+            condition on the discriminant group, ``Gamma = rho^-1(rho(Gamma))``.
+
+            The returned
+            :class:`sage_extensions.categories.isotropic_orbits.IsotropicVectorReductionImage`
+            is the image ``G_v`` of the stabilizer in ``O(v^perp/<v>)``, the image
+            ``rho(K_v)`` of the kernel of the parabolic's Levi map in ``O(A_L)`` --
+            with whether that image is trivial as an output, because one lift of an
+            isometry decides membership only when it is -- and a membership test
+            for an isometry of ``v^perp/<v>``.  Two lifts differ by an element of
+            ``K_v``, a unipotent group containing the Eichler transvections
+            ``t(v, a)``, ``a`` orthogonal to ``v`` (V. Gritsenko, K. Hulek,
+            G. Sankaran, *Abelianisation of orthogonal groups and the fundamental
+            group of modular varieties*, arXiv:0810.1614, §3.1, equation (4)), so
+            the criterion is ``rho(g)`` in ``rho(K_v) rho(Gamma)``, computed in the
+            finite group ``O(A_L)``; the quotient action is the quotient block of
+            Dutour Sikirić--Hulek, arXiv:2302.01679v2, theorem
+            `theorem_isotropic_k_planes`, printed pp. 33--34.
+
+            Where it is needed: Sterk's five Enriques cusp diagrams (H. Sterk,
+            *Compactifications of the period space of Enriques surfaces, Part I*,
+            Math. Z. 207 (1991), 4.3.5--4.3.9) are diagrams of the reflection
+            subgroup of ``G_v`` for ``Gamma_{En,2}`` on ``T_{En}``
+            (Proposition 2.7, p. 6 for the group; Proposition 4.2.3 with
+            Remark 4.2.4, p. 16 for its five cusps), which is research#654; the
+            output is the subgroup input of #297, the chamber anchored at the cusp.
+            """
+            from sage_extensions.categories.isotropic_orbits import (
+                IsotropicVectorReductionImage,
+            )
+
+            return IsotropicVectorReductionImage(self, representative)
+
+        def isotropic_plane_orbits(self, representatives=None, *, stabilizer_generators=None):
+            r"""Return this subgroup's orbits of primitive isotropic planes, one per divided-class point.
+
+            The planes of an indefinite lattice are classified inside each
+            ``O(L)``-orbit, and the splitting of one such orbit under the
+            subgroup is a double-coset computation in an infinite group.  Each
+            step below is a published statement, and the computation is finite.
+
+            **1. The ambient orbits and their representatives.**  For the
+            Enriques period lattice ``T_{\mathrm{En}} = U \oplus U(2) \oplus
+            E_8(-2)`` there are exactly two ``O(T_{\mathrm{En}})``-orbits of
+            primitive isotropic planes, represented by
+            ``P_1 = \mathbb{Z} e_1 + \mathbb{Z} e_3`` and
+            ``P_2 = \mathbb{Z}(2 e_1 + 2 e_2 + w) + \mathbb{Z} e_3`` with ``w``
+            a vector of ``E_8(-2)`` of norm ``-8``: H. Sterk,
+            *Compactifications of the period space of Enriques surfaces, Part
+            I*, Math. Z. 207 (1991), Proposition 4.6 (p. 29), with the two
+            ``0``-cusps of Proposition 4.5 (p. 28) for the lines.  These are
+            the integers' representatives ``(e_1, e_2)`` of ``U`` and
+            ``(e_3, e_4)`` of ``U(2)``: D. Dutour Sikirić and K. Hulek,
+            *Moduli of polarised Enriques surfaces -- computational aspects*,
+            J. London Math. Soc. 110 (2024), arXiv:2302.01679, §3.6 (the Tits
+            building), p. 22.  They are the ``representatives`` argument; a
+            lattice whose ambient plane orbit is enumerated by the port's
+            marking classes needs no argument.
+
+            **2. One plane, one divided class set.**  ``\Gamma`` acts on a
+            plane through its divided discriminant classes ``[u/div(u)]`` in
+            ``A_L = L^\#/L``, and ``A_L`` has exponent two, so the class set is
+            read off ``P/2P`` (:func:`_divided_discriminant_classes`).
+
+            **3. The double-coset reduction.**  The subgroup is a character
+            kernel, so ``\Gamma = \rho^{-1}(\rho(\Gamma))``; with
+            ``U = \widetilde{O}(L) = \ker \rho \subset K = \Gamma`` and
+            ``H = G_x`` the stabilizer of the plane, the quotient map
+            ``O(L) \to O(L)/\widetilde{O}(L) \cong O^+_{10}(\mathbb{F}_2)``
+            carries the double cosets ``\Gamma \backslash O(L) / H`` onto those
+            of the finite image (Dutour Sikirić--Hulek, Lemma 3.6, printed
+            p. 22), and those double cosets *are* the ``\Gamma``-orbits of the
+            ``O(L)``-orbit ``xG``.  So the ``\Gamma``-orbits are the
+            ``\rho(\Gamma)``-orbits on the finite ``\rho(O(L))``-orbit of the
+            plane's class set, which is the computation here.
+
+            **4. The check the published indices supply, and the check the call now
+            demands.**  The count in step 3 is the number of ``\Gamma``-orbits of
+            planes only when ``\rho(G_x) = \mathrm{Stab}_Q(J_x)``, ``G_x`` being the
+            stabilizer of the plane ``x`` and ``J_x`` its divided class set:
+            ``\rho(G_x) \subseteq \mathrm{Stab}_Q(J_x)`` always, since ``x \mapsto J_x``
+            is built from lattice operations and ``\widetilde{O}(L) = \ker \rho`` acts
+            trivially, so ``|Q . J_x| \le [Q : \rho(G_x)]`` and a count read off
+            ``Q . J_x`` is a *lower bound* until the two agree.  Dutour Sikirić--Hulek,
+            §3.6, p. 22 supply that agreement for ``N = U \oplus U(2) \oplus E_8(-2)``:
+            the images of the stabilizers of ``P_1`` and ``P_2`` have index
+            ``527 = 17 \cdot 31`` and ``23715 = 3^2 \cdot 5 \cdot 17 \cdot 31`` in
+            ``\rho(O(N))``, and their class sets are exactly those sizes, so the trivial-image subgroup has
+            ``527 + 23715 = 24242`` plane orbits, the ``1``-cusps of that paper's
+            ``\widetilde{\mathcal{M}}_{\mathrm{En}}``.  With both of the paper's orbits
+            present, a computed set of class-orbit sizes equal to ``{527, 23715}``
+            forces the equality orbit by orbit, because each size bounds its own index
+            from below and the two published indices are distinct.  For
+            ``\Gamma = \Gamma_{\mathrm{En},2}`` -- the image in ``O(T_{\mathrm{En}})``
+            of ``\{g \in O(L) : g I_{\mathrm{En}} = I_{\mathrm{En}} g,\ g(h) = h\}``,
+            V. Alexeev, P. Engel, D. Z. Garza, L. Schaffler, *Compact moduli of
+            Enriques surfaces of degree 2*, Nagoya Math. J. 259 (2025), Def. 2.6, with
+            ``F_{En,2} = \mathbb{D}(T_{\mathrm{En}})/\Gamma_{\mathrm{En},2}`` of Def. 2.7
+            and the boundary of Cor. 3.12 -- the same finite computation returns the
+            ``9`` plane orbits those authors state for the ``1``-cusps of ``F_{En,2}``
+            (§3.3, p. 590).  The lattice hypothesis of that citation is checked by
+            exhibiting an isometry onto ``N``, not by comparing invariants.
+
+            Where neither applies the call uses the plane's own setwise
+            stabilizer: its generators are constructed at any primitive
+            isotropic plane by integer linear algebra from the block equations
+            of the parabolic (Dutour Sikirić--Hulek, Theorem 4.9, printed
+            p. 22), and ``is_parabolic_complete()`` decides on three computed
+            indices whether they are the whole stabilizer (#331, #366).  That
+            route needs neither the lattice to be ``N`` nor the two indices
+            above to agree, because with ``\rho(G_x)`` in hand the orbits are
+            the double cosets ``\rho(\Gamma) \backslash \rho(O(L)) /
+            \rho(G_x)`` themselves, computed by ``splitting_isometries``.  On
+            ``T_{\mathrm{Co}}`` the agreement genuinely fails — the plane's
+            stabilizer maps onto a subgroup of index ``8`` in the stabilizer of
+            its order-four isotropic subgroup, while its divided class set is a
+            single ``\rho(O(L))``-orbit of ``23715`` points — so the class set
+            there is short by a factor of ``8`` and the double cosets are what
+            the count is read from.  Where the parabolic's family is *not*
+            established to be all of ``\rho(G_x)`` the call raises, naming the
+            representative and the missing factor, instead of returning a
+            count.  An alternative for such a lattice is
+            ``stabilizer_generators``, a mapping from the position of a representative
+            to generators of its stabilizer in ``O(L)``; each is checked to stabilize
+            the plane, and ``[Q : \langle\rho(h)\rangle]`` then bounds ``[Q : \rho(G_x)]``
+            from above, closing the same sandwich.
+
+            Each returned :class:`IsotropicPlaneOrbit` realizes its plane from
+            the representative it was split out of, by the word in the ambient
+            generators above it, and checks that the transported plane has the
+            class set it should.
+            """
+            from sage_extensions.categories.isotropic_orbits import (
+                _divided_class_isotropic_plane_orbits,
+            )
+
+            return _divided_class_isotropic_plane_orbits(
+                self, representatives, stabilizer_generators
+            )
+
+        def isotropic_orbit_iterator(self, rank, *, height_bound=None):
+            r"""Yield the first primitive isotropic subobject of each orbit of this subgroup (#62)."""
+            from sage_extensions.categories.isotropic_orbits import _isotropic_orbit_iterator
+
+            return _isotropic_orbit_iterator(self, self.supergroup().domain(), rank, height_bound)
 
         def isotropic_are_equivalent(self, left, right, *, flag=False) -> bool:
 
@@ -536,8 +681,9 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 self, left, right, flag=flag
             )
 
+        @cached_method
         def cusps(self, rank=1):
-            r"""Return this arithmetic subgroup's primitive-isotropic cusp orbits."""
+            r"""Return the retained primitive-isotropic cusp orbits of this subgroup and rank."""
             from sage_extensions.categories.isotropic_orbits import _arithmetic_cusp
             from sage_extensions.categories.sets.finite_ordered_sets import (
                 finite_ordered_set,
@@ -553,13 +699,29 @@ class PredicateSubgroups(OwnedParameterizedCategory):
         def tits_building_incidence(self):
             r"""Return this subgroup's line/plane quotient-building incidence.
 
-            Rank-two flags are split under the same finite-character quotient
-            as the line and plane orbits, so each edge retains actual subgroup
+            A line cusp meets a plane cusp when some element of this subgroup
+            carries a line of the first into a plane of the second.  At one
+            plane ``P`` these pairs are covered by the ``Stab_Gamma(P)``-orbits
+            of the isotropic lines of ``P``: the lines of a totally isotropic
+            plane are isotropic, and two flags over the same plane are
+            ``Gamma``-equivalent exactly when their lines lie in one
+            ``Stab_Gamma(P)``-orbit.  Where the plane's parabolic is complete
+            a covering of those orbits is supplied by it, so the incidence
+            never reaches the indefinite port's generic stabilizer enumeration
+            (:func:`...orthogonal_quotients._plane_parabolic_incidence_flags`,
+            #391); where it is not, the flag row keeps its own route.  Distinct
+            flag orbits may have the same two cusp endpoints, so the returned
+            relation retains one certificate per endpoint pair, not one edge
+            per flag orbit.  Each certificate retains actual subgroup
             transporters to its two cusp vertices rather than transporters
             inherited from the full orthogonal group.
             """
             from sage_extensions.categories.isotropic_orbits import (
                 ArithmeticCuspIncidence,
+                IsotropicFlag,
+            )
+            from sage_extensions.categories.orthogonal_quotients import (
+                _plane_parabolic_incidence_flags,
             )
             from sage_extensions.categories.sets.finite_ordered_sets import (
                 finite_ordered_set,
@@ -568,28 +730,118 @@ class PredicateSubgroups(OwnedParameterizedCategory):
             lattice = self.supergroup().domain()
             line_cusps = self.cusps(1)
             plane_cusps = self.cusps(2)
-            incidences = []
-            for flag in self.isotropic_orbit_representatives(2, flag=True):
+
+            def matching_cusps(term, cusps):
+                matches = []
+                for cusp in cusps:
+                    if term not in cusp.universe():
+                        continue
+                    witness = cusp.transporter_witness(term)
+                    if witness is not None:
+                        matches.append((cusp, witness))
+                return matches
+
+            # A covering of the incidence by flags: at each plane
+            # representative cover the Stab_Gamma(P)-orbits of the lines of P
+            # from the plane's own parabolic, and use the flag row wherever
+            # that route does not apply.  The lines of P need not form one orbit of the
+            # parabolic -- the divisibility of a line of P is an invariant the
+            # parabolic preserves -- so the Stab_Gamma(P)-orbits are computed
+            # per orbit of the parabolic on the lines of P, and those orbits
+            # are the ambient flag orbits read at this plane: the ambient
+            # flags whose plane term is carried to P by an ambient isometry,
+            # transported by it.
+            orthogonal_group = self.supergroup()
+            ambient_flags = tuple(orthogonal_group.isotropic_orbit_representatives(2, flag=True))
+            quotient = self.finite_character_quotient()
+            # The ambient flag row need not choose the ambient plane row's
+            # representative.  In that case there is no registered source lift
+            # for its plane.  Normalize each such flag once to a registered
+            # ambient representative, rather than starting a fresh isometry
+            # search against every much larger transported target plane.  The
+            # third component is that source normalization, when one is needed.
+            ambient_sources = []
+            ambient_plane_representatives = None
+            for ambient_flag in ambient_flags:
+                _ambient_line, ambient_plane = ambient_flag.terms()
+                source_lift = quotient.isotropic_lift_of(ambient_plane)
+                if source_lift is not None:
+                    ambient_sources.append((ambient_flag, source_lift, None))
+                    continue
+                if ambient_plane_representatives is None:
+                    ambient_plane_representatives = tuple(
+                        orthogonal_group.isotropic_orbit_representatives(2)
+                    )
+                for source_plane in ambient_plane_representatives:
+                    source_lift = quotient.isotropic_lift_of(source_plane)
+                    if source_lift is None:
+                        continue
+                    source_witness = orthogonal_group.isotropic_equivalence_witness(
+                        ambient_plane, source_plane
+                    )
+                    if source_witness is not None:
+                        ambient_sources.append(
+                            (ambient_flag, source_lift, source_witness)
+                        )
+                        break
+                else:
+                    ambient_sources.append((ambient_flag, None, None))
+            sourced_flags = []
+            parabolic_routed = True
+            for plane in self.isotropic_orbit_representatives(2):
+                plane_orbit_flags = []
+                for ambient_flag, source_lift, source_witness in ambient_sources:
+                    _ambient_line, ambient_plane = ambient_flag.terms()
+                    # The source row now meets the source lift at one registered
+                    # plane.  Composing that normalization with the row's own
+                    # lifts gives an exact ambient witness to each target plane,
+                    # without an isometry search against the transported target.
+                    target_lift = quotient.isotropic_lift_of(plane)
+                    if source_lift is not None and target_lift is not None:
+                        witness = target_lift * ~source_lift
+                        if source_witness is not None:
+                            witness = witness * source_witness
+                    else:
+                        witness = orthogonal_group.isotropic_equivalence_witness(
+                            ambient_plane, plane
+                        )
+                    if witness is None:
+                        continue
+                    plane_orbit_flags.append(witness.transport_isotropic_object(ambient_flag))
+                if not plane_orbit_flags:
+                    parabolic_routed = False
+                    break
+                for orbit_flag in plane_orbit_flags:
+                    from_parabolic = _plane_parabolic_incidence_flags(self, plane, orbit_flag)
+                    if from_parabolic is None:
+                        parabolic_routed = False
+                        break
+                    sourced_flags.extend(from_parabolic)
+                if not parabolic_routed:
+                    break
+            if not parabolic_routed:
+                sourced_flags = list(self.isotropic_orbit_representatives(2, flag=True))
+
+            candidate_incidences = []
+            for flag in sourced_flags:
                 line, plane = flag.terms()
-                line_vertices = tuple(cusp for cusp in line_cusps if line in cusp)
-                plane_vertices = tuple(cusp for cusp in plane_cusps if plane in cusp)
+                line_vertices = matching_cusps(line, line_cusps)
+                plane_vertices = matching_cusps(plane, plane_cusps)
                 if len(line_vertices) != 1 or len(plane_vertices) != 1:
                     raise ArithmeticError(
                         f"the isotropic flag {flag} of {lattice} lies in {len(line_vertices)} "
                         f"line cusps and {len(plane_vertices)} plane cusps of {self}; each "
                         f"term of a flag must lie in exactly one cusp"
                     )
-                line_cusp = line_vertices[0]
-                plane_cusp = plane_vertices[0]
-                line_transporter = line_cusp.transporter_witness(line)
-                plane_transporter = plane_cusp.transporter_witness(plane)
+                line_cusp, line_transporter = line_vertices[0]
+                plane_cusp, plane_transporter = plane_vertices[0]
                 if line_transporter is None or plane_transporter is None:
                     raise ArithmeticError(
                         f"the isotropic flag {flag} of {lattice} lies in the cusps "
                         f"{line_cusp} and {plane_cusp} of {self}, but no element of {self} "
                         f"carries the cusp representatives to its terms"
                     )
-                incidences.append(
+                candidate_incidences.append(
                     ArithmeticCuspIncidence(
                         self,
                         flag,
@@ -599,11 +851,44 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                         plane_transporter,
                     )
                 )
-            if any(incidence.lattice() is not lattice for incidence in incidences):
+            if any(incidence.lattice() is not lattice for incidence in candidate_incidences):
                 raise ArithmeticError(
                     f"the Tits building incidence of {self} has a cusp incidence in a lattice "
                     f"other than {lattice}, the lattice {self.supergroup()} acts on"
                 )
+            # In the fallback, two candidate records whose flags are equivalent
+            # expose an over-split flag row.  The parabolic covering needs no
+            # such check: distinct double cosets over the selected line-fixing
+            # subgroup may map to one K-orbit, by the covering argument above.
+            if not parabolic_routed:
+                for position, first in enumerate(candidate_incidences):
+                    for second in candidate_incidences[position + 1:]:
+                        if first.line_cusp() is not second.line_cusp() or first.plane_cusp() is not second.plane_cusp():
+                            continue
+                        if self.isotropic_equivalence_witness(first.flag(), second.flag(), flag=True) is not None:
+                            raise ArithmeticError(
+                                f"the flags {first.flag()} and {second.flag()} of {lattice} are "
+                                f"equivalent under {self}, yet they are recorded as two flag orbits "
+                                f"over the line cusp {first.line_cusp()} and the plane cusp "
+                                f"{first.plane_cusp()}: the flag orbits are over-split"
+                            )
+            # The building incidence is a relation between two orbit vertices,
+            # not the quotient's set of flag orbits.  Several flags can witness
+            # the same relation, and the parabolic covering can repeat one of
+            # its K-orbits when the selected line-fixing generators are a proper
+            # subgroup of the full line stabilizer.  Retain one actual flag
+            # certificate for each endpoint pair.  Identity is intentional:
+            # every match is one of the retained objects of the two cusp rows,
+            # and comparing distinct cusps would start another orbit search.
+            incidences = []
+            for candidate in candidate_incidences:
+                if any(
+                    incidence.line_cusp() is candidate.line_cusp()
+                    and incidence.plane_cusp() is candidate.plane_cusp()
+                    for incidence in incidences
+                ):
+                    continue
+                incidences.append(candidate)
             return finite_ordered_set(tuple(incidences))
 
         def _repr_(self):
@@ -627,8 +912,8 @@ class KernelSubgroups(_PredicateSubgroupConstruction):
         group = self.base()
         return self(group.Mor(group).identity())
 
-    def _call_(self, morphism):
-        r"""Construct the kernel subgroup retaining its defining morphism."""
+    def _call_(self, morphism, *, generating_morphism_factory=None):
+        r"""Construct the kernel with its defining map and chosen free augmentation."""
         group = self.base()
         if morphism.domain() is not group:
             raise ValueError(
@@ -643,6 +928,7 @@ class KernelSubgroups(_PredicateSubgroupConstruction):
             predicate=lambda element: morphism(element) == identity,
             description="elements mapped to the identity by the defining morphism",
             kernel_morphism=morphism,
+            generating_morphism_factory=generating_morphism_factory,
         )
 
     @classmethod
@@ -650,14 +936,17 @@ class KernelSubgroups(_PredicateSubgroupConstruction):
         return "kernel subgroups"
 
     class ParentMethods:
-        def __init__(self, kernel_morphism, **rest) -> None:
+        def __init__(self, kernel_morphism, generating_morphism_factory=None, **rest) -> None:
             self._kernel_morphism = kernel_morphism
             super().__init__(**rest)
+            if generating_morphism_factory is not None:
+                _fix_selected_generating_morphism(self, generating_morphism_factory)
             # Schreier's lemma: a finitely generated group mapping to a finite
             # group has its kernel generated by the Schreier family of the
             # finite image, so that family is this kernel's selected datum.
             if (
-                self.supergroup().has_selected_group_resolution()
+                not _retains_group_resolution(self)
+                and self.supergroup().has_selected_group_resolution()
                 and kernel_morphism.codomain() in OwnedFiniteGroups()
             ):
                 _fix_selected_generating_morphism(
@@ -666,6 +955,11 @@ class KernelSubgroups(_PredicateSubgroupConstruction):
 
         def kernel_morphism(self):
             return self._kernel_morphism
+
+        def schreier_generators(self, *, generators=None):
+            r"""The Schreier generating family, indexed by the retained free basis."""
+            morphism = self.schreier_generating_morphism(generators=generators)
+            return morphism.domain().group_generators().map(morphism, name="Schreier generators")
 
         def index(self, *, generators=None):
             r"""The index of a kernel with a represented finite image.
@@ -677,6 +971,11 @@ class KernelSubgroups(_PredicateSubgroupConstruction):
             selected a generating resolution.
             """
             return self.coset_space(generators=generators).cardinality()
+
+        def schreier_generators(self, *, generators=None):
+            r"""The Schreier generating family, indexed by the retained free basis."""
+            morphism = self.schreier_generating_morphism(generators=generators)
+            return morphism.domain().group_generators().map(morphism, name="Schreier generators")
 
         def has_finite_coset_space(self) -> bool:
             r"""Whether ``G/ker(f)`` is realized through ``f`` into a finite group with selected generators of ``G``."""
@@ -693,6 +992,11 @@ class KernelSubgroups(_PredicateSubgroupConstruction):
         def schreier_generating_morphism(self, *, generators=None):
             r"""Schreier's lemma on the coset space ``G/ker(f)`` with its section."""
             return self.coset_space(generators=generators).schreier_generating_morphism()
+
+        def schreier_generators(self, *, generators=None):
+            r"""The kernel's Schreier generating family on the retained free basis."""
+            morphism = self.schreier_generating_morphism(generators=generators)
+            return morphism.domain().group_generators().map(morphism, name="Schreier generators")
 
         def _cardinality_decision(self):
             r"""Return the exact kernel order when the ambient group is finite."""
@@ -820,6 +1124,11 @@ class PreimageSubgroups(_PredicateSubgroupConstruction):
             """
             return self.coset_space(generators=generators).schreier_generating_morphism()
 
+        def schreier_generators(self, *, generators=None):
+            r"""The Schreier generating family, indexed by the retained free basis."""
+            morphism = self.schreier_generating_morphism(generators=generators)
+            return morphism.domain().group_generators().map(morphism, name="Schreier generators")
+
         def selected_group_resolution(self):
             r"""The selected generating epimorphism onto ``f^-1(K)``, assembled when ``f: G -> Q`` has infinite codomain.
 
@@ -920,8 +1229,12 @@ class StabilizerSubgroups(_PredicateSubgroupConstruction):
         description=None,
         generating_morphism=None,
         basis_change=None,
+        vector_witness=None,
     ):
         r"""Construct the stabilizer retaining the stabilized object and action.
+
+        ``vector_witness(left, right)`` is the action owner's exact decision of
+        vector equivalence under this stabilizer, when it supplies one.
 
         ``generating_morphism`` is the action owner's free generating
         morphism onto the stabilizer, when its action supplies one.
@@ -949,6 +1262,7 @@ class StabilizerSubgroups(_PredicateSubgroupConstruction):
             stabilizer_action=action,
             generating_morphism=generating_morphism,
             basis_change=basis_change,
+            vector_witness=vector_witness,
         )
 
     @classmethod
@@ -956,11 +1270,16 @@ class StabilizerSubgroups(_PredicateSubgroupConstruction):
         return "stabilizer subgroups"
 
     class ParentMethods:
-        def __init__(self, stabilized_object, stabilizer_action, basis_change=None, **rest) -> None:
+        def __init__(self, stabilized_object, stabilizer_action, basis_change=None, vector_witness=None, **rest) -> None:
             self._stabilized_object = stabilized_object
             self._stabilizer_action = stabilizer_action
             self._basis_change = basis_change
+            self._vector_witness = vector_witness
             super().__init__(**rest)
+
+        def owned_vector_witness(self):
+            r"""The action owner's exact vector decision for this stabilizer, or ``None``."""
+            return self._vector_witness
 
         def basis_change(self):
             r"""The automorphism ``P`` the generators were computed through: ``P(e_j) = b_j``, ``b`` adapted to the stabilized flag."""
@@ -1055,6 +1374,26 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
                 f"{[subgroup for subgroup in subgroups if subgroup.supergroup() is not group]} "
                 f"are not subgroups of {group}"
             )
+        # Retain character_data from intersected subgroups when not supplied explicitly
+        # (e.g. Γ_h = ρ⁻¹(H) ∩ O⁺(N) via G.intersection): merged data makes
+        # finite_character_quotient available on the intersection itself.
+        if character_data is None and character_data_complete is None:
+            merged = {}
+            complete = True
+            for sg in subgroups:
+                if sg in PredicateSubgroups(group):
+                    snap = sg._character_data_snapshot()
+                    # merge deterministically: OR for kernels, concat for preimages
+                    merged["determinant_kernel"] = bool(merged.get("determinant_kernel", False) or snap.get("determinant_kernel", False))
+                    merged["spinor_kernel"] = bool(merged.get("spinor_kernel", False) or snap.get("spinor_kernel", False))
+                    if snap.get("discriminant_preimages", ()):
+                        merged["discriminant_preimages"] = tuple(merged.get("discriminant_preimages", ())) + tuple(snap.get("discriminant_preimages", ()))
+                    complete = complete and sg.character_data_is_complete()
+                else:
+                    complete = False
+            if merged:
+                character_data = {k: v for k, v in merged.items() if v}
+                character_data_complete = complete
         return _object_of(
             _predicate_subgroup_category(self),
             _ambient=OwnedGroups(),
@@ -1074,12 +1413,22 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
         def __init__(self, intersected_subgroups, **rest) -> None:
             self._intersected_subgroups = intersected_subgroups
             super().__init__(**rest)
-            # For f: G -> F finite, K <= F and B <= G finitely generated with
-            # inclusion i, f^-1(K) cap B = i((f i)^-1(K)); the Schreier family
-            # of that restricted preimage, pushed into G, generates this
-            # intersection.
+            # Both sides are finite-index character kernels (e.g. discriminant
+            # preimage ∩ spinor kernel for Γ_h). Neither is generated, but
+            # the ambient O(N) is — use its finite-index Schreier.
             if not _retains_group_resolution(self) and intersected_subgroups.cardinality() == cardinal(2):
                 group = self.supergroup()
+                if all(
+                    sg in PredicateSubgroups(group) and sg.contains_character_kernel()
+                    for sg in intersected_subgroups
+                ) and group.has_selected_group_resolution():
+                    _fix_selected_generating_morphism(
+                        self,
+                        lambda intersection, intersected_subgroups=intersected_subgroups: (
+                            intersection._character_intersection_generating_morphism(intersected_subgroups)
+                        ),
+                    )
+                    return
                 for preimage in intersected_subgroups:
                     match preimage:
                         case _ if preimage in KernelSubgroups(group):
@@ -1127,16 +1476,20 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
                             ),
                         )
                         return
-
         def intersected_subgroups(self):
             return self._intersected_subgroups
 
         def _restricted_preimage_generating_morphism(self, morphism, target, generated):
-            r"""``E ->> f^-1(K) cap B`` through the Schreier morphism onto ``(f i)^-1(K)``."""
+            r"""``E ->> f^-1(K) cap B`` through the Schreier morphism onto ``(f i)^-1(K)``.
+
+            The restricted inclusion lands in B and its composite with f
+            lands in K. These two range laws give the intersection
+            corestriction at its constructing owner.
+            """
             inclusion = generated.inclusion()
             restricted = (morphism * inclusion).preimage_subgroup(target)
             augmentation = restricted.schreier_generating_morphism()
-            return (inclusion * restricted.inclusion() * augmentation).factor_through(self.inclusion())
+            return (inclusion * restricted.inclusion() * augmentation)._corestrict_to_subgroup(self)
 
         def _restricted_character_generating_morphism(self, character_subgroup, generated):
             r"""Generate ``Gamma cap B`` by restricting a finite character condition to ``B``.
@@ -1146,12 +1499,12 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
             supplies the existing predicate-subgroup Schreier computation;
             no membership or word algorithm for an arbitrary generated
             subgroup of ``G`` is assumed.
+
+            The restricted predicate and its inclusion supply both
+            intersection range laws for the resulting corestriction.
             """
             quotient = character_subgroup.finite_character_quotient()
-            index_bound = (
-                int(quotient.image_keys().cardinality())
-                // int(quotient.subgroup_image_keys().cardinality())
-            )
+            index_bound = quotient.index()
             inclusion = generated.inclusion()
             restricted = generated.predicate_subgroup(
                 lambda element: inclusion(element) in character_subgroup,
@@ -1161,7 +1514,31 @@ class IntersectionSubgroups(_PredicateSubgroupConstruction):
                 index_bound=index_bound,
                 generators=generated.group_generators(),
             )
-            return (inclusion * restricted.inclusion() * augmentation).factor_through(self.inclusion())
+            return (inclusion * restricted.inclusion() * augmentation)._corestrict_to_subgroup(self)
+
+        def _character_intersection_generating_morphism(self, intersected_subgroups):
+            # Lazy: finite-family prerequisite is checked at realization, not construction
+            group = self.supergroup()
+            if not group.has_selected_finite_group_generating_set():
+                raise ValueError(f"cannot generate {self}: ambient {group} has no retained finite generating family")
+            # Exact index is available on the intersection itself now that character_data is retained.
+            # Only fall back to product bound when the intersection's character quotient is
+            # not yet complete (ValueError: no finite character quotient), not on arbitrary errors.
+            try:
+                q = self.finite_character_quotient()
+                # The intersection retains merged character data, so its own
+                # character quotient answers the exact index from the group
+                # orders of the generated image; no image element is listed.
+                index_bound = q.index()
+            except ValueError:
+                index_bound = 1
+                for cs in intersected_subgroups:
+                    q = cs.finite_character_quotient()
+                    index_bound *= q.index()
+            return self.finite_index_schreier_generating_morphism(
+                index_bound=index_bound,
+                generators=group.group_generators(),
+            )
 
 __all__ = [
     "CentralizerSubgroups",

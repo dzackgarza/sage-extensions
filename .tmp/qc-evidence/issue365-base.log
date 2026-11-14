@@ -1,0 +1,57 @@
+FFFF..F..FFFF                                                            [100%]
+=================================== FAILURES ===================================
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11939: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_kernel_generators'
+E   KeyError: ((Morphism from Integral lattice of rank 3 and signature (2, 1) to Integral lattice of rank 3 and signature (2, 1),), ())
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11949: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+E   KeyError: ((Morphism from Integral lattice of rank 3 and signature (2, 1) to Integral lattice of rank 3 and signature (2, 1),), ())
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11949: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+E   KeyError: ((Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1),), ())
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11949: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+E   KeyError: ((Morphism from Integral lattice of rank 1 and signature (1, 0) to Integral lattice of rank 1 and signature (1, 0),), ())
+
+During handling of the above exception, another exception occurred:
+E   AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+/repos/sage-extensions/src/sage_extensions/categories/lattices.py:11949: AttributeError: 'EichlerRecursion' object has no attribute 'isotropic_quotient_lift'
+=========================== short test summary info ============================
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[reduction]
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[radical]
+FAILED tests/lattices/test_higher_rank_unipotent_kernel.sage::test_null_plane_unipotent_kernel_has_the_full_hom_and_central_lattices[generators]
+FAILED tests/lattices/test_parabolic_induction.sage::test_primitive_isotropic_refinement_selects_the_line_eichler_operation
+FAILED tests/lattices/test_parabolic_induction.sage::test_the_eichler_transvections_of_a_line_form_an_abelian_group
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[line]
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_split_pointwise_levi_lift_over_an_infinite_quotient[plane]
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_glued_line_pointwise_image_excludes_quotient_negation
+FAILED tests/lattices/test_pointwise_levi_images.sage::test_zero_null_pointwise_levi_lift_and_joint_kernel
+9 failed, 4 passed in 4.96s
+[peakrss] issue353: child waited=1 shell_code=1 samples=5
+[peakrss] peak tree RSS      : 477 MiB
+[peakrss] low-water MemAvail : 10124 MiB
+[peakrss] peak single VmHWM  : 477 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      466 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   477 MiB hwm=   477 MiB avail= 10124 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   348 MiB hwm=   348 MiB avail= 10232 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   315 MiB hwm=   315 MiB avail= 10261 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   271 MiB hwm=   271 MiB avail= 10271 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 10473 MiB
+launcher exit: 1
