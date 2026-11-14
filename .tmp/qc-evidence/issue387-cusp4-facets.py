@@ -98,9 +98,12 @@ def lift_of(element):
     coefficients = [int(entry) for entry in element.to_vector()]
     for position, label in enumerate(frame_labels):
         coefficient = coefficients[position]
-        if coefficient:
-            piece = frame[label].to_vector()
-            total = [entry + coefficient * int(other) for entry, other in zip(total, piece)]
+        if not coefficient:
+            continue
+        piece = frame[label]
+        piece = piece.to_vector() if hasattr(piece, "to_vector") else piece
+        piece = [int(entry) for entry in piece]
+        total = [entry + coefficient * other for entry, other in zip(total, piece)]
     return tuple(total)
 
 

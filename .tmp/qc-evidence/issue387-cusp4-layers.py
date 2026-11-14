@@ -155,26 +155,17 @@ def multiple_of_cusp(difference):
     return ratio is not None
 
 
-frame = image.reduction().coordinate_frame()
-frame_labels = tuple(image.reduction().module_generating_set())
-
-
 def lift_in_ambient_coordinates(row):
-    r"""Return the TEn coordinates of the class lift of a reduction root.
+    r"""Return the T_En coordinates of the class lift of a reduction root.
 
-    ``class_lift`` returns an element of the perpendicular subobject, whose
-    ``to_vector`` is in that subobject's frame and not in ``T_En``'s, so the
-    lift is rebuilt here from the reduction's own coordinate frame -- the
-    same section ``class_lift`` uses, summed in ``T_En`` coordinates.
+    ``class_lift`` is the library's own section: it sums the reduction's
+    coordinate frame into the perpendicular subobject and includes the result
+    in ``T_En``, and the element it returns has twelve coordinates there
+    (``issue387-cusp4-liftshape.log``).  The frame's own elements have eleven,
+    in the perpendicular's frame, so lifting them by hand misaligns the
+    comparison -- this is the verified route.
     """
-    total = [0] * len(ambient_labels)
-    coefficients = [int(entry) for entry in row.to_vector()]
-    for position, label in enumerate(frame_labels):
-        coefficient = coefficients[position]
-        if coefficient:
-            piece = frame[label].to_vector()
-            total = [entry + coefficient * int(other) for entry, other in zip(total, piece)]
-    return tuple(total)
+    return tuple(int(entry) for entry in image.class_lift(to_element(row)).to_vector())
 
 
 def printed_wall_index(row):
