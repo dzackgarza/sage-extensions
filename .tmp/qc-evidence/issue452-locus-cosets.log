@@ -1,0 +1,36 @@
+provider SHA: eb07c430a41b78a5926eb40500f7073f70a95312
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt452/.tmp/probe452h.py
+[    4.1s] built: P rank 10  m 4
+[    4.1s] denominator 2 smith [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+[    4.1s] steps (2, 2, 2, 2, 2, 2, 2, 2, 2, 2) #reps 1024 |K| 1024
+[   73.5s] representatives: 1024  passing: 256
+[   73.5s] period generators: 10
+[   73.5s] origin: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+[   73.5s] family size 275  distinct: 266
+[   98.6s] every family member integral: True
+[  145.6s] rho-images computed
+[  146.2s] rho(K_v) order: 256
+[  146.2s] --- the locus is a union of kernel cosets ---
+[  146.2s]   passing + kernel 0 integral: True
+[  146.3s]   passing + kernel 3 integral: True
+[  146.4s]   passing + kernel 7 integral: True
+[  146.5s]   refused + kernel 0 integral: False
+[  146.5s]   refused + kernel 3 integral: False
+[  146.6s]   refused + kernel 7 integral: False
+[  146.6s] --- the period keeps integrality ---
+[  146.7s]   passing + period 0 integral: True  refused + period 0 integral: False
+[  146.8s]   passing + period 5 integral: True  refused + period 5 integral: False
+[  146.8s] done
+[peakrss] run: child waited=0 shell_code=0 samples=76
+[peakrss] peak tree RSS      : 449 MiB
+[peakrss] low-water MemAvail : 6655 MiB
+[peakrss] peak single VmHWM  : 449 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      438 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   150.1s procs=  3 rss=   449 MiB hwm=   449 MiB avail=  8857 MiB
+[peakrss]   t=   148.1s procs=  3 rss=   448 MiB hwm=   448 MiB avail=  8747 MiB
+[peakrss]   t=   142.1s procs=  3 rss=   447 MiB hwm=   447 MiB avail=  8858 MiB
+[peakrss]   t=   144.1s procs=  3 rss=   447 MiB hwm=   447 MiB avail=  8804 MiB
+[peakrss]   t=   146.1s procs=  3 rss=   447 MiB hwm=   447 MiB avail=  8905 MiB

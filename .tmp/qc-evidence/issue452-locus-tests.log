@@ -1,0 +1,20 @@
+provider SHA: eb07c430a41b78a5926eb40500f7073f70a95312
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q --tb=short tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+....                                                                     [100%]
+4 passed in 5.09s
+[peakrss] run: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 353 MiB
+[peakrss] low-water MemAvail : 10549 MiB
+[peakrss] peak single VmHWM  : 353 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      335 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     8.0s procs=  5 rss=   353 MiB hwm=   353 MiB avail= 10585 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   348 MiB hwm=   348 MiB avail= 10555 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   334 MiB hwm=   334 MiB avail= 10549 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   203 MiB hwm=   204 MiB avail= 10639 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail= 10809 MiB

@@ -1,0 +1,26 @@
+provider SHA: eb07c430a41b78a5926eb40500f7073f70a95312
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt452/.tmp/probe452i.py
+[    0.9s] U + <2> div 1 rank 3 |P/mP| = 2 |integral| = 2 |reported| = 2 AGREE missing 0 extra 0
+[    1.8s] U + U + <2> div 1 rank 5 |P/mP| = 8 |integral| = 8 |reported| = 8 AGREE missing 0 extra 0
+[    2.2s] U(2) + <2> div 2 rank 3 |P/mP| = 4 |integral| = 2 |reported| = 2 AGREE missing 0 extra 0
+[    3.0s] U(2) + U(2) div 2 rank 4 |P/mP| = 16 |integral| = 16 |reported| = 16 AGREE missing 0 extra 0
+[    3.5s] U(4) + <2> div 4 rank 3 |P/mP| = 8 |integral| = 4 |reported| = 4 AGREE missing 0 extra 0
+[    4.3s] U(2) + U(4) div 2 rank 4 |P/mP| = 16 |integral| = 16 |reported| = 16 AGREE missing 0 extra 0
+[    6.6s] U(2) + U(2) + <2> div 2 rank 5 |P/mP| = 64 |integral| = 32 |reported| = 64 DISAGREE missing 0 extra 32
+[    7.4s] U(2) + A2 div 2 rank 4 |P/mP| = 16 |integral| = 4 |reported| = 4 AGREE missing 0 extra 0
+[    8.4s] U(2) + <2> + <2> div 2 rank 4 |P/mP| = 16 |integral| = 8 |reported| = 8 AGREE missing 0 extra 0
+[    8.9s] U(2) + <4> div 2 rank 3 |P/mP| = 4 |integral| = 4 |reported| = 4 AGREE missing 0 extra 0
+[    8.9s] done
+[peakrss] run: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 341 MiB
+[peakrss] low-water MemAvail : 8810 MiB
+[peakrss] peak single VmHWM  : 341 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      330 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   341 MiB hwm=   341 MiB avail=  8810 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   331 MiB hwm=   331 MiB avail=  8823 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   329 MiB hwm=   329 MiB avail=  8840 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   317 MiB hwm=   317 MiB avail=  8842 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   302 MiB hwm=   302 MiB avail=  8860 MiB
