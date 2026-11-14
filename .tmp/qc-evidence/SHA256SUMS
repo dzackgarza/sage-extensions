@@ -352,7 +352,6 @@ ff48ef82404f8023a579113c4e1f8ad30c1829441fa7ca845b538e17ff585a93  .tmp/qc-eviden
 cf076d784836d4120a45f2deb68dfb57b80b4a69f8d067276bb7aecb30341863  .tmp/qc-evidence/issue407-stabilizer-file.log
 4ea88041b494a345e4d32960f960784e26411f3112c15d5512546e727f7687bc  .tmp/qc-evidence/issue407-sweep-tests-groups.log
 b044a0c8e26b850718c5cfc08f5e5518a3f3471d2079d81a2d2834471480e1b6  .tmp/qc-evidence/triage/407-abelianization-supplies-a-gap-whole-group-map.md
-88f328a51f0478b708af195b1b91196399e364aca86edf0b6336bb84a4887aad  .tmp/qc-evidence/triage/407-cardinality-of-a-finitely-presented-group.md
 3df67cd47741b945760c71faedb98039cf2a79178bff3ba967508f489dcf7606  .tmp/qc-evidence/triage/407-cardinality-of-a-mor-set-of-g-sets.md
 452d597442197da09a202df6606bb532ece9190ea0ebac0fa018e176aa90be00  .tmp/qc-evidence/triage/407-character-quotient-witness-search-assumes-a-generator-inside.md
 788bcb6b2506599f5f84ba5feefc99cc34be3f54c3c937db9076f55f964b5dc2  .tmp/qc-evidence/triage/407-conjugation-morphism-supplies-a-gap-whole-group-map.md
@@ -364,12 +363,9 @@ b1707671fb48aa62f233fd425cd760c8b4476b4a950a3acd8d5d31d86c0ff39f  .tmp/qc-eviden
 4fb0e69fa64cb7bdeac55d888470b2dc8353ec7727a9e409501cdfc82e5c275f  .tmp/qc-evidence/triage/407-group-algebra-functor-hands-a-module-arrow-to-the-algebra-mor.md
 8c3bd3aee72988e36b88bf8b261b491074e2b3503f9d37151ad7c4c83c47dbc8  .tmp/qc-evidence/triage/407-modules-of-a-bare-set.md
 1b491d93cf1d805b04bdde91a21692fffffe95d4c69ed1288c2de558bae19477  .tmp/qc-evidence/triage/407-named-matrix-group-degree-is-an-assertion.md
-c7174b03ec04a57c9279b9aff6eb2e9976de316a95de8bbe3553c52b3ec88b97  .tmp/qc-evidence/triage/407-owned-algebraic-closure-is-built-without-its-base-field.md
-e37cd3752082453d264a46262c3d012d0b12e180153b69db722167264d50471a  .tmp/qc-evidence/triage/407-session-namespace-omits-the-owned-group-categories.md
 217568e493ddc2055da9c142cd3c64fb19e524c99e679d420d790c240067b4bc  .tmp/qc-evidence/triage/407-sets-parameterized-by-a-group.md
 58b13dbed5da93b1602e8970e6275ffe03071cc4094d8c835538f0125c4946bc  .tmp/qc-evidence/triage/407-the-regular-representation-asserts-a-rank-it-does-not-have.md
 16d06b1681d212c3bf207335db2dd5fa7d70054e8f2661dab99c3c12bf8f4b2f  .tmp/qc-evidence/triage/407-triage-index.md
-723a251ff9a4c56f91dc98804ba8f45f4027356838cced7e63d33c47b337d210  .tmp/qc-evidence/triage/407-session-namespace-omits-the-owned-group-categories.md
 011ed4219c151f11cac41449841af6659f1093ad9bf37f2de21b61cc7f067359  .tmp/qc-evidence/issue409-just-test-addopts-unavailable.log
 50e70c91744434b0fd21662999a97002ea1ebea1f9b2575ab51fb306563a9dc0  .tmp/qc-evidence/issue409-slice-after-fix-context.log
 a3fe35f5c7fa5aa51c72c3c41b2dfe1ebda9811f6581ca2f2e58ad119dd81876  .tmp/qc-evidence/issue409-slice-after-fix-default.log
@@ -418,6 +414,5 @@ af872c2d99bb13b55c14885f81a4ec53b81990ad089c03638c30f1e1e9ee8b26  issue398-divis
 8f28fa7dd159b9bf13614bb1a200a54f25426c8d4e68e3a7c3da510f0e13883c  issue398-green-three-files.log
 f4e71291acf5de872bcac54b973a192fda2c6aa68959138d9781d61b1221252d  issue398-regression-fixed.log
 ec2f24bd1b150cd0dd67ac6fb7d7656b74c5433ce1933ba617c313350da5224e  issue406-plugins-after-rewrite.log
-e913e40112925d13a8212e3ae45f959c1c5a04a07def808ef1a3573720c73cde  .tmp/qc-evidence/triage/407-session-namespace-omits-the-owned-group-categories.md
-c02219eff47dadd249ce7b1c5b7f3aaa71f09966a6bf15876597dbb15c641449  .tmp/qc-evidence/triage/407-owned-algebraic-closure-is-built-without-its-base-field.md
 8d59f1bc9370415b9d35e77243d65fc49b4312971d43e4fb05bb84d0f1f33077  .tmp/qc-evidence/triage/407-triage-index.md
+a95e7a7a7d80d3b31cffdba7c89d7d1db1d2aef505475718931b8af7aafa6fe4  .tmp/qc-evidence/issue407-repair7-merged-tree.log

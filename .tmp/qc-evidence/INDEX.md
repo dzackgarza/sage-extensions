@@ -1022,3 +1022,14 @@ Follow-up in the same session, after the two repairs:
 | `issue398-division-after.log` | this slice's one-formula division | the division probe of the same shape as the before-row | `RR(1)/RR(2)` = `1/2`, `RR(1)/(sqrt2-1)` and `~x` = `1/(sqrt(2) - 1)`; `ZZ(1)/ZZ(2)` = `1/2`, `~ZZ(2)` and `e/2` still refuse |
 
 | `issue406-plugins-after-rewrite.log` | the plugin repairs, with the finding grouping rewritten as `itertools.groupby` | `tests/engineering/test_the_suite_plugins_report_what_they_measured.py -q` under the repository addopts | **2 passed in 13.30 s**, exit 0 |
+
+The `tests/groups` side of #408's namespace cause and of its closure cause are recorded in
+this triage's index, not filed twice: three cause bodies that this triage first wrote
+(`407-session-namespace-*`, `407-owned-algebraic-closure-*`,
+`407-cardinality-of-a-finitely-presented-group`) were folded into #408's filed causes
+`408-the-session-namespace-does-not-publish-the-constructors-the-suite`,
+`408-the-algebraic-closure-of-a-finite-field-is-raised-with-the-wrong` and
+`408-cardinality-refuses-for-a-group-whose-finiteness-is-a-predicate`, and their digests are
+removed from `SHA256SUMS`.  `issue407-repair7-merged-tree.log` is the run on the merged tree
+that is pushed: the identity repair's three greens hold there, nothing new is red, and the
+closure's `TypeError` is absent from all eleven files.
