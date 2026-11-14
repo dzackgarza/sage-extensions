@@ -32,12 +32,17 @@ parabolic's family is certified complete (``is_parabolic_complete``, #331,
 #366), so the stabilizer never reaches the indefinite port's generic
 enumeration, which is killed at the memory guard on this lattice.
 
-**What is asserted.**  No lattice-database card holds a ``T_Co`` value
-(lattice-database#7), so no count is typed.  The assertion is what the cited
-construction guarantees for every output:
+**What is asserted.**  The decided Gamma relation has 13 edges over four line
+cusps and seven plane cusps.  No lattice-database card holds a ``T_Co`` value
+(lattice-database#7); this acceptance value is checked against representatives
+from both the pinned and the image's indefinite-port checkouts.  In addition,
+the cited construction guarantees for every output:
 
 * each edge joins a line that lies in its plane -- the edge's line term is
-  contained in its plane term;
+  contained in its plane term, and one subgroup element carries the selected
+  line cusp representative into the selected plane cusp representative;
+* the incidence is a relation, not a flag-orbit count -- no two retained edges
+  have the same line and plane cusp endpoints;
 * every line orbit and every plane orbit has an edge -- each cusp of the
   line row and of the plane row appears as a vertex of some edge;
 * the ``O(T_Co)`` incidence has one edge -- the ambient group is the whole of
@@ -108,6 +113,29 @@ def _assert_line_in_plane(line, plane) -> None:
     assert plane.inclusion().is_in_image(line.inclusion()(domain.module_generator(label)))
 
 
+def _coordinates(term):
+    r"""The integral coordinates of a subobject's retained basis in its ambient lattice."""
+    inclusion = term.inclusion()
+    domain = inclusion.domain()
+    lattice = inclusion.codomain()
+    labels = tuple(lattice.module_generating_set())
+    return tuple(
+        tuple(
+            int(inclusion(domain.module_generator(label)).to_vector()(other))
+            for other in labels
+        )
+        for label in domain.module_generating_set()
+    )
+
+
+def _assert_orbit_incidence(subgroup, incidence) -> None:
+    r"""One subgroup element carries the line cusp representative into the plane cusp representative."""
+    witness = incidence.plane_transporter() * ~incidence.line_transporter()
+    assert witness in subgroup
+    moved_line = witness.transport_isotropic_object(incidence.line_cusp().representative())
+    _assert_line_in_plane(moved_line, incidence.plane_cusp().representative())
+
+
 def run_row(lattice, subgroup, label, cap):
     r"""Return ``(edge count, line cusps, plane cusps, decided)`` for one incidence row."""
     start = time.monotonic()
@@ -122,12 +150,33 @@ def run_row(lattice, subgroup, label, cap):
     elapsed = time.monotonic() - start
     lines = tuple(subgroup.cusps(1))
     planes = tuple(subgroup.cusps(2))
+    for position, cusp in enumerate(lines):
+        log(f"[{label}] line cusp {position}: {_coordinates(cusp.representative())}")
+    for position, cusp in enumerate(planes):
+        log(f"[{label}] plane cusp {position}: {_coordinates(cusp.representative())}")
     line_vertices = {incidence.line_cusp() for incidence in incidences}
     plane_vertices = {incidence.plane_cusp() for incidence in incidences}
-    for incidence in incidences:
+    retained_pairs = []
+    for position, incidence in enumerate(incidences):
+        line_id = next(
+            index for index, cusp in enumerate(lines)
+            if cusp is incidence.line_cusp() or cusp == incidence.line_cusp()
+        )
+        plane_id = next(
+            index for index, cusp in enumerate(planes)
+            if cusp is incidence.plane_cusp() or cusp == incidence.plane_cusp()
+        )
+        pair = (line_id, plane_id)
+        assert all(previous != pair for previous in retained_pairs)
+        retained_pairs.append(pair)
         _assert_line_in_plane(incidence.line(), incidence.plane())
+        _assert_orbit_incidence(subgroup, incidence)
         assert incidence.line_cusp() in lines
         assert incidence.plane_cusp() in planes
+        log(
+            f"[{label}] edge {position}: L{line_id} < P{plane_id}; "
+            f"line={_coordinates(incidence.line())}; plane={_coordinates(incidence.plane())}"
+        )
     for cusp in lines:
         assert cusp in line_vertices, f"a line cusp of {label} carries no edge"
     for cusp in planes:
@@ -163,6 +212,9 @@ def main(argv):
         rows[label] = (count, line_count, plane_count)
     if rows["O(T_Co)"][0] != 1:
         log("the O(T_Co) incidence through this route is not one edge")
+        return 1
+    if rows["Gamma_{Co,2}"] != (13, 4, 7):
+        log("the Gamma_{Co,2} incidence is not the decided 13-edge relation over 4 line and 7 plane cusps")
         return 1
     log(
         f"the O(T_Co) incidence has {rows['O(T_Co)'][0]} edge; the Gamma_{{Co,2}} incidence has "

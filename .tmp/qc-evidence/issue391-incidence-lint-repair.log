@@ -1,0 +1,4 @@
+provider SHA: 1a59869ba62b9eda408c5e5d062a2a9b240fe899
+command: just test-lint tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage
+"$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m sage_extensions.testing.test_lint tests/lattices/test_the_coble_incidence_of_line_and_plane_orbits.sage
+1 files, 0 findings

@@ -3301,36 +3301,37 @@ def _levi_restriction_fixes_line(plane, generator, line_vector, coordinates):
 
 
 def _plane_parabolic_incidence_flags(subgroup, plane, flag):
-    r"""The edges of the Tits building at one plane, from the plane's parabolic (#391).
+    r"""A flag covering of the Tits-building incidence at one plane, from its parabolic (#391).
 
     Let ``G = O(L)``, ``P`` a primitive isotropic plane, ``F_0 = (ell_0 < P)``
     a flag whose line is one line of ``P``, ``Pi = Stab_G(P)`` the plane's
-    parabolic and ``K = Stab_Gamma(P) = Gamma cap Pi``.  The edges at the
-    orbit of ``P`` are the ``K``-orbits on the lines of ``P``.  Those lines
+    parabolic and ``K = Stab_Gamma(P) = Gamma cap Pi``.  The incidence at the
+    orbit of ``P`` is covered by the ``K``-orbits on the lines of ``P``.  Those lines
     decompose into ``Pi``-orbits -- the divisibility of a line of ``P`` is
-    preserved by ``Pi``, so there can be several -- and this function returns
-    the ``K``-orbits inside the ``Pi``-orbit of ``ell_0``: they are the double
-    cosets
+    preserved by ``Pi``, so there can be several.  Write
+    ``H = Pi cap Stab_G(ell_0)``.  The ``K``-orbits inside the ``Pi``-orbit of
+    ``ell_0`` are the double cosets ``K \ Pi / H``.  This function covers them
+    by the double cosets ``K \ Pi / R``, where ``R`` is the subgroup generated
+    by the retained parabolic generators whose Levi restriction fixes the
+    line.  Since ``R <= H``, the natural map of these double-coset sets onto
+    ``K \ Pi / H`` is surjective: no ``K``-orbit is lost, although one can be
+    represented more than once.  The public incidence call removes those
+    repetitions when it retains one flag certificate per line/plane cusp pair.
 
-    ``K \ Pi / (Pi cap Stab_G(ell_0))``,
-
-    whose right-hand group is the subfamily of the parabolic fixing the line,
-    read on the Levi restriction itself.  Because the subgroup is the full
-    preimage of its own discriminant image, it contains ``ker rho`` restricted
-    to ``Pi``, so replacing the right-hand group by its product with that
-    kernel changes no double coset and the double cosets descend to the finite
-    image (D. Dutour Sikiri'c and K. Hulek, arXiv:2302.01679v2, Lemma 3.6,
-    printed p. 22: the quotient map by a normal subgroup contained in the
-    left group pairs the double-coset decompositions).  The left group is
-    then exactly ``rho(Gamma) cap rho(Pi)``, computed as that intersection,
-    and the right group is the discriminant image of the line-fixing members
-    of the certified family.
+    Because the subgroup is the full preimage of its own discriminant image,
+    it contains ``ker rho`` restricted to ``Pi``, so both coverings descend to
+    the finite image (D. Dutour Sikiri'c and K. Hulek, arXiv:2302.01679v2,
+    Lemma 3.6, printed p. 22: the quotient map by a normal subgroup contained
+    in the left group pairs the double-coset decompositions).  The left group
+    is then exactly ``rho(Gamma) cap rho(Pi)``, computed as that intersection,
+    and the covering's right group is the discriminant image of ``R``.
 
     Each returned flag is ``F_0`` transported by one lifted double-coset
     representative, an element of the parabolic spelled as a word in the
     certified family and checked against the discriminant map before it
-    transports; its line term is one line of the ``Pi``-orbit per ``K``-orbit,
-    and its plane term is the plane itself.  Where the parabolic is not
+    transports.  Together their line terms cover every ``K``-orbit of the
+    ``Pi``-orbit, with repetitions allowed, and each plane term is the plane
+    itself.  Where the parabolic is not
     established to be complete, or the subgroup is not a discriminant
     preimage, ``None`` is returned and the caller keeps its own route.
     """
