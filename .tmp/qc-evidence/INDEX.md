@@ -1249,3 +1249,21 @@ surfaces to close, and the session publishes them in the meantime.
 | `issue468-runs/*.log` | the tree of this push | the 16 whole runs, one per file |
 | `issue468-lint-tl13-before.log` / `-after.log` | base `51310d6` / the tree of this push | every `TL13` line of the tree-wide `test_lint`, with the run's totals |
 | `issue468-star-import.log` | both trees | `import sage_extensions.all`: 3.24 s → 2.34 s |
+
+## #471 — the kernel-plane-rows driver reads the plane's Gram tensor
+
+`tests/coble_kernel_plane_rows.py` decided a returned plane's total isotropy by
+a double loop of `lattice.b(...)` over the plane's retained generators --
+`OWN-24`'s own violation example and the shape `STY-102` names -- and returned
+`(None, False)` both for a representative that breaks that contract and for a
+row that did not return inside its per-call cap, so a red CI job could not be
+read. The check is now the plane's induced Gram tensor against the zero tensor
+of the plane's own framing, and the two outcomes are separate reports and
+separate exit statuses (`decided` / `undecided` / `contract violation`, 0 / 1 /
+2 / 3).
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue471-row-step-probe.py` / `.log` | the tree of this push | the induced Gram tensor of a plane the row returns is the zero `(2,2)` tensor and equals `lattice.gram_tensor().pullback(plane.inclusion())`; a rank-two primitive *non-isotropic* subobject's is `[[0,1],[1,0]]` and the check reports "its induced Gram tensor is not zero", a rank-one subobject "its rank is 1, not two"; the old pairing loop says `True` / `False` on the same two, so the reading changed and the verdicts did not; warm cost per representative 0.262 ms against the old loop's 1.055 ms (x189720 planes = 49.8 s against 200.1 s) |
+| same | the tree of this push | the driver's own `main`, its `_coble_lattice` pointed at the gate lattice `U + U(2) + <-2>`: `[Otilde] 2 planes in 15.3 s` against 2 double cosets over 1 ambient class, `[Otilde+] 2 planes in 11.7 s` against 2, exit status 0, peak tree RSS 571 MiB |
+| same | the tree of this push | the two reports apart, and all four exit statuses, each driven by a stub row: a row holding the non-isotropic subobject → `contract violation` / status 2; a row that does not return inside a 3 s cap → `undecided` / status 1; a row of three planes against two double cosets → status 3. The Coble rows themselves were not run on this VM |
