@@ -1,0 +1,16 @@
+[  227.3s] rho(K_v) from the basis transvections: order 1
+[  700.4s] a2 class_lift - printed = 1 * v; printed lift admitted: True class lift admitted: False
+[  703.0s] a3 class_lift - printed = 0 * v; printed lift admitted: True class lift admitted: True
+[  705.6s] a4 class_lift - printed = 0 * v; printed lift admitted: True class lift admitted: True
+[  708.0s] a5 class_lift - printed = 0 * v; printed lift admitted: True class lift admitted: True
+[  710.8s] a6 class_lift - printed = 0 * v; printed lift admitted: True class lift admitted: True
+[  713.5s] a7 class_lift - printed = 0 * v; printed lift admitted: True class lift admitted: True
+[  715.7s] a8 class_lift - printed = 0 * v; printed lift admitted: True class lift admitted: True
+[  718.1s] a9 class_lift - printed = 0 * v; printed lift admitted: True class lift admitted: True
+[  720.9s] a10 class_lift - printed = 1 * v; printed lift admitted: True class lift admitted: False
+[  723.8s] a11 class_lift - printed = -2 * v; printed lift admitted: True class lift admitted: True
+[  727.0s] a12 class_lift - printed = -2 * v; printed lift admitted: True class lift admitted: True
+[  727.7s] g = s_(a2+v) s_a2 fixes v: True acts trivially on N: True
+[  728.1s] rho(g) is the identity: False
+[  728.1s] rho(g) in rho(Gamma): False
+[  728.1s] done

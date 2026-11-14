@@ -422,3 +422,61 @@ def test_each_of_the_fourth_cusps_first_layers_agrees_with_the_whole_lattice_in_
             f"layer {layer.layer_number()} of square {layer.square()} at offset "
             f"{layer.offset()} disagrees with its whole-lattice solutions in the cell"
         )
+
+
+_FOURTH_CHAMBER = {}
+
+
+def _fourth_chamber():
+    r"""Card ``029J``'s row 4.3.8 as ``(reduction image at its cusp, its walls, the row)``.
+
+    The row stores the cusp vector of H. Sterk, *Compactifications of the period
+    space of Enriques surfaces, Part I*, Math. Z. 207 (1991), (4.3.8), p. 23,
+    and the eleven walls of Fig. 10 in the card's Gram coordinates, which are
+    those of ``T_{\mathrm{En}}``; both are read here by tag, and the image is
+    built once per session.
+    """
+    if not _FOURTH_CHAMBER:
+        row = next(
+            row
+            for row in card("cusp_diagrams", "029J")["rows"]["gamma-en-2"]
+            if row["statement"] == "4.3.8"
+        )
+        subgroup = _gamma_en_2()
+        lattice = subgroup.supergroup().domain()
+        image = subgroup.isotropic_vector_reduction_image(
+            lattice([int(entry) for entry in row["cusp"]])
+        )
+        walls = tuple(
+            image.lattice()([int(entry) for entry in wall]) for wall in row["wall_vectors"]
+        )
+        _FOURTH_CHAMBER.update(image=image, walls=walls, row=row)
+    return _FOURTH_CHAMBER["image"], _FOURTH_CHAMBER["walls"], _FOURTH_CHAMBER["row"]
+
+
+def test_every_wall_of_the_fourth_cusp_chamber_is_a_reflection_of_the_stabilizer_image() -> None:
+    r"""Each of Fig. 10's eleven walls is admitted, whichever lift of its class is reflected.
+
+    Sterk (4.3.8), p. 23, prints Fig. 10 as "the diagram for the reflection
+    subgroup of ``G_v``", ``G_v`` the image of ``\Gamma_v`` in
+    ``O(v^\perp/\mathbf Z v)`` (the definition after Lemma 4.3.4), so the reflection in each of
+    its walls lies in ``G_v``.  Each printed wall is a vector of ``v^\perp``,
+    and its reflection in ``T_{\mathrm{En}}`` fixes ``v`` and induces the
+    reflection of ``N`` in the wall's class.  Membership of that class in
+    ``G_v`` is a property of the class: ``admits_root``, which reflects in
+    the frame's lift of the class, and ``contains_lift`` of the reflection in
+    the printed vector, which is another lift of the same reflection of ``N``,
+    must both say yes.
+    """
+    image, walls, row = _fourth_chamber()
+    reduction = image.reduction()
+    perpendicular = reduction.orthogonal_complement()
+    classes = tuple(
+        reduction.projection()(perpendicular.inclusion().lift(wall)) for wall in walls
+    )
+    printed = tuple(image.contains_lift(image.root_reflection(wall)) for wall in walls)
+    by_class = tuple(image.admits_root(wall_class) for wall_class in classes)
+
+    assert cardinal(sum(1 for _ in walls)) == cardinal(row["wall_count"])
+    assert all(printed)
+    assert all(by_class)

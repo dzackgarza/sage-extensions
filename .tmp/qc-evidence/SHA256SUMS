@@ -319,3 +319,5 @@ c993cc700e9c4a3e216d04ec25c2caa737afa98b3914a8e0d992f0d8d1a684a6  .tmp/qc-eviden
 4037c9bc0787eecc91fff7fd47e1aafea7bda745232feb1fc99e24c4a643ce22  issue390-tco-rows.log
 4ca4c813b157eda6defee9e50f5c1729f3c3f577bc95e1ad7bc7cf8a6e778190  issue390-gate.log
 37396e7385fcbe04c8144bd4f64ca004dfe759969edf9436fd52b7ead34d624b  issue390-gamma-row-final-tree.log
+7b3b39c81c0947e8d6d886e205b9e66e874c98930b0868769b0e3f4941d3bf9b  .tmp/qc-evidence/issue402-lift-dependence.py
+9f591994ea5798109bea0e24b8ecd8739642f9d6b1d0d4f512614aa71cd0777d  .tmp/qc-evidence/issue402-lift-dependence.log
