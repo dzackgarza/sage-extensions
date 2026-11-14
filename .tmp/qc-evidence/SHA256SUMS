@@ -297,3 +297,5 @@ c2b4ac1401abb43643aa2be3bbcccee813a97270ff4acc42c9c90ce999bfdb19  issue387-cusp4
 72ab14269b7ea56f6f40de55d6dc51006f371e37e60fe7c007663c2bc0f99017  issue387-cusp4-layers-figure.log
 bbc9cffb65911b8235975edc26411ddfcd04a59cf7f729a2eff2f74933a0897b  issue387-cusp4-layers-row.log
 c6bc96d6e2a7a6ace5593ee340cc9fa1348c0e9cac432fbbe70ab469e9e4e32a  .tmp/qc-evidence/issue387-cusp4-filter.log
+641d2b70b18d0a90cf81601659e1e692bfe44efa523ffb34bdc095698e3a11e0  .tmp/qc-evidence/issue387-cusp4-facets.py
+d87e786fe2258105c33b727aaf645539e41a8f68da6e66da6a4e7fd4da789442  .tmp/qc-evidence/issue387-cusp4-facets.log

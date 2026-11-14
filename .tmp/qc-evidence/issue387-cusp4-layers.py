@@ -74,7 +74,8 @@ subgroup = gamma_en_2()
 say(f"subgroup built in {time.time() - began:.1f} s")
 
 name = "Sterk_4"
-which = sys.argv[2] if len(sys.argv) > 2 else "selected"
+arguments = sys.argv[1:]
+which = next((item for item in arguments if item in ("figure", "selected")), "selected")
 cusp = (
     Sterk.sterk4_cusp_vector()
     if which == "figure"
@@ -132,7 +133,7 @@ def coordinates(element):
     return tuple(int(entry) for entry in element.to_vector())
 
 
-printed_coordinates = tuple(coordinates(wall) for wall in printed_walls)
+printed_coordinates = tuple(coordinates(wall) for wall in printed_all)
 cusp_coordinates = coordinates(cusp_vector)
 covered = set()
 
@@ -154,8 +155,30 @@ def multiple_of_cusp(difference):
     return ratio is not None
 
 
+frame = image.reduction().coordinate_frame()
+frame_labels = tuple(image.reduction().module_generating_set())
+
+
+def lift_in_ambient_coordinates(row):
+    r"""Return the TEn coordinates of the class lift of a reduction root.
+
+    ``class_lift`` returns an element of the perpendicular subobject, whose
+    ``to_vector`` is in that subobject's frame and not in ``T_En``'s, so the
+    lift is rebuilt here from the reduction's own coordinate frame -- the
+    same section ``class_lift`` uses, summed in ``T_En`` coordinates.
+    """
+    total = [0] * len(ambient_labels)
+    coefficients = [int(entry) for entry in row.to_vector()]
+    for position, label in enumerate(frame_labels):
+        coefficient = coefficients[position]
+        if coefficient:
+            piece = frame[label].to_vector()
+            total = [entry + coefficient * int(other) for entry, other in zip(total, piece)]
+    return tuple(total)
+
+
 def printed_wall_index(row):
-    lift = coordinates(image.class_lift(to_element(row)))
+    lift = lift_in_ambient_coordinates(row)
     for index, wall in enumerate(printed_coordinates):
         for sign in (1, -1):
             difference = tuple(a - sign * b for a, b in zip(lift, wall))
@@ -216,7 +239,7 @@ class Recording(_filtered_vinal_class()):
 hyperbolic_lattices._filtered_vinal_class = lambda: Recording
 say("walk instrumented; running the public cusp_chamber at Sterk_4")
 began = time.time()
-bound = None if not sys.argv[1:] else int(sys.argv[1])
+bound = next((int(item) for item in arguments if item.lstrip("-").isdigit()), None)
 say(f"bound: max_decompositions={bound}")
 chamber = image.cusp_chamber(max_decompositions=bound)
 say(f"cusp_chamber returned in {time.time() - began:.1f} s")

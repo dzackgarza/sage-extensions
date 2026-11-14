@@ -49,11 +49,13 @@ say("building the subgroup")
 subgroup = gamma_en_2()
 say("subgroup built")
 
-which = sys.argv[1] if len(sys.argv) > 1 else "figure"
+arguments = sys.argv[1:]
+which = next((item for item in arguments if item in ("figure", "selected")), "figure")
+bound = next((int(item) for item in arguments if item.isdigit()), 40)
 cusp = Sterk.sterk4_cusp_vector() if which == "figure" else Sterk.selected_isotropic_vectors()["Sterk_4"]
 image = subgroup.isotropic_vector_reduction_image(cusp)
 reduction = HyperbolicLattices(ZZ)(image.reduction())
-chamber = image.cusp_chamber(max_decompositions=int(sys.argv[2]) if len(sys.argv) > 2 else 40)
+chamber = image.cusp_chamber(max_decompositions=bound)
 walls = tuple(chamber.wall_roots())
 say(f"cusp={which} walls={len(walls)} complete={chamber.is_complete_wall_set()}")
 
