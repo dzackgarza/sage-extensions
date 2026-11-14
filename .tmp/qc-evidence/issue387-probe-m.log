@@ -1,0 +1,28 @@
+[01:59:58] importing
+[02:00:00] imported in 1.2 s
+[02:00:05] swap built; it is an isometry: True
+[02:00:05] 8 E8-block reflections built
+[02:00:08] 9 nontrivial block images in O(A)
+[02:00:08] |D| = 696729600 in 9.7 s
+[02:01:53] |rho(Gamma_library)| = 696729600 in 114.1 s
+[02:01:57] 5 live lifts of the image generators in 118.2 s
+[02:01:57] |join(D, rho(Gamma_library))| = 696729600 in 118.6 s
+[02:01:57] equality D = rho(Gamma_library): True
+[02:01:58] |O(A_(U(2)))| = 2
+[02:02:00] |O(A_(E8(2)))| = 348364800
+[02:02:02] |rho(K_v)| at Sterk_4 = 1
+[02:02:02] probe complete in 123.1 s
+[peakrss] issue387: child waited=0 shell_code=0 samples=64
+[peakrss] peak tree RSS      : 759 MiB
+[peakrss] low-water MemAvail : 10249 MiB
+[peakrss] peak single VmHWM  : 759 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      748 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   120.1s procs=  3 rss=   759 MiB hwm=   759 MiB avail= 10507 MiB
+[peakrss]   t=   118.1s procs=  3 rss=   758 MiB hwm=   758 MiB avail= 10427 MiB
+[peakrss]   t=   116.1s procs=  3 rss=   708 MiB hwm=   708 MiB avail= 10595 MiB
+[peakrss]   t=   122.1s procs=  3 rss=   685 MiB hwm=   759 MiB avail= 10432 MiB
+[peakrss]   t=   124.1s procs=  3 rss=   684 MiB hwm=   759 MiB avail= 10249 MiB
+launcher exit: 0

@@ -1,0 +1,117 @@
+[22:07:41] importing
+[22:07:42] imported in 0.9 s
+[22:08:03] subgroup built in 21.2 s
+[22:08:03] image at eta' built in 21.5 s
+[22:08:03] engine gram signature (1, 9), negated=True
+[22:08:04] card walls: 11, squares [-4, -4, -4, -4, -4, -4, -4, -2, -4, -2, -4]
+[22:09:28] controlling vector: (7, -17, -34, -51, -68, -85, -60, 21, 4, 4)
+[22:09:28] controlling lift square 4
+[22:09:29] walk lift squares [-4, -4, -4, -4, -4, -4, -4, -2, -2, -2, -2, -4, -2, -2, -2, -2]
+[22:09:29] === card walls: distance from v0, admits ===
+[22:09:29] card wall 0: q=-4, dist=1.0000, admitted=False
+[22:09:29] card wall 1: q=-4, dist=0.0000, admitted=True
+[22:09:29] card wall 2: q=-4, dist=0.0000, admitted=True
+[22:09:29] card wall 3: q=-4, dist=0.0000, admitted=True
+[22:09:29] card wall 4: q=-4, dist=0.0000, admitted=True
+[22:09:29] card wall 5: q=-4, dist=0.0000, admitted=True
+[22:09:30] card wall 6: q=-4, dist=0.0000, admitted=True
+[22:09:30] card wall 7: q=-2, dist=0.0000, admitted=True
+[22:09:30] card wall 8: q=-4, dist=3.0000, admitted=False
+[22:09:30] card wall 9: q=-2, dist=-9.8995, admitted=True
+[22:09:30] card wall 10: q=-4, dist=-8.0000, admitted=True
+[22:09:30] === walk walls: distance from v0, admits, rho(reflection) trivial ===
+[22:09:36] walk 0: q=-4, dist=0.0000, admitted=True, rho trivial=False
+[22:09:37] walk 1: q=-4, dist=0.0000, admitted=True, rho trivial=False
+[22:09:37] walk 2: q=-4, dist=0.0000, admitted=True, rho trivial=False
+[22:09:37] walk 3: q=-4, dist=0.0000, admitted=True, rho trivial=False
+[22:09:37] walk 4: q=-4, dist=0.0000, admitted=True, rho trivial=False
+[22:09:37] walk 5: q=-4, dist=0.0000, admitted=True, rho trivial=False
+[22:09:38] walk 6: q=-4, dist=0.0000, admitted=True, rho trivial=False
+[22:09:38] walk 7: q=-2, dist=0.0000, admitted=True, rho trivial=True
+[22:09:38] walk 8: q=-2, dist=1.4142, admitted=True, rho trivial=True
+[22:09:38] walk 9: q=-2, dist=1.4142, admitted=True, rho trivial=True
+[22:09:39] walk 10: q=-2, dist=2.8284, admitted=True, rho trivial=True
+[22:09:39] walk 11: q=-4, dist=4.0000, admitted=True, rho trivial=False
+[22:09:39] walk 12: q=-2, dist=4.2426, admitted=True, rho trivial=True
+[22:09:39] walk 13: q=-2, dist=4.2426, admitted=True, rho trivial=True
+[22:09:40] walk 14: q=-2, dist=5.6569, admitted=True, rho trivial=True
+[22:09:40] walk 15: q=-2, dist=5.6569, admitted=True, rho trivial=True
+[22:09:40] === walk x card closing (a10=8, a11=9, a12=10) ===
+[22:09:40] walk 0: [-2, 2, 2]
+[22:09:40] walk 1: [2, 0, 2]
+[22:09:40] walk 2: [0, 0, 0]
+[22:09:40] walk 3: [0, 0, 0]
+[22:09:40] walk 4: [0, 0, 0]
+[22:09:40] walk 5: [0, 0, 0]
+[22:09:40] walk 6: [0, 2, 0]
+[22:09:40] walk 7: [0, 0, 2]
+[22:09:40] walk 8: [2, -12, -14]
+[22:09:40] walk 9: [4, -10, -14]
+[22:09:40] walk 10: [10, -26, -30]
+[22:09:40] walk 11: [24, -58, -68]
+[22:09:40] walk 12: [16, -42, -46]
+[22:09:40] walk 13: [18, -40, -46]
+[22:09:40] walk 14: [22, -56, -62]
+[22:09:40] walk 15: [26, -52, -62]
+[22:09:40] === walk x walk nonzero ===
+[22:09:40] walk 0 x walk 6: 2
+[22:09:40] walk 0 x walk 7: 2
+[22:09:40] walk 0 x walk 11: 2
+[22:09:40] walk 0 x walk 14: 2
+[22:09:40] walk 0 x walk 15: 2
+[22:09:40] walk 1 x walk 2: 2
+[22:09:40] walk 1 x walk 8: 2
+[22:09:40] walk 1 x walk 9: 2
+[22:09:40] walk 1 x walk 11: 2
+[22:09:40] walk 2 x walk 3: 2
+[22:09:40] walk 3 x walk 4: 2
+[22:09:40] walk 3 x walk 10: 2
+[22:09:40] walk 4 x walk 5: 2
+[22:09:40] walk 5 x walk 6: 2
+[22:09:40] walk 5 x walk 12: 2
+[22:09:40] walk 5 x walk 13: 2
+[22:09:40] walk 8 x walk 13: 2
+[22:09:40] walk 8 x walk 15: 4
+[22:09:40] walk 9 x walk 12: 2
+[22:09:40] walk 9 x walk 14: 4
+[22:09:40] walk 10 x walk 14: 2
+[22:09:40] walk 10 x walk 15: 2
+[22:09:40] walk 12 x walk 15: 4
+[22:09:40] walk 13 x walk 14: 4
+[22:09:40] walk 14 x walk 15: 6
+[22:09:40] === card 11x11 Gram ===
+[22:09:40] card 0: [0, 2, 0, 0, 0, 0, 0, 0, 0, 0]
+[22:09:40] card 1: [0, 2, 0, 0, 0, 0, 0, 0, 2, 0]
+[22:09:40] card 2: [2, 2, 2, 0, 0, 0, 0, 0, 0, 0]
+[22:09:40] card 3: [0, 0, 2, 2, 0, 0, 0, 0, 0, 0]
+[22:09:40] card 4: [0, 0, 0, 2, 2, 0, 0, 0, 0, 0]
+[22:09:40] card 5: [0, 0, 0, 0, 2, 2, 0, 0, 0, 0]
+[22:09:40] card 6: [0, 0, 0, 0, 0, 2, 0, 2, 0, 2]
+[22:09:40] card 7: [0, 0, 0, 0, 0, 0, 0, 0, 0, 2]
+[22:09:40] card 8: [0, 0, 0, 0, 0, 0, 2, 0, 0, 0]
+[22:09:40] card 9: [0, 2, 0, 0, 0, 0, 0, 0, 0, 0]
+[22:09:40] card 10: [0, 0, 0, 0, 0, 0, 2, 2, 0, 0]
+[22:09:40] === 8 distance-0 walk walls vs card ===
+[22:09:40] walk 0 (distance 0) matches card walls []
+[22:09:40] walk 1 (distance 0) matches card walls [6]
+[22:09:40] walk 2 (distance 0) matches card walls [5]
+[22:09:40] walk 3 (distance 0) matches card walls [4]
+[22:09:40] walk 4 (distance 0) matches card walls [3]
+[22:09:40] walk 5 (distance 0) matches card walls [2]
+[22:09:40] walk 6 (distance 0) matches card walls [1]
+[22:09:40] walk 7 (distance 0) matches card walls [7]
+[22:09:40] probe complete in 118.8 s
+[peakrss] issue387: child waited=0 shell_code=0 samples=61
+[peakrss] peak tree RSS      : 665 MiB
+[peakrss] low-water MemAvail : 13910 MiB
+[peakrss] peak single VmHWM  : 665 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      654 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   120.1s procs=  3 rss=   665 MiB hwm=   665 MiB avail= 14103 MiB
+[peakrss]   t=   116.1s procs=  3 rss=   664 MiB hwm=   664 MiB avail= 14103 MiB
+[peakrss]   t=   118.1s procs=  3 rss=   664 MiB hwm=   664 MiB avail= 14103 MiB
+[peakrss]   t=   112.0s procs=  3 rss=   660 MiB hwm=   660 MiB avail= 14107 MiB
+[peakrss]   t=   114.1s procs=  3 rss=   660 MiB hwm=   660 MiB avail= 14107 MiB
+launcher exit: 0

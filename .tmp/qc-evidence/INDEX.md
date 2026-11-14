@@ -688,3 +688,18 @@ The exact `just test` command first fails usage because the image's Python does 
 | `issue391-failing-modules-base.log` | `118a910bcf` | exactly the same failing modules: **15 passed, 10 failed in 28.89 s** |
 | `issue391-failure-comparison.log` | the tree of this push | **zero new failing test IDs**; all ten baseline failures are identical |
 | `issue391-push-gate.log` | `a226af6af2` | `just test-push`: **7 files checked, no errors** (syntax only, not the suite) |
+## #387 — the group of the card's chamber, and the exactness of contains_lift
+
+The group question of the rewritten issue, with the walk diagnosis.  The
+probes are `issue387-probe-*.py` under the session's `.scratch` (not tracked;
+the commands are recorded in the results document and the logs carry the
+launcher's peakrss footer).
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue387-probe-h.log` | `118a910` | the card's eleven walls and the walk's sixteen at the figure's cusp vector, in `T_En` coordinates: the walk's eight distance-zero walls are the card's `a8..a2` and `α9`; the eight additions pair positively (library convention) with the card's closing walls; the three true closing walls of the chamber containing `v0` pass the trusted filter `contains_root_reflection` |
+| `issue387-probe-i.log` | `118a910` | the `T_En` coordinates of the controlling vector's lift and of all sixteen walk walls, for the local chamber computations |
+| `issue387-probe-j2.log` | `118a910` | the repaired walk's acceptance log at Sterk_4 over 40 minutes: the three true closers all pass `contains_root_reflection`; the walk accepts eight additions at heights `√2..4√2` and gains none for thirty minutes — the stall inside one whole-layer `qsolve` |
+| `issue387-probe-k.log` | `118a910` | `|A_{T_En}| = 1024`; the `H(2)`-summand `A_B = <[e'*], [f']*]` of order 4 with q-values `0,0,0,1`; its annihilator of order 256; `|ρ(Γ_library)| = 696729600` |
+| `issue387-probe-l.log` | `118a910` | the robust annihilator-based membership data: the action of `O(A)` generators returns elements of an equal copy of `A` (parent-identity noise, not a group fact); the sanity checks `in_B` pass on `A_B` and fail on `[a1*]` |
+| `issue387-probe-m.log` | `118a910` | **the equality**: `|D| = 696729600` from the block isometries in 9.7 s; `|ρ(Γ_library)| = 696729600`; `|join(D, ρ(Γ_library))| = 696729600` — the library's group is Sterk's group; `|O(A_{U(2)})| = 2`, `|O(A_{E8(2)})| = 348364800`; `|ρ(K_v)| = 1` at Sterk_4 |

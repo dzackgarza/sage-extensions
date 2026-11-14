@@ -1,0 +1,40 @@
+[01:20:54] importing
+[01:20:56] imported in 1.9 s
+[01:21:04] |A_(T_En)| = 1024
+[01:21:04] the H(2)-summand A_B = <[ep*], [fp*]> has order 4
+[01:21:04]   q-values on A_B: [[0] in Fraction Field of Integer Ring / (2)Integer Ring, [0] in Fraction Field of Integer Ring / (2)Integer Ring, [0] in Fraction Field of Integer Ring / (2)Integer Ring, [1] in Fraction Field of Integer Ring / (2)Integer Ring]
+[01:23:07] the annihilator A_E8 of A_B has order 256
+[01:23:32] subgroup built in 157.8 s
+[01:25:41] |rho(Gamma_library)| = 696729600
+[01:25:41]   = 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 2 * 3 * 3 * 3 * 3 * 3 * 5 * 5 * 7
+[01:25:41] rho(Gamma_library) has 5 generators
+[01:25:41]   generator 0 moves [ep] outside A_B: [3]
+[01:25:41]   generator 0 moves [fp] outside A_B: [2]
+[01:25:41]   generator 1 moves [ep] outside A_B: [2]
+[01:25:41]   generator 1 moves [fp] outside A_B: [3]
+[01:25:41]   generator 2 moves [ep] outside A_B: [2]
+[01:25:41]   generator 2 moves [fp] outside A_B: [3]
+[01:25:41]   generator 3 moves [ep] outside A_B: [2]
+[01:25:41]   generator 3 moves [fp] outside A_B: [3]
+[01:25:41]   generator 4 moves [ep] outside A_B: [2]
+[01:25:41]   generator 4 moves [fp] outside A_B: [3]
+[01:25:41] generators violating the decomposition: 10
+Traceback (most recent call last):
+  File "/probe.py", line 104, in <module>
+    stamp(f"|O(A_{U(2)})| = {order_B}")
+                  ^
+NameError: name 'U' is not defined
+[peakrss] issue387: child waited=1 shell_code=1 samples=151
+[peakrss] peak tree RSS      : 761 MiB
+[peakrss] low-water MemAvail : 7694 MiB
+[peakrss] peak single VmHWM  : 761 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      750 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   294.4s procs=  3 rss=   761 MiB hwm=   761 MiB avail=  9460 MiB
+[peakrss]   t=   296.4s procs=  3 rss=   761 MiB hwm=   761 MiB avail=  9306 MiB
+[peakrss]   t=   298.4s procs=  3 rss=   761 MiB hwm=   761 MiB avail=  9107 MiB
+[peakrss]   t=   300.4s procs=  3 rss=   761 MiB hwm=   761 MiB avail=  9439 MiB
+[peakrss]   t=   292.4s procs=  3 rss=   759 MiB hwm=   759 MiB avail=  9340 MiB
+launcher exit: 1
