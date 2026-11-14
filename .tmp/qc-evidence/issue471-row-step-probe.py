@@ -56,7 +56,8 @@ def old_spelling(lattice, subobject):
 
 driver = load_driver()
 log(f"driver loaded: {driver.__doc__.splitlines()[0]}")
-log(f"statuses: {driver.ROW_DECIDED!r} {driver.ROW_UNDECIDED!r} {driver.ROW_CONTRACT_VIOLATION!r}")
+log(f"statuses: {[status.name + ' = ' + status.value for status in driver.RowStatus]}")
+assert len(driver.RowStatus) == 3, list(driver.RowStatus)
 
 gate = Lattices(ZZ)("U") + Lattices(ZZ)([[0, 2], [2, 0]]) + Lattices(ZZ)([[-2]])
 header("gate lattice", f"{gate} of rank {gate.module_rank()}")
@@ -175,7 +176,7 @@ count, contract_status = driver.run_row(StubGroup(stable, (bad, bad)), "Otilde",
 log(f"run_row of a row holding {bad}: ({count}, {contract_status!r})")
 count, undecided_status = driver.run_row(StubGroup(stable, (), delay=30), "Otilde", 2)
 log(f"run_row of a row that does not return inside 2 s: ({count}, {undecided_status!r})")
-assert contract_status != undecided_status, (contract_status, undecided_status)
+assert contract_status is not undecided_status, (contract_status, undecided_status)
 log(f"the two reports differ: {contract_status!r} != {undecided_status!r}")
 
 for expected, name, group in (

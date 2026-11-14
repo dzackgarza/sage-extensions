@@ -1,83 +1,83 @@
-provider SHA: de94fac512a329ecb643150c8e57c237d81e87b7 (worktree, uncommitted at run time)
+provider SHA: 020eccfa2453d1d771c7f161864d378cf701af8e (worktree, uncommitted at run time)
 port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
 probe: .tmp/qc-evidence/issue471-row-step-probe.py
 command: /sage/.venv/bin/python -u -s /probe.py inside /workspace/nucleus/work/home/sage-image/run.sh -w /work
 [    0.0s] driver loaded: The two kernel plane rows on the Coble lattice, through the public call.
-[    0.0s] statuses: 'decided' 'undecided' 'contract violation'
+[    0.0s] statuses: ['DECIDED = decided', 'UNDECIDED = undecided', 'CONTRACT_VIOLATION = contract violation']
 [    0.0s] --- gate lattice ---
 [    0.0s] Integral lattice of rank 5 and signature (2, 3) of rank 5
-[    4.7s] ambient O(L)-plane classes: 1
-[    4.7s] === 1. the plane's induced Gram tensor ===
-[    4.7s] plane Integral lattice of rank 2 and signature (0, 0) of rank 2, primitive True
-[    4.7s] plane.gram_tensor() = Type (0, 2) tensor in ((Integer Ring^2)*)^{⊗2}
+[    4.5s] ambient O(L)-plane classes: 1
+[    4.5s] === 1. the plane's induced Gram tensor ===
+[    4.5s] plane Integral lattice of rank 2 and signature (0, 0) of rank 2, primitive True
+[    4.5s] plane.gram_tensor() = Type (0, 2) tensor in ((Integer Ring^2)*)^{⊗2}
 [[0, 0], [0, 0]] in ((Integer Ring^2)*)^{⊗2}
-[    4.7s] zero tensor of that framing: Type (0, 2) tensor in ((Integer Ring^2)*)^{⊗2}
+[    4.5s] zero tensor of that framing: Type (0, 2) tensor in ((Integer Ring^2)*)^{⊗2}
 [[0, 0], [0, 0]]
-[    4.7s] induced == zero: True
-[    4.7s] ambient form pulled back along the inclusion: Type (0, 2) tensor in ((Integer Ring^2)*)^{⊗2}
+[    4.5s] induced == zero: True
+[    4.5s] ambient form pulled back along the inclusion: Type (0, 2) tensor in ((Integer Ring^2)*)^{⊗2}
 [[0, 0], [0, 0]]
-[    4.7s] the two spellings agree: True
-[    4.7s] its retained generators (0, 1) and their pairings:
-[    4.7s]   b(0, 0) = 0
-[    4.7s]   b(0, 1) = 0
-[    4.7s]   b(1, 0) = 0
-[    4.7s]   b(1, 1) = 0
-[    4.7s] 
-[    4.8s] a rank-two primitive subobject Integral lattice of rank 2 and signature (1, 1) of rank 2, primitive True
-[    4.8s] its induced Gram tensor = Type (0, 2) tensor in ((Integer Ring^2)*)^{⊗2}
+[    4.5s] the two spellings agree: True
+[    4.5s] its retained generators (0, 1) and their pairings:
+[    4.5s]   b(0, 0) = 0
+[    4.5s]   b(0, 1) = 0
+[    4.5s]   b(1, 0) = 0
+[    4.5s]   b(1, 1) = 0
+[    4.5s] 
+[    4.5s] a rank-two primitive subobject Integral lattice of rank 2 and signature (1, 1) of rank 2, primitive True
+[    4.5s] its induced Gram tensor = Type (0, 2) tensor in ((Integer Ring^2)*)^{⊗2}
 [[0, 1], [1, 0]] in ((Integer Ring^2)*)^{⊗2}
-[    4.8s] induced == zero: False
-[    4.8s] the pairing of the two basis vectors it spans: 1
-[    4.8s] 
-[    4.8s] a rank-one subobject Integral lattice of rank 1 and signature (0, 0) of rank 1
-[    4.8s] === 2. the driver's check on these three ===
-[    4.8s] plane: None
-[    4.8s] non-isotropic rank-two: 'its induced Gram tensor is not zero'
-[    4.8s] rank one: 'its rank is 1, not two'
-[    4.8s] the old pairing loop on the plane: True
-[    4.8s] the old pairing loop on the non-isotropic rank-two: False
-[    4.8s] === 2b. cost of the check, warm, per representative ===
-[    4.8s] induced Gram tensor: 0.262 ms each, x189720 = 49.8 s
-[    5.0s] old pairing loop: 1.055 ms each, x189720 = 200.1 s
-[    5.0s] === 3. the driver's rows on the gate lattice ===
-[    5.0s] main on the gate lattice (the driver's own rows, double cosets included):
+[    4.5s] induced == zero: False
+[    4.5s] the pairing of the two basis vectors it spans: 1
+[    4.5s] 
+[    4.5s] a rank-one subobject Integral lattice of rank 1 and signature (0, 0) of rank 1
+[    4.5s] === 2. the driver's check on these three ===
+[    4.5s] plane: None
+[    4.5s] non-isotropic rank-two: 'its induced Gram tensor is not zero'
+[    4.5s] rank one: 'its rank is 1, not two'
+[    4.5s] the old pairing loop on the plane: True
+[    4.5s] the old pairing loop on the non-isotropic rank-two: False
+[    4.5s] === 2b. cost of the check, warm, per representative ===
+[    4.6s] induced Gram tensor: 0.231 ms each, x189720 = 43.9 s
+[    4.8s] old pairing loop: 1.228 ms each, x189720 = 232.9 s
+[    4.8s] === 3. the driver's rows on the gate lattice ===
+[    4.8s] main on the gate lattice (the driver's own rows, double cosets included):
 the Coble period lattice Integral lattice of rank 5 and signature (2, 3) of rank 5
-[Otilde] 2 planes in 15.3 s
+[Otilde] 2 planes in 15.4 s
 [Otilde] expected 2 planes over 1 ambient class(es)
-[Otilde+] 2 planes in 11.7 s
+[Otilde+] 2 planes in 11.9 s
 [Otilde+] expected 2 planes over 1 ambient class(es)
 the Otilde count is 2 and the Otilde+ count is 2
 [   33.3s] main exit status: 0
 [   33.3s] === 4. the two reports, and all four exit statuses ===
-[   33.3s] the Otilde row on the gate lattice: 2 planes
+[   33.4s] the Otilde row on the gate lattice: 2 planes
 [Otilde] contract violation: representative 0 of the 2 returned is not a primitive isotropic plane -- its induced Gram tensor is not zero
-[   33.3s] run_row of a row holding Integral lattice of rank 2 and signature (1, 1): (None, 'contract violation')
+[   33.4s] run_row of a row holding Integral lattice of rank 2 and signature (1, 1): (None, <RowStatus.CONTRACT_VIOLATION: 'contract violation'>)
 [Otilde] undecided: the row did not return inside its 2 s cap
-[   35.3s] run_row of a row that does not return inside 2 s: (None, 'undecided')
-[   35.3s] the two reports differ: 'contract violation' != 'undecided'
+[   35.4s] run_row of a row that does not return inside 2 s: (None, <RowStatus.UNDECIDED: 'undecided'>)
+[   35.4s] the two reports differ: <RowStatus.CONTRACT_VIOLATION: 'contract violation'> != <RowStatus.UNDECIDED: 'undecided'>
 the Coble period lattice the gate lattice Integral lattice of rank 5 and signature (2, 3) behind a stub row of rank 5
 [Otilde] contract violation: representative 0 of the 2 returned is not a primitive isotropic plane -- its induced Gram tensor is not zero
-[   35.3s] main on a row holding a non-isotropic representative: exit status 2 in 0.0 s (expected 2)
+[   35.4s] main on a row holding a non-isotropic representative: exit status 2 in 0.0 s (expected 2)
 the Coble period lattice the gate lattice Integral lattice of rank 5 and signature (2, 3) behind a stub row of rank 5
 [Otilde] undecided: the row did not return inside its 3 s cap
-[   38.3s] main on a row that does not return inside the cap: exit status 1 in 3.0 s (expected 1)
+[   38.4s] main on a row that does not return inside the cap: exit status 1 in 3.0 s (expected 1)
 the Coble period lattice the gate lattice Integral lattice of rank 5 and signature (2, 3) behind a stub row of rank 5
 [Otilde] 3 planes in 0.0 s
 [Otilde] expected 2 planes over 1 ambient class(es)
 [Otilde] the row returned 3 planes but the double cosets of its 1 ambient class(es) number 2
-[   38.4s] main on a row whose count is not its double cosets: exit status 3 in 0.1 s (expected 3)
-[   38.4s] PROBE 471 DONE
+[   38.6s] main on a row whose count is not its double cosets: exit status 3 in 0.1 s (expected 3)
+[   38.6s] PROBE 471 DONE
 [peakrss] probe471: child waited=0 shell_code=0 samples=21
-[peakrss] peak tree RSS      : 571 MiB
-[peakrss] low-water MemAvail : 8488 MiB
-[peakrss] peak single VmHWM  : 571 MiB
+[peakrss] peak tree RSS      : 569 MiB
+[peakrss] low-water MemAvail : 7647 MiB
+[peakrss] peak single VmHWM  : 569 MiB
 [peakrss] peak VmHWM by executable (this is the per-process attribution):
-[peakrss]   python                      560 MiB peak
+[peakrss]   python                      558 MiB peak
 [peakrss]   timeout                       7 MiB peak
 [peakrss]   proot-x86_64                  3 MiB peak
-[peakrss]   t=    34.0s procs=  3 rss=   571 MiB hwm=   571 MiB avail=  8499 MiB
-[peakrss]   t=    36.0s procs=  3 rss=   571 MiB hwm=   571 MiB avail=  8488 MiB
-[peakrss]   t=    38.0s procs=  3 rss=   571 MiB hwm=   571 MiB avail=  8489 MiB
-[peakrss]   t=    40.0s procs=  3 rss=   571 MiB hwm=   571 MiB avail=  8489 MiB
-[peakrss]   t=    32.0s procs=  3 rss=   565 MiB hwm=   565 MiB avail=  8547 MiB
+[peakrss]   t=    40.0s procs=  3 rss=   569 MiB hwm=   569 MiB avail=  8152 MiB
+[peakrss]   t=    34.0s procs=  3 rss=   568 MiB hwm=   568 MiB avail=  7844 MiB
+[peakrss]   t=    36.0s procs=  3 rss=   568 MiB hwm=   568 MiB avail=  7874 MiB
+[peakrss]   t=    38.0s procs=  3 rss=   568 MiB hwm=   568 MiB avail=  7647 MiB
+[peakrss]   t=    32.0s procs=  3 rss=   563 MiB hwm=   563 MiB avail=  7748 MiB
 launcher exit: 0

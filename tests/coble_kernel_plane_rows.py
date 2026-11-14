@@ -63,6 +63,7 @@ contract, 3 a decided row whose count differs from its double cosets.
 """
 
 import argparse
+import enum
 import signal
 import sys
 import time
@@ -90,9 +91,17 @@ def _coble_lattice():
     return NamedLattices.Tco
 
 
-ROW_DECIDED = "decided"
-ROW_UNDECIDED = "undecided"
-ROW_CONTRACT_VIOLATION = "contract violation"
+class RowStatus(enum.Enum):
+    r"""What one kernel plane row did: decided, undecided, or a broken contract.
+
+    Three outcomes, not a boolean: a cap the caller set and an answer of the
+    library's that breaks the row's contract are different facts about the
+    run, and the driver reports them apart (exit statuses 1 and 2).
+    """
+
+    DECIDED = "decided"
+    UNDECIDED = "undecided"
+    CONTRACT_VIOLATION = "contract violation"
 
 
 def _plane_contract_violation(subobject) -> str | None:
@@ -125,7 +134,7 @@ def run_row(subgroup, label, cap):
     never failed, because the cap is the caller's budget and not a
     mathematical statement.  Every representative the call returns is checked
     against the row's contract before its count is reported, and that
-    violation is a distinct status -- the two are not the same report.
+    violation is a different ``RowStatus`` -- the two are not the same report.
     ``check_row_count`` then compares the count with the row's double cosets.
     """
     start = time.monotonic()
@@ -134,7 +143,7 @@ def run_row(subgroup, label, cap):
         planes = tuple(subgroup.isotropic_orbit_representatives(2))
     except RowUndecided:
         log(f"[{label}] undecided: the row did not return inside its {cap:.0f} s cap")
-        return None, ROW_UNDECIDED
+        return None, RowStatus.UNDECIDED
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)
     elapsed = time.monotonic() - start
@@ -145,9 +154,9 @@ def run_row(subgroup, label, cap):
                 f"[{label}] contract violation: representative {position} of the "
                 f"{len(planes)} returned is not a primitive isotropic plane -- {violation}"
             )
-            return None, ROW_CONTRACT_VIOLATION
+            return None, RowStatus.CONTRACT_VIOLATION
     log(f"[{label}] {len(planes)} planes in {elapsed:.1f} s")
-    return len(planes), ROW_DECIDED
+    return len(planes), RowStatus.DECIDED
 
 
 def _kernel_row_expected_count(subgroup, plane):
@@ -279,9 +288,9 @@ def main(argv):
             log("the whole-run budget is spent")
             return 1
         count, status = run_row(subgroup, label, arguments.cap)
-        if status == ROW_UNDECIDED:
+        if status is RowStatus.UNDECIDED:
             return 1
-        if status == ROW_CONTRACT_VIOLATION:
+        if status is RowStatus.CONTRACT_VIOLATION:
             return 2
         if not check_row_count(lattice, subgroup, label, count):
             return 3

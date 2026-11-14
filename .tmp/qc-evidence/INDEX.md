@@ -1267,3 +1267,15 @@ separate exit statuses (`decided` / `undecided` / `contract violation`, 0 / 1 /
 | `issue471-row-step-probe.py` / `.log` | the tree of this push | the induced Gram tensor of a plane the row returns is the zero `(2,2)` tensor and equals `lattice.gram_tensor().pullback(plane.inclusion())`; a rank-two primitive *non-isotropic* subobject's is `[[0,1],[1,0]]` and the check reports "its induced Gram tensor is not zero", a rank-one subobject "its rank is 1, not two"; the old pairing loop says `True` / `False` on the same two, so the reading changed and the verdicts did not; warm cost per representative 0.262 ms against the old loop's 1.055 ms (x189720 planes = 49.8 s against 200.1 s) |
 | same | the tree of this push | the driver's own `main`, its `_coble_lattice` pointed at the gate lattice `U + U(2) + <-2>`: `[Otilde] 2 planes in 15.3 s` against 2 double cosets over 1 ambient class, `[Otilde+] 2 planes in 11.7 s` against 2, exit status 0, peak tree RSS 571 MiB |
 | same | the tree of this push | the two reports apart, and all four exit statuses, each driven by a stub row: a row holding the non-isotropic subobject → `contract violation` / status 2; a row that does not return inside a 3 s cap → `undecided` / status 1; a row of three planes against two double cosets → status 3. The Coble rows themselves were not run on this VM |
+
+Follow-up on #471 (review of `020eccfa24`): the three row statuses are one
+`RowStatus` enum instead of three module-level strings compared with `==`
+(`CON-08`: a chosen outcome is not a mode string; `STY-159`: a flag that
+changes the return shape is named). `run_row` and `main` use its members, with
+identity tests. `issue471-row-step-probe.py` and `.log` at the paths above are
+the re-run on that tree, not the run cited in `020eccfa24`'s body: the values
+move by noise only -- induced Gram tensor 0.231 ms against the old loop's
+1.228 ms per representative (×189720 = 43.9 s against 232.9 s), `[Otilde] 2
+planes in 15.4 s` and `[Otilde+] 2 planes in 11.9 s` against 2 double cosets
+each, exit status 0, peak tree RSS 569 MiB, and the enum's three members with
+statuses 2 / 1 / 3 driven by the stub rows.
