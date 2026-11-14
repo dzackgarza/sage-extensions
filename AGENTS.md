@@ -319,7 +319,10 @@ the category states. Every construction in the tree moves to this shape;
 
 - **Construction is almost instant.** It stores the defining datum and fixes
   the category, and nothing else. It computes no invariant, no inverse, no
-  group generators, no presentation and no check.
+  group generators, no presentation and no check. The same holds for derived
+  categorical structure: supercategory Mors, homsets, forgetful inclusions,
+  category placements, kernels, orbit data and finite sets of results are
+  built on first request, never as a side effect of constructing an object.
 - **Computation is lazy and cached.** A datum of an object (`O(L)`'s group
   generators, an inverse, a Gram matrix of a sublattice, a genus symbol) is
   computed on the first request, cached on the object, and reused by every
