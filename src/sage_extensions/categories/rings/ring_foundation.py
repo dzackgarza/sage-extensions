@@ -7604,11 +7604,15 @@ def _owned_real_algebraic_numbers() -> _OwnedRingParent:
 def _owned_algebraic_closure_finite_field(characteristic: int) -> _OwnedRingParent:
     r"""The algebraic closure of a finite prime field, keyed by characteristic.
 
-    The closure is raised through the finite field's own closure method
-    (``FiniteField.algebraic_closure``), which is the published route and the
-    one instance Sage's finite-field constructions resolve to.  Sage's
-    constructor named here takes the field and a generator name, not a
-    characteristic, so calling it with the characteristic selects no closure.
+    The operation belongs to the finite field, so the closure is raised through
+    ``FiniteField.algebraic_closure``, which returns one cached pseudo-Conway
+    closure per characteristic (``GF(p).algebraic_closure() is
+    GF(p).algebraic_closure()``), and that is the instance Sage's own
+    finite-field constructions resolve to.  Raising the closure through
+    ``AlgebraicClosureFiniteField`` instead would require a generator name, and
+    a name coined by an adapter is never a construction: Sage's constructor
+    takes ``(base_ring, name)``, so the characteristic this function is keyed by
+    does not select any closure there.
     """
     engine = SageGF(int(characteristic)).algebraic_closure()
     return _OwnedRingParent(
