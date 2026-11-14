@@ -1,0 +1,26 @@
+lattice of rank 5
+[Otilde] 2 planes in 36.6 s
+[Otilde] run_row -> count=2 decided=True
+[Otilde] expected 2 planes over 1 ambient class(es)
+[Otilde] check_row_count -> True in 36.7 s
+[Otilde+] 2 planes in 10.2 s
+[Otilde+] run_row -> count=2 decided=True
+[Otilde+] expected 2 planes over 1 ambient class(es)
+[Otilde+] check_row_count -> True in 11.2 s
+rows: Otilde=2 Otilde+=2
+PROBE404 OK
+[peakrss] probe404b: child waited=0 shell_code=0 samples=27
+[peakrss] peak tree RSS      : 2570 MiB
+[peakrss] low-water MemAvail : 12610 MiB
+[peakrss] peak single VmHWM  : 2570 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      1996 MiB peak
+[peakrss]   python                      563 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    50.0s procs=  4 rss=  2570 MiB hwm=  2570 MiB avail= 12610 MiB
+[peakrss]   t=    48.0s procs=  4 rss=  2565 MiB hwm=  2565 MiB avail= 12618 MiB
+[peakrss]   t=    46.0s procs=  4 rss=  2559 MiB hwm=  2559 MiB avail= 12625 MiB
+[peakrss]   t=    44.0s procs=  4 rss=  2551 MiB hwm=  2551 MiB avail= 12633 MiB
+[peakrss]   t=    42.0s procs=  4 rss=  2542 MiB hwm=  2542 MiB avail= 12640 MiB
+launcher exit: 0

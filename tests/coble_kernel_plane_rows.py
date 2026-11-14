@@ -81,6 +81,58 @@ def _coble_lattice():
     return NamedLattices.Tco
 
 
+def _is_a_primitive_isotropic_plane(lattice, subobject) -> bool:
+    r"""Whether ``subobject`` is a rank-two primitive totally isotropic subobject.
+
+    The three clauses are the row's own contract on every output: the rank is
+    two, the subobject is primitive in ``lattice``, and the pairing of every
+    ordered pair of its retained generators vanishes -- the Gram matrix of the
+    two-generator basis is zero.
+    """
+    if subobject.module_rank() != cardinal(2):
+        return False
+    if subobject.is_primitive() is not True:
+        return False
+    labels = tuple(subobject.module_generating_set())
+    for left in labels:
+        for right in labels:
+            if lattice.b(
+                subobject.inclusion()(subobject.module_generator(left)),
+                subobject.inclusion()(subobject.module_generator(right)),
+            ) != lattice.base_ring().zero():
+                return False
+    return True
+
+
+def run_row(lattice, subgroup, label, cap):
+    r"""Return ``(count, decided)`` for one kernel plane row of ``subgroup``.
+
+    The row step is the public call ``isotropic_orbit_representatives(2)``,
+    whose returned subobjects are the orbit representatives of the row, under
+    the per-row cap: the alarm's ``RowUndecided`` makes the row undecided,
+    never failed, because the cap is the caller's budget and not a
+    mathematical statement.  Every representative the call returns is checked
+    against the row's contract before its count is reported, and
+    ``check_row_count`` then compares that count with the row's double cosets.
+    """
+    start = time.monotonic()
+    try:
+        signal.setitimer(signal.ITIMER_REAL, cap)
+        planes = tuple(subgroup.isotropic_orbit_representatives(2))
+    except RowUndecided:
+        log(f"[{label}] undecided: the row did not return inside its {cap:.0f} s cap")
+        return None, False
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+    elapsed = time.monotonic() - start
+    for plane in planes:
+        if not _is_a_primitive_isotropic_plane(lattice, plane):
+            log(f"[{label}] a representative is not a primitive isotropic plane")
+            return None, False
+    log(f"[{label}] {len(planes)} planes in {elapsed:.1f} s")
+    return len(planes), True
+
+
 def _kernel_row_expected_count(subgroup, plane):
     r"""The double-coset count of one kernel plane row, by group orders.
 

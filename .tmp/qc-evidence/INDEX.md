@@ -806,3 +806,22 @@ carrying the ambient generator image that carried its parent there.
 | `issue402-kernel-repair.py` / `issue402-kernel-repair.log` | the tree of this push | `kernel_generators()` at card `029J` row 4.3.8's cusp: **20 generators** (the transvections of a basis of `v^perp` and of nine generators of the parameter classes `B / v^perp`), `rho(K_v)` of **order 256**, and `admits_root` **True for all eleven** printed walls' classes |
 | `issue402-kernel-tests.log` | the tree of this push | `tests/lattices/test_the_isotropic_reduction_image.sage -k "every_wall_of_the_fourth or two_lifts or one_sift_per_root or agrees_with_the_levi or reduces_to"`: **5 passed in 1054.96 s** -- the red test of `a33dae4` is green, and `rho(K_v)` is still trivial at `Sterk_1` |
 | `issue402-locus-classes.py` / `issue402-locus-classes.log` | `b77de81` | the owner of the integral lift locus, unchanged: for the identity marking of the reduction at the same line, class 64 of `integral_parameter_classes()` is in the locus and the lift at its `residue.preimage` is **not integral**, so the locus is not the set of residues of integral lifts there |
+
+## #404 — the kernel plane rows driver's row step, restored
+
+`488f06f` deleted `run_row` and `_is_a_primitive_isotropic_plane` from
+`tests/coble_kernel_plane_rows.py` when it added the expected-count
+machinery, and left `main` calling the deleted `run_row`, so image run
+43610158124 stopped 7 s in with `NameError: name 'run_row' is not defined` and
+never reached the first row of either kernel plane. Both functions are
+restored: the row step is the public call
+`subgroup.isotropic_orbit_representatives(2)` under the per-row cap (the
+alarm's `RowUndecided` makes a row undecided, never failed), each returned
+representative checked for rank two, primitivity and total isotropy, and its
+count handed to `check_row_count`.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue404-row-step-probe.py` | the tree of this push | the probe: `tests/coble_kernel_plane_rows.py` loaded as a module (not run as a script) and its own `run_row` and `check_row_count` called on the gate lattice `U + U(2) + <-2>`, so the restored row step is exercised without running the Coble rows on the VM |
+| `issue404-row-step-probe.log` | the tree of this push | on `U + U(2) + <-2>` (rank 5, 1 ambient `O(L)`-class): `Otilde` **2 planes in 36.6 s**, `check_row_count` true against 2 double cosets; `Otilde+` **2 planes in 10.2 s**, true against 2; `Otilde+ >= Otilde`; peak tree 2570 MiB, exit 0 (`PROBE404 OK`) |
+| `issue404-gate.log` | the tree of this push | the gate on the file that gates the same contract, `tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage`: **3 passed in 61.06 s**, `--no-time-gates`, two calls over the 20 s gate (25.51 s on `6JRS`, 31.16 s on `U + U(2) + <-2>`) |

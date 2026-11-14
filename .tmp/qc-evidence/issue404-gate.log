@@ -1,0 +1,37 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.23 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: platformdirs-4.13.5, anyio-4.15.1
+collected 3 items
+
+tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage . [ 33%]
+..                                                                       [100%]
+
+========================== test-call performance gate ==========================
+tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage::test_the_kernel_plane_rows_of_6jrs_equal_their_double_coset_counts: 25.51 s > 20 s
+tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage::test_the_kernel_plane_rows_of_u_plus_u2_plus_root_equal_their_double_coset_counts: 31.16 s > 20 s
+============================== slowest durations ===============================
+31.16s call     tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage::test_the_kernel_plane_rows_of_u_plus_u2_plus_root_equal_their_double_coset_counts
+25.51s call     tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage::test_the_kernel_plane_rows_of_6jrs_equal_their_double_coset_counts
+4.11s call     tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage::test_the_kernel_plane_rows_of_the_unimodular_plane_sum_equal_their_double_coset_counts
+
+(6 durations < 0.005s hidden.  Use -vv to show these durations.)
+========================= 3 passed in 61.06s (0:01:01) =========================
+[peakrss] gate404b: child waited=0 shell_code=0 samples=34
+[peakrss] peak tree RSS      : 2657 MiB
+[peakrss] low-water MemAvail : 12067 MiB
+[peakrss] peak single VmHWM  : 2657 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2021 MiB peak
+[peakrss]   python                      625 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   count                         0 MiB peak
+[peakrss]   t=    64.0s procs=  4 rss=  2657 MiB hwm=  2657 MiB avail= 12524 MiB
+[peakrss]   t=    62.0s procs=  4 rss=  2614 MiB hwm=  2645 MiB avail= 12567 MiB
+[peakrss]   t=    60.0s procs=  4 rss=  2611 MiB hwm=  2641 MiB avail= 12574 MiB
+[peakrss]   t=    58.0s procs=  4 rss=  2604 MiB hwm=  2635 MiB avail= 12582 MiB
+[peakrss]   t=    56.0s procs=  4 rss=  2598 MiB hwm=  2628 MiB avail= 12589 MiB
+launcher exit: 0

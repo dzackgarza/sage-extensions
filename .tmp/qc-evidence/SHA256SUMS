@@ -328,3 +328,6 @@ c993cc700e9c4a3e216d04ec25c2caa737afa98b3914a8e0d992f0d8d1a684a6  .tmp/qc-eviden
 d47f788a75c570809d663df4d7e6a4d61f0e034e675370d49f6da2954687a2c3  .tmp/qc-evidence/issue402-kernel-tests.log
 b3d00ebe307071c5a8dbe6fdee95893525b71de49f93c5fa0ec3348513ffc4e1  .tmp/qc-evidence/issue402-locus-classes.py
 af6164efd7d708a9788fbabe51e17e3c755cafe3a6c8534873a39044f1d4468e  .tmp/qc-evidence/issue402-locus-classes.log
+dc5a12556101a6814de23fb5bd5adca42f88974cda2a0d2f2039421be2c941f7  .tmp/qc-evidence/issue404-row-step-probe.py
+a3f8fa98f4195255dc102b22078d8a4f245a8bb008880227283e02055954fda4  .tmp/qc-evidence/issue404-row-step-probe.log
+a5328e6b9598aa12e12314189ad7d003a594ed868612fc190eeae38028ac823c  .tmp/qc-evidence/issue404-gate.log
