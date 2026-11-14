@@ -1,0 +1,27 @@
+.F....FFFF...............F...F                                           [100%]
+=========================== short test summary info ============================
+FAILED tests/rings/test_rings_are_algebras_over_themselves.sage::test_the_augmentation_ideal_of_the_symmetric_group_algebra_has_codimension_one
+FAILED tests/rings/test_elementary_arithmetic_of_owned_rings.sage::test_rationals_in_lowest_terms_and_their_inverses
+FAILED tests/rings/test_elementary_arithmetic_of_owned_rings.sage::test_owned_rational_equality_realizes_exact_python_fraction_literals
+FAILED tests/rings/test_elementary_arithmetic_of_owned_rings.sage::test_the_owned_integers_coerce_canonically_into_the_rationals_and_reals
+FAILED tests/rings/test_elementary_arithmetic_of_owned_rings.sage::test_three_is_a_primitive_root_modulo_seven
+FAILED tests/modules/test_elementwise_linearity_over_an_infinite_ring.sage::test_frobenius_on_f3_x_mod_x3_minus_1_is_additive_but_not_x_linear
+FAILED tests/modules/test_direct_local_exact_maps.sage::test_the_cokernel_of_x_on_the_local_ring_at_the_origin_is_the_residue_field
+7 failed, 23 passed in 7.32s
+EXIT=1
+[peakrss] p398-regress-rebased: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 479 MiB
+[peakrss] low-water MemAvail : 8484 MiB
+[peakrss] peak single VmHWM  : 479 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      466 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          2 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=    10.0s procs=  4 rss=   479 MiB hwm=   479 MiB avail=  8629 MiB
+[peakrss]   t=     8.0s procs=  4 rss=   460 MiB hwm=   460 MiB avail=  8484 MiB
+[peakrss]   t=     6.0s procs=  4 rss=   315 MiB hwm=   315 MiB avail=  8652 MiB
+[peakrss]   t=     4.0s procs=  4 rss=   279 MiB hwm=   279 MiB avail=  8761 MiB
+[peakrss]   t=     2.0s procs=  4 rss=   133 MiB hwm=   133 MiB avail=  8793 MiB
+launcher exit: 0

@@ -1,0 +1,214 @@
+....FF...F                                                               [100%]
+=================================== FAILURES ===================================
+_____________ test_convolution_of_lp_and_lq_lands_in_lr[p1-q1-r1] ______________
+
+>   return self.cache[k]
+E   KeyError: (('finite', 2), 93594704, 93594704)
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+p = 1, q = 2, r = 2
+
+    @pytest.mark.parametrize(
+        "p, q, r",
+        [
+            (1, 1, 1),
+            (1, 2, 2),
+            (2, 2, oo),
+            (1, oo, oo),
+            (oo, 1, oo),
+            (RR(sqrt(2)), RR(sqrt(2)), 1 / (RR(sqrt(2)) - 1)),
+        ],
+    )
+    def test_convolution_of_lp_and_lq_lands_in_lr(p, q, r) -> None:
+        r"""$1/p + 1/q = 1 + 1/r$, including the endpoints and $p = q = \sqrt2$, $r = 1/(\sqrt2 - 1)$.
+    
+        Source: Lieb–Loss, *Analysis*, Theorem 4.2.
+        """
+        left = Lp(p, RR, RR).quotient_by_null_functions()
+>       right = Lp(q, RR, RR).quotient_by_null_functions()
+                ^^^^^^^^^^^^^
+
+tests/functions/test_young_convolution.sage:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/functions/real_functions.py:894: in Lp
+    return _lebesgue_space(_integrability(p), domain, codomain)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/functions/real_functions.py:889: in _lebesgue_space
+    return SymmetricBilinearFormModules(RR)(module.bilinear_forms(RR)(_l2_pairing))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of symmetric modules with a bilinear form over Real Field
+x = Generic morphism:
+  From: Module over Real Field on Classes in the multilinear tensor presentation
+  To:   Real Field
+
+    def _call_(self, x):
+        """
+        Construct an object in this category from the data in ``x``,
+        or throw :exc:`NotImplementedError`.
+    
+        EXAMPLES::
+    
+            sage: Semigroups()._call_(3)
+            Traceback (most recent call last):
+            ...
+            NotImplementedError
+        """
+>       raise NotImplementedError
+E       NotImplementedError
+
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:606: NotImplementedError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> Real Field accepted without exhaustive linearity verification; the source is not represented as finite
+_____________ test_convolution_of_lp_and_lq_lands_in_lr[p2-q2-r2] ______________
+
+>   return self.cache[k]
+E   KeyError: (('finite', 2), 93594704, 93594704)
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+p = 2, q = 2, r = +Infinity
+
+    @pytest.mark.parametrize(
+        "p, q, r",
+        [
+            (1, 1, 1),
+            (1, 2, 2),
+            (2, 2, oo),
+            (1, oo, oo),
+            (oo, 1, oo),
+            (RR(sqrt(2)), RR(sqrt(2)), 1 / (RR(sqrt(2)) - 1)),
+        ],
+    )
+    def test_convolution_of_lp_and_lq_lands_in_lr(p, q, r) -> None:
+        r"""$1/p + 1/q = 1 + 1/r$, including the endpoints and $p = q = \sqrt2$, $r = 1/(\sqrt2 - 1)$.
+    
+        Source: Lieb–Loss, *Analysis*, Theorem 4.2.
+        """
+>       left = Lp(p, RR, RR).quotient_by_null_functions()
+               ^^^^^^^^^^^^^
+
+tests/functions/test_young_convolution.sage:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/functions/real_functions.py:894: in Lp
+    return _lebesgue_space(_integrability(p), domain, codomain)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    w = self.f(*args, **kwds)
+src/sage_extensions/categories/functions/real_functions.py:889: in _lebesgue_space
+    return SymmetricBilinearFormModules(RR)(module.bilinear_forms(RR)(_l2_pairing))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:592: in __call__
+    return self._call_(x, *args, **opts)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of symmetric modules with a bilinear form over Real Field
+x = Generic morphism:
+  From: Module over Real Field on Classes in the multilinear tensor presentation
+  To:   Real Field
+
+    def _call_(self, x):
+        """
+        Construct an object in this category from the data in ``x``,
+        or throw :exc:`NotImplementedError`.
+    
+        EXAMPLES::
+    
+            sage: Semigroups()._call_(3)
+            Traceback (most recent call last):
+            ...
+            NotImplementedError
+        """
+>       raise NotImplementedError
+E       NotImplementedError
+
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:606: NotImplementedError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> Real Field accepted without exhaustive linearity verification; the source is not represented as finite
+___ test_the_gaussian_convolved_with_one_is_root_pi_on_every_representative ____
+
+    def test_the_gaussian_convolved_with_one_is_root_pi_on_every_representative() -> None:
+        r"""$(e^{-x^2} * 1)(y) = \int e^{-x^2}\,dx = \sqrt\pi$, and changing $1$ at $0$ does not change it."""
+        first = Lp(1, RR, RR)
+        bounded = Lp(oo, RR, RR)
+>       g(t) = exp(-t^2)
+                         
+
+tests/functions/test_young_convolution.sage:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/element.pyx:2048: in sage.structure.element.Element.__pow__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   TypeError: unsupported operand parent(s) for ^: 'Symbolic Ring' and 'Integer Ring'
+
+sage/structure/coerce.pyx:1297: TypeError
+==================================== PASSES ====================================
+_____________ test_convolution_of_lp_and_lq_lands_in_lr[p0-q0-r0] ______________
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> L^1(R), modulo almost-everywhere equality accepted without exhaustive linearity verification; the source is not represented as finite
+_____________ test_convolution_of_lp_and_lq_lands_in_lr[p3-q3-r3] ______________
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> L^+Infinity(R), modulo almost-everywhere equality accepted without exhaustive linearity verification; the source is not represented as finite
+_____________ test_convolution_of_lp_and_lq_lands_in_lr[p4-q4-r4] ______________
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> L^+Infinity(R), modulo almost-everywhere equality accepted without exhaustive linearity verification; the source is not represented as finite
+_____________ test_convolution_of_lp_and_lq_lands_in_lr[p5-q5-r5] ______________
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Real Field retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Real Field on Classes in the multilinear tensor presentation -> L^1/(sqrt(2) - 1)(R), modulo almost-everywhere equality accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+PASSED tests/rings/test_exact_real_division.sage::test_the_reciprocal_identity_keeps_the_radical_quotient_exact
+PASSED tests/rings/test_exact_real_division.sage::test_a_real_divides_by_a_real_and_inverts
+PASSED tests/rings/test_rational_exact_reals.sage::test_a_product_of_distinct_square_roots_that_is_rational_converts_to_qq
+PASSED tests/functions/test_young_convolution.sage::test_convolution_of_lp_and_lq_lands_in_lr[p0-q0-r0]
+PASSED tests/functions/test_young_convolution.sage::test_convolution_of_lp_and_lq_lands_in_lr[p3-q3-r3]
+PASSED tests/functions/test_young_convolution.sage::test_convolution_of_lp_and_lq_lands_in_lr[p4-q4-r4]
+PASSED tests/functions/test_young_convolution.sage::test_convolution_of_lp_and_lq_lands_in_lr[p5-q5-r5]
+FAILED tests/functions/test_young_convolution.sage::test_convolution_of_lp_and_lq_lands_in_lr[p1-q1-r1]
+FAILED tests/functions/test_young_convolution.sage::test_convolution_of_lp_and_lq_lands_in_lr[p2-q2-r2]
+FAILED tests/functions/test_young_convolution.sage::test_the_gaussian_convolved_with_one_is_root_pi_on_every_representative
+3 failed, 7 passed in 6.35s
+EXIT=1
+[peakrss] p398-green-rebased: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 361 MiB
+[peakrss] low-water MemAvail : 8552 MiB
+[peakrss] peak single VmHWM  : 361 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      348 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     8.0s procs=  4 rss=   361 MiB hwm=   361 MiB avail=  8620 MiB
+[peakrss]   t=     6.0s procs=  4 rss=   355 MiB hwm=   355 MiB avail=  8552 MiB
+[peakrss]   t=     4.0s procs=  4 rss=   290 MiB hwm=   290 MiB avail=  8575 MiB
+[peakrss]   t=     2.0s procs=  4 rss=   160 MiB hwm=   160 MiB avail=  8667 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail=  8767 MiB
+launcher exit: 0

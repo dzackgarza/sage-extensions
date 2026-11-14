@@ -1,0 +1,35 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: reportlog-1.0.0, timeout-2.4.0, platformdirs-4.13.5, anyio-4.15.1
+collected 19 items
+
+<Dir sage-extensions>
+  <Dir tests>
+    <Module test_finite_form_groups.py>
+      <Function test_split_elementary_two_discriminant_orthogonal_group[1-2]>
+      <Function test_split_elementary_two_discriminant_orthogonal_group[2-72]>
+      <Function test_split_elementary_two_discriminant_orthogonal_group[5-46998591897600]>
+      <Function test_hyperbolic_discriminant_form_of_exponent_four>
+      <Function test_bilinear_hyperbolic_plane_has_full_linear_group>
+      <Function test_reindexed_a2_simple_roots_have_an_integral_transporter>
+      <Function test_a2_bases_with_different_pairings_have_no_orthogonal_transporter[1]>
+      <Function test_a2_bases_with_different_pairings_have_no_orthogonal_transporter[2]>
+      <Function test_hyperbolic_plane_is_even_unimodular_and_two_elementary>
+    <Module test_integer_residue_rings.py>
+      <Function test_integer_residue_constructions>
+    <Module test_native_ring_constructions.py>
+      <Function test_rational_localization_and_finite_field>
+      <Function test_free_algebras_keep_their_constructing_categories>
+      <Function test_number_field_and_maximal_quotient_are_one_field>
+      <Function test_presentations_retain_their_data_and_category>
+      <Function test_dual_numbers_retain_their_quotient>
+      <Function test_power_series_retain_their_completion>
+    <Module test_prime_and_maximal_ideals.py>
+      <Function test_prime_and_maximal_ideal_construction>
+      <Function test_quotient_field_query_preserves_construction_placement>
+      <Function test_residue_field_construction_from_maximal_ideal>
+
+========================= 19 tests collected in 2.57s ==========================
+EXIT=0

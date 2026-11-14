@@ -944,3 +944,45 @@ One pytest process per file and per probe, never the suite.
 | `410-sample-02d9657.log`, `410-sample-441519c.log` | causes C, E, F, G | the four "never implemented" causes show the same error at both commits: the `Emb` cardinality assertion, `is_cyclic`, the `cyclic_subgroup` refusal (masked at `02d9657` by `_form_module_morphism`) and the bare tuple |
 | `410-baseline-11-ids-at-5f5fc25.log` | `5f5fc25` (the `main` this push is rebased onto) | the same 11 ids, `-v --tb=line`: **11 failed in 11.17 s** — the #408 push that moved `main` under this triage changed no definite-lattice test |
 | `410-repair-a-and-b-targeted-on-the-push-tree.log` | `3cb0d5e` (the tree of this push, rebased) | the four cause-A ids, the cause-B id and test_rational_scalars_on_a_base_changed_lattice.sage on the rebased tree: **6 passed in 3.88 s** |
+| `issue402-cusp4-chamber-at-vertex.py` / `issue402-cusp4-chamber-at-vertex.log` | the tree of this push | the public `cusp_chamber(p_0)` at card `029J` row 4.3.8's cusp, `p_0` the vertex of square 2 of the card's polyhedron (nine printed walls through it): **complete, 11 walls**, the nine through `p_0` printed, two more of squares `-4` and `-2`; 245 filter questions, 116 admitted |
+| `issue402-cusp4-chamber-gram.py` / `issue402-cusp4-chamber-gram.log` | the tree of this push | the eleven walls of that chamber and card `029J`'s eleven printed walls, in `N`: **the two Gram matrices are equal entry by entry**, and both polyhedra have 26 rays of squares `0..12`. The returned chamber contains `p_0` on the side where the two closing walls pair `-2` with it, the card's on the side where they pair `+2` |
+
+## #406: the suite stopped before its first test (2026-11-14, `main` `9b297125`)
+
+The repository's own `addopts` in force (`suite_budget`, `test_lint`,
+`--timeout=60 --timeout-method=signal`, junit, report log), with
+`pytest-timeout` and `pytest-reportlog` supplied at `.scratch/wt406/.pydeps`
+because this venv carries `pytest` only.  Every run is
+`/sage/.venv/bin/python -m pytest -p qc_sage_session` inside the adopted image
+with the tree bound at `/repos/sage-extensions`, `PYTHONPATH` carrying
+`/ci/tool-artifacts/pytest_plugins`, the port's `src`, the tree's `src` and the
+`.pydeps` path.
+
+| log | tree | command shape | result |
+| --- | --- | --- | --- |
+| `issue406-suite-collection-stop.log` | `9b297125` | `--collect-only` | 3930 collected, **0 run**; `! _pytest.outcomes.Exit: collection took 232.90 s; the measured ceiling is 6 s !`; exit 1; peak RSS 3763 MiB |
+| `issue406-suite-lint-stop.log` | `9b297125` | `--collect-only -q --no-time-gates` | 3930 collected, **0 run**; `! _pytest.outcomes.Exit: test lint: 1514 findings (run just test-lint for all) !`; exit 1; collection 471.88 s |
+| `issue406-bisect-good-fca190e.log` | `fca190e` (`14b9cc16^`) | `--collect-only` | collection completed with no ceiling message: the good side of the bisect |
+| `issue406-red-tests-on-main.log` | `9b297125` | `tests/engineering/test_the_suite_plugins_report_what_they_measured.py -q` | **2 failed in 18.03 s**, exit 1 |
+| `issue406-green-tests-on-repair.log` | the #406 repair | same | **2 passed in 22.44 s**, exit 0; calls 11.63 s and 10.72 s, `setup` 0.00 s |
+| `issue406-repair-full-run.log` | the #406 repair | `-q -k plugins_report_what_they_measured` | the whole tree collected, the collection ceiling reported, the two selected tests ran |
+
+The bad side of the bisect is measured at the tip in the first row only:
+collecting `14b9cc16`'s 1437-file tree held 6.4 GiB after nine minutes and the
+run was stopped to keep the shared VM's memory.  That measurement is unrun, not
+passing; `14b9cc16` is the commit that introduced the three `pytest.exit` calls
+(`git blame`), and it has no earlier history for
+`src/sage_extensions/testing/suite_budget.py`.
+
+Follow-up in the same session, after the two repairs:
+
+| log | tree | command shape | result |
+| --- | --- | --- | --- |
+| `issue406-run-before-issue398-repair.log` | `9b297125` plus this slice's plugin repair, before #398's repair (which #410 landed as `e9b6c2c`) | `-q -k plugins_report_what_they_measured` | the gate is reported (`collection took 625.38 s; the measured ceiling is 6 s`) and the run then ends at `Interrupted: 1 error during collection` — #398's RecursionError, 0 tests run |
+| `issue406-final-full-run.log` | `main` with this slice's repairs, #410's included | same | the gate is reported (`collection took 224.19 s; the measured ceiling is 6 s`), the two selected tests **run and pass**: `2 passed, 3939 deselected in 241.97 s`, exit 1 on the gate report, peak RSS 3945 MiB |
+| `issue398-red-rational-exact-reals.log` | `9b297125` | `tests/rings/test_rational_exact_reals.sage` | **1 failed in 5.32 s** (`RecursionError`) |
+| `issue398-green-three-files.log` | main with #410's `_div_` repair and this slice's test | the same file, `tests/rings/test_exact_real_division.sage` and `tests/functions/test_young_convolution.sage` | **3 failed, 7 passed in 6.35 s**: the new file and the rational exact reals pass, and the convolution file collects and runs, reporting three defects of its own |
+| `issue398-regression-base.log` | `9b297125` | 8 files over rings, lattices and modules | **8 failed, 22 passed in 5.57 s** |
+| `issue398-regression-fixed.log` | main with #410's `_div_` repair and this slice's test | same | **7 failed, 23 passed in 7.32 s**; the one difference is `test_a_product_of_distinct_square_roots_that_is_rational_converts_to_qq`, the other seven FAILED ids identical |
+| `issue398-division-before.log` | `9b297125` | division probe with the session imported | `RR(1)/RR(2)`, `RR(1)/(sqrt2-1)` and `~RR(2)` are `RecursionError`; `ZZ(1)/ZZ(2)` is `1/2` |
+| `issue398-division-after.log` | main with #410's `_div_` repair | the three equalities of that probe | `1/(RR(sqrt2)-1) == RR(sqrt2)+1`, `(sqrt2-1)*1/(sqrt2-1) == 1` and `~RR(4)*RR(4) == RR(1)` all decided `True` |

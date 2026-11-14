@@ -1,0 +1,8 @@
+inverse: 1/(sqrt(2) - 1)
+root + 1: sqrt(2) + 1
+inverse == root + 1: True
+(root-1)*inverse == 1: True
+(RR(3)/RR(4))*RR(4) == RR(3): True
+~root == 1/root: True
+EXIT=0
+launcher exit: 0

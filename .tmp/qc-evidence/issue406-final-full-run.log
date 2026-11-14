@@ -1,0 +1,28 @@
+..                                                                       [100%]
+-------------- generated report log file: tests/.report/run.jsonl --------------
+=============================== time-gate report ===============================
+collection took 224.19 s; the measured ceiling is 6 s
+============================== slowest durations ===============================
+13.25s call     tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_collection_over_its_ceiling_still_runs_the_selected_tests
+4.50s call     tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it
+0.00s setup    tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it
+0.00s setup    tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_collection_over_its_ceiling_still_runs_the_selected_tests
+0.00s teardown tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_collection_over_its_ceiling_still_runs_the_selected_tests
+0.00s teardown tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it
+2 passed, 3939 deselected in 241.97s (0:04:01)
+EXIT=1
+[peakrss] p406-final-rebased: child waited=0 shell_code=0 samples=161
+[peakrss] peak tree RSS      : 3945 MiB
+[peakrss] low-water MemAvail : 1590 MiB
+[peakrss] peak single VmHWM  : 3958 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     3717 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=   242.3s procs=  5 rss=  3945 MiB hwm=  3958 MiB avail=  4772 MiB
+[peakrss]   t=   232.3s procs=  5 rss=  3912 MiB hwm=  3927 MiB avail=  1684 MiB
+[peakrss]   t=   238.3s procs=  5 rss=  3904 MiB hwm=  3927 MiB avail=  4219 MiB
+[peakrss]   t=   234.3s procs=  5 rss=  3899 MiB hwm=  3927 MiB avail=  1590 MiB
+[peakrss]   t=   236.3s procs=  5 rss=  3898 MiB hwm=  3927 MiB avail=  1779 MiB
+launcher exit: 0

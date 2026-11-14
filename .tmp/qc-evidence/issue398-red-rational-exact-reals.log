@@ -1,0 +1,41 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_a_product_of_distinct_square_roots_that_is_rational_converts_to_qq ____
+
+    def test_a_product_of_distinct_square_roots_that_is_rational_converts_to_qq() -> None:
+        r"""``sqrt(6) sqrt(3) sqrt(2) = 6``, though the symbolic ring keeps the three roots apart."""
+>       value = RR(37) / 3 * RR(6).sqrt() * RR(3).sqrt() * RR(2).sqrt()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/rings/test_rational_exact_reals.sage:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/modules/pure/modules.py:1704: in __truediv__
+    return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:1704: in __truediv__
+    return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:1704: in __truediv__
+    return self.parent().scalar_multiple(ring.one() / ring(scalar), self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   RecursionError: maximum recursion depth exceeded
+!!! Recursion detected (same locals & position)
+=========================== short test summary info ============================
+FAILED tests/rings/test_rational_exact_reals.sage::test_a_product_of_distinct_square_roots_that_is_rational_converts_to_qq
+1 failed in 5.32s
+EXIT=1
+[peakrss] p406-real-division-base: child waited=0 shell_code=0 samples=5
+[peakrss] peak tree RSS      : 319 MiB
+[peakrss] low-water MemAvail : 7546 MiB
+[peakrss] peak single VmHWM  : 322 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      309 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     8.0s procs=  4 rss=   319 MiB hwm=   322 MiB avail=  7546 MiB
+[peakrss]   t=     6.0s procs=  4 rss=   299 MiB hwm=   299 MiB avail=  7913 MiB
+[peakrss]   t=     4.0s procs=  4 rss=   282 MiB hwm=   282 MiB avail=  8209 MiB
+[peakrss]   t=     2.0s procs=  4 rss=   123 MiB hwm=   123 MiB avail=  7948 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     5 MiB hwm=     5 MiB avail=  8358 MiB
+launcher exit: 0

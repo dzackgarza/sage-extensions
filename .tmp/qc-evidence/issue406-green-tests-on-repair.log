@@ -1,0 +1,26 @@
+..                                                                       [100%]
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+11.63s call     tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_collection_over_its_ceiling_still_runs_the_selected_tests
+10.72s call     tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it
+0.00s setup    tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_collection_over_its_ceiling_still_runs_the_selected_tests
+0.00s setup    tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it
+0.00s teardown tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it
+0.00s teardown tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_collection_over_its_ceiling_still_runs_the_selected_tests
+2 passed in 22.44s
+EXIT=0
+[peakrss] p406-green-addopts: child waited=0 shell_code=0 samples=14
+[peakrss] peak tree RSS      : 560 MiB
+[peakrss] low-water MemAvail : 6660 MiB
+[peakrss] peak single VmHWM  : 560 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      273 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=    14.3s procs=  5 rss=   560 MiB hwm=   560 MiB avail=  6758 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   559 MiB hwm=   559 MiB avail=  6971 MiB
+[peakrss]   t=     8.1s procs=  5 rss=   559 MiB hwm=   559 MiB avail=  6953 MiB
+[peakrss]   t=    10.1s procs=  5 rss=   559 MiB hwm=   559 MiB avail=  6899 MiB
+[peakrss]   t=    12.2s procs=  5 rss=   559 MiB hwm=   559 MiB avail=  6892 MiB
+launcher exit: 0
