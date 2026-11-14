@@ -286,6 +286,10 @@ def _category_graph_signature(category: Category, memo=None):
     persistent comparison key, that same signature is retained on the category
     for the overlapping supergraphs of later comparison keys. Before then only
     the call-local ``memo`` is used.
+
+    The signature reads only ``_super_categories``, which Sage computes once
+    per category, so a completed signature is a fixed property of the
+    category and is retained on it.
     """
     persistent = category.__dict__.get("_owned_graph_signature")
     if persistent is not None:
@@ -313,6 +317,7 @@ def _category_graph_signature(category: Category, memo=None):
     )
     signature = (declaring.__module__, declaring.__qualname__, supers)
     memo[identity] = signature
+    category._owned_graph_signature = signature
     return signature
 
 
@@ -346,6 +351,7 @@ def _category_graph_depth(category: Category, memo=None) -> int:
         return 0
     depth = 1 + max(_category_graph_depth(super_category, memo) for super_category in supers)
     memo[identity] = depth
+    category._owned_graph_depth = depth
     return depth
 
 
@@ -413,7 +419,7 @@ def _stable_signature_integer(signature) -> int:
     return int.from_bytes(digest, "big")
 
 
-def _category_provider_order_key(category: Category, memo=None):
+def _category_provider_order_key(category: Category):
     r"""Order category providers without modifying Sage's native ``_cmp_key``.
 
     The controlled C3 merge requires a strict provider order, with each strict
@@ -423,18 +429,18 @@ def _category_provider_order_key(category: Category, memo=None):
     graph signature and Sage's original session counter distinguish incomparable
     and parameterized providers without constructing their Mor-family classes.
     """
-    if memo is None:
-        memo = {}
-    identity = id(category)
-    cached = memo.get(identity)
-    if cached is None:
-        cached = (
-            _category_graph_depth(category),
-            repr(_category_graph_signature(category)),
-            category._cmp_key[1],
-        )
-        memo[identity] = cached
-    return cached
+    persistent = category.__dict__.get("_owned_provider_order_key")
+    if persistent is not None:
+        return persistent
+    key = (
+        _category_graph_depth(category),
+        repr(_category_graph_signature(category)),
+        category._cmp_key[1],
+    )
+    # Depth, signature and session counter are fixed once computed, so the
+    # order key is retained on the category rather than per linearization.
+    category._owned_provider_order_key = key
+    return key
 
 
 class _OwnedCategoryComparisonKey:
@@ -651,8 +657,7 @@ def _declared_category_linearization(category: Category) -> tuple[Category, ...]
     from sage.misc.c3_controlled import C3_sorted_merge
 
     cache = {}
-    provider_order_cache = {}
-    provider_order_key = lambda node: _category_provider_order_key(node, provider_order_cache)
+    provider_order_key = _category_provider_order_key
 
     def linearize(node):
         known = cache.get(id(node))
