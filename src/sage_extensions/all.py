@@ -141,8 +141,6 @@ from sage_extensions.categories.group.g_sets import (  # noqa: F401
 from sage_extensions.categories.group.groups import (  # noqa: F401
     AbelianGroups,
     FiniteAbelianGroups,
-    FinitelyGeneratedGroups,
-    FinitelyPresentedGroups,
     Groups,
     LieGroups,
     OwnedAbelianGroups,
@@ -152,14 +150,6 @@ from sage_extensions.categories.group.groups import (  # noqa: F401
 )
 from sage_extensions.categories.group.magmas import (  # noqa: F401
     AdditiveGroups,
-)
-from sage_extensions.categories.group.profinite.absolute_galois_group import (  # noqa: F401
-    AbsoluteGaloisGroup,
-    AbsoluteGaloisGroups,
-    AbsoluteGaloisGroupsOfFiniteFields,
-)
-from sage_extensions.categories.group.profinite.profinite_groups import (  # noqa: F401
-    ProfiniteGroups,
 )
 from sage_extensions.categories.holomorphic_atlases import (  # noqa: F401
     HolomorphicAtlases,
@@ -260,32 +250,19 @@ from sage_extensions.categories.modules.hodge_structures import (  # noqa: F401
     MixedHodgeStructures,
     PolarizedHodgeStructures,
 )
-from sage_extensions.categories.modules.connections import (  # noqa: F401
-    ModulesWithConnection,
-    ModulesWithFlatConnection,
-)
-from sage_extensions.categories.modules.fractional_ideals import (  # noqa: F401
-    FractionalIdeals,
-)
 from sage_extensions.categories.modules.framed.formed.form_modules import (  # noqa: F401
     BilinearFormModules,
     FormModules,
-    SymmetricBilinearFormModules,
 )
 from sage_extensions.categories.modules.framed.fraction_field_quotients import (  # noqa: F401
     FractionFieldQuotients,
 )
 from sage_extensions.categories.modules.pure.modules import (  # noqa: F401
-    FinitelyGeneratedModules,
-    FinitelyPresentedModules,
     FinitelyPresentedTorsionModules,
     FreeModules,
     MatrixEndomorphismSpaces,
     MatrixSpaces,
     Modules,
-    ProjectiveModules,
-    TensorProductModules,
-    TorsionModules,
 )
 from sage_extensions.categories.orbifolds import (  # noqa: F401
     ComplexOrbifolds,
@@ -429,14 +406,6 @@ from sage_extensions.categories.algebras.subalgebras import (  # noqa: F401
 )
 from sage_extensions.categories.algebras.algebra_ideals import (  # noqa: F401
     GeneratedAlgebraIdeals,
-)
-from sage_extensions.categories.algebras.free_algebras import (  # noqa: F401
-    AlternatingAlgebras,
-    SymmetricAlgebras,
-    TensorAlgebras,
-)
-from sage_extensions.categories.algebras.graded_commutative_algebras import (  # noqa: F401
-    StrictlyGradedCommutativeAlgebras,
 )
 from sage_extensions.categories.algebras.graded_lie_algebras import (  # noqa: F401
     GradedLieAlgebras,
