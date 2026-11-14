@@ -1033,3 +1033,31 @@ this triage's index, not filed twice: three cause bodies that this triage first 
 removed from `SHA256SUMS`.  `issue407-repair7-merged-tree.log` is the run on the merged tree
 that is pushed: the identity repair's three greens hold there, nothing new is red, and the
 closure's `TypeError` is absent from all eleven files.
+## #409, reopened — the counts the length assertions carried are stated again
+
+`fba2e71` replaced the two `len(...)` assertions with the section's images
+equalling the orbit of the distinguished vector, and the review of it reads
+correctly: nothing on the page pinned the orbit's order, so an action returning
+a smaller orbit would satisfy that equality with two cosets sharing an image,
+and the nine (four) distinct vectors the length carried would be gone. Each
+test now asserts the orbit-stabilizer count as a stated cardinality of the
+orbit against the coset space, with the values derived in the test rather than
+typed: `|G| = 72` beside `|Stab| = 8` gives `[G : Stab(v)] = 72/8 = 9` for the
+split four-dimensional form, and `|G| = 8` beside `|Stab| = 2` gives `8/2 = 4`
+for the anisotropic ternary plane. Together with the image-set equality, "one
+coset per vector" now means nine and four distinct vectors.
+
+The gate is measured in `b6b63d0`'s tree with this commit's change to
+`tests/test_finite_cosets.py` applied: the pushed tree's source is the same,
+its parent `5d1b66f` adding only that slice's evidence, and the four tests are
+the file's whole selection. So the plug-ins it measures are the ones `fd7260d`
+and the #406 review left behind. An earlier attempt
+of the same gate on the pre-rebase tree also had four tests pass but exited 1 on
+`session star import took 3.11 s; the measured ceiling is 3 s`, the
+shared-preamble ceiling that `suite_budget.pytest_sessionfinish` turns into
+`TESTS_FAILED` for any workload over it, under the other triage runs on the
+VM; no test of this file causes it.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue409-slice-orbit-count-gate.log` | `b6b63d0`'s tree with this commit's change to `tests/test_finite_cosets.py` | gates and lint on, `tests/test_finite_cosets.py`: **4 passed in 22.18 s**, slowest call 13.02 s under the 20 s ceiling, star import under its 3 s ceiling, exit 0 |

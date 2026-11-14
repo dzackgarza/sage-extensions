@@ -50,10 +50,13 @@ def test_split_four_dimensional_form_cosets_are_its_nonzero_singular_vectors() -
     cosets = group.left_cosets(stabilizer)
     section = cosets.representative_map()
 
+    assert group.cardinality() == 72
     assert stabilizer.cardinality() == 8
     assert cosets.cardinality() == 9
-    # One coset per singular vector: the section carries the cosets onto the
-    # orbit of the distinguished vector, so its images are distinct.
+    # Orbit-stabilizer: [G : Stab(v)] = 72/8 = 9 is the order of the orbit of
+    # the distinguished vector, so the section's images, one per coset, are
+    # nine distinct singular vectors.
+    assert group.orbit_of_element(vector).cardinality() == cosets.cardinality()
     assert set(section(point)(vector) for point in cosets) == set(group.orbit_of_element(vector))
     for point in cosets:
         assert cosets.coset_of(section(point)) == point
@@ -76,7 +79,9 @@ def test_anisotropic_ternary_plane_cosets_are_its_unit_vectors() -> None:
     assert group.cardinality() == 8
     assert stabilizer.cardinality() == 2
     assert cosets.cardinality() == 4
-    # One coset per unit vector: the section carries the cosets onto the orbit.
+    # Orbit-stabilizer: [G : Stab(v)] = 8/2 = 4 is the order of the orbit, so
+    # the section's images, one per coset, are four distinct unit vectors.
+    assert group.orbit_of_element(vector).cardinality() == cosets.cardinality()
     assert set(section(point)(vector) for point in cosets) == set(group.orbit_of_element(vector))
     for point in cosets:
         assert cosets.coset_of(section(point)) == point

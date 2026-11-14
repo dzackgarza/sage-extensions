@@ -402,6 +402,11 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 _FINDINGS = pytest.StashKey[dict[Path, list[Finding]]]()
 
 
+def pytest_sessionstart(session: pytest.Session) -> None:
+    r"""Start the run with no file carrying findings; collection fills this in."""
+    session.config.stash[_FINDINGS] = {}
+
+
 def _finding_key(path: Path, rootpath: Path) -> Path:
     r"""The path a collected item and a finding share."""
     return (path if path.is_absolute() else rootpath / path).resolve()
@@ -417,7 +422,6 @@ def pytest_collection_finish(session: pytest.Session) -> None:
     even when no collected test is in the file.
     """
     rootpath = session.config.rootpath
-    session.config.stash[_FINDINGS] = {}
     if session.config.getoption("no_test_lint"):
         return
     files = sorted({
@@ -434,19 +438,19 @@ def pytest_collection_finish(session: pytest.Session) -> None:
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_setup(item: pytest.Item) -> None:
-    findings = item.config.stash[_FINDINGS].get(item.path.resolve())
+    findings = item.config.stash[_FINDINGS].get(item.path.resolve(), ())
     if findings:
         pytest.fail("\n".join(map(str, findings)), pytrace=False)
 
 
 def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
     del exitstatus
-    if session.config.stash.get(_FINDINGS, None):
+    if session.config.stash[_FINDINGS]:
         session.exitstatus = pytest.ExitCode.TESTS_FAILED
 
 
 def pytest_terminal_summary(terminalreporter) -> None:
-    findings = terminalreporter.config.stash.get(_FINDINGS, None)
+    findings = terminalreporter.config.stash[_FINDINGS]
     if not findings:
         return
     every = [finding for file_findings in findings.values() for finding in file_findings]

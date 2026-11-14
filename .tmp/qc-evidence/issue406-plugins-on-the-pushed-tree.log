@@ -1,0 +1,32 @@
+....                                                                     [100%]
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+9.28s call     tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it
+9.20s call     tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_collection_over_its_ceiling_still_runs_the_selected_tests
+0.12s call     tests/rings/test_exact_real_division.sage::test_the_reciprocal_identity_keeps_the_radical_quotient_exact
+0.00s call     tests/rings/test_exact_real_division.sage::test_a_real_divides_by_a_real_and_inverts
+0.00s setup    tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_collection_over_its_ceiling_still_runs_the_selected_tests
+0.00s setup    tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it
+0.00s setup    tests/rings/test_exact_real_division.sage::test_the_reciprocal_identity_keeps_the_radical_quotient_exact
+0.00s setup    tests/rings/test_exact_real_division.sage::test_a_real_divides_by_a_real_and_inverts
+0.00s teardown tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_collection_over_its_ceiling_still_runs_the_selected_tests
+0.00s teardown tests/engineering/test_the_suite_plugins_report_what_they_measured.py::test_a_lint_finding_fails_the_tests_of_the_file_that_holds_it
+0.00s teardown tests/rings/test_exact_real_division.sage::test_the_reciprocal_identity_keeps_the_radical_quotient_exact
+0.00s teardown tests/rings/test_exact_real_division.sage::test_a_real_divides_by_a_real_and_inverts
+4 passed in 19.56s
+EXIT=0
+[peakrss] review-notes-rebased: child waited=0 shell_code=0 samples=15
+[peakrss] peak tree RSS      : 430 MiB
+[peakrss] low-water MemAvail : 3119 MiB
+[peakrss] peak single VmHWM  : 480 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      243 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=    26.0s procs=  5 rss=   430 MiB hwm=   480 MiB avail=  3119 MiB
+[peakrss]   t=    18.0s procs=  5 rss=   415 MiB hwm=   470 MiB avail=  3490 MiB
+[peakrss]   t=    16.0s procs=  5 rss=   408 MiB hwm=   456 MiB avail=  3578 MiB
+[peakrss]   t=    24.0s procs=  5 rss=   394 MiB hwm=   447 MiB avail=  3313 MiB
+[peakrss]   t=    14.0s procs=  5 rss=   371 MiB hwm=   418 MiB avail=  3572 MiB
+launcher exit: 0

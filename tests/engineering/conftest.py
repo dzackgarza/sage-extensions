@@ -82,7 +82,7 @@ def probe_run(tree: dict[str, str], *arguments: str) -> ProbeRun:
             transcript=completed.stdout + completed.stderr,
         )
     finally:
-        shutil.rmtree(root, ignore_errors=True)
+        shutil.rmtree(root)
 
 
 def _failure_message(record: dict) -> str:
@@ -106,4 +106,18 @@ def _outcomes(records: list[dict]) -> dict[str, str]:
     return {nodeid: "failed" if nodeid in failed else "passed" for nodeid in sorted(reported)}
 
 
-builtins.probe_run = probe_run
+def pytest_configure(config) -> None:
+    r"""Bind the abbreviation for this session, as the lint documents.
+
+    ``sage_extensions.testing.test_lint`` admits a name a directory's
+    ``conftest.py`` binds as a builtin and reads that set after the conftests
+    have run; ``tests/lattices/conftest.py`` binds ``card`` the same way.  The
+    name is removed when the session ends, so the binding lasts exactly as long
+    as the tests that name it.
+    """
+    builtins.probe_run = probe_run
+
+
+def pytest_unconfigure(config) -> None:
+    r"""Remove the session's abbreviation, leaving ``builtins`` as it was found."""
+    del builtins.probe_run

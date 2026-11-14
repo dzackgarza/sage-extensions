@@ -88,7 +88,11 @@ is red on that report rather than on an abort.  Peak process-tree RSS 3945 MiB.
 recorded with the workload it measured and reported in the end-of-run summary,
 the way the 20 s call ceiling already was; `pytest_sessionfinish` makes the run
 red.  Recording is independent of `--no-time-gates`, which now lifts what makes
-the run red without lifting what the run measured.
+the run red without lifting what the run measured.  Each ceiling is now an ini
+setting (`time_gate_star_import_ceiling`, `time_gate_collection_ceiling`,
+`time_gate_call_ceiling`) defaulting to the recorded measurement, so a run
+states the ceilings it enforces and the plugin's own tests breach one by
+stating a zero-second ceiling rather than by sleeping.
 
 `src/sage_extensions/testing/test_lint.py`: the findings are filed under the
 file that holds them at collection, each test of such a file fails at its setup
