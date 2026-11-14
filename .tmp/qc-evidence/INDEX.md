@@ -1120,3 +1120,31 @@ and not $q(x+y) - q(x) - q(y)$, the doubled pairing there.
 | log | commit cited | result |
 | --- | --- | --- |
 | `issue409-slice-derived-values-gate.log` | `4a94605`'s tree with this commit's change to `tests/test_finite_cosets.py` | gates and lint on: **4 passed in 8.81 s**, slowest call 7.22 s under the 20 s ceiling, exit 0 |
+
+### #410 — the two repairs replaced by their principled forms
+
+`e9b6c2c` (division) and `6e85b07` (the GAP stabilizer) did not meet the repository's standard on
+re-reading them: the first dispatched on `self.parent() is ring`, the second guarded the empty
+generating family. Both are replaced, in `4b958ef`'s lineage and `852a901` as pushed: one formula
+at the module owner, with the reciprocal stated at the two fields' owner, and one GAP path that is
+given the group's own identity.
+
+The two spellings of the reciprocal differ exactly where a scalar is not a unit, which is why the
+replacement is not cosmetic. Measured, same probe, clean base and the tree of the push:
+
+| row | clean `8755b95` (`** -1`) | the tree of the push (`inverse_of_unit`) |
+| --- | --- | --- |
+| `ZZ(3) ** -1` / `ZZ(3).inverse_of_unit()` | `(1)/(3)` | `ZeroDivisionError: 3 is not a unit` |
+| a ZZ-module vector `/ ZZ(2)` | `TypeError: no conversion of this rational to integer` | `ZeroDivisionError: 2 is not a unit` |
+| `QQ[x].gen() ** -1` / `.inverse_of_unit()` | `1/x`, the fraction field | `ArithmeticError: x is not a unit in ...` |
+| `RR(1)/RR(2)`, `~RR(2)` | `1/2`, `1/2` | `1/2`, `1/2` |
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `410-probe-units.log`, `410-probe-units-on-clean-8755b95.log` | the tree of this push / clean `8755b95` | the unit-inverse and `** -1` columns above, on QQ, ZZ, QQ[x], Zmod(6), RR and CC |
+| `410-probe-zz.log`, `410-probe-zz-on-clean-8755b95.log` | the tree of this push / clean `8755b95` | the ZZ-module division: `ZeroDivisionError: 2 is not a unit` here, `TypeError` there |
+| `410-probe-design2.log` | the tree of this push | `RR(1)/RR(2) = 1/2`, `RR(3)/RR(2) = 3/2`, `RR(3)/ZZ(3) = 1`, `~RR(2) = 1/2`, `RR(2) * ~RR(2) = 1`, `~RR(0)` and `RR(1)/RR(0)` refused, `CC(1)/CC(2) = 1/2`, a QQ-module vector `/ 2 = (1)/(2)*e_0` and `/ ZZ(3) = (1)/(3)*e_0`, `packing_radius() = 1/2`, `center_density() = 1/4` |
+| `410-replacement-repairs-gate-at-1e0546d.log` | the tree of this push (`852a901`) | the four cause-A ids, the cause-B id and the #150 contract on the rebased tree: **6 passed in 5.61 s** |
+| `410-replacement-repairs-gate-at-8755b95.log` | `4b958ef` before the rebase | the same six ids: **6 passed in 10.79 s** |
+| `410-promoted-repairs-b-alone-at-8755b95.log` | repair B alone, on `8755b95` | the same six ids with only the GAP stabilizer changed: **6 passed in 6.23 s** |
+| `410-regression-set-comparison.log` | the tree of this push against clean `8755b95` | fourteen files, one pytest process per file per tree, FAILED-id sets compared: every row has an empty only-on-this-tree set, and the counts agree row by row (`tests/sets` 33 failed / 123 passed on both; `test_exact_real_division` 2 passed; `test_rational_exact_reals` 1 passed; `test_young_convolution` 3 failed / 4 passed; `test_lebesgue_spaces_on_the_line` 9 failed / 5 passed; `test_fraction_field_base_change_archive` 2 failed; `test_finite_cokernel_constructor` 1 failed; `test_predicate_kernel_and_stabilizer_subgroups_of_s4` 1 failed / 4 passed; `test_structured_subgroups` 1 passed; `test_group_law` 1 failed / 3 passed; `test_integral_stabilizers` 4 passed; `test_vector_family_stabilizers` 10 passed; `test_rational_scalars_on_a_base_changed_lattice` 1 passed; `test_definite_metric_invariants_archive` 2 passed). `test_a_stabilizers_generators_generate_a_subgroup` reached the 600 s cap on **both** trees (`exit=124`), so it is not claimed either way |
