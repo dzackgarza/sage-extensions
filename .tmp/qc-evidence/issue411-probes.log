@@ -1,0 +1,45 @@
+===== probe411 =====
+provider SHA: dcfe72cf691b0c9b92cc4e326cd98b28fa8383d3
+== 1. which values name an integer (`_integral_rank`)
+  '2'          in preamble ZZ: True    _integral_rank: 2       (engine ZZ: True)
+  '2'          in preamble ZZ: True    _integral_rank: 2       (engine ZZ: False)
+  '2'          in preamble ZZ: True    _integral_rank: 2       (engine ZZ: False)
+  '2.0'        in preamble ZZ: True    _integral_rank: 2       (engine ZZ: True)
+  '2.5'        in preamble ZZ: False   _integral_rank: None    (engine ZZ: False)
+  '(5)/(2)'    in preamble ZZ: False   _integral_rank: None    (engine ZZ: False)
+  '2'          in preamble ZZ: False   _integral_rank: None    (engine ZZ: False)
+  'True'       in preamble ZZ: True    _integral_rank: 1       (engine ZZ: True)
+== 2. catalogue matrix groups at each spelling of the rank
+  GL('2'      , GF(3)) -> order 48
+  SL('2'      , GF(3)) -> order 24
+  Sp('2'      , GF(3)) -> order 24
+  GU('2'      , GF(3)) -> order 96
+  GL('2'      , GF(3)) -> order 48
+  SL('2'      , GF(3)) -> order 24
+  Sp('2'      , GF(3)) -> order 24
+  GU('2'      , GF(3)) -> order 96
+  GL('2'      , GF(3)) -> order 48
+  SL('2'      , GF(3)) -> order 24
+  Sp('2'      , GF(3)) -> order 24
+  GU('2'      , GF(3)) -> order 96
+  GL('2.0'    , GF(3)) -> order 48
+  SL('2.0'    , GF(3)) -> order 24
+  Sp('2.0'    , GF(3)) -> order 24
+  GU('2.0'    , GF(3)) -> order 96
+  GL('2.5'    , GF(3)) raised AssertionError: GL_n(R) needs a rank n that is an integer n >= 0, but got 2.
+  SL('2.5'    , GF(3)) raised ValueError: SL_n(R) requires an integral rank
+  Sp('2.5'    , GF(3)) raised ValueError: a group degree must be an integer
+  GU('2.5'    , GF(3)) raised ValueError: a group degree must be an integer
+  GL('(5)/(2)', GF(3)) raised AssertionError: GL_n(R) needs a rank n that is an integer n >= 0, but got (5
+  SL('(5)/(2)', GF(3)) raised ValueError: SL_n(R) requires an integral rank
+  Sp('(5)/(2)', GF(3)) raised ValueError: a group degree must be an integer
+  GU('(5)/(2)', GF(3)) raised ValueError: a group degree must be an integer
+  GL('2'      , GF(3)) raised AssertionError: GL_n(R) needs a rank n that is an integer n >= 0, but got '2
+  SL('2'      , GF(3)) raised ValueError: SL_n(R) requires an integral rank
+  Sp('2'      , GF(3)) raised ValueError: a group degree must be an integer
+  GU('2'      , GF(3)) raised ValueError: a group degree must be an integer
+== 3. the centre of a group algebra through Modules.linear_combination
+  Z(Fraction Field[S_3]): rank 3, basis (0, 1, 2)
+  Z(Integer Ring[S_3]): rank 3, basis (0, 1, 2)
+  class sum of the identity class: [1]
+

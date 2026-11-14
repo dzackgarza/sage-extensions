@@ -1148,3 +1148,25 @@ replacement is not cosmetic. Measured, same probe, clean base and the tree of th
 | `410-replacement-repairs-gate-at-8755b95.log` | `4b958ef` before the rebase | the same six ids: **6 passed in 10.79 s** |
 | `410-promoted-repairs-b-alone-at-8755b95.log` | repair B alone, on `8755b95` | the same six ids with only the GAP stabilizer changed: **6 passed in 6.23 s** |
 | `410-regression-set-comparison.log` | the tree of this push against clean `8755b95` | fourteen files, one pytest process per file per tree, FAILED-id sets compared: every row has an empty only-on-this-tree set, and the counts agree row by row (`tests/sets` 33 failed / 123 passed on both; `test_exact_real_division` 2 passed; `test_rational_exact_reals` 1 passed; `test_young_convolution` 3 failed / 4 passed; `test_lebesgue_spaces_on_the_line` 9 failed / 5 passed; `test_fraction_field_base_change_archive` 2 failed; `test_finite_cokernel_constructor` 1 failed; `test_predicate_kernel_and_stabilizer_subgroups_of_s4` 1 failed / 4 passed; `test_structured_subgroups` 1 passed; `test_group_law` 1 failed / 3 passed; `test_integral_stabilizers` 4 passed; `test_vector_family_stabilizers` 10 passed; `test_rational_scalars_on_a_base_changed_lattice` 1 passed; `test_definite_metric_invariants_archive` 2 passed). `test_a_stabilizers_generators_generate_a_subgroup` reached the 600 s cap on **both** trees (`exit=124`), so it is not claimed either way |
+
+## #411 — the second half of `tests/groups`
+
+The slice is the 38 files #411 lists (every `tests/groups` file from
+`test_group_automorphisms_archive.sage` on, plus `test_g_sets_torsor_archive.sage`):
+148 tests, run one file per pytest process in the published image with the
+repository's own `just test` and its `addopts` blanked, as in the commands above.
+Triage record: `results/issue411-triage.md`. The 22 open causes are staged as
+paste-ready issue bodies in `.tmp/qc-evidence/triage/411-*.md`.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue411-slice-red.log` | `36e5eac` | the sweep: 38 files, **42 failed / 106 passed**, 19 files with failures; each section is one file's run with its own pytest summary |
+| `issue411-slice-final.log` | `d0cfd20`, `dcfe72c` (on `8971654`) | the same 38 files on the repaired tree: **41 failed / 107 passed**, the same 41 ids that fail on `36e5eac` with the two repairs; the one green is the degree test of C02 |
+| `issue411-probes.log` | `d0cfd20`, `dcfe72c` | the three decisions the two repairs rest on, printed from the image: which values `_integral_rank` admits (`QQ(2)` yes, `2.5` no, a string no, an engine `ZZ(2)` no), `GL/SL/Sp/GU` of `GF(3)` at each, and `Z(QQ[S_3])`/`Z(ZZ[S_3])` of rank 3 through `Modules.linear_combination` |
+| `issue411-candidates.log` | `c8a3ced` (two dropped attempts) | the two candidate repairs measured and NOT landed: C05's engine crossing, which moves the five conjugation tests to `'...ArrowType' object has no attribute 'gap'` and leaves M12's file unfinished at 360 s where it failed in 0.87 s; and C20's ring-first `matrix`, whose result `Groups.SL(2, ZZ)` refuses as a Sage object |
+
+Two limits of this host, recorded rather than hidden: the image's venv has no
+`pytest-timeout` and no `pytest-reportlog`, so the repository's `addopts` are blanked
+and the two gate plugins named by hand (`--no-time-gates --no-test-lint` for the
+sweeps), and every run is a single file in its own process because other chats use the
+same VM.
