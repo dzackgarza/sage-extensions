@@ -1,0 +1,10 @@
+Running 1 items in this shard
+.                                                                        [100%]
+==================================== PASSES ====================================
+_ test_the_fourth_cusps_walk_stops_within_twenty_decompositions_at_the_card_chamber _
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+PASSED tests/lattices/test_the_isotropic_reduction_image.sage::test_the_fourth_cusps_walk_stops_within_twenty_decompositions_at_the_card_chamber
+1 passed, 10 deselected in 982.48s (0:16:22)

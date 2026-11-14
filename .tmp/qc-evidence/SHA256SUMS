@@ -345,3 +345,5 @@ c40ef31d9e556acdb50bffb35a71d4c0a6b829b9400d990e4d084fbaf476457b  .tmp/qc-eviden
 d0c19b7270034a4dc140743676e21406ba5c0885234d48dfb68b7c97df0b5fa5  .tmp/qc-evidence/issue409-slice-orbit-counts.log
 a880b559e9ebf7627f29ba3b3b56dabfc5ae7e8553d5bf1672e9aee78643bc5f  .tmp/qc-evidence/issue409-slice-orbit-counts.py
 4a3b20906598a8630fbc96529f522939530f3dd1c69b16798e36e13a0874f250  .tmp/qc-evidence/issue409-slice-three-path-run-stopped.log
+dc6b427d8a7d046745eaf4c6ebfa859dfc52ada26ed77448e2deb019637b1864  .tmp/qc-evidence/issue402-reduction-image-file.log
+0020182157d7ad7ae08b3888a6b3d40364806c930c7795b533da5c83ea35959f  .tmp/qc-evidence/issue402-cusp4-walk-test.log

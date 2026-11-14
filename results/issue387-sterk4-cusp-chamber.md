@@ -52,6 +52,13 @@ controlling vector or the group differs from Sterk's cusp 4.
 
 ## 3. The group differs, and the measurement says how
 
+**Corrected by #402 (5af2f0b).** The conclusion of this section is false.
+The filter refused two walls of the card's chamber, `alpha_2` and `alpha_10`,
+because `ρ(K_v)` was taken from the transvections of a basis of `v^⊥` only;
+the filter defined a smaller reflection group than `W(G_v)`, not a bigger
+one. With all of `K_v`, the public `cusp_chamber()` returns the card's eleven
+walls (`.tmp/qc-evidence/issue402-*`).
+
 Three measurements pin it down:
 
 1. **The walk, with the candidate rules repaired** (below), accepts sixteen
