@@ -827,3 +827,78 @@ count handed to `check_row_count`.
 | `issue404-gate.log` | the tree of this push | the gate on the file that gates the same contract, `tests/lattices/test_the_stable_plane_rows_equal_their_double_coset_counts.sage`: **3 passed in 61.06 s**, `--no-time-gates`, two calls over the 20 s gate (25.51 s on `6JRS`, 31.16 s on `U + U(2) + <-2>`) |
 | `issue402-cusp4-chamber-at-vertex.py` / `issue402-cusp4-chamber-at-vertex.log` | the tree of this push | the public `cusp_chamber(p_0)` at card `029J` row 4.3.8's cusp, `p_0` the vertex of square 2 of the card's polyhedron (nine printed walls through it): **complete, 11 walls**, the nine through `p_0` printed, two more of squares `-4` and `-2`; 245 filter questions, 116 admitted |
 | `issue402-cusp4-chamber-gram.py` / `issue402-cusp4-chamber-gram.log` | the tree of this push | the eleven walls of that chamber and card `029J`'s eleven printed walls, in `N`: **the two Gram matrices are equal entry by entry**, and both polyhedra have 26 rays of squares `0..12`. The returned chamber contains `p_0` on the side where the two closing walls pair `-2` with it, the card's on the side where they pair `+2` |
+
+## #409 — the finite-coset slice's only red is the file's own session standard
+
+`tests/test_finite_cosets.py` holds four tests. Under the flags the issue's
+observation used, `--no-time-gates --no-test-lint`, all four pass on `main` at
+`9b29712`, alone and in session behind sibling files that drive the same
+coset, transport and stabiliser machinery, and they pass at `bbb6608`,
+`484e4c5` and `0ee5ad5`; the slice contributes no failing test id to the 238
+of 633, and the three paths still collect exactly 633 tests here. Its one red
+is the collection the repository's own invocation performs: the file imported
+`sage.all` and five `sage_extensions` modules directly, imported the private
+`_owned_integers` and called `len()` twice, so with the session-standard lint
+on, `pytest` exited 1 with `no tests ran` and nine findings before any of the
+four tests ran. The file entered that way at `178bec4` (2026-10-26, added with
+the coset machinery) and never ran under `just test` since. `fba2e71` repairs
+it: the names come from `from sage_extensions.all import *`, and the two length
+assertions are replaced by the statement they were numbering, the coset
+section carrying the cosets onto the orbit of the distinguished vector, whose
+9 and 4 are derived (72/8 and 8/2, printed with `|G|` and `|Stab|` beside
+`|orbit|`) rather than typed.
+
+Two limits of this host are recorded, not worked around. The image's Sage
+environment has neither `pytest-timeout` nor `pytest-reportlog`, so `just test`
+verbatim dies on its own `addopts` (`unrecognized arguments: --timeout=60
+--timeout-method=signal --report-log=...`) and the observation's 60 s cap
+cannot be reproduced as failures; per-test durations are recorded instead, and
+the slowest of the four is 11.7 s. And the three-path run cannot be bounded
+here: `tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage::
+test_the_enriques_orthogonal_groups_line_stabilizer_generates_a_subgroup` ran
+past eleven minutes with nothing to stop it, which the observation's
+`--timeout=60` would have turned into a failure; the run was stopped after the
+first four tests of `tests/groups`, so the split by file for the other two
+paths is not in these logs.
+
+Paste-ready body for the one cause this slice owns (this connection reads and
+pushes, it cannot create issues):
+
+```
+tests/test_finite_cosets.py runs under no invocation of just test
+
+Under the repository's own invocation the session-standard lint ends the run
+red at collection, so the file's four tests have never run:
+
+  $ just test tests/test_finite_cosets.py -o addopts= -p \
+      sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint
+  no tests ran in 2.26s
+  ! _pytest.outcomes.Exit: test lint: 9 findings (run just test-lint for all)
+  tests/test_finite_cosets.py:3: TL01 import sage.all
+  ... five TL01, one TL02 (_owned_integers), two TL10 (len at :63, :85)
+  exit 1
+
+Introduced by 178bec4 ("Carry exact coset transversals and pairing-map graph
+construction", 2026-10-26), which added the file outside the session standard;
+D. Zack Garza. The eight top-level .py tests share the finding pattern (41
+findings over five of them, `python -m sage_extensions.testing.test_lint
+tests/test_*.py`), so the repair of the others belongs to whoever owns them.
+
+When this closes a user of the library gets `tests/test_finite_cosets.py` as a
+suite that actually runs: the four coset, section and Schreier assertions are
+executed by `just test` instead of being skipped by a collection error.
+
+Repaired on main in fba2e71.
+```
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue409-just-test-addopts-unavailable.log` | `9b29712` | the repository's `addopts` under this host's image: `unrecognized arguments: --timeout=60 --timeout-method=signal --report-log=tests/.report/run.jsonl`, exit 4, nothing collected — the reason the runs below pass `-o addopts=` with the two gate plugins named explicitly |
+| `issue409-slice-collection-count.log` | `9b29712` | `tests/groups tests/objects tests/test_finite_cosets.py` collect **633** tests (302 / 327 / 4), the issue's denominator |
+| `issue409-slice-main-run.log` | `9b29712` | `tests/test_finite_cosets.py` under `--no-time-gates --no-test-lint`: **4 passed in 3.81 s**, slowest call 3.07 s |
+| `issue409-slice-earlier-commits.log` | `bbb6608`, `484e4c5`, `0ee5ad5` | the same four tests at each commit: **4 passed** in 7.51 s, 7.87 s, 7.91 s — no commit of that day carries a red here |
+| `issue409-slice-three-path-run-stopped.log` | `9b29712` | the three-path run, stopped by me after 11 min: four tests done, no failure, blocked in `test_the_enriques_orthogonal_groups_line_stabilizer_generates_a_subgroup` |
+| `issue409-slice-default-invocation-red.log` | `9b29712` | the red: gates and lint on, `tests/test_finite_cosets.py` alone — **no tests ran**, `Exit: test lint: 9 findings`, exit 1 |
+| `issue409-slice-after-fix-default.log` | `fba2e71` | the same invocation on the repaired tree: **4 passed in 9.11 s**, 0 findings |
+| `issue409-slice-after-fix-context.log` | `fba2e71` | the repaired file behind seven sibling files (four `tests/groups` coset tests, `test_symmetric_group_s3.sage`, `test_orthogonal_group_of_a2.sage`): **36 passed, 9 failed**, all nine in the two sibling files, none here |
+| `issue409-slice-orbit-counts.py` / `.log` | `fba2e71` | the numbers the replaced `len()` calls carried: split four-dimensional form `|orbit| = 9`, `|G| = 72`, `|Stab| = 8`; anisotropic ternary plane `|orbit| = 4`, `|G| = 8`, `|Stab| = 2` |

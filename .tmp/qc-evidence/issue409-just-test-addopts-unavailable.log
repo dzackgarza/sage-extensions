@@ -1,0 +1,18 @@
+provider SHA: 9b297125b3726d6e6b5f548f2ad3ef01c7933029
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session --no-time-gates --no-test-lint --collect-only -q tests/test_finite_cosets.py
+ERROR: usage: python -m pytest [options] [file_or_dir] [file_or_dir] [...]
+python -m pytest: error: unrecognized arguments: --timeout=60 --timeout-method=signal --report-log=tests/.report/run.jsonl
+  inifile: /repos/sage-extensions/pyproject.toml
+  rootdir: /repos/sage-extensions
+
+[peakrss] run409-1131939: child waited=4 shell_code=4 samples=2
+[peakrss] peak tree RSS      : 278 MiB
+[peakrss] low-water MemAvail : 13621 MiB
+[peakrss] peak single VmHWM  : 278 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      267 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   278 MiB hwm=   278 MiB avail= 13621 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13999 MiB
