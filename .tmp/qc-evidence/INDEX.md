@@ -1356,3 +1356,35 @@ processes each, under the suite's 3.0 s ceiling for that workload.
 | `issue452-locus-tests-merged.log` | `27fd250`, the merge of this repair with `a8b7eb8` | `tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage`: **4 passed in 4.83 s**, lint on, exit 0 | 
 | `issue452-reduction-image-tests-merged.log` | `27fd250`, the same tree | `tests/lattices/test_the_isotropic_reduction_image.sage`: **11 passed in 1504.36 s**, the five-row chamber test at 752.69 s and the two-lifts test at 272.78 s; `--no-time-gates`, the five overruns printed | 
 | `issue452-tco-coset-count.log` | `fd0f1c0`, the pushed tree (the probe reads the locus' own Smith data) | the number of lift tests a `T_Co = <2> + (U + E8(-1))(2)` line of divisibility two forces: period 4, rank 9, nine Smith invariants one, **512 coset representatives, `|K| = 512`**, `|P/mP| = 262144` — so one `integral_restriction` per coset is the 512-test cost the repair adds to that line, and no `T_Co` row was run | 
+## Issue #500: a ring element divides in its ring, and a module's element divides by a scalar
+
+`38274f7` replaces the per-realization placement of `b3c7ca3`. A ring is a left module over itself, so
+a ring element's class carries both the ring's quotient `a b^{-1}` and the module's scalar action
+`b^{-1} a`; they agree only when the ring commutes. `OwnedRings.ElementMethods` now states the
+operator, `__truediv__ = Element.__truediv__`, and the module level keeps `v / r = r^{-1} v` for the
+modules whose elements are not ring elements. The composition had to be read twice: a chain-built
+parent composes `(Element, category.element_class)`, where the ring level already precedes the module
+level, while `refine` prepends newly reached category methods to the whole native element class of an
+adopted parent, so a ring first built as a module over itself kept the module's division whatever the
+final category order said. `_final_category_operations` is now shared by the parent and the element
+rebuild, and `_realization_operations` keeps the object's own implementation in front of a level a
+refinement moved ahead of it. The two owned fields state their reciprocal as `one() / x` with no
+direct `_div_` call.
+
+| row | at 51310d6 (main before this push) | on the tree of this push |
+| --- | --- | --- |
+| `M_2(QQ)`: `~divisor` | the module's scalar action answered `__truediv__` | `1 - e_21`, the inverse in the ring |
+| `M_2(QQ)`: `e_12 / (1 + e_21)` | `ValueError: ... is not in Category of sets with partial maps` | `e_12 - e_11`, which is `e_12 (1 - e_21)`; `(1 - e_21) e_12` is `e_12 - e_22` |
+| `RR`, `CC`: `__truediv__` written in | `ExactRealNumber`, `ExactComplexNumber` (`b3c7ca3`) | `OwnedRings.ElementMethods [Element.__truediv__]`, with `_div_` at `ExactRealNumber`/`ExactComplexNumber` |
+| `QQ[x]`, `QQ[x]/(x^2-2)`, `QQ(i)`: `__truediv__` written in | `Modules.ElementMethods` | `_OwnedRingElement.__truediv__`, reached through the rebuilt element class |
+| `ZZ`: `3 / 2` | `3/2` by the realization's division | `3/2`, the same realization, now also under the coercion model |
+| a QQ-module vector `/ 2` | `(1)/(2)*v` by the module formula | the same, and it is the module's own operation |
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `500-element-class-division.log` | `38274f7` | where each ring's `__truediv__` and `_div_` are written, by class and descriptor; then `e_12/(1+e_21) == e_12 - e_11` with `!= e_12 - e_22` and `!= (~divisor) e_12`, the module's `v / r`, the lattice's refusal, and `RR`/`CC` reciprocals including `1/(sqrt 2 - 1) == sqrt 2 + 1` and `packing_radius() = 1/2` |
+| `500-ring-division-new-test.log` | `38274f7` | `tests/rings/test_elements_divide_in_their_own_ring.sage`: **4 passed in 19.13 s** (1 failed, 3 passed at `51310d6`) |
+| `500-gate-410-slice.log` | `38274f7` | #410's slice -- four cause-A ids, the cause-B id and #150's contract: **6 passed in 2.07 s** |
+| `500-integer-literal-division.log` | `38274f7` | an integer divisor on an engine-backed ring: `ZZ(3)/2 = 3/2`, `QQ[x](x)/2`, `(1 + sqrt5)/2`, and `Sterk.sterk_roots()` returning its five diagrams |
+| `500-refine-resolution-surface.log` | `38274f7` | the names the two rebuild rules resolve, over fourteen object kinds: `__truediv__` and `order_ideal` on the refined element classes, `__add__`/`__sub__` and `norm`/`trace` where a category level had moved in front of the realization, `__iter__`/`adic_completion` on the refined parents |
+| `500-regression-compared.log` | `38274f7` against `51310d6` | fourteen directories and the root `tests/*.py`, one pytest process each per tree, FAILED ids and not counts: every row has an empty only-on-this-tree set; `tests/rings` has **two fixed ids** and 75 failed, 257 passed against 77 failed, 251 passed. Not measured: `tests/lattices` as one directory (6245 MiB, stopped by the 6144 MiB guard on both trees) and `tests/groups` (1000 s cap) |

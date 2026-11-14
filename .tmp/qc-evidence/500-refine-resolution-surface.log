@@ -1,0 +1,10 @@
+provider SHA: 51310d613cd8c27860c70ff2f3370fedc6a18f21
+port SHA: 991b88b0
+command: python /probe500.py
+names the rebuilds resolve, by class and rule:
+  Owned_NativeFreeAlgebraParent_with_category.element_class {'_realization_operations': ['__add__', '__radd__', '__rsub__', '__sub__'], '_final_category_operations': ['order_ideal']}
+  Owned_OwnedAlgebraParent_with_category {'_final_category_operations': ['__iter__', 'adic_completion']}
+  Owned_OwnedAlgebraParent_with_category.element_class {'_realization_operations': ['norm', 'trace'], '_final_category_operations': ['order_ideal']}
+  Owned_PresentedAlgebraParent_with_category {'_final_category_operations': ['__iter__', 'adic_completion']}
+  Owned_PresentedAlgebraParent_with_category.element_class {'_realization_operations': ['__add__', '__radd__', '__rsub__', '__sub__'], '_final_category_operations': ['order_ideal']}
+launcher exit: 0

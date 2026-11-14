@@ -1,0 +1,65 @@
+provider SHA: 51310d613cd8c27860c70ff2f3370fedc6a18f21
+port SHA: 991b88b0
+command: python /probe500.py
+element class resolution, __truediv__ and _div_:
+  ZZ: __truediv__ sage_extensions.categories.rings.ring_foundation._OwnedRingElement [_OwnedRingElement.__truediv__]
+  ZZ: _div_      sage.structure.element.RingElement [RingElement._div_]
+  QQ: __truediv__ sage_extensions.categories.rings.ring_foundation.LocalizationRings.ElementMethods [Monoids.ElementMethods.divide_by_unit]
+  QQ: _div_      sage.structure.element.RingElement [RingElement._div_]
+  QQ[x]: __truediv__ sage_extensions.categories.algebras.free_algebras.Owned_NativeFreeAlgebraParent_with_category.element_class [_OwnedRingElement.__truediv__]
+  QQ[x]: _div_      sage.structure.element.RingElement [RingElement._div_]
+  QQ[x]/(x^2-2): __truediv__ sage_extensions.categories.algebras.free_algebras.Owned_PresentedAlgebraParent_with_category.element_class [_OwnedRingElement.__truediv__]
+  QQ[x]/(x^2-2): _div_      sage.structure.element.RingElement [RingElement._div_]
+  QQ(i): __truediv__ sage_extensions.categories.algebras.free_algebras.Owned_PresentedAlgebraParent_with_category.element_class [_OwnedRingElement.__truediv__]
+  QQ(i): _div_      sage.structure.element.RingElement [RingElement._div_]
+  RR: __truediv__ sage_extensions.categories.rings.ring_foundation.OwnedRings.ElementMethods [Element.__truediv__]
+  RR: _div_      sage_extensions.rings.real.ExactRealNumber [ExactRealNumber._div_]
+  CC: __truediv__ sage_extensions.categories.rings.ring_foundation.OwnedRings.ElementMethods [Element.__truediv__]
+  CC: _div_      sage_extensions.rings.complex.ExactComplexNumber [ExactComplexNumber._div_]
+  M_2(QQ): __truediv__ sage_extensions.categories.rings.ring_foundation.OwnedRings.ElementMethods [Element.__truediv__]
+  M_2(QQ): _div_      sage.categories.monoids.Monoids.ElementMethods [Monoids.ElementMethods._div_]
+  M_2(ZZ): __truediv__ sage_extensions.categories.rings.ring_foundation.OwnedRings.ElementMethods [Element.__truediv__]
+  M_2(ZZ): _div_      sage.categories.monoids.Monoids.ElementMethods [Monoids.ElementMethods._div_]
+
+M_2(QQ), a noncommutative ring: a / b = a b^-1 and not b^-1 a
+  ~divisor = Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring
+  ~divisor == 1 - e21 = True
+  e12 / divisor = Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring
+  e12 / divisor == e12 - e11 = True
+  e12 / divisor != e12 - e22 = True
+  (~divisor) * e12 == e12 - e22 = True
+  e12 / divisor != (~divisor) * e12 = True
+  divisor / divisor == 1 = True
+  e12 / (2 * one) == (1/2) e12 = True
+
+a module's elements divide by the scalar's unit inverse
+  v / 2 = (1)/(2)*[v]
+  v / 2 == (1/2) v = True
+  v / ZZ(3) == (1/3) v = True
+  v / (1/2) == 2 v = True
+  (2 v) / 2 == v = True
+  QQ-module v / Qi2 = 2*[v]
+  a ZZ-lattice vector / 2 raises ZeroDivisionError: 2 is not a unit
+  a ZZ-lattice vector / ZZ(3) raises ZeroDivisionError: 3 is not a unit
+  Lattices(ZZ)(2).packing_radius() = 1/2
+  Lattices(ZZ)(2).center_density() = 1/4
+
+RR and CC state a reciprocal as one() / x
+  RR(1) / RR(2) = 1/2
+  RR(3) / RR(2) = 3/2
+  RR(3) / 2 = 3/2
+  RR(3) / ZZ(3) = 1
+  ~RR(2) = 1/2
+  ~RR(2) == RR(1) / RR(2) = True
+  RR(2) * ~RR(2) = 1
+  1 / (sqrt 2 - 1) = 1/(sqrt(2) - 1)
+  1 / (sqrt 2 - 1) == sqrt 2 + 1 = True
+  ~RR(0) raises ZeroDivisionError: cannot divide 1 by 0: the denominator is zero
+  RR(1) / RR(0) raises ZeroDivisionError: cannot divide 1 by 0: the denominator is zero
+  CC(1) / CC(2) = 1/2
+  ~CC(2) == CC(1) / CC(2) = True
+  CC(3) / 2 = 3/2
+  RR(1) / (CC(1) / CC(2)), a quotient in the common parent = 2
+  QQ(1) / QQ(2) = (1)/(2)
+  QQ(3).inverse_of_unit() = (1)/(3)
+launcher exit: 0
