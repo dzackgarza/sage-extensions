@@ -1,0 +1,17 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt468base3
+tree HEAD: 37b67b7e467e7bfcfe6e6e1652d5f5111ed003c7
+tree all.py sha256: 88c45ea656f3c99edfcb7a2ac5b862a5c5ec460a5543ecb1f9c2d5ead37113ff  /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt468base3/src/sage_extensions/all.py
+command: .scratch/import_time.py 3
+star import, 3 fresh processes: 0.319, 0.254, 0.252 s
+max 0.319 s against the 3.0 s ceiling
+[peakrss] run: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 376 MiB
+[peakrss] low-water MemAvail : 13118 MiB
+[peakrss] peak single VmHWM  : 376 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      268 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  4 rss=   376 MiB hwm=   376 MiB avail= 13118 MiB
+[peakrss]   t=     4.0s procs=  4 rss=   324 MiB hwm=   324 MiB avail= 13186 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13206 MiB

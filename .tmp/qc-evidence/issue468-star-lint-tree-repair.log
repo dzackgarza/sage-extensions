@@ -1,0 +1,1442 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt468s
+tree HEAD: 37b67b7e467e7bfcfe6e6e1652d5f5111ed003c7
+tree all.py sha256: fde94ca304c9444d88951e563ecd5022cc30572e8482ea6c3ebe1b46aea86c18  /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt468s/src/sage_extensions/all.py
+command: -m sage_extensions.testing.test_lint
+tests/algebras/test_a_presented_algebra_element_displays_through_its_presentation.sage:18: TL07 compares a rendering: assert the mathematical object, not its display
+tests/algebras/test_a_presented_algebra_element_displays_through_its_presentation.sage:18: TL07 str(): a representation, not a mathematical value
+tests/algebras/test_affine_semigroup_algebras.sage:8: TL01 from sage_extensions.categories.algebras.semigroup_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:9: TL01 from sage_extensions.categories.algebras.free_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:10: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:10: TL02 imports the private name _owned_integers
+tests/algebras/test_affine_semigroup_algebras.sage:19: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_affine_semigroup_algebras.sage:38: TL01 from sage_extensions.categories.algebras.semigroup_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:39: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:39: TL02 imports the private name _owned_integers
+tests/algebras/test_algebra_base_change_archive.sage:10: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_algebra_preservation.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_commutative_algebras_are_reachable.sage:12: TL01 import the complete session with from sage_extensions.all import *
+tests/algebras/test_commutative_algebras_are_reachable.sage:22: TL07 compares a rendering: assert the mathematical object, not its display
+tests/algebras/test_commutative_algebras_are_reachable.sage:22: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_commutative_algebras_are_reachable.sage:32: TL07 compares a rendering: assert the mathematical object, not its display
+tests/algebras/test_commutative_algebras_are_reachable.sage:32: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_commutative_algebras_are_reachable.sage:33: TL07 compares a rendering: assert the mathematical object, not its display
+tests/algebras/test_commutative_algebras_are_reachable.sage:33: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_commutative_algebras_are_reachable.sage:34: TL07 compares a rendering: assert the mathematical object, not its display
+tests/algebras/test_commutative_algebras_are_reachable.sage:34: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_commutative_algebras_are_reachable.sage:40: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_coproduct_quotient_relation_transport.sage:8: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_de_rham.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_finite_presentations_of_commutative_algebras.sage:85: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/algebras/test_finite_presentations_of_commutative_algebras.sage:90: TL03 isinstance(): introspection is not mathematics
+tests/algebras/test_free_algebra_generators.sage:20: TL10 len(): ask for a cardinality
+tests/algebras/test_free_algebra_generators.sage:23: TL11 .gens: write group_generators, module_generators or algebra_generators
+tests/algebras/test_free_algebra_generators.sage:30: TL10 len(): ask for a cardinality
+tests/algebras/test_free_algebra_generators.sage:33: TL11 .gens: write group_generators, module_generators or algebra_generators
+tests/algebras/test_functor_adjunctions.sage:2: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_general_algebra_structure.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_group_algebra_functor_archive.sage:12: TL02 private attribute ._augmentation
+tests/algebras/test_group_algebras.sage:11: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_group_algebras.sage:18: TL08 OwnedCategoryOverBaseRing: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/algebras/test_group_algebras.sage:22: TL01 from sage_extensions.categories.modules.framed.framed_free_modules import ...: take every name from the session
+tests/algebras/test_group_algebras.sage:23: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/algebras/test_group_algebras.sage:27: TL02 private attribute ._selected_relation_morphism
+tests/algebras/test_isometry_commutant.sage:23: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:24: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:25: TL01 from sage.matrix.special import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:26: TL01 from sage.modules.free_module_element import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:27: TL01 from sage.rings.infinity import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:28: TL01 from sage.rings.number_field.number_field import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:29: TL01 from sage.rings.polynomial.polynomial_ring_constructor import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:30: TL01 from sage.rings.rational_field import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:31: TL01 from sage.rings.integer_ring import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:32: TL01 from sage.rings.rational_field import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:33: TL01 from sage_extensions.algebras.isometry_commutant import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:34: TL01 from sage.rings.finite_rings.finite_field_constructor import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:52: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:69: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:69: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:70: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:71: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:89: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:109: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:124: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:125: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:143: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:143: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:144: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:146: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:147: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:149: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:159: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:161: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:162: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:170: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:171: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:173: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:174: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:179: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:179: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:189: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:192: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:193: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:203: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:205: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:206: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:214: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:235: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:240: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:240: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:322: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:324: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:325: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:334: TL09 an assertion that holds of anything
+tests/algebras/test_isometry_commutant.sage:355: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:361: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:363: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:370: TL01 from sage.algebras.quatalg.quaternion_algebra import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:373: TL11 .gens: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:408: TL09 an assertion that holds of anything
+tests/algebras/test_isometry_commutant.sage:442: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:443: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:445: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:448: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:449: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:468: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:470: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:472: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:477: TL01 from sage.arith.misc import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:500: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:502: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:504: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:504: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:506: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:519: TL01 from sage.arith.misc import ...: take every name from the session
+tests/algebras/test_isometry_commutant.sage:527: TL10 len(): ask for a cardinality
+tests/algebras/test_isometry_commutant.sage:529: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:530: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_isometry_commutant.sage:531: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_lie_cokernels.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_morphisms_of_presented_commutative_algebras.sage:20: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_morphisms_of_presented_commutative_algebras.sage:80: TL04 try/except: expected failures are asserted with pytest.raises
+tests/algebras/test_morphisms_of_presented_commutative_algebras.sage:85: TL09 an assertion that holds of anything
+tests/algebras/test_native_free_algebra_module_factor.sage:10: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_native_free_algebra_module_factor.sage:103: TL09 test_commutative_nonunital_theory_does_not_inherit_tensor_coproduct asserts nothing
+tests/algebras/test_native_free_algebra_module_factor.sage:107: TL04 try/except: expected failures are asserted with pytest.raises
+tests/algebras/test_norm_one_units.sage:11: TL01 from sage.algebras.quatalg.quaternion_algebra import ...: take every name from the session
+tests/algebras/test_norm_one_units.sage:12: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/algebras/test_norm_one_units.sage:13: TL01 from sage.rings.number_field.number_field import ...: take every name from the session
+tests/algebras/test_norm_one_units.sage:14: TL01 from sage.rings.rational_field import ...: take every name from the session
+tests/algebras/test_norm_one_units.sage:15: TL01 from sage_extensions.algebras.norm_one_units import ...: take every name from the session
+tests/algebras/test_norm_one_units.sage:29: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_norm_one_units.sage:30: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_norm_one_units.sage:31: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_norm_one_units.sage:37: TL11 .gens: write group_generators, module_generators or algebra_generators
+tests/algebras/test_norm_one_units.sage:42: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_norm_one_units.sage:43: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_norm_one_units.sage:44: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_norm_one_units.sage:62: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_norm_one_units.sage:63: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_norm_one_units.sage:64: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_order_hermitian_modules.sage:18: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/algebras/test_order_hermitian_modules.sage:19: TL01 from sage.matrix.special import ...: take every name from the session
+tests/algebras/test_order_hermitian_modules.sage:20: TL01 from sage.rings.integer_ring import ...: take every name from the session
+tests/algebras/test_order_hermitian_modules.sage:21: TL01 from sage.rings.rational_field import ...: take every name from the session
+tests/algebras/test_order_hermitian_modules.sage:22: TL01 from sage.rings.finite_rings.integer_mod_ring import ...: take every name from the session
+tests/algebras/test_order_hermitian_modules.sage:23: TL01 from sage_extensions.algebras.isometry_commutant import ...: take every name from the session
+tests/algebras/test_order_hermitian_modules.sage:24: TL01 from sage_extensions.algebras.order_hermitian_modules import ...: take every name from the session
+tests/algebras/test_order_hermitian_modules.sage:35: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_order_hermitian_modules.sage:57: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_order_hermitian_modules.sage:59: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_order_hermitian_modules.sage:84: TL10 len(): ask for a cardinality
+tests/algebras/test_order_hermitian_modules.sage:84: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_order_hermitian_modules.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_order_hermitian_modules.sage:88: TL10 len(): ask for a cardinality
+tests/algebras/test_order_hermitian_modules.sage:114: TL10 len(): ask for a cardinality
+tests/algebras/test_order_hermitian_modules.sage:116: TL10 len(): ask for a cardinality
+tests/algebras/test_order_hermitian_modules.sage:120: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_order_hermitian_modules.sage:121: TL10 len(): ask for a cardinality
+tests/algebras/test_order_hermitian_modules.sage:121: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/algebras/test_pushout_cocone_compatibility.sage:5: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_relative_presentations.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_tensor_symmetric_adjunctions.sage:6: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_the_coefficient_ring_view_of_a_polynomial_quotient.sage:12: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_the_coefficient_ring_view_of_a_polynomial_quotient.sage:50: TL08 AlgebrasWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/algebras/test_the_underlying_module_of_a_coefficient_view.sage:31: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/algebras/test_the_underlying_module_of_a_coefficient_view.sage:35: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/algebras/test_the_underlying_module_of_a_coefficient_view.sage:35: TL02 imports the private name _relation_morphism
+tests/algebras/test_the_underlying_module_of_a_coefficient_view.sage:38: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/algebras/test_the_underlying_module_of_a_coefficient_view.sage:60: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/algebras/test_the_underlying_module_of_a_coefficient_view.sage:92: TL08 AlgebrasWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/algebras/test_the_underlying_module_of_a_coefficient_view.sage:94: TL10 len(): ask for a cardinality
+tests/algebras/test_the_underlying_module_of_a_coefficient_view.sage:119: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/algebras/test_underlying_module_of_an_algebra_morphism.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/categories/test_categories_as_objects_in_cat.sage:19: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/categories/test_categories_as_objects_in_cat.sage:21: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/categories/test_categories_as_objects_in_cat.sage:38: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/categories/test_categories_as_objects_in_cat.sage:41: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/categories/test_class_sets_of_small_categories.sage:9: TL01 from sage_extensions.categories.abstract_categories.products import ...: take every name from the session
+tests/categories/test_class_sets_of_small_categories.sage:10: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/categories/test_class_sets_of_small_categories.sage:11: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/categories/test_class_sets_of_small_categories.sage:16: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/categories/test_class_sets_of_small_categories.sage:45: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/categories/test_diagram_cones.sage:7: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/categories/test_diagram_cones.sage:8: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/categories/test_diagram_cones.sage:15: TL04 try/except: expected failures are asserted with pytest.raises
+tests/categories/test_diagram_cones.sage:23: TL04 try/except: expected failures are asserted with pytest.raises
+tests/categories/test_diagram_cones.sage:24: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/categories/test_functor_composition_through_a_subcategory.sage:12: TL01 from sage_extensions.categories.abstract_categories.cat import ...: take every name from the session
+tests/categories/test_functor_composition_through_a_subcategory.sage:13: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/categories/test_functor_composition_through_a_subcategory.sage:14: TL01 from sage_extensions.categories.algebras.differential_graded_algebras import ...: take every name from the session
+tests/categories/test_functors_between_discrete_categories.sage:27: TL03 super(): introspection is not mathematics
+tests/categories/test_functors_between_discrete_categories.sage:66: TL09 test_object_map_does_not_define_a_functor_on_nondiscrete_categories asserts nothing
+tests/categories/test_functors_between_discrete_categories.sage:70: TL04 try/except: expected failures are asserted with pytest.raises
+tests/categories/test_module_universal_constructions.sage:145: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/categories/test_module_universal_constructions.sage:151: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/categories/test_module_universal_constructions.sage:181: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/categories/test_module_universal_constructions.sage:181: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/categories/test_module_universal_constructions.sage:203: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/categories/test_module_universal_constructions.sage:205: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/categories/test_resolution_categories.sage:9: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/engineering/test_the_suite_plugins_report_what_they_measured.py:19: TL13 probe_run is not a session name
+tests/engineering/test_the_suite_plugins_report_what_they_measured.py:41: TL13 probe_run is not a session name
+tests/forms/test_all_ones_form_correlation.sage:13: TL01 from sage_extensions.categories._lattice import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:13: TL02 imports the private name _DiagonalGram
+tests/forms/test_all_ones_form_correlation.sage:14: TL01 from sage_extensions.categories.modules.framed.formed.form_modules import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:15: TL01 from sage_extensions.categories.modules.hodge import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:15: TL02 imports the private name _attach_diagonal_correlation_witness
+tests/forms/test_all_ones_form_correlation.sage:18: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/forms/test_all_ones_form_correlation.sage:63: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_all_ones_form_correlation.sage:70: TL02 private attribute ._dual_product_construction
+tests/forms/test_all_ones_form_correlation.sage:72: TL03 vars(): introspection is not mathematics
+tests/forms/test_all_ones_form_correlation.sage:78: TL02 private attribute ._dual_product_construction
+tests/forms/test_all_ones_form_correlation.sage:80: TL03 vars(): introspection is not mathematics
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:17: TL01 from itertools import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:20: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:20: TL02 imports the private name _torsion_form_orthogonal_subobject
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:20: TL02 imports the private name _torsion_form_subquotient
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:26: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:27: TL01 from sage.rings.integer_ring import ...: take every name from the session
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:42: TL10 len(): ask for a cardinality
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:42: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:43: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_degenerate_restrictions_and_subquotients.sage:99: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_formed_radical_archive.sage:36: TL02 private attribute ._element_of_unformed_module
+tests/forms/test_formed_radical_archive.sage:68: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_formed_radical_archive.sage:146: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:176: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_formed_radical_archive.sage:201: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:202: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:250: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:251: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_formed_radical_archive.sage:278: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/forms/test_formed_radical_archive.sage:287: TL02 private attribute ._preamble_radical_quotient_basis_map
+tests/forms/test_formed_radical_archive.sage:288: TL02 private attribute ._preamble_radical_quotient_cokernel_projection
+tests/forms/test_isometry_between_torsion_forms.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_isometry_between_torsion_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:95: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:109: TL09 an assertion that holds of anything
+tests/forms/test_isometry_between_torsion_forms.sage:124: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_isometry_between_torsion_forms.sage:155: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:66: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:89: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:116: TL05 test_a_refused_witness_is_undecided_never_false takes the monkeypatch fixture
+tests/forms/test_orbit_and_profile_radical_isometry.sage:128: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_orbit_and_profile_radical_isometry.sage:143: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_orbit_and_profile_radical_isometry.sage:151: TL05 monkeypatch: mocks prove nothing about the real objects
+tests/forms/test_orbit_and_profile_radical_isometry.sage:154: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_orbit_and_profile_radical_isometry.sage:157: TL02 private attribute ._radical_isometry_decision
+tests/forms/test_orbit_and_profile_radical_isometry.sage:222: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_polar_radical_criterion.sage:23: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:27: TL02 imports the private name _polar_form_is_nondegenerate
+tests/forms/test_polar_radical_criterion.sage:30: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_polar_radical_criterion.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:58: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_polar_radical_criterion.sage:69: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:155: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:164: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:172: TL10 len(): ask for a cardinality
+tests/forms/test_polar_radical_criterion.sage:181: TL10 len(): ask for a cardinality
+tests/forms/test_quadratic_form_descent.sage:21: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_quadratic_form_descent.sage:25: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_quadratic_form_descent.sage:65: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_the_coble_anti_isometry.sage:24: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_coble_anti_isometry.sage:42: TL01 from sage.combinat.root_system.cartan_matrix import ...: take every name from the session
+tests/forms/test_the_coble_anti_isometry.sage:43: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/forms/test_the_coble_anti_isometry.sage:48: TL01 from sage.rings.integer_ring import ...: take every name from the session
+tests/forms/test_the_coble_anti_isometry.sage:89: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_coble_anti_isometry.sage:95: TL10 len(): ask for a cardinality
+tests/forms/test_the_coble_anti_isometry.sage:95: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:96: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:99: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:101: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:102: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:110: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:112: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:113: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:121: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_coble_anti_isometry.sage:128: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:25: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:29: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:32: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:59: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:126: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:182: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_isometry_decision_for_radical_forms.sage:212: TL03 isinstance(): introspection is not mathematics
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:18: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL01 from sage_extensions.categories.modules.framed.formed.torsion_form_modules import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _regenerate_form_on_generators
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:21: TL02 imports the private name _torsion_form_orthogonal_subobject
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:25: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:99: TL07 pytest.raises(match=...): matches an error message
+tests/forms/test_the_polar_radical_and_nondegenerate_quotient.sage:177: TL10 len(): ask for a cardinality
+tests/foundations/test_constructor_data_acceptance.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/functions/test_holder_grading_and_young_exponents.sage:12: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/groups/test_a_double_coset_section_returns_its_group_elements.sage:25: TL01 from sage_extensions.categories.rational_integral_stabilizers import ...: take every name from the session
+tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage:41: TL01 from sage_extensions.categories.rational_integral_stabilizers import ...: take every name from the session
+tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage:73: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage:76: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage:77: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage:89: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_a_stabilizers_generators_generate_a_subgroup.sage:92: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_abelian_groups_and_torsion_modules_are_public.sage:12: TL01 import the complete session with from sage_extensions.all import *
+tests/groups/test_abelian_groups_and_torsion_modules_are_public.sage:23: TL08 OwnedAbelianGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_abelian_groups_and_torsion_modules_are_public.sage:24: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_abelian_groups_and_torsion_modules_are_public.sage:24: TL07 repr(): a representation, not a mathematical value
+tests/groups/test_abelian_groups_and_torsion_modules_are_public.sage:24: TL08 OwnedAbelianGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_abelian_groups_and_torsion_modules_are_public.sage:25: TL07 repr(): a representation, not a mathematical value
+tests/groups/test_abelian_groups_and_torsion_modules_are_public.sage:25: TL08 OwnedFiniteAbelianGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_abelian_groups_and_torsion_modules_are_public.sage:32: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_abelian_groups_and_torsion_modules_are_public.sage:32: TL07 repr(): a representation, not a mathematical value
+tests/groups/test_arithmetic_finite_generation_archive.sage:18: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_character_intersection_generators.sage:74: TL01 from sage_extensions.categories.group.predicate_subgroups import ...: take every name from the session
+tests/groups/test_character_intersection_generators.sage:92: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_character_intersection_generators.sage:96: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_character_intersection_generators.sage:96: TL07 str(): a representation, not a mathematical value
+tests/groups/test_character_intersection_generators.sage:110: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_character_intersection_generators.sage:112: TL09 an assertion that holds of anything
+tests/groups/test_character_intersection_generators.sage:114: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_character_intersection_generators.sage:114: TL07 str(): a representation, not a mathematical value
+tests/groups/test_counting_a_generated_matrix_subgroup.sage:22: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_counting_a_generated_matrix_subgroup.sage:26: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/groups/test_counting_a_generated_matrix_subgroup.sage:79: TL08 OwnedFiniteGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_counting_a_generated_matrix_subgroup.sage:94: TL08 OwnedFiniteGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_counting_a_generated_matrix_subgroup.sage:118: TL08 OwnedFiniteGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_counting_a_generated_matrix_subgroup.sage:134: TL08 OwnedFiniteGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_counting_a_generated_matrix_subgroup.sage:135: TL08 OwnedInfiniteGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_counting_a_generated_matrix_subgroup.sage:150: TL03 isinstance(): introspection is not mathematics
+tests/groups/test_counting_a_generated_matrix_subgroup.sage:153: TL08 OwnedFiniteGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_counting_a_generated_matrix_subgroup.sage:154: TL08 OwnedInfiniteGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_finite_index_closure_401.sage:4: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_finite_index_closure_401.sage:4: TL02 imports the private name _matrix_group_element_matrix
+tests/groups/test_finite_index_closure_401.sage:8: TL01 from sage.modular.arithgroup.all import ...: take every name from the session
+tests/groups/test_finite_index_closure_401.sage:12: TL02 private attribute ._engine_group
+tests/groups/test_finite_index_closure_401.sage:14: TL02 private attribute ._from_engine
+tests/groups/test_finite_index_closure_401.sage:23: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_finite_index_closure_401.sage:24: TL10 len(): ask for a cardinality
+tests/groups/test_finite_index_closure_401.sage:24: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_finite_index_closure_401.sage:29: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_finite_index_closure_401.sage:50: TL10 len(): ask for a cardinality
+tests/groups/test_finite_index_closure_401.sage:51: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_finite_index_closure_401.sage:54: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_finite_index_closure_401.sage:54: TL07 str(): a representation, not a mathematical value
+tests/groups/test_finite_index_closure_401.sage:101: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_finite_index_closure_401.sage:102: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_finite_index_closure_401.sage:136: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_finite_index_closure_401.sage:139: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_finite_index_closure_401.sage:139: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:49: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:49: TL02 imports the private name _engine_generator_epimorphism
+tests/groups/test_free_and_catalogued_groups.sage:53: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:56: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:56: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:58: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:62: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:62: TL02 imports the private name _gap_model
+tests/groups/test_free_and_catalogued_groups.sage:67: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_free_and_catalogued_groups.sage:68: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:71: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:71: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:73: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:74: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:75: TL02 private attribute ._from_engine_generator_images
+tests/groups/test_free_and_catalogued_groups.sage:79: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:79: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:81: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:86: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:86: TL02 imports the private name _element_to_engine
+tests/groups/test_free_and_catalogued_groups.sage:90: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:91: TL02 private attribute ._from_engine_generator_images
+tests/groups/test_free_and_catalogued_groups.sage:96: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:96: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:98: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:102: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:105: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:105: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:107: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:111: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:111: TL02 imports the private name _gap_model
+tests/groups/test_free_and_catalogued_groups.sage:112: TL01 from sage.libs.gap.libgap import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:117: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:120: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:120: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:122: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:135: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:138: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:138: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:140: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:170: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:171: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:173: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:174: TL03 type(): introspection is not mathematics
+tests/groups/test_free_and_catalogued_groups.sage:175: TL02 private attribute ._repr_
+tests/groups/test_free_and_catalogued_groups.sage:180: TL02 private attribute ._repr_
+tests/groups/test_free_and_catalogued_groups.sage:181: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:183: TL02 private attribute ._description
+tests/groups/test_free_and_catalogued_groups.sage:184: TL07 repr(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:185: TL02 private attribute ._latex_
+tests/groups/test_free_and_catalogued_groups.sage:187: TL02 private attribute ._repr_
+tests/groups/test_free_and_catalogued_groups.sage:200: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:201: TL02 private attribute ._description
+tests/groups/test_free_and_catalogued_groups.sage:202: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:202: TL07 repr(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:203: TL02 private attribute ._latex_
+tests/groups/test_free_and_catalogued_groups.sage:203: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:226: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:227: TL01 from sage_extensions.categories.group.g_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:227: TL02 imports the private name _permutation_from_point_map
+tests/groups/test_free_and_catalogued_groups.sage:228: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:232: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:236: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:238: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:242: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:247: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:248: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:251: TL01 from sage.groups.perm_gps.permgroup_named import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:253: TL02 private attribute ._engine
+tests/groups/test_free_and_catalogued_groups.sage:253: TL03 isinstance(): introspection is not mathematics
+tests/groups/test_free_and_catalogued_groups.sage:254: TL02 private attribute ._engine
+tests/groups/test_free_and_catalogued_groups.sage:254: TL03 isinstance(): introspection is not mathematics
+tests/groups/test_free_and_catalogued_groups.sage:255: TL02 private attribute ._engine
+tests/groups/test_free_and_catalogued_groups.sage:285: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:288: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:288: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:290: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:291: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:294: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:294: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:296: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:300: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:305: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:310: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:329: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:331: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:332: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:337: TL01 from sage_extensions.categories.group.g_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:337: TL02 imports the private name _permutation_from_point_map
+tests/groups/test_free_and_catalogued_groups.sage:339: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:342: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:342: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:344: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:348: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:352: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:353: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:355: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:355: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:357: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:358: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:361: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:361: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:363: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:365: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:380: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:383: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:383: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:385: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:407: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:410: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:429: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:432: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:432: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:434: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:445: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:448: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:551: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:552: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:553: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:554: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:555: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:558: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:559: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:563: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:564: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:571: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:572: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:573: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:580: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:581: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:582: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:586: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:593: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:594: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:601: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:609: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:611: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:613: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:614: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:618: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:619: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:620: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:621: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:640: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:669: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:675: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:675: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:677: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:678: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:681: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:681: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:683: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:739: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:742: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:742: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:744: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:745: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:752: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:764: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:767: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:767: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:769: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:771: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:774: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:774: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:776: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:782: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:785: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:785: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:787: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:795: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:798: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:798: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:800: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:803: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:806: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:806: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:808: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:812: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/groups/test_free_and_catalogued_groups.sage:813: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:815: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:818: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:818: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:820: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:840: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:843: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:843: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:845: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:868: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:871: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:871: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:873: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:915: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:917: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:932: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:933: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:934: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:935: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:936: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:937: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:938: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:939: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:940: TL08 OwnedGroups: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:952: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_free_and_catalogued_groups.sage:961: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:964: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:964: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:966: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:982: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:985: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:985: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:987: TL09 an assertion that holds of anything
+tests/groups/test_free_and_catalogued_groups.sage:992: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_free_and_catalogued_groups.sage:995: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_free_and_catalogued_groups.sage:995: TL07 str(): a representation, not a mathematical value
+tests/groups/test_free_and_catalogued_groups.sage:997: TL09 an assertion that holds of anything
+tests/groups/test_generated_model_character_quotient.sage:15: TL01 from sage.libs.gap.libgap import ...: take every name from the session
+tests/groups/test_generated_model_character_quotient.sage:73: TL10 len(): ask for a cardinality
+tests/groups/test_generated_model_character_quotient.sage:83: TL02 private attribute ._multiply
+tests/groups/test_generated_model_character_quotient.sage:103: TL02 private attribute ._multiply
+tests/groups/test_generated_model_character_quotient.sage:125: TL02 private attribute ._multiply
+tests/groups/test_generated_model_character_quotient.sage:130: TL10 len(): ask for a cardinality
+tests/groups/test_generated_model_character_quotient.sage:131: TL10 len(): ask for a cardinality
+tests/groups/test_generated_model_character_quotient.sage:168: TL02 private attribute ._multiply
+tests/groups/test_generated_model_character_quotient.sage:173: TL02 private attribute ._multiply
+tests/groups/test_generated_model_character_quotient.sage:187: TL10 len(): ask for a cardinality
+tests/groups/test_generated_model_character_quotient.sage:203: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_generated_model_character_quotient.sage:213: TL01 from sage_extensions.categories.group.predicate_subgroups import ...: take every name from the session
+tests/groups/test_generated_model_character_quotient.sage:233: TL02 private attribute ._allowed
+tests/groups/test_generated_model_character_quotient.sage:249: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_generated_model_character_quotient.sage:249: TL02 imports the private name _element_to_engine
+tests/groups/test_generated_model_character_quotient.sage:249: TL02 imports the private name _gap_model
+tests/groups/test_generated_model_character_quotient.sage:249: TL02 imports the private name _subgroup_from_gap
+tests/groups/test_generated_model_character_quotient.sage:288: TL10 len(): ask for a cardinality
+tests/groups/test_generated_model_character_quotient.sage:330: TL01 from sage_extensions.categories.group.predicate_subgroups import ...: take every name from the session
+tests/groups/test_generated_model_character_quotient.sage:360: TL02 private attribute ._sign_descent_rank
+tests/groups/test_generated_model_character_quotient.sage:361: TL10 len(): ask for a cardinality
+tests/groups/test_generated_model_character_quotient.sage:368: TL03 __import__(): introspection is not mathematics
+tests/groups/test_generated_model_character_quotient.sage:370: TL02 private attribute ._gap_model
+tests/groups/test_generated_model_character_quotient.sage:370: TL03 __import__(): introspection is not mathematics
+tests/groups/test_generated_model_character_quotient.sage:377: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_generated_model_character_quotient.sage:377: TL02 imports the private name _element_to_engine
+tests/groups/test_generated_model_character_quotient.sage:377: TL02 imports the private name _gap_model
+tests/groups/test_generated_model_character_quotient.sage:380: TL03 __import__(): introspection is not mathematics
+tests/groups/test_generated_model_character_quotient.sage:383: TL03 __import__(): introspection is not mathematics
+tests/groups/test_generated_model_character_quotient.sage:389: TL01 from sage_extensions.categories.orthogonal_quotients import ...: take every name from the session
+tests/groups/test_generated_model_character_quotient.sage:389: TL02 imports the private name _f2_rank
+tests/groups/test_generated_model_character_quotient.sage:422: TL10 len(): ask for a cardinality
+tests/groups/test_generated_model_character_quotient.sage:425: TL02 private attribute ._discriminant_word_section
+tests/groups/test_generated_model_character_quotient.sage:426: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_generated_model_character_quotient.sage:426: TL02 imports the private name _element_to_engine
+tests/groups/test_generated_model_character_quotient.sage:430: TL10 len(): ask for a cardinality
+tests/groups/test_group_generators_use_the_supplied_family.sage:16: TL01 from unittest import ...: take every name from the session
+tests/groups/test_group_generators_use_the_supplied_family.sage:28: TL01 from sage_extensions.catalogue import ...: take every name from the session
+tests/groups/test_group_generators_use_the_supplied_family.sage:45: TL03 type(): introspection is not mathematics
+tests/groups/test_group_generators_use_the_supplied_family.sage:45: TL05 mock: mocks prove nothing about the real objects
+tests/groups/test_group_generators_use_the_supplied_family.sage:55: TL02 private attribute ._engine_group
+tests/groups/test_group_generators_use_the_supplied_family.sage:55: TL10 len(): ask for a cardinality
+tests/groups/test_group_generators_use_the_supplied_family.sage:55: TL11 .gens: write group_generators, module_generators or algebra_generators
+tests/groups/test_group_generators_use_the_supplied_family.sage:55: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_group_generators_use_the_supplied_family.sage:56: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_group_generators_use_the_supplied_family.sage:57: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_group_generators_use_the_supplied_family.sage:95: TL02 private attribute ._engine_group
+tests/groups/test_group_generators_use_the_supplied_family.sage:95: TL10 len(): ask for a cardinality
+tests/groups/test_group_generators_use_the_supplied_family.sage:95: TL11 .gens: write group_generators, module_generators or algebra_generators
+tests/groups/test_group_generators_use_the_supplied_family.sage:95: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_group_generators_use_the_supplied_family.sage:96: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/groups/test_group_generators_use_the_supplied_family.sage:110: TL02 private attribute ._engine_group
+tests/groups/test_group_generators_use_the_supplied_family.sage:110: TL10 len(): ask for a cardinality
+tests/groups/test_group_generators_use_the_supplied_family.sage:110: TL11 .gens: write group_generators, module_generators or algebra_generators
+tests/groups/test_group_morphisms_archive.sage:183: TL13 GeneratedSubgroups is not a session name
+tests/groups/test_group_morphisms_archive.sage:363: TL08 GroupsWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_group_products_and_coproducts_of_presentations.sage:353: TL08 GroupsWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:14: TL01 from sage_extensions.categories.group.g_sets import ...: take every name from the session
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:14: TL02 imports the private name _orbit_schreier_morphism
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:18: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:23: TL02 private attribute ._orbit_of
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:38: TL03 reads __dict__: introspection is not mathematics
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:39: TL09 an assertion that holds of anything
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:41: TL10 len(): ask for a cardinality
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:46: TL02 private attribute ._orbit_words
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:52: TL02 private attribute ._orbit_of
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:110: TL02 private attribute ._orbit_of
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:111: TL03 reads __dict__: introspection is not mathematics
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:124: TL03 reads __dict__: introspection is not mathematics
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:125: TL09 an assertion that holds of anything
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:128: TL02 private attribute ._orbit_of
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:129: TL03 reads __dict__: introspection is not mathematics
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:138: TL01 from sage_extensions.categories.rational_integral_stabilizers import ...: take every name from the session
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:138: TL02 imports the private name _deduplicated_generating_morphism
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:153: TL10 len(): ask for a cardinality
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:157: TL10 len(): ask for a cardinality
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:172: TL01 from sage_extensions.categories.rational_integral_stabilizers import ...: take every name from the session
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:172: TL02 imports the private name _unique_image_family
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:183: TL03 isinstance(): introspection is not mathematics
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:191: TL10 len(): ask for a cardinality
+tests/groups/test_the_orbit_schreier_family_reads_the_retained_sweep.sage:193: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_transversal_positions_beyond_machine_int.sage:17: TL01 from sage.all import ...: take every name from the session
+tests/groups/test_transversal_positions_beyond_machine_int.sage:19: TL01 from sage_extensions.categories.group.groups import ...: take every name from the session
+tests/groups/test_transversal_positions_beyond_machine_int.sage:19: TL02 imports the private name _gap_list_entry
+tests/groups/test_transversal_positions_beyond_machine_int.sage:35: TL09 test_a_negative_position_is_refused_by_the_helper asserts nothing
+tests/groups/test_transversal_positions_beyond_machine_int.sage:38: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_transversal_positions_beyond_machine_int.sage:55: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_transversal_positions_beyond_machine_int.sage:95: TL07 repr(): a representation, not a mathematical value
+tests/groups/test_transversal_positions_beyond_machine_int.sage:98: TL03 type(): introspection is not mathematics
+tests/groups/test_transversal_positions_beyond_machine_int.sage:103: TL04 try/except: expected failures are asserted with pytest.raises
+tests/groups/test_transversal_positions_beyond_machine_int.sage:104: TL03 type(): introspection is not mathematics
+tests/groups/test_transversal_positions_beyond_machine_int.sage:105: TL07 compares a rendering: assert the mathematical object, not its display
+tests/groups/test_transversal_positions_beyond_machine_int.sage:105: TL07 repr(): a representation, not a mathematical value
+tests/groups/test_transversal_positions_beyond_machine_int.sage:107: TL03 type(): introspection is not mathematics
+tests/lattices/test_catalogue_e8_order_embeddings.sage:12: TL01 from sage_extensions.catalogue import ...: take every name from the session
+tests/lattices/test_catalogue_e8_order_embeddings.sage:12: TL02 imports the private name _SAGE_E8_BASIS_ORDER
+tests/lattices/test_catalogue_e8_order_embeddings.sage:12: TL02 imports the private name _SAGE_E8_POSITION
+tests/lattices/test_catalogue_e8_order_embeddings.sage:27: TL07 str(): a representation, not a mathematical value
+tests/lattices/test_catalogue_e8_order_embeddings.sage:28: TL10 len(): ask for a cardinality
+tests/lattices/test_catalogue_gluing_embedding.sage:18: TL01 from sage_extensions.sterk import ...: take every name from the session
+tests/lattices/test_catalogue_gluing_embedding.sage:63: TL10 len(): ask for a cardinality
+tests/lattices/test_coble_discriminant_orbit_values.sage:44: TL10 len(): ask for a cardinality
+tests/lattices/test_coble_discriminant_orbit_values.sage:54: TL10 len(): ask for a cardinality
+tests/lattices/test_coble_discriminant_orbit_values.sage:56: TL10 len(): ask for a cardinality
+tests/lattices/test_coble_discriminant_orbit_values.sage:65: TL10 len(): ask for a cardinality
+tests/lattices/test_coble_discriminant_orbit_values.sage:90: TL10 len(): ask for a cardinality
+tests/lattices/test_coble_discriminant_orbit_values.sage:91: TL10 len(): ask for a cardinality
+tests/lattices/test_commuting_involution_centralizers.sage:22: TL10 len(): ask for a cardinality
+tests/lattices/test_commuting_involution_centralizers.sage:24: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_commuting_involution_centralizers.sage:25: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_congruence_subgroups.sage:39: TL10 len(): ask for a cardinality
+tests/lattices/test_congruence_subgroups.sage:42: TL09 an assertion that holds of anything
+tests/lattices/test_content_and_doubling.sage:16: TL01 from sage_extensions.categories.abstract_categories.arrow_categories import ...: take every name from the session
+tests/lattices/test_content_and_doubling.sage:29: TL01 from sage_indefinite_port.indefinite.marked_lattices import ...: take every name from the session
+tests/lattices/test_content_and_doubling.sage:39: TL01 from sage_indefinite_port.indefinite.marked_lattices import ...: take every name from the session
+tests/lattices/test_content_and_doubling.sage:42: TL01 from sage_extensions.categories.abstract_categories.arrow_categories import ...: take every name from the session
+tests/lattices/test_coxeter_affine_unions.sage:12: TL01 import the complete session with from sage_extensions.all import *
+tests/lattices/test_coxeter_affine_unions.sage:46: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_affine_unions.sage:66: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_affine_unions.sage:73: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_affine_unions.sage:86: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_affine_unions.sage:94: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_affine_unions.sage:102: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_affine_unions.sage:103: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_affine_unions.sage:105: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_affine_unions.sage:118: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_affine_unions.sage:142: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_affine_unions.sage:172: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_affine_unions.sage:190: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_affine_unions.sage:200: TL01 from sage_extensions.categories.coxeter_diagrams import ...: take every name from the session
+tests/lattices/test_coxeter_affine_unions.sage:200: TL02 imports the private name _owned_coxeter_matrix
+tests/lattices/test_coxeter_affine_unions.sage:201: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/lattices/test_coxeter_affine_unions.sage:203: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/lattices/test_coxeter_affine_unions.sage:214: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_affine_unions.sage:217: TL03 isinstance(): introspection is not mathematics
+tests/lattices/test_coxeter_affine_unions.sage:219: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_maximal_subdiagram_audit.sage:11: TL01 from itertools import ...: take every name from the session
+tests/lattices/test_coxeter_maximal_subdiagram_audit.sage:13: TL01 import the complete session with from sage_extensions.all import *
+tests/lattices/test_coxeter_maximal_subdiagram_audit.sage:14: TL01 from sage_extensions.categories.coxeter_diagrams import ...: take every name from the session
+tests/lattices/test_coxeter_maximal_subdiagram_audit.sage:14: TL02 imports the private name _owned_coxeter_matrix
+tests/lattices/test_coxeter_maximal_subdiagram_audit.sage:15: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/lattices/test_coxeter_maximal_subdiagram_audit.sage:36: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_maximal_subdiagram_audit.sage:96: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/lattices/test_coxeter_maximal_subdiagram_audit.sage:104: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_maximal_subdiagram_audit.sage:109: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_maximal_subdiagram_audit.sage:112: TL10 len(): ask for a cardinality
+tests/lattices/test_coxeter_maximal_subdiagram_audit.sage:114: TL03 isinstance(): introspection is not mathematics
+tests/lattices/test_cyclic_normalizers.sage:21: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:22: TL01 from sage.rings.finite_rings.finite_field_constructor import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:23: TL01 from sage_extensions.categories.lattice_centralizers import ...: take every name from the session
+tests/lattices/test_cyclic_normalizers.sage:31: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:54: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:54: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:71: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:71: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:87: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_cyclic_normalizers.sage:101: TL09 an assertion that holds of anything
+tests/lattices/test_cyclic_normalizers.sage:116: TL10 len(): ask for a cardinality
+tests/lattices/test_cyclic_normalizers.sage:122: TL10 len(): ask for a cardinality
+tests/lattices/test_degenerate_pointed_vectors.sage:27: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_degenerate_pointed_vectors.sage:28: TL07 str(): a representation, not a mathematical value
+tests/lattices/test_degenerate_pointed_vectors.sage:28: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_degenerate_pointed_vectors.sage:29: TL07 str(): a representation, not a mathematical value
+tests/lattices/test_degenerate_pointed_vectors.sage:30: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_degenerate_pointed_vectors.sage:47: TL10 len(): ask for a cardinality
+tests/lattices/test_discriminant_morphism_on_two_elementary_forms.sage:16: TL01 import the complete session with from sage_extensions.all import *
+tests/lattices/test_discriminant_morphism_on_two_elementary_forms.sage:50: TL10 len(): ask for a cardinality
+tests/lattices/test_discriminant_morphism_on_two_elementary_forms.sage:74: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_discriminant_morphism_on_two_elementary_forms.sage:75: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_discriminant_morphism_on_two_elementary_forms.sage:111: TL10 len(): ask for a cardinality
+tests/lattices/test_discriminant_normal_form.sage:15: TL01 import the complete session with from sage_extensions.all import *
+tests/lattices/test_discriminant_normal_form.sage:23: TL03 reads __name__: introspection is not mathematics
+tests/lattices/test_discriminant_normal_form.sage:23: TL03 type(): introspection is not mathematics
+tests/lattices/test_discriminant_normal_form.sage:33: TL10 len(): ask for a cardinality
+tests/lattices/test_discriminant_normal_form.sage:34: TL10 len(): ask for a cardinality
+tests/lattices/test_discriminant_representation_of_a_setwise_stabilizer.sage:57: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_discriminant_representation_of_a_setwise_stabilizer.sage:76: TL10 len(): ask for a cardinality
+tests/lattices/test_discriminant_representation_of_a_setwise_stabilizer.sage:77: TL10 len(): ask for a cardinality
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:14: TL01 import the complete session with from sage_extensions.all import *
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:32: TL02 private attribute ._coinvariant_discriminant_from_invariant
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:33: TL02 private attribute ._coinvariant_discriminant_from_invariant
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:60: TL02 private attribute ._full_discriminant_glue_data
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:61: TL02 private attribute ._coinvariant_glue_inverse_maps
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:63: TL02 private attribute ._full_discriminant_glue_data
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:64: TL02 private attribute ._coinvariant_glue_inverse_maps
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:83: TL01 from sage_extensions.categories.modules.framed.finitely_generated import ...: take every name from the session
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:90: TL02 private attribute ._coinvariant_discriminant_from_invariant
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:90: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:93: TL02 private attribute ._presented_module_from_morphism
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:100: TL02 private attribute ._presented_module_from_morphism
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:101: TL04 try/except: expected failures are asserted with pytest.raises
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:102: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:103: TL02 private attribute ._coinvariant_discriminant_from_invariant
+tests/lattices/test_discriminant_transport_inverse_reuse.sage:105: TL02 private attribute ._presented_module_from_morphism
+tests/lattices/test_finiteness_premise_under_a_containing_bound.sage:241: TL09 an assertion that holds of anything
+tests/lattices/test_general_linear_images.sage:8: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/lattices/test_general_linear_images.sage:9: TL01 from sage.matrix.special import ...: take every name from the session
+tests/lattices/test_general_linear_images.sage:10: TL01 from sage.modules.free_module_element import ...: take every name from the session
+tests/lattices/test_general_linear_images.sage:11: TL01 from sage.rings.finite_rings.finite_field_constructor import ...: take every name from the session
+tests/lattices/test_general_linear_images.sage:12: TL01 from sage.rings.integer_ring import ...: take every name from the session
+tests/lattices/test_general_linear_images.sage:13: TL01 from sage_extensions.categories.isotropic_parabolics import ...: take every name from the session
+tests/lattices/test_general_linear_images.sage:32: TL10 len(): ask for a cardinality
+tests/lattices/test_gram_constrained_embeddings.sage:10: TL01 from sage_extensions.categories.abstract_categories.arrow_categories import ...: take every name from the session
+tests/lattices/test_gram_constrained_embeddings.sage:11: TL01 from sage_indefinite_port.indefinite.marked_lattices import ...: take every name from the session
+tests/lattices/test_gram_constrained_embeddings.sage:23: TL10 len(): ask for a cardinality
+tests/lattices/test_gram_constrained_embeddings.sage:25: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_gram_constrained_embeddings.sage:32: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_lattices.sage:10: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/lattices/test_hermitian_lattices.sage:11: TL01 from sage.rings.number_field.number_field import ...: take every name from the session
+tests/lattices/test_hermitian_lattices.sage:12: TL01 from sage_extensions.categories.hermitian_lattices import ...: take every name from the session
+tests/lattices/test_hermitian_lattices.sage:33: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_lattices.sage:48: TL09 an assertion that holds of anything
+tests/lattices/test_hermitian_lattices.sage:62: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_hermitian_lattices.sage:63: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_hermitian_nonmaximal_and_congruence_parabolics.sage:21: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/lattices/test_hermitian_nonmaximal_and_congruence_parabolics.sage:22: TL01 from sage.rings.number_field.number_field import ...: take every name from the session
+tests/lattices/test_hermitian_nonmaximal_and_congruence_parabolics.sage:23: TL01 from sage_extensions.categories.hermitian_lattices import ...: take every name from the session
+tests/lattices/test_hermitian_nonmaximal_and_congruence_parabolics.sage:29: TL02 private attribute ._coordinates_in_order
+tests/lattices/test_hermitian_nonmaximal_and_congruence_parabolics.sage:35: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_nonmaximal_and_congruence_parabolics.sage:73: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_nonmaximal_and_congruence_parabolics.sage:90: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_hermitian_nonmaximal_and_congruence_parabolics.sage:92: TL02 private attribute ._coordinates_in_order
+tests/lattices/test_hermitian_parabolics.sage:10: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/lattices/test_hermitian_parabolics.sage:11: TL01 from sage.matrix.special import ...: take every name from the session
+tests/lattices/test_hermitian_parabolics.sage:12: TL01 from sage.rings.number_field.number_field import ...: take every name from the session
+tests/lattices/test_hermitian_parabolics.sage:13: TL01 from sage_extensions.categories.hermitian_lattices import ...: take every name from the session
+tests/lattices/test_hermitian_parabolics.sage:14: TL01 from sage.rings.integer_ring import ...: take every name from the session
+tests/lattices/test_hermitian_parabolics.sage:15: TL01 from sage.rings.rational_field import ...: take every name from the session
+tests/lattices/test_hermitian_parabolics.sage:16: TL01 from sage.rings.integer_ring import ...: take every name from the session
+tests/lattices/test_hermitian_parabolics.sage:17: TL01 from sage.rings.rational_field import ...: take every name from the session
+tests/lattices/test_hermitian_parabolics.sage:63: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_hermitian_parabolics.sage:71: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_hermitian_parabolics.sage:72: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_parabolics.sage:73: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_hermitian_parabolics.sage:87: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_hermitian_parabolics.sage:96: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_parabolics.sage:107: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_parabolics.sage:109: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_hermitian_parabolics.sage:121: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_parabolics.sage:152: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_parabolics.sage:153: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_parabolics.sage:156: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_parabolics.sage:174: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_hermitian_parabolics.sage:180: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_hermitian_parabolics.sage:185: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_parabolics.sage:195: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_parabolics.sage:196: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_parabolics.sage:212: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_parabolics.sage:237: TL10 len(): ask for a cardinality
+tests/lattices/test_hermitian_parabolics.sage:237: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_hermitian_parabolics.sage:251: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_hermitian_parabolics.sage:252: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_hermitian_parabolics.sage:254: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_hermitian_parabolics.sage:265: TL03 isinstance(): introspection is not mathematics
+tests/lattices/test_hermitian_parabolics.sage:265: TL10 len(): ask for a cardinality
+tests/lattices/test_indefinite_finite_normalizers.sage:14: TL07 str(): a representation, not a mathematical value
+tests/lattices/test_indefinite_finite_normalizers.sage:20: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_indefinite_finite_normalizers.sage:25: TL10 len(): ask for a cardinality
+tests/lattices/test_indefinite_finite_normalizers.sage:38: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_indefinite_finite_normalizers.sage:40: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_infinite_order_centralizers.sage:14: TL10 len(): ask for a cardinality
+tests/lattices/test_infinite_order_centralizers.sage:15: TL10 len(): ask for a cardinality
+tests/lattices/test_infinite_order_centralizers.sage:17: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_infinite_order_centralizers.sage:28: TL10 len(): ask for a cardinality
+tests/lattices/test_infinite_order_centralizers.sage:37: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_infinite_order_centralizers.sage:38: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_infinite_order_centralizers.sage:39: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_infinite_order_centralizers.sage:48: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_infinite_order_centralizers.sage:49: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_infinite_order_centralizers.sage:59: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_infinite_order_centralizers.sage:60: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_infinite_order_centralizers.sage:61: TL10 len(): ask for a cardinality
+tests/lattices/test_infinite_order_centralizers.sage:61: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_infinite_order_centralizers.sage:66: TL01 from sage_extensions.categories.lattice_centralizers import ...: take every name from the session
+tests/lattices/test_infinite_order_centralizers.sage:73: TL09 an assertion that holds of anything
+tests/lattices/test_integral_restriction_unimodular_fast_path.sage:74: TL04 try/except: expected failures are asserted with pytest.raises
+tests/lattices/test_integral_restriction_unimodular_fast_path.sage:175: TL04 try/except: expected failures are asserted with pytest.raises
+tests/lattices/test_integral_restriction_unimodular_fast_path.sage:183: TL07 compares a rendering: assert the mathematical object, not its display
+tests/lattices/test_integral_restriction_unimodular_fast_path.sage:183: TL07 str(): a representation, not a mathematical value
+tests/lattices/test_integral_restriction_unimodular_fast_path.sage:189: TL09 an assertion that holds of anything
+tests/lattices/test_integral_restriction_unimodular_fast_path.sage:192: TL09 an assertion that holds of anything
+tests/lattices/test_isometry_arrow_state.sage:13: TL01 import the complete session with from sage_extensions.all import *
+tests/lattices/test_isometry_arrow_state.sage:42: TL02 private attribute ._form_module_morphism
+tests/lattices/test_isometry_arrow_state.sage:43: TL02 private attribute ._element_function
+tests/lattices/test_isometry_arrow_state.sage:43: TL09 an assertion that holds of anything
+tests/lattices/test_isometry_arrow_state.sage:100: TL10 len(): ask for a cardinality
+tests/lattices/test_isometry_arrow_state.sage:110: TL10 len(): ask for a cardinality
+tests/lattices/test_isometry_arrow_state.sage:118: TL10 len(): ask for a cardinality
+tests/lattices/test_isometry_arrow_state.sage:172: TL10 len(): ask for a cardinality
+tests/lattices/test_isometry_arrow_state.sage:173: TL10 len(): ask for a cardinality
+tests/lattices/test_isometry_arrow_state.sage:195: TL10 len(): ask for a cardinality
+tests/lattices/test_isometry_decision.sage:10: TL01 from sage_extensions.categories.sets.finite_families import ...: take every name from the session
+tests/lattices/test_isometry_decision.sage:36: TL08 finite_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/lattices/test_isometry_hash_consistency.sage:73: TL10 len(): ask for a cardinality
+tests/lattices/test_isometry_hash_consistency.sage:88: TL10 len(): ask for a cardinality
+tests/lattices/test_isometry_hash_consistency.sage:96: TL01 from sage_extensions.tensors import ...: take every name from the session
+tests/lattices/test_isometry_hash_consistency.sage:101: TL02 private attribute ._coordinate_tensor
+tests/lattices/test_isometry_hash_consistency.sage:101: TL03 type(): introspection is not mathematics
+tests/lattices/test_isometry_hash_consistency.sage:105: TL02 private attribute ._cache_key
+tests/lattices/test_isometry_hash_consistency.sage:115: TL04 try/except: expected failures are asserted with pytest.raises
+tests/lattices/test_isometry_hash_consistency.sage:117: TL02 private attribute ._cache_key
+tests/lattices/test_isometry_hash_consistency.sage:121: TL02 private attribute ._cache_key
+tests/lattices/test_isometry_hash_consistency.sage:122: TL03 isinstance(): introspection is not mathematics
+tests/lattices/test_isometry_hash_consistency.sage:144: TL03 isinstance(): introspection is not mathematics
+tests/lattices/test_isotropic_orbit_iterators.sage:12: TL10 len(): ask for a cardinality
+tests/lattices/test_isotropic_orbit_iterators.sage:13: TL10 len(): ask for a cardinality
+tests/lattices/test_isotropic_rational_right_cosets.sage:38: TL01 from sage_extensions.categories.isotropic_orbits import ...: take every name from the session
+tests/lattices/test_isotropic_reduction_and_correlation.sage:26: TL01 import the complete session with from sage_extensions.all import *
+tests/lattices/test_isotropic_reduction_and_correlation.sage:61: TL03 reads __name__: introspection is not mathematics
+tests/lattices/test_isotropic_reduction_and_correlation.sage:61: TL03 type(): introspection is not mathematics
+tests/lattices/test_isotropic_reduction_and_correlation.sage:66: TL03 reads __name__: introspection is not mathematics
+tests/lattices/test_isotropic_reduction_and_correlation.sage:66: TL03 type(): introspection is not mathematics
+tests/lattices/test_isotropic_reduction_and_correlation.sage:77: TL10 len(): ask for a cardinality
+tests/lattices/test_isotropic_routes_small_examples.sage:29: TL10 len(): ask for a cardinality
+tests/lattices/test_lattice_display_without_ordering.sage:14: TL01 from sage.all import ...: take every name from the session
+tests/lattices/test_lattice_display_without_ordering.sage:16: TL01 import the complete session with from sage_extensions.all import *
+tests/lattices/test_lattice_display_without_ordering.sage:26: TL07 latex(): a representation, not a mathematical value
+tests/lattices/test_lattice_display_without_ordering.sage:31: TL07 repr(): a representation, not a mathematical value
+tests/lattices/test_lattice_display_without_ordering.sage:37: TL04 try/except: expected failures are asserted with pytest.raises
+tests/lattices/test_lattice_display_without_ordering.sage:40: TL07 compares a rendering: assert the mathematical object, not its display
+tests/lattices/test_lattice_display_without_ordering.sage:40: TL07 str(): a representation, not a mathematical value
+tests/lattices/test_lattice_display_without_ordering.sage:48: TL07 latex(): a representation, not a mathematical value
+tests/lattices/test_lattice_display_without_ordering.sage:51: TL09 an assertion that holds of anything
+tests/lattices/test_lattice_isometry_semantic_api.sage:8: TL01 from sage.all import ...: take every name from the session
+tests/lattices/test_lattice_isometry_semantic_api.sage:17: TL02 private attribute ._witness_matrix
+tests/lattices/test_lattice_semantic_api.sage:3: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/lattices/test_lattice_semantic_api.sage:4: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/lattices/test_lattice_semantic_api.sage:28: TL02 private attribute ._dual_product_construction
+tests/lattices/test_lattice_semantic_api.sage:31: TL09 an assertion that holds of anything
+tests/lattices/test_lattice_semantic_api.sage:70: TL09 an assertion that holds of anything
+tests/lattices/test_low_witt_witnesses.sage:8: TL01 from sage_indefinite_port.indefinite.marked_lattices import ...: take every name from the session
+tests/lattices/test_low_witt_witnesses.sage:43: TL01 from itertools import ...: take every name from the session
+tests/lattices/test_low_witt_witnesses.sage:45: TL01 from sage_indefinite_port.indefinite.low_witt import ...: take every name from the session
+tests/lattices/test_low_witt_witnesses.sage:50: TL10 len(): ask for a cardinality
+tests/lattices/test_named_lattice_constructions.sage:57: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/lattices/test_named_lattice_constructions.sage:58: TL01 from sage.rings.rational_field import ...: take every name from the session
+tests/lattices/test_named_lattice_constructions.sage:60: TL01 from sage_extensions.categories.modules.framed.formed.form_modules import ...: take every name from the session
+tests/lattices/test_named_lattice_constructions.sage:61: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/lattices/test_named_lattice_constructions.sage:62: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/lattices/test_named_lattice_constructions.sage:62: TL02 imports the private name _engine_element
+tests/lattices/test_named_lattice_constructions.sage:76: TL02 private attribute ._component_array
+tests/lattices/test_named_lattice_constructions.sage:110: TL01 from sage_extensions.categories.modules.framed.formed.form_modules import ...: take every name from the session
+tests/lattices/test_named_lattice_constructions.sage:111: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/lattices/test_named_lattice_constructions.sage:112: TL01 from sage_extensions.tensors.tensor import ...: take every name from the session
+tests/lattices/test_named_lattice_constructions.sage:116: TL02 private attribute ._from_bilinear_evaluation
+tests/lattices/test_named_lattice_constructions.sage:121: TL04 try/except: expected failures are asserted with pytest.raises
+tests/lattices/test_named_lattice_constructions.sage:124: TL07 compares a rendering: assert the mathematical object, not its display
+tests/lattices/test_named_lattice_constructions.sage:124: TL07 str(): a representation, not a mathematical value
+tests/lattices/test_named_lattice_constructions.sage:127: TL02 private attribute ._as_numerical_tensor
+tests/lattices/test_named_lattice_constructions.sage:127: TL03 isinstance(): introspection is not mathematics
+tests/lattices/test_nondegenerate_marking_stabilizers.sage:18: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_nondegenerate_marking_stabilizers.sage:63: TL01 from sage_indefinite_port.indefinite.marked_lattices import ...: take every name from the session
+tests/lattices/test_odd_glue.sage:22: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/lattices/test_odd_glue.sage:25: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/lattices/test_odd_glue.sage:28: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/lattices/test_oriented_isotropic_flags.sage:20: TL09 an assertion that holds of anything
+tests/lattices/test_oriented_isotropic_flags.sage:54: TL09 an assertion that holds of anything
+tests/lattices/test_oriented_isotropic_flags.sage:104: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_oriented_isotropic_flags.sage:105: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_oriented_isotropic_flags.sage:145: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_oriented_isotropic_flags.sage:173: TL02 private attribute ._natural_transformation_from_apex
+tests/lattices/test_oriented_isotropic_flags.sage:174: TL02 private attribute ._natural_transformation_from_apex
+tests/lattices/test_orthogonal_group_semantic_api.sage:13: TL01 from sage.all import ...: take every name from the session
+tests/lattices/test_radical_quotient_integral.sage:25: TL03 hasattr(): introspection is not mathematics
+tests/lattices/test_radical_quotient_integral.sage:68: TL01 from sage_extensions.catalogue import ...: take every name from the session
+tests/lattices/test_radical_quotient_integral.sage:68: TL02 imports the private name _E8g
+tests/lattices/test_radical_quotient_integral.sage:68: TL02 imports the private name _block_gram
+tests/lattices/test_radical_quotient_integral.sage:82: TL03 hasattr(): introspection is not mathematics
+tests/lattices/test_rational_isotropic_flag_complex.sage:20: TL10 len(): ask for a cardinality
+tests/lattices/test_sterk_elliptic_population_archive.sage:12: TL01 from collections import ...: take every name from the session
+tests/lattices/test_sterk_elliptic_population_archive.sage:13: TL01 from fractions import ...: take every name from the session
+tests/lattices/test_sterk_elliptic_population_archive.sage:156: TL10 len(): ask for a cardinality
+tests/lattices/test_sterk_elliptic_population_archive.sage:158: TL10 len(): ask for a cardinality
+tests/lattices/test_sterk_maximal_elliptic_subdiagrams.sage:13: TL01 from collections import ...: take every name from the session
+tests/lattices/test_sterk_maximal_elliptic_subdiagrams.sage:15: TL01 import the complete session with from sage_extensions.all import *
+tests/lattices/test_sterk_maximal_elliptic_subdiagrams.sage:36: TL10 len(): ask for a cardinality
+tests/lattices/test_sterk_maximal_elliptic_subdiagrams.sage:37: TL10 len(): ask for a cardinality
+tests/lattices/test_sterk_maximal_elliptic_subdiagrams.sage:39: TL10 len(): ask for a cardinality
+tests/lattices/test_sterk_maximal_elliptic_subdiagrams.sage:93: TL10 len(): ask for a cardinality
+tests/lattices/test_sublattice_stabilizer_vector_decisions.sage:33: TL09 an assertion that holds of anything
+tests/lattices/test_sublattice_stabilizer_vector_decisions.sage:38: TL01 from itertools import ...: take every name from the session
+tests/lattices/test_sublattice_stabilizer_vector_decisions.sage:44: TL07 str(): a representation, not a mathematical value
+tests/lattices/test_sublattice_stabilizer_vector_decisions.sage:45: TL07 str(): a representation, not a mathematical value
+tests/lattices/test_the_coble_divisor_groups.sage:95: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/lattices/test_the_divided_class_construction.sage:129: TL07 str(): a representation, not a mathematical value
+tests/lattices/test_the_divided_class_construction.sage:130: TL07 compares a rendering: assert the mathematical object, not its display
+tests/lattices/test_the_divided_class_construction.sage:130: TL07 repr(): a representation, not a mathematical value
+tests/lattices/test_the_setwise_action_at_a_plane.sage:45: TL07 str(): a representation, not a mathematical value
+tests/lattices/test_the_setwise_action_at_a_plane.sage:81: TL10 len(): ask for a cardinality
+tests/lattices/test_the_setwise_action_at_a_plane.sage:114: TL10 len(): ask for a cardinality
+tests/modules/test_cap_complexes_zx.sage:4: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+tests/modules/test_cardinality_and_exponent_over_any_pid.sage:44: TL10 len(): ask for a cardinality
+tests/modules/test_cardinality_and_exponent_over_any_pid.sage:45: TL10 len(): ask for a cardinality
+tests/modules/test_cochain_complexes.sage:4: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+tests/modules/test_cohomology_functors.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_cohomology_functors.sage:5: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+tests/modules/test_cohomology_of_cyclic_groups.sage:13: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:19: TL01 from sage_extensions.categories.polyhedral_cones import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:53: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:54: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:55: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:70: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:72: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:109: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:110: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_dual_point_hash.sage:110: TL10 len(): ask for a cardinality
+tests/modules/test_dual_point_hash.sage:128: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_dual_point_hash.sage:139: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/modules/test_dual_point_hash.sage:139: TL02 imports the private name _probe_prefix
+tests/modules/test_finitely_presented_module_archive.sage:42: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_finitely_presented_module_archive.sage:64: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_fraction_field_base_change_archive.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_fraction_field_base_change_archive.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_fraction_field_quotients_are_a_public_category.sage:15: TL01 import the complete session with from sage_extensions.all import *
+tests/modules/test_free_modules_are_a_public_category.sage:10: TL01 import the complete session with from sage_extensions.all import *
+tests/modules/test_integer_graded_cochain_complexes.sage:4: TL01 from sage_extensions.categories.modules.cochain_complexes import ...: take every name from the session
+tests/modules/test_invariant_factor_framing.sage:4: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_invariant_factor_framing.sage:24: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:26: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:52: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_invariant_factor_framing.sage:67: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_module_completion_maps.sage:10: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_module_completion_maps.sage:76: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_module_functors_are_category_methods.sage:10: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_module_product_elements.sage:12: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_module_product_elements.sage:13: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/modules/test_module_product_elements.sage:20: TL02 private attribute ._categorical_product_construction
+tests/modules/test_module_product_elements.sage:35: TL09 test_a_product_rejects_components_indexed_by_another_set asserts nothing
+tests/modules/test_module_product_elements.sage:38: TL02 private attribute ._categorical_product_construction
+tests/modules/test_module_product_elements.sage:42: TL04 try/except: expected failures are asserted with pytest.raises
+tests/modules/test_powers.sage:11: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_powers.sage:93: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_rank_stratification_and_local_freeness.sage:10: TL01 from sage_extensions.categories.abstract_categories.mor_categories import ...: take every name from the session
+tests/modules/test_rank_stratification_and_local_freeness.sage:54: TL03 isinstance(): introspection is not mathematics
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:19: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:23: TL01 from sage_extensions.categories.modules.framed.framed_free_modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:26: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:31: TL01 from sage_extensions.refine import ...: take every name from the session
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:71: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:92: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:93: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_paired_module_readings_of_an_algebra.sage:108: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:19: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:41: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:42: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:43: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:55: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:56: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:57: TL09 an assertion that holds of anything
+tests/modules/test_the_selected_relation_morphism_contract.sage:66: TL08 ModulesWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/modules/test_the_selected_relation_morphism_contract.sage:67: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL01 from sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules import ...: take every name from the session
+tests/modules/test_the_selected_relation_morphism_contract.sage:72: TL02 imports the private name _relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:77: TL02 private attribute ._selected_relation_morphism
+tests/modules/test_the_selected_relation_morphism_contract.sage:88: TL09 an assertion that holds of anything
+tests/objects/test_affine_plane_over_qq.sage:2: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/objects/test_discriminant_bilinear_form_of_a1.sage:2: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/objects/test_discriminant_bilinear_form_of_a1.sage:5: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/objects/test_discriminant_bilinear_form_of_a1.sage:8: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/objects/test_discriminant_quadratic_form_of_a1.sage:2: TL01 from sage_extensions.categories.modules.framed.fraction_field_quotients import ...: take every name from the session
+tests/objects/test_discriminant_quadratic_form_of_a1.sage:5: TL01 from sage_extensions.categories.modules.framed.formed import ...: take every name from the session
+tests/objects/test_exterior_algebra_of_qq2.sage:2: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/objects/test_hyperbolic_plane.sage:83: TL04 try/except: expected failures are asserted with pytest.raises
+tests/objects/test_hyperbolic_plane.sage:97: TL02 private attribute ._index_ranks
+tests/objects/test_integers.sage:2: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/objects/test_k3_lattice.sage:35: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/objects/test_k3_lattice.sage:36: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/objects/test_polynomial_ring_qq_x.sage:2: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/objects/test_smooth_functions_on_the_line.sage:2: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/objects/test_symmetric_algebra_of_qq2.sage:2: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/objects/test_tensor_algebra_of_qq2.sage:2: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/rings/test_a_quotient_is_a_cyclic_module_over_its_cover.sage:13: TL01 from sage_extensions.categories.modules.pure.modules import ...: take every name from the session
+tests/rings/test_a_quotient_is_a_cyclic_module_over_its_cover.sage:79: TL01 from sage_extensions.categories.modules.framed.framed_free_modules import ...: take every name from the session
+tests/rings/test_a_quotient_is_a_cyclic_module_over_its_cover.sage:82: TL01 from sage_extensions.refine import ...: take every name from the session
+tests/rings/test_a_quotient_is_a_cyclic_module_over_its_cover.sage:88: TL08 FramedFreeModules: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_commutative_algebra.sage:6: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/rings/test_commutative_algebra.sage:20: TL02 private attribute ._engine_element
+tests/rings/test_commutative_algebra.sage:20: TL02 private attribute ._from_engine_element
+tests/rings/test_completion_arithmetic.sage:12: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/rings/test_elementary_arithmetic_of_owned_rings.sage:10: TL01 from fractions import ...: take every name from the session
+tests/rings/test_elementary_arithmetic_of_owned_rings.sage:94: TL09 an assertion that holds of anything
+tests/rings/test_elementary_arithmetic_of_owned_rings.sage:95: TL09 an assertion that holds of anything
+tests/rings/test_embeddings_of_quadratic_fields.sage:71: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/rings/test_embeddings_of_quadratic_fields.sage:74: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_embeddings_of_quadratic_fields.sage:77: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_embeddings_of_quadratic_fields.sage:92: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/rings/test_embeddings_of_quadratic_fields.sage:106: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_embeddings_of_quadratic_fields.sage:109: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_embeddings_of_quadratic_fields.sage:117: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/rings/test_embeddings_of_quadratic_fields.sage:123: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_field_isomorphism_decisions.sage:14: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/rings/test_five_adic_completion_and_its_lattice.sage:29: TL01 from sage.all import ...: take every name from the session
+tests/rings/test_five_adic_completion_and_its_lattice.sage:31: TL01 import the complete session with from sage_extensions.all import *
+tests/rings/test_five_adic_completion_and_its_lattice.sage:81: TL07 repr(): a representation, not a mathematical value
+tests/rings/test_five_adic_completion_and_its_lattice.sage:83: TL07 latex(): a representation, not a mathematical value
+tests/rings/test_five_adic_completion_and_its_lattice.sage:83: TL07 str(): a representation, not a mathematical value
+tests/rings/test_five_adic_completion_and_its_lattice.sage:131: TL04 try/except: expected failures are asserted with pytest.raises
+tests/rings/test_five_adic_completion_and_its_lattice.sage:136: TL09 an assertion that holds of anything
+tests/rings/test_five_adic_completion_and_its_lattice.sage:146: TL01 from sage_extensions.categories.rings.commutative_algebra import ...: take every name from the session
+tests/rings/test_five_adic_completion_and_its_lattice.sage:146: TL02 imports the private name _EXACT_LITERAL_UNSUPPORTED
+tests/rings/test_five_adic_completion_and_its_lattice.sage:146: TL02 imports the private name _exact_integer_rational_parts
+tests/rings/test_five_adic_completion_and_its_lattice.sage:153: TL03 hasattr(): introspection is not mathematics
+tests/rings/test_five_adic_completion_and_its_lattice.sage:160: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/rings/test_five_adic_completion_and_its_lattice.sage:167: TL03 isinstance(): introspection is not mathematics
+tests/rings/test_fraction_field_localization.sage:51: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_localization_fraction_equality.sage:24: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/rings/test_localization_fraction_equality.sage:117: TL02 private attribute ._selected_representation_kind
+tests/rings/test_localizations_of_the_integers.sage:80: TL01 from sage.rings.integer_ring import ...: take every name from the session
+tests/rings/test_localizations_of_the_integers.sage:81: TL01 from sage.rings.rational_field import ...: take every name from the session
+tests/rings/test_monic_polynomial_quotient_cardinality.sage:74: TL02 private attribute ._monic_quotient_cardinality
+tests/rings/test_monic_polynomial_quotient_cardinality.sage:82: TL02 private attribute ._monic_quotient_cardinality
+tests/rings/test_number_field_construction_and_display.sage:16: TL01 from sage.all import ...: take every name from the session
+tests/rings/test_number_field_construction_and_display.sage:18: TL01 import the complete session with from sage_extensions.all import *
+tests/rings/test_number_field_construction_and_display.sage:26: TL07 compares a rendering: assert the mathematical object, not its display
+tests/rings/test_number_field_construction_and_display.sage:26: TL07 str(): a representation, not a mathematical value
+tests/rings/test_number_field_construction_and_display.sage:27: TL08 OwnedNumberFields: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_number_field_construction_and_display.sage:29: TL07 repr(): a representation, not a mathematical value
+tests/rings/test_number_field_construction_and_display.sage:43: TL10 len(): ask for a cardinality
+tests/rings/test_number_field_construction_and_display.sage:57: TL07 repr(): a representation, not a mathematical value
+tests/rings/test_number_field_construction_and_display.sage:59: TL07 latex(): a representation, not a mathematical value
+tests/rings/test_number_field_construction_and_display.sage:66: TL04 try/except: expected failures are asserted with pytest.raises
+tests/rings/test_number_field_construction_and_display.sage:69: TL07 compares a rendering: assert the mathematical object, not its display
+tests/rings/test_number_field_construction_and_display.sage:69: TL07 str(): a representation, not a mathematical value
+tests/rings/test_number_field_construction_and_display.sage:77: TL07 latex(): a representation, not a mathematical value
+tests/rings/test_number_field_construction_and_display.sage:79: TL09 an assertion that holds of anything
+tests/rings/test_order_conjugation_restriction.sage:14: TL01 import the complete session with from sage_extensions.all import *
+tests/rings/test_owned_rings.sage:92: TL10 len(): ask for a cardinality
+tests/rings/test_owned_scalars_act_on_sage_matrices.sage:21: TL01 import operator: take every name from the session
+tests/rings/test_owned_scalars_act_on_sage_matrices.sage:25: TL01 from sage.matrix.constructor import ...: take every name from the session
+tests/rings/test_owned_scalars_act_on_sage_matrices.sage:26: TL01 from sage.matrix.matrix_space import ...: take every name from the session
+tests/rings/test_owned_scalars_act_on_sage_matrices.sage:27: TL01 from sage.rings.finite_rings.finite_field_constructor import ...: take every name from the session
+tests/rings/test_owned_scalars_act_on_sage_matrices.sage:28: TL01 from sage.rings.integer_ring import ...: take every name from the session
+tests/rings/test_owned_scalars_act_on_sage_matrices.sage:29: TL01 from sage.rings.rational_field import ...: take every name from the session
+tests/rings/test_owned_scalars_act_on_sage_matrices.sage:116: TL02 private attribute ._engine_element
+tests/rings/test_owned_scalars_act_on_sage_matrices.sage:136: TL01 from sage.algebras.quatalg.quaternion_algebra import ...: take every name from the session
+tests/rings/test_owned_scalars_act_on_sage_matrices.sage:138: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/rings/test_owned_scalars_act_on_sage_matrices.sage:138: TL02 imports the private name _OwnedScalarOnSageMatrices
+tests/rings/test_owned_scalars_act_on_sage_matrices.sage:145: TL11 .gens: write group_generators, module_generators or algebra_generators
+tests/rings/test_owned_scalars_act_on_sage_matrices.sage:159: TL02 private attribute ._act_
+tests/rings/test_owned_scalars_act_on_sage_matrices.sage:160: TL02 private attribute ._act_
+tests/rings/test_owned_scalars_act_on_sage_matrices.sage:163: TL02 private attribute ._act_
+tests/rings/test_prime_localization_field_decisions.sage:17: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/rings/test_prime_localization_field_decisions.sage:171: TL09 an assertion that holds of anything
+tests/rings/test_principal_maximal_ideals_in_k_t.sage:33: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_principal_maximal_ideals_in_k_t.sage:34: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_principal_maximal_ideals_in_k_t.sage:43: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_principal_maximal_ideals_in_k_t.sage:44: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_principal_maximal_ideals_in_k_t.sage:57: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_principal_maximal_ideals_in_k_t.sage:71: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_principal_maximal_ideals_in_k_t.sage:79: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_q_root_five_as_a_rational_algebra.sage:11: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/rings/test_rational_field_placement.sage:16: TL01 import the complete session with from sage_extensions.all import *
+tests/rings/test_rational_field_placement.sage:26: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/rings/test_rational_field_placement.sage:28: TL08 OwnedOrderedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_rational_field_placement.sage:29: TL08 OwnedNumberFields: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_rings_are_algebras_over_themselves.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/rings/test_rings_as_algebras_over_their_base.sage:13: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/rings/test_the_gaussian_integers_as_a_ring_of_integers.sage:24: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_the_gaussian_integers_as_a_ring_of_integers.sage:25: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_the_gaussian_integers_as_a_ring_of_integers.sage:26: TL07 compares a rendering: assert the mathematical object, not its display
+tests/rings/test_the_gaussian_integers_as_a_ring_of_integers.sage:26: TL07 repr(): a representation, not a mathematical value
+tests/rings/test_the_gaussian_integers_as_a_ring_of_integers.sage:36: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_the_gaussian_integers_as_a_ring_of_integers.sage:45: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/rings/test_the_gaussian_integers_as_a_ring_of_integers.sage:53: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/schemes/test_ade_pair_boundary_decomposition.sage:12: TL01 from sage_extensions.categories.schemes.ade_surfaces import ...: take every name from the session
+tests/schemes/test_ade_pair_boundary_decomposition.sage:12: TL02 imports the private name _a_family_polygon_data
+tests/schemes/test_ade_pair_boundary_decomposition.sage:12: TL02 imports the private name _ade_parameter
+tests/schemes/test_ade_pair_boundary_decomposition.sage:12: TL02 imports the private name _ade_polygon_data
+tests/schemes/test_ade_pair_boundary_decomposition.sage:12: TL02 imports the private name _polygon_side_decorations
+tests/schemes/test_ade_pair_boundary_decomposition.sage:12: TL02 imports the private name _validated_at21_low_level_variant
+tests/schemes/test_ade_pair_boundary_decomposition.sage:223: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_ade_pair_boundary_decomposition.sage:226: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_ade_pair_boundary_decomposition.sage:226: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_ade_pair_boundary_decomposition.sage:231: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_ade_pair_boundary_decomposition.sage:234: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_ade_pair_boundary_decomposition.sage:234: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_ade_pair_boundary_decomposition.sage:273: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_ade_pair_boundary_decomposition.sage:276: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_ade_pair_boundary_decomposition.sage:276: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_affine_schemes.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/schemes/test_complete_intersections.sage:75: TL08 constructs through the axiom DelPezzo(): construct through the top-level category of the kind
+tests/schemes/test_complete_intersections.sage:76: TL08 constructs through the axiom DelPezzo(): construct through the top-level category of the kind
+tests/schemes/test_group_scheme_morphisms.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/schemes/test_k3_hodge_structure.sage:18: TL08 constructs through the axiom K3(): construct through the top-level category of the kind
+tests/schemes/test_k3_hodge_structure.sage:30: TL08 constructs through the axiom K3(): construct through the top-level category of the kind
+tests/schemes/test_quasi_coherent_sheaves.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/schemes/test_quotient_base_change.sage:4: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/schemes/test_quotients_descent.sage:10: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/schemes/test_scheme_base_change.sage:136: TL08 constructs through the axiom DelPezzo(): construct through the top-level category of the kind
+tests/schemes/test_toric_blowup_of_the_plane_at_a_fixed_point.sage:55: TL08 constructs through the axiom DelPezzo(): construct through the top-level category of the kind
+tests/schemes/test_toric_blowups.sage:90: TL08 constructs through the axiom DelPezzo(): construct through the top-level category of the kind
+tests/schemes/test_toric_schemes.sage:85: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:85: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:86: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:88: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:98: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:123: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:123: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:146: TL04 try/except: expected failures are asserted with pytest.raises
+tests/schemes/test_toric_schemes.sage:149: TL07 compares a rendering: assert the mathematical object, not its display
+tests/schemes/test_toric_schemes.sage:149: TL07 str(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:156: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:156: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:167: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:168: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:180: TL01 from sage_extensions.categories.schemes.toric.toric_schemes import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _affine_chart
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _character_on_overlap
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_localization
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_supporting_character_monomial
+tests/schemes/test_toric_schemes.sage:180: TL02 imports the private name _face_transition
+tests/schemes/test_toric_schemes.sage:187: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/schemes/test_toric_schemes.sage:187: TL02 imports the private name _owned_integers
+tests/schemes/test_toric_schemes.sage:192: TL07 repr(): a representation, not a mathematical value
+tests/schemes/test_toric_schemes.sage:225: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:227: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:246: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:249: TL10 len(): ask for a cardinality
+tests/schemes/test_toric_schemes.sage:285: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:286: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:290: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/schemes/test_toric_schemes.sage:292: TL11 generators: write group_generators, module_generators or algebra_generators
+tests/sets/test_a_finite_literal_set_reads_as_a_subset.sage:12: TL01 import the complete session with from sage_extensions.all import *
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:103: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:145: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:154: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:155: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:168: TL09 test_ordered_union_requires_a_selected_order_on_both_inputs asserts nothing
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:170: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:172: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:174: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:183: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:184: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:207: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:218: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:219: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:230: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:236: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:238: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:253: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:255: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:256: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:267: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:277: TL10 len(): ask for a cardinality
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:281: TL10 len(): ask for a cardinality
+tests/sets/test_cartesian_additive_group_placement.sage:7: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_cartesian_additive_group_placement.sage:18: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cartesian_additive_group_placement.sage:37: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cartesian_additive_group_placement.sage:46: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cartesian_additive_group_placement.sage:47: TL13 AdditiveMonoids is not a session name
+tests/sets/test_cartesian_additive_group_placement.sage:48: TL13 AdditiveMonoids is not a session name
+tests/sets/test_cartesian_additive_group_placement.sage:58: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_cartesian_additive_group_placement.sage:59: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_cartesian_additive_group_placement.sage:66: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cartesian_additive_group_placement.sage:78: TL13 AdditiveMonoids is not a session name
+tests/sets/test_cartesian_additive_group_placement.sage:87: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_cartesian_additive_group_placement.sage:88: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_cartesian_additive_group_placement.sage:91: TL13 AdditiveMonoids is not a session name
+tests/sets/test_cartesian_additive_group_placement.sage:96: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cartesian_additive_group_placement.sage:107: TL13 AdditiveMonoids is not a session name
+tests/sets/test_cartesian_additive_group_placement.sage:108: TL13 AdditiveMonoids is not a session name
+tests/sets/test_cartesian_additive_group_placement.sage:117: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cartesian_additive_group_placement.sage:119: TL13 AdditiveMonoids is not a session name
+tests/sets/test_cartesian_additive_group_placement.sage:123: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_cartesian_additive_group_placement.sage:124: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_cartesian_additive_group_placement.sage:131: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_cartesian_additive_group_placement.sage:136: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_equalizers_and_coequalizers_of_finite_sets.sage:72: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_equalizers_and_coequalizers_of_finite_sets.sage:156: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_equalizers_and_coequalizers_of_finite_sets.sage:160: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_equalizers_and_coequalizers_of_finite_sets.sage:185: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_equalizers_and_coequalizers_of_finite_sets.sage:188: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_equalizers_and_coequalizers_of_finite_sets.sage:264: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_equalizers_and_coequalizers_of_finite_sets.sage:272: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_function_sets_are_a_public_category.sage:10: TL01 import the complete session with from sage_extensions.all import *
+tests/sets/test_natural_numbers_and_finite_ordinals.sage:30: TL08 OwnedSemirings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_natural_numbers_and_finite_ordinals.sage:34: TL02 private attribute ._meet_
+tests/sets/test_power_sets.sage:4: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_power_sets.sage:28: TL08 constructs through FinitePowerSets: construct through the top-level category of the kind
+tests/sets/test_power_sets.sage:32: TL08 constructs through FinitePowerSets: construct through the top-level category of the kind
+tests/sets/test_power_sets.sage:35: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:17: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:18: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:38: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:39: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:41: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:42: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:43: TL10 len(): ask for a cardinality
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:48: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:50: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:51: TL10 len(): ask for a cardinality
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:55: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:65: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:80: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:81: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:82: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:83: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:85: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:86: TL10 len(): ask for a cardinality
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:90: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:101: TL03 isinstance(): introspection is not mathematics
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:108: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:109: TL02 private attribute ._value_at_normalized_index
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:110: TL10 len(): ask for a cardinality
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:114: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:115: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:137: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:146: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:165: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:166: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:167: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:168: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:176: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:192: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:193: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:194: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:201: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:217: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:218: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:220: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:228: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:243: TL01 from sage_extensions.categories.sets.finite_ordered_sets import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:244: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:246: TL08 finite_ordered_set: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:247: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:248: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:254: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:255: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:261: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:262: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:263: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:268: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:273: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:286: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:289: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:290: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:299: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:300: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:301: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:302: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:308: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:324: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:332: TL09 test_unproved_infinite_value_category_cannot_place_monoid_product asserts nothing
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:333: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:334: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:335: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:339: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:340: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:345: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:346: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:354: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:355: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:356: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:360: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:362: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:363: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:370: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:377: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:378: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:379: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:380: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:388: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:394: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:409: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:430: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:438: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:442: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:443: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:452: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:453: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:454: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:459: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:462: TL09 an assertion that holds of anything
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:495: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:496: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:513: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:520: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:522: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:523: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:533: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:534: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:551: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:565: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:574: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:574: TL02 imports the private name _coproduct_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:590: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:603: TL10 len(): ask for a cardinality
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:616: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:618: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:626: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:632: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:633: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:639: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:644: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:708: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:708: TL02 imports the private name _cartesian_product_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:721: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:730: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:731: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:732: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:733: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:734: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:734: TL02 imports the private name _cartesian_product_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:734: TL02 imports the private name _coproduct_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:742: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:754: TL01 from sage_extensions.categories.group.magmas import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:755: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:755: TL02 imports the private name _cartesian_product_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:755: TL02 imports the private name _coproduct_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:773: TL01 from sage_extensions.categories.abstract_categories.functors import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:774: TL01 from sage_extensions.categories.functors.core import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:775: TL01 from sage_extensions.categories.sets.indexed_families import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:776: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:776: TL02 imports the private name _cartesian_product_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:776: TL02 imports the private name _coproduct_morphism
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:786: TL08 indexed_family: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:808: TL04 try/except: expected failures are asserted with pytest.raises
+tests/sets/test_subobject_undecided_membership.sage:4: TL01 from sage_extensions.logic import ...: take every name from the session
+tests/sets/test_subobject_undecided_membership.sage:42: TL04 try/except: expected failures are asserted with pytest.raises
+tests/tensors/test_coordinate_tensor_contractions.sage:23: TL01 import numpy: take every name from the session
+tests/tensors/test_coordinate_tensor_contractions.sage:25: TL01 from sage_extensions.tensors.tensor import ...: take every name from the session
+tests/tensors/test_coordinate_tensor_contractions.sage:25: TL02 imports the private name _engine_modular_pairing_pullback
+tests/tensors/test_tensors.sage:126: TL01 from fractions import ...: take every name from the session
+tests/test_finite_form_groups.py:9: TL01 import sage.all: take every name from the session
+tests/test_finite_form_groups.py:11: TL01 from sage_extensions.catalogue import ...: take every name from the session
+tests/test_finite_form_groups.py:12: TL01 from sage_extensions.categories.lattices import ...: take every name from the session
+tests/test_finite_form_groups.py:13: TL01 from sage_extensions.categories.sets.set_categories import ...: take every name from the session
+tests/test_finite_form_groups.py:48: TL09 an assertion that holds of anything
+tests/test_integer_residue_rings.py:8: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/test_integer_residue_rings.py:8: TL02 imports the private name _owned_integers
+tests/test_integer_residue_rings.py:23: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/test_integer_residue_rings.py:28: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/test_integer_residue_rings.py:33: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/test_integer_residue_rings.py:34: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/test_native_ring_constructions.py:3: TL01 from sage_extensions.categories.algebras.algebras import ...: take every name from the session
+tests/test_native_ring_constructions.py:4: TL01 from sage_extensions.categories.algebras.free_algebras import ...: take every name from the session
+tests/test_native_ring_constructions.py:5: TL01 from sage_extensions.categories.rings.commutative_algebra import ...: take every name from the session
+tests/test_native_ring_constructions.py:10: TL01 from sage_extensions.categories.rings.commutative_ideals import ...: take every name from the session
+tests/test_native_ring_constructions.py:11: TL01 from sage_extensions.categories.rings.number_fields import ...: take every name from the session
+tests/test_native_ring_constructions.py:11: TL02 imports the private name _number_field_of
+tests/test_native_ring_constructions.py:12: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/test_native_ring_constructions.py:12: TL02 imports the private name _owned_integers
+tests/test_native_ring_constructions.py:12: TL02 imports the private name _owned_rationals
+tests/test_native_ring_constructions.py:26: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/test_native_ring_constructions.py:46: TL08 constructs through the axiom Maximal(): construct through the top-level category of the kind
+tests/test_native_ring_constructions.py:63: TL10 len(): ask for a cardinality
+tests/test_native_ring_constructions.py:74: TL08 AlgebrasWithChosenFinitePresentation: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/test_prime_and_maximal_ideals.py:7: TL01 from sage_extensions.categories.rings.commutative_ideals import ...: take every name from the session
+tests/test_prime_and_maximal_ideals.py:8: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/test_prime_and_maximal_ideals.py:8: TL02 imports the private name _owned_integers
+tests/test_prime_and_maximal_ideals.py:8: TL02 imports the private name _owned_rationals
+tests/test_prime_and_maximal_ideals.py:39: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/test_prime_and_maximal_ideals.py:41: TL08 constructs through the axiom Maximal(): construct through the top-level category of the kind
+tests/test_prime_and_maximal_ideals.py:42: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+tests/test_prime_and_maximal_ideals.py:48: TL08 constructs through the axiom Maximal(): construct through the top-level category of the kind
+tests/test_prime_and_maximal_ideals.py:49: TL08 OwnedRings: a chosen-datum or implementation construction; construct through the top-level category of the kind
+932 files, 1424 findings (TL01, TL02, TL03, TL04, TL05, TL07, TL08, TL09, TL10, TL11, TL13)
+[peakrss] run: child waited=1 shell_code=1 samples=6
+[peakrss] peak tree RSS      : 295 MiB
+[peakrss] low-water MemAvail : 12319 MiB
+[peakrss] peak single VmHWM  : 301 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      290 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   295 MiB hwm=   301 MiB avail= 12791 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   295 MiB hwm=   301 MiB avail= 12662 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   295 MiB hwm=   301 MiB avail= 12319 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   294 MiB hwm=   294 MiB avail= 12796 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   287 MiB hwm=   287 MiB avail= 12935 MiB

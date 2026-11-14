@@ -1279,3 +1279,67 @@ move by noise only -- induced Gram tensor 0.231 ms against the old loop's
 planes in 15.4 s` and `[Otilde+] 2 planes in 11.9 s` against 2 double cosets
 each, exit status 0, peak tree RSS 569 MiB, and the enum's three members with
 statuses 2 / 1 / 3 driven by the stub rows.
+
+## #468 review repair — one static star import per area package
+
+The review of `de94fac512` accepted the one-authority result — no area-declared
+name is hand-imported in `all.py`, the 75 names two areas declare are the same
+objects, and `CoxeterGroups` and the #407 group categories resolve to the
+preamble's constructors — and refused the mechanism: `for _area_name in
+_area_package.__all__: globals()[_area_name] = getattr(_area_package,
+_area_name)` is a `globals()` mutation with a dynamic lookup (STY-120; AGENTS
+§3/§4 and "Dynamic peeking").  `all.py` now names each area once, in a static
+`from sage_extensions.<area> import *  # noqa: F403`, in the order the loop
+walked, and the `_AREA_PACKAGES` tuple is deleted, so the list of areas exists
+only where it is used.  `import *` is defined as binding the package's `__all__`,
+which is what the loop did by hand, so the mechanism is the declaration and
+nothing else.
+
+Measured on base `37b67b7` (that is `de94fac` plus #471, which changes only
+`tests/coble_kernel_plane_rows.py` and evidence files, nothing under `src/`)
+against the same commit with this repair's `all.py`.
+
+**Same bindings.**  Dumping every non-dunder name of `sage_extensions.all` in
+both trees, the two dumps differ in one line over 690 names: the private
+`_AREA_PACKAGES` tuple itself.  The 689 others agree in name, in the type of the
+bound object, and in the `__module__`/`__qualname__` that object declares itself
+under.  An audit of the declarations finds 599 over 524 distinct names in the 22
+areas, 75 declared by two areas, 0 names unbound in the session, no name bound to
+an object no declarer exports beyond `Integer` and `RealNumber` (which the
+session rebinds to its own runtime objects below the imports, in both trees), and
+no loop temporary left in the module.
+
+**The six names of #407's cause** resolve to the preamble's constructors and
+construct: `CoxeterGroups()([[1, 3], [3, 1]]).order()` is 6 and the group is in
+`FreeGroupQuotients()` and `OwnedGroups().Finite()`; `SymmetricGroups()(Sets.Δ[2])`
+has order 6; `Groups.S(3).predicate_subgroup(sgn = 1)` is in
+`Subgroups(Groups.S(3))` with order 3; `GeneralLinearGroups()(GF(2), 2).order()`
+is 6; `Torsors(C_3)(regular C_3-set)` has cardinality 3.  `CoxeterGroups` is the
+only one of the six with a Sage namesake, and the session's binding shadows it.
+
+**The 16 files of #407's and #408's namespace causes**, one pytest process per
+file, `-o addopts= -p sage_extensions.testing.suite_budget -p
+sage_extensions.testing.test_lint --no-time-gates --no-test-lint`, on the base
+and on this tree: 141 test ids each, 43 red each, the same id set, the same
+failure kind for every shared red id, and 0 ids green on the base and red here.
+The 15 ids the causes' record lists as red-to-green at `de94fac` are green in
+both.
+
+**Nothing else moves**: the tree-wide `test_lint` reports 932 files and 1424
+findings with identical lines in both trees, so `TL13` stays at the 10 names
+#408's `C36` filed; `import sage_extensions.all` after `sage.all` is 0.319 /
+0.254 / 0.252 s on the base against 0.319 / 0.309 / 0.320 s here, three fresh
+processes each, under the suite's 3.0 s ceiling for that workload.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue468-star-bindings.py` | — | the audit, re-runnable: reads the areas from `all.py` (star imports, or `_AREA_PACKAGES` on the base), checks every declaration is bound to the declarer's object, prints the six and eighteen names with owner, Sage namesake and origin, then constructs the six |
+| `issue468-star-bindings-base.log` / `-repair.log` | base `37b67b7` / the tree of this push | 22 areas, 599 declarations, 524 distinct, 75 shared, 0 unbound, no loop temporary; `CoxeterGroups` `SHADOWED`, the other 22 `none`; the five constructions |
+| `issue468-star-namespace-dump.py` | — | the dump: name, bound type, and the object's `__module__`/`__qualname__`; a `LazyImport` is recorded unresolved because ten `categories.functions` names raise on first access (#440, older than this repair) |
+| `issue468-star-namespace-dump-base.log` / `-repair.log`, `issue468-star-namespace-diff.log` | base `37b67b7` / the tree of this push | 690 names against 689; the `diff` is one deleted line, `_AREA_PACKAGES` |
+| `issue468-star-cause-ids.py` | — | the id-level comparison of two trees' JUnit reports |
+| `issue468-star-causes-base.log` / `-repair.log` | base `37b67b7` / the tree of this push | the 16 files' pytest summaries side by side; identical in every file |
+| `issue468-star-causes-ids.log` | base `37b67b7` / the tree of this push | 141 ids and 43 red in both; same id set; no id green on the base and red here; the 15 recorded ids green in both |
+| `issue468-star-runs/base/*.log`, `issue468-star-runs/repair/*.log` | base `37b67b7` / the tree of this push | the 32 whole runs, one process per file |
+| `issue468-star-lint-tree-base.log` / `-repair.log` | base `37b67b7` / the tree of this push | tree-wide `test_lint`: 932 files, 1424 findings in each, lines identical |
+| `issue468-star-import-time.py`, `-base.log`, `-repair.log` | base `37b67b7` / the tree of this push | `import sage_extensions.all` after `sage.all`, three fresh processes: 0.319 / 0.254 / 0.252 s against 0.319 / 0.309 / 0.320 s |

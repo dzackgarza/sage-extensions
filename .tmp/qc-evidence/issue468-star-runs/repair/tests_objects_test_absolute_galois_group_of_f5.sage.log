@@ -1,0 +1,34 @@
+provider SHA: 37b67b7e467e7bfcfe6e6e1652d5f5111ed003c7
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line --junit-xml=.tmp/causes468/tests_objects_test_absolute_galois_group_of_f5.sage.xml tests/objects/test_absolute_galois_group_of_f5.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+...F.                                                                    [100%]
+=================================== FAILURES ===================================
+E   KeyError: 3
+
+During handling of the above exception, another exception occurred:
+E   TypeError: Ring morphism:
+      From: Finite Field in z3 of size 5^3
+      To:   Algebraic closure of Finite Field of size 5
+      Defn: z3 |--> z3 is an arrow of another Mor; native ring computations use the protected engine crossing
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (5) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:782 Elementwise module morphism Module over Integer Ring / Ideal (5) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (5) of Integer Ring on Integer Ring / Ideal (5) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:573: TypeError: Ring morphism:
+=========================== short test summary info ============================
+FAILED tests/objects/test_absolute_galois_group_of_f5.sage::test_the_finite_quotients
+1 failed, 4 passed in 0.43s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 321 MiB
+[peakrss] low-water MemAvail : 11213 MiB
+[peakrss] peak single VmHWM  : 321 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      304 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  5 rss=   321 MiB hwm=   321 MiB avail= 11213 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   123 MiB hwm=   123 MiB avail= 11429 MiB
+[peakrss]   t=     0.0s procs=  2 rss=    10 MiB hwm=    10 MiB avail= 11626 MiB

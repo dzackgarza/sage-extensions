@@ -1,0 +1,17 @@
+provider SHA: 37b67b7e467e7bfcfe6e6e1652d5f5111ed003c7
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --no-test-lint -q --tb=line --junit-xml=.tmp/causes468/tests_objects_test_trivial_connection_on_the_affine_line.sage.xml tests/objects/test_trivial_connection_on_the_affine_line.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+....                                                                     [100%]
+4 passed in 0.35s
+[peakrss] run: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 287 MiB
+[peakrss] low-water MemAvail : 10318 MiB
+[peakrss] peak single VmHWM  : 287 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      270 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     2.0s procs=  5 rss=   287 MiB hwm=   287 MiB avail= 10318 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail= 10553 MiB

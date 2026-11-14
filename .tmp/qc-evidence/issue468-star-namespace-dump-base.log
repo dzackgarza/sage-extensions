@@ -1,0 +1,13 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt468base3
+tree HEAD: 37b67b7e467e7bfcfe6e6e1652d5f5111ed003c7
+tree all.py sha256: 88c45ea656f3c99edfcb7a2ac5b862a5c5ec460a5543ecb1f9c2d5ead37113ff  /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt468base3/src/sage_extensions/all.py
+command: .scratch/namespace_dump.py /repos/sage-extensions/.tmp/names2-wt468base3.tsv
+690 names -> /repos/sage-extensions/.tmp/names2-wt468base3.tsv
+lazy and left unresolved: 20 ['Coble', 'CyclicCovers', 'Embeddings', 'GradedLebesgueAlgebra', 'GradedLebesgueModule', 'GradedTensorProductModules', 'GradedTensorSquare', 'Involutions', 'LebesgueConvolution', 'LebesgueConvolutionAlgebra', 'LebesgueConvolutionModule', 'LebesgueGradedModules', 'NamedLattices', 'NegativeDefTwoElementary', 'Sterk', 'TwoElementary', 'graded_lebesgue_algebra', 'lebesgue_convolution_algebra', 'signature_orthogonal_sums', 'two_elementary_orthogonal_sums']
+[peakrss] run: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 4 MiB
+[peakrss] low-water MemAvail : 13270 MiB
+[peakrss] peak single VmHWM  : 4 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       5 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail= 13270 MiB

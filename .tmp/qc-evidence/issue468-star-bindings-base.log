@@ -1,0 +1,56 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt468base3
+tree HEAD: 37b67b7e467e7bfcfe6e6e1652d5f5111ed003c7
+tree all.py sha256: 88c45ea656f3c99edfcb7a2ac5b862a5c5ec460a5543ecb1f9c2d5ead37113ff  /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt468base3/src/sage_extensions/all.py
+command: .scratch/bindings.py
+module: /repos/sage-extensions/src/sage_extensions/all.py
+area packages: 22; star imports in all.py: 0
+declarations: 599 over 524 distinct names
+declared by more than one area: 75
+unbound in the session: 0 []
+bound to an object no declarer exports: 2 ['Integer', 'RealNumber']
+loop temporaries left in the module: []
+
+name                                 declared by                                    sage namesake  binding
+Subgroups                            sage_extensions.groups                         none           sage_extensions.categories.group.groups.Subgroups
+SymmetricGroups                      sage_extensions.groups                         none           sage_extensions.categories.group.groups.SymmetricGroups
+GeneralLinearGroups                  sage_extensions.groups                         none           sage_extensions.categories.group.groups.GeneralLinearGroups
+FreeGroupQuotients                   sage_extensions.groups                         none           sage_extensions.categories.group.groups.FreeGroupQuotients
+Torsors                              sage_extensions.groups                         none           sage_extensions.categories.group.g_sets.Torsors
+CoxeterGroups                        sage_extensions.groups                         SHADOWED       sage_extensions.categories.group.groups.CoxeterGroups
+AbsoluteGaloisGroups                 sage_extensions.categories.group.profinite     none           sage_extensions.categories.group.profinite.absolute_galois_groups.AbsoluteGaloisGroups
+AbsoluteGaloisGroupsOfFiniteFields   sage_extensions.categories.group.profinite     none           sage_extensions.categories.group.profinite.absolute_galois_groups.AbsoluteGaloisGroupsOfFiniteFields
+FinitelyGeneratedGroups              sage_extensions.groups                         none           sage_extensions.categories.group.groups.FinitelyGeneratedGroups
+FinitelyPresentedGroups              sage_extensions.groups                         none           sage_extensions.categories.group.groups.FinitelyPresentedGroups
+ProfiniteGroups                      sage_extensions.categories.group.profinite     none           sage_extensions.categories.group.profinite.profinite_groups.ProfiniteGroups
+AlternatingAlgebras                  sage_extensions.categories.algebras            none           sage_extensions.categories.algebras.free_algebras.AlternatingAlgebras
+SymmetricAlgebras                    sage_extensions.categories.algebras            none           sage_extensions.categories.algebras.free_algebras.SymmetricAlgebras
+TensorAlgebras                       sage_extensions.categories.algebras            none           sage_extensions.categories.algebras.free_algebras.TensorAlgebras
+StrictlyGradedCommutativeAlgebras    sage_extensions.categories.algebras            none           sage_extensions.categories.algebras.graded_algebras.GradedAlgebras.Supercommutative.Alternating
+FractionalIdeals                     sage_extensions.categories.modules             none           sage_extensions.categories.modules.fractional_ideals.FractionalIdeals
+ModulesWithConnection                sage_extensions.categories.modules             none           sage_extensions.categories.modules.connections.ModulesWithConnection
+ModulesWithFlatConnection            sage_extensions.categories.modules             none           sage_extensions.categories.modules.connections.ModulesWithConnection.Integrable
+FinitelyGeneratedModules             sage_extensions.categories.modules             none           sage_extensions.categories.modules.pure.modules.Modules.FinitelyGenerated
+FinitelyPresentedModules             sage_extensions.categories.modules             none           sage_extensions.categories.modules.pure.modules.Modules.FinitelyPresented
+ProjectiveModules                    sage_extensions.categories.modules             none           sage_extensions.categories.modules.pure.modules.Modules.Projective
+TorsionModules                       sage_extensions.categories.modules             none           sage_extensions.categories.modules.pure.modules.Modules.Torsion
+TensorProductModules                 sage_extensions.categories.modules             none           sage_extensions.categories.modules.pure.modules.TensorProductModules
+SymmetricBilinearFormModules         sage_extensions.categories.modules             none           sage_extensions.categories.modules.framed.formed.form_modules.BilinearFormModules.Symmetric
+
+CoxeterGroups()([[1, 3], [3, 1]]).order(): 6
+  in FreeGroupQuotients(): True
+  in OwnedGroups().Finite(): True
+SymmetricGroups()(Sets.Δ[2]).order(): 6
+Subgroups(S_3) contains S_3.predicate_subgroup(sgn = 1): True of order 3
+GeneralLinearGroups()(GF(2), 2).order(): 6
+Torsors(C_3)(regular C_3-set).cardinality(): 3
+[peakrss] run: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 420 MiB
+[peakrss] low-water MemAvail : 13078 MiB
+[peakrss] peak single VmHWM  : 420 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      409 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        0 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   420 MiB hwm=   420 MiB avail= 13154 MiB
+[peakrss]   t=     0.0s procs=  2 rss=     8 MiB hwm=     8 MiB avail= 13078 MiB

@@ -24,39 +24,39 @@ from sage_extensions import language_runtime as _language_runtime
 
 # The session publishes what each area package declares.  A package's
 # ``__all__`` is the one authority for its names (OWN-19; AGENTS, "Names and
-# ownership"), so this module names no member of those declarations: the
-# packages below are the session's areas and each contributes its whole
-# ``__all__``.  An area's constructor is a session name by construction, so a
-# second hand-written list cannot drift from the owner's (API-06, API-07).
-_AREA_PACKAGES = (
-    "sage_extensions.categories.abstract_categories",
-    "sage_extensions.categories.algebras",
-    "sage_extensions.categories.divisors",
-    "sage_extensions.categories.forms",
-    "sage_extensions.categories.functions",
-    "sage_extensions.categories.group.profinite",
-    "sage_extensions.categories.modules",
-    "sage_extensions.categories.modules.framed",
-    "sage_extensions.categories.modules.framed.finitely_generated",
-    "sage_extensions.categories.modules.framed.formed",
-    "sage_extensions.categories.modules.group_modules",
-    "sage_extensions.categories.modules.pure",
-    "sage_extensions.categories.modules.pure.finitely_generated",
-    "sage_extensions.categories.schemes.toric",
-    "sage_extensions.categories.sets",
-    "sage_extensions.categories.sets.enumerated",
-    "sage_extensions.groups",
-    "sage_extensions.lexicon",
-    "sage_extensions.rings",
-    "sage_extensions.schemes",
-    "sage_extensions.static_types",
-    "sage_extensions.tensors",
-)
-for _area_package_name in _AREA_PACKAGES:
-    _area_package = _import_module(_area_package_name)
-    for _area_name in _area_package.__all__:
-        globals()[_area_name] = getattr(_area_package, _area_name)
-del _area_package_name, _area_package, _area_name
+# ownership"), so this module names no member of those declarations: each star
+# import below binds exactly that package's whole ``__all__``, in this order.  An
+# area's constructor is a session name by construction, so a second hand-written
+# list cannot drift from the owner's (API-06, API-07).
+#
+# The star import is the binding and nothing else: a name an area declares is
+# written once, in the owner's ``__all__``, and appears here only as the package
+# that declares it.  ``import *`` is defined as "bind ``__all__``", so a name an
+# owner adds reaches the session without an edit here; the F403 suppression marks
+# that this module deliberately consumes the declaration rather than restating it
+# (STY-120: no ``globals()`` mutation, no string lookup, no ``getattr``).
+from sage_extensions.categories.abstract_categories import *  # noqa: F403
+from sage_extensions.categories.algebras import *  # noqa: F403
+from sage_extensions.categories.divisors import *  # noqa: F403
+from sage_extensions.categories.forms import *  # noqa: F403
+from sage_extensions.categories.functions import *  # noqa: F403
+from sage_extensions.categories.group.profinite import *  # noqa: F403
+from sage_extensions.categories.modules import *  # noqa: F403
+from sage_extensions.categories.modules.framed import *  # noqa: F403
+from sage_extensions.categories.modules.framed.finitely_generated import *  # noqa: F403
+from sage_extensions.categories.modules.framed.formed import *  # noqa: F403
+from sage_extensions.categories.modules.group_modules import *  # noqa: F403
+from sage_extensions.categories.modules.pure import *  # noqa: F403
+from sage_extensions.categories.modules.pure.finitely_generated import *  # noqa: F403
+from sage_extensions.categories.schemes.toric import *  # noqa: F403
+from sage_extensions.categories.sets import *  # noqa: F403
+from sage_extensions.categories.sets.enumerated import *  # noqa: F403
+from sage_extensions.groups import *  # noqa: F403
+from sage_extensions.lexicon import *  # noqa: F403
+from sage_extensions.rings import *  # noqa: F403
+from sage_extensions.schemes import *  # noqa: F403
+from sage_extensions.static_types import *  # noqa: F403
+from sage_extensions.tensors import *  # noqa: F403
 from sage_extensions.categories.abstract_categories.functors import (  # noqa: F401
     DiscreteCategories,
     DiscreteCategory,

@@ -1,0 +1,15 @@
+# the session namespace of each tree, dumped with issue468-star-namespace-dump.py
+# base: 37b67b7 (all.py sha256 88c45ea6...),
+# repair: the same commit with this repair's all.py (sha256 fde94ca3...)
+
+$ grep 'names ->' issue468-star-namespace-dump-base.log issue468-star-namespace-dump-repair.log
+690 names -> /repos/sage-extensions/.tmp/names2-wt468base3.tsv
+689 names -> /repos/sage-extensions/.tmp/names2-wt468s.tsv
+
+$ diff <base dump> <repair dump>
+619d618
+< _AREA_PACKAGES	tuple	builtins.tuple
+
+# 690 base names, 689 repaired: the one difference is the module-private _AREA_PACKAGES
+# tuple the loop read, which the static star imports replace.  Every other binding is the
+# same type under the same module and qualified name.
