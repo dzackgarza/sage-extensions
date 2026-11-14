@@ -61,7 +61,12 @@ from sage.rings.quotient_ring import QuotientRing_generic
 from sage.rings.rational_field import QQ as SageQQ
 from sage.rings.number_field.number_field_base import NumberField
 from sage.rings.ring import Ring
-from sage.structure.element import CommutativeRingElement, RingElement, parent as element_parent
+from sage.structure.element import (
+    CommutativeRingElement,
+    Element,
+    RingElement,
+    parent as element_parent,
+)
 from sage.structure.parent import Parent
 from sage.rings.qqbar import AA as SageAA
 from sage.rings.finite_rings.finite_field_constructor import GF as SageGF
@@ -4242,6 +4247,31 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                 zero_ideal = ring.ideal(ring.zero())
                 return zero_ideal.colon(ring.ideal(self)) == zero_ideal
 
+    class ElementMethods:
+        r"""What an element of a unital ring is: its division by a unit.
+
+        Division in a ring is multiplication by the inverse of the divisor,
+        \(a / b = a b^{-1}\), so the quotient is taken on the right.  For a ring
+        that does not commute this is not \(b^{-1} a\), which is the scalar
+        action of the same element on the ring regarded as a left module over
+        itself.
+
+        The operator is the coercion model's ``Element.__truediv__``: it brings
+        both operands into one parent and asks ``_div_`` there, so \(a / b\) is
+        computed in the parent the two elements have in common.  ``_div_``
+        stays with the element realization that computes it -- an exact field
+        decides the zero and undecided-nonzero denominators, an engine-backed
+        ring divides in its engine, and an element realization with neither
+        keeps \(a b^{-1}\) from the monoid level
+        (``sage.categories.monoids.Monoids.ElementMethods._div_``).
+        """
+
+        # Division by the inverse on the right, ahead of the scalar action of a
+        # module over the ring (``Modules.ElementMethods.__truediv__``), which
+        # is ``b^{-1} a`` and a different operation when the ring does not
+        # commute.
+        __truediv__ = Element.__truediv__
+
     class ParentMethods:
         def __iter__(self):
             r"""Enumerate the points of a finite owned ring through its selected engine.
@@ -5803,6 +5833,12 @@ class _OwnedRingElement(RingElement):
         return _owned_engine_element(self.parent(), other._backend() % self._backend())
 
     def __truediv__(self, other):
+        r"""Return ``a b^{-1}``: the engine divides, after reading the operand.
+
+        An engine-backed ring computes its own quotient, and the divisor is read
+        in this ring along its canonical map (``_operator_operand``), which is
+        what lets an integer literal divide an element of it.
+        """
         other = self._operator_operand(other)
         if other is NotImplemented:
             return NotImplemented

@@ -37,6 +37,14 @@ _PREAMBLE_PACKAGE = __name__.rpartition(".")[0] + "."
 # class, not a mixin: it is the class an owned category is tied to.
 _IMPLEMENTATION_BASES = (Parent, Element, Morphism)
 
+# What a class dictionary holds about the class itself rather than about its
+# objects.  Aliasing one of these onto a rebuilt class would describe the class,
+# not hand it an operation.
+_CLASS_BOOKKEEPING = frozenset({
+    "__module__", "__qualname__", "__doc__", "__dict__", "__weakref__",
+    "__slots__", "__annotations__", "__firstlineno__", "__static_attributes__",
+})
+
 
 @cached_function
 def _owned_mixins(category: Category, attr: str) -> tuple[type, ...]:
@@ -221,25 +229,9 @@ def owned_parent_class(implementation: type, category: Category) -> type:
     # The alias is the original provider's descriptor, not a second
     # implementation.  Private construction hooks stay on their provider so
     # ``run_construction_hooks`` still executes each level exactly once.
-    new_names = {
-        name
-        for provider in mixins
-        for name in vars(provider)
-        if not name.startswith("_")
-    }
-    preferred = {}
-    seen = set()
-    for provider in providers:
-        for name, value in vars(provider).items():
-            if name.startswith("_") or name in seen:
-                continue
-            seen.add(name)
-            if provider in carried and name in new_names:
-                preferred[name] = value
-
     concrete = implementation.__dict__.get("_preamble_concrete", inherited)
     new_class = _owned_dynamic_class(f"Owned{concrete.__name__}", (*mixins, inherited), concrete)
-    for name, value in preferred.items():
+    for name, value in _final_category_operations(providers, carried, new_class).items():
         setattr(new_class, name, value)
     _supply_participant_implementations(new_class, mixins, inherited)
     new_class._preamble_concrete = concrete
@@ -251,6 +243,96 @@ def _rebuild_parent_class(parent: Parent, category: Category) -> None:
     parent.__class__ = owned_parent_class(type(parent), category)
 
 
+def _final_category_operations(
+    providers: tuple[type, ...],
+    carried: frozenset[type],
+    built: type,
+) -> dict[str, object]:
+    r"""Return the public operations the final category order keeps, by name.
+
+    ``providers`` are the category's implementation classes in its own order
+    and ``carried`` the ones the object already dispatches through; ``built`` is
+    the class about to be handed the object.  Refinement adds a category to an
+    object that already dispatches through the categories it had, and a class
+    reached by an earlier refinement stays in the method resolution order where
+    it was put.  A name the final category gives to a more specific level would
+    therefore keep answering from that earlier class: a ring's own division by a
+    unit sits at the ring category and the scalar division of a module over the
+    ring at the module category, and a ring refined into both takes the ring's
+    only if the final order is read again after the refinement.
+
+    The first provider of a name in ``providers`` order is the one the final
+    category selects.  When it is already carried and ``built`` resolves that
+    name to another of the category's providers, its descriptor is returned for
+    the caller to alias, so the class resolves the name as the category does.
+    A name ``built`` resolves to a realization outside these providers keeps
+    that realization: this orders the category's own levels, and a computation
+    the category leaves to its realizations is not one of them.  Names are the
+    public ones, a Python protocol operation such as ``__truediv__`` among
+    them; a single-underscore name is a construction hook and stays on the
+    provider that declared it.
+    """
+    known = frozenset(providers)
+    resolved = _declaring_classes(built)
+    selected: dict[str, object] = {}
+    seen: set[str] = set()
+    for provider in providers:
+        for name, value in vars(provider).items():
+            if _is_bookkeeping_or_hook(name) or name in seen:
+                continue
+            seen.add(name)
+            if provider not in carried or resolved.get(name) is provider:
+                continue
+            if resolved.get(name) in known:
+                selected[name] = value
+    return selected
+
+
+def _declaring_classes(built: type) -> dict[str, type]:
+    r"""Return the class that first declares each name, in ``built``'s own order."""
+    resolved: dict[str, type] = {}
+    for implemented in built.__mro__:
+        for name in vars(implemented):
+            resolved.setdefault(name, implemented)
+    return resolved
+
+
+def _is_bookkeeping_or_hook(name: str) -> bool:
+    r"""Whether ``name`` describes the class itself, or is a construction hook."""
+    if name in _CLASS_BOOKKEEPING:
+        return True
+    return name.startswith("_") and not name.startswith("__")
+
+
+def _realization_operations(providers: tuple[type, ...], built: type) -> dict[str, object]:
+    r"""Return the operations ``built``'s own realization supplies, by name.
+
+    An element class pairs a realization with the methods of its category levels,
+    and the realization is where the object's own data is implemented; a level
+    states what the category adds to it.  A refinement prepends the newly reached
+    category methods to the whole native class, and so to the realization as
+    well, which can leave a general category's operation in front of the
+    realization's own.  A ring's division is that case: an engine-backed ring
+    divides an element in its engine and reads the divisor along its canonical
+    map, while the scalar division of a module over the ring is another
+    operation, and the ring is refined into that module.  So a name a preamble
+    realization of ``built`` supplies is resolved by it, and only the names no
+    realization supplies are the category's to order.
+    """
+    known = frozenset(providers)
+    realization: dict[str, type] = {}
+    for implemented in built.__mro__:
+        if implemented in known or not implemented.__module__.startswith(_PREAMBLE_PACKAGE):
+            continue
+        for name in vars(implemented):
+            realization.setdefault(name, implemented)
+    resolved = _declaring_classes(built)
+    return {
+        name: vars(declarer)[name]
+        for name, declarer in realization.items()
+        if resolved[name] is not declarer and not _is_bookkeeping_or_hook(name)
+    }
+
 
 def _rebuild_element_class(parent: Parent, category: Category) -> None:
     from sage.categories.sets_cat import Sets as SageSets
@@ -259,12 +341,12 @@ def _rebuild_element_class(parent: Parent, category: Category) -> None:
     # element class of its own to rebuild.
     if category.is_subcategory(SageSets().Facade()):
         return
-    mixins = _owned_mixins(category, "ElementMethods")
-    if not mixins:
+    providers = _owned_mixins(category, "ElementMethods")
+    if not providers:
         return
     native = parent.element_class
     carried = frozenset(native.__mro__)
-    mixins = tuple(m for m in mixins if m is not object and m not in carried)
+    mixins = tuple(m for m in providers if m is not object and m not in carried)
     if not mixins:
         return
     parent.__dict__.pop("_abstract_element_class", None)
@@ -273,6 +355,10 @@ def _rebuild_element_class(parent: Parent, category: Category) -> None:
         (*mixins, native),
         doccls=native,
     )
+    for name, value in _realization_operations(providers, element_class).items():
+        setattr(element_class, name, value)
+    for name, value in _final_category_operations(providers, carried, element_class).items():
+        setattr(element_class, name, value)
     _supply_participant_implementations(element_class, mixins, native)
     parent.element_class = element_class
 
