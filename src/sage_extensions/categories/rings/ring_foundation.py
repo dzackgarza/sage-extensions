@@ -3314,10 +3314,10 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                     hypothesis.
                     """
                     from sage_extensions.categories.group.profinite.absolute_galois_group import (
-                        AbsoluteGaloisGroup,
+                        _canonical_absolute_galois_group,
                     )
 
-                    return AbsoluteGaloisGroup(self)
+                    return _canonical_absolute_galois_group(_own_ring(self))
 
     class NoZeroDivisors(CategoryWithAxiom):
         r"""Rings in which ``xy = 0`` forces ``x = 0`` or ``y = 0``.

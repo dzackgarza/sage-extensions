@@ -908,23 +908,6 @@ def _canonical_absolute_galois_group(field):
     return _realized_absolute_galois_group(field)
 
 
-def AbsoluteGaloisGroup(field, closure=None, embedding=None):
-    r"""Return the represented absolute Galois group of ``field``.
-
-    The canonical closure/embedding realization is one object per owned field.
-    Stated realization data construct a distinct object through the same
-    absolute-Galois group category entry.
-    """
-    field = _own_ring(field)
-    if closure is None and embedding is None:
-        return _canonical_absolute_galois_group(field)
-    return _realized_absolute_galois_group(
-        field,
-        closure=closure,
-        embedding=embedding,
-    )
-
-
 class OpenSubgroupInclusion:
     r"""The literal inclusion of a realized open subgroup into its supergroup group."""
 
@@ -1179,7 +1162,6 @@ def OpenGaloisSubgroupConjugacyClass(supergroup, extension_field):
 
 
 __all__ = [
-    "AbsoluteGaloisGroup",
     "AbsoluteGaloisGroupElement",
     "ArithmeticFrobeniusElement",
     "ElementConjugacyClass",
