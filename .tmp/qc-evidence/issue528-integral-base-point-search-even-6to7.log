@@ -1,0 +1,57 @@
+[    0.0s] min_rank=6 max_rank=7 box=2 budget=480 s, one search over every block sum
+[    0.0s] 2105 lattices in the search space
+[   15.5s]   50 torsors tried, 0 hits
+[   26.1s]   100 torsors tried, 0 hits
+[   43.4s]   150 torsors tried, 0 hits
+[   55.1s]   200 torsors tried, 0 hits
+[   64.7s]   250 torsors tried, 0 hits
+[   77.7s]   300 torsors tried, 0 hits
+[   87.0s]   350 torsors tried, 0 hits
+[   98.0s]   400 torsors tried, 0 hits
+[  106.8s]   450 torsors tried, 0 hits
+[  117.9s]   500 torsors tried, 0 hits
+[  126.4s]   550 torsors tried, 0 hits
+[  136.9s]   600 torsors tried, 0 hits
+[  144.1s]   650 torsors tried, 0 hits
+[  150.6s]   700 torsors tried, 0 hits
+[  159.8s]   750 torsors tried, 0 hits
+[  176.4s]   800 torsors tried, 0 hits
+[  183.9s] HIT lattice ('U(5)', 'U(5)', 'U(4)') gram [[0, 5, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0], [0, 0, 0, 5, 0, 0], [0, 0, 5, 0, 0, 0], [0, 0, 0, 0, 0, 4], [0, 0, 0, 0, 4, 0]]
+[  183.9s]     marked pattern (-2, 0, 0, 0, -1, 0) of divisibility 2, reduction isometry transvection
+[  183.9s]     the base point is not integral: True
+[  184.3s]     residue classes of P/mP: 4096
+[  185.2s]     the locus: 512
+[  185.2s]     818 torsors tried so far
+[  185.7s] HIT lattice ('U(5)', 'U(5)', 'U(4)') gram [[0, 5, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0], [0, 0, 0, 5, 0, 0], [0, 0, 5, 0, 0, 0], [0, 0, 0, 0, 0, 4], [0, 0, 0, 0, 4, 0]]
+[  185.7s]     marked pattern (-2, 0, 0, 0, 1, 0) of divisibility 2, reduction isometry transvection
+[  185.7s]     the base point is not integral: True
+[  185.8s]     residue classes of P/mP: 4096
+[  186.9s]     the locus: 512
+[  186.9s]     820 torsors tried so far
+[  187.8s] HIT lattice ('U(5)', 'U(5)', 'U(4)') gram [[0, 5, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0], [0, 0, 0, 5, 0, 0], [0, 0, 5, 0, 0, 0], [0, 0, 0, 0, 0, 4], [0, 0, 0, 0, 4, 0]]
+[  187.8s]     marked pattern (2, 0, 0, 0, -1, 0) of divisibility 2, reduction isometry transvection
+[  187.8s]     the base point is not integral: True
+[  187.9s]     residue classes of P/mP: 4096
+[  188.9s]     the locus: 512
+[  188.9s]     822 torsors tried so far
+[  188.9s] 
+[  188.9s] RESULT lattices=2105 lattices_searched=50 odd_lattices_skipped=40 marked_lines=419 torsors=822 hits=3 completed=True failures=0 seconds=188.9
+[  188.9s]   ('U(5)', 'U(5)', 'U(4)') (-2, 0, 0, 0, -1, 0) transvection div=2
+[  188.9s]   ('U(5)', 'U(5)', 'U(4)') (-2, 0, 0, 0, 1, 0) transvection div=2
+[  188.9s]   ('U(5)', 'U(5)', 'U(4)') (2, 0, 0, 0, -1, 0) transvection div=2
+[  188.9s] PROBE DONE
+[peakrss] p528e67: child waited=0 shell_code=0 samples=109
+[peakrss] peak tree RSS      : 1197 MiB
+[peakrss] low-water MemAvail : 6383 MiB
+[peakrss] peak single VmHWM  : 1198 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1188 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   run.sh                        4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   170.2s procs=  3 rss=  1197 MiB hwm=  1197 MiB avail=  7502 MiB
+[peakrss]   t=   168.2s procs=  3 rss=  1192 MiB hwm=  1192 MiB avail=  7145 MiB
+[peakrss]   t=   166.2s procs=  3 rss=  1186 MiB hwm=  1186 MiB avail=  7209 MiB
+[peakrss]   t=   164.2s procs=  3 rss=  1180 MiB hwm=  1180 MiB avail=  7650 MiB
+[peakrss]   t=   204.3s procs=  3 rss=  1177 MiB hwm=  1198 MiB avail=  6739 MiB
+launcher exit: 0

@@ -1,0 +1,50 @@
+[    0.0s] min_rank=3 max_rank=5 box=2 budget=480 s, one search over every block sum
+[    0.0s] 1650 lattices in the search space
+[   20.2s]   50 torsors tried, 0 hits
+[   33.0s]   100 torsors tried, 0 hits
+[   55.4s]   150 torsors tried, 0 hits
+[   73.3s]   200 torsors tried, 0 hits
+[   89.6s]   250 torsors tried, 0 hits
+[  105.4s]   300 torsors tried, 0 hits
+[  118.4s]   350 torsors tried, 0 hits
+[  131.2s]   400 torsors tried, 0 hits
+[  144.8s]   450 torsors tried, 0 hits
+[  154.7s]   500 torsors tried, 0 hits
+[  165.8s]   550 torsors tried, 0 hits
+[  179.4s]   600 torsors tried, 0 hits
+[  194.9s]   650 torsors tried, 0 hits
+[  211.9s]   700 torsors tried, 0 hits
+[  229.1s]   750 torsors tried, 0 hits
+[  249.7s]   800 torsors tried, 0 hits
+[  268.3s]   850 torsors tried, 0 hits
+[  284.5s]   900 torsors tried, 0 hits
+[  293.2s]   950 torsors tried, 0 hits
+[  299.9s]   1000 torsors tried, 0 hits
+[  308.9s]   1050 torsors tried, 0 hits
+[  320.4s]   1100 torsors tried, 0 hits
+[  332.9s]   1150 torsors tried, 0 hits
+[  348.3s]   1200 torsors tried, 0 hits
+[  365.3s]   1250 torsors tried, 0 hits
+[  380.9s]   1300 torsors tried, 0 hits
+[  401.3s]   1350 torsors tried, 0 hits
+[  419.7s]   1400 torsors tried, 0 hits
+[  448.6s]   1450 torsors tried, 0 hits
+[  464.4s]   1500 torsors tried, 0 hits
+[  479.3s]   1550 torsors tried, 0 hits
+[  486.0s] budget spent after 1568 torsors, 343 of 1650 lattices
+[  486.0s] 
+[  486.0s] RESULT lattices=1650 lattices_searched=343 odd_lattices_skipped=270 marked_lines=1064 torsors=1568 hits=0 completed=False failures=0 seconds=486.0
+[  486.0s] PROBE DONE
+[peakrss] p528e35: child waited=124 shell_code=124 samples=270
+[peakrss] peak tree RSS      : 2453 MiB
+[peakrss] low-water MemAvail : 6171 MiB
+[peakrss] peak single VmHWM  : 2456 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     2445 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   522.8s procs=  3 rss=  2453 MiB hwm=  2456 MiB avail=  9370 MiB
+[peakrss]   t=   524.8s procs=  3 rss=  2453 MiB hwm=  2456 MiB avail=  9293 MiB
+[peakrss]   t=   526.8s procs=  3 rss=  2453 MiB hwm=  2456 MiB avail=  9286 MiB
+[peakrss]   t=   528.8s procs=  3 rss=  2453 MiB hwm=  2456 MiB avail=  9234 MiB
+[peakrss]   t=   530.8s procs=  3 rss=  2453 MiB hwm=  2456 MiB avail=  9278 MiB
