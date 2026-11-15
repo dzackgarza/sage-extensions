@@ -1,4 +1,4 @@
-tree SHA: 9bc00c11ac214bab87130fa33267253f1b48ad90
+tree SHA: 635600802d338ff9313559229510e7093ed623f0
 port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
 inner 520 s, outer 580 s, guard 6144 MiB
 command: python -m pytest -p qc_sage_session tests/schemes/test_polytopes.sage tests/lattices/test_rational_polyhedral_cones.sage tests/sets/test_a_subset_is_a_cache_key.sage tests/objects/test_standard_triangle.sage tests/lattices/test_reduction_cell_adjacency.sage tests/lattices/test_reduction_cell_faces.sage -q -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates  (repository addopts)
@@ -266,15 +266,15 @@ FAILED tests/objects/test_standard_triangle.sage::test_the_ehrhart_polynomial_of
 FAILED tests/objects/test_standard_triangle.sage::test_the_toric_variety_of_the_triangle_is_the_projective_plane
 FAILED tests/lattices/test_reduction_cell_adjacency.sage::test_a_quadrant_meets_its_reflection_in_a_ray_and_its_opposite_only_at_the_origin
 FAILED tests/lattices/test_reduction_cell_faces.sage::test_the_positive_quadrant_has_two_rays_and_a_stabilizer_of_order_two
-8 failed, 21 passed in 3.45s
+8 failed, 21 passed in 2.39s
 [peakrss] tests531: child waited=1 shell_code=1 samples=3
-[peakrss] peak tree RSS      : 345 MiB
-[peakrss] low-water MemAvail : 12756 MiB
-[peakrss] peak single VmHWM  : 345 MiB
+[peakrss] peak tree RSS      : 476 MiB
+[peakrss] low-water MemAvail : 13325 MiB
+[peakrss] peak single VmHWM  : 476 MiB
 [peakrss] peak VmHWM by executable (this is the per-process attribution):
-[peakrss]   python                      333 MiB peak
+[peakrss]   python                      465 MiB peak
 [peakrss]   timeout                       7 MiB peak
 [peakrss]   proot-x86_64                  3 MiB peak
-[peakrss]   t=     4.0s procs=  3 rss=   345 MiB hwm=   345 MiB avail= 13228 MiB
-[peakrss]   t=     2.0s procs=  3 rss=   312 MiB hwm=   312 MiB avail= 12756 MiB
-[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     2 MiB avail= 12982 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   476 MiB hwm=   476 MiB avail= 13325 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   306 MiB hwm=   306 MiB avail= 13481 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13686 MiB

@@ -1995,15 +1995,18 @@ class SetSubobjectCategory(SliceCategory):
             proposition unless the inclusion's domain is a finite enumeration,
             so two subsets that no procedure separates may yet be decided
             equal, and a hash that separated them would contradict that
-            decision.  The reason is Rice's theorem: over an infinite ambient
-            set the subsets are given by arbitrary computable predicates, so a
-            computable invariant that is constant on equal sets is constant on
-            all of them (Rice, *Trans. Amer. Math. Soc.* 74 (1953), 358-366).
-            A subclass whose equality is decidable refines the hash, as the
-            finite enumerated sets above do.  The presentation is not such a
-            refinement: one subset is cut out by many predicates, and equal
-            subsets are not obliged to share the predicate that decides their
-            members.
+            decision.  The premise is the library's: a subset asks membership
+            as a proposition, one that may be undecided (``DEF-06``), so the
+            subsets here are the semi-decided ones Rice's theorem is about and
+            not the decidable ones, over which a computable invariant constant
+            on equal sets need not be constant -- whether the subset contains
+            one fixed point is one.  So over an infinite ambient set no
+            computable invariant is finer than the ambient set (Rice, *Trans.
+            Amer. Math. Soc.* 74 (1953), 358-366), while a subclass whose
+            equality is decidable refines the hash, as the finite enumerated
+            sets above do.  The presentation is not such a refinement: one
+            subset is cut out by many predicates, and equal subsets are not
+            obliged to share the predicate that decides their members.
 
             The hash is cached.  A subset is a factor of the interned finite
             products and coproducts, whose store keys a family by its factors'
