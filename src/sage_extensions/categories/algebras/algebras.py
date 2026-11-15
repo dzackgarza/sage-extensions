@@ -3734,11 +3734,19 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
             undecided proposition when neither construction applies, unless a
             retained relation supplies a verified torsion element.
 
-            A framed free algebra is not this level's case: it is a free module
-            on the frame, so ``FramedFreeModules`` -- a subcategory, and
-            therefore the provider the category order names first -- answers
-            ``_torsion_freeness_decision`` for it, and this level is not
-            reached.
+            A framed free algebra is free on its frame, so it is torsion-free:
+            $r \sum_s a_s e_s = \sum_s (r a_s) e_s = 0$ reads $r a_s = 0$ in
+            every coordinate, and a non-zero-divisor kills no nonzero
+            coefficient.  $\mathbf{Z}[x]/(x^2)$, free on $\{1, x\}$ over
+            $\mathbf{Z}$, is one; so is $\mathbf{Z}/4[x]/(x^2)$, whose scalar
+            ring's non-zero-divisors are its units, though not its domain.  The
+            hypothesis is on the scalar, which is the reading
+            ``is_torsion_free`` states, and not on the ring; the classical
+            statement asks for an integral domain because there the fraction
+            field exists and the torsion is its kernel.  This level answers for
+            these algebras: this category and ``FramedFreeModules`` are
+            incomparable, so which of the two declares the answer is the
+            category order's to say rather than one being below the other.
             """
             from sage_extensions.categories.algebras.free_algebras import (
                 SymmetricAlgebras,
@@ -3747,6 +3755,8 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
 
             base = self.base_ring()
             if base.is_field() is True:
+                return True
+            if self in FramedFreeModules(base):
                 return True
             assert base in PrincipalIdealDomains(), (
                 f"torsion-freeness of {self} is decided here only over a principal ideal domain, but "

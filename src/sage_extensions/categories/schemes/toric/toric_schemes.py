@@ -1571,7 +1571,7 @@ class ToricSchemes(OwnedCategoryOverBaseRing):
                 lambda degree: NN(
                     self.line_bundle_cohomology(divisor, int(degree)).dimension()
                 ),
-                name=f"Line-bundle cohomology dimensions of {divisor}",
+                name=lambda divisor=divisor: f"Line-bundle cohomology dimensions of {divisor}",
             )
 
         def integral_singular_cohomology(self, degree):

@@ -1677,8 +1677,7 @@ class Modules(OwnedCategoryOverBaseRing):
             with no basis at all the dual is smaller and still unpresented:
             $\operatorname{Hom}_{\mathbf{Z}}(\mathbf{Z}/8, \mathbf{Z}) = 0$,
             so $O_{\mathbf{Z}/8}(2) = (0)$, and this level does not compute it
-            until the dual of a finitely presented module is presented
-            (its own issue).
+            until the dual of a finitely presented module is presented.
 
             Where the dual does carry a generating family -- a module with a
             chosen finite basis, above all -- this level answers.  Where it
@@ -1703,13 +1702,13 @@ class Modules(OwnedCategoryOverBaseRing):
             ring = module.base_ring()
             dual = module.dual_module()
             assert dual.has_selected_module_resolution(), (
-                f"the order ideal of {self} is the image of evaluation at it, "
-                f"computed from the values of a generating family of the dual "
-                f"{dual}, and that dual has no selected generating family here: "
-                f"this library holds none for it, so the image has no generating "
-                f"family of values to be spanned by.  The values themselves are "
-                f"the linear functionals on {module} at {self}, which need no "
-                "presentation of the dual to be defined"
+                f"the order ideal of {self} is the ideal that the values of "
+                f"the linear functionals on {module} at {self} generate, and "
+                f"those values cannot be collected here: the functionals from "
+                f"{module} to {ring} are {dual}, and no family of them that "
+                f"generates it is known, so there is nothing to range over.  "
+                f"The values themselves exist without one, and each is a "
+                f"functional applied to {self}"
             )
             evaluation = Modules(ring).Mor(dual, ring.regular_module())(
                 {
@@ -2460,6 +2459,22 @@ class Modules(OwnedCategoryOverBaseRing):
             return AtomicProposition("is_torsion_free", self)
 
         def is_torsion_free(self):
+            r"""Return whether every element a non-zero-divisor kills is zero.
+
+            Torsion means killed by a non-zero-divisor of the scalar ring: over
+            an integral domain, whose nonzero elements are its
+            non-zero-divisors, that is $\ker(M \to \operatorname{Frac}(R)
+            \otimes_R M)$, the submodule :meth:`torsion_submodule` returns
+            (Stacks Project, Definition \S 15.22.1 and Lemma \S 15.22.2).
+            Killing by any nonzero scalar is the other convention and a
+            different predicate: over $\mathbf{Z}/4$ it refutes
+            $\mathbf{Z}/4[x]$, since $2 \cdot (2x) = 0$, although the scalar
+            $2$ there is a zero-divisor and so kills nothing in this one.
+
+            A level that computes an answer decides it
+            (:meth:`_torsion_freeness_decision`); where none does, this returns
+            the undecided proposition rather than either answer.
+            """
             return self._torsion_freeness_decision()
 
         def is_framed_module(self) -> bool:
@@ -4159,7 +4174,7 @@ class ModuleSubobjects(OwnedCategoryOverBaseRing):
             return finite_indexed_family(
                 labels,
                 lambda label: self.inclusion()(self.module_generator(label)),
-                name=f"Embedded framing of {self}",
+                name=lambda self=self: f"Embedded framing of {self}",
             )
 
         def is_primitive(self) -> bool:
@@ -7306,7 +7321,7 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                 return finite_indexed_family(
                     kernel_labels,
                     localized_kernel_element,
-                    name=f"Localized kernel spanning family of {self}",
+                    name=lambda self=self: f"Localized kernel spanning family of {self}",
                 )
 
             from sage_extensions.rings.real import RR
@@ -7336,7 +7351,7 @@ class MatrixSpaces(OwnedCategoryOverBaseRing):
                 return finite_indexed_family(
                     positions,
                     kernel_vector,
-                    name=f"Kernel spanning family of {self}",
+                    name=lambda self=self: f"Kernel spanning family of {self}",
                 )
 
             basis = (

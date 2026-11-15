@@ -3006,7 +3006,7 @@ def _primary_form_component_family(form):
     return indexed_family(
         primes,
         lambda prime: form.primary_part(prime),
-        name=f"Primary components of {form}",
+        name=lambda form=form: f"Primary components of {form}",
     )
 
 

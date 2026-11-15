@@ -1,0 +1,20 @@
+tree SHA: 1775a6f461580147200ca23734f283e7e7fc31d0
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py
+product, unhashable first: one object -> True
+coproduct, unhashable first: one object -> True
+product, hashable first: one object -> True
+coproduct, hashable first: one object -> True
+unhashable-factor product interns -> True
+filtered mutable-vector product built: Product of the family over Ordered subset of {(1, 2), (3, 4)} | factor(v) is factor -> True | two equal families one product -> True
+family comparison is a proposition: TypeError
+undecided equality builds both and keeps both -> True True True
+[peakrss] r5accept: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 3 MiB
+[peakrss] low-water MemAvail : 11749 MiB
+[peakrss] peak single VmHWM  : 3 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       3 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail= 11749 MiB
+launcher exit: 0

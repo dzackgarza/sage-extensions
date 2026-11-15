@@ -203,7 +203,7 @@ class DiscreteCategory(OwnedCategory):
         self._object_set = object_set
         self._objects = indexed_family(
             object_set, lambda value: _object_of(self, value=value),
-            name=f"Objects of the discrete category on {object_set}",
+            name=lambda object_set=object_set: f"Objects of the discrete category on {object_set}",
         )
         super().__init__()
 
@@ -234,7 +234,7 @@ class DiscreteCategory(OwnedCategory):
         return indexed_family(
             self.object_set(),
             lambda value: self.identity(self(value)),
-            name=f"Arrows of {self}",
+            name=lambda self=self: f"Arrows of {self}",
         )
 
     def Mor(self, domain: Parent, codomain: Parent) -> DiscreteMor:

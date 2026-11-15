@@ -2529,7 +2529,7 @@ def _affine_quotient_normalization_data(quotient):
                 normalizations[int(position)],
                 normalization_maps[int(position)],
             ),
-            name=f"Normalized components of {quotient}",
+            name=lambda quotient=quotient: f"Normalized components of {quotient}",
         )
         component_module_numerators = finite_indexed_family(
             component_indices,
