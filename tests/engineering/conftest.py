@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import builtins
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -36,6 +37,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from sage_extensions import timing as sage_timing
+from sage_extensions.categories._lattice import (
+    subgroup_record_name,
+    subobject_record_name,
+)
 
 SOURCE_TREE = Path(__file__).resolve().parents[2]
 PROBE_ROOT = SOURCE_TREE / ".tmp" / "plugin-probes"
@@ -179,6 +184,8 @@ def pytest_configure(config) -> None:
     """
     builtins.probe_run = probe_run
     builtins.stage_records_of = stage_records_of
+    builtins.subgroup_record_name = subgroup_record_name
+    builtins.subobject_record_name = subobject_record_name
     builtins.kept_test_run = kept_test_run
     builtins.simultaneous_test_runs = simultaneous_test_runs
 
@@ -187,6 +194,8 @@ def pytest_unconfigure(config) -> None:
     r"""Remove the session's abbreviation, leaving ``builtins`` as it was found."""
     del builtins.probe_run
     del builtins.stage_records_of
+    del builtins.subgroup_record_name
+    del builtins.subobject_record_name
     del builtins.kept_test_run
     del builtins.simultaneous_test_runs
 
@@ -237,17 +246,24 @@ def _name_parts(name: str) -> tuple[str, str, str, str]:
     return kind, commit, stamp, suffix
 
 
-def _stamp_of(name: str) -> tuple[float, str]:
-    r"""A record file's start, as a wall clock, and the pid its stamp ends with.
+RECORD_NAME = re.compile(
+    r"[-\w]+-(?P<commit>[0-9a-f]{12})-(?P<start>\d{8}T\d{12}Z)-(?P<pid>\d+)\.[a-z]+"
+)
+r"""A record file's whole name: kind, commit, start, pid and suffix.
 
-    The stamp is ``<start>-<pid>``: the microsecond start time the record is
-    named by and the process that wrote it.  A name that is not of that shape
-    is not one of these files, and ``ValueError`` says so.
-    """
-    _kind, _commit, stamp, _suffix = _name_parts(name)
-    start, _, pid = stamp.rpartition("-")
-    moment = datetime.strptime(start, "%Y%m%dT%H%M%S%fZ").replace(tzinfo=timezone.utc)
-    return moment.timestamp(), pid
+A file whose name this does not match is not a record of a run -- the probe
+directories, the report logs and the JUnit files keep their own names -- so the
+search below selects by the pattern rather than reading a name and handling the
+failure.
+"""
+
+
+def _stamp_of(name: str) -> tuple[float, str]:
+    r"""A record file's start, as a wall clock, and the pid its stamp ends with."""
+    parts = RECORD_NAME.fullmatch(name)
+    assert parts is not None, f"{name} is not the name of a timing record"
+    moment = datetime.strptime(parts["start"], "%Y%m%dT%H%M%S%fZ").replace(tzinfo=timezone.utc)
+    return moment.timestamp(), parts["pid"]
 
 
 def _record_file(path: Path, *, after: int = 0) -> RecordFile:
@@ -299,11 +315,11 @@ def _kept_by(directory: Path, probe: ProbeRun) -> tuple[Path, ...]:
     """
     selected = []
     for name in sorted(_sizes(directory)):
-        try:
-            start, pid = _stamp_of(name)
-        except ValueError:
+        parts = RECORD_NAME.fullmatch(name)
+        if parts is None:
             continue
-        if pid == str(probe.pid) and start >= probe.launched:
+        start = datetime.strptime(parts["start"], "%Y%m%dT%H%M%S%fZ").replace(tzinfo=timezone.utc)
+        if parts["pid"] == str(probe.pid) and start.timestamp() >= probe.launched:
             selected.append(directory / name)
     return tuple(selected)
 

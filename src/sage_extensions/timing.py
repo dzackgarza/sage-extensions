@@ -104,7 +104,6 @@ logger.setLevel(logging.INFO)
 # is given is resolved under it too: one lock for the process's record, taken
 # once, rather than two that could disagree about which process this is.
 _HANDLER_LOCK = threading.RLock()
-_INPUT_LIMIT = 240
 
 _PROCESS_START = datetime.now(timezone.utc)
 _PROCESS_ID = os.getpid()
@@ -256,17 +255,6 @@ def _installed_handler() -> _JSONLineHandler:
         return _HANDLER
 
 
-def _named(name: str) -> str:
-    r"""A caller's name for its input, fitted to one line of the record.
-
-    Whitespace is collapsed and the text is cut to the limit; nothing else is
-    done to it.  The name is the caller's, so this has nothing to inspect and
-    nothing to render.
-    """
-    text = " ".join(name.split())
-    return text if len(text) <= _INPUT_LIMIT else text[: _INPUT_LIMIT - 1] + "…"
-
-
 def _emit(entry: dict) -> None:
     r"""Hand one record to the logger, whose installed handler appends it."""
     _installed_handler()
@@ -287,7 +275,7 @@ def stage(name: str, input: str):
     """
     entry = {
         "stage": name,
-        "input": _named(input),
+        "input": " ".join(input.split()),
         "commit": current_commit(),
         "run": _process_stamp(),
         "pid": os.getpid(),

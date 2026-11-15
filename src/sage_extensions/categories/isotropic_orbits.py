@@ -19,9 +19,12 @@ from sage.structure.element import parent as element_parent
 from sage.structure.sage_object import SageObject
 
 from sage_extensions.categories._lattice import (
-    lattice_record_name,
+    _group_label,
+    _lattice_label,
     orbit_row_record_name,
+    record_name,
     subgroup_record_name,
+    vector_label,
 )
 from sage_extensions.categories.modules.pure.modules import ModuleSubobjects
 from sage_extensions.categories.sets.finite_ordered_sets import (
@@ -2261,10 +2264,11 @@ def _plane_representatives_record_name(representatives, subgroup) -> str:
     no object).
     """
     count = len(representatives)
-    return (
+    return record_name(
         f"{count} ambient plane representative{'s' if count != 1 else ''} of "
-        f"{lattice_record_name(subgroup.supergroup().domain())} "
-        f"under {subgroup_record_name(subgroup)}"
+        f"{_lattice_label(subgroup.supergroup().domain())} under {_group_label(subgroup)}",
+        subgroup,
+        tuple(representatives),
     )
 
 
@@ -2373,35 +2377,26 @@ class CuspLayerEnumeration(SageObject):
         return f"layer {self._number} of the cusp chamber walk"
 
 
-def _cusp_record_name(reduction_image) -> str:
-    r"""Name the cusp a reduction image is attached to, for a timing record.
+def _cusp_record_name(reduction_image, *arguments, **keywords) -> str:
+    r"""Name one computation at a cusp, by the cusp and by every argument the call got.
 
-    The cusp is the primitive isotropic vector the image is computed at, in the
-    ambient lattice and under the subgroup: ``G_v``, its chamber and its computed
-    vertex are properties of that cusp, and a lattice on its own carries several
-    (Sterk's five on ``T_{En}``), so a name that stops at the lattice names every
-    cusp of it at once.
+    The cusp is the primitive isotropic vector the reduction image is attached to,
+    in the ambient lattice and under the subgroup: ``G_v``, its chamber and its
+    computed vertex are properties of that cusp, and a lattice on its own carries
+    several (Sterk's five on ``T_{En}``).  The call's own arguments are passed
+    through as they arrived -- not unpacked by hand here -- so a keyword the call
+    was given is in the digest, and ``cusp_chamber()`` and
+    ``cusp_chamber(max_decompositions=20)`` are two names
+    (:func:`sage_extensions.categories._lattice.record_name`).
     """
-    return (
-        f"the cusp of {reduction_image.vector()} in "
-        f"{lattice_record_name(reduction_image.lattice())} "
-        f"under {subgroup_record_name(reduction_image.subgroup())}"
+    return record_name(
+        f"the cusp of {vector_label(reduction_image.vector())} in "
+        f"{_lattice_label(reduction_image.lattice())} "
+        f"under {_group_label(reduction_image.subgroup())}",
+        reduction_image,
+        *arguments,
+        **keywords,
     )
-
-
-def _cusp_chamber_record_name(reduction_image, controlling_vector) -> str:
-    r"""Name one chamber computation at a cusp, the point it grows from included.
-
-    ``cusp_chamber`` accepts the vertex to grow the chamber from, and the walk it
-    runs depends on it; ``None`` leaves the choice to the computation, and the
-    name says so rather than naming a point nobody supplied.
-    """
-    point = (
-        "its own vertex"
-        if controlling_vector is None
-        else f"the controlling vector ({', '.join(str(int(entry)) for entry in controlling_vector.to_vector())})"
-    )
-    return f"{_cusp_record_name(reduction_image)} at {point}"
 
 
 class IsotropicVectorReductionImage(SageObject):
@@ -2821,9 +2816,7 @@ class IsotropicVectorReductionImage(SageObject):
 
     @timed_stage(
         "cusp chamber",
-        input=lambda self, *arguments, **keywords: _cusp_chamber_record_name(
-            self, arguments[0] if arguments else keywords.get("controlling_vector")
-        ),
+        input=lambda self, *arguments, **keywords: _cusp_record_name(self, *arguments, **keywords),
     )
     def cusp_chamber(
         self,
@@ -3041,7 +3034,7 @@ class IsotropicVectorReductionImage(SageObject):
 
     @timed_stage(
         "controlling vector",
-        input=lambda self, *arguments, **keywords: _cusp_record_name(self),
+        input=lambda self, *arguments, **keywords: _cusp_record_name(self, *arguments, **keywords),
     )
     def _computed_controlling_vector(self):
         r"""Return the class in ``N`` computed as the point of the hyperbolic space.
