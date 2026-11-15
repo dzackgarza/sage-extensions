@@ -124,10 +124,23 @@ _HANDLER_LOCK = threading.RLock()
 # of its own continues the counter rather than sharing a name with it.
 _STAGE_COUNTER = count(1)
 
-# The stages this thread has open, innermost last, with the pid they were opened
-# under: a forked child inherits its parent's stack, and its own file holds none
-# of those ids, so the child starts from an empty one.
-_OPEN_STAGES = threading.local()
+class _OpenStages(threading.local):
+    r"""The stages one thread has open, innermost last, and the pid they opened under.
+
+    A ``threading.local`` whose two fields exist in every thread because they are
+    set when the thread's own copy is made, rather than being probed for on each
+    read: a thread that has opened nothing has an empty stack, which is a state
+    and not an absence.  The pid is the process the stack was emptied for: a
+    forked child inherits its parent's stack and writes a file of its own, which
+    holds none of those ids, so the child starts from an empty one.
+    """
+
+    def __init__(self) -> None:
+        self.ids: list[int] = []
+        self.pid = os.getpid()
+
+
+_OPEN_STAGES = _OpenStages()
 
 _PROCESS_START = datetime.now(timezone.utc)
 _PROCESS_ID = os.getpid()
@@ -287,12 +300,10 @@ def _open_stage_ids() -> list[int]:
     process writes a file of its own and the parent's open ids are not lines of
     it.
     """
-    stack = getattr(_OPEN_STAGES, "stack", None)
-    if stack is None or _OPEN_STAGES.pid != os.getpid():
-        stack = []
-        _OPEN_STAGES.stack = stack
+    if _OPEN_STAGES.pid != os.getpid():
+        _OPEN_STAGES.ids = []
         _OPEN_STAGES.pid = os.getpid()
-    return stack
+    return _OPEN_STAGES.ids
 
 
 def _emit(entry: dict) -> None:
@@ -349,7 +360,11 @@ def stage(name: str, input: str):
         _emit(entry)
         raise
     finally:
-        open_stages.pop()
+        closed = open_stages.pop()
+        assert closed == entry["id"], (
+            f"the stage {name!r} of {entry['input']} has the id {entry['id']}, but the open stage "
+            f"stack closed {closed}: the records would name one another's stages as parents"
+        )
     entry.update(
         started=started.isoformat(),
         finished=datetime.now(timezone.utc).isoformat(),

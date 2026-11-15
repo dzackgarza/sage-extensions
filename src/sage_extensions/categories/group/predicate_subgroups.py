@@ -891,6 +891,22 @@ class PredicateSubgroups(OwnedParameterizedCategory):
                 incidences.append(candidate)
             return finite_ordered_set(tuple(incidences))
 
+        def description(self) -> str:
+            r"""Return this subgroup's own name: the condition that cuts it out.
+
+            Every construction of this owner states one clause -- ``sn_RR(g) =
+            1`` for ``O^+(L)``, ``rho_L(g) lies in ...`` for a preimage, ``g
+            lies in every selected subgroup`` for an intersection -- and the
+            clause is the whole of what a reader is told about the subgroup
+            without rendering it.  The rendering is not this: ``_repr_`` prints
+            the clause beside the ambient group, and an orthogonal group prints
+            its whole module, so two subgroups of one ``O(L)`` render alike past
+            any clamp.
+
+            Read by :func:`sage_extensions.categories._lattice._group_label`.
+            """
+            return f"the subgroup where {self._description}"
+
         def _repr_(self):
             return f"{{g in {self.supergroup()} : {self._description}}}"
 

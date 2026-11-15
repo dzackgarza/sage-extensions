@@ -5865,6 +5865,23 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         )
         return witness
 
+    def description(self) -> str:
+        r"""Return this isometry family's own name, for a timing record's input.
+
+        The automorphism group of a lattice is ``O(L)`` -- the name
+        :meth:`...Lattices.ParentMethods.orthogonal_group` gives it, and the
+        name its rendering begins with -- and the lattice is named beside it in
+        the same record, so this states the group and not its domain.  A family
+        between two lattices states that it is one, since which two is the
+        domain and the codomain the record names elsewhere.
+
+        Read by :func:`sage_extensions.categories._lattice._group_label`, which
+        writes the name of the subgroup an orbit row is taken under.
+        """
+        if self.domain() is self.codomain():
+            return "O(L)"
+        return "the isometries between its domain and its codomain"
+
     def _repr_(self):
         if self.domain() is self.codomain():
             return f"Orthogonal group O({self.domain()})"

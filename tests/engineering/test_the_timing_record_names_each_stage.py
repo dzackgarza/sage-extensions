@@ -117,11 +117,10 @@ def test_the_two_rows_of_one_lattice_are_named_apart():
 
     ``Õ(L)`` is the discriminant kernel and ``Õ⁺(L)`` its intersection with the
     spinor kernel, and the two rows are different computations of one lattice.
-    Each is named by the description its subgroup was constructed with -- the
-    preimage sentence, and the intersection sentence -- so the names differ
-    without either name having to identify the computation: what tells the two
-    records apart is their ``id``, and what tells the two rows apart for a reader
-    is this name.
+    Each row's name holds the description its subgroup states for itself
+    (:meth:`sage_extensions.categories.group.groups.Subgroups.ParentMethods.description`)
+    -- the preimage sentence, and the intersection sentence -- which is what a
+    reader of the line is told about the group the row is taken under.
     """
     lattice = _small_lattice()
     stable = lattice.stable_orthogonal_group()
@@ -129,51 +128,58 @@ def test_the_two_rows_of_one_lattice_are_named_apart():
     kernel_row = stage_records_of(lambda: stable.isotropic_orbit_representatives(1))
     positive_row = stage_records_of(lambda: positive.isotropic_orbit_representatives(1))
 
-    assert _record_named(kernel_row.records, "discriminant image") != _record_named(
-        positive_row.records, "discriminant image"
-    )
+    kernel_name = _record_named(kernel_row.records, "discriminant image")
+    positive_name = _record_named(positive_row.records, "discriminant image")
+
+    assert stable.description() in kernel_name
+    assert positive.description() in positive_name
+    assert kernel_name != positive_name
 
 
 def test_a_stage_record_carries_the_id_of_the_stage_that_encloses_it():
-    r"""One call's ids are the file's, and each stage's ``parent`` is the stage around it.
+    r"""Three nested stages, each record carrying its own ``id`` and its parent's.
 
-    The row is the outermost stage of this call: it is the only record with no
-    ``parent``, and every other record's ``parent`` is that record's ``id``.  A
-    reader finds a stage's sub-stages as the records whose ``parent`` is its
-    ``id``, and tells two records apart by the pair, which no name has to do.
+    A cusp chamber opens the walk of its subgroup, which asks for a point of its
+    own, which runs the full group's walk: ``cusp chamber``, then ``controlling
+    vector``, then a ``Vinberg walk`` inside it.  So the call's records are three
+    levels deep, and each record's ``parent`` is the ``id`` of the record that
+    encloses it, which a reader uses to find a stage's sub-stages.
     """
-    lattice = _small_lattice()
-    written = stage_records_of(
-        lambda: lattice.stable_orthogonal_group().isotropic_orbit_representatives(1)
-    )
+    cusp, _second = _two_cusps()
+    written = stage_records_of(lambda: cusp.cusp_chamber(max_decompositions=20))
 
     identities = tuple(record["id"] for record in written.records)
     assert tuple(sorted(set(identities))) == tuple(sorted(identities))
-    outermost = tuple(
-        record for record in written.records if record["parent"] is None
+    assert tuple(
+        record["stage"] for record in written.records if record["parent"] is None
+    ) == ("cusp chamber",)
+    enclosing = {record["id"]: record["parent"] for record in written.records}
+    assert all(parent is None or parent in enclosing for parent in enclosing.values())
+    chamber = next(
+        record["id"] for record in written.records if record["stage"] == "cusp chamber"
     )
-    assert tuple(record["stage"] for record in outermost) == (
-        "isotropic orbit representatives",
-    )
-    enclosing = {record["stage"]: record["id"] for record in written.records}
-    assert all(
-        record["parent"] == enclosing["isotropic orbit representatives"]
+    point = next(
+        record["id"]
         for record in written.records
-        if record["parent"] is not None
+        if record["stage"] == "controlling vector"
     )
+    assert enclosing[point] == chamber
+    assert tuple(
+        record["stage"]
+        for record in written.records
+        if record["parent"] == point
+    ) == ("Vinberg walk",)
 
 
-def test_an_integer_keyword_argument_of_a_sage_test_is_named_not_refused():
-    r"""``cusp_chamber(max_decompositions=200)`` writes a record, and the bound is in it.
+def test_an_integer_keyword_argument_is_named_not_refused():
+    r"""``cusp_chamber(max_decompositions=ZZ(200))`` writes a record naming the bound.
 
-    A literal in a ``.sage`` test is this library's own integer, not Python's,
-    and a naming step that admits only Python's raises inside the timed call: the
-    bound is then a computation that does not run.  The keyword arguments are
-    written as the call was given them, so the bound is in the name and no value
-    is refused for its type.
+    ``ZZ(200)`` is this library's integer and not Python's, and the keyword
+    arguments are written by their own ``repr``, so the bound is in the name and
+    no value is refused for its type.
     """
     cusp, _second = _two_cusps()
-    written = stage_records_of(lambda: cusp.cusp_chamber(max_decompositions=200))
+    written = stage_records_of(lambda: cusp.cusp_chamber(max_decompositions=ZZ(200)))
 
     assert "max_decompositions=200" in _record_named(written.records, "cusp chamber")
     assert all(record["outcome"] == "returned" for record in written.records)

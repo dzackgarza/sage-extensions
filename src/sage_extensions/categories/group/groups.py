@@ -8282,6 +8282,26 @@ class Subgroups(OwnedParameterizedCategory):
         def supergroup(self):
             return self._supergroup
 
+        def description(self) -> str:
+            r"""Return this subgroup's own name: the description its construction stated.
+
+            A subgroup of this owner is named by what its construction said about
+            it -- the name a group the catalogue holds is named by, the sentence
+            a stabilizer or a normalizer states, the description the caller of
+            :meth:`subgroup` wrote -- and a subgroup given by generators whose
+            caller wrote none is named by the only thing its construction did
+            state.  This is not the subgroup's rendering: ``_repr_`` prints the
+            subgroup beside its ambient group, so two subgroups of one ``O(L)``
+            render alike past any clamp, and a timing record would carry that.
+
+            Read by :func:`sage_extensions.categories._lattice._group_label`.
+            """
+            match self._description:
+                case None:
+                    return "a subgroup given by its own generators"
+                case stated:
+                    return stated
+
         def _engine_subgroup_from_generators(self, generators):
             return self.supergroup()._engine_subgroup_from_generators(generators)
 

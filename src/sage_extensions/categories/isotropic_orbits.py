@@ -8,6 +8,7 @@ capability and what would provision it, which is the owned behaviour until a
 provider arrives.
 """
 
+import inspect
 from dataclasses import dataclass
 from itertools import pairwise, product
 from operator import index
@@ -2374,20 +2375,33 @@ class CuspLayerEnumeration(SageObject):
         return f"layer {self._number} of the cusp chamber walk"
 
 
-def _cusp_record_name(reduction_image, controlling_vector=None, *, max_roots=None, max_decompositions=None) -> str:
-    r"""Name one computation at a cusp: the cusp, and the bounds the call was given.
+def _cusp_record_name(reduction_image, *arguments, **keywords) -> str:
+    r"""Name one computation at a cusp: the cusp, and the arguments the call was given.
 
     The cusp is the primitive isotropic vector the reduction image is attached to,
     in the ambient lattice and under the subgroup: ``G_v``, its chamber and its
     computed vertex are properties of that cusp, and a lattice on its own carries
     several (Sterk's five on ``T_{En}``).  The controlling vector is written by
-    its coordinates in its lattice's basis and the bounds by the keyword
-    arguments the call was given (:func:`..._lattice.keyword_arguments`), so
-    ``cusp_chamber()`` and ``cusp_chamber(max_decompositions=200)`` are two
-    names.  A name is a description, not an identity: the record's ``id`` and
-    its ``parent`` are what a reader tells two records apart by
+    its coordinates in its lattice's basis and the rest of the call by its
+    keyword arguments (:func:`sage_extensions.categories._lattice.keyword_arguments`),
+    so ``cusp_chamber()`` and ``cusp_chamber(max_decompositions=200)`` are two
+    names.
+
+    The arguments are read where they are bound rather than restated: the call's
+    own signature fills in a default it did not receive, so a parameter added to
+    :meth:`cusp_chamber` reaches the name without being written again here.
+
+    A name is a description, not an identity: the record's ``id`` and its
+    ``parent`` are what a reader tells two records apart by
     (:mod:`sage_extensions.timing`).
     """
+    call = inspect.signature(type(reduction_image).cusp_chamber).bind(
+        reduction_image, *arguments, **keywords
+    )
+    call.apply_defaults()
+    given = dict(call.arguments)
+    given.pop("self")
+    controlling_vector = given.pop("controlling_vector")
     point = (
         ""
         if controlling_vector is None
@@ -2398,7 +2412,7 @@ def _cusp_record_name(reduction_image, controlling_vector=None, *, max_roots=Non
         f"{_lattice_label(reduction_image.lattice())} "
         f"under {_group_label(reduction_image.subgroup())}"
         f"{point}"
-        f"{keyword_arguments(max_roots=max_roots, max_decompositions=max_decompositions)}"
+        f"{keyword_arguments(**given)}"
     )
 
 
@@ -2819,14 +2833,7 @@ class IsotropicVectorReductionImage(SageObject):
 
     @timed_stage(
         "cusp chamber",
-        input=lambda self, controlling_vector=None, *, max_roots=None, max_decompositions=None: (
-            _cusp_record_name(
-                self,
-                controlling_vector,
-                max_roots=max_roots,
-                max_decompositions=max_decompositions,
-            )
-        ),
+        input=lambda self, *arguments, **keywords: _cusp_record_name(self, *arguments, **keywords),
     )
     def cusp_chamber(
         self,

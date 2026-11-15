@@ -1499,12 +1499,14 @@ def keyword_arguments(**keywords) -> str:
     the keywords the call was given, in name order, and a reader of the line
     reads the bound.
 
-    A value is written as it states itself -- a number, an owned ring element, a
-    bound the caller wrote -- and a callable as the name its ``def`` has, which
-    is the only public description a filter carries.  ``None`` states no bound
-    and no filter and is left out.  Nothing is hashed, canonicalized or made
-    unique: two calls may share the text, and the record's ``id`` is what tells
-    their lines apart (:mod:`sage_extensions.timing`).
+    A value is written by its ``repr``, which is exact for every number this
+    library passes -- an owned ring element's ``repr`` is its value, a bound the
+    caller wrote is written back as it was given -- or by its owner's own
+    description where it states one (a group or a subgroup, through its public
+    ``description()``).  ``None`` states no bound and no filter and is left out.
+    Nothing is hashed, canonicalized or made unique: two calls may share the
+    text, and the record's ``id`` is what tells their lines apart
+    (:mod:`sage_extensions.timing`).
 
     EXAMPLES::
 
@@ -1522,26 +1524,27 @@ def keyword_arguments(**keywords) -> str:
         match value:
             case None:
                 continue
-            case _ if callable(value):
-                written.append(f"{name}={value.__name__}")
+            case _ if callable(getattr(value, "description", None)):
+                written.append(f"{name}={value.description()}")
             case _:
-                written.append(f"{name}={value}")
+                written.append(f"{name}={value!r}")
     return "".join(f", {entry}" for entry in written)
 
 
 def _lattice_label(lattice) -> str:
     r"""A lattice's name in a timing record: its ring and its Gram matrix.
 
-    The name is the input's public description: the ring the form is over and
-    the exact Gram entries in the lattice's own generators, which is the matrix
-    :meth:`...Lattices.ParentMethods.gram_matrix` states.  So a reader knows
-    which lattice a line is about, and two lattices of one rank are told apart
-    here because their Grams are written out.
+    The name is the input's public description: the ring the form is over, and
+    the entries of :meth:`...Lattices.ParentMethods.gram_matrix` -- the form's
+    matrix in the lattice's own selected framing -- each written by its own
+    ``repr``, so a rational entry is written as the rational it is and no entry
+    is lowered to an integer.  A reader of the line knows which lattice a stage
+    was computed on.
 
     It is a description and not an identity -- a record is identified by its run
     and its stage id (:mod:`sage_extensions.timing`) -- so nothing is
     canonicalized, decomposed or diagonalized for a log line, and two lattices
-    whose Grams are equal share the name, which is right: the same input.
+    whose Gram matrices are equal share the name, which is right: the same input.
 
     EXAMPLES::
 
@@ -1550,26 +1553,30 @@ def _lattice_label(lattice) -> str:
         sage: _lattice_label(Lattices(ZZ)("U"))
         'the rank-2 lattice over Integer Ring of Gram [[0, 1], [1, 0]]'
     """
-    ring, _labels, matrix = lattice._engine_gram()
+    matrix = lattice.gram_matrix()
     rows = ", ".join(
-        "[" + ", ".join(str(int(entry)) for entry in row) + "]" for row in matrix.rows()
+        "[" + ", ".join(repr(matrix[row, column]) for column in range(matrix.ncols())) + "]"
+        for row in range(matrix.nrows())
     )
-    return f"the rank-{lattice.module_rank()} lattice over {ring} of Gram [{rows}]"
+    return (
+        f"the rank-{lattice.module_rank()} lattice over {lattice.base_ring()} "
+        f"of Gram [{rows}]"
+    )
 
 
 def _group_label(group) -> str:
-    r"""A subgroup's name in a timing record: the description its construction stated.
+    r"""A subgroup's name in a timing record: the description its owner states.
 
-    Every predicate subgroup is constructed with one -- ``"sn_RR(g) = 1"`` for
-    ``O^+(L)``, the preimage sentence of ``discriminant_preimage`` for
-    :math:`\widetilde O(L)` -- and it is the description the group's own
-    rendering prints (:meth:`...groups.Subgroups.ParentMethods._repr_`).  It is
-    read off the attribute the constructing call retains it in and written as it
-    stands; nothing is rendered here, so a name that reads the same for two
-    subgroups is two names and the record's ``id`` tells their lines apart.
-
-    The whole orthogonal group states no description and is ``O(L)``; a subgroup
-    given by generators states whichever its caller wrote.
+    Each owner names its own kind, through its public
+    ``description()``: a predicate subgroup states the condition that cuts it
+    out (``the subgroup where sn_RR(g) = 1`` for ``O^+(L)``), a subgroup given
+    by generators states the description its caller wrote or that it is
+    generated, and a lattice's isometry group states ``O(L)``
+    (:meth:`sage_extensions.categories.group.groups.Subgroups.ParentMethods.description`,
+    :meth:`sage_extensions.categories.group.predicate_subgroups.PredicateSubgroups.ParentMethods.description`,
+    :meth:`sage_extensions.categories.lattice_morphisms.LatticeIsometryMor.description`).
+    A group whose owner states no description has no name here, and this raises
+    rather than naming it something its owner did not say.
 
     EXAMPLES::
 
@@ -1580,15 +1587,11 @@ def _group_label(group) -> str:
         'O(L)'
         sage: _group_label(lattice.O_plus())
         'the subgroup where sn_RR(g) = 1'
+        sage: _group_label(lattice.stable_orthogonal_group()).startswith(
+        ....:     "the subgroup where rho_L(g) lies in")
+        True
     """
-    from sage_extensions.categories.group.groups import GeneratedSubgroups
-    from sage_extensions.categories.group.predicate_subgroups import PredicateSubgroups
-
-    if isinstance(group, PredicateSubgroups.ParentMethods):
-        return f"the subgroup where {group._description}"
-    if isinstance(group, GeneratedSubgroups.ParentMethods):
-        return "a generated subgroup"
-    return "O(L)"
+    return group.description()
 
 
 def orbit_row_record_name(rank, *, flag, lattice, subgroup) -> str:
