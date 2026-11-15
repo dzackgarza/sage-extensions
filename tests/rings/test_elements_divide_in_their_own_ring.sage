@@ -59,6 +59,28 @@ def test_a_nonunit_of_the_scalar_ring_does_not_divide_a_vector() -> None:
         lattice.an_element() / 2
 
 
+def test_an_integer_literal_divides_in_the_parent_the_two_share() -> None:
+    r"""$\mathbf{Z}(3)/2 = 3/2$ in $\mathbf{Q}$, and $e_{12}/2 = \frac{1}{2}e_{12}$ in $M_2(\mathbf{Q})$.
+
+    $2$ is not a unit of $\mathbf{Z}$, so the quotient of $3$ by it is not an
+    integer: the ring's division runs in its engine and the quotient lands in
+    $\mathbf{Q}$, the fraction field the two are read in.  A matrix ring has no
+    such larger parent, and there the numeral is the scalar matrix $2I$, so
+    $e_{12}/2I$ is $\frac{1}{2}e_{12}$ by the same law.  Neither quotient is an
+    operator the element class states for numerals: the ring's division is the
+    one every owned ring answers with, and a numeral enters it through the
+    ring's own coercion.
+    """
+    matrices = QQ.matrix_space(2)
+    e12 = matrices.matrix_unit(0, 1)
+
+    assert ZZ(3) / 2 == QQ(3) / QQ(2)
+    assert (ZZ(3) / 2).parent() is QQ
+    assert 2 / ZZ(4) == QQ(1) / QQ(2)
+    assert RR(3) / 2 == RR(3) / RR(2)
+    assert e12 / 2 == (QQ(1) / QQ(2)) * e12
+
+
 def test_a_field_states_its_reciprocal_as_its_division_of_one() -> None:
     r"""$1/(\sqrt{2} - 1) = \sqrt{2} + 1$, and $\tilde{x} = 1/x$ in both fields."""
     root = RR(2).sqrt()
