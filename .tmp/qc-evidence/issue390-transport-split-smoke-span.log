@@ -1,0 +1,141 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt390p/.tmp/qc-evidence/issue390-transport-split.py
+tree SHA: a71272add96485c3e6ceeda07572bf40c5b2b5c0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 400 s, outer 500 s, guard 4096 MiB, args 'smoke window=1 detail=span cap=300'
+[0.0s] probe M: split the plane transport of the Otilde plane row (#390) -- smoke run on U + U(2) + <-2>
+[0.0s] cap 300 s, python 3.14.10
+[0.0s] sage_extensions from /repos/sage-extensions/src/sage_extensions/__init__.py
+[0.0s]   source categories/lattice_morphisms.py: 23003992b6f4c2a8
+[0.0s]   source categories/lattices.py: 546cb53548e1c2c5
+[0.0s]   source categories/orthogonal_quotients.py: f96fe36f753632a3
+[0.0s]   source categories/isotropic_parabolics.py: 6b1ec72891975a34
+[0.0s] lattice Integral lattice of rank 5 and signature (2, 3) of rank 5
+[0.3s] Otilde = lattice.stable_orthogonal_group()
+[0.3s] transport defined on sage_extensions.categories.lattice_morphisms.LatticeIsometryMethods
+[0.3s] primitive_isotropic_subobject resolves on sage_extensions.categories.lattices.Lattices.ParentMethods (CachedMethod)
+[0.3s] gc enabled: True, thresholds (2000, 10, 10)
+[0.4s] 
+[0.4s] --- window -1: planes [0, 0) mean ms per call ---
+[0.4s]     snapshot cost 0.1 s; rss 294 MiB; objects 263477 (previous 0)
+[0.4s] calling stable.isotropic_orbit_representatives(2)
+[19.9s] first transport resolved: codomain is the row's lattice: True; product OwnedLatticeEmbeddingMor_with_category_with_category.ArrowType, image OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType, plane OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[19.9s]   product class: sage_extensions.categories.lattice_morphisms.OwnedLatticeEmbeddingMor_with_category_with_category.ArrowType
+[19.9s]   image class: sage_extensions.categories.modules.framed.framed_free_modules.OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[19.9s]   plane class: sage_extensions.categories.modules.framed.framed_free_modules.OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[19.9s]   class-level tables followed: OwnedJoinCategory_with_category.__classcall__.cache
+[20.1s] 
+[20.1s] --- window 0: planes [0, 1) mean ms per call ---
+[20.1s]     product                            n=     1       0.26 ms
+[20.1s]     image                              n=     1       2.75 ms
+[20.1s]     basis                              n=     1       0.10 ms
+[20.1s]     admission                          n=     1       0.02 ms
+[20.1s]     call (four steps + framing)        n=     1       3.13 ms
+[20.1s]       in admission: primitive_isotropic_subobject (method) n=     1       0.01 ms
+[20.1s]       in admission: span basis          n=     1       2.44 ms
+[20.1s]       in admission: span construction   n=     1       0.23 ms
+[20.1s]     snapshot cost 0.2 s; rss 529 MiB; objects 897879 (previous 263477)
+[20.1s]     top growth by type: tuple +97528, list +93399, dict +61862, cell +42427, ConstantFunction +40232, ReferenceType +37018
+[20.1s]     top shrink by type: Homset_with_category -3, LazyImport -3
+[20.1s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 10 entrie(s)
+[20.1s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 3 owner(s), 3 entrie(s)
+[20.1s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1474
+[20.1s] the subgroup row held 2 planes before the public call wrapped it
+[20.1s] the call returned sage_extensions.categories.sets.finite_ordered_sets.FiniteOrderedSets.parent_class holding 2
+[20.1s] iterated to 2 planes
+[20.1s] the first 20 planes primitive: True
+[20.3s] 
+[20.3s] --- window 1: planes [1, 2) mean ms per call ---
+[20.3s]     product                            n=     1       0.45 ms
+[20.3s]     image                              n=     1       5.94 ms
+[20.3s]     basis                              n=     1       0.98 ms
+[20.3s]     admission                          n=     1       8.64 ms
+[20.3s]     call (four steps + framing)        n=     1      16.01 ms
+[20.3s]       in admission: admission.subobject_on n=     1       1.92 ms
+[20.3s]       in admission: admission.is_primitive n=     1       4.58 ms
+[20.3s]       in admission: admission.refine    n=     1       0.41 ms
+[20.3s]       in admission: primitive_isotropic_subobject (method) n=     1       8.63 ms
+[20.3s]       in admission: span basis          n=     2       1.95 ms
+[20.3s]       in admission: span construction   n=     2       1.93 ms
+[20.3s]     snapshot cost 0.2 s; rss 534 MiB; objects 899769 (previous 897879)
+[20.3s]     top growth by type: list +379, tuple +234, dict +229, ReferenceType +144, ConstantFunction +118, cell +94
+[20.3s]     top shrink by type: generator -3, GapElement_Permutation -3, GapElement -2
+[20.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 11 entrie(s)
+[20.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 3 owner(s), 3 entrie(s)
+[20.3s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1474
+[20.3s] 
+[20.3s] === patched ===
+[20.3s]   primitive_isotropic_subobject (method): primitive_isotropic_subobject on sage_extensions.categories.lattices.Lattices.ParentMethods (CachedMethod)
+[20.3s]   admission.subobject_on: subobject_on on sage_extensions.categories.lattices.Lattices.ParentMethods (function)
+[20.3s]   span basis: _span_basis_elements in sage_extensions.categories.lattices (function)
+[20.3s]   span construction: _lattice_subobject_spanning in sage_extensions.categories.lattices (function)
+[20.3s]   admission.refine: sage_extensions.refine.refine (function)
+[20.3s]   transport: transport_isotropic_object on sage_extensions.categories.lattice_morphisms.LatticeIsometryMethods (replaced by the clocked branch)
+[20.3s]   admission.is_primitive: is_primitive on sage_extensions.categories.modules.pure.modules.ModuleSubobjects.ParentMethods (function)
+[20.3s] flag branch calls: 0
+[20.3s] the interior labels below count only calls made inside the transport's admission step
+[20.3s] the instrumented branch against the original on the first calls:
+[20.3s]   call 0: rank 2 vs 2, generators equal: True
+[20.3s]   call 1: rank 2 vs 2, generators equal: True
+[20.3s]   divergences: 0
+[20.3s] 
+[20.3s] === mean ms per call, by window of 1 planes ===
+[20.3s] window        planes   product     image     basis admission    subobj      prim    refine    method   img all  img span  span def span ctor      call     gc s     rss
+[20.3s]      0         [0,1)      0.26      2.75      0.10      0.02         -         -         -      0.01         -         -      2.44      0.23      3.13     0.90     529
+[20.3s]      1         [1,2)      0.45      5.94      0.98      8.64      1.92      4.58      0.41      8.63         -         -      1.95      1.93     16.01     0.00     534
+[20.3s] 
+[20.3s] === first window against last (mean ms per call) ===
+[20.3s]   product                          window 0:      0.26  window 1:      0.45  ratio   1.74
+[20.3s]   image                            window 0:      2.75  window 1:      5.94  ratio   2.16
+[20.3s]   basis                            window 0:      0.10  window 1:      0.98  ratio   9.40
+[20.3s]   admission                        window 0:      0.02  window 1:      8.64  ratio 363.61
+[20.3s]   primitive_isotropic_subobject (method) window 0:      0.01  window 1:      8.63  ratio 638.83
+[20.3s]   span basis                       window 0:      2.44  window 1:      1.95  ratio   0.80
+[20.3s]   span construction                window 0:      0.23  window 1:      1.93  ratio   8.46
+[20.3s]   call (four steps + framing)      window 0:      3.13  window 1:     16.01  ratio   5.11
+[20.3s] 
+[20.3s] === the admission wrapper's own cost (step minus the method it times) ===
+[20.3s]   window 0: admission     0.02 ms, method     0.01 ms, wrapper   0.01 ms per call
+[20.3s]   window 1: admission     8.64 ms, method     8.63 ms, wrapper   0.01 ms per call
+[20.3s] 
+[20.3s] === the cyclic collector ===
+[20.3s]   497 collections, 0.9 s inside them, over 19.8 s of row
+[20.3s]   window 0: 496 collections 0.9 s (no window of calls to divide by)
+[20.3s]   window 1: 1 collections 0.0 s (no window of calls to divide by)
+[20.3s] 
+[20.3s] === cache tables, entries by window ===
+[20.3s]   OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: - 3 3
+[20.3s]   OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: - 10 11
+[20.3s]   OwnedJoinCategory_with_category.__classcall__.cache: - 1474 1474
+[20.3s] 
+[20.3s] === object count by type, first snapshot against last ===
+[20.3s]   tuple                                           53973 ->    151735  (+97762)
+[20.3s]   list                                            14774 ->    108552  (+93778)
+[20.3s]   dict                                            30716 ->     92807  (+62091)
+[20.3s]   cell                                             5945 ->     48466  (+42521)
+[20.3s]   ConstantFunction                                  407 ->     40757  (+40350)
+[20.3s]   ReferenceType                                   13860 ->     51022  (+37162)
+[20.3s]   NaturalNumberSets.element_class                    72 ->     32531  (+32459)
+[20.3s]   function                                        62506 ->     93565  (+31059)
+[20.3s]   _OwnedRingParent_with_category.element_class      169 ->     26237  (+26068)
+[20.3s]   MonoDict                                         1468 ->     23300  (+21832)
+[20.3s]   LazyImport                                       1836 ->      1833  (-3)
+[20.3s] 
+[20.3s] transported planes: 2, flag-branch calls: 0
+[20.3s] row wall time: 19.8 s, decided: True
+[20.3s] the row returned 2 planes
+[20.3s] peak VmHWM: 535 MiB
+[20.3s] PROBE M DONE
+[peakrss] probe390m-smoke8: child waited=0 shell_code=0 samples=12
+[peakrss] peak tree RSS      : 545 MiB
+[peakrss] low-water MemAvail : 10444 MiB
+[peakrss] peak single VmHWM  : 546 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      535 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    22.0s procs=  3 rss=   545 MiB hwm=   546 MiB avail= 10444 MiB
+[peakrss]   t=    20.0s procs=  3 rss=   535 MiB hwm=   535 MiB avail= 10507 MiB
+[peakrss]   t=    18.0s procs=  3 rss=   526 MiB hwm=   526 MiB avail= 10727 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   519 MiB hwm=   519 MiB avail= 10993 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   517 MiB hwm=   517 MiB avail= 11149 MiB
+launcher exit: 0

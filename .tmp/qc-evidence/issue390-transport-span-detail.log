@@ -1,0 +1,1046 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt390p/.tmp/qc-evidence/issue390-transport-split.py
+tree SHA: a71272add96485c3e6ceeda07572bf40c5b2b5c0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 900 s, outer 1000 s, guard 6144 MiB, args 'detail=span cap=700 window=50'
+[0.0s] probe M: split the plane transport of the Otilde plane row (#390)
+[0.0s] cap 700 s, python 3.14.10
+[0.0s] sage_extensions from /repos/sage-extensions/src/sage_extensions/__init__.py
+[0.0s]   source categories/lattice_morphisms.py: 23003992b6f4c2a8
+[0.0s]   source categories/lattices.py: 546cb53548e1c2c5
+[0.0s]   source categories/orthogonal_quotients.py: f96fe36f753632a3
+[0.0s]   source categories/isotropic_parabolics.py: 6b1ec72891975a34
+[0.0s] lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+[1.8s] Otilde = lattice.stable_orthogonal_group()
+[1.8s] transport defined on sage_extensions.categories.lattice_morphisms.LatticeIsometryMethods
+[1.8s] primitive_isotropic_subobject resolves on sage_extensions.categories.lattices.Lattices.ParentMethods (CachedMethod)
+[1.8s] gc enabled: True, thresholds (2000, 10, 10)
+[1.9s] 
+[1.9s] --- window -1: planes [0, 0) mean ms per call ---
+[1.9s]     snapshot cost 0.1 s; rss 296 MiB; objects 267069 (previous 0)
+[1.9s] calling stable.isotropic_orbit_representatives(2)
+[357.5s] first transport resolved: codomain is the row's lattice: True; product OwnedLatticeEmbeddingMor_with_category_with_category.ArrowType, image OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType, plane OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[357.5s]   product class: sage_extensions.categories.lattice_morphisms.OwnedLatticeEmbeddingMor_with_category_with_category.ArrowType
+[357.5s]   image class: sage_extensions.categories.modules.framed.framed_free_modules.OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[357.5s]   plane class: sage_extensions.categories.modules.framed.framed_free_modules.OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType
+[357.5s]   class-level tables followed: OwnedJoinCategory_with_category.__classcall__.cache
+[359.4s] 
+[359.4s] --- window 0: planes [0, 50) mean ms per call ---
+[359.4s]     product                            n=    50       0.21 ms
+[359.4s]     image                              n=    50       9.33 ms
+[359.4s]     basis                              n=    50       0.92 ms
+[359.4s]     admission                          n=    50      11.80 ms
+[359.4s]     call (four steps + framing)        n=    50      22.25 ms
+[359.4s]       in a step: admission.subobject_on n=    49       3.46 ms
+[359.4s]       in a step: admission.is_primitive n=    49       5.29 ms
+[359.4s]       in a step: admission.refine       n=    49       0.27 ms
+[359.4s]       in a step: primitive_isotropic_subobject (method) n=    50      11.79 ms
+[359.4s]       in a step: span basis             n=    99       2.45 ms
+[359.4s]       in a step: span construction      n=    99       3.93 ms
+[359.4s]     snapshot cost 0.7 s; rss 1454 MiB; objects 2853268 (previous 267069)
+[359.4s]     top growth by type: _OwnedRingParent_with_category.element_class +428133, list +291253, tuple +289609, NaturalNumberSets.element_class +222745, dict +220196, OwnedJoinCategory.element_class +137246
+[359.4s]     top shrink by type: Homset_with_category -3, LazyImport -3
+[359.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 67 entrie(s)
+[359.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[359.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[359.4s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1901
+[361.5s] 
+[361.5s] --- window 1: planes [50, 100) mean ms per call ---
+[361.5s]     product                            n=    50       0.20 ms
+[361.5s]     image                              n=    50      13.71 ms
+[361.5s]     basis                              n=    50       0.95 ms
+[361.5s]     admission                          n=    50      14.22 ms
+[361.5s]     call (four steps + framing)        n=    50      29.06 ms
+[361.5s]       in a step: admission.subobject_on n=    50       5.67 ms
+[361.5s]       in a step: admission.is_primitive n=    50       5.28 ms
+[361.5s]       in a step: admission.refine       n=    50       0.25 ms
+[361.5s]       in a step: primitive_isotropic_subobject (method) n=    50      14.21 ms
+[361.5s]       in a step: span basis             n=   100       2.43 ms
+[361.5s]       in a step: span construction      n=   100       7.22 ms
+[361.5s]     snapshot cost 0.6 s; rss 1482 MiB; objects 2914446 (previous 2853268)
+[361.5s]     top growth by type: list +13060, tuple +9096, dict +6122, ReferenceType +5197, cell +3400, MonoDict +3298
+[361.5s]     top shrink by type: Matrix_rational_dense -9, QuadraticForm -4
+[361.5s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 117 entrie(s)
+[361.5s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[361.5s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[361.5s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1901
+[364.1s] 
+[364.1s] --- window 2: planes [100, 150) mean ms per call ---
+[364.1s]     product                            n=    50       0.21 ms
+[364.1s]     image                              n=    50      18.41 ms
+[364.1s]     basis                              n=    50       1.06 ms
+[364.1s]     admission                          n=    50      17.40 ms
+[364.1s]     call (four steps + framing)        n=    50      37.07 ms
+[364.1s]       in a step: admission.subobject_on n=    50       8.10 ms
+[364.1s]       in a step: admission.is_primitive n=    50       5.85 ms
+[364.1s]       in a step: admission.refine       n=    50       0.33 ms
+[364.1s]       in a step: primitive_isotropic_subobject (method) n=    50      17.38 ms
+[364.1s]       in a step: span basis             n=   100       2.65 ms
+[364.1s]       in a step: span construction      n=   100      10.56 ms
+[364.1s]     snapshot cost 0.6 s; rss 1511 MiB; objects 2976888 (previous 2914446)
+[364.1s]     top growth by type: list +13186, tuple +9177, dict +6098, ReferenceType +5239, cell +3453, MonoDict +3326
+[364.1s]     top shrink by type: 
+[364.1s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 167 entrie(s)
+[364.1s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[364.1s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[364.1s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1901
+[367.7s] 
+[367.7s] --- window 3: planes [150, 200) mean ms per call ---
+[367.7s]     product                            n=    50       0.20 ms
+[367.7s]     image                              n=    50      22.40 ms
+[367.7s]     basis                              n=    50      18.19 ms
+[367.7s]     admission                          n=    50      18.51 ms
+[367.7s]     call (four steps + framing)        n=    50      59.30 ms
+[367.7s]       in a step: admission.subobject_on n=    50       9.98 ms
+[367.7s]       in a step: admission.is_primitive n=    50       5.25 ms
+[367.7s]       in a step: admission.refine       n=    50       0.25 ms
+[367.7s]       in a step: primitive_isotropic_subobject (method) n=    50      18.50 ms
+[367.7s]       in a step: span basis             n=   100       2.46 ms
+[367.7s]       in a step: span construction      n=   100      13.70 ms
+[367.7s]     snapshot cost 0.6 s; rss 1512 MiB; objects 2851569 (previous 2976888)
+[367.7s]     top growth by type: _ModuleScalarAction +500, FixedRestrictedMorCategory_with_category +350, Matrix_integer_dense +347, _PendingResolution +200, OwnedSetMorCategory_with_category_with_category +100, OwnedModuleMor_with_category_with_category +100
+[367.7s]     top shrink by type: _OwnedRingParent_with_category.element_class -38335, OwnedJoinCategory.element_class -19619, ConstantFunction -12557
+[367.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 217 entrie(s)
+[367.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[367.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[367.7s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1774
+[370.9s] 
+[370.9s] --- window 4: planes [200, 250) mean ms per call ---
+[370.9s]     product                            n=    50       0.20 ms
+[370.9s]     image                              n=    50      26.52 ms
+[370.9s]     basis                              n=    50       0.95 ms
+[370.9s]     admission                          n=    50      20.73 ms
+[370.9s]     call (four steps + framing)        n=    50      48.41 ms
+[370.9s]       in a step: admission.subobject_on n=    50      12.12 ms
+[370.9s]       in a step: admission.is_primitive n=    50       5.32 ms
+[370.9s]       in a step: admission.refine       n=    50       0.26 ms
+[370.9s]       in a step: primitive_isotropic_subobject (method) n=    50      20.72 ms
+[370.9s]       in a step: span basis             n=   100       2.51 ms
+[370.9s]       in a step: span construction      n=   100      16.77 ms
+[370.9s]     snapshot cost 0.6 s; rss 1514 MiB; objects 2913442 (previous 2851569)
+[370.9s]     top growth by type: list +13123, tuple +9136, dict +6049, ReferenceType +5218, cell +3426, MonoDict +3312
+[370.9s]     top shrink by type: 
+[370.9s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 267 entrie(s)
+[370.9s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[370.9s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[370.9s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1774
+[374.5s] 
+[374.5s] --- window 5: planes [250, 300) mean ms per call ---
+[374.5s]     product                            n=    50       0.23 ms
+[374.5s]     image                              n=    50      32.23 ms
+[374.5s]     basis                              n=    50       1.09 ms
+[374.5s]     admission                          n=    50      24.43 ms
+[374.5s]     call (four steps + framing)        n=    50      57.99 ms
+[374.5s]       in a step: admission.subobject_on n=    50      15.03 ms
+[374.5s]       in a step: admission.is_primitive n=    50       5.94 ms
+[374.5s]       in a step: admission.refine       n=    50       0.33 ms
+[374.5s]       in a step: primitive_isotropic_subobject (method) n=    50      24.42 ms
+[374.5s]       in a step: span basis             n=   100       2.74 ms
+[374.5s]       in a step: span construction      n=   100      20.85 ms
+[374.5s]     snapshot cost 0.7 s; rss 1517 MiB; objects 2975479 (previous 2913442)
+[374.5s]     top growth by type: list +13123, tuple +9136, dict +6049, ReferenceType +5218, cell +3426, MonoDict +3312
+[374.5s]     top shrink by type: 
+[374.5s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 317 entrie(s)
+[374.5s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[374.5s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[374.5s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1774
+[378.3s] 
+[378.3s] --- window 6: planes [300, 350) mean ms per call ---
+[378.3s]     product                            n=    50       0.20 ms
+[378.3s]     image                              n=    50      34.75 ms
+[378.3s]     basis                              n=    50       0.95 ms
+[378.3s]     admission                          n=    50      24.87 ms
+[378.3s]     call (four steps + framing)        n=    50      60.76 ms
+[378.3s]       in a step: admission.subobject_on n=    50      16.26 ms
+[378.3s]       in a step: admission.is_primitive n=    50       5.31 ms
+[378.3s]       in a step: admission.refine       n=    50       0.26 ms
+[378.3s]       in a step: primitive_isotropic_subobject (method) n=    50      24.86 ms
+[378.3s]       in a step: span basis             n=   100       2.49 ms
+[378.3s]       in a step: span construction      n=   100      22.98 ms
+[378.3s]     snapshot cost 0.6 s; rss 1521 MiB; objects 3037424 (previous 2975479)
+[378.3s]     top growth by type: list +13123, tuple +9136, dict +6049, ReferenceType +5218, cell +3426, MonoDict +3312
+[378.3s]     top shrink by type: 
+[378.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 367 entrie(s)
+[378.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[378.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[378.3s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1774
+[382.4s] 
+[382.4s] --- window 7: planes [350, 400) mean ms per call ---
+[382.4s]     product                            n=    50       0.21 ms
+[382.4s]     image                              n=    50      39.83 ms
+[382.4s]     basis                              n=    50       0.95 ms
+[382.4s]     admission                          n=    50      27.45 ms
+[382.4s]     call (four steps + framing)        n=    50      68.45 ms
+[382.4s]       in a step: admission.subobject_on n=    50      18.79 ms
+[382.4s]       in a step: admission.is_primitive n=    50       5.36 ms
+[382.4s]       in a step: admission.refine       n=    50       0.26 ms
+[382.4s]       in a step: primitive_isotropic_subobject (method) n=    50      27.44 ms
+[382.4s]       in a step: span basis             n=   100       2.53 ms
+[382.4s]       in a step: span construction      n=   100      26.75 ms
+[382.4s]     snapshot cost 0.7 s; rss 1527 MiB; objects 3099888 (previous 3037424)
+[382.4s]     top growth by type: list +13115, tuple +9128, dict +6044, ReferenceType +5212, cell +3416, MonoDict +3308
+[382.4s]     top shrink by type: 
+[382.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 417 entrie(s)
+[382.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[382.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[382.4s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1774
+[386.9s] 
+[386.9s] --- window 8: planes [400, 450) mean ms per call ---
+[386.9s]     product                            n=    50       0.21 ms
+[386.9s]     image                              n=    50      44.17 ms
+[386.9s]     basis                              n=    50       1.02 ms
+[386.9s]     admission                          n=    50      29.93 ms
+[386.9s]     call (four steps + framing)        n=    50      75.34 ms
+[386.9s]       in a step: admission.subobject_on n=    50      20.98 ms
+[386.9s]       in a step: admission.is_primitive n=    50       5.60 ms
+[386.9s]       in a step: admission.refine       n=    50       0.29 ms
+[386.9s]       in a step: primitive_isotropic_subobject (method) n=    50      29.92 ms
+[386.9s]       in a step: span basis             n=   100       2.58 ms
+[386.9s]       in a step: span construction      n=   100      29.95 ms
+[386.9s]     snapshot cost 0.7 s; rss 1534 MiB; objects 3161576 (previous 3099888)
+[386.9s]     top growth by type: list +13144, tuple +9148, dict +6066, ReferenceType +5227, cell +3436, MonoDict +3318
+[386.9s]     top shrink by type: 
+[386.9s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 467 entrie(s)
+[386.9s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[386.9s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[386.9s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1774
+[391.8s] 
+[391.8s] --- window 9: planes [450, 500) mean ms per call ---
+[391.8s]     product                            n=    50       0.23 ms
+[391.8s]     image                              n=    50      48.62 ms
+[391.8s]     basis                              n=    50       1.14 ms
+[391.8s]     admission                          n=    50      32.39 ms
+[391.8s]     call (four steps + framing)        n=    50      82.37 ms
+[391.8s]       in a step: admission.subobject_on n=    50      22.99 ms
+[391.8s]       in a step: admission.is_primitive n=    50       5.94 ms
+[391.8s]       in a step: admission.refine       n=    50       0.32 ms
+[391.8s]       in a step: primitive_isotropic_subobject (method) n=    50      32.38 ms
+[391.8s]       in a step: span basis             n=   100       2.73 ms
+[391.8s]       in a step: span construction      n=   100      33.03 ms
+[391.8s]     snapshot cost 0.7 s; rss 1540 MiB; objects 3222906 (previous 3161576)
+[391.8s]     top growth by type: list +13080, tuple +9111, dict +6015, ReferenceType +5203, cell +3410, MonoDict +3302
+[391.8s]     top shrink by type: Matrix_rational_dense -7
+[391.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 517 entrie(s)
+[391.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[391.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[391.8s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1774
+[397.0s] 
+[397.0s] --- window 10: planes [500, 550) mean ms per call ---
+[397.0s]     product                            n=    50       0.21 ms
+[397.0s]     image                              n=    50      52.56 ms
+[397.0s]     basis                              n=    50       1.04 ms
+[397.0s]     admission                          n=    50      34.01 ms
+[397.0s]     call (four steps + framing)        n=    50      87.82 ms
+[397.0s]       in a step: admission.subobject_on n=    50      25.09 ms
+[397.0s]       in a step: admission.is_primitive n=    50       5.57 ms
+[397.0s]       in a step: admission.refine       n=    50       0.29 ms
+[397.0s]       in a step: primitive_isotropic_subobject (method) n=    50      34.00 ms
+[397.0s]       in a step: span basis             n=   100       2.60 ms
+[397.0s]       in a step: span construction      n=   100      36.18 ms
+[397.0s]     snapshot cost 0.7 s; rss 1547 MiB; objects 3285540 (previous 3222906)
+[397.0s]     top growth by type: list +13164, tuple +9163, dict +6080, ReferenceType +5233, cell +3446, MonoDict +3322
+[397.0s]     top shrink by type: 
+[397.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 567 entrie(s)
+[397.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[397.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[397.0s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1774
+[402.5s] 
+[402.5s] --- window 11: planes [550, 600) mean ms per call ---
+[402.5s]     product                            n=    50       0.21 ms
+[402.5s]     image                              n=    50      56.49 ms
+[402.5s]     basis                              n=    50       0.98 ms
+[402.5s]     admission                          n=    50      35.89 ms
+[402.5s]     call (four steps + framing)        n=    50      93.58 ms
+[402.5s]       in a step: admission.subobject_on n=    50      27.11 ms
+[402.5s]       in a step: admission.is_primitive n=    50       5.45 ms
+[402.5s]       in a step: admission.refine       n=    50       0.28 ms
+[402.5s]       in a step: primitive_isotropic_subobject (method) n=    50      35.88 ms
+[402.5s]       in a step: span basis             n=   100       2.54 ms
+[402.5s]       in a step: span construction      n=   100      39.23 ms
+[402.5s]     snapshot cost 0.7 s; rss 1554 MiB; objects 3347529 (previous 3285540)
+[402.5s]     top growth by type: list +13123, tuple +9136, dict +6049, ReferenceType +5218, cell +3426, MonoDict +3312
+[402.5s]     top shrink by type: 
+[402.5s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 617 entrie(s)
+[402.5s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[402.5s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[402.5s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1774
+[408.3s] 
+[408.3s] --- window 12: planes [600, 650) mean ms per call ---
+[408.3s]     product                            n=    50       0.21 ms
+[408.3s]     image                              n=    50      61.48 ms
+[408.3s]     basis                              n=    50       1.08 ms
+[408.3s]     admission                          n=    50      38.76 ms
+[408.3s]     call (four steps + framing)        n=    50     101.53 ms
+[408.3s]       in a step: admission.subobject_on n=    50      29.65 ms
+[408.3s]       in a step: admission.is_primitive n=    50       5.73 ms
+[408.3s]       in a step: admission.refine       n=    50       0.30 ms
+[408.3s]       in a step: primitive_isotropic_subobject (method) n=    50      38.75 ms
+[408.3s]       in a step: span basis             n=   100       2.62 ms
+[408.3s]       in a step: span construction      n=   100      42.90 ms
+[408.3s]     snapshot cost 0.7 s; rss 1561 MiB; objects 3409455 (previous 3347529)
+[408.3s]     top growth by type: list +13123, tuple +9136, dict +6049, ReferenceType +5218, cell +3426, MonoDict +3312
+[408.3s]     top shrink by type: 
+[408.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 667 entrie(s)
+[408.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[408.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[408.3s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1774
+[414.5s] 
+[414.5s] --- window 13: planes [650, 700) mean ms per call ---
+[414.5s]     product                            n=    50       0.20 ms
+[414.5s]     image                              n=    50      64.81 ms
+[414.5s]     basis                              n=    50       0.96 ms
+[414.5s]     admission                          n=    50      39.92 ms
+[414.5s]     call (four steps + framing)        n=    50     105.89 ms
+[414.5s]       in a step: admission.subobject_on n=    50      31.25 ms
+[414.5s]       in a step: admission.is_primitive n=    50       5.38 ms
+[414.5s]       in a step: admission.refine       n=    50       0.26 ms
+[414.5s]       in a step: primitive_isotropic_subobject (method) n=    50      39.91 ms
+[414.5s]       in a step: span basis             n=   100       2.48 ms
+[414.5s]       in a step: span construction      n=   100      45.51 ms
+[414.5s]     snapshot cost 0.7 s; rss 1567 MiB; objects 3471379 (previous 3409455)
+[414.5s]     top growth by type: list +13123, tuple +9136, dict +6049, ReferenceType +5218, cell +3426, MonoDict +3312
+[414.5s]     top shrink by type: 
+[414.5s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 717 entrie(s)
+[414.5s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[414.5s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[414.5s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1774
+[421.8s] 
+[421.8s] --- window 14: planes [700, 750) mean ms per call ---
+[421.8s]     product                            n=    50       0.20 ms
+[421.8s]     image                              n=    50      87.78 ms
+[421.8s]     basis                              n=    50       0.99 ms
+[421.8s]     admission                          n=    50      42.24 ms
+[421.8s]     call (four steps + framing)        n=    50     131.21 ms
+[421.8s]       in a step: admission.subobject_on n=    50      33.50 ms
+[421.8s]       in a step: admission.is_primitive n=    50       5.42 ms
+[421.8s]       in a step: admission.refine       n=    50       0.26 ms
+[421.8s]       in a step: primitive_isotropic_subobject (method) n=    50      42.23 ms
+[421.8s]       in a step: span basis             n=   100       2.55 ms
+[421.8s]       in a step: span construction      n=   100      58.06 ms
+[421.8s]     snapshot cost 0.8 s; rss 1573 MiB; objects 3521153 (previous 3471379)
+[421.8s]     top growth by type: list +12309, tuple +8477, dict +5420, ReferenceType +4932, MonoDict +3134, MonoDictEraser +3134
+[421.8s]     top shrink by type: Rational -5808, QuadraticForm -88, KeyedRef -65
+[421.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 767 entrie(s)
+[421.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[421.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[421.8s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1750
+[428.8s] 
+[428.8s] --- window 15: planes [750, 800) mean ms per call ---
+[428.8s]     product                            n=    50       0.22 ms
+[428.8s]     image                              n=    50      74.65 ms
+[428.8s]     basis                              n=    50       1.17 ms
+[428.8s]     admission                          n=    50      45.63 ms
+[428.8s]     call (four steps + framing)        n=    50     121.67 ms
+[428.8s]       in a step: admission.subobject_on n=    50      36.15 ms
+[428.8s]       in a step: admission.is_primitive n=    50       6.01 ms
+[428.8s]       in a step: admission.refine       n=    50       0.33 ms
+[428.8s]       in a step: primitive_isotropic_subobject (method) n=    50      45.61 ms
+[428.8s]       in a step: span basis             n=   100       2.75 ms
+[428.8s]       in a step: span construction      n=   100      52.60 ms
+[428.8s]     snapshot cost 0.8 s; rss 1580 MiB; objects 3583770 (previous 3521153)
+[428.8s]     top growth by type: list +13159, tuple +9164, dict +6078, ReferenceType +5230, cell +3446, MonoDict +3320
+[428.8s]     top shrink by type: 
+[428.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 817 entrie(s)
+[428.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[428.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[428.8s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1750
+[436.0s] 
+[436.0s] --- window 16: planes [800, 850) mean ms per call ---
+[436.0s]     product                            n=    50       0.21 ms
+[436.0s]     image                              n=    50      78.55 ms
+[436.0s]     basis                              n=    50       1.10 ms
+[436.0s]     admission                          n=    50      47.52 ms
+[436.0s]     call (four steps + framing)        n=    50     127.38 ms
+[436.0s]       in a step: admission.subobject_on n=    50      38.19 ms
+[436.0s]       in a step: admission.is_primitive n=    50       5.91 ms
+[436.0s]       in a step: admission.refine       n=    50       0.33 ms
+[436.0s]       in a step: primitive_isotropic_subobject (method) n=    50      47.50 ms
+[436.0s]       in a step: span basis             n=   100       2.69 ms
+[436.0s]       in a step: span construction      n=   100      55.63 ms
+[436.0s]     snapshot cost 0.8 s; rss 1587 MiB; objects 3644975 (previous 3583770)
+[436.0s]     top growth by type: list +13069, tuple +9093, dict +6008, ReferenceType +5200, cell +3396, MonoDict +3300
+[436.0s]     top shrink by type: Rational -12, Matrix_rational_dense -5, QuadraticForm -4
+[436.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 867 entrie(s)
+[436.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[436.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[436.0s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1750
+[443.7s] 
+[443.7s] --- window 17: planes [850, 900) mean ms per call ---
+[443.7s]     product                            n=    50       0.23 ms
+[443.7s]     image                              n=    50      83.97 ms
+[443.7s]     basis                              n=    50       1.18 ms
+[443.7s]     admission                          n=    50      50.41 ms
+[443.7s]     call (four steps + framing)        n=    50     135.78 ms
+[443.7s]       in a step: admission.subobject_on n=    50      40.93 ms
+[443.7s]       in a step: admission.is_primitive n=    50       6.02 ms
+[443.7s]       in a step: admission.refine       n=    50       0.33 ms
+[443.7s]       in a step: primitive_isotropic_subobject (method) n=    50      50.40 ms
+[443.7s]       in a step: span basis             n=   100       2.76 ms
+[443.7s]       in a step: span construction      n=   100      59.64 ms
+[443.7s]     snapshot cost 0.8 s; rss 1594 MiB; objects 3707538 (previous 3644975)
+[443.7s]     top growth by type: list +13166, tuple +9162, dict +6083, ReferenceType +5233, cell +3443, MonoDict +3322
+[443.7s]     top shrink by type: 
+[443.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 917 entrie(s)
+[443.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[443.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[443.7s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1750
+[451.7s] 
+[451.7s] --- window 18: planes [900, 950) mean ms per call ---
+[451.7s]     product                            n=    50       0.22 ms
+[451.7s]     image                              n=    50      88.06 ms
+[451.7s]     basis                              n=    50       1.29 ms
+[451.7s]     admission                          n=    50      52.93 ms
+[451.7s]     call (four steps + framing)        n=    50     142.52 ms
+[451.7s]       in a step: admission.subobject_on n=    50      42.93 ms
+[451.7s]       in a step: admission.is_primitive n=    50       6.45 ms
+[451.7s]       in a step: admission.refine       n=    50       0.35 ms
+[451.7s]       in a step: primitive_isotropic_subobject (method) n=    50      52.92 ms
+[451.7s]       in a step: span basis             n=   100       2.89 ms
+[451.7s]       in a step: span construction      n=   100      62.56 ms
+[451.7s]     snapshot cost 0.8 s; rss 1629 MiB; objects 3770120 (previous 3707538)
+[451.7s]     top growth by type: list +13145, tuple +9159, dict +6065, ReferenceType +5224, cell +3443, MonoDict +3316
+[451.7s]     top shrink by type: 
+[451.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 967 entrie(s)
+[451.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[451.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[451.7s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1750
+[460.3s] 
+[460.3s] --- window 19: planes [950, 1000) mean ms per call ---
+[460.3s]     product                            n=    50       0.22 ms
+[460.3s]     image                              n=    50      94.69 ms
+[460.3s]     basis                              n=    50       1.34 ms
+[460.3s]     admission                          n=    50      56.52 ms
+[460.3s]     call (four steps + framing)        n=    50     152.77 ms
+[460.3s]       in a step: admission.subobject_on n=    50      46.38 ms
+[460.3s]       in a step: admission.is_primitive n=    50       6.53 ms
+[460.3s]       in a step: admission.refine       n=    50       0.36 ms
+[460.3s]       in a step: primitive_isotropic_subobject (method) n=    50      56.50 ms
+[460.3s]       in a step: span basis             n=   100       2.90 ms
+[460.3s]       in a step: span construction      n=   100      67.59 ms
+[460.3s]     snapshot cost 0.9 s; rss 1636 MiB; objects 3832171 (previous 3770120)
+[460.3s]     top growth by type: list +13123, tuple +9136, dict +6049, ReferenceType +5218, cell +3426, MonoDict +3312
+[460.3s]     top shrink by type: 
+[460.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1017 entrie(s)
+[460.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[460.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[460.3s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1750
+[469.3s] 
+[469.3s] --- window 20: planes [1000, 1050) mean ms per call ---
+[469.3s]     product                            n=    50       0.23 ms
+[469.3s]     image                              n=    50      99.89 ms
+[469.3s]     basis                              n=    50       1.42 ms
+[469.3s]     admission                          n=    50      59.25 ms
+[469.3s]     call (four steps + framing)        n=    50     160.79 ms
+[469.3s]       in a step: admission.subobject_on n=    50      48.81 ms
+[469.3s]       in a step: admission.is_primitive n=    50       6.78 ms
+[469.3s]       in a step: admission.refine       n=    50       0.37 ms
+[469.3s]       in a step: primitive_isotropic_subobject (method) n=    50      59.24 ms
+[469.3s]       in a step: span basis             n=   100       2.99 ms
+[469.3s]       in a step: span construction      n=   100      71.31 ms
+[469.3s]     snapshot cost 0.9 s; rss 1643 MiB; objects 3894095 (previous 3832171)
+[469.3s]     top growth by type: list +13128, tuple +9135, dict +6051, ReferenceType +5221, cell +3426, MonoDict +3314
+[469.3s]     top shrink by type: 
+[469.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1067 entrie(s)
+[469.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[469.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[469.3s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1750
+[478.6s] 
+[478.6s] --- window 21: planes [1050, 1100) mean ms per call ---
+[478.6s]     product                            n=    50       0.23 ms
+[478.6s]     image                              n=    50     104.15 ms
+[478.6s]     basis                              n=    50       1.42 ms
+[478.6s]     admission                          n=    50      61.46 ms
+[478.6s]     call (four steps + framing)        n=    50     167.26 ms
+[478.6s]       in a step: admission.subobject_on n=    50      51.12 ms
+[478.6s]       in a step: admission.is_primitive n=    50       6.70 ms
+[478.6s]       in a step: admission.refine       n=    50       0.36 ms
+[478.6s]       in a step: primitive_isotropic_subobject (method) n=    50      61.44 ms
+[478.6s]       in a step: span basis             n=   100       2.98 ms
+[478.6s]       in a step: span construction      n=   100      74.61 ms
+[478.6s]     snapshot cost 0.8 s; rss 1650 MiB; objects 3956034 (previous 3894095)
+[478.6s]     top growth by type: list +13123, tuple +9136, dict +6049, ReferenceType +5218, cell +3426, MonoDict +3312
+[478.6s]     top shrink by type: 
+[478.6s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1117 entrie(s)
+[478.6s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[478.6s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[478.6s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1750
+[487.8s] 
+[487.8s] --- window 22: planes [1100, 1150) mean ms per call ---
+[487.8s]     product                            n=    50       0.22 ms
+[487.8s]     image                              n=    50     103.88 ms
+[487.8s]     basis                              n=    50       1.11 ms
+[487.8s]     admission                          n=    50      60.08 ms
+[487.8s]     call (four steps + framing)        n=    50     165.29 ms
+[487.8s]       in a step: admission.subobject_on n=    50      50.80 ms
+[487.8s]       in a step: admission.is_primitive n=    50       5.85 ms
+[487.8s]       in a step: admission.refine       n=    50       0.32 ms
+[487.8s]       in a step: primitive_isotropic_subobject (method) n=    50      60.07 ms
+[487.8s]       in a step: span basis             n=   100       2.66 ms
+[487.8s]       in a step: span construction      n=   100      74.64 ms
+[487.8s]     snapshot cost 0.9 s; rss 1657 MiB; objects 4017980 (previous 3956034)
+[487.8s]     top growth by type: list +13123, tuple +9136, dict +6049, ReferenceType +5218, cell +3426, MonoDict +3312
+[487.8s]     top shrink by type: 
+[487.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1167 entrie(s)
+[487.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[487.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[487.8s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1750
+[497.7s] 
+[497.7s] --- window 23: planes [1150, 1200) mean ms per call ---
+[497.7s]     product                            n=    50       0.22 ms
+[497.7s]     image                              n=    50     111.81 ms
+[497.7s]     basis                              n=    50       1.31 ms
+[497.7s]     admission                          n=    50      65.01 ms
+[497.7s]     call (four steps + framing)        n=    50     178.36 ms
+[497.7s]       in a step: admission.subobject_on n=    50      55.08 ms
+[497.7s]       in a step: admission.is_primitive n=    50       6.37 ms
+[497.7s]       in a step: admission.refine       n=    50       0.35 ms
+[497.7s]       in a step: primitive_isotropic_subobject (method) n=    50      65.00 ms
+[497.7s]       in a step: span basis             n=   100       2.81 ms
+[497.7s]       in a step: span construction      n=   100      80.59 ms
+[497.7s]     snapshot cost 0.9 s; rss 1663 MiB; objects 4080081 (previous 4017980)
+[497.7s]     top growth by type: list +13118, tuple +9137, dict +6047, ReferenceType +5215, cell +3426, MonoDict +3310
+[497.7s]     top shrink by type: 
+[497.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1217 entrie(s)
+[497.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[497.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[497.7s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1750
+[508.0s] 
+[508.0s] --- window 24: planes [1200, 1250) mean ms per call ---
+[508.0s]     product                            n=    50       0.23 ms
+[508.0s]     image                              n=    50     116.39 ms
+[508.0s]     basis                              n=    50       1.39 ms
+[508.0s]     admission                          n=    50      67.33 ms
+[508.0s]     call (four steps + framing)        n=    50     185.35 ms
+[508.0s]       in a step: admission.subobject_on n=    50      57.09 ms
+[508.0s]       in a step: admission.is_primitive n=    50       6.61 ms
+[508.0s]       in a step: admission.refine       n=    50       0.36 ms
+[508.0s]       in a step: primitive_isotropic_subobject (method) n=    50      67.31 ms
+[508.0s]       in a step: span basis             n=   100       2.93 ms
+[508.0s]       in a step: span construction      n=   100      83.77 ms
+[508.0s]     snapshot cost 0.9 s; rss 1670 MiB; objects 4141691 (previous 4080081)
+[508.0s]     top growth by type: list +13103, tuple +9112, dict +6036, ReferenceType +5212, cell +3408, MonoDict +3308
+[508.0s]     top shrink by type: 
+[508.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1267 entrie(s)
+[508.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[508.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[508.0s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1750
+[518.3s] 
+[518.3s] --- window 25: planes [1250, 1300) mean ms per call ---
+[518.3s]     product                            n=    50       0.22 ms
+[518.3s]     image                              n=    50     116.97 ms
+[518.3s]     basis                              n=    50       1.31 ms
+[518.3s]     admission                          n=    50      67.37 ms
+[518.3s]     call (four steps + framing)        n=    50     185.87 ms
+[518.3s]       in a step: admission.subobject_on n=    50      57.48 ms
+[518.3s]       in a step: admission.is_primitive n=    50       6.36 ms
+[518.3s]       in a step: admission.refine       n=    50       0.35 ms
+[518.3s]       in a step: primitive_isotropic_subobject (method) n=    50      67.35 ms
+[518.3s]       in a step: span basis             n=   100       2.81 ms
+[518.3s]       in a step: span construction      n=   100      84.37 ms
+[518.3s]     snapshot cost 0.9 s; rss 1677 MiB; objects 4203386 (previous 4141691)
+[518.3s]     top growth by type: list +13107, tuple +9131, dict +6036, ReferenceType +5212, cell +3422, MonoDict +3308
+[518.3s]     top shrink by type: 
+[518.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1317 entrie(s)
+[518.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[518.3s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[518.3s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1750
+[529.1s] 
+[529.1s] --- window 26: planes [1300, 1350) mean ms per call ---
+[529.1s]     product                            n=    50       0.21 ms
+[529.1s]     image                              n=    50     124.07 ms
+[529.1s]     basis                              n=    50       1.23 ms
+[529.1s]     admission                          n=    50      70.28 ms
+[529.1s]     call (four steps + framing)        n=    50     195.78 ms
+[529.1s]       in a step: admission.subobject_on n=    50      60.63 ms
+[529.1s]       in a step: admission.is_primitive n=    50       6.16 ms
+[529.1s]       in a step: admission.refine       n=    50       0.34 ms
+[529.1s]       in a step: primitive_isotropic_subobject (method) n=    50      70.26 ms
+[529.1s]       in a step: span basis             n=   100       2.79 ms
+[529.1s]       in a step: span construction      n=   100      89.51 ms
+[529.1s]     snapshot cost 0.9 s; rss 1684 MiB; objects 4266184 (previous 4203386)
+[529.1s]     top growth by type: list +13170, tuple +9171, dict +6084, ReferenceType +5233, cell +3452, MonoDict +3322
+[529.1s]     top shrink by type: 
+[529.1s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1367 entrie(s)
+[529.1s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[529.1s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[529.1s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1750
+[540.6s] 
+[540.6s] --- window 27: planes [1350, 1400) mean ms per call ---
+[540.6s]     product                            n=    50       0.22 ms
+[540.6s]     image                              n=    50     132.48 ms
+[540.6s]     basis                              n=    50       1.34 ms
+[540.6s]     admission                          n=    50      75.46 ms
+[540.6s]     call (four steps + framing)        n=    50     209.50 ms
+[540.6s]       in a step: admission.subobject_on n=    50      65.33 ms
+[540.6s]       in a step: admission.is_primitive n=    50       6.51 ms
+[540.6s]       in a step: admission.refine       n=    50       0.36 ms
+[540.6s]       in a step: primitive_isotropic_subobject (method) n=    50      75.44 ms
+[540.6s]       in a step: span basis             n=   100       2.91 ms
+[540.6s]       in a step: span construction      n=   100      95.95 ms
+[540.6s]     snapshot cost 1.0 s; rss 1691 MiB; objects 4328110 (previous 4266184)
+[540.6s]     top growth by type: list +13128, tuple +9135, dict +6051, ReferenceType +5221, cell +3426, MonoDict +3314
+[540.6s]     top shrink by type: 
+[540.6s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1417 entrie(s)
+[540.6s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[540.6s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[540.6s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1750
+[553.4s] 
+[553.4s] --- window 28: planes [1400, 1450) mean ms per call ---
+[553.4s]     product                            n=    50       0.23 ms
+[553.4s]     image                              n=    50     157.26 ms
+[553.4s]     basis                              n=    50       1.38 ms
+[553.4s]     admission                          n=    50      75.37 ms
+[553.4s]     call (four steps + framing)        n=    50     234.23 ms
+[553.4s]       in a step: admission.subobject_on n=    50      65.18 ms
+[553.4s]       in a step: admission.is_primitive n=    50       6.58 ms
+[553.4s]       in a step: admission.refine       n=    50       0.36 ms
+[553.4s]       in a step: primitive_isotropic_subobject (method) n=    50      75.35 ms
+[553.4s]       in a step: span basis             n=   100       2.99 ms
+[553.4s]       in a step: span construction      n=   100     108.19 ms
+[553.4s]     snapshot cost 1.0 s; rss 1697 MiB; objects 4375937 (previous 4328110)
+[553.4s]     top growth by type: list +12233, tuple +8489, dict +5357, ReferenceType +4927, MonoDict +3124, MonoDictEraser +3124
+[553.4s]     top shrink by type: Rational -7260, QuadraticForm -110, Matrix_rational_dense -51
+[553.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1467 entrie(s)
+[553.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[553.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[553.4s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1742
+[565.4s] 
+[565.4s] --- window 29: planes [1450, 1500) mean ms per call ---
+[565.4s]     product                            n=    50       0.22 ms
+[565.4s]     image                              n=    50     137.75 ms
+[565.4s]     basis                              n=    50       1.38 ms
+[565.4s]     admission                          n=    50      78.13 ms
+[565.4s]     call (four steps + framing)        n=    50     217.48 ms
+[565.4s]       in a step: admission.subobject_on n=    50      67.99 ms
+[565.4s]       in a step: admission.is_primitive n=    50       6.56 ms
+[565.4s]       in a step: admission.refine       n=    50       0.35 ms
+[565.4s]       in a step: primitive_isotropic_subobject (method) n=    50      78.11 ms
+[565.4s]       in a step: span basis             n=   100       2.96 ms
+[565.4s]       in a step: span construction      n=   100      99.86 ms
+[565.4s]     snapshot cost 1.0 s; rss 1703 MiB; objects 4438206 (previous 4375937)
+[565.4s]     top growth by type: list +13123, tuple +9136, dict +6049, ReferenceType +5218, cell +3426, MonoDict +3312
+[565.4s]     top shrink by type: 
+[565.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1517 entrie(s)
+[565.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[565.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[565.4s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1742
+[577.8s] 
+[577.8s] --- window 30: planes [1500, 1550) mean ms per call ---
+[577.8s]     product                            n=    50       0.22 ms
+[577.8s]     image                              n=    50     144.59 ms
+[577.8s]     basis                              n=    50       1.26 ms
+[577.8s]     admission                          n=    50      81.03 ms
+[577.8s]     call (four steps + framing)        n=    50     227.10 ms
+[577.8s]       in a step: admission.subobject_on n=    50      71.19 ms
+[577.8s]       in a step: admission.is_primitive n=    50       6.31 ms
+[577.8s]       in a step: admission.refine       n=    50       0.35 ms
+[577.8s]       in a step: primitive_isotropic_subobject (method) n=    50      81.02 ms
+[577.8s]       in a step: span basis             n=   100       2.89 ms
+[577.8s]       in a step: span construction      n=   100     104.95 ms
+[577.8s]     snapshot cost 1.0 s; rss 1710 MiB; objects 4501406 (previous 4438206)
+[577.8s]     top growth by type: list +13130, tuple +9139, dict +6053, ReferenceType +5215, cell +3423, MonoDict +3310
+[577.8s]     top shrink by type: 
+[577.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1567 entrie(s)
+[577.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[577.8s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[577.8s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1742
+[590.1s] 
+[590.1s] --- window 31: planes [1550, 1600) mean ms per call ---
+[590.1s]     product                            n=    50       0.22 ms
+[590.1s]     image                              n=    50     142.83 ms
+[590.1s]     basis                              n=    50       1.28 ms
+[590.1s]     admission                          n=    50      80.08 ms
+[590.1s]     call (four steps + framing)        n=    50     224.42 ms
+[590.1s]       in a step: admission.subobject_on n=    50      70.26 ms
+[590.1s]       in a step: admission.is_primitive n=    50       6.28 ms
+[590.1s]       in a step: admission.refine       n=    50       0.35 ms
+[590.1s]       in a step: primitive_isotropic_subobject (method) n=    50      80.07 ms
+[590.1s]       in a step: span basis             n=   100       2.84 ms
+[590.1s]       in a step: span construction      n=   100     103.66 ms
+[590.1s]     snapshot cost 1.0 s; rss 1717 MiB; objects 4563308 (previous 4501406)
+[590.1s]     top growth by type: list +13163, tuple +9168, dict +6078, ReferenceType +5236, cell +3455, MonoDict +3324
+[590.1s]     top shrink by type: 
+[590.1s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1617 entrie(s)
+[590.1s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[590.1s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[590.1s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1742
+[602.7s] 
+[602.7s] --- window 32: planes [1600, 1650) mean ms per call ---
+[602.7s]     product                            n=    50       0.23 ms
+[602.7s]     image                              n=    50     147.13 ms
+[602.7s]     basis                              n=    50       1.24 ms
+[602.7s]     admission                          n=    50      82.12 ms
+[602.7s]     call (four steps + framing)        n=    50     230.72 ms
+[602.7s]       in a step: admission.subobject_on n=    50      72.33 ms
+[602.7s]       in a step: admission.is_primitive n=    50       6.27 ms
+[602.7s]       in a step: admission.refine       n=    50       0.34 ms
+[602.7s]       in a step: primitive_isotropic_subobject (method) n=    50      82.11 ms
+[602.7s]       in a step: span basis             n=   100       2.78 ms
+[602.7s]       in a step: span construction      n=   100     106.91 ms
+[602.7s]     snapshot cost 1.0 s; rss 1725 MiB; objects 4625281 (previous 4563308)
+[602.7s]     top growth by type: list +13123, tuple +9136, dict +6049, ReferenceType +5218, cell +3426, MonoDict +3312
+[602.7s]     top shrink by type: 
+[602.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1667 entrie(s)
+[602.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[602.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[602.7s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1742
+[615.7s] 
+[615.7s] --- window 33: planes [1650, 1700) mean ms per call ---
+[615.7s]     product                            n=    50       0.22 ms
+[615.7s]     image                              n=    50     150.62 ms
+[615.7s]     basis                              n=    50       1.26 ms
+[615.7s]     admission                          n=    50      84.21 ms
+[615.7s]     call (four steps + framing)        n=    50     236.31 ms
+[615.7s]       in a step: admission.subobject_on n=    50      74.42 ms
+[615.7s]       in a step: admission.is_primitive n=    50       6.28 ms
+[615.7s]       in a step: admission.refine       n=    50       0.34 ms
+[615.7s]       in a step: primitive_isotropic_subobject (method) n=    50      84.19 ms
+[615.7s]       in a step: span basis             n=   100       2.78 ms
+[615.7s]       in a step: span construction      n=   100     109.70 ms
+[615.7s]     snapshot cost 1.0 s; rss 1731 MiB; objects 4687125 (previous 4625281)
+[615.7s]     top growth by type: list +13123, tuple +9136, dict +6049, ReferenceType +5218, cell +3426, MonoDict +3312
+[615.7s]     top shrink by type: 
+[615.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1717 entrie(s)
+[615.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[615.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[615.7s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1742
+[629.1s] 
+[629.1s] --- window 34: planes [1700, 1750) mean ms per call ---
+[629.1s]     product                            n=    50       0.22 ms
+[629.1s]     image                              n=    50     156.81 ms
+[629.1s]     basis                              n=    50       1.41 ms
+[629.1s]     admission                          n=    50      87.73 ms
+[629.1s]     call (four steps + framing)        n=    50     246.16 ms
+[629.1s]       in a step: admission.subobject_on n=    50      77.49 ms
+[629.1s]       in a step: admission.is_primitive n=    50       6.64 ms
+[629.1s]       in a step: admission.refine       n=    50       0.35 ms
+[629.1s]       in a step: primitive_isotropic_subobject (method) n=    50      87.71 ms
+[629.1s]       in a step: span basis             n=   100       2.90 ms
+[629.1s]       in a step: span construction      n=   100     114.21 ms
+[629.1s]     snapshot cost 1.0 s; rss 1739 MiB; objects 4749034 (previous 4687125)
+[629.1s]     top growth by type: list +13123, tuple +9136, dict +6049, ReferenceType +5218, cell +3426, MonoDict +3312
+[629.1s]     top shrink by type: 
+[629.1s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1767 entrie(s)
+[629.1s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[629.1s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[629.1s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1742
+[642.7s] 
+[642.7s] --- window 35: planes [1750, 1800) mean ms per call ---
+[642.7s]     product                            n=    50       0.22 ms
+[642.7s]     image                              n=    50     159.39 ms
+[642.7s]     basis                              n=    50       1.25 ms
+[642.7s]     admission                          n=    50      88.48 ms
+[642.7s]     call (four steps + framing)        n=    50     249.34 ms
+[642.7s]       in a step: admission.subobject_on n=    50      78.64 ms
+[642.7s]       in a step: admission.is_primitive n=    50       6.32 ms
+[642.7s]       in a step: admission.refine       n=    50       0.35 ms
+[642.7s]       in a step: primitive_isotropic_subobject (method) n=    50      88.46 ms
+[642.7s]       in a step: span basis             n=   100       2.81 ms
+[642.7s]       in a step: span construction      n=   100     116.16 ms
+[642.7s]     snapshot cost 1.1 s; rss 1745 MiB; objects 4811328 (previous 4749034)
+[642.7s]     top growth by type: list +13087, tuple +9104, dict +6024, ReferenceType +5200, cell +3396, MonoDict +3300
+[642.7s]     top shrink by type: 
+[642.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1817 entrie(s)
+[642.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[642.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[642.7s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1742
+[656.7s] 
+[656.7s] --- window 36: planes [1800, 1850) mean ms per call ---
+[656.7s]     product                            n=    50       0.22 ms
+[656.7s]     image                              n=    50     164.33 ms
+[656.7s]     basis                              n=    50       1.32 ms
+[656.7s]     admission                          n=    50      90.94 ms
+[656.7s]     call (four steps + framing)        n=    50     256.80 ms
+[656.7s]       in a step: admission.subobject_on n=    50      81.10 ms
+[656.7s]       in a step: admission.is_primitive n=    50       6.32 ms
+[656.7s]       in a step: admission.refine       n=    50       0.34 ms
+[656.7s]       in a step: primitive_isotropic_subobject (method) n=    50      90.92 ms
+[656.7s]       in a step: span basis             n=   100       2.87 ms
+[656.7s]       in a step: span construction      n=   100     119.80 ms
+[656.7s]     snapshot cost 1.1 s; rss 1751 MiB; objects 4873497 (previous 4811328)
+[656.7s]     top growth by type: list +13170, tuple +9174, dict +6083, ReferenceType +5239, cell +3460, MonoDict +3326
+[656.7s]     top shrink by type: 
+[656.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1867 entrie(s)
+[656.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[656.7s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[656.7s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1742
+[671.0s] 
+[671.0s] --- window 37: planes [1850, 1900) mean ms per call ---
+[671.0s]     product                            n=    50       0.22 ms
+[671.0s]     image                              n=    50     168.40 ms
+[671.0s]     basis                              n=    50       1.32 ms
+[671.0s]     admission                          n=    50      93.13 ms
+[671.0s]     call (four steps + framing)        n=    50     263.07 ms
+[671.0s]       in a step: admission.subobject_on n=    50      83.17 ms
+[671.0s]       in a step: admission.is_primitive n=    50       6.42 ms
+[671.0s]       in a step: admission.refine       n=    50       0.35 ms
+[671.0s]       in a step: primitive_isotropic_subobject (method) n=    50      93.11 ms
+[671.0s]       in a step: span basis             n=   100       2.88 ms
+[671.0s]       in a step: span construction      n=   100     122.86 ms
+[671.0s]     snapshot cost 1.1 s; rss 1787 MiB; objects 4934961 (previous 4873497)
+[671.0s]     top growth by type: list +13059, tuple +9089, dict +6005, ReferenceType +5194, cell +3389, MonoDict +3296
+[671.0s]     top shrink by type: 
+[671.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1917 entrie(s)
+[671.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[671.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[671.0s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1742
+[685.6s] 
+[685.6s] --- window 38: planes [1900, 1950) mean ms per call ---
+[685.6s]     product                            n=    50       0.22 ms
+[685.6s]     image                              n=    50     171.78 ms
+[685.6s]     basis                              n=    50       1.26 ms
+[685.6s]     admission                          n=    50      94.37 ms
+[685.6s]     call (four steps + framing)        n=    50     267.63 ms
+[685.6s]       in a step: admission.subobject_on n=    50      84.64 ms
+[685.6s]       in a step: admission.is_primitive n=    50       6.23 ms
+[685.6s]       in a step: admission.refine       n=    50       0.35 ms
+[685.6s]       in a step: primitive_isotropic_subobject (method) n=    50      94.36 ms
+[685.6s]       in a step: span basis             n=   100       2.82 ms
+[685.6s]       in a step: span construction      n=   100     125.35 ms
+[685.6s]     snapshot cost 1.1 s; rss 1794 MiB; objects 4998155 (previous 4934961)
+[685.6s]     top growth by type: list +13148, tuple +9145, dict +6067, ReferenceType +5221, cell +3427, MonoDict +3314
+[685.6s]     top shrink by type: 
+[685.6s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 1967 entrie(s)
+[685.6s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[685.6s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[685.6s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1742
+[700.4s] 
+[700.4s] --- window 39: planes [1950, 2000) mean ms per call ---
+[700.4s]     product                            n=    50       0.22 ms
+[700.4s]     image                              n=    50     175.23 ms
+[700.4s]     basis                              n=    50       1.14 ms
+[700.4s]     admission                          n=    50      95.98 ms
+[700.4s]     call (four steps + framing)        n=    50     272.57 ms
+[700.4s]       in a step: admission.subobject_on n=    50      86.61 ms
+[700.4s]       in a step: admission.is_primitive n=    50       5.94 ms
+[700.4s]       in a step: admission.refine       n=    50       0.32 ms
+[700.4s]       in a step: primitive_isotropic_subobject (method) n=    50      95.97 ms
+[700.4s]       in a step: span basis             n=   100       2.72 ms
+[700.4s]       in a step: span construction      n=   100     128.16 ms
+[700.4s]     snapshot cost 1.1 s; rss 1800 MiB; objects 5059692 (previous 4998155)
+[700.4s]     top growth by type: list +13113, tuple +9133, dict +6044, ReferenceType +5218, cell +3428, MonoDict +3312
+[700.4s]     top shrink by type: Rational -132, QuadraticForm -2, Matrix_rational_dense -1
+[700.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 2017 entrie(s)
+[700.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[700.4s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[700.4s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1742
+[701.9s] the row did not return inside its 700 s cap
+[703.0s] 
+[703.0s] --- window 40: planes [2000, 2005) mean ms per call ---
+[703.0s]     product                            n=     5       0.26 ms
+[703.0s]     image                              n=     5     174.01 ms
+[703.0s]     basis                              n=     5       0.98 ms
+[703.0s]     admission                          n=     5      93.81 ms
+[703.0s]     call (four steps + framing)        n=     5     269.07 ms
+[703.0s]       in a step: admission.subobject_on n=     5      85.09 ms
+[703.0s]       in a step: admission.is_primitive n=     5       5.41 ms
+[703.0s]       in a step: admission.refine       n=     5       0.29 ms
+[703.0s]       in a step: primitive_isotropic_subobject (method) n=     5      93.80 ms
+[703.0s]       in a step: span basis             n=    11       2.68 ms
+[703.0s]       in a step: span construction      n=    10     126.82 ms
+[703.0s]     snapshot cost 1.1 s; rss 1791 MiB; objects 5065281 (previous 5059692)
+[703.0s]     top growth by type: list +1302, tuple +909, dict +635, ReferenceType +525, cell +352, MonoDict +332
+[703.0s]     top shrink by type: Rational -396, GapElement_Permutation -13, QuadraticForm -6
+[703.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: 1 owner(s), 2022 entrie(s)
+[703.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: 13 owner(s), 13 entrie(s)
+[703.0s]     cache OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: 1 owner(s), 1 entrie(s)
+[703.0s]     class cache OwnedJoinCategory_with_category.__classcall__.cache: 1742
+[703.0s] 
+[703.0s] === patched ===
+[703.0s]   primitive_isotropic_subobject (method): primitive_isotropic_subobject on sage_extensions.categories.lattices.Lattices.ParentMethods (CachedMethod)
+[703.0s]   admission.subobject_on: subobject_on on sage_extensions.categories.lattices.Lattices.ParentMethods (function)
+[703.0s]   span basis: _span_basis_elements in sage_extensions.categories.lattices (function)
+[703.0s]   span construction: _lattice_subobject_spanning in sage_extensions.categories.lattices (function)
+[703.0s]   admission.refine: sage_extensions.refine.refine (function)
+[703.0s]   transport: transport_isotropic_object on sage_extensions.categories.lattice_morphisms.LatticeIsometryMethods (replaced by the clocked branch)
+[703.0s]   admission.is_primitive: is_primitive on sage_extensions.categories.modules.pure.modules.ModuleSubobjects.ParentMethods (function)
+[703.0s] flag branch calls: 0
+[703.0s] the interior labels count only calls made inside the transport's own steps; 'image.' ones inside its image step, the others inside its admission step unless they are the span rows, which cover both
+[703.0s] the instrumented branch against the original on the first calls:
+[703.0s]   call 0: rank 2 vs 2, generators equal: True
+[703.0s]   call 1: rank 2 vs 2, generators equal: True
+[703.0s]   call 2: rank 2 vs 2, generators equal: True
+[703.0s]   divergences: 0
+[703.0s] 
+[703.0s] === mean ms per call, by window of 50 planes ===
+[703.0s] window        planes   product     image     basis admission    subobj      prim    refine    method   img all  img span  span def span ctor      call     gc s     rss
+[703.0s]      0        [0,50)      0.21      9.33      0.92     11.80      3.46      5.29      0.27     11.79         -         -      2.45      3.93     22.25     3.68    1454
+[703.0s]      1      [50,100)      0.20     13.71      0.95     14.22      5.67      5.28      0.25     14.21         -         -      2.43      7.22     29.06     0.01    1482
+[703.0s]      2     [100,150)      0.21     18.41      1.06     17.40      8.10      5.85      0.33     17.38         -         -      2.65     10.56     37.07     0.02    1511
+[703.0s]      3     [150,200)      0.20     22.40     18.19     18.51      9.98      5.25      0.25     18.50         -         -      2.46     13.70     59.30     0.87    1512
+[703.0s]      4     [200,250)      0.20     26.52      0.95     20.73     12.12      5.32      0.26     20.72         -         -      2.51     16.77     48.41     0.01    1514
+[703.0s]      5     [250,300)      0.23     32.23      1.09     24.43     15.03      5.94      0.33     24.42         -         -      2.74     20.85     57.99     0.02    1517
+[703.0s]      6     [300,350)      0.20     34.75      0.95     24.87     16.26      5.31      0.26     24.86         -         -      2.49     22.98     60.76     0.01    1521
+[703.0s]      7     [350,400)      0.21     39.83      0.95     27.45     18.79      5.36      0.26     27.44         -         -      2.53     26.75     68.45     0.01    1527
+[703.0s]      8     [400,450)      0.21     44.17      1.02     29.93     20.98      5.60      0.29     29.92         -         -      2.58     29.95     75.34     0.01    1534
+[703.0s]      9     [450,500)      0.23     48.62      1.14     32.39     22.99      5.94      0.32     32.38         -         -      2.73     33.03     82.37     0.02    1540
+[703.0s]     10     [500,550)      0.21     52.56      1.04     34.01     25.09      5.57      0.29     34.00         -         -      2.60     36.18     87.82     0.01    1547
+[703.0s]     11     [550,600)      0.21     56.49      0.98     35.89     27.11      5.45      0.28     35.88         -         -      2.54     39.23     93.58     0.01    1554
+[703.0s]     12     [600,650)      0.21     61.48      1.08     38.76     29.65      5.73      0.30     38.75         -         -      2.62     42.90    101.53     0.01    1561
+[703.0s]     13     [650,700)      0.20     64.81      0.96     39.92     31.25      5.38      0.26     39.91         -         -      2.48     45.51    105.89     0.01    1567
+[703.0s]     14     [700,750)      0.20     87.78      0.99     42.24     33.50      5.42      0.26     42.23         -         -      2.55     58.06    131.21     0.95    1573
+[703.0s]     15     [750,800)      0.22     74.65      1.17     45.63     36.15      6.01      0.33     45.61         -         -      2.75     52.60    121.67     0.02    1580
+[703.0s]     16     [800,850)      0.21     78.55      1.10     47.52     38.19      5.91      0.33     47.50         -         -      2.69     55.63    127.38     0.02    1587
+[703.0s]     17     [850,900)      0.23     83.97      1.18     50.41     40.93      6.02      0.33     50.40         -         -      2.76     59.64    135.78     0.02    1594
+[703.0s]     18     [900,950)      0.22     88.06      1.29     52.93     42.93      6.45      0.35     52.92         -         -      2.89     62.56    142.52     0.02    1629
+[703.0s]     19    [950,1000)      0.22     94.69      1.34     56.52     46.38      6.53      0.36     56.50         -         -      2.90     67.59    152.77     0.02    1636
+[703.0s]     20   [1000,1050)      0.23     99.89      1.42     59.25     48.81      6.78      0.37     59.24         -         -      2.99     71.31    160.79     0.02    1643
+[703.0s]     21   [1050,1100)      0.23    104.15      1.42     61.46     51.12      6.70      0.36     61.44         -         -      2.98     74.61    167.26     0.02    1650
+[703.0s]     22   [1100,1150)      0.22    103.88      1.11     60.08     50.80      5.85      0.32     60.07         -         -      2.66     74.64    165.29     0.02    1657
+[703.0s]     23   [1150,1200)      0.22    111.81      1.31     65.01     55.08      6.37      0.35     65.00         -         -      2.81     80.59    178.36     0.02    1663
+[703.0s]     24   [1200,1250)      0.23    116.39      1.39     67.33     57.09      6.61      0.36     67.31         -         -      2.93     83.77    185.35     0.02    1670
+[703.0s]     25   [1250,1300)      0.22    116.97      1.31     67.37     57.48      6.36      0.35     67.35         -         -      2.81     84.37    185.87     0.02    1677
+[703.0s]     26   [1300,1350)      0.21    124.07      1.23     70.28     60.63      6.16      0.34     70.26         -         -      2.79     89.51    195.78     0.02    1684
+[703.0s]     27   [1350,1400)      0.22    132.48      1.34     75.46     65.33      6.51      0.36     75.44         -         -      2.91     95.95    209.50     0.02    1691
+[703.0s]     28   [1400,1450)      0.23    157.26      1.38     75.37     65.18      6.58      0.36     75.35         -         -      2.99    108.19    234.23     1.25    1697
+[703.0s]     29   [1450,1500)      0.22    137.75      1.38     78.13     67.99      6.56      0.35     78.11         -         -      2.96     99.86    217.48     0.02    1703
+[703.0s]     30   [1500,1550)      0.22    144.59      1.26     81.03     71.19      6.31      0.35     81.02         -         -      2.89    104.95    227.10     0.02    1710
+[703.0s]     31   [1550,1600)      0.22    142.83      1.28     80.08     70.26      6.28      0.35     80.07         -         -      2.84    103.66    224.42     0.02    1717
+[703.0s]     32   [1600,1650)      0.23    147.13      1.24     82.12     72.33      6.27      0.34     82.11         -         -      2.78    106.91    230.72     0.02    1725
+[703.0s]     33   [1650,1700)      0.22    150.62      1.26     84.21     74.42      6.28      0.34     84.19         -         -      2.78    109.70    236.31     0.02    1731
+[703.0s]     34   [1700,1750)      0.22    156.81      1.41     87.73     77.49      6.64      0.35     87.71         -         -      2.90    114.21    246.16     0.02    1739
+[703.0s]     35   [1750,1800)      0.22    159.39      1.25     88.48     78.64      6.32      0.35     88.46         -         -      2.81    116.16    249.34     0.02    1745
+[703.0s]     36   [1800,1850)      0.22    164.33      1.32     90.94     81.10      6.32      0.34     90.92         -         -      2.87    119.80    256.80     0.02    1751
+[703.0s]     37   [1850,1900)      0.22    168.40      1.32     93.13     83.17      6.42      0.35     93.11         -         -      2.88    122.86    263.07     0.02    1787
+[703.0s]     38   [1900,1950)      0.22    171.78      1.26     94.37     84.64      6.23      0.35     94.36         -         -      2.82    125.35    267.63     0.02    1794
+[703.0s]     39   [1950,2000)      0.22    175.23      1.14     95.98     86.61      5.94      0.32     95.97         -         -      2.72    128.16    272.57     0.02    1800
+[703.0s]     40   [2000,2005)      0.26    174.01      0.98     93.81     85.09      5.41      0.29     93.80         -         -      2.68    126.82    269.07     0.00    1791
+[703.0s] 
+[703.0s] === first window against last (mean ms per call) ===
+[703.0s]   product                          window 0:      0.21  window 40:      0.26  ratio   1.26
+[703.0s]   image                            window 0:      9.33  window 40:    174.01  ratio  18.66
+[703.0s]   basis                            window 0:      0.92  window 40:      0.98  ratio   1.07
+[703.0s]   admission                        window 0:     11.80  window 40:     93.81  ratio   7.95
+[703.0s]   admission.subobject_on           window 0:      3.46  window 40:     85.09  ratio  24.62
+[703.0s]   admission.is_primitive           window 0:      5.29  window 40:      5.41  ratio   1.02
+[703.0s]   admission.refine                 window 0:      0.27  window 40:      0.29  ratio   1.07
+[703.0s]   primitive_isotropic_subobject (method) window 0:     11.79  window 40:     93.80  ratio   7.96
+[703.0s]   span basis                       window 0:      2.45  window 40:      2.68  ratio   1.09
+[703.0s]   span construction                window 0:      3.93  window 40:    126.82  ratio  32.25
+[703.0s]   call (four steps + framing)      window 0:     22.25  window 40:    269.07  ratio  12.09
+[703.0s] 
+[703.0s] === the admission wrapper's own cost (step minus the method it times) ===
+[703.0s]   window 0: admission    11.80 ms, method    11.79 ms, wrapper   0.01 ms per call
+[703.0s]   window 1: admission    14.22 ms, method    14.21 ms, wrapper   0.01 ms per call
+[703.0s]   window 2: admission    17.40 ms, method    17.38 ms, wrapper   0.01 ms per call
+[703.0s]   window 3: admission    18.51 ms, method    18.50 ms, wrapper   0.01 ms per call
+[703.0s]   window 4: admission    20.73 ms, method    20.72 ms, wrapper   0.01 ms per call
+[703.0s]   window 5: admission    24.43 ms, method    24.42 ms, wrapper   0.01 ms per call
+[703.0s]   window 6: admission    24.87 ms, method    24.86 ms, wrapper   0.01 ms per call
+[703.0s]   window 7: admission    27.45 ms, method    27.44 ms, wrapper   0.01 ms per call
+[703.0s]   window 8: admission    29.93 ms, method    29.92 ms, wrapper   0.01 ms per call
+[703.0s]   window 9: admission    32.39 ms, method    32.38 ms, wrapper   0.01 ms per call
+[703.0s]   window 10: admission    34.01 ms, method    34.00 ms, wrapper   0.01 ms per call
+[703.0s]   window 11: admission    35.89 ms, method    35.88 ms, wrapper   0.01 ms per call
+[703.0s]   window 12: admission    38.76 ms, method    38.75 ms, wrapper   0.01 ms per call
+[703.0s]   window 13: admission    39.92 ms, method    39.91 ms, wrapper   0.01 ms per call
+[703.0s]   window 14: admission    42.24 ms, method    42.23 ms, wrapper   0.01 ms per call
+[703.0s]   window 15: admission    45.63 ms, method    45.61 ms, wrapper   0.01 ms per call
+[703.0s]   window 16: admission    47.52 ms, method    47.50 ms, wrapper   0.01 ms per call
+[703.0s]   window 17: admission    50.41 ms, method    50.40 ms, wrapper   0.01 ms per call
+[703.0s]   window 18: admission    52.93 ms, method    52.92 ms, wrapper   0.02 ms per call
+[703.0s]   window 19: admission    56.52 ms, method    56.50 ms, wrapper   0.02 ms per call
+[703.0s]   window 20: admission    59.25 ms, method    59.24 ms, wrapper   0.02 ms per call
+[703.0s]   window 21: admission    61.46 ms, method    61.44 ms, wrapper   0.02 ms per call
+[703.0s]   window 22: admission    60.08 ms, method    60.07 ms, wrapper   0.01 ms per call
+[703.0s]   window 23: admission    65.01 ms, method    65.00 ms, wrapper   0.02 ms per call
+[703.0s]   window 24: admission    67.33 ms, method    67.31 ms, wrapper   0.02 ms per call
+[703.0s]   window 25: admission    67.37 ms, method    67.35 ms, wrapper   0.01 ms per call
+[703.0s]   window 26: admission    70.28 ms, method    70.26 ms, wrapper   0.01 ms per call
+[703.0s]   window 27: admission    75.46 ms, method    75.44 ms, wrapper   0.01 ms per call
+[703.0s]   window 28: admission    75.37 ms, method    75.35 ms, wrapper   0.02 ms per call
+[703.0s]   window 29: admission    78.13 ms, method    78.11 ms, wrapper   0.02 ms per call
+[703.0s]   window 30: admission    81.03 ms, method    81.02 ms, wrapper   0.01 ms per call
+[703.0s]   window 31: admission    80.08 ms, method    80.07 ms, wrapper   0.01 ms per call
+[703.0s]   window 32: admission    82.12 ms, method    82.11 ms, wrapper   0.01 ms per call
+[703.0s]   window 33: admission    84.21 ms, method    84.19 ms, wrapper   0.01 ms per call
+[703.0s]   window 34: admission    87.73 ms, method    87.71 ms, wrapper   0.02 ms per call
+[703.0s]   window 35: admission    88.48 ms, method    88.46 ms, wrapper   0.02 ms per call
+[703.0s]   window 36: admission    90.94 ms, method    90.92 ms, wrapper   0.02 ms per call
+[703.0s]   window 37: admission    93.13 ms, method    93.11 ms, wrapper   0.02 ms per call
+[703.0s]   window 38: admission    94.37 ms, method    94.36 ms, wrapper   0.01 ms per call
+[703.0s]   window 39: admission    95.98 ms, method    95.97 ms, wrapper   0.01 ms per call
+[703.0s]   window 40: admission    93.81 ms, method    93.80 ms, wrapper   0.01 ms per call
+[703.0s] 
+[703.0s] === the cyclic collector ===
+[703.0s]   3918 collections, 7.4 s inside them, over 700.0 s of row
+[703.0s]   window 0: 2033 collections 3.7 s, transport 1.1 s (330.5%)
+[703.0s]   window 1: 48 collections 0.0 s, transport 1.5 s (0.7%)
+[703.0s]   window 2: 47 collections 0.0 s, transport 1.9 s (0.9%)
+[703.0s]   window 3: 49 collections 0.9 s, transport 3.0 s (29.4%)
+[703.0s]   window 4: 48 collections 0.0 s, transport 2.4 s (0.6%)
+[703.0s]   window 5: 48 collections 0.0 s, transport 2.9 s (0.7%)
+[703.0s]   window 6: 48 collections 0.0 s, transport 3.0 s (0.4%)
+[703.0s]   window 7: 48 collections 0.0 s, transport 3.4 s (0.4%)
+[703.0s]   window 8: 48 collections 0.0 s, transport 3.8 s (0.4%)
+[703.0s]   window 9: 49 collections 0.0 s, transport 4.1 s (0.4%)
+[703.0s]   window 10: 48 collections 0.0 s, transport 4.4 s (0.3%)
+[703.0s]   window 11: 48 collections 0.0 s, transport 4.7 s (0.3%)
+[703.0s]   window 12: 48 collections 0.0 s, transport 5.1 s (0.3%)
+[703.0s]   window 13: 48 collections 0.0 s, transport 5.3 s (0.2%)
+[703.0s]   window 14: 49 collections 1.0 s, transport 6.6 s (14.5%)
+[703.0s]   window 15: 48 collections 0.0 s, transport 6.1 s (0.3%)
+[703.0s]   window 16: 49 collections 0.0 s, transport 6.4 s (0.3%)
+[703.0s]   window 17: 47 collections 0.0 s, transport 6.8 s (0.3%)
+[703.0s]   window 18: 49 collections 0.0 s, transport 7.1 s (0.3%)
+[703.0s]   window 19: 48 collections 0.0 s, transport 7.6 s (0.3%)
+[703.0s]   window 20: 48 collections 0.0 s, transport 8.0 s (0.3%)
+[703.0s]   window 21: 48 collections 0.0 s, transport 8.4 s (0.2%)
+[703.0s]   window 22: 48 collections 0.0 s, transport 8.3 s (0.2%)
+[703.0s]   window 23: 48 collections 0.0 s, transport 8.9 s (0.2%)
+[703.0s]   window 24: 48 collections 0.0 s, transport 9.3 s (0.2%)
+[703.0s]   window 25: 48 collections 0.0 s, transport 9.3 s (0.2%)
+[703.0s]   window 26: 49 collections 0.0 s, transport 9.8 s (0.2%)
+[703.0s]   window 27: 48 collections 0.0 s, transport 10.5 s (0.2%)
+[703.0s]   window 28: 48 collections 1.3 s, transport 11.7 s (10.7%)
+[703.0s]   window 29: 48 collections 0.0 s, transport 10.9 s (0.2%)
+[703.0s]   window 30: 49 collections 0.0 s, transport 11.4 s (0.2%)
+[703.0s]   window 31: 49 collections 0.0 s, transport 11.2 s (0.2%)
+[703.0s]   window 32: 48 collections 0.0 s, transport 11.5 s (0.2%)
+[703.0s]   window 33: 48 collections 0.0 s, transport 11.8 s (0.2%)
+[703.0s]   window 34: 48 collections 0.0 s, transport 12.3 s (0.2%)
+[703.0s]   window 35: 48 collections 0.0 s, transport 12.5 s (0.1%)
+[703.0s]   window 36: 49 collections 0.0 s, transport 12.8 s (0.1%)
+[703.0s]   window 37: 48 collections 0.0 s, transport 13.2 s (0.1%)
+[703.0s]   window 38: 49 collections 0.0 s, transport 13.4 s (0.1%)
+[703.0s]   window 39: 48 collections 0.0 s, transport 13.6 s (0.1%)
+[703.0s]   window 40: 5 collections 0.0 s (no window of calls to divide by)
+[703.0s] 
+[703.0s] === cache tables, entries by window ===
+[703.0s]   OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache___scalar_action_from_module_multiplication: - 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13 13
+[703.0s]   OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__levi_quotient_image_index: - 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+[703.0s]   OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType._cache__primitive_isotropic_subobject: - 67 117 167 217 267 317 367 417 467 517 567 617 667 717 767 817 867 917 967 1017 1067 1117 1167 1217 1267 1317 1367 1417 1467 1517 1567 1617 1667 1717 1767 1817 1867 1917 1967 2017 2022
+[703.0s]   OwnedJoinCategory_with_category.__classcall__.cache: - 1901 1901 1901 1774 1774 1774 1774 1774 1774 1774 1774 1774 1774 1774 1750 1750 1750 1750 1750 1750 1750 1750 1750 1750 1750 1750 1750 1750 1742 1742 1742 1742 1742 1742 1742 1742 1742 1742 1742 1742 1742
+[703.0s] 
+[703.0s] === object count by type, first snapshot against last ===
+[703.0s]   list                                            14878 ->    800937  (+786059)
+[703.0s]   tuple                                           54293 ->    682999  (+628706)
+[703.0s]   _OwnedRingParent_with_category.element_class     1002 ->    487977  (+486975)
+[703.0s]   dict                                            31114 ->    473016  (+441902)
+[703.0s]   ReferenceType                                   13929 ->    322342  (+308413)
+[703.0s]   NaturalNumberSets.element_class                   182 ->    256109  (+255927)
+[703.0s]   cell                                             5981 ->    252173  (+246192)
+[703.0s]   MonoDict                                         1470 ->    195748  (+194278)
+[703.0s]   MonoDictEraser                                   1470 ->    195748  (+194278)
+[703.0s]   ConstantFunction                                  470 ->    189158  (+188688)
+[703.0s]   Homset_with_category                                4 ->         1  (-3)
+[703.0s]   LazyImport                                       1836 ->      1833  (-3)
+[703.0s]   GroupsWithChosenFinitePresentation_with_category        1 ->         0  (-1)
+[703.0s] 
+[703.0s] transported planes: 2005, flag-branch calls: 0
+[703.0s] row wall time: 700.0 s, decided: False
+[703.0s] peak VmHWM: 1838 MiB
+[703.0s] PROBE M DONE
+[peakrss] probe390m-span: child waited=2 shell_code=2 samples=356
+[peakrss] peak tree RSS      : 3858 MiB
+[peakrss] low-water MemAvail : 7633 MiB
+[peakrss] peak single VmHWM  : 3903 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2054 MiB peak
+[peakrss]   python                     1838 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   686.4s procs=  4 rss=  3858 MiB hwm=  3858 MiB avail= 10770 MiB
+[peakrss]   t=   702.4s procs=  4 rss=  3827 MiB hwm=  3865 MiB avail= 10789 MiB
+[peakrss]   t=   700.4s procs=  4 rss=  3826 MiB hwm=  3858 MiB avail= 10806 MiB
+[peakrss]   t=   698.4s procs=  4 rss=  3825 MiB hwm=  3858 MiB avail= 10803 MiB
+[peakrss]   t=   696.4s procs=  4 rss=  3824 MiB hwm=  3858 MiB avail= 10804 MiB

@@ -1,0 +1,28 @@
+provider SHA: 9fd76e4e17042ca123f605a9a1cc7bb5ad246041
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session -o addopts= tests/rings/test_literal_probe_tmp.sage -q
+F                                                                        [100%]
+=================================== FAILURES ===================================
+______________________________ test_literal_probe ______________________________
+
+    def test_literal_probe() -> None:
+>       assert repr(element_parent(2)) == "sentinel: " + repr(type(2))
+E       assert 'Integer Ring' == "sentinel: <c...ement_class'>"
+E         
+E         - sentinel: <class 'sage_extensions.categories.rings.ring_foundation._OwnedRingParent_with_category.element_class'>
+E         + Integer Ring
+
+tests/rings/test_literal_probe_tmp.sage:8: AssertionError
+=========================== short test summary info ============================
+FAILED tests/rings/test_literal_probe_tmp.sage::test_literal_probe - assert '...
+1 failed in 2.30s
+[peakrss] run500-litprobe: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 260 MiB
+[peakrss] low-water MemAvail : 11462 MiB
+[peakrss] peak single VmHWM  : 260 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      249 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   260 MiB hwm=   260 MiB avail= 11462 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail= 12143 MiB

@@ -45,6 +45,20 @@ _CLASS_BOOKKEEPING = frozenset({
     "__slots__", "__annotations__", "__firstlineno__", "__static_attributes__",
 })
 
+# The Python names that construct an object, name its identity or serialize it.
+# A category level declares operations on the object's value; these belong to the
+# object's own class and its runtime, so a rebuild keeps them where they are.
+# ``__call__`` is a parent's element constructor and ``__init_extra__`` this
+# library's own construction hook.
+_RUNTIME_OWNED_NAMES = frozenset({
+    "__init__", "__init_subclass__", "__new__", "__prepare__", "__call__",
+    "__eq__", "__ne__", "__hash__",
+    "__reduce__", "__reduce_ex__", "__getstate__", "__setstate__",
+    "__copy__", "__deepcopy__",
+    "__getattr__", "__getattribute__", "__setattr__", "__delattr__",
+    "__class_getitem__", "__init_extra__",
+})
+
 
 @cached_function
 def _owned_mixins(category: Category, attr: str) -> tuple[type, ...]:
@@ -268,9 +282,10 @@ def _final_category_operations(
     A name ``built`` resolves to a realization outside these providers keeps
     that realization: this orders the category's own levels, and a computation
     the category leaves to its realizations is not one of them.  Names are the
-    public ones, a Python protocol operation such as ``__truediv__`` among
-    them; a single-underscore name is a construction hook and stays on the
-    provider that declared it.
+    public ones and the Python protocol operations on the object's value, a
+    ``__truediv__`` among them; a single-underscore name is a construction hook
+    and stays on the provider that declared it, and so does a dunder that
+    constructs the object or names its identity (``_is_bookkeeping_or_hook``).
     """
     known = frozenset(providers)
     resolved = _declaring_classes(built)
@@ -298,40 +313,21 @@ def _declaring_classes(built: type) -> dict[str, type]:
 
 
 def _is_bookkeeping_or_hook(name: str) -> bool:
-    r"""Whether ``name`` describes the class itself, or is a construction hook."""
-    if name in _CLASS_BOOKKEEPING:
+    r"""Whether ``name`` describes the class itself, or is not an operation of a category.
+
+    The class bookkeeping names describe the class rather than an object of it.
+    A single-underscore name is a construction hook -- ``_element_constructor_``,
+    ``_coerce_map_from_`` -- and stays on the provider that declared it, so
+    ``run_construction_hooks`` still executes each level exactly once.  A dunder
+    is a Python protocol name, and most of them are operations on the object's
+    value, which is what a category level declares: ``__truediv__`` is the one
+    whose order the ring and module levels disagree about.  The ones that
+    construct the object or name its identity are not: they belong to the
+    object's own class, and :data:`_RUNTIME_OWNED_NAMES` lists them.
+    """
+    if name in _CLASS_BOOKKEEPING or name in _RUNTIME_OWNED_NAMES:
         return True
     return name.startswith("_") and not name.startswith("__")
-
-
-def _realization_operations(providers: tuple[type, ...], built: type) -> dict[str, object]:
-    r"""Return the operations ``built``'s own realization supplies, by name.
-
-    An element class pairs a realization with the methods of its category levels,
-    and the realization is where the object's own data is implemented; a level
-    states what the category adds to it.  A refinement prepends the newly reached
-    category methods to the whole native class, and so to the realization as
-    well, which can leave a general category's operation in front of the
-    realization's own.  A ring's division is that case: an engine-backed ring
-    divides an element in its engine and reads the divisor along its canonical
-    map, while the scalar division of a module over the ring is another
-    operation, and the ring is refined into that module.  So a name a preamble
-    realization of ``built`` supplies is resolved by it, and only the names no
-    realization supplies are the category's to order.
-    """
-    known = frozenset(providers)
-    realization: dict[str, type] = {}
-    for implemented in built.__mro__:
-        if implemented in known or not implemented.__module__.startswith(_PREAMBLE_PACKAGE):
-            continue
-        for name in vars(implemented):
-            realization.setdefault(name, implemented)
-    resolved = _declaring_classes(built)
-    return {
-        name: vars(declarer)[name]
-        for name, declarer in realization.items()
-        if resolved[name] is not declarer and not _is_bookkeeping_or_hook(name)
-    }
 
 
 def _rebuild_element_class(parent: Parent, category: Category) -> None:
@@ -355,8 +351,6 @@ def _rebuild_element_class(parent: Parent, category: Category) -> None:
         (*mixins, native),
         doccls=native,
     )
-    for name, value in _realization_operations(providers, element_class).items():
-        setattr(element_class, name, value)
     for name, value in _final_category_operations(providers, carried, element_class).items():
         setattr(element_class, name, value)
     _supply_participant_implementations(element_class, mixins, native)
