@@ -1,0 +1,5 @@
+=== ran on: 4adbc382432a5f8e41013df2b4f47ebc7dcf7da2 (0 modified paths)
+=== command: pytest tests/sets/test_a_description_is_asked_for_when_it_is_read.sage tests/lattices/test_a_subobject_asks_the_ambient_lattice_for_no_display.sage tests/lattices/test_a_plane_transport_builds_one_span.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.test_lint
+....                                                                     [100%]
+4 passed in 1.90s
+=== exit: 0

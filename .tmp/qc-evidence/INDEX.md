@@ -2493,3 +2493,40 @@ post-repair early median is 9.17 ms (-29%, matching the image's 23.1 of 72.8 ms
 profiled), and against the previous round's 13.9 ms mean at the same 0.362 s
 calibration this round's mean is 11.9 ms.  The walk is unchanged: 309.6 s here
 against 292.3 s there, at a higher load.
+
+## The same repair on the tree that now carries `main` (#541, 2026-11-16)
+
+`main` moved while the round ran: `0f7d1ad` brings three later commits, and
+`7eb5248` removed `owned_parent_class`'s memoization, which is the per-object
+class construction the transport's category objects use.  So the row was
+measured again, before and after the repair, on that base: two runs of the same
+probe minutes apart, whose span counts are the probe's own and whose loads are
+in the logs.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541r2-green-merged.log` | `4adbc38` (the merge) | the three contract files on the merged tree: **4 passed in 1.90 s**, test lint loaded |
+| `541r2-sets-merged-base.log`, `541r2-sets-merged.log` | `0f7d1ad` / `4adbc38` | `tests/sets` on the merged base: 10 failed, **66 passed** and 102 errors against 10 failed, **67 passed** and 102 errors; FAILED/ERROR id sets identical |
+| `541r2-modules-merged-base.log`, `541r2-modules-merged.log` | same | `tests/modules` on the merged base: 63 failed, 182 passed, 69 errors on both trees, FAILED/ERROR id sets identical |
+| `541r2-transport-probe-merged.log` | `4adbc38` | the transport probe on the merged tree: **1** span construction a transport, the basis images in the moved plane, `e_1` outside it |
+| `541r2-calibration-merged.log` | `4adbc38` | the fixed-work calibration: **0.359 s** against 0.362 s before the merge, so the two bases are on one machine speed |
+| `541r2-row-base-merged.log` | `0f7d1ad` (no repair) | the row at load **0.52 1.20 1.84**: first plane **330.5 s**, 13 000 planes by 502.1 s, the interval between transports a median of **11.65-11.69 ms**, and **26 543 span constructions for 13 000 planes = 2.04 a plane** |
+| `541r2-row-merged.log` | `4adbc38` | the row at load **1.51 1.87 2.29**: first plane **327.3 s**, 14 000 planes by 491.7 s, median interval **10.44-10.45 ms**, **1.04 span constructions a plane** |
+| `541r2-row-merged-second.log` | `4adbc38` | the same run again at load **1.34 1.31 1.65**: first plane **302.0 s**, **20 000 planes by 533.5 s (86.4 planes/s, 11.6 ms a plane)**, median interval **10.17 ms early and 10.43 ms by plane 20 000**, **20 546 span constructions for 20 000 planes = 1.03 a plane** |
+
+What the pair says.  The load-free number is the span count: **2.04 -> 1.03**
+constructions a plane, which is the contract the repair states.  The per-plane
+time moved from a median of 11.69 ms at load 0.52 to 10.43 ms at load 1.34 --
+-11% while carrying two and a half times the load -- and the two earlier
+pre-merge runs, on a tree that still memoized `owned_parent_class`, moved
+12.86 -> 9.17 ms (-29%).  The difference between the two percentages is the
+memoization's removal: the category construction the transport still does per
+plane grew, so the span it no longer builds is a smaller share of the step.  The
+walk is untouched by the repair and its first-plane time is the machine's: 330.5 s
+at load 0.52 and 302.0-327.3 s at 1.34-1.51.
+
+What is still owed, and is not this repair's: the row's mean is worse than its
+median because RSS grows to 4.4 GiB as the 189 720 orbits are retained, so the
+walk's late planes pay for the memory it is keeping (9.17 -> 9.68 ms across
+19 000 planes before the merge).  That growth is the row materialising every
+orbit, not the transport.

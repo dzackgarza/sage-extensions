@@ -1,0 +1,13 @@
+=== tree: 4adbc382432a5f8e41013df2b4f47ebc7dcf7da2 (modified paths: 0)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== load: 0.72 0.96 1.34 1/317 2374574
+=== command: sage-image/run.sh -w /work, probe probe541calibration.py at /probe.py, inner 540 s, outer 570 s
+calibration 0.359 s
+[peakrss] run: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 13636 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       1 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13636 MiB
+=== launcher exit: 0

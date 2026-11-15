@@ -1,0 +1,102 @@
+=== tree: 0f7d1ad1b8e5851e587c1d65b658ed9ad5f9835e (modified paths: 0)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== load: 0.52 1.20 1.84 1/339 2370956
+=== command: sage-image/run.sh -w /work, probe probe541row2.py at /probe.py, inner 540 s, outer 570 s
+row: {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 11 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]} on rank 11
+before the row 1.5 s, planes transported 0, span constructions 0
+  [tick 1000] 343.8 s, planes transported 1000, span constructions 2543
+  [tick 1000] first plane at 330.5 s, 0.00 planes/s over the walk (206754.1 ms a plane)
+  [tick 1000] interval between transports: median 11.79 ms, last 11.74 ms
+  [tick 2000] 356.5 s, planes transported 2000, span constructions 4543
+  [tick 2000] first plane at 330.5 s, 0.01 planes/s over the walk (103331.7 ms a plane)
+  [tick 2000] interval between transports: median 11.77 ms, last 11.83 ms
+  [tick 3000] 369.3 s, planes transported 3000, span constructions 6543
+  [tick 3000] first plane at 330.5 s, 0.01 planes/s over the walk (68880.6 ms a plane)
+  [tick 3000] interval between transports: median 11.69 ms, last 12.26 ms
+  [tick 4000] 382.5 s, planes transported 4000, span constructions 8543
+  [tick 4000] first plane at 330.5 s, 0.02 planes/s over the walk (51659.4 ms a plane)
+  [tick 4000] interval between transports: median 11.69 ms, last 11.50 ms
+  [tick 5000] 395.9 s, planes transported 5000, span constructions 10543
+  [tick 5000] first plane at 330.5 s, 0.02 planes/s over the walk (41328.2 ms a plane)
+  [tick 5000] interval between transports: median 11.66 ms, last 11.76 ms
+  [tick 6000] 409.7 s, planes transported 6000, span constructions 12543
+  [tick 6000] first plane at 330.5 s, 0.03 planes/s over the walk (34441.3 ms a plane)
+  [tick 6000] interval between transports: median 11.65 ms, last 11.50 ms
+  [tick 7000] 421.4 s, planes transported 7000, span constructions 14543
+  [tick 7000] first plane at 330.5 s, 0.03 planes/s over the walk (29522.1 ms a plane)
+  [tick 7000] interval between transports: median 11.64 ms, last 11.29 ms
+  [tick 8000] 435.7 s, planes transported 8000, span constructions 16543
+  [tick 8000] first plane at 330.5 s, 0.04 planes/s over the walk (25833.1 ms a plane)
+  [tick 8000] interval between transports: median 11.65 ms, last 11.47 ms
+  [tick 9000] 447.5 s, planes transported 9000, span constructions 18543
+  [tick 9000] first plane at 330.5 s, 0.04 planes/s over the walk (22963.8 ms a plane)
+  [tick 9000] interval between transports: median 11.65 ms, last 11.69 ms
+  [tick 10000] 462.5 s, planes transported 10000, span constructions 20543
+  [tick 10000] first plane at 330.5 s, 0.05 planes/s over the walk (20668.7 ms a plane)
+  [tick 10000] interval between transports: median 11.65 ms, last 11.51 ms
+  [tick 11000] 474.4 s, planes transported 11000, span constructions 22543
+  [tick 11000] first plane at 330.5 s, 0.05 planes/s over the walk (18790.6 ms a plane)
+  [tick 11000] interval between transports: median 11.67 ms, last 11.88 ms
+  [tick 12000] 486.3 s, planes transported 12000, span constructions 24543
+  [tick 12000] first plane at 330.5 s, 0.06 planes/s over the walk (17225.6 ms a plane)
+  [tick 12000] interval between transports: median 11.68 ms, last 12.67 ms
+  [tick 13000] 502.1 s, planes transported 13000, span constructions 26543
+  [tick 13000] first plane at 330.5 s, 0.06 planes/s over the walk (15901.7 ms a plane)
+  [tick 13000] interval between transports: median 11.69 ms, last 11.49 ms
+  [tick 14000] 513.9 s, planes transported 14000, span constructions 28543
+  [tick 14000] first plane at 330.5 s, 0.07 planes/s over the walk (14766.6 ms a plane)
+  [tick 14000] interval between transports: median 11.69 ms, last 11.62 ms
+  [tick 15000] 525.7 s, planes transported 15000, span constructions 30543
+  [tick 15000] first plane at 330.5 s, 0.07 planes/s over the walk (13782.9 ms a plane)
+  [tick 15000] interval between transports: median 11.69 ms, last 11.72 ms
+  [tick 16000] 537.7 s, planes transported 16000, span constructions 32543
+  [tick 16000] first plane at 330.5 s, 0.08 planes/s over the walk (12922.1 ms a plane)
+  [tick 16000] interval between transports: median 11.70 ms, last 12.13 ms
+------------------------------------------------------------------------
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x86e5) [0x7c531119c6e5]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8786) [0x7c531119c786]
+/sage/.venv/lib/python3.14/site-packages/cysignals/signals.cpython-314-x86_64-linux-gnu.so(+0x8b54) [0x7c531119cb54]
+/lib/x86_64-linux-gnu/libc.so.6(+0x3fd70) [0x7c5312e9fd70]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa06a6) [0x7c5312f006a6]
+/lib/x86_64-linux-gnu/libc.so.6(+0xa1eeb) [0x7c5312f01eeb]
+/lib/x86_64-linux-gnu/libc.so.6(malloc+0xfe) [0x7c5312f029ce]
+/sage/.venv/bin/python() [0x1801f09]
+/sage/.venv/bin/python() [0x185b5f6]
+/sage/.venv/bin/python() [0x185b327]
+/sage/.venv/bin/python() [0x1810537]
+/sage/.venv/bin/python() [0x1817bc6]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x17ce1) [0x7c531136dce1]
+/sage/.venv/lib/python3.14/site-packages/sage/cpython/string.cpython-314-x86_64-linux-gnu.so(+0x53cd) [0x7c5312a953cd]
+/sage/.venv/bin/python() [0x1ac3558]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x109af) [0x7c53113669af]
+/sage/.venv/lib/python3.14/site-packages/sage/misc/cachefunc.cpython-314-x86_64-linux-gnu.so(+0x49907) [0x7c531139f907]
+/sage/.venv/bin/python() [0x1822fe1]
+/sage/.venv/bin/python() [0x1892a83]
+/sage/.venv/bin/python(PyEval_EvalCode+0xa6) [0x18936bc]
+/sage/.venv/bin/python() [0x1929339]
+/sage/.venv/bin/python() [0x1a7109b]
+/sage/.venv/bin/python() [0x1a70c41]
+/sage/.venv/bin/python() [0x19835c6]
+/sage/.venv/bin/python() [0x198350e]
+/sage/.venv/bin/python() [0x198341d]
+/sage/.venv/bin/python(Py_RunMain+0x40c) [0x198404c]
+/sage/.venv/bin/python() [0x1983c16]
+/sage/.venv/bin/python() [0x1983a70]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29ca8) [0x7c5312e89ca8]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x85) [0x7c5312e89d65]
+/sage/.venv/bin/python(_start+0x29) [0x19f75e9]
+------------------------------------------------------------------------
+[peakrss] run: child waited=124 shell_code=124 samples=270
+[peakrss] peak tree RSS      : 4082 MiB
+[peakrss] low-water MemAvail : 9346 MiB
+[peakrss] peak single VmHWM  : 4082 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     4071 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   538.2s procs=  3 rss=  4082 MiB hwm=  4082 MiB avail= 10122 MiB
+[peakrss]   t=   536.2s procs=  3 rss=  4055 MiB hwm=  4055 MiB avail= 10143 MiB
+[peakrss]   t=   534.2s procs=  3 rss=  4028 MiB hwm=  4028 MiB avail= 10161 MiB
+[peakrss]   t=   532.2s procs=  3 rss=  4000 MiB hwm=  4000 MiB avail= 10182 MiB
+[peakrss]   t=   530.2s procs=  3 rss=  3973 MiB hwm=  3973 MiB avail= 10205 MiB
+=== launcher exit: 124
