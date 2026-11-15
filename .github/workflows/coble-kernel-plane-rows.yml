@@ -67,3 +67,4 @@ jobs:
           path: .timings/
           retention-days: 90
           if-no-files-found: error
+          include-hidden-files: true
