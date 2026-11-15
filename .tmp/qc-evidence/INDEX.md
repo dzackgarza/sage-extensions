@@ -2530,3 +2530,9 @@ median because RSS grows to 4.4 GiB as the 189 720 orbits are retained, so the
 walk's late planes pay for the memory it is keeping (9.17 -> 9.68 ms across
 19 000 planes before the merge).  That growth is the row materialising every
 orbit, not the transport.
+
+The tree that was pushed is `6b4d623` (the merge of `0f7d1ad` and `#540`'s two
+algebra commits onto this round's work).  `541r2-green-pushed.log` is the three
+contract files on it: **4 passed in 1.74 s** with the test lint loaded.  The row
+is measured on `4adbc38`, the same tree without `#540`'s two algebras commits,
+which are not on the transport's path.
