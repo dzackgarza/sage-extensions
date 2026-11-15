@@ -33,16 +33,25 @@ is never a claim about which commit produced it: the commit is in its name and
 in every line.
 
 **What a record line holds.**  ``stage`` (the name), ``input`` (the name of what
-was computed), ``seconds`` (wall time, ``time.perf_counter``), ``started`` and
+was computed, read off the object and never rendered from it), ``seconds``
+(wall time, ``time.perf_counter``), ``started`` and
 ``finished`` (UTC, ISO 8601), ``outcome`` (``"returned"`` or ``"raised"``, with
 ``error`` naming the exception class), ``commit``, ``run`` (the process's start
 stamp, which is the file's own name) and ``pid``.
 
 **What it costs when nobody reads it.**  A stage is two ``perf_counter``
-readings, the rendering of its input's name, and one appended line.  Nothing is
+readings, the reading of its input's name, and one appended line.  Nothing is
 measured per element, no computation is re-run to time it, and the handler is
 added on the first record rather than at import, so importing the library writes
 nothing.
+
+**The input is named, not rendered.**  ``repr`` is a computation, and for a
+lattice it is an invariant one: ``Lattices``'s ``_repr_`` states the signature,
+which it reads off the form.  Naming an input that way would put a
+diagonalization inside a log line's cost, and a rendering that raised would take
+a measured call down for the record's sake.  So an object states its own cheap
+name with ``_timing_name`` — the lattice's is ``Integral lattice of rank 11`` —
+and an object that states none is recorded by the name of its class.
 
 **Which logger it is.**  ``sage_extensions.timing``, a child of the package's
 logger and nobody else's: this module sets that child's level and leaves
@@ -201,8 +210,19 @@ def _installed_handler() -> _JSONLineHandler:
 
 
 def _named(target) -> str:
-    r"""The input's name: a string as given, anything else by its own rendering."""
-    text = target if isinstance(target, str) else repr(target)
+    r"""The input's name: a string as given, else the cheap name the object states.
+
+    Nothing is rendered.  ``repr`` is a computation and, on this library's
+    lattices, an invariant one — the display states the signature, read off the
+    form — so an object that can be named for nothing states the name with
+    ``_timing_name``, and one that states none is named by its class.  Either way
+    a stage's cost is a clock reading, not a rendering.
+    """
+    if isinstance(target, str):
+        text = target
+    else:
+        stated = getattr(target, "_timing_name", None)
+        text = type(target).__name__ if stated is None else stated()
     text = " ".join(text.split())
     return text if len(text) <= _INPUT_LIMIT else text[: _INPUT_LIMIT - 1] + "…"
 
@@ -219,10 +239,11 @@ def stage(name: str, input):
 
     ``name`` is the stage — ``"ambient O(L) row"``, ``"coset walk and
     transport"`` — and ``input`` is what the stage was computed for, kept by
-    :func:`_named`, so a string passed here is recorded verbatim and any other
-    object by its own rendering.  The record is written when the block ends,
-    whether it returned or raised, and the exception is re-raised unchanged:
-    timing a stage is not a place to close an error.
+    :func:`_named`: a string passed here is recorded verbatim, an object by the
+    name it states with ``_timing_name``, and one that states none by its class.
+    The record is written when the block ends, whether it returned or raised, and
+    the exception is re-raised unchanged: timing a stage is not a place to close
+    an error.
     """
     entry = {
         "stage": name,
@@ -276,17 +297,18 @@ def timed_stage(name: str, *, input):
     return decorate
 
 
-def read_stage_records(path=None, *, after: int = 0) -> tuple[dict, ...]:
+def read_stage_records(path: str | Path, *, after: int = 0) -> tuple[dict, ...]:
     r"""The stage records in ``path``, from byte offset ``after`` onward.
 
-    ``path`` defaults to this process's own record file; ``after`` is how a
-    reader takes the records one call appended without parsing the ones before
-    it.  A missing file is no records, never an error: a run that reached no
-    measured stage has nothing to say.
+    ``path`` is a record file, named as :func:`record_path` names this process's
+    own.  ``after`` is how a reader takes the records one call appended without
+    parsing the ones before it.
+
+    A file that is not there raises.  A record is read because a run was asked
+    what it measured, and an empty tuple would answer "it measured nothing" for
+    a file the caller named and the run never wrote — the two are different
+    findings and only one of them is true.
     """
-    location = record_path() if path is None else Path(path)
-    if not location.is_file():
-        return ()
-    with location.open("r", encoding="utf-8") as handle:
+    with Path(path).open("r", encoding="utf-8") as handle:
         handle.seek(after)
         return tuple(json.loads(line) for line in handle if line.strip())

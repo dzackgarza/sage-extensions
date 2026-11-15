@@ -45,7 +45,7 @@ class ProbeRun:
     ``failed``; ``messages`` holds the failure messages, so a test can ask
     which file a finding was reported against; ``transcript`` is the run's own
     output, where a plugin writes a measurement that fails no test; ``log`` is
-    the file its ``log_file`` setting named, empty when it named none, which is
+    the file the probe's own configuration names with ``log_file``, which is
     where a library's own logging configuration decides whether a record
     arrives.
     """
@@ -64,12 +64,15 @@ def probe_run(tree: dict[str, str], *arguments: str) -> ProbeRun:
     pytest's own, the plugin under test among them.  The probe directory
     carries its own ``pytest.ini``, so the repository's ``addopts`` do not
     reach the run: each plugin is loaded only when a test asks for it, and
-    nothing written there is linted or gated by the outer run.
+    nothing written there is linted or gated by the outer run.  That
+    configuration names the run's log ``pytest.log``, so every probe writes the
+    file :attr:`ProbeRun.log` reads and a run that writes none is an error
+    rather than an empty string.
     """
     PROBE_ROOT.mkdir(parents=True, exist_ok=True)
     root = Path(tempfile.mkdtemp(prefix="probe-", dir=PROBE_ROOT))
     try:
-        (root / "pytest.ini").write_text("[pytest]\n")
+        (root / "pytest.ini").write_text("[pytest]\nlog_file = pytest.log\n")
         for name, source in tree.items():
             (root / name).write_text(source)
         report = root / "report.jsonl"
@@ -96,7 +99,7 @@ def probe_run(tree: dict[str, str], *arguments: str) -> ProbeRun:
                 message for message in map(_failure_message, records) if message
             ),
             transcript=completed.stdout + completed.stderr,
-            log=written.read_text() if written.is_file() else "",
+            log=written.read_text(),
         )
     finally:
         shutil.rmtree(root)

@@ -1,6 +1,7 @@
 name: README example
-# The README example is the smallest acceptance: it runs as a doctest on
-# every push, inside the shared Sage image.
+# The README example is the smallest acceptance: it runs on every push, under
+# this repository's own pytest configuration so that the run keeps its timing
+# record (CONTRIBUTING.md ENV-03), inside the shared Sage image.
 on:
   push: {}
   workflow_dispatch: {}
@@ -31,9 +32,13 @@ jobs:
           uv pip install --quiet --python "$sage_python" "sage-julia-bridge @ git+https://github.com/dzackgarza/sage-julia-bridge"
           uv pip install --quiet --python "$sage_python" --no-deps -e .
       - name: Run the README example
+        # Under the repository's own addopts, which load the timing plugin: the
+        # bare `python -m doctest README.md` this step used to run loaded no
+        # plugin and wrote no .timings/, so the upload below had nothing to
+        # upload and failed a green run.
         run: |
           sage_python="$("$SAGE_BIN" -c 'import sys; print(sys.executable)')"
-          "$sage_python" -m doctest README.md
+          "$sage_python" -m pytest --doctest-glob=README.md README.md
       # The run's own timing record (CONTRIBUTING.md ENV-03): the test run's
       # report log and JUnit file as the run's plugin copied them into
       # .timings/, and the stage records the library appended as it computed.

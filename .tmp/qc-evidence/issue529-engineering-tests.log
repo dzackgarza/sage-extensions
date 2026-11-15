@@ -1,0 +1,21 @@
+tree SHA: 5e15399a8bae66cc25d7f87b55d57ab31128c29d
+port SHA: 991b88b0
+inner 560 s, outer 620 s, guard 6144 MiB
+command: /sage/.venv/bin/python -u -s -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q tests/engineering/test_the_timing_record_names_each_stage.py; echo pytest-exit=$?
+.....                                                                    [100%]
+5 passed in 5.26s
+pytest-exit=0
+[peakrss] ev529: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 812 MiB
+[peakrss] low-water MemAvail : 9862 MiB
+[peakrss] peak single VmHWM  : 812 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      456 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     6.0s procs=  7 rss=   812 MiB hwm=   812 MiB avail=  9862 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   585 MiB hwm=   585 MiB avail= 10008 MiB
+[peakrss]   t=     2.0s procs=  4 rss=   440 MiB hwm=   440 MiB avail= 10082 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     3 MiB avail= 10567 MiB
+launcher exit: 0
