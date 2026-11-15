@@ -1,0 +1,19 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt500/.tmp/probe500l.py
+tree SHA: 9fb6b396382e9842967c1f9a6bc4695be4ed264a
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 200 s, outer 260 s, guard 6144 MiB, args ''
+Modules.Free: TypeError: integer content requires a free module over ZZ
+FramedFreeModules: TypeError: integer content requires a free module over ZZ
+answering: TypeError: integer content requires a free module over ZZ
+[peakrss] p500l: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 231 MiB
+[peakrss] low-water MemAvail : 4571 MiB
+[peakrss] peak single VmHWM  : 231 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      220 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   run.sh                        7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   231 MiB hwm=   231 MiB avail=  4571 MiB
+[peakrss]   t=     0.0s procs=  2 rss=    15 MiB hwm=    15 MiB avail=  4733 MiB
+launcher exit: 0

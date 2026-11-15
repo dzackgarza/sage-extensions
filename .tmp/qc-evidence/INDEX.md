@@ -1753,3 +1753,12 @@ repository addopts: `500e-merged-tests.log`, **13 passed in 3.61 s**. The four-d
 sweep on the merged tree was started and cut by the inner 550 s cap with no ids printed
 (`merged-sweep.log`, session-only, not published): the VM was carrying other work at that
 moment, so the merged tree has the five files' run and not a directory comparison.
+
+One collateral level move the repair makes is `primitive_part` on `QQ(i)`, `ZZ['x']`
+and `QQ['x']` (from `Modules.Free.ElementMethods` to the framed level). Two probes
+record what its value does: `500e-primitive-part-values.log` (the framed reading's
+value is the one the answering method returns on `ZZ['x']` at `2x+2` and at
+`6x^2+9x`, `x + 1` and `2*x^2 + 3*x`) and `500e-primitive-part-over-qq.log` (over
+`QQ`, both implementations and the answering one raise the same `TypeError:
+integer content requires a free module over ZZ`, so the move changes no answer
+there).
