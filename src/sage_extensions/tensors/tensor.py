@@ -471,6 +471,13 @@ class Tensor:
             return False
         if Infinity in self._index_ranks():
             return self is other
+        ring = self.base_ring()
+        if other.base_ring() is ring and _engine_ring(ring).is_exact() is True:
+            # Exact engine equality decides each component.
+            return all(
+                _engine_element(ring, left) == _engine_element(ring, right)
+                for left, right in zip(self._flat_components(), other._flat_components(), strict=True)
+            )
         return all(
             left == right
             for left, right in zip(self._flat_components(), other._flat_components(), strict=True)

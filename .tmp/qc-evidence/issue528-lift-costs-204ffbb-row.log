@@ -1,0 +1,27 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue528-lift-test-cost.py
+tree SHA: 204ffbb96ef6f6502e126e93f671628b823c988f
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 300 s, outer 360 s, guard 6144 MiB, args 'row cap=240'
+[    0.0s] instrumented: _fraction_equality_status=False, _lift_at=True, _preimage_or_none=False, _target_section=False, base_point=False, eichler_transvection=True, eichler_transvection_matrix=True, factor_through_or_none=False, integral_restriction=False, is_integral_on=False, parameterization=True
+[    0.0s] lattice Integral lattice of rank 11 and signature (2, 9)
+[  240.0s] the row did not return inside its 240 s cap
+[  240.0s] 
+[  240.0s] the ambient row: 240.0 s, decided False
+[  240.0s]   call                                 calls   seconds
+[  240.0s]   _lift_at                              1362   183.669
+[  240.0s]   eichler_transvection                  1362    40.287
+[  240.0s]   parameterization                         2     0.175
+[  240.0s] RESULT row_seconds=240.0 decided=False _lift_at=1362 eichler_transvection=1362 parameterization=2
+[peakrss] p528row2: child waited=2 shell_code=2 samples=122
+[peakrss] peak tree RSS      : 553 MiB
+[peakrss] low-water MemAvail : 13431 MiB
+[peakrss] peak single VmHWM  : 553 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      542 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   242.1s procs=  3 rss=   553 MiB hwm=   553 MiB avail= 13634 MiB
+[peakrss]   t=   234.1s procs=  3 rss=   552 MiB hwm=   552 MiB avail= 13634 MiB
+[peakrss]   t=   236.1s procs=  3 rss=   552 MiB hwm=   552 MiB avail= 13634 MiB
+[peakrss]   t=   238.1s procs=  3 rss=   552 MiB hwm=   552 MiB avail= 13634 MiB
+[peakrss]   t=   240.1s procs=  3 rss=   552 MiB hwm=   552 MiB avail= 13634 MiB

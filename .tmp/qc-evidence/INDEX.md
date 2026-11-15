@@ -1883,3 +1883,18 @@ the point pair the family hash must not separate; it stopped at
 `NameError: name 'vector' is not defined` under the session import, so no such
 row is claimed, and the test uses a tuple and a subclass of it with no hash
 instead.
+## #528, second round: are the lift tests more numerous, or dearer?
+
+`204ffbb96e` corrected the integral locus' Smith reading *and* replaced its per-class test: the
+old test formed, per class, `eichler_transvection_matrix(f, s(a)) * base_images` with
+`base_images` computed once for the lattice; the new one composes the owned isometries,
+`eichler_transvection(f, s(a)) * base_point()`, and asks the composition for its
+`integral_restriction`. The two explanations have different owners, so one probe counts both.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue528-lift-test-cost.py` | base `a71272add9`, `204ffbb96e` | the probe: one file, run unchanged on both trees. It calls the same public entry at both, `IsotropicReductionLiftTorsors.integral_parameter_classes()`, on the commit's own control `U(2) + U(2) + <2>` (the one where #405 reproduced: 64 classes reported, 32 lifting), wraps by name the calls the test can make (`eichler_transvection`, `eichler_transvection_matrix`, `integral_restriction`, `is_integral_on`, `_preimage_or_none`, `factor_through_or_none`, `_fraction_equality_status`, `_lift_at`, `parameterization`, `base_point`, `_target_section`) and reports a name a tree does not have as absent rather than as zero. Its `row` mode runs the same instrumentation over T_Co's ambient plane row, capped, and prints the counts whether the row returns or not |
+| `issue528-lift-cost-base-control.log` | base `a71272add9` | the control: locus **0.042 s**, **2** classes tested, each by `eichler_transvection_matrix` -- **20.97 ms a test**, no composition, no `integral_restriction` |
+| `issue528-lift-cost-204ffbb-control.log` | `204ffbb96e` | the same control: locus **0.165 s**, **8** classes tested, each by `_lift_at` (composition) -- **20.6 ms a test**. On the rank-5 control the count went up 4x and the per-test cost did **not** move: the control alone would have said the cost is owed |
+| `issue528-lift-costs-base-row.log` | base `a71272add9` | T_Co's ambient plane row, **61.3 s and decided**: **1536 lift tests**, `eichler_transvection_matrix` 3.43 s in total, **2.23 ms a test**, `parameterization` 0.63 s over 5 calls |
+| `issue528-lift-costs-204ffbb-row.log` | `204ffbb96e` | the same row, capped at 240 s and **not returned**: **1362 lift tests**, `_lift_at` **183.67 s of the 240** -- **134.9 ms a test**, of which `eichler_transvection` is 40.29 s (29.6 ms), so **105 ms a test is the composition and the integral restriction**. The count is the same order as the base's 1536 (the base finished its whole row with it); the per-test cost is **61x**. The question is decided for dearer tests, and the rank-5 control was the wrong input to decide it on |

@@ -1937,10 +1937,14 @@ class LocalizationRings(OwnedCategory):
             source_engine = _engine_ring(source)
             decoder = self._localization_engine_source_decoder
             if decoder is not None:
-                return self.fraction(
+                # The engine's reduced denominator is a unit of its own
+                # realization of this localization, so it is admitted.
+                result = self._fraction_with_admitted_denominator(
                     decoder(represented.numerator()),
                     decoder(represented.denominator()),
                 )
+                result._engine_value = represented
+                return result
 
             # A localization of a quotient is realized privately by the
             # standard finite presentation
@@ -1972,20 +1976,29 @@ class LocalizationRings(OwnedCategory):
                             term *= inverses[position] ** int(exponent)
                     result += term
                 return result
-            return self.fraction(
+            result = self._fraction_with_admitted_denominator(
                 _owned_engine_element(source, source_engine(represented.numerator())),
                 _owned_engine_element(source, source_engine(represented.denominator())),
             )
+            result._engine_value = represented
+            return result
 
         def _engine_element(self, value):
             engine = self._preamble_engine_ring
             assert engine is not None, (
                 f"cannot compute with {value} in the localization {self}: it has no computer-algebra model"
             )
+            # An element raised from the engine retains its engine value.
+            if element_parent(value) is self:
+                retained = value.__dict__.get("_engine_value")
+                if retained is not None:
+                    return retained
             element = self(value)
             encoder = self._localization_engine_source_encoder
             if encoder is not None:
-                return encoder(element.numerator()) / encoder(element.denominator())
+                lowered = encoder(element.numerator()) / encoder(element.denominator())
+                element._engine_value = lowered
+                return lowered
             numerator = _engine_element(self.localization_source(), element.numerator())
             denominator = _engine_element(self.localization_source(), element.denominator())
             source_engine = _engine_ring(self.localization_source())
@@ -2073,10 +2086,18 @@ class LocalizationRings(OwnedCategory):
             return super()._descend_coefficient_from_presentation(value)
 
         def zero(self):
-            return self.fraction(self.localization_source().zero())
+            retained = self.__dict__.get("_localization_zero")
+            if retained is None:
+                retained = self.fraction(self.localization_source().zero())
+                self._localization_zero = retained
+            return retained
 
         def one(self):
-            return self.fraction(self.localization_source().one())
+            retained = self.__dict__.get("_localization_one")
+            if retained is None:
+                retained = self.fraction(self.localization_source().one())
+                self._localization_one = retained
+            return retained
 
         def characteristic(self):
             r"""Return the characteristic of ``S^{-1}R``, decided in the source ring.
@@ -7722,7 +7743,7 @@ def _own_ring(ring):
     construction.  Thus ``ZZ.base_ring() is ZZ`` and every morphism
     ``R[G] -> R`` finds one common base ring.
     """
-    if ring in OwnedRings():
+    if isinstance(ring, _OwnedRingParent) or ring in OwnedRings():
         return ring
     if ring not in SageRings():
         raise TypeError(f"{ring} is not a ring")
@@ -7923,7 +7944,20 @@ def _engine_ring(ring):
     return engine
 
 
+_LINEAR_ALGEBRA_RINGS = {}
+
+
 def _linear_algebra_ring(ring):
+    r"""The selected generic linear-algebra parent of ``ring``, chosen once per ring object."""
+    retained = _LINEAR_ALGEBRA_RINGS.get(id(ring))
+    if retained is not None and retained[0] is ring:
+        return retained[1]
+    chosen = _choose_linear_algebra_ring(ring)
+    _LINEAR_ALGEBRA_RINGS[id(ring)] = (ring, chosen)
+    return chosen
+
+
+def _choose_linear_algebra_ring(ring):
     r"""Choose exact scalar arithmetic for generic linear algebra.
 
     An exact field may select a symbolic computation ring whose parent
