@@ -64,7 +64,7 @@ def test_the_second_ask_for_a_hash_constructs_nothing() -> None:
 
 
 def test_equal_sets_hash_equally() -> None:
-    r"""Two builds of one image are equal sets, so the retained hash agrees with ``==``."""
+    r"""Two builds of one image are equal sets, so their hashes agree with ``==``."""
     left = _image_set_recording_its_enumeration([])
     right = _image_set_recording_its_enumeration([])
 
