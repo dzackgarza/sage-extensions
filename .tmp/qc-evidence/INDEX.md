@@ -1977,3 +1977,17 @@ below is green at that commit and not red.
 | `issue528-integrality-split.py` | -- | the per-lattice datum the ordered repair would cache: identity of the objects across two accesses, and the per-call cost and split of `integral_restriction` and `is_integral_on` |
 | `issue528-integrality-split.log` | `cff6a3a` | `ModulesOverIntegralDomains(ZZ)(L)` **is the same module**, its `generic_fibre_map()` **the same morphism**, `Modules(QQ).restriction_of_scalars(f)` **the same category**, and `_integral_extension_coordinate_span()` **the same datum** on a second access; `integral_restriction(L, L)` **3.61 ms** a call and `is_integral_on(L, L)` **2.66 ms** a call on the rank-5 control, both dominated by element and ring construction (`_element_constructor_`, `isinstance`, `__contains__`, `__classcall__`), not by a repeated frame. The profile of the T_Co row agrees: `_integral_extension_coordinate_span` is called twice per row at both trees |
 | `issue528-locus-nonidentity-test-on-0a55452.log` | `cff6a3a` | the new test `test_the_locus_at_a_non_identity_reduction_is_every_class_that_lifts` with the file's six others and the test lint plugin: **7 passed in 12.52 s** -- green, not red, at the commit under review |
+
+## #528, the restore of the per-class lift test and the row after it
+
+`0a55452cfa` replaced the locus' per-class lift test by the product `T * base_images`; its
+`base_images` is filled by rows (source-major entries into a `matrix(QQ, n_target, n_source, ...)`),
+so the product is `T * B^t`.  The restore puts back `_lift_at(coordinates).integral_restriction(source, target)`
+and deletes `lifts_integrally`, `base_images`, the per-call assertion and their imports.  The
+call-count test of the previous round counts calls of `base_point`, which the restored route makes
+once per class again, so it is removed with the mechanism it counted.
+
+| log | tree | result |
+| --- | --- | --- |
+| `issue528-locus-tests-restored.log` | `cff6a3a` + the restore | `tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage` with the test lint plugin: **6 passed in 13.24 s**, the new non-identity-reduction test included |
+| `issue528-row-after-restore.log` | `cff6a3a` + the restore | `T_Co`'s ambient plane row, cap 520 s: **did not return**; `_lift_at` **1536 calls, 162.155 s** and `eichler_transvection` **1536 calls, 30.851 s** inside the window -- about 105 ms a class, against the matrix test's row of 217.9 s (`issue528-repaired-row-counts.log`) |
