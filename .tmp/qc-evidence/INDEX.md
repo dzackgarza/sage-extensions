@@ -2177,3 +2177,17 @@ its reduction: even, primitive isotropic of divisibility two, base point not int
 | `issue528-transvection-tests-new.log` | the same worktree | `test_eichler_transvection_construction.sage`, `test_eichler_isometry_relations.sage`, `test_isotropic_reduction.sage` with the test lint: **12 passed in 2.67 s** |
 | `issue528-transvection-neighbours-base-9files.log` | `eb3aec7`, a clean worktree | the nine lattice files that mention `eichler_transvection`: **6 failed, 40 passed in 17.79 s** |
 | `issue528-transvection-neighbours-new9.log` | the tree this round pushes | the same nine: **6 failed, 41 passed in 15.65 s** -- the FAILED **ids** are identical to the base run's, and the extra pass is this file's second test |
+
+## #541, the plane row's per-plane cost: what one transport builds
+
+The census is on the smallest lattice of the row's kind whose plane transport
+costs more than 5 ms a plane: `U + U` (rank 4), at a median **10.59 ms cold**
+(span uncached) and **1.55 ms warm**. Each timed transport is of a fresh plane
+of a fresh equal lattice, so the span is built inside the timed region as the
+row builds it. Both logs are the probe's own output; the probe files sit beside
+them and the launcher is the one the header names.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-plane-transport-census.log` | `2291235` (main) | sections A-D: the cold/warm ladder on `U+U` (10.59 / 1.55 ms), `U+U+<-2>` (10.25 / 1.63) and `T_En` (13.95 / 2.09); one transport of one fresh plane under `setprofile` -- **35 567 calls, 1 span**, `_MorCategoryOf.Of` 111 calls 23.23 ms incl, `_declaring_classes` 15 calls 1.96 ms own, `OwnedCategory.__contains__` 942, `NaturalNumberSets` element constructions 1066; the unprofiled cold attribution (**13.07 ms a plane**, own ms: `_span_basis_elements` 1.88, `cokernel` 1.14, `Of` 1.02, `_lattice_subobject_on_basis` 0.86, `_declaring_classes` 0.30, `_owned_join_as_tuple` 0.37); the identity table |
+| `541-plane-datum-identity.log` | `2291235` (main) | which public datum is one object per parent: `L.gram_matrix()` **False**, `plane.embedded_module_generators()` **False**, and `module_generating_set`, `inclusion`, `cokernel`, `subobject_on`, `Mor(plane, L)` all **True**; per-call cost `gram_matrix` 604.55 us, `subobject_on` 1021.64 us, `embedded_module_generators` 10.99 us; the two `_span_basis_elements` calls of one transport see **different** families, so a family-keyed cache would not merge them |

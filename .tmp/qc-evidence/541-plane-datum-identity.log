@@ -1,0 +1,33 @@
+=== ran on: the worktree of 2291235e3d2c04d7ca5effb4b9c0f8b6cfaa5537 (main), port 991b88b0, pinned image 11.0.beta5
+=== command: the same launcher with PROBE=probe541id.py
+provider SHA: 2291235e3d2c04d7ca5effb4b9c0f8b6cfaa5537 (worktree)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe541id.py
+L.gram_matrix()                                      one object: False
+plane.embedded_module_generators()                   one object: False
+L.module_generating_set()                            one object: True
+plane.inclusion()                                    one object: True
+plane.inclusion().cokernel()                         one object: True
+L.subobject_on(family)                               one object: True
+L.module_category().Mor(plane, L)                    one object: True
+plane.embedded_module_generators()                      10.99 us a call
+L.gram_matrix()                                        604.55 us a call
+plane.inclusion().cokernel()                             0.01 us a call
+L.subobject_on(family)                                1021.64 us a call
+L.b(vector, vector)                                    105.28 us a call
+
+_span_basis_elements calls in one transport: 2
+  ((1, 0, 0, 0), (0, 0, 1, 0))
+  ((-1, 0, 0, 0), (0, 0, -1, 0))
+  all families equal: False
+[peakrss] probe541: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 297 MiB
+[peakrss] low-water MemAvail : 13025 MiB
+[peakrss] peak single VmHWM  : 297 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      286 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   297 MiB hwm=   297 MiB avail= 13025 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail= 13290 MiB
+launcher exit: 0
