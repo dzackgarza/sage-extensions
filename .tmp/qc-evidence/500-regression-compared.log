@@ -1,29 +1,32 @@
-=== regression: issue 500's tree against main 51310d6, one pytest process per directory per tree
-=== mine:    38274f799fd7c42dad240bde312a9751d47ae548  (the tree of this push)
-=== base:    51310d613cd8c27860c70ff2f3370fedc6a18f21  (main before this push)
+=== regression: issue 500's tree against main a71272a, one pytest process per directory per tree
+=== mine:    34980b870644034b195e904f15f98a4d0d290ea7  (the tree of this push; the code is 35c4f49)
+=== base:    a71272add96485c3e6ceeda07572bf40c5b2b5c0  (main before this push)
 === FAILED ids compared, never counts
 
-tests/rings    mine[75 failed, 257 passed in 36.16s] base[77 failed, 251 passed in 18.42s] only-mine[0] fixed[2]
+tests/rings    mine[74 failed, 258 passed in 36.94s] base[76 failed, 252 passed in 18.44s] only-mine[0] fixed[2]
     fixed     FAILED tests/rings/test_commutative_algebra.sage::test_affine_and_projective_plane_over_f5_have_the_textbook_point_counts_and_zeta_functions
     fixed     FAILED tests/rings/test_commutative_algebra.sage::test_polynomial_prime_localization_has_expected_residue_field
-tests/algebras mine[66 failed, 147 passed in 43.76s] base[66 failed, 147 passed in 44.56s] only-mine[0] fixed[0]
-tests/modules  mine[91 failed, 216 passed, 1 warning in 31.73s] base[91 failed, 216 passed, 1 warning in 34.28s] only-mine[0] fixed[0]
-tests/foundations mine[2 failed, 6 passed in 3.18s] base[2 failed, 6 passed in 3.24s] only-mine[0] fixed[0]
-tests/categories mine[61 failed, 56 passed in 9.64s] base[61 failed, 56 passed in 10.06s] only-mine[0] fixed[0]
-tests/sets     mine[33 failed, 123 passed in 4.53s] base[33 failed, 123 passed in 4.52s] only-mine[0] fixed[0]
-tests/objects  mine[123 failed, 203 passed in 36.22s] base[123 failed, 203 passed in 36.93s] only-mine[0] fixed[0]
-tests/forms    mine[48 failed, 93 passed in 380.69s (0:06:20)] base[48 failed, 93 passed in 529.46s (0:08:49)] only-mine[0] fixed[0]
-tests/divisors mine[42 failed, 25 passed in 17.59s] base[42 failed, 25 passed in 15.65s] only-mine[0] fixed[0]
-tests/schemes  mine[250 failed, 161 passed in 140.56s (0:02:20)] base[250 failed, 161 passed in 107.74s (0:01:47)] only-mine[0] fixed[0]
-tests/tensors  mine[19 failed, 24 passed in 2.10s] base[19 failed, 24 passed in 2.14s] only-mine[0] fixed[0]
-tests/topology mine[1 failed in 0.28s] base[1 failed in 0.25s] only-mine[0] fixed[0]
-tests/functions mine[49 failed, 14 passed in 3.92s] base[49 failed, 14 passed in 4.59s] only-mine[0] fixed[0]
-tests/engineering mine[4 failed, 4 passed in 31.98s] base[4 failed, 4 passed in 25.59s] only-mine[0] fixed[0]
+tests/algebras mine[64 failed, 149 passed in 44.54s] base[64 failed, 149 passed in 40.45s] only-mine[0] fixed[0]
+tests/modules  mine[82 failed, 225 passed, 1 warning in 30.15s] base[82 failed, 225 passed, 1 warning in 31.06s] only-mine[0] fixed[0]
+tests/foundations mine[2 failed, 6 passed in 3.13s] base[2 failed, 6 passed in 3.07s] only-mine[0] fixed[0]
+tests/categories mine[61 failed, 56 passed in 9.24s] base[61 failed, 56 passed in 9.08s] only-mine[0] fixed[0]
+tests/sets     mine[29 failed, 127 passed in 4.33s] base[29 failed, 127 passed in 4.32s] only-mine[0] fixed[0]
+tests/objects  mine[115 failed, 211 passed in 33.37s] base[115 failed, 211 passed in 33.42s] only-mine[0] fixed[0]
+tests/forms    mine[48 failed, 93 passed in 429.67s (0:07:09)] base[48 failed, 93 passed in 543.55s (0:09:03)] only-mine[0] fixed[0]
+tests/divisors mine[42 failed, 25 passed in 22.55s] base[42 failed, 25 passed in 18.14s] only-mine[0] fixed[0]
+tests/schemes  mine[250 failed, 161 passed in 211.77s (0:03:31)] base[250 failed, 161 passed in 119.71s (0:01:59)] only-mine[0] fixed[0]
+tests/tensors  mine[19 failed, 24 passed in 2.31s] base[19 failed, 24 passed in 1.67s] only-mine[0] fixed[0]
+tests/topology mine[1 failed in 0.33s] base[1 failed in 0.42s] only-mine[0] fixed[0]
+tests/functions mine[48 failed, 15 passed in 7.93s] base[48 failed, 15 passed in 6.98s] only-mine[0] fixed[0]
+tests/engineering mine[4 failed, 4 passed in 49.82s] base[4 failed, 4 passed in 48.56s] only-mine[0] fixed[0]
 
 === tests/*.py at the root, one process
-mine[25 passed in 12.64s] base[25 passed in 13.46s] only-mine[0] fixed[0]
+mine[25 passed in 15.28s] base[25 passed in 16.25s] only-mine[0] fixed[0]
+
+=== tests/rings/test_elements_divide_in_their_own_ring.sage, the slice's own test
+mine[4 passed in 18.61s] at a71272a with the same file added[1 failed, 3 passed in 17.24s], the red id being test_a_matrix_divides_by_the_inverse_of_the_divisor_on_the_right
 
 === not measured
-tests/lattices as one process exceeds the 6144 MiB peak guard on both trees (6245 MiB reached on this tree's
-first attempt, SIGTERM at 143 s); its coverage here is the #410 slice in 500-gate-410-slice.log.
-tests/groups reached a 1000 s cap without finishing on this tree.
+tests/lattices as one directory reaches 6245 MiB and the 6144 MiB peak guard stops it on both trees;
+its coverage here is #410's slice in 500-gate-410-slice.log, 6 passed.
+tests/groups does not finish inside a 1000 s cap on this tree.

@@ -1,28 +1,20 @@
-provider SHA: 51310d613cd8c27860c70ff2f3370fedc6a18f21
+provider SHA: 34980b870644034b195e904f15f98a4d0d290ea7
 port SHA: 991b88b0
-command: python -m pytest -p qc_sage_session -o addopts= tests/rings/test_elements_divide_in_their_own_ring.sage
-============================= test session starts ==============================
-platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
-rootdir: /repos/sage-extensions
-configfile: pyproject.toml
-plugins: platformdirs-4.13.5, anyio-4.15.1
-collected 4 items
-
-tests/rings/test_elements_divide_in_their_own_ring.sage ....             [100%]
-
-============================== 4 passed in 19.13s ==============================
-[peakrss] run500-qcevidence: child waited=0 shell_code=0 samples=11
-[peakrss] peak tree RSS      : 2341 MiB
-[peakrss] low-water MemAvail : 12299 MiB
+command: python -m pytest -p qc_sage_session -o addopts= -q --tb=line tests/rings/test_elements_divide_in_their_own_ring.sage
+....                                                                     [100%]
+4 passed in 18.61s
+[peakrss] run500-newtest-rebased: child waited=0 shell_code=0 samples=11
+[peakrss] peak tree RSS      : 2340 MiB
+[peakrss] low-water MemAvail : 12279 MiB
 [peakrss] peak single VmHWM  : 2366 MiB
 [peakrss] peak VmHWM by executable (this is the per-process attribution):
-[peakrss]   julia                      2050 MiB peak
-[peakrss]   python                      305 MiB peak
+[peakrss]   julia                      2046 MiB peak
+[peakrss]   python                      308 MiB peak
 [peakrss]   timeout                       7 MiB peak
 [peakrss]   proot-x86_64                  3 MiB peak
-[peakrss]   t=    20.0s procs=  4 rss=  2341 MiB hwm=  2366 MiB avail= 12299 MiB
-[peakrss]   t=    18.0s procs=  4 rss=  2233 MiB hwm=  2233 MiB avail= 12422 MiB
-[peakrss]   t=    16.0s procs=  4 rss=  2025 MiB hwm=  2025 MiB avail= 12627 MiB
-[peakrss]   t=    14.0s procs=  4 rss=  1819 MiB hwm=  1819 MiB avail= 12794 MiB
-[peakrss]   t=    12.0s procs=  4 rss=  1451 MiB hwm=  1451 MiB avail= 13101 MiB
+[peakrss]   t=    20.0s procs=  4 rss=  2340 MiB hwm=  2366 MiB avail= 12279 MiB
+[peakrss]   t=    18.0s procs=  4 rss=  2226 MiB hwm=  2234 MiB avail= 12403 MiB
+[peakrss]   t=    16.0s procs=  4 rss=  2116 MiB hwm=  2120 MiB avail= 12553 MiB
+[peakrss]   t=    14.0s procs=  4 rss=  1892 MiB hwm=  1892 MiB avail= 12759 MiB
+[peakrss]   t=    12.0s procs=  4 rss=  1511 MiB hwm=  1511 MiB avail= 13071 MiB
 launcher exit: 0
