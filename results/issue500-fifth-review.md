@@ -28,12 +28,11 @@ and the commutativity assertion appears once, at `modules.py:3125`.
 
 `Z[x]/(x^2)`, built as `ZZ["x"].quotient_by_relations([x ** 2])`, is in
 `FramedFreeModules(Z)` as well, of rank two.  The two categories are
-incomparable, so which
-of them declares `_torsion_freeness_decision` is the category order's to say, and
-the order puts this level first: on `a106d23` the algebra level answers, and on
-that object what it answers is `RecursionError`.  Rebuilt the other way, as
-`AlgebrasWithChosenFinitePresentation(Z).an_object()`, it is the same module of
-rank two and answers `True` the same way.
+incomparable, so which of them declares `_torsion_freeness_decision` is the
+category order's to say, and the order puts this level first: on `a106d23` the
+algebra level answers, and on that object what it answers is `RecursionError`.
+Built the other way, as `AlgebrasWithChosenFinitePresentation(Z).an_object()`,
+it is free of rank two too and answers `True`.
 
 The recursion is not in the body's own constructions.  `TensorAlgebras(Z)` and
 `SymmetricAlgebras(Z)` both construct in the probe -- `Category of tensor
@@ -98,7 +97,6 @@ again here over ten seeds of `PYTHONHASHSEED`:
   fourteen objects at each of the three levels under two seeds (84 pairs).  What
   the sort adds to the insertion loop is the cycle report, not a corrected
   order;
-
 * the two orders differ on 0, 1 or 2 of those 78 pairs, and what moves is
   `Modules.FinitelyGenerated` against `FramedFreeModules.ParentMethods` and
   against `Modules.Projective`, inside `QQ(i)`'s and `Z[x]/(x^2)`'s
