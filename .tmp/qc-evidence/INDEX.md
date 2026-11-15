@@ -1747,3 +1747,9 @@ this commit.
 measurement that says so, at 5.9 GiB and past 550 s. The comparison this round can
 stand on is the seven files that read the changed operations, and the four directories
 of the sweep.
+
+The merge with main (`67f856c`) was checked with the five files of this round under the
+repository addopts: `500e-merged-tests.log`, **13 passed in 3.61 s**. The four-directory
+sweep on the merged tree was started and cut by the inner 550 s cap with no ids printed
+(`merged-sweep.log`, session-only, not published): the VM was carrying other work at that
+moment, so the merged tree has the five files' run and not a directory comparison.
