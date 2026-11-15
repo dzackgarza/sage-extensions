@@ -1,4 +1,4 @@
-provider SHA: 34980b870644034b195e904f15f98a4d0d290ea7
+provider SHA: 7717c627b579d55f5a2bc132b98f3d7bd1e4b8af
 port SHA: 991b88b0
 command: python /probe500.py
 integer literal division:
@@ -18,6 +18,6 @@ coercions:
   QQ[x].has_coerce_map_from(SageZZ) = False
   lattice.an_element() / 2 raises ZeroDivisionError: 2 is not a unit
 sterk's form value:
-  Sterk.roots_18_2_0()['v22'].b = Cached version of <function FormModules.ElementMethods.b at 0x73215654cca0>
+  Sterk.roots_18_2_0()['v22'].b = Cached version of <function FormModules.ElementMethods.b at 0x77baa791cca0>
   Sterk.sterk_roots() keys = ['Sterk_1', 'Sterk_2', 'Sterk_3', 'Sterk_4', 'Sterk_5']
 launcher exit: 0

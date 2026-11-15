@@ -1,6 +1,7 @@
 === regression: issue 500's tree against main a71272a, one pytest process per directory per tree
-=== mine:    34980b870644034b195e904f15f98a4d0d290ea7  (the tree of this push; the code is 35c4f49)
-=== base:    a71272add96485c3e6ceeda07572bf40c5b2b5c0  (main before this push)
+=== mine:    7717c627b579d55f5a2bc132b98f3d7bd1e4b8af  (the tree of this push; the sweeps ran before two rebases,
+===          on a tree whose src/ and tests/ are identical: git diff 7717c62 <that tree> -- src tests is empty)
+=== base:    a71272add96485c3e6ceeda07572bf40c5b2b5c0  (the main the sweeps were run against)
 === FAILED ids compared, never counts
 
 tests/rings    mine[74 failed, 258 passed in 36.94s] base[76 failed, 252 passed in 18.44s] only-mine[0] fixed[2]
