@@ -1,0 +1,54 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue390-stage-alone.py
+tree SHA: a71272add96485c3e6ceeda07572bf40c5b2b5c0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 590 s, outer 650 s, guard 6144 MiB, args 'stage=ambient_row'
+[0.0s] probe: T_Co's plane row setup, stage 'ambient_row' alone (#528)
+[0.0s] cap 560 s, python 3.14.10
+[0.0s] the GAP proxy is installed on 3 sage_extensions modules
+[0.2s] calibration (fixed workload, for the run's CPU share): 0.165 s
+[2.0s] inputs built in 1.8 s; calling the stage alone
+[56.2s] 
+[56.2s] === GAP primitives, by time in this stage ===
+[56.2s]   SmallGeneratingSet                           1 calls       0.005 s
+[56.2s]   PreImage                                     1 calls       0.002 s
+[56.2s]   Stabilizer                                   1 calls       0.001 s
+[56.2s]   Image                                        1 calls       0.000 s
+[56.2s]   GroupHomomorphismByImagesNC                  1 calls       0.000 s
+[56.2s]   Group                                        1 calls       0.000 s
+[56.2s]   SymmetricGroup                               1 calls       0.000 s
+[56.2s]   Identity                                     1 calls       0.000 s
+[56.2s] 
+[56.2s] === the stage alone ===
+[56.2s]   stage                                                 calls   seconds  peak MiB
+[56.2s]   ambient_row                                               1      54.2       568
+[56.2s] === inside it (each sub-stage's own total, children included) ===
+[56.2s]   not inside a named sub-stage                                   54.176
+[56.2s] === below them ===
+[56.2s]   calibration (fixed workload, for the run's CPU share)      1     0.165
+[56.2s] the stage returned {Integral lattice of rank 2 and signature (0, 0)}
+[56.2s] 
+[56.2s] === everything else this run timed, outside the stage ===
+[56.2s]   row                                                   calls   seconds
+[56.2s]   input: lattice construction                               1       0.0
+[56.2s]   input: stable orthogonal group                            1       1.8
+[56.2s]   inputs proper (the rows above marked input:), total               1.9
+[56.2s] 
+[56.2s] the VM's 1-minute load average while this run went on: first 2.02, peak 2.02, last 2.00 (28 samples of /proc/loadavg)
+[56.2s] 
+[56.2s] peak VmRSS (python, sampled) 568 MiB
+[56.2s] RESULT stage=ambient_row seconds=54.18 inputs=1.86 calib=0.165 load_peak=2.02
+[56.2s] PROBE DONE
+[peakrss] p528b-base-ambient_row: child waited=0 shell_code=0 samples=30
+[peakrss] peak tree RSS      : 587 MiB
+[peakrss] low-water MemAvail : 9050 MiB
+[peakrss] peak single VmHWM  : 587 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      576 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    58.0s procs=  3 rss=   587 MiB hwm=   587 MiB avail=  9187 MiB
+[peakrss]   t=    56.0s procs=  3 rss=   576 MiB hwm=   576 MiB avail=  9184 MiB
+[peakrss]   t=    54.0s procs=  3 rss=   555 MiB hwm=   555 MiB avail=  9198 MiB
+[peakrss]   t=    52.0s procs=  3 rss=   553 MiB hwm=   553 MiB avail=  9180 MiB
+[peakrss]   t=    50.0s procs=  3 rss=   550 MiB hwm=   550 MiB avail=  9158 MiB
+launcher exit: 0

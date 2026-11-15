@@ -97,11 +97,25 @@ class _SparseFreeModuleElement(ModuleElement):
     def __init__(self, parent, coefficients) -> None:
         ModuleElement.__init__(self, parent)
         ring = parent.base_ring()
+        zero = ring.zero()
+        converted = ((label, ring(coefficient)) for label, coefficient in coefficients.items())
         self._coefficients = {
-            label: ring(coefficient)
-            for label, coefficient in coefficients.items()
-            if (ring(coefficient) == ring.zero()) is not True
+            label: coefficient
+            for label, coefficient in converted
+            if (coefficient == zero) is not True
         }
+
+    @staticmethod
+    def _from_owned_support(parent, coefficients):
+        r"""The element of ``parent`` with these coefficients, each an element of its base ring proved nonzero.
+
+        Constructor for raised engine results: the caller has already
+        decided every zero, so no coefficient is converted or compared again.
+        """
+        element = parent.element_class.__new__(parent.element_class)
+        ModuleElement.__init__(element, parent)
+        element._coefficients = coefficients
+        return element
 
     def __call__(self, label):
         r"""The value ``a(i)`` of this finitely supported function ``a : I -> R`` at ``i``.
@@ -110,6 +124,9 @@ class _SparseFreeModuleElement(ModuleElement):
         supported function \(I\to R\), and its value at a basis label is the
         coefficient of that basis element.
         """
+        # A stored label is a selected basis label of the parent.
+        if label in self._coefficients:
+            return self._coefficients[label]
         labels = self.parent().module_generating_set()
         assert label in labels, (
             f"{label!r} is not a basis label of {self.parent()}; the basis is indexed by {labels}"

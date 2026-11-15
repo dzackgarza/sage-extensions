@@ -1,0 +1,215 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue390-stage-alone.py
+tree SHA: a71272add96485c3e6ceeda07572bf40c5b2b5c0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 590 s, outer 650 s, guard 6144 MiB, args 'profile=ambient_row'
+[0.0s] probe: T_Co's plane row setup, stage 'ambient_row' alone (#528)
+[0.0s] cap 560 s, python 3.14.10
+[0.0s] the GAP proxy is installed on 3 sage_extensions modules
+[0.2s] calibration (fixed workload, for the run's CPU share): 0.166 s
+[0.2s] building input: stable orthogonal group
+[0.2s] building input: lattice construction
+[0.2s] input built: lattice construction in 0.0 s
+[2.0s] input built: stable orthogonal group in 1.8 s
+[2.0s] inputs built in 1.8 s; calling the stage alone
+[30.0s] progress stage='ambient_row' rss=452 MiB load=1.24
+[60.0s] progress stage='ambient_row' rss=505 MiB load=1.14
+[90.1s] progress stage='ambient_row' rss=527 MiB load=1.14
+[120.1s] progress stage='ambient_row' rss=546 MiB load=1.09
+[150.2s] progress stage='ambient_row' rss=569 MiB load=1.05
+[168.1s] 
+[168.1s] === GAP primitives, by time in this stage ===
+[168.1s]   SmallGeneratingSet                           1 calls       0.005 s
+[168.1s]   PreImage                                     1 calls       0.002 s
+[168.1s]   Stabilizer                                   1 calls       0.001 s
+[168.1s]   Group                                        1 calls       0.000 s
+[168.1s]   Image                                        1 calls       0.000 s
+[168.1s]   GroupHomomorphismByImagesNC                  1 calls       0.000 s
+[168.1s]   SymmetricGroup                               1 calls       0.000 s
+[168.1s]   Identity                                     1 calls       0.000 s
+[168.1s] 
+[168.1s] === the stage alone ===
+[168.1s]   stage                                                 calls   seconds  peak MiB
+[168.1s]   ambient_row                                               1     166.1       601
+[168.1s] === inside it (each sub-stage's own total, children included) ===
+[168.1s]   not inside a named sub-stage                                  166.115
+[168.1s] === below them ===
+[168.1s]   calibration (fixed workload, for the run's CPU share)      1     0.166
+[168.1s] the stage returned {Integral lattice of rank 2 and signature (0, 0)}
+[168.1s] 
+[168.1s] === the main thread's stack, 327 samples at 0.5 s ===
+[168.1s]   leaf frame (where the stage was) and the samples it holds:
+[168.1s]        16  category.py:693 __contains__
+[168.1s]        13  modules.py:244 <genexpr>
+[168.1s]        11  ring_foundation.py:5605 _backend
+[168.1s]         9  ring_foundation.py:6508 _element_constructor_
+[168.1s]         9  ring_foundation.py:6484 __call__
+[168.1s]         9  owned_category.py:1116 is_subcategory
+[168.1s]         7  set_categories.py:533 __contains__
+[168.1s]         7  set_categories.py:6722 _element_constructor_
+[168.1s]         7  ring_foundation.py:5601 __init__
+[168.1s]         7  category.py:706 __contains__
+[168.1s]         6  category.py:465 __classcall__
+[168.1s]         6  category.py:463 __classcall__
+[168.1s]   the last sample's whole stack, innermost first:
+[168.1s]      0. finite_ordered_sets.py:463 contains
+[168.1s]      1. finite_ordered_sets.py:205 __contains__
+[168.1s]      2. finite_ordered_sets.py:237 _element_constructor_
+[168.1s]      3. finite_ordered_sets.py:227 __call__
+[168.1s]      4. framed_free_modules.py:117 __call__
+[168.1s]      5. lattices.py:5810 _evaluate_gram
+[168.1s]      6. lattices.py:5822 b
+[168.1s]      7. lattices.py:452 <genexpr>
+[168.1s]      8. tensor.py:2654 _coordinate_tensor
+[168.1s]      9. tensor.py:2744 __call__
+[168.1s]     10. lattices.py:447 _lattice_subobject_on_basis
+[168.1s]     11. lattices.py:425 _lattice_subobject_spanning
+[168.1s]     12. lattices.py:3976 subobject_on
+[168.1s]     13. lattices.py:9430 primitive_isotropic_subobject
+[168.1s] 
+[168.1s] === cProfile, top calls by cumulative time ===
+[168.1s]          433491675 function calls (431458823 primitive calls) in 166.005 seconds
+[168.1s] 
+[168.1s]    Ordered by: cumulative time
+[168.1s]    List reduced from 5481 to 28 due to restriction <28>
+[168.1s] 
+[168.1s]    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+[168.1s]       2/1    0.000    0.000  166.115  166.115 /probe.py:406(<lambda>)
+[168.1s]       2/1    0.000    0.000  166.115  166.115 /repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:5223(isotropic_orbit_representatives)
+[168.1s]       3/1    0.000    0.000  166.086  166.086 /repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py:1574(_isotropic_orbit_representatives)
+[168.1s]         1    0.000    0.000  166.086  166.086 /repos/sage-extensions/src/sage_extensions/categories/isotropic_orbits.py:1397(_isotropic_plane_orbit_representatives)
+[168.1s]         2    0.000    0.000  165.971   82.986 /work/src/sage_indefinite_port/indefinite/isotropic_induction.py:68(isotropic_vector_classes)
+[168.1s]         2    0.000    0.000  165.970   82.985 /work/src/sage_indefinite_port/indefinite/isotropic_induction.py:78(_computed_isotropic_vector_classes)
+[168.1s]         1    0.000    0.000  158.499  158.499 /work/src/sage_indefinite_port/indefinite/marked_lattices.py:181(primitive_marking_classes)
+[168.1s]         1    0.000    0.000  131.807  131.807 /work/src/sage_indefinite_port/indefinite/recursive.py:1754(primitive_vector_classes)
+[168.1s] 99343/17262    0.034    0.000  131.355    0.008 {built-in method builtins.next}
+[168.1s]        59    0.000    0.000  131.303    2.225 /work/src/sage_indefinite_port/indefinite/recursive.py:1771(<genexpr>)
+[168.1s]        29    0.001    0.000  131.295    4.527 /work/src/sage_indefinite_port/indefinite/recursive.py:1572(pointed_isometry)
+[168.1s]        28    0.001    0.000  130.051    4.645 /work/src/sage_indefinite_port/indefinite/recursive.py:1695(_isotropic_pointed_isometry)
+[168.1s] 1385855/1027807    5.166    0.000   94.160    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:777(__call__)
+[168.1s]        10    0.000    0.000   89.808    8.981 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:267(integral_members)
+[168.1s]        10    0.001    0.000   89.795    8.980 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:201(_integral_lift_locus)
+[168.1s]        10    0.012    0.001   76.919    7.692 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:411(integral_parameter_classes)
+[168.1s] 608105/608018    0.658    0.000   70.549    0.000 {built-in method builtins.sum}
+[168.1s] 60421/47248    0.093    0.000   70.354    0.001 /repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1173(_call_)
+[168.1s] 43632/41244    0.118    0.000   63.680    0.002 /repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1142(_linear_combination_of_generator_images)
+[168.1s]      1034    0.009    0.000   55.518    0.054 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:676(<genexpr>)
+[168.1s] 5641/5461    0.003    0.000   46.645    0.009 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/form_modules.py:449(<lambda>)
+[168.1s]      2048    0.108    0.000   43.656    0.021 /repos/sage-extensions/src/sage_extensions/categories/isotropic_lifts.py:655(lifts_integrally)
+[168.1s] 372374/211450    0.147    0.000   39.958    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:576(__call__)
+[168.1s] 915353/824758    0.511    0.000   38.849    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:1648(__call__)
+[168.1s]     46913    0.362    0.000   38.478    0.001 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py:195(_add_)
+[168.1s]    180130    0.907    0.000   35.064    0.000 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py:97(__init__)
+[168.1s]    698821    0.204    0.000   34.500    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1249(__eq__)
+[168.1s]    699744    0.408    0.000   34.326    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1235(_richcmp_)
+[168.1s] 
+[168.1s] 
+[168.1s] 
+[168.1s] === the top calls and where they were called from ===
+[168.1s]   <lambda> (probe.py:406) cum=166.11 s own=0.00 s calls=2
+[168.1s]       the chain from the stage itself:
+[168.1s]   isotropic_orbit_representatives (lattice_morphisms.py:5223) cum=166.11 s own=0.00 s calls=2
+[168.1s]       called from <lambda> (probe.py:406) x1 cum=166.11 s
+[168.1s]       the chain from the stage itself:
+[168.1s]         <- <lambda> (probe.py:406)
+[168.1s]   _isotropic_orbit_representatives (isotropic_orbits.py:1574) cum=166.09 s own=0.00 s calls=3
+[168.1s]       called from isotropic_orbit_representatives (lattice_morphisms.py:5223) x1 cum=166.11 s
+[168.1s]       called from _isotropic_plane_orbit_representatives (isotropic_orbits.py:1397) x0 cum=0.00 s
+[168.1s]       the chain from the stage itself:
+[168.1s]         <- isotropic_orbit_representatives (lattice_morphisms.py:5223)
+[168.1s]         <- <lambda> (probe.py:406)
+[168.1s]   _isotropic_plane_orbit_representatives (isotropic_orbits.py:1397) cum=166.09 s own=0.00 s calls=1
+[168.1s]       called from _isotropic_orbit_representatives (isotropic_orbits.py:1574) x0 cum=0.00 s
+[168.1s]       the chain from the stage itself:
+[168.1s]         <- _isotropic_orbit_representatives (isotropic_orbits.py:1574)
+[168.1s]         <- isotropic_orbit_representatives (lattice_morphisms.py:5223)
+[168.1s]         <- <lambda> (probe.py:406)
+[168.1s]   isotropic_vector_classes (isotropic_induction.py:68) cum=165.97 s own=0.00 s calls=2
+[168.1s]       called from _planes_through_line (isotropic_orbits.py:1343) x1 cum=7.48 s
+[168.1s]       called from primitive_marking_classes (marked_lattices.py:181) x0 cum=0.00 s
+[168.1s]       the chain from the stage itself:
+[168.1s]         <- _planes_through_line (isotropic_orbits.py:1343)
+[168.1s]         <- isotropic_vector_classes (isotropic_induction.py:68)
+[168.1s] 
+[168.1s] === construction against computation, by own time ===
+[168.1s]   class                own s    share     cum s  entries
+[168.1s]   construction         30.07    18.1%    199.55      486
+[168.1s]   computation           0.20     0.1%   1057.59       69
+[168.1s]   other               135.74    81.7%   3581.00     4926
+[168.1s]   stage (its own time)    166.11
+[168.1s] 
+[168.1s] === construction: the biggest entries, by own time ===
+[168.1s]   file:line                                   function                              own s    cum s  calls
+[168.1s]   category.py:436                             __classcall__                         6.702    8.52814365338
+[168.1s]   ring_foundation.py:6488                     _element_constructor_                 5.454    7.13614101407
+[168.1s]   set_categories.py:6716                      _element_constructor_                 3.451    5.9459953545
+[168.1s]   ring_foundation.py:5601                     __init__                              2.546    2.5469538481
+[168.1s]   owned_category.py:1102                      is_subcategory                        2.238    2.24910624412
+[168.1s]   ring_foundation.py:1110                     __init__                              1.881    3.8361424695
+[168.1s]   set_categories.py:6621                      __init__                              1.183    1.1835196737
+[168.1s]   framed_free_modules.py:97                   __init__                              0.907   35.064 180130
+[168.1s]   ring_foundation.py:1701                     _element_constructor_                 0.853    2.0931829871
+[168.1s]   ring_foundation.py:5302                     __classcall__                         0.577    3.197 974343
+[168.1s]   modules.py:391                              __classcall__                         0.554   10.689 924855
+[168.1s]   set_categories.py:748                       __init__                              0.480    0.699 186516
+[168.1s]   framed_free_modules.py:335                  _element_constructor_                 0.474    7.337 601259
+[168.1s]   finite_ordered_sets.py:229                  _element_constructor_                 0.442    6.861 254329
+[168.1s] 
+[168.1s] === computation: the biggest entries, by own time ===
+[168.1s]   file:line                                   function                              own s    cum s  calls
+[168.1s]   set_categories.py:2469                      cardinality                           0.071    1.461 124472
+[168.1s]   module_morphisms.py:225                     solve                                 0.041    4.924    442
+[168.1s]   modules.py:7795                             image                                 0.027    3.260   1830
+[168.1s]   lattices.py:5814                            b                                     0.015   12.445   8893
+[168.1s]   permgroup.py:1889                           stabilizer                            0.015    0.032    206
+[168.1s]   probe.py:223                                call                                  0.008    0.008      8
+[168.1s]   rational_integral_stabilizers.py:222        _act_on_position                      0.004    5.965    750
+[168.1s]   indexed_families.py:69                      cardinality                           0.003    0.036   2854
+[168.1s]   g_sets.py:215                               _orbit_words                          0.002    6.419      1
+[168.1s]   rational_integral_stabilizers.py:958        image                                 0.002    1.453    550
+[168.1s]   form_modules.py:2476                        b                                     0.002    4.937   2219
+[168.1s]   groups.py:1549                              _from_engine                          0.002    0.003   2375
+[168.1s]   lattices.py:11014                           image                                 0.002    1.116    220
+[168.1s]   recursive.py:1695                           _isotropic_pointed_isometry           0.001  130.051     28
+[168.1s] 
+[168.1s] === other: the biggest entries, by own time ===
+[168.1s]   file:line                                   function                              own s    cum s  calls
+[168.1s]   ~:0                                         <built-in method builtins.isinsta     9.485    9.51267803782
+[168.1s]   objects.py:158                              __contains__                          7.112   13.4769795217
+[168.1s]   ring_foundation.py:6459                     _from_engine_element                  6.164    8.7109538481
+[168.1s]   set_categories.py:777                       __call__                              5.166   94.1601385855
+[168.1s]   category.py:693                             __contains__                          4.851    7.19310951501
+[168.1s]   ring_foundation.py:5571                     _operand_in_ring                      4.387   13.5886230052
+[168.1s]   ring_foundation.py:2169                     _fraction_equality_status             3.065   33.282 699744
+[168.1s]   set_categories.py:524                       __contains__                          3.006    5.5494624871
+[168.1s]   ring_foundation.py:7551                     _own_ring                             2.955   15.8216730444
+[168.1s]   ring_foundation.py:6484                     __call__                              2.867    9.99514101407
+[168.1s]   category_with_axiom.py:2021                 __classget__                          2.227    3.0751921883
+[168.1s]   set_categories.py:6726                      __call__                              2.193    8.1399953545
+[168.1s]   ring_foundation.py:5609                     _operator_operand                     1.919   14.9016036197
+[168.1s]   set_categories.py:539                       __call__                              1.890   11.4953729373
+[168.1s] 
+[168.1s] === everything else this run timed, outside the stage ===
+[168.1s]   row                                                   calls   seconds
+[168.1s]   input: lattice construction                               1       0.0
+[168.1s]   input: stable orthogonal group                            1       1.8
+[168.1s]   inputs proper (the rows above marked input:), total               1.8
+[168.1s] 
+[168.1s] the VM's 1-minute load average while this run went on: first 1.29, peak 1.31, last 1.04 (83 samples of /proc/loadavg)
+[168.1s] 
+[168.1s] peak VmRSS (python, sampled) 601 MiB
+[168.1s] RESULT stage=ambient_row seconds=166.11 inputs=1.81 calib=0.166 load_peak=1.31 profiled
+[168.1s] PROBE DONE
+[peakrss] p528r-base-ambient_row: child waited=0 shell_code=0 samples=86
+[peakrss] peak tree RSS      : 620 MiB
+[peakrss] low-water MemAvail : 13373 MiB
+[peakrss] peak single VmHWM  : 625 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      614 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   170.1s procs=  3 rss=   620 MiB hwm=   625 MiB avail= 13437 MiB
+[peakrss]   t=   168.1s procs=  3 rss=   612 MiB hwm=   612 MiB avail= 13460 MiB
+[peakrss]   t=   166.1s procs=  3 rss=   603 MiB hwm=   603 MiB avail= 13468 MiB
+[peakrss]   t=   164.1s procs=  3 rss=   598 MiB hwm=   598 MiB avail= 13468 MiB
+[peakrss]   t=   162.1s procs=  3 rss=   585 MiB hwm=   585 MiB avail= 13483 MiB
+launcher exit: 0

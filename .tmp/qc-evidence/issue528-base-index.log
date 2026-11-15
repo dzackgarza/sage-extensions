@@ -1,0 +1,68 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue390-stage-alone.py
+tree SHA: a71272add96485c3e6ceeda07572bf40c5b2b5c0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 590 s, outer 650 s, guard 6144 MiB, args 'stage=index'
+[0.0s] probe: T_Co's plane row setup, stage 'index' alone (#528)
+[0.0s] cap 560 s, python 3.14.10
+[0.0s] the GAP proxy is installed on 3 sage_extensions modules
+[0.2s] calibration (fixed workload, for the run's CPU share): 0.163 s
+[1.9s] inputs built in 1.8 s; calling the stage alone
+[116.6s] 
+[116.6s] === GAP primitives, by time in this stage ===
+[116.6s]   Order                                        2 calls       0.062 s
+[116.6s]   Subgroup                                     3 calls       0.048 s
+[116.6s]   Intersection                                 1 calls       0.020 s
+[116.6s]   SmallGeneratingSet                           2 calls       0.004 s
+[116.6s]   PreImage                                     2 calls       0.003 s
+[116.6s]   Stabilizer                                   2 calls       0.001 s
+[116.6s]   Group                                        2 calls       0.000 s
+[116.6s]   Image                                        2 calls       0.000 s
+[116.6s]   SymmetricGroup                               2 calls       0.000 s
+[116.6s]   GroupHomomorphismByImagesNC                  2 calls       0.000 s
+[116.6s]   Identity                                     2 calls       0.000 s
+[116.6s] 
+[116.6s] === the stage alone ===
+[116.6s]   stage                                                 calls   seconds  peak MiB
+[116.6s]   index                                                     1     114.7       nan
+[116.6s] === inside it (each sub-stage's own total, children included) ===
+[116.6s]   image_order                                               1   114.621
+[116.6s]   subgroup_image_order                                      1     0.045
+[116.6s]   not inside a named sub-stage                                    0.000
+[116.6s] === below them ===
+[116.6s]   _ambient_generators                                       2    85.799
+[116.6s]   ambient_discriminant_images                               1    25.956
+[116.6s]   calibration (fixed workload, for the run's CPU share)      1     0.163
+[116.6s]   _joint_discriminant_image_gap                             1     0.045
+[116.6s] the stage returned 46998591897600
+[116.6s] 
+[116.6s] === everything else this run timed, outside the stage ===
+[116.6s]   row                                                   calls   seconds
+[116.6s]   input: lattice construction                               1       0.0
+[116.6s]   input: stable orthogonal group                            1       1.8
+[116.6s]   input: character quotient                                 1       1.8
+[116.6s]   _ambient_generators                                       2      85.8
+[116.6s]   ambient_discriminant_images                               1      26.0
+[116.6s]   image_order                                               1     114.6
+[116.6s]   _joint_discriminant_image_gap                             1       0.0
+[116.6s]   subgroup_image_order                                      1       0.0
+[116.6s]   inputs proper (the rows above marked input:), total               3.5
+[116.6s] 
+[116.6s] the VM's 1-minute load average while this run went on: first 1.06, peak 1.20, last 1.03 (58 samples of /proc/loadavg)
+[116.6s] 
+[116.6s] peak VmRSS (python, sampled) 661 MiB
+[116.6s] RESULT stage=index seconds=114.67 inputs=3.53 calib=0.163 load_peak=1.20
+[116.6s] PROBE DONE
+[peakrss] p528b-base-index: child waited=0 shell_code=0 samples=60
+[peakrss] peak tree RSS      : 673 MiB
+[peakrss] low-water MemAvail : 12444 MiB
+[peakrss] peak single VmHWM  : 673 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      662 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   118.1s procs=  3 rss=   673 MiB hwm=   673 MiB avail= 12444 MiB
+[peakrss]   t=   116.0s procs=  3 rss=   671 MiB hwm=   671 MiB avail= 12446 MiB
+[peakrss]   t=   114.0s procs=  3 rss=   670 MiB hwm=   670 MiB avail= 12447 MiB
+[peakrss]   t=   112.0s procs=  3 rss=   669 MiB hwm=   669 MiB avail= 12448 MiB
+[peakrss]   t=   110.0s procs=  3 rss=   668 MiB hwm=   668 MiB avail= 12452 MiB
+launcher exit: 0

@@ -1981,10 +1981,9 @@ class LatticeIsometryMethods:
 
     def __mul__(self, other):
         if isinstance(other, LatticeIsometryMethods) and other.codomain() is self.domain():
-            if self.domain() is self.codomain() and other.parent() is self.parent():
-                return self.parent().compose(self, other)
-            source = other.domain()
-            return source.Isom(self.codomain())(lambda label: self(other(source.module_generator(label))))
+            # Every composable pair, endomorphism or not, composes as the
+            # product of its endpoint-framed matrices.
+            return self.parent().compose(self, other)
         return super().__mul__(other)
 
     def transport_isotropic_object(self, obj):

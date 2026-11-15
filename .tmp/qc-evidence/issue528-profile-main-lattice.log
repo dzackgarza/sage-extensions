@@ -1,0 +1,157 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue390-stage-alone.py
+tree SHA: 3a1964060ab55a6b09207f0ceeff67960fb3ef9b
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 500 s, outer 560 s, guard 6144 MiB, args 'profile=lattice input=direct'
+[0.0s] probe: T_Co's plane row setup, stage 'lattice' alone (#528)
+[0.0s] cap 560 s, python 3.14.10
+[0.0s] the GAP proxy is installed on 3 sage_extensions modules
+[0.3s] calibration (fixed workload, for the run's CPU share): 0.303 s
+[0.3s] inputs built in 0.0 s; calling the stage alone
+[0.4s] 
+[0.4s] === GAP primitives, by time in this stage ===
+[0.4s] 
+[0.4s] === the stage alone ===
+[0.4s]   stage                                                 calls   seconds  peak MiB
+[0.4s]   lattice                                                   1       0.1       nan
+[0.4s] === inside it (each sub-stage's own total, children included) ===
+[0.4s]   not inside a named sub-stage                                    0.085
+[0.4s] === below them ===
+[0.4s]   calibration (fixed workload, for the run's CPU share)      1     0.303
+[0.4s] the stage returned Integral lattice of rank 11 and signature (2, 9)
+[0.4s] 
+[0.4s] === cProfile, top calls by cumulative time ===
+[0.4s]          174420 function calls (171548 primitive calls) in 0.085 seconds
+[0.4s] 
+[0.4s]    Ordered by: cumulative time
+[0.4s]    List reduced from 847 to 28 due to restriction <28>
+[0.4s] 
+[0.4s]    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+[0.4s]         1    0.000    0.000    0.085    0.085 /probe.py:397(<lambda>)
+[0.4s]         1    0.000    0.000    0.078    0.078 /repos/sage-extensions/src/sage_extensions/catalogue.py:203(Tco)
+[0.4s]    189/52    0.000    0.000    0.070    0.001 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:576(__call__)
+[0.4s]         3    0.000    0.000    0.070    0.023 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:2934(__call__)
+[0.4s]         3    0.000    0.000    0.069    0.023 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:2950(_call_)
+[0.4s]         3    0.000    0.000    0.069    0.023 /repos/sage-extensions/src/sage_extensions/categories/_lattice.py:1902(_lattice)
+[0.4s]         3    0.000    0.000    0.064    0.021 /repos/sage-extensions/src/sage_extensions/categories/_lattice.py:1777(_lattice_from_gram_tensor)
+[0.4s]         3    0.000    0.000    0.052    0.017 /repos/sage-extensions/src/sage_extensions/categories/_lattice.py:501(_lattice_on_gram)
+[0.4s]         3    0.000    0.000    0.051    0.017 /repos/sage-extensions/src/sage_extensions/categories/_lattice.py:433(_lattice_object)
+[0.4s]         6    0.000    0.000    0.034    0.006 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py:1178(_new_sparse_free_module)
+[0.4s]        26    0.001    0.000    0.034    0.001 /repos/sage-extensions/src/sage_extensions/owned_category.py:1612(_object_of)
+[0.4s]         3    0.000    0.000    0.034    0.011 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/form_modules.py:4661(_form_module_from_bilinear_computation)
+[0.4s]         4    0.000    0.000    0.034    0.008 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py:1666(_fresh_free_module_on)
+[0.4s]         3    0.000    0.000    0.033    0.011 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/form_modules.py:4621(_construct_form_module)
+[0.4s]         3    0.000    0.000    0.033    0.011 /repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:2832(_module_with_structure)
+[0.4s]         3    0.000    0.000    0.032    0.011 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py:1096(_same_presentation_module)
+[0.4s]     37/22    0.000    0.000    0.031    0.001 /repos/sage-extensions/src/sage_extensions/owned_category.py:945(_make_named_class)
+[0.4s]         6    0.000    0.000    0.023    0.004 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:1669(parent_class)
+[0.4s]        47    0.000    0.000    0.023    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_foundation.py:217(ObjectType)
+[0.4s]         1    0.000    0.000    0.022    0.022 /repos/sage-extensions/src/sage_extensions/catalogue.py:61(_Ug)
+[0.4s]         1    0.000    0.000    0.022    0.022 /repos/sage-extensions/src/sage_extensions/catalogue.py:132(U)
+[0.4s]        15    0.001    0.000    0.022    0.001 /repos/sage-extensions/src/sage_extensions/owned_category.py:681(_owned_implementation_bases)
+[0.4s]        15    0.000    0.000    0.018    0.001 /repos/sage-extensions/src/sage_extensions/owned_category.py:648(_declared_category_linearization)
+[0.4s]    595/15    0.008    0.000    0.018    0.001 /repos/sage-extensions/src/sage_extensions/owned_category.py:662(linearize)
+[0.4s]         2    0.000    0.000    0.017    0.009 /repos/sage-extensions/src/sage_extensions/categories/_lattice.py:350(_gram_axiom_categories)
+[0.4s]         1    0.000    0.000    0.015    0.015 /repos/sage-extensions/src/sage_extensions/catalogue.py:98(_E8g_sage_basis_order)
+[0.4s]         1    0.000    0.000    0.015    0.015 /repos/sage-extensions/src/sage_extensions/catalogue.py:85(_E8g)
+[0.4s]         1    0.000    0.000    0.015    0.015 /repos/sage-extensions/src/sage_extensions/catalogue.py:65(_E8g_owned_order)
+[0.4s] 
+[0.4s] 
+[0.4s] 
+[0.4s] === the top calls and where they were called from ===
+[0.4s]   <lambda> (probe.py:397) cum=0.09 s own=0.00 s calls=1
+[0.4s]       the chain from the stage itself:
+[0.4s]   Tco (catalogue.py:203) cum=0.08 s own=0.00 s calls=1
+[0.4s]       called from <lambda> (probe.py:397) x1 cum=0.08 s
+[0.4s]       the chain from the stage itself:
+[0.4s]         <- <lambda> (probe.py:397)
+[0.4s]   __call__ (category.py:576) cum=0.07 s own=0.00 s calls=189
+[0.4s]       called from __call__ (lattices.py:2934) x3 cum=0.07 s
+[0.4s]       called from finite_ordered_set (finite_ordered_sets.py:835) x1 cum=0.01 s
+[0.4s]       called from cardinal (cardinals.py:1814) x175 cum=0.00 s
+[0.4s]       called from finite_ordinal_set (set_categories.py:557) x2 cum=0.00 s
+[0.4s]       called from __eq__ (cardinals.py:687) x8 cum=0.00 s
+[0.4s]       the chain from the stage itself:
+[0.4s]         <- __call__ (lattices.py:2934)
+[0.4s]         <- Tco (catalogue.py:203)
+[0.4s]         <- <lambda> (probe.py:397)
+[0.4s]   __call__ (lattices.py:2934) cum=0.07 s own=0.00 s calls=3
+[0.4s]       called from Tco (catalogue.py:203) x1 cum=0.03 s
+[0.4s]       called from U (catalogue.py:132) x1 cum=0.02 s
+[0.4s]       called from _E8g_owned_order (catalogue.py:65) x1 cum=0.01 s
+[0.4s]       the chain from the stage itself:
+[0.4s]         <- Tco (catalogue.py:203)
+[0.4s]         <- <lambda> (probe.py:397)
+[0.4s]   _call_ (lattices.py:2950) cum=0.07 s own=0.00 s calls=3
+[0.4s]       called from __call__ (category.py:576) x3 cum=0.07 s
+[0.4s]       the chain from the stage itself:
+[0.4s]         <- __call__ (category.py:576)
+[0.4s]         <- __call__ (lattices.py:2934)
+[0.4s]         <- Tco (catalogue.py:203)
+[0.4s]         <- <lambda> (probe.py:397)
+[0.4s] 
+[0.4s] === construction against computation, by own time ===
+[0.4s]   class                own s    share     cum s  entries
+[0.4s]   construction          0.01    10.6%      0.48       86
+[0.4s]   computation           0.00     0.0%      0.00        1
+[0.4s]   other                 0.08    88.7%      1.27      760
+[0.4s]   stage (its own time)      0.09
+[0.4s] 
+[0.4s] === construction: the biggest entries, by own time ===
+[0.4s]   file:line                                   function                              own s    cum s  calls
+[0.4s]   category.py:436                             __classcall__                         0.002    0.014   1737
+[0.4s]   ring_foundation.py:5414                     __classcall__                         0.001    0.006    197
+[0.4s]   homset.py:618                               __init__                              0.001    0.001      6
+[0.4s]   owned_category.py:1612                      _object_of                            0.001    0.034     26
+[0.4s]   owned_category.py:1704                      __init__                              0.000    0.008     26
+[0.4s]   owned_category.py:1102                      is_subcategory                        0.000    0.001   1062
+[0.4s]   ring_foundation.py:6623                     _element_constructor_                 0.000    0.000    594
+[0.4s]   set_categories.py:6716                      _element_constructor_                 0.000    0.001    669
+[0.4s]   inspect.py:2689                             __init__                              0.000    0.000    188
+[0.4s]   _lattice.py:350                             _gram_axiom_categories                0.000    0.017      2
+[0.4s]   cat.py:1155                                 meet                                  0.000    0.006     12
+[0.4s]   unique_representation.py:585                __classcall__                         0.000    0.012     31
+[0.4s]   matrix_space.py:854                         __init__                              0.000    0.000      1
+[0.4s]   set_categories.py:5107                      _element_constructor_                 0.000    0.002     10
+[0.4s] 
+[0.4s] === computation: the biggest entries, by own time ===
+[0.4s]   file:line                                   function                              own s    cum s  calls
+[0.4s]   set_categories.py:2469                      cardinality                           0.000    0.001     29
+[0.4s] 
+[0.4s] === other: the biggest entries, by own time ===
+[0.4s]   file:line                                   function                              own s    cum s  calls
+[0.4s]   owned_category.py:662                       linearize                             0.008    0.018    595
+[0.4s]   owned_category.py:422                       _category_provider_order_key          0.005    0.008  22843
+[0.4s]   refine.py:71                                _owned_mixins                         0.003    0.005      9
+[0.4s]   ~:0                                         <built-in method builtins.isinsta     0.002    0.002  14698
+[0.4s]   owned_category.py:140                       mro                                   0.002    0.006    123
+[0.4s]   dynamic_class.py:338                        dynamic_class_internal                0.002    0.005     37
+[0.4s]   ~:0                                         <method 'get' of 'dict' objects>      0.002    0.002  23869
+[0.4s]   category_with_axiom.py:2021                 __classget__                          0.002    0.002    744
+[0.4s]   owned_category.py:1198                      _owned_join_as_tuple                  0.001    0.006     29
+[0.4s]   owned_category.py:681                       _owned_implementation_bases           0.001    0.022     15
+[0.4s]   owned_category.py:100                       _c3_merge                             0.001    0.002     69
+[0.4s]   objects.py:158                              __contains__                          0.001    0.003   1145
+[0.4s]   category.py:693                             __contains__                          0.001    0.002   1514
+[0.4s]   owned_category.py:510                       _subcategory_class_with_cat_const     0.001    0.008     27
+[0.4s] 
+[0.4s] === everything else this run timed, outside the stage ===
+[0.4s]   row                                                   calls   seconds
+[0.4s]   inputs proper (the rows above marked input:), total               0.0
+[0.4s] 
+[0.4s] the VM's 1-minute load average while this run went on: first 8.07, peak 8.07, last 8.07 (1 samples of /proc/loadavg)
+[0.4s] 
+[0.4s] peak VmRSS (python, sampled) 269 MiB
+[0.4s] RESULT stage=lattice seconds=0.09 inputs=0.00 calib=0.303 load_peak=8.07 profiled
+[0.4s] PROBE DONE
+[peakrss] p528q-main-lattice: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 396 MiB
+[peakrss] low-water MemAvail : 3373 MiB
+[peakrss] peak single VmHWM  : 396 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      385 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   396 MiB hwm=   396 MiB avail=  3373 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   208 MiB hwm=   208 MiB avail=  3545 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  3695 MiB
+launcher exit: 0
