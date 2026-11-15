@@ -3546,28 +3546,7 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
 
     class ParentMethods:
         def _algebra_mor_class(self):
-            r"""The arrows of a presented algebra: images of its presentation generators.
-
-            A presentation on *independent* generators is a free algebra, and the
-            free arrows apply to it; only a presentation with relations needs
-            the presented arrows, whose element class reads the presentation
-            ring and the lift to it.  Asking the free-algebra category first
-            makes this answer a function of the algebra's own structure instead
-            of a race between this parent class and
-            ``FreeAlgebras.ParentMethods``: an algebra that is both (an affine
-            semigroup algebra on a free monoid is the polynomial algebra) has
-            one arrow class whichever order its parent classes are listed in,
-            and the class that can build its own augmentation.
-            """
-            from sage_extensions.categories.algebras.free_algebras import (
-                FreeAlgebras,
-            )
-
-            match self in FreeAlgebras(self.algebra_base_ring()):
-                case True:
-                    return FreeAlgebras.ParentMethods._algebra_mor_class(self)
-                case False:
-                    return PresentedAlgebraMor
+            return PresentedAlgebraMor
 
         def selected_algebra_presentation(self):
             r"""Return the one chosen truncation-one algebra resolution."""
