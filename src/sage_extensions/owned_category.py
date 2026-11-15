@@ -1257,7 +1257,17 @@ def _owned_join_as_tuple(categories) -> tuple[Category, ...]:
 
 def owned_category_join(categories) -> Category:
     r"""Return Sage's axiom-closed join realized as an owned join category."""
-    branches = _owned_join_as_tuple(tuple(categories))
+    return _owned_category_join(tuple(categories))
+
+
+@cache
+def _owned_category_join(categories) -> Category:
+    r"""The join of a tuple of categories, computed once per tuple.
+
+    Categories are unique objects, so the join is a function of the tuple
+    (Sage's ``Category.join`` is memoized the same way).
+    """
+    branches = _owned_join_as_tuple(categories)
     assert branches, "the join of no owned categories is not represented"
     if len(branches) == 1:
         return branches[0]
