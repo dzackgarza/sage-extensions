@@ -1,0 +1,163 @@
+[    0.2s] lattice Lattice of rank 11 and signature (2, 9) of rank 11
+[    0.2s] e = e_1, q(e) = 0
+[    0.2s] a = e_0 + 3*e_3, b(e, a) = 0
+[    0.3s] one library eichler_transvection: 117.157 ms
+[    0.5s] checks (t(e) = e, 121 pairings preserved): True
+[    1.0s] the library call, 20 times: 28.252 ms a call
+[    1.0s] instrumented: _owned_engine_element, _engine_element, _engine_ring, _engine_component_matrix, _element_constructor_@ring_foundation.IntegerModRing_generic, _element_constructor_@ring_foundation.PolynomialQuotientRing_generic, _element_constructor_@ring_foundation.PolynomialRing_generic, _element_constructor_@ring_foundation.RngMor, _element_constructor_@ring_foundation.RingMor, _element_constructor_@ring_foundation.PredicateSubrings.ParentMethods, _element_constructor_@ring_foundation.PredicateSubrings.ParentMethods, _element_constructor_@ring_foundation.LocalizationRings.ParentMethods, _element_constructor_@ring_foundation.LocalizationRings.ParentMethods, _element_constructor_@ring_foundation._PredicateSubringParent, _element_constructor_@ring_foundation._OwnedRingParent, to_vector@framed_free_modules.FramedFreeModules.ElementMethods, to_vector@framed_free_modules.FramedFreeModules.ElementMethods, _framing_lift@framed_free_modules.Modules.ParentMethods, _framing_lift@framed_free_modules._SparseFreeModuleParent
+[    1.9s] the same call counted, 20 times: 40.877 ms a call
+[    1.9s] 
+[    1.9s] === what one library call crosses ===
+[    1.9s]   call                                            calls       ms   us/call
+[    1.9s]   _owned_engine_element                          3761.0   13.663       3.6
+[    1.9s]   _element_constructor_                          9039.0    5.968       0.7
+[    1.9s]   _engine_element                                 441.0    3.738       8.5
+[    1.9s]   _engine_ring                                    534.0    0.700       1.3
+[    1.9s]   _engine_component_matrix                          1.0    0.329     329.0
+[    1.9s]   to_vector                                        22.0    0.025       1.1
+[    1.9s]   _framing_lift                                    22.0    0.017       0.8
+[    1.9s] 
+[    1.9s] === the crossings, by stage (one call) ===
+[    2.0s]   1 the three guards (parent, q(e), b(e, a))
+[    2.0s]       _element_constructor_                         28
+[    2.0s]       _owned_engine_element                         16
+[    2.0s]       _engine_element                                6
+[    2.0s]       _engine_ring                                   2
+[    2.0s]   2 half_norm = q(a)/2 in the fraction field
+[    2.0s]       _element_constructor_                         29
+[    2.0s]       _owned_engine_element                         11
+[    2.0s]       _engine_ring                                   1
+[    2.0s]   4 engine = _engine_ring(ring)
+[    2.0s]       _engine_ring                                   1
+[    2.0s]   5 e's coordinates, as written (to_vector per label)
+[    2.0s]       _element_constructor_                         33
+[    2.0s]       _engine_element                               33
+[    2.0s]       _engine_ring                                  11
+[    2.0s]       _framing_lift                                 11
+[    2.0s]       to_vector                                     11
+[    2.0s]   6 a's coordinates, as written (to_vector per label)
+[    2.0s]       _element_constructor_                         33
+[    2.0s]       _engine_element                               33
+[    2.0s]       _engine_ring                                  11
+[    2.0s]       _framing_lift                                 11
+[    2.0s]       to_vector                                     11
+[    2.0s]   5+6 the same two, one to_vector each (the datum read once)
+[    2.0s]       _element_constructor_                         66
+[    2.0s]       _engine_element                               66
+[    2.0s]       _engine_ring                                  22
+[    2.0s]       _framing_lift                                  2
+[    2.0s]       to_vector                                      2
+[    2.0s]   7 gram = _engine_component_matrix(gram_tensor())
+[    2.0s]       _engine_component_matrix                       1
+[    2.0s]   9 the per-entry loop (rank^2 entries)
+[    2.0s]       _element_constructor_                       8525
+[    2.0s]       _owned_engine_element                       3718
+[    2.0s]       _engine_ring                                 385
+[    2.0s]   10 the matrix assembly, entry by entry
+[    2.0s]       _element_constructor_                        363
+[    2.0s]       _engine_element                              363
+[    2.0s]       _engine_ring                                 121
+[    2.0s] 
+[    2.0s] 
+[    2.0s] === the base body's arrangement, stage by stage, per call (counters off) ===
+[    2.0s]     the stages below are `8316-8409` as the base tree wrote them, kept
+[    2.0s]     unchanged so one probe measures both trees; their matrix is checked
+[    2.0s]     equal to the library's, and the library no longer runs them.
+[    2.8s]   stage                                                      ms/call
+[    2.8s]   1 the three guards (parent, q(e), b(e, a))                   0.800
+[    2.8s]   2 ring.fraction_field()                                      0.012
+[    2.8s]   2 half_norm = q(a)/2 in the fraction field                   0.260
+[    2.8s]   3 labels = tuple(module_generating_set())                    0.022
+[    2.8s]   4 engine = _engine_ring(ring)                                0.003
+[    2.8s]   5 e's coordinates, as written (to_vector per label)          0.548
+[    2.8s]   6 a's coordinates, as written (to_vector per label)          0.116
+[    2.8s]   5+6 the same two, one to_vector each (the datum read once)     0.515
+[    2.8s]   7 gram = _engine_component_matrix(gram_tensor())             0.331
+[    2.8s]   8 gram * e (one rank-by-one product)                         0.069
+[    2.8s]   8 gram * a (one rank-by-one product)                         0.011
+[    2.8s]   9 the per-entry loop (rank^2 entries)                       35.358
+[    2.8s]   10 the matrix assembly, entry by entry                       2.084
+[    2.8s]   11 lattice.Aut()                                             0.007
+[    2.8s]   12 _isometry_from_column_matrix(matrix)                      1.084
+[    2.8s]   total                                                       41.220
+[    2.8s] 
+[    2.9s] === the formula's own arithmetic, engine throughout: 0.709 ms a call ===
+[    2.9s]     the library 28.252 ms, the base arrangement 41.220 ms, the formula 0.709 ms
+[    2.9s] RESULT library_ms=28.252 counted_ms=40.877 staged_ms=41.220 formula_ms=0.709 ratio=39.87
+[    2.9s] 
+[    2.9s] === cProfile over the library calls ===
+[    4.1s]          2322681 function calls (2229301 primitive calls) in 1.241 seconds
+
+   Ordered by: internal time
+   List reduced from 323 to 22 due to restriction <22>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    77560    0.089    0.000    0.119    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6624(_from_engine_element)
+276400/204320    0.075    0.000    0.529    0.000 /probe.py:82(counted)
+   170060    0.072    0.000    0.072    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6653(_element_constructor_)
+    61920    0.067    0.000    0.219    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5713(_operand_in_ring)
+   321540    0.067    0.000    0.067    0.000 {built-in method builtins.isinstance}
+   170060    0.054    0.000    0.169    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6649(__call__)
+    27340    0.048    0.000    0.110    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1115(__init__)
+    37180    0.039    0.000    0.335    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5823(__mul__)
+    22480    0.038    0.000    0.186    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1701(_fraction_with_admitted_denominator)
+75220/59820    0.035    0.000    0.316    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:8044(_owned_engine_element)
+    94720    0.034    0.000    0.081    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:7743(_own_ring)
+    37180    0.032    0.000    0.152    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5799(_mul_)
+    61920    0.032    0.000    0.055    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5693(_sage_numeral)
+    22240    0.031    0.000    0.063    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py:158(__contains__)
+    77560    0.030    0.000    0.030    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5756(__init__)
+   103800    0.029    0.000    0.029    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:2285(localization_source)
+     7700    0.026    0.000    0.139    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1936(_from_engine_element)
+   122660    0.025    0.000    0.025    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5760(_backend)
+    54660    0.024    0.000    0.207    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5764(_operator_operand)
+     2940    0.020    0.000    0.071    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1992(_engine_element)
+    22440    0.020    0.000    0.032    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:693(__contains__)
+     7260    0.018    0.000    0.342    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1153(_add_)
+
+
+
+[    4.1s]          2322681 function calls (2229301 primitive calls) in 1.241 seconds
+
+   Ordered by: call count
+   List reduced from 323 to 22 due to restriction <22>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   321540    0.067    0.000    0.067    0.000 {built-in method builtins.isinstance}
+276400/204320    0.075    0.000    0.529    0.000 /probe.py:82(counted)
+   170060    0.072    0.000    0.072    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6653(_element_constructor_)
+   170060    0.054    0.000    0.169    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6649(__call__)
+   122660    0.025    0.000    0.025    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5760(_backend)
+   103800    0.029    0.000    0.029    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:2285(localization_source)
+    94720    0.034    0.000    0.081    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:7743(_own_ring)
+    77560    0.089    0.000    0.119    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6624(_from_engine_element)
+    77560    0.030    0.000    0.030    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5756(__init__)
+75220/59820    0.035    0.000    0.316    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:8044(_owned_engine_element)
+    61920    0.067    0.000    0.219    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5713(_operand_in_ring)
+    61920    0.032    0.000    0.055    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5693(_sage_numeral)
+    54660    0.009    0.000    0.009    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6701(__contains__)
+    54660    0.024    0.000    0.207    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5764(_operator_operand)
+    52240    0.012    0.000    0.012    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1123(denominator)
+    37720    0.012    0.000    0.012    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1120(numerator)
+    37180    0.039    0.000    0.335    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5823(__mul__)
+    37180    0.032    0.000    0.152    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5799(_mul_)
+    27340    0.048    0.000    0.110    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1115(__init__)
+    22480    0.038    0.000    0.186    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1701(_fraction_with_admitted_denominator)
+    22440    0.020    0.000    0.032    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:693(__contains__)
+    22240    0.031    0.000    0.063    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py:158(__contains__)
+
+
+
+[peakrss] split528base: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 309 MiB
+[peakrss] low-water MemAvail : 12412 MiB
+[peakrss] peak single VmHWM  : 309 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      298 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   309 MiB hwm=   309 MiB avail= 12490 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   309 MiB hwm=   309 MiB avail= 12412 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   266 MiB hwm=   267 MiB avail= 12755 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail= 12888 MiB
+launcher exit: 0

@@ -1,0 +1,31 @@
+[    0.2s] === the T_Co specimen (Fraction Field of Integer Ring, rank 11) ===
+[    0.2s]   a.to_vector                    3
+[    0.2s]   e.to_vector                    1
+[    0.2s]   gram_tensor                    1
+[    0.2s]   module_generating_set         54
+[    0.2s]   ring.fraction_field            1
+[    0.2s]   ring.one                       1
+[    0.2s]   ring.zero                     45
+[    0.2s]   the transvection fixes e: True
+[    0.2s] COUNTS tco a.to_vector=3 e.to_vector=1 gram_tensor=1 module_generating_set=54 ring.fraction_field=1 ring.one=1 ring.zero=45
+[    0.3s] 
+[    0.3s] === the rank-3 control (Lattice of rank 3 and signature (2, 1)) ===
+[    0.3s]   a.to_vector                    3
+[    0.3s]   e.to_vector                    1
+[    0.3s]   gram_tensor                    1
+[    0.3s]   module_generating_set         25
+[    0.3s]   ring.fraction_field            1
+[    0.3s]   ring.zero                     14
+[    0.3s]   the transvection fixes e: True
+[    0.3s] COUNTS control a.to_vector=3 e.to_vector=1 gram_tensor=1 module_generating_set=25 ring.fraction_field=1 ring.zero=14
+[peakrss] counts528after: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 299 MiB
+[peakrss] low-water MemAvail : 12887 MiB
+[peakrss] peak single VmHWM  : 299 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      288 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   299 MiB hwm=   299 MiB avail= 12887 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13115 MiB
+launcher exit: 0

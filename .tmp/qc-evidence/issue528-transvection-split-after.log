@@ -1,0 +1,161 @@
+[    0.1s] lattice Lattice of rank 11 and signature (2, 9) of rank 11
+[    0.1s] e = e_1, q(e) = 0
+[    0.1s] a = e_0 + 3*e_3, b(e, a) = 0
+[    0.2s] one library eichler_transvection: 37.013 ms
+[    0.3s] checks (t(e) = e, 121 pairings preserved): True
+[    0.3s] the library call, 20 times: 1.481 ms a call
+[    0.3s] instrumented: _owned_engine_element, _engine_element, _engine_ring, _engine_component_matrix, _element_constructor_@ring_foundation.IntegerModRing_generic, _element_constructor_@ring_foundation.PolynomialQuotientRing_generic, _element_constructor_@ring_foundation.PolynomialRing_generic, _element_constructor_@ring_foundation.RngMor, _element_constructor_@ring_foundation.RingMor, _element_constructor_@ring_foundation.PredicateSubrings.ParentMethods, _element_constructor_@ring_foundation.PredicateSubrings.ParentMethods, _element_constructor_@ring_foundation.LocalizationRings.ParentMethods, _element_constructor_@ring_foundation.LocalizationRings.ParentMethods, _element_constructor_@ring_foundation._PredicateSubringParent, _element_constructor_@ring_foundation._OwnedRingParent, to_vector@framed_free_modules.FramedFreeModules.ElementMethods, to_vector@framed_free_modules.FramedFreeModules.ElementMethods, _framing_lift@framed_free_modules.Modules.ParentMethods, _framing_lift@framed_free_modules._SparseFreeModuleParent
+[    0.3s] the same call counted, 20 times: 1.535 ms a call
+[    0.3s] 
+[    0.3s] === what one library call crosses ===
+[    0.3s]   call                                            calls       ms   us/call
+[    0.3s]   _engine_element                                  79.0    0.295       3.7
+[    0.3s]   _engine_component_matrix                          1.0    0.190     190.0
+[    0.3s]   _owned_engine_element                            65.0    0.185       2.8
+[    0.3s]   _element_constructor_                           166.0    0.068       0.4
+[    0.3s]   _engine_ring                                     39.0    0.021       0.5
+[    0.3s]   to_vector                                         2.0    0.003       1.4
+[    0.3s]   _framing_lift                                     2.0    0.002       0.9
+[    0.3s] 
+[    0.3s] === the crossings, by stage (one call) ===
+[    0.4s]   1 the three guards (parent, q(e), b(e, a))
+[    0.4s]       _element_constructor_                         28
+[    0.4s]       _owned_engine_element                         16
+[    0.4s]       _engine_element                                6
+[    0.4s]       _engine_ring                                   2
+[    0.4s]   2 half_norm = q(a)/2 in the fraction field
+[    0.4s]       _element_constructor_                         29
+[    0.4s]       _owned_engine_element                         11
+[    0.4s]       _engine_ring                                   1
+[    0.4s]   4 engine = _engine_ring(ring)
+[    0.4s]       _engine_ring                                   1
+[    0.4s]   5 e's coordinates, as written (to_vector per label)
+[    0.4s]       _element_constructor_                         33
+[    0.4s]       _engine_element                               33
+[    0.4s]       _engine_ring                                  11
+[    0.4s]       _framing_lift                                 11
+[    0.4s]       to_vector                                     11
+[    0.4s]   6 a's coordinates, as written (to_vector per label)
+[    0.4s]       _element_constructor_                         33
+[    0.4s]       _engine_element                               33
+[    0.4s]       _engine_ring                                  11
+[    0.4s]       _framing_lift                                 11
+[    0.4s]       to_vector                                     11
+[    0.4s]   5+6 the same two, one to_vector each (the datum read once)
+[    0.4s]       _element_constructor_                         66
+[    0.4s]       _engine_element                               66
+[    0.4s]       _engine_ring                                  22
+[    0.4s]       _framing_lift                                  2
+[    0.4s]       to_vector                                      2
+[    0.4s]   7 gram = _engine_component_matrix(gram_tensor())
+[    0.4s]       _engine_component_matrix                       1
+[    0.4s]   9 the per-entry loop (rank^2 entries)
+[    0.4s]       _element_constructor_                       8525
+[    0.4s]       _owned_engine_element                       3718
+[    0.4s]       _engine_ring                                 385
+[    0.4s]   10 the matrix assembly, entry by entry
+[    0.4s]       _element_constructor_                        363
+[    0.4s]       _engine_element                              363
+[    0.4s]       _engine_ring                                 121
+[    0.4s] 
+[    0.4s] 
+[    0.4s] === the base body's arrangement, stage by stage, per call (counters off) ===
+[    0.4s]     the stages below are `8316-8409` as the base tree wrote them, kept
+[    0.4s]     unchanged so one probe measures both trees; their matrix is checked
+[    0.4s]     equal to the library's, and the library no longer runs them.
+[    0.7s]   stage                                                      ms/call
+[    0.7s]   1 the three guards (parent, q(e), b(e, a))                   0.123
+[    0.7s]   2 ring.fraction_field()                                      0.006
+[    0.7s]   2 half_norm = q(a)/2 in the fraction field                   0.089
+[    0.7s]   3 labels = tuple(module_generating_set())                    0.019
+[    0.7s]   4 engine = _engine_ring(ring)                                0.003
+[    0.7s]   5 e's coordinates, as written (to_vector per label)          0.136
+[    0.7s]   6 a's coordinates, as written (to_vector per label)          0.116
+[    0.7s]   5+6 the same two, one to_vector each (the datum read once)     0.222
+[    0.7s]   7 gram = _engine_component_matrix(gram_tensor())             0.206
+[    0.7s]   8 gram * e (one rank-by-one product)                         0.033
+[    0.7s]   8 gram * a (one rank-by-one product)                         0.008
+[    0.7s]   9 the per-entry loop (rank^2 entries)                       16.362
+[    0.7s]   10 the matrix assembly, entry by entry                       0.913
+[    0.7s]   11 lattice.Aut()                                             0.004
+[    0.7s]   12 _isometry_from_column_matrix(matrix)                      0.650
+[    0.7s]   total                                                       18.889
+[    0.7s] 
+[    0.7s] === the formula's own arithmetic, engine throughout: 0.389 ms a call ===
+[    0.7s]     the library 1.481 ms, the base arrangement 18.889 ms, the formula 0.389 ms
+[    0.7s] RESULT library_ms=1.481 counted_ms=1.535 staged_ms=18.889 formula_ms=0.389 ratio=3.81
+[    0.7s] 
+[    0.7s] === cProfile over the library calls ===
+[    0.8s]          146621 function calls (140421 primitive calls) in 0.062 seconds
+
+   Ordered by: internal time
+   List reduced from 302 to 22 due to restriction <22>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    20860    0.003    0.000    0.003    0.000 {built-in method builtins.isinstance}
+       20    0.003    0.000    0.035    0.002 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:8329(_eichler_transvection_column_matrix)
+7080/2380    0.002    0.000    0.025    0.000 /probe.py:82(counted)
+      540    0.002    0.000    0.008    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:1992(_engine_element)
+     2620    0.002    0.000    0.003    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py:158(__contains__)
+      520    0.001    0.000    0.002    0.000 /workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/copy.py:62(copy)
+     2780    0.001    0.000    0.002    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:693(__contains__)
+     2160    0.001    0.000    0.001    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:436(__classcall__)
+     1320    0.001    0.000    0.001    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6624(_from_engine_element)
+     2360    0.001    0.000    0.002    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6779(_element_constructor_)
+     2800    0.001    0.000    0.001    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6653(_element_constructor_)
+     3660    0.001    0.000    0.003    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:7743(_own_ring)
+     3000    0.001    0.000    0.001    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:2285(localization_source)
+      400    0.001    0.000    0.001    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:2275(_repr_)
+      220    0.001    0.000    0.002    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:2166(Of)
+     6240    0.001    0.000    0.002    0.000 /repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:243(<genexpr>)
+      400    0.001    0.000    0.005    0.000 /repos/sage-extensions/src/sage_extensions/tensors/tensor.py:122(_ring_session_and_latex)
+      440    0.001    0.000    0.004    0.000 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/framed_free_modules.py:119(__call__)
+      160    0.001    0.000    0.007    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:2201(_fraction_equality_status)
+ 1580/540    0.001    0.000    0.010    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:8031(_engine_element)
+      520    0.001    0.000    0.001    0.000 /sage/.venv/lib/python3.14/site-packages/sage/rings/infinity.py:1098(_element_constructor_)
+     2800    0.001    0.000    0.002    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6649(__call__)
+
+
+
+[    0.8s]          146621 function calls (140421 primitive calls) in 0.062 seconds
+
+   Ordered by: call count
+   List reduced from 302 to 22 due to restriction <22>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+    20860    0.003    0.000    0.003    0.000 {built-in method builtins.isinstance}
+7080/2380    0.002    0.000    0.025    0.000 /probe.py:82(counted)
+     6240    0.001    0.000    0.002    0.000 /repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:243(<genexpr>)
+     6200    0.000    0.000    0.000    0.000 /sage/.venv/lib/python3.14/site-packages/sage/misc/latex.py:243(<genexpr>)
+     3660    0.001    0.000    0.003    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:7743(_own_ring)
+     3000    0.001    0.000    0.001    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:2285(localization_source)
+     2940    0.000    0.000    0.000    0.000 {method 'get' of 'dict' objects}
+     2800    0.001    0.000    0.001    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6653(_element_constructor_)
+     2800    0.001    0.000    0.002    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6649(__call__)
+     2780    0.001    0.000    0.002    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:693(__contains__)
+     2640    0.000    0.000    0.000    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:5760(_backend)
+     2620    0.002    0.000    0.003    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py:158(__contains__)
+     2360    0.001    0.000    0.002    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6789(__call__)
+     2360    0.001    0.000    0.002    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6779(_element_constructor_)
+     2360    0.001    0.000    0.001    0.000 /repos/sage-extensions/src/sage_extensions/owned_category.py:1102(is_subcategory)
+     2360    0.000    0.000    0.001    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6793(__contains__)
+     2160    0.001    0.000    0.001    0.000 {built-in method builtins.getattr}
+     2160    0.001    0.000    0.001    0.000 /sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:436(__classcall__)
+1700/1680    0.000    0.000    0.000    0.000 {built-in method builtins.hash}
+     1600    0.000    0.000    0.000    0.000 {built-in method builtins.id}
+ 1580/540    0.001    0.000    0.010    0.000 /repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:8031(_engine_element)
+     1480    0.000    0.000    0.000    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:6684(__init__)
+
+
+
+[peakrss] split528after: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 309 MiB
+[peakrss] low-water MemAvail : 13004 MiB
+[peakrss] peak single VmHWM  : 309 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      298 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   309 MiB hwm=   309 MiB avail= 13004 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13232 MiB
+launcher exit: 0
