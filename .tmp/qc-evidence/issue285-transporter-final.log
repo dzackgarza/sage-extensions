@@ -1,0 +1,20 @@
+tree SHA: 7a35416ed29d70d59cb8df585ccb0a819f4cc057
+port SHA: 991b88b0
+inner 1500 s, outer 1600 s, guard 6144 MiB
+command: /sage/.venv/bin/python -u -s /probe.py 4.3.5 4.3.9
+4.3.5: 12 printed walls, 12 returned walls, transporter carries them onto the returned family: True, contains(transporter): True, the two families differ as sets: True, in 219.9 s
+4.3.9: 14 printed walls, 14 returned walls, transporter carries them onto the returned family: True, contains(transporter): True, the two families differ as sets: True, in 212.4 s
+[peakrss] probe285-final: child waited=0 shell_code=0 samples=218
+[peakrss] peak tree RSS      : 1757 MiB
+[peakrss] low-water MemAvail : 11323 MiB
+[peakrss] peak single VmHWM  : 1757 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1746 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   176.1s procs=  3 rss=  1757 MiB hwm=  1757 MiB avail= 12189 MiB
+[peakrss]   t=   178.1s procs=  3 rss=  1757 MiB hwm=  1757 MiB avail= 12139 MiB
+[peakrss]   t=   180.1s procs=  3 rss=  1757 MiB hwm=  1757 MiB avail= 12158 MiB
+[peakrss]   t=   182.1s procs=  3 rss=  1757 MiB hwm=  1757 MiB avail= 12169 MiB
+[peakrss]   t=   184.1s procs=  3 rss=  1675 MiB hwm=  1757 MiB avail= 12178 MiB
+launcher exit: 0

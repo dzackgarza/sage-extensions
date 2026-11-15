@@ -28,7 +28,10 @@ three cusps whose printed roots the library holds in ``T_{\mathrm{En}}``
 coordinates: *every* one of those roots' reflections lies in the image, decided
 by the discriminant criterion and not by one lift each.  The chamber of that
 reflection subgroup is ``cusp_chamber`` (#297), and the tests at the end of this
-file compare it with the five printed diagrams, wall by wall and edge by edge.
+file compare it with the five printed diagrams, wall by wall and edge by edge --
+and, at all five cusps, exhibit one element of the cusp group that carries
+Sterk's printed walls onto the returned ones, which is #285's clause itself:
+equal Gram matrices do not show that the two chambers are one orbit.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -674,12 +677,14 @@ def test_the_chamber_at_each_cusp_has_sterks_printed_gram_and_diagram() -> None:
     same reflection subgroup, and their Gram matrices coincide.  So the two are
     congruent root families with one diagram, and the diagram is compared as a
     labelled graph -- the card's \(\alpha_i\) on the matched walls -- rather than by
-    the wall vectors.  At the first cusp the transporting element is exhibited and
-    certified in \(G_v\) by
-    ``test_the_first_cusps_chamber_is_sterks_under_one_admitted_reflection``; at the
-    other four it is not exhibited, so what is asserted there is the recorded Gram,
-    the recorded diagram, and that every printed wall is an admitted reflection of
-    \(G_v\).
+    the wall vectors.  At the first cusp the transporting element is exhibited as
+    one admitted reflection, by
+    ``test_the_first_cusps_chamber_is_sterks_under_one_admitted_reflection``, and
+    at all five by
+    ``test_each_cusps_chamber_is_sterks_under_an_element_of_the_cusp_group``,
+    which decides the transporter's membership in \\(G_v\\) on the discriminant
+    group; this test asserts the recorded Gram, the recorded diagram, and that
+    every printed wall is an admitted reflection of \\(G_v\\).
     """
     rows = _card_cusp_rows()
     assert cardinal(sum(1 for _ in rows)) == cardinal(5)
@@ -859,3 +864,124 @@ def test_the_first_cusps_chamber_is_sterks_under_one_admitted_reflection() -> No
         reflection(returned[match[position]]) == returned[match[position]] for position in shared
     )
     assert image.contains(reflection) is True
+
+
+def _vector_key(vector):
+    r"""Return the coordinates of ``vector`` in the generating set of its lattice.
+
+    A wall of a chamber is a *vector*, not a line: the chamber is the
+    intersection of the half-spaces ``b(wall, x) >= 0``, so two walls with the
+    same line and opposite signs cut opposite half-spaces.  An isometry carrying
+    one chamber onto the other therefore has to carry the printed walls onto the
+    returned ones with their signs, and this is the key that comparison uses --
+    the sign-insensitive :func:`_normalized` is only for matching diagrams.
+    """
+    return tuple(int(entry) for entry in vector.to_vector())
+
+
+def _transporter_of_the_chambers(reduction, printed, returned):
+    r"""Return one isometry of ``N`` carrying Sterk's printed walls onto the returned ones.
+
+    ``printed`` and ``returned`` are two families of roots of ``N``, and the
+    question is the transporter of the two families under ``O(N)`` *up to
+    reindexing*: one isometry ``g`` with ``g o printed = returned o sigma`` for
+    some bijection ``sigma`` of the walls.  That is the library's own
+    construction, ``O(N).transporter`` on two families of vectors
+    (``coloured_vector_families``, the port of Indefinite.jl's
+    ``KernelLinPolytopeIntegral_Automorphism_Subspaces``), and it is not
+    re-done here: it reads the labelled pairing graph of the printed family --
+    the diagram, with every square and every pairing for an edge label -- takes
+    its automorphisms as the candidate reindexings ``sigma``, and solves, for
+    each, the exact linear system ``T(v_i) = w_{sigma(i)}`` in
+    ``N \otimes \mathbf Q``.  Because a chamber's ten or more walls span the
+    rank-ten space, each ``sigma`` admits at most one such ``T``, and the answer
+    is ``None`` when no ``sigma`` admits an integral one.
+
+    So the diagram symmetry the clause asks for is searched, not chosen, and
+    the isometry returned carries the whole printed family onto the whole
+    returned family.  Whether it lies in ``G_v`` is decided by the caller with
+    :meth:`contains`, the call's own criterion.
+    """
+    count = int(cardinal(sum(1 for _ in printed)))
+    indices = Sets.Δ[count - 1]
+    family = Sets().Mor(indices, reduction)(lambda position: printed[int(position)])
+    target = Sets().Mor(indices, reduction)(lambda position: returned[int(position)])
+    return reduction.O().transporter(family, target)
+
+
+def test_each_cusps_chamber_is_sterks_under_an_element_of_the_cusp_group() -> None:
+    r"""At every cusp an element of \(G_v\) carries Sterk's printed chamber onto the returned one.
+
+    This is the clause #285 asks for: the chamber's simple roots *are* Sterk's
+    published ones, compared as sets of roots up to the cusp group's action, and
+    not merely a root family with his Gram matrix.  Two chambers of one
+    reflection group are carried one to the other by an element of it -- the
+    chamber complex of a Coxeter group is a chamber system on which the group
+    acts simply transitively (J. E. Humphreys, *Reflection Groups and Coxeter
+    Groups*, Cambridge Studies in Advanced Mathematics 29, §5.13, with §1.12 for
+    the chamber as the intersection of the half-spaces of its walls; E. B.
+    Vinberg, *On the groups of unit elements of certain quadratic forms*, Math.
+    USSR Sb. 16 (1972), §1) -- and the returned chamber is the cell of the
+    reflection subgroup \(W'\le G_v\) at the controlling vector the call computes
+    (:meth:`cusp_chamber`, Proposition 4, p. 28), while Sterk's printed diagram
+    at each cusp is "the diagram for the reflection subgroup of \(G_v\)" (H.
+    Sterk, *Compactifications of the period space of Enriques surfaces, Part I*,
+    Math. Z. 207 (1991), (4.3.5) with Fig. 4, p. 19, (4.3.6), p. 21, (4.3.7),
+    p. 22, (4.3.8) with Fig. 10, p. 23, and (4.3.9) with Fig. 12, p. 24).  So the
+    transporting element lies in \(W'\), hence in \(G_v\).
+
+    The element is the library's transporter of two families of lattice vectors,
+    :func:`_transporter_of_the_chambers`: it searches the reindexings of the
+    printed family that preserve the labelled pairing graph -- the diagram
+    symmetry Sterk leaves as a computation in (4.3.10), p. 24, "symmetries of
+    the graph can be lifted to \(\Gamma_v\)" -- and solves for the isometry of
+    \(N\) carrying each printed wall to its image.  Nothing is chosen by hand,
+    and because a chamber's walls span the rank-ten space the isometry for a
+    given reindexing is unique.
+
+    Membership in \(G_v\) is then asked of the call itself, :meth:`contains`,
+    which decides \(\rho(g) \in \rho(K_v)\rho(\Gamma_{\mathrm{En},2})\) on the
+    discriminant group by one sift and never against a list of the group's
+    elements -- the same criterion the chamber's root filter uses.  At these
+    five cusps the answer is *yes*, so at each of them Sterk's published simple
+    roots are the returned ones moved by an element of the cusp group.
+
+    **The two lists are not the same list.**  The returned chamber is the cell at
+    a controlling vector the call computes for itself, so its wall vectors need
+    not be Sterk's, and at all five cusps they are not: the two families differ
+    as sets of walls at each of them, which is exactly why equal Gram matrices
+    left the clause open, and the transporter asserted below is therefore
+    nontrivial at every cusp.  The match of the two diagrams is Sterk's
+    (4.3.10) computation, and it is the transporter's own search that decides it
+    here.
+    """
+    rows = _card_cusp_rows()
+    transported = []
+    for statement in sorted(rows):
+        data = _card_chamber(statement)
+        image = data["image"]
+        reduction = image.reduction()
+        printed = data["printed"]
+        returned = data["returned"]
+        transporter = _transporter_of_the_chambers(reduction, printed, returned)
+        assert transporter.parent() is reduction.Aut(), statement
+        carried = tuple(_vector_key(transporter(wall)) for wall in printed)
+        assert set(carried) == set(_vector_key(wall) for wall in returned), (
+            f"the isometry of O(N) that carries Sterk's printed walls at {statement} onto the "
+            f"chamber of G_v the call returns carries them onto another family of walls"
+        )
+        assert image.contains(transporter) is True, (
+            f"at Sterk's cusp {statement} the element of O(N) carrying his printed walls onto the "
+            f"chamber of G_v that the call returns is not certified by the call's own membership "
+            f"test, so the returned chamber is not his chamber moved by G_v"
+        )
+        differences = set(_normalized(wall) for wall in printed) != set(
+            _normalized(wall) for wall in returned
+        )
+        if differences:
+            assert transporter != reduction.Aut().one(), statement
+        transported.append(differences)
+
+    assert cardinal(sum(1 for _ in transported)) == cardinal(sum(1 for _ in rows))
+    assert cardinal(sum(1 for _ in rows)) == cardinal(5)
+    assert any(differences for differences in transported)

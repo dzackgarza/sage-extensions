@@ -1,0 +1,54 @@
+tree SHA: 7a35416ed29d70d59cb8df585ccb0a819f4cc057
+port SHA: 991b88b0
+inner 3300 s, outer 3400 s, guard 6144 MiB
+command: /sage/.venv/bin/python -u -s /probe.py 4.3.6 4.3.7 4.3.8 4.3.9
+=== 4.3.6
+  chamber and printed family: 234.7 s
+  walls: printed 10, returned 10, matched 10
+  positions whose printed and matched returned vectors coincide: 6
+  sets coincide: False
+  transporter: Morphism from Integral lattice of rank 10 and signature (1, 9) to Integral lattice of rank 10 and signature (1, 9) in 0.1 s
+  parent is reduction.Aut(): True
+  carries the printed family onto the returned one: True
+  contains: True in 0.7 s
+=== 4.3.7
+  chamber and printed family: 176.7 s
+  walls: printed 12, returned 12, matched 12
+  positions whose printed and matched returned vectors coincide: 2
+  sets coincide: False
+  transporter: Morphism from Integral lattice of rank 10 and signature (1, 9) to Integral lattice of rank 10 and signature (1, 9) in 0.1 s
+  parent is reduction.Aut(): True
+  carries the printed family onto the returned one: True
+  contains: True in 1.9 s
+=== 4.3.8
+  chamber and printed family: 181.3 s
+  walls: printed 11, returned 11, matched 11
+  positions whose printed and matched returned vectors coincide: 1
+  sets coincide: False
+  transporter: Morphism from Integral lattice of rank 10 and signature (1, 9) to Integral lattice of rank 10 and signature (1, 9) in 0.2 s
+  parent is reduction.Aut(): True
+  carries the printed family onto the returned one: True
+  contains: True in 1.0 s
+=== 4.3.9
+  chamber and printed family: 197.8 s
+  walls: printed 14, returned 14, matched 14
+  positions whose printed and matched returned vectors coincide: 0
+  sets coincide: False
+  transporter: Morphism from Integral lattice of rank 10 and signature (1, 9) to Integral lattice of rank 10 and signature (1, 9) in 0.2 s
+  parent is reduction.Aut(): True
+  carries the printed family onto the returned one: True
+  contains: True in 1.0 s
+[peakrss] probe285-four: child waited=0 shell_code=0 samples=401
+[peakrss] peak tree RSS      : 956 MiB
+[peakrss] low-water MemAvail : 7887 MiB
+[peakrss] peak single VmHWM  : 958 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      948 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   790.4s procs=  3 rss=   956 MiB hwm=   956 MiB avail= 10868 MiB
+[peakrss]   t=   792.4s procs=  3 rss=   950 MiB hwm=   958 MiB avail= 10868 MiB
+[peakrss]   t=   794.4s procs=  3 rss=   943 MiB hwm=   958 MiB avail= 10864 MiB
+[peakrss]   t=   798.4s procs=  3 rss=   943 MiB hwm=   958 MiB avail= 10873 MiB
+[peakrss]   t=   800.4s procs=  3 rss=   943 MiB hwm=   958 MiB avail= 10866 MiB
+launcher exit: 0

@@ -1525,3 +1525,26 @@ started from.  "The tree" is the working tree whose `src` and `tests` are
 The probe sources behind the `500d-*` measurement logs are session probes, not
 library code, and stay out of the tree: each prints the rings, the values and the
 class that answered, so the log carries every reading it is cited for.
+## #285: the cusp group carries Sterk's printed chamber onto the returned one
+
+`tests/lattices/test_the_isotropic_reduction_image.sage` gains
+`test_each_cusps_chamber_is_sterks_under_an_element_of_the_cusp_group`. At each of Sterk's five cusps it asks the
+library's `O(N).transporter` for one isometry of `N = v^⊥/Zv` carrying the card's printed wall vectors onto the
+walls `cusp_chamber()` returns (the transporter searches the diagram's own symmetries and solves each exact linear
+system, so no reindexing is chosen by hand), and then asks the image's `contains` — the discriminant criterion
+`ρ(g) ∈ ρ(K_v)ρ(Γ_{En,2})`, one sift, no element list — whether that isometry lies in the cusp group `G_v`. The
+answer is yes at all five, so Sterk's published simple roots are the returned ones moved by an element of `G_v`,
+which is #285's clause; equal Gram matrices left exactly this open. The whole file, all 17 tests, runs in the image
+job `isotropic-reduction-image-tests.yml`, which no turn waits on; the rows below are the run at one cusp each and
+the lint, which is what a turn's feedback loop allows.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue285-transporter-final.log` | `7a35416` plus the test change of this commit (uncommitted at the time of the run) | the new test's own body — the module's helpers and the module's assertions — at (4.3.5) and (4.3.9): 12 printed and 12 returned walls with the transporter carrying one family onto the other and `contains` `True` in 219.9 s, and 14 and 14 with `contains` `True` in 212.4 s; the two families differ as sets of walls at both cusps; the probe's whole run 436 s, peak tree RSS 1757 MiB on the pinned image with the indefinite port at `/work` |
+| `issue285-transporter-435.log` | the same working tree | (4.3.5): chamber and printed family in 230.8 s, 12 walls each, 9 positions coincide, the transporter found in 0.1 s and `contains` `True` in 0.7 s |
+| `issue285-transporter-four.log` | the same working tree | (4.3.6), (4.3.7), (4.3.8), (4.3.9) in one process: chambers in 234.7, 176.7, 181.3 and 197.8 s; 10, 12, 11 and 14 walls with 6, 2, 1 and 0 positions coinciding; the transporter in 0.1–0.2 s and `contains` `True` in 0.7–1.9 s at every one; the probe 802 s, peak tree RSS 956 MiB. This run compares the two families sign-insensitively, which is the earlier form of the assertion; the isometry it reads is the same object the committed test asserts, and the sign-sensitive comparison is the row above |
+| `issue285-transporter-lint.log` | the same working tree | `python -m sage_extensions.testing.test_lint tests/lattices/test_the_isotropic_reduction_image.sage`: **1 files, 0 findings** in 4.0 s |
+
+The probe sources behind these logs are session probes, not library code, and stay out of the tree: each execs the
+test file through `sage.repl.preparse` and runs the test's body for the cusps named on its command line, or prints
+the chamber, the transporter and the membership answer at one cusp.
