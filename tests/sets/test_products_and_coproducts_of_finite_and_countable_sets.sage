@@ -1006,3 +1006,65 @@ def test_infinite_componentwise_set_maps_use_a_selected_natural_transformation()
             pass
         else:
             raise AssertionError("componentwise arrow accepted a different factor object")
+
+
+def test_a_subset_is_a_factor_and_equal_subsets_give_one_product() -> None:
+    r"""``SET-05``: a subset of a finite set is a factor, and equal subsets are one factor.
+
+    Two subsets of ``{a, b}`` cut out by the same predicate are equal sets, so the
+    products with them are one product; the subset ``{b}`` is another factor.
+    """
+    points = FiniteOrderedSets()(("a", "b"))
+    first = points.power_set().from_predicate(lambda member: member == "a")
+    second = points.power_set().from_predicate(lambda member: member == "a")
+    other = points.power_set().from_predicate(lambda member: member == "b")
+    assert first == second
+    assert first != other
+
+    product = Sets().product((first, points))
+    assert Sets().product((second, points)) is product
+    assert Sets().product((other, points)) is not product
+    coproduct = Sets().coproduct((first, points))
+    assert Sets().coproduct((second, points)) is coproduct
+
+
+def test_a_polytope_is_a_factor_of_a_product() -> None:
+    r"""``SET-05``: an equal triangle is one factor, and different triangles are not.
+
+    A polytope is the convex hull of its vertices, so its vertex set decides
+    the equality of two polytopes of one lattice -- what containment both ways,
+    the equality of two subsets of an infinite ambient set, leaves as a
+    proposition that no procedure decides.  A triangle and the triangle on the
+    same vertices listed from another corner are one set: one hash, and one
+    product with ``Delta[1]``.  Triangles with different vertices are
+    different convex hulls, and five of them have five hashes.
+    """
+    lattice = ZZ ^ 2
+    triangle = ConvexPolytopes(lattice)([[0, 0], [1, 0], [0, 1]])
+    relocated = ConvexPolytopes(lattice)([[1, 0], [0, 1], [0, 0]])
+    other = ConvexPolytopes(lattice)([[0, 0], [2, 0], [0, 1]])
+
+    assert triangle == relocated
+    assert triangle != other
+    assert hash(triangle) == hash(relocated)
+
+    product = Sets().product((triangle, Sets.Δ[1]))
+    assert product.factor(0) is triangle
+    assert Sets().product((triangle, Sets.Δ[1])) is product
+    assert Sets().product((relocated, Sets.Δ[1])) is product
+    other_product = Sets().product((other, Sets.Δ[1]))
+    assert other_product is not product
+    assert other_product.factor(0) is other
+
+    triangles = [
+        ConvexPolytopes(lattice)(vertices)
+        for vertices in (
+            ((0, 0), (1, 0), (0, 1)),
+            ((0, 0), (2, 0), (0, 1)),
+            ((0, 0), (1, 0), (0, 2)),
+            ((0, 0), (1, 1), (0, 1)),
+            ((0, 0), (1, 0), (1, 1)),
+        )
+    ]
+    assert cardinal(sum(1 for _ in {hash(each) for each in triangles})) == cardinal(5)
+

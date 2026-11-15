@@ -1,0 +1,28 @@
+tree SHA: d1ab7fc7856b1132cf1c745128eddce0e5f7e6ca
+port SHA: 991b88b0
+inner 300 s, outer 350 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u /probe.py
+polygon vertices: 119
+  hash 1 of the 119-gon:    2.020 ms
+  hash 2 of the 119-gon:    0.019 ms
+  hash 3 of the 119-gon:    0.009 ms
+  hash 1 of a subset of 2000 points:   76.055 ms
+    decisions this hash: 2000
+  hash 2 of a subset of 2000 points:   75.912 ms
+    decisions this hash: 2000
+  hash 3 of a subset of 2000 points:   77.746 ms
+    decisions this hash: 2000
+  hash 1 of the cone with a lineality space:    0.413 ms
+  hash 2 of the cone with a lineality space:    0.202 ms
+  hash 3 of the cone with a lineality space:    0.175 ms
+[peakrss] cost531main: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 289 MiB
+[peakrss] low-water MemAvail : 11767 MiB
+[peakrss] peak single VmHWM  : 289 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      278 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   289 MiB hwm=   289 MiB avail= 11767 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 11937 MiB
+launcher exit: 0

@@ -1,0 +1,53 @@
+tree SHA: 96c6f3d50e2e3e4c48860bf5b7c41da419a91304
+port SHA: 991b88b0
+inner 400 s, outer 450 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u /probe.py
+triangle == relocated: True
+triangle == cut: True
+triangle == other: False
+hash triangle, relocated, cut, other: 3753296340304525076 3753296340304525076 3753296340304525076 6385616775860823294
+five triangles, distinct hashes: 5
+a second triangle on the same vertices gives the same product: True
+a different triangle gives another product: True
+the halfspace triangle gives the same product: True
+[   0.06s] polytope identity
+polygon vertices: 119
+  first hash of the 119-gon:  115.171 ms
+  second hash of it:    0.002 ms
+  third hash of it:    0.000 ms
+  one hash: True
+[   0.19s] polytope cache
+upper: pointed False, dimension 2, canonical form (((1, 0),), ((0, 1),)), hash 6203386781628041536
+steeper: pointed False, dimension 2, canonical form (((1, 1),), ((1, -1),)), hash 4063588281701445641
+mirror: pointed False, dimension 2, canonical form (((1, -1),), ((-1, -1),)), hash 2962759483388409246
+lower: pointed False, dimension 2, canonical form (((1, 0),), ((0, -1),)), hash -7126765664035714842
+upper == lower: False
+three half-planes, distinct hashes: 3
+two sides of one line, distinct hashes: 2
+quarter: (((1, 0, 0),), ((0, 0, 1), (0, 1, 0))) 3469221157262005507
+opposite: (((1, 0, 0),), ((0, -1, 0), (0, 0, 1))) -5800060939625869966
+quarter == opposite: False
+wide cone pointed: False
+  first hash of the cone with a lineality space:    0.564 ms
+  second hash of it:    0.001 ms
+  third hash of it:    0.000 ms
+[   0.25s] cone cache
+  first hash of a subset of 2000 points:   76.782 ms
+  second hash of it:    0.001 ms
+  third hash of it:    0.001 ms
+  decisions: before 2000, after the first hash 4000, after three hashes 4000
+[   0.36s] subset cache
+half-planes: 8 cones, 8 forms, 28 pairs agree, 0 disagree
+wedges: 56 cones, 28 forms, 1540 pairs agree, 0 disagree
+[   0.49s] canonical form is a complete invariant
+[peakrss] probe531f: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 296 MiB
+[peakrss] low-water MemAvail : 11845 MiB
+[peakrss] peak single VmHWM  : 296 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      285 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   296 MiB hwm=   296 MiB avail= 11845 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 12088 MiB
+launcher exit: 0

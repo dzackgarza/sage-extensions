@@ -1,0 +1,7 @@
+=== ran on: 1e18b98 (the merge of omm/main 2993a51 into the #541 repair)
+=== command: pytest tests/modules/test_the_embedded_framing_is_one_datum.sage -o addopts= -p qc_sage_session
+=== ran on: 1e18b987fd324e4ccf2eacc769c4b01ce32b8b4c (0 modified paths)
+=== command: pytest tests/modules/test_the_embedded_framing_is_one_datum.sage -o addopts= -p qc_sage_session
+..                                                                       [100%]
+2 passed in 1.09s
+=== exit: 0

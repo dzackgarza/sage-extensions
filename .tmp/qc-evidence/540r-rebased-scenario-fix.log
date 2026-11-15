@@ -1,0 +1,62 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt540c
+tree SHA: 6141e01daebd1e75b0b5e1840fc355980aa69252
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests: tests/sets/test_cardinality_construction_comparisons.sage tests/sets/test_standard_cardinals_archive.sage tests/divisors/test_toric_class_groups.sage
+extra: -q --no-header -p no:cacheprovider --tb=line
+FF.F.........                                                            [100%]
+=================================== FAILURES ===================================
+E   AssertionError: cannot give the morphism (2)^(ℵ_0) -> (2)^(ℵ_0) of cardinals: it is undecided whether (2)^(ℵ_0) <= (2)^(ℵ_0)
+/repos/sage-extensions/src/sage_extensions/categories/sets/cardinals.py:369: AssertionError: cannot give the morphism (2)^(ℵ_0) -> (2)^(ℵ_0) of cardinals: it is undecided whether (2)^(ℵ_0) <= (2)^(ℵ_0)
+E   AssertionError: cannot give the morphism ℵ_0 -> ℵ_0 of cardinals: it is undecided whether ℵ_0 <= ℵ_0
+/repos/sage-extensions/src/sage_extensions/categories/sets/cardinals.py:369: AssertionError: cannot give the morphism ℵ_0 -> ℵ_0 of cardinals: it is undecided whether ℵ_0 <= ℵ_0
+E   TypeError: the proposition is_finitely_generated(Ring over Fraction Field of Integer Ring) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+/repos/sage-extensions/src/sage_extensions/logic.py:44: TypeError: the proposition is_finitely_generated(Ring over Fraction Field of Integer Ring) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+0.57s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_hirzebruch_surface_survives_a_polynomial_ring_built_first
+0.22s call     tests/divisors/test_toric_class_groups.sage::test_the_three_torus_invariant_lines_of_the_plane_share_one_nonzero_class
+0.12s call     tests/sets/test_standard_cardinals_archive.sage::test_matrix_ring_cardinality_tracks_the_coefficient_ring
+0.11s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_cone_has_order_two
+0.10s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_cone_is_torsion
+0.06s call     tests/sets/test_standard_cardinals_archive.sage::test_rational_power_series_have_continuum_cardinality
+0.03s call     tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic
+0.03s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_affine_plane_is_trivial
+0.01s call     tests/divisors/test_toric_class_groups.sage::test_the_boundary_is_three_lines_and_the_canonical_class_is_minus_three_lines
+0.01s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_surface_is_free
+0.01s call     tests/sets/test_standard_cardinals_archive.sage::test_rational_polynomial_ring_is_countable
+0.00s call     tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_compares_a_countable_power_set_with_two_to_aleph_zero
+0.00s call     tests/divisors/test_toric_class_groups.sage::test_the_torus_invariant_weil_divisors_of_the_plane_are_free_on_its_three_rays
+0.00s setup    tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_compares_a_countable_power_set_with_two_to_aleph_zero
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_three_torus_invariant_lines_of_the_plane_share_one_nonzero_class
+0.00s setup    tests/sets/test_standard_cardinals_archive.sage::test_matrix_ring_cardinality_tracks_the_coefficient_ring
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_cone_has_order_two
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_hirzebruch_surface_survives_a_polynomial_ring_built_first
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_boundary_is_three_lines_and_the_canonical_class_is_minus_three_lines
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_cone_is_torsion
+0.00s setup    tests/sets/test_standard_cardinals_archive.sage::test_rational_polynomial_ring_is_countable
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_surface_is_free
+0.00s setup    tests/sets/test_standard_cardinals_archive.sage::test_rational_power_series_have_continuum_cardinality
+0.00s setup    tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_torus_invariant_weil_divisors_of_the_plane_are_free_on_its_three_rays
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_affine_plane_is_trivial
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_affine_plane_is_trivial
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_three_torus_invariant_lines_of_the_plane_share_one_nonzero_class
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_surface_is_free
+0.00s teardown tests/sets/test_standard_cardinals_archive.sage::test_matrix_ring_cardinality_tracks_the_coefficient_ring
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_boundary_is_three_lines_and_the_canonical_class_is_minus_three_lines
+0.00s teardown tests/sets/test_standard_cardinals_archive.sage::test_rational_power_series_have_continuum_cardinality
+0.00s teardown tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_hirzebruch_surface_survives_a_polynomial_ring_built_first
+0.00s teardown tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_compares_a_countable_power_set_with_two_to_aleph_zero
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_cone_has_order_two
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_cone_is_torsion
+0.00s teardown tests/sets/test_standard_cardinals_archive.sage::test_rational_polynomial_ring_is_countable
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_torus_invariant_weil_divisors_of_the_plane_are_free_on_its_three_rays
+=========================== short test summary info ============================
+FAILED tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_compares_a_countable_power_set_with_two_to_aleph_zero
+FAILED tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic
+FAILED tests/sets/test_standard_cardinals_archive.sage::test_rational_power_series_have_continuum_cardinality
+3 failed, 10 passed in 1.81s

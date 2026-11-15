@@ -1,0 +1,21 @@
+=== ran on: f3dd15671eb6beedad8199c19ed4571fef1068f5 (2 modified paths)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== command: pytest tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage tests/lattices/test_integral_reduction_lift_witness.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --durations=0
+............                                                             [100%]
+============================== slowest durations ===============================
+7.32s call     tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage::test_the_locus_of_a_section_with_unequal_smith_steps_is_every_class_that_lifts
+3.04s call     tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage::test_the_locus_at_a_non_integral_base_point_is_every_class_that_lifts
+1.10s call     tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage::test_the_locus_of_a_divisibility_two_control_with_a_nontrivial_kernel_is_every_class
+0.89s call     tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage::test_the_locus_of_the_divisibility_two_controls_is_every_class_that_lifts
+0.72s call     tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage::test_the_integral_locus_is_a_subset_of_its_torsor
+0.53s call     tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage::test_the_locus_of_divisibility_one_controls_is_every_class_that_lifts
+0.47s call     tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage::test_the_locus_is_membership_in_the_residue_class
+0.39s call     tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage::test_an_empty_residue_locus_gives_an_empty_subset
+0.32s call     tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage::test_the_locus_of_a_divisibility_four_control_is_every_class_that_lifts
+0.04s call     tests/lattices/test_integral_reduction_lift_witness.sage::test_unequal_hyperbolic_determinants_have_no_integral_marked_line_lift
+0.03s call     tests/lattices/test_integral_reduction_lift_witness.sage::test_identity_reduction_has_an_integral_marked_line_lift
+0.02s call     tests/lattices/test_integral_reduction_lift_witness.sage::test_the_lift_torsor_computes_its_base_point_once_per_torsor
+
+(24 durations < 0.005s hidden.  Use -vv to show these durations.)
+12 passed in 16.24s
+=== exit: 0

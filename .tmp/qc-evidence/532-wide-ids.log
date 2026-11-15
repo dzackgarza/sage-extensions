@@ -1,0 +1,34 @@
+# The failure and error ids of the two wide runs, one line each.
+# The full logs are 1.2 MB each because the sets file's 55 setup errors repeat its
+# lint findings; what they differ in is the id set, which is what is kept here.
+#
+# main tree: refs/remotes/omm/main 52cbab3e7c77c2202311a59057a3c332a15b1efc
+# fixed tree: 9bc00c1 with the quotient repair
+# port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+# command: python -m pytest -p qc_sage_session tests/lattices/test_cone_integral_primitive_compositions.sage tests/lattices/test_reduction_complex_exploration.sage tests/schemes/test_lattice_polygon_invariants.sage tests/schemes/test_polytope_classification.sage tests/schemes/test_toric_archive_reconciliation.sage tests/schemes/test_toric_polarizing_sections.sage tests/schemes/test_toric_schemes.sage tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage -q -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates
+
+## main
+6 failed, 9 passed, 55 errors in 15.67s
+FAILED tests/lattices/test_cone_integral_primitive_compositions.sage::test_a_simplicial_cone_retains_its_inclusion_and_ray_lattice_index
+FAILED tests/lattices/test_reduction_complex_exploration.sage::test_the_four_quadrants_pair_every_facet_and_their_transporters_generate_O_of_I2
+FAILED tests/schemes/test_lattice_polygon_invariants.sage::test_the_centred_square_is_reflexive_with_the_diamond_as_polar_dual
+FAILED tests/schemes/test_polytope_classification.sage::test_there_are_sixteen_reflexive_polygons
+FAILED tests/schemes/test_toric_archive_reconciliation.sage::test_the_standard_triangle_polarizes_the_projective_plane_with_sections_its_lattice_points
+FAILED tests/schemes/test_toric_polarizing_sections.sage::test_the_polarizing_divisor_of_twice_the_triangle_recovers_it_and_cuts_a_smooth_conic
+ERROR tests/schemes/test_toric_schemes.sage
+ERROR tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage
+
+## fixed
+6 failed, 9 passed, 55 errors in 19.93s
+FAILED tests/lattices/test_cone_integral_primitive_compositions.sage::test_a_simplicial_cone_retains_its_inclusion_and_ray_lattice_index
+FAILED tests/lattices/test_reduction_complex_exploration.sage::test_the_four_quadrants_pair_every_facet_and_their_transporters_generate_O_of_I2
+FAILED tests/schemes/test_lattice_polygon_invariants.sage::test_the_centred_square_is_reflexive_with_the_diamond_as_polar_dual
+FAILED tests/schemes/test_polytope_classification.sage::test_there_are_sixteen_reflexive_polygons
+FAILED tests/schemes/test_toric_archive_reconciliation.sage::test_the_standard_triangle_polarizes_the_projective_plane_with_sections_its_lattice_points
+FAILED tests/schemes/test_toric_polarizing_sections.sage::test_the_polarizing_divisor_of_twice_the_triangle_recovers_it_and_cuts_a_smooth_conic
+ERROR tests/schemes/test_toric_schemes.sage
+ERROR tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage
+
+## verdict
+FAILED sets identical: True
+files with a setup ERROR, identical: True

@@ -1,0 +1,331 @@
+=== ran on: e7632190cbcc2540599adced4245b07b1eaaf73f (0 modified paths)
+=== command: sage -t src/sage_extensions/categories/isotropic_lifts.py
+Running doctests with ID 2026-11-15-18-36-34-cde14bf7.
+Git branch: HEAD
+Git ref: 6301b4e43e-dirty
+Running with SAGE_LOCAL='/sage/.venv'
+Using --optional=debian,jupymake,pip,pynormaliz,python_flint,sage
+Features to be detected: 32_bit,4ti2,benzene,buckygen,cddexec_gmp,conway_polynomials,csdp,cvxopt,cvxopt,database_cremona_ellcurve,database_cremona_mini_ellcurve,database_cubic_hecke,database_ellcurves,database_graphs,database_jones_numfield,database_knotinfo,dot2tex,dvipng,ecm,flatter,fpylll,fricas,gap_package_atlasrep,gap_package_design,gap_package_grape,gap_package_guava,gap_package_hap,gap_package_polenta,gap_package_polycyclic,gap_package_qpa,gap_package_quagroup,gap_package_tomlib,gfan,giac,glucose,graph_genus,graphviz,imagemagick,info,ipython,jmol,jupymake,jupyter_sphinx,kenzo,khoca,kissat,latte_int,lrcalc_python,lrslib,mathics,matroid_database,meson_editable,mpmath,msolve,nauty,networkx,numpy,palp,pandoc,pdftocairo,pexpect,phitigra,pillow,plantri,polytopes_db,polytopes_db_4d,pplpy,primecountpy,ptyprocess,pycosat,pycryptosat,pynormaliz,pyparsing,python_igraph,regina,requests,rpy2,rubiks,sage.combinat,sage.geometry.polyhedron,sage.graphs,sage.groups,sage.libs.flint,sage.libs.gap,sage.libs.giac,sage.libs.linbox,sage.libs.m4ri,sage.libs.ntl,sage.libs.pari,sage.libs.singular,sage.misc.cython,sage.modular,sage.modules,sage.numerical.mip,sage.plot,sage.rings.complex_double,sage.rings.finite_rings,sage.rings.function_field,sage.rings.number_field,sage.rings.padics,sage.rings.real_mpfr,sage.schemes,sage.symbolic,sage_numerical_backends_coin,sagemath_doc_html,scipy,singular,sloane_database,snappy,sphinx,sympy,threejs,topcom
+Doctesting 1 file.
+../../sage/src/bin/sage -t --warn-long 5.0 --random-seed=129281141412249480217791807297597534113 src/sage_extensions/categories/isotropic_lifts.py
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 75, in sage_extensions.categories.isotropic_lifts._vector_denominator
+Failed example:
+    U = Lattices(ZZ)("U")
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator[0]>", line 1, in <module>
+        U = Lattices(ZZ)("U")
+            ^^^^^^^^
+    NameError: name 'Lattices' is not defined
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 76, in sage_extensions.categories.isotropic_lifts._vector_denominator
+Failed example:
+    R = U.basis_vector(0).isotropic_reduction()
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator[1]>", line 1, in <module>
+        R = U.basis_vector(Integer(0)).isotropic_reduction()
+            ^
+    NameError: name 'U' is not defined
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 77, in sage_extensions.categories.isotropic_lifts._vector_denominator
+Failed example:
+    lifts = R.rational_lifts(R, R.Isom(R).identity())
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator[2]>", line 1, in <module>
+        lifts = R.rational_lifts(R, R.Isom(R).identity())
+                ^^^^^^^^^^^^^^^^
+      File "sage/misc/lazy_import.pyx", line 428, in sage.misc.lazy_import.LazyImport.__getattr__
+        return getattr(self.get_object(), attr)
+    AttributeError: type object 'R' has no attribute 'rational_lifts'
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 78, in sage_extensions.categories.isotropic_lifts._vector_denominator
+Failed example:
+    lifts.parameter_space().module_rank() == 0
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator[3]>", line 1, in <module>
+        lifts.parameter_space().module_rank() == Integer(0)
+        ^^^^^
+    NameError: name 'lifts' is not defined
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 80, in sage_extensions.categories.isotropic_lifts._vector_denominator
+Failed example:
+    lifts.integral_base_point().integral_restriction(U, U) is not None
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator[4]>", line 1, in <module>
+        lifts.integral_base_point().integral_restriction(U, U) is not None
+        ^^^^^
+    NameError: name 'lifts' is not defined
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 82, in sage_extensions.categories.isotropic_lifts._vector_denominator
+Failed example:
+    integral = lifts.integral_torsor()
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator[5]>", line 1, in <module>
+        integral = lifts.integral_torsor()
+                   ^^^^^
+    NameError: name 'lifts' is not defined
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 83, in sage_extensions.categories.isotropic_lifts._vector_denominator
+Failed example:
+    origin = integral.base_point()
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator[6]>", line 1, in <module>
+        origin = integral.base_point()
+                 ^^^^^^^^^^^^^^^^^^^
+    AttributeError: 'function' object has no attribute 'base_point'
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 84, in sage_extensions.categories.isotropic_lifts._vector_denominator
+Failed example:
+    integral.difference(origin, origin) == integral.acting_group().one()
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator[7]>", line 1, in <module>
+        integral.difference(origin, origin) == integral.acting_group().one()
+        ^^^^^^^^^^^^^^^^^^^
+    AttributeError: 'function' object has no attribute 'difference'
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 793, in sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point
+Failed example:
+    L = Lattices(ZZ)("U") + Lattices(ZZ)([[2]])
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point[0]>", line 1, in <module>
+        L = Lattices(ZZ)("U") + Lattices(ZZ)([[Integer(2)]])
+            ^^^^^^^^
+    NameError: name 'Lattices' is not defined
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 794, in sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point
+Failed example:
+    R = L.basis_vector(0).isotropic_reduction()
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point[1]>", line 1, in <module>
+        R = L.basis_vector(Integer(0)).isotropic_reduction()
+            ^
+    NameError: name 'L' is not defined
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 795, in sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point
+Failed example:
+    T = R.rational_lifts(R, R.Isom(R).identity())
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point[2]>", line 1, in <module>
+        T = R.rational_lifts(R, R.Isom(R).identity())
+            ^^^^^^^^^^^^^^^^
+      File "sage/misc/lazy_import.pyx", line 428, in sage.misc.lazy_import.LazyImport.__getattr__
+        return getattr(self.get_object(), attr)
+    AttributeError: type object 'R' has no attribute 'rational_lifts'
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 796, in sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point
+Failed example:
+    a = T.parameter_space().module_generators()[0]
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point[3]>", line 1, in <module>
+        a = T.parameter_space().module_generators()[Integer(0)]
+            ^
+    NameError: name 'T' is not defined
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 797, in sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point
+Failed example:
+    lift = T.parameterization()(a)
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point[4]>", line 1, in <module>
+        lift = T.parameterization()(a)
+               ^
+    NameError: name 'T' is not defined
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 798, in sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point
+Failed example:
+    torsor = T.integral_torsor()
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point[5]>", line 1, in <module>
+        torsor = T.integral_torsor()
+                 ^
+    NameError: name 'T' is not defined
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 799, in sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point
+Failed example:
+    coordinate = torsor.trivialization().inverse()(lift)
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point[6]>", line 1, in <module>
+        coordinate = torsor.trivialization().inverse()(lift)
+                     ^^^^^^
+    NameError: name 'torsor' is not defined
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 800, in sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point
+Failed example:
+    coordinate != torsor.acting_group().one()
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point[7]>", line 1, in <module>
+        coordinate != torsor.acting_group().one()
+        ^^^^^^^^^^
+    NameError: name 'coordinate' is not defined
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 802, in sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point
+Failed example:
+    torsor.trivialization()(coordinate) == lift
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point[8]>", line 1, in <module>
+        torsor.trivialization()(coordinate) == lift
+        ^^^^^^
+    NameError: name 'torsor' is not defined
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 804, in sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point
+Failed example:
+    torsor.base_point() == T.integral_base_point()
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point[9]>", line 1, in <module>
+        torsor.base_point() == T.integral_base_point()
+        ^^^^^^
+    NameError: name 'torsor' is not defined
+**********************************************************************
+File "src/sage_extensions/categories/isotropic_lifts.py", line 806, in sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point
+Failed example:
+    torsor.difference(lift, torsor.base_point()) == coordinate
+Exception raised:
+    Traceback (most recent call last):
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 739, in _run
+        self.compile_and_execute(example, compiler, test.globs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/sage/.venv/lib/python3.14/site-packages/sage/doctest/forker.py", line 1161, in compile_and_execute
+        exec(compiled, globs)
+        ~~~~^^^^^^^^^^^^^^^^^
+      File "<doctest sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point[10]>", line 1, in <module>
+        torsor.difference(lift, torsor.base_point()) == coordinate
+        ^^^^^^
+    NameError: name 'torsor' is not defined
+**********************************************************************
+2 items had failures:
+   8 of   9 in sage_extensions.categories.isotropic_lifts._vector_denominator
+  11 of  12 in sage_extensions.categories.isotropic_lifts._vector_denominator.ParentMethods.integral_base_point
+    [19 tests, 19 failures, 0.03s wall]
+----------------------------------------------------------------------
+../../sage/src/bin/sage -t --warn-long 5.0 --random-seed=129281141412249480217791807297597534113 src/sage_extensions/categories/isotropic_lifts.py  # 19 doctests failed
+----------------------------------------------------------------------
+Total time for all tests: 0.1 seconds
+    cpu time: 0.0 seconds
+    cumulative wall time: 0.0 seconds
+Features detected for doctesting: 
+=== exit: 0

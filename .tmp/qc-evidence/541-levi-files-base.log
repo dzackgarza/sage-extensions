@@ -1,0 +1,626 @@
+=== ran on: e7632190cbcc2540599adced4245b07b1eaaf73f (0 modified paths)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== command: pytest tests/lattices/test_congruence_levi_images.sage tests/lattices/test_higher_rank_levi_kernel.sage tests/lattices/test_higher_rank_levi_lifts.sage tests/lattices/test_higher_rank_unipotent_kernel.sage tests/lattices/test_levi_sections_and_supplied_preimages.sage tests/lattices/test_pointwise_levi_images.sage tests/lattices/test_split_line_levi_generator_lifts.sage tests/lattices/test_subgroup_levi_images.sage tests/lattices/test_isotropic_reduction.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates
+F......F.......F.................F.F.......                              [100%]
+=================================== FAILURES ===================================
+___ test_congruence_levi_lifts_and_kernel_retain_the_modulus_three_condition ___
+
+>   return cache[k]
+E   KeyError: (({g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : Generic morphism:
+E     From: Orthogonal group O(Integral lattice of rank 4 and signature (2, 2))
+E     To:   Subgroup of Aut_Category of modules over Integer Ring / Ideal (3) of Integer Ring(Lattice of rank 4 over Integer Ring / Ideal (3) of Integer Ring)(g) lies in Subgroup of Subgroup of Aut_Category of modules over Integer Ring / Ideal (3) of Integer Ring(Lattice of rank 4 over Integer Ring / Ideal (3) of Integer Ring)}, Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1), False), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_congruence_levi_lifts_and_kernel_retain_the_modulus_three_condition():
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic + hyperbolic
+        e, f, u, v = tuple(ambient.module_generators())
+        labels = tuple(ambient.module_generating_set())
+        reduction = ambient.primitive_isotropic_subobject(e).isotropic_reduction()
+        negative = ambient.Aut()(dict(zip(labels, (e, f, -u, -v), strict=True)))
+        global_negative = ambient.Aut()({label: -ambient.module_generator(label) for label in labels})
+        representation = _mod_three_representation(ambient)
+        target = representation.codomain().subgroup((representation(global_negative),))
+        subgroup = representation.preimage_subgroup(target)
+        assert negative not in subgroup and global_negative in subgroup
+        minus = reduction.levi_action()(negative)
+>       lift = reduction.levi_lift(minus, subgroup=subgroup)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_congruence_levi_images.sage:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattices.py:12429: in levi_lift
+    if isometry not in self.levi_image(subgroup=subgroup):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:4447: in __contains__
+    member = self.predicate()(point)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3785: in <lambda>
+    lambda element: element in image_locus,
+                    ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:4447: in __contains__
+    member = self.predicate()(point)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:12198: in <lambda>
+    lambda isometry: self._levi_lift_in_subgroup(subgroup, isometry, pointwise=pointwise) is not None
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    ???
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    ???
+src/sage_extensions/categories/lattices.py:12223: in _levi_lift_in_subgroup
+    kernel = ambient.subgroup(tuple(full.kernel().group_generators()))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5922: in group_generators
+    self.selected_group_resolution().generators(name="Group generators"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5885: in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:383: in selected_resolution
+    resolution = selected.realize()
+                 ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:116: in realize
+    return self._resolution_factory()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:53: in resolution
+    augmentation = generating_morphism(subgroup)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3759: in <lambda>
+    augmentation = None if generators is None else lambda kernel: kernel.free_cover(generators())
+                                                                                    ^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:12178: in <lambda>
+    levi.select_kernel_generators(lambda: finite_ordered_set(tuple(self._levi_kernel_generators())))
+                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:12371: in _levi_kernel_generators
+    return finite_ordered_set((*transvections, *reversal))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:12363: in <genexpr>
+    parabolic(lattice.integral_isometry(transvection))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Integral lattice of rank 4 and signature (2, 2)
+morphism = Morphism from Integral lattice of rank 4 and signature (2, 2) to Integral lattice of rank 4 and signature (2, 2)
+source = None
+
+    def integral_isometry(self, morphism, *, source=None):
+        r"""Descend a rational isometry onto this integral lattice.
+    
+        A formed scalar extension retains its defining source lattice.
+        That source supplies the integral model even when the rational
+        endpoints differ. A rational space presented without an integral
+        model requires ``source`` explicitly. Both directions must
+        preserve the stated lattices; raise ``ValueError`` otherwise.
+    
+        EXAMPLES::
+    
+            sage: L = Lattices(ZZ)("U")
+            sage: V = L.vector_space()
+            sage: phi = V.Isom(V)(lambda label: -V.module_generator(label))
+            sage: g = L.integral_isometry(phi)
+            sage: all(g(x) == -x for x in L.module_generators())
+            True
+            sage: labels = tuple(V.module_generating_set())
+            sage: e, f = V.module_generator(labels[0]), V.module_generator(labels[1])
+            sage: dilation = V.Isom(V)(lambda j: V.scalar_multiple(QQ(2), e) if j == labels[0] else V.scalar_multiple(QQ(1)/QQ(2), f))
+            sage: L.integral_isometry(dilation)
+            Traceback (most recent call last):
+            ...
+            ValueError: the rational isometry does not map the source integral lattice onto the target
+        """
+        if source is None:
+            from sage_extensions.categories.modules.framed.formed.form_modules import (
+                FormBaseChanges,
+            )
+    
+            rational_source = morphism.domain()
+            if rational_source in FormBaseChanges(rational_source.base_ring()):
+                source = rational_source.base_change_source()
+                if (
+                    rational_source.base_change_ring_map()
+                    != self.base_ring().fraction_field_map()
+                ):
+                    raise ValueError(
+                        "the rational source must retain scalar extension from the target integral ring"
+                    )
+            elif rational_source is self.vector_space():
+                source = self
+            else:
+>               raise ValueError(
+                    "the source integral lattice must be supplied for distinct rational endpoints"
+                )
+E               ValueError: the source integral lattice must be supplied for distinct rational endpoints
+
+src/sage_extensions/categories/lattices.py:4120: ValueError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (3) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Integer Ring / Ideal (3) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (3) of Integer Ring on Integer Ring / Ideal (3) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+______ test_null_plane_levi_image_generators_realize_both_signs_on_a_line ______
+
+    def test_null_plane_levi_image_generators_realize_both_signs_on_a_line():
+        r"""In 2U + <2>, negating the last summand lifts the nontrivial O(<2>) element."""
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic + hyperbolic + Lattices(ZZ)([[2]])
+        basis = tuple(ambient.module_generators())
+        reduction = ambient.primitive_isotropic_subobject(basis[0], basis[2]).isotropic_reduction()
+        image = reduction.levi_image()
+>       family = tuple(reduction.levi_image_generators())
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_higher_rank_levi_lifts.sage:114: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/lattices.py:12415: in levi_image_generators
+    return self.levi_image(subgroup=subgroup).group_generators()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5922: in group_generators
+    self.selected_group_resolution().generators(name="Group generators"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:6922: in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:383: in selected_resolution
+    resolution = selected.realize()
+                 ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:116: in realize
+    return self._resolution_factory()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:1202: in selected_resolution
+    generators = generating_set()
+                 ^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3792: in <lambda>
+    lambda: finite_ordered_set(tuple(image(self(generator)) for generator in source.group_generators()))
+                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5922: in group_generators
+    self.selected_group_resolution().generators(name="Group generators"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5885: in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:383: in selected_resolution
+    resolution = selected.realize()
+                 ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:116: in realize
+    return self._resolution_factory()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:1202: in selected_resolution
+    generators = generating_set()
+                 ^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattice_morphisms.py:4528: in <lambda>
+    lambda: self._marking_stabilizer_generators(category, marked, stabilizer)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattice_morphisms.py:4868: in _marking_stabilizer_generators
+    result = lattice.lattice_category()._marked_automorphism_generators(category, marked)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:2784: in _marked_automorphism_generators
+    else self._isotropic_plane_parabolic_generators(marked)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:2841: in _isotropic_plane_parabolic_generators
+    if not subobject.is_parabolic_complete():
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/isotropic_parabolics.py:4733: in is_parabolic_complete
+    return self.parabolic_completeness_decision()[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+src/sage_extensions/categories/isotropic_parabolics.py:4646: in parabolic_completeness_decision
+    with stage(
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/contextlib.py:141: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:344: in stage
+    "commit": current_commit(),
+              ^^^^^^^^^^^^^^^^
+src/sage_extensions/timing.py:247: in current_commit
+    completed = subprocess.run(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+input = None, capture_output = True, timeout = None, check = True
+popenargs = (('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD'),)
+kwargs = {'text': True, 'stdout': -1, 'stderr': -1}
+
+    def run(*popenargs,
+            input=None, capture_output=False, timeout=None, check=False, **kwargs):
+        """Run command with arguments and return a CompletedProcess instance.
+    
+        The returned instance will have attributes args, returncode, stdout and
+        stderr. By default, stdout and stderr are not captured, and those attributes
+        will be None. Pass stdout=PIPE and/or stderr=PIPE in order to capture them,
+        or pass capture_output=True to capture both.
+    
+        If check is True and the exit code was non-zero, it raises a
+        CalledProcessError. The CalledProcessError object will have the return code
+        in the returncode attribute, and output & stderr attributes if those streams
+        were captured.
+    
+        If timeout (seconds) is given and the process takes too long,
+         a TimeoutExpired exception will be raised.
+    
+        There is an optional argument "input", allowing you to
+        pass bytes or a string to the subprocess's stdin.  If you use this argument
+        you may not also use the Popen constructor's "stdin" argument, as
+        it will be used internally.
+    
+        By default, all communication is in bytes, and therefore any "input" should
+        be bytes, and the stdout and stderr will be bytes. If in text mode, any
+        "input" should be a string, and stdout and stderr will be strings decoded
+        according to locale encoding, or by "encoding" if set. Text mode is
+        triggered by setting any of text, encoding, errors or universal_newlines.
+    
+        The other arguments are the same as for the Popen constructor.
+        """
+        if input is not None:
+            if kwargs.get('stdin') is not None:
+                raise ValueError('stdin and input arguments may not both be used.')
+            kwargs['stdin'] = PIPE
+    
+        if capture_output:
+            if kwargs.get('stdout') is not None or kwargs.get('stderr') is not None:
+                raise ValueError('stdout and stderr arguments may not be used '
+                                 'with capture_output.')
+            kwargs['stdout'] = PIPE
+            kwargs['stderr'] = PIPE
+    
+        with Popen(*popenargs, **kwargs) as process:
+            try:
+                stdout, stderr = process.communicate(input, timeout=timeout)
+            except TimeoutExpired as exc:
+                process.kill()
+                if _mswindows:
+                    # Windows accumulates the output in a single blocking
+                    # read() call run on child threads, with the timeout
+                    # being done in a join() on those threads.  communicate()
+                    # _after_ kill() is required to collect that and add it
+                    # to the exception.
+                    exc.stdout, exc.stderr = process.communicate()
+                else:
+                    # POSIX _communicate already populated the output so
+                    # far into the TimeoutExpired exception.
+                    process.wait()
+                raise
+            except:  # Including KeyboardInterrupt, communicate handled that.
+                process.kill()
+                # We don't call process.wait() as .__exit__ does that for us.
+                raise
+            retcode = process.poll()
+            if check and retcode:
+>               raise CalledProcessError(retcode, process.args,
+                                         output=stdout, stderr=stderr)
+E               subprocess.CalledProcessError: Command '('git', '-C', '/repos/sage-extensions', 'rev-parse', 'HEAD')' returned non-zero exit status 128.
+
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/subprocess.py:578: CalledProcessError
+____ test_the_split_two_plane_preimage_uses_the_supplied_kernel_and_cosets _____
+
+    def test_the_split_two_plane_preimage_uses_the_supplied_kernel_and_cosets():
+        lattice = NamedLattices.U + NamedLattices.U
+        e, f, a, b = lattice.module_generators()
+        reduction = e.isotropic_reduction()
+        levi = reduction.levi_action()
+        parabolic, quotient = levi.domain(), levi.codomain()
+        reversal = lattice.O()({
+            label: -vector if vector in (e, f) else vector
+            for label, vector in zip(lattice.module_generating_set(), lattice.module_generators(), strict=True)
+        })
+        kernel_family = (lattice.eichler_transvection(e, a), lattice.eichler_transvection(e, b), reversal)
+        supplied_family = (
+            *(parabolic(value) for value in kernel_family),
+            *(levi.lift(value) for value in quotient.group_generators()),
+        )
+        levi = parabolic.Mor(quotient)(lambda value: reduction.levi_action()(value))
+        levi.select_section(Sets().Mor(quotient, parabolic)(reduction.levi_action().lift))
+        kernel = levi.kernel()
+>       kernel.select_group_resolution(generators=Set(tuple(kernel(value) for value in kernel_family)))
+
+tests/lattices/test_levi_sections_and_supplied_preimages.sage:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = {g in {g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g(im(Generic morphism:
+  From: Integ...)
+  To:   Integral lattice of rank 4 and signature (2, 2))} : elements mapped to the identity by the defining morphism}
+generators = {Morphism from Integral lattice of rank 4 and signature (2, 2) to Integral lattice of rank 4 and signature (2, 2), Mor..., 2), Morphism from Integral lattice of rank 4 and signature (2, 2) to Integral lattice of rank 4 and signature (2, 2)}
+
+    def select_group_resolution(self, *, generators):
+        r"""Select the generating epimorphism ``F(S) ->> G`` on a supplied set ``S``, and return ``G``.
+    
+        ``generators`` is an owned set or family of elements of ``G``.
+    
+        It is the degree-zero truncation of a free-group resolution of
+        ``G`` (``CAT-29``): the caller supplies a family that generates
+        this group, and is trusted to have established that it does
+        (``OWN-22``).  Afterwards ``group_generators()`` answers, and
+        group morphisms out of ``G`` compute images and finite-image
+        word sections from it.  Selecting computes nothing.  A group
+        whose generators a realization computes selects them itself, as
+        ``O(L)`` does.
+        """
+        if self.has_selected_group_resolution():
+>           raise ValueError(f"{self} already has a selected generating resolution")
+E           ValueError: {g in {g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g(im(Generic morphism:
+E             From: Integral lattice of rank 1 and signature (0, 0)
+E             To:   Integral lattice of rank 4 and signature (2, 2)))=im(Generic morphism:
+E             From: Integral lattice of rank 1 and signature (0, 0)
+E             To:   Integral lattice of rank 4 and signature (2, 2))} : elements mapped to the identity by the defining morphism} already has a selected generating resolution
+
+src/sage_extensions/categories/group/groups.py:5974: ValueError
+___ test_special_orthogonal_null_line_has_its_proper_quotient_image[setwise] ___
+
+>   return cache[k]
+E   KeyError: (({g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : det(g)=1}, Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1), False), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+pointwise = False
+
+    @pytest.mark.parametrize("pointwise", (False, True), ids=("setwise", "pointwise"))
+    def test_special_orthogonal_null_line_has_its_proper_quotient_image(pointwise):
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic + hyperbolic
+        e, f, u, v = tuple(ambient.module_generators())
+        labels = tuple(ambient.module_generating_set())
+        space = ambient.primitive_isotropic_subobject(e)
+        reduction = space.isotropic_reduction()
+        full = reduction.levi_action()
+        negative = ambient.Aut()(dict(zip(labels, (e, f, -u, -v), strict=True)))
+        exchange = ambient.Aut()(dict(zip(labels, (e, f, v, u), strict=True)))
+        minus = full(negative)
+        swapped = full(exchange)
+        subgroup = ambient.SO()
+        action = reduction.pointwise_levi_action(subgroup=subgroup) if pointwise else reduction.levi_action(subgroup=subgroup)
+        image = reduction.pointwise_levi_image(subgroup=subgroup) if pointwise else reduction.levi_image(subgroup=subgroup)
+        assert minus in image
+>       assert swapped not in image
+               ^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_subgroup_levi_images.sage:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/sets/set_categories.py:4447: in __contains__
+    member = self.predicate()(point)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3785: in <lambda>
+    lambda element: element in image_locus,
+                    ^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:4447: in __contains__
+    member = self.predicate()(point)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:12198: in <lambda>
+    lambda isometry: self._levi_lift_in_subgroup(subgroup, isometry, pointwise=pointwise) is not None
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+src/sage_extensions/categories/lattices.py:12223: in _levi_lift_in_subgroup
+    kernel = ambient.subgroup(tuple(full.kernel().group_generators()))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5922: in group_generators
+    self.selected_group_resolution().generators(name="Group generators"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5885: in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:383: in selected_resolution
+    resolution = selected.realize()
+                 ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:116: in realize
+    return self._resolution_factory()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:53: in resolution
+    augmentation = generating_morphism(subgroup)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3759: in <lambda>
+    augmentation = None if generators is None else lambda kernel: kernel.free_cover(generators())
+                                                                                    ^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:12178: in <lambda>
+    levi.select_kernel_generators(lambda: finite_ordered_set(tuple(self._levi_kernel_generators())))
+                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:12371: in _levi_kernel_generators
+    return finite_ordered_set((*transvections, *reversal))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:12363: in <genexpr>
+    parabolic(lattice.integral_isometry(transvection))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Integral lattice of rank 4 and signature (2, 2)
+morphism = Morphism from Integral lattice of rank 4 and signature (2, 2) to Integral lattice of rank 4 and signature (2, 2)
+source = None
+
+    def integral_isometry(self, morphism, *, source=None):
+        r"""Descend a rational isometry onto this integral lattice.
+    
+        A formed scalar extension retains its defining source lattice.
+        That source supplies the integral model even when the rational
+        endpoints differ. A rational space presented without an integral
+        model requires ``source`` explicitly. Both directions must
+        preserve the stated lattices; raise ``ValueError`` otherwise.
+    
+        EXAMPLES::
+    
+            sage: L = Lattices(ZZ)("U")
+            sage: V = L.vector_space()
+            sage: phi = V.Isom(V)(lambda label: -V.module_generator(label))
+            sage: g = L.integral_isometry(phi)
+            sage: all(g(x) == -x for x in L.module_generators())
+            True
+            sage: labels = tuple(V.module_generating_set())
+            sage: e, f = V.module_generator(labels[0]), V.module_generator(labels[1])
+            sage: dilation = V.Isom(V)(lambda j: V.scalar_multiple(QQ(2), e) if j == labels[0] else V.scalar_multiple(QQ(1)/QQ(2), f))
+            sage: L.integral_isometry(dilation)
+            Traceback (most recent call last):
+            ...
+            ValueError: the rational isometry does not map the source integral lattice onto the target
+        """
+        if source is None:
+            from sage_extensions.categories.modules.framed.formed.form_modules import (
+                FormBaseChanges,
+            )
+    
+            rational_source = morphism.domain()
+            if rational_source in FormBaseChanges(rational_source.base_ring()):
+                source = rational_source.base_change_source()
+                if (
+                    rational_source.base_change_ring_map()
+                    != self.base_ring().fraction_field_map()
+                ):
+                    raise ValueError(
+                        "the rational source must retain scalar extension from the target integral ring"
+                    )
+            elif rational_source is self.vector_space():
+                source = self
+            else:
+>               raise ValueError(
+                    "the source integral lattice must be supplied for distinct rational endpoints"
+                )
+E               ValueError: the source integral lattice must be supplied for distinct rational endpoints
+
+src/sage_extensions/categories/lattices.py:4120: ValueError
+_ test_spinor_subgroup_lift_adjusts_the_null_action_and_preserves_the_quotient _
+
+>   return cache[k]
+E   KeyError: (({g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : sn_RR(g) = 1}, Morphism from Integral lattice of rank 2 and signature (1, 1) to Integral lattice of rank 2 and signature (1, 1), False), ())
+
+sage/misc/cachefunc.pyx:1965: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_spinor_subgroup_lift_adjusts_the_null_action_and_preserves_the_quotient():
+        r"""The real spinor sign of -Id_U is negative; two such factors cancel.
+    
+        Fixing the line leaves only Eichler translations in the quotient
+        kernel, all with trivial spinor norm. A pointwise lift cannot cancel
+        the negative quotient sign, while reversing the null line can.
+        """
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic + hyperbolic
+        e, f, u, v = tuple(ambient.module_generators())
+        labels = tuple(ambient.module_generating_set())
+        reduction = ambient.primitive_isotropic_subobject(e).isotropic_reduction()
+        negative = ambient.Aut()(dict(zip(labels, (e, f, -u, -v), strict=True)))
+        global_negative = ambient.Aut()({label: -ambient.module_generator(label) for label in labels})
+        subgroup = ambient.O_plus()
+        assert negative not in subgroup and global_negative in subgroup
+        minus = reduction.levi_action()(negative)
+        action = reduction.levi_action(subgroup=subgroup)
+>       lift = action.lift(minus)
+               ^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_subgroup_levi_images.sage:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/groups.py:3632: in lift
+    return section(section.domain()(element))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:417: in __call__
+    return self._element_constructor_(*arguments, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:4468: in _element_constructor_
+    member = self.is_parent_of(element)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:4447: in __contains__
+    member = self.predicate()(point)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:12198: in <lambda>
+    lambda isometry: self._levi_lift_in_subgroup(subgroup, isometry, pointwise=pointwise) is not None
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1970: in sage.misc.cachefunc.CachedMethodCaller.__call__
+    w = self._instance_call(*args, **kwds)
+sage/misc/cachefunc.pyx:1848: in sage.misc.cachefunc.CachedMethodCaller._instance_call
+    return self.f(self._instance, *args, **kwds)
+src/sage_extensions/categories/lattices.py:12223: in _levi_lift_in_subgroup
+    kernel = ambient.subgroup(tuple(full.kernel().group_generators()))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5922: in group_generators
+    self.selected_group_resolution().generators(name="Group generators"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5885: in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:383: in selected_resolution
+    resolution = selected.realize()
+                 ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:116: in realize
+    return self._resolution_factory()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:53: in resolution
+    augmentation = generating_morphism(subgroup)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3759: in <lambda>
+    augmentation = None if generators is None else lambda kernel: kernel.free_cover(generators())
+                                                                                    ^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:12178: in <lambda>
+    levi.select_kernel_generators(lambda: finite_ordered_set(tuple(self._levi_kernel_generators())))
+                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:12371: in _levi_kernel_generators
+    return finite_ordered_set((*transvections, *reversal))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:12363: in <genexpr>
+    parabolic(lattice.integral_isometry(transvection))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Integral lattice of rank 4 and signature (2, 2)
+morphism = Morphism from Integral lattice of rank 4 and signature (2, 2) to Integral lattice of rank 4 and signature (2, 2)
+source = None
+
+    def integral_isometry(self, morphism, *, source=None):
+        r"""Descend a rational isometry onto this integral lattice.
+    
+        A formed scalar extension retains its defining source lattice.
+        That source supplies the integral model even when the rational
+        endpoints differ. A rational space presented without an integral
+        model requires ``source`` explicitly. Both directions must
+        preserve the stated lattices; raise ``ValueError`` otherwise.
+    
+        EXAMPLES::
+    
+            sage: L = Lattices(ZZ)("U")
+            sage: V = L.vector_space()
+            sage: phi = V.Isom(V)(lambda label: -V.module_generator(label))
+            sage: g = L.integral_isometry(phi)
+            sage: all(g(x) == -x for x in L.module_generators())
+            True
+            sage: labels = tuple(V.module_generating_set())
+            sage: e, f = V.module_generator(labels[0]), V.module_generator(labels[1])
+            sage: dilation = V.Isom(V)(lambda j: V.scalar_multiple(QQ(2), e) if j == labels[0] else V.scalar_multiple(QQ(1)/QQ(2), f))
+            sage: L.integral_isometry(dilation)
+            Traceback (most recent call last):
+            ...
+            ValueError: the rational isometry does not map the source integral lattice onto the target
+        """
+        if source is None:
+            from sage_extensions.categories.modules.framed.formed.form_modules import (
+                FormBaseChanges,
+            )
+    
+            rational_source = morphism.domain()
+            if rational_source in FormBaseChanges(rational_source.base_ring()):
+                source = rational_source.base_change_source()
+                if (
+                    rational_source.base_change_ring_map()
+                    != self.base_ring().fraction_field_map()
+                ):
+                    raise ValueError(
+                        "the rational source must retain scalar extension from the target integral ring"
+                    )
+            elif rational_source is self.vector_space():
+                source = self
+            else:
+>               raise ValueError(
+                    "the source integral lattice must be supplied for distinct rational endpoints"
+                )
+E               ValueError: the source integral lattice must be supplied for distinct rational endpoints
+
+src/sage_extensions/categories/lattices.py:4120: ValueError
+=========================== short test summary info ============================
+FAILED tests/lattices/test_congruence_levi_images.sage::test_congruence_levi_lifts_and_kernel_retain_the_modulus_three_condition
+FAILED tests/lattices/test_higher_rank_levi_lifts.sage::test_null_plane_levi_image_generators_realize_both_signs_on_a_line
+FAILED tests/lattices/test_levi_sections_and_supplied_preimages.sage::test_the_split_two_plane_preimage_uses_the_supplied_kernel_and_cosets
+FAILED tests/lattices/test_subgroup_levi_images.sage::test_special_orthogonal_null_line_has_its_proper_quotient_image[setwise]
+FAILED tests/lattices/test_subgroup_levi_images.sage::test_spinor_subgroup_lift_adjusts_the_null_action_and_preserves_the_quotient
+5 failed, 38 passed in 14.74s

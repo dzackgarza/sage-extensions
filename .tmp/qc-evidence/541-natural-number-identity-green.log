@@ -1,0 +1,5 @@
+=== ran on: 8566d9aea6204fa014039c548beebf290130a6f6 (1 modified paths)
+=== command: test tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage
+..                                                                       [100%]
+2 passed in 1.01s
+=== exit recorded above

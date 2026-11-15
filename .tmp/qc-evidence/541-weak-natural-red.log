@@ -1,0 +1,59 @@
+=== ran on: 9d072551232c5bf507ba261c43a99c31dad6870b (0 modified paths)
+=== command: pytest tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates
+..FFF...                                                                 [100%]
+=================================== FAILURES ===================================
+_______ test_a_natural_number_is_held_only_while_something_references_it _______
+
+    def test_a_natural_number_is_held_only_while_something_references_it() -> None:
+        r"""A natural has its reader's references and no others: a set keeps none of its points alive."""
+        control = []
+        holder = (control,)
+        point = NN(70001)
+        held = (point,)
+    
+>       assert sys.getrefcount(point) == sys.getrefcount(control)
+E       assert 3 == 2
+E        +  where 3 = <built-in function getrefcount>(70001)
+E        +    where <built-in function getrefcount> = sys.getrefcount
+E        +  and   2 = <built-in function getrefcount>([])
+E        +    where <built-in function getrefcount> = sys.getrefcount
+
+tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage:39: AssertionError
+____________ test_a_released_natural_number_leaves_no_entry_behind _____________
+
+    def test_a_released_natural_number_leaves_no_entry_behind() -> None:
+        r"""Released, a natural is not retained: asking for its value again builds it again."""
+        control = []
+        holder = (control,)
+        point = NN(70002)
+        value = int(point)
+        del point
+    
+        rebuilt = NN(value)
+        held = (rebuilt,)
+    
+>       assert sys.getrefcount(rebuilt) == sys.getrefcount(control)
+E       assert 3 == 2
+E        +  where 3 = <built-in function getrefcount>(70002)
+E        +    where <built-in function getrefcount> = sys.getrefcount
+E        +  and   2 = <built-in function getrefcount>([])
+E        +    where <built-in function getrefcount> = sys.getrefcount
+
+tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage:54: AssertionError
+_______________ test_a_natural_number_read_back_is_the_one_point _______________
+
+    def test_a_natural_number_read_back_is_the_one_point() -> None:
+        r"""Pickled or copied, a natural names its value, so it comes back as this point."""
+        point = NN(70003)
+    
+>       assert loads(dumps(point)) is point
+E       AssertionError: assert 70003 is 70003
+E        +  where 70003 = loads(b'x\x9c\x85R\xdbn\xd3@\x10M\ni\xa8{\xa3\xd0\xa6\\\xca\xfd\xd6p1\xb7O\x80\'\x10\x162/~\x89V\xeb\xf5$^\xe1\xac3\xbb\xeb\...\xfd\x81\x04\xf4\xc5\x00\xe3P}\xc9\r\xfa\x1e~9\xc0WM>\xc5\xd7a0\'\xbcj\x00\xdf|0{\xed\x96\x99\xe1\xdb<\xfe\r}\x191\xd4')
+E        +    where b'x\x9c\x85R\xdbn\xd3@\x10M\ni\xa8{\xa3\xd0\xa6\\\xca\xfd\xd6p1\xb7O\x80\'\x10\x162/~\x89V\xeb\xf5$^\xe1\xac3\xbb\xeb\...\xfd\x81\x04\xf4\xc5\x00\xe3P}\xc9\r\xfa\x1e~9\xc0WM>\xc5\xd7a0\'\xbcj\x00\xdf|0{\xed\x96\x99\xe1\xdb<\xfe\r}\x191\xd4' = dumps(70003)
+
+tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage:62: AssertionError
+=========================== short test summary info ============================
+FAILED tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage::test_a_natural_number_is_held_only_while_something_references_it
+FAILED tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage::test_a_released_natural_number_leaves_no_entry_behind
+FAILED tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage::test_a_natural_number_read_back_is_the_one_point
+3 failed, 5 passed in 2.65s

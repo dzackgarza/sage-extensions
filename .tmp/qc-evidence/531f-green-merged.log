@@ -1,0 +1,173 @@
+tree SHA: 7de970fd9461c9bfcc673907cf732f5b2d6707d8
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 300 s, outer 340 s, guard 6144 MiB
+command: python -m pytest -p qc_sage_session tests/schemes/test_polytopes.sage tests/sets/test_a_subset_is_a_cache_key.sage tests/lattices/test_rational_polyhedral_cones.sage tests/algebras/test_affine_semigroup_algebras.sage -q -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates  (repository addopts)
+FFF................EEE                                                   [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_linearly_independent_semigroup_generators_give_the_polynomial_algebra _
+tests/algebras/test_affine_semigroup_algebras.sage:8: TL01 from sage_extensions.categories.algebras.semigroup_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:9: TL01 from sage_extensions.categories.algebras.free_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:10: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:10: TL02 imports the private name _owned_integers
+tests/algebras/test_affine_semigroup_algebras.sage:19: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_affine_semigroup_algebras.sage:38: TL01 from sage_extensions.categories.algebras.semigroup_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:39: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:39: TL02 imports the private name _owned_integers
+_ ERROR at setup of test_semigroup_algebra_of_the_monoid_generated_by_e1_e2_and_their_sum_satisfies_z_equals_xy _
+tests/algebras/test_affine_semigroup_algebras.sage:8: TL01 from sage_extensions.categories.algebras.semigroup_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:9: TL01 from sage_extensions.categories.algebras.free_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:10: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:10: TL02 imports the private name _owned_integers
+tests/algebras/test_affine_semigroup_algebras.sage:19: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_affine_semigroup_algebras.sage:38: TL01 from sage_extensions.categories.algebras.semigroup_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:39: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:39: TL02 imports the private name _owned_integers
+_ ERROR at setup of test_a_semigroup_algebra_keeps_its_identity_after_a_polynomial_ring_is_built _
+tests/algebras/test_affine_semigroup_algebras.sage:8: TL01 from sage_extensions.categories.algebras.semigroup_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:9: TL01 from sage_extensions.categories.algebras.free_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:10: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:10: TL02 imports the private name _owned_integers
+tests/algebras/test_affine_semigroup_algebras.sage:19: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_affine_semigroup_algebras.sage:38: TL01 from sage_extensions.categories.algebras.semigroup_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:39: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:39: TL02 imports the private name _owned_integers
+=================================== FAILURES ===================================
+____________ test_triangle_with_vertices_0_0_0_3_6_0_satisfies_pick ____________
+
+    def test_triangle_with_vertices_0_0_0_3_6_0_satisfies_pick() -> None:
+        r"""Area 9; boundary points `\gcd(0,3) + \gcd(6,3) + \gcd(6,0) = 3 + 3 + 6 = 12`;
+        Pick's theorem `9 = I + 12/2 - 1` gives 4 interior points, 16 in all."""
+        lattice = ZZ.free_module(2)
+        triangle = ConvexPolytopes(lattice)(((0, 0), (0, 3), (6, 0)))
+    
+        assert triangle.dimension() == 2
+        assert triangle.volume() == 9
+        assert triangle.normalized_volume() == 18
+        assert triangle.n_integral_points() == 16
+        assert triangle.n_interior_points() == 4
+        assert triangle.n_boundary_points() == 12
+>       assert triangle.interior_contains_point((1, 1))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_polytopes.sage:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/schemes/polytopes.py:1006: in interior_contains_point
+    self._engine_coordinates(point)
+src/sage_extensions/categories/schemes/polytopes.py:700: in _engine_coordinates
+    point = self.rational_point(point)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Lattice Polygon of dimension 2 with 3 vertices, point = (1, 1)
+
+    def rational_point(self, point):
+        r"""Return ``point`` of ``M`` or ``M_QQ`` as a point of ``M_QQ = M tensor QQ``.
+    
+        ``M`` includes into ``M_QQ`` by ``m |-> m tensor 1``, which keeps
+        the coordinates of ``m`` in the shared frame.
+        """
+        ambient = self.ambient_space()
+        lattice = self.ambient_lattice()
+>       match point.parent():
+              ^^^^^^^^^^^^
+            case parent if parent is lattice:
+E           AttributeError: 'tuple' object has no attribute 'parent'
+
+src/sage_extensions/categories/schemes/polytopes.py:684: AttributeError
+____ test_square_has_ehrhart_polynomial_2t_plus_1_squared_and_h_star_1_6_1 _____
+
+    def test_square_has_ehrhart_polynomial_2t_plus_1_squared_and_h_star_1_6_1() -> None:
+        r"""`t[-1,1]^2` has `(2t+1)^2` lattice points; `h^* = (1, L(1) - 3, I) = (1, 6, 1)`,
+        summing to the normalized volume 8.  It is reflexive; its polar dual is the
+        reflexive diamond `\operatorname{conv}\{\pm e_1, \pm e_2\}`, whose polar dual is
+        the square again."""
+        lattice = ZZ.free_module(2)
+        square = ConvexPolytopes(lattice)(((-1, -1), (-1, 1), (1, 1), (1, -1)))
+        polynomial = square.ehrhart_polynomial()
+        t = polynomial.parent().algebra_generator("t")
+        polar = square.polar_dual()
+    
+        assert polynomial == 4 * t**2 + 4 * t + 1
+        assert tuple(square.h_star_vector()) == (1, 6, 1)
+        assert square.is_reflexive()
+        assert polar.is_reflexive()
+        assert polar.n_integral_points() == 5
+        assert polar.volume() == 2
+>       assert polar.polar_dual() == square
+
+tests/schemes/test_polytopes.sage:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices) and is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices)
+
+    def __bool__(self):
+>       raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E       TypeError: the proposition is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices) and is_subset(Lattice Polygon of dimension 2 with 4 vertices, Lattice Polygon of dimension 2 with 4 vertices) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+
+src/sage_extensions/logic.py:44: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+___ test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120 ___
+
+>   return self._cached_methods[name]
+E   KeyError: 'f_vector'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120() -> None:
+        r"""The dodecahedron `\{5, 3\}` has 20 vertices, 30 edges, 12 faces, and full
+        symmetry group the Coxeter group `H_3` of order 120 (Coxeter, *Regular
+        Polytopes*, Table I)."""
+        dodecahedron = RegularPolytopes().from_schlafli_symbol("{5,3}")
+        diagram = dodecahedron.symmetry_coxeter_diagram()
+        first, second, third = diagram.vertices()
+    
+        assert dodecahedron.dimension() == 3
+>       assert tuple(dodecahedron.f_vector()) == (1, 20, 30, 12, 1)
+                     ^^^^^^^^^^^^^^^^^^^^^
+
+tests/schemes/test_polytopes.sage:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'RegularPolytopes.parent_class' object has no attribute 'f_vector'
+
+sage/cpython/getattr.pyx:357: AttributeError
+======================= test lint: 8 findings in 1 files =======================
+tests/algebras/test_affine_semigroup_algebras.sage:8: TL01 from sage_extensions.categories.algebras.semigroup_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:9: TL01 from sage_extensions.categories.algebras.free_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:10: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:10: TL02 imports the private name _owned_integers
+tests/algebras/test_affine_semigroup_algebras.sage:19: TL07 repr(): a representation, not a mathematical value
+tests/algebras/test_affine_semigroup_algebras.sage:38: TL01 from sage_extensions.categories.algebras.semigroup_algebras import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:39: TL01 from sage_extensions.categories.rings.ring_foundation import ...: take every name from the session
+tests/algebras/test_affine_semigroup_algebras.sage:39: TL02 imports the private name _owned_integers
+=========================== short test summary info ============================
+FAILED tests/schemes/test_polytopes.sage::test_triangle_with_vertices_0_0_0_3_6_0_satisfies_pick
+FAILED tests/schemes/test_polytopes.sage::test_square_has_ehrhart_polynomial_2t_plus_1_squared_and_h_star_1_6_1
+FAILED tests/schemes/test_polytopes.sage::test_dodecahedron_has_coxeter_diagram_h3_and_symmetry_group_of_order_120
+ERROR tests/algebras/test_affine_semigroup_algebras.sage::test_linearly_independent_semigroup_generators_give_the_polynomial_algebra
+ERROR tests/algebras/test_affine_semigroup_algebras.sage::test_semigroup_algebra_of_the_monoid_generated_by_e1_e2_and_their_sum_satisfies_z_equals_xy
+ERROR tests/algebras/test_affine_semigroup_algebras.sage::test_a_semigroup_algebra_keeps_its_identity_after_a_polynomial_ring_is_built
+3 failed, 16 passed, 3 errors in 4.22s
+[peakrss] tests531: child waited=1 shell_code=1 samples=5
+[peakrss] peak tree RSS      : 353 MiB
+[peakrss] low-water MemAvail : 12590 MiB
+[peakrss] peak single VmHWM  : 353 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      342 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   353 MiB hwm=   353 MiB avail= 12590 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   333 MiB hwm=   333 MiB avail= 12633 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   299 MiB hwm=   299 MiB avail= 12701 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   162 MiB hwm=   162 MiB avail= 12841 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     7 MiB hwm=     7 MiB avail= 12955 MiB

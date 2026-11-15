@@ -1,0 +1,112 @@
+=== ran on: e7632190cbcc2540599adced4245b07b1eaaf73f (1 modified paths)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== command: pytest tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.test_lint
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+______________ test_the_integral_locus_is_a_subset_of_its_torsor _______________
+
+>   return self._cached_methods[name]
+E   KeyError: 'integral_lift_locus'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_integral_locus_is_a_subset_of_its_torsor() -> None:
+        r"""``T_Z`` has the inclusion of a subset of ``T``, into the torsor itself."""
+        lattice, marked, reduction, torsor = _non_integral_base_point_control()
+>       locus = torsor.integral_lift_locus()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class' object has no attribute 'integral_lift_locus'
+
+sage/cpython/getattr.pyx:362: AttributeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+______________ test_the_locus_is_membership_in_the_residue_class _______________
+
+>   return self._cached_methods[name]
+E   KeyError: 'integral_lift_locus'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_the_locus_is_membership_in_the_residue_class() -> None:
+        r"""A lift is in ``T_Z`` exactly when its parameter's class lies in the residue locus.
+    
+        Both directions are decided on lifts the test builds: the classes of ``C`` itself give
+        members, and the torsor's own base point -- whose parameter is the zero class, outside
+        ``C`` at this specimen -- does not.
+        """
+        lattice, marked, reduction, torsor = _non_integral_base_point_control()
+>       locus = torsor.integral_lift_locus()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class' object has no attribute 'integral_lift_locus'
+
+sage/cpython/getattr.pyx:362: AttributeError
+______________ test_an_empty_residue_locus_gives_an_empty_subset _______________
+
+>   return self._cached_methods[name]
+E   KeyError: 'integral_lift_locus'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_an_empty_residue_locus_gives_an_empty_subset() -> None:
+        r"""``T_Z`` is empty exactly when ``C`` is, and the locus decides it.
+    
+        ``U``'s and ``U(2)``'s marked null lines both reduce to rank zero, but no integral
+        isometry joins the ambient lattices, whose determinants differ, so the residue locus is
+        empty and so is the integral locus -- a decision the locus has to make for itself,
+        since a subset of an infinite torsor cannot be emptied by enumeration.
+        """
+        source = Lattices(ZZ)("U")
+        target = Lattices(ZZ)([[0, 2], [2, 0]])
+        first = source.basis_vector(0).isotropic_reduction()
+        second = target.basis_vector(0).isotropic_reduction()
+        torsor = first.rational_lifts(second, first.Isom(second)(()))
+    
+        assert source.determinant() != target.determinant()
+        assert torsor.integral_parameter_classes().is_empty() is True
+>       assert torsor.integral_lift_locus().is_empty() is True
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+sage/structure/category_object.pyx:867: in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.parent_class' object has no attribute 'integral_lift_locus'
+
+sage/cpython/getattr.pyx:362: AttributeError
+=========================== short test summary info ============================
+FAILED tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage::test_the_integral_locus_is_a_subset_of_its_torsor
+FAILED tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage::test_the_locus_is_membership_in_the_residue_class
+FAILED tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage::test_an_empty_residue_locus_gives_an_empty_subset
+3 failed in 2.03s

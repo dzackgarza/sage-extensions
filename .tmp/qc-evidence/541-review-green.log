@@ -1,0 +1,5 @@
+=== ran on: 18b34bde9d1069853dbd784ca00edf29a5f950b5 (0 modified paths)
+=== command: pytest tests/sets/test_a_description_is_asked_for_when_it_is_read.sage tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates
+........                                                                 [100%]
+8 passed in 0.52s
+=== exit: 0

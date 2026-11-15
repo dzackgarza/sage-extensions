@@ -1,0 +1,893 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt540d
+tree SHA: c43d3a0bf6cb085465c891982ea2efb0867849d9
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests: tests/algebras/test_affine_semigroup_algebras.sage tests/algebras/test_free_algebra_issue614_cells.sage tests/divisors/test_toric_class_groups.sage tests/sets/test_cardinality_construction_comparisons.sage tests/sets/test_standard_cardinals_archive.sage
+inner 560 s, outer 600 s, guard 6144 MiB, extra '-o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --durations=0'
+command: /sage/.venv/bin/python -m pytest -p qc_sage_session tests/algebras/test_affine_semigroup_algebras.sage tests/algebras/test_free_algebra_issue614_cells.sage tests/divisors/test_toric_class_groups.sage tests/sets/test_cardinality_construction_comparisons.sage tests/sets/test_standard_cardinals_archive.sage -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates --durations=0
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates OFF (--no-time-gates): star import 0.29 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 22 items
+
+tests/algebras/test_affine_semigroup_algebras.sage ....                  [ 18%]
+tests/algebras/test_free_algebra_issue614_cells.sage F....               [ 40%]
+tests/divisors/test_toric_class_groups.sage ........                     [ 77%]
+tests/sets/test_cardinality_construction_comparisons.sage FF             [ 86%]
+tests/sets/test_standard_cardinals_archive.sage .F.                      [100%]
+
+=================================== FAILURES ===================================
+______ test_cell_61_tensor_and_divided_power_algebras_of_a_torsion_module ______
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self._cached_methods[name]
+E   KeyError: '_cache__module_category'
+
+sage/structure/category_object.pyx:858: KeyError
+
+During handling of the above exception, another exception occurred:
+
+>   return self.cache[k]
+E   KeyError: ({0,...,1}, (140683795851408, 140683795851408))
+
+sage/misc/cachefunc.pyx:1024: KeyError
+
+During handling of the above exception, another exception occurred:
+
+    def test_cell_61_tensor_and_divided_power_algebras_of_a_torsion_module() -> None:
+        r"""Cell 61: ``2t = 0``, ``t*t != 0``, ``2(t*t) = 0``, ``Γ^2(M) = ZZ/4``.
+    
+        ``M`` is ``ZZ/2`` on one generator, so ``T(M)`` kills ``2t`` while ``t*t``
+        survives, and ``Γ^2(M)`` is the divided square of ``ZZ/2``, which is
+        ``ZZ/4``: its invariant factors are ``[4]``, and ``4 γ_2(γ) = 0``.
+        """
+        module = _cell_61_module()
+        tensor = module.tensor_algebra()
+        divided = module.divided_power_algebra()
+>       t = tensor.algebra_generator(0)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/algebras/test_free_algebra_issue614_cells.sage:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/algebras/algebras.py:2079: in algebra_generator
+    return self.selected_algebra_resolution().generator(label)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/algebras/algebras.py:2057: in selected_algebra_resolution
+    return self.selected_resolution(self.algebra_framing_owner())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:383: in selected_resolution
+    resolution = selected.realize()
+                 ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:116: in realize
+    return self._resolution_factory()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/algebras/algebras.py:1115: in selected_resolution
+    first_face = presentation_owner.Mor(degree_one, presentation_ring)(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:438: in operation
+    return category_level(instance, *objects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_foundation.py:307: in Mor
+    return self.MorCategory().Of(source, target)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:2313: in Of
+    if len(inherited) == 1 and all(
+                               ^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:2314: in <genexpr>
+    _declared_category_reaches(inherited[0], other) for other in declared
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:244: in _declared_category_reaches
+    pending.extend(current.super_categories())
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1126: in super_categories
+    self.mor_family().family_over(supercategory).Of(domain, codomain)
+src/sage_extensions/categories/abstract_categories/mor_categories.py:2268: in Of
+    else fixed_class(self, domain, codomain)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/classcall_metaclass.pyx:328: in sage.misc.classcall_metaclass.ClasscallMetaclass.__call__
+    ???
+src/sage_extensions/categories/abstract_categories/mor_categories.py:909: in __classcall__
+    return typecall(cls, *arguments, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/classcall_metaclass.pyx:477: in sage.misc.classcall_metaclass.typecall
+    ???
+src/sage_extensions/owned_category.py:834: in retaining_initializer
+    initializer(self, *args, **keywords)
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:3404: in __init__
+    _initialize_module_mor_parent(
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:2970: in _initialize_module_mor_parent
+    placement = domain.module_category()._mor_parent_placement(
+                ^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2890: in sage.misc.cachefunc.CachedMethod.__get__
+    ???
+sage/misc/cachefunc.pyx:2256: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__init__
+    ???
+sage/structure/category_object.pyx:852: in sage.structure.category_object.CategoryObject.__getattr__
+    ???
+sage/structure/category_object.pyx:865: in sage.structure.category_object.CategoryObject.getattr_from_category
+    ???
+sage/misc/lazy_attribute.pyx:127: in sage.misc.lazy_attribute._lazy_attribute.__get__
+    ???
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:1717: in parent_class
+    return self._make_named_class('parent_class', 'ParentMethods')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/owned_category.py:968: in _make_named_class
+    bases = _owned_implementation_bases(category, provider_names)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/owned_category.py:698: in _owned_implementation_bases
+    for level in _declared_category_linearization(category):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/owned_category.py:678: in _declared_category_linearization
+    return linearize(category)
+           ^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/owned_category.py:669: in linearize
+    sequences = [list(linearize(parent)) for parent in parents]
+                      ^^^^^^^^^^^^^^^^^
+src/sage_extensions/owned_category.py:669: in linearize
+    sequences = [list(linearize(parent)) for parent in parents]
+                      ^^^^^^^^^^^^^^^^^
+src/sage_extensions/owned_category.py:669: in linearize
+    sequences = [list(linearize(parent)) for parent in parents]
+                      ^^^^^^^^^^^^^^^^^
+src/sage_extensions/owned_category.py:667: in linearize
+    sorted(node.super_categories(), key=provider_order_key, reverse=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:1522: in super_categories
+    commutative = base_ring._commutativity_decision()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/algebras/algebras.py:2115: in _commutativity_decision
+    multiplication = self.multiplication()
+                     ^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/algebras/algebras.py:1798: in multiplication
+    return native.multiplication()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/modules/native_modules.py:287: in multiplication
+    tensor = Modules(self.base_ring()).tensor_product((module, module))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:816: in tensor_product
+    return _module_tensor_product(family)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1029: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+src/sage_extensions/categories/modules/pure/modules.py:6470: in _module_tensor_product
+    return _module_tensor_product_with_data(factors)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:6503: in _module_tensor_product_with_data
+    tensor_labels = _tensor_label_set(factors)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:5926: in _tensor_label_set
+    return Sets().product(
+src/sage_extensions/categories/sets/set_categories.py:1494: in product
+    return self._finite_product(family)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:1507: in _finite_product
+    if any(factor not in self for factor in family):
+       ^^^
+src/sage_extensions/categories/sets/set_categories.py:1507: in <genexpr>
+    if any(factor not in self for factor in family):
+                                            ^^^^^^
+src/sage_extensions/categories/sets/indexed_families.py:228: in <genexpr>
+    self._value_at_normalized_index(index)
+src/sage_extensions/categories/sets/indexed_families.py:131: in _value_at_normalized_index
+    self._rank_value_cache[rank] = self._value_function(normalized)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:5929: in <lambda>
+    lambda index: factors.value(index).module_generating_set(),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/pure/modules.py:1937: in module_generating_set
+    return self.selected_resolution_generating_set(self.module_category())
+                                                   ^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2890: in sage.misc.cachefunc.CachedMethod.__get__
+    ???
+E   RecursionError: maximum recursion depth exceeded
+!!! Recursion detected (same locals & position)
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Integer Ring on Classes in the multilinear tensor presentation -> Direct sum over Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Integer Ring on Classes in the multilinear tensor presentation -> Module of symmetric words on Free module on Coproduct of the family over Integer Ring over Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Sym(Free module on Coproduct of the family over Integer Ring over Integer Ring) -> Gamma(Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2]) accepted without exhaustive linearity verification; the source is not represented as finite
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Integer Ring on Classes in the multilinear tensor presentation -> Gamma(Finitely presented module on 1 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2]) accepted without exhaustive linearity verification; the source is not represented as finite
+____ test_cardinality_compares_a_countable_power_set_with_two_to_aleph_zero ____
+
+    def test_cardinality_compares_a_countable_power_set_with_two_to_aleph_zero() -> None:
+        naturals = Sets.Δ[aleph0]
+        power_set = naturals.power_set()
+>       comparison = Sets().cardinality_functor().power_set_comparison(power_set)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinality_construction_comparisons.sage:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/functors/cardinality.py:82: in power_set_comparison
+    return self.codomain().Mor(expected, self(power_set)).unique_morphism()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Set of Morphisms from (2)^(ℵ_0) to (2)^(ℵ_0) in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda
+
+    @cached_method
+    def unique_morphism(self) -> CardinalityMorphism:
+        empty = self.is_empty()
+        if empty is True:
+            raise ValueError(
+                f"there is no morphism {self.domain()} -> {self.codomain()} of cardinals: "
+                f"{self.domain()} is not <= {self.codomain()}"
+            )
+>       assert empty is False, (
+               ^^^^^^^^^^^^^^
+            f"cannot give the morphism {self.domain()} -> {self.codomain()} of cardinals: it is "
+            f"undecided whether {self.domain()} <= {self.codomain()}"
+        )
+E       AssertionError: cannot give the morphism (2)^(ℵ_0) -> (2)^(ℵ_0) of cardinals: it is undecided whether (2)^(ℵ_0) <= (2)^(ℵ_0)
+
+src/sage_extensions/categories/sets/cardinals.py:369: AssertionError
+_ test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic _
+
+    def test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic() -> None:
+        polynomial = QQ.polynomial_ring("y")
+        countable_product = ZZ.product_with(polynomial)
+        continuum_product = ZZ.product_with(RR)
+        continuum_coproduct = QQbar.coproduct_with(CC)
+        cardinality = Sets().cardinality_functor()
+    
+>       countable_comparison = cardinality.cartesian_product_comparison(countable_product)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinality_construction_comparisons.sage:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/functors/cardinality.py:64: in cartesian_product_comparison
+    return self.codomain().Mor(expected, self(product)).unique_morphism()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    self.cache = f(self._instance)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Set of Morphisms from ℵ_0 to ℵ_0 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda
+
+    @cached_method
+    def unique_morphism(self) -> CardinalityMorphism:
+        empty = self.is_empty()
+        if empty is True:
+            raise ValueError(
+                f"there is no morphism {self.domain()} -> {self.codomain()} of cardinals: "
+                f"{self.domain()} is not <= {self.codomain()}"
+            )
+>       assert empty is False, (
+               ^^^^^^^^^^^^^^
+            f"cannot give the morphism {self.domain()} -> {self.codomain()} of cardinals: it is "
+            f"undecided whether {self.domain()} <= {self.codomain()}"
+        )
+E       AssertionError: cannot give the morphism ℵ_0 -> ℵ_0 of cardinals: it is undecided whether ℵ_0 <= ℵ_0
+
+src/sage_extensions/categories/sets/cardinals.py:369: AssertionError
+____________ test_rational_power_series_have_continuum_cardinality _____________
+
+    def test_rational_power_series_have_continuum_cardinality() -> None:
+        power_series = QQ.power_series_ring("t")
+    
+        assert power_series.cardinality() == continuum
+        # A finitely generated QQ-algebra is a quotient of some QQ[x_1, ..., x_n], hence
+        # countable, so the continuum-sized QQ[[t]] is not finitely generated.
+>       assert not power_series.is_finitely_generated()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_standard_cardinals_archive.sage:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = is_finitely_generated(Ring over Fraction Field of Integer Ring)
+
+    def __bool__(self):
+>       raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E       TypeError: the proposition is_finitely_generated(Ring over Fraction Field of Integer Ring) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+
+src/sage_extensions/logic.py:44: TypeError
+============================== slowest durations ===============================
+2.66s call     tests/algebras/test_affine_semigroup_algebras.sage::test_the_presentation_of_a_semigroup_algebra_answers_the_same_in_both_orders
+0.33s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_hirzebruch_surface_survives_a_polynomial_ring_built_first
+0.30s call     tests/divisors/test_toric_class_groups.sage::test_the_three_torus_invariant_lines_of_the_plane_share_one_nonzero_class
+0.13s call     tests/algebras/test_free_algebra_issue614_cells.sage::test_cell_61_tensor_and_divided_power_algebras_of_a_torsion_module
+0.12s call     tests/algebras/test_affine_semigroup_algebras.sage::test_semigroup_algebra_of_the_monoid_generated_by_e1_e2_and_their_sum_satisfies_z_equals_xy
+0.08s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_cone_is_torsion
+0.07s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_cone_has_order_two
+0.06s call     tests/algebras/test_affine_semigroup_algebras.sage::test_a_semigroup_algebra_keeps_its_identity_after_a_polynomial_ring_is_built
+0.04s call     tests/algebras/test_affine_semigroup_algebras.sage::test_linearly_independent_semigroup_generators_give_the_polynomial_algebra
+0.04s call     tests/algebras/test_free_algebra_issue614_cells.sage::test_cell_84_an_infinite_generator_map_induces_substitution
+0.03s call     tests/sets/test_standard_cardinals_archive.sage::test_rational_power_series_have_continuum_cardinality
+0.03s call     tests/algebras/test_free_algebra_issue614_cells.sage::test_cell_61_keeps_the_module_it_quotients_and_its_own_generators
+0.03s call     tests/algebras/test_free_algebra_issue614_cells.sage::test_cell_84_keeps_the_infinite_basis_and_the_morphism_endpoints
+0.02s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_affine_plane_is_trivial
+0.01s call     tests/divisors/test_toric_class_groups.sage::test_the_boundary_is_three_lines_and_the_canonical_class_is_minus_three_lines
+0.01s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_surface_is_free
+0.01s call     tests/sets/test_standard_cardinals_archive.sage::test_rational_polynomial_ring_is_countable
+0.01s call     tests/sets/test_standard_cardinals_archive.sage::test_matrix_ring_cardinality_tracks_the_coefficient_ring
+
+(48 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/algebras/test_free_algebra_issue614_cells.sage::test_cell_61_tensor_and_divided_power_algebras_of_a_torsion_module
+FAILED tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_compares_a_countable_power_set_with_two_to_aleph_zero
+FAILED tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic
+FAILED tests/sets/test_standard_cardinals_archive.sage::test_rational_power_series_have_continuum_cardinality
+========================= 4 failed, 18 passed in 6.45s =========================
+[peakrss] pytest540: child waited=1 shell_code=1 samples=5
+[peakrss] peak tree RSS      : 400 MiB
+[peakrss] low-water MemAvail : 13138 MiB
+[peakrss] peak single VmHWM  : 407 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      396 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     8.0s procs=  3 rss=   400 MiB hwm=   407 MiB avail= 13147 MiB
+[peakrss]   t=     4.0s procs=  4 rss=   394 MiB hwm=   395 MiB avail= 13138 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   363 MiB hwm=   363 MiB avail= 13165 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   310 MiB hwm=   310 MiB avail= 13362 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13603 MiB

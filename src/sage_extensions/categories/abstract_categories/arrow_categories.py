@@ -1981,7 +1981,54 @@ class SetSubobjectCategory(SliceCategory):
 
             return negation(self == other)
 
-        __hash__ = None
+        @cached_method
+        def __hash__(self) -> int:
+            r"""Hash the ambient set, refined by the members when it is finite and enumerated.
+
+            Equal subsets have one ambient set, and over a finite enumerated
+            ambient set they have the same decided members, read here by their
+            positions in its enumeration.
+
+            Over an infinite ambient set this is the hash of that set, and
+            every subset of it hashes alike.  Equality there is containment
+            both ways, and :meth:`is_contained_in` states each containment as a
+            proposition unless the inclusion's domain is a finite enumeration,
+            so two subsets that no procedure separates may yet be decided
+            equal, and a hash that separated them would contradict that
+            decision.  The premise is the library's: a subset asks membership
+            as a proposition, one that may be undecided (``DEF-06``), so the
+            subsets here are the semi-decided ones Rice's theorem is about and
+            not the decidable ones, over which a computable invariant constant
+            on equal sets need not be constant -- whether the subset contains
+            one fixed point is one.  So over an infinite ambient set no
+            computable invariant is finer than the ambient set (Rice, *Trans.
+            Amer. Math. Soc.* 74 (1953), 358-366), while a subclass whose
+            equality is decidable refines the hash, as the finite enumerated
+            sets above do.  The presentation is not such a refinement: one
+            subset is cut out by many predicates, and equal subsets are not
+            obliged to share the predicate that decides their members.
+
+            The hash is cached.  A subset is a factor of the interned finite
+            products and coproducts, whose store keys a family by its factors'
+            hashes (`SET-05`), and over a finite ambient set this hash decides
+            the membership of every point of it, which is not work to repeat at
+            every lookup.  A subset is a value: its predicate is fixed when it
+            is constructed, so the decisions the cached hash records do not
+            change.
+            """
+            from sage_extensions.categories.sets.set_categories import (
+                EnumeratedSets,
+                FiniteSets,
+            )
+
+            base = self.codomain()
+            if base in FiniteSets() and base in EnumeratedSets():
+                return hash((base, tuple(
+                    position
+                    for position, member in enumerate(base)
+                    if self.is_parent_of(member) is True
+                )))
+            return hash(base)
 
         def _repr_(self):
             return f"Subobject of {self.codomain()} defined by {self.domain()}"

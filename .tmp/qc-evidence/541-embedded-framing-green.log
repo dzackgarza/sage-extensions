@@ -1,0 +1,5 @@
+=== ran on: ca1f0b2cd24bed2e2df0b6c7e0f8a17b81531307 (1 modified paths)
+=== command: pytest tests/modules/test_the_embedded_framing_is_one_datum.sage -o addopts= -p qc_sage_session
+..                                                                       [100%]
+2 passed in 1.15s
+=== exit: 0

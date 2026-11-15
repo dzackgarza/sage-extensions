@@ -1,0 +1,19 @@
+tree SHA: 9bc00c11ac214bab87130fa33267253f1b48ad90
+port SHA: 991b88b0
+inner 400 s, outer 460 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py
+pointed cones of Z^2: 40 cones, first hash 0.462 ms, cached 0.0004 ms
+cones with a lineality, Z^2: 40 cones, first hash 0.071 ms, cached 0.0001 ms
+cones with a lineality, Z^3: 40 cones, first hash 1.008 ms, cached 0.0001 ms
+pointed cones of Z^3: 40 cones, first hash 0.261 ms, cached 0.0001 ms
+the whole line as a cone: 0 pointed True
+  form ((), ()) hash 4934970488691429162
+  equal to itself cut out again: True hash equal: True
+[peakrss] probe531cost: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 13675 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       2 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13675 MiB
+launcher exit: 0

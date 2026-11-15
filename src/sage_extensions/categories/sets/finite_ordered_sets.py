@@ -85,7 +85,7 @@ class OrderedEnumeratedSets(OwnedCategory):
         index_of: Callable[[PointT], IndexT | None],
         contains: Callable[[PointT], bool] | None = None,
         equivalent: Callable[[PointT, PointT], bool] | None = None,
-        name: str | None = None,
+        name: str | Callable[[], str] | None = None,
     ) -> Sets().ObjectType:
         r"""Construct an ordered enumerated set from its chosen enumeration."""
         assert index_set in EnumeratedSets(), (
@@ -119,7 +119,7 @@ class OrderedEnumeratedSets(OwnedCategory):
             index_of: Callable[[PointT], IndexT | None],
             contains: Callable[[PointT], bool] | None = None,
             equivalent: Callable[[PointT, PointT], bool] | None = None,
-            name: str | None = None,
+            name: str | Callable[[], str] | None = None,
             **rest,
         ) -> None:
             assert callable(element_at), (
@@ -257,9 +257,19 @@ class OrderedEnumeratedSets(OwnedCategory):
                 return point
             raise ValueError(f"{self} is empty, so it has no element")
 
+        def description(self):
+            r"""What this set was named with, rendered now.
+
+            A name given as a function is a description of the set's source, and
+            rendering it is the reader's act: the set asks it here and not at
+            construction, so building the set computes no display.
+            """
+            return self._name() if callable(self._name) else self._name
+
         def _repr_(self) -> str:
             size = cardinal(self.cardinality())
-            prefix = f"{self._name} = " if self._name else ""
+            described = self.description()
+            prefix = f"{described} = " if described else ""
             if size.is_finite():
                 count = int(size.finite_value())
                 shown = tuple(self) if count <= 12 else tuple(islice(self, 6))
@@ -371,7 +381,7 @@ class FiniteOrderedSets(OwnedCategory):
         index_of: Callable[[PointT], IndexT | None] | None = None,
         contains: Callable[[PointT], bool] | None = None,
         equivalent: Callable[[PointT, PointT], bool] | None = None,
-        name: str | None = None,
+        name: str | Callable[[], str] | None = None,
     ) -> ObjectOfCategory:
         r"""Construct the finite ordered set enumerated by ``element_at`` on ``index_set``.
 
@@ -403,38 +413,20 @@ class FiniteOrderedSets(OwnedCategory):
             lookup = dict(zip(points, indices, strict=True))
             if len(lookup) != len(points):
                 raise ValueError("an enumeration must select distinct points at distinct indices")
+            # A candidate is looked up in the table, so one that refuses a hash,
+            # or whose equality with a point of its hash is undecided, raises
+            # the table's TypeError, as ``[0] in {}`` does.
             def index_of(point):
                 retained = identity_indices.get(id(point))
                 if retained is not None:
                     return retained
-                try:
-                    return lookup.get(point)
-                except (TypeError, ValueError):
-                    # A query can have undecidable symbolic equality even
-                    # when the selected points formed a valid hash table.
-                    for index, present in zip(indices, points, strict=True):
-                        if point is present or (point == present) is True:
-                            return index
-                    return None
+                return lookup.get(point)
             if contains is None:
                 def contains(point):
-                    from sage_extensions.logic import conjunction, negation
-
-                    if id(point) in identity_indices:
-                        return True
-                    try:
-                        position = lookup.get(point)
-                    except (TypeError, ValueError):
-                        return negation(conjunction(
-                            negation(True if point is present else point == present)
-                            for present in points
-                        ))
-                    return position is not None
+                    return id(point) in identity_indices or point in lookup
         if contains is None:
             # Membership is the domain of the selected enumeration inverse,
-            # not a second independent set reconstructed from its values.
-            # The inverse already uses a hash table when points are hashable,
-            # and retains the necessary equality fallback otherwise. A
+            # not a second independent set reconstructed from its values. A
             # supplied inverse can be extended arbitrarily off the image;
             # only the forward equation certifies such a candidate.
             def contains(point):
@@ -570,11 +562,22 @@ class FiniteOrderedSets(OwnedCategory):
 
             return negation(self == other)
 
+        @cached_method
         def __hash__(self) -> int:
-            r"""Return the hash of the tuple of the points, which is what :meth:`__eq__` compares.
+            r"""Return the hash of the tuple of the points, which :meth:`__eq__` compares.
+
+            The points of a finite ordered set are values, so the set is fixed by
+            them and this hash does not change: it is computed on the first ask
+            and read after (``STY-55``).  A reader does ask repeatedly, because
+            the store that keeps one product per equal family keys a family by
+            its factors' hashes (``SET-05``), and a set whose points are reached
+            through a map -- an image, a product section -- would otherwise build
+            all of them again per ask.
 
             The points hash and their hashes agree with their equality (the rule
-            of :class:`FiniteOrderedSets`), so equal sets hash equally.
+            of :class:`FiniteOrderedSets`), so equal sets hash equally, and a set
+            carrying a point that refuses a hash refuses one too: the computation
+            raises before anything is cached.
             """
             return hash(tuple(self))
 
@@ -634,20 +637,13 @@ def _filtered_ordered_set(
     inverse_lookup = dict(zip(points, positions, strict=True))
     if len(inverse_lookup) != len(points):
         raise ValueError("a filtered enumeration cannot contain duplicate points")
-    def position_of(value):
-        try:
-            return inverse_lookup.get(value)
-        except (TypeError, ValueError):
-            for i, point in enumerate(points):
-                if value is point or (value == point) is True:
-                    return i
-            return None
-
     def element_at(index):
         return points[int(index)]
 
     def index_of(element):
-        return position_of(element)
+        # A candidate that refuses a hash, or whose equality is undecided,
+        # raises the table's TypeError, as ``[0] in {}`` does.
+        return inverse_lookup.get(element)
 
     def contains(element):
         # The selected tuple supplies an enumeration, not the definition of

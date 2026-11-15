@@ -1,0 +1,5 @@
+=== ran on: 353418f784644cc3ed722796611d2d4bd0e324bd (0 modified paths)
+=== command: test tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage tests/modules/test_the_embedded_framing_is_one_datum.sage
+.....                                                                    [100%]
+5 passed in 1.36s
+=== exit recorded above

@@ -1,0 +1,54 @@
+tree SHA: 9bc00c11ac214bab87130fa33267253f1b48ad90
+port SHA: 991b88b0
+inner 500 s, outer 560 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py
+short : pointed=False dim=3
+  lines  [(3, 1, 2)]
+  rays   [(-3, -1, 0), (-11, -3, 0)]
+  form   (((3, 1, 2),), ((-1, 3), (0, 1)))
+  hash   7518367605285449842
+longer: pointed=False dim=3
+  lines  [(3, 1, 2)]
+  rays   [(0, 0, 1), (-1, 0, 3)]
+  form   (((3, 1, 2),), ((-1, 3), (0, 1)))
+  hash   7518367605285449842
+the reviewer's pair: equal True | hash equal True | one set 1
+two sides of a line: equal False hash equal False
+two presentations of one cone: 398 cones, 0 disagreements
+  FORM DISAGREES WITH EQUALITY False False
+distinct cones of the sample: 79003 pairs, 1 where the form or the hash disagrees with the cone equality
+form collisions among unequal cones of the sample: 0
+  UNEQUAL CONES WITH ONE HASH: a plain hash collision, or an equality that is too fine
+    left  dim 3 halfspaces [Generic morphism:
+  From: Integral lattice of rank 3 and signature (3, 0)
+  To:   Integer Ring, Generic morphism:
+  From: Integral lattice of rank 3 and signature (3, 0)
+  To:   Integer Ring]
+        lines [(1, -1, 0)] rays [(0, 1, 0), (0, -1, -1)]
+        form (((1, -1, 0),), ((-1, -1), (1, 0))) hash of the form 6531578157056315217
+        engine H [An inequality (0, 0, -1) x + 0 >= 0, An inequality (1, 1, -1) x + 0 >= 0]
+    right dim 3 halfspaces [Generic morphism:
+  From: Integral lattice of rank 3 and signature (3, 0)
+  To:   Integer Ring, Generic morphism:
+  From: Integral lattice of rank 3 and signature (3, 0)
+  To:   Integer Ring]
+        lines [(1, -1, 0)] rays [(0, 1, 0), (0, -1, -2)]
+        form (((1, -1, 0),), ((-1, -2), (1, 0))) hash of the form 6531578157056315217
+        engine H [An inequality (0, 0, -1) x + 0 >= 0, An inequality (2, 2, -1) x + 0 >= 0]
+    equal both ways: False False
+    engine polyhedra equal: False
+    hash of the cones: -6739555679549878130 -6739555679549878130
+hash of a cone with a lineality: first 0.995 ms, cached 0.000 ms
+[peakrss] probe532fix: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 341 MiB
+[peakrss] low-water MemAvail : 13158 MiB
+[peakrss] peak single VmHWM  : 341 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      330 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   341 MiB hwm=   341 MiB avail= 13208 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   335 MiB hwm=   335 MiB avail= 13174 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   302 MiB hwm=   302 MiB avail= 13158 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     2 MiB avail= 13160 MiB
+launcher exit: 0

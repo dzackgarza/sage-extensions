@@ -1,0 +1,21 @@
+=== ran on: 4c294887821909c5e827bda8bd52d42dd1961223 (1 modified paths)
+=== command: pytest tests/modules/test_the_embedded_framing_is_one_datum.sage -o addopts= -p qc_sage_session
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+____________ test_the_embedded_framing_of_a_subobject_is_one_family ____________
+
+    def test_the_embedded_framing_of_a_subobject_is_one_family() -> None:
+        r"""Asked twice, a subobject's embedded framing is the family it built once."""
+        lattice, plane = _plane_of_two_hyperbolic_planes()
+    
+>       assert plane.embedded_module_generators() is plane.embedded_module_generators()
+E       assert Embedded framing of Integral lattice of rank 2 and signature (0, 0): [0 ↦ e_1, 1 ↦ e_2] is Embedded framing of Integral lattice of rank 2 and signature (0, 0): [0 ↦ e_1, 1 ↦ e_2]
+E        +  where Embedded framing of Integral lattice of rank 2 and signature (0, 0): [0 ↦ e_1, 1 ↦ e_2] = embedded_module_generators()
+E        +    where embedded_module_generators = Integral lattice of rank 2 and signature (0, 0).embedded_module_generators
+E        +  and   Embedded framing of Integral lattice of rank 2 and signature (0, 0): [0 ↦ e_1, 1 ↦ e_2] = embedded_module_generators()
+E        +    where embedded_module_generators = Integral lattice of rank 2 and signature (0, 0).embedded_module_generators
+
+tests/modules/test_the_embedded_framing_is_one_datum.sage:41: AssertionError
+=========================== short test summary info ============================
+FAILED tests/modules/test_the_embedded_framing_is_one_datum.sage::test_the_embedded_framing_of_a_subobject_is_one_family
+1 failed, 1 passed in 3.14s

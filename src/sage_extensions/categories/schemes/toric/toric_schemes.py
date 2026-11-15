@@ -177,25 +177,58 @@ def _semigroup_monomial(algebra, exponents):
     return _owned_engine_element(algebra, monomial)
 
 
+def _semigroup_generator_point(cone, generator):
+    r"""The lattice point of a semigroup generator, as a chart's algebra records it."""
+    return tuple(int(entry) for entry in _engine_vector(cone.character_lattice(), generator))
+
+
+def _chart_semigroup_generators(cone, chart):
+    r"""The generators of ``cone``'s semigroup, in the order the chart lists them.
+
+    ``cone`` is a cone equal to the one ``chart`` was built from, so the two
+    present one semigroup and ``cone``'s generators are the chart's as lattice
+    points.  The chart's algebra fixes the order — it is the algebra's own
+    datum, ``affine_semigroup_generator_positions`` — so what is read off these
+    generators (a character on the overlap, the variable of a divisor's
+    support, a chart pullback) is assigned to the chart's positions, never to
+    the order ``cone`` happens to list its own.
+    """
+    positions = chart.coordinate_algebra().affine_semigroup_generator_positions()
+    by_point = {
+        _semigroup_generator_point(cone, generator): generator
+        for generator in cone.semigroup_generators()
+    }
+    assert len(by_point) == len(positions), (
+        f"the semigroup of {cone} presents {len(by_point)} generators while the chart "
+        f"{chart} was built from one presenting {len(positions)}"
+    )
+    ordered = tuple(by_point.get(point) for point in sorted(positions, key=positions.__getitem__))
+    assert all(generator is not None for generator in ordered), (
+        f"the semigroup of {cone} and the chart {chart} have different generators, "
+        "although that chart was built from a cone equal to this one"
+    )
+    return ordered
+
+
 @cached_function
 def _face_supporting_character_monomial(face, cone, chart):
     r"""The monomial ``chi^m`` cutting ``face`` out of ``cone`` (CLS Prop. 1.3.16).
 
     ``m`` is a sum of selected semigroup generators. Construct its character
-    class directly in the chart's actual coordinate algebra.
+    class directly in the chart's actual coordinate algebra, at the positions
+    that algebra gives its generators: the sum is over the lattice points the
+    face-supporting generators name, and the chart, not the cone argument,
+    decides which variable each point is.
     """
     algebra = chart.coordinate_algebra()
-    generators = tuple(cone.semigroup_generators())
-    ranking = cone.semigroup_generators().ranking_map()
-    exponents = [0] * len(generators)
-    by_identity = {id(generator): position for position, generator in enumerate(generators)}
+    positions = algebra.affine_semigroup_generator_positions()
+    exponents = [0 for _ in positions]
     for generator in cone.face_supporting_generators(face):
-        position = by_identity.get(id(generator))
-        if position is None:
-            # Preserve exact mathematical lookup for equivalent, noncanonical
-            # labels, but avoid comparing represented module morphisms for the
-            # canonical generators returned by this same cone.
-            position = int(ranking(generator))
+        position = positions.get(_semigroup_generator_point(cone, generator))
+        assert position is not None, (
+            f"the face-supporting generator {generator} of {cone} is not a generator of the "
+            f"chart {chart}, although that chart was built from a cone equal to {cone}"
+        )
         exponents[position] += 1
     return _semigroup_monomial(algebra, tuple(exponents))
 
@@ -205,23 +238,42 @@ def _character_monomial(character, cone, chart):
     r"""The monomial ``chi^m`` in ``k[S_sigma]`` of a character of ``S_sigma``.
 
     The cone supplies a nonnegative integer expansion in its selected Hilbert
-    generators; multiply their classes in the actual coordinate algebra.
+    generators; multiply their classes in the actual coordinate algebra at the
+    positions that algebra gives them, so the exponents do not depend on the
+    order a cone equal to the chart's own happens to list its generators in.
     """
     algebra = chart.coordinate_algebra()
-    exponents = tuple(
-        int(multiplicity)
-        for multiplicity in cone.semigroup_coefficients(character)
-    )
-    return _semigroup_monomial(algebra, exponents)
+    positions = algebra.affine_semigroup_generator_positions()
+    exponents = [0 for _ in positions]
+    for generator, multiplicity in zip(
+        cone.semigroup_generators(),
+        cone.semigroup_coefficients(character),
+        strict=True,
+    ):
+        position = positions.get(_semigroup_generator_point(cone, generator))
+        assert position is not None, (
+            f"the generator {generator} of {cone} is not a generator of the chart {chart}, "
+            f"although that chart was built from a cone equal to {cone}"
+        )
+        exponents[position] += int(multiplicity)
+    return _semigroup_monomial(algebra, tuple(exponents))
 
 
 @cached_function
 def _affine_chart(cone, base_ring):
     r"""``U_sigma = Spec k[S_sigma]``, one chart per cone and base (CLS Prop. 1.3.9).
 
-    The chart depends on the cone and the base field alone, so it is shared by
-    every construction that reaches it: the atlas a toric variety is glued from
-    holds exactly the objects its ``affine_chart`` answers with.
+    The chart depends on the cone's value and the base field alone, so it is
+    shared by every construction that reaches a cone equal to it: the atlas a
+    toric variety is glued from holds exactly the objects its ``affine_chart``
+    answers with, and two varieties of one fan hold one ``U_sigma``, not two.
+
+    What the chart adds to the cone is the presentation of ``S_sigma``: its
+    coordinate algebra carries the lattice point of each of its generators
+    (``affine_semigroup_generator_coordinates``).  Every datum computed with a
+    chart — the supporting character of a face, the localization at it, a
+    transition out of it — is indexed by that presentation, never by the order
+    a cone merely equal to the chart's own lists its generators in.
     """
     return (_semigroup_algebra(cone, base_ring)).affine_spectrum(base_ring=base_ring)
 
@@ -353,7 +405,7 @@ def _face_transition_morphism(face, source_cone, target_cone, base_ring):
     target_open_algebra = source_open.coordinate_algebra()
     generator_images = tuple(
         _character_on_overlap(generator, face, source_cone, base_ring)
-        for generator in target_cone.semigroup_generators()
+        for generator in _chart_semigroup_generators(target_cone, target_chart)
     )
     # A generic owned PresentedAlgebraMorphism rechecks each toric relation by
     # comparing its image in the owned localization. For singular Hilbert
@@ -471,7 +523,7 @@ def _toric_chart_pullback(lattice_morphism, source_cone, target_cone, base_ring)
     source_algebra = source_chart.coordinate_algebra()
     target_algebra = target_chart.coordinate_algebra()
     target_labels = tuple(target_algebra.algebra_generating_set())
-    target_generators = target_cone.semigroup_generators()
+    target_generators = _chart_semigroup_generators(target_cone, target_chart)
     domain_fan = source_cone.parent()
     codomain_fan = target_cone.parent()
     return target_algebra.Mor(source_algebra)(
@@ -834,7 +886,9 @@ class ToricSchemes(OwnedCategoryOverBaseRing):
                         continue
                     generators = tuple(
                         algebra.algebra_generator(labels[position])
-                        for position, character in enumerate(cone.semigroup_generators())
+                        for position, character in enumerate(
+                            _chart_semigroup_generators(cone, chart)
+                        )
                         if _pairing_on_ray(self.fan(), character, ray) > zero
                     )
                     ideals.append(algebra.ideal(*generators))

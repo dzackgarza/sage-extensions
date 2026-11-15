@@ -11,6 +11,23 @@ Example II.6.5.2, checked against the text in the Zotero library).
 from sage_extensions.all import *  # noqa: F401,F403
 
 
+def test_the_class_group_of_the_hirzebruch_surface_survives_a_polynomial_ring_built_first() -> None:
+    r"""``Cl(P^1 x P^1) = Z^2`` after ``QQ[y]`` has been built.
+
+    The class group is read through the chart's face localization, which builds
+    the degree-zero arrow of the chart algebra's own resolution; which parent
+    class of that algebra answers is decided by the order the algebra's parent
+    classes are listed in, and that order followed what the session had built.
+    Building ``QQ[y]`` first is the minimal history that reaches the other
+    order.  The answer is the same ``Z^2``.
+    """
+    QQ.polynomial_ring("y")
+    quadric = RationalPolyhedralFans(ZZ.free_module(2)).hirzebruch_surface_fan(0).toric_variety(QQ)
+
+    assert quadric.class_group().is_free()
+    assert quadric.class_group().module_rank() == 2
+
+
 def test_the_three_torus_invariant_lines_of_the_plane_share_one_nonzero_class() -> None:
     r"""``div(chi^m) = <m, u_0> D_0 + <m, u_1> D_1 + <m, u_2> D_2`` identifies the three lines in ``Cl P^2``."""
     fans = RationalPolyhedralFans(ZZ.free_module(2))

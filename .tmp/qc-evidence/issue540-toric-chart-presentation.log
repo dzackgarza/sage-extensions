@@ -1,0 +1,133 @@
+=== #540: a toric chart's data is read from that chart's own presentation
+=== image: ghcr.io/dzackgarza/sage@sha256:59568577... (Sage 11.0.beta5, Python 3.14.10)
+=== port repo at /work: 991b88b095a42a1e3679569ea42328c900c120f6
+=== tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt540
+=== base SHA: 2291235e3d2c04d7ca5effb4b9c0f8b6cfaa5537
+=== fixed SHA: f7bc9b9bde49d39e69a0e1136c74ebf29f719cc6
+=== launch: ~/sage-image/run.sh -w /work -b <port>:/work -b <tree>:/repos/sage-extensions -b ~/ai-review-ci:/ci
+===          PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work:/repos/sage-extensions/src
+
+--- 1. the file the issue names, in one process, on the base tree ---
+/sage/.venv/bin/python -m pytest -p qc_sage_session tests/divisors/test_toric_class_groups.sage
+collected 7 items
+tests/divisors/test_toric_class_groups.sage .......                      [100%]
+(the summary line is lost: timing_record's `git -C /repos/sage-extensions rev-parse HEAD`
+ fails inside proot, the worktree's .git file naming a host path; the seven dots are the
+ seven collected tests and no F appears)
+
+--- 2. the same file, ten hash seeds, one process each, base tree ---
+seed 0:   rc=0  7 passed in 2.08s      seed 11:  rc=0  7 passed in 2.03s
+seed 1:   rc=0  7 passed in 2.35s      seed 13:  rc=0  7 passed in 2.09s
+seed 2:   rc=0  7 passed in 2.08s      seed 42:  rc=0  7 passed in 2.08s
+seed 3:   rc=0  7 passed in 2.14s      seed 99:  rc=0  7 passed in 2.08s
+seed 7:   rc=0  7 passed in 1.97s      seed 123: rc=0  7 passed in 1.99s
+
+--- 3. [RETRACTED 2026-11-15: this section's conclusion is false.  The four failures do occur, and not from these caches; see section 6.  The probe results below stand.] ---
+probe, base tree: cones of `projective_space_fan()` and of `hirzebruch_surface_fan(0)`
+over one `ZZ.free_module(2)` that have the same rays
+  same rays [(0, 1), (1, 0)]   eq: False   hash eq: True   engine cones eq: True
+  same rays [(0, 1), (1, 0)]   eq: False   hash eq: True   engine cones eq: False
+`fans.py:751` requires `element_parent(other) is self.parent()` for cone equality, while
+`fans.py:95` hashes the ray coordinates, so equal-cone cache hits happen only inside one
+fan object.  Inside one fan the equal copies are `c.intersection(c)`, `C.faces(k)` members
+and pairwise intersections of maximal cones; over P2, P1xP1, Hirzebruch 2, the A1 cone and
+P3 the Hilbert basis came back in the same order from every copy, 0 disagreements out of
+every pair tested.
+
+[RETRACTED: the sentence that followed -- that "the base tree has no failing instance to
+observe and the repair is the invariant, not a reproduced red" -- is false.  It was drawn
+from runs of the file alone.  Run in one process after two `tests/sets` files, the same
+tree fails four of the file's seven tests, and the cause is the augmentation identity of
+the chart's free algebra, not these caches.  Section 6 records the reproduction.]
+
+--- 4. the 18 test files that reach the toric chart API, one process ---
+tests/schemes/test_toric_*.sage tests/divisors/test_toric_*.sage
+tests/divisors/test_cox_ring_grading.sage tests/objects/test_standard_triangle.sage
+tests/objects/test_projective_plane_over_qq.sage tests/schemes/test_lattice_polygon_invariants.sage
+base 2291235e3d:  42 failed, 72 passed in 15.53s
+fixed f7bc9b9:    42 failed, 73 passed in 13.40s
+the FAILED id sets are identical (42 and 42, `diff` empty); the extra pass is the new test
+
+--- 5. the test lint on tests/schemes/test_toric_schemes.sage ---
+/sage/.venv/bin/python -m sage_extensions.testing.test_lint <base file>  -> 1 files, 34 findings
+/sage/.venv/bin/python -m sage_extensions.testing.test_lint <fixed file> -> 1 files, 34 findings
+the finding kinds compare equal after stripping line numbers; no finding is in the new test
+
+--- 6. #540's four failures reproduced, and their cause: the augmentation identity ---
+=== base SHA: d1ab7fc7856b1132cf1c745128eddce0e5f7e6ca (main)
+=== trees: .scratch/wt540base3 (base, pristine) and .scratch/wt540b (the repair)
+=== launcher as above; every run one process, --tb from the log's own lines
+
+6a. the owner's scenario -- two `tests/sets` files, then the toric file, one process
+base d1ab7fc:  7 failed, 5 passed in 2.36s
+  FAILED tests/sets/.../test_cardinality_compares_a_countable_power_set_with_two_to_aleph_zero
+  FAILED tests/sets/.../test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic
+  FAILED tests/sets/.../test_rational_power_series_have_continuum_cardinality
+  FAILED tests/divisors/test_toric_class_groups.sage::test_the_three_torus_invariant_lines_of_the_plane_share_one_nonzero_class
+  FAILED tests/divisors/test_toric_class_groups.sage::test_the_boundary_is_three_lines_and_the_canonical_class_is_minus_three_lines
+  FAILED tests/divisors/test_toric_class_groups.sage::test_the_torus_invariant_weil_divisors_of_the_plane_are_free_on_its_three_rays
+  FAILED tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_surface_is_free
+fixed:         3 failed, 12 passed in 2.90s -- the same three `tests/sets` ids, no toric id.
+The three `tests/sets` failures are the files' own: run alone on both trees they are the same
+three ids (3 failed, 2 passed in 1.53s base, 1.87s fixed).
+
+6b. the minimal reproduction, algebra-only, on the base tree
+  QQ.polynomial_ring("y")
+  algebra = AffineSemigroupAlgebras(QQ)(((1, 0), (0, 1)),)
+  algebra.Mor(algebra).identity()
+-> ValueError: the whole-algebra map for Free module on Coproduct of the family over NN over
+   Fraction Field of Integer Ring has different endpoints Multivariate Polynomial Ring in
+   s0, s1 over Rational Field -> Multivariate Polynomial Ring in s0, s1 over Rational Field
+   (algebras.py:4645, from PresentedAlgebraMorphism.__init__, from
+   _AlgebraMorCommonMethods._from_engine_morphism :4789, from PresentedAlgebraMor.identity
+   :4893, from the augmentation at :5254, from selected_resolution :938, from
+   algebra_generator :2057, from toric_schemes.py:262)
+Without the polynomial ring first the same three lines pass: the identity is built and fixes
+the generator.  With it, two different answers for one algebra.
+
+6c. why: the arrow class is decided by the order of the parent classes, not by the algebra
+`AlgebrasWithChosenFinitePresentation.ParentMethods._algebra_mor_class` (algebras.py:3547)
+and `FreeAlgebras.ParentMethods._algebra_mor_class` (free_algebras.py:1580) both answer for a
+semigroup algebra on a free monoid -- it is the polynomial algebra and a finitely presented
+algebra at once.  Which one is reached is the MRO of the object's generated `_with_category`
+class, and that order follows what was built before:
+  without QQ[y]  MRO: ... GradedAlgebras.ParentMethods, FreeAlgebras.ParentMethods,
+                       _CommutativeUnitalAlgebraParentMethods,
+                       AlgebrasWithChosenFinitePresentation.ParentMethods ...
+                 answer: FramedFreeAlgebraMor   (identity builds from generator images)
+  with QQ[y]     MRO: ... GradedAlgebras.ParentMethods,
+                       AlgebrasWithChosenFinitePresentation.ParentMethods,
+                       FreeAlgebras.ParentMethods ...
+                 answer: PresentedAlgebraMor     (identity goes through the engine ring)
+Deterministic per construction history and independent of PYTHONHASHSEED: eight runs without
+QQ[y] answered FramedFreeAlgebraMor eight times, three with it answered PresentedAlgebraMor
+three times.  `PresentedAlgebraMor.identity` builds `engine.hom(engine)` and
+`PresentedAlgebraMorphism` refuses it, so the augmentation of the free algebra's own
+degree-zero resolution -- the one arrow that must exist before the resolution is installed --
+is built in a class that cannot build it.
+
+6d. the repair
+`AlgebrasWithChosenFinitePresentation.ParentMethods._algebra_mor_class` defers to
+`FreeAlgebras.ParentMethods._algebra_mor_class` when the algebra is a free algebra, so the
+answer is a function of the algebra rather than of the parent-class order, and the identity
+is built by the class that can build it (generator images, no engine arrow, no
+`module_category` of the algebra, which does not exist yet at that point).
+The caches of the first turn stay keyed by the cone's value, and `_semigroup_generator_positions`
+became `AffineSemigroupAlgebras.affine_semigroup_generator_positions` -- a datum of the algebra,
+which already carried `affine_semigroup_generator_coordinates`.
+
+6e. the new test, red on the base tree and green on the repair
+tests/algebras/test_affine_semigroup_algebras.sage::test_a_semigroup_algebra_keeps_its_identity_after_a_polynomial_ring_is_built
+  base d1ab7fc: 1 failed, 2 passed in 5.11s (the ValueError above)
+  fixed:        3 passed in 1.49s
+The first turn's `test_two_varieties_of_one_fan_share_one_chart_per_cone_and_read_its_own_ring`
+was deleted: it passes at 022f7a5 without any repair, so it tests nothing this round changed.
+
+6f. no regression elsewhere
+the 58 files of tests/algebras, one process:
+  base d1ab7fc  103 failed, 110 passed in 61.79s
+  fixed         103 failed, 111 passed in 65.65s   FAILED ids identical; the extra pass is 6e
+the 18 files that reach the toric chart API, one process:
+  base d1ab7fc   42 failed,  73 passed in 13.97s
+  fixed          42 failed,  72 passed in 13.19s   FAILED ids identical; one fewer pass is the
+                                                  deleted test of 6e

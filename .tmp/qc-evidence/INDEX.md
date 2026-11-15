@@ -2177,3 +2177,284 @@ its reduction: even, primitive isotropic of divisibility two, base point not int
 | `issue528-transvection-tests-new.log` | the same worktree | `test_eichler_transvection_construction.sage`, `test_eichler_isometry_relations.sage`, `test_isotropic_reduction.sage` with the test lint: **12 passed in 2.67 s** |
 | `issue528-transvection-neighbours-base-9files.log` | `eb3aec7`, a clean worktree | the nine lattice files that mention `eichler_transvection`: **6 failed, 40 passed in 17.79 s** |
 | `issue528-transvection-neighbours-new9.log` | the tree this round pushes | the same nine: **6 failed, 41 passed in 15.65 s** -- the FAILED **ids** are identical to the base run's, and the extra pass is this file's second test |
+
+## #541, the plane row's per-plane cost: what one transport builds
+
+The census is on the smallest lattice of the row's kind whose plane transport
+costs more than 5 ms a plane: `U + U` (rank 4), at a median **10.59 ms cold**
+(span uncached) and **1.55 ms warm**. Each timed transport is of a fresh plane
+of a fresh equal lattice, so the span is built inside the timed region as the
+row builds it. Both logs are the probe's own output; the probe files sit beside
+them and the launcher is the one the header names.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-plane-transport-census.log` | `2291235` (main) | sections A-D: the cold/warm ladder on `U+U` (10.59 / 1.55 ms), `U+U+<-2>` (10.25 / 1.63) and `T_En` (13.95 / 2.09); one transport of one fresh plane under `setprofile` -- **35 567 calls, 1 span**, `_MorCategoryOf.Of` 111 calls 23.23 ms incl, `_declaring_classes` 15 calls 1.96 ms own, `OwnedCategory.__contains__` 942, `NaturalNumberSets` element constructions 1066; the unprofiled cold attribution (**13.07 ms a plane**, own ms: `_span_basis_elements` 1.88, `cokernel` 1.14, `Of` 1.02, `_lattice_subobject_on_basis` 0.86, `_declaring_classes` 0.30, `_owned_join_as_tuple` 0.37); the identity table |
+| `541-plane-datum-identity.log` | `2291235` (main) | which public datum is one object per parent: `L.gram_matrix()` **False**, `plane.embedded_module_generators()` **False**, and `module_generating_set`, `inclusion`, `cokernel`, `subobject_on`, `Mor(plane, L)` all **True**; per-call cost `gram_matrix` 604.55 us, `subobject_on` 1021.64 us, `embedded_module_generators` 10.99 us; the two `_span_basis_elements` calls of one transport see **different** families, so a family-keyed cache would not merge them |
+| `541-embedded-framing-red.log` | `4c29488` | `tests/modules/test_the_embedded_framing_is_one_datum.sage` on the tree before the repair: **1 failed, 1 passed in 3.14 s** -- `plane.embedded_module_generators() is plane.embedded_module_generators()` is False, while the same family's points are still the generator images |
+| `541-embedded-framing-green.log` | `ca1f0b2` + the repair | the same file with `embedded_module_generators` cached per subobject: **2 passed in 1.15 s** |
+| `541-embedded-framing-lint.log` | `ca1f0b2` + the repair | `sage_extensions.testing.test_lint` on the new test file: **1 files, 0 findings** |
+| `541-otilde-row-capped.log` | `cb9ba77` | `NamedLattices.Tco.stable_orthogonal_group().isotropic_orbit_representatives(2)`, once, capped at ten minutes: **0 planes transported** by 510.6 s (the tick log), killed by the 600 s inner cap with the walk still inside its first stage; peak tree RSS 1145 MiB. So there is no planes-per-second to report, and the 283.9 s to a first transport that `7c0859c832` recorded is not reproduced on this tree. Not bisected |
+| `541-plane-transport-census-after.log` | `cb9ba77` | the same census after the repair: `U+U` **10.45 ms cold / 1.62 ms warm**, `U+U+<-2>` 10.49 / 1.66, `T_En` 14.71 / 2.20, and **35 569 calls** for the profiled transport against 35 567 before -- the repair restores a contract, it does not move the plane's cost |
+| `issue540-toric-chart-presentation.log` | `f7bc9b9` (base `2291235e3d`) | `tests/divisors/test_toric_class_groups.sage`, the file #540 names, one process: **7 passed in 2.08 s** on the base tree and **7 passed** on each of ten `PYTHONHASHSEED`s, so the four failures do not reproduce; cone equality requires one fan object (`fans.py:751`) while the hash is the ray coordinates (`fans.py:95`), and every equal copy inside one fan lists one Hilbert basis in one order (0 disagreements over P2, P1xP1, Hirzebruch 2, the A1 cone, P3), so the repair is the invariant the code now enforces. The 18 files reaching the toric chart API, one process: base **42 failed, 72 passed in 15.53 s**, fixed **42 failed, 73 passed in 13.40 s**, FAILED id sets identical; the test lint on `tests/schemes/test_toric_schemes.sage` reports the same 34 findings before and after, none in the new test |
+| `541-embedded-framing-green-merged.log` | `1e18b98` (the merge) | the same file after omm/main `2993a51` was merged in: **2 passed in 1.09 s** |
+| `issue540-toric-chart-presentation.log` (section 6 of the same log) | `2993a51`/`d1ab7fc` base, repair in this round's commit | #540's four failures **do** occur, and not from the toric cone caches: two `tests/sets` files then `tests/divisors/test_toric_class_groups.sage` in one process is **7 failed, 5 passed** on base `d1ab7fc` (four toric ids) and **3 failed, 12 passed** with the repair (only the three pre-existing `tests/sets` ids). Cause: a semigroup algebra on a free monoid answers `_algebra_mor_class` from `FreeAlgebras.ParentMethods` or from `AlgebrasWithChosenFinitePresentation.ParentMethods`, whichever its generated parent class lists first, and the first is decided by what was built before (`QQ.polynomial_ring("y")` is enough); the second builds `PresentedAlgebraMor.identity` from `engine.hom(engine)`, which `PresentedAlgebraMorphism` refuses, so the augmentation of the free algebra's own degree-zero resolution dies. The minimal reproduction is three lines in `tests/algebras/test_affine_semigroup_algebras.sage`, red on base **1 failed, 2 passed in 5.11 s**, green **3 passed in 1.49 s**. No regression: the 58 `tests/algebras` files **103 failed, 110 passed in 61.79 s** base against **103 failed, 111 passed in 65.65 s** fixed with identical FAILED ids, and the 18 toric files **42/73** against **42/72** with identical ids (the one fewer pass is the deleted first-turn test, which passes without any repair). Section 3's "cannot occur" sentence is retracted in place |
+| `531f-red-tests.log` | `d1ab7fc` (main) | the three test files of this round on main: **5 new tests red, 3 polytope-suite failures pre-existing at main, 0 lint findings** -- `test_triangles_with_one_vertex_set_are_one_polytope_with_one_hash` raises on the undecided `is_subset(...) and is_subset(...)`, `test_a_subset_hash_decides_each_member_once` sees the second hash ask the predicate again (4 extra questions), and the three cone tests see one hash for three half-planes, for the two sides of one line and for the two quarter-spaces; `tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage` is not part of the run: it holds 160 pre-existing lint findings at main, so every test in it errors at setup |
+| `531f-green-tests.log` | `96c6f3d` + the repair | `tests/schemes/test_polytopes.sage`, `tests/sets/test_a_subset_is_a_cache_key.sage` and `tests/lattices/test_rational_polyhedral_cones.sage`, one process: **3 failed, 16 passed in 2.45 s**, and the 3 failures are exactly the polytope-suite failures of main (the `rational_point` AttributeError below); the 5 tests of this round pass, the lint reports no finding in any of the three files |
+| `531f-lint.log` | `96c6f3d` + the repair | `sage_extensions.testing.test_lint` on the four test files: **4 files, 162 findings**, all 162 in `tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage` and the same 162 (kind for kind, line numbers narrowed) as at main, so this round adds no finding; the new file, the polytope suite and the cone suite have none |
+| `531f-sets-main.log` | `d1ab7fc` (main) | `tests/sets`, one process: **10 failed, 57 passed, 102 errors in 6.22 s** |
+| `531f-sets-fixed.log` | `96c6f3d` + the repair | `tests/sets` on the fixed tree: **10 failed, 58 passed, 102 errors in 6.75 s** -- the FAILED id set is identical to main's, the extra pass is the new cache-key test |
+| `531f-schemes-main.log` | `d1ab7fc` (main) | `tests/schemes`, one process: **254 failed, 90 passed, 68 errors in 111.63 s** |
+| `531f-schemes-fixed.log` | `96c6f3d` + the repair | `tests/schemes` on the fixed tree: **251 failed, 94 passed, 68 errors in 115.49 s**; the FAILED set drops exactly `test_lattice_polygon_invariants.sage`'s three polytope-equality tests, which raise on `is_subset(...) and is_subset(...)` at main |
+| `531f-modules-main.log` | `d1ab7fc` (main) | `tests/modules tests/objects`, one process: **162 failed, 330 passed, 148 errors in 51.44 s** |
+| `531f-modules-fixed.log` | `96c6f3d` + the repair | the same two directories on the fixed tree: **160 failed, 332 passed, 148 errors in 56.48 s**; the FAILED set drops exactly `tests/objects/test_standard_triangle.sage`'s `test_the_invariants_of_the_triangle` and `test_the_order_of_the_vertices_does_not_matter` |
+| `531f-polytopes-main.log` | `d1ab7fc` (main) | `tests/schemes/test_polytopes.sage` at main: **3 failed, 1 passed**; the failures are `interior_contains_point((1, 0))`-shaped `AttributeError: 'tuple' object has no attribute 'parent'` in `polytopes.py:684 rational_point` and the dodecahedron row, all three unchanged on the fixed tree |
+| `531f-probe.log` | `96c6f3d` + the repair | polytope identity (**equal triangles one hash and one product**, five triangles five hashes, the halfspace triangle the same hash and product), the cost of the three hashes, and the canonical forms: `y >= 0` `(((1, 0),), ((0, 1),))`, `y <= x` `(((1, 1),), ((1, -1),))`, `x + y <= 0` `(((1, -1),), ((-1, -1),))`, `y <= 0` `(((1, 0),), ((0, -1),))`; the 119-gon's first hash **115.171 ms** then 0.002 and 0.000 ms, the cone with a lineality space 0.564 then 0.001/0.000 ms, a subset of 2000 points **76.782 ms** then 0.001/0.001 ms with 2000 membership decisions at the first hash and none after; on 8 half-planes and 56 wedges of `Z^2` the canonical form agrees with the cone equality on every pair (**28 + 1540 pairs, 0 disagreements**) |
+| `531f-cost-main.log` | `d1ab7fc` (main) | the same three hashes repeated on main, for the cost the caches remove: the 119-gon 2.020 / 0.019 / 0.009 ms (main hashes the ambient space, so it is cheap and carries nothing), a subset of 2000 points **76.055 / 75.912 / 77.746 ms with 2000 membership decisions at each hash**, the cone with a lineality space 0.413 / 0.202 / 0.175 ms |
+| `531f-green-merged.log` | `7de970f` (the merge of `5370933`) | the three files of this round plus `tests/algebras/test_affine_semigroup_algebras.sage` on the merged tree, one process: **3 failed, 16 passed, 3 errors in 4.22 s** -- the 3 failures are the polytope-suite failures of main and the 3 errors are that algebras file's own lint findings (TL01/TL02 at its imports), so the round's tests stay green after `#540`'s merge |
+| `531last-probe.log` | `52cbab3` + this round's changes | the canonical form the cone tests now document: `y >= 0` `(((1, 0),), ((0, 1),))`, `y <= x` `(((1, 1),), ((0, -1),))`, `x + y <= 0` `(((1, -1),), ((0, -1),))`, `y <= 0` `(((1, 0),), ((0, -1),))` -- the two that moved are the two the removed orthogonal projection stated as `(1, -1)` and `(-1, -1)`, and the transversal of the Hermite basis states the class each ray is in; on 15 cones of `Z^2` and `Z^3` **120 pairs, 0 disagreements** between cone equality, canonical-form equality and hash equality; the polytope vertex set, read from the private polyhedron, is `{(0, 0), (1, 0), (0, 1)}` for all three presentations of the triangle; `Sets().product((relocated, Sets.Δ[1])) is product`, the same for `cut`, and another triangle gives another product |
+| `531last-core.log` | `52cbab3` + this round's changes | `tests/schemes/test_polytopes.sage`, `tests/lattices/test_rational_polyhedral_cones.sage`, `tests/sets/test_a_subset_is_a_cache_key.sage`, `tests/objects/test_standard_triangle.sage`, `tests/lattices/test_reduction_cell_adjacency.sage`, `tests/lattices/test_reduction_cell_faces.sage`, one process: **8 failed, 20 passed in 4.26 s**, no lint finding in any of them; the polytope file's own test, with the product assertions added, passes |
+| `531last-core-main.log` | `52cbab3` (main) | the same six files on main: **8 failed, 20 passed in 3.28 s**; the FAILED sets of the two runs are identical, and the three `interior_contains_point`/dodecahedron rows of `test_polytopes.sage` are main's |
+| `531last-wide-ids.log` | `52cbab3` + this round's changes | the eight other cone- and polytope-touching test files: **6 failed, 9 passed, 55 errors** on the fixed tree and **6 failed, 9 passed, 55 errors** on main, FAILED ids and the files with a setup ERROR identical; the extracts of both runs, the full logs being 1.2 MB of repeated lint findings in the sets file |
+| `531last-tensor-boundary.log` | `52cbab3` + this round's changes | `just tensor-boundary scope=all`: **168** suspected coordinate operations on main and **166** on the fixed tree, none of them in `polyhedral_cones.py`; the two that leave are the `$X.transpose()` calls of the removed projection and no pattern's count rose |
+| `532-green-nonunit.log` | `9bc00c1` + the quotient repair | `tests/lattices/test_rational_polyhedral_cones.sage` alone: **15 passed in 0.68 s**, the test that was red in `532-red-nonunit.log` among them |
+| `532-core.log` | `9bc00c1` + the quotient repair | the six-file core batch: **8 failed, 21 passed in 2.39 s**; the FAILED set is `531last-core-main.log`'s eight, unchanged, and the 21st pass is the new test |
+| `532-wide-ids.log` | `9bc00c1` + the quotient repair | the eight other cone- and polytope-touching files: **6 failed, 9 passed, 55 errors** here and on `52cbab3`, FAILED ids and the files with a setup ERROR identical; extracts, the full logs being repeated lint findings |
+| `532-probe.log` | `9bc00c1` + the quotient repair | the reviewer's pair: one form `(((3, 1, 2),), ((-1, 3), (0, 1)))` and one hash for both presentations, and `cardinal({short, longer}) == 1`; **398 cones of `Z^3` cut out twice with a redundant positive combination, 0 disagreements**; on the sample's 79003 pairs the canonical form equals the cone equality everywhere (**0 form collisions among unequal cones**), and the one unequal pair with one hash is a CPython collision (`hash(-1) == hash(-2)`), which the family store resolves by comparing inside the bucket; the two sides of one line stay two sets; the polytope vertex set and the four product assertions are unchanged |
+| `532-cost.log` | `9bc00c1` + the quotient repair | the first hash of a fresh cone and the cached ones: pointed `Z^2` 0.462 ms, pointed `Z^3` 0.261 ms, with a lineality `Z^3` 1.008 ms, cached 0.0001–0.0004 ms; the whole `Z^1` cut out by no covector is the zero cone and hashes as `((), ())` |
+| `532-tensor-boundary.log` | `9bc00c1` + the quotient repair | `just tensor-boundary scope=all`: 168 on main, **166** here, `polyhedral_cones.py` contributing none and adding none; the two that leave are the removed projection's `$X.transpose()` calls |
+| `540r-red-reproduction.log` | `75cbec5` (the repair reverted, `5370933`'s probe deleted) | `tests/divisors/test_toric_class_groups.sage`, one process: **5 failed, 3 passed in 1.12 s** -- the new first row, `test_the_class_group_of_the_hirzebruch_surface_survives_a_polynomial_ring_built_first`, and the four rows the flipped parent-class order reaches, each at the endpoints `ValueError` through `toric_schemes.py:262` -> `algebras.py:4645` -> `:4789` -> `:4911`; the three rows that do not reach it pass |
+| `540r-red-algebras-file.log` | `75cbec5` | `tests/algebras/test_affine_semigroup_algebras.sage`, one process: **1 failed, 3 passed in 0.83 s** -- `test_a_semigroup_algebra_keeps_its_identity_after_a_polynomial_ring_is_built` fails at `augmentation` on the same `ValueError`; the file's four rows run at all now, its three pre-existing lint findings (TL01, TL02, TL07) being gone |
+| `540r-toric-fix.log` | `b64b6d1` | the same file, one process: **8 passed in 2.10 s**, the new first row included |
+| `540r-algebras-file.log` | `b64b6d1` | the same algebras file, one process: **4 passed in 0.79 s**, no lint finding |
+| `540r-both-orders-probe.log` | `b64b6d1` | `QQ[S]` for `S = <(1,0),(0,1)>` in both construction orders, one process each, no `QQ[y]` first and `QQ[y]` first: `_algebra_mor_class()` is `FramedFreeAlgebraMor` in the first and `PresentedAlgebraMor` in the second, and in **both** `selected_algebra_resolution().augmentation()` is built, fixes `s0`, has parent `Mor_UnitalAlg(A, A)`, `algebra_framing_morphism()` is the identity of `A.Mor(A)`, and `class_group()` of the Hirzebruch surface is free of rank 2 |
+| `540r-scenario-base.log` | `52cbab3` (main) | the issue's scenario, `tests/sets/test_cardinality_construction_comparisons.sage`, `tests/sets/test_standard_cardinals_archive.sage` and `tests/divisors/test_toric_class_groups.sage` in one process: **3 failed, 9 passed in 2.89 s**, the three failures the two `tests/sets` files' own |
+| `540r-scenario-fix.log` | `b64b6d1` | the same three files on the repaired tree: **3 failed, 10 passed in 2.67 s**; the FAILED id set is identical to main's and the extra pass is the new toric row |
+| `540r-algebras-base.log` | `52cbab3` (main) | `tests/algebras` with `--ignore=tests/algebras/test_module_structure.sage` (that file aborts inside `QuadraticField` on both trees), one process: **44 failed, 43 passed, 125 errors in 42.71 s** |
+| `540r-algebras-fix.log` | `b64b6d1` | the same directory on the repaired tree: **44 failed, 47 passed, 122 errors in 43.88 s**; the FAILED id set is identical to main's, the four extra passes are the semigroup file's four rows, which no longer error at setup, and the three fewer errors are that file's lint findings |
+| `540r-edge-refused.log` | `52cbab3` with `5370933`'s probe removed | the placement repair this review asks for, measured: with `FreeAlgebras(R)` declared below `AlgebrasWithChosenFinitePresentation(R)` the two quadric-cone rows of the toric file fail (**....FF..**) because the presented parent class then answers for the polynomial algebra a semigroup algebra is built from and `_finitely_presented_algebra_from_data` (`free_algebras.py:1319`, `:1320`) reads a resolution truncated in degree zero; the same happens with `presentation_ring()` answering its degree-zero source, and with `SymmetricAlgebras(R)` declared below the presented category as well |
+| `540r-rebased-red-reproduction.log` | `1bbe9a9` | the row above's tree after the series was rebased onto main `b33d193` (`#531`'s cone canonical form): `tests/divisors/test_toric_class_groups.sage` **5 failed, 3 passed in 1.66 s**, the same five rows |
+| `540r-rebased-toric-fix.log` | `6141e01` | the same file at the rebased repair: **8 passed in 3.03 s** |
+| `540r-rebased-algebras-file.log` | `6141e01` | `tests/algebras/test_affine_semigroup_algebras.sage`: **4 passed in 1.33 s** |
+| `540r-rebased-scenario-base.log` | `b33d193` (main) | the issue's scenario at the new base: **3 failed, 9 passed in 3.32 s**, the two `tests/sets` files' three |
+| `540r-rebased-scenario-fix.log` | `6141e01` | the same three files at the rebased repair: **3 failed, 10 passed in 1.81 s**, FAILED ids identical |
+| `540r-rebased-algebras-base.log` | `b33d193` (main) | `tests/algebras` with `test_module_structure.sage` ignored: **44 failed, 43 passed, 125 errors in 25.07 s** |
+| `540r-rebased-algebras-fix.log` | `6141e01` | the same directory at the rebased repair: **44 failed, 47 passed, 122 errors in 21.91 s**; FAILED ids identical to the new base's |
+| `540r-lint-base.log` | `52cbab3` (main, the merged tree the round before) | `python -m sage_extensions.testing.test_lint tests/algebras/test_affine_semigroup_algebras.sage`: **1 files, 8 findings (TL01, TL02, TL07)**, exit 1 -- five TL01 at the three function-local module imports, two TL02 at `_owned_integers`, one TL07 at `repr(algebra)`; as a pytest plugin each finding errors the tests of the file that holds it, which is the three setup errors `531f-green-merged.log` records |
+| `540r-lint-main.log` | `dcdeddde` | the same command on the file as this round leaves it: **1 files, 0 findings**, exit 0 |
+| `540r-lint-pytest-main.log` | `dcdeddde` | the file collected by pytest with `-p sage_extensions.testing.test_lint` named as well: **4 passed in 0.69 s**, so the four rows run and no finding errors them |
+
+## #541 -- the Õ(T_Co) row's setup, measured against the VM's load
+
+The row is `NamedLattices.Tco.stable_orthogonal_group().isotropic_orbit_representatives(2)`.
+`7c0859c832` reached its first transported plane at 283.9 s; main did not reach one
+at all in ten minutes, and the question was whether a commit between them slowed
+the setup or the VM's load decided the two readings.  Every run below carries
+`calib`, the wall time of one fixed workload (10M integer cubes and a GAP
+`Order(SymmetricGroup(8))`) timed in the same process, and every run is capped at
+500 s of row inside a 545 s inner and a 595 s outer kill.  Alternating order:
+base, main, main, base.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-otilde-row-calibrated-base-1.log` | `7c0859c832` | first plane **352.6 s**, calib 0.362 (974 units), 8758 planes at the cap, 58.89 planes/s |
+| `541-otilde-row-calibrated-base-2.log` | `7c0859c832` | first plane **356.9 s**, calib 0.364 (980), 8324 planes, 56.04 planes/s |
+| `541-otilde-row-calibrated-main-1.log` | main `d1ab7fc785` | **no plane by 514.1 s**, calib 0.415 (>= 1239) |
+| `541-otilde-row-calibrated-main-2.log` | main `d1ab7fc785` | first plane **441.8 s**, calib 0.363 (1217), 3283 planes, 55.99 planes/s |
+| `541-otilde-row-bisect.log` | -- | the `git bisect run` transcript: predicate `first plane / calib >= 1100`, `022f7a5271` red (1263), `5e7eb7ccdd` green (941), `2291235e3d` red (1340), `10c3902861` green (504); **`2291235e3d2c04d7ca5effb4b9c0f8b6cfaa5537 is the first bad commit`** |
+| `541-bisect-step-022f7a5271.log`, `-5e7eb7ccdd.log`, `-2291235e3d.log`, `-10c3902861.log` | each step's own tree | the four step runs, each with its stack samples (`faulthandler`, every 120 s): at 120 s the base sits in `integral_restriction` and by 240 s in the coset walk, while main sits in `_finite_family_key` -> `__hash__` -> `point_at` |
+| `541-hash-red.log` | main `d1ab7fc785` | `tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage`: **1 failed, 2 passed in 2.03 s**, `assert (0, 1, 2, 3, 0, 1, ...) == (0, 1, 2, 3)` |
+| `541-hash-green.log` | the repair | the same file: **3 passed in 1.18 s** |
+| `541-hash-lint.log` | the repair | test lint: **1 files, 0 findings** |
+| `541-otilde-row-after-hash-repair.log` | the repair | first plane **483.6 s**, calib 0.577 (838 units), 2089 planes, 72.67 planes/s |
+| `541-framing-test-after-docs.log` | the docs commit | `tests/modules/test_the_embedded_framing_is_one_datum.sage`: **2 passed in 1.10 s** |
+| `541-two-test-files-on-the-pushed-tree.log` | the pushed tree (`ea895a8` + this round's four commits) | `tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage` and `tests/modules/test_the_embedded_framing_is_one_datum.sage` together: **5 passed in 1.36 s** |
+| `532-merged-core.log` | `fb7c2b4` (the merge of `95be77c`) | the six-file core batch on the merged tree: **8 failed, 21 passed in 2.38 s** |
+| `532-merged-core-main.log` | `95be77c` (main) | the same six files on main: **8 failed, 20 passed in 2.22 s**, the FAILED sets identical; the 21st pass on the merged tree is this round's new test |
+| `532-merged-wide-ids.log` | `fb7c2b4` (the merge of `95be77c`) | the eight other cone- and polytope-touching files: **6 failed, 9 passed, 55 errors** on the merged tree and **6 failed, 9 passed, 55 errors in 14.12 s** on `95be77c`, FAILED ids and the files with a setup ERROR identical; extracts of both runs |
+
+## #541 -- the hash's lifetime, and one plane transport priced on T_Co
+
+The reviewer's round kept the bisection (`2291235e3d`), the red test and the
+cache's correctness, and asked for `cached_method` instead of an
+instance-dictionary cache, for the hash tests to state contracts, and for one
+correction in the cone docstring; then for the census of one plane transport on
+T_Co itself, which is the row's own lattice.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-hash-cached-method-green.log` | the `cached_method` commit | `tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage`: **3 passed in 1.76 s** |
+| `541-hash-cached-method-lint.log` | the same | test lint: **1 files, 0 findings** |
+| `541-cones-docs-green.log` | the docstring commit | `tests/lattices/test_rational_polyhedral_cones.sage`: **15 passed in 1.51 s** |
+| `541-tco-census-probe.py`, `541-tco-census.log` | main `664a9c3` | one plane transport on T_Co: **2.69 ms** warm, 2.5 ms cold, 14.33 ms and 9 261 calls under `setprofile`; own time per plane `_span_basis_elements` 1.719 ms, `Lattices._repr_` 0.626, `FiniteOrderedSets.from_indexed` 0.555, `NaturalNumberSets.__call__` 0.231 over **644** constructions |
+| `541-natural-number-identity-red.log` | main `664a9c3` | `tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage`: **2 failed in 2.03 s**, `assert 1 is 1` |
+| `541-natural-number-identity-green.log`, `-lint.log` | the repair | the same file **2 passed in 1.01 s**; lint **1 files, 0 findings** |
+| `541-tco-census-after-ordinal-repair.log` | the repair | the same transport: **2.43 ms**, `_span_basis_elements` 1.070 ms, `from_indexed` 0.145 ms, `NN` 0.162 ms over the same 644 calls |
+| `541-sets-dir-after.log`, `541-sets-dir-base.log` | the repair / a clean tree at `664a9c3` | `tests/sets/` whole: **29 failed, 146 passed in 7.44 s** against **29 failed, 144 passed in 8.27 s**; the 29 FAILED ids are the same set, so no new failure |
+| `541-row-after-ordinal-repair-1.log`, `-2.log` | the pushed tree | the row under the ten-minute cap, twice: **0 planes by 511.5 s and by 511.6 s**, calib 0.378 both times (>= 1352 calib units), both stack-sampled inside `_finite_family_key` -> `__hash__` -> `point_at`. The 838-unit run `353418f` quotes does **not** reproduce |
+
+## #540, fourth round: the free algebra's own presentation, and two operations the tree refuses
+
+Base: main `664a9c3b72`, port at `991b88b095`, image `ghcr.io/dzackgarza/sage@sha256:59568577…`
+through `~/sage-image/run.sh -w /work`.  Every run blanks the repository `addopts` and loads
+`qc_sage_session`; `--no-time-gates` is passed where a row is legitimately over the 20 s call
+ceiling.  "plain order" is a session with no `QQ.polynomial_ring` built first; "poly order" is
+one that builds `QQ.polynomial_ring("y")` first.
+
+| log | tree | result |
+| --- | --- | --- |
+| `540d-presentation-row-red.log` | main `664a9c3` with this round's test files | `tests/algebras/test_affine_semigroup_algebras.sage`: **1 failed, 3 passed in 3.49 s**; both orders' session scripts exit 1 at `assert algebra.presentation_ring() is algebra` |
+| `540d-two-orders-on-main.log` | main `664a9c3` | the conftest session script run twice on main: **order 0 returncode 1, order 1 returncode 1**, both at `assert algebra.presentation_ring() is algebra` (line 15 of the script as it stood) -- the record for the claim that the red row is red for the presentation methods, not for the augmentation |
+| `540d-algebra-and-cells.log` | this round's tree | `tests/algebras/test_affine_semigroup_algebras.sage` + `tests/algebras/test_free_algebra_issue614_cells.sage` in one process: **1 failed, 8 passed in 5.31 s**, the failure `test_cell_61_tensor_and_divided_power_algebras_of_a_torsion_module`, which fails alone on main too |
+| `540d-toric-and-sets.log` | this round's tree | `tests/divisors/test_toric_class_groups.sage` after the two `tests/sets` triggers in one process: **3 failed, 10 passed in 1.95 s** -- all 8 toric rows pass |
+| `540d-toric-and-sets-main.log` | main `664a9c3` | the same three files: **3 failed, 10 passed in 2.41 s**, the same three `tests/sets` ids |
+| `540d-algebras-dir.log` | this round's tree | the whole `tests/algebras/` directory in one process: **103 failed, 112 passed in 102.83 s** |
+| `540d-algebras-dir-main.log` | main `664a9c3` | the same directory: **103 failed, 112 passed in 88.86 s**; the two FAILED-id sets are identical (`comm -23` and `comm -13` both empty) |
+| `540d-lint.log` | this round's tree | `python -m sage_extensions.testing.test_lint tests/algebras/test_affine_semigroup_algebras.sage`: **1 files, 0 findings** |
+| `540d-rebased-cells-toric-sets.log` | the rebased tree, on `e763219` | the two algebra files, the toric file and the two `tests/sets` triggers in one process: **4 failed, 18 passed in 6.45 s** -- every toric row and every row of this round's algebra file pass |
+| `540d-sets-on-the-new-base.log` | `e763219` | the two `tests/sets` files alone: **3 failed, 2 passed in 1.33 s**, the same three ids, so they are not this round's |
+
+Not evidence that anything passed: the two operations this round did **not** deliver, and the runs
+that establish why.  The placement of the two `ParentMethods` was attacked three ways and each was
+measured on 2026-11-15 in the same image:
+
+- declaring `FreeAlgebras(R).FinitelyGeneratedAsAlgebra()` a subcategory of
+  `AlgebrasWithChosenFinitePresentation(R)` through a `CategoryWithAxiom` with that
+  `extra_super_categories` leaves the object's category holding the plain `FreeAlgebras(R)` and
+  `AlgebrasWithChosenFinitePresentation(R)` as incomparable factors, so the join still orders the
+  two `ParentMethods` by creation: `FramedFreeAlgebraMor` plain, `PresentedAlgebraMor` poly.
+- additionally placing a finitely generated free algebra in that refinement makes the two
+  comparable and answers `PresentedAlgebraMor` in both orders, but puts every free algebra inside
+  `AlgebrasWithChosenFinitePresentation`; `AffineSemigroupAlgebras(ZZ)(((1,0),(0,1),(1,1)))` then
+  dies building its own relation lift, at `free_algebras.py:1311`'s quotient-of-a-quotient branch
+  reading `lift_to_presentation` of a free algebra.
+- one shared `_algebra_mor_class_of` keyed on the algebra -- first on AWCFP membership, then on
+  `is_free` -- answers deterministically, but `tests/algebras/test_free_algebra_issue614_cells.sage`
+  then loses `SparseFreeAlgebraMorphism` from the graded Mor's element class and its cell 84 cannot
+  substitute in `Sym(ZZ[NN])` (`3 failed, 2 passed` against main's `1 failed, 4 passed`).
+
+The augmentation, likewise: building it as `self.Mor(self).identity()` (`algebras.py:5324`) gives
+`augmentation().parent() is A.Mor(A)` for `QQ[S]` and in the toric chart, but the tensor algebra of
+the torsion module in cell 61 realizes its degree-zero resolution *during* construction
+(`QuotientRing._reduce_` -> `homogeneous_components` -> `algebra_generator` -> the augmentation
+factory), so the graded element class of `GradedAlgebras(ZZ)` is built there and cell 84's sparse
+arrow loses its class; with the branch reverted the cells file returns to main's `1 failed, 4
+passed` and `QQ[S]`'s augmentation parent is `Mor_UnitalAlg(A, A)` again.
+## #541 -- the integral lift locus is a subset of its torsor, not an image of a product
+
+`integral_parameter_classes` is a datum of the torsor and is built in 4 ms on
+`T_Co`, but `_integral_lift_locus` presented `T_Z` as the image of
+`C x ker r`, and the product interner keys a family by its factors' hashes: the
+hash of the 131072-class residue locus walked all of it, **65.2 s a candidate**
+(`541-locus-baseline.log`).  The locus is the subset of the torsor cut out by
+the parameter's residue class, so nothing is asked for.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-locus-probe.py`, `541-locus-baseline.log` | main `e763219` | `T_Co` at its first isotropic vector, identity reduction isometry: `\|passing\|` 256, `\|kernel\|` 512, period 4, `\|C\|` 131072; residue locus **0.004 s**, `integral_members()` **65.218 s**, `is_empty()` 0.000 s, `integral_base_point_or_none()` 0.016 s; a subset of the torsor **0.000 s**, one admitted point 0.003 s, membership 0.000 s |
+| `541-locus-red.log` | main `e763219` | `tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage`: **3 failed in 2.03 s**, `AttributeError: ... has no attribute 'integral_lift_locus'` |
+
+## #541 -- the locus is the subset, and the row reaches its first plane at base parity
+
+`_integral_lift_locus` built `C x ker r` to name the integral lift locus, and the
+product interner keys a family by its factors' hashes, so each candidate the
+`T_Co` plane row tested walked the residue locus' 131072 classes.  The locus is
+the subset of the torsor cut out by the parameter's residue class; the repair
+constructs that subset, admits one point so its emptiness is decided, and returns
+the empty set when the residue locus is empty.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-locus-after.log` | the repair | same probe, same specimen: `integral_members()` **0.021 s** (was 65.218 s), `integral_base_point_or_none()` 0.000 s (was 0.016 s), the subset cut in 0.000 s, one admitted point 0.003 s, membership 0.000 s |
+| `541-locus-green.log` | the repair | the new file with `test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage` and `test_integral_reduction_lift_witness.sage`: **12 passed in 16.24 s** |
+| `541-locus-lint.log` | the repair | test lint on the new file: **1 files, 0 findings** |
+| `541-coble-line-base.log`, `541-coble-line-after.log` | main `e763219` / the repair | `test_the_coble_lattice_line_orbit_call_returns.sage`, the port's own consumer of `integral_members`: **100.0 s -> 59.5 s**, 1 passed on both |
+| `541-levi-files-base.log`, `541-levi-files-after.log` | main `e763219` / the repair | nine Levi/isotropic-reduction files: **5 failed, 38 passed** on both, the FAILED ids identical |
+| `541-locus-doctests-broken.log`, `-base.log` | the repair / main `e763219` | `sage -t` on `isotropic_lifts.py`: 24 of 24 and 19 of 19 failed — the forker attributes nested-scope docstrings to `_vector_denominator.ParentMethods`, so the module's doctests are not runnable this way at either tree |
+| `541-locus-doctest-run.log` | the repair | the examples this round touches, run by hand: `integral_torsor`'s four, `integral_lift_locus`'s two, `integral_members`' one — all hold |
+| `541-row-after-locus.log`, `541-row-probe.py` | the repair | the `Õ(T_Co)` plane row, `ROW_DEADLINE=500`, calib **0.369 s**: **first plane at 353.3 s = 957 calib units** (base `7c0859c832` 974-980, main `e763219` >= 1352), **11 191 planes** by 502.1 s at **75.2 planes/s, 13.3 ms a plane** |
+
+## #541 -- the same runs on the rebased tree, which is the pushed one
+
+Main moved to `7784c13e44` (the `#540` round, whose moves are `algebras.py`,
+`semigroup_algebras.py` and `tests/algebras/`) while this round's repair was
+being written, so the repair and its test were rebased onto it.  The lattice,
+sets and `isotropic_lifts` code is byte-identical between `e763219` and the
+rebased tree, and the rows below are the same commands re-run so that each log
+names the pushed commit.
+
+| log | tree | result |
+| --- | --- | --- |
+| `541-locus-green-rebased.log` | `c8790f2` | the new file with the two existing locus files: **12 passed in 11.28 s** |
+| `541-levi-files-after-rebased.log`, `541-levi-files-base-rebased.log` | `c8790f2` / `e763219` | the nine Levi/isotropic-reduction files: **4 failed, 39 passed in 14.95 s** against **4 failed, 39 passed in 15.47 s**, the FAILED ids identical |
+| `541-levi-onefile-after-rebased.log`, `541-levi-onefile-base.log` | `c8790f2` / `e763219` | `test_higher_rank_levi_lifts.sage` alone: **8 passed** on both.  The batch's fifth failure in `541-levi-files-after.log` and `541-levi-files-base.log` is this test, which passes alone on both trees: a cross-test interaction of the tree, not of this round |
+| `541-coble-line-after-rebased.log` | `c8790f2` | the port's own consumer, `test_the_coble_lattice_line_orbit_call_returns.sage`: **58.07 s, 1 passed** (100.0 s at `e763219`) |
+| `541-row-after-locus-rebased.log` | `c8790f2` | the row again, calib **0.364 s**: **first plane at 440.0 s = 1209 calibration units**, 2 756 planes by 521.0 s at **34.0 planes/s, 29.4 ms a plane**; load average **8.45 on 4 CPUs** during the run (other sessions' Lean builds and pandoc).  Against `541-row-after-locus.log`'s 353.3 s at calib 0.369 (957 units, 75.2 planes/s): the walk's per-plane rate halved while the calibration moved 1.4 %, so the calibration under-normalises and the two runs are not comparable with each other |
+
+Both capped runs of the repair reach a plane (353.3 s and 440.0 s, 957 and 1209
+units) where the parent tree `e763219` reached none in 511.5 s and 511.6 s at
+calib 0.378 (>= 1353 units), and neither run's stack samples enter
+`_finite_family_key`: the 120 s sample of the rebased run is inside
+`integral_restriction` at `isotropic_lifts.py:644`, the residue locus' own
+per-representative test.
+
+## #541, the naturals' intern table given a lifetime, and the row at low load
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-weak-natural-red.log` | `9d07255` | the two test files before the repair: **3 failed, 5 passed in 2.65 s**.  Both lifetime tests stop at `assert 3 == 2` -- the strong `cached_method` table is the third reference -- and the pickle test at `loads(dumps(point)) is point` False.  Test lint loaded, no finding on either file |
+| `541-weak-natural-green.log` | `ac4edea` | the two test files after: **8 passed in 0.40 s**, test lint loaded, **0 findings** |
+| `541-weak-natural-sets-dir-base.log`, `541-weak-natural-sets-dir-fix.log` | `ac941dc62b` / `ac4edea` | `tests/sets` whole: **29 failed, 146 passed in 6.68 s** against **29 failed, 149 passed in 7.79 s**; the FAILED id sets are identical under `sort` and `diff`, and the three that now pass are this round's tests |
+| `541-weak-natural-retain-base.log`, `541-weak-natural-retain-fix.log` | `ac941dc62b` / `ac4edea` | 10^6 distinct naturals, one probe on both trees: resident **+287.5 MiB, table of 1 000 000 entries**, 1.6 s at the base, against **+0.0 MiB, table of 1 entry**, 1.1 s.  Pickle protocols 0/2/5, `copy` and `deepcopy`: base refuses 0 (`TypeError: Cannot convert NaturalNumberSets.element_class to sage.structure.parent.Parent`) and loses identity on the rest; the repair returns the one point on all of them, and `loads(dumps(NN)) is NN` (False at the base) |
+| `541-weak-natural-point-base.log`, `541-weak-natural-point-fix.log` | `ac941dc62b` / `ac4edea` | one point of `NN`, 200 000 hits and 200 000 misses: a repeat construction **0.22 -> 0.24 us**, a first construction **1.10 -> 1.02 us** (a second pair of runs put the repeat at 0.25 and the first at 1.17 us, so the hit is +0.02-0.03 us and the miss is inside the noise) |
+| `541-row10-repair-1.log`, `541-row10-base-1.log`, `541-row10-repair-2.log`, `541-row10-base-2.log` | `ac4edea` / `7c0859c832` | the Otilde(T_Co) plane row, four runs alternating between the repaired tree and the base, each calibrated and killed at 590 s outer / 570 s inner with `ROW_DEADLINE=540`: see the table below |
+| `541-weak-natural-consumers-base.log`, `541-weak-natural-consumers-fix.log` | `ac941dc62b` / `ac4edea` | the 46 test files outside `tests/sets` that name `NN`, `NN.`, `NN(` or `Sets.Δ`: **81 failed, 174 passed in 3:51** against **81 failed, 174 passed in 4:05**, FAILED id sets identical under `sort` and `diff`.  The failures are the tree's, not this round's |
+
+The row, in the order it was run.  Load averages are the line the log's own header
+records, read from `/proc/loadavg` on 4 CPUs immediately before the run; "units"
+is the first-plane time divided by the run's own calibration.
+
+| run | tree | load before | calibration | first plane | units | planes at the cap | planes/s over the walk | first 29 s window |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `-repair-1` | `ac4edea` | 1.55 1.54 2.48 | 0.365 s | **345.4 s** | **946** | 11 036 by 554.1 s | **52.88** (18.9 ms) | 72.19 |
+| `-base-1` | `7c0859c832` | 5.76 3.82 3.02 | 0.713 s | **478.5 s** | **671** | 5 283 by 567.2 s | **59.55** (16.8 ms) | 49.74 |
+| `-repair-2` | `ac4edea` | 2.50 5.91 4.97 | 0.568 s | **341.8 s** | **602** | 14 305 by 550.4 s | **68.55** (14.6 ms) | 69.03 |
+| `-base-2` | `7c0859c832` | 1.79 2.64 3.64 | 0.429 s | **349.3 s** | **814** | 11 690 by 561.2 s | **55.17** (18.1 ms) | 54.98 |
+
+What the four runs decide.  The repaired tree's first plane is **345.4 s and
+341.8 s** in two runs whose calibrations differ by 55 % (0.365 and 0.568 s): the
+stage is reproducible in absolute seconds and the calibration is not, so the
+same 345 s reads as 946 units in one run and 602 in the other.  The base tree's
+two runs are **349.3 s** at load 1.79 and **478.5 s** at load 5.76.  So at
+comparable load -- 345.4 s (load 1.55) against 349.3 s (load 1.79) -- the
+repaired row's first plane is within 1.1 % of the base tree's, which is the
+parity `ac941dc62b` could not establish from 957 and 1209 units; those two runs
+had near-equal calibrations (0.369, 0.364) and first planes 353.3 s and 440.0 s,
+so their disagreement was the 8.45 load of the second, not the calibration.  The
+per-plane rate does not separate the trees either: 52.9 and 68.6 planes/s on the
+repair against 55.2 and 59.6 on the base, with the rate drifting inside a run as
+the machine's load moved (run 1 goes 72.2 -> 52.9 over 209 s while the load
+average goes 1.5 -> 5.9).
+
+## #541, the review round: the table declared, the release observed, and the census' display
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-review-release-red.log` | `ac941dc62b` | the release test of this round on the tree before the intern table has a lifetime: **2 failed** -- `assert reference() is None` reports `assert 70002 is None` (the strong `cached_method` holds the element) and the pickle test `False`.  The file and `tests/sets/conftest.py` were copied onto that tree, so the log's "2 modified paths" is exactly them |
+| `541-review-green.log` | `18b34bd` | the description contract file with the two sets files: **8 passed in 0.52 s**, test lint loaded, 0 findings |
+| `541-review-retain.log` | `309ab54` | the retention probe after the review's three source findings: 10^6 distinct naturals leave the table at **1 entry and +0.0 MiB** in 1.1 s; pickle protocols 0/2/5 and `copy`/`deepcopy` return the interned point; `loads(dumps(NN)) is NN` |
+| `541-review-sets-dir.log` | `18b34bd` | `tests/sets` whole: **29 failed, 149 passed in 7.37 s**; the 29 are the tree's, and this round adds the description test |
+| `541-review-modules-base.log`, `541-review-modules-fix.log` | `ac941dc62b` / `18b34bd` | `tests/modules`, where the span bases are consumed: **90 failed, 224 passed** on both trees, FAILED id sets identical under `sort` and `diff` |
+| `541-review-description-red.log` | `ac941dc62b` | the description contract at the base: **1 failed**, `KeyError: 'description'` from `sage/structure/category_object.pyx`: a named set has no way to describe itself except by being displayed |
+| `541-census-before.log`, `541-census-after.log` | `6b6cfe2` + the review fixes / `309ab54` + the description repair | one plane transport on T_Co, the same probe minutes apart: warm **2.29 -> 1.63 ms**, cold 2.38/2.34/2.26 -> 1.69/1.60/1.64 ms, wrapped-site median **2.53 -> 1.86 ms**, and `Lattices._repr_` **0.588 ms over 1.0 calls a plane -> 0.000 ms over 0.0 calls** |
+| `541-census-final.log` | `18b34bd` | the same probe on the pushed commit: warm **1.73 ms**, `Lattices._repr_` still 0 calls a plane.  The cold and per-site figures are higher than `-after`'s on this run (cold 2.33/2.05/2.21 ms, wrapped-site median 2.92 ms) because the machine was carrying a load of 1.5-2.3; the warm median over 20 transports and the call count are the stable readings |
+| `541-row11-repair.log` | `18b34bd` | the Otilde(T_Co) plane row once, at load average **0.55 1.19 1.89** on 4 CPUs (the lowest of the round), calibration **0.362 s**, `ROW_DEADLINE=540` inside 570 s inner / 590 s outer: **first plane at 292.3 s = 807 units**, **19 637 planes** by 565.2 s, **71.96 planes/s, 13.9 ms a plane** |
+
+What the row run says.  The first-plane stage transports nothing, so it cannot
+carry the repair: its 345.4 s and 341.8 s in the previous round's two runs and
+292.3 s here differ by the machine, whose load was 1.55 and 2.50 then and 0.55
+here.  The per-plane rate is where the repair lands, and 13.9 ms against the
+previous round's 14.6 and 18.9 ms is the transport's -0.66 ms a plane on a plane
+whose 14 ms are mostly the walk (the transport is 2.3 of them).  So the row at
+low load is **292.3 s to the first plane and 72.0 planes/s**, and the census, not
+the row, is the measurement of the repair.

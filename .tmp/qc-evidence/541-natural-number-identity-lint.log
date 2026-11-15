@@ -1,0 +1,4 @@
+=== ran on: 8566d9aea6204fa014039c548beebf290130a6f6 (1 modified paths)
+=== command: lint tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage
+1 files, 0 findings
+=== exit recorded above

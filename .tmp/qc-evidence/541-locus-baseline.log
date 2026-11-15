@@ -1,0 +1,54 @@
+=== tree: e7632190cbcc2540599adced4245b07b1eaaf73f (modified paths: 0)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== command: sage-image/run.sh -w /work, probe at /probe.py, inner cap 540 s, outer 570 s
+
+===== A. the control U(2) + A2 at its non-integral reflection lift =====
+  torsor built in 0.193 s
+  |passing| 2 |kernel| 8 |representatives| 2 period 16
+  residue locus built in 0.001 s, cardinality 16
+  integral_members() in 0.012 s
+  is_empty() in 0.000 s -> False
+  locus answers inclusion: False
+  locus answers is_parent_of: True
+  locus answers predicate: False
+  locus answers universe: False
+  integral_base_point_or_none() in 0.019 s -> a lift
+  subset of the torsor built in 0.000 s
+  admitted one point in 0.002 s
+  subset.is_empty() in 0.000 s -> False
+  membership asked again in 0.000 s -> True
+  empty residue locus? False
+
+T_Co isotropic marked vector e_ep, div 2
+
+===== C. T_Co at its first isotropic vector, identity reduction isometry =====
+  torsor built in 0.265 s
+  |passing| 256 |kernel| 512 |representatives| 256 period 4
+  residue locus built in 0.004 s, cardinality 131072
+  integral_members() in 65.218 s
+  is_empty() in 0.000 s -> False
+  locus answers inclusion: False
+  locus answers is_parent_of: True
+  locus answers predicate: False
+  locus answers universe: False
+  integral_base_point_or_none() in 0.016 s -> a lift
+  subset of the torsor built in 0.000 s
+  admitted one point in 0.003 s
+  subset.is_empty() in 0.000 s -> False
+  membership asked again in 0.000 s -> True
+  empty residue locus? False
+[   73.68 s] done
+[peakrss] probe541locus: child waited=0 shell_code=0 samples=39
+[peakrss] peak tree RSS      : 470 MiB
+[peakrss] low-water MemAvail : 13272 MiB
+[peakrss] peak single VmHWM  : 473 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      462 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    74.0s procs=  3 rss=   470 MiB hwm=   470 MiB avail= 13272 MiB
+[peakrss]   t=    72.0s procs=  3 rss=   468 MiB hwm=   468 MiB avail= 13276 MiB
+[peakrss]   t=    70.0s procs=  3 rss=   466 MiB hwm=   466 MiB avail= 13279 MiB
+[peakrss]   t=    68.0s procs=  3 rss=   464 MiB hwm=   464 MiB avail= 13279 MiB
+[peakrss]   t=    66.0s procs=  3 rss=   462 MiB hwm=   462 MiB avail= 13279 MiB
+=== launcher exit: 0
