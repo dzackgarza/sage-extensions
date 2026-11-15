@@ -51,20 +51,11 @@ def test_semigroup_algebra_of_the_monoid_generated_by_e1_e2_and_their_sum_satisf
 def test_a_semigroup_algebra_keeps_its_identity_after_a_polynomial_ring_is_built() -> None:
     r"""``QQ[S]``'s identity and augmentation are arrows of its own ``Mor``.
 
-    ``QQ[S]`` for ``S = <(1,0), (0,1)>`` is a free algebra and a finitely
-    presented algebra at once, and the pair has two Mor families:
-    ``QQ[S].Mor(QQ[S])`` is the graded-algebra Mor of the join category, while
-    the selected resolution keeps its degree-zero arrow in the unital-algebra
-    Mor of the pair.  That arrow belongs to the resolution's owner: the
-    resolution is keyed by ``algebra_framing_owner()``, a category, and
-    ``UnitalAlgebraMorCategoryConstruction.fixed_category_class_for`` reads the
-    domain's own arrow class for it.
-
-    The augmentation of the algebra belongs to the algebra, and the library
-    answers it in the algebra's own Mor: ``algebra_framing_morphism`` returns
-    ``self.Mor(self).identity()`` when the framing source is the algebra itself,
-    which is what a free algebra is.  So that arrow is the identity of
-    ``QQ[S].Mor(QQ[S])`` and is drawn from it.
+    ``QQ[S]`` for ``S = <(1,0), (0,1)>`` is free on its two generators, so the
+    degree-zero resolution it selects is the algebra itself and its
+    augmentation is the identity.  That arrow is an arrow of the algebra's own
+    ``QQ[S].Mor(QQ[S])``, the graded-algebra Mor of its category, whatever the
+    session built before it.
     """
     QQ.polynomial_ring("y")
     algebra = AffineSemigroupAlgebras(QQ)(((1, 0), (0, 1)),)
@@ -80,23 +71,35 @@ def test_a_semigroup_algebra_keeps_its_identity_after_a_polynomial_ring_is_built
     assert augmentation(generator * generator) == generator * generator
 
 
-def test_the_presentation_of_a_semigroup_algebra_answers_the_same_in_both_orders() -> None:
-    r"""The chosen presentation of ``QQ[S]`` answers the same in either order.
+def test_a_free_semigroup_algebra_presents_itself_in_a_fresh_session() -> None:
+    r"""``QQ[S]`` in a session that built nothing before it.
 
-    ``QQ[S]`` for ``S = <(1,0), (0,1)>`` is a free algebra and a finitely
-    presented algebra at once -- ``AffineSemigroupAlgebras`` is a subcategory of
-    ``AlgebrasWithChosenFinitePresentation`` -- and the session's category
-    construction order decides which of the two categories'
-    ``ParentMethods`` a join of them puts first.  A free algebra has the trivial
-    finite presentation, its own selected generators and no relations, and that
-    answer is not allowed to depend on the order: the presentation ring is the
-    algebra, the relation family is empty, the presentation morphism is the
-    algebra's own identity, and the lift is the element itself.
+    ``QQ[S]`` for ``S = <(1,0), (0,1)>`` is the free commutative algebra on
+    its two generators, so it is an algebra with a chosen finite presentation:
+    its own generators and no relations.  In that session its arrows are the
+    framed free-algebra arrows, its identity and the augmentation of its
+    degree-zero resolution are arrows of ``QQ[S].Mor(QQ[S])``, it is its own
+    presentation ring with no relations, and its quotient by ``s0 s1`` is
+    presented on ``QQ[S]`` by that one relation, in which ``s0 s1 = 0`` while
+    ``s0`` and ``s0^2`` are not zero.
 
-    Each order needs its own process: the first parent class a session builds
-    is the one it keeps for the rest of that session.  The runner in this
-    directory's ``conftest.py`` runs the session script in a fresh interpreter
-    and reports its exit status.
+    Sage orders the parent classes of two categories that are not
+    subcategories of each other by the order the session built them, so the
+    script runs in its own process; ``conftest.py`` holds it and the runner.
     """
-    assert session_order_verdict(polynomial_ring_first=False) == 0
-    assert session_order_verdict(polynomial_ring_first=True) == 0
+    run = session_order_run(polynomial_ring_first=False)
+
+    assert run.returncode == 0, run.stderr
+
+
+def test_a_free_semigroup_algebra_presents_itself_after_a_polynomial_ring_is_built() -> None:
+    r"""``QQ[S]`` in a session that built ``QQ[y]`` first.
+
+    The same assertions as in a fresh session, in the other construction
+    order: building a polynomial ring first constructs the free-algebra
+    categories before the categories of algebras with a chosen finite
+    presentation, and no answer about ``QQ[S]`` may depend on that.
+    """
+    run = session_order_run(polynomial_ring_first=True)
+
+    assert run.returncode == 0, run.stderr
