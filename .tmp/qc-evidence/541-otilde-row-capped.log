@@ -1,0 +1,39 @@
+=== ran on: cb9ba77 (main + the framing repair), port 991b88b0, pinned image 11.0.beta5
+=== command: sage-image/run.sh -w /work, port at /work, worktree at /repos/sage-extensions, repo .git bound so the timing stage can read the commit, ROW_DEADLINE=545
+=== ran on: cb9ba77e14cd9abb86fb139f31c9e23f94683aac (modified paths: 0)
+=== command: sage-image/run.sh -w /work, port at /work, worktree at /repos/sage-extensions, probe at /probe.py, ROW_DEADLINE=545
+row: {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 11 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 2, 1 ↦ 2, 2 ↦ 2, 3 ↦ 2, 4 ↦ 2, 5 ↦ 2, 6 ↦ 2, 7 ↦ 2, 8 ↦ 2, 9 ↦ 2, 10 ↦ 2]} on rank 11
+before the row elapsed 1.6 s, planes transported 0
+before the row no plane transported yet
+  [tick] elapsed 30.0 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 60.0 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 90.1 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 120.1 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 150.1 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 180.1 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 210.1 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 240.2 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 270.2 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 300.2 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 330.2 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 360.3 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 390.3 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 420.3 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 450.3 s, planes transported 0
+  [tick] no plane transported yet
+  [tick] elapsed 480.4 s, planes transported 0
+  [tick] no plane transported yet
