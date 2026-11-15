@@ -1981,7 +1981,27 @@ class SetSubobjectCategory(SliceCategory):
 
             return negation(self == other)
 
-        __hash__ = None
+        def __hash__(self) -> int:
+            r"""Hash the ambient set, refined by the members when it is finite and enumerated.
+
+            Equal subsets have one ambient set, and over a finite enumerated
+            ambient set they have the same decided members, read here by their
+            positions in its enumeration; elsewhere equality is containment
+            both ways, and the ambient set is what it supplies to a hash.
+            """
+            from sage_extensions.categories.sets.set_categories import (
+                EnumeratedSets,
+                FiniteSets,
+            )
+
+            base = self.codomain()
+            if base in FiniteSets() and base in EnumeratedSets():
+                return hash((base, tuple(
+                    position
+                    for position, member in enumerate(base)
+                    if self.is_parent_of(member) is True
+                )))
+            return hash(base)
 
         def _repr_(self):
             return f"Subobject of {self.codomain()} defined by {self.domain()}"

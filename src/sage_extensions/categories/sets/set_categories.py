@@ -1319,6 +1319,12 @@ class Sets(CategoryPacketMethods, OwnedCategory):
     machinery rebuild parents and Hom objects through that category, so every
     owned set parent must also be a Sage set parent at the implementation
     boundary.
+
+    Every object of this category hashes, and its hash agrees with its
+    equality.  Equal families of sets have one product and one coproduct
+    (`SET-05`), and the store that finds them keys a family by its factors'
+    hashes.  A set whose equality is extensional hashes what that equality
+    compares, or a coarser invariant of it, such as its ambient set.
     """
 
     _MorCategory = SetMorCategoryConstruction
@@ -6328,14 +6334,11 @@ type _FiniteFamilyStore = dict[int, list[tuple[IndexedFamily, Sets().ObjectType]
 def _finite_family_key(family: IndexedFamily) -> int:
     r"""The key a finite construction is interned under: its index set and its factors.
 
-    Equal families have equal index sets and equal factors at equal indices, and
-    a set's hash agrees with its equality -- a finite ordered set hashes its
-    points, which hash by the rule of ``FiniteOrderedSets`` -- so equal families
-    have one key.  The factors enter as the multiset of their hashes, because
-    equality pairs them label by label, not position by position.
+    Equal families have equal index sets, which enumerate in one order, and
+    equal factors index by index; every set hashes consistently with its
+    equality (the rule of :class:`Sets`), so equal families have one key.
     """
-    factor_hashes = tuple(sorted(hash(factor) for factor in family))
-    return hash((family.index_set(), factor_hashes))
+    return hash((family.index_set(), tuple(hash(factor) for factor in family)))
 
 
 def _equal_interned_family(
