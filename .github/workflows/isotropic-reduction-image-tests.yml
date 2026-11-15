@@ -48,15 +48,10 @@ jobs:
           just test tests/lattices/test_the_isotropic_reduction_image.sage \
             --no-time-gates --timeout "$TEST_TIMEOUT" -v
         shell: bash
-      # The run's own timing record (CONTRIBUTING.md ENV-03): the report log and
-      # JUnit file this run's plugin copied into .timings/, named by commit and
-      # start time, and the library's stage records beside them.  tests/.report/
-      # is not uploaded: the next run overwrites it.
-      - name: Keep the run's timing record
+      - name: Keep the run's timing and report log
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: timings-${{ github.job }}-${{ github.sha }}
-          path: .timings/
+          name: reduction-image-report-${{ github.sha }}
+          path: tests/.report/
           retention-days: 90
-          if-no-files-found: warn

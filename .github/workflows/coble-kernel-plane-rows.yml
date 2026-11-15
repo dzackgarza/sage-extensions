@@ -56,14 +56,3 @@ jobs:
           "$sage_python" tests/coble_kernel_plane_rows.py \
             --cap "$COBLE_CALL_CAP" --budget "$COBLE_ROW_BUDGET"
         shell: bash
-      # The run's own timing record (CONTRIBUTING.md ENV-03): the test run's
-      # report log and JUnit file as the run's plugin copied them into
-      # .timings/, and the stage records the library appended as it computed.
-      - name: Keep the run's timing record
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: timings-${{ github.job }}-${{ github.sha }}
-          path: .timings/
-          retention-days: 90
-          if-no-files-found: warn

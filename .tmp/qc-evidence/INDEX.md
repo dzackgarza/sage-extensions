@@ -1578,3 +1578,9 @@ this commit's working tree, except the two rows marked *base*, which are a clean
 
 The three pre-existing failures and the 22 s gate report were re-measured on the clean worktree in the same
 session rather than assumed; nothing in this commit touches the code they run.
+
+The seven workflow steps of ENV-03 are `results/issue529-timing-record-workflows.patch`, not history: the
+connection's GitHub App may not update a file under `.github/workflows/` and the push was refused with
+`refusing to allow a GitHub App to create or update workflow ... without 'workflows' permission`. The patch is
+`git diff da0fa12..<the commit that carried them> -- .github/workflows/` and `git apply --check` passes against
+`da0fa12`'s workflows; the two `uses:`-only tiers are not in it, as ENV-03 says.

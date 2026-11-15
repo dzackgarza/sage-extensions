@@ -34,17 +34,6 @@ jobs:
         run: |
           sage_python="$("$SAGE_BIN" -c 'import sys; print(sys.executable)')"
           "$sage_python" -m doctest README.md
-      # The run's own timing record (CONTRIBUTING.md ENV-03): the test run's
-      # report log and JUnit file as the run's plugin copied them into
-      # .timings/, and the stage records the library appended as it computed.
-      - name: Keep the run's timing record
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: timings-${{ github.job }}-${{ github.sha }}
-          path: .timings/
-          retention-days: 90
-          if-no-files-found: warn
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
