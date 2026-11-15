@@ -48,6 +48,39 @@ def test_the_order_ideal_of_an_integer_polynomial_is_the_ideal_of_its_coefficien
     assert ideal == ZZ.ideal(2)
 
 
+def test_the_order_ideal_of_a_polynomial_is_read_off_its_coefficients() -> None:
+    r"""$O_{\mathbf{Z}[x]}(2x+2)$ is the coordinate ideal $(2)$, and the dual cannot state it.
+
+    The values of the linear functionals on $\mathbf{Z}[x]$ at $2x+2$ generate
+    $(2)$: every value is $2\varphi(1) + 2\varphi(x)$, and the functional that
+    is $1$ on $1$ attains $2$.  The ideal is an ideal of the base ring
+    $\mathbf{Z}$ -- an element of the ideals of $\mathbf{Z}$ and not a
+    submodule of anything -- because the linear functionals take their values
+    there.
+
+    What states it is not the dual: $\operatorname{Hom}_{\mathbf{Z}}
+    (\mathbf{Z}[x], \mathbf{Z})$ is $\prod_{\mathbf{N}} \mathbf{Z}$, which is
+    uncountable, so no countable family of its points generates it, and by
+    Baer--Specker it is not free; this library holds no generating family of
+    it, so the image of evaluation cannot be spanned by their values.  The
+    level that answers is the framed free module's, which reads the ideal off
+    the coordinate functionals of the monomial basis: each coordinate of
+    $2x+2$ is $2$, and each is attained.  That level is a subcategory of
+    $\mathrm{Modules}(\mathbf{Z})\mathrm{Free}()$ and so is the more specific
+    one, which is the provider the rebuild rule must keep
+    (``refine._final_category_operations``).
+    """
+    line = ZZ["x"]
+    x = line.algebra_generator("x")
+    element = 2 * x + 2
+    dual = element.parent().dual_module()
+    ideal = element.order_ideal()
+
+    assert dual.has_selected_module_resolution() is False
+    assert ideal in CommutativeIdeals(ZZ)
+    assert ideal == ZZ.ideal(2)
+
+
 def test_the_order_ideal_of_a_rational_polynomial_is_the_unit_ideal() -> None:
     r"""$O_{\mathbf{Q}[x]}(x+1) = \mathbf{Q}$: the coefficients generate the field.
 
