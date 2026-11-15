@@ -1,4 +1,4 @@
-r"""One datum: a finite ordered set's hash is computed once and read after (#541).
+r"""One datum: a finite ordered set's hash is computed once and read after.
 
 A finite ordered set is fixed by its points (the rule of
 :class:`FiniteOrderedSets`), so its hash -- the hash of the tuple of its points,
@@ -39,10 +39,12 @@ def _image_set_recording_its_enumeration(record):
     return Sets().image_set(image, source, inverse=preimage)
 
 
-def test_the_first_ask_for_a_hash_enumerates_the_set() -> None:
-    r"""The hash is the tuple of the points, so computing it reads all of them."""
+def test_construction_computes_no_point_and_the_first_hash_computes_the_tuple() -> None:
+    r"""Building the set asks its map for nothing; the first hash asks for every point."""
     record = []
     points = _image_set_recording_its_enumeration(record)
+
+    assert tuple(record) == ()
 
     hash(points)
 
@@ -61,7 +63,7 @@ def test_the_second_ask_for_a_hash_constructs_nothing() -> None:
     assert tuple(record) == asked
 
 
-def test_equal_sets_still_hash_equally() -> None:
+def test_equal_sets_hash_equally() -> None:
     r"""Two builds of one image are equal sets, so the retained hash agrees with ``==``."""
     left = _image_set_recording_its_enumeration([])
     right = _image_set_recording_its_enumeration([])
