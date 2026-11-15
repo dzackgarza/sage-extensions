@@ -1,0 +1,111 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue528-integrality-split.py
+tree SHA: cff6a3aa6229f555c1788e05966c761adeb81087
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 400 s, outer 460 s, guard 6144 MiB, args ''
+[    0.5s] lattice Integral lattice of rank 5 and signature (3, 2)
+[    0.5s] the lift at the zero parameter, which is the base point
+[    0.5s] 
+[    0.5s] === is each datum the same object on a second access? ===
+[    0.5s]   ModulesOverIntegralDomains(ZZ)(L) is the same module: True
+[    0.5s]   generic_fibre_map() is the same morphism: True
+[    0.5s]   Modules(QQ).restriction_of_scalars(f) is the same category: True
+[    0.5s]   the extension framing span is the same datum: True
+[    0.6s] 
+[    0.6s]   integral_restriction(L, L): 3.61 ms a call over 40 calls
+[    0.8s] 
+[    0.8s]   is_integral_on(L, L): 2.66 ms a call over 40 calls
+[    1.1s] 
+[    1.1s] === 40 calls of integral_restriction: by own time ===
+[    1.1s]   file:line                                     function                            own s    cum s    calls
+[    1.1s]   ring_foundation.py:6647                       _element_constructor_               0.015    0.059    21960
+[    1.1s]   ~:0                                           <built-in method builtins.isins     0.012    0.012    88720
+[    1.1s]   objects.py:158                                __contains__                        0.011    0.021    14920
+[    1.1s]   set_categories.py:777                         __call__                            0.011    0.091     2600
+[    1.1s]   category.py:436                               __classcall__                       0.011    0.015    21280
+[    1.1s]   ring_foundation.py:1986                       _engine_element                     0.009    0.033     3200
+[    1.1s]   category.py:693                               __contains__                        0.008    0.011    17240
+[    1.1s]   ring_foundation.py:6618                       _from_engine_element                0.008    0.011    10760
+[    1.1s]   copy.py:62                                    copy                                0.006    0.008     2600
+[    1.1s]   module_morphisms.py:1233                      _engine_image                       0.006    0.022      200
+[    1.1s]   lattices.py:3923                              base_ring                           0.006    0.008    14400
+[    1.1s]   ~:0                                           <built-in method builtins.getat     0.005    0.005    19280
+[    1.1s]   ring_foundation.py:7737                       _own_ring                           0.005    0.016    17880
+[    1.1s]   modules.py:2989                               scalar_action                       0.005    0.036     1000
+[    1.1s]   lattice_morphisms.py:1699                     integral_restriction                0.005    0.318       40
+[    1.1s]   mor_categories.py:2166                        Of                                  0.005    0.012     1440
+[    1.1s]   framed_free_modules.py:352                    _element_constructor_               0.005    0.027     6400
+[    1.1s]   ring_foundation.py:6643                       __call__                            0.005    0.063    21960
+[    1.1s] 
+[    1.1s] === 40 calls of integral_restriction: by cumulative time ===
+[    1.1s]   probe.py:107                                  <lambda>                            0.000    0.318       40
+[    1.1s]   lattice_morphisms.py:1699                     integral_restriction                0.005    0.318       40
+[    1.1s]   lattice_morphisms.py:1781                     <genexpr>                           0.000    0.106      240
+[    1.1s]   ~:0                                           <built-in method builtins.sum>      0.001    0.104      200
+[    1.1s]   lattice_morphisms.py:1783                     <genexpr>                           0.001    0.092     1200
+[    1.1s]   set_categories.py:777                         __call__                            0.011    0.091     2600
+[    1.1s]   modules.py:3072                               scalar_multiple                     0.002    0.089     1000
+[    1.1s]   ring_foundation.py:6643                       __call__                            0.005    0.063    21960
+[    1.1s]   ring_foundation.py:6647                       _element_constructor_               0.015    0.059    21960
+[    1.1s]   ring_foundation.py:8025                       _engine_element                     0.003    0.044     8400
+[    1.1s]   modules.py:2989                               scalar_action                       0.005    0.036     1000
+[    1.1s]   ring_foundation.py:1986                       _engine_element                     0.009    0.033     3200
+[    1.1s]   framed_free_modules.py:97                     __init__                            0.005    0.033     2600
+[    1.1s]   mor_foundation.py:436                         operation                           0.001    0.033     1520
+[    1.1s]   ring_foundation.py:6695                       __contains__                        0.005    0.031     7080
+[    1.1s]   ring_foundation.py:6623                       _engine_element                     0.003    0.030     6200
+[    1.1s]   mor_categories.py:1648                        __call__                            0.000    0.028      400
+[    1.1s]   framed_free_modules.py:348                    __call__                            0.001    0.027     5000
+[    1.3s] 
+[    1.3s] === 40 calls of is_integral_on: by own time ===
+[    1.3s]   file:line                                     function                            own s    cum s    calls
+[    1.3s]   ~:0                                           <built-in method builtins.isins     0.011    0.011    73480
+[    1.3s]   objects.py:158                                __contains__                        0.009    0.018    14160
+[    1.3s]   category.py:436                               __classcall__                       0.008    0.012    16520
+[    1.3s]   set_categories.py:777                         __call__                            0.007    0.054     1560
+[    1.3s]   category.py:693                               __contains__                        0.006    0.009    15120
+[    1.3s]   module_morphisms.py:280                       solve                               0.006    0.025      200
+[    1.3s]   mor_categories.py:2166                        Of                                  0.006    0.014     2080
+[    1.3s]   module_morphisms.py:1233                      _engine_image                       0.005    0.020      200
+[    1.3s]   set_categories.py:6833                        _element_constructor_               0.004    0.007    12080
+[    1.3s]   ring_foundation.py:6647                       _element_constructor_               0.004    0.009     7800
+[    1.3s]   set_categories.py:524                         __contains__                        0.004    0.007     5480
+[    1.3s]   ring_foundation.py:1986                       _engine_element                     0.003    0.010      600
+[    1.3s]   module_morphisms.py:1934                      _preimage_or_none                   0.003    0.114      400
+[    1.3s]   framed_free_modules.py:352                    _element_constructor_               0.003    0.014     3000
+[    1.3s]   ring_foundation.py:6618                       _from_engine_element                0.003    0.004     3800
+[    1.3s]   modules.py:243                                <genexpr>                           0.003    0.008    20800
+[    1.3s]   mor_categories.py:2127                        _cached_between                     0.003    0.005     2280
+[    1.3s]   set_categories.py:6843                        __call__                            0.002    0.010    12080
+[    1.3s] 
+[    1.3s] === 40 calls of is_integral_on: by cumulative time ===
+[    1.3s]   probe.py:108                                  <lambda>                            0.000    0.238       40
+[    1.3s]   lattice_morphisms.py:1483                     is_integral_on                      0.000    0.238       40
+[    1.3s]   module_morphisms.py:2061                      factor_through_or_none              0.001    0.181       40
+[    1.3s]   module_morphisms.py:1934                      _preimage_or_none                   0.003    0.114      400
+[    1.3s]   module_morphisms.py:2191                      _preimage_through_the_extension     0.002    0.102      200
+[    1.3s]   set_categories.py:777                         __call__                            0.007    0.054     1560
+[    1.3s]   mor_categories.py:142                         _category_accepts_morphism          0.000    0.048       80
+[    1.3s]   core.py:313                                   __call__                            0.000    0.048       40
+[    1.3s]   core.py:256                                   morphism_image                      0.000    0.048       40
+[    1.3s]   mor_categories.py:1102                        __contains__                        0.000    0.046       40
+[    1.3s]   mor_categories.py:1084                        accepts                             0.000    0.046       40
+[    1.3s]   mor_categories.py:1001                        _already_parented_arrow             0.000    0.046       40
+[    1.3s]   mor_categories.py:184                         _arrow_is_inherited_from_subcat     0.000    0.046       40
+[    1.3s]   mor_categories.py:226                         _declared_category_reaches          0.001    0.046       40
+[    1.3s]   module_morphisms.py:1221                      _call_                              0.001    0.039      800
+[    1.3s]   module_morphisms.py:2575                      <lambda>                            0.000    0.038      200
+[    1.3s]   mor_categories.py:1648                        __call__                            0.001    0.033      760
+[    1.3s]   scalar_change.py:233                          <lambda>                            0.000    0.027      200
+[    1.3s] 
+[    1.3s] PROBE DONE
+[peakrss] p528t: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 309 MiB
+[peakrss] low-water MemAvail : 13610 MiB
+[peakrss] peak single VmHWM  : 309 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      298 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   309 MiB hwm=   309 MiB avail= 13610 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13838 MiB
+launcher exit: 0

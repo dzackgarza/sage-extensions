@@ -1917,6 +1917,83 @@ The repair keeps 204ffbb's corrected coset reading and restores the matrix test.
 | `issue528-locus-tests-204ffbb-red.log` | `204ffbb96e` | the same file there: the new test **fails** -- the torsor asks for its base point **10** times where the repair asks **3** -- and one existing test fails too (the unequal-Smith-steps control, which `d83ae97`, the child of 204ffbb, repairs; 204ffbb is not main) |
 | `issue528-repaired-row-counts.log` | main `6ce8d8a8` + the repair | T_Co's ambient plane row: **returns in 217.9 s** with `_lift_at` called **0** times, where `204ffbb96e` did not return at 300 s with 1362 calls costing 183.67 s, and `a71272add9` returned in 54-61 s. The per-class lift test is gone from the row; the remaining gap to the base is not the lift test and is the next measurement |
 
+## #528, the tree's own comparison: one cProfile of the ambient row per tree
+
+The slow-run triage's third step: one profile of the ambient `O(L)` plane row of `T_Co` at
+`a71272add9` and one at main `cff6a3a`, compared function by function by own time and call
+count. Each run is one process, capped at 520 s, with the row's two inputs (the lattice and its
+stable orthogonal group) built outside the profiled region, and each prints the wall time of a
+fixed workload beside the row's seconds.
+
+The two tables are the raw record; `issue528-row-profile-compare.py` joins them on
+`(path, function)` and prints what grew, which is what the log holds.
+
+| log or table | tree | what it is |
+| --- | --- | --- |
+| `issue528-row-profile.py` | -- | the probe: builds the inputs, profiles the row alone, writes one table per run |
+| `issue528-row-profile-compare.py` | -- | the comparison: two tables in, the growth of own time and of call count out |
+| `issue528-profile-t-row-base.log` | `a71272add9` | the base run's log: **232.4 s** under the profiler, `calib=0.164`, the row **returns**, **448,757,911** calls |
+| `issue528-profile-t-row-base.tsv` | `a71272add9` | the base run's table, 5,448 functions |
+| `issue528-profile-t-row-main.log` | `cff6a3a` | the main run's log: **did not return at 520 s** (`calib=0.162`), **1,408,289,407** calls in the calls that completed |
+| `issue528-profile-t-row-main.tsv` | `cff6a3a` | the main run's table, 5,350 functions, marked `decided=False` |
+| `issue528-profile-t-row-compare.log` | both | the comparison, and its own statement that one table is truncated |
+
+The base row was profiled once before (`issue528-profile-base-ambient-row.log`, 168.1 s at
+`calib=0.165`); this run of the same tree took 232.4 s at `calib=0.164`. The two are not
+reconciled here and no number is quoted from either alone: the comparison below is one base
+run against one main run under the same probe in the same session, and the calibration of the
+two runs agrees to 1.2 %.
+
+What the tables say, per call and not per row (the main table is truncated, so it is read per
+call and never as a row total):
+
+| function | base calls / cum | main calls / cum |
+| --- | --- | --- |
+| `recursive._isotropic_pointed_isometry` | 28 / 182.9 s (6.5 s a call) | 6 / 509.6 s (**84.9 s a call**) |
+| `isotropic_lifts._integral_lift_locus` | 8 / 127.6 s (15.9 s a call) | 2 / 498.8 s (**249 s a call**) |
+| `isotropic_lifts.integral_parameter_classes` | 8 / 114.7 s (14.3 s a call) | 2 / 65.7 s (32.8 s a call) |
+| `lattice_morphisms.is_integral_on` | 28 / 6.5 s | 6 / 0.27 s |
+| `module_morphisms.solve` | 441 / 6.6 s | 192 / 0.11 s |
+
+So the row's growth is not the ring division of `solve` on this tree: `is_integral_on` and
+`solve` are *cheaper* per call at main. It is the part of `_integral_lift_locus` that is not
+`integral_parameter_classes` -- the product and image-set construction over the passing
+classes and the kernel -- which goes from 1.6 s a call to about 216 s a call, and the owned
+set and category machinery under it is what the comparison ranks first: `set_categories
+.__call__` 10.5 -> 75.2 s own at 9.2x the calls, `__contains__` 5.3 -> 37.6 s at 9.0x,
+`_element_constructor_` 4.3 -> 34.4 s at 9.2x, and, multiplicatively, `component` 597x,
+`index_set` 459x, `family` 442x, `point_at` 66x. The commit that grew it is not bisected in
+this round, and the row's number at main is not the whole row.
+
+## #528, the review of `0a55452cfa`: what a test of its matrix reading can and cannot see
+
+The review ordered a behaviour test whose reduction isometry has a non-integral base point, red at
+`0a55452cfa`. Two probes were run before writing it, and the answer they give is why the test
+below is green at that commit and not red.
+
+| log or table | tree | what it is |
+| --- | --- | --- |
+| `issue528-lift-transpose.py` | -- | the probe: per class of the parameter quotient, the lift's own `integral_restriction`, the locus' reported classes, and both matrix readings (`T * B^t`, what `0a55452cfa` computes, and `T * B`, with the images in columns), at every signed permutation and Eichler transvection of a control's reduction and their pairwise products |
+| `issue528-lift-transpose.log` | `cff6a3a` | `U(2) + U(2) + <2>`: 110 reduction isometries, **30** with a base point whose coordinate matrix is not symmetric; at the three printed, `membership_disagreements` **0** and `matrix_disagreements` **0** -- the two readings give the same class set, and both agree with the truth and with the reported locus. `U + A3(2)`: 6 isometries, 4 with a non-symmetric base-point matrix, again **0**. The transposed product is a different *matrix* (it differs from the lift's at 64 of 64 and 63 of 64 classes there) but it is the same *verdict*: integrality and `det` are transpose-invariant for a square matrix |
+| `issue528-lift-nonintegral-base.py` | -- | the search for the case the review names: every lift of a reduction isometry, over the seven small controls the locus' tests use, asked whether its **base point** restricts integrally |
+| `issue528-lift-nonintegral-base.log` | `cff6a3a` | **0 of 252** reduction isometries have a base point that does not restrict integrally: every rational lift of a reduction isometry of `U + <2>`, `U + U + <2>`, `U(2) + <2>`, `U(2) + U(2)`, `U(4) + <2>`, `U(2) + U(2) + <2>` and `U + A3(2)` is already an isometry of the lattice. The condition the review says the answer changes under does not occur on a control a test can afford |
+| `issue528-integrality-split.py` | -- | the per-lattice datum the ordered repair would cache: identity of the objects across two accesses, and the per-call cost and split of `integral_restriction` and `is_integral_on` |
+| `issue528-integrality-split.log` | `cff6a3a` | `ModulesOverIntegralDomains(ZZ)(L)` **is the same module**, its `generic_fibre_map()` **the same morphism**, `Modules(QQ).restriction_of_scalars(f)` **the same category**, and `_integral_extension_coordinate_span()` **the same datum** on a second access; `integral_restriction(L, L)` **3.61 ms** a call and `is_integral_on(L, L)` **2.66 ms** a call on the rank-5 control, both dominated by element and ring construction (`_element_constructor_`, `isinstance`, `__contains__`, `__classcall__`), not by a repeated frame. The profile of the T_Co row agrees: `_integral_extension_coordinate_span` is called twice per row at both trees |
+| `issue528-locus-nonidentity-test-on-0a55452.log` | `cff6a3a` | the new test `test_the_locus_at_a_non_identity_reduction_is_every_class_that_lifts` with the file's six others and the test lint plugin: **7 passed in 12.52 s** -- green, not red, at the commit under review |
+
+## #528, the restore of the per-class lift test and the row after it
+
+`0a55452cfa` replaced the locus' per-class lift test by the product `T * base_images`; its
+`base_images` is filled by rows (source-major entries into a `matrix(QQ, n_target, n_source, ...)`),
+so the product is `T * B^t`.  The restore puts back `_lift_at(coordinates).integral_restriction(source, target)`
+and deletes `lifts_integrally`, `base_images`, the per-call assertion and their imports.  The
+call-count test of the previous round counts calls of `base_point`, which the restored route makes
+once per class again, so it is removed with the mechanism it counted.
+
+| log | tree | result |
+| --- | --- | --- |
+| `issue528-locus-tests-restored.log` | `cff6a3a` + the restore | `tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage` with the test lint plugin: **6 passed in 13.24 s**, the new non-identity-reduction test included |
+| `issue528-row-after-restore.log` | `cff6a3a` + the restore | `T_Co`'s ambient plane row, cap 520 s: **did not return**; `_lift_at` **1536 calls, 162.155 s** and `eichler_transvection` **1536 calls, 30.851 s** inside the window -- about 105 ms a class, against the matrix test's row of 217.9 s (`issue528-repaired-row-counts.log`) |
 ## The fifth review of #500: the torsion reading and the provider order
 
 The four logs below are the runs the commits `030a528` and `476f87c` cite.  The
@@ -1993,3 +2070,18 @@ stage's close asserts it closed its own id; and the tests that asserted only
 | `issue529b-timing-record-tests-green.log` | `238ec3c` | `tests/engineering/test_the_timing_record_names_each_stage.py` with the test lint and the suite budget: **9 passed in 10.24 s** |
 | `issue529b-vinberg-tests-green.log` | `238ec3c` | `tests/lattices/test_reflection_hyperbolic.sage` and `tests/lattices/test_the_subgroup_cusp_chamber.sage`: **7 passed in 131.41 s** |
 | `issue529b-reduction-image-cusps-green.log` | `238ec3c` | the two cusp-chamber tests of `tests/lattices/test_the_isotropic_reduction_image.sage` by node id (`max_decompositions=8` and `=20`): **2 passed in 149.95 s** |
+## #500, the sixth round: the citation, the false clause, the docstring, the dead line, the record
+
+The five corrections `b762a8a`, `5f69bb3`, `2ac0d5c`, `851df47` and the commit
+that carries `results/issue500-fifth-review.md`: what the order and the walk
+really do across processes, where the recursion really runs, and the regression
+the five commits do not move.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue500r6-seeds-orders.log` | `6e51d33` | the provider probe run once per `PYTHONHASHSEED` in 0-9, one fresh process each, over 26 objects x 3 levels: **the walk has two forms** for `QQ(i)`'s and `Z[x]/(x^2)`'s `ParentMethods` and one for the other 76 pairs, **`_owned_mixins` has one form for all 78 pairs in all ten seeds**, and the first provider of every name is the same in all ten; **the old insertion order has two forms**, the same two the walk has. The digest of all 780 probe lines is in the log, the probe in `issue500r6-seeds-orders.py` |
+| `issue500r6-relation.log` | `6e51d33` | `_precedes` on the 33 (object, level) pairs of the relation probe and on 84 of the extension probe: **0 classes precede themselves, 0 pairs precede each other both ways, 0 triples break transitivity**, and **neither order puts a relation-ordered pair the wrong way round** -- so the relation is a strict partial order where measured and the sort's contribution is the `CycleError`, not a corrected order |
+| `issue500r6-recursion.log` | `2ac0d5c`, `851df47` | `TensorAlgebras(ZZ)` and `SymmetricAlgebras(ZZ)` both **construct**; `Z[x]/(x^2).is_torsion_free()` is **True** from the framed branch at `algebras.py:3759`; and the recursion is #533's path -- `algebras.py:3773` -> `_represented_relation_torsion_witness` (`:3804`) -> `presentation_ring` (`:3564`) -> `selected_algebra_presentation` (`:3553`) -> `selected_algebra_resolution` (`:2057`) -> `objects.py:383` -> **`owned_category.py:669 linearize`**, the frame census showing **1303 frames, 127 in `linearize` and 43 in `_declared_category_linearization`**, repeating through `super_categories` -> `_commutativity_decision` -> `tensor_product` -> `module_generating_set` -> `parent_class` -> `linearize`. `Z[x]/(2x)`, one of #533's three objects, raises the same `RecursionError` from `is_torsion_free()` |
+| `issue500r6-tests.log` | `851df47` | the round's two test files under the test lint: **10 passed in 0.87 s** |
+| `issue500r6-sweep-tree.log` | `851df47` | `tests/modules`, `tests/algebras`, `tests/categories`, one pytest process each: **90 failed 222 passed**, **103 failed 110 passed**, **63 failed 61 passed** |
+| `issue500r6-sweep-base.log` | `6e51d33` (a clean worktree) | the same three directories: **the same three summaries, the same FAILED ids, 0 on either side only** |
