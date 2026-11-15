@@ -1,0 +1,13 @@
+tree SHA: 006679543bfa3740d4da13cdfa3342d56d29b677
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 2048 MiB
+command: /sage/.venv/bin/python -u -s -m sage_extensions.testing.test_lint tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage
+1 files, 0 findings
+[peakrss] lint531: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 2 MiB
+[peakrss] low-water MemAvail : 13477 MiB
+[peakrss] peak single VmHWM  : 2 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       3 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13477 MiB
+launcher exit: 0

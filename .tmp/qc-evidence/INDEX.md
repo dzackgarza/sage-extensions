@@ -1677,3 +1677,18 @@ The probes behind the two measurement rows are session probes and stay out of th
 times a hash and counts distinct hash values over 200 span bases, `issue531-point-hash.py` hashes equal vectors
 built two ways, and `issue531-subobject-scan-after.py` is #390's probe S with the hash of a finite ordered set
 censused by caller and cardinality.
+
+### #531: the rerun of #390's reproduction, and the T_Co row
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue531-subobject-scan-after.log` | the repair (`0066795`) | #390's probe S unchanged in its workload — 600 transports on `U + U + <-2>`, windows of 100 — with the hash censused: **600 transports in 32.0 s, mean 53.34 ms** (the record on `cef9c5d` is 104.7 s, mean 174.43 ms); `_lattice_subobject_spanning` cache **1187 entries on 1187 distinct hash values** (the record: 1197 on 5); the equality comparisons `subobject_on` makes are **1.0 per call in every window** (the record: 525.3 rising to 5415.4); process time per transport **14.89 ms in the first window against 12.16 ms in the last, ratio 0.82** — flat in the number of subobjects built, where the wall clock of this host (load 9) moves 35.15 to 22.46 ms with no trend |
+| `issue531-hash-census-row.log`, `issue531-hash-census-row-large.log` | the repair | who hashes a finite ordered set inside the ambient `O(L)` plane row of `T_Co`: 1040 hashes of sets of at most 129 points in the first 150 s, then **one hash of a lazily enumerated 131072-point image set (points `_GeneralPresentedElement`), 20.6 s**, asked from `set_categories.py:1504 _finite_product` — its interning key is an index set this large. That is the one cost the repair adds (it was `O(1)` before) and it is the interning site's, not the hash's: no other consumer in this row hashes a set of more than 512 points |
+| `issue531-tco-row.log` | the repair | the `Otilde(T_Co)` plane row capped at 520 s (probe J, `cap=520`, inner 560 s): **0 lifts, 0 planes transported; the whole cap inside the ambient `O(L)` plane row** (519.9 s of 520.0 s), so the transport's per-plane time is not reached |
+| `issue531-tco-row-base.log` | `da0fa12` (a clean worktree) | the same probe and cap on the tree before the change: **also 0 lifts, 520.0 s in the same stage** — the row's setup, not this hash, is what keeps the transport from starting. The record's 138.5 s for that stage belongs to `484e4c52`; main has moved since. Against the record's **637 ms per plane** the transport therefore cannot be timed from the row on this tree |
+| `issue531-lint.log` | the repair | `test_lint` on the new file: **1 files, 0 findings** |
+
+The probes behind these rows are session probes and stay out of the tree: `issue531-subobject-scan-after.py` is #390's
+probe S with the hash of a finite ordered set censused by caller and cardinality (and the process time of each
+transport recorded beside its wall time); `issue531-hash-census-row.py` runs the ambient `O(L)` plane row of `T_Co`
+under that census and prints it while the row runs, so a cap leaves the table behind.

@@ -1,0 +1,109 @@
+tree SHA: 5c1268324ca5f556a55b356876003a05c0fa3fe3
+port SHA: 991b88b0
+inner 560 s, outer 620 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py n=600 window=100
+[0.0s] probe #531: the same run as probe S, with the hash of a finite ordered set counted
+[0.0s] n=600, window=100, pool=40, seed=20261115, python 3.14.10
+[0.0s] load 9.01 on 4 cores
+[0.0s] hash counted at: sage_extensions.categories.sets.finite_ordered_sets.FiniteOrderedSets.ParentMethods
+[10.1s] lattice Integral lattice of rank 5 and signature (2, 3), rank 5, signature (2, 3)
+[10.1s] isometries to move by: 40 words of length three in O(L)'s generators
+[10.1s] equality counted on:
+[10.1s]   lattice: no Python __eq__ on OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType; its comparisons are C-level and cannot be counted here
+[10.1s]   lattice framing: sage_extensions.categories.sets.finite_ordered_sets.FiniteOrderedSets.ParentMethods
+[10.1s]   subobject: no Python __eq__ on OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType; its comparisons are C-level and cannot be counted here
+[10.1s]   subobject framing: FiniteOrderedSets.ParentMethods (the same implementation, already counted)
+[10.1s]   subobject domain: no Python __eq__ on OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType; its comparisons are C-level and cannot be counted here
+[10.1s]   image: no Python __eq__ on OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType; its comparisons are C-level and cannot be counted here
+[10.1s]   image framing: FiniteOrderedSets.ParentMethods (the same implementation, already counted)
+[16.4s] 
+[16.4s] --- window 0: 100 transports ---
+[16.4s]     transport   mean    35.15 ms  median    31.58 ms  max   264.29 ms
+[16.4s]     comparisons     100  (1.0 per call, 195.3 us each)
+[16.4s]       FiniteOrderedSets.ParentMethods.__eq__  from lattices.py:3976 subobject_on                  other=FiniteOrderedSets.parent_class    100 comparisons,    195.3 us each
+[16.5s]     live objects 665523, rss 492 MiB, load 9.30 on 4 cores
+[21.0s]   200 transports, mean 28.51 ms, last 28.69 ms, rss 518 MiB
+[21.0s] 
+[21.0s] --- window 1: 100 transports ---
+[21.0s]     transport   mean    21.88 ms  median    22.98 ms  max    45.28 ms
+[21.0s]     comparisons     100  (1.0 per call, 101.3 us each)
+[21.0s]       FiniteOrderedSets.ParentMethods.__eq__  from lattices.py:3976 subobject_on                  other=FiniteOrderedSets.parent_class    100 comparisons,    101.3 us each
+[21.1s]     live objects 880530, rss 524 MiB, load 9.03 on 4 cores
+[25.9s] 
+[25.9s] --- window 2: 100 transports ---
+[25.9s]     transport   mean    21.96 ms  median    22.08 ms  max    52.93 ms
+[25.9s]     comparisons     100  (1.0 per call, 47.2 us each)
+[25.9s]       FiniteOrderedSets.ParentMethods.__eq__  from lattices.py:3976 subobject_on                  other=FiniteOrderedSets.parent_class    100 comparisons,     47.2 us each
+[26.1s]     live objects 1097108, rss 554 MiB, load 9.11 on 4 cores
+[32.1s]   400 transports, mean 26.61 ms, last 10.89 ms, rss 575 MiB
+[32.1s] 
+[32.1s] --- window 3: 100 transports ---
+[32.1s]     transport   mean    27.44 ms  median    26.45 ms  max    57.46 ms
+[32.1s]     comparisons     100  (1.0 per call, 138.2 us each)
+[32.1s]       FiniteOrderedSets.ParentMethods.__eq__  from lattices.py:3976 subobject_on                  other=FiniteOrderedSets.parent_class    100 comparisons,    138.2 us each
+[32.2s]     live objects 1313867, rss 584 MiB, load 9.02 on 4 cores
+[37.6s] 
+[37.6s] --- window 4: 100 transports ---
+[37.6s]     transport   mean    32.87 ms  median    25.03 ms  max   990.76 ms
+[37.6s]     comparisons     100  (1.0 per call, 53.3 us each)
+[37.6s]       FiniteOrderedSets.ParentMethods.__eq__  from lattices.py:3976 subobject_on                  other=FiniteOrderedSets.parent_class    100 comparisons,     53.3 us each
+[37.7s]     live objects 1531326, rss 609 MiB, load 8.79 on 4 cores
+[41.9s]   600 transports, mean 26.96 ms, last 29.05 ms, rss 630 MiB
+[41.9s] 
+[41.9s] --- window 5: 100 transports ---
+[41.9s]     transport   mean    22.46 ms  median    23.88 ms  max    49.22 ms
+[41.9s]     comparisons     100  (1.0 per call, 81.4 us each)
+[41.9s]       FiniteOrderedSets.ParentMethods.__eq__  from lattices.py:3976 subobject_on                  other=FiniteOrderedSets.parent_class    100 comparisons,     81.4 us each
+[42.1s]     live objects 1746845, rss 642 MiB, load 8.79 on 4 cores
+[42.1s] 
+[42.1s] === one transport, by window of 100 calls ===
+[42.1s] window  calls   mean ms   median  comparisons  per call  us each   built    cpu ms
+[42.1s]      0    100     35.15    31.58          100       1.0    195.3        100     14.89
+[42.1s]      1    100     21.88    22.98          100       1.0    101.3        200     12.20
+[42.1s]      2    100     21.96    22.08          100       1.0     47.2        300     12.05
+[42.1s]      3    100     27.44    26.45          100       1.0    138.2        400     12.35
+[42.1s]      4    100     32.87    25.03          100       1.0     53.3        500     16.51
+[42.1s]      5    100     22.46    23.88          100       1.0     81.4        600     12.16
+[42.1s]   window 0: 35.15 ms per transport; window 5: 22.46 ms; ratio 0.64 over 500 transports
+[42.1s]   process time per transport: window 0 14.89 ms; window 5 12.16 ms; ratio 0.82
+[42.1s]   the timed call is the library's own transport_isotropic_object; its two statements were split on T_Co by probe M and that split is not repeated here
+[42.1s] 
+[42.1s] === comparisons, count per call and microseconds each, by window ===
+[42.1s]   FiniteOrderedSets.ParentMethods.__eq__   other=FiniteOrderedSets.parent_class
+[42.1s]     called from lattices.py:3976 subobject_on
+[42.1s]     per call :     1.0     1.0     1.0     1.0     1.0     1.0
+[42.1s]     us each  :   195.3   101.3    47.2   138.2    53.3    81.4
+[42.1s]     window 0: 100 comparisons (1.0 per call); window 5: 100 (1.0 per call); ratio 1.00
+[42.1s]   (windows 0 1 2 3 4 5)
+[42.1s] 
+[42.1s] 
+[42.1s] === who hashes a finite ordered set, and how large the set is ===
+[42.1s]   set_categories.py:1504 _finite_product                        3534 calls,     23.1 us each, cardinalities [1, 2, 5]
+[42.1s]   lattices.py:3976 subobject_on                                 1778 calls,     86.6 us each, cardinalities [1]
+[42.1s]   total 5312 hashes, 0.24 s of the run
+[42.1s] === the accumulation ===
+[42.9s]   primitive_isotropic_subobject cache entries: 1179
+[42.9s]   _lattice_subobject_spanning cache entries: 1187
+[43.0s]   distinct hash values among those keys: 1187 -> [-9203165336194487033, -9158925068205045261, -9152005366327436265, -9133538334537349303, -9109542084643866829, -9101371433916024217]
+[43.0s]   distinct cardinalities of the cached bases: [1, 2, 3, 4, 5]
+[43.0s]   a dict lookup on these keys compares the stored keys one by one whenever their hashes agree, which is why the comparison count grows
+[43.0s]   distinct transported subobjects: 599
+[43.0s]   subobjects retained by the probe: 600
+[43.0s]   600 transports in 32.0 s, mean 53.34 ms
+[43.0s]   peak VmHWM 642 MiB
+[43.0s] PROBE S DONE
+[peakrss] probe531scanb: child waited=0 shell_code=0 samples=26
+[peakrss] peak tree RSS      : 654 MiB
+[peakrss] low-water MemAvail : 9381 MiB
+[peakrss] peak single VmHWM  : 654 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      643 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=    48.1s procs=  3 rss=   654 MiB hwm=   654 MiB avail=  9727 MiB
+[peakrss]   t=    50.1s procs=  3 rss=   654 MiB hwm=   654 MiB avail=  9475 MiB
+[peakrss]   t=    46.1s procs=  3 rss=   640 MiB hwm=   640 MiB avail=  9625 MiB
+[peakrss]   t=    44.1s procs=  3 rss=   631 MiB hwm=   631 MiB avail=  9496 MiB
+[peakrss]   t=    42.1s procs=  3 rss=   620 MiB hwm=   630 MiB avail=  9627 MiB
+launcher exit: 0
