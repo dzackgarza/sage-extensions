@@ -1,0 +1,113 @@
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt540red
+tree SHA: 1bbe9a9091f81626e137b67ea3c38da8f111c3ae
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+tests: tests/divisors/test_toric_class_groups.sage
+extra: -q --no-header -p no:cacheprovider --tb=line
+FFFF...F                                                                 [100%]
+=================================== FAILURES ===================================
+E   KeyError: ((2-dimensional cone with rays {[1], [0]}, 2-dimensional cone with rays {-[0], [1]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {[1]}, 2-dimensional cone with rays {[1], [0]}, 2-dimensional cone with rays {-[0], [1]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {[1]}, 2-dimensional cone with rays {[1], [0]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {[1]}, 2-dimensional cone with rays {[1], [0]}, Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   ValueError: the whole-algebra map for Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring -> Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring has different endpoints Multivariate Polynomial Ring in s0, s1 over Rational Field -> Multivariate Polynomial Ring in s0, s1 over Rational Field
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+/repos/sage-extensions/src/sage_extensions/categories/algebras/algebras.py:4645: ValueError: the whole-algebra map for Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring -> Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring has different endpoints Multivariate Polynomial Ring in s0, s1 over Rational Field -> Multivariate Polynomial Ring in s0, s1 over Rational Field
+E   KeyError: ((2-dimensional cone with rays {-[0] - [1], [1]}, 2-dimensional cone with rays {-[0] - [1], [0]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {-[0] - [1]}, 2-dimensional cone with rays {-[0] - [1], [1]}, 2-dimensional cone with rays {-[0] - [1], [0]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {-[0] - [1]}, 2-dimensional cone with rays {-[0] - [1], [1]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {-[0] - [1]}, 2-dimensional cone with rays {-[0] - [1], [1]}, Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   ValueError: the whole-algebra map for Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring -> Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring has different endpoints Multivariate Polynomial Ring in s0, s1 over Rational Field -> Multivariate Polynomial Ring in s0, s1 over Rational Field
+/repos/sage-extensions/src/sage_extensions/categories/algebras/algebras.py:4645: ValueError: the whole-algebra map for Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring -> Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring has different endpoints Multivariate Polynomial Ring in s0, s1 over Rational Field -> Multivariate Polynomial Ring in s0, s1 over Rational Field
+E   KeyError: ((2-dimensional cone with rays {-[0] - [1], [1]}, 2-dimensional cone with rays {-[0] - [1], [0]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {-[0] - [1]}, 2-dimensional cone with rays {-[0] - [1], [1]}, 2-dimensional cone with rays {-[0] - [1], [0]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {-[0] - [1]}, 2-dimensional cone with rays {-[0] - [1], [1]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {-[0] - [1]}, 2-dimensional cone with rays {-[0] - [1], [1]}, Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   ValueError: the whole-algebra map for Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring -> Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring has different endpoints Multivariate Polynomial Ring in s0, s1 over Rational Field -> Multivariate Polynomial Ring in s0, s1 over Rational Field
+/repos/sage-extensions/src/sage_extensions/categories/algebras/algebras.py:4645: ValueError: the whole-algebra map for Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring -> Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring has different endpoints Multivariate Polynomial Ring in s0, s1 over Rational Field -> Multivariate Polynomial Ring in s0, s1 over Rational Field
+E   KeyError: ((2-dimensional cone with rays {-[0] - [1], [1]}, 2-dimensional cone with rays {-[0] - [1], [0]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {-[0] - [1]}, 2-dimensional cone with rays {-[0] - [1], [1]}, 2-dimensional cone with rays {-[0] - [1], [0]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {-[0] - [1]}, 2-dimensional cone with rays {-[0] - [1], [1]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {-[0] - [1]}, 2-dimensional cone with rays {-[0] - [1], [1]}, Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   ValueError: the whole-algebra map for Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring -> Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring has different endpoints Multivariate Polynomial Ring in s0, s1 over Rational Field -> Multivariate Polynomial Ring in s0, s1 over Rational Field
+/repos/sage-extensions/src/sage_extensions/categories/algebras/algebras.py:4645: ValueError: the whole-algebra map for Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring -> Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring has different endpoints Multivariate Polynomial Ring in s0, s1 over Rational Field -> Multivariate Polynomial Ring in s0, s1 over Rational Field
+E   KeyError: ((2-dimensional cone with rays {[1], [0]}, 2-dimensional cone with rays {-[0], [1]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {[1]}, 2-dimensional cone with rays {[1], [0]}, 2-dimensional cone with rays {-[0], [1]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {[1]}, 2-dimensional cone with rays {[1], [0]}, Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   KeyError: ((1-dimensional cone with rays {[1]}, 2-dimensional cone with rays {[1], [0]}, Spectrum of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring), ())
+
+During handling of the above exception, another exception occurred:
+E   ValueError: the whole-algebra map for Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring -> Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring has different endpoints Multivariate Polynomial Ring in s0, s1 over Rational Field -> Multivariate Polynomial Ring in s0, s1 over Rational Field
+/repos/sage-extensions/src/sage_extensions/categories/algebras/algebras.py:4645: ValueError: the whole-algebra map for Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring -> Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring has different endpoints Multivariate Polynomial Ring in s0, s1 over Rational Field -> Multivariate Polynomial Ring in s0, s1 over Rational Field
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+0.56s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_hirzebruch_surface_survives_a_polynomial_ring_built_first
+0.15s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_affine_plane_is_trivial
+0.14s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_cone_has_order_two
+0.12s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_cone_is_torsion
+0.10s call     tests/divisors/test_toric_class_groups.sage::test_the_three_torus_invariant_lines_of_the_plane_share_one_nonzero_class
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_hirzebruch_surface_survives_a_polynomial_ring_built_first
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_hirzebruch_surface_survives_a_polynomial_ring_built_first
+0.00s call     tests/divisors/test_toric_class_groups.sage::test_the_boundary_is_three_lines_and_the_canonical_class_is_minus_three_lines
+0.00s call     tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_surface_is_free
+0.00s call     tests/divisors/test_toric_class_groups.sage::test_the_torus_invariant_weil_divisors_of_the_plane_are_free_on_its_three_rays
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_boundary_is_three_lines_and_the_canonical_class_is_minus_three_lines
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_three_torus_invariant_lines_of_the_plane_share_one_nonzero_class
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_cone_has_order_two
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_cone_is_torsion
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_surface_is_free
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_torus_invariant_weil_divisors_of_the_plane_are_free_on_its_three_rays
+0.00s setup    tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_affine_plane_is_trivial
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_three_torus_invariant_lines_of_the_plane_share_one_nonzero_class
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_cone_has_order_two
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_affine_plane_is_trivial
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_torus_invariant_weil_divisors_of_the_plane_are_free_on_its_three_rays
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_cone_is_torsion
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_surface_is_free
+0.00s teardown tests/divisors/test_toric_class_groups.sage::test_the_boundary_is_three_lines_and_the_canonical_class_is_minus_three_lines
+=========================== short test summary info ============================
+FAILED tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_hirzebruch_surface_survives_a_polynomial_ring_built_first
+FAILED tests/divisors/test_toric_class_groups.sage::test_the_three_torus_invariant_lines_of_the_plane_share_one_nonzero_class
+FAILED tests/divisors/test_toric_class_groups.sage::test_the_boundary_is_three_lines_and_the_canonical_class_is_minus_three_lines
+FAILED tests/divisors/test_toric_class_groups.sage::test_the_torus_invariant_weil_divisors_of_the_plane_are_free_on_its_three_rays
+FAILED tests/divisors/test_toric_class_groups.sage::test_the_class_group_of_the_quadric_surface_is_free
+5 failed, 3 passed in 1.66s
