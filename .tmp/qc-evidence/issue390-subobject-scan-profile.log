@@ -1,0 +1,169 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt390q/.tmp/qc-evidence/issue390-subobject-scan.py
+tree SHA: cef9c5d4540ee5552ea5bc887001c2f222230cb6
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 560 s, outer 620 s, guard 4096 MiB, args 'n=420 window=100 profile'
+[0.0s] probe S: which equality scans the subobjects built before (#390)
+[0.0s] n=420, window=100, pool=40, seed=20261115, python 3.14.10
+[0.0s] load 2.82 on 4 cores
+[4.1s] lattice Integral lattice of rank 5 and signature (2, 3), rank 5, signature (2, 3)
+[4.1s] isometries to move by: 40 words of length three in O(L)'s generators
+[4.1s] equality counted on:
+[4.1s]   lattice: no Python __eq__ on OwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType; its comparisons are C-level and cannot be counted here
+[4.1s]   lattice framing: sage_extensions.categories.sets.finite_ordered_sets.FiniteOrderedSets.ParentMethods
+[4.1s]   subobject: no Python __eq__ on OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType; its comparisons are C-level and cannot be counted here
+[4.1s]   subobject framing: FiniteOrderedSets.ParentMethods (the same implementation, already counted)
+[4.1s]   subobject domain: no Python __eq__ on OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType; its comparisons are C-level and cannot be counted here
+[4.1s]   image: no Python __eq__ on OwnedOwnedJoinCategory.parent_class[_SparseFreeModuleParent].ObjectType; its comparisons are C-level and cannot be counted here
+[4.1s]   image framing: FiniteOrderedSets.ParentMethods (the same implementation, already counted)
+[4.1s] profiled windows begin at calls [101, 301], 100 calls each
+[8.3s] 
+[8.3s] --- window 0: 100 transports ---
+[8.3s]     transport   mean    22.52 ms  median    22.68 ms  max    35.49 ms
+[8.3s]     comparisons   51612  (516.1 per call, 43.3 us each)
+[8.3s]       FiniteOrderedSets.ParentMethods.__eq__  from lattices.py:3976 subobject_on                  other=FiniteOrderedSets.parent_class  51612 comparisons,     43.3 us each
+[8.4s]     live objects 676809, rss 494 MiB, load 2.69 on 4 cores
+[32.5s]   200 transports, mean 78.79 ms, last 60.99 ms, rss 519 MiB
+[32.5s] 
+[32.5s] --- window 1: 100 transports ---
+[32.5s]     transport   mean   135.06 ms  median   140.79 ms  max   180.49 ms
+[32.5s]     comparisons  147585  (1475.8 per call, 131.6 us each)
+[32.5s]       FiniteOrderedSets.ParentMethods.__eq__  from lattices.py:3976 subobject_on                  other=FiniteOrderedSets.parent_class 147585 comparisons,    131.6 us each
+[32.6s]     live objects 892169, rss 526 MiB, load 2.45 on 4 cores
+[45.4s] 
+[45.4s] --- window 2: 100 transports ---
+[45.4s]     transport   mean    72.47 ms  median    72.85 ms  max    85.74 ms
+[45.4s]     comparisons  244349  (2443.5 per call, 43.0 us each)
+[45.4s]       FiniteOrderedSets.ParentMethods.__eq__  from lattices.py:3976 subobject_on                  other=FiniteOrderedSets.parent_class 244349 comparisons,     43.0 us each
+[45.4s]     live objects 1108477, rss 554 MiB, load 2.38 on 4 cores
+[96.3s]   400 transports, mean 130.19 ms, last 111.51 ms, rss 576 MiB
+[96.3s] 
+[96.3s] --- window 3: 100 transports ---
+[96.3s]     transport   mean   290.73 ms  median   295.72 ms  max   341.19 ms
+[96.3s]     comparisons  342744  (3427.4 per call, 132.5 us each)
+[96.3s]       FiniteOrderedSets.ParentMethods.__eq__  from lattices.py:3976 subobject_on                  other=FiniteOrderedSets.parent_class 342744 comparisons,    132.5 us each
+[96.4s]     live objects 1326246, rss 586 MiB, load 2.31 on 4 cores
+[100.4s] 
+[100.4s] --- window 4: 20 transports ---
+[100.4s]     transport   mean   114.61 ms  median   115.15 ms  max   117.47 ms
+[100.4s]     comparisons   81180  (4059.0 per call, 43.1 us each)
+[100.4s]       FiniteOrderedSets.ParentMethods.__eq__  from lattices.py:3976 subobject_on                  other=FiniteOrderedSets.parent_class  81180 comparisons,     43.1 us each
+[100.4s]     live objects 1370427, rss 591 MiB, load 2.29 on 4 cores
+[100.4s] 
+[100.4s] === one transport, by window of 100 calls ===
+[100.4s] window  calls   mean ms   median  comparisons  per call  us each   built
+[100.4s]      0    100     22.52    22.68        51612     516.1     43.3        100
+[100.4s]      1    100    135.06   140.79       147585    1475.8    131.6        200
+[100.4s]      2    100     72.47    72.85       244349    2443.5     43.0        300
+[100.4s]      3    100    290.73   295.72       342744    3427.4    132.5        400
+[100.4s]      4     20    114.61   115.15        81180    4059.0     43.1        500
+[100.4s]   window 0: 22.52 ms per transport; window 4: 114.61 ms; ratio 5.09 over 400 transports
+[100.4s]   the timed call is the library's own transport_isotropic_object; its two statements were split on T_Co by probe M and that split is not repeated here
+[100.4s] 
+[100.4s] === comparisons, count per call and microseconds each, by window ===
+[100.4s]   FiniteOrderedSets.ParentMethods.__eq__   other=FiniteOrderedSets.parent_class
+[100.4s]     called from lattices.py:3976 subobject_on
+[100.4s]     per call :   516.1  1475.8  2443.5  3427.4   811.8
+[100.4s]     us each  :    43.3   131.6    43.0   132.5    43.1
+[100.4s]     window 0: 51612 comparisons (516.1 per call); window 4: 81180 (811.8 per call); ratio 1.57
+[100.4s]   (windows 0 1 2 3 4)
+[100.4s] 
+[100.4s] === the accumulation ===
+[100.7s]   primitive_isotropic_subobject cache entries: 827
+[100.7s]   _lattice_subobject_spanning cache entries: 835
+[100.7s]   distinct hash values among those keys: 5 -> [1, 2, 3, 4, 5]
+[100.7s]   distinct cardinalities of the cached bases: [1, 2, 3, 4, 5]
+[100.7s]   a dict lookup on these keys compares the stored keys one by one whenever their hashes agree, which is why the comparison count grows
+[100.7s]   distinct transported subobjects: 419
+[100.7s]   subobjects retained by the probe: 420
+[100.7s]   420 transports in 96.3 s, mean 229.26 ms
+[100.7s]   peak VmHWM 602 MiB
+[100.7s] 
+[100.7s] === two profiled windows ===
+[100.7s]   window at call 101: 23.93 s self time over 100 calls
+[100.7s]   window at call 301: 50.52 s self time over 100 calls
+[100.7s] 
+[100.7s]   growth of cumulative time per call
+[100.7s]     function                                                       early      late    growth
+[100.7s]     subobject_on (lattices.py:3972)                               210.00    476.15    266.16
+[100.7s]     counted (probe.py:130)                                        197.16    461.07    263.91
+[100.7s]     __eq__ (finite_ordered_sets.py:578)                           192.35    449.88    257.52
+[100.7s]     primitive_isotropic_subobject (lattices.py:9411)              155.96    319.35    163.39
+[100.7s]     transport_isotropic_object (lattice_morphisms.py:1978)        134.45    289.61    155.16
+[100.7s]     conjunction (logic.py:153)                                     99.34    230.65    131.31
+[100.7s]     <genexpr> (finite_ordered_sets.py:601)                         97.48    228.63    131.15
+[100.7s]     image (module_morphisms.py:1550)                               81.54    185.05    103.50
+[100.7s]     <genexpr> (finite_ordered_sets.py:177)                         65.90    152.88     86.97
+[100.7s]     cardinality (set_categories.py:2469)                           61.08    140.40     79.32
+[100.7s]     <lambda> (finite_ordered_sets.py:406)                          57.88    134.52     76.63
+[100.7s]     __call__ (mor_categories.py:1648)                              58.14    132.42     74.28
+[100.7s]     __call__ (set_categories.py:777)                               56.55    128.15     71.60
+[100.7s]     cardinal (cardinals.py:1814)                                   48.04    109.80     61.76
+[100.7s] 
+[100.7s]   the callers of FiniteOrderedSets.__eq__, window at call 101:
+[100.7s]     __eq__ at finite_ordered_sets.py:578: 145596 calls
+[100.7s]       called by counted (probe.py:130): 145596 call(s)
+[100.7s]         itself called by subobject_on (lattices.py:3972): 145596 call(s)
+[100.7s] 
+[100.7s]   the callers of FiniteOrderedSets.__eq__, window at call 301:
+[100.7s]     __eq__ at finite_ordered_sets.py:578: 338790 calls
+[100.7s]       called by counted (probe.py:130): 338790 call(s)
+[100.7s]         itself called by subobject_on (lattices.py:3972): 338790 call(s)
+[100.7s] 
+[100.7s]   raw cumulative view, window at call 101:
+[100.7s]              69977148 function calls (69209518 primitive calls) in 23.930 seconds
+[100.7s]        Ordered by: cumulative time
+[100.7s]        List reduced from 819 to 16 due to restriction <16>
+[100.7s]        ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+[100.7s]           292    0.067    0.000   21.000    0.072 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:3972(subobject_on)
+[100.7s]        145596    0.346    0.000   19.716    0.000 /probe.py:130(counted)
+[100.7s]        145596    0.618    0.000   19.235    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:578(__eq__)
+[100.7s]           193    0.002    0.000   15.596    0.081 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:9411(primitive_isotropic_subobject)
+[100.7s]            99    0.003    0.000   13.445    0.136 /repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:1978(transport_isotropic_object)
+[100.7s]     293033/147531    0.077    0.000    9.934    0.000 /repos/sage-extensions/src/sage_extensions/logic.py:153(conjunction)
+[100.7s]        291192    0.113    0.000    9.748    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:601(<genexpr>)
+[100.7s]            99    0.001    0.000    8.154    0.082 /repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1550(image)
+[100.7s]     1183118/890763    0.255    0.000    6.590    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:177(<genexpr>)
+[100.7s]        596493    0.322    0.000    6.108    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:2469(cardinality)
+[100.7s]        300372    0.178    0.000    5.814    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:1648(__call__)
+[100.7s]        291771    0.148    0.000    5.788    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:406(<lambda>)
+[100.7s]     302317/300174    1.180    0.000    5.655    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:777(__call__)
+[100.7s]       1793240    0.892    0.000    4.804    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/cardinals.py:1814(cardinal)
+[100.7s]       1485435    0.416    0.000    4.588    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:73(cardinal)
+[100.7s]     588664/296893    0.664    0.000    4.141    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:152(__iter__)
+[100.7s] 
+[100.7s]   raw cumulative view, window at call 301:
+[100.7s]              148509634 function calls (146775658 primitive calls) in 50.519 seconds
+[100.7s]        Ordered by: cumulative time
+[100.7s]        List reduced from 817 to 16 due to restriction <16>
+[100.7s]        ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+[100.7s]           294    0.159    0.001   47.615    0.162 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:3972(subobject_on)
+[100.7s]        338790    0.805    0.000   46.107    0.000 /probe.py:130(counted)
+[100.7s]        338790    1.446    0.000   44.988    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:578(__eq__)
+[100.7s]           195    0.002    0.000   31.935    0.164 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:9411(primitive_isotropic_subobject)
+[100.7s]            99    0.004    0.000   28.961    0.293 /repos/sage-extensions/src/sage_extensions/categories/lattice_morphisms.py:1978(transport_isotropic_object)
+[100.7s]     679437/340743    0.177    0.000   23.065    0.000 /repos/sage-extensions/src/sage_extensions/logic.py:153(conjunction)
+[100.7s]        677580    0.262    0.000   22.863    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:601(<genexpr>)
+[100.7s]            99    0.001    0.000   18.505    0.187 /repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1550(image)
+[100.7s]     2728854/2050101    0.592    0.000   15.288    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:177(<genexpr>)
+[100.7s]       1369407    0.742    0.000   14.040    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:2469(cardinality)
+[100.7s]        678165    0.348    0.000   13.452    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:406(<lambda>)
+[100.7s]        686850    0.406    0.000   13.242    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:1648(__call__)
+[100.7s]     688809/686652    2.680    0.000   12.815    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:777(__call__)
+[100.7s]       4112022    2.038    0.000   10.980    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/cardinals.py:1814(cardinal)
+[100.7s]       3417663    0.949    0.000   10.521    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:73(cardinal)
+[100.7s]     1361502/683337    1.531    0.000    9.573    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:152(__iter__)
+[100.7s] PROBE S DONE
+[peakrss] probe390s-profile: child waited=0 shell_code=0 samples=52
+[peakrss] peak tree RSS      : 602 MiB
+[peakrss] low-water MemAvail : 12900 MiB
+[peakrss] peak single VmHWM  : 612 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      601 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   102.1s procs=  3 rss=   602 MiB hwm=   612 MiB avail= 12900 MiB
+[peakrss]   t=   100.1s procs=  3 rss=   599 MiB hwm=   599 MiB avail= 12917 MiB
+[peakrss]   t=    98.0s procs=  3 rss=   596 MiB hwm=   596 MiB avail= 12915 MiB
+[peakrss]   t=    94.0s procs=  3 rss=   585 MiB hwm=   585 MiB avail= 12931 MiB
+[peakrss]   t=    96.0s procs=  3 rss=   585 MiB hwm=   585 MiB avail= 12923 MiB
+launcher exit: 0

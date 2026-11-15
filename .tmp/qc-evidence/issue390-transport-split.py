@@ -80,12 +80,22 @@ method it times.
     sage -python <this file> detail=span  # also split subobject_on itself into
                                           # its span basis and its subobject
                                           # construction
+    sage -python <this file> detail=basis # also split the sublattice
+                                          # construction into its five steps
+    sage -python <this file> coercion     # also census the coercion and action
+                                          # containers of the ambient lattice,
+                                          # its free module and its base ring
+    sage -python <this file> profile      # also profile one early and one late
+                                          # window of 40 calls and compare them
     sage -python <this file> smoke        # U + U(2) + <-2>, whose Otilde row
                                           # returns 2 planes: the check that
                                           # the split and the windows work
 """
 
+import cProfile
 import gc
+import os
+import pstats
 import sys
 import threading
 import time
@@ -108,6 +118,16 @@ def _now():
 
 def log(message=""):
     print(f"[{_now() - START:.1f}s] {message}", flush=True)
+
+
+def _load():
+    """The machine's one-minute load and its core count: the row shares the VM."""
+    try:
+        with open("/proc/loadavg") as handle:
+            load = float(handle.read().split()[0])
+    except OSError:
+        load = float("nan")
+    return load, os.cpu_count()
 
 
 def _status_mib(field):
@@ -149,6 +169,7 @@ COUNTERS = {}     # window -> Counter of object types
 CACHES = {}       # window -> {(owner, name): [owners, entries]}
 CLASS_CACHES = {}  # window -> {class name: entries}
 RSS = {}          # window -> VmRSS in MiB
+LOADS = {}        # window -> (load average 1 min, cores)
 GC_ROWS = {}      # window -> [collections, seconds]
 _LOCK = threading.Lock()
 
@@ -273,6 +294,346 @@ def wrap_step(instance_or_class, name, label, *, cached=None, into_steps=None, f
     return klass
 
 
+# ------------------------- the sublattice construction, split (detail=basis)
+
+# The call graph inside ``_lattice_subobject_spanning``, parent first.  The
+# report subtracts a parent's children from it to get the parent's own time:
+# ``_lattice_subobject_spanning`` is the whole construction,
+# ``_lattice_object`` is one of its children and
+# ``_form_module_from_bilinear_computation`` one of ``_lattice_object``'s, whose
+# own children are the inclusion and the parent construction.
+BASIS_LABELS = (
+    "span construction",
+    "ctor data",
+    "fresh module",
+    "gram tensor",
+    "lattice object",
+    "form module",
+    "inclusion",
+    "module with structure",
+)
+BASIS_CHILDREN = {
+    "span construction": ("ctor data", "fresh module", "gram tensor", "lattice object"),
+    "lattice object": ("form module",),
+    "form module": ("inclusion", "module with structure"),
+}
+BASIS_INNER = ("span construction", "lattice object", "form module")
+
+# What the coercion census reads on each parent: ``Parent._introspect_coerce``
+# is the coercion model's own debugging view of those containers, and it hands
+# back the live objects, so a length is a length now and not a copy.
+COERCION_KEYS = (
+    "_coerce_from_list",
+    "_convert_from_list",
+    "_action_list",
+    "_coerce_from_hash",
+    "_convert_from_hash",
+    "_embedding",
+)
+COERCION_TARGETS = []
+COERCION_ROWS = {}     # window -> {target: {key: length}}
+REGISTRATIONS = {}     # window -> {target: {call: count}}
+LAST_PLANE = []        # the most recently transported plane, for the census
+
+FRAMES = []
+
+
+class _Nest:
+    """Open a construction frame; the innermost finished frame charges its time.
+
+    A construction step calls another, so a call's own cost is its wall time
+    with the time of every frame opened inside it subtracted -- the same
+    accounting probe J used for the row's stages, here inside one step.
+    """
+
+    def __init__(self, label):
+        self.label = label
+
+    def __enter__(self):
+        self.begin = _now()
+        self.children = 0.0
+        self.opened = 0
+        FRAMES.append(self)
+        return self
+
+    def __exit__(self, *exception):
+        elapsed = _now() - self.begin
+        FRAMES.pop()
+        if STATE.get("in_transport"):
+            add(STATE["window"], self.label, elapsed)
+            add(STATE["window"], self.label + " own", elapsed - self.children)
+        if FRAMES:
+            FRAMES[-1].opened += 1
+            if STATE.get("in_transport"):
+                FRAMES[-1].children += elapsed
+        if (
+            STATE.get("trace")
+            and STATE.get("in_transport")
+            and self.label.startswith(STATE["trace"][0])
+            and STATE["trace"][1] < 8
+        ):
+            STATE["trace"][1] += 1
+            log(
+                f"    trace {self.label}: {1000 * elapsed:.2f} ms, "
+                f"{self.opened} child frame(s), {1000 * self.children:.2f} ms in them, "
+                f"caller {STATE['trace'][2]}"
+            )
+        return False
+
+
+def needs_transport_flag():
+    return any(
+        STATE.get(key)
+        for key in ("detail_image", "detail_span", "detail_basis", "profile")
+    )
+
+
+def wrap_function(namespace, name, label):
+    """Wrap a module-level function, recording only calls made in the transport."""
+    original = getattr(namespace, name)
+
+    def timed(*args, __original=original, __label=label, **kwargs):
+        # Outside the transport this function is the library's own, untouched:
+        # the row's setup calls ``tensor`` and the constructors constantly, and
+        # a frame per call there would change the tree it is measuring.
+        if not STATE.get("in_transport"):
+            return __original(*args, **kwargs)
+        if STATE.get("trace"):
+            caller = sys._getframe(1).f_code.co_name
+            STATE["trace"][2] = caller
+        with _Nest(__label):
+            return __original(*args, **kwargs)
+
+    setattr(namespace, name, timed)
+    STATE["patched"].append(
+        f"{label}: {name} in {getattr(namespace, '__name__', '?')} (function)"
+    )
+
+
+def wrap_method_gated(instance, name, label):
+    """Wrap a plain method on the class ``instance`` resolves it on."""
+    klass = (
+        next(k for k in instance.__mro__ if name in vars(k))
+        if isinstance(instance, type)
+        else _resolving_class(instance, name)
+    )
+    original = vars(klass)[name]
+
+    def timed(self, *args, __original=original, __label=label, **kwargs):
+        function = (
+            __original.__get__(self, type(self)) if hasattr(__original, "__get__") else __original
+        )
+        if not STATE.get("in_transport"):
+            return function(*args, **kwargs)
+        with _Nest(__label):
+            return function(*args, **kwargs)
+
+    setattr(klass, name, timed)
+    STATE["patched"].append(
+        f"{label}: {name} on {klass.__module__}.{klass.__qualname__} ({type(original).__name__})"
+    )
+
+
+def install_constructor_split(lattice, ring):
+    """Split ``_lattice_subobject_spanning`` into the steps it takes."""
+    import sage_extensions.categories.lattices as lattice_module
+    import sage_extensions.categories.modules.framed.formed.form_modules as form_modules
+
+    wrap_function(lattice_module, "_span_basis_elements", "span basis")
+    wrap_function(lattice_module, "_lattice_subobject_spanning", "span construction")
+    wrap_function(lattice_module, "_module_subobject_constructor_data", "ctor data")
+    wrap_function(lattice_module, "tensor", "gram tensor")
+    wrap_method_gated(ring, "_fresh_free_module_on", "fresh module")
+    wrap_function(
+        form_modules, "_form_module_from_bilinear_computation", "form module"
+    )
+    # ``_lattice_object`` is handed the source module, and it is that module's
+    # own ``Emb`` and ``_module_with_structure`` that build the inclusion and
+    # the parent: both are patched the first time it is reached.
+    original_object = lattice_module._lattice_object
+
+    def timed_lattice_object(*args, __original=original_object, **kwargs):
+        if not STATE.get("in_transport"):
+            return __original(*args, **kwargs)
+        module = args[1] if len(args) > 1 else kwargs.get("module")
+        if module is not None and not STATE.get("lattice_inner_wrapped"):
+            STATE["lattice_inner_wrapped"] = True
+            try:
+                # ``source.Emb(module)`` is reached through the subobject
+                # construction's own ``inclusion`` call, and that is where it
+                # is timed: the class carrying ``Emb`` only exists once the
+                # subobject has been built.
+                from sage_extensions.categories.modules.pure.modules import (
+                    ModuleSubobjectConstruction,
+                )
+
+                wrap_method_gated(ModuleSubobjectConstruction, "inclusion", "inclusion")
+            except Exception as failure:  # pragma: no cover - reporting only
+                log(f"  inclusion not wrapped: {failure!r}")
+            try:
+                wrap_method_gated(module, "_module_with_structure", "module with structure")
+            except Exception as failure:  # pragma: no cover - reporting only
+                log(f"  _module_with_structure not wrapped: {failure!r}")
+        with _Nest("lattice object"):
+            return __original(*args, **kwargs)
+
+    lattice_module._lattice_object = timed_lattice_object
+    STATE["patched"].append(
+        "lattice object: _lattice_object in sage_extensions.categories.lattices (function)"
+    )
+    log("the sublattice construction is split; labels: " + ", ".join(BASIS_LABELS))
+
+
+def install_coercion(lattice):
+    """Census the coercion and action containers of the parents a plane touches."""
+    free = lattice.unformed_module()
+    ring = lattice.base_ring()
+    COERCION_TARGETS.extend(
+        (("ambient lattice", lattice), ("its free module", free), ("base ring", ring))
+    )
+    for label, parent in COERCION_TARGETS:
+        try:
+            containers = parent._introspect_coerce()
+        except Exception as failure:  # pragma: no cover - reporting only
+            log(f"  {label}: no coercion census ({failure!r})")
+            continue
+        log(
+            f"  {label}: "
+            + ", ".join(
+                f"{key.lstrip('_')} {0 if containers[key] is None else len(containers[key])}"
+                for key in COERCION_KEYS
+            )
+        )
+    # Who *registers* a map on each of them: the registration calls are the
+    # only way an entry appears, and ``self`` names the parent it appears on.
+    for label, parent in COERCION_TARGETS:
+        klass = type(parent)
+        for name in ("register_coercion", "register_embedding", "register_action",
+                     "register_conversion"):
+            original = getattr(klass, name, None)
+            if original is None:
+                continue
+
+            def timed_registration(self, *args, __label=label, __name=name,
+                                   __original=original, **kwargs):
+                outcome = __original(self, *args, **kwargs)
+                if self is parent:
+                    row = REGISTRATIONS.setdefault(STATE["window"], {}).setdefault(
+                        __label, {}
+                    )
+                    row[__name] = row.get(__name, 0) + 1
+                return outcome
+
+            try:
+                setattr(klass, name, timed_registration)
+            except Exception as failure:  # pragma: no cover
+                log(f"  {label}.{name} not counted: {failure!r}")
+    log("coercion census targets: " + ", ".join(label for label, _ in COERCION_TARGETS))
+
+
+def coercion_row():
+    """The containers' lengths, and what the last plane's parent holds."""
+    row = {}
+    for label, parent in COERCION_TARGETS:
+        try:
+            containers = parent._introspect_coerce()
+        except Exception:  # pragma: no cover
+            continue
+        row[label] = {
+            key: (0 if containers[key] is None else len(containers[key]))
+            for key in COERCION_KEYS
+        }
+    if LAST_PLANE:
+        plane = LAST_PLANE[-1]
+        try:
+            containers = plane._introspect_coerce()
+            row["the last plane"] = {
+                key: (0 if containers[key] is None else len(containers[key]))
+                for key in COERCION_KEYS
+            }
+        except Exception:  # pragma: no cover
+            pass
+    return row
+
+
+# ------------------------------------- who calls the set comparison (profile mode)
+#
+# The profiler names ``FiniteOrderedSets.__eq__`` as the function whose time per
+# call grows and ``subobject_on`` as its caller; the call site inside that
+# function is what a repair has to change, so the comparison counts itself by
+# the file and line of the frame that made the call.
+EQ_CALLS = {}
+
+
+def install_equality_probe():
+    from sage_extensions.categories.sets.finite_ordered_sets import (
+        FiniteOrderedSets,
+    )
+
+    from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+
+    instance = finite_ordered_set((0, 1))
+    candidates = [
+        klass
+        for klass in type(instance).__mro__
+        if "__eq__" in vars(klass) and hasattr(vars(klass)["__eq__"], "__code__")
+    ]
+    library = [
+        klass
+        for klass in candidates
+        if vars(klass)["__eq__"].__code__.co_filename.endswith("finite_ordered_sets.py")
+    ]
+    if not library:
+        raise RuntimeError(
+            "no Python class on "
+            f"{type(instance).__mro__} defines the library's __eq__ (candidates: {candidates})"
+        )
+    klass = library[0]
+    original = vars(klass)["__eq__"]
+
+    def timed(self, other, __original=original):
+        if STATE.get("in_transport"):
+            frame = sys._getframe(1)
+            site = f"{frame.f_code.co_filename.rsplit('/', 1)[-1]}:{frame.f_lineno} {frame.f_code.co_name}"
+            row = EQ_CALLS.setdefault(STATE["window"], {})
+            row[site] = row.get(site, 0) + 1
+        return __original(self, other)
+
+    setattr(klass, "__eq__", timed)
+    STATE["patched"].append(
+        f"equality: __eq__ on {klass.__module__}.{klass.__qualname__} (counting its call sites)"
+    )
+    log("the set comparison counts its own call sites, by file:line of the caller")
+
+
+# ------------------------------------------------------------------ profiling
+
+PROFILE_SPECS = (("early", 5, 25), ("late", 120, 160))
+PROFILES = {}
+PROFILE_CALLS = {}
+
+
+def profile_hook(planes):
+    """Start or stop a profiler at this plane's boundaries."""
+    if not STATE.get("profile"):
+        return
+    running = STATE.get("_profiling")
+    if running is not None and planes >= running[2]:
+        label, profiler, _stop, start = running
+        profiler.disable()
+        PROFILES[label] = profiler
+        PROFILE_CALLS[label] = planes - start
+        STATE["_profiling"] = None
+        log(f"profile {label} closed at plane {planes} ({PROFILE_CALLS[label]} calls)")
+    for label, start, stop in PROFILE_SPECS:
+        if planes == start and label not in PROFILES:
+            profiler = cProfile.Profile()
+            profiler.enable()
+            STATE["_profiling"] = (label, profiler, stop, start)
+            log(f"profile {label} opened at plane {planes}")
+            break
+
+
 # ------------------------------------------------------- the measured table
 
 ORIGINAL_TRANSPORT = None
@@ -303,8 +664,9 @@ def instrumented_transport(self, obj):
         close_window(planes)
         STATE["_window_floor"] = planes
     window = STATE["window"]
+    profile_hook(planes)
 
-    if STATE.get("detail_image") or STATE.get("detail_span"):
+    if needs_transport_flag():
         STATE["in_transport"] = True
     mark = clock()
     product = self * obj.inclusion()
@@ -327,8 +689,13 @@ def instrumented_transport(self, obj):
     finally:
         STATE["in_admission"] = False
     after_admission = clock()
-    if STATE.get("detail_image") or STATE.get("detail_span"):
+    if needs_transport_flag():
         STATE["in_transport"] = False
+    if STATE.get("coercion"):
+        if not LAST_PLANE:
+            LAST_PLANE.append(moved)
+        else:
+            LAST_PLANE[0] = moved
 
     if len(STATE["verified"]) < 3:
         reference = ORIGINAL_TRANSPORT(self, obj)
@@ -475,6 +842,7 @@ def close_window(planes):
     CACHES[window] = caches
     CLASS_CACHES[window] = class_tables
     RSS[window] = _status_mib("VmRSS:")
+    LOADS[window] = _load()
     STATE.setdefault("_window_end", {})[window] = planes
 
     row = WINDOWS.setdefault(window, {})
@@ -494,10 +862,26 @@ def close_window(planes):
         if not cell:
             continue
         log(f"      in a step: {step:<22} n={cell[1]:>6}  {1000 * cell[0] / cell[1]:9.2f} ms")
+    if STATE.get("detail_basis"):
+        for step in BASIS_LABELS:
+            cell = row.get(step)
+            own = row.get(step + " own")
+            if not cell:
+                continue
+            log(
+                f"        construction: {step:<24} n={cell[1]:>6} "
+                f"{1000 * cell[0] / cell[1]:9.2f} ms"
+                + (
+                    f"  own {1000 * own[0] / own[1]:9.2f} ms"
+                    if own and (step,) and own[1] == cell[1]
+                    else ""
+                )
+            )
     log(
         f"    snapshot cost {spent:.1f} s; rss {_status_mib('VmRSS:'):.0f} MiB; "
         f"objects {sum(counts.values())} (previous "
-        f"{sum(COUNTERS[window - 1].values()) if window - 1 in COUNTERS else 0})"
+        f"{sum(COUNTERS[window - 1].values()) if window - 1 in COUNTERS else 0}); "
+        f"load {LOADS[window][0]:.2f} on {LOADS[window][1]} core(s)"
     )
     if window - 1 in COUNTERS:
         top = Counter(
@@ -520,6 +904,28 @@ def close_window(planes):
         log(f"    cache {owner}.{key}: {owners} owner(s), {entries} entrie(s)")
     for label, size in sorted(class_tables.items(), key=lambda pair: -pair[1])[:6]:
         log(f"    class cache {label}: {size}")
+    if STATE.get("profile") and window in EQ_CALLS:
+        top = sorted(EQ_CALLS[window].items(), key=lambda item: -item[1])[:3]
+        log("    set comparisons from: " + ", ".join(f"{site} x{count}" for site, count in top))
+    if STATE.get("coercion"):
+        COERCION_ROWS[window] = coercion_row()
+        log("    coercion census: " + " | ".join(
+            f"{target}: " + " ".join(
+                f"{key.lstrip('_')} {value}" for key, value in containers.items()
+            )
+            for target, containers in COERCION_ROWS[window].items()
+        ))
+        registered = REGISTRATIONS.get(window, {})
+        if registered:
+            log("    registrations on a tracked parent: " + " | ".join(
+                f"{target}: " + " ".join(f"{call} {count}" for call, count in calls.items())
+                for target, calls in registered.items()
+            ))
+        log(
+            f"    live MonoDict objects: {counts.get('MonoDict', 0)}, "
+            f"live parents of the plane's class: "
+            f"{counts.get(type(LAST_PLANE[0]).__name__, 0) if LAST_PLANE else 0}"
+        )
     STATE["window"] = window + 1
 
 
@@ -545,6 +951,47 @@ def _gc_callback(phase, info):
 
 
 # ------------------------------------------------------------------- report
+
+def format_key(key):
+    """``function (file:line)`` for a profile key."""
+    filename, lineno, name = key[:3]
+    return f"{name} ({filename.rsplit('/', 1)[-1]}:{lineno})"
+
+
+def caller_chain(profiler, key, depth=6):
+    """The largest-cumulative caller of ``key``, then of that one, and so on.
+
+    The probe's own wrappers are stepped over: they stand between the library
+    functions and say nothing about the library's call graph.
+    """
+    stats = pstats.Stats(profiler).stats
+    chain = []
+    current = key
+    for _ in range(depth):
+        value = stats.get(current)
+        if value is None or not value[4]:
+            break
+        candidates = [
+            item for item in value[4].items()
+            if "probe.py" not in item[0][0]
+        ] or list(value[4].items())
+        parent, counts = max(candidates, key=lambda item: item[1][3])
+        chain.append((parent, counts, counts[1]))
+        current = parent
+    return chain
+
+
+def dump_profile(profiler):
+    """The profile's own cumulative view, into the log."""
+    import io
+
+    stream = io.StringIO()
+    stats = pstats.Stats(profiler, stream=stream)
+    stats.sort_stats("cumulative").print_stats(18)
+    for line in stream.getvalue().splitlines():
+        if line.strip():
+            log("    " + line)
+
 
 class RowUndecided(Exception):
     pass
@@ -628,6 +1075,183 @@ def report(row_seconds, decided, count):
                 f"  {step:<32} window {first}: {a:9.2f}  window {last}: {b:9.2f}  "
                 f"ratio {b / a if a else float('nan'):6.2f}"
             )
+    if STATE.get("detail_basis"):
+        order = [
+            window for window in sorted(WINDOWS)
+            if WINDOWS[window].get("span construction")
+        ]
+        log("")
+        log("=== the sublattice construction, mean ms per call, inclusive, by window ===")
+        log(
+            f"{'window':>6}{'planes':>14}"
+            + "".join(f"{name[:13]:>14}" for name in BASIS_LABELS)
+        )
+        for window in order:
+            row = WINDOWS[window]
+            held = row.get("call (four steps + framing)", [0.0, 0])[1]
+            high = STATE.get("_window_end", {}).get(window, held)
+            cells = ""
+            for name in BASIS_LABELS:
+                cell = row.get(name)
+                cells += f"{1000 * cell[0] / cell[1]:14.2f}" if cell else f"{'-':>14}"
+            log(f"{window:>6}{f'[{high - held}, {high})':>14}{cells}")
+        log("")
+        log("=== the same, exclusive: a parent's time with its children subtracted ===")
+        log(f"{'window':>6}{'planes':>14}" + "".join(f"{'excl ' + n[:8]:>14}" for n in BASIS_INNER))
+        for window in order:
+            row = WINDOWS[window]
+            high = STATE.get("_window_end", {}).get(window, 0)
+            held = row.get("call (four steps + framing)", [0.0, 0])[1]
+            cells = ""
+            for name in BASIS_INNER:
+                cell = row.get(name + " own")
+                cells += f"{1000 * cell[0] / cell[1]:14.2f}" if cell else f"{'-':>14}"
+            log(f"{window:>6}{f'[{high - held}, {high})':>14}{cells}")
+        if order:
+            first, last = order[0], order[-1]
+            log("")
+            log("=== the construction, first window against last (inclusive) ===")
+            for name in BASIS_LABELS:
+                left = WINDOWS[first].get(name)
+                right = WINDOWS[last].get(name)
+                if not left or not right:
+                    continue
+                a = 1000 * left[0] / left[1]
+                b = 1000 * right[0] / right[1]
+                log(
+                    f"  {name:<28} window {first}: {a:9.2f}  window {last}: {b:9.2f}  "
+                    f"ratio {b / a if a else float('nan'):6.2f}  calls/plane "
+                    f"{left[1] / max(WINDOWS[first].get('call (four steps + framing)', [0, 1])[1], 1):4.2f}"
+                )
+
+    if STATE.get("coercion"):
+        log("")
+        log("=== the coercion census, length by window ===")
+        windows = sorted(COERCION_ROWS)
+        for target in [label for label, _parent in COERCION_TARGETS] + ["the last plane"]:
+            for key in COERCION_KEYS:
+                cells = [
+                    str(COERCION_ROWS[window].get(target, {}).get(key, "-"))
+                    for window in windows
+                ]
+                if len(set(cells)) == 1:
+                    continue
+                log(f"  {target}.{key.lstrip('_')}: " + " ".join(cells))
+        log("  (windows in order: " + " ".join(str(window) for window in windows) + ")")
+        log("")
+        log("=== registrations on a tracked parent, by window ===")
+        for window in sorted(REGISTRATIONS):
+            calls = REGISTRATIONS[window]
+            log(
+                f"  window {window}: " + " | ".join(
+                    f"{target}: " + " ".join(f"{call} {count}" for call, count in counts.items())
+                    for target, counts in calls.items()
+                )
+            )
+        if not REGISTRATIONS:
+            log("  none: no coercion, embedding, action or conversion was registered on "
+                "the ambient lattice, its free module or the base ring during the row")
+        log("")
+        log("=== MonoDict objects by window ===")
+        for window in sorted(COUNTERS):
+            counts = COUNTERS[window]
+            log(
+                f"  window {window}: MonoDict {counts.get('MonoDict', 0)}, "
+                f"MonoDictEraser {counts.get('MonoDictEraser', 0)}, "
+                f"TripleDict {counts.get('TripleDict', 0)}, "
+                f"parents of the plane's class "
+                f"{counts.get(type(LAST_PLANE[0]).__name__, 0) if LAST_PLANE else 0}"
+            )
+
+    if EQ_CALLS:
+        log("")
+        log("=== the set comparison, calls by their call site, per window ===")
+        for window in sorted(EQ_CALLS):
+            total = sum(EQ_CALLS[window].values())
+            log(
+                f"  window {window}: {total} comparisons -- " + ", ".join(
+                    f"{site} x{count}"
+                    for site, count in sorted(EQ_CALLS[window].items(), key=lambda item: -item[1])
+                )
+            )
+
+    if PROFILES:
+        log("")
+        log("=== two profiled windows of the same row ===")
+        per_call = {}
+        for label in ("early", "late"):
+            if label not in PROFILES:
+                log(f"  {label}: the row did not reach this window")
+                continue
+            stats = pstats.Stats(PROFILES[label])
+            calls = max(PROFILE_CALLS.get(label, 1), 1)
+            per_call[label] = {
+                key: value[3] / calls for key, value in stats.stats.items()
+            }
+            log(
+                f"  {label}: {PROFILE_CALLS.get(label)} calls, "
+                f"{stats.total_tt:.2f} s of profiled self time"
+            )
+        if "early" in per_call and "late" in per_call:
+            early, late = per_call["early"], per_call["late"]
+            rows = sorted(
+                ((late.get(key, 0.0), early.get(key, 0.0), key) for key in late),
+                reverse=True,
+            )
+            log("")
+            log("  mean ms of cumulative time per transport call, worst functions (late)")
+            log(f"    {'function':<46}{'early':>10}{'late':>10}{'growth':>10}")
+            for late_value, early_value, key in rows[:12]:
+                log(
+                    f"    {format_key(key):<46}{1000 * early_value:10.2f}"
+                    f"{1000 * late_value:10.2f}{1000 * (late_value - early_value):10.2f}"
+                )
+            growth = sorted(
+                (
+                    (late.get(key, 0.0) - early.get(key, 0.0), late.get(key, 0.0),
+                     early.get(key, 0.0), key)
+                    for key in set(late) | set(early)
+                ),
+                reverse=True,
+            )
+            log("")
+            log("  the same, ranked by growth")
+            log(f"    {'function':<46}{'early':>10}{'late':>10}{'growth':>10}")
+            for change, late_value, early_value, key in growth[:12]:
+                log(
+                    f"    {format_key(key):<46}{1000 * early_value:10.2f}"
+                    f"{1000 * late_value:10.2f}{1000 * change:10.2f}"
+                )
+            log("")
+            log("  the caller chain of the largest growth among the library's own functions:")
+            library = [
+                entry for entry in growth if "probe.py" not in entry[3][0]
+            ] or growth
+            for level, (key, values, calls_seen) in enumerate(
+                caller_chain(PROFILES["late"], library[0][3])
+            ):
+                log(
+                    "    " + "  " * level + f"{format_key(key)}  "
+                    f"cumulative {1000 * values[3] / max(PROFILE_CALLS.get('late', 1), 1):.2f} ms per call, "
+                    f"{calls_seen} call(s)"
+                )
+            for rank, entry in enumerate(library[1:4], start=2):
+                log("")
+                log(f"  the caller chain of the {rank}nd largest growth:")
+                for level, (key, values, calls_seen) in enumerate(
+                    caller_chain(PROFILES["late"], entry[3])
+                ):
+                    log(
+                        "    " + "  " * level + f"{format_key(key)}  "
+                        f"cumulative {1000 * values[3] / max(PROFILE_CALLS.get('late', 1), 1):.2f} ms per call, "
+                        f"{calls_seen} call(s)"
+                    )
+            log("")
+            log("  raw cumulative view, early window:")
+            dump_profile(PROFILES["early"])
+            log("  raw cumulative view, late window:")
+            dump_profile(PROFILES["late"])
+
     log("")
     log("=== the admission wrapper's own cost (step minus the method it times) ===")
     for window in sorted(WINDOWS):
@@ -708,6 +1332,13 @@ def main(argv):
             chosen = argument.split("=", 1)[1]
             STATE["detail_image"] = chosen == "image"
             STATE["detail_span"] = chosen == "span"
+            STATE["detail_basis"] = chosen == "basis"
+        if argument == "coercion":
+            STATE["coercion"] = True
+        if argument == "profile":
+            STATE["profile"] = True
+        if argument.startswith("trace="):
+            STATE["trace"] = [argument.split("=", 1)[1], 0, "?"]
     smoke = bool(argv) and argv[0] == "smoke"
 
     import sage_extensions
@@ -717,6 +1348,23 @@ def main(argv):
     log(
         "probe M: split the plane transport of the Otilde plane row (#390)"
         + (" -- smoke run on U + U(2) + <-2>" if smoke else "")
+    )
+    log(
+        "modes: "
+        + ", ".join(
+            [
+                name
+                for key, name in (
+                    ("detail_image", "detail=image"),
+                    ("detail_span", "detail=span"),
+                    ("detail_basis", "detail=basis"),
+                    ("coercion", "coercion"),
+                    ("profile", "profile"),
+                )
+                if STATE.get(key)
+            ]
+            or ["stage split only"]
+        )
     )
     log(f"cap {ROW_CAP} s, python {sys.version.split()[0]}")
     log(f"sage_extensions from {sage_extensions.__file__}")
@@ -740,6 +1388,16 @@ def main(argv):
     stable = lattice.stable_orthogonal_group()
     log("Otilde = lattice.stable_orthogonal_group()")
 
+    if STATE.get("detail_basis"):
+        install_constructor_split(lattice, lattice.base_ring())
+    if STATE.get("coercion"):
+        install_coercion(lattice)
+    if STATE.get("profile"):
+        install_equality_probe()
+        log(
+            "profiling windows: "
+            + ", ".join(f"{label} calls [{start}, {stop})" for label, start, stop in PROFILE_SPECS)
+        )
     global ORIGINAL_TRANSPORT
     klass = _resolving_class(stable.one(), "transport_isotropic_object")
     ORIGINAL_TRANSPORT = vars(klass)["transport_isotropic_object"]
@@ -839,6 +1497,13 @@ def main(argv):
         signal_module.setitimer(signal_module.ITIMER_REAL, 0)
         row_seconds = _now() - begin
     STATE["done"] = True
+    running = STATE.get("_profiling")
+    if running is not None:
+        running[1].disable()
+        PROFILES[running[0]] = running[1]
+        PROFILE_CALLS[running[0]] = STATE["planes"] - running[3]
+        STATE["_profiling"] = None
+        log(f"profile {running[0]} closed by the row's end at plane {STATE['planes']}")
     count = None
     if planes is not None:
         count = len(planes)
