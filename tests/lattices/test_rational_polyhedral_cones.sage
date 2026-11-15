@@ -221,7 +221,7 @@ def test_two_quarter_spaces_of_one_dimension_and_one_lineality_line_are_two_sets
 
 
 def test_one_cone_with_a_lineality_of_non_unit_pivot_is_one_hash() -> None:
-    r"""Two presentations of one half-plane of ``Z^3`` are one cone and one hash.
+    r"""Two presentations of one 3-dimensional wedge around a line are one cone and one hash.
 
     The cone ``{<(-1, 3, 0), x> >= 0, <(3, -11, 1), x> >= 0}`` has dimension
     three, the lineality line ``<(3, 1, 2)>``, whose Hermite basis has the
