@@ -4174,8 +4174,18 @@ class ModuleSubobjects(OwnedCategoryOverBaseRing):
             r"""Return the ambient module, i.e. the codomain of the inclusion."""
             return self.inclusion().codomain()
 
+        @cached_method
         def embedded_module_generators(self):
-            r"""Return the indexed family of selected generator images."""
+            r"""Return the indexed family of selected generator images.
+
+            The framing is a datum of the subobject alone -- the images of its
+            generators under the stored inclusion -- so it is built once per
+            subobject and every reader gets that one family, as the inclusion
+            it is built from already is.  Rebuilding it per call cost a plane's
+            transport a new family and a new image of every generator for every
+            construction that asked (#541: 20 indexed families inside one
+            transport, 10.59 ms a plane).
+            """
             labels = self.module_generating_set()
             return finite_indexed_family(
                 labels,
