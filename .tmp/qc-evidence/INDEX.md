@@ -2269,3 +2269,6 @@ base, main, main, base.
 | `541-otilde-row-after-hash-repair.log` | the repair | first plane **483.6 s**, calib 0.577 (838 units), 2089 planes, 72.67 planes/s |
 | `541-framing-test-after-docs.log` | the docs commit | `tests/modules/test_the_embedded_framing_is_one_datum.sage`: **2 passed in 1.10 s** |
 | `541-two-test-files-on-the-pushed-tree.log` | the pushed tree (`ea895a8` + this round's four commits) | `tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage` and `tests/modules/test_the_embedded_framing_is_one_datum.sage` together: **5 passed in 1.36 s** |
+| `532-merged-core.log` | `fb7c2b4` (the merge of `95be77c`) | the six-file core batch on the merged tree: **8 failed, 21 passed in 2.38 s** |
+| `532-merged-core-main.log` | `95be77c` (main) | the same six files on main: **8 failed, 20 passed in 2.22 s**, the FAILED sets identical; the 21st pass on the merged tree is this round's new test |
+| `532-merged-wide-ids.log` | `fb7c2b4` (the merge of `95be77c`) | the eight other cone- and polytope-touching files: **6 failed, 9 passed, 55 errors** on the merged tree and **6 failed, 9 passed, 55 errors in 14.12 s** on `95be77c`, FAILED ids and the files with a setup ERROR identical; extracts of both runs |
