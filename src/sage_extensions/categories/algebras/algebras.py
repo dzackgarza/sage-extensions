@@ -3730,9 +3730,15 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
 
             If ``R`` and ``A`` are domains, torsion-freeness of ``A`` is instead
             equivalent to injectivity of ``R -> A``.  An undecided or refuted
-            domain hypothesis proves neither answer, so the general module
-            predicate remains undecided when neither construction applies,
-            unless a retained relation supplies a verified torsion element.
+            domain hypothesis proves neither answer, so this level states the
+            undecided proposition when neither construction applies, unless a
+            retained relation supplies a verified torsion element.
+
+            A framed free algebra is not this level's case: it is a free module
+            on the frame, so ``FramedFreeModules`` -- a subcategory, and
+            therefore the provider the category order names first -- answers
+            ``_torsion_freeness_decision`` for it, and this level is not
+            reached.
             """
             from sage_extensions.categories.algebras.free_algebras import (
                 SymmetricAlgebras,
@@ -3747,8 +3753,6 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                 f"{base} is not known to be one"
             )
             match self:
-                case _ if self in FramedFreeModules(base):
-                    return True
                 case _ if self in TensorAlgebras(base):
                     generating = TensorAlgebras.ParentMethods.generating_module(self)
                 case _ if self in SymmetricAlgebras(base):
@@ -3758,7 +3762,7 @@ class AlgebrasWithChosenFinitePresentation(OwnedCategoryOverBaseRing):
                 case _:
                     if self._represented_relation_torsion_witness() is not None:
                         return False
-                    return Modules.ParentMethods._torsion_freeness_decision(self)
+                    return AtomicProposition("is_torsion_free", self)
 
             assert generating in ModulesWithChosenFinitePresentation(base), (
                 f"torsion-freeness of {self} needs a computation for its actual generating "
@@ -4965,27 +4969,6 @@ class _OwnedAlgebraParent(_OwnedRingParent):
     def _defer_native_algebra_construction(self):
         r"""The algebra owner installs its selected resolution before its regular module."""
         return True
-
-    def _rank_decision(self):
-        r"""Return the rank this algebra's own frame states, when it is framed free.
-
-        \(R^{(S)}\) is free on its frame \(S\), so its rank is the cardinality
-        of \(S\) -- the cardinal is the frame's, not a natural number, since a
-        frame may be infinite.  The algebra retains that frame as its module
-        generating set.  This is the realization's answer to the generic
-        ``module_rank``'s hook: on an algebra's class the framed-free category's
-        own ``module_rank`` is answered after the generic module methods, so the
-        construction states the datum here instead.  An algebra stated on a
-        module without a chosen frame has no answer of its own and leaves the
-        generic cases in force.
-        """
-        from sage_extensions.categories.modules.framed.framed_free_modules import (
-            FramedFreeModules,
-        )
-
-        if self in FramedFreeModules(self.base_ring()):
-            return self.module_generating_set().cardinality()
-        return super()._rank_decision()
 
     def _native_scalar_action(self, scalar, element):
         r"""Apply the retained algebra structure map, not the engine's default embedding.

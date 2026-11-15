@@ -1,0 +1,63 @@
+tree SHA: 27d76f39825b6fda5c93dad1a2a72f37da3ddbb0  dirty: 1
+targets: tests/categories/test_the_refined_category_answers_with_its_own_operation.sage
+inner 550 s, outer 610 s, guard 6144 MiB
+...F                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_the_framed_level_answers_the_question_the_general_level_left_undecided __
+
+    def test_the_framed_level_answers_the_question_the_general_level_left_undecided() -> None:
+        r"""On $\mathbf{Z}[x]$ the module questions are answered, not merely asked.
+    
+        $\mathbf{Z}[x]$ is free on the monomials, so it is torsion-free: a basis
+        element is killed only by a scalar killing its coefficient, and $\mathbf{Z}$
+        is a domain.  Its members annihilate nothing, so $\operatorname{Ann}_{\mathbf{Z}}(\mathbf{Z}[x]) = (0)$,
+        and that is the zero ideal of the base ring $\mathbf{Z}$ -- an element of the
+        ideals of $\mathbf{Z}$, not a submodule of $\mathbf{Z}[x]$.
+    
+        Both answers come from ``FramedFreeModules.ParentMethods``, the level the
+        category order puts first for a framed free module.  The general module
+        level states the same two questions as undecided propositions, since it has
+        no basis to read; before the category order was repaired it answered them
+        here and both came back undecided.  That is the whole difference, and it is
+        a change of answer, so it is stated.
+        """
+        line = ZZ["x"]
+>       ideal = line.annihilator()
+                ^^^^^^^^^^^^^^^^^^
+
+tests/categories/test_the_refined_category_answers_with_its_own_operation.sage:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring
+
+    def annihilator(self):
+        r"""Return ``Ann_R(M)=ker(rho_M: R -> End_Ab(U(M)))``.
+    
+        Here ``rho_M(r)(m)=rm`` is additive, but not necessarily
+        R-linear. Its kernel is precisely the two-sided ideal of scalars
+        annihilating every point. The selected module representation
+        computes this ideal without requiring a general algorithm for
+        kernels of morphisms between represented rings.
+        """
+        represented = self._represented_annihilator_ideal()
+>       assert represented is not NotImplemented, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the annihilator Ann_R({self}) over {self.base_ring()} has no algorithm for a module in {self.category()}"
+        )
+E       AssertionError: the annihilator Ann_R(Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring) over Integer Ring has no algorithm for a module in Join of Category of symmetric algebras over Integer Ring and Category of graded free algebras over Integer Ring and Category of finitely presented commutative algebras and Category of projective associative unital algebras and Category of integral domains and Category of noetherian rings and Category of free projective modules over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring and Category of framed free modules over Integer Ring and Category of infinite countable sets
+
+src/sage_extensions/categories/modules/pure/modules.py:3024: AssertionError
+=========================== short test summary info ============================
+FAILED tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_the_framed_level_answers_the_question_the_general_level_left_undecided
+1 failed, 3 passed in 0.80s
+[peakrss] run500: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 314 MiB
+[peakrss] low-water MemAvail : 13773 MiB
+[peakrss] peak single VmHWM  : 314 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      304 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   314 MiB hwm=   314 MiB avail= 13773 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13999 MiB
+launcher exit: 1

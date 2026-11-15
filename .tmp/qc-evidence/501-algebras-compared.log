@@ -1,0 +1,37 @@
+tests/algebras on this tree and on b61feeb, one pytest process each.
+tree:    45 failed, 44 passed, 124 errors in 32.78s
+b61feeb: 45 failed, 44 passed, 124 errors in 32.64s
+FAILED/ERROR ids only on either side: 0
+
+The same directory on 27d76f3, before the provider-order repair, has 21 ids fewer:
+27d76f3: 24 failed, 65 passed, 124 errors in 19.41s
+ids present only after 6578c33 (main's state, and this tree's):
+  FAILED tests/algebras/test_cartan_calculus.sage::test_cartan_identities_hold_on_a_mixed_degree_form
+  FAILED tests/algebras/test_cartan_calculus.sage::test_contraction_and_lie_derivative_along_d_dx
+  FAILED tests/algebras/test_center_corestriction_archive.sage::test_center_of_the_exterior_algebra_of_the_plane_contains_e1e2_but_not_e1
+  FAILED tests/algebras/test_dg_and_derivations.sage::test_de_rham_differential_is_a_degree_one_graded_derivation
+  FAILED tests/algebras/test_framed_free_algebra_comparisons_archive.sage::test_comparison_maps_out_of_the_tensor_algebra_and_into_divided_powers
+  FAILED tests/algebras/test_framed_free_algebra_comparisons_archive.sage::test_symmetric_and_divided_power_algebras_agree_over_the_rationals
+  FAILED tests/algebras/test_free_algebra_archive_reconciliation.sage::test_a_map_of_polynomial_algebras_is_determined_by_generator_images
+  FAILED tests/algebras/test_free_algebra_archive_reconciliation.sage::test_degree_two_ranks_of_tensor_symmetric_exterior_and_divided_power_algebras
+  FAILED tests/algebras/test_free_algebra_archive_reconciliation.sage::test_second_tensor_power_of_the_plane_contains_xy_but_not_x
+  FAILED tests/algebras/test_free_algebra_archive_reconciliation.sage::test_sign_rule_for_permuted_triple_products_in_the_exterior_algebra
+  FAILED tests/algebras/test_free_algebra_issue614_cells.sage::test_cell_61_tensor_and_divided_power_algebras_of_a_torsion_module
+  FAILED tests/algebras/test_free_forgetful_adjunction_archive.sage::test_exterior_square_of_a_plane_endomorphism_is_multiplication_by_its_determinant
+  FAILED tests/algebras/test_generated_ideals_of_graded_algebras.sage::test_generator_images_may_be_keyed_by_the_generators_themselves
+  FAILED tests/algebras/test_generated_ideals_of_graded_algebras.sage::test_the_ideal_generated_by_x_in_an_exterior_algebra_is_two_sided
+  FAILED tests/algebras/test_one_construction_per_label_set.sage::test_the_free_construction_on_ordered_labels_is_one_object_per_route
+  FAILED tests/algebras/test_power_algebra_owner_convergence.sage::test_exterior_and_divided_power_functors_send_xy_to_2ab_under_x_to_2a_y_to_b
+  FAILED tests/algebras/test_power_algebras.sage::test_canonical_comparison_maps_between_the_four_free_constructions
+  FAILED tests/algebras/test_power_algebras.sage::test_exterior_and_divided_power_algebras_preserve_composition_on_torsion_modules
+  FAILED tests/algebras/test_power_algebras.sage::test_exterior_square_of_z4_squared_is_z4
+  FAILED tests/algebras/test_tensor_and_symmetric_algebras_of_the_plane.sage::test_abelianizing_the_tensor_algebra_kills_the_commutator
+  FAILED tests/algebras/test_tensor_and_symmetric_algebras_of_the_plane.sage::test_swapping_the_letters_is_an_involution_of_the_tensor_algebra
+
+and the root exception, from the same file run alone with --tb=line:
+E   RecursionError: maximum recursion depth exceeded
+/repos/sage-extensions/src/sage_extensions/categories/rings/ring_foundation.py:6651: RecursionError: maximum recursion depth exceeded
+E   RecursionError: maximum recursion depth exceeded
+/repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:532: RecursionError: maximum recursion depth exceeded
+E   RecursionError: maximum recursion depth exceeded
+/repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py:172: RecursionError: maximum recursion depth exceeded

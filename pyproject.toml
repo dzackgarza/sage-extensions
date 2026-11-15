@@ -47,7 +47,7 @@ testpaths = ["tests"]
 #
 # Those two files are overwritten by the next run, so
 # sage_extensions.testing.timing_record copies them, at the end of the session,
-# into .timings/ at the checkout's root, named by commit and start time
+# into .timings/ at the checkout's root, named by commit, start time and pid
 # (CONTRIBUTING.md ENV-03).  That directory is untracked and holds the library's
 # own stage records (sage_extensions.timing) beside them, so a run's wall times
 # outlive the run.

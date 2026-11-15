@@ -20,7 +20,9 @@ of itself: ``pytest-xdist`` finishes a session in each worker's process, and the
 report log and the JUnit file are the controller's.  Two runs started in the same
 second keep two records, because a record's name is its run's.  And a stage
 names its input in words its call site writes, so the record says what the run
-was computing rather than what an object happens to print.
+was computing rather than what an object happens to print — which means the
+names identify their inputs: two lattices of one rank are two names, and two
+subgroup rows of one lattice are two names.
 
 The order asserted is the order the run *wrote* the lines, which is the order
 the stages ended: a stage's line carries its wall time, so the outermost one is
@@ -35,17 +37,29 @@ def _small_lattice():
     return Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[-2]])
 
 
+def _small_lattice_of_the_same_rank():
+    r"""``U + U + <-8>``: rank five like ``L_1``, and no name of the catalogue's."""
+    return Lattices(ZZ)("U") + Lattices(ZZ)("U") + Lattices(ZZ)([[-8]])
+
+
+def _record_named(records, stage_name):
+    r"""The ``input`` one stage of a record wrote."""
+    return next(record["input"] for record in records if record["stage"] == stage_name)
+
+
 def _hyperbolic_triangle():
     r"""``U + A1``: the triangle Vinberg's algorithm cuts out in three walls."""
     return HyperbolicLattices(ZZ)(Lattices(ZZ)("U") + Lattices(ZZ)("A1"))
 
 
 def test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_durations():
-    r"""One call, four records, each naming the row and the lattice it ran on.
+    r"""One call, four records, each naming the row, the lattice and the subgroup.
 
-    The name is the caller's: the row's rank, and the lattice's rank with the
-    labels of its generators.  Nothing is read off an object and nothing is
-    rendered, so the four records say what the run computed.
+    The name is the caller's: the row's rank, the lattice's catalogue name or the
+    digest of its Gram, and the subgroup the row is taken under.  Nothing is read
+    off an object and nothing is rendered, so the four records say what the run
+    computed — and the lattice here is no catalogue entry, so its name is its
+    Gram's digest rather than the positional labels of its generators.
     """
     lattice = _small_lattice()
     written = stage_records_of(
@@ -65,9 +79,64 @@ def test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_duratio
     )
     assert all(record["outcome"] == "returned" for record in written.records)
     assert all(record["seconds"] >= 0 for record in written.records)
-    assert tuple(record["input"] for record in written.records) == (
-        "rank-1 subobject row of the rank-5 lattice on generators 0, 1, 2, 3, 4",
-    ) * 4
+    # The three stages the subgroup's row wraps name the subgroup; the ambient
+    # row inside them is the whole group's row, and says so.
+    assert _record_named(written.records, "ambient O(L) row").endswith(" under O(L)")
+    row_names = tuple(
+        record["input"]
+        for record in written.records
+        if record["stage"] != "ambient O(L) row"
+    )
+    assert set(row_names) == {row_names[0]}
+    assert row_names[0].startswith("rank-1 subobject row of the rank-5 lattice of Gram digest ")
+    assert row_names[0].endswith(
+        " under the subgroup with rho_L(g) in a subgroup of O(A_L) it states no description of"
+    )
+
+
+def test_two_lattices_of_one_rank_are_two_names():
+    r"""Two rank-five lattices with no catalogue name do not share an ``input``.
+
+    ``U + U + <-2>`` and ``U + U + <-8>`` are the same rank and different forms,
+    so a name built from the rank and the positional generator labels -- both
+    ``generators 0, 1, 2, 3, 4`` -- is one name for two computations, and the
+    record cannot say which of them a stage measured.
+    """
+    first = stage_records_of(
+        lambda: _small_lattice().stable_orthogonal_group().isotropic_orbit_representatives(1)
+    )
+    second = stage_records_of(
+        lambda: _small_lattice_of_the_same_rank()
+        .stable_orthogonal_group()
+        .isotropic_orbit_representatives(1)
+    )
+
+    assert _record_named(first.records, "ambient O(L) row") != _record_named(
+        second.records, "ambient O(L) row"
+    )
+
+
+def test_two_subgroups_of_one_lattice_are_two_names():
+    r"""The ``O(L)`` row and the ``ker(rho)`` row of one lattice are two names.
+
+    The subgroup the row is taken under is half of what the row is: the whole
+    orthogonal group's line orbits and the stable orthogonal group's are
+    different computations, and a name that stops at the lattice and the rank
+    gives them one string — which is what the ``Õ(T_Co)`` and ``Õ⁺(T_Co)`` rows
+    did.
+    """
+    lattice = _small_lattice()
+    stable = lattice.stable_orthogonal_group()
+    whole = stage_records_of(lambda: lattice.Aut().isotropic_orbit_representatives(1))
+    stable_row = stage_records_of(lambda: stable.isotropic_orbit_representatives(1))
+    stable_plus_row = stage_records_of(
+        lambda: stable.intersection(lattice.O_plus()).isotropic_orbit_representatives(1)
+    )
+
+    assert _record_named(whole.records, "ambient O(L) row").endswith(" under O(L)")
+    assert _record_named(stable_row.records, "discriminant image") != _record_named(
+        stable_plus_row.records, "discriminant image"
+    )
 
 
 def test_the_vinberg_walk_runs_once_however_its_callers_spell_the_default_keyword():

@@ -17,8 +17,8 @@ presentation, and an infinite ring.
   the two readings agree, so that example states the level only in its
   docstring; the case where they cannot be confused is
   ``tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage``,
-  where the dual ``prod_N ZZ`` has no generating family in this library and the
-  module level therefore cannot answer at all.
+  where the dual ``prod_N ZZ`` has no selected generating family in this
+  library and the module level therefore cannot answer at all.
 * ``__iter__`` is ``OwnedRings.Finite.ParentMethods.__iter__``, which enumerates
   a *finite* ring's points through its selected engine; ``QQ(i)`` is not finite,
   so no level of this rebuild gives it an enumeration, and the general ring
@@ -28,6 +28,9 @@ presentation, and an infinite ring.
 * ``adic_completion`` is ``OwnedRings.ParentMethods.adic_completion``, the
   ring's inverse limit, not the module's base change to the completed scalar
   ring of ``ModulesWithChosenFinitePresentation.ParentMethods``.
+
+The order those levels are kept in is stated once, in
+``sage_extensions.refine._owned_mixins``; this file does not restate it.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
@@ -42,8 +45,6 @@ def test_the_module_level_states_the_order_ideal_of_an_algebra_element() -> None
     level is stated because the module level's image of the linear functionals
     states an ideal of the same ring as well, and here both readings give the
     same ideal -- so this value alone does not say which of the two answered.
-    The framed level is the one the category hierarchy names, being a
-    subcategory of ``Modules(QQ).Free()``.
     """
     field = QuadraticField(-1)
     element = field(1 + field.primitive_element())
@@ -97,3 +98,26 @@ def test_the_ring_states_the_completion_of_the_field_at_the_zero_ideal() -> None
     assert completion.completion_map_kernel() == field.ideal(0)
     assert completion_map.is_injective() is True
     assert completion.is_isomorphic_to(field)
+
+def test_the_framed_level_answers_the_question_the_general_level_left_undecided() -> None:
+    r"""On $\mathbf{Z}[x]$ the module questions are answered, not merely asked.
+
+    $\mathbf{Z}[x]$ is free on the monomials, so it is torsion-free: a basis
+    element is killed only by a scalar killing its coefficient, and $\mathbf{Z}$
+    is a domain.  Its members annihilate nothing, so $\operatorname{Ann}_{\mathbf{Z}}(\mathbf{Z}[x]) = (0)$,
+    and that is the zero ideal of the base ring $\mathbf{Z}$ -- an element of the
+    ideals of $\mathbf{Z}$, not a submodule of $\mathbf{Z}[x]$.
+
+    Both answers come from ``FramedFreeModules.ParentMethods``, the level the
+    category order puts first for a framed free module.  The general module
+    level states the same two questions as undecided propositions, since it has
+    no basis to read; before the category order was repaired it answered them
+    here and both came back undecided.  That is the whole difference, and it is
+    a change of answer, so it is stated.
+    """
+    line = ZZ["x"]
+    ideal = line.annihilator()
+
+    assert line.is_torsion_free() is True
+    assert ideal in CommutativeIdeals(ZZ)
+    assert ideal == ZZ.ideal(0)

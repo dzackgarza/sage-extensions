@@ -1,0 +1,197 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue390-stage-alone.py
+tree SHA: a71272add96485c3e6ceeda07572bf40c5b2b5c0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 500 s, outer 560 s, guard 6144 MiB, args 'profile=group input=direct'
+[0.0s] probe: T_Co's plane row setup, stage 'group' alone (#528)
+[0.0s] cap 560 s, python 3.14.10
+[0.0s] the GAP proxy is installed on 3 sage_extensions modules
+[0.5s] calibration (fixed workload, for the run's CPU share): 0.472 s
+[0.5s] building input: lattice construction
+[0.6s] input built: lattice construction in 0.1 s
+[0.6s] inputs built in 0.1 s; calling the stage alone
+[11.1s] 
+[11.1s] === GAP primitives, by time in this stage ===
+[11.1s] 
+[11.1s] === the stage alone ===
+[11.1s]   stage                                                 calls   seconds  peak MiB
+[11.1s]   group                                                     1      10.5       407
+[11.1s] === inside it (each sub-stage's own total, children included) ===
+[11.1s]   not inside a named sub-stage                                   10.487
+[11.1s] === below them ===
+[11.1s]   calibration (fixed workload, for the run's CPU share)      1     0.472
+[11.1s] the stage returned {g in Orthogonal group O(Integral lattice of rank 11 and signature (2, 9)) : rho_L(g) lies in Subgroup of Orthogonal group of Finitely presented module on 11 mo
+[11.1s] 
+[11.1s] === the main thread's stack, 20 samples at 0.5 s ===
+[11.1s]   leaf frame (where the stage was) and the samples it holds:
+[11.1s]         2  set_categories.py:6722 _element_constructor_
+[11.1s]         1  owned_category.py:432 _category_provider_order_key
+[11.1s]         1  cardinals.py:1818 cardinal
+[11.1s]         1  set_categories.py:6716 _element_constructor_
+[11.1s]         1  arrow_categories.py:2478 _require_base_morphisms
+[11.1s]         1  set_categories.py:811 __call__
+[11.1s]         1  set_categories.py:812 __call__
+[11.1s]         1  arrow_categories.py:2590 _isomorphism_from_known_inverse_pair
+[11.1s]         1  category.py:465 __classcall__
+[11.1s]         1  refine.py:187 is_abstract
+[11.1s]         1  cardinals.py:631 _call_
+[11.1s]         1  category.py:463 __classcall__
+[11.1s]   the last sample's whole stack, innermost first:
+[11.1s]      0. framed_free_modules.py:329 _linear_combination_from_generator_coefficients
+[11.1s]      1. modules.py:2004 linear_combination
+[11.1s]      2. native_modules.py:55 coefficients
+[11.1s]      3. native_modules.py:282 coefficients
+[11.1s]      4. modules.py:2649 _framing_lift
+[11.1s]      5. framed_free_modules.py:530 to_vector
+[11.1s]      6. modules.py:7120 _matrix_column_coordinates
+[11.1s]      7. modules.py:7856 _matrix_coefficients
+[11.1s]      8. modules.py:6991 _selected_module_coefficients
+[11.1s]      9. modules.py:2673 _framing_lift
+[11.1s]     10. framed_free_modules.py:530 to_vector
+[11.1s]     11. lattices.py:6882 rational_pairing
+[11.1s]     12. module_morphisms.py:3548 __call__
+[11.1s]     13. form_modules.py:2137 b
+[11.1s] 
+[11.1s] === cProfile, top calls by cumulative time ===
+[11.1s]          11089529 function calls (10974592 primitive calls) in 10.460 seconds
+[11.1s] 
+[11.1s]    Ordered by: cumulative time
+[11.1s]    List reduced from 2442 to 28 due to restriction <28>
+[11.1s] 
+[11.1s]    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+[11.1s]       2/1    0.000    0.000   10.486   10.486 /probe.py:403(<lambda>)
+[11.1s]       2/1    0.000    0.000   10.486   10.486 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:4238(stable_orthogonal_group)
+[11.1s]         1    0.000    0.000   10.392   10.392 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:8022(discriminant_group)
+[11.1s]         1    0.000    0.000   10.392   10.392 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:8010(discriminant_quadratic_form)
+[11.1s]         1    0.000    0.000    9.932    9.932 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:6955(discriminant_module)
+[11.1s]         1    0.000    0.000    9.731    9.731 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/discriminant_modules.py:980(_discriminant_module)
+[11.1s]         1    0.000    0.000    7.111    7.111 /repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:2133(quadratic_forms)
+[11.1s]         1    0.000    0.000    7.111    7.111 /repos/sage-extensions/src/sage_extensions/categories/forms/forms.py:920(_quadratic_forms)
+[11.1s]         1    0.000    0.000    7.109    7.109 /repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:2236(divided_square)
+[11.1s]         1    0.000    0.000    7.109    7.109 /repos/sage-extensions/src/sage_extensions/categories/modules/powers.py:854(_divided_square)
+[11.1s]         1    0.003    0.003    6.923    6.923 /repos/sage-extensions/src/sage_extensions/categories/modules/powers.py:780(_presented_degree_power)
+[11.1s] 70657/42034    0.766    0.000    5.200    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:777(__call__)
+[11.1s] 69897/42055    0.084    0.000    4.917    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:1648(__call__)
+[11.1s]         1    0.034    0.034    4.027    4.027 /repos/sage-extensions/src/sage_extensions/categories/modules/powers.py:756(_divided_relations)
+[11.1s]       132    0.001    0.000    2.600    0.020 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/discriminant_modules.py:961(<genexpr>)
+[11.1s]         1    0.000    0.000    2.564    2.564 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/discriminant_modules.py:951(_descended_quadratic_gram)
+[11.1s]        12    0.000    0.000    2.564    0.214 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/discriminant_modules.py:960(<genexpr>)
+[11.1s]      2378    0.022    0.000    2.527    0.001 /repos/sage-extensions/src/sage_extensions/categories/sets/fixed_size_selections.py:128(support)
+[11.1s]         3    0.018    0.006    2.507    0.836 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/finitely_generated/finitely_presented_modules.py:3241(_presented_module_from_morphism)
+[11.1s]         2    0.000    0.000    2.462    1.231 /repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:4349(__call__)
+[11.1s]         2    0.004    0.002    2.461    1.231 /repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:4361(_call_)
+[11.1s]       121    0.001    0.000    2.227    0.018 /repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:3543(__call__)
+[11.1s]       121    0.026    0.000    2.212    0.018 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:6881(rational_pairing)
+[11.1s]       110    0.001    0.000    2.178    0.020 /repos/sage-extensions/src/sage_extensions/categories/modules/framed/formed/form_modules.py:2103(b)
+[11.1s] 17384/14369    0.009    0.000    2.009    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/set_categories.py:387(<lambda>)
+[11.1s]     30246    0.137    0.000    1.911    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:229(_element_constructor_)
+[11.1s]      2379    0.077    0.000    1.817    0.001 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:373(from_indexed)
+[11.1s]     39433    0.032    0.000    1.760    0.000 /repos/sage-extensions/src/sage_extensions/categories/sets/finite_ordered_sets.py:406(<lambda>)
+[11.1s] 
+[11.1s] 
+[11.1s] 
+[11.1s] === the top calls and where they were called from ===
+[11.1s]   <lambda> (probe.py:403) cum=10.49 s own=0.00 s calls=2
+[11.1s]       the chain from the stage itself:
+[11.1s]   stable_orthogonal_group (lattices.py:4238) cum=10.49 s own=0.00 s calls=2
+[11.1s]       called from <lambda> (probe.py:403) x1 cum=10.49 s
+[11.1s]       the chain from the stage itself:
+[11.1s]         <- <lambda> (probe.py:403)
+[11.1s]   discriminant_group (lattices.py:8022) cum=10.39 s own=0.00 s calls=1
+[11.1s]       called from stable_orthogonal_group (lattices.py:4238) x0 cum=0.00 s
+[11.1s]       the chain from the stage itself:
+[11.1s]         <- stable_orthogonal_group (lattices.py:4238)
+[11.1s]         <- <lambda> (probe.py:403)
+[11.1s]   discriminant_quadratic_form (lattices.py:8010) cum=10.39 s own=0.00 s calls=1
+[11.1s]       called from discriminant_group (lattices.py:8022) x0 cum=0.00 s
+[11.1s]       the chain from the stage itself:
+[11.1s]         <- discriminant_group (lattices.py:8022)
+[11.1s]         <- stable_orthogonal_group (lattices.py:4238)
+[11.1s]         <- <lambda> (probe.py:403)
+[11.1s]   discriminant_module (lattices.py:6955) cum=9.93 s own=0.00 s calls=1
+[11.1s]       called from discriminant_quadratic_form (lattices.py:8010) x0 cum=0.00 s
+[11.1s]       the chain from the stage itself:
+[11.1s]         <- discriminant_quadratic_form (lattices.py:8010)
+[11.1s]         <- discriminant_group (lattices.py:8022)
+[11.1s]         <- stable_orthogonal_group (lattices.py:4238)
+[11.1s]         <- <lambda> (probe.py:403)
+[11.1s] 
+[11.1s] === construction against computation, by own time ===
+[11.1s]   class                own s    share     cum s  entries
+[11.1s]   construction          2.09    19.9%     10.36      243
+[11.1s]   computation           0.02     0.2%     43.89       12
+[11.1s]   other                 8.35    79.6%    169.82     2187
+[11.1s]   stage (its own time)     10.49
+[11.1s] 
+[11.1s] === construction: the biggest entries, by own time ===
+[11.1s]   file:line                                   function                              own s    cum s  calls
+[11.1s]   category.py:436                             __classcall__                         0.738    1.028 392842
+[11.1s]   set_categories.py:6716                      _element_constructor_                 0.420    0.680 496339
+[11.1s]   set_categories.py:6621                      __init__                              0.139    0.139 281484
+[11.1s]   finite_ordered_sets.py:229                  _element_constructor_                 0.137    1.911  30246
+[11.1s]   owned_category.py:1704                      __init__                              0.072    0.344   2689
+[11.1s]   ring_foundation.py:6488                     _element_constructor_                 0.056    0.066  61241
+[11.1s]   modules.py:391                              __classcall__                         0.055    0.389  37175
+[11.1s]   mor_categories.py:1561                      __init__                              0.054    0.085   6021
+[11.1s]   owned_category.py:1102                      is_subcategory                        0.047    0.057  89340
+[11.1s]   ring_foundation.py:5302                     __classcall__                         0.046    0.357  38254
+[11.1s]   owned_category.py:1612                      _object_of                            0.046    0.567   2686
+[11.1s]   ring_foundation.py:5601                     __init__                              0.043    0.043  49011
+[11.1s]   owned_category.py:845                       is_subcategory                        0.033    0.034  65499
+[11.1s]   framed_free_modules.py:335                  _element_constructor_                 0.032    0.213  10974
+[11.1s] 
+[11.1s] === computation: the biggest entries, by own time ===
+[11.1s]   file:line                                   function                              own s    cum s  calls
+[11.1s]   set_categories.py:2469                      cardinality                           0.020    1.206  30639
+[11.1s]   form_modules.py:2103                        b                                     0.001    2.178    110
+[11.1s]   lattices.py:8010                            discriminant_quadratic_form           0.000   10.392      1
+[11.1s]   lattice_morphisms.py:3890                   discriminant_preimage                 0.000    0.041      1
+[11.1s]   lattices.py:6955                            discriminant_module                   0.000    9.932      1
+[11.1s]   indexed_families.py:69                      cardinality                           0.000    0.000     16
+[11.1s]   discriminant_modules.py:980                 _discriminant_module                  0.000    9.731      1
+[11.1s]   lattice_morphisms.py:4171                   discriminant_representation           0.000    0.009      1
+[11.1s]   lattices.py:4191                            discriminant_representation           0.000    0.009      1
+[11.1s]   finite_enumerated_set.py:249                cardinality                           0.000    0.000      2
+[11.1s]   integer_mod_ring.py:1094                    order                                 0.000    0.000     16
+[11.1s]   lattices.py:8022                            discriminant_group                    0.000   10.392      1
+[11.1s] 
+[11.1s] === other: the biggest entries, by own time ===
+[11.1s]   file:line                                   function                              own s    cum s  calls
+[11.1s]   set_categories.py:777                       __call__                              0.766    5.200  70657
+[11.1s]   set_categories.py:524                       __contains__                          0.373    0.638 232130
+[11.1s]   objects.py:158                              __contains__                          0.305    0.608 190515
+[11.1s]   ~:0                                         <built-in method builtins.isinsta     0.274    0.2751245227
+[11.1s]   category.py:693                             __contains__                          0.211    0.339 210954
+[11.1s]   set_categories.py:539                       __call__                              0.181    1.301 198937
+[11.1s]   threading.py:337                            wait                                  0.171    0.204     19
+[11.1s]   ~:0                                         <built-in method builtins.getattr     0.171    0.173 165426
+[11.1s]   set_categories.py:6726                      __call__                              0.170    0.854 496339
+[11.1s]   set_categories.py:6730                      __contains__                          0.164    0.188 513769
+[11.1s]   mor_categories.py:2166                      Of                                    0.159    0.689  18940
+[11.1s]   category.py:3128                            is_subcategory                        0.132    0.232 169500
+[11.1s]   cardinals.py:1814                           cardinal                              0.112    0.678  92033
+[11.1s]   misc.py:3902                                binomial                              0.108    0.108  30414
+[11.1s] 
+[11.1s] === everything else this run timed, outside the stage ===
+[11.1s]   row                                                   calls   seconds
+[11.1s]   input: lattice construction                               1       0.1
+[11.1s]   inputs proper (the rows above marked input:), total               0.1
+[11.1s] 
+[11.1s] the VM's 1-minute load average while this run went on: first 8.15, peak 8.36, last 8.36 (6 samples of /proc/loadavg)
+[11.1s] 
+[11.1s] peak VmRSS (python, sampled) 407 MiB
+[11.1s] RESULT stage=group seconds=10.49 inputs=0.07 calib=0.472 load_peak=8.36 profiled
+[11.1s] PROBE DONE
+[peakrss] p528q-base-group: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 422 MiB
+[peakrss] low-water MemAvail : 2760 MiB
+[peakrss] peak single VmHWM  : 422 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      411 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.1s procs=  3 rss=   422 MiB hwm=   422 MiB avail=  2771 MiB
+[peakrss]   t=    12.1s procs=  3 rss=   417 MiB hwm=   417 MiB avail=  2760 MiB
+[peakrss]   t=    10.1s procs=  3 rss=   414 MiB hwm=   414 MiB avail=  2887 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   413 MiB hwm=   413 MiB avail=  3015 MiB
+[peakrss]   t=     8.1s procs=  3 rss=   413 MiB hwm=   413 MiB avail=  2865 MiB
+launcher exit: 0

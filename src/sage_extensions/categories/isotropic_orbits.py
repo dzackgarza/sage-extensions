@@ -18,7 +18,11 @@ from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import parent as element_parent
 from sage.structure.sage_object import SageObject
 
-from sage_extensions.categories._lattice import lattice_record_name
+from sage_extensions.categories._lattice import (
+    lattice_record_name,
+    orbit_row_record_name,
+    subgroup_record_name,
+)
 from sage_extensions.categories.modules.pure.modules import ModuleSubobjects
 from sage_extensions.categories.sets.finite_ordered_sets import (
     finite_ordered_set,
@@ -1575,9 +1579,11 @@ def _witt_one_hilbert_line_representatives(lattice):
 
 @timed_stage(
     "ambient O(L) row",
-    input=lambda orthogonal_group, rank, *, flag=False: (
-        f"rank-{rank} {'flag' if flag else 'subobject'} row of "
-        f"{lattice_record_name(orthogonal_group.domain())}"
+    input=lambda orthogonal_group, rank, *, flag=False: orbit_row_record_name(
+        rank,
+        flag=flag,
+        lattice=orthogonal_group.domain(),
+        subgroup=orthogonal_group,
     ),
 )
 def _isotropic_orbit_representatives(orthogonal_group, rank, *, flag=False):
@@ -1825,9 +1831,7 @@ class _DividedClassPlaneOrbitDecomposition:
     @timed_stage(
         "discriminant images",
         input=lambda self, subgroup, representatives, stabilizer_generators=None: (
-            _plane_representatives_record_name(
-                representatives, representatives[0].inclusion().codomain()
-            )
+            _plane_representatives_record_name(representatives, subgroup)
         ),
     )
     def __init__(self, subgroup, representatives, stabilizer_generators=None) -> None:
@@ -1842,7 +1846,7 @@ class _DividedClassPlaneOrbitDecomposition:
                 f"be a plane of one lattice: the first is a plane of {lattice} and another is not"
             )
         self._lattice = lattice
-        self._record_name = _plane_representatives_record_name(representatives, lattice)
+        self._record_name = _plane_representatives_record_name(representatives, subgroup)
         self._discriminant = lattice.discriminant_group()
         quotient = subgroup.finite_character_quotient()
         # The engine is the character quotient's own discriminant image, so the
@@ -2246,24 +2250,28 @@ def _primitive_isotropic_plane_of(lattice, plane):
     )
 
 
-def _plane_representatives_record_name(representatives, lattice) -> str:
+def _plane_representatives_record_name(representatives, subgroup) -> str:
     r"""The ambient plane representatives, named for a timing record.
 
-    The name is the call site's: how many representatives the row runs on, and
-    the lattice's rank and generator labels.  Nothing is read off a plane
-    (:mod:`sage_extensions.timing` names no object).
+    The name is the call site's: how many representatives the row runs on, the
+    lattice's held name, and the subgroup the row is taken under -- the last
+    because two subgroup rows of one lattice over the same representatives are
+    two computations (``orthogonal_quotients.py``'s row name is this one's
+    sibling).  Nothing is read off a plane (:mod:`sage_extensions.timing` names
+    no object).
     """
     count = len(representatives)
     return (
         f"{count} ambient plane representative{'s' if count != 1 else ''} of "
-        f"{lattice_record_name(lattice)}"
+        f"{lattice_record_name(subgroup.supergroup().domain())} "
+        f"under {subgroup_record_name(subgroup)}"
     )
 
 
 @timed_stage(
     "divided-class plane row",
     input=lambda subgroup, representatives, stabilizer_generators=None: (
-        _plane_representatives_record_name(representatives, subgroup.supergroup().domain())
+        _plane_representatives_record_name(representatives, subgroup)
     ),
 )
 def _divided_class_isotropic_plane_orbits(subgroup, representatives, stabilizer_generators=None):
@@ -2363,6 +2371,37 @@ class CuspLayerEnumeration(SageObject):
 
     def __repr__(self) -> str:
         return f"layer {self._number} of the cusp chamber walk"
+
+
+def _cusp_record_name(reduction_image) -> str:
+    r"""Name the cusp a reduction image is attached to, for a timing record.
+
+    The cusp is the primitive isotropic vector the image is computed at, in the
+    ambient lattice and under the subgroup: ``G_v``, its chamber and its computed
+    vertex are properties of that cusp, and a lattice on its own carries several
+    (Sterk's five on ``T_{En}``), so a name that stops at the lattice names every
+    cusp of it at once.
+    """
+    return (
+        f"the cusp of {reduction_image.vector()} in "
+        f"{lattice_record_name(reduction_image.lattice())} "
+        f"under {subgroup_record_name(reduction_image.subgroup())}"
+    )
+
+
+def _cusp_chamber_record_name(reduction_image, controlling_vector) -> str:
+    r"""Name one chamber computation at a cusp, the point it grows from included.
+
+    ``cusp_chamber`` accepts the vertex to grow the chamber from, and the walk it
+    runs depends on it; ``None`` leaves the choice to the computation, and the
+    name says so rather than naming a point nobody supplied.
+    """
+    point = (
+        "its own vertex"
+        if controlling_vector is None
+        else f"the controlling vector ({', '.join(str(int(entry)) for entry in controlling_vector.to_vector())})"
+    )
+    return f"{_cusp_record_name(reduction_image)} at {point}"
 
 
 class IsotropicVectorReductionImage(SageObject):
@@ -2780,7 +2819,12 @@ class IsotropicVectorReductionImage(SageObject):
         reflection = self._lattice.reflection(lift)
         return self.contains_lift(reflection)
 
-    @timed_stage("cusp chamber", input=lambda self, *arguments, **keywords: lattice_record_name(self.lattice()))
+    @timed_stage(
+        "cusp chamber",
+        input=lambda self, *arguments, **keywords: _cusp_chamber_record_name(
+            self, arguments[0] if arguments else keywords.get("controlling_vector")
+        ),
+    )
     def cusp_chamber(
         self,
         controlling_vector=None,
@@ -2995,7 +3039,10 @@ class IsotropicVectorReductionImage(SageObject):
             )
         return tuple(records)
 
-    @timed_stage("controlling vector", input=lambda self, *arguments, **keywords: lattice_record_name(self.lattice()))
+    @timed_stage(
+        "controlling vector",
+        input=lambda self, *arguments, **keywords: _cusp_record_name(self),
+    )
     def _computed_controlling_vector(self):
         r"""Return the class in ``N`` computed as the point of the hyperbolic space.
 

@@ -157,8 +157,12 @@ test *args:
 readme:
     #!/usr/bin/env bash
     set -euo pipefail
-    sage_python="$("${SAGE_BIN:?set SAGE_BIN to the sage of the image}" -c 'import sys; print(sys.executable)')"
-    "$sage_python" -m pytest --doctest-glob=README.md README.md
+    # The interpreter is `_sage-python`'s answer, as in `test`: SAGE_BIN may name
+    # the image's own launcher, whose `sys.executable` is a path inside that
+    # image and not one this host can run.
+    PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" \
+        "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" \
+        -m pytest --doctest-glob=README.md README.md
 
 # The suite runs in parallel, one Sage process per worker, and records which
 # test ran each line; only lines a passing test ran count as covered.

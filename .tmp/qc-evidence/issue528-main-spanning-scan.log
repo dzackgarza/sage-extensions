@@ -1,0 +1,72 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue390-spanning-scan.py
+tree SHA: 3a1964060ab55a6b09207f0ceeff67960fb3ef9b
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 300 s, outer 360 s, guard 6144 MiB, args 'calls=1200'
+[    0.0s] probe: what _lattice_subobject_spanning computes or scans (U2m2, 1200 calls)
+[    0.0s] lattice Integral lattice of rank 5 and signature (2, 3) of rank 5
+[    0.0s] span basis of 2 vectors: (e_0, e_1)
+[    0.0s] populations before the first call:
+[    0.1s]   the module's generating set                 5
+[    0.1s]   the lattice object's classcall cache        -1
+[    0.1s]   the fresh module's classcall cache          -1
+[    0.1s]   the label set Sets.Delta                    -1
+[    2.6s] 
+[    2.6s] 1180 objects built; the plain loop of 1140 calls took 2.4 s
+[    2.6s] populations after the last call:
+[    2.6s]   the module's generating set                 5
+[    2.6s]   the lattice object's classcall cache        -1
+[    2.6s]   the fresh module's classcall cache          -1
+[    2.6s]   the label set Sets.Delta                    -1
+[    2.6s] 
+[    2.6s] === the steps of one construction: first 100 calls against the last 100 ===
+[    2.6s]   step                                      calls  first ms   last ms   ratio   total s
+[    2.6s]   spanning, the whole call                   1180     2.642     1.985    0.75      2.45
+[    2.6s]   4 placement                                1140     1.035     0.774    0.75      0.90
+[    2.6s]   nf fresh module (all calls)                2281     0.562     0.326    0.58      0.74
+[    2.6s]   4a bilinear computation                    1140     0.716     0.525    0.73      0.61
+[    2.6s]   4c construct                               1140     0.674     0.493    0.73      0.57
+[    2.6s]   1 constructor data                         1140     0.561     0.397    0.71      0.56
+[    2.6s]   4d with structure                          1140     0.647     0.475    0.73      0.55
+[    2.6s]   4b categories                              1140     0.038     0.029    0.77      0.03
+[    2.6s] 
+[    2.6s] === own time, cProfile over calls 25-40 (early) ===
+[    2.6s]   file:line                                     function                            own s    cum s  calls
+[    2.6s]   owned_category.py:1198                        _owned_join_as_tuple               0.0040   0.0111     60
+[    2.6s]   category.py:436                               __classcall__                      0.0032   0.0049   6150
+[    2.6s]   objects.py:158                                __contains__                       0.0030   0.0057   4170
+[    2.6s]   ~:0                                           <built-in method builtins.isins    0.0027   0.0027  20130
+[    2.6s]   category.py:693                               __contains__                       0.0022   0.0032   4665
+[    2.6s]   owned_category.py:1228                        <genexpr>                          0.0020   0.0020  13350
+[    2.6s]   owned_category.py:1223                        <genexpr>                          0.0017   0.0036   1560
+[    2.6s]   lattices.py:5800                              _evaluate_gram                     0.0013   0.0196     60
+[    2.6s]   set_categories.py:524                         __contains__                       0.0013   0.0024   1875
+[    2.6s]   ring_foundation.py:6623                       _element_constructor_              0.0012   0.0017   2340
+[    2.6s]   framed_free_modules.py:106                    __call__                           0.0011   0.0107    750
+[    2.6s]   ring_foundation.py:7713                       _own_ring                          0.0010   0.0057   2265
+[    2.6s] 
+[    2.6s] === own time, cProfile over calls 125-140 ===
+[    2.6s]   file:line                                     function                            own s    cum s  calls
+[    2.6s]   owned_category.py:1198                        _owned_join_as_tuple               0.0040   0.0111     60
+[    2.6s]   category.py:436                               __classcall__                      0.0032   0.0049   6150
+[    2.6s]   objects.py:158                                __contains__                       0.0030   0.0058   4170
+[    2.6s]   ~:0                                           <built-in method builtins.isins    0.0027   0.0027  20130
+[    2.6s]   category.py:693                               __contains__                       0.0022   0.0032   4665
+[    2.6s]   owned_category.py:1228                        <genexpr>                          0.0020   0.0020  13350
+[    2.6s]   owned_category.py:1223                        <genexpr>                          0.0016   0.0036   1560
+[    2.6s]   set_categories.py:524                         __contains__                       0.0013   0.0024   1875
+[    2.6s]   lattices.py:5800                              _evaluate_gram                     0.0013   0.0197     60
+[    2.6s]   ring_foundation.py:6623                       _element_constructor_              0.0012   0.0017   2340
+[    2.6s]   framed_free_modules.py:106                    __call__                           0.0011   0.0108    750
+[    2.6s]   category_with_axiom.py:2021                   __classget__                       0.0010   0.0015    915
+[peakrss] p528span6: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 320 MiB
+[peakrss] low-water MemAvail : 13547 MiB
+[peakrss] peak single VmHWM  : 320 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      309 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   320 MiB hwm=   320 MiB avail= 13547 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   301 MiB hwm=   301 MiB avail= 13726 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail= 13897 MiB
+launcher exit: 0

@@ -1,0 +1,191 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.tmp/qc-evidence/issue390-stage-alone.py
+tree SHA: a71272add96485c3e6ceeda07572bf40c5b2b5c0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 500 s, outer 560 s, guard 6144 MiB, args 'profile=direct_plane input=direct'
+[0.0s] probe: T_Co's plane row setup, stage 'direct_plane' alone (#528)
+[0.0s] cap 560 s, python 3.14.10
+[0.0s] the GAP proxy is installed on 3 sage_extensions modules
+[0.3s] calibration (fixed workload, for the run's CPU share): 0.282 s
+[0.3s] building input: lattice construction
+[0.3s] input built: lattice construction in 0.0 s
+[0.3s] inputs built in 0.0 s; calling the stage alone
+[0.9s] 
+[0.9s] === GAP primitives, by time in this stage ===
+[0.9s] 
+[0.9s] === the stage alone ===
+[0.9s]   stage                                                 calls   seconds  peak MiB
+[0.9s]   direct_plane                                              1       0.6       nan
+[0.9s] === inside it (each sub-stage's own total, children included) ===
+[0.9s]   not inside a named sub-stage                                    0.617
+[0.9s] === below them ===
+[0.9s]   calibration (fixed workload, for the run's CPU share)      1     0.282
+[0.9s] the stage returned Integral lattice of rank 2 and signature (0, 0)
+[0.9s] 
+[0.9s] === the main thread's stack, 1 samples at 0.5 s ===
+[0.9s]   leaf frame (where the stage was) and the samples it holds:
+[0.9s]         1  owned_category.py:1116 is_subcategory
+[0.9s]   the last sample's whole stack, innermost first:
+[0.9s]      0. owned_category.py:1116 is_subcategory
+[0.9s]      1. category.py:709 __contains__
+[0.9s]      2. objects.py:172 __contains__
+[0.9s]      3. ring_foundation.py:7560 _own_ring
+[0.9s]      4. ring_foundation.py:630 _engine_ring_value
+[0.9s]      5. lattices.py:5810 _evaluate_gram
+[0.9s]      6. lattices.py:5822 b
+[0.9s]      7. lattices.py:452 <genexpr>
+[0.9s]      8. tensor.py:2654 _coordinate_tensor
+[0.9s]      9. tensor.py:2744 __call__
+[0.9s]     10. lattices.py:447 _lattice_subobject_on_basis
+[0.9s]     11. lattices.py:425 _lattice_subobject_spanning
+[0.9s]     12. lattices.py:3976 subobject_on
+[0.9s]     13. lattices.py:9430 primitive_isotropic_subobject
+[1.0s] 
+[1.0s] === cProfile, top calls by cumulative time ===
+[1.0s]          750839 function calls (745245 primitive calls) in 0.617 seconds
+[1.0s] 
+[1.0s]    Ordered by: cumulative time
+[1.0s]    List reduced from 1883 to 28 due to restriction <28>
+[1.0s] 
+[1.0s]    ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+[1.0s]        45    0.000    0.000    0.257    0.006 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:5814(b)
+[1.0s]        45    0.003    0.000    0.255    0.006 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:5800(_evaluate_gram)
+[1.0s]       2/1    0.000    0.000    0.183    0.183 /probe.py:335(_direct_plane)
+[1.0s]         1    0.000    0.000    0.183    0.183 /repos/sage-extensions/src/sage_extensions/categories/lattices.py:9411(primitive_isotropic_subobject)
+[1.0s]   356/262    0.003    0.000    0.182    0.001 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:2166(Of)
+[1.0s]   261/134    0.007    0.000    0.181    0.001 /repos/sage-extensions/src/sage_extensions/owned_category.py:832(retaining_initializer)
+[1.0s]      92/7    0.000    0.000    0.169    0.024 <frozen importlib._bootstrap>:1360(_find_and_load)
+[1.0s]      92/7    0.000    0.000    0.168    0.024 <frozen importlib._bootstrap>:1308(_find_and_load_unlocked)
+[1.0s]     69/67    0.000    0.000    0.159    0.002 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:902(__classcall__)
+[1.0s]    309/13    0.000    0.000    0.150    0.012 <frozen importlib._bootstrap>:483(_call_with_frames_removed)
+[1.0s]      90/7    0.000    0.000    0.150    0.021 <frozen importlib._bootstrap>:914(_load_unlocked)
+[1.0s]      87/6    0.000    0.000    0.149    0.025 <frozen importlib._bootstrap_external>:757(exec_module)
+[1.0s]      87/6    0.000    0.000    0.148    0.025 {built-in method builtins.exec}
+[1.0s]         1    0.000    0.000    0.147    0.147 /sage/.venv/lib/python3.14/site-packages/numpy/__init__.py:1(<module>)
+[1.0s]    474/11    0.000    0.000    0.143    0.013 {built-in method builtins.__import__}
+[1.0s]    191/67    0.000    0.000    0.138    0.002 <frozen importlib._bootstrap>:1409(_handle_fromlist)
+[1.0s] 1146/1143    0.000    0.000    0.136    0.000 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py:373(selected_resolution)
+[1.0s]         6    0.000    0.000    0.136    0.023 /repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:1885(selected_module_resolution)
+[1.0s]         3    0.000    0.000    0.135    0.045 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/objects.py:115(realize)
+[1.0s]         2    0.000    0.000    0.135    0.068 /repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:5007(selected_resolution)
+[1.0s]     21/20    0.000    0.000    0.121    0.006 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:882(element_class)
+[1.0s]         1    0.000    0.000    0.120    0.120 /repos/sage-extensions/src/sage_extensions/categories/modules/pure/modules.py:1897(module_generators)
+[1.0s]         2    0.000    0.000    0.113    0.057 /repos/sage-extensions/src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:3466(_framing_morphism)
+[1.0s]   143/123    0.005    0.000    0.105    0.001 /repos/sage-extensions/src/sage_extensions/owned_category.py:945(_make_named_class)
+[1.0s]        91    0.001    0.000    0.105    0.001 <frozen importlib._bootstrap>:1243(_find_spec)
+[1.0s]     21/20    0.000    0.000    0.102    0.005 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:668(_generated_arrow_type)
+[1.0s]     11/10    0.001    0.000    0.101    0.010 /repos/sage-extensions/src/sage_extensions/categories/abstract_categories/mor_categories.py:689(_arrow_type_from_declared_graph)
+[1.0s]       605    0.098    0.000    0.101    0.000 {built-in method posix.stat}
+[1.0s] 
+[1.0s] 
+[1.0s] 
+[1.0s] === the top calls and where they were called from ===
+[1.0s]   b (lattices.py:5814) cum=0.26 s own=0.00 s calls=45
+[1.0s]       called from _direct_plane (probe.py:335) x37 cum=0.24 s
+[1.0s]       called from <genexpr> (lattices.py:9438) x4 cum=0.01 s
+[1.0s]       called from <genexpr> (lattices.py:451) x0 cum=0.00 s
+[1.0s]       the chain from the stage itself:
+[1.0s]         <- _direct_plane (probe.py:335)
+[1.0s]   _evaluate_gram (lattices.py:5800) cum=0.25 s own=0.00 s calls=45
+[1.0s]       called from b (lattices.py:5814) x37 cum=0.24 s
+[1.0s]       the chain from the stage itself:
+[1.0s]         <- b (lattices.py:5814)
+[1.0s]         <- _direct_plane (probe.py:335)
+[1.0s]   _direct_plane (probe.py:335) cum=0.18 s own=0.00 s calls=2
+[1.0s]       the chain from the stage itself:
+[1.0s]   primitive_isotropic_subobject (lattices.py:9411) cum=0.18 s own=0.00 s calls=1
+[1.0s]       called from _direct_plane (probe.py:335) x0 cum=0.00 s
+[1.0s]       the chain from the stage itself:
+[1.0s]         <- _direct_plane (probe.py:335)
+[1.0s]   Of (mor_categories.py:2166) cum=0.18 s own=0.00 s calls=356
+[1.0s]       called from super_categories (mor_categories.py:1116) x90 cum=0.09 s
+[1.0s]       called from Mor (modules.py:1535) x16 cum=0.07 s
+[1.0s]       called from Of (mor_categories.py:2166) x32 cum=0.02 s
+[1.0s]       called from super_categories (lattice_morphisms.py:2518) x6 cum=0.01 s
+[1.0s]       called from Mor (mor_foundation.py:306) x17 cum=0.01 s
+[1.0s]       called from _carves_the_same_mor (mor_categories.py:2437) x26 cum=0.01 s
+[1.0s]       the chain from the stage itself:
+[1.0s]         <- super_categories (mor_categories.py:1116)
+[1.0s]         <- _owned_direct_supercategories (mor_categories.py:821)
+[1.0s]         <- arrow_supercategories (mor_categories.py:701)
+[1.0s]         <- visit (mor_categories.py:705)
+[1.0s]         <- _arrow_type_from_declared_graph (mor_categories.py:689)
+[1.0s]         <- _generated_arrow_type (mor_categories.py:668)
+[1.0s]         <- element_class (mor_categories.py:882)
+[1.0s]         <- elementwise (ring_foundation.py:946)
+[1.0s]         <- _ringlike_mor_element (ring_foundation.py:550)
+[1.0s]         <- _element_constructor_ (ring_foundation.py:943)
+[1.0s]         <- __call__ (mor_foundation.py:50)
+[1.0s]         <- __call__ (mor_categories.py:1007)
+[1.0s]         <- __call__ (ring_foundation.py:937)
+[1.0s]         <- _ring_morphism_defining_module_action (modules.py:2908)
+[1.0s] 
+[1.0s] === construction against computation, by own time ===
+[1.0s]   class                own s    share     cum s  entries
+[1.0s]   construction          0.05     7.9%      1.47      199
+[1.0s]   computation           0.00     0.0%      0.26        4
+[1.0s]   other                 0.57    92.0%      8.99     1680
+[1.0s]   stage (its own time)      0.62
+[1.0s] 
+[1.0s] === construction: the biggest entries, by own time ===
+[1.0s]   file:line                                   function                              own s    cum s  calls
+[1.0s]   category.py:436                             __classcall__                         0.010    0.043  11128
+[1.0s]   set_categories.py:6716                      _element_constructor_                 0.009    0.019  12977
+[1.0s]   finite_ordered_sets.py:229                  _element_constructor_                 0.005    0.061   1142
+[1.0s]   set_categories.py:6621                      __init__                              0.005    0.005   6643
+[1.0s]   ring_foundation.py:6488                     _element_constructor_                 0.003    0.004   5102
+[1.0s]   owned_category.py:1102                      is_subcategory                        0.002    0.003   5131
+[1.0s]   framed_free_modules.py:97                   __init__                              0.001    0.006    243
+[1.0s]   ring_foundation.py:5302                     __classcall__                         0.001    0.015   1717
+[1.0s]   homset.py:618                               __init__                              0.001    0.023     94
+[1.0s]   ring_foundation.py:5601                     __init__                              0.001    0.001   2026
+[1.0s]   modules.py:391                              __classcall__                         0.001    0.005   1428
+[1.0s]   mor_categories.py:911                       __init__                              0.001    0.100     69
+[1.0s]   set_categories.py:748                       __init__                              0.001    0.001    150
+[1.0s]   owned_category.py:1612                      _object_of                            0.001    0.042     36
+[1.0s] 
+[1.0s] === computation: the biggest entries, by own time ===
+[1.0s]   file:line                                   function                              own s    cum s  calls
+[1.0s]   set_categories.py:2469                      cardinality                           0.000    0.003    159
+[1.0s]   lattices.py:5814                            b                                     0.000    0.257     45
+[1.0s]   indexed_families.py:69                      cardinality                           0.000    0.000      6
+[1.0s]   integer_mod_ring.py:1094                    order                                 0.000    0.000     11
+[1.0s] 
+[1.0s] === other: the biggest entries, by own time ===
+[1.0s]   file:line                                   function                              own s    cum s  calls
+[1.0s]   ~:0                                         <built-in method posix.stat>          0.098    0.101    605
+[1.0s]   owned_category.py:681                       _owned_implementation_bases           0.023    0.069     55
+[1.0s]   owned_category.py:662                       linearize                             0.018    0.038   1673
+[1.0s]   owned_category.py:140                       mro                                   0.015    0.044    519
+[1.0s]   set_categories.py:524                       __contains__                          0.015    0.018   6336
+[1.0s]   refine.py:41                                _owned_mixins                         0.014    0.017     29
+[1.0s]   dynamic_class.py:338                        dynamic_class_internal                0.011    0.045    309
+[1.0s]   owned_category.py:100                       _c3_merge                             0.010    0.014    328
+[1.0s]   owned_category.py:217                       _abc_metaclass_for                    0.010    0.011    176
+[1.0s]   ~:0                                         <built-in method builtins.isinsta     0.010    0.010  65801
+[1.0s]   set_categories.py:777                       __call__                              0.010    0.061   1571
+[1.0s]   refine.py:163                               owned_parent_class                    0.010    0.040    106
+[1.0s]   set_categories.py:539                       __call__                              0.009    0.043   5151
+[1.0s]   textwrap.py:416                             dedent                                0.008    0.009     53
+[1.0s] 
+[1.0s] === everything else this run timed, outside the stage ===
+[1.0s]   row                                                   calls   seconds
+[1.0s]   input: lattice construction                               1       0.0
+[1.0s]   inputs proper (the rows above marked input:), total               0.0
+[1.0s] 
+[1.0s] the VM's 1-minute load average while this run went on: first 8.47, peak 8.47, last 8.47 (1 samples of /proc/loadavg)
+[1.0s] 
+[1.0s] peak VmRSS (python, sampled) 269 MiB
+[1.0s] RESULT stage=direct_plane seconds=0.62 inputs=0.04 calib=0.282 load_peak=8.47 profiled
+[1.0s] PROBE DONE
+[peakrss] p528q-base-direct_plane: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 410 MiB
+[peakrss] low-water MemAvail : 3172 MiB
+[peakrss] peak single VmHWM  : 410 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      399 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.1s procs=  3 rss=   410 MiB hwm=   410 MiB avail=  3172 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   192 MiB hwm=   192 MiB avail=  3313 MiB
+[peakrss]   t=     0.0s procs=  2 rss=     9 MiB hwm=     9 MiB avail=  3437 MiB
+launcher exit: 0

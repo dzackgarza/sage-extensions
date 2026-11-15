@@ -5,10 +5,10 @@ carries two readings that both go by the name ``order_ideal``: the ring's
 element class reaches ``Modules.ElementMethods.order_ideal`` through the module
 structure $U(\mathbf{Z}[x])$ and
 ``FramedFreeModules.ElementMethods.order_ideal`` from the chosen basis of the
-monomials.  The framed level is the more specific one -- a subcategory of
-``Modules(Z).Free()`` -- so the rebuild rule
-(``refine._final_category_operations``) keeps it, and the framed level states
-the value: the ideal the coordinates of the chosen basis generate.  The module
+monomials.  The framed level is the one the rebuild rule keeps; the rule is
+stated once, in ``sage_extensions.refine._owned_mixins``, and is not restated
+here.  The framed level states the value: the ideal the coordinates of the
+chosen basis generate.  The module
 level states it only where the dual carries a generating family, and on an
 infinite basis it does not: $\operatorname{Hom}_{\mathbf{Z}}
 (\mathbf{Z}[x], \mathbf{Z})$ is $\prod_{\mathbf{N}} \mathbf{Z}$, which is

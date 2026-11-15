@@ -30,7 +30,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 from sage_extensions import timing as sage_timing
@@ -50,6 +52,12 @@ class ProbeRun:
     the file the probe's own configuration names with ``log_file``, which is
     where a library's own logging configuration decides whether a record
     arrives.
+
+    ``pid`` and ``launched`` are what the run's own record files are found by:
+    the pid is the process that kept them, which is the child this module
+    started, and ``launched`` is the wall clock just before it started, so a
+    file an earlier run of a reused pid left behind is not mistaken for this
+    one's.
     """
 
     exit_status: int
@@ -57,6 +65,8 @@ class ProbeRun:
     messages: tuple[str, ...]
     transcript: str
     log: str
+    pid: int
+    launched: float
 
 
 def probe_run(tree: dict[str, str], *arguments: str) -> ProbeRun:
@@ -73,10 +83,22 @@ def probe_run(tree: dict[str, str], *arguments: str) -> ProbeRun:
     """
     root = _probe_directory(tree)
     try:
-        completed = subprocess.run(
-            _probe_command(root, arguments), cwd=root, capture_output=True, text=True
+        launched = time.time()
+        process = subprocess.Popen(
+            _probe_command(root, arguments),
+            cwd=root,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
         )
-        return _probe_report(root, completed.returncode, completed.stdout + completed.stderr)
+        output, _ = process.communicate()
+        return _probe_report(
+            root,
+            process.returncode,
+            output,
+            pid=process.pid,
+            launched=launched,
+        )
     finally:
         shutil.rmtree(root)
 
@@ -107,7 +129,7 @@ def _probe_command(root: Path, arguments: tuple[str, ...]) -> list[str]:
     ]
 
 
-def _probe_report(root: Path, exit_status: int, output: str) -> ProbeRun:
+def _probe_report(root: Path, exit_status: int, output: str, *, pid: int, launched: float) -> ProbeRun:
     r"""What the run in ``root`` reported, read off its own files."""
     records = [
         json.loads(line)
@@ -120,6 +142,8 @@ def _probe_report(root: Path, exit_status: int, output: str) -> ProbeRun:
         messages=tuple(message for message in map(_failure_message, records) if message),
         transcript=output,
         log=(root / "pytest.log").read_text(),
+        pid=pid,
+        launched=launched,
     )
 
 
@@ -206,10 +230,29 @@ def _sizes(directory: Path) -> dict[str, int]:
     }
 
 
+def _name_parts(name: str) -> tuple[str, str, str, str]:
+    r"""``<kind>-<commit>-<start>-<pid>.<suffix>``, split into its four parts."""
+    stem, _, suffix = name.partition(".")
+    kind, commit, stamp = stem.split("-", 2)
+    return kind, commit, stamp, suffix
+
+
+def _stamp_of(name: str) -> tuple[float, str]:
+    r"""A record file's start, as a wall clock, and the pid its stamp ends with.
+
+    The stamp is ``<start>-<pid>``: the microsecond start time the record is
+    named by and the process that wrote it.  A name that is not of that shape
+    is not one of these files, and ``ValueError`` says so.
+    """
+    _kind, _commit, stamp, _suffix = _name_parts(name)
+    start, _, pid = stamp.rpartition("-")
+    moment = datetime.strptime(start, "%Y%m%dT%H%M%S%fZ").replace(tzinfo=timezone.utc)
+    return moment.timestamp(), pid
+
+
 def _record_file(path: Path, *, after: int = 0) -> RecordFile:
     r"""The file at ``path``, read by its name and by the lines past ``after``."""
-    stem, _, suffix = path.name.partition(".")
-    kind, commit, stamp = stem.split("-", 2)
+    kind, commit, stamp, suffix = _name_parts(path.name)
     return RecordFile(
         name=path.name,
         kind=kind,
@@ -224,27 +267,50 @@ def _record_file(path: Path, *, after: int = 0) -> RecordFile:
 def stage_records_of(invoke) -> RecordFile:
     r"""The record file one stage-timed call appended to, read back from disk.
 
-    ``invoke`` is the call.  The file is found by what the directory held before
-    and after — the one file that grew — and not through the writer's own
-    :func:`sage_extensions.timing.record_path`, so a name the writer got wrong
-    is a name this reads and a test can refuse; and ``records`` are the lines
-    that call appended, not those of an earlier call in the same process.
+    ``invoke`` is the call, and the file is this process's own
+    (:func:`sage_extensions.timing.record_path`): another test worker writes its
+    own, under a pid of its own, so nothing this reads can be another process's
+    record.  The name is required to exist and to grow — a stage-timed call that
+    wrote no record is the finding, not an empty read — and ``records`` are the
+    lines that call appended, not those of an earlier call in this process.
     """
-    directory = sage_timing.timing_directory()
-    before = _sizes(directory)
+    path = sage_timing.record_path()
+    before = path.stat().st_size if path.is_file() else 0
     invoke()
-    grown = sorted(
-        name for name, size in _sizes(directory).items() if size > before.get(name, 0)
+    assert path.is_file(), (
+        f"the stage-timed call wrote no record: there is no file at {path}, which is the name this "
+        "process's record is required to have"
     )
-    assert len(grown) == 1, (
-        f"one stage-timed call should append to one record file, but these grew: {grown}"
+    after = path.stat().st_size
+    assert after > before, (
+        f"the stage-timed call appended nothing to {path}, which held {before} bytes before it"
     )
-    return _record_file(directory / grown[0], after=before.get(grown[0], 0))
+    return _record_file(path, after=before)
+
+
+def _kept_by(directory: Path, probe: ProbeRun) -> tuple[Path, ...]:
+    r"""The record files ``probe`` kept, found by the probe's own stamp.
+
+    Not by what the directory held before and after the run: the repository's
+    own runs are parallel, and another worker's file appearing in that window
+    would be read as this probe's.  A file is this probe's when its stamp ends
+    with the pid of the process this module started and its start is at or after
+    the moment that process was started.
+    """
+    selected = []
+    for name in sorted(_sizes(directory)):
+        try:
+            start, pid = _stamp_of(name)
+        except ValueError:
+            continue
+        if pid == str(probe.pid) and start >= probe.launched:
+            selected.append(directory / name)
+    return tuple(selected)
 
 
 @dataclass(frozen=True)
 class KeptRun:
-    r"""One probe run, and the record files that appeared while it was in flight.
+    r"""One probe run, and the record files that run's own stamp names.
 
     ``probe`` is what the run itself reported — its exit status among it — so a
     test can refuse a run that failed anywhere, and not only in the assertion it
@@ -270,12 +336,9 @@ def kept_test_run(tree, *arguments) -> KeptRun:
     pytest of its own.
     """
     directory = sage_timing.timing_directory()
-    before = set(_sizes(directory))
     probe = probe_run(tree, *PLUGIN_ARGUMENTS, *arguments)
     return KeptRun(
-        files=tuple(
-            _record_file(directory / name) for name in sorted(set(_sizes(directory)) - before)
-        ),
+        files=tuple(_record_file(path) for path in _kept_by(directory, probe)),
         probe=probe,
     )
 
@@ -290,9 +353,9 @@ def simultaneous_test_runs(*trees: dict[str, str]) -> tuple[tuple[RecordFile, ..
     plugin arguments ``kept_test_run`` uses.
     """
     directory = sage_timing.timing_directory()
-    before = set(_sizes(directory))
     roots = [_probe_directory(tree) for tree in trees]
     try:
+        launched = time.time()
         processes = [
             subprocess.Popen(
                 _probe_command(root, PLUGIN_ARGUMENTS),
@@ -306,14 +369,11 @@ def simultaneous_test_runs(*trees: dict[str, str]) -> tuple[tuple[RecordFile, ..
         probes = []
         for root, process in zip(roots, processes):
             output, _ = process.communicate()
-            probes.append(_probe_report(root, process.returncode, output or ""))
-        return (
-            tuple(
-                _record_file(directory / name)
-                for name in sorted(set(_sizes(directory)) - before)
-            ),
-            tuple(probes),
-        )
+            probes.append(
+                _probe_report(root, process.returncode, output, pid=process.pid, launched=launched)
+            )
+        kept = sorted(path for probe in probes for path in _kept_by(directory, probe))
+        return (tuple(_record_file(path) for path in kept), tuple(probes))
     finally:
         for root in roots:
             shutil.rmtree(root)
