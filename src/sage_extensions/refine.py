@@ -81,17 +81,16 @@ def _owned_mixins(category: Category, attr: str) -> tuple[type, ...]:
     declares the name, and the walk records every category that does.
 
     Class $P$ precedes class $Q$ when a proper supercategory of a category
-    reaching $P$ reaches $Q$ (:func:`_precedes`).  That relation is not a
-    partial order -- it is neither transitive nor antisymmetric in general --
-    so the classes are not sorted by comparing them pairwise.  They are the
-    nodes of a :class:`graphlib.TopologicalSorter` graph whose edges are the
-    pairs the relation holds; its linear extension is the order, and a cycle
-    is :exc:`graphlib.CycleError` rather than an order, which pairwise
-    insertion cannot notice.
+    reaching $P$ reaches $Q$ (:func:`_precedes`), and $P$ comes before $Q$
+    whenever $P$ precedes $Q$: the order is a linear extension of the relation.
+    The classes are the nodes of a :class:`graphlib.TopologicalSorter` graph
+    whose edges are the pairs the relation holds, so a cycle among them is
+    :exc:`graphlib.CycleError` rather than an order.
 
-    It is reflexive: a category reaching $P$ and one of its proper
-    supercategories both reach $P$, so a class precedes itself and the edge
-    carries nothing.  A class is not its own predecessor here.
+    A class precedes itself exactly when a category reaching $P$ has a proper
+    supercategory that also reaches $P$.  That is a cycle to the sorter rather
+    than a statement about the order, so the graph carries only the pairs of
+    distinct classes.
 
     The relation orders two classes only when the category hierarchy puts one
     below the other, and it says nothing between two categories over different
