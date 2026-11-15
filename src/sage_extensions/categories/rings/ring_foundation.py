@@ -4257,15 +4257,16 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
         itself.
 
         The operator is the coercion model's ``Element.__truediv__``: it brings
-        both operands into one parent and asks ``_div_`` there, so \(a / b\) is
-        computed in the parent the two elements have in common, which is the ring
-        exactly when the divisor is one of its units.  Where it is not, the
-        answer is the one the element realization that computes the division
-        gives: an engine-backed ring divides in its engine, and the quotient may
-        land in a larger parent -- \(\mathbf{Z}(3) / 2 = 3/2\) is an element of
-        \(\mathbf{Q}\) and not of \(\mathbf{Z}\); an exact field decides its zero
-        and undecided-nonzero denominators before dividing; and a realization
-        with neither keeps \(a b^{-1}\) from the monoid level
+        both operands into one parent and asks ``_div_`` there.  That parent is
+        the one the operands meet in, and the quotient need not stay in it:
+        \(\mathbf{Z}(3) / 2\) divides in \(\mathbf{Z}\), where \(3\) and the
+        numeral \(2\) meet, and the answer \(3/2\) is an element of
+        \(\mathbf{Q}\) because the realization's ``_div_`` says where the
+        quotient lands.  The realization that computes the division therefore
+        owns the codomain: an engine-backed ring divides in its engine and reads
+        the quotient in the parent the engine put it in; an exact field decides
+        its zero and undecided-nonzero denominators before dividing; and a
+        realization with neither keeps \(a b^{-1}\) from the monoid level
         (``sage.categories.monoids.Monoids.ElementMethods._div_``).  What a ring
         element never answers is the module's \(b^{-1} a\).
         """
@@ -6643,32 +6644,31 @@ class _OwnedRingParent(Parent):
         return value in self._engine
 
     def _coerce_map_from_(self, source):
-        r"""Return the represented canonical scalar map into this ring.
+        r"""Return the represented canonical scalar map this realization itself owns.
 
         Between owned rings the engine decides whether its canonical ring map
-        exists.  The other canonical sources are the initial semiring NN, whose
-        unique unital semiring morphism into a unital ring is represented by the
-        semiring category itself rather than by a ring-specific exception, and
-        the integers, whose unique unital ring morphism \(n \mapsto n\cdot 1\)
-        every unital ring receives.  This realization answers the canonical
-        sources it knows before the ring category states them, so it states the
-        integer one itself: a numeral is how a session writes a scalar
-        (``a / 2``, ``2 * a``), and a session's literal is its own integer,
-        while a Python caller's is an ``int`` under the Python type itself
-        (``sage.structure.element.parent`` answers ``int`` for an ``int``).
+        exists, and the initial semiring NN is represented by the semiring
+        category's own morphism; those two are the sources this realization
+        answers.  Every other canonical source is the ring category's to state,
+        and it is asked last: a ring's unique unital ring morphism
+        \(n \mapsto n\cdot 1\) from the integers is stated once, on
+        :class:`OwnedRings`, and a second copy here would be a second authority
+        for it (``OWN-19``).  A numeral still reaches the ring -- a session's
+        literal is its own integer and a Python caller's is an ``int`` under the
+        Python type itself (``sage.structure.element.parent`` answers ``int``
+        for an ``int``) -- through the category's hook, which this method now
+        defers to.
 
-        A raw Sage integer is not this: it stays outside the owned universe and
+        A raw Sage integer is not that: it stays outside the owned universe and
         :meth:`_element_constructor_` refuses it.
         """
         match source:
-            case _ if source is int or source is _owned_integers():
-                return _owned_ring_from_integer
             case _ if source in OwnedRings():
                 return self._engine.has_coerce_map_from(_engine_ring(source))
             case _ if source is OwnedSemirings().initial_object():
                 return OwnedSemirings().initial_morphism(self)
             case _:
-                return None
+                return super()._coerce_map_from_(source)
 
     def zero(self):
         return self._from_engine_element(self._engine.zero())
