@@ -2472,9 +2472,10 @@ class Modules(OwnedCategoryOverBaseRing):
             Stacks puts a domain in the hypothesis, where the nonzero scalars
             are the non-zero-divisors.
             Killing by any nonzero scalar is the other convention and a
-            different predicate: over $\mathbf{Z}/4$ it refutes
-            $\mathbf{Z}/4[x]$, since $2 \cdot (2x) = 0$, although the scalar
-            $2$ there is a zero-divisor and so kills nothing in this one.
+            different predicate: in $\mathbf{Z}/4[x]$ the scalar $2$ kills
+            $2x \neq 0$, which that reading calls torsion and this one does
+            not, because $2$ is a zero-divisor and only a non-zero-divisor
+            makes an element torsion.
 
             A level that computes an answer decides it
             (:meth:`_torsion_freeness_decision`); where none does, this returns
