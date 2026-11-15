@@ -9,22 +9,23 @@ also a finitely generated framed free module, a module with a chosen finite
 presentation, and an infinite ring.
 
 * ``order_ideal`` is ``Modules.ElementMethods.order_ideal`` -- the image of the
-  linear functionals -- not the coordinate reading of
-  ``FramedFreeModules.ElementMethods.order_ideal``.  On ``QQ(i)`` the two agree,
-  so that example states the level only in its docstring; the value that tells
-  them apart is in
-  ``tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage``,
-  where the module's dual is a product and only the module level can read it.
+  linear functionals, read through the module's pairing -- not the coordinate
+  reading of ``FramedFreeModules.ElementMethods.order_ideal``.  On ``QQ(i)`` the
+  two agree, so that example states the level only in its docstring;
+  ``tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage``
+  states the same operation where the module's dual is the product
+  ``prod_S QQ`` and the value is read through that product's coordinate
+  functionals.
 * ``__iter__`` is ``OwnedRings.Finite.ParentMethods.__iter__``, which enumerates
   a *finite* ring's points through its selected engine; ``QQ(i)`` is not finite,
-  so it states no enumeration of its points and no level of this rebuild gives
-  it one.
+  so no level of this rebuild gives it an enumeration, and the general ring
+  states none at all (``iter(..)`` fails in the language, which
+  ``tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage`` states for
+  ``ZZ['x']``).
 * ``adic_completion`` is ``OwnedRings.ParentMethods.adic_completion``, the
   ring's inverse limit, not the module's base change to the completed scalar
   ring of ``ModulesWithChosenFinitePresentation.ParentMethods``.
 """
-
-import pytest
 
 from sage_extensions.all import *  # noqa: F401,F403
 
@@ -49,10 +50,13 @@ def test_the_module_level_states_the_order_ideal_of_an_algebra_element() -> None
 def test_a_finite_ring_enumerates_its_points_through_its_engine() -> None:
     r"""$\mathbf{Z}/8$ is finite, so it states its eight residue classes.
 
-    ``OwnedRings.Finite.ParentMethods.__iter__`` answers.  The ring has eight
-    points, each an element of it and each different from the others, and the
-    classes of $0, \ldots, 7$ are exactly those eight points: the enumeration
-    is of the ring's whole underlying set, not of a generating family of it.
+    ``OwnedRings.Finite.ParentMethods.__iter__`` answers -- not the general ring
+    level, which states no enumeration of its points, and not the framed free
+    module's coordinate iteration, which would list the coefficients of a chosen
+    basis.  The ring has eight points, each an element of it and each different
+    from the others, and the classes of $0, \ldots, 7$ are exactly those eight
+    points: the enumeration is of the ring's whole underlying set, not of a
+    generating family of it.
     """
     ring = Zmod(8)
     points = tuple(ring)
