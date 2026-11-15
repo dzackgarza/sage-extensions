@@ -2604,14 +2604,11 @@ class DiscriminantImageMembership:
         self._discriminant_group = quotient._discriminant_group
         self._engine = _gap_model(self._discriminant_group)
         self._image = quotient._joint_discriminant_image_gap()
+        self._converted_elements = {}
 
     def quotient(self):
         r"""Return the character quotient whose discriminant image this tests."""
         return self._quotient
-
-    def image(self):
-        r"""Return ``\rho(\Gamma)`` as the ``O(A_L)`` engine subgroup the chain is of."""
-        return self._image
 
     def contains(self, isometry) -> bool:
         r"""Whether the isometry of ``O(A_L)`` lies in ``\rho(\Gamma)``."""
@@ -2624,25 +2621,34 @@ class DiscriminantImageMembership:
     def __contains__(self, isometry) -> bool:
         return self.contains(isometry)
 
-    def engine_elements(self, isometries):
-        r"""Return the ``O(A_L)`` engine elements of a family of isometries, for :meth:`meets_translates`."""
+    def _engine_element(self, isometry):
+        r"""Return the engine element of an isometry of ``O(A_L)``, converting it once.
+
+        The conversion is this object's boundary crossing: the isometry is an owned
+        element of ``O(A_L)`` and the chain sifted is the engine's, so what crosses is
+        kept here and never handed back out.  One question of :meth:`meets_translates`
+        asks about the same family of factors once per candidate, so each element is
+        converted once and then reused.
+        """
         from sage_extensions.categories.group.groups import _element_to_engine
 
-        return tuple(
-            _element_to_engine(self._discriminant_group, isometry) for isometry in isometries
-        )
+        converted = self._converted_elements.get(isometry)
+        if converted is None:
+            converted = _element_to_engine(self._discriminant_group, isometry)
+            self._converted_elements[isometry] = converted
+        return converted
 
     def meets_translates(self, factors, isometry) -> bool:
         r"""Whether ``f`` times the isometry lies in ``\rho(\Gamma)`` for some ``f`` of ``factors``.
 
-        ``factors`` are engine elements (:meth:`engine_elements`), converted once
-        by the caller, so each question converts one isometry and sifts each
-        product through the chain.
+        ``factors`` and ``isometry`` are isometries of the discriminant group as owned
+        elements of ``O(A_L)``; their engine elements are this object's own datum
+        (:meth:`_engine_element`), so no caller converts one and none is returned.
         """
-        from sage_extensions.categories.group.groups import _element_to_engine
-
-        target = _element_to_engine(self._discriminant_group, isometry)
-        return any(factor * target in self._image for factor in factors)
+        target = self._engine_element(isometry)
+        return any(
+            self._engine_element(factor) * target in self._image for factor in factors
+        )
 
 
 _MISSING_ARITHMETIC_GENERATING_SET = (
