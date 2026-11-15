@@ -2340,3 +2340,16 @@ the torsion module in cell 61 realizes its degree-zero resolution *during* const
 factory), so the graded element class of `GradedAlgebras(ZZ)` is built there and cell 84's sparse
 arrow loses its class; with the branch reverted the cells file returns to main's `1 failed, 4
 passed` and `QQ[S]`'s augmentation parent is `Mor_UnitalAlg(A, A)` again.
+## #541 -- the integral lift locus is a subset of its torsor, not an image of a product
+
+`integral_parameter_classes` is a datum of the torsor and is built in 4 ms on
+`T_Co`, but `_integral_lift_locus` presented `T_Z` as the image of
+`C x ker r`, and the product interner keys a family by its factors' hashes: the
+hash of the 131072-class residue locus walked all of it, **65.2 s a candidate**
+(`541-locus-baseline.log`).  The locus is the subset of the torsor cut out by
+the parameter's residue class, so nothing is asked for.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-locus-probe.py`, `541-locus-baseline.log` | main `e763219` | `T_Co` at its first isotropic vector, identity reduction isometry: `\|passing\|` 256, `\|kernel\|` 512, period 4, `\|C\|` 131072; residue locus **0.004 s**, `integral_members()` **65.218 s**, `is_empty()` 0.000 s, `integral_base_point_or_none()` 0.016 s; a subset of the torsor **0.000 s**, one admitted point 0.003 s, membership 0.000 s |
+| `541-locus-red.log` | main `e763219` | `tests/lattices/test_the_integral_lift_locus_is_a_subset_of_the_torsor.sage`: **3 failed in 2.03 s**, `AttributeError: ... has no attribute 'integral_lift_locus'` |
