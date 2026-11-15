@@ -1,0 +1,39 @@
+=== #540: the placement edge the review asks for, and what it breaks
+===
+=== Every run below is one process in the pinned image, port at 991b88b0, tree main
+=== 52cbab3 with 5370933's membership probe removed:
+===   pytest -p qc_sage_session tests/divisors/test_toric_class_groups.sage -q
+
+--- the hunk under test, in src/sage_extensions/categories/algebras/free_algebras.py ---
+     def super_categories(self):
+         return [
+             Algebras(self.base_ring()).Associative().Unital(),
++            AlgebrasWithChosenFinitePresentation(self.base_ring()),
+         ]
+
+=== Run A: that hunk alone.
+
+....FF..                                                                 [100%]
+   the two failures are the quadric-cone rows, through
+E   TypeError: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring has no chosen finite algebra presentation: its selected resolution is truncated in degree 0
+_____________ test_the_class_group_of_the_quadric_cone_is_torsion ______________
+sage/misc/cachefunc.pyx:1024: in sage.misc.cachefunc.CachedFunction.__call__
+    return self.cache[k]
+
+=== Run B: that hunk, and presentation_ring() answering its degree-zero source
+===   (return self.selected_algebra_resolution().level(0)).
+
+....FF..                                                                 [100%]
+E   TypeError: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring has no chosen finite algebra presentation: its selected resolution is truncated in degree 0
+_____________ test_the_class_group_of_the_quadric_cone_is_torsion ______________
+sage/misc/cachefunc.pyx:1024: in sage.misc.cachefunc.CachedFunction.__call__
+    return self.cache[k]
+
+=== Run C: Run A plus SymmetricAlgebras(R) below
+===   AlgebrasWithChosenFinitePresentation(R) as well.
+
+....FF..                                                                 [100%]
+E   TypeError: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring has no chosen finite algebra presentation: its selected resolution is truncated in degree 0
+_____________ test_the_class_group_of_the_quadric_cone_is_torsion ______________
+sage/misc/cachefunc.pyx:1024: in sage.misc.cachefunc.CachedFunction.__call__
+    return self.cache[k]

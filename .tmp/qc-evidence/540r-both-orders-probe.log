@@ -1,0 +1,29 @@
+=== #540: the same semigroup algebra in both construction orders, after the repair
+=== trees: b64b6d1 (the repair) in one process each, port at 991b88b0
+=== probe: probe540i.py -- order plain: no polynomial ring built first; order poly: QQ[y] first
+
+provider SHA: b64b6d1b3f0ecc7b701491a847b76d1c066a630a (worktree /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt540c)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe540i.py order=plain
+order: plain
+_algebra_mor_class: <class 'sage_extensions.categories.algebras.free_algebras.FramedFreeAlgebraMor'>
+mro: ['OwnedNativeFreeAlgebraWithAffineSemigroupData_with_category', 'ParentMethods', 'ParentMethods', 'ParentMethods', 'ParentMethods', '_CommutativeUnitalAlgebraParentMethods', 'ParentMethods', 'ParentMethods']
+generating_module owner: SymmetricAlgebras.ParentMethods.generating_module
+augmentation: Generic endomorphism of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring parent: Mor_UnitalAlg(Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring, Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring)
+aug fixes generator: True
+framing parent is A.Mor(A): True
+class_group: Finitely presented module on 4 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 0, 1 ↦ 0] free: True rank: 2
+launcher exit: 0 order=plain
+
+provider SHA: b64b6d1b3f0ecc7b701491a847b76d1c066a630a (worktree /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt540c)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe540i.py order=poly
+order: poly
+_algebra_mor_class: <class 'sage_extensions.categories.algebras.algebras.PresentedAlgebraMor'>
+mro: ['OwnedNativeFreeAlgebraWithAffineSemigroupData_with_category', 'ParentMethods', 'ParentMethods', 'ParentMethods', 'ParentMethods', 'ParentMethods', '_CommutativeUnitalAlgebraParentMethods', 'ParentMethods']
+generating_module owner: SymmetricAlgebras.ParentMethods.generating_module
+augmentation: Generic endomorphism of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring parent: Mor_UnitalAlg(Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring, Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring)
+aug fixes generator: True
+framing parent is A.Mor(A): True
+class_group: Finitely presented module on 4 module generators over Integer Ring with invariant factors Invariant-factor family: [0 ↦ 0, 1 ↦ 0] free: True rank: 2
+launcher exit: 0 order=poly
