@@ -4256,23 +4256,18 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
         action of the same element on the ring regarded as a left module over
         itself.
 
-        The quotient is taken in the parent the two operands have in common,
-        which is the ring exactly when the divisor is a unit of it.  A ring
-        therefore divides by a divisor that is not one of its units by answering
-        in the larger parent it shares with it: \(\mathbf{Z}(3) / 2 = 3/2\) is
-        the quotient in \(\mathbf{Q}\), not a refusal and not an element of
-        \(\mathbf{Z}\), because \(2\) is a unit of \(\mathbf{Q}\) and the
-        coercion model meets \(3\) and \(2\) there.  Where the divisor is a unit
-        of the ring the quotient is one of its own elements.
-
         The operator is the coercion model's ``Element.__truediv__``: it brings
         both operands into one parent and asks ``_div_`` there, so \(a / b\) is
-        computed in the parent the two elements have in common.  ``_div_``
-        stays with the element realization that computes it -- an exact field
-        decides the zero and undecided-nonzero denominators, an engine-backed
-        ring divides in its engine, and an element realization with neither
-        keeps \(a b^{-1}\) from the monoid level
-        (``sage.categories.monoids.Monoids.ElementMethods._div_``).
+        computed in the parent the two elements have in common, which is the ring
+        exactly when the divisor is one of its units.  Where it is not, the
+        answer is the one the element realization that computes the division
+        gives: an engine-backed ring divides in its engine, and the quotient may
+        land in a larger parent -- \(\mathbf{Z}(3) / 2 = 3/2\) is an element of
+        \(\mathbf{Q}\) and not of \(\mathbf{Z}\); an exact field decides its zero
+        and undecided-nonzero denominators before dividing; and a realization
+        with neither keeps \(a b^{-1}\) from the monoid level
+        (``sage.categories.monoids.Monoids.ElementMethods._div_``).  What a ring
+        element never answers is the module's \(b^{-1} a\).
         """
 
         # Division by the inverse on the right, ahead of the scalar action of a
