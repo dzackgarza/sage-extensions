@@ -1916,3 +1916,23 @@ The repair keeps 204ffbb's corrected coset reading and restores the matrix test.
 | `issue528-locus-tests-repaired.log` | main `6ce8d8a8` + the repair | `tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage` with the test lint plugin: **6 passed in 16.97 s**, the new counting test included |
 | `issue528-locus-tests-204ffbb-red.log` | `204ffbb96e` | the same file there: the new test **fails** -- the torsor asks for its base point **10** times where the repair asks **3** -- and one existing test fails too (the unequal-Smith-steps control, which `d83ae97`, the child of 204ffbb, repairs; 204ffbb is not main) |
 | `issue528-repaired-row-counts.log` | main `6ce8d8a8` + the repair | T_Co's ambient plane row: **returns in 217.9 s** with `_lift_at` called **0** times, where `204ffbb96e` did not return at 300 s with 1362 calls costing 183.67 s, and `a71272add9` returned in 54-61 s. The per-class lift test is gone from the row; the remaining gap to the base is not the lift test and is the next measurement |
+
+## The fifth review of #500: the torsion reading and the provider order
+
+The four logs below are the runs the commits `030a528` and `476f87c` cite.  The
+probes were run in the adopted image with the checkout bound at
+`/repos/sage-extensions` and the port at `/work`, the same shape as above but
+with `PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work:/repos/sage-extensions/src`
+and the script bound at `/probe.py`.  The tree is `6e4e097`, which is the four
+commits merged onto the remote main `1cc2481`; the source files these logs
+measure are unchanged by that merge.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue500r5-name-owners.py` | the tree of `476f87c` | the probe: for twenty-six constructed objects and each of `ParentMethods`, `ElementMethods`, `MorphismMethods`, computes the order the deleted insertion loop gave and the order the tree gives, prints the two wherever they differ, and then asks, for every name any provider declares, which provider answers it first under each |
+| `issue500r5-name-owners.log` | the tree of `476f87c` | three runs in fresh processes: the orders differ in **2, 1 and 1** of the 78 pairs -- always `Modules.FinitelyGenerated` against `FramedFreeModules`, in `QQ(i)` and `Z[x]/(x^2)`'s `ParentMethods` -- and **no name's answering provider moves in any run** |
+| `issue500r5-answering-class.py` | the tree of `030a528` | the probe: names the class in the rebuilt type's method resolution order that declares `_torsion_freeness_decision`, and the answer |
+| `issue500r5-answering-class.log` | the tree of `030a528` | `Z[x]/(x^2)`: `AlgebrasWithChosenFinitePresentation.ParentMethods` **True**; `Z/4[x]`, `Z[x]`, `Q(i)`: `FramedFreeModules.ParentMethods` **True** |
+| `issue500r5-refusal.log` | the tree of `587aabd` | the order-ideal refusal on `2` in `Z/8` as a `Z`-module, printed: the message names the element, the ideal, the functionals that are missing and what they are for, and no word STY-49 bans |
+| `issue500r5-tests.log` | the tree of `6e4e097` | `tests/categories/test_the_refined_category_answers_with_its_own_operation.sage tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage`, test lint loaded: **10 passed in 0.91 s**; the same two files at `a106d23` with the two new tests: **2 failed, 8 passed in 4.59 s** |
+| `issue500r5-sweep.log` | the tree of `6e4e097` and a clean worktree at `1cc2481` | a digest, assembled from the run logs and labelled as one: twelve directories, the five root test modules and `tests/lattices/test_lattice_surfaces.sage`, each summary line with its count of FAILED/ERROR ids, and the ids present on one side only -- **none, in any of the fourteen**; the only count that differs is `tests/categories`, 45 passed against 42, the three tests this round adds |
