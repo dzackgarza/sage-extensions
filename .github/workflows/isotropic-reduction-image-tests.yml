@@ -48,3 +48,10 @@ jobs:
           just test tests/lattices/test_the_isotropic_reduction_image.sage \
             --no-time-gates --timeout "$TEST_TIMEOUT" -v
         shell: bash
+      - name: Keep the run's timing and report log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reduction-image-report-${{ github.sha }}
+          path: tests/.report/
+          retention-days: 90
