@@ -1,0 +1,77 @@
+tree SHA: 61797fba510011b833897fb7cc9f79af43bed16d
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 580 s, outer 640 s, guard 6144 MiB
+command: python -m pytest -p qc_sage_session tests/forms/test_all_ones_form_correlation.sage tests/lattices/test_content_and_doubling.sage tests/lattices/test_reflection_rational_line.sage -q --no-test-lint  (repository addopts)
+.....F....                                                               [100%]
+=================================== FAILURES ===================================
+______________ test_index_two_sublattices_of_a_hyperbolic_summand ______________
+
+    def test_index_two_sublattices_of_a_hyperbolic_summand():
+        r"""U in U+U has three index-two sublattices; O(U) exchanges <e,2f>, <2e,f> and fixes <e+f,2f>."""
+        hyperbolic = Lattices(ZZ)("U")
+        ambient = hyperbolic + hyperbolic
+        e, f, _u, _v = tuple(ambient.module_generators())
+        saturated = ambient.subobject_on((e, f)).inclusion()
+>       assert ambient.O().nonprimitive_sublattice_classes(saturated, (1, 2)).cardinality() == cardinal(2)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_content_and_doubling.sage:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Orthogonal group O(Integral lattice of rank 4 and signature (2, 2))
+saturated = Generic morphism:
+  From: Integral lattice of rank 2 and signature (1, 1)
+  To:   Integral lattice of rank 4 and signature (2, 2)
+divisors = (1, 2)
+
+    def nonprimitive_sublattice_classes(self, saturated, divisors):
+        r"""Return one inclusion per ``Stab(S)``-class of ``J <= S`` with the given elementary divisors."""
+>       from sage_indefinite_port.indefinite.marked_lattices import nonprimitive_sublattice_classes
+E       ImportError: cannot import name 'nonprimitive_sublattice_classes' from 'sage_indefinite_port.indefinite.marked_lattices' (/work/src/sage_indefinite_port/indefinite/marked_lattices.py)
+
+src/sage_extensions/categories/lattice_morphisms.py:5034: ImportError
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+0.18s call     tests/lattices/test_content_and_doubling.sage::test_doubling_keeps_the_group_but_not_the_discriminant
+0.17s call     tests/lattices/test_content_and_doubling.sage::test_content_strata_of_square_eight_in_u
+0.03s call     tests/lattices/test_reflection_rational_line.sage::test_a_nonprimitive_integral_reflection_vector_still_reflects
+0.03s call     tests/forms/test_all_ones_form_correlation.sage::test_the_all_ones_form_row_is_the_constant_family
+0.02s call     tests/lattices/test_content_and_doubling.sage::test_index_two_sublattices_of_a_hyperbolic_summand
+0.02s call     tests/lattices/test_content_and_doubling.sage::test_null_vectors_of_different_content_are_inequivalent
+0.02s call     tests/lattices/test_reflection_rational_line.sage::test_the_doubled_root_defines_the_reflection_of_the_root
+0.01s call     tests/forms/test_all_ones_form_correlation.sage::test_the_witness_is_attached_only_to_a_diagonal_gram
+0.01s call     tests/lattices/test_reflection_rational_line.sage::test_the_doubled_reflection_is_an_involution_of_the_lattice
+0.01s call     tests/lattices/test_reflection_rational_line.sage::test_a_line_with_no_integral_reflection_vector_is_refused
+0.00s setup    tests/forms/test_all_ones_form_correlation.sage::test_the_all_ones_form_row_is_the_constant_family
+0.00s setup    tests/lattices/test_content_and_doubling.sage::test_null_vectors_of_different_content_are_inequivalent
+0.00s setup    tests/forms/test_all_ones_form_correlation.sage::test_the_witness_is_attached_only_to_a_diagonal_gram
+0.00s setup    tests/lattices/test_content_and_doubling.sage::test_doubling_keeps_the_group_but_not_the_discriminant
+0.00s setup    tests/lattices/test_reflection_rational_line.sage::test_the_doubled_root_defines_the_reflection_of_the_root
+0.00s setup    tests/lattices/test_content_and_doubling.sage::test_index_two_sublattices_of_a_hyperbolic_summand
+0.00s setup    tests/lattices/test_reflection_rational_line.sage::test_the_doubled_reflection_is_an_involution_of_the_lattice
+0.00s setup    tests/lattices/test_reflection_rational_line.sage::test_a_line_with_no_integral_reflection_vector_is_refused
+0.00s setup    tests/lattices/test_reflection_rational_line.sage::test_a_nonprimitive_integral_reflection_vector_still_reflects
+0.00s setup    tests/lattices/test_content_and_doubling.sage::test_content_strata_of_square_eight_in_u
+0.00s teardown tests/lattices/test_content_and_doubling.sage::test_index_two_sublattices_of_a_hyperbolic_summand
+0.00s teardown tests/lattices/test_reflection_rational_line.sage::test_a_nonprimitive_integral_reflection_vector_still_reflects
+0.00s teardown tests/lattices/test_content_and_doubling.sage::test_content_strata_of_square_eight_in_u
+0.00s teardown tests/forms/test_all_ones_form_correlation.sage::test_the_all_ones_form_row_is_the_constant_family
+0.00s teardown tests/lattices/test_content_and_doubling.sage::test_doubling_keeps_the_group_but_not_the_discriminant
+0.00s teardown tests/forms/test_all_ones_form_correlation.sage::test_the_witness_is_attached_only_to_a_diagonal_gram
+0.00s teardown tests/lattices/test_reflection_rational_line.sage::test_the_doubled_root_defines_the_reflection_of_the_root
+0.00s teardown tests/lattices/test_reflection_rational_line.sage::test_the_doubled_reflection_is_an_involution_of_the_lattice
+0.00s teardown tests/lattices/test_reflection_rational_line.sage::test_a_line_with_no_integral_reflection_vector_is_refused
+0.00s teardown tests/lattices/test_content_and_doubling.sage::test_null_vectors_of_different_content_are_inequivalent
+=========================== short test summary info ============================
+FAILED tests/lattices/test_content_and_doubling.sage::test_index_two_sublattices_of_a_hyperbolic_summand
+1 failed, 9 passed in 1.36s
+[peakrss] tests530: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 330 MiB
+[peakrss] low-water MemAvail : 12915 MiB
+[peakrss] peak single VmHWM  : 330 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      319 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   330 MiB hwm=   330 MiB avail= 12915 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail= 12974 MiB

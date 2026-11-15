@@ -1,0 +1,55 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe530d.py
+tree SHA: 0fd90fcd0298d3565c2151e0596da91bf641b261
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 400 s, outer 460 s, guard 6144 MiB, args ''
+--- ZZ**2: base ring Integer Ring
+  has_selected_module_resolution: True
+  module_generating_set(): {0,...,1}
+  its cardinality: 2
+  dual_module(): Free module on {Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring, Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring} over Integer Ring
+  dual has_selected_module_resolution: True
+  dual.module_generating_set(): {0,...,1}
+--- Zmod(8): base ring Integer Ring
+  has_selected_module_resolution: True
+  module_generating_set(): {0,...,0}
+  its cardinality: 1
+  dual_module(): Mor(Integer Ring / Ideal (8) of Integer Ring, Integer Ring)
+  dual has_selected_module_resolution: False
+  dual.module_generating_set(): ValueError: Mor(Integer Ring / Ideal (8) of Integer Ring, Integer Ring) has no chosen resolution relative to Category of modules over Integer Ring
+--- QQ(i): base ring Fraction Field of Integer Ring
+  has_selected_module_resolution: True
+  module_generating_set(): {0,...,1}
+  its cardinality: 2
+  dual_module(): Free module on {Generic morphism:
+  From: Free module on {1, a} over Fraction Field of Integer Ring
+  To:   Free module on {[0]} over Fraction Field of Integer Ring, Generic morphism:
+  From: Free module on {1, a} over Fraction Field of Integer Ring
+  To:   Free module on {[0]} over Fraction Field of Integer Ring} over Fraction Field of Integer Ring
+  dual has_selected_module_resolution: True
+  dual.module_generating_set(): {0,...,1}
+--- ZZ['x']: base ring Integer Ring
+  has_selected_module_resolution: True
+  module_generating_set(): Coproduct of the family over NN = {0, 1, 2, ...}
+  its cardinality: ℵ_0
+  dual_module(): Module over Integer Ring on Product of the family over Coproduct of the family over NN = {0, 1, 2, ...}
+  dual has_selected_module_resolution: False
+  dual.module_generating_set(): ValueError: Module over Integer Ring on Product of the family over Coproduct of the family over NN = {0, 1, 2, ...} has no chosen resolution relative to Category of modules over Integer Ring
+--- QQ['x']: base ring Fraction Field of Integer Ring
+  has_selected_module_resolution: True
+  module_generating_set(): Coproduct of the family over NN = {0, 1, 2, ...}
+  its cardinality: ℵ_0
+  dual_module(): Module over Fraction Field of Integer Ring on Product of the family over Coproduct of the family over NN = {0, 1, 2, ...}
+  dual has_selected_module_resolution: False
+  dual.module_generating_set(): ValueError: Module over Fraction Field of Integer Ring on Product of the family over Coproduct of the family over NN = {0, 1, 2, ...} has no chosen resolution relative to Category of modules over Fraction Field of Integer Ring
+[peakrss] probe530: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 2 MiB
+[peakrss] low-water MemAvail : 11995 MiB
+[peakrss] peak single VmHWM  : 2 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       2 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 11995 MiB
+launcher exit: 0

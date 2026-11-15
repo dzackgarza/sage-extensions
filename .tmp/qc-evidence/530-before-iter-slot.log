@@ -1,0 +1,27 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe530i.py
+tree SHA: 0fd90fcd0298d3565c2151e0596da91bf641b261
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 300 s, outer 360 s, guard 6144 MiB, args ''
+package: /repos/old/src/sage_extensions/__init__.py
+ring.__iter__: <bound method OwnedRings.ParentMethods.__iter__ of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring>
+isinstance(ring, collections.abc.Iterable): True
+iter: TypeError
+tuple: TypeError
+dual: Module over Fraction Field of Integer Ring on Product of the family over NN = {0, 1, 2, ...}
+dual is Mor(M, QQ.reg): False
+constant functional at e0+e1: 2
+(2x+2).order_ideal(): Ideal (2) of Integer Ring
+[peakrss] probe530: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 303 MiB
+[peakrss] low-water MemAvail : 9566 MiB
+[peakrss] peak single VmHWM  : 303 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      292 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   bash                          1 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   303 MiB hwm=   303 MiB avail=  9566 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   282 MiB hwm=   282 MiB avail=  9811 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   224 MiB hwm=   224 MiB avail=  9800 MiB
+[peakrss]   t=     0.0s procs=  2 rss=     8 MiB hwm=     8 MiB avail=  9938 MiB
+launcher exit: 0

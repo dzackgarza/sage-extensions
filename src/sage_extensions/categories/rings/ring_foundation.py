@@ -3590,16 +3590,18 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
                 and is not an enumeration protocol, so this is the ring's whole
                 enumeration of its points.
 
-                The hypothesis of this algorithm is that the construction
-                retained a distinct engine whose values are the ring's points.
-                It is asserted, as an algorithmic hypothesis of the listing
-                (``STY-49``), and not reported as a mathematical statement about
-                the ring: the ring is finite either way.
+                The hypothesis of this algorithm is that the ring is presented as
+                a quotient of a ring whose points are listed, the classes being
+                this ring's points.  It is asserted, as an algorithmic
+                hypothesis of the listing (``STY-49``), and not reported as a
+                mathematical statement about the ring: the ring is finite either
+                way.
                 """
                 engine = self._selected_engine_ring()
                 assert engine is not None and engine is not self, (
-                    f"cannot list the points of {self}: its construction retains no distinct "
-                    "engine whose values are the ring's points"
+                    f"cannot list the points of {self}: they are the classes of a "
+                    "quotient ring, and this ring is not stated as the quotient of "
+                    "a ring whose points are listed"
                 )
                 return iter(_owned_engine_element(self, point) for point in engine)
 

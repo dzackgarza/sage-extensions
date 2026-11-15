@@ -1,0 +1,5 @@
+tree SHA: 61797fba510011b833897fb7cc9f79af43bed16d
+command: python -m sage_extensions.testing.test_lint .scratch/iterable_try.sage
+.scratch/iterable_try.sage:3: TL01 import collections.abc: take every name from the session
+.scratch/iterable_try.sage:15: TL03 isinstance(): introspection is not mathematics
+1 files, 2 findings (TL01, TL03)

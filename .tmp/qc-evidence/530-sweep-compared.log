@@ -1,0 +1,31 @@
+Targets: tests/modules tests/rings tests/forms tests/categories, one pytest process per run,
+repository addopts blanked (-o addopts=) so the run is the library's behaviour alone.
+
+new tree (library = this commit's working tree, tests from it too):
+  193 failed, 395 passed, 318 errors in 256.71s
+base    (library = git archive 0fd90fc, same test files):
+  194 failed, 394 passed, 318 errors in 90.83s
+
+FAILED/ERROR ids, sorted, compared with comm:
+  only on the new tree:  (none)
+  only on the base:
+    FAILED tests/modules/test_the_dual_of_a_module_is_its_module_of_functionals.sage::test_the_dual_of_an_infinite_free_module_is_the_module_of_functionals
+
+The two sweeps are byte-for-byte the same run otherwise; the sole difference is the
+new test's dual-construction assertion, red on the base and green on the new tree.
+The base run's 90.83 s against the new tree's 256.71 s did not reproduce when the
+directories were run separately on the new tree: 26.76 s (tests/modules) and 68.34 s
+(tests/rings tests/forms tests/categories), i.e. 95.1 s in total, against 90.8 s for
+the base in one process. The 256.71 s run is an outlier of the VM, not a cost.
+
+== tests/forms, --no-test-lint, one process each ==
+new tree: 48 failed, 93 passed, 324.12 s
+base    : 49 failed, 92 passed, 321.82 s
+  only on the new tree: (none)
+  only on the base:
+    FAILED tests/forms/test_all_ones_form_correlation.sage::test_the_witness_is_attached_only_to_a_diagonal_gram
+
+That one id differs because the test file bound into both runs is this commit's: on
+the base library it calls _attach_diagonal_correlation_witness with the two arguments
+this commit gives it, and the base function takes three. The base sweep's own run of
+the file with its own arity is .tmp/qc-evidence/500d-extra-base.log (2 passed).
