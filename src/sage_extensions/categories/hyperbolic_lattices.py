@@ -173,22 +173,26 @@ def _rational_pair(value):
     return (int(value.numerator()), int(value.denominator()))
 
 
-def _vinberg_walk_record_name(lattice, controlling_vector, max_roots, max_decompositions, admits_root) -> str:
+def _vinberg_walk_record_name(lattice, controlling_vector, max_roots, max_decompositions) -> str:
     r"""Name one Vinberg walk in a timing record: the lattice, the point, the bounds.
 
-    ``_vinberg_search`` is cached on ``(controlling_vector, max_roots,
-    max_decompositions, admits_root)``, and all four are what a reader of the
-    line needs to know which walk a duration belongs to: the point the chamber is
-    grown from decides which vertices are written down, and the bounds and the
-    root filter decide which walls survive.  The lattice is named by its ring and
-    Gram (:func:`..._lattice._lattice_label`), the point by its coordinates in
-    the lattice's basis, and the bounds and the filter by the keyword arguments
-    the call was given (:func:`..._lattice.keyword_arguments`).
+    The lattice is named by its ring and Gram
+    (:func:`..._lattice._lattice_label`), the point the chamber is grown from by
+    its coordinates in the lattice's basis -- it decides which vertices are
+    written down -- and the bounds by the keyword arguments the call was given
+    (:func:`..._lattice.keyword_arguments`), because a bounded walk and an
+    unbounded one are two computations.
 
-    A name is a description and not an identity -- the record's ``id`` and
+    The root filter is not in the name.  A caller's filter is a closure
+    (``cusp_chamber``'s ``admits_root`` is one), and a closure's ``repr`` is its
+    function's name and the address of the process that created it, which says
+    where the walk ran and not what it computed.  The filter is the walk's
+    caller's, and that caller states which subgroup it cuts out in its own
+    record: for ``cusp_chamber`` the record enclosing this one names the cusp.
+
+    A name is a description and not an identity: the record's ``id`` and
     ``parent`` are what a reader tells two records apart by
-    (:mod:`sage_extensions.timing`) -- so two filters that share a ``def`` name
-    share this name too, and their walks are still two records.
+    (:mod:`sage_extensions.timing`).
     """
     point = (
         "the engine's own point"
@@ -197,7 +201,7 @@ def _vinberg_walk_record_name(lattice, controlling_vector, max_roots, max_decomp
     )
     return (
         f"{_lattice_label(lattice)}, controlling vector {point}"
-        f"{keyword_arguments(max_roots=max_roots, max_decompositions=max_decompositions, admits_root=admits_root)}"
+        f"{keyword_arguments(max_roots=max_roots, max_decompositions=max_decompositions)}"
     )
 
 
@@ -1221,7 +1225,6 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
                     controlling_vector,
                     max_roots,
                     max_decompositions,
-                    admits_root,
                 ),
             ):
                 assert self.base_ring() is _owned_integers(), (

@@ -1959,7 +1959,17 @@ def _own_group(
 
 
 def _transported_subgroup(group, engine_subgroup):
-    r"""Return the subgroup of ``group`` computed by ``engine_subgroup``."""
+    r"""Return the subgroup of ``group`` computed by ``engine_subgroup``.
+
+    The construction states the subgroup's name for a timing record, because
+    this is the one kind that neither writes a description nor cuts itself out by
+    a condition: the source is the subgroup the engine computed, the map is the
+    transport that makes the owned copy of it, and the name states both
+    (:meth:`Subgroups.ParentMethods.description`,
+    :func:`sage_extensions.categories._lattice._group_label`).  It is written
+    here and nothing is read off a rendering of the source, whose generator list
+    can be longer than the line.
+    """
     subgroup = _object_of(
         Cat().meet(
             (
@@ -1972,6 +1982,7 @@ def _transported_subgroup(group, engine_subgroup):
         _ambient=OwnedGroups(),
         _engine=(OwnedGroups(), _GroupEngine, _GroupElement),
         engine=engine_subgroup,
+        description="the subgroup transported from a subgroup the engine computed",
         supergroup=group,
     )
     if _is_finitely_generated_witness(engine_subgroup):
@@ -8274,31 +8285,56 @@ class Subgroups(OwnedParameterizedCategory):
         return "subgroups"
 
     class ParentMethods:
-        def __init__(self, supergroup, integral_points_ring=None, **rest) -> None:
+        def __init__(self, supergroup, integral_points_ring=None, description=None, **rest) -> None:
             self._supergroup = supergroup
             self._integral_points_ring = integral_points_ring
-            super().__init__(facade=supergroup, **rest)
+            # The sentence the constructing owner wrote for this subgroup,
+            # declared and set at the one level every subgroup kind is built
+            # through.  It is forwarded to the realization as well, which is what
+            # ``_repr_`` and ``_latex_`` read, and a kind whose construction
+            # states its clause at its own level -- a predicate subgroup -- has
+            # taken the keyword there and forwards none.
+            self._stated_description = description
+            if description is None:
+                super().__init__(facade=supergroup, **rest)
+            else:
+                super().__init__(facade=supergroup, description=description, **rest)
 
         def supergroup(self):
             return self._supergroup
 
         def description(self) -> str:
-            r"""Return this subgroup's own name: the description its construction stated.
+            r"""Return the description this subgroup's construction stated, for a record.
 
-            A subgroup of this owner is named by what its construction said about
-            it -- the name a group the catalogue holds is named by, the sentence
-            a stabilizer or a normalizer states, the description the caller of
-            :meth:`subgroup` wrote -- and a subgroup given by generators whose
-            caller wrote none is named by the only thing its construction did
-            state.  This is not the subgroup's rendering: ``_repr_`` prints the
-            subgroup beside its ambient group, so two subgroups of one ``O(L)``
-            render alike past any clamp, and a timing record would carry that.
+            ``_stated_description`` is declared and set here, at the level every
+            subgroup kind is built through, and it is the sentence the
+            constructing owner wrote about the subgroup: what a transport was
+            made from and by, the name a group of integral points was built
+            under.  A kind whose defining data say more states its own
+            description at its own level, and that one is read instead: a
+            generated subgroup
+            (:meth:`GeneratedSubgroups.ParentMethods.description`), a predicate
+            subgroup
+            (:meth:`...predicate_subgroups.PredicateSubgroups.ParentMethods.description`),
+            an intersection
+            (:meth:`...predicate_subgroups.IntersectionSubgroups.ParentMethods.description`).
+
+            A kind that stated nothing has no description, and this raises rather
+            than naming the subgroup something its construction did not say.
+            A rendering is not a name: ``_repr_`` writes one for a person reading
+            a single object, while a record's ``input`` states what the owning
+            construction said about the subgroup.
 
             Read by :func:`sage_extensions.categories._lattice._group_label`.
             """
-            match self._description:
+            match self._stated_description:
                 case None:
-                    return "a subgroup given by its own generators"
+                    raise NotImplementedError(
+                        "a subgroup whose construction stated no description has no name "
+                        "in a timing record: the kinds that describe themselves from their "
+                        "own data state one at their own level, and every other kind states "
+                        "the description where it is built"
+                    )
                 case stated:
                     return stated
 
@@ -8475,6 +8511,25 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
             if self._selected_subgroup_generators is None:
                 self._selected_subgroup_generators = self.group_generators()
             return self._selected_subgroup_generators
+
+        def description(self) -> str:
+            r"""Return this generated subgroup's own name: what its construction stated.
+
+            A generated subgroup's defining data is its selected generator family
+            and the sentence the caller wrote beside it, so this level states
+            both cases: the caller's own description from
+            :meth:`OwnedGroups.ParentMethods.subgroup` or from the construction
+            that generated the subgroup, and, where the caller wrote none, the
+            one thing that construction did say -- that the subgroup is given by
+            those generators.
+
+            Read by :func:`sage_extensions.categories._lattice._group_label`.
+            """
+            match self._stated_description:
+                case None:
+                    return "a subgroup given by its own generators"
+                case stated:
+                    return stated
 
         def _admit_generator(self, generator):
             r"""A selected generator as a member: it is the one-letter word of its own generating set.

@@ -2387,20 +2387,18 @@ def _cusp_record_name(reduction_image, *arguments, **keywords) -> str:
     so ``cusp_chamber()`` and ``cusp_chamber(max_decompositions=200)`` are two
     names.
 
-    The arguments are read where they are bound rather than restated: the call's
-    own signature fills in a default it did not receive, so a parameter added to
-    :meth:`cusp_chamber` reaches the name without being written again here.
+    The arguments are read where they are bound rather than restated: the bound
+    method's own signature fills in a default the call did not receive, so a
+    parameter added to :meth:`cusp_chamber` reaches the name without being
+    written again here.
 
     A name is a description, not an identity: the record's ``id`` and its
     ``parent`` are what a reader tells two records apart by
     (:mod:`sage_extensions.timing`).
     """
-    call = inspect.signature(type(reduction_image).cusp_chamber).bind(
-        reduction_image, *arguments, **keywords
-    )
+    call = inspect.signature(reduction_image.cusp_chamber).bind(*arguments, **keywords)
     call.apply_defaults()
     given = dict(call.arguments)
-    given.pop("self")
     controlling_vector = given.pop("controlling_vector")
     point = (
         ""
