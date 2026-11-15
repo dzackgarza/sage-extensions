@@ -1,0 +1,6 @@
+=== ran on: c8790f24c2ff1617e0dfa4e07fd5358ff0e1c74b (0 modified paths)
+=== port: 991b88b095a42a1e3679569ea42328c900c120f6
+=== command: pytest tests/lattices/test_higher_rank_levi_lifts.sage -o addopts= -p qc_sage_session -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates
+........                                                                 [100%]
+8 passed in 1.56s
+=== exit: 0

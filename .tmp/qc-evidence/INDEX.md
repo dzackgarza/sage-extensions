@@ -2373,3 +2373,27 @@ the empty set when the residue locus is empty.
 | `541-locus-doctests-broken.log`, `-base.log` | the repair / main `e763219` | `sage -t` on `isotropic_lifts.py`: 24 of 24 and 19 of 19 failed — the forker attributes nested-scope docstrings to `_vector_denominator.ParentMethods`, so the module's doctests are not runnable this way at either tree |
 | `541-locus-doctest-run.log` | the repair | the examples this round touches, run by hand: `integral_torsor`'s four, `integral_lift_locus`'s two, `integral_members`' one — all hold |
 | `541-row-after-locus.log`, `541-row-probe.py` | the repair | the `Õ(T_Co)` plane row, `ROW_DEADLINE=500`, calib **0.369 s**: **first plane at 353.3 s = 957 calib units** (base `7c0859c832` 974-980, main `e763219` >= 1352), **11 191 planes** by 502.1 s at **75.2 planes/s, 13.3 ms a plane** |
+
+## #541 -- the same runs on the rebased tree, which is the pushed one
+
+Main moved to `7784c13e44` (the `#540` round, whose moves are `algebras.py`,
+`semigroup_algebras.py` and `tests/algebras/`) while this round's repair was
+being written, so the repair and its test were rebased onto it.  The lattice,
+sets and `isotropic_lifts` code is byte-identical between `e763219` and the
+rebased tree, and the rows below are the same commands re-run so that each log
+names the pushed commit.
+
+| log | tree | result |
+| --- | --- | --- |
+| `541-locus-green-rebased.log` | `c8790f2` | the new file with the two existing locus files: **12 passed in 11.28 s** |
+| `541-levi-files-after-rebased.log`, `541-levi-files-base-rebased.log` | `c8790f2` / `e763219` | the nine Levi/isotropic-reduction files: **4 failed, 39 passed in 14.95 s** against **4 failed, 39 passed in 15.47 s**, the FAILED ids identical |
+| `541-levi-onefile-after-rebased.log`, `541-levi-onefile-base.log` | `c8790f2` / `e763219` | `test_higher_rank_levi_lifts.sage` alone: **8 passed** on both.  The batch's fifth failure in `541-levi-files-after.log` and `541-levi-files-base.log` is this test, which passes alone on both trees: a cross-test interaction of the tree, not of this round |
+| `541-coble-line-after-rebased.log` | `c8790f2` | the port's own consumer, `test_the_coble_lattice_line_orbit_call_returns.sage`: **58.07 s, 1 passed** (100.0 s at `e763219`) |
+| `541-row-after-locus-rebased.log` | `c8790f2` | the row again, calib **0.364 s**: **first plane at 440.0 s = 1209 calibration units**, 2 756 planes by 521.0 s at **34.0 planes/s, 29.4 ms a plane**; load average **8.45 on 4 CPUs** during the run (other sessions' Lean builds and pandoc).  Against `541-row-after-locus.log`'s 353.3 s at calib 0.369 (957 units, 75.2 planes/s): the walk's per-plane rate halved while the calibration moved 1.4 %, so the calibration under-normalises and the two runs are not comparable with each other |
+
+Both capped runs of the repair reach a plane (353.3 s and 440.0 s, 957 and 1209
+units) where the parent tree `e763219` reached none in 511.5 s and 511.6 s at
+calib 0.378 (>= 1353 units), and neither run's stack samples enter
+`_finite_family_key`: the 120 s sample of the rebased run is inside
+`integral_restriction` at `isotropic_lifts.py:644`, the residue locus' own
+per-representative test.
