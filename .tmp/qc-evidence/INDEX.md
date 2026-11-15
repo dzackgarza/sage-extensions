@@ -1939,19 +1939,25 @@ measure are unchanged by that merge.
 
 ## #531 round 5 (2026-11-15): one store for the finite interners
 
-The round's work is `bd7f43c` (the red tests) and `ec17c79` (the repair) on the
-remote main `28bbfa7`.  The two red rows below are at the round's base
-`1cc2481`, the base the review read; the rest are at the heads they name.
+The round's work is `aafb4ac` (the red tests) and `df5f484` (the repair).  The
+two red rows are at the round's base `1cc2481`, the base the review read; the
+head rows are at `1775a6f`, whose measured content is the tree this evidence
+commit produces, and the base rows at `5fabcdc`, the remote main the round is
+rebased onto.  The SHAs the repair was first written and measured at are older
+than its rebases -- `d43bab4` and `aed5e3e` -- and the patches of `aafb4ac`
+against `d43bab4` and `df5f484` against `aed5e3e` are byte-identical
+(`git show --format= <sha> -- src tests` on each side, digest
+`75dd05cb…` and `c87f2942…`).
 
 | log | commit cited | result |
 | --- | --- | --- |
-| `issue531-r5-order.py`, `issue531-r5-order.log` | `1cc2481` | item 1, both construction orders, with both stores emptied between runs: **product and coproduct are one object when the key-less family is built first, and two objects when the keyed one is** (`True` then `False`, both operations) — the order the existing test did not build |
+| `issue531-r5-order.py`, `issue531-r5-order.log` | `1cc2481` | item 1, both construction orders, with both stores emptied between runs: **product and coproduct are one object when the key-less family is built first and two objects when the keyed one is** (`True` then `False`, both operations) -- the order the existing test did not build |
 | `issue531-r5-red.py`, `issue531-r5-red.log` | `1cc2481` | item 2: a mutable `vector(QQ, [1, 2])` answers `isinstance(..., Hashable)` **True** while `hash` raises `TypeError: mutable vectors are unhashable`; `T = S.filtered(lambda p: True)` over two mutable vectors reports `points_have_a_hash` **True**, and the product of the one-factor family over `T` raises `TypeError: cannot use 'tuple' as a dict key (mutable vectors are unhashable)`.  The probe reads `points_have_a_hash`, which the repair deletes, so it runs at the base only |
 | `issue531-r5-factors.py`, `issue531-r5-factors.log` | `1cc2481` | the counterexample to keying the store by the factors: `hash(finite_ordered_set(([0],)))` raises `TypeError: unhashable type: 'list'`, and yet `Sets().product` of a family with that factor **builds and interns** (`second product is the first` True, coproduct likewise); a family whose values are Python lists is refused by the product with its own message |
-| `issue531-r5-accept.py`, `issue531-r5-accept.log` | `ec17c79` | the repair, measured: one product and one coproduct in **both** orders; a family whose factor refuses a hash still interns; the product over the filtered set of mutable `QQ` vectors builds with `factor(v) is factor` and two equal filtered families share it; an undecided family equality builds **both** constructions and keeps both |
-| `issue531-r5-four-head-mine.log` | `ec17c79` | `tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage`, `tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage`, `tests/rings/test_a_quotient_class_hashes_by_its_class.sage`, `tests/modules/test_dual_point_hash.sage`, `--no-test-lint`: **6 failed, 47 passed in 4.04 s** |
-| `issue531-r5-four-head-base.log` | `28bbfa7` (a clean worktree) | the same four files: **6 failed, 46 passed in 7.33 s**; the six FAILED ids are identical (`test_unchecked_discrete_diagram_cannot_certify_infinite_factors`, `test_finite_diagram_restricted_to_infinite_parity_family`, `test_constant_countable_coproduct_has_diagonal_enumeration`, `test_selected_nonconstant_countable_coproduct_is_enumerated`, `test_componentwise_set_maps_accept_additive_diagrams`, `test_infinite_componentwise_set_maps_use_a_selected_natural_transformation`), so the extra pass is this round's net one test |
-| `issue531-r5-sets-head-mine.log` | `ec17c79` | `tests/sets`, `--no-test-lint`: **29 failed, 136 passed in 7.06 s** |
-| `issue531-r5-sets-head-base.log` | `28bbfa7` | the same directory: **29 failed, 135 passed in 7.70 s**; the FAILED id sets are identical, and the one extra pass is the added test net one against the one it replaces |
-| `issue531-r5-lint-head-mine.log` | `ec17c79` | `test_lint` on the three test files this round touches: **3 files, 167 findings** |
-| `issue531-r5-lint-head-base.log` | `28bbfa7` | the same three: **3 files, 161 findings** — the products file already ends the run red at the base, and the six added findings are the three kinds its other tests carry (TL01 local imports, TL08 `finite_ordered_set` and `indexed_family` construction), which a test in that file cannot avoid without rewriting the file |
+| `issue531-r5-accept.py`, `issue531-r5-accept.log` | `1775a6f` | the repair, measured: one product and one coproduct in **both** orders; a family whose factor refuses a hash still interns; the product over the filtered set of mutable `QQ` vectors builds with `factor(v) is factor` and two equal filtered families share it; an undecided family equality builds **both** constructions and keeps both |
+| `issue531-r5-four-head-mine.log` | `1775a6f` | `tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage`, `tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage`, `tests/rings/test_a_quotient_class_hashes_by_its_class.sage`, `tests/modules/test_dual_point_hash.sage`, `--no-test-lint`: **6 failed, 47 passed in 4.08 s** |
+| `issue531-r5-four-head-base.log` | `5fabcdc` (a clean worktree) | the same four files: **6 failed, 46 passed in 4.12 s**; the six FAILED ids are identical -- `test_unchecked_discrete_diagram_cannot_certify_infinite_factors`, `test_finite_diagram_restricted_to_infinite_parity_family`, `test_constant_countable_coproduct_has_diagonal_enumeration`, `test_selected_nonconstant_countable_coproduct_is_enumerated`, `test_componentwise_set_maps_accept_additive_diagrams`, `test_infinite_componentwise_set_maps_use_a_selected_natural_transformation` -- so the extra pass is this round's net one test |
+| `issue531-r5-sets-head-mine.log` | `1775a6f` | `tests/sets`, `--no-test-lint`: **29 failed, 136 passed in 12.11 s** |
+| `issue531-r5-sets-head-base.log` | `5fabcdc` | the same directory: **29 failed, 135 passed in 12.97 s**; the FAILED id sets are identical, and the one extra pass is the added test net one against the one it replaces |
+| `issue531-r5-lint-head-mine.log` | `1775a6f` | `test_lint` on the three test files this round touches: **3 files, 167 findings** |
+| `issue531-r5-lint-head-base.log` | `5fabcdc` | the same three: **3 files, 161 findings** -- the products file already ends the run red at the base, and the six added findings are the three kinds its other tests carry (TL01 local imports, TL08 `finite_ordered_set` and `indexed_family` construction), which a test in that file cannot avoid without rewriting the file |

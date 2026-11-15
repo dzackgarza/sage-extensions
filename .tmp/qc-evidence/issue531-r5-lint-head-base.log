@@ -1,4 +1,4 @@
-tree SHA: 28bbfa73bd05d678161dee145ee893c91d41a4de
+tree SHA: 5fabcdc9a07f350d3d516ae9e1deb815bc01f6f5
 port SHA: 991b88b0
 inner 300 s, outer 360 s, guard 4096 MiB
 command: /sage/.venv/bin/python -u -s -m sage_extensions.testing.test_lint tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage tests/rings/test_a_quotient_class_hashes_by_its_class.sage tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage
@@ -166,11 +166,11 @@ tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:929: T
 3 files, 161 findings (TL01, TL02, TL03, TL04, TL08, TL09, TL10)
 [peakrss] r5lintb: child waited=1 shell_code=1 samples=2
 [peakrss] peak tree RSS      : 295 MiB
-[peakrss] low-water MemAvail : 12612 MiB
+[peakrss] low-water MemAvail : 11450 MiB
 [peakrss] peak single VmHWM  : 295 MiB
 [peakrss] peak VmHWM by executable (this is the per-process attribution):
 [peakrss]   python                      284 MiB peak
 [peakrss]   timeout                       7 MiB peak
 [peakrss]   proot-x86_64                  3 MiB peak
-[peakrss]   t=     2.0s procs=  3 rss=   295 MiB hwm=   295 MiB avail= 12983 MiB
-[peakrss]   t=     0.0s procs=  1 rss=     4 MiB hwm=     4 MiB avail= 12612 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   295 MiB hwm=   295 MiB avail= 11450 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     2 MiB avail= 11682 MiB
