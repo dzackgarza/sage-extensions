@@ -21,6 +21,14 @@ run whose configuration put its report log somewhere else is kept from where it
 put it.  An option the run did not set asked for no file, and there is nothing
 to keep; an option that names a file this run did not write is an error, because
 the alternative is filing another run's timings under this run's name.
+
+**Kept once per run, by the run's controller.**  ``pytest-xdist`` runs the whole
+session again on each worker, ``pytest_sessionfinish`` included, and both files
+this plugin copies are written by the controller alone: a worker that copied
+them would file the controller's half-written report log under a start stamp of
+its own, one more record per worker, and fail an assertion about a JUnit file
+the run has not written yet — an assertion ``xdist`` swallows, so the run stays
+green while the directory fills with records of nothing.
 """
 
 from __future__ import annotations
@@ -39,8 +47,19 @@ r"""The pytest options that name the report log and the JUnit file."""
 _STARTED = pytest.StashKey[tuple[str, float]]()
 
 
+def _is_worker(config: pytest.Config) -> bool:
+    r"""Whether this process is one of ``pytest-xdist``'s workers.
+
+    A worker runs the session hooks in its own process, with the controller's
+    options and a start time of its own; nothing it writes is the run's record.
+    """
+    return hasattr(config, "workerinput")
+
+
 def pytest_configure(config: pytest.Config) -> None:
     r"""Stamp the run's start, which names its record and dates what it wrote."""
+    if _is_worker(config):
+        return
     started = datetime.now(timezone.utc)
     config.stash[_STARTED] = (started.strftime("%Y%m%dT%H%M%SZ"), started.timestamp())
 
@@ -52,12 +71,17 @@ def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:
     ``trylast`` so the copy is of what every plugin has finished writing: the
     report log is appended to by ``pytest-reportlog`` as the run reports, and the
     JUnit file is written by pytest's own ``junitxml`` session finish.
+
+    The controller alone does this: under ``-n`` each worker finishes a session
+    of its own, and both files are the controller's.
     """
+    if _is_worker(session.config):
+        return
     directory = timing.timing_directory()
     commit = timing.current_commit()[:12]
     stamp, epoch = session.config.stash[_STARTED]
     for option in KEPT:
-        named = getattr(session.config.option, option, None)
+        named = getattr(session.config.option, option)
         if named is None:
             continue
         written = Path(named)
