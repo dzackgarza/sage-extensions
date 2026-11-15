@@ -1,0 +1,6 @@
+=== python -m sage_extensions.testing.test_lint tests/algebras/test_affine_semigroup_algebras.sage
+tree: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt540c
+tree SHA: dcdeddde8c706fbbc3ee5525b656f8d476a2b298
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+1 files, 0 findings
+lint exit: 0

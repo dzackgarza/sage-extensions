@@ -2234,3 +2234,6 @@ them and the launcher is the one the header names.
 | `540r-rebased-scenario-fix.log` | `6141e01` | the same three files at the rebased repair: **3 failed, 10 passed in 1.81 s**, FAILED ids identical |
 | `540r-rebased-algebras-base.log` | `b33d193` (main) | `tests/algebras` with `test_module_structure.sage` ignored: **44 failed, 43 passed, 125 errors in 25.07 s** |
 | `540r-rebased-algebras-fix.log` | `6141e01` | the same directory at the rebased repair: **44 failed, 47 passed, 122 errors in 21.91 s**; FAILED ids identical to the new base's |
+| `540r-lint-base.log` | `52cbab3` (main, the merged tree the round before) | `python -m sage_extensions.testing.test_lint tests/algebras/test_affine_semigroup_algebras.sage`: **1 files, 8 findings (TL01, TL02, TL07)**, exit 1 -- five TL01 at the three function-local module imports, two TL02 at `_owned_integers`, one TL07 at `repr(algebra)`; as a pytest plugin each finding errors the tests of the file that holds it, which is the three setup errors `531f-green-merged.log` records |
+| `540r-lint-main.log` | `dcdeddde` | the same command on the file as this round leaves it: **1 files, 0 findings**, exit 0 |
+| `540r-lint-pytest-main.log` | `dcdeddde` | the file collected by pytest with `-p sage_extensions.testing.test_lint` named as well: **4 passed in 0.69 s**, so the four rows run and no finding errors them |
