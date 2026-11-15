@@ -1,4 +1,4 @@
-tree SHA: 6d848c5bc977b93684abff54391bab9f3deb75dd
+tree SHA: a8ce60f6b2c89e186efaeaa2992a8933dd4c9c12
 port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
 tests: tests/lattices/test_eichler_transvection_construction.sage
 inner 600 s, outer 660 s, guard 6144 MiB
@@ -7,11 +7,17 @@ F                                                                        [100%]
 ___________ test_a_transvection_reads_each_vector_and_the_ring_once ____________
 
     def test_a_transvection_reads_each_vector_and_the_ring_once() -> None:
-        r"""One transvection reads \(e\) once, \(a\) once, and the ring's one not at all.
+        r"""One transvection reads \(e\) once, \(a\) once, and the ring's one at most once.
     
-        The control is \(U\oplus\langle 2\rangle\) over `QQ`, with \(e=e_0\)
-        isotropic, \(a=e_2\) of square two and \(b(e,a)=0\), so the transvection is
-        not the identity: it sends \(a\) to \(a-2e\).  Before the repair the same
+        The control is \(U\oplus\langle 2\rangle\) over `QQ` in the basis
+        \(e_0,e_1,e_2\), with \(e=e_0\) isotropic, \(f=e_1\) its hyperbolic
+        partner of pairing one, and \(a=e_2\) of square two and \(b(e,a)=0\), so
+        the transvection is not the identity: on the pair it is
+        \(t(e,a)(e)=e\) and \(t(e,a)(f)=f+a-\tfrac12 q(a)\,e = f+a-e\).  That
+        second image is what reads the coefficient \(\tfrac12 q(a)\): a
+        construction that divided by the ring's one instead of by two sends \(f\) to
+        \(f+a-2e\), and the control's own square-two \(a\) cannot see the
+        difference on \(a\) alone.  Before the repair the same
         call read \(e\)'s coordinates three times -- once per basis label -- read
         \(a\)'s five, and asked the ring for its one five times, once per diagonal
         entry.  It now reads them three, five and at most one: the two reads of \(a\)
@@ -51,24 +57,25 @@ ___________ test_a_transvection_reads_each_vector_and_the_ring_once ____________
         orthogonal.to_vector = orthogonal_reader
         ring.one = ring_one
     
+        partner = lattice.module_generator(labels[1])
+        assert isotropic.b(partner) == ring.one()
         assert transvection(isotropic) == isotropic
-        assert transvection(orthogonal) == orthogonal - lattice.scalar_multiple(QQ(2), isotropic)
+        assert transvection(partner) == partner + orthogonal - isotropic
 >       assert counts["the coordinates of e"] == 1
 E       assert 3 == 1
 E        +  where 1 = Integer(1)
 
-tests/lattices/test_eichler_transvection_construction.sage:82: AssertionError
+tests/lattices/test_eichler_transvection_construction.sage:90: AssertionError
 =========================== short test summary info ============================
 FAILED tests/lattices/test_eichler_transvection_construction.sage::test_a_transvection_reads_each_vector_and_the_ring_once
-1 failed in 1.10s
-[peakrss] test528red: child waited=1 shell_code=1 samples=3
-[peakrss] peak tree RSS      : 313 MiB
-[peakrss] low-water MemAvail : 12094 MiB
-[peakrss] peak single VmHWM  : 313 MiB
+1 failed in 1.18s
+[peakrss] test528red: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 314 MiB
+[peakrss] low-water MemAvail : 12924 MiB
+[peakrss] peak single VmHWM  : 314 MiB
 [peakrss] peak VmHWM by executable (this is the per-process attribution):
-[peakrss]   python                      302 MiB peak
+[peakrss]   python                      303 MiB peak
 [peakrss]   timeout                       7 MiB peak
 [peakrss]   proot-x86_64                  3 MiB peak
-[peakrss]   t=     4.0s procs=  3 rss=   313 MiB hwm=   313 MiB avail= 12094 MiB
-[peakrss]   t=     2.0s procs=  3 rss=   140 MiB hwm=   140 MiB avail= 12525 MiB
-[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 12550 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   314 MiB hwm=   314 MiB avail= 12924 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     6 MiB hwm=     7 MiB avail= 13041 MiB

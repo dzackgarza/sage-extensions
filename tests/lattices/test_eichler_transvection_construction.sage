@@ -33,11 +33,17 @@ from sage_extensions.all import *
 
 
 def test_a_transvection_reads_each_vector_and_the_ring_once() -> None:
-    r"""One transvection reads \(e\) once, \(a\) once, and the ring's one not at all.
+    r"""One transvection reads \(e\) once, \(a\) once, and the ring's one at most once.
 
-    The control is \(U\oplus\langle 2\rangle\) over `QQ`, with \(e=e_0\)
-    isotropic, \(a=e_2\) of square two and \(b(e,a)=0\), so the transvection is
-    not the identity: it sends \(a\) to \(a-2e\).  Before the repair the same
+    The control is \(U\oplus\langle 2\rangle\) over `QQ` in the basis
+    \(e_0,e_1,e_2\), with \(e=e_0\) isotropic, \(f=e_1\) its hyperbolic
+    partner of pairing one, and \(a=e_2\) of square two and \(b(e,a)=0\), so
+    the transvection is not the identity: on the pair it is
+    \(t(e,a)(e)=e\) and \(t(e,a)(f)=f+a-\tfrac12 q(a)\,e = f+a-e\).  That
+    second image is what reads the coefficient \(\tfrac12 q(a)\): a
+    construction that divided by the ring's one instead of by two sends \(f\) to
+    \(f+a-2e\), and the control's own square-two \(a\) cannot see the
+    difference on \(a\) alone.  Before the repair the same
     call read \(e\)'s coordinates three times -- once per basis label -- read
     \(a\)'s five, and asked the ring for its one five times, once per diagonal
     entry.  It now reads them three, five and at most one: the two reads of \(a\)
@@ -77,8 +83,10 @@ def test_a_transvection_reads_each_vector_and_the_ring_once() -> None:
     orthogonal.to_vector = orthogonal_reader
     ring.one = ring_one
 
+    partner = lattice.module_generator(labels[1])
+    assert isotropic.b(partner) == ring.one()
     assert transvection(isotropic) == isotropic
-    assert transvection(orthogonal) == orthogonal - lattice.scalar_multiple(QQ(2), isotropic)
+    assert transvection(partner) == partner + orthogonal - isotropic
     assert counts["the coordinates of e"] == 1
     assert counts["the coordinates of a"] == 3
     assert counts["the one of the ring"] <= 1
