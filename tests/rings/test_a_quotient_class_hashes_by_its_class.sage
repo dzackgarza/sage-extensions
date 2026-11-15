@@ -1,14 +1,16 @@
-r"""A class of ``ZZ/(n)`` hashes as the class, not as the lift it was given (#531).
+r"""A class hashes through a representative the engine selects, or not at all (#531).
 
 :meth:`QuotientRings.ElementMethods._richcmp_` decides equality of two classes by
 membership of their difference in the defining ideal, so ``1`` and ``4`` are one
-class of ``ZZ/(3)``.  The hash is the engine's representative of the class, which
-the engine hashes as that class, so equal classes given different lifts hash
-equally and distinct classes of one modulus hash apart.
+class of ``ZZ/(3)``.  A class hashes through a representative the engine selects
+one per class -- the residues of ``ZZ/(n)``, or a normal form over a coefficient
+field -- so equal classes given different lifts hash equally, and distinct classes
+of one modulus hash apart.  Over ``ZZ`` no representative is selected, so a class
+there refuses a hash instead of separating classes its equality identifies.
 
-The two statements are what a cache keyed by such classes needs: without a hash of
-the class, every set of vectors over ``ZZ/(n)`` is unhashable, and the cache of
-``_lattice_subobject_spanning`` cannot be keyed by a span basis over ``ZZ/(3)``.
+Without the hash, every set of vectors over ``ZZ/(n)`` is unhashable, and the
+cache of ``_lattice_subobject_spanning`` cannot be keyed by a span basis over
+``ZZ/(3)``.
 """
 
 from sage_extensions.all import *  # noqa: F401,F403
