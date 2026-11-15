@@ -1,0 +1,526 @@
+tree SHA: 1775a6f461580147200ca23734f283e7e7fc31d0
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 520 s, outer 580 s, guard 6144 MiB
+command: python -m pytest -p qc_sage_session tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage tests/rings/test_a_quotient_class_hashes_by_its_class.sage tests/modules/test_dual_point_hash.sage -q --no-test-lint  (repository addopts)
+................FF.......FF......F.F.................                    [100%]
+=================================== FAILURES ===================================
+_______ test_unchecked_discrete_diagram_cannot_certify_infinite_factors ________
+
+    def test_unchecked_discrete_diagram_cannot_certify_infinite_factors() -> None:
+        from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+        from sage_extensions.categories.group.magmas import AdditiveMonoids
+        from sage_extensions.categories.sets.indexed_families import indexed_family
+    
+        factor = AdditiveMonoids().an_object()
+        index_category = DiscreteCategory(NN)
+        raw = indexed_family(NN, lambda index: factor if int(index) % 2 == 0 else Sets.Δ[1])
+>       unchecked = Cat().Mor(index_category, AdditiveMonoids()).discrete_diagram(raw)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:531: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/abstract_categories/cat.py:1653: in discrete_diagram
+    return _DiscreteDiagram(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <[AttributeError('_DiscreteDiagram' object has no attribute '_domain') raised in repr()] _DiscreteDiagram object at 0x7073233d4980>
+index_category = Discrete category on NN = {0, 1, 2, ...}
+codomain = Category of additive monoids
+values = Indexed family over NN = {0, 1, 2, ...}
+
+    def __init__(
+        self,
+        index_category: Category,
+        codomain: Category,
+        values: IndexedFamily,
+    ) -> None:
+        if index_category not in DiscreteCategories():
+            raise TypeError(
+                f"a discrete diagram needs a discrete index category, but {index_category} is not discrete"
+            )
+        from sage_extensions.categories.sets.set_categories import EnumeratedSets, Sets
+    
+        index_set = index_category.object_set()
+        if isinstance(values, IndexedFamily) and values.index_set() is not index_set:
+            raise ValueError("the diagram's indexed family must retain its discrete category's exact object set")
+        if not Sets().is_provably_finite(index_set) or index_set not in EnumeratedSets():
+>           raise TypeError(
+                "an object callback without finite enumerated indices cannot establish "
+                "a category-valued discrete diagram; use a selected functor or constant diagram"
+            )
+E           TypeError: an object callback without finite enumerated indices cannot establish a category-valued discrete diagram; use a selected functor or constant diagram
+
+src/sage_extensions/categories/abstract_categories/functors.py:414: TypeError
+___________ test_finite_diagram_restricted_to_infinite_parity_family ___________
+
+    def test_finite_diagram_restricted_to_infinite_parity_family() -> None:
+        from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+        from sage_extensions.categories.group.magmas import AdditiveMonoids, AdditiveGroups
+        from sage_extensions.categories.sets.indexed_families import indexed_family
+        from sage_extensions.categories.sets.set_categories import CartesianProductsOfAdditiveMonoids
+    
+        labels = Sets.Δ[1]
+        finite_index = DiscreteCategory(labels)
+        infinite_index = DiscreteCategory(NN)
+        even = AdditiveMonoids().an_object()
+        odd = AdditiveGroups().an_object()
+        diagram = Cat().Mor(finite_index, AdditiveMonoids()).discrete_diagram(
+            indexed_family(labels, lambda i: even if i == labels(0) else odd)
+        )
+        parity = Cat().Mor(infinite_index, finite_index).from_object_map(
+            lambda n: labels(int(n) % 2)
+        )
+        selected = diagram.restrict(parity)
+        family = indexed_family(NN, selected)
+        product = Sets().product(family)
+        assert family.selected_diagram() is selected
+        assert product in CartesianProductsOfAdditiveMonoids()
+        assert family(NN(0)) is even and family(NN(1)) is odd
+        point = product(lambda n: family(n)(int(n)))
+        unit = product(lambda n: family(n).one())
+        projection = product.projection(NN(3))
+        assert projection.parent() is AdditiveMonoids().Mor(product, odd)
+        assert projection(point + unit) == projection(point) + projection(unit)
+        assert projection(product.zero()) == odd.zero()
+    
+        # The nonconstant product also has the actual AddMon universal arrow.
+        # The common source is the even factor, and its selected zero maps give
+        # compatible legs into both kinds of factors without identifying them.
+        from sage_extensions.categories.functors.core import NaturalTransformation
+    
+        source_diagram = Cat().Mor(infinite_index, AdditiveMonoids()).constant_functor(even)
+        components = NaturalTransformation(
+            source_diagram, selected,
+            lambda obj: AdditiveMonoids().Mor(even, family(obj.value()))(
+                lambda _value: family(obj.value()).zero()
+            ),
+        )
+        induced = product.from_maps(even, components)
+        assert induced.parent() is AdditiveMonoids().Mor(even, product)
+        for index in (NN(0), NN(1), NN(6), NN(7)):
+            assert product.projection(index)(induced(even.one())) == family(index).zero()
+    
+        wrong_components = NaturalTransformation(
+            source_diagram, selected,
+            lambda obj: Sets().Mor(even, family(obj.value()))(
+                lambda _value: family(obj.value()).zero()
+            ),
+        )
+        wrong_induced = product.from_maps(even, wrong_components)
+        try:
+            product.projection(NN(3))(wrong_induced(even.one()))
+        except TypeError:
+            pass
+        else:
+            raise AssertionError("a Set-map component falsely certified the nonconstant additive product")
+    
+>       unchecked = Cat().Mor(infinite_index, AdditiveMonoids()).discrete_diagram(
+            indexed_family(NN, lambda n: even if int(n) % 2 == 0 else Sets.Δ[1])
+        )
+
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:607: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/abstract_categories/cat.py:1653: in discrete_diagram
+    return _DiscreteDiagram(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <[AttributeError('_DiscreteDiagram' object has no attribute '_domain') raised in repr()] _DiscreteDiagram object at 0x707319730410>
+index_category = Discrete category on NN = {0, 1, 2, ...}
+codomain = Category of additive monoids
+values = Indexed family over NN = {0, 1, 2, ...}
+
+    def __init__(
+        self,
+        index_category: Category,
+        codomain: Category,
+        values: IndexedFamily,
+    ) -> None:
+        if index_category not in DiscreteCategories():
+            raise TypeError(
+                f"a discrete diagram needs a discrete index category, but {index_category} is not discrete"
+            )
+        from sage_extensions.categories.sets.set_categories import EnumeratedSets, Sets
+    
+        index_set = index_category.object_set()
+        if isinstance(values, IndexedFamily) and values.index_set() is not index_set:
+            raise ValueError("the diagram's indexed family must retain its discrete category's exact object set")
+        if not Sets().is_provably_finite(index_set) or index_set not in EnumeratedSets():
+>           raise TypeError(
+                "an object callback without finite enumerated indices cannot establish "
+                "a category-valued discrete diagram; use a selected functor or constant diagram"
+            )
+E           TypeError: an object callback without finite enumerated indices cannot establish a category-valued discrete diagram; use a selected functor or constant diagram
+
+src/sage_extensions/categories/abstract_categories/functors.py:414: TypeError
+__________ test_constant_countable_coproduct_has_diagonal_enumeration __________
+
+    def test_constant_countable_coproduct_has_diagonal_enumeration() -> None:
+        from sage_extensions.categories.sets.indexed_families import indexed_family
+    
+        coproduct = Sets().coproduct(indexed_family(NN, Sets.Δ[1]))
+        assert coproduct in EnumeratedSets()
+>       ranking = coproduct.ranking_map()
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:790: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/sets/set_categories.py:6261: in ranking_map
+    return self._ranking_isomorphism(position_of, point_at)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:383: in _ranking_isomorphism
+    counting_order = self.counting_well_order()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:2741: in counting_well_order
+    if size.is_finite():
+       ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = sum_{i in NN = {0, 1, 2, ...}} kappa_i
+
+    def is_finite(self) -> bool:
+        expression = self.expression()
+>       assert expression.is_normal_form(), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"cannot decide whether the cardinal {self} is finite: it is not a finite sum, product, or "
+            "supremum of known cardinals"
+        )
+E       AssertionError: cannot decide whether the cardinal sum_{i in NN = {0, 1, 2, ...}} kappa_i is finite: it is not a finite sum, product, or supremum of known cardinals
+
+src/sage_extensions/categories/sets/cardinals.py:732: AssertionError
+_________ test_selected_nonconstant_countable_coproduct_is_enumerated __________
+
+    def test_selected_nonconstant_countable_coproduct_is_enumerated() -> None:
+        from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+        from sage_extensions.categories.sets.indexed_families import indexed_family
+    
+        labels = Sets.Δ[1]
+        finite_shape = DiscreteCategory(labels)
+        infinite_shape = DiscreteCategory(NN)
+        factor_diagram = Cat().Mor(finite_shape, EnumeratedSets()).discrete_diagram(
+            indexed_family(labels, lambda i: Sets.Δ[0] if i == labels(0) else Sets.Δ[1])
+        )
+        parity = Cat().Mor(infinite_shape, finite_shape).from_object_map(
+            lambda n: labels(int(n) % 2)
+        )
+        family = indexed_family(NN, factor_diagram.restrict(parity))
+        coproduct = Sets().coproduct(family)
+        assert coproduct in EnumeratedSets()
+>       ranking = coproduct.ranking_map()
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:817: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/sets/set_categories.py:6261: in ranking_map
+    return self._ranking_isomorphism(position_of, point_at)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:383: in _ranking_isomorphism
+    counting_order = self.counting_well_order()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:2741: in counting_well_order
+    if size.is_finite():
+       ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = sum_{i in NN = {0, 1, 2, ...}} kappa_i
+
+    def is_finite(self) -> bool:
+        expression = self.expression()
+>       assert expression.is_normal_form(), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"cannot decide whether the cardinal {self} is finite: it is not a finite sum, product, or "
+            "supremum of known cardinals"
+        )
+E       AssertionError: cannot decide whether the cardinal sum_{i in NN = {0, 1, 2, ...}} kappa_i is finite: it is not a finite sum, product, or supremum of known cardinals
+
+src/sage_extensions/categories/sets/cardinals.py:732: AssertionError
+_____________ test_componentwise_set_maps_accept_additive_diagrams _____________
+
+    def test_componentwise_set_maps_accept_additive_diagrams() -> None:
+        from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+        from sage_extensions.categories.functors.core import NaturalTransformation
+        from sage_extensions.categories.group.magmas import AdditiveMonoids
+        from sage_extensions.categories.sets.indexed_families import indexed_family
+        from sage_extensions.categories.sets.set_categories import (
+            _cartesian_product_morphism, _coproduct_morphism,
+        )
+    
+        additive = AdditiveMonoids()
+        factor = additive.an_object()
+        diagram = Cat().Mor(DiscreteCategory(NN), additive).constant_functor(factor)
+        legs = NaturalTransformation(diagram, diagram, lambda _obj: additive.Mor(factor, factor).identity())
+        family = indexed_family(NN, diagram)
+        product = Sets().product(family)
+        coproduct = Sets().coproduct(family)
+        product_map = _cartesian_product_morphism(product, product, legs)
+        coproduct_map = _coproduct_morphism(coproduct, coproduct, legs)
+        for index in (NN(0), NN(3)):
+>           assert product_map(product.zero()).component(index) == factor.zero()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:918: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/sets/set_categories.py:4964: in component
+    self._components(normalized)
+src/sage_extensions/categories/sets/set_categories.py:6480: in <lambda>
+    lambda index: component(index)(section.component(index))
+                  ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+index = 0
+
+    def component(index):
+        selected = shape.object(index)
+        if transformation.source()(selected) is not source.factor(
+            index
+        ) or transformation.target()(selected) is not target.factor(index):
+            raise ValueError(
+                "the component transformation does not have the product's factor objects"
+            )
+        arrow = transformation.component(selected)
+>       if not _category_accepts_morphism(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+            Sets(), source.factor(index), target.factor(index), arrow
+        ):
+E       NameError: cannot access free variable '_category_accepts_morphism' where it is not associated with a value in enclosing scope
+
+src/sage_extensions/categories/sets/set_categories.py:6470: NameError
+__ test_infinite_componentwise_set_maps_use_a_selected_natural_transformation __
+
+    def test_infinite_componentwise_set_maps_use_a_selected_natural_transformation() -> None:
+        from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+        from sage_extensions.categories.functors.core import NaturalTransformation
+        from sage_extensions.categories.sets.indexed_families import indexed_family
+        from sage_extensions.categories.sets.set_categories import (
+            _cartesian_product_morphism, _coproduct_morphism,
+        )
+    
+        point = Sets.Δ[0]
+        index_category = DiscreteCategory(NN)
+        diagram = Cat().Mor(index_category, Sets()).constant_functor(point)
+        components = NaturalTransformation(
+            diagram, diagram, lambda _index: Sets().Mor(point, point).identity()
+        )
+        family = indexed_family(NN, point)
+        product = Sets().product(family)
+        coproduct = Sets().coproduct(family)
+        product_map = _cartesian_product_morphism(product, product, components)
+        coproduct_map = _coproduct_morphism(coproduct, coproduct, components)
+        section = product(lambda _index: point(0))
+        assert product_map.parent() is Sets().Mor(product, product)
+        assert coproduct_map.parent() is Sets().Mor(coproduct, coproduct)
+        for index in (NN(0), NN(1), NN(5)):
+>           assert product_map(section).component(index) == section.component(index)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:965: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/sets/set_categories.py:4964: in component
+    self._components(normalized)
+src/sage_extensions/categories/sets/set_categories.py:6480: in <lambda>
+    lambda index: component(index)(section.component(index))
+                  ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+index = 0
+
+    def component(index):
+        selected = shape.object(index)
+        if transformation.source()(selected) is not source.factor(
+            index
+        ) or transformation.target()(selected) is not target.factor(index):
+            raise ValueError(
+                "the component transformation does not have the product's factor objects"
+            )
+        arrow = transformation.component(selected)
+>       if not _category_accepts_morphism(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+            Sets(), source.factor(index), target.factor(index), arrow
+        ):
+E       NameError: cannot access free variable '_category_accepts_morphism' where it is not associated with a value in enclosing scope
+
+src/sage_extensions/categories/sets/set_categories.py:6470: NameError
+-------------- generated report log file: tests/.report/run.jsonl --------------
+============================== slowest durations ===============================
+0.82s call     tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_distinct_span_bases_of_one_rank_do_not_share_a_hash
+0.35s call     tests/modules/test_dual_point_hash.sage::test_the_zero_and_the_scalars_keep_their_own_hashes
+0.22s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_a_class_over_zz_refuses_a_hash_because_reduction_is_no_normal_form
+0.21s call     tests/modules/test_dual_point_hash.sage::test_inserting_distinct_dual_points_does_not_compare_every_pair
+0.20s call     tests/modules/test_dual_point_hash.sage::test_distinct_dual_points_have_distinct_hashes
+0.09s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_laurent_quotient_refuse_a_hash
+0.07s call     tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others
+0.05s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_polynomial_quotient_over_a_field_hash_through_its_normal_form
+0.05s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_a_family_over_a_set_of_mutable_vectors_builds_its_product
+0.03s call     tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_equal_finite_ordered_sets_hash_equally
+0.01s call     tests/modules/test_dual_point_hash.sage::test_a_domain_without_a_finite_probe_falls_back_to_its_endpoints
+0.01s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_with_different_lifts_are_one_key
+0.01s call     tests/modules/test_dual_point_hash.sage::test_equal_dual_points_share_a_hash_whatever_presents_them
+0.01s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_mixed_finite_infinite_coproduct_rank_uses_summand_layers
+0.01s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_equal_finite_families_of_unhashable_labels_share_one_construction
+0.01s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_coproduct_induced_map_requires_compatible_component_morphisms
+0.01s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_equal_families_are_one_construction_in_both_construction_orders
+0.01s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_coproduct_rank_layer_has_direct_inverse
+0.01s call     tests/modules/test_dual_point_hash.sage::test_the_primal_points_keep_their_distribution
+0.01s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_set_product_and_coproduct_accept_stronger_mor_legs
+0.01s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_product_of_additive_monoids_has_componentwise_addition
+0.01s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_indexed_family_rank_cache_supplies_product_factors
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_square_of_the_natural_numbers_is_countable_and_listed_by_diagonals
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_product_of_two_and_three_points_has_six_points
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_a_construction_of_an_undecided_family_equality_is_built
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_product_functor_applies_a_transposition_to_the_first_coordinate
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_product_accepts_validated_nonconstant_diagram_cone
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_natural_numbers_plus_two_points_are_countable_and_enumerated
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_diagram_restricted_to_infinite_parity_family
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_disjoint_union_of_two_and_three_points_has_five_points
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_componentwise_product_morphism_rejects_wrong_factor_map
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_componentwise_coproduct_morphism_checks_its_source_and_target_summands
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_family_hash_does_not_require_hashable_index_labels
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_componentwise_set_maps_inherit_additive_morphisms
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_infinite_constant_additive_product_universal_morphism
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_infinite_indexed_functor_map_retains_canonical_category_inclusion
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_componentwise_set_maps_accept_additive_diagrams
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_infinite_constant_additive_product_retains_its_monoid_and_projections
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_additive_product_factors_a_verified_nonconstant_diagram
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_diagonal_enumeration_of_the_square_of_the_naturals_is_ranked
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_selected_nonconstant_countable_coproduct_is_enumerated
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_infinite_componentwise_set_maps_use_a_selected_natural_transformation
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_empty_index_coproduct_enumeration_terminates
+0.00s call     tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_set_with_an_unhashable_point_is_unhashable
+0.00s call     tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_finite_ordinal_hashes_by_its_points_like_the_set_they_form
+0.00s call     tests/modules/test_dual_point_hash.sage::test_the_probe_reads_at_most_eight_elements_of_a_finite_family
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_disjoint_union_of_two_and_three_points_has_five_points
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_componentwise_product_morphism_rejects_wrong_factor_map
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_componentwise_set_maps_accept_additive_diagrams
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_constant_countable_coproduct_has_diagonal_enumeration
+0.00s call     tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_distinct_classes_of_one_modulus_hash_apart
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_coproduct_induced_map_requires_compatible_component_morphisms
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_unproved_infinite_value_category_cannot_place_monoid_product
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_selected_nonconstant_countable_coproduct_is_enumerated
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_indexed_family_cache_does_not_decide_undecidable_index_equality
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_constant_countable_coproduct_has_diagonal_enumeration
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_componentwise_coproduct_morphism_checks_its_source_and_target_summands
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_coproduct_rank_layer_has_direct_inverse
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_empty_index_coproduct_enumeration_terminates
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_indexed_family_cache_does_not_decide_undecidable_index_equality
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_unchecked_discrete_diagram_cannot_certify_infinite_factors
+0.00s setup    tests/modules/test_dual_point_hash.sage::test_a_domain_without_a_finite_probe_falls_back_to_its_endpoints
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_componentwise_set_maps_inherit_additive_morphisms
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_laurent_quotient_refuse_a_hash
+0.00s setup    tests/modules/test_dual_point_hash.sage::test_distinct_dual_points_have_distinct_hashes
+0.00s setup    tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_distinct_span_bases_of_one_rank_do_not_share_a_hash
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_diagram_restricted_to_infinite_parity_family
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_indexed_family_cache_equality_is_not_limited_to_hash_buckets
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_indexed_family_cache_equality_is_not_limited_to_hash_buckets
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_with_different_lifts_are_one_key
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_infinite_constant_additive_product_retains_its_monoid_and_projections
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_equal_finite_families_of_unhashable_labels_share_one_construction
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_indexed_family_cache_reuses_only_decided_equal_labels
+0.00s setup    tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_infinite_componentwise_set_maps_use_a_selected_natural_transformation
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_unproved_infinite_value_category_cannot_place_monoid_product
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_a_class_over_zz_refuses_a_hash_because_reduction_is_no_normal_form
+0.00s setup    tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_equal_finite_ordered_sets_hash_equally
+0.00s setup    tests/modules/test_dual_point_hash.sage::test_the_primal_points_keep_their_distribution
+0.00s call     tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_indexed_family_cache_reuses_only_decided_equal_labels
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_mixed_finite_infinite_coproduct_rank_uses_summand_layers
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_infinite_constant_additive_product_universal_morphism
+0.00s setup    tests/modules/test_dual_point_hash.sage::test_inserting_distinct_dual_points_does_not_compare_every_pair
+0.00s setup    tests/modules/test_dual_point_hash.sage::test_equal_dual_points_share_a_hash_whatever_presents_them
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_polynomial_quotient_over_a_field_hash_through_its_normal_form
+0.00s setup    tests/modules/test_dual_point_hash.sage::test_the_probe_reads_at_most_eight_elements_of_a_finite_family
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_a_construction_of_an_undecided_family_equality_is_built
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_product_accepts_validated_nonconstant_diagram_cone
+0.00s setup    tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_distinct_classes_of_one_modulus_hash_apart
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_infinite_indexed_functor_map_retains_canonical_category_inclusion
+0.00s setup    tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_finite_ordinal_hashes_by_its_points_like_the_set_they_form
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_infinite_componentwise_set_maps_use_a_selected_natural_transformation
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_indexed_family_rank_cache_supplies_product_factors
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_square_of_the_natural_numbers_is_countable_and_listed_by_diagonals
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_selected_nonconstant_countable_coproduct_is_enumerated
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_constant_countable_coproduct_has_diagonal_enumeration
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_set_product_and_coproduct_accept_stronger_mor_legs
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_additive_product_factors_a_verified_nonconstant_diagram
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_equal_families_are_one_construction_in_both_construction_orders
+0.00s setup    tests/modules/test_dual_point_hash.sage::test_the_zero_and_the_scalars_keep_their_own_hashes
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_diagonal_enumeration_of_the_square_of_the_naturals_is_ranked
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_componentwise_set_maps_accept_additive_diagrams
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_family_hash_does_not_require_hashable_index_labels
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_natural_numbers_plus_two_points_are_countable_and_enumerated
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_product_of_two_and_three_points_has_six_points
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_product_functor_applies_a_transposition_to_the_first_coordinate
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_a_family_over_a_set_of_mutable_vectors_builds_its_product
+0.00s setup    tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_set_with_an_unhashable_point_is_unhashable
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_product_of_two_and_three_points_has_six_points
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_unchecked_discrete_diagram_cannot_certify_infinite_factors
+0.00s setup    tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_product_of_additive_monoids_has_componentwise_addition
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_unchecked_discrete_diagram_cannot_certify_infinite_factors
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_a_family_over_a_set_of_mutable_vectors_builds_its_product
+0.00s teardown tests/modules/test_dual_point_hash.sage::test_the_zero_and_the_scalars_keep_their_own_hashes
+0.00s teardown tests/modules/test_dual_point_hash.sage::test_distinct_dual_points_have_distinct_hashes
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_diagram_restricted_to_infinite_parity_family
+0.00s teardown tests/modules/test_dual_point_hash.sage::test_the_probe_reads_at_most_eight_elements_of_a_finite_family
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_product_of_additive_monoids_has_componentwise_addition
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_a_class_over_zz_refuses_a_hash_because_reduction_is_no_normal_form
+0.00s teardown tests/modules/test_dual_point_hash.sage::test_inserting_distinct_dual_points_does_not_compare_every_pair
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_disjoint_union_of_two_and_three_points_has_five_points
+0.00s teardown tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_distinct_span_bases_of_one_rank_do_not_share_a_hash
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_coproduct_rank_layer_has_direct_inverse
+0.00s teardown tests/modules/test_dual_point_hash.sage::test_a_domain_without_a_finite_probe_falls_back_to_its_endpoints
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_indexed_family_cache_does_not_decide_undecidable_index_equality
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_additive_product_factors_a_verified_nonconstant_diagram
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_laurent_quotient_refuse_a_hash
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_of_a_polynomial_quotient_over_a_field_hash_through_its_normal_form
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_classes_with_different_lifts_are_one_key
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_product_accepts_validated_nonconstant_diagram_cone
+0.00s teardown tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others
+0.00s teardown tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_equal_finite_ordered_sets_hash_equally
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_indexed_family_cache_equality_is_not_limited_to_hash_buckets
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_componentwise_coproduct_morphism_checks_its_source_and_target_summands
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_family_hash_does_not_require_hashable_index_labels
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_mixed_finite_infinite_coproduct_rank_uses_summand_layers
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_equal_finite_families_of_unhashable_labels_share_one_construction
+0.00s teardown tests/modules/test_dual_point_hash.sage::test_equal_dual_points_share_a_hash_whatever_presents_them
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_infinite_indexed_functor_map_retains_canonical_category_inclusion
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_coproduct_induced_map_requires_compatible_component_morphisms
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_componentwise_set_maps_inherit_additive_morphisms
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_set_product_and_coproduct_accept_stronger_mor_legs
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_product_functor_applies_a_transposition_to_the_first_coordinate
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_square_of_the_natural_numbers_is_countable_and_listed_by_diagonals
+0.00s teardown tests/modules/test_dual_point_hash.sage::test_the_primal_points_keep_their_distribution
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_equal_families_are_one_construction_in_both_construction_orders
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_componentwise_product_morphism_rejects_wrong_factor_map
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_indexed_family_rank_cache_supplies_product_factors
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_natural_numbers_plus_two_points_are_countable_and_enumerated
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_infinite_constant_additive_product_universal_morphism
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_a_construction_of_an_undecided_family_equality_is_built
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_infinite_constant_additive_product_retains_its_monoid_and_projections
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_empty_index_coproduct_enumeration_terminates
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_the_diagonal_enumeration_of_the_square_of_the_naturals_is_ranked
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_indexed_family_cache_reuses_only_decided_equal_labels
+0.00s teardown tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_set_with_an_unhashable_point_is_unhashable
+0.00s teardown tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_finite_ordinal_hashes_by_its_points_like_the_set_they_form
+0.00s teardown tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_unproved_infinite_value_category_cannot_place_monoid_product
+0.00s teardown tests/rings/test_a_quotient_class_hashes_by_its_class.sage::test_distinct_classes_of_one_modulus_hash_apart
+=========================== short test summary info ============================
+FAILED tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_unchecked_discrete_diagram_cannot_certify_infinite_factors
+FAILED tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_diagram_restricted_to_infinite_parity_family
+FAILED tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_constant_countable_coproduct_has_diagonal_enumeration
+FAILED tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_selected_nonconstant_countable_coproduct_is_enumerated
+FAILED tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_componentwise_set_maps_accept_additive_diagrams
+FAILED tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_infinite_componentwise_set_maps_use_a_selected_natural_transformation
+6 failed, 47 passed in 4.08s
+[peakrss] tests531: child waited=1 shell_code=1 samples=4
+[peakrss] peak tree RSS      : 353 MiB
+[peakrss] low-water MemAvail : 11557 MiB
+[peakrss] peak single VmHWM  : 353 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      342 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     6.0s procs=  3 rss=   353 MiB hwm=   353 MiB avail= 11557 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   345 MiB hwm=   352 MiB avail= 11575 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   291 MiB hwm=   291 MiB avail= 11636 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail= 11832 MiB
