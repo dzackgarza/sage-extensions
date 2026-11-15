@@ -228,6 +228,7 @@ from sage_extensions.refine import refine
 from sage_extensions.tensors.tensor import (
     Tensor,
     _engine_component_matrix,
+    _engine_row_family_gram,
     tensor,
 )
 
@@ -443,6 +444,28 @@ def _lattice_subobject_on_basis(module, basis, extra_categories, construction_da
     match rank:
         case 0:
             gram = _IdentityGram(source_module)
+        case _ if module.module_rank().is_finite():
+            # The restricted Gram is the pullback of the retained Gram along
+            # the basis rows: one engine product B G B^t, not rank^2 pairings.
+            from sage.matrix.constructor import matrix as engine_matrix
+
+            gram_ring, gram_labels, ambient_gram = module._engine_gram()
+            rows = engine_matrix(
+                ambient_gram.base_ring(),
+                [
+                    [_engine_ring_value(gram_ring, coordinates(label)) for label in gram_labels]
+                    for coordinates in (element.to_vector() for element in basis_elements)
+                ],
+            )
+            gram = tensor(
+                gram_ring,
+                (),
+                (rank, rank),
+                tuple(
+                    _owned_engine_element(gram_ring, entry)
+                    for entry in _engine_row_family_gram(ambient_gram, rows).list()
+                ),
+            )
         case _:
             gram = tensor(
                 ring,

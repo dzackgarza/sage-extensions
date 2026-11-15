@@ -1235,6 +1235,12 @@ class LocalizationRings(OwnedCategory):
                         other = parent(other)
                     except (TypeError, ValueError, ArithmeticError):
                         return False
+            # Two fractions that retain their values in this localization's
+            # exact engine model compare there: the model is the ring.
+            left_engine = self.__dict__.get("_engine_value")
+            right_engine = other.__dict__.get("_engine_value")
+            if left_engine is not None and right_engine is not None and parent._preamble_engine_ring.is_exact():
+                return bool(left_engine == right_engine)
             return self.parent()._fraction_equality_status(self, other)
 
         def _richcmp_(self, other, op):

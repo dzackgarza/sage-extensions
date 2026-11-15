@@ -217,11 +217,14 @@ class _SparseFreeModuleElement(ModuleElement):
                 coefficients.pop(label, None)
             else:
                 coefficients[label] = value
-        return self.parent().element_class(self.parent(), coefficients)
+        # Every coefficient is a sum in the base ring with its proved zeros
+        # removed: the stored invariant holds without conversion.
+        return _SparseFreeModuleElement._from_owned_support(self.parent(), coefficients)
 
     def _neg_(self):
-        return self.parent()._element_constructor_(
-            {label: -coefficient for label, coefficient in self._coefficients.items()}
+        return _SparseFreeModuleElement._from_owned_support(
+            self.parent(),
+            {label: -coefficient for label, coefficient in self._coefficients.items()},
         )
 
     def _lmul_(self, scalar):

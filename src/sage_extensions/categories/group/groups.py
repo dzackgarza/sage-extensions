@@ -8440,13 +8440,13 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
             if deferred_subgroup_generators is not None:
                 self.select_group_generators(
                     lambda: finite_ordered_set(
-                        tuple(self(generator) for generator in deferred_subgroup_generators())
+                        tuple(self._admit_generator(generator) for generator in deferred_subgroup_generators())
                     )
                 )
                 return
             labels = selected_subgroup_generators
             source = Groups.Free(index_set=labels)
-            generator_morphism = Sets().Mor(labels, self)(lambda generator: self(generator))
+            generator_morphism = Sets().Mor(labels, self)(self._admit_generator)
             _fix_selected_group_resolution_data(
                 self, source, labels, generator_morphism
             )
@@ -8455,6 +8455,15 @@ class GeneratedSubgroups(OwnedParameterizedCategory):
             if self._selected_subgroup_generators is None:
                 self._selected_subgroup_generators = self.group_generators()
             return self._selected_subgroup_generators
+
+        def _admit_generator(self, generator):
+            r"""A selected generator as a member: it is the one-letter word of its own generating set.
+
+            Its membership is the range law of the free cover's basis map, so it
+            is retained (:meth:`_retain_admitted_member`) instead of solved by
+            :meth:`membership_decision`.
+            """
+            return self._retain_admitted_member(self.supergroup()(generator))
 
         def _retain_admitted_member(self, element):
             r"""Mark an element this subgroup's own construction supplied, on the element.
