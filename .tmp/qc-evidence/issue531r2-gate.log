@@ -1,0 +1,18 @@
+tree SHA: 10c133af338f3db1e2c1bf564d1e5b0762acb6ca
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s -m pytest -o addopts= -p qc_sage_session tests/rings/test_a_quotient_class_hashes_by_its_class.sage tests/categories/test_formed_vector_space_placement.sage tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage -q
+.........                                                                [100%]
+9 passed in 3.06s
+[peakrss] r2gate: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 351 MiB
+[peakrss] low-water MemAvail : 13375 MiB
+[peakrss] peak single VmHWM  : 351 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      340 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   351 MiB hwm=   351 MiB avail= 13375 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   304 MiB hwm=   304 MiB avail= 13409 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13641 MiB
+launcher exit: 0

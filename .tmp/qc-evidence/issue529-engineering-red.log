@@ -1,0 +1,93 @@
+tree SHA: 63797cf6f079d0ef63e2e379f7c3380887ac3487
+port SHA: 991b88b0
+inner 560 s, outer 620 s, guard 6144 MiB
+command: /sage/.venv/bin/python -u -s -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q tests/engineering/test_the_timing_record_names_each_stage.py; echo pytest-exit=$?
+F...F                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_durations _
+
+    def test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_durations():
+        r"""One call, four records, each naming the lattice by its rank and nothing computed.
+    
+        The lattice display states the signature, and reading it off the form is a
+        congruence diagonalization: an invariant computed for a log line.  A stage
+        names its input instead, so the four records carry the rank of the lattice
+        the row was computed for, as the lattice states it.
+        """
+        lattice = _small_lattice()
+        written = stage_records_of(
+            lambda: lattice.stable_orthogonal_group().isotropic_orbit_representatives(1)
+        )
+    
+        assert written.kind == "stages"
+        assert written.suffix == "jsonl"
+        assert written.commit == written.head[:12]
+        assert all(record["commit"] == written.head for record in written.records)
+        assert all(record["run"] == written.stamp for record in written.records)
+        assert tuple(record["stage"] for record in written.records) == (
+            "discriminant image",
+            "ambient O(L) row",
+            "coset splitting and transport",
+            "isotropic orbit representatives",
+        )
+        assert all(record["outcome"] == "returned" for record in written.records)
+        assert all(record["seconds"] >= 0 for record in written.records)
+>       assert tuple(record["input"] for record in written.records) == (
+            "Integral lattice of rank 5",
+        ) * 4
+E       AssertionError: assert ('Integral la...ature (2, 3)') == ('Integral la...ce of rank 5')
+E         
+E         At index 0 diff: 'Integral lattice of rank 5 and signature (2, 3)' != 'Integral lattice of rank 5'
+E         Use -v to get more diff
+
+tests/engineering/test_the_timing_record_names_each_stage.py:68: AssertionError
+------------------------------ Captured log call -------------------------------
+INFO     sage_extensions.timing:timing.py:213 discriminant image
+INFO     sage_extensions.timing:timing.py:213 ambient O(L) row
+INFO     sage_extensions.timing:timing.py:213 coset splitting and transport
+INFO     sage_extensions.timing:timing.py:213 isotropic orbit representatives
+_____________________ test_a_parallel_run_keeps_one_record _____________________
+
+    def test_a_parallel_run_keeps_one_record():
+        r"""``-n 2`` finishes a session in each worker, and keeps the run's record once.
+    
+        ``pytest-xdist`` runs the session hooks in every worker's own process, under
+        a start stamp of its own, while the report log and the JUnit file are the
+        controller's alone.  A worker that kept a copy too would file the
+        controller's half-written log under a second name and fail on a JUnit file
+        the run has not written — an assertion ``xdist`` swallows, leaving a green
+        run beside a directory of records that are not runs.  One record, whatever
+        the number of workers.
+        """
+        kept = kept_test_run(
+            {"test_the_probe.py": "def test_the_probe():\n    assert 1 + 1 == 2\n"},
+            "-n", "2",
+        )
+    
+>       assert tuple(entry.kind for entry in kept) == ("junit", "report")
+E       AssertionError: assert ('report',) == ('junit', 'report')
+E         
+E         At index 0 diff: 'report' != 'junit'
+E         Right contains one more item: 'report'
+E         Use -v to get more diff
+
+tests/engineering/test_the_timing_record_names_each_stage.py:150: AssertionError
+=========================== short test summary info ============================
+FAILED tests/engineering/test_the_timing_record_names_each_stage.py::test_a_stage_timed_call_writes_its_stage_records_in_order_with_their_durations
+FAILED tests/engineering/test_the_timing_record_names_each_stage.py::test_a_parallel_run_keeps_one_record
+2 failed, 3 passed in 5.28s
+pytest-exit=1
+[peakrss] red529: child waited=0 shell_code=0 samples=4
+[peakrss] peak tree RSS      : 712 MiB
+[peakrss] low-water MemAvail : 9076 MiB
+[peakrss] peak single VmHWM  : 712 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      456 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     6.0s procs=  7 rss=   712 MiB hwm=   712 MiB avail=  9076 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   551 MiB hwm=   551 MiB avail=  9179 MiB
+[peakrss]   t=     2.0s procs=  4 rss=   318 MiB hwm=   318 MiB avail=  9360 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  9599 MiB
+launcher exit: 0

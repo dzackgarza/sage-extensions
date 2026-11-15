@@ -40,11 +40,12 @@ from sage.misc.cachefunc import cached_method
 from sage.rings.integer_ring import ZZ as SageZZ
 from sage.structure.element import parent as element_parent
 
+from sage_extensions.categories._lattice import lattice_record_name
 from sage_extensions.categories.modules.pure.modules import ModuleSubobjects
 from sage_extensions.categories.rings.ring_foundation import (
     OwnedCategoryOverBaseRing,
 )
-from sage_extensions.timing import timed_stage
+from sage_extensions.timing import stage, timed_stage
 
 
 def _integral_solution(system, target):
@@ -4385,7 +4386,12 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             point_set = libgap.eval("Set([" + ",".join(str(point) for point in points) + "])")
             return int(libgap.Length(libgap.Orbit(action, point_set, libgap.eval("OnSets"))))
 
-        @timed_stage("stabilizer discriminant image orders", input=lambda self, *arguments, **keywords: self.ambient_lattice())
+        @timed_stage(
+            "stabilizer discriminant image orders",
+            input=lambda self, *arguments, **keywords: (
+                f"a rank-{self.module_rank()} subobject of {lattice_record_name(self.ambient_lattice())}"
+            ),
+        )
         def stabilizer_discriminant_image_orders(self):
             r"""Return `(upper, lower)`: the bound on `\rho(G_P)` and the order of the returned images.
 
@@ -4593,7 +4599,6 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             return total // part
 
         @cached_method
-        @timed_stage("parabolic completeness decision", input=lambda self, *arguments, **keywords: self.ambient_lattice())
         def parabolic_completeness_decision(self):
             r"""Return `(complete, reason)` for the parabolic's generators, `reason` ``None`` when complete.
 
@@ -4633,68 +4638,78 @@ class PrimitiveIsotropicSubobjects(OwnedCategoryOverBaseRing):
             certificate does not settle the congruence level -- is reported as ``False``
             with that refusal as the reason.  That is what this predicate's `False` has
             always meant: not established.
+
+            The decision is one stage of the timing record
+            (:mod:`sage_extensions.timing`), timed here rather than by a decorator:
+            this method is cached, and a wrapper would replace the signature
+            ``cached_method`` builds its argument fixer from with
+            ``(*arguments, **keywords)``.
             """
-            if self.splitting_complement() is not None:
+            with stage(
+                "parabolic completeness decision",
+                f"a rank-{self.module_rank()} subobject of {lattice_record_name(self.ambient_lattice())}",
+            ):
+                if self.splitting_complement() is not None:
+                    return True, None
+                rank = int(self.module_rank())
+                if rank != 2:
+                    return (
+                        False,
+                        f"no cited statement shows that the generators of the parabolic at {self} "
+                        f"generate it: the block equations of Dutour Sikirić--Hulek, Theorem 4.9 "
+                        f"(arXiv:2302.01679v2, printed pp. 33--34), and the three factors this decides "
+                        f"for a plane, are stated for a primitive isotropic plane, and this "
+                        f"subobject has rank {rank}",
+                    )
+                failures = []
+                try:
+                    radical = self.unipotent_radical_index()
+                except (ArithmeticError, NotImplementedError, ValueError) as error:
+                    return (
+                        False,
+                        f"the radical factor at {self} is not decided: {error}; the family is then "
+                        f"only a subgroup of the parabolic",
+                    )
+                if radical != 1:
+                    failures.append(
+                        f"the radical is not generated (unipotent_radical_index() = {radical})"
+                    )
+                try:
+                    plane_index = self.levi_plane_action_index(trivial_on_quotient=True)
+                except (ArithmeticError, NotImplementedError, ValueError) as error:
+                    return (
+                        False,
+                        f"the plane-action factor at {self} is not decided: {error}; the family is "
+                        f"then only a subgroup of the parabolic",
+                    )
+                if plane_index != 1:
+                    failures.append(
+                        f"the plane actions of the members that act trivially on I^perp/I have "
+                        f"index {plane_index} in GL(I)"
+                    )
+                try:
+                    quotient_index = self.levi_quotient_image_index(trivial_on_plane=True)
+                except (ArithmeticError, NotImplementedError, ValueError) as error:
+                    return (
+                        False,
+                        f"the quotient factor at {self} is not decided: {error}; the family is "
+                        f"then only a subgroup of the parabolic",
+                    )
+                if quotient_index != 1:
+                    failures.append(
+                        f"the quotient images of the members that fix I pointwise have index "
+                        f"{quotient_index} in O(I^perp/I)"
+                    )
+                if failures:
+                    return (
+                        False,
+                        f"the image of the parabolic's generators at {self} in GL(I) x O(I^perp/I) "
+                        f"is not the whole product: " + "; ".join(failures) + ". The family's image "
+                        f"is then a proper subgroup of M, so the family is a proper subgroup of the "
+                        f"parabolic (Milne, Group Theory, v4.01, Theorem 1.47 printed p. 22 with "
+                        f"Corollary 1.48 printed p. 23, applied to P_I -> M)",
+                    )
                 return True, None
-            rank = int(self.module_rank())
-            if rank != 2:
-                return (
-                    False,
-                    f"no cited statement shows that the generators of the parabolic at {self} "
-                    f"generate it: the block equations of Dutour Sikirić--Hulek, Theorem 4.9 "
-                    f"(arXiv:2302.01679v2, printed pp. 33--34), and the three factors this decides "
-                    f"for a plane, are stated for a primitive isotropic plane, and this "
-                    f"subobject has rank {rank}",
-                )
-            failures = []
-            try:
-                radical = self.unipotent_radical_index()
-            except (ArithmeticError, NotImplementedError, ValueError) as error:
-                return (
-                    False,
-                    f"the radical factor at {self} is not decided: {error}; the family is then "
-                    f"only a subgroup of the parabolic",
-                )
-            if radical != 1:
-                failures.append(
-                    f"the radical is not generated (unipotent_radical_index() = {radical})"
-                )
-            try:
-                plane_index = self.levi_plane_action_index(trivial_on_quotient=True)
-            except (ArithmeticError, NotImplementedError, ValueError) as error:
-                return (
-                    False,
-                    f"the plane-action factor at {self} is not decided: {error}; the family is "
-                    f"then only a subgroup of the parabolic",
-                )
-            if plane_index != 1:
-                failures.append(
-                    f"the plane actions of the members that act trivially on I^perp/I have "
-                    f"index {plane_index} in GL(I)"
-                )
-            try:
-                quotient_index = self.levi_quotient_image_index(trivial_on_plane=True)
-            except (ArithmeticError, NotImplementedError, ValueError) as error:
-                return (
-                    False,
-                    f"the quotient factor at {self} is not decided: {error}; the family is "
-                    f"then only a subgroup of the parabolic",
-                )
-            if quotient_index != 1:
-                failures.append(
-                    f"the quotient images of the members that fix I pointwise have index "
-                    f"{quotient_index} in O(I^perp/I)"
-                )
-            if failures:
-                return (
-                    False,
-                    f"the image of the parabolic's generators at {self} in GL(I) x O(I^perp/I) "
-                    f"is not the whole product: " + "; ".join(failures) + ". The family's image "
-                    f"is then a proper subgroup of M, so the family is a proper subgroup of the "
-                    f"parabolic (Milne, Group Theory, v4.01, Theorem 1.47 printed p. 22 with "
-                    f"Corollary 1.48 printed p. 23, applied to P_I -> M)",
-                )
-            return True, None
 
         def is_parabolic_complete(self) -> bool:
             r"""Return whether the generators of :meth:`parabolic_stabilizer_generators` are the whole parabolic.

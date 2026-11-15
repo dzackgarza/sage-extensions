@@ -1,0 +1,13 @@
+The two sweeps above, and the two lattice id lists below, compared.
+targets: tests/modules tests/categories tests/rings tests/forms -- tree 6578c33 (7 files dirty: the two following commits' content), base 9d278f5
+
+== counts
+265 failed, 642 passed, 2 warnings in 410.06s (0:06:50)
+265 failed, 641 passed, 2 warnings in 423.47s (0:07:03)
+
+== ids only on the tree / only on the base
+
+== lattice files: 7 read the dual, the order ideal or the content
+tree 2 failed 21 passed; base 3 failed 20 passed; the id only on the base is the rewritten test's old name:
+2d1
+< FAILED tests/lattices/test_lattice_semantic_api.sage::test_the_infinite_rank_dual_is_the_product_and_evaluates_by_projections

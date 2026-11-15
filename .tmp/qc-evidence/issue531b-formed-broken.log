@@ -1,0 +1,175 @@
+tree SHA: 63797cf6f079d0ef63e2e379f7c3380887ac3487
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s -m pytest -o addopts= -p qc_sage_session tests/categories/test_formed_vector_space_placement.sage -q
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_a2_stays_nondegenerate_over_QQ_and_GF2_and_degenerates_over_GF3 _____
+
+>   return self.cache[k]
+E   TypeError: cannot use 'tuple' as a dict key (cannot use 'tuple' as a set element (unhashable type: 'OwnedJoinCategory.element_class'))
+
+sage/misc/cachefunc.pyx:1024: TypeError
+
+During handling of the above exception, another exception occurred:
+
+>   hash(o)
+
+sage/misc/cachefunc.pyx:563: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/sets/finite_ordered_sets.py:620: in __hash__
+    return hash(tuple(self))
+           ^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = (1modIdeal(3)ofIntegerRing)*e_0 + (2modIdeal(3)ofIntegerRing)*e_1
+
+    def __hash__(self):
+        zero = self.parent().base_ring().zero()
+        if any(
+            (coefficient == zero) is not False
+            for coefficient in self._coefficients.values()
+        ):
+            raise TypeError(
+                "a sparse vector with undecided zero coefficients has no selected canonical hash"
+            )
+>       return hash((id(self.parent()), frozenset(self._coefficients.items())))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use 'tuple' as a set element (unhashable type: 'OwnedJoinCategory.element_class')
+
+src/sage_extensions/categories/modules/framed/framed_free_modules.py:256: TypeError
+
+During handling of the above exception, another exception occurred:
+
+>   hash(o)
+
+sage/misc/cachefunc.pyx:603: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/sets/finite_ordered_sets.py:620: in __hash__
+    return hash(tuple(self))
+           ^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = (1modIdeal(3)ofIntegerRing)*e_0 + (2modIdeal(3)ofIntegerRing)*e_1
+
+    def __hash__(self):
+        zero = self.parent().base_ring().zero()
+        if any(
+            (coefficient == zero) is not False
+            for coefficient in self._coefficients.values()
+        ):
+            raise TypeError(
+                "a sparse vector with undecided zero coefficients has no selected canonical hash"
+            )
+>       return hash((id(self.parent()), frozenset(self._coefficients.items())))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use 'tuple' as a set element (unhashable type: 'OwnedJoinCategory.element_class')
+
+src/sage_extensions/categories/modules/framed/framed_free_modules.py:256: TypeError
+
+During handling of the above exception, another exception occurred:
+
+>   hash(self)
+
+sage/structure/sage_object.pyx:435: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/sets/finite_ordered_sets.py:620: in __hash__
+    return hash(tuple(self))
+           ^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = (1modIdeal(3)ofIntegerRing)*e_0 + (2modIdeal(3)ofIntegerRing)*e_1
+
+    def __hash__(self):
+        zero = self.parent().base_ring().zero()
+        if any(
+            (coefficient == zero) is not False
+            for coefficient in self._coefficients.values()
+        ):
+            raise TypeError(
+                "a sparse vector with undecided zero coefficients has no selected canonical hash"
+            )
+>       return hash((id(self.parent()), frozenset(self._coefficients.items())))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: cannot use 'tuple' as a set element (unhashable type: 'OwnedJoinCategory.element_class')
+
+src/sage_extensions/categories/modules/framed/framed_free_modules.py:256: TypeError
+
+During handling of the above exception, another exception occurred:
+
+    def test_a2_stays_nondegenerate_over_QQ_and_GF2_and_degenerates_over_GF3() -> None:
+        r"""``det A2 = 3``, so ``A2 (x) F_p`` is degenerate exactly for ``p = 3``.
+    
+        The radical over ``F_3`` is the line spanned by ``e1 - e2``: modulo 3 the
+        Gram matrix ``+-[[2, -1], [-1, 2]]`` has all entries equal.
+        """
+        a2 = Lattices(ZZ)("A2")
+        over_rationals = a2.vector_space()
+        over_two = a2.base_change(ZZ.Mor(GF(2))(lambda n: GF(2)(n)))
+        over_three = a2.base_change(ZZ.Mor(GF(3))(lambda n: GF(3)(n)))
+    
+        assert a2.determinant() == 3
+        assert over_rationals.dimension() == 2
+        assert over_rationals.is_nondegenerate()
+        assert over_two.is_nondegenerate()
+        assert not over_three.is_nondegenerate()
+>       assert over_three.radical().dimension() == 1
+               ^^^^^^^^^^^^^^^^^^^^
+
+tests/categories/test_formed_vector_space_placement.sage:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:4207: in radical
+    return self.left_radical()
+           ^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/modules/framed/formed/form_modules.py:1436: in left_radical
+    return self.left_curry().kernel()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/modules/module_morphisms/module_morphisms.py:1526: in kernel
+    represented = owner._represented_kernel_of_morphism(self)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/modules/framed/framed_free_modules.py:1094: in _represented_kernel_of_morphism
+    return self.subobject_on(generators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/lattices.py:3976: in subobject_on
+    return _lattice_subobject_spanning(self, basis)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:1026: in sage.misc.cachefunc.CachedFunction.__call__
+    ???
+sage/misc/cachefunc.pyx:565: in sage.misc.cachefunc.dict_key
+    ???
+sage/misc/cachefunc.pyx:614: in genexpr
+    ???
+sage/misc/cachefunc.pyx:614: in genexpr
+    ???
+sage/misc/cachefunc.pyx:605: in sage.misc.cachefunc.cache_key
+    ???
+sage/misc/cachefunc.pyx:616: in sage.misc.cachefunc.cache_key_unhashable
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   TypeError: <class 'sage_extensions.categories.sets.finite_ordered_sets.FiniteOrderedSets.parent_class'> is not hashable and does not implement _cache_key()
+
+sage/structure/sage_object.pyx:437: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Integer Ring / Ideal (3) of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Integer Ring / Ideal (3) of Integer Ring on Classes in the multilinear tensor presentation -> Module over Integer Ring / Ideal (3) of Integer Ring on Integer Ring / Ideal (3) of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+=========================== short test summary info ============================
+FAILED tests/categories/test_formed_vector_space_placement.sage::test_a2_stays_nondegenerate_over_QQ_and_GF2_and_degenerates_over_GF3
+1 failed in 2.42s
+[peakrss] formed531: child waited=1 shell_code=1 samples=2
+[peakrss] peak tree RSS      : 301 MiB
+[peakrss] low-water MemAvail : 12957 MiB
+[peakrss] peak single VmHWM  : 301 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      290 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   301 MiB hwm=   301 MiB avail= 12957 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     0 MiB hwm=     0 MiB avail= 13179 MiB

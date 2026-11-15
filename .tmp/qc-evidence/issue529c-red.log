@@ -1,0 +1,52 @@
+tree SHA: fc4f322061197c6490e6e1624cc274114e68d516
+port SHA: 991b88b0
+inner 560 s, outer 620 s, guard 6144 MiB
+command: /sage/.venv/bin/python -u -s -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q tests/engineering/test_the_timing_record_names_each_stage.py -k 'two_runs or parallel'; echo pytest-exit=$?
+proot warning: can't sanitize binding "/workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt529b/.tmp/issue529-probe.py": No such file or directory
+.F                                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_two_runs_started_together_keep_two_records ________________
+
+    def test_two_runs_started_together_keep_two_records():
+        r"""Two runs begun in one second are two records, each holding its own test.
+    
+        The record's name is its run's: the start to the microsecond and the pid of
+        the process that kept it.  A stamp to the second is one name for two runs, and
+        then the second run's copy lands on the first run's file — one record, holding
+        one of the two tests, with nothing to say that the other ever ran.  Both
+        probes here are started before either is waited on, so they begin together.
+        """
+        files, probes = simultaneous_test_runs(
+            {"test_the_first_probe.py": "def test_the_first_probe():\n    assert 1 + 1 == 2\n"},
+            {"test_the_second_probe.py": "def test_the_second_probe():\n    assert 2 + 2 == 4\n"},
+        )
+    
+        assert tuple(probe.exit_status for probe in probes) == (0, 0)
+>       assert tuple(entry.kind for entry in files) == ("junit", "junit", "report", "report")
+E       AssertionError: assert ('junit', 'report') == ('junit', 'ju...rt', 'report')
+E         
+E         At index 1 diff: 'report' != 'junit'
+E         Right contains 2 more items, first extra item: 'report'
+E         Use -v to get more diff
+
+tests/engineering/test_the_timing_record_names_each_stage.py:173: AssertionError
+=========================== short test summary info ============================
+FAILED tests/engineering/test_the_timing_record_names_each_stage.py::test_two_runs_started_together_keep_two_records
+1 failed, 1 passed, 4 deselected in 9.98s
+pytest-exit=1
+[peakrss] red529b: child waited=0 shell_code=0 samples=9
+[peakrss] peak tree RSS      : 626 MiB
+[peakrss] low-water MemAvail : 3721 MiB
+[peakrss] peak single VmHWM  : 627 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      287 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   git                           3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     8.0s procs=  7 rss=   626 MiB hwm=   627 MiB avail=  3994 MiB
+[peakrss]   t=    12.0s procs=  6 rss=   462 MiB hwm=   529 MiB avail=  3721 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   396 MiB hwm=   397 MiB avail=  4411 MiB
+[peakrss]   t=    10.0s procs=  5 rss=   295 MiB hwm=   303 MiB avail=  3922 MiB
+[peakrss]   t=     4.0s procs=  4 rss=   272 MiB hwm=   272 MiB avail=  4488 MiB
+launcher exit: 0

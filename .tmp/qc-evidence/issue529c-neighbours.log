@@ -1,0 +1,89 @@
+tree SHA: ad28ef011653034fd2f7cadb5e504267ed8f8646
+port SHA: 991b88b0
+inner 560 s, outer 620 s, guard 6144 MiB
+command: /sage/.venv/bin/python -u -s -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q tests/lattices/test_hyperbolic_root_lengths_and_vinberg.sage tests/lattices/test_isotropic_line_orbits_of_small_indefinite_lattices.sage tests/lattices/test_isotropic_parabolic_restriction.sage; echo pytest-exit=$?
+proot warning: can't sanitize binding "/workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt529c/.tmp/issue529-probe.py": No such file or directory
+.........F                                                               [100%]
+=================================== FAILURES ===================================
+_____ test_null_plane_restriction_kernel_is_the_integral_skew_shear_group ______
+
+    def test_null_plane_restriction_kernel_is_the_integral_skew_shear_group():
+        r"""Fixing e,u in 2U forces f -> f+t*u, v -> v-t*e for t in ZZ."""
+        ambient = Lattices(ZZ)("U") + Lattices(ZZ)("U")
+        e, f, u, v = tuple(ambient.module_generators())
+        labels = tuple(ambient.module_generating_set())
+        space = ambient.primitive_isotropic_subobject(e, u)
+        kernel = space.isotropic_reduction().isotropic_action().kernel()
+        parameters = []
+>       for generator in kernel.group_generators():
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/lattices/test_isotropic_parabolic_restriction.sage:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/group/groups.py:5871: in group_generators
+    self.selected_group_resolution().generators(name="Group generators"),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5834: in selected_group_resolution
+    return self.selected_resolution(OwnedGroups())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:383: in selected_resolution
+    resolution = selected.realize()
+                 ^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:116: in realize
+    return self._resolution_factory()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:53: in resolution
+    augmentation = generating_morphism(subgroup)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:3709: in <lambda>
+    augmentation = None if generators is None else lambda kernel: kernel.free_cover(generators())
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/groups.py:5903: in free_cover
+    elements = tuple(self(generator) for generator in generators)
+               ^^^^^
+src/sage_extensions/categories/group/groups.py:5903: in <genexpr>
+    elements = tuple(self(generator) for generator in generators)
+                     ^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:417: in __call__
+    return self._element_constructor_(*arguments, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/group/predicate_subgroups.py:229: in _element_constructor_
+    return _ConditionSetEngine._element_constructor_(self, self.supergroup()(datum))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = {g in {g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g(im(Generic morphism:
+  From: Integ...)
+  To:   Integral lattice of rank 4 and signature (2, 2))} : elements mapped to the identity by the defining morphism}
+element = Morphism from Integral lattice of rank 4 and signature (2, 2) to Integral lattice of rank 4 and signature (2, 2)
+
+    def _element_constructor_(self, element):
+        member = self.is_parent_of(element)
+        if member is False:
+>           raise ValueError(f"{element!r} is not in {self}")
+E           ValueError: Morphism from Integral lattice of rank 4 and signature (2, 2) to Integral lattice of rank 4 and signature (2, 2) is not in {g in {g in Orthogonal group O(Integral lattice of rank 4 and signature (2, 2)) : g(im(Generic morphism:
+E             From: Integral lattice of rank 2 and signature (0, 0)
+E             To:   Integral lattice of rank 4 and signature (2, 2)))=im(Generic morphism:
+E             From: Integral lattice of rank 2 and signature (0, 0)
+E             To:   Integral lattice of rank 4 and signature (2, 2))} : elements mapped to the identity by the defining morphism}
+
+src/sage_extensions/categories/sets/set_categories.py:4463: ValueError
+=========================== short test summary info ============================
+FAILED tests/lattices/test_isotropic_parabolic_restriction.sage::test_null_plane_restriction_kernel_is_the_integral_skew_shear_group
+1 failed, 9 passed in 25.27s
+pytest-exit=1
+[peakrss] nb529d: child waited=0 shell_code=0 samples=15
+[peakrss] peak tree RSS      : 614 MiB
+[peakrss] low-water MemAvail : 13057 MiB
+[peakrss] peak single VmHWM  : 624 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      611 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=    28.0s procs=  4 rss=   614 MiB hwm=   624 MiB avail= 13057 MiB
+[peakrss]   t=    26.0s procs=  4 rss=   586 MiB hwm=   586 MiB avail= 13092 MiB
+[peakrss]   t=    24.0s procs=  4 rss=   573 MiB hwm=   573 MiB avail= 13108 MiB
+[peakrss]   t=    22.0s procs=  4 rss=   565 MiB hwm=   565 MiB avail= 13115 MiB
+[peakrss]   t=    20.0s procs=  4 rss=   557 MiB hwm=   557 MiB avail= 13123 MiB
+launcher exit: 0

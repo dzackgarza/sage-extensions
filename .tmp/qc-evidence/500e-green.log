@@ -1,0 +1,16 @@
+tree SHA: 9d278f59e63029d12be06dd28c46775e96411907  dirty: 3
+targets: tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage tests/categories/test_the_refined_category_answers_with_its_own_operation.sage tests/modules/test_the_dual_of_a_module_is_its_module_of_functionals.sage
+inner 550 s, outer 610 s, guard 6144 MiB
+........                                                                 [100%]
+8 passed in 1.94s
+[peakrss] run500: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 302 MiB
+[peakrss] low-water MemAvail : 12781 MiB
+[peakrss] peak single VmHWM  : 302 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      291 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   302 MiB hwm=   302 MiB avail= 12781 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 12973 MiB
+launcher exit: 0

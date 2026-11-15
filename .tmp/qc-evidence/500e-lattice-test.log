@@ -1,0 +1,16 @@
+tree SHA: 6578c33c69cd9e597c83834b97f992656da757ac  dirty: 6
+targets: tests/lattices/test_lattice_semantic_api.sage
+inner 550 s, outer 610 s, guard 6144 MiB
+....                                                                     [100%]
+4 passed in 1.80s
+[peakrss] run500: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 302 MiB
+[peakrss] low-water MemAvail : 12408 MiB
+[peakrss] peak single VmHWM  : 302 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      291 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   302 MiB hwm=   302 MiB avail= 12408 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail= 12652 MiB
+launcher exit: 0

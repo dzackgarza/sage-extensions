@@ -1,0 +1,32 @@
+tree SHA: 63797cf6f079d0ef63e2e379f7c3380887ac3487
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py
+--- a formed module over a quotient ring: radical() ---
+radical raised: TypeError <class 'sage_extensions.categories.sets.finite_ordered_sets.FiniteOrderedSets.parent_class'> is not hashable and does not implement _cache_key()
+process time 0.23 s
+--- a span-basis subobject scan on U + U + <-2> ---
+400 subobject_on calls, process time 0.44 s
+--- a product of finite sets ---
+product: Product of the family over {0,...,1} process time 0.0 s
+
+=== hash calls of finite ordered sets, by the caller that asked ---
+       104  lattices.py:3976 subobject_on
+        21  set_categories.py:1504 _finite_product
+         2  modules.py:816 tensor_product
+       127  total
+=== refusals, by caller ===
+         4  lattices.py:3976 subobject_on
+first refusal: [('lattices.py:3976 subobject_on', 'FiniteOrderedSets.parent_class', 1, (('sage_extensions.categories.modules.framed.framed_free_modules.OwnedJoinCategory.element_class[_SparseFreeModuleElement]', None),))]
+PROBE DONE
+[peakrss] census531b: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 301 MiB
+[peakrss] low-water MemAvail : 7333 MiB
+[peakrss] peak single VmHWM  : 301 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      290 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   301 MiB hwm=   301 MiB avail=  7333 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  7540 MiB
+launcher exit: 0

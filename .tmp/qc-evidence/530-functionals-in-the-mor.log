@@ -1,0 +1,29 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe530e.py
+tree SHA: 0fd90fcd0298d3565c2151e0596da91bf641b261
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 400 s, outer 460 s, guard 6144 MiB, args ''
+  Mor(M, QQ.reg): Mor(Free module on NN = {0, 1, 2, ...} over Fraction Field of Integer Ring, Free module on {[0]} over Fraction Field of Integer Ring)
+  M.module_generating_set(): NN = {0, 1, 2, ...}
+  labels cardinality: ℵ_0
+  Mor(...)(lambda label: 0): Generic morphism:
+  From: Free module on NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+  To:   Free module on {[0]} over Fraction Field of Integer Ring
+  Mor(...)(IndexedFamily(labels, 1 at 0)): Generic morphism:
+  From: Free module on NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+  To:   Free module on {[0]} over Fraction Field of Integer Ring
+  Mor(...)(IndexedFamily(labels, all ones)): Generic morphism:
+  From: Free module on NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+  To:   Free module on {[0]} over Fraction Field of Integer Ring
+  delta_0(e0): [0]
+  delta_0(e1): 0
+  constant(e0): [0]
+  constant(2*e0 + 3*e7): 5*[0]
+  equip_bilinear_form: TypeError: Modules.ParentMethods.equip_bilinear_form() takes 2 positional arguments but 3 were given
+[peakrss] probe530: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 3 MiB
+[peakrss] low-water MemAvail : 12738 MiB
+[peakrss] peak single VmHWM  : 4 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       5 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     4 MiB avail= 12738 MiB
+launcher exit: 0

@@ -1,0 +1,50 @@
+tree SHA: 006679543bfa3740d4da13cdfa3342d56d29b677
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py cap=150
+[0.0s] cap 150 s, load 2.53
+[0.0s] lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+[2.0s] Otilde(T_Co) built; the row below is the ambient O(L) plane row
+[30.0s]   so far 1033 hashes, 0.02 s, largest 129 points, worst ('set_categories.py:1504 _finite_product', 11): 53.3 us each
+[60.0s]   so far 1033 hashes, 0.02 s, largest 129 points, worst ('set_categories.py:1504 _finite_product', 11): 53.3 us each
+[90.0s]   so far 1033 hashes, 0.02 s, largest 129 points, worst ('set_categories.py:1504 _finite_product', 11): 53.3 us each
+[120.0s]   so far 1033 hashes, 0.02 s, largest 129 points, worst ('set_categories.py:1504 _finite_product', 11): 53.3 us each
+[150.1s]   so far 1040 hashes, 0.03 s, largest 512 points, worst ('set_categories.py:1504 _finite_product', 11): 53.3 us each
+[152.0s]   hashed a set of 131072 points from set_categories.py:1504 _finite_product in 20.60 s: set sage_extensions.categories.sets.finite_ordered_sets.FiniteOrderedSets.parent_class[_EnumeratedImageSetEngine].ObjectType, point sage_extensions.categories.modules.framed.finitely_generated.finitely_presented_modules.OwnedJoinCategory.element_class[_GeneralPresentedElement]
+[152.0s] the row did not return inside its 150 s cap
+[152.0s] row incomplete after 150.0 s
+[152.0s] 
+[152.0s] === hashes of finite ordered sets, by caller and cardinality ===
+[152.0s] caller                                                card    calls   us each   total s
+[152.0s] set_categories.py:1504 _finite_product              131072        120603249.2    20.603
+[152.0s] set_categories.py:1504 _finite_product                  11       94      53.3     0.005
+[152.0s] set_categories.py:1504 _finite_product                 512        1    3346.0     0.003
+[152.0s] set_categories.py:1504 _finite_product                   2      284      11.3     0.003
+[152.0s] set_categories.py:1504 _finite_product                   9      137      18.6     0.003
+[152.0s] set_categories.py:2670 finite_subsets                    7      128      16.0     0.002
+[152.0s] set_categories.py:1504 _finite_product                 256        1    1714.5     0.002
+[152.0s] set_categories.py:2612 power_set                         7      128      13.3     0.002
+[152.0s] lattices.py:3976 subobject_on                            9        3     542.8     0.002
+[152.0s] set_categories.py:1504 _finite_product                  10       44      36.1     0.002
+[152.0s] lattices.py:3976 subobject_on                            2        3     253.5     0.001
+[152.0s] lattices.py:3976 subobject_on                            1        4     150.3     0.001
+[152.0s] set_categories.py:1504 _finite_product                 129        7      78.2     0.001
+[152.0s] set_categories.py:1504 _finite_product                   1       37      14.2     0.001
+[152.0s] lattices.py:3976 subobject_on                           10        3     162.2     0.000
+[152.0s]   total 1041 hashes, 20.63 s, largest set hashed 131072 points
+[152.0s] PROBE DONE
+[peakrss] census531b: child waited=0 shell_code=0 samples=78
+[peakrss] peak tree RSS      : 505 MiB
+[peakrss] low-water MemAvail : 11955 MiB
+[peakrss] peak single VmHWM  : 505 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      494 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   run.sh                        3 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   154.1s procs=  3 rss=   505 MiB hwm=   505 MiB avail= 12226 MiB
+[peakrss]   t=   140.1s procs=  3 rss=   503 MiB hwm=   503 MiB avail= 12242 MiB
+[peakrss]   t=   142.1s procs=  3 rss=   503 MiB hwm=   503 MiB avail= 12242 MiB
+[peakrss]   t=   144.1s procs=  3 rss=   503 MiB hwm=   503 MiB avail= 12242 MiB
+[peakrss]   t=   146.1s procs=  3 rss=   503 MiB hwm=   503 MiB avail= 12241 MiB
+launcher exit: 0

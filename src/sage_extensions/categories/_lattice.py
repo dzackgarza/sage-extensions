@@ -1468,6 +1468,27 @@ def signature_pair(positive, negative):
     return signature_pairs().pair(cardinal(positive), cardinal(negative))
 
 
+def lattice_record_name(lattice) -> str:
+    r"""Name a lattice in a timing record: its rank and the labels of its generators.
+
+    A timing record's ``input`` is a name the call site writes, not one read off
+    an object (:mod:`sage_extensions.timing`), and this is that name for the
+    input most of the long rows are computed on.  It is composed from what the
+    lattice already carries -- ``module_rank()`` and the labels of its generating
+    set -- so naming a lattice costs neither a rendering nor an invariant, and
+    two lattices of one rank are told apart by their labels.
+
+    EXAMPLES::
+
+        sage: from sage_extensions.categories.lattices import Lattices
+        sage: from sage_extensions.categories._lattice import lattice_record_name
+        sage: lattice_record_name(Lattices(ZZ)("U"))
+        'the rank-2 lattice on generators 0, 1'
+    """
+    labels = ", ".join(str(label) for label in lattice.module_generating_set())
+    return f"the rank-{lattice.module_rank()} lattice on generators {labels}"
+
+
 def _congruence_diagonal_form(gram: Tensor):
     r"""Compute Sage's diagonal form and change of basis with exact scalar tests.
 

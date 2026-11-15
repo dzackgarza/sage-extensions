@@ -1,0 +1,2 @@
+FAILED tests/lattices/test_content_and_doubling.sage::test_index_two_sublattices_of_a_hyperbolic_summand
+FAILED tests/lattices/test_module_generators.sage::test_the_identity_form_on_countable_rank_is_nondegenerate_definite_and_not_unimodular

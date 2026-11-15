@@ -1,0 +1,32 @@
+tree SHA: ad28ef011653034fd2f7cadb5e504267ed8f8646
+port SHA: 991b88b0
+inner 280 s, outer 320 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py
+lattice name: the rank-5 lattice on generators 0, 1, 2, 3, 4
+ambient plane representatives: 1 in 3.16 s
+record name: 1 ambient plane representative of the rank-5 lattice on generators 0, 1, 2, 3, 4
+orbits: 1 in 0.00 s
+stage file: /repos/sage-extensions/.timings/stages-ad28ef011653-20261115T090014412683Z-1810891.jsonl
+  discriminant image | rank-2 subobject row of the rank-5 lattice on generators 0, 1, 2, 3, 4 | 0.002
+  ambient O(L) row | rank-1 subobject row of the rank-5 lattice on generators 0, 1, 2, 3, 4 | 0.303
+  ambient O(L) row | rank-2 subobject row of the rank-5 lattice on generators 0, 1, 2, 3, 4 | 0.919
+  parabolic completeness decision | a rank-2 subobject of the rank-5 lattice on generators 0, 1, 2, 3, 4 | 0.053
+  coset splitting and transport | rank-2 subobject row of the rank-5 lattice on generators 0, 1, 2, 3, 4 | 2.236
+  isotropic orbit representatives | rank-2 subobject row of the rank-5 lattice on generators 0, 1, 2, 3, 4 | 3.157
+  discriminant images | 1 ambient plane representative of the rank-5 lattice on generators 0, 1, 2, 3, 4 | 0.016
+  ambient divided-class row | 1 ambient plane representative of the rank-5 lattice on generators 0, 1, 2, 3, 4 | 0.0
+  coset action | 1 ambient plane representative of the rank-5 lattice on generators 0, 1, 2, 3, 4 | 0.0
+  divided-class orbit set | 1 ambient plane representative of the rank-5 lattice on generators 0, 1, 2, 3, 4 | 0.001
+[peakrss] plane529e: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 471 MiB
+[peakrss] low-water MemAvail : 13150 MiB
+[peakrss] peak single VmHWM  : 471 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      458 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     4.0s procs=  4 rss=   471 MiB hwm=   471 MiB avail= 13150 MiB
+[peakrss]   t=     2.0s procs=  4 rss=   421 MiB hwm=   421 MiB avail= 13153 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13427 MiB
+launcher exit: 0

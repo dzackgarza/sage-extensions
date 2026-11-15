@@ -14,6 +14,7 @@ from sage.all import (
 )
 from sage.categories.fields import Fields as SageFields
 from sage.rings.finite_rings.finite_field_constructor import GF as _SageGF
+from sage.rings.finite_rings.integer_mod_ring import IntegerModRing_generic as SageIntegerModRing
 
 try:
     from sage.categories.ordered_fields import OrderedFields as SageOrderedFields
@@ -918,6 +919,31 @@ def _engine_quotient_representative(quotient_engine, backend_value):
             return backend_value.lift()
 
 
+def _engine_quotient_reduction_is_canonical(engine) -> bool:
+    r"""Whether ``engine`` selects one representative of each class of a quotient.
+
+    Private adapter of :class:`QuotientRings` (``OWN-06``), read only by its
+    ``__hash__``.  A hash of a class must not depend on which lift was written
+    down, so it can be the engine's hash of the engine's representative only
+    where that representative is one per class: in ``ZZ/(n)``, whose
+    representatives are the residues, and in a quotient over a coefficient field,
+    where ``ideal.reduce`` is Singular's normal form with respect to a Gröbner
+    basis.  Over ``ZZ`` Sage's ``Ideal_generic.reduce`` returns the
+    representative it was given -- in ``ZZ[x,y]/(4, 6x)`` the one class of ``x``
+    and ``3x`` has the representatives ``xbar`` and ``-xbar`` -- so no
+    representative is selected there.
+    """
+    match engine:
+        case SageIntegerModRing():
+            return True
+        case QuotientRing_generic():
+            return engine.base_ring() in SageFields()
+        case _ if engine is not None and engine in SageFields():
+            return True
+        case _:
+            return False
+
+
 class QuotientRings(OwnedCategory):
     r"""Commutative quotient rings equipped with their quotient map."""
 
@@ -989,6 +1015,26 @@ class QuotientRings(OwnedCategory):
 
         def _repr_(self):
             return f"{self.lift()} mod {self.parent().defining_ideal()}"
+
+        def __hash__(self):
+            r"""Return the hash of the class, through a representative the engine selects.
+
+            Two classes are equal exactly when their lifts differ by an element
+            of the defining ideal (:meth:`_richcmp_`), so a hash of the lift would
+            separate equal classes.  A representative the engine selects one per
+            class is what can be hashed, and
+            :func:`_engine_quotient_reduction_is_canonical` names where the
+            engine does that; a quotient outside those cases refuses a hash
+            rather than offering one its equality does not respect.
+            """
+            parent = self.parent()
+            engine = parent._preamble_engine_ring
+            if not _engine_quotient_reduction_is_canonical(engine):
+                raise TypeError(
+                    f"a class of {parent} has no hash: {engine} does not select one "
+                    "representative of a class, and the lift does not determine the class"
+                )
+            return hash((id(parent), parent._engine_element(self)))
 
     class ParentMethods:
         _derived_construction_parameters = frozenset({"base_ring"})

@@ -1,0 +1,14 @@
+A second lattice batch (seven files) started on the tree and never reached its summary; the base run of it was cut
+at the start of its own output. Neither is a comparison; both are recorded as unfinished.
+
+tree SHA: 6578c33c69cd9e597c83834b97f992656da757ac  dirty: 7
+targets: tests/lattices/test_catalogue.sage tests/lattices/test_hodge_calculus.sage tests/lattices/test_hyperbolic_space.sage tests/lattices/test_discriminant_module_rank_seventeen.sage tests/lattices/test_enriques_polarization_orbits.sage tests/lattices/test_integral_lattices_archive_reconciliation.sage tests/lattices/test_named_lattice_constructions.sage
+inner 550 s, outer 610 s, guard 6144 MiB
+  ... (collection diagnostics, then the cap)
+ense, sage.modules.vector_real_double_dense, PyNormaliz_cpp, sage.graphs.bliss, sage.modules.numpy_util, sage.matrix.matrix_complex_double_dense, sage.modules.vector_complex_double_dense (total: 390)
+
+== base run
+tree SHA: 9d278f59e63029d12be06dd28c46775e96411907  dirty: 0
+targets: tests/lattices/test_catalogue.sage tests/lattices/test_hodge_calculus.sage tests/lattices/test_hyperbolic_space.sage tests/lattices/test_discriminant_module_rank_seventeen.sage tests/lattices/test_enriques_polarization_orbits.sage tests/lattices/test_integral_lattices_archive_reconciliation.sage tests/lattices/test_named_lattice_constructions.sage
+inner 550 s, outer 610 s, guard 6144 MiB
+...........FFF....................

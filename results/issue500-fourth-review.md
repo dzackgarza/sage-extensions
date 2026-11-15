@@ -1,5 +1,12 @@
 # The fourth review of #500: one pairing for the dual's two shapes, the language's refusal, and the finite axiom in the placement
 
+> **Superseded in part, 2026-11-15.** Section 1's repair kept the dual's two
+> shapes and the shape match in `dual_evaluation_image_generators`. #530 rules
+> that the dual has one basis-free construction, `Mor(M, R.regular_module())`,
+> and that the order ideal is the image of evaluation at that module; the
+> shape, the helper and the coordinate round trip are gone, and the text below
+> is the record of the state it answered, not a prescription.
+
 The review of `af3edeec78`, `ef39a9bfbb`, `b5cfd57f77` and `1b8358c261` made four
 claims.  Each is checked below against the tree at `5f17b92fe7`, then answered.
 The subject of #500 does not change: a ring element's `/` is the ring's own

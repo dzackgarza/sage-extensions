@@ -1,0 +1,30 @@
+tree SHA: 5c1268324ca5f556a55b356876003a05c0fa3fe3
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py
+labels: (0, 1, 2, 3, 4)
+two equal vectors, separately built: equal? True identical? False
+  hashes: -4024491175064079283 -4024491175064079283
+  parents identical? True
+  type: sage_extensions.categories.modules.framed.framed_free_modules.OwnedJoinCategory.element_class[_SparseFreeModuleElement]
+  __hash__ from: sage_extensions.categories.modules.framed.framed_free_modules._SparseFreeModuleElement <function _SparseFreeModuleElement.__hash__ at 0x7c8ef505dd20>
+building one vector: 30.7 us
+two equal fifteen-point sets: equal? True cardinality 15
+hash of a fifteen-point set: 5.2 us
+__eq__ of two equal fifteen-point sets: 344.4 us
+hash of an isometry: -5514708220984159197
+[peakrss] probe531pt: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 470 MiB
+[peakrss] low-water MemAvail : 10123 MiB
+[peakrss] peak single VmHWM  : 470 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      459 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   run.sh                        2 MiB peak
+[peakrss]   t=    12.0s procs=  3 rss=   470 MiB hwm=   470 MiB avail= 10327 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   466 MiB hwm=   466 MiB avail= 10401 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   462 MiB hwm=   462 MiB avail= 10401 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   427 MiB hwm=   427 MiB avail= 10240 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   404 MiB hwm=   404 MiB avail= 10123 MiB
+launcher exit: 0

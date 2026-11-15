@@ -18,6 +18,17 @@ method names").
 A ring whose points are a finite set does state their enumeration, and
 ``tests/categories/test_the_refined_category_answers_with_its_own_operation.sage``
 states it for $\mathbf{Z}/8$.
+
+The assertions below state both halves of what the language then says about
+$\mathbf{Z}[x]$: ``__iter__`` is ``None``, and ``iter`` and ``tuple`` refuse.
+The language draws one further consequence, which this file records rather than
+asserts: an object whose ``__iter__`` is ``None`` is not an instance of
+``collections.abc.Iterable``, where one whose ``__iter__`` raised would still be
+(measured: ``True`` with the method ``7b23fc3`` replaced, ``False`` with the
+slot set to ``None``, the two agreeing on ``iter`` and ``tuple``).  The test
+lint bars the spelling --- ``TL01`` refuses ``import collections.abc`` and
+``TL03`` refuses ``isinstance`` --- so the assertion would have to be admitted
+by the standard before it can be written here.
 """
 
 import pytest

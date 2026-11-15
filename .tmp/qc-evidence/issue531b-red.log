@@ -1,0 +1,75 @@
+tree SHA: 63797cf6f079d0ef63e2e379f7c3380887ac3487
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s -m pytest -o addopts= -p qc_sage_session tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage -v
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0 -- /sage/.venv/bin/python
+cachedir: .pytest_cache
+hypothesis profile 'default'
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 5 items
+
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_equal_finite_ordered_sets_hash_equally PASSED [ 20%]
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_distinct_span_bases_of_one_rank_do_not_share_a_hash PASSED [ 40%]
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others PASSED [ 60%]
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_finite_ordinal_hashes_by_its_points_like_the_set_they_form PASSED [ 80%]
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_set_with_an_unhashable_point_is_unhashable FAILED [100%]
+
+=================================== FAILURES ===================================
+______________ test_a_set_with_an_unhashable_point_is_unhashable _______________
+
+    def test_a_set_with_an_unhashable_point_is_unhashable() -> None:
+        r"""An equal pair of sets, one of whose points refuses a hash, has one hash: none.
+    
+        :class:`tuple` and :class:`frozenset` hash their contents and refuse a hash
+        when a content does not hash; a finite ordered set is the same data.  A
+        mutable Sage vector or matrix is unhashable and equals its immutable copy,
+        so the two sets below are equal: a hash that fell back to something weaker
+        than the points when a point refused a hash gives these two equal sets two
+        values.  The points are built over Python integers, ``int(...)``, because
+        the preparser makes a literal a library integer that Sage's constructors
+        reject (``tests/forms/test_the_coble_anti_isometry.sage``).
+        """
+        mutable_vector = vector([int(1), int(2)])
+        immutable_vector = vector([int(1), int(2)])
+        immutable_vector.set_immutable()
+        mutable_matrix = identity_matrix(int(2))
+        immutable_matrix = identity_matrix(int(2))
+        immutable_matrix.set_immutable()
+    
+        assert mutable_vector == immutable_vector
+        assert mutable_matrix == immutable_matrix
+        for mutable, immutable in (
+            (mutable_vector, immutable_vector),
+            (mutable_matrix, immutable_matrix),
+        ):
+            with pytest.raises(TypeError):
+                hash(mutable)
+            floating = FiniteOrderedSets()((mutable,))
+            fixed = FiniteOrderedSets()((immutable,))
+            relocated = FiniteOrderedSets()((immutable,))
+            assert floating == fixed
+            assert fixed == relocated
+            assert hash(fixed) == hash(relocated)
+>           with pytest.raises(TypeError):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE TypeError
+
+tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage:189: Failed
+=========================== short test summary info ============================
+FAILED tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage::test_a_set_with_an_unhashable_point_is_unhashable
+========================= 1 failed, 4 passed in 3.55s ==========================
+[peakrss] red531c: child waited=1 shell_code=1 samples=3
+[peakrss] peak tree RSS      : 329 MiB
+[peakrss] low-water MemAvail : 9243 MiB
+[peakrss] peak single VmHWM  : 329 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      318 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   329 MiB hwm=   329 MiB avail=  9243 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   302 MiB hwm=   302 MiB avail=  9262 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail=  9286 MiB

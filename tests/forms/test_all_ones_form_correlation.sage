@@ -66,15 +66,11 @@ def test_the_witness_is_attached_only_to_a_diagonal_gram() -> None:
         pass
 
     candidate = _Candidate()
-    _attach_diagonal_correlation_witness(
-        standard, candidate, standard._dual_product_construction()
-    )
+    _attach_diagonal_correlation_witness(standard, candidate)
     assert "_preamble_non_surjectivity_witness" in vars(candidate)
 
     module, form, _value_module = _all_ones_form()
     all_ones = FormModules(QQ)(form)
     withheld = _Candidate()
-    _attach_diagonal_correlation_witness(
-        all_ones, withheld, standard._dual_product_construction()
-    )
+    _attach_diagonal_correlation_witness(all_ones, withheld)
     assert "_preamble_non_surjectivity_witness" not in vars(withheld)

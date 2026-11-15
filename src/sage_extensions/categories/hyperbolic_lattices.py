@@ -51,7 +51,7 @@ from sage.structure.sage_object import SageObject
 
 from sage_extensions.categories.sets.indexed_families import finite_indexed_family_from_values
 from sage_extensions.categories.lattices import Lattices
-from sage_extensions.categories._lattice import signature_pair
+from sage_extensions.categories._lattice import lattice_record_name, signature_pair
 from sage_extensions.categories.sets.cardinals import cardinal
 from sage_extensions.categories.rings.ring_foundation import (
     _owned_engine_element,
@@ -69,7 +69,7 @@ from sage_extensions.categories.sets.finite_ordered_sets import (
 )
 from sage_extensions.logic import AtomicProposition
 from sage_extensions.refine import refine
-from sage_extensions.timing import timed_stage
+from sage_extensions.timing import stage
 from sage_extensions.tensors.tensor import _engine_component_matrix, tensor
 
 _VINBERG_NF_PROJECT = Path(__file__).resolve().parents[4] / "src.bak" / "backends" / "external" / "vinbergs_algorithm" / "references" / "VinbergsAlgorithmNF"
@@ -1159,7 +1159,6 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             )
 
         @cached_method
-        @timed_stage("Vinberg walk", input=lambda self, *arguments, **keywords: self)
         def _vinberg_search(self, controlling_vector, max_roots, max_decompositions, admits_root=None):
             r"""Run Vinberg's algorithm and return completeness with the roots.
 
@@ -1175,30 +1174,37 @@ class HyperbolicLattices(OwnedCategoryOverBaseRing):
             height comparison is made in every real embedding.  The available
             realization works over the integers only, so the wider case is a
             stated absence rather than a silent coercion.
+
+            The walk is one stage of the timing record (:mod:`sage_extensions.timing`),
+            timed here rather than by a decorator: this method is cached, and a
+            wrapper would present ``cached_method`` with ``(*arguments,
+            **keywords)`` for the key's argument fixer, so ``admits_root=None``
+            written out and left off would be two cache entries for one walk.
             """
-            assert self.base_ring() is _owned_integers(), (
-                f"cannot run Vinberg's algorithm on {self} over {self.base_ring()}: the "
-                f"algorithm holds over any totally real ring of integers, but the "
-                f"available implementation works over ZZ only.  Bottinelli's "
-                f"VinbergsAlgorithmNF (github.com/bottine/VinbergsAlgorithmNF) handles "
-                f"the wider case, and it is not connected here"
-            )
-            gram, negated = self._engine_gram_of_signature_n_1()
-            coordinates = None if controlling_vector is None else list(_framing_coordinates(controlling_vector))
-            row_filter = None
-            if admits_root is not None:
-                def row_filter(row):
-                    element = self(tuple(int(entry) for entry in row))
-                    return bool(admits_root(-element if negated else element))
-            complete, rows = _vinal_vinberg_roots(
-                gram,
-                coordinates,
-                max_roots,
-                max_decompositions,
-                admits_root=row_filter,
-            )
-            roots = tuple(self(tuple(int(entry) for entry in row)) for row in rows)
-            return complete, tuple(-root for root in roots) if negated else roots
+            with stage("Vinberg walk", f"{lattice_record_name(self)}, {max_roots} roots at most"):
+                assert self.base_ring() is _owned_integers(), (
+                    f"cannot run Vinberg's algorithm on {self} over {self.base_ring()}: the "
+                    f"algorithm holds over any totally real ring of integers, but the "
+                    f"available implementation works over ZZ only.  Bottinelli's "
+                    f"VinbergsAlgorithmNF (github.com/bottine/VinbergsAlgorithmNF) handles "
+                    f"the wider case, and it is not connected here"
+                )
+                gram, negated = self._engine_gram_of_signature_n_1()
+                coordinates = None if controlling_vector is None else list(_framing_coordinates(controlling_vector))
+                row_filter = None
+                if admits_root is not None:
+                    def row_filter(row):
+                        element = self(tuple(int(entry) for entry in row))
+                        return bool(admits_root(-element if negated else element))
+                complete, rows = _vinal_vinberg_roots(
+                    gram,
+                    coordinates,
+                    max_roots,
+                    max_decompositions,
+                    admits_root=row_filter,
+                )
+                roots = tuple(self(tuple(int(entry) for entry in row)) for row in rows)
+                return complete, tuple(-root for root in roots) if negated else roots
 
         def _facet_roots(self, roots):
             r"""Return the roots of ``roots`` whose half-spaces are the facets of their intersection.

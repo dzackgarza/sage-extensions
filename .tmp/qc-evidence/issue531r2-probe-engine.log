@@ -1,0 +1,40 @@
+tree SHA: ad28ef011653034fd2f7cadb5e504267ed8f8646
+port SHA: 991b88b0
+inner 180 s, outer 240 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py
+ideal: Finitely presented module on 2 module generators over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring
+--- ZZ[x,y]/(4, 6x): Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Finitely presented module on 2 module generators over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring ---
+  engine: Quotient of Multivariate Polynomial Ring in x, y over Integer Ring by the ideal (4, 6*x) QuotientRing_generic_with_category
+  engine base ring: Integer Ring
+  x mod Finitely presented module on 2 module generators over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring vs 3*x mod Finitely presented module on 2 module generators over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring: equal True
+    engine xbar vs -xbar; hashes (3744985340818229357, -3744986470996619882)
+    library hashes 7448607250706145878 and -6410882757501259355
+--- QQ[t]/(t^2+1): Free module on {1, t} over Fraction Field of Integer Ring ---
+Traceback (most recent call last):
+  File "sage/structure/category_object.pyx", line 858, in sage.structure.category_object.CategoryObject.getattr_from_category
+    return self._cached_methods[name]
+KeyError: '_preamble_engine_ring'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/probe.py", line 39, in <module>
+    describe("QQ[t]/(t^2+1)", rational_quotient, (t,), (t + t ** 2 + 1,))
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/probe.py", line 7, in describe
+    engine = quotient._preamble_engine_ring
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "sage/structure/category_object.pyx", line 852, in sage.structure.category_object.CategoryObject.__getattr__
+    return self.getattr_from_category(name)
+  File "sage/structure/category_object.pyx", line 867, in sage.structure.category_object.CategoryObject.getattr_from_category
+    attr = getattr_from_other_class(self, cls, name)
+  File "sage/cpython/getattr.pyx", line 362, in sage.cpython.getattr.getattr_from_other_class
+    raise AttributeError(dummy_error_message)
+AttributeError: 'Owned_OwnedAlgebraParent_with_category' object has no attribute '_preamble_engine_ring'. Did you mean: '_preamble_base_ring'?
+[peakrss] probe531r2: child waited=1 shell_code=1 samples=1
+[peakrss] peak tree RSS      : 2 MiB
+[peakrss] low-water MemAvail : 13562 MiB
+[peakrss] peak single VmHWM  : 2 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       2 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 13562 MiB

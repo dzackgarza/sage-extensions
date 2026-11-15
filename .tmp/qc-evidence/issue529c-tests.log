@@ -1,0 +1,23 @@
+tree SHA: ad28ef011653034fd2f7cadb5e504267ed8f8646
+port SHA: 991b88b0
+inner 560 s, outer 620 s, guard 6144 MiB
+command: /sage/.venv/bin/python -u -s -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q tests/engineering/test_the_timing_record_names_each_stage.py tests/engineering/test_the_suite_plugins_report_what_they_measured.py; echo pytest-exit=$?
+proot warning: can't sanitize binding "/workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt529c/.tmp/issue529-probe.py": No such file or directory
+........                                                                 [100%]
+8 passed in 9.91s
+pytest-exit=0
+[peakrss] ev529d: child waited=0 shell_code=0 samples=7
+[peakrss] peak tree RSS      : 808 MiB
+[peakrss] low-water MemAvail : 12848 MiB
+[peakrss] peak single VmHWM  : 808 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      473 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=     6.0s procs=  7 rss=   808 MiB hwm=   808 MiB avail= 13000 MiB
+[peakrss]   t=     8.0s procs=  5 rss=   581 MiB hwm=   581 MiB avail= 13013 MiB
+[peakrss]   t=    10.0s procs=  5 rss=   572 MiB hwm=   572 MiB avail= 12924 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   505 MiB hwm=   505 MiB avail= 13126 MiB
+[peakrss]   t=    12.0s procs=  4 rss=   485 MiB hwm=   486 MiB avail= 12848 MiB
+launcher exit: 0

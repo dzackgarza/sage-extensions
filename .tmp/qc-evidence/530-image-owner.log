@@ -1,0 +1,56 @@
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/probe530c.py
+tree SHA: 0fd90fcd0298d3565c2151e0596da91bf641b261
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+inner 400 s, outer 460 s, guard 6144 MiB, args ''
+--- ZZ**2 at (-6,9): base ring Integer Ring
+  dual_module(): Free module on {Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring, Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring} over Integer Ring
+  dual.module_generating_set(): {0,...,1}
+  generator images {l: f_l(v)}: {0: -6, 1: 9}
+  Mor(dual, R.reg)(images): Generic morphism:
+  From: Free module on {Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring, Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring} over Integer Ring
+  To:   Integer Ring
+  evaluation.domain() is dual: True
+  evaluation.codomain() is regular: True
+  evaluation.image(): Ideal (3) of Integer Ring
+  old route dual_evaluation_image_generators: (-6, 9)
+--- ZZ**2 at 0: base ring Integer Ring
+  dual_module(): Free module on {Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring, Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring} over Integer Ring
+  dual.module_generating_set(): {0,...,1}
+  generator images {l: f_l(v)}: {0: 0, 1: 0}
+  Mor(dual, R.reg)(images): Generic morphism:
+  From: Free module on {Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring, Generic morphism:
+  From: Free module on {[0], [1]} over Integer Ring
+  To:   Integer Ring} over Integer Ring
+  To:   Integer Ring
+  evaluation.domain() is dual: True
+  evaluation.codomain() is regular: True
+  evaluation.image(): Ideal (0) of Integer Ring
+  old route dual_evaluation_image_generators: (0, 0)
+--- ZZ['x'] at 2x+2: base ring Integer Ring
+  dual_module(): Module over Integer Ring on Product of the family over Coproduct of the family over NN = {0, 1, 2, ...}
+  dual.module_generating_set(): ValueError: Module over Integer Ring on Product of the family over Coproduct of the family over NN = {0, 1, 2, ...} has no chosen resolution relative to Category of modules over Integer Ring
+--- Zmod(8) at 3: base ring Integer Ring
+  dual_module(): Mor(Integer Ring / Ideal (8) of Integer Ring, Integer Ring)
+  dual.module_generating_set(): ValueError: Mor(Integer Ring / Ideal (8) of Integer Ring, Integer Ring) has no chosen resolution relative to Category of modules over Integer Ring
+[peakrss] probe530: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 13311 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       2 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 13311 MiB
+launcher exit: 0

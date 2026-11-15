@@ -24,11 +24,12 @@ True
 
 ```
 
-The block runs as a doctest on every push, in the
-[README example workflow](.github/workflows/readme.yml). Locally:
+The block runs on every push, under the repository's own pytest configuration,
+in the [README example workflow](.github/workflows/readme.yml), so the run keeps
+its timing record (`CONTRIBUTING.md` ENV-03). Locally:
 
 ```bash
-"$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m doctest README.md
+SAGE_BIN=/sage/.venv/bin/sage just readme
 ```
 
 ## Read next

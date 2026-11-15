@@ -1,0 +1,51 @@
+tree SHA: 006679543bfa3740d4da13cdfa3342d56d29b677
+port SHA: 991b88b0
+inner 300 s, outer 360 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py cap=240
+[0.0s] cap 240 s, load 2.66
+[0.0s] lattice Integral lattice of rank 11 and signature (2, 9) of rank 11
+[2.0s] Otilde(T_Co) built; the row below is the ambient O(L) plane row
+[30.0s]   so far 899 hashes, 0.02 s, largest 129 points, worst ('set_categories.py:1504 _finite_product', 11): 55.1 us each
+[60.0s]   so far 899 hashes, 0.02 s, largest 129 points, worst ('set_categories.py:1504 _finite_product', 11): 55.1 us each
+[90.0s]   so far 906 hashes, 0.03 s, largest 512 points, worst ('set_categories.py:1504 _finite_product', 11): 55.1 us each
+[120.1s]   so far 906 hashes, 0.03 s, largest 512 points, worst ('set_categories.py:1504 _finite_product', 11): 55.1 us each
+[150.1s]   so far 906 hashes, 0.03 s, largest 512 points, worst ('set_categories.py:1504 _finite_product', 11): 55.1 us each
+[180.1s]   so far 1371 hashes, 85.99 s, largest 131072 points, worst ('set_categories.py:1504 _finite_product', 131072): 85955931.0 us each
+[210.1s]   so far 1371 hashes, 85.99 s, largest 131072 points, worst ('set_categories.py:1504 _finite_product', 131072): 85955931.0 us each
+[240.1s]   so far 1371 hashes, 85.99 s, largest 131072 points, worst ('set_categories.py:1504 _finite_product', 131072): 85955931.0 us each
+[242.0s] the row did not return inside its 240 s cap
+[242.0s] row incomplete after 240.0 s
+[242.0s] 
+[242.0s] === hashes of finite ordered sets, by caller and cardinality ===
+[242.0s] caller                                                card    calls   us each   total s
+[242.0s] set_categories.py:1504 _finite_product              131072        185955931.0    85.956
+[242.0s] set_categories.py:1504 _finite_product                  11      113      57.7     0.007
+[242.0s] set_categories.py:1504 _finite_product                   2      404      12.0     0.005
+[242.0s] set_categories.py:1504 _finite_product                   9      209      19.3     0.004
+[242.0s] set_categories.py:1504 _finite_product                 512        1    3385.2     0.003
+[242.0s] set_categories.py:1504 _finite_product                  10       70      39.3     0.003
+[242.0s] lattices.py:3976 subobject_on                            9        4     630.6     0.003
+[242.0s] set_categories.py:2670 finite_subsets                    7      128      17.2     0.002
+[242.0s] set_categories.py:2612 power_set                         7      128      13.9     0.002
+[242.0s] set_categories.py:1504 _finite_product                 256        1    1734.1     0.002
+[242.0s] lattices.py:3976 subobject_on                            2        4     261.7     0.001
+[242.0s] lattices.py:3976 subobject_on                            1        7     130.9     0.001
+[242.0s] set_categories.py:2670 finite_subsets                   10       45      18.4     0.001
+[242.0s] lattices.py:3976 subobject_on                           10        5     148.0     0.001
+[242.0s] set_categories.py:2612 power_set                        10       45      15.6     0.001
+[242.0s]   total 1371 hashes, 85.99 s, largest set hashed 131072 points
+[242.0s] PROBE DONE
+[peakrss] census531: child waited=0 shell_code=0 samples=123
+[peakrss] peak tree RSS      : 515 MiB
+[peakrss] low-water MemAvail : 11965 MiB
+[peakrss] peak single VmHWM  : 515 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      504 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   244.1s procs=  3 rss=   515 MiB hwm=   515 MiB avail= 12139 MiB
+[peakrss]   t=   240.1s procs=  3 rss=   514 MiB hwm=   514 MiB avail= 12441 MiB
+[peakrss]   t=   242.1s procs=  3 rss=   514 MiB hwm=   514 MiB avail= 12435 MiB
+[peakrss]   t=   232.1s procs=  3 rss=   513 MiB hwm=   513 MiB avail= 12475 MiB
+[peakrss]   t=   234.1s procs=  3 rss=   513 MiB hwm=   513 MiB avail= 12473 MiB
+launcher exit: 0
