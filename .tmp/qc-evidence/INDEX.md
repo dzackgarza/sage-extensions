@@ -1901,3 +1901,18 @@ old test formed, per class, `eichler_transvection_matrix(f, s(a)) * base_images`
 | `issue528-lift-cost-204ffbb-control.log` | `204ffbb96e` | the same control: locus **0.165 s**, **8** classes tested, each by `_lift_at` (composition) -- **20.6 ms a test**. On the rank-5 control the count went up 4x and the per-test cost did **not** move: the control alone would have said the cost is owed |
 | `issue528-lift-costs-base-row.log` | base `a71272add9` | T_Co's ambient plane row, **61.3 s and decided**: **1536 lift tests**, `eichler_transvection_matrix` 3.43 s in total, **2.23 ms a test**, `parameterization` 0.63 s over 5 calls |
 | `issue528-lift-costs-204ffbb-row.log` | `204ffbb96e` | the same row, capped at 240 s and **not returned**: **1362 lift tests**, `_lift_at` **183.67 s of the 240** -- **134.9 ms a test**, of which `eichler_transvection` is 40.29 s (29.6 ms), so **105 ms a test is the composition and the integral restriction**. The count is the same order as the base's 1536 (the base finished its whole row with it); the per-test cost is **61x**. The question is decided for dearer tests, and the rank-5 control was the wrong input to decide it on |
+
+## #528, the repair: the lift test reads the lift's matrix, with its datum built once
+
+The decision made the cost per test, not owed: `_lift_at(coordinates).integral_restriction(...)`
+builds a transvection, a composition and a preimage of the target's frame for every class, where
+the pre-204ffbb route formed `transvection matrix * base_images` with `base_images` taken once.
+The repair keeps 204ffbb's corrected coset reading and restores the matrix test.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue528-lift-matrix-equivalence.py` | the tree of the repair | the probe: wraps `_parameter_at`, which every tested class passes through, so the tested coordinates are recorded without reconstructing the Smith reading, runs the locus, then asks each recorded class for the composition's own `integral_restriction` and compares. Prints a disagreement with its coordinates |
+| `issue528-lift-matrix-equivalence.log` | main `6ce8d8a8` + the repair | the control `U(2) + U(2) + <2>`: **8 of 8 classes agree**; the T_En line of Sterk's cusp 4: **1024 of 1024 agree**, the matrix reading **37.205 s** against the composition's **66.028 s** on the same classes |
+| `issue528-locus-tests-repaired.log` | main `6ce8d8a8` + the repair | `tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage` with the test lint plugin: **6 passed in 16.97 s**, the new counting test included |
+| `issue528-locus-tests-204ffbb-red.log` | `204ffbb96e` | the same file there: the new test **fails** -- the torsor asks for its base point **10** times where the repair asks **3** -- and one existing test fails too (the unequal-Smith-steps control, which `d83ae97`, the child of 204ffbb, repairs; 204ffbb is not main) |
+| `issue528-repaired-row-counts.log` | main `6ce8d8a8` + the repair | T_Co's ambient plane row: **returns in 217.9 s** with `_lift_at` called **0** times, where `204ffbb96e` did not return at 300 s with 1362 calls costing 183.67 s, and `a71272add9` returned in 54-61 s. The per-class lift test is gone from the row; the remaining gap to the base is not the lift test and is the next measurement |

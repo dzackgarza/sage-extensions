@@ -1,0 +1,18 @@
+tree SHA: 76b44493793e43f915dbe2129019f8e9cb5fb0ce
+file: tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage
+......                                                                   [100%]
+6 passed in 16.97s
+[peakrss] run: child waited=0 shell_code=0 samples=10
+[peakrss] peak tree RSS      : 363 MiB
+[peakrss] low-water MemAvail : 12564 MiB
+[peakrss] peak single VmHWM  : 363 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      352 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    18.0s procs=  3 rss=   363 MiB hwm=   363 MiB avail= 12564 MiB
+[peakrss]   t=    16.0s procs=  3 rss=   354 MiB hwm=   354 MiB avail= 12579 MiB
+[peakrss]   t=    14.0s procs=  3 rss=   353 MiB hwm=   353 MiB avail= 12742 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   352 MiB hwm=   352 MiB avail= 12947 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   351 MiB hwm=   351 MiB avail= 12967 MiB
+exit: 0
