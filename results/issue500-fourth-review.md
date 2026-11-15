@@ -169,9 +169,10 @@ and the product constructor does not.
   inverse system's `TypeError`.
 * The dual of a quotient that has no chosen presentation
   ($\mathbf{Z}/8$ as a $\mathbf{Z}$-module): `dual.module_generating_set()`
-  raises `ValueError: ... has no chosen resolution`, as it did before this
-  change, and `O(3)$ there is the zero ideal only if that dual is presented.
-  Reported rather than asserted; no test pins it.
+  raises `ValueError: Mor(Z/8, Z) has no chosen resolution`, as it did before
+  this change, so $O_{Z/8}(3)$ is not computed there by either reading -- the
+  framed level raises `AttributeError: ... has no attribute 'to_vector'` on the
+  same element.  Reported rather than asserted; no test pins it.
 * $M_2(\mathbf{Z})(1) / 2$ -- #523.
 
 ## Regression
