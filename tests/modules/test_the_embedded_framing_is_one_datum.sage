@@ -5,16 +5,7 @@ is the family of the images of its generators in the ambient module.  Both are
 data of the subobject alone -- ``inclusion`` already answers with one stored
 monomorphism ("Return the chosen monomorphism represented by constructor
 data") -- so a reader asking twice is asking about one family, not building a
-second one:
-
-    plane.embedded_module_generators() is plane.embedded_module_generators()
-    False                                (before the repair: a new family, and a
-                                          new image of every generator, per call)
-
-The transport of a plane asks for it once per construction, and the census that
-found this priced the plane's transport at 10.59 ms with 20 indexed families
-built inside it, so the framing was being rebuilt while the inclusion it is built
-from was not.
+second one.
 
 The tests pin the identity and pin the datum: the family is the images of the
 generators under the stored inclusion, not a second construction that happens to
@@ -36,7 +27,7 @@ def _plane_of_two_hyperbolic_planes():
 
 def test_the_embedded_framing_of_a_subobject_is_one_family() -> None:
     r"""Asked twice, a subobject's embedded framing is the family it built once."""
-    lattice, plane = _plane_of_two_hyperbolic_planes()
+    _, plane = _plane_of_two_hyperbolic_planes()
 
     assert plane.embedded_module_generators() is plane.embedded_module_generators()
 
