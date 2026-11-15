@@ -1,0 +1,40 @@
+tree SHA: 9e9c24ade14e330adfc5a715280d76c64f88db6d (detached worktree of refs/remotes/omm/main)
+port SHA: 991b88b095a42a1e3679569ea42328c900c120f6
+probe: .tmp/qc-evidence/issue528-transvection-crossings.py
+command: /workspace/nucleus/work/home/sage-image/run.sh -w /work -- /sage/.venv/bin/python -u -s /probe.py
+inner 570 s, outer 598 s, peakrss guard 6144 MiB
+rank 3: _engine_element=40, _owned_engine_element=28, ring._element_constructor_=21
+  q(a) = 6 (half (6)/(2)); b(e, f) = 1; rank^2 = 9
+  t(e) == e: True
+  t(a) == a - q(a) e: True
+  t(f) == f + a - (1/2)q(a) e: True
+  t(f) with q(a) instead of (1/2)q(a) differs: True
+rank 6: _engine_element=76, _owned_engine_element=32, ring._element_constructor_=37
+  q(a) = 6 (half (6)/(2)); b(e, f) = 1; rank^2 = 36
+  t(e) == e: True
+  t(a) == a - q(a) e: True
+  t(f) == f + a - (1/2)q(a) e: True
+  t(f) with q(a) instead of (1/2)q(a) differs: True
+rank 9: _engine_element=112, _owned_engine_element=41, ring._element_constructor_=55
+  q(a) = 6 (half (6)/(2)); b(e, f) = 1; rank^2 = 81
+  t(e) == e: True
+  t(a) == a - q(a) e: True
+  t(f) == f + a - (1/2)q(a) e: True
+  t(f) with q(a) instead of (1/2)q(a) differs: True
+rank 12: _engine_element=148, _owned_engine_element=50, ring._element_constructor_=73
+  q(a) = 6 (half (6)/(2)); b(e, f) = 1; rank^2 = 144
+  t(e) == e: True
+  t(a) == a - q(a) e: True
+  t(f) == f + a - (1/2)q(a) e: True
+  t(f) with q(a) instead of (1/2)q(a) differs: True
+[peakrss] probe528cross: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 306 MiB
+[peakrss] low-water MemAvail : 12644 MiB
+[peakrss] peak single VmHWM  : 306 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      295 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   306 MiB hwm=   306 MiB avail= 12644 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 12885 MiB
+launcher exit: 0

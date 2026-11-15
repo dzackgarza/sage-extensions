@@ -1,0 +1,35 @@
+tree SHA: 6d848c5bc977b93684abff54391bab9f3deb75dd
+probe: /workspace/nucleus/work/projects/p-8c69fc7199b5456b9cfab0b695f65a6c/repo/.scratch/wt528s/.tmp/qc-evidence/issue528-transvection-crossings.py
+inner 240 s, outer 270 s
+rank 3: _engine_element=69, _owned_engine_element=336, ring._element_constructor_=68
+  q(a) = 6 (half (6)/(2)); b(e, f) = 1; rank^2 = 9
+  t(e) == e: True
+  t(a) == a - q(a) e: True
+  t(f) == f + a - (1/2)q(a) e: True
+  t(f) with q(a) instead of (1/2)q(a) differs: True
+rank 6: _engine_element=294, _owned_engine_element=1165, ring._element_constructor_=234
+  q(a) = 6 (half (6)/(2)); b(e, f) = 1; rank^2 = 36
+  t(e) == e: True
+  t(a) == a - q(a) e: True
+  t(f) == f + a - (1/2)q(a) e: True
+  t(f) with q(a) instead of (1/2)q(a) differs: True
+rank 9: _engine_element=600, _owned_engine_element=2539, ring._element_constructor_=483
+  q(a) = 6 (half (6)/(2)); b(e, f) = 1; rank^2 = 81
+  t(e) == e: True
+  t(a) == a - q(a) e: True
+  t(f) == f + a - (1/2)q(a) e: True
+  t(f) with q(a) instead of (1/2)q(a) differs: True
+rank 12: _engine_element=1014, _owned_engine_element=4453, ring._element_constructor_=822
+  q(a) = 6 (half (6)/(2)); b(e, f) = 1; rank^2 = 144
+  t(e) == e: True
+  t(a) == a - q(a) e: True
+  t(f) == f + a - (1/2)q(a) e: True
+  t(f) with q(a) instead of (1/2)q(a) differs: True
+[peakrss] run: child waited=0 shell_code=0 samples=1
+[peakrss] peak tree RSS      : 1 MiB
+[peakrss] low-water MemAvail : 11207 MiB
+[peakrss] peak single VmHWM  : 1 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   timeout                       1 MiB peak
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     1 MiB avail= 11207 MiB
+launcher exit: 0
