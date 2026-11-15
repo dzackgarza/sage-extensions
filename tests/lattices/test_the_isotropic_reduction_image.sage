@@ -108,25 +108,53 @@ def test_each_cusp_reduces_to_a_hyperbolic_rank_ten_lattice() -> None:
 
 
 def test_two_lifts_of_a_wall_reflection_differ_by_the_kernel_and_get_one_answer() -> None:
-    r"""``s_{a+v} s_a`` lies in ``K_v``, and the criterion answers ``s_a`` and ``s_{a+v}`` alike.
+    r"""``s_{a+v} s_a`` lies in ``K_v`` and both lifts of a wall reflection are admitted.
 
     For a printed wall ``a`` of card ``029J``'s row 4.3.8 (Sterk, Math. Z. 207
     (1991), (4.3.8) with Fig. 10, p. 23), ``a`` and ``a + v`` lie in
     ``v^\perp``, both reflections are integral and fix ``v``, and both induce
     the reflection of ``N`` in the class of ``a``; their quotient therefore
     fixes ``v`` and acts trivially on ``N``, which is the kernel ``K_v`` of the
-    Levi map.  The criterion ``\rho(g) \in \rho(K_v)\rho(\Gamma)`` decides a
-    class of ``N``, so it gives the two lifts one answer.
+    Levi map.  The quotient is asserted to be an element of ``rho(K_v)``, and
+    ``rho(K_v)`` is asserted nontrivial: at this cusp the divisibility of ``v``
+    is two, so the kernel is strictly larger than the transvections of lattice
+    vectors and a single lift does not decide a class.
+
+    The criterion ``\rho(g) \in \rho(K_v)\rho(\Gamma)`` decides a class of
+    ``N``, so it gives the two lifts one answer -- and that answer is *yes* for
+    the printed walls, which is what Sterk's figure states: Fig. 10 is "the
+    diagram for the reflection subgroup of ``G_v``", so each wall's reflection
+    lies in ``G_v``.  Asserting only that the answers agree would hold with both
+    lifts refused, which is exactly the failure a kernel computed from lattice
+    parameters produces here, so both are asserted admitted.
     """
-    image, walls, _row = _fourth_chamber()
+    image, walls, row = _fourth_chamber()
+    lattice = image.lattice()
     vector = image.vector()
+    rho = lattice.discriminant_representation()
+    kernel_image = image.kernel_discriminant_image()
+    kernel_identity = kernel_image.one()
+    quotients = []
     for wall in walls:
         first = image.root_reflection(wall)
         second = image.root_reflection(wall + vector)
         quotient = second * first
         assert quotient(vector) == vector
         assert image.line().acts_trivially_on_isotropic_reduction(quotient) is True
-        assert image.contains_lift(first) == image.contains_lift(second)
+        assert rho(quotient) in kernel_image
+        assert image.contains_lift(first) is True
+        assert image.contains_lift(second) is True
+        quotients.append((wall.q(), rho(quotient)))
+
+    assert cardinal(sum(1 for _ in quotients)) == cardinal(row["wall_count"])
+    # The kernel's image is not trivial at this cusp, and the (-4) walls are the
+    # walls whose quotient is the transvection of the fractional parameter a/2:
+    # some printed wall therefore contributes a *nontrivial* class of rho(K_v),
+    # which is the class a kernel of lattice parameters would have missed.
+    assert image.kernel_discriminant_image_is_trivial() is False
+    fractional = tuple(element for square, element in quotients if square == ZZ(-4))
+    assert cardinal(sum(1 for _ in fractional)) > cardinal(0)
+    assert any(element != kernel_identity for element in fractional)
 
 
 def test_sterks_published_cusp_roots_are_reflections_of_the_stabilizer_image() -> None:

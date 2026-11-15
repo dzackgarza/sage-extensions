@@ -370,23 +370,18 @@ class ExactComplexNumber(FieldElement):
         return self.parent().element_class(self.parent(), -self._expression, _julia().call("-", self._calcium_()))
 
     def __invert__(self):
-        return self.parent().one() / self
+        r"""``z^{-1}``: the reciprocal of ``z`` in this field, its unit inverse."""
+        return self.inverse_of_unit()
 
     def _unit_inverse_decision(self):
-        r"""``z^{-1}``: every nonzero complex number is a unit."""
-        return ~self
+        r"""``z^{-1}``: every nonzero complex number is a unit.
 
-    def __truediv__(self, other):
-        r"""``z / w``: the field's own division, ``z w^{-1}``.
-
-        A complex number is an element of the ring of complex numbers as well as
-        of that ring regarded as a module over itself, and the two divisions
-        differ for a noncommutative ring: the ring's is ``z w^{-1}`` and the
-        module's scalar action is ``w^{-1} z``.  This method states the ring's,
-        through the same ``_div_`` that decides the zero and undecided-nonzero
-        denominators.
+        The reciprocal is the field's own division of one by ``z``, which is
+        where the zero and the undecided-nonzero cases are decided.  One and
+        ``z`` are elements of this ring, so their quotient is the ring's
+        ``z w^{-1}`` and reaches the ``_div_`` of this realization.
         """
-        return self._div_(self.parent()(other))
+        return self.parent().one() / self
 
     def __pow__(self, exponent, modulus=None):
         r"""The principal power \(z^w = \exp(w \log z)\); an integer power is the iterated product."""

@@ -559,22 +559,18 @@ class ExactRealNumber(FieldElement):
         return self._from_computation(-self._expression)
 
     def __invert__(self):
-        return self.parent().one() / self
+        r"""``x^{-1}``: the reciprocal of ``x`` in this field, its unit inverse."""
+        return self.inverse_of_unit()
 
     def _unit_inverse_decision(self):
-        r"""``x^{-1}``: every nonzero real number is a unit."""
-        return ~self
+        r"""``x^{-1}``: every nonzero real number is a unit.
 
-    def __truediv__(self, other):
-        r"""``x / y``: the field's own division, ``x y^{-1}``.
-
-        A real number is an element of the ring of reals as well as of that ring
-        regarded as a module over itself, and the two divisions differ for a
-        noncommutative ring: the ring's is ``x y^{-1}`` and the module's scalar
-        action is ``y^{-1} x``.  This method states the ring's, through the same
-        ``_div_`` that decides the zero and undecided-nonzero denominators.
+        The reciprocal is the field's own division of one by ``x``, which is
+        where the zero and the undecided-nonzero cases are decided.  One and
+        ``x`` are elements of this ring, so their quotient is the ring's
+        ``x y^{-1}`` and reaches the ``_div_`` of this realization.
         """
-        return self._div_(self.parent()(other))
+        return self.parent().one() / self
 
     def __pow__(self, exponent, modulus=None):
         if modulus is not None:

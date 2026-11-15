@@ -101,6 +101,27 @@ def test_the_locus_of_the_divisibility_two_controls_is_every_class_that_lifts() 
         _assert_locus_is_the_integral_classes(lattice, 2)
 
 
+def test_the_locus_of_a_divisibility_two_control_with_a_nontrivial_kernel_is_every_class() -> None:
+    r"""On `U(2) + U(2) + <2>` the reported locus is the integral classes, not more.
+
+    This is the smallest control where the class coordinates of the locus decide the
+    answer: the section's coordinate matrix has Smith invariants one, its saturation
+    differs from the parameter lattice in every coordinate, and the transvection kernel
+    `K = {a : s(a) in L'}` has a proper complement inside the locus.  Read with the
+    coordinate change inverted -- `a = V^-1 u` instead of `a = V u` for the Smith
+    decomposition `U (N A) V = D` -- the same code reported all 64 classes of `P/mP`
+    while only 32 of them lift integrally (#405), so the comparison below is what pins
+    the coset reading and not only the divisibility of the marked vector.
+    """
+    lattice = (
+        Lattices(ZZ)([[0, 2], [2, 0]])
+        + Lattices(ZZ)([[0, 2], [2, 0]])
+        + Lattices(ZZ)([[2]])
+    )
+
+    _assert_locus_is_the_integral_classes(lattice, 2)
+
+
 def test_the_locus_of_a_divisibility_four_control_is_every_class_that_lifts() -> None:
     r"""On `U(4) + <2>` the marked line has divisibility four.
 
