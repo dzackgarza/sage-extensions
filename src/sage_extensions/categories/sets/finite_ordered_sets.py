@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Hashable, Iterable
+from collections.abc import Callable, Iterable
 from itertools import chain, islice
 from typing import TYPE_CHECKING, TypeVar
 
@@ -278,6 +278,19 @@ class FiniteOrderedSets(OwnedCategory):
     finiteness and the operations it permits.  Every other route -- a finite
     set, finitely many points, an indexed presentation -- computes that datum
     and enters through it.
+
+    The points of a finite ordered set are values: each one hashes, and its
+    hash agrees with its equality.  A set is fixed by its points, and what is
+    keyed by a set or by its points -- the inverse of its enumeration, which is
+    a hash table of the points; the product and the coproduct of a family of
+    sets, interned under the factors' hashes; an interned label set -- is
+    correct only while the points cannot change and their hashes agree with
+    their equality.  A point that refuses a hash is mutable, as a Python list
+    or a mutable Sage vector is, and then the value is its tuple or the vector
+    after ``set_immutable()``; or its owner computes no hash for it, and a
+    constant hash agrees with every equality.  The constructions that build the
+    hash table of the points refuse such a point, with the table's
+    ``TypeError``.
     """
 
     def an_object(self) -> ObjectOfCategory:
@@ -342,29 +355,9 @@ class FiniteOrderedSets(OwnedCategory):
 
         Literal ingress: the points are read once, in order.
         """
-        # Dictionary insertion preserves the first occurrence and delegates
-        # hashable-point identification to the maintained hash-table engine.
-        # A genuinely unhashable point still requires the equality fallback;
-        # do not impose hashability on the mathematical points of a finite set.
-        supplied = tuple(points)
-        try:
-            distinct = tuple(dict.fromkeys(supplied))
-        except (TypeError, ValueError):
-            distinct_list = []
-            for point in supplied:
-                comparisons = tuple(
-                    True if point is present else point == present
-                    for present in distinct_list
-                )
-                if any(equal is True for equal in comparisons):
-                    continue
-                if any(equal is not False for equal in comparisons):
-                    raise ValueError(
-                        "cannot form a finite set of distinct points: equality of supplied "
-                        "unhashable elements is undecided"
-                    )
-                distinct_list.append(point)
-            distinct = tuple(distinct_list)
+        # The points hash (the rule of this category), so dictionary insertion
+        # identifies repeated points and keeps the first occurrence.
+        distinct = tuple(dict.fromkeys(points))
         return self.from_indexed(
             finite_ordinal_set(len(distinct)),
             lambda position: distinct[int(position)],
@@ -382,12 +375,9 @@ class FiniteOrderedSets(OwnedCategory):
     ) -> ObjectOfCategory:
         r"""Construct the finite ordered set enumerated by ``element_at`` on ``index_set``.
 
-        The default inverse and membership maps are this construction's own
-        storage: where the points support a hash table it uses one, and it
-        otherwise compares with the points of the selected enumeration.  Owned
-        mathematical objects are not required to be hashable.  Which of the two
-        a construction uses is not a fact about its points and is reported to
-        nobody: both compute the same inverse over the same enumeration.
+        The default inverse is a hash table of the points, which hash by the
+        rule of :class:`FiniteOrderedSets`, and membership is that inverse's
+        domain.
         """
         assert cardinal(index_set.cardinality()).is_finite(), (
             f"a finite ordered set needs a finite index set, but {index_set} is not finite"
@@ -407,74 +397,39 @@ class FiniteOrderedSets(OwnedCategory):
             # ranking, and iteration. The index ranking supplies positions.
             index_ranking = index_set.ranking_map()
             element_at = lambda index: points[int(index_ranking(index))]
-            # The declared enumeration must be injective. A dictionary
-            # silently drops duplicate hashable points otherwise, and its
-            # inverse would no longer be inverse to the chosen enumeration.
-            # This dictionary is this set's own storage, not a claim about its
-            # points: the branch below computes the same inverse by comparison.
-            try:
-                lookup = dict(zip(points, indices, strict=True))
-            except (TypeError, ValueError):
-                for offset, present in enumerate(points):
-                    for earlier in points[:offset]:
-                        equal = True if present is earlier else present == earlier
-                        if equal is True:
-                            raise ValueError("an enumeration must select distinct points at distinct indices")
-                        if equal is not False:
-                            raise ValueError("distinctness of the enumerated points is undecided")
-                def index_of(point):
-                    retained = identity_indices.get(id(point))
-                    if retained is not None:
-                        return retained
+            # The declared enumeration must be injective: the table identifies
+            # equal points, so a repeated point leaves it smaller than the
+            # enumeration, and its inverse would not be inverse to it.
+            lookup = dict(zip(points, indices, strict=True))
+            if len(lookup) != len(points):
+                raise ValueError("an enumeration must select distinct points at distinct indices")
+            def index_of(point):
+                retained = identity_indices.get(id(point))
+                if retained is not None:
+                    return retained
+                try:
+                    return lookup.get(point)
+                except (TypeError, ValueError):
+                    # A query can have undecidable symbolic equality even
+                    # when the selected points formed a valid hash table.
                     for index, present in zip(indices, points, strict=True):
-                        equal = True if point is present else point == present
-                        if equal is True:
+                        if point is present or (point == present) is True:
                             return index
                     return None
+            if contains is None:
+                def contains(point):
+                    from sage_extensions.logic import conjunction, negation
 
-                # The inverse is a partial *decision* procedure. A missing
-                # decided match does not refute membership when an equality
-                # is unresolved. Retain the finite existential separately.
-                if contains is None:
-                    def contains(point):
-                        from sage_extensions.logic import conjunction, negation
-
-                        if id(point) in identity_indices:
-                            return True
+                    if id(point) in identity_indices:
+                        return True
+                    try:
+                        position = lookup.get(point)
+                    except (TypeError, ValueError):
                         return negation(conjunction(
                             negation(True if point is present else point == present)
                             for present in points
                         ))
-            else:
-                if len(lookup) != len(points):
-                    raise ValueError("an enumeration must select distinct points at distinct indices")
-                def index_of(point):
-                    retained = identity_indices.get(id(point))
-                    if retained is not None:
-                        return retained
-                    try:
-                        return lookup.get(point)
-                    except (TypeError, ValueError):
-                        # A query can have undecidable symbolic equality even
-                        # when the selected points formed a valid hash table.
-                        for index, present in zip(indices, points, strict=True):
-                            if point is present or (point == present) is True:
-                                return index
-                        return None
-                if contains is None:
-                    def contains(point):
-                        from sage_extensions.logic import conjunction, negation
-
-                        if id(point) in identity_indices:
-                            return True
-                        try:
-                            position = lookup.get(point)
-                        except (TypeError, ValueError):
-                            return negation(conjunction(
-                                negation(True if point is present else point == present)
-                                for present in points
-                            ))
-                        return position is not None
+                    return position is not None
         if contains is None:
             # Membership is the domain of the selected enumeration inverse,
             # not a second independent set reconstructed from its values.
@@ -618,8 +573,8 @@ class FiniteOrderedSets(OwnedCategory):
         def __hash__(self) -> int:
             r"""Return the hash of the tuple of the points, which is what :meth:`__eq__` compares.
 
-            A set carrying a point that refuses a hash is unhashable, as the tuple
-            of those points is.
+            The points hash and their hashes agree with their equality (the rule
+            of :class:`FiniteOrderedSets`), so equal sets hash equally.
             """
             return hash(tuple(self))
 
@@ -675,26 +630,18 @@ def _filtered_ordered_set(
 
     points = tuple(selected)
     positions = tuple(range(len(points)))
-    try:
-        inverse_lookup = dict(zip(points, positions, strict=True))
-    except (TypeError, ValueError):
-        def position_of(value):
+    # The points hash (the rule of FiniteOrderedSets), so the inverse is a table.
+    inverse_lookup = dict(zip(points, positions, strict=True))
+    if len(inverse_lookup) != len(points):
+        raise ValueError("a filtered enumeration cannot contain duplicate points")
+    def position_of(value):
+        try:
+            return inverse_lookup.get(value)
+        except (TypeError, ValueError):
             for i, point in enumerate(points):
-                same = True if point is value else point == value
-                if same is True:
+                if value is point or (value == point) is True:
                     return i
             return None
-    else:
-        if len(inverse_lookup) != len(points):
-            raise ValueError("a filtered enumeration cannot contain duplicate points")
-        def position_of(value):
-            try:
-                return inverse_lookup.get(value)
-            except (TypeError, ValueError):
-                for i, point in enumerate(points):
-                    if value is point or (value == point) is True:
-                        return i
-                return None
 
     def element_at(index):
         return points[int(index)]
@@ -860,20 +807,8 @@ def interned_finite_ordered_set(labels):
     constructor is where that identity belongs: the datum is the ordered
     labels, not the Python object that carried them in.
 
-    Only hashable labels can be interned by value; a family of unhashable
-    points keeps its own identity, as it must.
+    The labels are the points of the set, so they hash (the rule of
+    :class:`FiniteOrderedSets`) and key the cache by value.
     """
     return finite_ordered_set(labels)
 
-
-def interned_labels(labels):
-    r"""``interned_finite_ordered_set`` when the labels are hashable, else a fresh set.
-
-    Interning is by value, so it needs labels that are values; a family of
-    unhashable points is presented data that cannot be named twice, and it
-    keeps its own identity.
-    """
-    labels = tuple(labels)
-    if all(isinstance(label, Hashable) for label in labels):
-        return interned_finite_ordered_set(labels)
-    return finite_ordered_set(labels)

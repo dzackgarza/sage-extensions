@@ -150,6 +150,17 @@ class CharacterSets(OwnedParameterizedCategory):
         def __call__(self, element):
             return self.class_function()(element)
 
+        def __hash__(self) -> int:
+            r"""Hash the values on the conjugacy-class representatives of ``G``.
+
+            A class function is determined by its values on the classes, so two
+            equal characters have one value family and one hash.
+            """
+            return hash(tuple(
+                self(representative)
+                for representative in self.conjugacy_class_representatives()
+            ))
+
         def degree(self):
             r"""The value at the identity, the dimension of the representation."""
             return self(self.group().one())

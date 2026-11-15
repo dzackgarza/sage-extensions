@@ -528,6 +528,10 @@ class RationalPolyhedralCones(OwnedParameterizedCategory):
                 return self.is_equal_to(other)
             return super().__eq__(other)
 
+        def __hash__(self) -> int:
+            r"""Hash the ambient lattice and the cone as a subset, which equality compares."""
+            return hash((id(self.ambient_lattice()), self._engine_polyhedron()))
+
         def is_equal_to(self, other) -> bool:
             r"""Return whether the two cones are the same subset of ``L tensor QQ``.
 

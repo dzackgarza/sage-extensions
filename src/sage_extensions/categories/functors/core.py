@@ -142,6 +142,15 @@ class Functor(CategoricalArrow, Element):
         r"""Functors have identity semantics as parameters of categorical constructions."""
         return id(self)
 
+    def __hash__(self) -> int:
+        r"""The identity hash, which agrees with a functor's identity equality.
+
+        A functor is a point a finite ordered set can hold: an object of an
+        arrow category or a flag diagram among the isotropic orbit
+        representatives.
+        """
+        return object.__hash__(self)
+
     def domain(self) -> Category:
         return self._domain
 

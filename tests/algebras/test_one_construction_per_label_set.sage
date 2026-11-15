@@ -79,17 +79,11 @@ def test_the_free_construction_on_ordered_labels_is_one_object_per_route() -> No
 def test_label_data_that_is_not_the_same_data_keeps_its_own_identity() -> None:
     r"""Interning is by ordered labels, never by what a set happens to equal.
 
-    A family of unhashable points cannot be interned by value, so two such
-    families stay two modules.  An ordinal card ``2`` presents ``{0, 1}`` as an
-    ordinal and the tuple ``(0, 1)`` presents it as named points: the selected
-    basis is the set object, so these are two data and two modules, each of
-    them stable across calls.
+    An ordinal card ``2`` presents ``{0, 1}`` as an ordinal and the tuple
+    ``(0, 1)`` presents it as named points: the selected basis is the set
+    object, so these are two data and two modules, each of them stable across
+    calls.
     """
-    first = Modules(QQ).free_module([[1], [2]])
-    second = Modules(QQ).free_module([[1], [2]])
-    assert first is not second
-    assert first.module_generating_set() == second.module_generating_set()
-
     ordinal = Modules(QQ).free_module(2)
     named = Modules(QQ).free_module((0, 1))
     assert ordinal is Modules(QQ).free_module(2)

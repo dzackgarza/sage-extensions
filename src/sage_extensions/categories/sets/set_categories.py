@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import Callable, Hashable, Iterable
+from collections.abc import Callable, Iterable
 from itertools import count, islice, product
 from math import comb
 from operator import index as integer_index
@@ -1468,7 +1468,7 @@ class Sets(CategoryPacketMethods, OwnedCategory):
             unusable as a codomain -- a caller could not compare what an operation
             returned against a value it built.  A family's value map is a callable
             and cannot key a cache, so a finite index set is resolved to its
-            factors, which compare by their own equality.
+            factors, whose hashes key the store and whose own equality decides.
 
             Asking for the product constructs the object only: it stores the
             family and fixes the category (`OWN-22`).  The discrete diagram and
@@ -4878,12 +4878,12 @@ class CartesianProductsOfSets(OwnedCategory):
         sage: coproduct.index_set() is labels
         True
 
-    Unverified specimens for unhashable labels and empty products::
+    Unverified specimens for tuple labels and empty products::
 
-        sage: labels = finite_ordered_set(([0], [1]))
+        sage: labels = finite_ordered_set(((0,), (1,)))
         sage: product = Sets().product(indexed_family(labels, lambda label: points))
         sage: section = product(("a", "b"))
-        sage: product.projection([0])(section), product.projection([1])(section)
+        sage: product.projection((0,))(section), product.projection((1,))(section)
         ('a', 'b')
         sage: product.ranking_map().inverse()(product.ranking_map()(section)) == section
         True
@@ -6325,22 +6325,17 @@ def _finite_words(alphabet, *, commutative):
 type _FiniteFamilyStore = dict[int, list[tuple[IndexedFamily, Sets().ObjectType]]]
 
 
-def _finite_family_slot(family: IndexedFamily) -> int:
-    r"""The bucket a finite construction is interned in: its index set's cardinality.
+def _finite_family_key(family: IndexedFamily) -> int:
+    r"""The key a finite construction is interned under: its index set and its factors.
 
-    Equal families have index sets of one cardinality, so this partition keeps
-    every equal pair together, and the cardinality is an invariant every finite
-    enumerated index set supplies whatever its points are.  No point of an index
-    set is hashed here, and none has to be able to hash (`SET-05`).
-
-    The factors are the other invariant equality supplies -- equal families
-    agree at every index -- but they are not available as a key: a factor need
-    not hash.  A factor that is a finite ordered set of Python lists hashes the
-    tuple of its points, and that tuple refuses, while a product or coproduct of
-    such a family is built; keying by the factors would refuse those families
-    instead of comparing them, which is the question this store no longer asks.
+    Equal families have equal index sets and equal factors at equal indices, and
+    a set's hash agrees with its equality -- a finite ordered set hashes its
+    points, which hash by the rule of ``FiniteOrderedSets`` -- so equal families
+    have one key.  The factors enter as the multiset of their hashes, because
+    equality pairs them label by label, not position by position.
     """
-    return int(family.index_set().cardinality().finite_value())
+    factor_hashes = tuple(sorted(hash(factor) for factor in family))
+    return hash((family.index_set(), factor_hashes))
 
 
 def _equal_interned_family(
@@ -6365,24 +6360,20 @@ def _interned_by_equality(
     store: _FiniteFamilyStore,
     build: Callable[[IndexedFamily], Sets().ObjectType],
 ) -> Sets().ObjectType:
-    r"""Intern a finite construction by the family's equality, in one store.
+    r"""Intern a finite construction by the family's equality, under the family's key.
 
-    ``store`` maps the cardinality of an index set to the families interned with
-    that many factors, and ``build`` performs the construction.
-
-    Hashing is a storage optimization and never the contract: two presentations
-    of one family are one construction (`SET-05`), whichever of the two is built
-    first.  A family is compared, by ``==``, with the families of its own bucket
-    and with no other, so the bucket key has to be an invariant of equality and
-    nothing else -- the cardinality is one, and the points of an index set are
-    never hashed to find it.
+    ``store`` maps a key (``_finite_family_key``) to the families interned under
+    it, and ``build`` performs the construction.  Equal families have one key,
+    so two presentations of one family are one construction (`SET-05`), whichever
+    is built first, and a family is compared by ``==`` with the families of its
+    own key and with no other.
 
     An undecided family equality interns nothing: the family is built and kept
     beside the one it could not be compared with
     (``test_a_construction_of_an_undecided_family_equality_is_built``), so the
     store holds both and neither replaces the other.
     """
-    bucket = store[_finite_family_slot(family)]
+    bucket = store[_finite_family_key(family)]
     interned = _equal_interned_family(bucket, family)
     if interned is not None:
         return interned

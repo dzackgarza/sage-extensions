@@ -138,22 +138,22 @@ class DiscreteMorCategoryConstruction(MorCategoryConstruction):
 class DiscreteCategory(OwnedCategory):
     r"""The discrete category on one set.
 
-    Unverified specimens retain unhashable labels and distinguish two equal
-    underlying sets supplied as different objects::
+    Unverified specimens retain labels addressed by equal objects and distinguish
+    two equal underlying sets supplied as different objects::
 
         sage: from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
-        sage: labels = finite_ordered_set(([0], [1]))
+        sage: labels = finite_ordered_set(((0,), (1,)))
         sage: category = DiscreteCategory(labels)
-        sage: category([0]) is category([0])
+        sage: category((0,)) is category((0,))
         True
-        sage: category.objects().value([0]) is category([0])
+        sage: category.objects().value((0,)) is category((0,))
         True
-        sage: category.Mor(category([0]), category([1])).cardinality() == cardinal(0)
+        sage: category.Mor(category((0,)), category((1,))).cardinality() == cardinal(0)
         True
-        sage: identity = category.identity(category([0]))
+        sage: identity = category.identity(category((0,)))
         sage: identity * identity == identity
         True
-        sage: other_labels = finite_ordered_set(([0], [1]))
+        sage: other_labels = finite_ordered_set(((0,), (1,)))
         sage: DiscreteCategory(other_labels).object_set() is other_labels
         True
         sage: DiscreteCategory(other_labels) is not category
