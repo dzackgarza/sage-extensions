@@ -10205,7 +10205,7 @@ class Lattices(OwnedCategoryOverBaseRing):
                 indexed_family(
                     Sets.Δ[count - 1],
                     lambda _position: self,
-                    name=f"Orthogonal power summands of {self}",
+                    name=lambda self=self: f"Orthogonal power summands of {self}",
                 )
             )
 
@@ -10999,7 +10999,7 @@ class OrthogonalSumLattices(OwnedCategoryOverBaseRing):
                             )
                         )
                     ),
-                    name=f"Blocks of an element of {source}",
+                    name=lambda source=source: f"Blocks of an element of {source}",
                 )
                 block_sum = self.from_coproduct_cocone(legs)
                 return self.O()(lambda label: block_sum(self.module_generator(label)))

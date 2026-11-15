@@ -957,7 +957,7 @@ def _voronoi_facets(lattice):
     return finite_indexed_family(
         finite_ordered_set(tuple(facets)),
         lambda vector: facets[vector],
-        name=f"Voronoi facets of {lattice}",
+        name=lambda lattice=lattice: f"Voronoi facets of {lattice}",
     )
 
 

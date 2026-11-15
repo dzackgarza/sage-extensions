@@ -82,7 +82,7 @@ def index_rank_family(ranks):
     return indexed_family(
         Sets.Δ[len(entries) - 1],
         lambda index: entries[int(index)],
-        name=f"Index ranks ({', '.join(str(entry) for entry in entries)})",
+        name=lambda entries=entries: f"Index ranks ({', '.join(str(entry) for entry in entries)})",
     )
 
 

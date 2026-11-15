@@ -3859,7 +3859,7 @@ class LatticeIsometryMor(LatticeEmbeddingMor, CoreMor):
         return finite_indexed_family(
             labels,
             lambda label: lifts[label],
-            name=f"lifts along O(L) -> O(A_L) of the group generators of O(A_L), L = {lattice}",
+            name=lambda lattice=lattice: f"lifts along O(L) -> O(A_L) of the group generators of O(A_L), L = {lattice}",
         )
 
     def discriminant_factorization(self, isometry):

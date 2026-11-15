@@ -144,7 +144,7 @@ class DiscriminantModules(OwnedCategoryOverBaseRing):
             return indexed_family(
                 index,
                 lambda prime: components[prime],
-                name=f"Primary components of {self}",
+                name=lambda self=self: f"Primary components of {self}",
             )
 
         def primary_part(self, prime):
