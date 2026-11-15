@@ -1,0 +1,6 @@
+provider SHA: 34a9a2f6ecc34178645ec9fa00b496d60197430d
+port SHA: 991b88b0
+command: python /probe.py
+AssertionError:
+the order ideal of 2 mod Ideal (8) of Integer Ring is the ideal that the values of the linear functionals on Integer Ring / Ideal (8) of Integer Ring at 2 mod Ideal (8) of Integer Ring generate, and those values cannot be collected here: the functionals from Integer Ring / Ideal (8) of Integer Ring to Integer Ring are Mor(Integer Ring / Ideal (8) of Integer Ring, Integer Ring), and no family of them that generates it is known, so there is nothing to range over.  The values themselves exist without one, and each is a functional applied to 2 mod Ideal (8) of Integer Ring
+launcher exit: 0

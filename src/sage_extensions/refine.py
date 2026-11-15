@@ -11,9 +11,11 @@ through owned facades that hold the Sage parent as a private engine.
 
 import inspect
 from _abc import _abc_init
+from collections import defaultdict
 from collections.abc import Callable, Iterable, Iterator
 from contextlib import contextmanager
 from functools import update_wrapper
+from graphlib import TopologicalSorter
 
 from sage.categories.category import Category
 from sage.categories.morphism import Morphism
@@ -78,36 +80,58 @@ def _owned_mixins(category: Category, attr: str) -> tuple[type, ...]:
     A category reaches a method class when its own class or a base of it
     declares the name, and the walk records every category that does.
 
-    **The order, stated once.**  Provider $P$ precedes provider $Q$ when a
-    proper supercategory of a category reaching $P$ reaches $Q$
-    (:func:`_precedes`); a pair that relation does not order keeps the order in
-    which the walk visits it, which is the linear extension
-    :meth:`Category.all_super_categories` computes.  The walk alone is not
-    enough: it puts a subcategory before its supercategories but says nothing
-    between two categories over different base rings, so an object that is a
-    framed free module over $R$ and a module over itself reaches
-    ``FramedFreeModules(R)`` -- a subcategory of ``Modules(R).Free()`` -- after
-    a ``Modules(S)`` over another ring whose class also declares the general
-    ``Modules`` provider.
+    Class $P$ precedes class $Q$ when a proper supercategory of a category
+    reaching $P$ reaches $Q$ (:func:`_precedes`).  That relation is not a
+    partial order -- it is neither transitive nor antisymmetric in general --
+    so the classes are not sorted by comparing them pairwise.  They are the
+    nodes of a :class:`graphlib.TopologicalSorter` graph whose edges are the
+    pairs the relation holds; its linear extension is the order, and a cycle
+    is :exc:`graphlib.CycleError` rather than an order, which pairwise
+    insertion cannot notice.
 
-    The rest of this module cites this paragraph rather than restating it.
+    It is reflexive: a category reaching $P$ and one of its proper
+    supercategories both reach $P$, so a class precedes itself and the edge
+    carries nothing.  A class is not its own predecessor here.
+
+    The relation orders two classes only when the category hierarchy puts one
+    below the other, and it says nothing between two categories over different
+    base rings.  An object that is a framed free module over $R$ and a module
+    over itself reaches ``FramedFreeModules(R)`` -- a subcategory of
+    ``Modules(R).Free()`` -- after a ``Modules(S)`` over another ring whose
+    class also declares the general ``Modules`` class; that is why the walk's
+    order is not enough on its own, and why a pair the relation does not order
+    is left to it.  Of the classes the sort has released, the one the walk
+    reaches first is taken next, so the sequence keeps the walk's order
+    wherever the relation leaves two classes free to be either way round.
     """
-    reached: dict[type, list[Category]] = {}
+    reached: defaultdict[type, list[Category]] = defaultdict(list)
     for cat in category.all_super_categories(proper=False):
         provider = _nearest_provider(cat, attr)
-        if provider is None:
-            continue
-        sources = reached.setdefault(provider, [])
-        if not sources or sources[-1] is not cat:
-            sources.append(cat)
-    ordered: list[type] = []
+        if provider is not None:
+            reached[provider].append(cat)
+    ordering = TopologicalSorter()
     for provider in reached:
-        for index, earlier in enumerate(ordered):
-            if _precedes(reached, attr, provider, earlier):
-                ordered.insert(index, provider)
-                break
-        else:
-            ordered.append(provider)
+        ordering.add(provider)
+    for provider in reached:
+        ordering.add(
+            provider,
+            *(
+                earlier
+                for earlier in reached
+                if earlier is not provider
+                and _precedes(reached, attr, earlier, provider)
+            ),
+        )
+    ordering.prepare()
+    position = {provider: index for index, provider in enumerate(reached)}
+    ordered: list[type] = []
+    released = list(ordering.get_ready())
+    while released:
+        provider = min(released, key=position.__getitem__)
+        released.remove(provider)
+        ordered.append(provider)
+        ordering.done(provider)
+        released.extend(ordering.get_ready())
     return tuple(ordered)
 
 
@@ -140,10 +164,9 @@ def _precedes(
 ) -> bool:
     """Whether a supercategory of a category reaching ``left`` reaches ``right``.
 
-    The order :func:`_owned_mixins` returns is this relation alone, and that
-    docstring is where it is stated.  A pair the relation does not order in
-    either direction -- two categories that are not below one another, such as
-    a ring and a module over it -- keeps the walk's own order.
+    A pair the relation does not order in either direction -- two categories
+    that are not below one another, such as a ring and a module over it -- is
+    left to the walk's own order.
     """
     return any(
         _nearest_provider(supercategory, attr) is right

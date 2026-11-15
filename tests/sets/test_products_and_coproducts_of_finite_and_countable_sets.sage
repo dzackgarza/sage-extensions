@@ -266,7 +266,18 @@ def test_equal_finite_families_of_unhashable_labels_share_one_construction() -> 
     assert Sets().product(first) is not coproduct
 
 
-def test_a_finite_family_hash_reads_its_index_set_and_not_its_values() -> None:
+def test_finite_family_hash_does_not_require_hashable_index_labels() -> None:
+    r"""A family over labels that refuse a hash has a hash, because equality decides.
+
+    ``#531``: the hash reads the cardinality of the index set, and every finite
+    enumerated index set supplies one, whatever its points are.  Equality of two
+    such families is decided -- the index sets are finite ordered sets whose
+    points are Python lists that decide their own equality, and the values are
+    compared index by index -- so ``f == g`` implies one cardinality for the two,
+    and the hash respects equality.  The values need not support hashing either:
+    equality is their own extensional relation, not the hashability of their
+    representatives.
+    """
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
     from sage_extensions.categories.sets.indexed_families import indexed_family
 
@@ -276,18 +287,95 @@ def test_a_finite_family_hash_reads_its_index_set_and_not_its_values() -> None:
     assert first == second
     assert hash(first) == hash(second)
 
-    # The values need not support hashing either: equality is their own
-    # extensional relation, not the hashability of their representatives.
     unhashable_first = indexed_family(labels, lambda label: [label[0]])
     unhashable_second = indexed_family(labels, lambda label: [label[0]])
     assert unhashable_first == unhashable_second
     assert hash(unhashable_first) == hash(unhashable_second)
 
-    # The hash reads the index set, and a finite ordered set carrying a point
-    # that refuses a hash is unhashable (#531), so a family over one is too.
-    unhashable_labels = finite_ordered_set(([0], [1]))
+    # The points of the index set need not hash: the hash reads their number.
+    list_labels = finite_ordered_set(([0], [1]))
+    list_first = indexed_family(list_labels, lambda label: label[0])
+    list_second = indexed_family(finite_ordered_set(([0], [1])), lambda label: label[0])
+    assert list_labels == finite_ordered_set(([0], [1]))
+    assert list_first == list_second
+    assert hash(list_first) == hash(list_second)
+
+
+def test_equal_families_of_points_with_a_hashable_and_an_unhashable_form_hash_alike() -> None:
+    r"""``#531``: the family hash reads the index set's cardinality, not the index set.
+
+    A point can have a hashable and an unhashable form -- a Sage vector and its
+    immutable copy are equal and only one of them hashes -- so two equal index
+    sets can differ in hashability, and so can two equal families over them.  A
+    hash of the index set would give those families two values, which is why the
+    family hash reads the cardinality instead.  A tuple and its subclass with no
+    hash are that pair of forms.
+
+    The interns follow: the key-less family is stored in the bucket its
+    cardinality names, and the family that has a key reads that bucket when its
+    key looks up nothing, so the two are one product.
+    """
+    from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+    from sage_extensions.categories.sets.indexed_families import indexed_family
+
+    class UnhashablePoint(tuple):
+        r"""A point with a hashable form: the same tuple, without a hash."""
+
+        __hash__ = None
+
+    factor = Sets.Δ[1]
+    keyless_labels = finite_ordered_set((UnhashablePoint((1, 2)),))
+    keyed_labels = finite_ordered_set(((1, 2),))
+    keyless = indexed_family(keyless_labels, lambda label: factor)
+    keyed = indexed_family(keyed_labels, lambda label: factor)
+
+    assert keyless_labels == keyed_labels
     with pytest.raises(TypeError):
-        hash(indexed_family(unhashable_labels, lambda label: label[0]))
+        hash(keyless_labels)
+    assert keyless == keyed
+    assert hash(keyless) == hash(keyed)
+
+    keyless_product = Sets().product(keyless)
+    assert Sets().product(keyed) is keyless_product
+    assert Sets().product(keyless) is keyless_product
+
+
+def test_a_construction_of_an_undecided_family_equality_is_built() -> None:
+    r"""An undecided family equality interns nothing, and replaces nothing.
+
+    ``#531``: the interners compare families by equality, and a comparison whose
+    value is a proposition is neither equality nor inequality.  It is not
+    equality, so the second family is built instead of taking the first
+    construction; it is not inequality either, so the first construction stays.
+    Here each family carries a set of one symbolic point, whose own equality is
+    undecided, so the family comparison is that proposition.
+    """
+    from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
+    from sage_extensions.categories.sets.indexed_families import indexed_family
+    from sage_extensions.logic import AtomicProposition
+
+    class SymbolicPoint:
+        r"""A point that states its equality as a proposition."""
+
+        def __eq__(self, other):
+            return AtomicProposition("equal_symbolic_points", self, other)
+
+    labels = finite_ordered_set((0, 1))
+    factor = Sets.Δ[1]
+    first_factor = finite_ordered_set((SymbolicPoint(),))
+    second_factor = finite_ordered_set((SymbolicPoint(),))
+    first = indexed_family(labels, lambda label: first_factor if label == 0 else factor)
+    second = indexed_family(labels, lambda label: second_factor if label == 0 else factor)
+
+    # The comparison is the proposition, which has no Python truth value at all.
+    with pytest.raises(TypeError):
+        bool(first == second)
+
+    first_product = Sets().product(first)
+    second_product = Sets().product(second)
+    assert second_product is not first_product
+    assert first_product.factor(0) is first_factor
+    assert second_product.factor(0) is second_factor
 
 
 def test_infinite_constant_additive_product_retains_its_monoid_and_projections() -> None:

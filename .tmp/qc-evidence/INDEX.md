@@ -1855,6 +1855,37 @@ first ambient class, because on main that input is what does not return.
 | `501-tests.log` | this round's commits | the five files of #500/#530 under the repository addopts: **14 passed in 1.34 s** |
 | `501-algebras-tree.log`, `501-algebras-b61.log`, `501-algebras-compared.log`, `501-algebras-ids.log` | this tree and `b61feeb`, both with the change | `tests/algebras`, one pytest process each: **45 failed, 44 passed, 124 errors in 32.78 s** against **45 failed, 44 passed, 124 errors in 32.64 s**, **0 FAILED/ERROR ids only on either side**. The same directory on `27d76f3` has 21 ids fewer, so those 21 are main's and predate this round: their root exception on `test_power_algebras.sage` is `RecursionError: maximum recursion depth exceeded` through `objects.py:172`, `set_categories.py:532` and `ring_foundation.py:6651`, reached while an exterior or divided power algebra of a torsion module is built. Open, and not repaired here |
 
+## #531 round 4: the quotient hash's cover, and the interners' key
+
+The tree is `ca9b5a8` unless a row names another; the base is a clean worktree at
+`76b4449`, the commit the round started from. Port `991b88b0`. Each run is one
+pytest process in the pinned image with the repository's own addopts; the
+products file carries its own pre-existing lint findings, so the three
+directory runs carry `--no-test-lint`, and the two clean test files are also run
+with the gate on (`issue531r4-lint-gate.log`).
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue531r4-red-quotient.log` | `76b4449` with the test file of `ab14fef` | `tests/rings/test_a_quotient_class_hashes_by_its_class.sage`: **1 failed, 4 passed in 0.24 s**; the failure is `test_classes_of_a_laurent_quotient_refuse_a_hash` at `:84: Failed: DID NOT RAISE TypeError` |
+| `issue531r4-green-quotient.log` | `ab14fef` with `9fd14a2` | the same file: **5 passed in 0.21 s** |
+| `issue531r4-red-sets.log` | `76b4449` with the test file of `ca9b5a8` | `tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage`: **8 failed, 27 passed in 1.98 s**, of which the two this change states are red there -- `test_finite_family_hash_does_not_require_hashable_index_labels` and `test_equal_families_of_points_with_a_hashable_and_an_unhashable_form_hash_alike` -- and six are main's own |
+| `issue531r4-sets.log` / `issue531r4-sets-base.log` | `ca9b5a8` / `76b4449` | `tests/sets`: **29 failed, 135 passed in 6.45 s** against **29 failed, 133 passed in 7.20 s**, the 29 FAILED ids identical; the two extra passes are the two tests this change adds |
+| `issue531r4-rings.log` / `issue531r4-rings-base.log` | `ca9b5a8` / `76b4449` | `tests/rings`: **76 failed, 263 passed in 44.30 s** against **76 failed, 261 passed in 43.65 s**, FAILED ids identical |
+| `issue531r4-categories-objects.log` / `-base.log` | `ca9b5a8` / `76b4449` | `tests/categories` + `tests/objects`: **183 failed, 264 passed in 56.19 s** against **183 failed, 264 passed in 54.87 s**, FAILED ids identical |
+| `issue531r4-lint-gate.log` | `ca9b5a8` | `tests/rings/test_a_quotient_class_hashes_by_its_class.sage` + `tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage` with the test lint in force: **10 passed in 1.80 s**; `test_lint` on the rings file alone: **1 files, 0 findings** |
+| `issue531r4-intern-count.log` / `-base.log` | `5277c4e` / `76b4449` | 200 distinct products over one four-point label set, with `IndexedFamily.__eq__` wrapped by the session probe: **0 family comparisons, 0.2827 s** against **20100 comparisons, 2.2002 s**, and the store's own count **0 families in the cardinality buckets against 201**. The intermediate tree `ca9b5a8`, whose bucket also held the keyed families, made **19900 comparisons in 2.1957 s** -- the count is what found that, and no log of it is published because the run wrote over itself |
+
+The probe that named the engines is a session probe and stays out of the tree: it
+prints, for each quotient, its engine's class, `cover_ring()`, `base_ring()` and
+whether `_engine_quotient_reduction_is_canonical` admits it, which is how the
+table in `9fd14a2`'s message was read.  A second session probe was meant to
+build a mutable Sage vector and its immutable copy -- equal, one hashing -- as
+the point pair the family hash must not separate; it stopped at
+`NameError: name 'vector' is not defined` under the session import, so no such
+row is claimed, and the test uses a tuple and a subclass of it with no hash
+instead.  The probe behind the comparison counts (`issue531r4-intern-count.log`)
+builds 200 products over one label set and wraps `IndexedFamily.__eq__` to count
+the comparisons; it is the same file on both trees.
 ## #528, second round: are the lift tests more numerous, or dearer?
 
 `204ffbb96e` corrected the integral locus' Smith reading *and* replaced its per-class test: the
@@ -1870,3 +1901,38 @@ old test formed, per class, `eichler_transvection_matrix(f, s(a)) * base_images`
 | `issue528-lift-cost-204ffbb-control.log` | `204ffbb96e` | the same control: locus **0.165 s**, **8** classes tested, each by `_lift_at` (composition) -- **20.6 ms a test**. On the rank-5 control the count went up 4x and the per-test cost did **not** move: the control alone would have said the cost is owed |
 | `issue528-lift-costs-base-row.log` | base `a71272add9` | T_Co's ambient plane row, **61.3 s and decided**: **1536 lift tests**, `eichler_transvection_matrix` 3.43 s in total, **2.23 ms a test**, `parameterization` 0.63 s over 5 calls |
 | `issue528-lift-costs-204ffbb-row.log` | `204ffbb96e` | the same row, capped at 240 s and **not returned**: **1362 lift tests**, `_lift_at` **183.67 s of the 240** -- **134.9 ms a test**, of which `eichler_transvection` is 40.29 s (29.6 ms), so **105 ms a test is the composition and the integral restriction**. The count is the same order as the base's 1536 (the base finished its whole row with it); the per-test cost is **61x**. The question is decided for dearer tests, and the rank-5 control was the wrong input to decide it on |
+
+## #528, the repair: the lift test reads the lift's matrix, with its datum built once
+
+The decision made the cost per test, not owed: `_lift_at(coordinates).integral_restriction(...)`
+builds a transvection, a composition and a preimage of the target's frame for every class, where
+the pre-204ffbb route formed `transvection matrix * base_images` with `base_images` taken once.
+The repair keeps 204ffbb's corrected coset reading and restores the matrix test.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue528-lift-matrix-equivalence.py` | the tree of the repair | the probe: wraps `_parameter_at`, which every tested class passes through, so the tested coordinates are recorded without reconstructing the Smith reading, runs the locus, then asks each recorded class for the composition's own `integral_restriction` and compares. Prints a disagreement with its coordinates |
+| `issue528-lift-matrix-equivalence.log` | main `6ce8d8a8` + the repair | the control `U(2) + U(2) + <2>`: **8 of 8 classes agree**; the T_En line of Sterk's cusp 4: **1024 of 1024 agree**, the matrix reading **37.205 s** against the composition's **66.028 s** on the same classes |
+| `issue528-locus-tests-repaired.log` | main `6ce8d8a8` + the repair | `tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage` with the test lint plugin: **6 passed in 16.97 s**, the new counting test included |
+| `issue528-locus-tests-204ffbb-red.log` | `204ffbb96e` | the same file there: the new test **fails** -- the torsor asks for its base point **10** times where the repair asks **3** -- and one existing test fails too (the unequal-Smith-steps control, which `d83ae97`, the child of 204ffbb, repairs; 204ffbb is not main) |
+| `issue528-repaired-row-counts.log` | main `6ce8d8a8` + the repair | T_Co's ambient plane row: **returns in 217.9 s** with `_lift_at` called **0** times, where `204ffbb96e` did not return at 300 s with 1362 calls costing 183.67 s, and `a71272add9` returned in 54-61 s. The per-class lift test is gone from the row; the remaining gap to the base is not the lift test and is the next measurement |
+
+## The fifth review of #500: the torsion reading and the provider order
+
+The four logs below are the runs the commits `030a528` and `476f87c` cite.  The
+probes were run in the adopted image with the checkout bound at
+`/repos/sage-extensions` and the port at `/work`, the same shape as above but
+with `PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work:/repos/sage-extensions/src`
+and the script bound at `/probe.py`.  The tree is `6e4e097`, which is the four
+commits merged onto the remote main `1cc2481`; the source files these logs
+measure are unchanged by that merge.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue500r5-name-owners.py` | the tree of `476f87c` | the probe: for twenty-six constructed objects and each of `ParentMethods`, `ElementMethods`, `MorphismMethods`, computes the order the deleted insertion loop gave and the order the tree gives, prints the two wherever they differ, and then asks, for every name any provider declares, which provider answers it first under each |
+| `issue500r5-name-owners.log` | the tree of `476f87c` | three runs in fresh processes: the orders differ in **2, 1 and 1** of the 78 pairs -- always `Modules.FinitelyGenerated` against `FramedFreeModules`, in `QQ(i)` and `Z[x]/(x^2)`'s `ParentMethods` -- and **no name's answering provider moves in any run** |
+| `issue500r5-answering-class.py` | the tree of `030a528` | the probe: names the class in the rebuilt type's method resolution order that declares `_torsion_freeness_decision`, and the answer |
+| `issue500r5-answering-class.log` | the tree of `030a528` | `Z[x]/(x^2)`: `AlgebrasWithChosenFinitePresentation.ParentMethods` **True**; `Z/4[x]`, `Z[x]`, `Q(i)`: `FramedFreeModules.ParentMethods` **True** |
+| `issue500r5-refusal.log` | the tree of `587aabd` | the order-ideal refusal on `2` in `Z/8` as a `Z`-module, printed: the message names the element, the ideal, the functionals that are missing and what they are for, and no word STY-49 bans |
+| `issue500r5-tests.log` | the tree of `6e4e097` | `tests/categories/test_the_refined_category_answers_with_its_own_operation.sage tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage`, test lint loaded: **10 passed in 0.91 s**; the same two files at `a106d23` with the two new tests: **2 failed, 8 passed in 4.59 s** |
+| `issue500r5-sweep.log` | the tree of `6e4e097` and a clean worktree at `1cc2481` | a digest, assembled from the run logs and labelled as one: twelve directories, the five root test modules and `tests/lattices/test_lattice_surfaces.sage`, each summary line with its count of FAILED/ERROR ids, and the ids present on one side only -- **none, in any of the fourteen**; the only count that differs is `tests/categories`, 45 passed against 42, the three tests this round adds |

@@ -169,3 +169,34 @@ def test_the_locus_of_a_section_with_unequal_smith_steps_is_every_class_that_lif
     })
 
     _assert_locus_is_the_integral_classes(lattice, 2, marked=marked)
+
+
+def test_the_locus_builds_its_one_per_lattice_datum_once() -> None:
+    r"""The lift test's per-class work does not rebuild the base point's images.
+
+    The locus tests one class per coset of the transvection kernel, and each test needs the
+    same datum: the base point's images of the source generators.  Reading the lift's own
+    matrix takes that datum once for the call; composing the two owned isometries per class
+    and asking the composition for its integral restriction takes it once per class, which is
+    what made the ambient plane row of `T_Co` pay 134.9 ms a class instead of 2.23 ms (#528).
+
+    The contract asserted here is a call count, not a time: the torsor asks for its base point
+    once while the locus is computed, however many classes the locus tests.  The control's
+    locus tests eight classes, so a per-class reading asks eight times.
+    """
+    hyperbolic = Lattices(ZZ)([[0, 2], [2, 0]])
+    lattice = hyperbolic + hyperbolic + Lattices(ZZ)([[2]])
+    torsor = _marked_line_lift_torsor(lattice, _first_basis_line(lattice))
+    original = torsor.base_point
+    counts = [0]
+
+    def counting():
+        counts[0] += 1
+        return original()
+
+    torsor.base_point = counting
+    reported = torsor.integral_parameter_classes()
+    torsor.base_point = original
+    # The locus is not the single zero class: the count below is a count over several.
+    assert reported.cardinality() > 1
+    assert int(counts[0]) == 3
