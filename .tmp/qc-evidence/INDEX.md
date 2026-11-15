@@ -1916,3 +1916,18 @@ The repair keeps 204ffbb's corrected coset reading and restores the matrix test.
 | `issue528-locus-tests-repaired.log` | main `6ce8d8a8` + the repair | `tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage` with the test lint plugin: **6 passed in 16.97 s**, the new counting test included |
 | `issue528-locus-tests-204ffbb-red.log` | `204ffbb96e` | the same file there: the new test **fails** -- the torsor asks for its base point **10** times where the repair asks **3** -- and one existing test fails too (the unequal-Smith-steps control, which `d83ae97`, the child of 204ffbb, repairs; 204ffbb is not main) |
 | `issue528-repaired-row-counts.log` | main `6ce8d8a8` + the repair | T_Co's ambient plane row: **returns in 217.9 s** with `_lift_at` called **0** times, where `204ffbb96e` did not return at 300 s with 1362 calls costing 183.67 s, and `a71272add9` returned in 54-61 s. The per-class lift test is gone from the row; the remaining gap to the base is not the lift test and is the next measurement |
+
+## #529, the seventh round: identity is the run and the stage id, the name describes the input
+
+The record's `input` stops being an identity: every stage line now carries `id`
+(unique in the run's file) and `parent` (the enclosing stage's `id`), and the
+canonical-form naming machinery is deleted. The first log is the red state on
+main; the rest are the repair, on the commit this section's push names.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue529-reflection-hyperbolic-main-red.log` | main `1cc2481` | `tests/lattices/test_reflection_hyperbolic.sage` alone: **3 failed, 1 passed in 2.05 s**, all three red on `TypeError: 200 of _OwnedRingParent_with_category.element_class has no canonical form for a record name` at `_lattice.py:1579` -- the `.sage` bound `max_decompositions=200` raised inside the timed call, so the Vinberg walk did not run. The second call of each walk failed as `KeyError: ((None, None, 200, None), ())`: the raise sat inside `cached_method` |
+| `issue529-timing-record-tests-green.log` | `8b7e517` | `tests/engineering/test_the_timing_record_names_each_stage.py` with the test lint and the suite budget: **9 passed in 11.41 s**, the three round-7 tests among them (the `Õ`/`Õ⁺` rows of one lattice named apart; a stage's record carrying its own `id` and its enclosing stage's `id`; `cusp_chamber(max_decompositions=200)` named, not refused) |
+| `issue529-vinberg-tests-green.log` | `8b7e517` | `tests/lattices/test_reflection_hyperbolic.sage` and `tests/lattices/test_the_subgroup_cusp_chamber.sage`: **7 passed in 155.61 s** -- the file that was red on main above, and the `.sage` literals at `test_the_subgroup_cusp_chamber.sage:119-120` (`max_decompositions=400` beside a filter) |
+| `issue529-reduction-image-cusps-green.log` | `8b7e517` | the two cusp-chamber tests of `tests/lattices/test_the_isotropic_reduction_image.sage` selected by node id -- `max_decompositions=8` and `max_decompositions=20`, the file's literal sites: **2 passed in 148.92 s** |
+| `issue529-reduction-image-whole-file-capped.log` | main `1cc2481` + the repair, before it was committed | the same file whole, capped at 560 s: **6 passed** and the seventh still running when the cap killed it (peak RSS 1882 MiB). No verdict on the file; the two cusp-chamber tests above are what was decided |

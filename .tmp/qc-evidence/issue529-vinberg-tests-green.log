@@ -1,0 +1,29 @@
+provider SHA: 8b7e517ad88cd919c20271ebb18d17d14fe05cc1
+.......                                                                  [100%]
+=============================== warnings summary ===============================
+tests/lattices/test_the_subgroup_cusp_chamber.sage: 102 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/lattices/test_the_subgroup_cusp_chamber.sage: 102 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================== test-call performance gate ==========================
+tests/lattices/test_the_subgroup_cusp_chamber.sage::test_the_subgroup_cusp_chamber_at_the_first_cusp_has_the_card_wall_count: 146.03 s > 20 s
+7 passed, 204 warnings in 155.61s (0:02:35)
+[peakrss] final-vinberg-tests: child waited=0 shell_code=0 samples=80
+[peakrss] peak tree RSS      : 1622 MiB
+[peakrss] low-water MemAvail : 11514 MiB
+[peakrss] peak single VmHWM  : 1622 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1611 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   106.1s procs=  3 rss=  1622 MiB hwm=  1622 MiB avail= 12329 MiB
+[peakrss]   t=   108.1s procs=  3 rss=  1622 MiB hwm=  1622 MiB avail= 12331 MiB
+[peakrss]   t=   110.1s procs=  3 rss=  1622 MiB hwm=  1622 MiB avail= 12331 MiB
+[peakrss]   t=   112.1s procs=  3 rss=  1581 MiB hwm=  1622 MiB avail= 12334 MiB
+[peakrss]   t=   114.1s procs=  3 rss=  1539 MiB hwm=  1622 MiB avail= 12155 MiB
+launcher exit: 0
