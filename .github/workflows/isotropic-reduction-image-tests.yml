@@ -1,0 +1,42 @@
+name: Isotropic reduction image tests (#387)
+## The tests of tests/lattices/test_the_isotropic_reduction_image.sage in the
+## published image.  The file's chamber rows take minutes per test, past the
+## per-test gate's timeout, so they run in this one job that reports later.
+on:
+  workflow_dispatch:
+    inputs:
+      timeout:
+        description: "seconds one test may take"
+        required: false
+        default: "7200"
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: isotropic-reduction-image-tests
+  cancel-in-progress: false
+jobs:
+  reduction-image-tests:
+    name: The isotropic reduction image tests
+    runs-on: ubuntu-latest
+    container: ghcr.io/dzackgarza/sage:develop
+    timeout-minutes: 350
+    steps:
+      - name: Check out the commit under test
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Mark the checkout as a safe git directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Run the test file
+        env:
+          PYTHONPATH: src
+          TEST_TIMEOUT: ${{ inputs.timeout || '7200' }}
+        run: |
+          set -o pipefail
+          "$SAGE_BIN" --version
+          git rev-parse HEAD
+          sage_python="$("$SAGE_BIN" -c "import sys; print(sys.executable)")"
+          "$sage_python" -m pytest tests/lattices/test_the_isotropic_reduction_image.sage \
+            --no-time-gates --timeout "$TEST_TIMEOUT" -v
+        shell: bash
