@@ -1873,6 +1873,7 @@ with the gate on (`issue531r4-lint-gate.log`).
 | `issue531r4-rings.log` / `issue531r4-rings-base.log` | `ca9b5a8` / `76b4449` | `tests/rings`: **76 failed, 263 passed in 44.30 s** against **76 failed, 261 passed in 43.65 s**, FAILED ids identical |
 | `issue531r4-categories-objects.log` / `-base.log` | `ca9b5a8` / `76b4449` | `tests/categories` + `tests/objects`: **183 failed, 264 passed in 56.19 s** against **183 failed, 264 passed in 54.87 s**, FAILED ids identical |
 | `issue531r4-lint-gate.log` | `ca9b5a8` | `tests/rings/test_a_quotient_class_hashes_by_its_class.sage` + `tests/sets/test_a_finite_ordered_set_hashes_by_its_points.sage` with the test lint in force: **10 passed in 1.80 s**; `test_lint` on the rings file alone: **1 files, 0 findings** |
+| `issue531r4-intern-count.log` / `-base.log` | `5277c4e` / `76b4449` | 200 distinct products over one four-point label set, with `IndexedFamily.__eq__` wrapped by the session probe: **0 family comparisons, 0.2827 s** against **20100 comparisons, 2.2002 s**, and the store's own count **0 families in the cardinality buckets against 201**. The intermediate tree `ca9b5a8`, whose bucket also held the keyed families, made **19900 comparisons in 2.1957 s** -- the count is what found that, and no log of it is published because the run wrote over itself |
 
 The probe that named the engines is a session probe and stays out of the tree: it
 prints, for each quotient, its engine's class, `cover_ring()`, `base_ring()` and
@@ -1882,7 +1883,9 @@ build a mutable Sage vector and its immutable copy -- equal, one hashing -- as
 the point pair the family hash must not separate; it stopped at
 `NameError: name 'vector' is not defined` under the session import, so no such
 row is claimed, and the test uses a tuple and a subclass of it with no hash
-instead.
+instead.  The probe behind the comparison counts (`issue531r4-intern-count.log`)
+builds 200 products over one label set and wraps `IndexedFamily.__eq__` to count
+the comparisons; it is the same file on both trees.
 ## #528, second round: are the lift tests more numerous, or dearer?
 
 `204ffbb96e` corrected the integral locus' Smith reading *and* replaced its per-class test: the

@@ -1,0 +1,17 @@
+tree SHA: 76b44493793e43f915dbe2129019f8e9cb5fb0ce
+port SHA: 991b88b0
+inner 250 s, outer 310 s, guard 4096 MiB
+command: /sage/.venv/bin/python -u -s /probe.py
+RESULT products=200 comparisons=20100 seconds=2.2002
+RESULT keyless=one-list-of-201
+[peakrss] interncount: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 279 MiB
+[peakrss] low-water MemAvail : 13754 MiB
+[peakrss] peak single VmHWM  : 279 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      268 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   279 MiB hwm=   279 MiB avail= 13754 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     3 MiB hwm=     3 MiB avail= 13895 MiB
+launcher exit: 0

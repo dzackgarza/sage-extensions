@@ -1003,3 +1003,5 @@ fd42c9a40f1025437ae085e6d8b470b0d161841134d8eacc1c0e3173ab1fa413  .tmp/qc-eviden
 93cf35f1a6758b099338f5d49700b2ea7c04ead5d7a86aef613fda1ae7d58dad  issue528-lift-cost-204ffbb-control.log
 e040e965e96a9d4e13d30c0840e6e7792ade90438f3b8c9b0d2d750a7ca18b99  issue528-lift-costs-base-row.log
 c4558319842dd4be2c3b52cefb57c2d8d01de699e854bf3fe5fbf91da3d4bd60  issue528-lift-costs-204ffbb-row.log
+48295b3634a76b009b65aa60c2c1abed9acffe33a5740312916c0cc5d5654d91  .tmp/qc-evidence/issue531r4-intern-count.log
+473b4c5d22474e9555a7b97e35afd5e7e2e7c0c893c4e1cf3158f73dd4522f50  .tmp/qc-evidence/issue531r4-intern-count-base.log
