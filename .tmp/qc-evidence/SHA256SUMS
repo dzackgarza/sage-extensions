@@ -783,3 +783,4 @@ cff425e5f75cb5cee2177c1d56a8a64671f3bf619d8312684901707c57b49b8b  500-review-sur
 53487b908045458f49d2cb11b18177a7ab9361de14dd3a167a3466aba4dfb92a  500-review-gate-410.log
 a23f5b48c14de08164bcdb131f8671de7c0cc7e969de25f62702fa785f1c160f  500-review-base-red.log
 6b6b82add9f2998def03f5feafc0bc77e3a7449affbb6a0cc1f3e55486a17e8b  500-review-regression-compared.log
+b3119dab8bc71da3dfb449deeab3c71b06d5ad1ffdbeda679d65b8370d755bb9  issue452-pushed-reduction-image-tests.log
