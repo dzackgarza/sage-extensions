@@ -224,15 +224,16 @@ def test_one_cone_with_a_lineality_of_non_unit_pivot_is_one_hash() -> None:
     r"""Two presentations of one half-plane of ``Z^3`` are one cone and one hash.
 
     The cone ``{<(-1, 3, 0), x> >= 0, <(3, -11, 1), x> >= 0}`` has dimension
-    three and the lineality line ``<(3, 1, 2)>``, whose Hermite basis has the
-    pivot ``3`` in its first coordinate, so the line is not a coordinate line.
-    Its other extreme ray is ``(-11, -3, 0)``.  The third covector
+    three, the lineality line ``<(3, 1, 2)>``, whose Hermite basis has the
+    pivot ``3`` in its first coordinate and so is not a coordinate line, and
+    the extreme rays ``(-3, -1, 0)`` and ``(-11, -3, 0)``.  The third covector
     ``(0, -2, 1)`` is ``(3, -11, 1) + 3(-1, 3, 0)``, a positive combination of
     the first two, so it cuts out the same cone.  The private exact polyhedron
-    states an extreme ray only up to a lineality vector: it reports
-    ``(-11, -3, 0)`` for the first presentation and ``(-2, 0, 6)``, which is
-    ``(-11, -3, 0) + 3(3, 1, 2)``, for the second.  Those two are one ray
-    modulo the lineality, so the two presentations are one set and one hash.
+    states an extreme ray only up to a lineality vector, and here it states
+    ``(-11, -3, 0)`` for the first presentation and ``(-1, 0, 3)`` for the
+    second: twice ``(-1, 0, 3)`` is ``(-11, -3, 0) + 3(3, 1, 2)``, so the two
+    are one class modulo the lineality up to a positive rational, and one ray
+    of the image.  The two presentations are one set and one hash.
     """
     lattice = Lattices(ZZ)([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
     short = lattice.reduction_cell(((-1, 3, 0), (3, -11, 1)))
