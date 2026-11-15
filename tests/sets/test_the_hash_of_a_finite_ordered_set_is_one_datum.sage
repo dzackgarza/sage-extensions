@@ -20,9 +20,8 @@ from sage_extensions.all import *  # noqa: F401,F403
 def _image_set_recording_its_enumeration(record):
     r"""The image of $\{0,1,2,3\}$ under $n \mapsto n^2$, recording every ask.
 
-    The points are reached through the map, as the image of a set of classes or
-    of pairs is in the plane row; ``record`` collects the source points the map
-    is asked about.
+    The points are reached through the map; ``record`` collects the source points
+    the map is asked about.
     """
     source = FiniteOrderedSets()((0, 1, 2, 3))
 
