@@ -26,6 +26,8 @@ the points, and it fails outright for a hash of the cardinality alone.
 
 from sage_extensions.all import *  # noqa: F401,F403
 
+import pytest
+
 _COUNT = 200
 
 
@@ -39,11 +41,11 @@ def _coordinates(vector):
     return tuple(int(entry) for entry in vector.to_vector())
 
 
-def _span_bases(lattice, count):
-    r"""``count`` distinct rank-two span bases of ``lattice``, as finite ordered sets.
+def _span_basis(lattice, index):
+    r"""The ``index``-th rank-two span basis of ``lattice``, as a finite ordered set.
 
     ``index`` selects the pair ``(e_0 + (k+1)e_1 + k e_2, e_2 + (k+1)e_3 + k e_4)``
-    of the lattice's generators, which is independent for every ``k``, so each
+    of the lattice's generators, which is independent for every ``k``, so the
     set is a basis of the rank-two span it generates.  The bases are built
     through :class:`FiniteOrderedSets`, which is the class whose hash is at
     issue: its points are lattice vectors, the objects the cache of #390 keys
@@ -51,13 +53,15 @@ def _span_bases(lattice, count):
     """
     labels = tuple(lattice.module_generating_set())
     points = tuple(lattice.module_generator(label) for label in labels)
-    bases = []
-    for index in range(count):
-        left = points[0] + ZZ(index + 1) * points[1] + ZZ(index) * points[2]
-        right = points[2] + ZZ(index + 1) * points[3] + ZZ(index) * points[4]
-        assert cardinal(lattice.subobject_on((left, right)).module_rank()) == cardinal(2)
-        bases.append(FiniteOrderedSets()((left, right)))
-    return tuple(bases)
+    left = points[0] + ZZ(index + 1) * points[1] + ZZ(index) * points[2]
+    right = points[2] + ZZ(index + 1) * points[3] + ZZ(index) * points[4]
+    assert cardinal(lattice.subobject_on((left, right)).module_rank()) == cardinal(2)
+    return FiniteOrderedSets()((left, right))
+
+
+def _span_bases(lattice, count):
+    r"""``count`` distinct rank-two span bases of ``lattice``, as finite ordered sets."""
+    return tuple(_span_basis(lattice, index) for index in range(count))
 
 
 def test_equal_finite_ordered_sets_hash_equally() -> None:
@@ -98,7 +102,7 @@ def test_distinct_span_bases_of_one_rank_do_not_share_a_hash() -> None:
         tuple(_coordinates(point) for point in basis) for basis in bases
     }
     hashes = tuple(hash(basis) for basis in bases)
-    distinct_hashes = {value for value in hashes}
+    distinct_hashes = set(hashes)
 
     assert cardinal(sum(1 for _ in bases)) == cardinal(_COUNT)
     assert cardinal(sum(1 for _ in contents)) == cardinal(_COUNT)
@@ -117,9 +121,7 @@ def test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others() ->
     """
     lattice = _small_lattice()
     bases = _span_bases(lattice, 32)
-    table = {}
-    for position, basis in enumerate(bases):
-        table[basis] = position
+    table = {basis: position for position, basis in enumerate(bases)}
     rebuilt = tuple(
         FiniteOrderedSets()(tuple(basis)) for basis in bases
     )
@@ -129,25 +131,60 @@ def test_a_span_basis_finds_its_own_cache_entry_without_scanning_the_others() ->
     assert hash(bases[0]) != hash(bases[1])
 
 
-def test_the_finite_ordinals_take_the_hash_of_their_points_too() -> None:
-    r"""The finite ordinals inherit the contract: \(\Delta[2]\) and \(\Delta[3]\) hash apart.
+def test_a_finite_ordinal_hashes_by_its_points_like_the_set_they_form() -> None:
+    r"""An ordinal hashes as the finite ordered set of the same points does.
 
     ``AugmentedSimplexCategory`` is the one category refining ``FiniteOrderedSets``
     (``set_categories.py``, ``super_categories``), so an ordinal is a finite
-    ordered set and takes this hash with its points ``0, ..., n``.  Stated here
-    because a repair of the hash changes the inherited value as well: what a
-    dictionary keyed by index sets sees is the ordinal's hash, and two ordinals
-    of different sizes are different sets.
+    ordered set and takes this hash with its points ``0, ..., n``.  Two ordinals
+    are never distinct sets of one cardinality, so the second set here is
+    another three points: the hash reads the points, and two sets of one
+    cardinality are apart.
     """
-    small = Sets.Δ[2]
-    large = Sets.Δ[3]
-    again = Sets.Δ[2]
-    table = {small: "two", large: "three"}
+    ordinal = Sets.Δ[2]
+    same = FiniteOrderedSets()(tuple(ordinal))
+    shifted = FiniteOrderedSets()(tuple(Sets.Δ[3])[1:])
 
-    assert small == again
-    assert small != large
-    assert hash(small) == hash(again)
-    assert hash(small) != hash(large)
-    assert tuple(small) == (0, 1, 2)
-    assert cardinal(sum(1 for _ in table)) == cardinal(2)
-    assert table[again] == "two"
+    assert tuple(ordinal) == (0, 1, 2)
+    assert ordinal == same
+    assert ordinal != shifted
+    assert ordinal.cardinality() == shifted.cardinality()
+    assert hash(ordinal) == hash(same)
+    assert hash(ordinal) != hash(shifted)
+
+
+def test_a_set_with_an_unhashable_point_is_unhashable() -> None:
+    r"""An equal pair of sets, one of whose points refuses a hash, has one hash: none.
+
+    :class:`tuple` and :class:`frozenset` hash their contents and refuse a hash
+    when a content does not hash; a finite ordered set is the same data.  A
+    mutable Sage vector or matrix is unhashable and equals its immutable copy,
+    so the two sets below are equal: a hash that fell back to something weaker
+    than the points when a point refused a hash gives these two equal sets two
+    values.  The points are built over Python integers, ``int(...)``, because
+    the preparser makes a literal a library integer that Sage's constructors
+    reject (``tests/forms/test_the_coble_anti_isometry.sage``).
+    """
+    mutable_vector = vector([int(1), int(2)])
+    immutable_vector = vector([int(1), int(2)])
+    immutable_vector.set_immutable()
+    mutable_matrix = identity_matrix(int(2))
+    immutable_matrix = identity_matrix(int(2))
+    immutable_matrix.set_immutable()
+
+    assert mutable_vector == immutable_vector
+    assert mutable_matrix == immutable_matrix
+    for mutable, immutable in (
+        (mutable_vector, immutable_vector),
+        (mutable_matrix, immutable_matrix),
+    ):
+        with pytest.raises(TypeError):
+            hash(mutable)
+        floating = FiniteOrderedSets()((mutable,))
+        fixed = FiniteOrderedSets()((immutable,))
+        relocated = FiniteOrderedSets()((immutable,))
+        assert floating == fixed
+        assert fixed == relocated
+        assert hash(fixed) == hash(relocated)
+        with pytest.raises(TypeError):
+            hash(floating)
