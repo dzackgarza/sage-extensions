@@ -1,0 +1,18 @@
+provider SHA: 9bc11855f51df06a4ccaecb13c5ffbe6c0647f4a
+port SHA: 991b88b0
+command: python /probe500.py
+is_injective(): True
+is_surjective(): is_surjective(Generic morphism:
+  From: Free module on {1, a} over Fraction Field of Integer Ring
+  To:   Free module on {1, a} over Free module on {1, a} over Fraction Field of Integer Ring)
+as_isomorphism(): RAISED AssertionError: Generic morphism:
+  From: Free module on {1, a} over Fraction Field of Integer Ring
+  To:   Free module on {1, a} over Free module on {1, a} over Fraction Field of Integer Ring has no inverse: it is not known to be a bijection Free module on {1, a} over Fraction Field of Integer Ring -> Free module on {1, a} over Free module on {1, a} over Fraction Field of Integer Ring (injectivity and surjectivi
+
+adic_inverse_system(): RAISED TypeError: object() takes exactly 0 positional arguments (1 given)
+adic_limit_cone(): RAISED TypeError: object() takes exactly 0 positional arguments (1 given)
+adic_module_projection(1): RAISED TypeError: ModulesWithChosenFinitePresentation.ParentMethods.adic_module_projection() missing 1 required positional argument: 'exponent'
+adic_truncation(1): Free module on {1, a} over Fraction Field of Integer Ring / Ideal (0) of Free module on {1, a} over Fraction Field of Integer Ring
+2-truncations: Free module on {1, a} over Fraction Field of Integer Ring / Ideal (0) of Free module on {1, a} over Fraction Field of Integer Ring
+adic_artin_truncation(1): RAISED ValueError: Free module on {1, a} over Fraction Field of Integer Ring / Ideal (0) of Free module on {1, a} over Fraction Field of Integer Ring is not known to be Artinian, so it has not been shown to have finite length
+launcher exit: 0

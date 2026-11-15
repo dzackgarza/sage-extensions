@@ -1,0 +1,8 @@
+=== ran on: the working tree of 9cfb525c519b41c3cc5b67adc64366aae69f8f96
+=== sweep lat-mine500d
+=== tree: 5f17b92fe7370eb8db460d9f6919b99bcb4cd243
+=== started: 2026-11-15T05:18:09+00:00
+tests/lattices/test_content_and_doubling.sage: 1 failed, 3 passed in 1.94s
+    FAILED tests/lattices/test_content_and_doubling.sage::test_index_two_sublattices_of_a_hyperbolic_summand
+tests/lattices/test_reflection_rational_line.sage: 4 passed in 1.71s
+=== finished: 2026-11-15T05:18:15+00:00

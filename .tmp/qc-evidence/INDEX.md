@@ -1368,6 +1368,13 @@ processes each, under the suite's 3.0 s ceiling for that workload.
 | `issue452-locus-tests-merged.log` | `27fd250`, the merge of this repair with `a8b7eb8` | `tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage`: **4 passed in 4.83 s**, lint on, exit 0 | 
 | `issue452-reduction-image-tests-merged.log` | `27fd250`, the same tree | `tests/lattices/test_the_isotropic_reduction_image.sage`: **11 passed in 1504.36 s**, the five-row chamber test at 752.69 s and the two-lifts test at 272.78 s; `--no-time-gates`, the five overruns printed | 
 | `issue452-tco-coset-count.log` | `fd0f1c0`, the pushed tree (the probe reads the locus' own Smith data) | the number of lift tests a `T_Co = <2> + (U + E8(-1))(2)` line of divisibility two forces: period 4, rank 9, nine Smith invariants one, **512 coset representatives, `|K| = 512`**, `|P/mP| = 262144` — so one `integral_restriction` per coset is the 512-test cost the repair adds to that line, and no `T_Co` row was run | 
+| `issue452-unequal-steps-search.py`, `.log` | `045fe69`, the tree before this repair | the sweep for a control whose section has unequal Smith steps: 140 (lattice, marked vector) pairs over `U(k)`, `U(2)`, `U(4)`, `U(8)` summed with `<2>+<2>`, `<2>+<4>`, `<4>+<4>`, `A2`, `A2(2)`, `A3(2)`, `D4(2)`; **9 unequal**, every one of them `U(4) + <2> + <2>` at a non-basis marked vector with steps `(32, 16)`; every basis-vector marked line has all steps equal | 
+| `issue452-unequal-steps-locus.py`, `-before.log` / `-after.log` | `ada50c4` / `8f6d5cf` | the chosen control `U + A3(2)` at `-2e0 + 2e1 - e2 + 2e3 - e4`: period 8, denominator 4, Smith invariants `(1, 2, 2)`, steps `(4, 2, 2)`, `V = ((0,0,-1),(-1,0,-2),(1,-1,0))` not a signed permutation of the cube; **the locus reports 256 of the 512 classes of `P/mP` before and 512 after**, the direct enumeration 512 in both | 
+| `issue452-unequal-steps-red.log` | `ada50c4`, the test commit's own tree | `tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage`: **1 failed, 4 passed in 20.17 s**; the failure is `Extra items in the right set` on the new control | 
+| `issue452-locus-coset-readings.log` | `d83ae97`, the repair | the same file: **5 passed in 21.56 s**, `test_lint` on | 
+| `issue452-reduction-and-eichler-tests.log` | `8f6d5cf` | `test_isotropic_reduction.sage`, `test_eichler_isometry_relations.sage`, `test_two_u_eichler_model.sage`: **18 passed, 1 failed in 7.94 s**; the failure is `test_approximate_generating_family_uses_exact_two_u_perpendicular_frames` | 
+| `issue452-two-u-eichler-base.log` | `ada50c4`, before the repair | the same id fails there as well: 1 failed, 8 passed in 6.04 s — **pre-existing, not a regression** | 
+| `issue452-reduction-image-tests-2.log` | `8f6d5cf`, the repaired tree | `tests/lattices/test_the_isotropic_reduction_image.sage`: **11 passed in 1168.99 s**, the two-lifts test at 239.08 s, the published-cusp-roots test at 294.36 s, the five-row chamber test at 547.53 s; `--no-time-gates`, the four overruns printed — `K_v` from the repaired locus and the sifting membership give the same answers as before | 
 ## Issue #500: a ring element divides in its ring, and a module's element divides by a scalar
 
 `7717c62` replaces the per-realization placement of `b3c7ca3`. A ring is a left module over itself, so
@@ -1400,6 +1407,8 @@ direct `_div_` call.
 | `500-integer-literal-division.log` | `7717c62` | an integer divisor on an engine-backed ring: `ZZ(3)/2 = 3/2`, `QQ[x](x)/2`, `(1 + sqrt5)/2`, and `Sterk.sterk_roots()` returning its five diagrams |
 | `500-refine-resolution-surface.log` | `7717c62` | the names the two rebuild rules resolve, over fourteen object kinds: `__truediv__` and `order_ideal` on the refined element classes, `__add__`/`__sub__` and `norm`/`trace` where a category level had moved in front of the realization, `__iter__`/`adic_completion` on the refined parents |
 | `500-regression-compared.log` | `7717c62` against `a71272a` | fourteen directories and the root `tests/*.py`, one pytest process each per tree, FAILED ids and not counts: every row has an empty only-on-this-tree set; `tests/rings` has **two fixed ids** and 74 failed, 258 passed against 76 failed, 252 passed. Not measured: `tests/lattices` as one directory (6245 MiB, stopped by the 6144 MiB guard on both trees) and `tests/groups` (1000 s cap) |
+| `issue452-merged-quick-tests.log` | `b2676c2`, the merge of this repair with #500's ring division | `test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage`, `test_isotropic_reduction.sage`, `test_eichler_isometry_relations.sage`: **15 passed in 21.13 s** | 
+| `issue452-merged-reduction-image-tests.log` | `b2676c2`, the same tree | `tests/lattices/test_the_isotropic_reduction_image.sage`: **11 passed in 1227.36 s**, the two-lifts test at 244.30 s, the published-cusp-roots test at 300.90 s, the five-row chamber test at 578.05 s; `--no-time-gates`, the five overruns printed | 
 ## Issue #500, the review of `7717c62`: one operator, the `_div_` hook, and the narrowed rebuild rule
 
 The review found three things in `7717c62`: a second division operator at `_OwnedRingElement`, a `refine` rule that
@@ -1437,3 +1446,111 @@ and `_OwnedRingParent` states it too, because it answers the canonical sources i
 | `500-review-gate-410.log` | `9fd76e4` | #410's slice -- four cause-A ids, the cause-B id and #150's contract: **6 passed in 1.89 s** |
 | `500-review-base-red.log` | `0a8a95b` | the same test file at main: **1 failed, 4 passed in 19.32 s**, red on `test_an_integer_literal_divides_in_the_parent_the_two_share` at `e12 / 2` |
 | `500-review-regression-compared.log` | `9fd76e4` against `0a8a95b` | fourteen directories and the root `tests/*.py`, one pytest process each per tree, FAILED ids compared: **every row has an empty only-on-this-tree set**; `tests/rings` is 74 failed, 259 passed against 75 failed, 258 passed, with the one fixed id being the new test. The sweeps ran on `d3ca9ee`, whose `src` and `tests` are `9fd76e4`'s (`git diff d3ca9ee 9fd76e4 -- src tests` is empty) |
+| `issue452-final-quick-tests.log` | `ba3ab60`, the pushed tree | the lift-locus file with `test_isotropic_reduction.sage` and `test_eichler_isometry_relations.sage`: **15 passed in 20.99 s** | 
+| `issue452-pushed-reduction-image-tests.log` | `ba3ab60`, the same tree | `tests/lattices/test_the_isotropic_reduction_image.sage`: **11 passed in 1538.48 s**, the two-lifts test at 231.33 s, the published-cusp-roots test at 365.35 s, the five-row chamber test at 858.67 s; `--no-time-gates`, the four overruns printed | 
+
+## Issue #500, the second review: one authority for the integer coercion, the positive criterion, and the three tests
+
+The review of `9fd76e4` found the integer coercion stated twice, a deny-list deciding which dunders the rebuild rule
+may order, three moved operations with no test, and one false sentence in the ring contract. `6828f81` answers all
+four. The criterion is now the Python language reference's container protocol (Data Model, §3.3.7) and numeric
+protocol (§3.3.8) plus public names, 62 names; the integer map is stated once, on `OwnedRings`, and the
+engine-backed realization defers to it through `super()`; the tests are
+`tests/categories/test_the_refined_category_answers_with_its_own_operation.sage`, stating for `QQ(i)` which level
+answers `order_ideal`, `__iter__` and `adic_completion` and what each returns.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `500b-findings.log` | `6828f81` | the four findings read on the tree that answers them: the two `_coerce_map_from_` hooks and which names their bytecode holds (`_OwnedRingParent`'s no longer names `_owned_ring_from_integer`); for eight rings what the `int` case, the session integer and a raw Sage integer answer, and the integer case reached through `super()`; the criterion's answer for twenty-one names and its 62-name size; the names the rule installs on each of the eight rings' classes, with the dunders outside the value protocol; the level answering each of the three moved operations on `QQ(i)` and its value; the ring contract's docstring |
+| `500b-criterion.log` | `6828f81` | the old deny-list and the new criterion run over the same providers for eighteen constructed objects (the eight review rings, `ZZ**2`, `QQ**2`, two lattices, `ZZ_5`, `ZZ/8`, `Zp(5)`, `ZZ[i]`, `QQ[x,y]`): **the same four names are selected by both** -- `__truediv__`, `order_ideal` on element classes, `__iter__` and `adic_completion` on parent classes -- with **nothing selected by only one of the two** |
+| `500b-tests.log` | `6828f81` | `tests/categories/test_the_refined_category_answers_with_its_own_operation.sage` and `tests/rings/test_elements_divide_in_their_own_ring.sage`: **8 passed in 16.57 s**, lint plugin on (the fix commit cites the first run of the same two files on the same content, 18.91 s) |
+| `500b-sweep-tree.log` | `6828f81` | thirteen test directories, one pytest process each: 840 FAILED ids in total. The runs were made on the working tree before it was committed, and its `src` and `tests` are `6828f81`'s |
+| `500b-sweep-base.log` | `ba3ab60` | a clean worktree at the commit fetched from main: the same thirteen directories and the root `tests/*.py` |
+| `500b-sweep-tree-extra.log` | `6828f81` | the root `tests/*.py` (**25 passed in 10.92 s**), and the two lattice files that read the framed content: `test_content_and_doubling.sage` 1 failed, 3 passed; `test_reflection_rational_line.sage` 4 passed |
+| `500b-sweep-base-extra.log` | `ba3ab60` | the same two lattice files on the base: 1 failed, 3 passed and 4 passed, the same ids |
+| `500b-regression-compared.log` | `6828f81` against `ba3ab60` | FAILED ids compared per target: **840 on each side, 0 only on the tree, 0 only on the base**; the only count difference is `tests/categories` 59 passed against 56, which is the three new tests. Not swept as one directory: `tests/lattices`, 5.6 GiB resident and unfinished after 25 minutes here |
+
+## Issue #500, the third review: the order-ideal regression, its owner, and the three notes
+
+The second review's tree (`6828f810a0`) raised on `(2x+2).order_ideal()` for `ZZ['x']` and on `(x+1).order_ideal()` for
+`QQ['x']`: the rebuild rule of #500 keeps `Modules.ElementMethods.order_ideal` on these rings, and that method read
+`dual.codomain()` off a dual that, for an infinite chosen basis, is the product `R^S` and has no codomain attribute.
+The mathematics such a call must answer is `ZZ.ideal(2)` and `QQ.ideal(1)`; both are the values the same calls
+returned at `51310d6`. `af3edee` asserts them red, `ef39a9b` repairs the method at its owner, `b5cfd57` moves the
+ring-point enumeration onto `OwnedRings().Finite()`, `1b8358c` states the completion at the zero ideal by its map.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `500c-red.log` | `af3edee` (with only the test added to `9bc1185`) | `tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage`: **2 failed in 1.34 s**, both at `modules.py:1663 in order_ideal -- regular = dual.codomain()`, `AttributeError: 'GeneralModules.parent_class' object has no attribute 'codomain'` |
+| `500c-tests.log` | `1b8358c` | the two test files this issue changes, with the test lint plugin on: **5 passed in 1.85 s** |
+| `500c-tests-uncommitted.log` | the working tree whose `src` and `tests` are `b5cfd57`'s and `1b8358c`'s, before they were committed | the two files above plus `tests/rings/test_elements_divide_in_their_own_ring.sage`: **10 passed in 21.14 s** |
+| `500c-lint-uncommitted.log` | the same working tree | the two files with `-o addopts= -p sage_extensions.testing.test_lint`: **5 passed in 6.01 s** |
+| `500c-order-ideal-at-51310d6.log` | `51310d6` (a clean worktree) | `(2x+2).order_ideal()` on `ZZ['x']` is `Ideal (2) of Integer Ring` and equal to `ZZ.ideal(2)`; `(x+1).order_ideal()` on `QQ['x']` is equal to `QQ.ideal(1)`; `(1+i).order_ideal()` on `QQ(i)` is equal to `QQ.ideal(1)`. All three answered by `FramedFreeModules.ElementMethods.order_ideal` |
+| `500c-coercion-at-51310d6.log` | `51310d6` | `has_coerce_map_from` read source by source (int, `ZZ`, `QQ`, `QQ(i)`, `ZZ['x']`, the module `ZZ**2`) on `ZZ['x']`, `QQ(i)` and `M_2(QQ)`, with `_coerce_map_from_`'s owner |
+| `500c-coercion-on-main.log` | `9bc1185` | the same probe on main. **Appeared: `int` on all three rings, and `ZZ` on `M_2(QQ)`** (whose hook owner moves from `sage.structure.parent.Parent` to `OwnedRings.ParentMethods`). **Vanished: none.** Values: `ZZ['x'](3) == 3*1`, `QQ(i)(3) == 3`, `M_2(QQ)(3) == M_2(QQ)(ZZ(3)) == 3*I`; every module and cross-ring source stays refused |
+| `500c-iter-before.log` | `af3edee` (a clean worktree) | before the move: `GF(2)`, `GF(4)`, `Zmod(6)`, `Zmod(8)` enumerate through `OwnedRings.ParentMethods`; `QQ(i)` and `ZZ['x']` refuse with `it is not placed among finite sets`; `ZZ` already raises `unable to coerce <class 'dict'> to an integer` from the framed free module's enumeration |
+| `500c-iter-after.log` | the working tree whose `src` is `b5cfd57`'s | after the move: the four finite rings enumerate the same points through `OwnedRings.Finite.ParentMethods`; `QQ(i)` and `ZZ['x']` refuse with `it is not a finite ring, so its points are not a finite iteration of its selected engine`; `ZZ` is unchanged. The intermediate state, with the general refusal deleted, is not in this log: measured then, `tuple(ZZ['x'])` handed back the ring itself forever and `iter(QQ(i))`/`iter(ZZ)` reached the framed coordinate enumeration and raised on the first element |
+| `500c-completion-map.log` | `9bc1185` | the completion of `QQ(i)` at `(0)`: the kernel is the zero ideal, `completion_map().is_injective()` is `True`, `is_surjective()` is the proposition `is_surjective(...)` (decided only between finite enumerated endpoints), `as_isomorphism()` refuses for lack of it, and `is_isomorphic_to(field)` is `True` |
+| `500c-rings-tree.log` | the working tree of `b5cfd57` | `tests/rings`, one pytest process: **74 failed, 259 passed in 49.64 s** |
+| `500c-rings-base.log` | `af3edee` | the same command on a clean worktree: **74 failed, 259 passed in 55.75 s**. The 74 FAILED ids are identical; the earlier run of this change had 19 more and they were all the `refine` name shadowed by a local import, repaired before this log |
+| `500c-sweep-tree.log` | the working tree of `b5cfd57` | eleven test directories, one pytest process each, plus the root `tests/*.py`: 465 FAILED ids |
+| `500c-sweep-base.log` | `af3edee` | the same twelve targets on a clean worktree: 467 FAILED ids |
+| `500c-compared.log` | the two sweeps above | FAILED ids compared per target: **0 only on the tree**, and the only two ids only on the base are the two red tests this issue adds, so **0 new and 2 fixed**. `tests/lattices` is not swept as a directory (5.6 GiB resident, unfinished after 25 minutes on this host); its two files that read the framed content are below |
+| `500c-lattice-content-tree.log` | the working tree of `b5cfd57` | `tests/lattices/test_content_and_doubling.sage`: 1 failed, 3 passed (`test_index_two_sublattices_of_a_hyperbolic_summand`) |
+| `500c-lattice-content-base.log` | `af3edee` | the same file on a clean worktree: 1 failed, 3 passed, the same id |
+| `500c-lattice-reflection-tree.log` | the working tree of `b5cfd57` | `tests/lattices/test_reflection_rational_line.sage`: **4 passed** |
+| `500c-lattice-reflection-base.log` | `af3edee` | the same file: **4 passed** |
+
+The probe sources behind the `500c-*` measurement logs are session probes, not library code, and stay out of the
+tree as the repository requires: each one builds the rings named in its row and prints what the call returned, its
+value and the class that answered, so the log carries every reading it is cited for.
+
+## Issue #500, fourth review (added 2026-11-15)
+
+Base for every comparison: a clean worktree at `5f17b92fe7`, the main this round
+started from.  "The tree" is the working tree whose `src` and `tests` are
+`c5af4fc`, `7b23fc3` and `1a53c51`.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `500d-red.log` | `5f17b92fe7` (a clean worktree, with only the new test copied in) | `tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage`: **1 failed in 1.36 s** at `assert __iter__ is None` -- the general ring still answers `__iter__` with a method there |
+| `500d-tests.log` | `c5af4fc`, `7b23fc3`, `1a53c51` | the four files this issue owns, with the test lint plugin on: **11 passed in 18.40 s** |
+| `500d-order-ideal.log` | the tree of `1a53c51` | per object: the module, its base ring, the dual's shape, which method answers, the order ideal, whether it is in `CommutativeIdeals(R)`, the values `dual_evaluation_image_generators` returns, the framed level's own answer, and `dual_evaluation` at the first coordinate functional of the product. `Modules.ElementMethods.order_ideal` answers on `ZZ['x']`, `QQ['x']`, `QQ(i)` and `Zmod(8)`; `FramedFreeModules.ElementMethods.order_ideal` on `ZZ**2` and `Lattices(ZZ)([[2]])`. Values: `(2x+2)` -> `Ideal (2)` of `ZZ`, `(x+1)` -> the unit ideal of `QQ`, `(-6,9)` -> `(3)`, `6e0` -> `(6)`, every one of them in `CommutativeIdeals` of its base ring. `Zmod(8)(3)` is computed by neither reading: the module level raises `ValueError: Mor(Z/8, Z) has no chosen resolution` from the dual's own owner, and the framed level raises `AttributeError: ... has no attribute 'to_vector'` |
+| `500d-iter.log` | the tree of `7b23fc3` | `ZZ['x']`, `QQ['x']`, `QQ` and `QQ(i)` resolve `__iter__` to `None`; `iter` and `tuple` raise `TypeError` at once (`'...' object is not iterable`), so `tuple(ZZ['x'])` does not read `ZZ['x'][0]`. `ZZ` resolves it to `FramedFreeModules.FinitelyGenerated.ParentMethods` and raises `unable to coerce <class 'dict'> to an integer` (#526, unchanged). `Zmod(8)`, `Zmod(1)`, `GF(2)`, `GF(4)`, `GF(9)` enumerate 8, 1, 2, 4 and 9 points through `OwnedRings.Finite.ParentMethods` |
+| `500d-finite-probe.log` | the tree of `7b23fc3` | the finite rings of every owned constructor: quotient `Z/8` (8 points), `Z/1` (1), prime field `Z/2` (2), residue field of `Z/4` (2), polynomial quotients `GF(4)` (4) and `GF(9)` (9) -- all in the finite-ring axiom, all enumerating through `OwnedRings.Finite.ParentMethods`. Products `GF(2) x GF(2)` (4) and `Z/4 x GF(3)` (12) are in the axiom and **do not enumerate**: their class resolves `__iter__` to `FramedFreeModules.FinitelyGenerated.ParentMethods`, which raises `ValueError: (0,) should be of length 2` |
+| `500d-finite-probe-before.log` | `5f17b92fe7`, unmodified | the same probe before this round: same constructor answers everywhere except that an infinite ring refuses with `it is not a finite ring, so its points are not a finite iteration of its selected engine`. The two products already answered through the framed module's coordinate iteration, so the placement change does not move them |
+| `500d-sweep-tree.log` | the tree of `c5af4fc`, `7b23fc3`, `1a53c51` | twelve test directories, one pytest process each, plus the twenty root `tests/*.py` files: FAILED ids listed per target |
+| `500d-sweep-base.log` | `5f17b92fe7` (a clean worktree) | the same targets on the base |
+| `500d-compared.log` | the two sweeps above, and the two below | FAILED ids compared per target: **0 only on the tree, 0 only on the base** for every target. The one count difference is `tests/rings` **260 passed against 259** -- the new test |
+| `500d-lattices-tree.log` | the tree of `1a53c51` | `tests/lattices/test_content_and_doubling.sage`: 1 failed, 3 passed (`test_index_two_sublattices_of_a_hyperbolic_summand`); `tests/lattices/test_reflection_rational_line.sage`: **4 passed** |
+| `500d-lattices-base.log` | `5f17b92fe7` | the same two files: the same ids |
+| `500d-extra-tree.log` | the tree of `1a53c51` | the seven files that read the dual, the order ideal or a lattice element: `test_lattice_semantic_api` 4 passed, `test_lattice_elements` 6, `test_named_lattice_constructions` 12, `test_hodge_calculus` 3, `test_hyperbolic_space` 3 failed, `test_all_ones_form_correlation` 2 passed, `test_infinite_form_duality` 2 failed |
+| `500d-extra-base.log` | `5f17b92fe7` | the same seven, id for id |
+| `500d-merge-check.log` | `7232ec0` (the merged tree; the file is `7a35416`'s, from the #285/#312 chat) | `tests/lattices/test_the_isotropic_reduction_image.sage`'s five new cusp-chamber tests under this issue's changes: **5 passed in 942.10 s**, the chamber test 938.17 s past the 20 s call gate (`--no-time-gates`, as `7a35416` measured 907.97 s). The whole file run without `-k` was cut at a 1500 s cap after eleven tests had passed and none failed |
+
+The probe sources behind the `500d-*` measurement logs are session probes, not
+library code, and stay out of the tree: each prints the rings, the values and the
+class that answered, so the log carries every reading it is cited for.
+## #285: the cusp group carries Sterk's printed chamber onto the returned one
+
+`tests/lattices/test_the_isotropic_reduction_image.sage` gains
+`test_each_cusps_chamber_is_sterks_under_an_element_of_the_cusp_group`. At each of Sterk's five cusps it asks the
+library's `O(N).transporter` for one isometry of `N = v^⊥/Zv` carrying the card's printed wall vectors onto the
+walls `cusp_chamber()` returns (the transporter searches the diagram's own symmetries and solves each exact linear
+system, so no reindexing is chosen by hand), and then asks the image's `contains` — the discriminant criterion
+`ρ(g) ∈ ρ(K_v)ρ(Γ_{En,2})`, one sift, no element list — whether that isometry lies in the cusp group `G_v`. The
+answer is yes at all five, so Sterk's published simple roots are the returned ones moved by an element of `G_v`,
+which is #285's clause; equal Gram matrices left exactly this open. The whole file, all 17 tests, runs in the image
+job `isotropic-reduction-image-tests.yml`, which no turn waits on; the rows below are the run at one cusp each and
+the lint, which is what a turn's feedback loop allows.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue285-transporter-final.log` | `7a35416` plus the test change of this commit (uncommitted at the time of the run) | the new test's own body — the module's helpers and the module's assertions — at (4.3.5) and (4.3.9): 12 printed and 12 returned walls with the transporter carrying one family onto the other and `contains` `True` in 219.9 s, and 14 and 14 with `contains` `True` in 212.4 s; the two families differ as sets of walls at both cusps; the probe's whole run 436 s, peak tree RSS 1757 MiB on the pinned image with the indefinite port at `/work` |
+| `issue285-transporter-435.log` | the same working tree | (4.3.5): chamber and printed family in 230.8 s, 12 walls each, 9 positions coincide, the transporter found in 0.1 s and `contains` `True` in 0.7 s |
+| `issue285-transporter-four.log` | the same working tree | (4.3.6), (4.3.7), (4.3.8), (4.3.9) in one process: chambers in 234.7, 176.7, 181.3 and 197.8 s; 10, 12, 11 and 14 walls with 6, 2, 1 and 0 positions coinciding; the transporter in 0.1–0.2 s and `contains` `True` in 0.7–1.9 s at every one; the probe 802 s, peak tree RSS 956 MiB. This run compares the two families sign-insensitively, which is the earlier form of the assertion; the isometry it reads is the same object the committed test asserts, and the sign-sensitive comparison is the row above |
+| `issue285-transporter-lint.log` | the same working tree | `python -m sage_extensions.testing.test_lint tests/lattices/test_the_isotropic_reduction_image.sage`: **1 files, 0 findings** in 4.0 s |
+
+The probe sources behind these logs are session probes, not library code, and stay out of the tree: each execs the
+test file through `sage.repl.preparse` and runs the test's body for the cusps named on its command line, or prints
+the chamber, the transporter and the membership answer at one cusp.

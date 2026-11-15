@@ -1653,25 +1653,35 @@ class Modules(OwnedCategoryOverBaseRing):
         def order_ideal(self):
             r"""Return ``O_M(v) = {phi(v) : phi in Hom_R(M,R)}``.
 
-            This is the image ideal of evaluation at this element. The
-            represented computation uses generators of the linear dual;
-            it does not require a chosen basis of ``M``.
+            This is the image ideal of evaluation at this element, an ideal of
+            the scalar ring ``R``: the linear functionals on a vector take values
+            in the ring they map into, so on a ring read as a module over its
+            base ring this is an ideal of that base ring and not of the ring
+            itself.
+
+            The values are the module's pairing ``M^* x M -> R``
+            (:meth:`dual_evaluation`) at the functionals that generate the
+            evaluation image; which shape the linear dual takes is the module's
+            business, and this operation does not ask.  The intrinsic ideal is
+            the same one the chosen basis computes as its coordinates
+            (:meth:`FramedFreeModules.ElementMethods.order_ideal
+            <sage_extensions.categories.modules.framed.framed_free_modules.FramedFreeModules.ElementMethods.order_ideal>`)
+            when the module is free on that basis.
+
+            EXAMPLES::
+
+                sage: ring = ZZ['x']
+                sage: x = ring.algebra_generator('x')
+                sage: (2 * x + 2).order_ideal() == ZZ.ideal(2)
+                True
             """
             module = self.parent()
             ring = module.base_ring()
-            dual = module.dual_module()
-            regular = dual.codomain()
-            evaluation = Modules(ring).Mor(dual, regular)(
-                lambda label: dual.module_generator(label)(self)
+            assert ring in OwnedRings().Commutative(), (
+                f"the order ideal O_M(v) is an ideal of the scalar ring, and R = {ring} is not "
+                "known to be commutative"
             )
-            image = evaluation.image()
-            regular_label = regular.module_generating_set()[0]
-            return ring.ideal(
-                *(
-                    image.inclusion()(generator).to_vector()(regular_label)
-                    for generator in image.module_generators()
-                )
-            )
+            return ring.ideal(*module.dual_evaluation_image_generators(self))
 
         def __rmul__(self, scalar):
             r"""Return ring multiplication or the left module scalar action.
@@ -2616,8 +2626,12 @@ class Modules(OwnedCategoryOverBaseRing):
             r"""Read the coefficients of the chosen preimage of ``element`` under the framing.
 
             Protected contract of ``Modules(R)``. Permitted callers are
-            :meth:`_framing_lift` and module coordinate-transport or morphism
-            evaluation constructors already holding an owned framing vector.
+            :meth:`_framing_lift`, :meth:`_dual_coefficients` (the pairing
+            :meth:`dual_evaluation` and the evaluation image
+            :meth:`dual_evaluation_image_generators` read a vector only through
+            the coordinates the construction retained), and module
+            coordinate-transport or morphism evaluation constructors already
+            holding an owned framing vector.
             The localized-module equality predicate also reads the stored
             coordinates of an actual free source vector to test whether its
             finitely many coefficients vanish after localization.
@@ -3034,6 +3048,10 @@ class Modules(OwnedCategoryOverBaseRing):
             retained as that construction rather than as a free module on the
             labels.  A finite basis needs no product: there the dual is the
             free module of the same rank.
+
+            This is the selected datum that fixes which of the dual's two shapes
+            exists for this module; it is read by :meth:`dual_module` and by the
+            pairing :meth:`dual_evaluation`, and by no consumer of either.
             """
             if not self.has_selected_module_resolution():
                 return None
@@ -3051,37 +3069,113 @@ class Modules(OwnedCategoryOverBaseRing):
             return Modules(ring)._categorical_product_construction(factors)
 
         def dual_evaluation(self, functional, vector):
-            r"""Return the pairing ``M^* x M -> R`` evaluated at ``vector``.
+            r"""Return the pairing ``M^* x M -> R`` at a functional and a vector.
 
-            A vector is a finitely supported function on the chosen basis
-            labels, so its value under the functional is the finite sum of its
-            coefficients against the functional's projections.  No basis of the
-            dual is chosen: for an infinite basis the dual is the product, whose
-            projections are its defining data.
+            The functional is an element of :meth:`dual_module` in whichever of
+            its two shapes that module takes, and the value is the ring element
+            it assigns to ``vector``.  A vector is a finitely supported function
+            on the chosen basis labels, so its value under a functional of the
+            product ``prod_S R`` is the finite sum of its coordinates against the
+            functional's projections; no basis of the dual is chosen there.  A
+            functional of the module-of-functionals shape is applied to the
+            vector directly, its value being an element of the regular rank-one
+            module.
+
+            This is the module's one pairing: :meth:`dual_evaluation_image_generators`
+            reads the evaluation image through it, and no consumer needs to know
+            which shape the dual took.
             """
             ring = self.base_ring()
-            construction = self._dual_product_construction()
-            if construction is None:
-                raise TypeError(
-                    f"cannot evaluate {functional} at {vector}: the algebraic dual of {self} is not a "
-                    f"product (its chosen basis is finite or it has none)"
-                )
             to_ring = ring.regular_module_isomorphism()
-            coordinates = self.framing_morphism().lift(self(vector))
-            coefficients = coordinates.parent()._selected_module_coefficients(
-                coordinates
-            )
-            return sum(
-                (
-                    ring(coefficient)
-                    * to_ring(
-                        Modules(ring).product_component(
-                            construction, functional, label
-                        )
+            match self._dual_product_construction():
+                case None:
+                    return to_ring(functional(vector))
+                case construction:
+                    return sum(
+                        (
+                            ring(coefficient)
+                            * to_ring(
+                                Modules(ring).product_component(
+                                    construction, functional, label
+                                )
+                            )
+                            for label, coefficient in self._dual_coefficients(vector).items()
+                        ),
+                        ring.zero(),
                     )
-                    for label, coefficient in coefficients.items()
+
+        def dual_evaluation_image_generators(self, vector):
+            r"""Return the pairing's values at ``vector`` that generate its image ideal.
+
+            ``O_M(vector) = {phi(vector) : phi in M^*}`` is the image of the
+            linear map ``M^* -> R``, ``phi |-> phi(vector)``, so it is generated
+            by the values at any family spanning that source.  The two shapes of
+            :meth:`dual_module` supply such a family differently.
+
+            A dual that is the module of functionals into ``{}_R R`` carries a
+            chosen presentation, and the values at its generators generate the
+            image.  A dual that is the product ``prod_S R`` has no presentation
+            at all: the algebraic dual of a free module on an infinite basis is
+            not generated by its points.  It still gives the image, because a
+            vector is a finite sum ``sum_s a_s e_s`` and
+            ``phi(vector) = sum_s a_s phi(s)`` reads only the finitely many
+            coordinates ``a_s`` the construction retained.  The coordinate
+            functionals at those labels therefore generate the image, and each
+            of them attains its own coordinate.
+            """
+            ring = self.base_ring()
+            assert ring in OwnedRings().Commutative(), (
+                f"the dual of {self} is a module over the scalar ring, and reading its values "
+                f"needs R = {ring} to be commutative"
+            )
+            match self._dual_product_construction():
+                case None:
+                    dual = self.dual_module()
+                    functionals = tuple(
+                        dual.module_generator(label)
+                        for label in dual.module_generating_set()
+                    )
+                case construction:
+                    functionals = tuple(
+                        self._dual_coordinate_functional(construction, label)
+                        for label in self._dual_coefficients(vector)
+                    )
+            return tuple(
+                self.dual_evaluation(functional, vector) for functional in functionals
+            )
+
+        def _dual_coefficients(self, vector):
+            r"""Return the retained coordinate family of ``vector`` in the chosen basis.
+
+            Protected contract of ``Modules(R)`` under ``OWN-05``.  Its callers
+            are the pairing :meth:`dual_evaluation` and
+            :meth:`dual_evaluation_image_generators`: both read a vector only
+            through the finitely many coordinates the construction retained, and
+            both need them labelled by the chosen generating set rather than as a
+            free vector.  Coefficients outside the family are zero, so the family
+            contains the support without deciding it.
+            """
+            coordinates = self.framing_morphism().lift(self(vector))
+            return coordinates.parent()._selected_module_coefficients(coordinates)
+
+        def _dual_coordinate_functional(self, construction, label):
+            r"""Return the coordinate functional ``e_label^*`` of the product dual.
+
+            ``e_label^*`` is the point of ``prod_S R`` that is ``1`` at ``label``
+            and ``0`` at every other label.  Its components are the product's
+            projections, and ``product_element`` assembles a point from them, so
+            the functional is stated in the product's own defining data rather
+            than as a function on the module.
+            """
+            ring = self.base_ring()
+            return Modules(ring).product_element(
+                construction,
+                IndexedFamily(
+                    self.module_generating_set(),
+                    lambda candidate, chosen=label: (
+                        ring.one() if candidate == chosen else ring.zero()
+                    ),
                 ),
-                ring.zero(),
             )
 
         def dual_module(self):
@@ -3093,6 +3187,13 @@ class Modules(OwnedCategoryOverBaseRing):
             construction.  The commutative case is the internal Mor into the
             regular rank-one module and inherits its selected presentation
             whenever the endpoint data represent one.
+
+            The result takes one of two shapes, and :meth:`dual_evaluation`
+            pairs with it in both: a module of functionals carrying a chosen
+            presentation when the chosen basis is finite, and the product
+            ``prod_S R`` when it is infinite.  Those are one dual, stated in the
+            shape its module algebra has, and consumers read it through the
+            pairing rather than through the shape.
             """
             ring = self.base_ring()
             if ring not in OwnedRings().Commutative():

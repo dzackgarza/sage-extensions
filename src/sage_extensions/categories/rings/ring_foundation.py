@@ -3555,6 +3555,54 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
             r"""Hopkins–Levitzki: a left Artinian unital ring is left Noetherian."""
             return [OwnedRings().Noetherian()]
 
+    class Finite(CategoryWithAxiom):
+        r"""Finite rings: the underlying set of the ring is finite.
+
+        A finite ring is placed among the finite sets, and its points are a
+        finite set -- a fact about the ring, not about the engine that happens
+        to realize it (``ARC-08``).  Enumerating the points of a ring is stated
+        here rather than on the general ring category: an infinite ring's points
+        are not a finite iteration, so the general ring states no enumeration of
+        them at all (``STY-48``, ``STY-89``).  The algorithm that lists them
+        reads the realization the ring was constructed with; which points those
+        are is fixed by the construction, never by the engine's class.
+        """
+
+        @classmethod
+        def _repr_object_names(cls):
+            return "finite rings"
+
+        def an_object(self):
+            r"""The field of two elements."""
+            return GF(2)
+
+        def extra_super_categories(self):
+            r"""A finite ring's underlying set is finite."""
+            return [owned_sets.FiniteSets()]
+
+        class ParentMethods:
+            def __iter__(self):
+                r"""Enumerate the points of the ring through its selected engine.
+
+                The ring is a finite set, so its points are the values of the
+                engine that realizes it, each read back as an element of this
+                ring.  Ring adjunction syntax is implemented by ``__getitem__``
+                and is not an enumeration protocol, so this is the ring's whole
+                enumeration of its points.
+
+                The hypothesis of this algorithm is that the construction
+                retained a distinct engine whose values are the ring's points.
+                It is asserted, as an algorithmic hypothesis of the listing
+                (``STY-49``), and not reported as a mathematical statement about
+                the ring: the ring is finite either way.
+                """
+                engine = self._selected_engine_ring()
+                assert engine is not None and engine is not self, (
+                    f"cannot list the points of {self}: its construction retains no distinct "
+                    "engine whose values are the ring's points"
+                )
+                return iter(_owned_engine_element(self, point) for point in engine)
+
     class Commutative(CategoryWithAxiom):
         r"""Commutative unital rings in the owned mathematical graph."""
 
@@ -4257,15 +4305,16 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
         itself.
 
         The operator is the coercion model's ``Element.__truediv__``: it brings
-        both operands into one parent and asks ``_div_`` there, so \(a / b\) is
-        computed in the parent the two elements have in common, which is the ring
-        exactly when the divisor is one of its units.  Where it is not, the
-        answer is the one the element realization that computes the division
-        gives: an engine-backed ring divides in its engine, and the quotient may
-        land in a larger parent -- \(\mathbf{Z}(3) / 2 = 3/2\) is an element of
-        \(\mathbf{Q}\) and not of \(\mathbf{Z}\); an exact field decides its zero
-        and undecided-nonzero denominators before dividing; and a realization
-        with neither keeps \(a b^{-1}\) from the monoid level
+        both operands into one parent and asks ``_div_`` there.  That parent is
+        the one the operands meet in, and the quotient need not stay in it:
+        \(\mathbf{Z}(3) / 2\) divides in \(\mathbf{Z}\), where \(3\) and the
+        numeral \(2\) meet, and the answer \(3/2\) is an element of
+        \(\mathbf{Q}\) because the realization's ``_div_`` says where the
+        quotient lands.  The realization that computes the division therefore
+        owns the codomain: an engine-backed ring divides in its engine and reads
+        the quotient in the parent the engine put it in; an exact field decides
+        its zero and undecided-nonzero denominators before dividing; and a
+        realization with neither keeps \(a b^{-1}\) from the monoid level
         (``sage.categories.monoids.Monoids.ElementMethods._div_``).  What a ring
         element never answers is the module's \(b^{-1} a\).
         """
@@ -4277,23 +4326,27 @@ class OwnedRings(CategoryPacketMethods, OwnedCategory):
         __truediv__ = Element.__truediv__
 
     class ParentMethods:
-        def __iter__(self):
-            r"""Enumerate the points of a finite owned ring through its selected engine.
+        r"""A ring's points are not a sequence, so the general ring states no ``__iter__``.
 
-            Ring adjunction syntax is implemented by ``__getitem__`` and is
-            not an enumeration protocol. For a finite ring, the selected
-            engine already enumerates the underlying points; expose those
-            points as owned elements instead of allowing Python's sequence
-            fallback to repeatedly return the ring itself.
-            """
-            from sage_extensions.categories.sets.set_categories import FiniteSets
+        A ring states an enumeration of its points only where its points are a
+        finite set, which is :class:`OwnedRings.Finite`; an iterator need not be
+        finite, and $\mathbf{Z}$, $\mathbf{Z}[x]$ and $\mathbf{Q}(i)$ are
+        countable, so the general ring has no enumeration to offer and states
+        none rather than refusing one.
 
-            if self not in FiniteSets():
-                raise TypeError(f"cannot enumerate {self}: it is not placed among finite sets")
-            engine = self._selected_engine_ring()
-            if engine is None or engine is self:
-                raise TypeError(f"cannot enumerate {self}: no selected finite engine enumeration is available")
-            return iter(_owned_engine_element(self, point) for point in engine)
+        ``__iter__ = None`` states that in the language rather than in a method
+        of ours.  ``__getitem__`` is the adjunction syntax
+        ``R[x_1, ..., x_n]`` and not an index into a sequence, so with
+        ``__iter__`` merely absent Python's sequence fallback would read that
+        construction as iteration -- ``ZZ['x'][0]`` is the ring itself, so
+        ``tuple(ZZ['x'])`` would hand the ring back forever.  Setting the
+        special method to ``None`` states that the operation is not available:
+        ``iter()`` then raises ``TypeError`` without falling back to
+        ``__getitem__`` (Python Language Reference, Data Model, §3.3, "Special
+        method names", on setting a special method to ``None``).
+        """
+
+        __iter__ = None
 
         def _coerce_map_from_(self, source):
             r"""Return the canonical map from ``source`` into this ring, where the ring states one.
@@ -6456,6 +6509,15 @@ class _OwnedRingParent(Parent):
                 from sage_extensions.owned_category import owned_category_join
 
                 placement = owned_category_join((placement, category))
+            # A ring whose placement states a finite underlying set is a finite
+            # ring, and that is an axiom of the ring rather than a method of the
+            # general ring category (STY-48).  The placement states the
+            # finiteness -- the constructor's statement, never the engine's
+            # class (ARC-08) -- and the axiom joins it here rather than after
+            # construction: the finite level is read by construction steps that
+            # run in the hooks below, and a post-construction refinement is too
+            # late for them (OWN-03, OWN-23).
+            placement = _with_finite_ring_axiom(placement)
             # This is the root of the owned ring construction chain. Let the
             # host Parent initialize cooperatively here, exactly once; levels
             # above this one reach it through super().__init__.
@@ -6503,7 +6565,7 @@ class _OwnedRingParent(Parent):
                 )
                 if category is not None:
                     placement = owned_category_join((placement, category))
-                refine(self, placement)
+                refine(self, _with_finite_ring_axiom(placement))
             _install_self_module_placement(self)
         except BaseException:
             # A failed constructor cannot leave its incomplete owned ring in
@@ -6643,32 +6705,31 @@ class _OwnedRingParent(Parent):
         return value in self._engine
 
     def _coerce_map_from_(self, source):
-        r"""Return the represented canonical scalar map into this ring.
+        r"""Return the represented canonical scalar map this realization itself owns.
 
         Between owned rings the engine decides whether its canonical ring map
-        exists.  The other canonical sources are the initial semiring NN, whose
-        unique unital semiring morphism into a unital ring is represented by the
-        semiring category itself rather than by a ring-specific exception, and
-        the integers, whose unique unital ring morphism \(n \mapsto n\cdot 1\)
-        every unital ring receives.  This realization answers the canonical
-        sources it knows before the ring category states them, so it states the
-        integer one itself: a numeral is how a session writes a scalar
-        (``a / 2``, ``2 * a``), and a session's literal is its own integer,
-        while a Python caller's is an ``int`` under the Python type itself
-        (``sage.structure.element.parent`` answers ``int`` for an ``int``).
+        exists, and the initial semiring NN is represented by the semiring
+        category's own morphism; those two are the sources this realization
+        answers.  Every other canonical source is the ring category's to state,
+        and it is asked last: a ring's unique unital ring morphism
+        \(n \mapsto n\cdot 1\) from the integers is stated once, on
+        :class:`OwnedRings`, and a second copy here would be a second authority
+        for it (``OWN-19``).  A numeral still reaches the ring -- a session's
+        literal is its own integer and a Python caller's is an ``int`` under the
+        Python type itself (``sage.structure.element.parent`` answers ``int``
+        for an ``int``) -- through the category's hook, which this method now
+        defers to.
 
-        A raw Sage integer is not this: it stays outside the owned universe and
+        A raw Sage integer is not that: it stays outside the owned universe and
         :meth:`_element_constructor_` refuses it.
         """
         match source:
-            case _ if source is int or source is _owned_integers():
-                return _owned_ring_from_integer
             case _ if source in OwnedRings():
                 return self._engine.has_coerce_map_from(_engine_ring(source))
             case _ if source is OwnedSemirings().initial_object():
                 return OwnedSemirings().initial_morphism(self)
             case _:
-                return None
+                return super()._coerce_map_from_(source)
 
     def zero(self):
         return self._from_engine_element(self._engine.zero())
@@ -7271,6 +7332,23 @@ def _real_or_complex_field_placements() -> tuple[Category, ...]:
     r"""The placement of ``RDF``, ``CDF`` and ``CC``: they present ``RR`` or
     ``CC``, uncountable fields."""
     return (*_field_placements(), owned_sets.UncountableSets())
+
+
+def _with_finite_ring_axiom(placement: Category) -> Category:
+    r"""Return ``placement`` with the finite-ring axiom when it states a finite underlying set.
+
+    Finiteness is the ring constructor's statement about the ring, and it is in
+    the placement that constructor selects -- never read off the engine's class
+    (``ARC-08``).  The axiom that carries the enumeration of a finite ring's
+    points is part of the category the host constructor receives, at every level
+    that fixes the placement, so that no later construction step reads the
+    finite level of an object that has not reached it (``OWN-03``, ``OWN-23``).
+    """
+    if not placement.is_subcategory(owned_sets.FiniteSets()):
+        return placement
+    from sage_extensions.owned_category import owned_category_join
+
+    return owned_category_join((placement, OwnedRings().Finite()))
 
 
 def _owned_ring_category(

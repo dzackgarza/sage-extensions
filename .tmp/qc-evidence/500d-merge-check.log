@@ -1,0 +1,10 @@
+=== ran on: 7232ec048b63836078882b2c4643025531f9362c (the merged tree; the file is 7a35416's and unchanged by this issue)
+=== command: pytest -p qc_sage_session -p sage_extensions.testing.suite_budget tests/lattices/test_the_isotropic_reduction_image.sage -k "printed_gram or pair_nonnegatively or lattice_sterks_lemma or chambers_reflections or admitted_reflection" -o addopts= --no-time-gates -q --tb=line
+=== note: the same file run whole, without -k, was cut at a 1500 s cap after eleven tests had passed and none had failed (dots only, no failure summary); the five tests selected here are the slow ones that run after them, and 7a35416 records them as 5 passed in 907.97 s with the chamber test at 904.05 s
+tree: 7232ec048b63836078882b2c4643025531f9362c
+command: pytest -k the five new cusp-chamber tests --no-time-gates
+.....                                                                    [100%]
+========================== test-call performance gate ==========================
+tests/lattices/test_the_isotropic_reduction_image.sage::test_the_chamber_at_each_cusp_has_sterks_printed_gram_and_diagram: 938.17 s > 20 s
+5 passed, 11 deselected in 942.10s (0:15:42)
+exit: 0

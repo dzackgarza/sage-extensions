@@ -1,0 +1,50 @@
+provider SHA: 9bc11855f51df06a4ccaecb13c5ffbe6c0647f4a
+port SHA: 991b88b0
+command: python /probe500.py
+python: 3.14.10
+=== onto ZZ['x']
+  has_coerce_map_from(int): True
+    -> coerced value: None
+  has_coerce_map_from(ZZ): True
+    -> coerced value: 1
+  has_coerce_map_from(QQ): False
+    -> coerced value: RAISED TypeError: no canonical coercion from Fraction Field of Integer Ring to Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring
+  has_coerce_map_from(QQ(i)): False
+    -> coerced value: RAISED TypeError: no canonical coercion from Free module on {1, a} over Fraction Field of Integer Ring to Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring
+  has_coerce_map_from(ZZ['x']): True
+    -> coerced value: x
+  has_coerce_map_from(module ZZ**2): False
+    -> coerced value: RAISED TypeError: no canonical coercion from Free module on {[0], [1]} over Integer Ring to Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring
+  _coerce_map_from_ owner: 'sage_extensions.categories.rings.ring_foundation._OwnedRingParent'
+
+=== onto QQ(i)
+  has_coerce_map_from(int): True
+    -> coerced value: None
+  has_coerce_map_from(ZZ): True
+    -> coerced value: 1
+  has_coerce_map_from(QQ): True
+    -> coerced value: 0
+  has_coerce_map_from(QQ(i)): True
+    -> coerced value: a
+  has_coerce_map_from(ZZ['x']): False
+    -> coerced value: RAISED TypeError: no canonical coercion from Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring to Free module on {1, a} over Fraction Field of Integer Ring
+  has_coerce_map_from(module ZZ**2): False
+    -> coerced value: RAISED TypeError: no canonical coercion from Free module on {[0], [1]} over Integer Ring to Free module on {1, a} over Fraction Field of Integer Ring
+  _coerce_map_from_ owner: 'sage_extensions.categories.rings.ring_foundation._OwnedRingParent'
+
+=== onto M_2(QQ)
+  has_coerce_map_from(int): True
+    -> coerced value: None
+  has_coerce_map_from(ZZ): True
+    -> coerced value: Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring
+  has_coerce_map_from(QQ): False
+    -> coerced value: RAISED TypeError: no canonical coercion from Fraction Field of Integer Ring to Free module on {Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring, Generic endomorphism of Free module 
+  has_coerce_map_from(QQ(i)): False
+    -> coerced value: RAISED TypeError: no canonical coercion from Free module on {1, a} over Fraction Field of Integer Ring to Free module on {Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring, Generic e
+  has_coerce_map_from(ZZ['x']): False
+    -> coerced value: RAISED TypeError: no canonical coercion from Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring to Free module on {Generic endomorphism of Free module on {[0], [1]} over Fraction Field of
+  has_coerce_map_from(module ZZ**2): False
+    -> coerced value: RAISED TypeError: no canonical coercion from Free module on {[0], [1]} over Integer Ring to Free module on {Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring, Generic endomorphism of
+  _coerce_map_from_ owner: 'sage_extensions.categories.rings.ring_foundation.OwnedRings.ParentMethods'
+
+launcher exit: 0

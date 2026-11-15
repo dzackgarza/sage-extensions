@@ -1,0 +1,35 @@
+provider SHA: 8f6d5cfa7a1a11466bf771c0e84b01b3b35bcd99
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q --tb=short tests/lattices/test_the_isotropic_reduction_image.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+...........                                                              [100%]
+=============================== warnings summary ===============================
+tests/lattices/test_the_isotropic_reduction_image.sage: 396 warnings
+  /repos/vinal/src/sage/vinal.py:193: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m2 = np.dot( np.dot(g, s.M), g.transpose())
+
+tests/lattices/test_the_isotropic_reduction_image.sage: 396 warnings
+  /repos/vinal/src/sage/vinal.py:194: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    m1 = np.dot( np.dot( Matrix(a), s.M), g.transpose() )
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================== test-call performance gate ==========================
+tests/lattices/test_the_isotropic_reduction_image.sage::test_two_lifts_of_a_wall_reflection_differ_by_the_kernel_and_get_one_answer: 239.08 s > 20 s
+tests/lattices/test_the_isotropic_reduction_image.sage::test_sterks_published_cusp_roots_are_reflections_of_the_stabilizer_image: 294.36 s > 20 s
+tests/lattices/test_the_isotropic_reduction_image.sage::test_every_cusp_chamber_has_the_wall_count_of_its_card_row: 547.53 s > 20 s
+tests/lattices/test_the_isotropic_reduction_image.sage::test_each_of_the_fourth_cusps_first_layers_agrees_with_the_whole_lattice_in_the_cell: 30.50 s > 20 s
+11 passed, 792 warnings in 1168.99s (0:19:28)
+[peakrss] run: child waited=0 shell_code=0 samples=591
+[peakrss] peak tree RSS      : 1960 MiB
+[peakrss] low-water MemAvail : 5777 MiB
+[peakrss] peak single VmHWM  : 1964 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1947 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=   648.4s procs=  5 rss=  1960 MiB hwm=  1964 MiB avail=  8732 MiB
+[peakrss]   t=   650.4s procs=  5 rss=  1960 MiB hwm=  1964 MiB avail=  8752 MiB
+[peakrss]   t=   652.4s procs=  5 rss=  1960 MiB hwm=  1964 MiB avail=  8785 MiB
+[peakrss]   t=   654.4s procs=  5 rss=  1959 MiB hwm=  1964 MiB avail=  8812 MiB
+[peakrss]   t=   646.4s procs=  5 rss=  1938 MiB hwm=  1942 MiB avail=  8786 MiB

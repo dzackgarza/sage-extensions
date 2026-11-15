@@ -1,0 +1,16 @@
+provider SHA: 1b8358c2615488dcf3939ca0454c4dbf205b3340
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session tests/lattices/test_reflection_rational_line.sage -o addopts= -q --tb=no -rf
+....                                                                     [100%]
+4 passed in 1.70s
+[peakrss] run500-mine500-reflection: child waited=0 shell_code=0 samples=2
+[peakrss] peak tree RSS      : 309 MiB
+[peakrss] low-water MemAvail : 11591 MiB
+[peakrss] peak single VmHWM  : 309 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      299 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     2.0s procs=  3 rss=   309 MiB hwm=   309 MiB avail= 11591 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     2 MiB hwm=     2 MiB avail= 11786 MiB
+launcher exit: 0

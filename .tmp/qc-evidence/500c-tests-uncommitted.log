@@ -1,0 +1,71 @@
+provider SHA: ef39a9bfbbbab52431a8f7c1e8a666be34b5fd36
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session tests/categories/test_the_refined_category_answers_with_its_own_operation.sage tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage tests/rings/test_elements_divide_in_their_own_ring.sage
+============================= test session starts ==============================
+platform linux -- Python 3.14.10, pytest-9.1.1, pluggy-1.7.0
+time gates on: star import 0.25 s (ceiling 3 s), collection ceiling 6 s, each test call ceiling 20 s
+rootdir: /repos/sage-extensions
+configfile: pyproject.toml
+plugins: asyncio-1.5.0, xdist-3.8.0, reportlog-1.0.0, platformdirs-4.13.5, hypothesis-6.170.15, anyio-4.15.1, timeout-2.4.0, cov-7.1.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+timeout: 60.0s
+timeout method: signal
+timeout func_only: False
+collected 10 items
+
+tests/categories/test_the_refined_category_answers_with_its_own_operation.sage . [ 10%]
+..                                                                       [ 30%]
+tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage . [ 40%]
+.                                                                        [ 50%]
+tests/rings/test_elements_divide_in_their_own_ring.sage .....            [100%]
+
+------ generated xml file: /repos/sage-extensions/tests/.report/junit.xml ------
+-------------- generated report log file: tests/.report/run.jsonl --------------
+========================== test-call performance gate ==========================
+tests/rings/test_elements_divide_in_their_own_ring.sage::test_a_field_states_its_reciprocal_as_its_division_of_one: 20.04 s > 20 s
+============================== slowest durations ===============================
+20.04s call     tests/rings/test_elements_divide_in_their_own_ring.sage::test_a_field_states_its_reciprocal_as_its_division_of_one
+0.20s call     tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_the_module_level_states_the_order_ideal_of_an_algebra_element
+0.05s call     tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_a_finite_ring_enumerates_its_points_through_its_engine
+0.04s call     tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_an_integer_polynomial_is_the_ideal_of_its_coefficients
+0.03s call     tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_the_ring_states_the_completion_of_the_field_at_the_zero_ideal
+0.03s call     tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_a_rational_polynomial_is_the_unit_ideal
+0.03s call     tests/rings/test_elements_divide_in_their_own_ring.sage::test_an_integer_literal_divides_in_the_parent_the_two_share
+0.01s call     tests/rings/test_elements_divide_in_their_own_ring.sage::test_a_matrix_divides_by_the_inverse_of_the_divisor_on_the_right
+0.01s call     tests/rings/test_elements_divide_in_their_own_ring.sage::test_a_nonunit_of_the_scalar_ring_does_not_divide_a_vector
+0.00s call     tests/rings/test_elements_divide_in_their_own_ring.sage::test_a_vector_divides_by_the_unit_inverse_of_its_scalar
+0.00s setup    tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_the_module_level_states_the_order_ideal_of_an_algebra_element
+0.00s setup    tests/rings/test_elements_divide_in_their_own_ring.sage::test_a_field_states_its_reciprocal_as_its_division_of_one
+0.00s teardown tests/rings/test_elements_divide_in_their_own_ring.sage::test_a_field_states_its_reciprocal_as_its_division_of_one
+0.00s setup    tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_a_finite_ring_enumerates_its_points_through_its_engine
+0.00s setup    tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_a_rational_polynomial_is_the_unit_ideal
+0.00s setup    tests/rings/test_elements_divide_in_their_own_ring.sage::test_a_vector_divides_by_the_unit_inverse_of_its_scalar
+0.00s setup    tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_the_ring_states_the_completion_of_the_field_at_the_zero_ideal
+0.00s setup    tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_an_integer_polynomial_is_the_ideal_of_its_coefficients
+0.00s setup    tests/rings/test_elements_divide_in_their_own_ring.sage::test_a_matrix_divides_by_the_inverse_of_the_divisor_on_the_right
+0.00s setup    tests/rings/test_elements_divide_in_their_own_ring.sage::test_an_integer_literal_divides_in_the_parent_the_two_share
+0.00s setup    tests/rings/test_elements_divide_in_their_own_ring.sage::test_a_nonunit_of_the_scalar_ring_does_not_divide_a_vector
+0.00s teardown tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_the_module_level_states_the_order_ideal_of_an_algebra_element
+0.00s teardown tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_a_finite_ring_enumerates_its_points_through_its_engine
+0.00s teardown tests/categories/test_the_refined_category_answers_with_its_own_operation.sage::test_the_ring_states_the_completion_of_the_field_at_the_zero_ideal
+0.00s teardown tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_an_integer_polynomial_is_the_ideal_of_its_coefficients
+0.00s teardown tests/rings/test_elements_divide_in_their_own_ring.sage::test_an_integer_literal_divides_in_the_parent_the_two_share
+0.00s teardown tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage::test_the_order_ideal_of_a_rational_polynomial_is_the_unit_ideal
+0.00s teardown tests/rings/test_elements_divide_in_their_own_ring.sage::test_a_nonunit_of_the_scalar_ring_does_not_divide_a_vector
+0.00s teardown tests/rings/test_elements_divide_in_their_own_ring.sage::test_a_matrix_divides_by_the_inverse_of_the_divisor_on_the_right
+0.00s teardown tests/rings/test_elements_divide_in_their_own_ring.sage::test_a_vector_divides_by_the_unit_inverse_of_its_scalar
+============================= 10 passed in 21.14s ==============================
+[peakrss] run500-iter500-tests: child waited=1 shell_code=1 samples=13
+[peakrss] peak tree RSS      : 2439 MiB
+[peakrss] low-water MemAvail : 8985 MiB
+[peakrss] peak single VmHWM  : 2452 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   julia                      2108 MiB peak
+[peakrss]   python                      332 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    22.0s procs=  4 rss=  2439 MiB hwm=  2439 MiB avail=  8985 MiB
+[peakrss]   t=    24.0s procs=  4 rss=  2399 MiB hwm=  2452 MiB avail=  9004 MiB
+[peakrss]   t=    20.0s procs=  4 rss=  2343 MiB hwm=  2343 MiB avail=  9110 MiB
+[peakrss]   t=    18.0s procs=  4 rss=  2241 MiB hwm=  2241 MiB avail=  9243 MiB
+[peakrss]   t=    16.0s procs=  4 rss=  2087 MiB hwm=  2136 MiB avail=  9553 MiB

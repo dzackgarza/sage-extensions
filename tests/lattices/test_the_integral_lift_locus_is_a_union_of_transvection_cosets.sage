@@ -28,16 +28,24 @@ in this session is an owned set and an owned set is not equal to a Python one.
 from sage_extensions.all import *  # noqa: F401,F403
 
 
-def _marked_line_lift_torsor(lattice):
-    r"""The first basis line of ``lattice`` and the lift torsor of its identity reduction.
+def _marked_line_lift_torsor(lattice, marked):
+    r"""The lift torsor of the identity reduction of ``lattice`` at the line spanned by ``marked``.
 
-    The first basis vector of each control below is a primitive isotropic vector, so its line
-    is a rank-one primitive totally isotropic subobject and the reduction is defined.
+    ``marked`` must be a primitive isotropic vector of ``lattice``, so that its line is a
+    rank-one primitive totally isotropic subobject and the reduction along it is defined.
+    """
+    reduction = lattice.primitive_isotropic_subobject(marked).isotropic_reduction()
+    return reduction.rational_lifts(reduction, reduction.Isom(reduction).identity())
+
+
+def _first_basis_line(lattice):
+    r"""The first basis vector of ``lattice``, which is the marked line of the small controls.
+
+    The first basis vector of each control whose marked vector is not given below is a
+    primitive isotropic vector.
     """
     labels = tuple(lattice.module_generating_set())
-    marked = lattice.module_generator(labels[0])
-    reduction = lattice.primitive_isotropic_subobject(marked).isotropic_reduction()
-    return marked, reduction.rational_lifts(reduction, reduction.Isom(reduction).identity())
+    return lattice.module_generator(labels[0])
 
 
 def _classes_that_lift_integrally(lattice, torsor):
@@ -61,9 +69,15 @@ def _classes_that_lift_integrally(lattice, torsor):
     )
 
 
-def _assert_locus_is_the_integral_classes(lattice, divisibility) -> None:
-    r"""The reported locus is exactly the classes of ``P/mP`` that lift integrally."""
-    marked, torsor = _marked_line_lift_torsor(lattice)
+def _assert_locus_is_the_integral_classes(lattice, divisibility, marked=None) -> None:
+    r"""The reported locus is exactly the classes of ``P/mP`` that lift integrally.
+
+    ``marked`` is the primitive isotropic vector whose line is reduced at; without it the
+    first basis line is taken, which is what the small controls mark.
+    """
+    if marked is None:
+        marked = _first_basis_line(lattice)
+    torsor = _marked_line_lift_torsor(lattice, marked)
     integral_classes = _classes_that_lift_integrally(lattice, torsor)
     zero = torsor.integral_parameter_quotient().codomain().zero()
 
@@ -131,3 +145,27 @@ def test_the_locus_of_a_divisibility_four_control_is_every_class_that_lifts() ->
     lattice = Lattices(ZZ)([[0, 4], [4, 0]]) + Lattices(ZZ)([[2]])
 
     _assert_locus_is_the_integral_classes(lattice, 4)
+
+
+def test_the_locus_of_a_section_with_unequal_smith_steps_is_every_class_that_lifts() -> None:
+    r"""On `U + A3(2)` at a marked line of divisibility two the section's steps are `(4, 2, 2)`.
+
+    The marked vector `-2e0 + 2e1 - e2 + 2e3 - e4` of `U + A3(2)` is primitive isotropic of
+    divisibility two.  Its period is eight, and the section's coordinate matrix has Smith
+    invariants `(1, 2, 2)` over the denominator four, so the saturation
+    `S = {a : s(a) in L'}` is `V(4Z x 2Z x 2Z)` for a `V` that is not the identity.
+
+    Reading the saturation as the cube `4Z x 2Z x 2Z` itself -- which is `S` only when the
+    steps are all equal, as they are in every other control here -- reported 256 of the 512
+    classes of `P/mP`, while every class of this control lifts integrally.  The comparison
+    below is therefore what pins the kernel's reading through `V`, and not only the
+    divisibility of the marked vector.
+    """
+    lattice = Lattices(ZZ)("U") + Lattices(ZZ)([[4, 2, 0], [2, 4, 2], [0, 2, 4]])
+    labels = tuple(lattice.module_generating_set())
+    marked = lattice.linear_combination({
+        label: ZZ(coefficient)
+        for label, coefficient in zip(labels, (-2, 2, -1, 2, -1), strict=True)
+    })
+
+    _assert_locus_is_the_integral_classes(lattice, 2, marked=marked)

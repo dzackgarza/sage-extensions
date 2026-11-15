@@ -1,0 +1,27 @@
+provider SHA: ada50c4feb2cc260dc04d4742a33d661dd6e474f
+command: just test -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q --tb=line tests/lattices/test_two_u_eichler_model.sage
+PYTHONPATH="$HOME/ai-review-ci/tool-artifacts/pytest_plugins${PYTHONPATH:+:$PYTHONPATH}" "$(just -f ~/ai-review-ci/justfiles/sage.just -d . _sage-python)" -m pytest -p qc_sage_session "$@"
+...F.....                                                                [100%]
+=================================== FAILURES ===================================
+E   assert False
+     +  where False = all(<generator object test_approximate_generating_family_uses_exact_two_u_perpendicular_frames.<locals>.<genexpr> at 0x74c64f396bd0>)
+/repos/sage-extensions/tests/lattices/test_two_u_eichler_model.sage:78: assert False
+=========================== short test summary info ============================
+FAILED tests/lattices/test_two_u_eichler_model.sage::test_approximate_generating_family_uses_exact_two_u_perpendicular_frames
+1 failed, 8 passed in 6.04s
+error: recipe `test` failed on line 154 with exit code 1
+[peakrss] run: child waited=1 shell_code=1 samples=6
+[peakrss] peak tree RSS      : 506 MiB
+[peakrss] low-water MemAvail : 9676 MiB
+[peakrss] peak single VmHWM  : 506 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      488 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   just                          4 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   sh                            1 MiB peak
+[peakrss]   t=    10.0s procs=  5 rss=   506 MiB hwm=   506 MiB avail=  9676 MiB
+[peakrss]   t=     8.0s procs=  5 rss=   501 MiB hwm=   501 MiB avail=  9677 MiB
+[peakrss]   t=     6.0s procs=  5 rss=   462 MiB hwm=   462 MiB avail=  9717 MiB
+[peakrss]   t=     4.0s procs=  5 rss=   439 MiB hwm=   439 MiB avail=  9780 MiB
+[peakrss]   t=     2.0s procs=  5 rss=   130 MiB hwm=   130 MiB avail=  9947 MiB

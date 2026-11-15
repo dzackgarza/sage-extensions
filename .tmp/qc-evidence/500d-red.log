@@ -1,0 +1,13 @@
+=== ran on: a clean worktree at 5f17b92fe7370eb8db460d9f6919b99bcb4cd243 with only tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage copied in
+=== command: pytest -p qc_sage_session -o addopts= -q --tb=line tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage
+worktree: 
+base SHA: 5f17b92fe7370eb8db460d9f6919b99bcb4cd243
+F                                                                        [100%]
+=================================== FAILURES ===================================
+E   assert __iter__ is None
+     +  where __iter__ = Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring.__iter__
+/repos/sage-extensions/tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage:38: assert __iter__ is None
+=========================== short test summary info ============================
+FAILED tests/rings/test_a_ring_states_no_enumeration_of_its_points.sage::test_a_polynomial_ring_states_no_enumeration_of_its_points
+1 failed in 1.36s
+exit: 1

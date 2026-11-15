@@ -1,0 +1,38 @@
+=== FAILED ids compared, never counts.  tree: the working tree of 9cfb525c519b41c3cc5b67adc64366aae69f8f96; base: a clean worktree at 5f17b92fe7370eb8db460d9f6919b99bcb4cd243
+=== tree log sweep-mine500d.log  vs  base log sweep-base500d.log
+tests/algebras         tree: 64 failed, 149 passed in 46.23s          base: 64 failed, 149 passed in 45.53s          only-here 0 / only-base 0
+tests/categories       tree: 61 failed, 59 passed in 14.56s           base: 61 failed, 59 passed in 12.66s           only-here 0 / only-base 0
+tests/coble_gamma_co_2_incidence_rows.py tree: no tests ran in 1.35s                    base: no tests ran in 1.36s                    only-here 0 / only-base 0
+tests/coble_kernel_plane_rows.py tree: no tests ran in 1.31s                    base: no tests ran in 1.31s                    only-here 0 / only-base 0
+tests/divisors         tree: 42 failed, 25 passed in 11.23s           base: 42 failed, 25 passed in 11.43s           only-here 0 / only-base 0
+tests/engineering      tree: 2 failed, 6 passed in 25.31s             base: 2 failed, 6 passed in 24.33s             only-here 0 / only-base 0
+tests/enriques_polarization_rows_by_card.py tree: no tests ran in 1.33s                    base: no tests ran in 1.35s                    only-here 0 / only-base 0
+tests/foundations      tree: 2 failed, 6 passed in 4.74s              base: 2 failed, 6 passed in 3.82s              only-here 0 / only-base 0
+tests/functions        tree: 48 failed, 15 passed in 5.37s            base: 48 failed, 15 passed in 5.17s            only-here 0 / only-base 0
+tests/modules          tree: 82 failed, 227 passed, 1 warning in 36.93s base: 82 failed, 227 passed, 1 warning in 35.70s only-here 0 / only-base 0
+tests/objects          tree: 115 failed, 211 passed in 37.13s         base: 115 failed, 211 passed in 35.29s         only-here 0 / only-base 0
+tests/research_issue_388_acceptance.py tree: no tests ran in 0.13s                    base: no tests ran in 0.13s                    only-here 0 / only-base 0
+tests/rings            tree: 74 failed, 260 passed in 35.31s          base: 74 failed, 259 passed in 35.14s          only-here 0 / only-base 0
+tests/sets             tree: 29 failed, 127 passed in 6.28s           base: 29 failed, 127 passed in 5.74s           only-here 0 / only-base 0
+tests/tensors          tree: 19 failed, 24 passed in 3.45s            base: 19 failed, 24 passed in 2.54s            only-here 0 / only-base 0
+tests/test_finite_cosets.py tree: 4 passed in 4.99s                        base: 4 passed in 5.36s                        only-here 0 / only-base 0
+tests/test_finite_form_groups.py tree: 9 passed in 6.77s                        base: 9 passed in 6.73s                        only-here 0 / only-base 0
+tests/test_integer_residue_rings.py tree: 1 passed in 1.17s                        base: 1 passed in 1.12s                        only-here 0 / only-base 0
+tests/test_native_ring_constructions.py tree: 8 passed in 1.80s                        base: 8 passed in 1.78s                        only-here 0 / only-base 0
+tests/test_prime_and_maximal_ideals.py tree: 3 passed in 1.16s                        base: 3 passed in 1.18s                        only-here 0 / only-base 0
+tests/topology         tree: 1 failed in 1.35s                        base: 1 failed in 1.35s                        only-here 0 / only-base 0
+
+=== the same comparison for the lattice content files
+=== tree log sweep-lat-mine500d.log  vs  base log sweep-lat-base500d.log
+tests/lattices/test_content_and_doubling.sage tree: 1 failed, 3 passed in 1.94s              base: 1 failed, 3 passed in 1.94s              only-here 0 / only-base 0
+tests/lattices/test_reflection_rational_line.sage tree: 4 passed in 1.71s                        base: 4 passed in 1.73s                        only-here 0 / only-base 0
+
+=== and for the files that read the dual, the order ideal or a lattice element
+=== tree log sweep-extra500d.log  vs  base log sweep-extra-base500d.log
+tests/forms/test_all_ones_form_correlation.sage tree: 2 passed in 1.39s                        base: 2 passed in 1.39s                        only-here 0 / only-base 0
+tests/forms/test_infinite_form_duality.sage tree: 2 failed in 1.43s                        base: 2 failed in 1.46s                        only-here 0 / only-base 0
+tests/lattices/test_hodge_calculus.sage tree: 3 passed in 1.88s                        base: 3 passed in 1.89s                        only-here 0 / only-base 0
+tests/lattices/test_hyperbolic_space.sage tree: 3 failed in 1.57s                        base: 3 failed in 1.57s                        only-here 0 / only-base 0
+tests/lattices/test_lattice_elements.sage tree: 6 passed in 1.65s                        base: 6 passed in 1.73s                        only-here 0 / only-base 0
+tests/lattices/test_lattice_semantic_api.sage tree: 4 passed in 1.87s                        base: 4 passed in 1.42s                        only-here 0 / only-base 0
+tests/lattices/test_named_lattice_constructions.sage tree: 12 passed in 2.85s                       base: 12 passed in 2.83s                       only-here 0 / only-base 0

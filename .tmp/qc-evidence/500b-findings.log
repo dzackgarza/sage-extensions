@@ -1,0 +1,87 @@
+commit: 6828f810a0007815ab4ec62647483429f46d6ea4
+command: python /repos/sage-extensions/.scratch/issue500/probe_findings.py
+tree: this commit's src and tests
+
+finding 1: the integer coercion is stated once
+  the hook of OwnedRings states the integer case:
+    ('int', '_owned_integers', '_owned_ring_from_integer', 'super', '_coerce_map_from_')
+  the hook of the engine-backed realization does not:
+    ('OwnedRings', '_engine', 'has_coerce_map_from', '_engine_ring', 'OwnedSemirings', 'initial_object', 'initial_morphism', 'super', '_coerce_map_from_')
+  ZZ: _coerce_map_from_(int) -> <function _owned_ring_from_integer at 0x77c37b1d66c0>; the integer case of the ring category answers with <function _owned_ring_from_integer at 0x77c37b1d66c0>
+      _coerce_map_from_(session integer) -> True; a raw Sage integer -> None
+      ZZ(3)/2 in this ring's elements: (3)/(2)
+  QQ: _coerce_map_from_(int) -> <function _owned_ring_from_integer at 0x77c37b1d66c0>; the integer case of the ring category answers with None
+      _coerce_map_from_(session integer) -> <function _owned_ring_from_integer at 0x77c37b1d66c0>; a raw Sage integer -> None
+      ZZ(3)/2 in this ring's elements: (3)/(2)
+  RR: _coerce_map_from_(int) -> None; the integer case of the ring category answers with None
+      _coerce_map_from_(session integer) -> True; a raw Sage integer -> True
+      ZZ(3)/2 in this ring's elements: 3/2
+  CC: _coerce_map_from_(int) -> None; the integer case of the ring category answers with None
+      _coerce_map_from_(session integer) -> True; a raw Sage integer -> True
+      ZZ(3)/2 in this ring's elements: 3/2
+  Zp(5): _coerce_map_from_(int) -> <function _owned_ring_from_integer at 0x77c37b1d66c0>; the integer case of the ring category answers with <function _owned_ring_from_integer at 0x77c37b1d66c0>
+      _coerce_map_from_(session integer) -> True; a raw Sage integer -> None
+      ZZ(3)/2 in this ring's elements: p-adic element with residue 4, valuation 0, precision 20
+  QQ[x]: _coerce_map_from_(int) -> <function _owned_ring_from_integer at 0x77c37b1d66c0>; the integer case of the ring category answers with <function _owned_ring_from_integer at 0x77c37b1d66c0>
+      _coerce_map_from_(session integer) -> True; a raw Sage integer -> None
+      ZZ(3)/2 in this ring's elements: (3)/(2)
+  QQ(i): _coerce_map_from_(int) -> <function _owned_ring_from_integer at 0x77c37b1d66c0>; the integer case of the ring category answers with <function _owned_ring_from_integer at 0x77c37b1d66c0>
+      _coerce_map_from_(session integer) -> True; a raw Sage integer -> None
+      ZZ(3)/2 in this ring's elements: 3/2
+  M_2(QQ): _coerce_map_from_(int) -> <function _owned_ring_from_integer at 0x77c37b1d66c0>; the integer case of the ring category answers with None
+      _coerce_map_from_(session integer) -> <function _owned_ring_from_integer at 0x77c37b1d66c0>; a raw Sage integer -> None
+      ZZ(3)/2 in this ring's elements: Generic endomorphism of Free module on {[0], [1]} over Fraction Field of Integer Ring
+
+finding 2: the value-protocol criterion
+  __truediv__: bookkeeping-or-hook = False
+  __iter__: bookkeeping-or-hook = False
+  order_ideal: bookkeeping-or-hook = False
+  adic_completion: bookkeeping-or-hook = False
+  _div_: bookkeeping-or-hook = True
+  _coerce_map_from_: bookkeeping-or-hook = True
+  __init__: bookkeeping-or-hook = True
+  __eq__: bookkeeping-or-hook = True
+  __ne__: bookkeeping-or-hook = True
+  __hash__: bookkeeping-or-hook = True
+  __call__: bookkeeping-or-hook = True
+  __repr__: bookkeeping-or-hook = True
+  __lt__: bookkeeping-or-hook = True
+  __bool__: bookkeeping-or-hook = True
+  __reduce__: bookkeeping-or-hook = True
+  __getattr__: bookkeeping-or-hook = True
+  __dict__: bookkeeping-or-hook = True
+  __slots__: bookkeeping-or-hook = True
+  __enter__: bookkeeping-or-hook = True
+  __classcall__: bookkeeping-or-hook = True
+  __get__: bookkeeping-or-hook = True
+  the criterion admits 62 names
+
+  the names the rule installs on the class of each of the eight rings
+    ZZ parent: []; dunders outside the value protocol: []
+    ZZ element: []; dunders outside the value protocol: []
+    QQ parent: []; dunders outside the value protocol: []
+    QQ element: []; dunders outside the value protocol: []
+    RR parent: []; dunders outside the value protocol: []
+    RR element: []; dunders outside the value protocol: []
+    CC parent: []; dunders outside the value protocol: []
+    CC element: []; dunders outside the value protocol: []
+    Zp(5) parent: ['_cardinality_decision', '_rank_decision', '_selected_adic_defining_ideal', '_selected_algebra_structure_morphism']; dunders outside the value protocol: []
+    Zp(5) element: []; dunders outside the value protocol: []
+    QQ[x] parent: ['_rank_decision', '_specialized_algebra_with_structure']; dunders outside the value protocol: []
+    QQ[x] element: []; dunders outside the value protocol: []
+    QQ(i) parent: ['__iter__', '_cardinality_decision', '_rank_decision', 'adic_completion']; dunders outside the value protocol: []
+    QQ(i) element: []; dunders outside the value protocol: []
+    M_2(QQ) parent: []; dunders outside the value protocol: []
+    M_2(QQ) element: ['_mul_']; dunders outside the value protocol: []
+
+finding 3: the operations the rule moves, on QQ(i)
+  order_ideal answers: sage_extensions.categories.modules.pure.modules.Modules.ElementMethods.order_ideal
+    (1 + i).order_ideal() = Finitely presented module on 1 module generators over Fraction Field of Integer Ring; == QQ.ideal(1): True
+  __iter__ answers: sage_extensions.categories.rings.ring_foundation.OwnedRings.ParentMethods.__iter__
+    iter(field) raises TypeError: cannot enumerate Free module on {1, a} over Fraction Field of Integer Ring: it is not placed among finite sets
+  adic_completion answers: sage_extensions.categories.rings.ring_foundation.OwnedRings.ParentMethods.adic_completion
+    field.adic_completion(ideal(0)) = Free module on {1, a} over Free module on {1, a} over Fraction Field of Integer Ring
+    completion_source() is field: True
+
+finding 4: the ring contract's sentence
+   What an element of a unital ring is: its quotient by the ring's own law. Division in a ring is multiplication by the inverse of the divisor, \(a / b = a b^{-1}\), so the quotient is taken on the right. For a ring that does not commute this is not \(b^{-1} a\), which is the scalar action of the same element on the ring regarded as a left module over itself. The operator is the coercion model's ``Element.__truediv__``: it brings both operands into one parent and asks ``_div_`` there. That parent is the one the operands meet in, and the quotient need not stay in it: \(\mathbf{Z}(3) / 2\) divides in \(\mathbf{Z}\), where \(3\) and the numeral \(2\) meet, and the answer \(3/2\) is an element of \(\mathbf{Q}\) because the realization's ``_div_`` says where the quotient lands. The realization that computes the division therefore owns the codomain: an engine-backed ring divides in its engine and reads the quotient in the parent the engine put it in; an exact field decides its zero and undecided-nonzero denominators before dividing; and a realization with neither keeps \(a b^{-1}\) from the monoid level (``sage.categories.monoids.Monoids.ElementMethods._div_``). What a ring element never an

@@ -2478,9 +2478,10 @@ class IsotropicVectorReductionImage(SageObject):
         p. 9) composes them by adding parameters and so makes ``K_v`` abelian.
 
         **The parameters are not the lattice vectors.**  ``E_{f,x}`` preserves ``L`` when
-        ``f`` and ``x`` both lie in it (equation (10), printed p. 9), which is coprime
-        with the transvections that are integral for a *fractional* ``x``: ``t(v, x)(y)``
-        has two terms outside ``L`` that cancel for such an ``x``.  The parameters
+        ``f`` and ``x`` both lie in it (equation (10), printed p. 9).  That is a route to
+        integrality and not a criterion for it: the transvection is integral for a
+        *fractional* ``x`` as well, because ``t(v, x)(y)`` has two terms outside ``L``
+        that cancel for such an ``x``.  The parameters
         therefore range over a lattice between ``v^\perp`` and ``(1/d) v^\perp``, ``d``
         the divisibility of ``v``, and at ``d > 1`` that lattice strictly contains
         ``v^\perp``.  At card ``029J``'s cusp 4 (H. Sterk, *Compactifications of the
@@ -2499,7 +2500,7 @@ class IsotropicVectorReductionImage(SageObject):
         the integral lift locus, where they act simply transitively, and the family it
         returns generates them.  They are read here, not recomputed: a second family, a
         residue search over ``v^\perp/d v^\perp`` or a hand-built transvection matrix,
-        would be a second statement of this kernel at its consumer (#452).
+        would be a second statement of this kernel at its consumer.
 
         Each generator is asserted to fix ``v`` and to act trivially on ``N``: the two
         conditions that define ``K_v`` and that the torsor's kernel also states.
@@ -2610,12 +2611,6 @@ class IsotropicVectorReductionImage(SageObject):
             remaining.difference_update(common * element for common in intersection)
         return tuple(representatives)
 
-    @cached_method
-    def _kernel_coset_engine_elements(self):
-        return self.discriminant_image_membership().engine_elements(
-            self._kernel_coset_representatives()
-        )
-
     def _coset_meets_the_subgroup(self, image) -> bool:
         r"""Whether ``\rho(K_v) \cdot image`` meets ``\rho(\Gamma)``.
 
@@ -2623,13 +2618,15 @@ class IsotropicVectorReductionImage(SageObject):
         (:meth:`discriminant_image_membership`), once per right coset of
         ``\rho(K_v) \cap \rho(\Gamma)`` in the finite subgroup ``\rho(K_v)`` that
         :meth:`kernel_discriminant_image` computes
-        (:meth:`_kernel_coset_representatives`), with the representatives
-        converted to the chain's engine once.  The product is taken in the
-        engine's order; for a lift ``g`` in ``P_v`` the order does not matter,
-        because ``K_v`` is normal in ``P_v`` and ``\rho(K_v) \rho(g) = \rho(g) \rho(K_v)``.
+        (:meth:`_kernel_coset_representatives`); the membership object keeps each
+        conversion of a coset representative to the chain's engine, so it is made
+        once per representative rather than once per question.  The product is
+        taken in the engine's order; for a lift ``g`` in ``P_v`` the order does not
+        matter, because ``K_v`` is normal in ``P_v`` and
+        ``\rho(K_v) \rho(g) = \rho(g) \rho(K_v)``.
         """
         return self.discriminant_image_membership().meets_translates(
-            self._kernel_coset_engine_elements(), image
+            self._kernel_coset_representatives(), image
         )
 
     def contains(self, isometry, *, lift=None) -> bool:

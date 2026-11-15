@@ -1,0 +1,27 @@
+tree SHA: 7a35416ed29d70d59cb8df585ccb0a819f4cc057
+port SHA: 991b88b0
+inner 2400 s, outer 2500 s, guard 6144 MiB
+command: /sage/.venv/bin/python -u -s /probe.py 4.3.5
+=== 4.3.5
+  chamber and printed family: 230.8 s
+  walls: printed 12, returned 12, matched 12
+  positions whose printed and matched returned vectors coincide: 9
+  sets coincide: False
+  transporter: Morphism from Integral lattice of rank 10 and signature (1, 9) to Integral lattice of rank 10 and signature (1, 9) in 0.1 s
+  parent is reduction.Aut(): True
+  carries the printed family onto the returned one: True
+  contains: True in 0.7 s
+[peakrss] probe285-435: child waited=0 shell_code=0 samples=118
+[peakrss] peak tree RSS      : 1760 MiB
+[peakrss] low-water MemAvail : 11166 MiB
+[peakrss] peak single VmHWM  : 1760 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                     1749 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   184.1s procs=  3 rss=  1760 MiB hwm=  1760 MiB avail= 11565 MiB
+[peakrss]   t=   186.1s procs=  3 rss=  1760 MiB hwm=  1760 MiB avail= 11565 MiB
+[peakrss]   t=   188.1s procs=  3 rss=  1760 MiB hwm=  1760 MiB avail= 11411 MiB
+[peakrss]   t=   190.1s procs=  3 rss=  1760 MiB hwm=  1760 MiB avail= 11442 MiB
+[peakrss]   t=   192.1s procs=  3 rss=  1678 MiB hwm=  1760 MiB avail= 11166 MiB
+launcher exit: 0

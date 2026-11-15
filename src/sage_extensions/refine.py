@@ -37,26 +37,34 @@ _PREAMBLE_PACKAGE = __name__.rpartition(".")[0] + "."
 # class, not a mixin: it is the class an owned category is tied to.
 _IMPLEMENTATION_BASES = (Parent, Element, Morphism)
 
-# What a class dictionary holds about the class itself rather than about its
-# objects.  Aliasing one of these onto a rebuilt class would describe the class,
-# not hand it an operation.
-_CLASS_BOOKKEEPING = frozenset({
-    "__module__", "__qualname__", "__doc__", "__dict__", "__weakref__",
-    "__slots__", "__annotations__", "__firstlineno__", "__static_attributes__",
-})
-
-# The Python names that construct an object, name its identity or serialize it.
-# A category level declares operations on the object's value; these belong to the
-# object's own class and its runtime, so a rebuild keeps them where they are.
-# ``__call__`` is a parent's element constructor and ``__init_extra__`` this
-# library's own construction hook.
-_RUNTIME_OWNED_NAMES = frozenset({
-    "__init__", "__init_subclass__", "__new__", "__prepare__", "__call__",
-    "__eq__", "__ne__", "__hash__",
-    "__reduce__", "__reduce_ex__", "__getstate__", "__setstate__",
-    "__copy__", "__deepcopy__",
-    "__getattr__", "__getattribute__", "__setattr__", "__delattr__",
-    "__class_getitem__", "__init_extra__",
+# The Python language reference's two sections of special methods that act on
+# an object's value: emulating container types (Data Model, §3.3.7) and
+# emulating numeric types (§3.3.8), Python 3.14 Language Reference,
+# https://docs.python.org/3/reference/datamodel.html.  A category level
+# declares operations on the object's value, so these are the dunder names a
+# rebuild may order; every other dunder names identity, construction, attribute
+# access, representation, comparison, a call or a context manager, and stays
+# with the object's own class and its runtime.
+_VALUE_PROTOCOL_NAMES = frozenset({
+    # Emulating container types, §3.3.7.
+    "__len__", "__length_hint__", "__getitem__", "__setitem__", "__delitem__",
+    "__missing__", "__iter__", "__reversed__", "__contains__",
+    # Emulating numeric types, §3.3.8: the binary arithmetic operations.
+    "__add__", "__sub__", "__mul__", "__matmul__", "__truediv__",
+    "__floordiv__", "__mod__", "__divmod__", "__pow__", "__lshift__",
+    "__rshift__", "__and__", "__xor__", "__or__",
+    # Their reflected forms.
+    "__radd__", "__rsub__", "__rmul__", "__rmatmul__", "__rtruediv__",
+    "__rfloordiv__", "__rmod__", "__rdivmod__", "__rpow__", "__rlshift__",
+    "__rrshift__", "__rand__", "__rxor__", "__ror__",
+    # Their augmented assignments.
+    "__iadd__", "__isub__", "__imul__", "__imatmul__", "__itruediv__",
+    "__ifloordiv__", "__imod__", "__ipow__", "__ilshift__", "__irshift__",
+    "__iand__", "__ixor__", "__ior__",
+    # The unary operations, the conversions and the roundings.
+    "__neg__", "__pos__", "__abs__", "__invert__",
+    "__complex__", "__int__", "__float__", "__index__",
+    "__round__", "__trunc__", "__floor__", "__ceil__",
 })
 
 
@@ -313,21 +321,31 @@ def _declaring_classes(built: type) -> dict[str, type]:
 
 
 def _is_bookkeeping_or_hook(name: str) -> bool:
-    r"""Whether ``name`` describes the class itself, or is not an operation of a category.
+    r"""Whether ``name`` names no operation on an object's value.
 
-    The class bookkeeping names describe the class rather than an object of it.
-    A single-underscore name is a construction hook -- ``_element_constructor_``,
+    A category level declares operations on the object's value, and the Python
+    language reference states which special methods those are: emulating
+    container types (Data Model, §3.3.7) and emulating numeric types (§3.3.8),
+    the names in :data:`_VALUE_PROTOCOL_NAMES`.  The criterion is read
+    positively, so a protocol a later version of the language defines is
+    admitted by having been defined rather than by having been left out of a
+    list of exclusions.  A dunder outside those two sections names construction
+    or identity (``__init__``, ``__eq__``, ``__hash__``, ``__reduce__``), a
+    call (``__call__``), attribute access (``__getattr__``), representation
+    (``__repr__``), comparison (``__lt__``) or a context manager
+    (``__enter__``), and belongs to the object's own class; so does the class
+    bookkeeping a class dictionary carries (``__dict__``, ``__slots__``,
+    ``__annotations__``).  ``__truediv__`` is the one whose order the ring and
+    module levels disagree about.  A public name is an operation.  A
+    single-underscore name is a construction hook -- ``_element_constructor_``,
     ``_coerce_map_from_`` -- and stays on the provider that declared it, so
-    ``run_construction_hooks`` still executes each level exactly once.  A dunder
-    is a Python protocol name, and most of them are operations on the object's
-    value, which is what a category level declares: ``__truediv__`` is the one
-    whose order the ring and module levels disagree about.  The ones that
-    construct the object or name its identity are not: they belong to the
-    object's own class, and :data:`_RUNTIME_OWNED_NAMES` lists them.
+    ``run_construction_hooks`` still executes each level exactly once.
     """
-    if name in _CLASS_BOOKKEEPING or name in _RUNTIME_OWNED_NAMES:
-        return True
-    return name.startswith("_") and not name.startswith("__")
+    if not name.startswith("_"):
+        return False
+    if name.startswith("__") and name.endswith("__"):
+        return name not in _VALUE_PROTOCOL_NAMES
+    return True
 
 
 def _rebuild_element_class(parent: Parent, category: Category) -> None:

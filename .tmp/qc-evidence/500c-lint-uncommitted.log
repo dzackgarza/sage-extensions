@@ -1,0 +1,19 @@
+provider SHA: ef39a9bfbbbab52431a8f7c1e8a666be34b5fd36
+port SHA: 991b88b0
+command: python -m pytest -p qc_sage_session tests/categories/test_the_refined_category_answers_with_its_own_operation.sage tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage -o addopts= -p sage_extensions.testing.test_lint -q
+.....                                                                    [100%]
+5 passed in 6.01s
+[peakrss] run500-lint500: child waited=0 shell_code=0 samples=6
+[peakrss] peak tree RSS      : 326 MiB
+[peakrss] low-water MemAvail : 6340 MiB
+[peakrss] peak single VmHWM  : 326 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      315 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    10.0s procs=  3 rss=   326 MiB hwm=   326 MiB avail=  8148 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   325 MiB hwm=   325 MiB avail=  6340 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   297 MiB hwm=   297 MiB avail=  6930 MiB
+[peakrss]   t=     4.0s procs=  3 rss=   220 MiB hwm=   220 MiB avail=  6513 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   124 MiB hwm=   124 MiB avail=  6583 MiB
+launcher exit: 0

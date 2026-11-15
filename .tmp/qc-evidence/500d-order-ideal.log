@@ -1,0 +1,71 @@
+=== ran on: the working tree of 9cfb525c519b41c3cc5b67adc64366aae69f8f96 (committed as 1a53c51)
+=== command: session probe, printing each module, its base ring, the dual shape, the answering method, the order ideal, the values generating it, the framed level answer, and the pairing at a coordinate functional
+
+---- ZZ['x'] element 2x+2 (infinite chosen basis)
+   module: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring
+   base ring: Integer Ring
+   answers Modules.ElementMethods.order_ideal: True
+   answers FramedFreeModules.ElementMethods.order_ideal: False
+   dual shape: product over the chosen basis labels
+   order_ideal: Ideal (2) of Integer Ring
+   in CommutativeIdeals(Integer Ring): True
+   values generating the image: (2, 2)
+   framed level's own answer: Ideal (2) of Integer Ring
+   coordinate functional at the first label: Section of Product of the family over Coproduct of the family over NN = {0, 1, 2, ...}
+   pairing at it: 2
+
+---- QQ['x'] element x+1 (infinite chosen basis)
+   module: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Fraction Field of Integer Ring
+   base ring: Fraction Field of Integer Ring
+   answers Modules.ElementMethods.order_ideal: True
+   answers FramedFreeModules.ElementMethods.order_ideal: False
+   dual shape: product over the chosen basis labels
+   order_ideal: Finitely presented module on 1 module generators over Fraction Field of Integer Ring
+   in CommutativeIdeals(Fraction Field of Integer Ring): True
+   values generating the image: (1, 1)
+   framed level's own answer: Finitely presented module on 1 module generators over Fraction Field of Integer Ring
+   coordinate functional at the first label: Section of Product of the family over Coproduct of the family over NN = {0, 1, 2, ...}
+   pairing at it: 1
+
+---- QQ(i) element 1+i (finite chosen basis)
+   module: Free module on {1, a} over Fraction Field of Integer Ring
+   base ring: Fraction Field of Integer Ring
+   answers Modules.ElementMethods.order_ideal: True
+   answers FramedFreeModules.ElementMethods.order_ideal: False
+   dual shape: none (a finite basis or no chosen resolution)
+   order_ideal: Finitely presented module on 1 module generators over Fraction Field of Integer Ring
+   in CommutativeIdeals(Fraction Field of Integer Ring): True
+   values generating the image: (1, 1)
+   framed level's own answer: Finitely presented module on 1 module generators over Fraction Field of Integer Ring
+
+---- ZZ**2 element (-6,9) (finite chosen basis)
+   module: Free module on {[0], [1]} over Integer Ring
+   base ring: Integer Ring
+   answers Modules.ElementMethods.order_ideal: False
+   answers FramedFreeModules.ElementMethods.order_ideal: True
+   dual shape: none (a finite basis or no chosen resolution)
+   order_ideal: Ideal (3) of Integer Ring
+   in CommutativeIdeals(Integer Ring): True
+   values generating the image: (-6, 9)
+   framed level's own answer: Ideal (3) of Integer Ring
+
+---- lattice <2> element 6e0
+   module: Integral lattice of rank 1 and signature (1, 0)
+   base ring: Integer Ring
+   answers Modules.ElementMethods.order_ideal: False
+   answers FramedFreeModules.ElementMethods.order_ideal: True
+   dual shape: none (a finite basis or no chosen resolution)
+   order_ideal: Ideal (6) of Integer Ring
+   in CommutativeIdeals(Integer Ring): True
+   values generating the image: (6,)
+   framed level's own answer: Ideal (6) of Integer Ring
+
+---- Zmod(8) element 3 (quotient)
+   module: Integer Ring / Ideal (8) of Integer Ring
+   base ring: Integer Ring
+   answers Modules.ElementMethods.order_ideal: True
+   answers FramedFreeModules.ElementMethods.order_ideal: False
+   dual shape: none (a finite basis or no chosen resolution)
+   order_ideal RAISED ValueError : Mor(Integer Ring / Ideal (8) of Integer Ring, Integer Ring) has no chosen resolution relative to Category of modules over Integer Ring
+   values RAISED ValueError : Mor(Integer Ring / Ideal (8) of Integer Ring, Integer Ring) has no chosen resolution relative to Category of modules over Integer Ring
+   framed level RAISED AttributeError : 'OwnedJoinCategory.element_class' object has no attribute 'to_vector'

@@ -1,0 +1,85 @@
+=== ran on: 5f17b92fe7370eb8db460d9f6919b99bcb4cd243 with the tree unmodified (before this round's edits; the refusal it prints is the one deleted in 7b23fc3)
+=== command: session probe over Zmod(8), Zmod(1), GF(2), GF(4), GF(9), the owned products, the residue field and rationals
+
+---- Zmod(8) owned quotient
+   ring: Integer Ring / Ideal (8) of Integer Ring
+   category: Join of Category of finite rings and Category of quotient rings and Category of commutative algebras and Category of local rings and Category of artinian rings and Category of modules over Integer Ring / Ideal (8) of Integer Ring
+   in FiniteSets: True
+   in OwnedRings().Finite(): True
+   cardinality: 8
+   type.__iter__: <function OwnedRings.Finite.ParentMethods.__iter__ at 0x7e1b81b07b60>
+   is ring level: False | is finite level: True
+   tuple() count 8 first (0 mod Ideal (8) of Integer Ring, 1 mod Ideal (8) of Integer Ring, 2 mod Ideal (8) of Integer Ring, 3 mod Ideal (8) of Integer Ring)
+
+---- Zmod(1) zero ring
+   ring: Integer Ring / Ideal (1) of Integer Ring
+   category: Join of Category of finite rings and Category of quotient rings and Category of commutative algebras and Category of artinian rings and Category of modules over Integer Ring / Ideal (1) of Integer Ring
+   in FiniteSets: True
+   in OwnedRings().Finite(): True
+   cardinality: 1
+   type.__iter__: <function OwnedRings.Finite.ParentMethods.__iter__ at 0x7e1b81b07b60>
+   is ring level: False | is finite level: True
+   tuple() count 1 first (0 mod Ideal (1) of Integer Ring,)
+
+---- GF(2) prime field
+   ring: Integer Ring / Ideal (2) of Integer Ring
+   category: Join of Category of finite fields and Category of quotient rings and Category of prime fields and Category of commutative algebras and Category of modules over Integer Ring / Ideal (2) of Integer Ring
+   in FiniteSets: True
+   in OwnedRings().Finite(): True
+   cardinality: 2
+   type.__iter__: <function OwnedRings.Finite.ParentMethods.__iter__ at 0x7e1b81b07b60>
+   is ring level: False | is finite level: True
+   tuple() count 2 first (0 mod Ideal (2) of Integer Ring, 1 mod Ideal (2) of Integer Ring)
+
+---- GF(4) finite extension
+   ring: Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring / Ideal (z2^2 + z2 + 1 mod Ideal (2) of Integer Ring) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring
+   category: Join of Category of commutative algebras and Category of finite fields and Category of quotient rings and Category of modules over Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring / Ideal (z2^2 + z2 + 1 mod Ideal (2) of Integer Ring) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring
+   in FiniteSets: True
+   in OwnedRings().Finite(): True
+   cardinality: 4
+   type.__iter__: <function OwnedRings.Finite.ParentMethods.__iter__ at 0x7e1b81b07b60>
+   is ring level: False | is finite level: True
+   tuple() count 4 first (0 mod Ideal (z2^2 + z2 + 1 mod Ideal (2) of Integer Ring) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring, z2 mod Ideal (z2^2 + z2 + 1 mod Ideal (2) of Integer Ring) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring, z2 + 1 mod Ideal (2) of Integer Ring mod Ideal (z2^2 + z2 + 1 mod Ideal (2) of Integer Ring) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring, 1 mod Ideal (2) of Integer Ring mod Ideal (z2^2 + z2 + 1 mod Ideal (2) of Integer Ring) of Free module on Coproduct of the family over NN = {0, 1, 2, ...} over Integer Ring / Ideal (2) of Integer Ring)
+
+---- GF(2)[x]/(x^2) quotient of a polynomial ring
+   CONSTRUCTION RAISED AttributeError : 'Owned_NativeFreeAlgebraParent_with_category' object has no attribute 'quotient'
+
+---- product GF(2) x GF(2)
+   ring: Finite ring with 4 elements
+   category: Join of Category of commutative algebras and Category of finite rings and Category of artinian rings and Category of finitely generated framed free modules over Finite ring with 4 elements
+   in FiniteSets: True
+   in OwnedRings().Finite(): True
+   cardinality: 4
+   type.__iter__: <function FramedFreeModules.FinitelyGenerated.ParentMethods.__iter__ at 0x7e1b81563950>
+   is ring level: False | is finite level: False
+   tuple RAISED ValueError : (0,) should be of length 2
+
+---- product Zmod(4) x GF(3)
+   ring: Finite ring with 12 elements
+   category: Join of Category of commutative algebras and Category of finite rings and Category of artinian rings and Category of finitely generated framed free modules over Finite ring with 12 elements
+   in FiniteSets: True
+   in OwnedRings().Finite(): True
+   cardinality: 12
+   type.__iter__: <function FramedFreeModules.FinitelyGenerated.ParentMethods.__iter__ at 0x7e1b81563950>
+   is ring level: False | is finite level: False
+   tuple RAISED ValueError : (0,) should be of length 2
+
+---- finite local ring Zmod(4) residue field
+   ring: Integer Ring / Ideal (2) of Integer Ring
+   category: Join of Category of finite fields and Category of quotient rings and Category of prime fields and Category of commutative algebras and Category of modules over Integer Ring / Ideal (2) of Integer Ring
+   in FiniteSets: True
+   in OwnedRings().Finite(): True
+   cardinality: 2
+   type.__iter__: <function OwnedRings.Finite.ParentMethods.__iter__ at 0x7e1b81b07b60>
+   is ring level: False | is finite level: True
+   tuple() count 2 first (0 mod Ideal (2) of Integer Ring, 1 mod Ideal (2) of Integer Ring)
+
+---- Zp(5)?
+   ring: Ring over Integer Ring
+   category: Join of Category of local nontrivial adic completions and Category of commutative algebras and Category of complete local rings and Category of noetherian rings and Category of modules over Ring over Integer Ring
+   in FiniteSets: False
+   in OwnedRings().Finite(): False
+   cardinality raised AssertionError cannot compute the cardinality of Ring over Integer Ring: its construction supplies no exact value or decided finite enumeration (it is in Join of Cat
+   type.__iter__: <function OwnedRings.ParentMethods.__iter__ at 0x7e1b81b07cc0>
+   is ring level: True | is finite level: False
+   tuple RAISED TypeError : cannot enumerate Ring over Integer Ring: it is not a finite ring, so its points are not a finite iteration of its selected engine

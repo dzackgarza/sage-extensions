@@ -1,0 +1,10 @@
+commit: 6828f810a0007815ab4ec62647483429f46d6ea4 (the sweep ran on the working tree before it was committed; its src and tests are this commit's -- git diff 6828f810a0007815ab4ec62647483429f46d6ea4 -- src tests is empty)
+shape: one pytest process per target, PYTHONPATH=/ci/tool-artifacts/pytest_plugins:/work/src:/work:/repos/sage-extensions/src, python -m pytest -p qc_sage_session <target> -o addopts= -q --tb=no -rf, inside the pinned image
+
+=== sweep base-extra
+=== tree: ba3ab6001f9f15ad4671aba8543bbfd0a9ccb53a
+=== started: 2026-11-15T03:25:25+00:00
+tests/lattices/test_content_and_doubling.sage: 1 failed, 3 passed in 1.77s
+    FAILED tests/lattices/test_content_and_doubling.sage::test_index_two_sublattices_of_a_hyperbolic_summand
+tests/lattices/test_reflection_rational_line.sage: 4 passed in 1.45s
+=== finished: 2026-11-15T03:25:30+00:00
