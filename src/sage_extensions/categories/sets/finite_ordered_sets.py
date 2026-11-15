@@ -602,7 +602,7 @@ def _filtered_ordered_set(
     universe: Parent,
     predicate: Callable[[PointT], bool | Predicate],
     *,
-    name: str | None = None,
+    name: str | Callable[[], str] | None = None,
 ) -> FiniteOrderedSets().ObjectType | None:
     r"""Compute the ordered subset \(\{x\in S : P(x)\}\), or decline an undecided enumeration.
 
@@ -611,7 +611,9 @@ def _filtered_ordered_set(
     ``Sets.condition_set``.  The input is an owned finite enumerated set
     with an immutable predicate on its points.  When every value is decided,
     the result is the owned finite ordered subset, with the original
-    universe, predicate and canonical inclusion retained.  ``None`` means
+    universe, predicate and canonical inclusion retained.  A name given as a
+    function is a description of the subset, rendered when a reader asks for
+    the description and not when the subset is built.  ``None`` means
     only that this optional enumeration computation is unavailable; it
     makes no claim about the subset or its cardinality.
 
