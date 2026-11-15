@@ -2085,3 +2085,32 @@ the five commits do not move.
 | `issue500r6-tests.log` | `851df47` | the round's two test files under the test lint: **10 passed in 0.87 s** |
 | `issue500r6-sweep-tree.log` | `851df47` | `tests/modules`, `tests/algebras`, `tests/categories`, one pytest process each: **90 failed 222 passed**, **103 failed 110 passed**, **63 failed 61 passed** |
 | `issue500r6-sweep-base.log` | `6e51d33` (a clean worktree) | the same three directories: **the same three summaries, the same FAILED ids, 0 on either side only** |
+
+## #528, third round: the constructor inside one `_lift_at`, and the base point as one datum
+
+`843bb5b000` restored the per-class lift test and left the row at about 105 ms a class, naming the
+element and ring construction of the lift's images from a whole-row split.  This round splits one
+call.  `issue528-lift-split.py` wraps `_lift_at`, records the classes the locus itself tests, and
+re-runs the body of `isotropic_lifts.py:388-401` stage by stage (parameter, section, `Aut()`, the
+transvection's column matrix, the isometry from it, the base point, the composition, the locus'
+`integral_restriction`), checking once that the reproduction is the library's lift on all 11
+generators.  `mode=row` installs the split in place of `_lift_at`, so the classes are the row's own
+and the twentieth stops the row; `mode=line` does the same on the primitive isotropic basis line
+`ep` of `T_Co`.  What it found: `TrivializedTorsors.base_point` (`g_sets.py:2055`) recomputed
+`trivialization()(one())` on every call, and each evaluation pays the condition set's ingress
+(`set_categories.py:4461` -> `is_parent_of` `:4429` -> `is_in_image`/`solve`), a membership test per
+lattice generator for a point that never changes.
+
+| log | tree | result |
+| --- | --- | --- |
+| `issue528-lift-split-row.log` | base `4237442` | `T_Co`'s ambient plane row, 20 classes, 1 torsor: `_lift_at` **90.1 ms a class**, `base_point` **59.739 ms**, `eichler_transvection` 19.326 ms, `_target_section` 3.527 ms, `_parameter_at` 1.391 ms, composition 0.891 ms; `is_parent_of` **52 calls at 31.46 ms**; `first.base_point() is first.base_point()` **False**; the base point's own profile 0.142 s under the profiler, its ingress `trivialization()(one())` 100.245 ms a call over the first two (cold) |
+| `issue528-lift-split-row-after.log` | `4237442` + the repair, uncommitted | the same 20 classes: **33.4 ms a class**, `base_point` **0.001 ms**, `is_parent_of` **7 calls**, the two base points **the same object** |
+| `issue528-lift-split-line-base.log` | base `4237442` | the rank-11 line torsor of `T_Co`, 20 classes: 29.4 ms a class, `base_point` 8.752 ms, the test's `integral_restriction` 16.549 ms |
+| `issue528-lift-split-line.log` | `4237442` + the repair, uncommitted | the same 20 classes: 20.4 ms, `base_point` 0.001 ms, the test 16.507 ms |
+| `issue528-base-point-once-red.log` | base `4237442` | `tests/lattices/test_integral_reduction_lift_witness.sage` with the test lint: **1 failed, 2 passed in 1.34 s** -- the new test, at `base is fibre.base_point()` |
+| `issue528-base-point-once-green.log` | `4237442` + the repair, uncommitted | the same file: **3 passed in 1.11 s** |
+| `issue528-locus-tests-after.log` | `4237442` + the repair, uncommitted | `test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage` and the witness file: **9 passed in 13.54 s** |
+| `issue528-neighbours-base.log` | a clean worktree at `4237442` | `test_g_sets_torsor_archive.sage`, `test_finite_cosets.py`, `test_finite_group_subgroups_and_quotients.sage`: **2 failed, 15 passed** |
+| `issue528-neighbours-green.log` | `4237442` + the repair, uncommitted | the same three: **the same two FAILED ids, 2 failed, 15 passed** -- neither failure is this round's |
+| `issue528-row-after-base-point-cache.log` | `4237442` + the repair, uncommitted | `issue528-lift-test-cost.py`'s own row probe, cap 520 s: `T_Co`'s ambient plane row **returns in 175.3 s** (`_lift_at` 4096 calls, 113.940 s; `eichler_transvection` 4096, 80.994 s), against **undecided at 520 s** at `843bb5b000` (`issue528-row-after-restore.log`, 1536 calls, 162.155 s) |
+| `issue528-tests-rebased.log` | `11eec17` + this round's commits | the tree this branch pushes, after the rebase onto the new main: the witness file, the locus file and `test_g_sets_torsor_archive.sage`: **1 failed, 10 passed in 14.22 s**, the failure the same pre-existing `test_the_equivariant_self_maps_of_the_regular_c3_set_are_its_three_translations` |

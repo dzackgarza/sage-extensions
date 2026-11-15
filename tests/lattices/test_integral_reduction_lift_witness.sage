@@ -35,3 +35,23 @@ def test_unequal_hyperbolic_determinants_have_no_integral_marked_line_lift() -> 
     assert fibre.integral_base_point_or_none() is None
 
 
+def test_the_lift_torsor_computes_its_base_point_once_per_torsor() -> None:
+    r"""The base point is a datum of the torsor, not of the call that reads it.
+
+    The torsor's point set cuts the rational isometries by a predicate, and
+    admitting a point into such a set decides that predicate: one membership
+    test of the marked line and one per lattice generator, each a preimage
+    computation.  The point asked for is the image of the identity under the
+    trivialization fixed at construction, so it is the same point on every
+    call and is computed once per torsor -- ``Torsors.from_trivialization``
+    says as much when a base point is supplied, and this holds when it is not.
+    """
+    lattice = Lattices(ZZ)("U") + Lattices(ZZ)([[2]])
+    line = lattice.basis_vector(0)
+    reduction = line.isotropic_reduction()
+    fibre = reduction.rational_lifts(reduction, reduction.Isom(reduction).identity())
+
+    base = fibre.base_point()
+
+    assert base is fibre.base_point()
+    assert fibre.trivialization()(fibre.acting_group().one()) == base

@@ -1,0 +1,23 @@
+[    0.0s] instrumented: _fraction_equality_status=False, _lift_at=True, _preimage_or_none=False, _target_section=False, base_point=False, eichler_transvection=True, eichler_transvection_matrix=False, factor_through_or_none=False, integral_restriction=False, is_integral_on=False, parameterization=True
+[    0.0s] lattice Integral lattice of rank 11 and signature (2, 9)
+[  175.4s] 
+[  175.4s] the ambient row: 175.3 s, decided True
+[  175.4s]   call                                 calls   seconds
+[  175.4s]   _lift_at                              4096   113.940
+[  175.4s]   eichler_transvection                  4096    80.994
+[  175.4s]   parameterization                         8     0.011
+[  175.4s] RESULT row_seconds=175.3 decided=True _lift_at=4096 eichler_transvection=4096 parameterization=8
+[peakrss] p528rowf: child waited=0 shell_code=0 samples=89
+[peakrss] peak tree RSS      : 589 MiB
+[peakrss] low-water MemAvail : 13239 MiB
+[peakrss] peak single VmHWM  : 589 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      578 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=   176.1s procs=  3 rss=   589 MiB hwm=   589 MiB avail= 13239 MiB
+[peakrss]   t=   174.1s procs=  3 rss=   574 MiB hwm=   574 MiB avail= 13655 MiB
+[peakrss]   t=   172.1s procs=  3 rss=   556 MiB hwm=   556 MiB avail= 13670 MiB
+[peakrss]   t=   170.1s procs=  3 rss=   550 MiB hwm=   550 MiB avail= 13670 MiB
+[peakrss]   t=   166.1s procs=  3 rss=   549 MiB hwm=   549 MiB avail= 13678 MiB
+launcher exit: 0

@@ -2052,7 +2052,19 @@ class TrivializedTorsors(OwnedParameterizedCategory):
         def point_set(self):
             return self.trivialization().codomain()
 
+        @cached_method
         def base_point(self):
+            r"""The point the selected trivialization sends the identity to.
+
+            This is a datum of the torsor, not of the call that reads it: the
+            group, the trivialization and the selected point are all fixed at
+            construction, so every call asks for the same point.  Reading that
+            point through the trivialization is not free -- the point sets of
+            the torsors built from a condition set decide their defining
+            predicate on ingress -- so it is computed once per torsor.  A point
+            supplied to ``Torsors.from_trivialization`` is the point returned,
+            as that method states.
+            """
             if self._selected_base_point is not None:
                 return self._selected_base_point
             return self.trivialization()(self.acting_group().one())

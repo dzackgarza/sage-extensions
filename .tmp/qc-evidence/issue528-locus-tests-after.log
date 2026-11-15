@@ -1,0 +1,16 @@
+.........                                                                [100%]
+9 passed in 13.54s
+[peakrss] p528lt: child waited=0 shell_code=0 samples=8
+[peakrss] peak tree RSS      : 361 MiB
+[peakrss] low-water MemAvail : 13474 MiB
+[peakrss] peak single VmHWM  : 361 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      350 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=    14.0s procs=  3 rss=   361 MiB hwm=   361 MiB avail= 13474 MiB
+[peakrss]   t=    12.0s procs=  3 rss=   360 MiB hwm=   360 MiB avail= 13476 MiB
+[peakrss]   t=    10.0s procs=  3 rss=   358 MiB hwm=   358 MiB avail= 13478 MiB
+[peakrss]   t=     8.0s procs=  3 rss=   356 MiB hwm=   356 MiB avail= 13479 MiB
+[peakrss]   t=     6.0s procs=  3 rss=   354 MiB hwm=   354 MiB avail= 13480 MiB
+launcher exit: 0

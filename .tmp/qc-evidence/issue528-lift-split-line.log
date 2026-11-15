@@ -1,0 +1,137 @@
+[    0.1s] calibration (fixed workload, for the run's CPU share): 0.118 s
+[    0.1s] mode=line classes=20 cap=200 s
+[    0.1s] input: lattice 0.03 s: Integral lattice of rank 11 and signature (2, 9)
+[    0.1s] basis: ('h', 'ep', 'fp', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8')
+[    0.2s] norms of the basis vectors: h: 2, ep: 0, fp: 0, a1: -4, a2: -4, a3: -4, a4: -4, a5: -4, a6: -4, a7: -4, a8: -4
+[    0.2s] a primitive isotropic basis vector: ep
+[    0.3s] input: primitive isotropic line 0.07 s
+[    0.4s] input: its isotropic reduction 0.19 s (quotient rank 9)
+[    0.8s] input: the rational lift torsor 0.37 s: <sage_extensions.owned_category.OwnedJoinCategory.parent_class object at 0x758eb1f6f250>
+[    0.8s] the locus' test lattices: source Integral lattice of rank 11 and signature (2, 9), target Integral lattice of rank 11 and signature (2, 9)
+[    0.8s] 
+[    0.8s] === the locus' own classes: recording them ===
+[    1.6s] recorded 20 class(es) in 0.8 s of locus (stopped after the recording: True)
+[    1.6s]   the library's own `_lift_at`: 20 calls, 0.407 s, 20.4 ms a call
+[    1.6s] 
+[    1.6s] === the split, per class (the body of `_lift_at` stage by stage) ===
+[    2.4s] the split reproduces the library's `_lift_at` on all 11 generators: True
+[    2.4s] 
+[    2.4s]   stage                                                 calls   ms/call   total s
+[    2.4s]   eichler_transvection (whole)                             20    18.307     0.366
+[    2.4s]   column matrix                                             1    16.804     0.017
+[    2.4s]   integral_restriction (the test)                          21    16.507     0.347
+[    2.4s]   base_point: ingress points(one * base)                    1     8.829     0.009
+[    2.4s]   isometry from column                                      1     0.898     0.001
+[    2.4s]   composition *                                            21     0.865     0.018
+[    2.4s]   _parameter_at                                            21     0.589     0.012
+[    2.4s]   _target_section                                          21     0.335     0.007
+[    2.4s]   base_point: acting_group().one()                          1     0.219     0.000
+[    2.4s]   Aut() (parent construction)                               1     0.004     0.000
+[    2.4s]   base_point: trivialization()                              1     0.002     0.000
+[    2.4s]   witt accessors                                           21     0.002     0.000
+[    2.4s]   base_point (whole)                                       20     0.001     0.000
+[    2.4s] 
+[    2.4s] the constructors' calls over the 20 classes: (counters were reset after the recording, so these are the split's)
+[    2.4s]   _ConditionSetEngine.is_parent_of                              2 calls    0.008 s own     3.96 ms a call
+[    2.4s]   _ConditionSetEngine.__contains__                              0 calls    0.000 s own     0.00 ms a call
+[    2.4s]   _ConditionSetEngine._element_constructor_                     2 calls    0.008 s own     3.97 ms a call
+[    2.4s]   ModuleMorphismMethods.is_in_image                             9 calls    0.004 s own     0.46 ms a call
+[    2.4s] 
+[    2.4s] counts reset; profiling one library `_lift_at` alone:
+[    2.6s] 
+[    2.6s] === one library `_lift_at`, profiled: 0.044 s, 117460 calls; its `integral_restriction` a further 0.017 s (integral: True) ===
+[    2.6s]   file:line                                               function                              own s    cum s    calls
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:6647_element_constructor_                 0.003    0.003     8634
+[    2.6s]   ~:0                                                     <built-in method builtins.isinsta     0.003    0.003    18069
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:6618_from_engine_element                  0.003    0.004     3941
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:5707_operand_in_ring                      0.002    0.007     3142
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:1115__init__                              0.002    0.004     1370
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:6643__call__                              0.002    0.005     8634
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:1695_fraction_with_admitted_denominat     0.001    0.006     1127
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:8038_owned_engine_element                 0.001    0.010     3797
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:5817__mul__                               0.001    0.010     1872
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:2279localization_source                   0.001    0.001     5264
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:5793_mul_                                 0.001    0.004     1872
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:5750__init__                              0.001    0.001     3941
+[    2.6s]   sage_extensions/categories/abstract_categories/objects.py:158__contains__                          0.001    0.002     1355
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:7737_own_ring                             0.001    0.003     4897
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:5754_backend                              0.001    0.001     6267
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:1153_add_                                 0.001    0.011      364
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:1930_from_engine_element                  0.001    0.004      386
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:5758_operator_operand                     0.001    0.007     2778
+[    2.6s]   sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:436__classcall__                         0.001    0.001     1553
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:5687_sage_numeral                         0.001    0.002     3142
+[    2.6s] 
+[    2.6s] === construction sites inside the same call, by own time ===
+[    2.6s]   file:line                                               function                              own s    cum s    calls
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:6647_element_constructor_                 0.003    0.003     8634
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:1115__init__                              0.002    0.004     1370
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:5750__init__                              0.001    0.001     3941
+[    2.6s]   sage_extensions/categories/abstract_categories/objects.py:158__contains__                          0.001    0.002     1355
+[    2.6s]   sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:436__classcall__                         0.001    0.001     1553
+[    2.6s]   sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:693__contains__                          0.001    0.001     1374
+[    2.6s]   sage_extensions/categories/sets/set_categories.py:6779  _element_constructor_                 0.000    0.001     1070
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:6695__contains__                          0.000    0.000     2778
+[    2.6s]   sage_extensions/categories/sets/set_categories.py:525   __contains__                          0.000    0.001      457
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:1706_element_constructor_                 0.000    0.000      587
+[    2.6s]   sage_extensions/categories/sets/set_categories.py:6793  __contains__                          0.000    0.000     1070
+[    2.6s]   sage_extensions/categories/sets/set_categories.py:6684  __init__                              0.000    0.000      613
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:1859__contains__                          0.000    0.000      375
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:1788is_parent_of                          0.000    0.000      375
+[    2.6s]   sage_extensions/categories/sets/finite_ordered_sets.py:229_element_constructor_                 0.000    0.001       40
+[    2.6s]   sage_extensions/categories/sets/set_categories.py:749   __init__                              0.000    0.000       14
+[    2.6s]   sage/.venv/lib/python3.14/site-packages/sage/matrix/matrix_space.py:1077_element_constructor_                 0.000    0.000        3
+[    2.6s]   sage_extensions/categories/modules/module_morphisms/module_morphisms.py:527__init__                              0.000    0.001        5
+[    2.6s]   sage_extensions/categories/sets/finite_ordered_sets.py:203__contains__                          0.000    0.000      120
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:5438__classcall__                         0.000    0.000       36
+[    2.6s]   sage_extensions/owned_category.py:1704                  __init__                              0.000    0.000        3
+[    2.6s]   sage_extensions/categories/modules/framed/framed_free_modules.py:351_element_constructor_                 0.000    0.000       37
+[    2.6s]   sage_extensions/categories/abstract_categories/mor_categories.py:1561__init__                              0.000    0.000        3
+[    2.6s]   sage_extensions/categories/modules/fibered_modules.py:56__init__                              0.000    0.000        5
+[    2.6s] 
+[    2.6s] === construction sites inside the same call, by call count ===
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:6647_element_constructor_                 0.003    0.003     8634
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:5750__init__                              0.001    0.001     3941
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:6695__contains__                          0.000    0.000     2778
+[    2.6s]   sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:436__classcall__                         0.001    0.001     1553
+[    2.6s]   sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:693__contains__                          0.001    0.001     1374
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:1115__init__                              0.002    0.004     1370
+[    2.6s]   sage_extensions/categories/abstract_categories/objects.py:158__contains__                          0.001    0.002     1355
+[    2.6s]   sage_extensions/categories/sets/set_categories.py:6779  _element_constructor_                 0.000    0.001     1070
+[    2.6s]   sage_extensions/categories/sets/set_categories.py:6793  __contains__                          0.000    0.000     1070
+[    2.6s]   sage_extensions/categories/sets/set_categories.py:6684  __init__                              0.000    0.000      613
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:1706_element_constructor_                 0.000    0.000      587
+[    2.6s]   sage_extensions/categories/sets/set_categories.py:525   __contains__                          0.000    0.001      457
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:1788is_parent_of                          0.000    0.000      375
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:1859__contains__                          0.000    0.000      375
+[    2.6s]   sage_extensions/categories/sets/finite_ordered_sets.py:203__contains__                          0.000    0.000      120
+[    2.6s]   sage_extensions/categories/sets/finite_ordered_sets.py:229_element_constructor_                 0.000    0.001       40
+[    2.6s] 
+[    2.6s] === the construction sites' callers (who asks for the construction, and what it costs) ===
+[    2.6s]   sage_extensions/categories/lattices.py:8306 _eichler_transvection_column_matrix: own 0.000 s, cum 0.038 s, 1 calls
+[    2.6s]       <- sage_extensions/categories/lattices.py:8388 eichler_transvection: own 0.000 s, cum 0.038 s, 1 calls
+[    2.6s]   sage_extensions/categories/rings/ring_foundation.py:6647 _element_constructor_: own 0.003 s, cum 0.003 s, 8634 calls
+[    2.6s]       <- sage_extensions/categories/rings/ring_foundation.py:6643 __call__: own 0.003 s, cum 0.003 s, 8634 calls
+[    2.6s]   sage_extensions/categories/lattice_morphisms.py:5361 _isometry_from_column_matrix: own 0.000 s, cum 0.002 s, 1 calls
+[    2.6s]       <- sage_extensions/categories/lattices.py:8388 eichler_transvection: own 0.000 s, cum 0.002 s, 1 calls
+[    2.6s] 
+[    2.6s] === the same constructors inside that one profiled call ===
+[    2.6s]   _ConditionSetEngine.is_parent_of                              0 calls    0.000 s own     0.00 ms a call
+[    2.6s]   _ConditionSetEngine.__contains__                              0 calls    0.000 s own     0.00 ms a call
+[    2.6s]   _ConditionSetEngine._element_constructor_                     0 calls    0.000 s own     0.00 ms a call
+[    2.6s]   ModuleMorphismMethods.is_in_image                             0 calls    0.000 s own     0.00 ms a call
+[    2.6s] 
+[    2.6s] RESULT classes=20 lift_ms=20.4 base_point_ms=0.0 transvection_ms=18.3 composition_ms=0.9 test_ms=16.5 calib=0.118
+[    2.6s] PROBE DONE
+[peakrss] p528line: child waited=0 shell_code=0 samples=3
+[peakrss] peak tree RSS      : 425 MiB
+[peakrss] low-water MemAvail : 13223 MiB
+[peakrss] peak single VmHWM  : 425 MiB
+[peakrss] peak VmHWM by executable (this is the per-process attribution):
+[peakrss]   python                      414 MiB peak
+[peakrss]   timeout                       7 MiB peak
+[peakrss]   proot-x86_64                  3 MiB peak
+[peakrss]   t=     4.0s procs=  3 rss=   425 MiB hwm=   425 MiB avail= 13223 MiB
+[peakrss]   t=     2.0s procs=  3 rss=   422 MiB hwm=   422 MiB avail= 13597 MiB
+[peakrss]   t=     0.0s procs=  1 rss=     1 MiB hwm=     2 MiB avail= 13889 MiB
+launcher exit: 0
