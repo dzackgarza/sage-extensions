@@ -76,16 +76,21 @@ def _owned_mixins(category: Category, attr: str) -> tuple[type, ...]:
     is computed once per category rather than once per object built in it.
 
     A category reaches a method class when its own class or a base of it
-    declares the name, and the walk records every category that does.  The
-    order it visits them in is the linear extension
-    :meth:`Category.all_super_categories` computes, which puts a subcategory
-    before its supercategories but says nothing between two categories over
-    different base rings: an object that is a framed free module over $R$ and
-    a module over itself reaches ``FramedFreeModules(R)`` -- a subcategory of
-    ``Modules(R).Free()`` -- after a ``Modules(S)`` over another ring whose
-    class also declares the general ``Modules`` provider.  The hierarchy
-    decides such a pair, so it is read again here (:func:`_precedes`), and only
-    then does the walk order decide.
+    declares the name, and the walk records every category that does.
+
+    **The order, stated once.**  Provider $P$ precedes provider $Q$ when a
+    proper supercategory of a category reaching $P$ reaches $Q$
+    (:func:`_precedes`); a pair that relation does not order keeps the order in
+    which the walk visits it, which is the linear extension
+    :meth:`Category.all_super_categories` computes.  The walk alone is not
+    enough: it puts a subcategory before its supercategories but says nothing
+    between two categories over different base rings, so an object that is a
+    framed free module over $R$ and a module over itself reaches
+    ``FramedFreeModules(R)`` -- a subcategory of ``Modules(R).Free()`` -- after
+    a ``Modules(S)`` over another ring whose class also declares the general
+    ``Modules`` provider.
+
+    The rest of this module cites this paragraph rather than restating it.
     """
     reached: dict[type, list[Category]] = {}
     for cat in category.all_super_categories(proper=False):
@@ -133,34 +138,13 @@ def _nearest_provider(category: Category, attr: str) -> type | None:
 def _precedes(
     reached: dict[type, list[Category]], attr: str, left: type, right: type
 ) -> bool:
-    r"""Whether ``left`` is the provider of the more specific category.
+    """Whether a supercategory of a category reaching ``left`` reaches ``right``.
 
-    ``left`` precedes ``right`` when a proper supercategory of a category
-    reaching ``left`` reaches ``right``, and no proper supercategory of a
-    category reaching ``right`` reaches ``left``.
-
-    The relation is read between categories, which have a hierarchy, and not
-    between the method classes, which have none.  This is what decides
-    ``FramedFreeModules(R).ElementMethods`` against ``Modules.ElementMethods``:
-    ``FramedFreeModules(R)`` is a subcategory of ``Modules(R)``, whose class
-    reaches the general ``Modules`` provider, so the framed level is the more
-    specific one even where the walk reaches the general provider first,
-    through a ``Modules(S)`` over another base ring.  Requiring the reverse
-    comparison to fail is what keeps a general level from being hoisted over
-    the specific levels that inherit it: ``OwnedRings`` reaches the general
-    ring provider and its subcategories reach their own, so every supercategory
-    of one of those subcategories that reaches ``OwnedRings`` reaches nothing
-    more general through it.
+    The order :func:`_owned_mixins` returns is this relation alone, and that
+    docstring is where it is stated.  A pair the relation does not order in
+    either direction -- two categories that are not below one another, such as
+    a ring and a module over it -- keeps the walk's own order.
     """
-    return _reaches_above(reached, attr, left, right) and not _reaches_above(
-        reached, attr, right, left
-    )
-
-
-def _reaches_above(
-    reached: dict[type, list[Category]], attr: str, left: type, right: type
-) -> bool:
-    """Whether a proper supercategory of a category reaching ``left`` reaches ``right``."""
     return any(
         _nearest_provider(supercategory, attr) is right
         for cat in reached[left]
@@ -358,12 +342,8 @@ def _final_category_operations(
     only if the final order is read again after the refinement.
 
     The first provider of a name in ``providers`` order is the one the final
-    category selects, and that order is the category hierarchy's: a provider
-    whose categories are below another's precedes it (:func:`_owned_mixins`,
-    :func:`_precedes`).  The ring and module levels are incomparable as
-    categories, so the hierarchy does not order those two and the walk's own
-    order decides; the framed and general module levels are comparable, and the
-    framed level precedes.  When the selected provider is already carried and
+    category selects; that order is :func:`_owned_mixins`'s, whose docstring
+    states it.  When the selected provider is already carried and
     ``built`` resolves that name to another of the category's providers, its
     descriptor is returned for the caller to alias, so the class resolves the
     name as the category does.  A name ``built`` resolves to a realization
