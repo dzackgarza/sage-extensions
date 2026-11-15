@@ -1,4 +1,4 @@
-r"""A class hashes through a representative the engine selects, or not at all (#531).
+r"""A class hashes through a representative the engine selects, or not at all.
 
 :meth:`QuotientRings.ElementMethods._richcmp_` decides equality of two classes by
 membership of their difference in the defining ideal, so ``1`` and ``4`` are one

@@ -245,9 +245,9 @@ def test_equal_finite_families_of_unhashable_labels_share_one_construction() -> 
     r"""``SET-05``: equal families have one product and one coproduct.
 
     A finite ordered set of Python lists carries a point that refuses a hash, so
-    it has no hash (#531) and no construction can be interned by one.  The
-    families themselves are compared, and two separately built equal families are
-    one product and one coproduct.
+    the set has none, and no index set has to have one for its family to be
+    interned.  The families themselves are compared, and two separately built
+    equal families are one product and one coproduct.
     """
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
     from sage_extensions.categories.sets.indexed_families import indexed_family
@@ -269,14 +269,14 @@ def test_equal_finite_families_of_unhashable_labels_share_one_construction() -> 
 def test_finite_family_hash_does_not_require_hashable_index_labels() -> None:
     r"""A family over labels that refuse a hash has a hash, because equality decides.
 
-    ``#531``: the hash reads the cardinality of the index set, and every finite
-    enumerated index set supplies one, whatever its points are.  Equality of two
-    such families is decided -- the index sets are finite ordered sets whose
-    points are Python lists that decide their own equality, and the values are
-    compared index by index -- so ``f == g`` implies one cardinality for the two,
-    and the hash respects equality.  The values need not support hashing either:
-    equality is their own extensional relation, not the hashability of their
-    representatives.
+    The hash reads the cardinality of the index set, and every finite enumerated
+    index set supplies one, whatever its points are.  Equality of two such
+    families is decided -- the index sets are finite ordered sets whose points are
+    Python lists that decide their own equality, and the values are compared index
+    by index -- so ``f == g`` implies one cardinality for the two, and the hash
+    respects equality.  The values need not support hashing either: equality is
+    their own extensional relation, and a value that refuses a hash is not a
+    family that cannot be hashed.
     """
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
     from sage_extensions.categories.sets.indexed_families import indexed_family
@@ -390,12 +390,14 @@ def test_a_family_over_a_set_of_mutable_vectors_builds_its_product() -> None:
 def test_a_construction_of_an_undecided_family_equality_is_built() -> None:
     r"""An undecided family equality interns nothing, and replaces nothing.
 
-    ``#531``: the interners compare families by equality, and a comparison whose
-    value is a proposition is neither equality nor inequality.  It is not
-    equality, so the second family is built instead of taking the first
-    construction; it is not inequality either, so the first construction stays.
-    Here each family carries a set of one symbolic point, whose own equality is
-    undecided, so the family comparison is that proposition.
+    The interners compare families by equality inside one bucket, and a
+    comparison whose value is a proposition is neither equality nor inequality.
+    It is not equality, so the second family is built instead of taking the first
+    construction; it is not inequality either, so the first construction stays
+    and both are retained.  Each family here carries a set of one symbolic point,
+    whose own equality is undecided, and both have two factors, so the store's
+    bucket for a two-point index set holds both and the comparison it makes is
+    the proposition.
     """
     from sage_extensions.categories.sets.finite_ordered_sets import finite_ordered_set
     from sage_extensions.categories.sets.indexed_families import indexed_family
