@@ -1,0 +1,1338 @@
+=== ran on: 8566d9aea6204fa014039c548beebf290130a6f6 (1 modified paths)
+=== command: test tests/sets/
+..........F.FF.....F........FFF.F.....F.FFFF...F........................ [ 41%]
+..F......FF.................FF..F.......F..................FF.......FF.. [ 82%]
+....F.F...F...............F....                                          [100%]
+=================================== FAILURES ===================================
+___ test_comparisons_of_cardinals_compose_and_are_carried_by_the_arithmetic ____
+
+    def test_comparisons_of_cardinals_compose_and_are_carried_by_the_arithmetic() -> None:
+        cardinals = Cardinalities()
+>       two_three = cardinals.Mor(2, 3).unique_morphism()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Set of Morphisms from 2 to 3 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda
+
+    @cached_method
+    def unique_morphism(self) -> CardinalityMorphism:
+        empty = self.is_empty()
+        if empty is True:
+            raise ValueError(
+                f"there is no morphism {self.domain()} -> {self.codomain()} of cardinals: "
+                f"{self.domain()} is not <= {self.codomain()}"
+            )
+>       assert empty is False, (
+               ^^^^^^^^^^^^^^
+            f"cannot give the morphism {self.domain()} -> {self.codomain()} of cardinals: it is "
+            f"undecided whether {self.domain()} <= {self.codomain()}"
+        )
+E       AssertionError: cannot give the morphism 2 -> 3 of cardinals: it is undecided whether 2 <= 3
+
+src/sage_extensions/categories/sets/cardinals.py:369: AssertionError
+_________________ test_the_countable_sum_of_ones_is_aleph_zero _________________
+
+    def test_the_countable_sum_of_ones_is_aleph_zero() -> None:
+>       assert Cardinalities().indexed_sum(NN, lambda _index: cardinal(1)) == aleph0
+E       assert sum_{i in NN ... ...}} kappa_i == ℵ_0
+E         
+E         Use -v to get more diff
+
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:43: AssertionError
+____________ test_a_finite_cardinal_is_the_natural_number_it_counts ____________
+
+    def test_a_finite_cardinal_is_the_natural_number_it_counts() -> None:
+        r"""$|\{0, 1, 2\}| = 3$, and the finite cardinal $7$ read in $\mathbb{Z}$ and $\mathbb{Q}$ is $7$."""
+        assert cardinal(3) == 3
+        assert Sets.Δ[2].cardinality() == 3
+        assert ZZ(cardinal(7)) == 7
+>       assert QQ(cardinal(7)) == 7
+               ^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/rings/ring_foundation.py:1792: in __call__
+    return self._element_constructor_(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/rings/ring_foundation.py:1719: in _element_constructor_
+    if source is not self and source in Modules(self.base_ring()) and source.unformed_module() is self:
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/objects.py:172: in __contains__
+    return super().__contains__(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Category of modules over Integer Ring
+x = <class 'sage_extensions.categories.sets.cardinals.Cardinalities.parent_class'>
+
+    def __contains__(self, x) -> bool:
+        """
+        Membership testing.
+    
+        Returns whether ``x`` is an object in this category, that is
+        if the category of ``x`` is a subcategory of ``self``.
+    
+        EXAMPLES::
+    
+            sage: ZZ in Sets()
+            True
+        """
+        try:
+>           c = x.category()
+                ^^^^^^^^^^^^
+E           TypeError: category() needs an argument
+
+/sage/.venv/lib/python3.14/site-packages/sage/categories/category.py:706: TypeError
+________ test_nonidentity_well_order_maps_compose_with_exact_endpoints _________
+
+    def test_nonidentity_well_order_maps_compose_with_exact_endpoints() -> None:
+        well_orders = WellOrderedSets()
+        source = Sets.Δ[1]
+        target = Sets.Δ[2]
+        inclusion = well_orders.Mor(source, target)(lambda point: target(int(point) + 1))
+        shift = well_orders.Mor(target, target)(lambda point: target(min(2, int(point) + 1)))
+        composite = shift * inclusion
+        assert composite.parent() is well_orders.Mor(source, target)
+        assert composite.underlying_set_morphism().domain() is source
+        assert composite.underlying_set_morphism().codomain() is target
+        assert tuple(int(composite(point)) for point in source) == (2, 2)
+        try:
+            well_orders.Mor(target, target)(lambda point: target(2 - int(point)))
+        except ValueError:
+            pass
+        else:
+>           raise AssertionError("an order-reversing map was admitted to well-ordered Mor")
+E           AssertionError: an order-reversing map was admitted to well-ordered Mor
+
+tests/sets/test_cardinal_and_ordinal_order_morphisms.sage:150: AssertionError
+___________ test_zero_to_the_zero_is_one_and_zero_to_the_one_is_zero ___________
+
+    def test_zero_to_the_zero_is_one_and_zero_to_the_one_is_zero() -> None:
+        cardinals = Cardinalities()
+    
+        assert cardinal(0) ** cardinal(0) == cardinal(1)
+        assert cardinal(0) ** cardinal(1) == cardinal(0)
+>       assert cardinals.Mor(cardinal(0) ** cardinal(0), cardinal(0) ** cardinal(1)).is_empty()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinal_morphisms_archive.sage:16: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = is_empty(Set of Morphisms from 1 to 0 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda)
+
+    def __bool__(self):
+>       raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E       TypeError: the proposition is_empty(Set of Morphisms from 1 to 0 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+
+src/sage_extensions/logic.py:44: TypeError
+____ test_cardinality_compares_a_countable_power_set_with_two_to_aleph_zero ____
+
+    def test_cardinality_compares_a_countable_power_set_with_two_to_aleph_zero() -> None:
+        naturals = Sets.Δ[aleph0]
+        power_set = naturals.power_set()
+>       comparison = Sets().cardinality_functor().power_set_comparison(power_set)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinality_construction_comparisons.sage:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/functors/cardinality.py:82: in power_set_comparison
+    return self.codomain().Mor(expected, self(power_set)).unique_morphism()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Set of Morphisms from (2)^(ℵ_0) to (2)^(ℵ_0) in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda
+
+    @cached_method
+    def unique_morphism(self) -> CardinalityMorphism:
+        empty = self.is_empty()
+        if empty is True:
+            raise ValueError(
+                f"there is no morphism {self.domain()} -> {self.codomain()} of cardinals: "
+                f"{self.domain()} is not <= {self.codomain()}"
+            )
+>       assert empty is False, (
+               ^^^^^^^^^^^^^^
+            f"cannot give the morphism {self.domain()} -> {self.codomain()} of cardinals: it is "
+            f"undecided whether {self.domain()} <= {self.codomain()}"
+        )
+E       AssertionError: cannot give the morphism (2)^(ℵ_0) -> (2)^(ℵ_0) of cardinals: it is undecided whether (2)^(ℵ_0) <= (2)^(ℵ_0)
+
+src/sage_extensions/categories/sets/cardinals.py:369: AssertionError
+_ test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic _
+
+    def test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic() -> None:
+        polynomial = QQ.polynomial_ring("y")
+        countable_product = ZZ.product_with(polynomial)
+        continuum_product = ZZ.product_with(RR)
+        continuum_coproduct = QQbar.coproduct_with(CC)
+        cardinality = Sets().cardinality_functor()
+    
+>       countable_comparison = cardinality.cartesian_product_comparison(countable_product)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinality_construction_comparisons.sage:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/functors/cardinality.py:64: in cartesian_product_comparison
+    return self.codomain().Mor(expected, self(product)).unique_morphism()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Set of Morphisms from ℵ_0 to ℵ_0 in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda
+
+    @cached_method
+    def unique_morphism(self) -> CardinalityMorphism:
+        empty = self.is_empty()
+        if empty is True:
+            raise ValueError(
+                f"there is no morphism {self.domain()} -> {self.codomain()} of cardinals: "
+                f"{self.domain()} is not <= {self.codomain()}"
+            )
+>       assert empty is False, (
+               ^^^^^^^^^^^^^^
+            f"cannot give the morphism {self.domain()} -> {self.codomain()} of cardinals: it is "
+            f"undecided whether {self.domain()} <= {self.codomain()}"
+        )
+E       AssertionError: cannot give the morphism ℵ_0 -> ℵ_0 of cardinals: it is undecided whether ℵ_0 <= ℵ_0
+
+src/sage_extensions/categories/sets/cardinals.py:369: AssertionError
+____ test_cardinal_arithmetic_and_order_do_not_assume_continuum_hypothesis _____
+
+    def test_cardinal_arithmetic_and_order_do_not_assume_continuum_hypothesis() -> None:
+        cardinals = Cardinalities()
+        assert cardinal(3) ** cardinal(5) == cardinal(243)
+        assert aleph0 + continuum == continuum
+        assert aleph0 * continuum == continuum
+        assert aleph0 ** aleph0 == continuum
+    
+        assert cardinals.compare(aleph(1), continuum) is CardinalComparison.LESS_OR_EQUAL
+>       assert cardinals.Mor(aleph(1), continuum).cardinality() == 1
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_cardinals_and_ordinals.sage:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Set of Morphisms from ℵ_1 to (2)^(ℵ_0) in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda
+
+    def cardinality(self) -> Cardinalities.ObjectType:
+        r"""The cardinality ``|X|``, an object of ``Card``.
+    
+        Cardinality is total on sets (`CAT-01`), and this is its one
+        owner: no set construction restates it.  It is an isomorphism
+        invariant, so it is read off what the construction of ``X``
+        determines, by placement:
+    
+        - the finite ordinal ``n`` has the cardinality of its order
+          type ``n``;
+        - a set with a chosen enumeration from an index set is in
+          bijection with that index set;
+        - ``|P(X)| = 2^|X|``, since ``P(X)`` is in bijection with the
+          characteristic maps ``X -> 2``;
+        - ``|Y^X| = |Y|^|X|``, the definition of cardinal exponentiation;
+        - the ``k``-element subsets of ``X`` number ``binomial(|X|, k)``
+          for finite ``X``, one for ``k = 0``, and ``|X|`` for infinite
+          ``X`` and ``k >= 1``;
+        - the finite subsets of ``X`` number ``2^|X|`` for finite ``X``
+          and ``|X|`` for infinite ``X``;
+        - ``|prod_i X_i| = prod_i |X_i|`` and ``|coprod_i X_i| =
+          sum_i |X_i|``, the definitions of cardinal product and sum;
+        - any other finite set with a chosen enumeration is counted
+          through that enumeration, and any
+          other countably infinite set has cardinality ``aleph_0``.
+    
+        A realization whose construction determines a cardinality these
+        standard set cases do not reach supplies that theorem through the
+        protected ``_cardinality_decision`` hook.  The public operation
+        remains here.  A represented set outside all of these routes has a
+        cardinality that no exact computation here reaches, and the
+        assertion says so.
+        """
+        construction_cardinality = self._cardinality_decision()
+>       assert construction_cardinality is not None, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"cannot compute the cardinality of {self}: its construction supplies no exact value "
+            f"or decided finite enumeration (it is in {self.category()})"
+        )
+E       AssertionError: cannot compute the cardinality of Set of Morphisms from ℵ_1 to (2)^(ℵ_0) in Card: cardinalities with a unique morphism kappa -> lambda exactly when kappa <= lambda: its construction supplies no exact value or decided finite enumeration (it is in Join of Category of homsets of sets and Category of sets)
+
+src/sage_extensions/categories/sets/set_categories.py:2510: AssertionError
+________ test_infinite_constant_additive_monoid_does_not_gain_inverses _________
+
+    def test_infinite_constant_additive_monoid_does_not_gain_inverses() -> None:
+        product = Sets().product(indexed_family(NN, NN))
+>       assert product in AdditiveMonoids()
+                          ^^^^^^^^^^^^^^^
+E       NameError: name 'AdditiveMonoids' is not defined
+
+tests/sets/test_cartesian_additive_group_placement.sage:47: NameError
+_____________ test_group_product_retains_monoid_universal_property _____________
+
+    def test_group_product_retains_monoid_universal_property() -> None:
+        product = Sets().product((ZZ, ZZ))
+        source = NN
+>       additive = AdditiveMonoids()
+                   ^^^^^^^^^^^^^^^
+E       NameError: name 'AdditiveMonoids' is not defined
+
+tests/sets/test_cartesian_additive_group_placement.sage:78: NameError
+_______________ test_infinite_group_product_retains_monoid_cones _______________
+
+    def test_infinite_group_product_retains_monoid_cones() -> None:
+        from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+        from sage_extensions.categories.functors.core import NaturalTransformation
+    
+        index = DiscreteCategory(NN)
+>       additive = AdditiveMonoids()
+                   ^^^^^^^^^^^^^^^
+E       NameError: name 'AdditiveMonoids' is not defined
+
+tests/sets/test_cartesian_additive_group_placement.sage:91: NameError
+__________ test_mixed_finite_monoid_product_is_not_an_additive_group ___________
+
+    def test_mixed_finite_monoid_product_is_not_an_additive_group() -> None:
+        mixed = Sets().product((ZZ, NN))
+>       assert mixed in AdditiveMonoids()
+                        ^^^^^^^^^^^^^^^
+E       NameError: name 'AdditiveMonoids' is not defined
+
+tests/sets/test_cartesian_additive_group_placement.sage:107: NameError
+____ test_opaque_infinite_callback_does_not_claim_additive_group_structure _____
+
+    def test_opaque_infinite_callback_does_not_claim_additive_group_structure() -> None:
+        opaque = Sets().product(indexed_family(NN, lambda _index: ZZ))
+        assert opaque not in AdditiveGroups()
+>       assert opaque not in AdditiveMonoids()
+                             ^^^^^^^^^^^^^^^
+E       NameError: name 'AdditiveMonoids' is not defined
+
+tests/sets/test_cartesian_additive_group_placement.sage:119: NameError
+____ test_fixed_cardinality_subset_functor_is_defined_exactly_on_injections ____
+
+    def test_fixed_cardinality_subset_functor_is_defined_exactly_on_injections() -> None:
+        source = Sets.Δ[2]
+        target = Sets.Δ[4]
+        inclusion = Sets().Mono(source, target)(lambda value: target(value + 1))
+        pairs = Sets().fixed_cardinality_subset_functor(2)
+>       carried = pairs(inclusion)
+                  ^^^^^^^^^^^^^^^^
+
+tests/sets/test_construction_functors.sage:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/functors/core.py:333: in __call__
+    return self.morphism_image(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Direct image on subsets of cardinality 2: Wide subcategory of Category of sets with arrows in Monomorphism arrows of Category of sets -> Category of sets
+morphism = Generic morphism:
+  From: {0,...,2}
+  To:   {0,...,4}
+
+    def morphism_image(self, morphism: Map) -> Map:
+        r"""The image ``F(f): F(A) -> F(B)`` of an arrow ``f: A -> B`` of the domain.
+    
+        Both sides are admitted by the Mor categories that own them: ``f``
+        is an arrow of ``Hom_C(A, B)``, and its image is an arrow of
+        ``Hom_D(F(A), F(B))``. This is admission of the actual maps, not
+        placement of the objects constructed on them in those categories.
+        """
+        from sage_extensions.categories.abstract_categories.mor_categories import (
+            _category_accepts_morphism,
+        )
+    
+        if not _category_accepts_morphism(self.domain(), morphism.domain(), morphism.codomain(), morphism):
+>           raise TypeError(
+                f"cannot apply {self} to {morphism}: it is not a morphism {morphism.domain()} -> "
+                f"{morphism.codomain()} of {self.domain()}"
+            )
+E           TypeError: cannot apply Direct image on subsets of cardinality 2: Wide subcategory of Category of sets with arrows in Monomorphism arrows of Category of sets -> Category of sets to Generic morphism:
+E             From: {0,...,2}
+E             To:   {0,...,4}: it is not a morphism {0,...,2} -> {0,...,4} of Wide subcategory of Category of sets with arrows in Monomorphism arrows of Category of sets
+
+src/sage_extensions/categories/functors/core.py:278: TypeError
+___________ test_injections_compose_and_the_constant_map_is_not_one ____________
+
+    def test_injections_compose_and_the_constant_map_is_not_one() -> None:
+        r"""$x \mapsto 2x$ then $y \mapsto y + 1$ embeds $\{0, 1\}$ in $\{0, \dots, 4\}$ as $\{1, 3\}$."""
+        two = Sets.Δ[1]
+        four = Sets.Δ[3]
+        five = Sets.Δ[4]
+        doubling = Sets().Mono(two, four)(lambda x: four(2 * x))
+        shift = Sets().Mono(four, five)(lambda x: five(x + 1))
+        composite = shift * doubling
+    
+        assert doubling.is_injective()
+        assert doubling.image().cardinality() == cardinal(2)
+        assert composite.is_injective()
+        assert composite(two(1)) == five(3)
+        assert Sets().Mono(two, two).identity()(two(1)) == two(1)
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests/sets/test_injections_surjections_and_subsets_of_finite_sets.sage:31: Failed
+____________ test_the_two_element_subsets_of_four_points_number_six ____________
+
+    def test_the_two_element_subsets_of_four_points_number_six() -> None:
+        pairs = Sets.Δ[3].subsets_of_size(2)
+    
+        assert pairs.cardinality() == cardinal(6)
+        assert pairs({0, 1}) in pairs
+>       assert sum(1 for _pair in pairs) == 6
+                                           ^^^
+
+tests/sets/test_injections_surjections_and_subsets_of_finite_sets.sage:115: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/sets/set_categories.py:344: in __iter__
+    ranking = self.ranking_map()
+              ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <abstract method ranking_map at 0x79e75918efb0>
+instance = Subsets of {0,...,3} of cardinality 2
+cls = <class 'sage_extensions.categories.sets.set_categories.OwnedJoinCategory.parent_class[_EnumeratedFixedCardinalitySubsetSetEngine].ObjectType'>
+
+    def __get__(self, instance, cls):
+        """
+        Implement the attribute access protocol.
+    
+        EXAMPLES::
+    
+            sage: class A: pass
+            sage: def f(x): return 1
+            sage: f = abstract_method(f)
+            sage: f.__get__(A(), A)
+            Traceback (most recent call last):
+            ...
+            NotImplementedError: <abstract method f at ...>
+        """
+        if instance is None:
+            return self
+        if self._optional:
+            return NotImplemented
+>       raise NotImplementedError(repr(self))
+E       NotImplementedError: <abstract method ranking_map at 0x79e75918efb0>
+
+/sage/.venv/lib/python3.14/site-packages/sage/misc/abstract_method.py:218: NotImplementedError
+_____ test_the_points_of_zero_to_three_greater_than_one_are_two_and_three ______
+
+    def test_the_points_of_zero_to_three_greater_than_one_are_two_and_three() -> None:
+        four = Sets.Δ[3]
+        large = Sets().condition_set(four, lambda x: x > 1)
+    
+        assert large.cardinality() == cardinal(2)
+>       assert set(large) == {four(2), four(3)}
+E       assert {2, 3} == {2, 3}
+E         
+E         Use -v to get more diff
+
+tests/sets/test_injections_surjections_and_subsets_of_finite_sets.sage:123: AssertionError
+_____________ test_natural_numbers_are_the_initial_owned_semiring ______________
+
+    def test_natural_numbers_are_the_initial_owned_semiring() -> None:
+        semirings = OwnedSemirings()
+    
+        assert NN in semirings
+        assert semirings.initial_object() is NN
+>       assert NN.category().is_subcategory(NN.category()._meet_(ZZ.category()))
+E       assert False
+E        +  where False = is_subcategory(Join of Category of owned semirings and Category of commutative monoids and Category of commutative nonunital semirings and Category of infinite countable sets)
+E        +    where is_subcategory = Category of natural number sets.is_subcategory
+E        +      where Category of natural number sets = category()
+E        +        where category = NN.category
+E        +    and   Join of Category of owned semirings and Category of commutative monoids and Category of commutative nonunital semirings and Category of infinite countable sets = Cached version of <function Category._meet_ at 0x79e991549010>(Join of Category of orders with a chosen integral basis and Category of owned ordered rings and Category of principal ideal rings and Category of infinite countable sets)
+E        +      where Cached version of <function Category._meet_ at 0x79e991549010> = Category of natural number sets._meet_
+E        +        where Category of natural number sets = category()
+E        +          where category = NN.category
+E        +      and   Join of Category of orders with a chosen integral basis and Category of owned ordered rings and Category of principal ideal rings and Category of infinite countable sets = category()
+E        +        where category = ZZ.category
+
+tests/sets/test_natural_numbers_and_finite_ordinals.sage:34: AssertionError
+________ test_mixed_natural_and_integer_arithmetic_uses_the_initial_map ________
+
+    def test_mixed_natural_and_integer_arithmetic_uses_the_initial_map() -> None:
+>       canonical = ZZ.coerce_map_from(NN)
+                    ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_natural_numbers_and_finite_ordinals.sage:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/parent.pyx:2095: in sage.structure.parent.Parent.coerce_map_from
+    ???
+sage/structure/parent.pyx:2131: in sage.structure.parent.Parent.coerce_map_from
+    ???
+/workspace/nucleus/work/home/sage-image/rootfs/opt/uv-python/cpython-3.14.10-linux-x86_64-gnu/lib/python3.14/copy.py:82: in copy
+    return copier(x)
+           ^^^^^^^^^
+sage/categories/map.pyx:195: in sage.categories.map.Map.__copy__
+    ???
+sage/categories/map.pyx:259: in sage.categories.map.Map.parent
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+X = NN = {0, 1, 2, ...}, Y = Integer Ring, category = Category of sets
+check = True
+
+    def Hom[DomainElementT: Parent, CodomainElementT: Parent](
+        X: DomainElementT,
+        Y: CodomainElementT,
+        category: Category | None = None,
+        check: bool = True,
+    ) -> Homset[DomainElementT, CodomainElementT]:
+        """
+        Create the space of homomorphisms from X to Y in the category ``category``.
+    
+        INPUT:
+    
+        - ``X`` -- an object of a category
+    
+        - ``Y`` -- an object of a category
+    
+        - ``category`` -- a category in which the morphisms must be
+          (default: the meet of the categories of ``X`` and ``Y``);
+          both ``X`` and ``Y`` must belong to that category
+    
+        - ``check`` -- boolean (default: ``True``); whether to check the
+          input, and in particular that ``X`` and ``Y`` belong to
+          ``category``.
+    
+        OUTPUT: a homset in category
+    
+        EXAMPLES::
+    
+            sage: V = VectorSpace(QQ, 3)                                                    # needs sage.modules
+            sage: Hom(V, V)                                                                 # needs sage.modules
+            Set of Morphisms (Linear Transformations) from
+            Vector space of dimension 3 over Rational Field to
+            Vector space of dimension 3 over Rational Field
+            sage: G = AlternatingGroup(3)                                                   # needs sage.groups
+            sage: Hom(G, G)                                                                 # needs sage.groups
+            Set of Morphisms
+             from Alternating group of order 3!/2 as a permutation group
+               to Alternating group of order 3!/2 as a permutation group
+               in Category of finite enumerated permutation groups
+            sage: Hom(ZZ, QQ, Sets())
+            Set of Morphisms from Integer Ring to Rational Field in Category of sets
+    
+            sage: Hom(FreeModule(ZZ, 1), FreeModule(QQ, 1))                                 # needs sage.modules
+            Set of Morphisms
+             from Ambient free module of rank 1 over the principal ideal domain Integer Ring
+               to Vector space of dimension 1 over Rational Field
+               in Category of commutative additive groups
+            sage: Hom(FreeModule(QQ, 1), FreeModule(ZZ, 1))                                 # needs sage.modules
+            Set of Morphisms
+             from Vector space of dimension 1 over Rational Field
+               to Ambient free module of rank 1 over the principal ideal domain Integer Ring
+               in Category of commutative additive groups
+    
+        Here, we test against a memory leak that has been fixed at :issue:`11521` by
+        using a weak cache::
+    
+            sage: # needs sage.libs.pari
+            sage: for p in prime_range(10^3):
+            ....:  K = GF(p)
+            ....:  a = K(0)
+            sage: import gc
+            sage: gc.collect()       # random
+            624
+            sage: from sage.rings.finite_rings.finite_field_prime_modn import FiniteField_prime_modn as FF
+            sage: L = [x for x in gc.get_objects() if isinstance(x, FF)]
+            sage: len(L), L[0]
+            (1, Finite Field of size 997)
+    
+        To illustrate the choice of the category, we consider the
+        following parents as running examples::
+    
+            sage: X = ZZ; X
+            Integer Ring
+            sage: Y = SymmetricGroup(3); Y                                                  # needs sage.groups
+            Symmetric group of order 3! as a permutation group
+    
+        By default, the smallest category containing both ``X`` and ``Y``,
+        is used::
+    
+            sage: Hom(X, Y)                                                                 # needs sage.groups
+            Set of Morphisms from Integer Ring
+             to Symmetric group of order 3! as a permutation group
+             in Category of enumerated monoids
+    
+        Otherwise, if ``category`` is specified, then ``category`` is used,
+        after checking that ``X`` and ``Y`` are indeed in ``category``::
+    
+            sage: Hom(X, Y, Magmas())                                                       # needs sage.groups
+            Set of Morphisms
+             from Integer Ring
+             to Symmetric group of order 3! as a permutation group
+             in Category of magmas
+    
+            sage: Hom(X, Y, Groups())                                                       # needs sage.groups
+            Traceback (most recent call last):
+            ...
+            ValueError: Integer Ring is not in Category of groups
+    
+        A parent (or a parent class of a category) may specify how to
+        construct certain homsets by implementing a method ``_Hom_(self,
+        codomain, category)``. This method should either construct the
+        requested homset or raise a :exc:`TypeError`. This hook is currently
+        mostly used to create homsets in some specific subclass of
+        :class:`Homset` (e.g.
+        :class:`~sage.rings.homset.RingHomset_generic`)::
+    
+            sage: Hom(QQ,QQ).__class__
+            <class 'sage.rings.homset.RingHomset_generic_with_category'>
+    
+        Do not call this hook directly to create homsets, as it does not
+        handle unique representation::
+    
+            sage: Hom(QQ,QQ) == QQ._Hom_(QQ, category=QQ.category())
+            True
+            sage: Hom(QQ,QQ) is QQ._Hom_(QQ, category=QQ.category())
+            False
+    
+        TESTS:
+    
+        Homset are unique parents::
+    
+            sage: k = GF(5)
+            sage: H1 = Hom(k, k)
+            sage: H2 = Hom(k, k)
+            sage: H1 is H2
+            True
+    
+        Moreover, if no category is provided, then the result is identical
+        with the result for the meet of the categories of the domain and
+        the codomain::
+    
+            sage: Hom(QQ, ZZ) is Hom(QQ,ZZ, Category.meet([QQ.category(), ZZ.category()]))
+            True
+    
+        Some doc tests in ``sage.rings`` (need to) break the unique
+        parent assumption. But if domain or codomain are not unique
+        parents, then the homset will not fit. That is to say, the hom set
+        found in the cache will have a (co)domain that is equal to, but
+        not identical with, the given (co)domain.
+    
+        By :issue:`9138`, we abandon the uniqueness of homsets, if the
+        domain or codomain break uniqueness::
+    
+            sage: from sage.rings.polynomial.multi_polynomial_ring import MPolynomialRing_polydict_domain
+            sage: P.<x,y,z>=MPolynomialRing_polydict_domain(QQ, 3, order='degrevlex')
+            sage: Q.<x,y,z>=MPolynomialRing_polydict_domain(QQ, 3, order='degrevlex')
+            sage: P == Q
+            True
+            sage: P is Q
+            False
+    
+        Hence, ``P`` and ``Q`` are not unique parents. By consequence, the
+        following homsets aren't either::
+    
+            sage: H1 = Hom(QQ,P)
+            sage: H2 = Hom(QQ,Q)
+            sage: H1 == H2
+            True
+            sage: H1 is H2
+            False
+    
+        It is always the most recently constructed homset that remains in
+        the cache::
+    
+            sage: H2 is Hom(QQ,Q)
+            True
+    
+        Variation on the theme::
+    
+            sage: # needs sage.modules
+            sage: U1 = FreeModule(ZZ, 2)
+            sage: U2 = FreeModule(ZZ, 2, inner_product_matrix=matrix([[1,0], [0,-1]]))
+            sage: U1 == U2, U1 is U2
+            (False, False)
+            sage: V = ZZ^3
+            sage: H1 = Hom(U1, V); H2 = Hom(U2, V)
+            sage: H1 == H2, H1 is H2
+            (False, False)
+            sage: H1 = Hom(V, U1); H2 = Hom(V, U2)
+            sage: H1 == H2, H1 is H2
+            (False, False)
+    
+        Since :issue:`11900`, the meet of the categories of the given arguments is
+        used to determine the default category of the homset. This can also be a
+        join category, as in the following example::
+    
+            sage: PA = Parent(category=Algebras(QQ))
+            sage: PJ = Parent(category=Rings() & Modules(QQ))
+            sage: Hom(PA, PJ)
+            Set of Homomorphisms
+             from <sage.structure.parent.Parent object at ...>
+               to <sage.structure.parent.Parent object at ...>
+            sage: Hom(PA, PJ).category()
+            Category of homsets of
+             unital magmas and right modules over Rational Field
+              and left modules over Rational Field
+            sage: Hom(PA, PJ, Rngs())
+            Set of Morphisms
+             from <sage.structure.parent.Parent object at ...>
+               to <sage.structure.parent.Parent object at ...> in Category of rngs
+    
+        .. TODO::
+    
+            - Design decision: how much of the homset comes from the
+              category of ``X`` and ``Y``, and how much from the specific
+              ``X`` and ``Y``.  In particular, do we need several parent
+              classes depending on ``X`` and ``Y``, or does the difference
+              only lie in the elements (i.e.  the morphism), and of course
+              how the parent calls their constructors.
+            - Specify the protocol for the ``_Hom_`` hook in case of ambiguity
+              (e.g. if both a parent and some category thereof provide one).
+    
+        TESTS:
+    
+        Facade parents over plain Python types are supported::
+    
+            sage: from sage.sets.pythonclass import Set_PythonType
+            sage: R = Set_PythonType(int)
+            sage: S = Set_PythonType(float)
+            sage: Hom(R, S)
+            Set of Morphisms from Set of Python objects of class 'int'
+             to Set of Python objects of class 'float' in Category of infinite sets
+    
+        Checks that the domain and codomain are in the specified
+        category. Case of a non parent::
+    
+            sage: # needs sage.graphs
+            sage: S = SimplicialComplex([[1,2], [1,4]]); S.rename('S')
+            sage: Hom(S, S, SimplicialComplexes())
+            Set of Morphisms from S to S in Category of finite simplicial complexes
+            sage: Hom(Set(), S, Sets())
+            Set of Morphisms from {} to S in Category of sets
+            sage: Hom(S, Set(), Sets())
+            Set of Morphisms from S to {} in Category of sets
+            sage: H = Hom(S, S, ChainComplexes(QQ))
+            Traceback (most recent call last):
+            ...
+            ValueError: S is not in Category of chain complexes over Rational Field
+    
+        Those checks are done with the natural idiom ``X in category``,
+        and not ``X.category().is_subcategory(category)`` as it used to be
+        before :issue:`16275` (see :issue:`15801` for a real use case)::
+    
+            sage: # needs sage.graphs
+            sage: class PermissiveCategory(Category):
+            ....:     def super_categories(self): return [Objects()]
+            ....:     def __contains__(self, X): return True
+            sage: C = PermissiveCategory(); C.rename('Permissive category')
+            sage: S.category().is_subcategory(C)
+            False
+            sage: S in C
+            True
+            sage: Hom(S, S, C)
+            Set of Morphisms from S to S in Permissive category
+    
+        With ``check=False``, uninitialized parents, as can appear upon
+        unpickling, are supported. Case of a parent::
+    
+            sage: cls = type(Set())
+            sage: S = unpickle_newobj(cls, ())  # A non parent
+            sage: H = Hom(S, S, SimplicialComplexes(), check=False)
+            sage: H = Hom(S, S, Sets(),                check=False)
+            sage: H = Hom(S, S, ChainComplexes(QQ),    check=False)
+    
+        Case of a non parent::
+    
+            sage: # needs sage.graphs
+            sage: cls = type(SimplicialComplex([[1,2], [1,4]]))
+            sage: S = unpickle_newobj(cls, ())
+            sage: H = Hom(S, S, Sets(),                check=False)
+            sage: H = Hom(S, S, Groups(),              check=False)
+            sage: H = Hom(S, S, SimplicialComplexes(), check=False)
+    
+        Typical example where unpickling involves calling Hom on an
+        uninitialized parent::
+    
+            sage: P.<x,y> = QQ['x,y']
+            sage: Q = P.quotient([x^2 - 1, y^2 - 1])
+            sage: q = Q.an_element()                                                        # needs sage.libs.singular
+            sage: explain_pickle(dumps(Q))                                                  # needs sage.libs.singular
+            pg_...
+            ... = pg_dynamic_class('QuotientRing_generic_with_category', (pg_QuotientRing_generic, pg_getattr(..., 'parent_class')), None, None, pg_QuotientRing_generic)
+            si... = unpickle_newobj(..., ())
+            ...
+            si... = pg_unpickle_MPolynomialRing_libsingular(..., ('x', 'y'), ...)
+            si... = ... pg_Hom(si..., si..., ...) ...
+            sage: Q == loads(dumps(Q))
+            True
+    
+        Check that the ``_Hom_`` method of the ``category`` input is used::
+    
+            sage: from sage.categories.category_types import Category_over_base_ring
+            sage: class ModulesWithHom(Category_over_base_ring):
+            ....:     def super_categories(self):
+            ....:         return [Modules(self.base_ring())]
+            ....:     class ParentMethods:
+            ....:         def _Hom_(self, Y, category=None):
+            ....:             print("Modules")
+            ....:             raise TypeError
+            sage: class AlgebrasWithHom(Category_over_base_ring):
+            ....:     def super_categories(self):
+            ....:         return [Algebras(self.base_ring()), ModulesWithHom(self.base_ring())]
+            ....:     class ParentMethods:
+            ....:         def _Hom_(self, Y, category=None):
+            ....:             R = self.base_ring()
+            ....:             if category is not None and category.is_subcategory(Algebras(R)):
+            ....:                 print("Algebras")
+            ....:             raise TypeError
+            sage: from sage.structure.element import Element
+            sage: class Foo(Parent):
+            ....:     def _coerce_map_from_base_ring(self):
+            ....:         return self._generic_coerce_map(self.base_ring())
+            ....:     class Element(Element):
+            ....:         pass
+            sage: X = Foo(base=QQ, category=AlgebrasWithHom(QQ))
+            sage: H = Hom(X, X, ModulesWithHom(QQ))
+            Modules
+        """
+        # This should use cache_function instead
+        # However some special handling is currently needed for
+        # domains/codomains that break the unique parent condition. Also,
+        # at some point, it somehow broke the coercion (see e.g. sage -t
+        # sage.rings.real_mpfr). To be investigated.
+        key = (X, Y, category)
+        try:
+            H = _cache[key]
+        except KeyError:
+            H = None
+        if H is not None:
+            # Return H unless the domain or codomain breaks the unique parent condition
+            if H.domain() is X and H.codomain() is Y:
+                return H
+    
+        # Determines the category
+        if category is None:
+            category = X.category()._meet_(Y.category())
+            # Recurse to make sure that Hom(X, Y) and Hom(X, Y, category) are identical
+            # No need to check the input again
+            H = Hom(X, Y, category, check=False)
+        else:
+            if check:
+                if not isinstance(category, Category):
+                    raise TypeError("Argument category (= {}) must be a category.".format(category))
+                for O in [X, Y]:
+                    try:
+                        category_mismatch = O not in category
+                    except Exception:
+                        # An error should not happen, this here is just to be on
+                        # the safe side.
+                        category_mismatch = True
+                    # A category mismatch does not necessarily mean that an error
+                    # should be raised. Instead, it could be the case that we are
+                    # unpickling an old pickle (that doesn't set the "check"
+                    # argument to False). In this case, it could be that the
+                    # (co)domain is not properly initialised, which we are
+                    # checking now. See trac #16275 and #14793.
+                    if category_mismatch and O._is_category_initialized():
+                        # At this point, we can be rather sure that O is properly
+                        # initialised, and thus its string representation is
+                        # available for the following error message. It simply
+                        # belongs to the wrong category.
+>                       raise ValueError("{} is not in {}".format(O, category))
+E                       ValueError: NN = {0, 1, 2, ...} is not in Category of sets
+
+/sage/.venv/lib/python3.14/site-packages/sage/categories/homset.py:449: ValueError
+_______________ test_a_finite_ordinal_is_ranked_by_the_identity ________________
+
+    def test_a_finite_ordinal_is_ranked_by_the_identity() -> None:
+        five = Sets.Δ[4]
+        ranking = five.ranking_map()
+    
+        assert five[2] == 2
+        assert ranking(five(3)) == 3
+        assert ranking.inverse()(3) == five(3)
+        with pytest.raises(IndexError):
+>           five[7]
+
+tests/sets/test_natural_numbers_and_finite_ordinals.sage:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/sets/set_categories.py:362: in __getitem__
+    return self.ranking_map().inverse()(position)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/abstract_categories/mor_categories.py:1649: in __call__
+    return self.forward()(element)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:810: in __call__
+    point = source(element)
+            ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = {0,...,4}, element = 7
+
+    def __call__(self, element):
+        r"""Normalize a natural number to the point of this ordinal it names.
+    
+        This is the element constructor, the one boundary that admits
+        foreign data, so it reads the position directly.  It cannot ask
+        the ranking map: applying an arrow coerces its argument into the
+        domain, and the domain is this parent.
+        """
+        if element not in self:
+>           raise ValueError(f"{element!r} is not an element of {self}")
+E           ValueError: 7 is not an element of {0,...,4}
+
+src/sage_extensions/categories/sets/set_categories.py:549: ValueError
+____ test_inverse_and_direct_image_form_the_set_subobject_galois_connection ____
+
+    def test_inverse_and_direct_image_form_the_set_subobject_galois_connection() -> None:
+        source = Sets.Δ[5]
+        target = Sets.Δ[2]
+        residue = Sets().Mor(source, target)(lambda n: target(int(n) % 3))
+        source_subsets = source.power_set()
+        target_subsets = target.power_set()
+        selected = source_subsets({0, 1, 3, 4})
+        upper_bound = target_subsets({0, 1})
+    
+        direct = source_subsets.direct_image_morphism(residue)
+        inverse = target_subsets.inverse_image_morphism(residue)
+>       assert direct(selected) == target_subsets({0, 1})
+
+tests/sets/test_power_sets.sage:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = not not is_member(0, Image of Subobject of {0,...,5} defined by Ordered subset of {0,...,5} under Generic morphism:
+  ...object of {0,...,5} defined by Ordered subset of {0,...,5} under Generic morphism:
+  From: {0,...,5}
+  To:   {0,...,2})
+
+    def __bool__(self):
+>       raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E       TypeError: the proposition not not is_member(0, Image of Subobject of {0,...,5} defined by Ordered subset of {0,...,5} under Generic morphism:
+E         From: {0,...,5}
+E         To:   {0,...,2}) and not not is_member(1, Image of Subobject of {0,...,5} defined by Ordered subset of {0,...,5} under Generic morphism:
+E         From: {0,...,5}
+E         To:   {0,...,2}) and not is_member(2, Image of Subobject of {0,...,5} defined by Ordered subset of {0,...,5} under Generic morphism:
+E         From: {0,...,5}
+E         To:   {0,...,2}) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+
+src/sage_extensions/logic.py:44: TypeError
+_______ test_unchecked_discrete_diagram_cannot_certify_infinite_factors ________
+
+    def test_unchecked_discrete_diagram_cannot_certify_infinite_factors() -> None:
+        from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+        from sage_extensions.categories.group.magmas import AdditiveMonoids
+        from sage_extensions.categories.sets.indexed_families import indexed_family
+    
+        factor = AdditiveMonoids().an_object()
+        index_category = DiscreteCategory(NN)
+        raw = indexed_family(NN, lambda index: factor if int(index) % 2 == 0 else Sets.Δ[1])
+>       unchecked = Cat().Mor(index_category, AdditiveMonoids()).discrete_diagram(raw)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:556: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/abstract_categories/cat.py:1653: in discrete_diagram
+    return _DiscreteDiagram(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <[AttributeError('_DiscreteDiagram' object has no attribute '_domain') raised in repr()] _DiscreteDiagram object at 0x79e7994e1e50>
+index_category = Discrete category on NN = {0, 1, 2, ...}
+codomain = Category of additive monoids
+values = Indexed family over NN = {0, 1, 2, ...}
+
+    def __init__(
+        self,
+        index_category: Category,
+        codomain: Category,
+        values: IndexedFamily,
+    ) -> None:
+        if index_category not in DiscreteCategories():
+            raise TypeError(
+                f"a discrete diagram needs a discrete index category, but {index_category} is not discrete"
+            )
+        from sage_extensions.categories.sets.set_categories import EnumeratedSets, Sets
+    
+        index_set = index_category.object_set()
+        if isinstance(values, IndexedFamily) and values.index_set() is not index_set:
+            raise ValueError("the diagram's indexed family must retain its discrete category's exact object set")
+        if not Sets().is_provably_finite(index_set) or index_set not in EnumeratedSets():
+>           raise TypeError(
+                "an object callback without finite enumerated indices cannot establish "
+                "a category-valued discrete diagram; use a selected functor or constant diagram"
+            )
+E           TypeError: an object callback without finite enumerated indices cannot establish a category-valued discrete diagram; use a selected functor or constant diagram
+
+src/sage_extensions/categories/abstract_categories/functors.py:414: TypeError
+___________ test_finite_diagram_restricted_to_infinite_parity_family ___________
+
+    def test_finite_diagram_restricted_to_infinite_parity_family() -> None:
+        from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+        from sage_extensions.categories.group.magmas import AdditiveMonoids, AdditiveGroups
+        from sage_extensions.categories.sets.indexed_families import indexed_family
+        from sage_extensions.categories.sets.set_categories import CartesianProductsOfAdditiveMonoids
+    
+        labels = Sets.Δ[1]
+        finite_index = DiscreteCategory(labels)
+        infinite_index = DiscreteCategory(NN)
+        even = AdditiveMonoids().an_object()
+        odd = AdditiveGroups().an_object()
+        diagram = Cat().Mor(finite_index, AdditiveMonoids()).discrete_diagram(
+            indexed_family(labels, lambda i: even if i == labels(0) else odd)
+        )
+        parity = Cat().Mor(infinite_index, finite_index).from_object_map(
+            lambda n: labels(int(n) % 2)
+        )
+        selected = diagram.restrict(parity)
+        family = indexed_family(NN, selected)
+        product = Sets().product(family)
+        assert family.selected_diagram() is selected
+        assert product in CartesianProductsOfAdditiveMonoids()
+        assert family(NN(0)) is even and family(NN(1)) is odd
+        point = product(lambda n: family(n)(int(n)))
+        unit = product(lambda n: family(n).one())
+        projection = product.projection(NN(3))
+        assert projection.parent() is AdditiveMonoids().Mor(product, odd)
+        assert projection(point + unit) == projection(point) + projection(unit)
+        assert projection(product.zero()) == odd.zero()
+    
+        # The nonconstant product also has the actual AddMon universal arrow.
+        # The common source is the even factor, and its selected zero maps give
+        # compatible legs into both kinds of factors without identifying them.
+        from sage_extensions.categories.functors.core import NaturalTransformation
+    
+        source_diagram = Cat().Mor(infinite_index, AdditiveMonoids()).constant_functor(even)
+        components = NaturalTransformation(
+            source_diagram, selected,
+            lambda obj: AdditiveMonoids().Mor(even, family(obj.value()))(
+                lambda _value: family(obj.value()).zero()
+            ),
+        )
+        induced = product.from_maps(even, components)
+        assert induced.parent() is AdditiveMonoids().Mor(even, product)
+        for index in (NN(0), NN(1), NN(6), NN(7)):
+            assert product.projection(index)(induced(even.one())) == family(index).zero()
+    
+        wrong_components = NaturalTransformation(
+            source_diagram, selected,
+            lambda obj: Sets().Mor(even, family(obj.value()))(
+                lambda _value: family(obj.value()).zero()
+            ),
+        )
+        wrong_induced = product.from_maps(even, wrong_components)
+        try:
+            product.projection(NN(3))(wrong_induced(even.one()))
+        except TypeError:
+            pass
+        else:
+            raise AssertionError("a Set-map component falsely certified the nonconstant additive product")
+    
+>       unchecked = Cat().Mor(infinite_index, AdditiveMonoids()).discrete_diagram(
+            indexed_family(NN, lambda n: even if int(n) % 2 == 0 else Sets.Δ[1])
+        )
+
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:632: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/abstract_categories/cat.py:1653: in discrete_diagram
+    return _DiscreteDiagram(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <[AttributeError('_DiscreteDiagram' object has no attribute '_domain') raised in repr()] _DiscreteDiagram object at 0x79e799b71020>
+index_category = Discrete category on NN = {0, 1, 2, ...}
+codomain = Category of additive monoids
+values = Indexed family over NN = {0, 1, 2, ...}
+
+    def __init__(
+        self,
+        index_category: Category,
+        codomain: Category,
+        values: IndexedFamily,
+    ) -> None:
+        if index_category not in DiscreteCategories():
+            raise TypeError(
+                f"a discrete diagram needs a discrete index category, but {index_category} is not discrete"
+            )
+        from sage_extensions.categories.sets.set_categories import EnumeratedSets, Sets
+    
+        index_set = index_category.object_set()
+        if isinstance(values, IndexedFamily) and values.index_set() is not index_set:
+            raise ValueError("the diagram's indexed family must retain its discrete category's exact object set")
+        if not Sets().is_provably_finite(index_set) or index_set not in EnumeratedSets():
+>           raise TypeError(
+                "an object callback without finite enumerated indices cannot establish "
+                "a category-valued discrete diagram; use a selected functor or constant diagram"
+            )
+E           TypeError: an object callback without finite enumerated indices cannot establish a category-valued discrete diagram; use a selected functor or constant diagram
+
+src/sage_extensions/categories/abstract_categories/functors.py:414: TypeError
+__________ test_constant_countable_coproduct_has_diagonal_enumeration __________
+
+    def test_constant_countable_coproduct_has_diagonal_enumeration() -> None:
+        from sage_extensions.categories.sets.indexed_families import indexed_family
+    
+        coproduct = Sets().coproduct(indexed_family(NN, Sets.Δ[1]))
+        assert coproduct in EnumeratedSets()
+>       ranking = coproduct.ranking_map()
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:815: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/sets/set_categories.py:6267: in ranking_map
+    return self._ranking_isomorphism(position_of, point_at)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:383: in _ranking_isomorphism
+    counting_order = self.counting_well_order()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:2747: in counting_well_order
+    if size.is_finite():
+       ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = sum_{i in NN = {0, 1, 2, ...}} kappa_i
+
+    def is_finite(self) -> bool:
+        expression = self.expression()
+>       assert expression.is_normal_form(), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"cannot decide whether the cardinal {self} is finite: it is not a finite sum, product, or "
+            "supremum of known cardinals"
+        )
+E       AssertionError: cannot decide whether the cardinal sum_{i in NN = {0, 1, 2, ...}} kappa_i is finite: it is not a finite sum, product, or supremum of known cardinals
+
+src/sage_extensions/categories/sets/cardinals.py:732: AssertionError
+_________ test_selected_nonconstant_countable_coproduct_is_enumerated __________
+
+    def test_selected_nonconstant_countable_coproduct_is_enumerated() -> None:
+        from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+        from sage_extensions.categories.sets.indexed_families import indexed_family
+    
+        labels = Sets.Δ[1]
+        finite_shape = DiscreteCategory(labels)
+        infinite_shape = DiscreteCategory(NN)
+        factor_diagram = Cat().Mor(finite_shape, EnumeratedSets()).discrete_diagram(
+            indexed_family(labels, lambda i: Sets.Δ[0] if i == labels(0) else Sets.Δ[1])
+        )
+        parity = Cat().Mor(infinite_shape, finite_shape).from_object_map(
+            lambda n: labels(int(n) % 2)
+        )
+        family = indexed_family(NN, factor_diagram.restrict(parity))
+        coproduct = Sets().coproduct(family)
+        assert coproduct in EnumeratedSets()
+>       ranking = coproduct.ranking_map()
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:842: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/misc/cachefunc.pyx:2328: in sage.misc.cachefunc.CachedMethodCallerNoArgs.__call__
+    ???
+src/sage_extensions/categories/sets/set_categories.py:6267: in ranking_map
+    return self._ranking_isomorphism(position_of, point_at)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:383: in _ranking_isomorphism
+    counting_order = self.counting_well_order()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/sage_extensions/categories/sets/set_categories.py:2747: in counting_well_order
+    if size.is_finite():
+       ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = sum_{i in NN = {0, 1, 2, ...}} kappa_i
+
+    def is_finite(self) -> bool:
+        expression = self.expression()
+>       assert expression.is_normal_form(), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"cannot decide whether the cardinal {self} is finite: it is not a finite sum, product, or "
+            "supremum of known cardinals"
+        )
+E       AssertionError: cannot decide whether the cardinal sum_{i in NN = {0, 1, 2, ...}} kappa_i is finite: it is not a finite sum, product, or supremum of known cardinals
+
+src/sage_extensions/categories/sets/cardinals.py:732: AssertionError
+_____________ test_componentwise_set_maps_accept_additive_diagrams _____________
+
+    def test_componentwise_set_maps_accept_additive_diagrams() -> None:
+        from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+        from sage_extensions.categories.functors.core import NaturalTransformation
+        from sage_extensions.categories.group.magmas import AdditiveMonoids
+        from sage_extensions.categories.sets.indexed_families import indexed_family
+        from sage_extensions.categories.sets.set_categories import (
+            _cartesian_product_morphism, _coproduct_morphism,
+        )
+    
+        additive = AdditiveMonoids()
+        factor = additive.an_object()
+        diagram = Cat().Mor(DiscreteCategory(NN), additive).constant_functor(factor)
+        legs = NaturalTransformation(diagram, diagram, lambda _obj: additive.Mor(factor, factor).identity())
+        family = indexed_family(NN, diagram)
+        product = Sets().product(family)
+        coproduct = Sets().coproduct(family)
+        product_map = _cartesian_product_morphism(product, product, legs)
+        coproduct_map = _coproduct_morphism(coproduct, coproduct, legs)
+        for index in (NN(0), NN(3)):
+>           assert product_map(product.zero()).component(index) == factor.zero()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/sets/set_categories.py:4970: in component
+    self._components(normalized)
+src/sage_extensions/categories/sets/set_categories.py:6474: in <lambda>
+    lambda index: component(index)(section.component(index))
+                  ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+index = 0
+
+    def component(index):
+        selected = shape.object(index)
+        if transformation.source()(selected) is not source.factor(
+            index
+        ) or transformation.target()(selected) is not target.factor(index):
+            raise ValueError(
+                "the component transformation does not have the product's factor objects"
+            )
+        arrow = transformation.component(selected)
+>       if not _category_accepts_morphism(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+            Sets(), source.factor(index), target.factor(index), arrow
+        ):
+E       NameError: cannot access free variable '_category_accepts_morphism' where it is not associated with a value in enclosing scope
+
+src/sage_extensions/categories/sets/set_categories.py:6464: NameError
+__ test_infinite_componentwise_set_maps_use_a_selected_natural_transformation __
+
+    def test_infinite_componentwise_set_maps_use_a_selected_natural_transformation() -> None:
+        from sage_extensions.categories.abstract_categories.functors import DiscreteCategory
+        from sage_extensions.categories.functors.core import NaturalTransformation
+        from sage_extensions.categories.sets.indexed_families import indexed_family
+        from sage_extensions.categories.sets.set_categories import (
+            _cartesian_product_morphism, _coproduct_morphism,
+        )
+    
+        point = Sets.Δ[0]
+        index_category = DiscreteCategory(NN)
+        diagram = Cat().Mor(index_category, Sets()).constant_functor(point)
+        components = NaturalTransformation(
+            diagram, diagram, lambda _index: Sets().Mor(point, point).identity()
+        )
+        family = indexed_family(NN, point)
+        product = Sets().product(family)
+        coproduct = Sets().coproduct(family)
+        product_map = _cartesian_product_morphism(product, product, components)
+        coproduct_map = _coproduct_morphism(coproduct, coproduct, components)
+        section = product(lambda _index: point(0))
+        assert product_map.parent() is Sets().Mor(product, product)
+        assert coproduct_map.parent() is Sets().Mor(coproduct, coproduct)
+        for index in (NN(0), NN(1), NN(5)):
+>           assert product_map(section).component(index) == section.component(index)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage:990: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/sage_extensions/categories/sets/set_categories.py:4970: in component
+    self._components(normalized)
+src/sage_extensions/categories/sets/set_categories.py:6474: in <lambda>
+    lambda index: component(index)(section.component(index))
+                  ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+index = 0
+
+    def component(index):
+        selected = shape.object(index)
+        if transformation.source()(selected) is not source.factor(
+            index
+        ) or transformation.target()(selected) is not target.factor(index):
+            raise ValueError(
+                "the component transformation does not have the product's factor objects"
+            )
+        arrow = transformation.component(selected)
+>       if not _category_accepts_morphism(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+            Sets(), source.factor(index), target.factor(index), arrow
+        ):
+E       NameError: cannot access free variable '_category_accepts_morphism' where it is not associated with a value in enclosing scope
+
+src/sage_extensions/categories/sets/set_categories.py:6464: NameError
+____________ test_rational_power_series_have_continuum_cardinality _____________
+
+    def test_rational_power_series_have_continuum_cardinality() -> None:
+        power_series = QQ.power_series_ring("t")
+    
+        assert power_series.cardinality() == continuum
+        # A finitely generated QQ-algebra is a quotient of some QQ[x_1, ..., x_n], hence
+        # countable, so the continuum-sized QQ[[t]] is not finitely generated.
+>       assert not power_series.is_finitely_generated()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/sets/test_standard_cardinals_archive.sage:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = is_finitely_generated(Ring over Fraction Field of Integer Ring)
+
+    def __bool__(self):
+>       raise TypeError(f"the proposition {self} has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown")
+E       TypeError: the proposition is_finitely_generated(Ring over Fraction Field of Integer Ring) has no Python truth value, because it may be undecided; call ask(...) on it to get True, False or Unknown
+
+src/sage_extensions/logic.py:44: TypeError
+------------------------------ Captured log call -------------------------------
+DEBUG    sage_extensions.categories.modules.general_modules:general_modules.py:424 General module over Fraction Field of Integer Ring retains its module laws as an undecided proposition
+DEBUG    sage_extensions.categories.modules.module_morphisms.module_morphisms:module_morphisms.py:830 Elementwise module morphism Module over Fraction Field of Integer Ring on Classes in the multilinear tensor presentation -> Module over Fraction Field of Integer Ring on Fraction Field of Integer Ring accepted without exhaustive linearity verification; the source is not represented as finite
+_____ test_the_naturality_square_of_the_singleton_transformation_commutes ______
+
+    def test_the_naturality_square_of_the_singleton_transformation_commutes() -> None:
+        two = Sets.Δ[1]
+        three = Sets.Δ[2]
+        doubling = Sets().Mor(two, three)(lambda x: three(2 * x))
+        square = _singletons().transformation().naturality_square(doubling)
+    
+>       assert square.left() == doubling
+               ^^^^^^^^^^^
+
+tests/sets/test_the_power_set_functor_and_its_natural_transformations.sage:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+sage/structure/element.pyx:494: in sage.structure.element.Element.__getattr__
+    ???
+sage/structure/element.pyx:507: in sage.structure.element.Element.getattr_from_category
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   ???
+E   AttributeError: 'OwnedJoinCategory.element_class' object has no attribute 'left'
+
+sage/cpython/getattr.pyx:357: AttributeError
+=========================== short test summary info ============================
+FAILED tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_comparisons_of_cardinals_compose_and_are_carried_by_the_arithmetic
+FAILED tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_the_countable_sum_of_ones_is_aleph_zero
+FAILED tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_a_finite_cardinal_is_the_natural_number_it_counts
+FAILED tests/sets/test_cardinal_and_ordinal_order_morphisms.sage::test_nonidentity_well_order_maps_compose_with_exact_endpoints
+FAILED tests/sets/test_cardinal_morphisms_archive.sage::test_zero_to_the_zero_is_one_and_zero_to_the_one_is_zero
+FAILED tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_compares_a_countable_power_set_with_two_to_aleph_zero
+FAILED tests/sets/test_cardinality_construction_comparisons.sage::test_cardinality_comparisons_retain_countable_and_continuum_factor_arithmetic
+FAILED tests/sets/test_cardinals_and_ordinals.sage::test_cardinal_arithmetic_and_order_do_not_assume_continuum_hypothesis
+FAILED tests/sets/test_cartesian_additive_group_placement.sage::test_infinite_constant_additive_monoid_does_not_gain_inverses
+FAILED tests/sets/test_cartesian_additive_group_placement.sage::test_group_product_retains_monoid_universal_property
+FAILED tests/sets/test_cartesian_additive_group_placement.sage::test_infinite_group_product_retains_monoid_cones
+FAILED tests/sets/test_cartesian_additive_group_placement.sage::test_mixed_finite_monoid_product_is_not_an_additive_group
+FAILED tests/sets/test_cartesian_additive_group_placement.sage::test_opaque_infinite_callback_does_not_claim_additive_group_structure
+FAILED tests/sets/test_construction_functors.sage::test_fixed_cardinality_subset_functor_is_defined_exactly_on_injections
+FAILED tests/sets/test_injections_surjections_and_subsets_of_finite_sets.sage::test_injections_compose_and_the_constant_map_is_not_one
+FAILED tests/sets/test_injections_surjections_and_subsets_of_finite_sets.sage::test_the_two_element_subsets_of_four_points_number_six
+FAILED tests/sets/test_injections_surjections_and_subsets_of_finite_sets.sage::test_the_points_of_zero_to_three_greater_than_one_are_two_and_three
+FAILED tests/sets/test_natural_numbers_and_finite_ordinals.sage::test_natural_numbers_are_the_initial_owned_semiring
+FAILED tests/sets/test_natural_numbers_and_finite_ordinals.sage::test_mixed_natural_and_integer_arithmetic_uses_the_initial_map
+FAILED tests/sets/test_natural_numbers_and_finite_ordinals.sage::test_a_finite_ordinal_is_ranked_by_the_identity
+FAILED tests/sets/test_power_sets.sage::test_inverse_and_direct_image_form_the_set_subobject_galois_connection
+FAILED tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_unchecked_discrete_diagram_cannot_certify_infinite_factors
+FAILED tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_finite_diagram_restricted_to_infinite_parity_family
+FAILED tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_constant_countable_coproduct_has_diagonal_enumeration
+FAILED tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_selected_nonconstant_countable_coproduct_is_enumerated
+FAILED tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_componentwise_set_maps_accept_additive_diagrams
+FAILED tests/sets/test_products_and_coproducts_of_finite_and_countable_sets.sage::test_infinite_componentwise_set_maps_use_a_selected_natural_transformation
+FAILED tests/sets/test_standard_cardinals_archive.sage::test_rational_power_series_have_continuum_cardinality
+FAILED tests/sets/test_the_power_set_functor_and_its_natural_transformations.sage::test_the_naturality_square_of_the_singleton_transformation_commutes
+29 failed, 146 passed in 7.44s
+=== exit recorded above

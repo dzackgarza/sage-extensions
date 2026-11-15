@@ -1,0 +1,35 @@
+=== ran on: b7593ab218b5ac8c9a92f03dd1291854e53b6c0e (1 modified paths)
+=== command: test tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____________________ test_a_natural_number_is_one_object ______________________
+
+    def test_a_natural_number_is_one_object() -> None:
+        r"""Two constructions of the same value are the one natural number."""
+>       assert NN(3) is NN(3)
+E       assert 3 is 3
+E        +  where 3 = NN(3)
+E        +    where 3 = Integer(3)
+E        +  and   3 = NN(3)
+E        +    where 3 = Integer(3)
+
+tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage:16: AssertionError
+________ test_the_point_of_a_finite_ordinal_is_the_natural_number_at_it ________
+
+    def test_the_point_of_a_finite_ordinal_is_the_natural_number_at_it() -> None:
+        r"""A position of an ordinal names one natural number, and the same one every time."""
+        ordinal = Sets.Δ[3]
+    
+>       assert ordinal(1) is ordinal(1)
+E       assert 1 is 1
+E        +  where 1 = {0,...,3}(1)
+E        +    where 1 = Integer(1)
+E        +  and   1 = {0,...,3}(1)
+E        +    where 1 = Integer(1)
+
+tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage:23: AssertionError
+=========================== short test summary info ============================
+FAILED tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage::test_a_natural_number_is_one_object
+FAILED tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage::test_the_point_of_a_finite_ordinal_is_the_natural_number_at_it
+2 failed in 2.03s
+=== exit recorded above

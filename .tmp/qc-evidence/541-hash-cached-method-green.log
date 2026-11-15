@@ -1,0 +1,5 @@
+=== ran on: 664a9c3b72821fa6dec738d786c7cf402c908dea (3 modified paths)
+=== command: test tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage
+...                                                                      [100%]
+3 passed in 1.76s
+=== exit recorded above

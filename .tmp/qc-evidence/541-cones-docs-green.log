@@ -1,0 +1,5 @@
+=== ran on: 664a9c3b72821fa6dec738d786c7cf402c908dea (3 modified paths)
+=== command: test tests/lattices/test_rational_polyhedral_cones.sage
+...............                                                          [100%]
+15 passed in 1.51s
+=== exit recorded above

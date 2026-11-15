@@ -2272,3 +2272,23 @@ base, main, main, base.
 | `532-merged-core.log` | `fb7c2b4` (the merge of `95be77c`) | the six-file core batch on the merged tree: **8 failed, 21 passed in 2.38 s** |
 | `532-merged-core-main.log` | `95be77c` (main) | the same six files on main: **8 failed, 20 passed in 2.22 s**, the FAILED sets identical; the 21st pass on the merged tree is this round's new test |
 | `532-merged-wide-ids.log` | `fb7c2b4` (the merge of `95be77c`) | the eight other cone- and polytope-touching files: **6 failed, 9 passed, 55 errors** on the merged tree and **6 failed, 9 passed, 55 errors in 14.12 s** on `95be77c`, FAILED ids and the files with a setup ERROR identical; extracts of both runs |
+
+## #541 -- the hash's lifetime, and one plane transport priced on T_Co
+
+The reviewer's round kept the bisection (`2291235e3d`), the red test and the
+cache's correctness, and asked for `cached_method` instead of an
+instance-dictionary cache, for the hash tests to state contracts, and for one
+correction in the cone docstring; then for the census of one plane transport on
+T_Co itself, which is the row's own lattice.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `541-hash-cached-method-green.log` | the `cached_method` commit | `tests/sets/test_the_hash_of_a_finite_ordered_set_is_one_datum.sage`: **3 passed in 1.76 s** |
+| `541-hash-cached-method-lint.log` | the same | test lint: **1 files, 0 findings** |
+| `541-cones-docs-green.log` | the docstring commit | `tests/lattices/test_rational_polyhedral_cones.sage`: **15 passed in 1.51 s** |
+| `541-tco-census-probe.py`, `541-tco-census.log` | main `664a9c3` | one plane transport on T_Co: **2.69 ms** warm, 2.5 ms cold, 14.33 ms and 9 261 calls under `setprofile`; own time per plane `_span_basis_elements` 1.719 ms, `Lattices._repr_` 0.626, `FiniteOrderedSets.from_indexed` 0.555, `NaturalNumberSets.__call__` 0.231 over **644** constructions |
+| `541-natural-number-identity-red.log` | main `664a9c3` | `tests/sets/test_the_points_of_a_finite_ordinal_are_values.sage`: **2 failed in 2.03 s**, `assert 1 is 1` |
+| `541-natural-number-identity-green.log`, `-lint.log` | the repair | the same file **2 passed in 1.01 s**; lint **1 files, 0 findings** |
+| `541-tco-census-after-ordinal-repair.log` | the repair | the same transport: **2.43 ms**, `_span_basis_elements` 1.070 ms, `from_indexed` 0.145 ms, `NN` 0.162 ms over the same 644 calls |
+| `541-sets-dir-after.log`, `541-sets-dir-base.log` | the repair / a clean tree at `664a9c3` | `tests/sets/` whole: **29 failed, 146 passed in 7.44 s** against **29 failed, 144 passed in 8.27 s**; the 29 FAILED ids are the same set, so no new failure |
+| `541-row-after-ordinal-repair-1.log`, `-2.log` | the pushed tree | the row under the ten-minute cap, twice: **0 planes by 511.5 s and by 511.6 s**, calib 0.378 both times (>= 1352 calib units), both stack-sampled inside `_finite_family_key` -> `__hash__` -> `point_at`. The 838-unit run `353418f` quotes does **not** reproduce |
