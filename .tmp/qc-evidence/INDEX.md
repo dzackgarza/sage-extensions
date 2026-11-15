@@ -1976,3 +1976,19 @@ main; the rest are the repair, on the commit this section's push names.
 | `issue529-vinberg-tests-green.log` | `8b7e517` | `tests/lattices/test_reflection_hyperbolic.sage` and `tests/lattices/test_the_subgroup_cusp_chamber.sage`: **7 passed in 155.61 s** -- the file that was red on main above, and the `.sage` literals at `test_the_subgroup_cusp_chamber.sage:119-120` (`max_decompositions=400` beside a filter) |
 | `issue529-reduction-image-cusps-green.log` | `8b7e517` | the two cusp-chamber tests of `tests/lattices/test_the_isotropic_reduction_image.sage` selected by node id -- `max_decompositions=8` and `max_decompositions=20`, the file's literal sites: **2 passed in 148.92 s** |
 | `issue529-reduction-image-whole-file-capped.log` | main `1cc2481` + the repair, before it was committed | the same file whole, capped at 560 s: **6 passed** and the seventh still running when the cap killed it (peak RSS 1882 MiB). No verdict on the file; the two cusp-chamber tests above are what was decided |
+
+## #500, the sixth round: the citation, the false clause, the docstring, the dead line, the record
+
+The five corrections `b762a8a`, `5f69bb3`, `2ac0d5c`, `851df47` and the commit
+that carries `results/issue500-fifth-review.md`: what the order and the walk
+really do across processes, where the recursion really runs, and the regression
+the five commits do not move.
+
+| log | commit cited | result |
+| --- | --- | --- |
+| `issue500r6-seeds-orders.log` | `6e51d33` | the provider probe run once per `PYTHONHASHSEED` in 0-9, one fresh process each, over 26 objects x 3 levels: **the walk has two forms** for `QQ(i)`'s and `Z[x]/(x^2)`'s `ParentMethods` and one for the other 76 pairs, **`_owned_mixins` has one form for all 78 pairs in all ten seeds**, and the first provider of every name is the same in all ten; **the old insertion order has two forms**, the same two the walk has. The digest of all 780 probe lines is in the log, the probe in `issue500r6-seeds-orders.py` |
+| `issue500r6-relation.log` | `6e51d33` | `_precedes` on the 33 (object, level) pairs of the relation probe and on 84 of the extension probe: **0 classes precede themselves, 0 pairs precede each other both ways, 0 triples break transitivity**, and **neither order puts a relation-ordered pair the wrong way round** -- so the relation is a strict partial order where measured and the sort's contribution is the `CycleError`, not a corrected order |
+| `issue500r6-recursion.log` | `2ac0d5c`, `851df47` | `TensorAlgebras(ZZ)` and `SymmetricAlgebras(ZZ)` both **construct**; `Z[x]/(x^2).is_torsion_free()` is **True** from the framed branch at `algebras.py:3759`; and the recursion is #533's path -- `algebras.py:3773` -> `_represented_relation_torsion_witness` (`:3804`) -> `presentation_ring` (`:3564`) -> `selected_algebra_presentation` (`:3553`) -> `selected_algebra_resolution` (`:2057`) -> `objects.py:383` -> **`owned_category.py:669 linearize`**, the frame census showing **1303 frames, 127 in `linearize` and 43 in `_declared_category_linearization`**, repeating through `super_categories` -> `_commutativity_decision` -> `tensor_product` -> `module_generating_set` -> `parent_class` -> `linearize`. `Z[x]/(2x)`, one of #533's three objects, raises the same `RecursionError` from `is_torsion_free()` |
+| `issue500r6-tests.log` | `851df47` | the round's two test files under the test lint: **10 passed in 0.87 s** |
+| `issue500r6-sweep-tree.log` | `851df47` | `tests/modules`, `tests/algebras`, `tests/categories`, one pytest process each: **90 failed 222 passed**, **103 failed 110 passed**, **63 failed 61 passed** |
+| `issue500r6-sweep-base.log` | `6e51d33` (a clean worktree) | the same three directories: **the same three summaries, the same FAILED ids, 0 on either side only** |

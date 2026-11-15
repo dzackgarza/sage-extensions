@@ -1,0 +1,5 @@
+tree SHA: 851df47e39e2b4802d55a16bb0cebfe709a59f77
+command: python -m pytest -p qc_sage_session -o addopts= -p sage_extensions.testing.suite_budget -p sage_extensions.testing.test_lint --no-time-gates -q tests/categories/test_the_refined_category_answers_with_its_own_operation.sage tests/modules/test_the_order_ideal_of_a_ring_element_over_its_base_ring.sage
+..........                                                               [100%]
+10 passed in 0.87s
+exit: 0
