@@ -2114,3 +2114,24 @@ lattice generator for a point that never changes.
 | `issue528-neighbours-green.log` | `4237442` + the repair, uncommitted | the same three: **the same two FAILED ids, 2 failed, 15 passed** -- neither failure is this round's |
 | `issue528-row-after-base-point-cache.log` | `4237442` + the repair, uncommitted | `issue528-lift-test-cost.py`'s own row probe, cap 520 s: `T_Co`'s ambient plane row **returns in 175.3 s** (`_lift_at` 4096 calls, 113.940 s; `eichler_transvection` 4096, 80.994 s), against **undecided at 520 s** at `843bb5b000` (`issue528-row-after-restore.log`, 1536 calls, 162.155 s) |
 | `issue528-tests-rebased.log` | `11eec17` + this round's commits | the tree this branch pushes, after the rebase onto the new main: the witness file, the locus file and `test_g_sets_torsor_archive.sage`: **1 failed, 10 passed in 14.22 s**, the failure the same pre-existing `test_the_equivariant_self_maps_of_the_regular_c3_set_are_its_three_translations` |
+
+## #528, fifth round: the locus at a reduction whose base point is not integral
+
+`integral_base_point_or_none` (`isotropic_lifts.py:768`) answers from the rational base point when
+that point restricts integrally, and walks `integral_parameter_classes` only when it does not.  Every
+control in the locus' test file is of the first kind; this round finds and tests a specimen of the
+second.  The specimen found is `U(5) + U(5) + U(4)` at `-2 e_1 - e_5`, at the Eichler transvection of
+its reduction: even, primitive isotropic of divisibility two, base point not integral, period eight,
+`P/mP` of 4096 classes against the locus' 512.  Odd lattices are refused by the locus itself
+(`isotropic_lifts.py:473` asserts evenness), so the search carries that filter.
+
+| log | commit / run | result |
+| --- | --- | --- |
+| `issue528-base-point-early-return.log` | `fa5c08b` | the premise: `U(2) + U(2) + <2>` at the identity of the reduction and at its Eichler transvection -- "the base point restricts integrally: True", "`integral_base_point_or_none()` returns the base point: True", "the locus was consulted: False" at both |
+| `issue528-integral-base-point-search-even-3to5.log` | `03c9f76` | ranks 3-5, even lattices only: 343 of 1650 lattices searched (270 odd skipped), 1064 marked lines, **1568 torsors, 0 hits**, budget-limited at 486 s |
+| `issue528-integral-base-point-search-even-6to7.log` | `03c9f76` | ranks 6-7, even lattices only: 50 lattices (40 odd skipped), 419 marked lines, 822 torsors, **3 hits** -- `U(5) + U(5) + U(4)` at `(-2, 0, 0, 0, -+1, 0)`, `P/mP` 4096, the locus 512; the run stops after the third hit, 2055 lattices of its space unsearched |
+| `issue528-integral-base-point-rank5.log` | `03c9f76` | rank-five even candidates of the specimen's shape, sized: 264 torsors, **16 hits, all of them on `U(5) + U(4) + A2`, which is rank six** (period 8, 4096 classes); no rank-five hit |
+| `issue528-integral-base-point-specimen.log` | `03c9f76` | the candidates' sizes: `U(5)+U(4)+U(4)` at `-2 e_0 - e_2` has an integral base point (4096 classes, locus 2048); `U(5)+U(5)+U(4)` at `-2 e_0 - e_4` does not (4096, locus 512); the rank-four sums raise from the reduction, which has no non-identity transvection |
+| `issue528-integral-base-point-targeted.log` | `03c9f76` | twelve lattices with definite quotients -- reflections, signed Gram symmetries, transvections and their products, 33 to 60 isometries each: **476 torsors, 0 hits** |
+| `issue528-integral-base-point-tco.log` | `03c9f76` | `T_Co`'s two primitive isotropic basis lines at the identity of the reduction: both base points integral; neither reduction has a non-identity Eichler transvection among its basis and short vectors |
+| `issue528-locus-tests-nonintegral-base.log` | `fa5c08b` | `tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage` with the test lint: **6 passed in 216.73 s**, the non-identity test at **181.11 s** against the 20 s gate (4096 lift tests) and the pre-existing unequal-Smith test at 29.12 s in the same loaded run |
