@@ -1913,3 +1913,51 @@ The repair keeps 204ffbb's corrected coset reading and restores the matrix test.
 | `issue528-locus-tests-repaired.log` | main `6ce8d8a8` + the repair | `tests/lattices/test_the_integral_lift_locus_is_a_union_of_transvection_cosets.sage` with the test lint plugin: **6 passed in 16.97 s**, the new counting test included |
 | `issue528-locus-tests-204ffbb-red.log` | `204ffbb96e` | the same file there: the new test **fails** -- the torsor asks for its base point **10** times where the repair asks **3** -- and one existing test fails too (the unequal-Smith-steps control, which `d83ae97`, the child of 204ffbb, repairs; 204ffbb is not main) |
 | `issue528-repaired-row-counts.log` | main `6ce8d8a8` + the repair | T_Co's ambient plane row: **returns in 217.9 s** with `_lift_at` called **0** times, where `204ffbb96e` did not return at 300 s with 1362 calls costing 183.67 s, and `a71272add9` returned in 54-61 s. The per-class lift test is gone from the row; the remaining gap to the base is not the lift test and is the next measurement |
+
+## #528, the tree's own comparison: one cProfile of the ambient row per tree
+
+The slow-run triage's third step: one profile of the ambient `O(L)` plane row of `T_Co` at
+`a71272add9` and one at main `cff6a3a`, compared function by function by own time and call
+count. Each run is one process, capped at 520 s, with the row's two inputs (the lattice and its
+stable orthogonal group) built outside the profiled region, and each prints the wall time of a
+fixed workload beside the row's seconds.
+
+The two tables are the raw record; `issue528-row-profile-compare.py` joins them on
+`(path, function)` and prints what grew, which is what the log holds.
+
+| log or table | tree | what it is |
+| --- | --- | --- |
+| `issue528-row-profile.py` | -- | the probe: builds the inputs, profiles the row alone, writes one table per run |
+| `issue528-row-profile-compare.py` | -- | the comparison: two tables in, the growth of own time and of call count out |
+| `issue528-profile-t-row-base.log` | `a71272add9` | the base run's log: **232.4 s** under the profiler, `calib=0.164`, the row **returns**, **448,757,911** calls |
+| `issue528-profile-t-row-base.tsv` | `a71272add9` | the base run's table, 5,448 functions |
+| `issue528-profile-t-row-main.log` | `cff6a3a` | the main run's log: **did not return at 520 s** (`calib=0.162`), **1,408,289,407** calls in the calls that completed |
+| `issue528-profile-t-row-main.tsv` | `cff6a3a` | the main run's table, 5,350 functions, marked `decided=False` |
+| `issue528-profile-t-row-compare.log` | both | the comparison, and its own statement that one table is truncated |
+
+The base row was profiled once before (`issue528-profile-base-ambient-row.log`, 168.1 s at
+`calib=0.165`); this run of the same tree took 232.4 s at `calib=0.164`. The two are not
+reconciled here and no number is quoted from either alone: the comparison below is one base
+run against one main run under the same probe in the same session, and the calibration of the
+two runs agrees to 1.2 %.
+
+What the tables say, per call and not per row (the main table is truncated, so it is read per
+call and never as a row total):
+
+| function | base calls / cum | main calls / cum |
+| --- | --- | --- |
+| `recursive._isotropic_pointed_isometry` | 28 / 182.9 s (6.5 s a call) | 6 / 509.6 s (**84.9 s a call**) |
+| `isotropic_lifts._integral_lift_locus` | 8 / 127.6 s (15.9 s a call) | 2 / 498.8 s (**249 s a call**) |
+| `isotropic_lifts.integral_parameter_classes` | 8 / 114.7 s (14.3 s a call) | 2 / 65.7 s (32.8 s a call) |
+| `lattice_morphisms.is_integral_on` | 28 / 6.5 s | 6 / 0.27 s |
+| `module_morphisms.solve` | 441 / 6.6 s | 192 / 0.11 s |
+
+So the row's growth is not the ring division of `solve` on this tree: `is_integral_on` and
+`solve` are *cheaper* per call at main. It is the part of `_integral_lift_locus` that is not
+`integral_parameter_classes` -- the product and image-set construction over the passing
+classes and the kernel -- which goes from 1.6 s a call to about 216 s a call, and the owned
+set and category machinery under it is what the comparison ranks first: `set_categories
+.__call__` 10.5 -> 75.2 s own at 9.2x the calls, `__contains__` 5.3 -> 37.6 s at 9.0x,
+`_element_constructor_` 4.3 -> 34.4 s at 9.2x, and, multiplicatively, `component` 597x,
+`index_set` 459x, `family` 442x, `point_at` 66x. The commit that grew it is not bisected in
+this round, and the row's number at main is not the whole row.
